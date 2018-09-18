@@ -26,9 +26,9 @@ node("docker") {
         \""""
 
         stage("Create virtualenv") {
-            sh """docker exec ${container_name} bash -e -c \"
+            sh """docker exec ${container_name} /usr/bin/scl enable rh-python35 -- /bin/bash -e -c \"
                 cd ${project}
-                scl enable rh-python35 python -m venv build_env
+                python -m venv build_env
             \""""
         }
 
