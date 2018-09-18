@@ -37,7 +37,6 @@ node("docker") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
                 build_env/bin/pip --proxy ${http_proxy} install -r requirements.txt
-                build_env/bin/pip --proxy ${http_proxy} install -e /home/jenkins/${project}
             \""""
         }
 
