@@ -36,6 +36,7 @@ node("docker") {
         stage("Install requirements") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
+                build_env/bin/pip --proxy ${http_proxy} install --upgrade pip
                 build_env/bin/pip --proxy ${http_proxy} install -r requirements.txt
             \""""
         }

@@ -105,3 +105,6 @@ venv.bak/
 
 # PyCharm IDE files
 .idea/
+
+# Compiled QML models
+*.qmlc
