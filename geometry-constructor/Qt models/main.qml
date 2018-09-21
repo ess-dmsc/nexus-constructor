@@ -1,6 +1,6 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
-import QtQuick.Dialogs 1.3
+import Qt.labs.platform 1.0
 import MyWriters 1.0
 
 Rectangle {
@@ -108,11 +108,8 @@ Rectangle {
     FileDialog {
         id: fileDialog
         title: "Choose a file to write to"
-        selectExisting: false
-        selectFolder: false
-        selectMultiple: false
         onAccepted: {
-            var path = fileDialog.fileUrl.toString()
+            var path = fileDialog.file.toString()
             // h5py requires a path, remove the file protocol if present
             var prefix = "file:///"
             if (path.startsWith(prefix)){
