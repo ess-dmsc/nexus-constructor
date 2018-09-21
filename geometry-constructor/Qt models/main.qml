@@ -60,7 +60,7 @@ Rectangle {
         id: pixelData
     }
 
-    function listViewAsJs(){
+    function pixelDataAsJs(){
         var data = []
         for(var i = 0; i < pixelData.count; i++){
             var pixel = pixelData.get(i)
@@ -85,7 +85,7 @@ Rectangle {
             text: "Write geometry"
             onClicked: {
                 myLogger.log("writing geometry")
-                var pixels = listViewAsJs()
+                var pixels = pixelDataAsJs()
                 myLogger.log_list(pixels)
                 hdfWriter.write_pixels(filenameField.text, pixels)
                 myLogger.log("written")
@@ -130,10 +130,20 @@ Rectangle {
     Component {
         id: pixelDelegate
         Row {
-            Text { text: "<b>Pixel name:</b>" + name + " <b>Faces:</b>" }
-            Repeater {
-                model: faces
-                Text { text: face + "," }
+            function facesToString(faceList){
+                var numbers = []
+                for(var j = 0; j < faceList.count; j++){
+                    numbers.push(faceList.get(j).face)
+                }
+                return numbers.join(", ")
+            }
+            Text {
+                width: 100
+                text: "<b>Name:</b>" + name
+            }
+            Text {
+                width: 200
+                text: "<b>Faces:</b>" + facesToString(faces)
             }
             Button {
                 text: "Remove"
