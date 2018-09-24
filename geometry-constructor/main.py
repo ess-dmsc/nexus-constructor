@@ -7,10 +7,13 @@ from PySide2.QtCore import QUrl
 from PySide2.QtQml import qmlRegisterType
 
 
-app = QApplication([])
 qmlRegisterType(Logger, 'MyWriters', 1, 0, 'Logger')
 qmlRegisterType(HdfWriter, 'MyWriters', 1, 0, 'HdfWriter')
 qmlRegisterType(PixelModel, 'MyModels', 1, 0, 'PixelModel')
+
+sys_argv = sys.argv + ['--style', 'Material']
+
+app = QApplication(sys_argv)
 view = QQuickView()
 url = QUrl("Qt models/main.qml")
 
