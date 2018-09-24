@@ -108,3 +108,7 @@ venv.bak/
 
 # Compiled QML models
 *.qmlc
+
+# Any hdf5 or nexus files generated as program output
+*.hdf5
+*.nx5
