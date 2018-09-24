@@ -1,17 +1,20 @@
 import h5py
+import Models
 from PySide2.QtCore import QObject, Slot
 
 
 class HdfWriter(QObject):
 
-    @Slot(str, 'QVariantList')
-    def write_pixels(self, filename, pixels):
+    @Slot(str, 'QVariant')
+    def write_pixels(self, filename, model: Models.PixelModel):
         print(filename)
+        pixels = model.my_list
         print(len(pixels))
+        print(pixels)
         with h5py.File(filename, 'w') as file:
             pixel_group = file.create_group("pixels")
             for pixel in pixels:
-                pixel_group.create_dataset(name=pixel['name'], dtype='i', data=pixel['faces'])
+                pixel_group.create_dataset(name=pixel.name, dtype='i', data=pixel.faces)
 
 
 class Logger(QObject):

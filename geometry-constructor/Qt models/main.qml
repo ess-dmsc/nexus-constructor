@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import Qt.labs.platform 1.0
 import MyWriters 1.0
+import MyModels 1.0
 
 Rectangle {
     width: 400; height: 300
@@ -36,12 +37,7 @@ Rectangle {
             text: "Add pixel"
             onClicked: {
                 myLogger.log("Adding new pixel")
-                var faces = facesField.text.split(",").map(
-                    function(s){
-                        return {face: parseInt(s.trim())}
-                    })
-                var pixel = {name: nameField.text, faces: faces}
-                pixelListView.model.append(pixel)
+                pixelListView.model.insert_pixel(nameField.text, facesField.text)
             }
         }
     }
@@ -60,22 +56,6 @@ Rectangle {
         id: pixelData
     }
 
-    function pixelDataAsJs(){
-        var data = []
-        for(var i = 0; i < pixelData.count; i++){
-            var pixel = pixelData.get(i)
-            var faces = []
-            for(var j = 0; j < pixel.faces.count; j++){
-                faces.push(pixel.faces.get(j).face)
-            }
-            data.push({
-                name: pixel.name,
-                faces: faces
-            })
-        }
-        return data
-    }
-
     Row {
         id: writeButtonRow
         anchors.bottom: parent.bottom
@@ -85,9 +65,7 @@ Rectangle {
             text: "Write geometry"
             onClicked: {
                 myLogger.log("writing geometry")
-                var pixels = pixelDataAsJs()
-                myLogger.log_list(pixels)
-                hdfWriter.write_pixels(filenameField.text, pixels)
+                hdfWriter.write_pixels(filenameField.text, pixelData)
                 myLogger.log("written")
             }
         }
@@ -99,9 +77,7 @@ Rectangle {
 
         Button {
             text: "Choose file"
-            onClicked: {
-                fileDialog.open()
-            }
+            onClicked: fileDialog.open()
         }
     }
 
@@ -130,26 +106,17 @@ Rectangle {
     Component {
         id: pixelDelegate
         Row {
-            function facesToString(faceList){
-                var numbers = []
-                for(var j = 0; j < faceList.count; j++){
-                    numbers.push(faceList.get(j).face)
-                }
-                return numbers.join(", ")
-            }
             Text {
                 width: 100
                 text: "<b>Name:</b>" + name
             }
             Text {
                 width: 200
-                text: "<b>Faces:</b>" + facesToString(faces)
+                text: "<b>Faces:</b>" + faces.join(", ")
             }
             Button {
                 text: "Remove"
-                onClicked: {
-                    pixelData.remove(index)
-                }
+                onClicked: pixelData.remove_pixel(index)
                 background: Rectangle {
                     border.color: "#f00"
                     border.width: parent.pressed ? 2 : 1
