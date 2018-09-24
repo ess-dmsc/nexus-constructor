@@ -15,3 +15,9 @@ repository. They can be installed from a terminal by running
 Unit tests are written to use [pytest](https://docs.pytest.org/en/latest/).
 Once the dependencies have been installed, they can be run from a terminal in
 the project's root directory by running the command `pytest`.
+
+## Linter
+
+flake8 is used to check [pep8](https://www.python.org/dev/peps/pep-0008/?) 
+compliance. It is installed via pip and can be run as `flake8` in the project's 
+root directory. 
