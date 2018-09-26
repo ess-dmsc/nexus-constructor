@@ -17,7 +17,7 @@ class Window(QQuickView):
 
     def __init__(self):
         super().__init__()
-        url = QUrl.fromLocalFile(path.join(path.dirname(__file__), 'Qt models\main.qml'))
+        url = QUrl.fromLocalFile(path.join(path.dirname(__file__), 'Qt models', 'main.qml'))
         self.setSource(url)
         if self.status() == QQuickView.Error:
             print(self.errors(), file=sys.stderr)
