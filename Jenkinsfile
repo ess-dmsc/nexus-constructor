@@ -80,6 +80,11 @@ def get_system_test_pipeline()
         node('windows10') {
             // Use custom location to avoid Win32 path length issues
             ws('c:\\jenkins\\') {
+                try {
+                    cleanWs()
+                } catch(Exception ex) {
+                    println("Warning, failed to clean workspace on Windows node");
+                }
                 dir("${project}") {
                     stage("Checkout") {
                         checkout scm
@@ -101,7 +106,6 @@ def get_system_test_pipeline()
                         junit "test_results.xml"
                     }
                 }  // dir
-                cleanWs()
             }  // ws
         }  // node
     }  // return
