@@ -92,9 +92,7 @@ def get_system_test_pipeline()
                     }
 
                     stage("Install requirements") {
-                        bat """dir
-                            build_env\\Scripts\\pip.exe --proxy ${env.http_proxy} install --upgrade pip
-                            build_env\\Scripts\\pip.exe --proxy ${env.http_proxy} install -r requirements.txt
+                        bat """build_env\\Scripts\\pip.exe --proxy ${env.http_proxy} install -r requirements.txt
                         """
                     }
 
