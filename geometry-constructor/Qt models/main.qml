@@ -15,7 +15,7 @@ Rectangle {
     }
 
     Rectangle {
-        id: animationArea
+        id: instrumentViewArea
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: pixelFieldsArea.right
