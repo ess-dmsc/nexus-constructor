@@ -1,12 +1,12 @@
 import h5py
-import Models
+from geometry_constructor.Models import PixelModel
 from PySide2.QtCore import QObject, Slot
 
 
 class HdfWriter(QObject):
 
     @Slot(str, 'QVariant')
-    def write_pixels(self, filename, model: Models.PixelModel):
+    def write_pixels(self, filename, model: PixelModel):
         print(filename)
         pixels = model.my_list
         print(len(pixels))

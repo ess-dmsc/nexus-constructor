@@ -33,6 +33,7 @@ Rectangle {
         }
         Button {
             id: addPixel
+            objectName: "addPixel"
             text: "Add pixel"
             onClicked: {
                 myLogger.log("Adding new pixel")
@@ -43,6 +44,7 @@ Rectangle {
 
     ListView {
         id: pixelListView
+        objectName: "pixelListView"
         model: pixelData
         delegate: pixelDelegate
         anchors.left: parent.left
@@ -53,6 +55,7 @@ Rectangle {
 
     PixelModel{
         id: pixelData
+        objectName: "pixelData"
     }
 
     Row {
@@ -115,6 +118,7 @@ Rectangle {
             }
             Button {
                 text: "Remove"
+                objectName: "removePixelButton"
                 onClicked: pixelData.remove_pixel(index)
                 background: Rectangle {
                     border.color: "#f00"
