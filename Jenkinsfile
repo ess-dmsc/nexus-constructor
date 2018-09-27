@@ -111,8 +111,8 @@ node() {
     cleanWs()
 
     def builders = [:]
-    builders['centos7'] = get_pipeline()
-    builders['windows'] = get_system_test_pipeline()
+    builders['unit_tests'] = get_pipeline()
+    builders['system_tests'] = get_system_test_pipeline()
 
     parallel builders
 
