@@ -92,13 +92,14 @@ def get_system_test_pipeline()
                     }
 
                     stage("Install requirements") {
-                        bat """build_env/bin/pip --proxy ${env.http_proxy} install --upgrade pip
-                            build_env/bin/pip --proxy ${env.http_proxy} install -r requirements.txt
-                        \""""
+                        bat """dir
+                            build_env\\Scripts\\pip.exe --proxy ${env.http_proxy} install --upgrade pip
+                            build_env\\Scripts\\pip.exe --proxy ${env.http_proxy} install -r requirements.txt
+                        """
                     }
 
                     stage("Run system tests") {
-                        bat """build_env/bin/pytest ./system_tests --ignore=build_env --junitxml=test_results.xml
+                        bat """build_env\\Scripts\\pytest.exe .\\system_tests --ignore=build_env --junitxml=test_results.xml
                         """
                         junit "test_results.xml"
                     }
