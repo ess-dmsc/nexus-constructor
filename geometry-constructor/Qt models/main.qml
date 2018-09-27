@@ -34,5 +34,11 @@ Rectangle {
 
             AnimatedEntity {}
         }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: scene3d.focus = true
+            enabled: !scene3d.focus
+        }
     }
 }
