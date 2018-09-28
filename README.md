@@ -1,3 +1,5 @@
+[![License (2-Clause BSD)](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)](https://github.com/ess-dmsc/nexus-geometry-constructor/blob/master/LICENSE) [![codecov](https://codecov.io/gh/ess-dmsc/nexus-geometry-constructor/branch/master/graph/badge.svg)](https://codecov.io/gh/ess-dmsc/nexus-geometry-constructor) [![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-geometry-constructor/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-geometry-constructor/job/master/)
+
 # nexus-geometry-constructor
 Construct NeXus files with instrument geometry information using a GUI
 
