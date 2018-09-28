@@ -102,7 +102,7 @@ def get_system_test_pipeline()
                         bat """build_env\\Scripts\\pytest.exe .\\ --ignore=build_env --junitxml=test_results.xml"""
                         bat """build_env\\Scripts\\pytest.exe --cov=geometry_constructor --cov-report=xml"""
                         withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
-                            bat """build_env\\Scripts\\codecov.exe -t ${TOKEN} -c ${scm_vars.GIT_COMMIT}"""
+                            bat """build_env\\Scripts\\codecov.exe -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml"""
                         }
                         junit "test_results.xml"
                     }
