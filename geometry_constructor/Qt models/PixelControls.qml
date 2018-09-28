@@ -5,6 +5,7 @@ import MyWriters 1.0
 import MyModels 1.0
 
 Rectangle {
+    anchors.margins:2
 
     Row {
         id: textRow
@@ -42,15 +43,22 @@ Rectangle {
         }
     }
 
-    ListView {
-        id: pixelListView
-        objectName: "pixelListView"
-        model: pixelData
-        delegate: pixelDelegate
+    Rectangle {
+        border.width: 1
+        border.color: "black"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: facesRow.bottom
         anchors.bottom: writeButtonRow.top
+        ListView {
+            id: pixelListView
+            objectName: "pixelListView"
+            model: pixelData
+            delegate: pixelDelegate
+            anchors.fill: parent
+            anchors.margins: 1
+            clip: true
+        }
     }
 
     PixelModel{
@@ -107,16 +115,38 @@ Rectangle {
 
     Component {
         id: pixelDelegate
-        Row {
+        Rectangle {
+            id: pixelBox
+            height: 45
+            border.width: 1
+            border.color: "black"
+            width: pixelListView.width
             Text {
+                id: nameLabel
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.margins: 2
                 width: 100
                 text: "<b>Name:</b>" + name
             }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: pixelBox.state = (pixelBox.state == "Extended") ? "" : "Extended"
+            }
             Text {
+                id: faceLabel
+                anchors.left: nameLabel.right
+                anchors.right: removeButton.left
+                anchors.top: parent.top
+                anchors.margins: 2
                 width: 185
                 text: "<b>Faces:</b>" + faces.join(", ")
             }
             Button {
+                id: removeButton
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 2
                 text: "Remove"
                 objectName: "removePixelButton"
                 onClicked: pixelData.remove_pixel(index)
@@ -127,6 +157,22 @@ Rectangle {
                     // darker button when hovered-over, or tab-selected
                     color: (parent.hovered || parent.activeFocus) ? "#f88" : "#faa"
                 }
+            }
+            Rectangle {
+                id: extendedContent
+                anchors.left: parent.left
+                anchors.top: removeButton.bottom
+                visible: false
+                Text{
+                    text: "I have been extended"
+                }
+            }
+
+            states: State {
+                name: "Extended"
+
+                PropertyChanges { target: pixelBox; height: 80 }
+                PropertyChanges { target: extendedContent; visible: true }
             }
         }
     }
