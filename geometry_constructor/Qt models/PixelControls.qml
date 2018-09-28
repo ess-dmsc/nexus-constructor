@@ -38,7 +38,7 @@ Rectangle {
             text: "Add pixel"
             onClicked: {
                 myLogger.log("Adding new pixel")
-                pixelListView.model.insert_pixel(nameField.text, facesField.text)
+                pixelData.add_pixel(nameField.text, facesField.text)
             }
         }
     }

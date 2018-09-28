@@ -34,7 +34,7 @@ class PixelModel(QAbstractListModel):
         }
 
     @Slot(str, str)
-    def insert_pixel(self, name, faces):
+    def add_pixel(self, name, faces):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self.my_list.append(Pixel(name, [int(face) for face in faces.split(',')]))
         self.endInsertRows()
