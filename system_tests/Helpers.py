@@ -23,3 +23,10 @@ def tree_search_items(item: QQuickItem, targetobjectname: str):
         if childresult is not None:
             return childresult
     return None
+
+
+# Prints the hierarchy of objectNames for a GUI item and its children. Useful for debugging tests.
+def print_tree(item: QQuickItem, level: int=0):
+    print((" " * level) + ":" + item.objectName())
+    for child in item.childItems():
+        print_tree(child, level + 1)
