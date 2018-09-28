@@ -63,8 +63,6 @@ def get_pipeline()
                             testsError = err
                             currentBuild.result = 'FAILURE'
                         }
-                        sh "docker cp ${container_name}:/home/jenkins/${project}/test_results.xml test_results.xml"
-                        junit "test_results.xml"
                 }
             } finally {
                 container.stop()
@@ -87,7 +85,7 @@ def get_system_test_pipeline()
                 }
                 dir("${project}") {
                     stage("Checkout") {
-                        checkout scm
+                        scm_vars = checkout scm
                     }  // stage
 
                     stage("Create virtualenv") {
@@ -96,13 +94,16 @@ def get_system_test_pipeline()
                     }
 
                     stage("Install requirements") {
-                        bat """build_env\\Scripts\\pip.exe --proxy ${env.http_proxy} install -r requirements.txt
-                        """
+                        bat """build_env\\Scripts\\pip.exe --proxy ${env.http_proxy} install -r requirements.txt"""
+                        bat """build_env\\Scripts\\pip.exe --proxy ${env.http_proxy} install codecov"""
                     }
 
-                    stage("Run system tests") {
-                        bat """build_env\\Scripts\\pytest.exe .\\system_tests --ignore=build_env --junitxml=test_results.xml
-                        """
+                    stage("Run unit and system tests") {
+                        bat """build_env\\Scripts\\pytest.exe .\\ --ignore=build_env --junitxml=test_results.xml"""
+                        bat """build_env\\Scripts\\pytest.exe --cov=geometry_constructor --cov-report=xml"""
+                        withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
+                            bat """build_env\\Scripts\\codecov.exe -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml"""
+                        }
                         junit "test_results.xml"
                     }
                 }  // dir
