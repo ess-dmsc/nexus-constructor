@@ -18,6 +18,11 @@ Unit tests are written to use [pytest](https://docs.pytest.org/en/latest/).
 Once the dependencies have been installed, they can be run from a terminal in
 the project's root directory by running the command `pytest`.
 
+Test coverage can be checked by running the following from the root of the repository:
+```
+pytest --cov=geometry_constructor
+```
+
 ## Linter
 
 flake8 is used to check [pep8](https://www.python.org/dev/peps/pep-0008/?) 
