@@ -44,8 +44,6 @@ Rectangle {
     }
 
     Rectangle {
-        border.width: 1
-        border.color: "black"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: facesRow.bottom
@@ -56,8 +54,13 @@ Rectangle {
             model: pixelData
             delegate: pixelDelegate
             anchors.fill: parent
-            anchors.margins: 1
             clip: true
+        }
+        Rectangle {
+            anchors.fill: parent
+            border.width: 1
+            border.color: "black"
+            color: "transparent"
         }
     }
 
