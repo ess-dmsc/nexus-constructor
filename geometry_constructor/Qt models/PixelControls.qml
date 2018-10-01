@@ -124,6 +124,10 @@ Rectangle {
             border.width: 1
             border.color: "black"
             width: pixelListView.width
+            MouseArea {
+                anchors.fill: pixelBox
+                onClicked: pixelBox.state = (pixelBox.state == "Extended") ? "" : "Extended"
+            }
             Text {
                 id: nameLabel
                 anchors.left: parent.left
@@ -166,10 +170,6 @@ Rectangle {
                 source: "file:images/caret.svg"
                 transformOrigin: Item.Center
                 rotation: 0
-            }
-            MouseArea { // Add an expansion caret symbol in the corner instead of a whole thing click
-                anchors.fill: expansionCaret
-                onClicked: pixelBox.state = (pixelBox.state == "Extended") ? "" : "Extended"
             }
 
             Rectangle {
