@@ -5,6 +5,7 @@ import MyWriters 1.0
 import MyModels 1.0
 
 Rectangle {
+    anchors.margins:2
 
     Row {
         id: textRow
@@ -37,20 +38,30 @@ Rectangle {
             text: "Add pixel"
             onClicked: {
                 myLogger.log("Adding new pixel")
-                pixelListView.model.insert_pixel(nameField.text, facesField.text)
+                pixelData.add_pixel(nameField.text, facesField.text)
             }
         }
     }
 
-    ListView {
-        id: pixelListView
-        objectName: "pixelListView"
-        model: pixelData
-        delegate: pixelDelegate
+    Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: facesRow.bottom
         anchors.bottom: writeButtonRow.top
+        ListView {
+            id: pixelListView
+            objectName: "pixelListView"
+            model: pixelData
+            delegate: pixelDelegate
+            anchors.fill: parent
+            clip: true
+        }
+        Rectangle {
+            anchors.fill: parent
+            border.width: 1
+            border.color: "black"
+            color: "transparent"
+        }
     }
 
     PixelModel{
@@ -107,16 +118,38 @@ Rectangle {
 
     Component {
         id: pixelDelegate
-        Row {
+        Rectangle {
+            id: pixelBox
+            height: 45
+            border.width: 1
+            border.color: "black"
+            width: pixelListView.width
+            MouseArea {
+                anchors.fill: pixelBox
+                onClicked: pixelBox.state = (pixelBox.state == "Extended") ? "" : "Extended"
+            }
             Text {
+                id: nameLabel
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.margins: 2
                 width: 100
                 text: "<b>Name:</b>" + name
             }
             Text {
+                id: faceLabel
+                anchors.left: nameLabel.right
+                anchors.right: removeButton.left
+                anchors.top: parent.top
+                anchors.margins: 2
                 width: 185
                 text: "<b>Faces:</b>" + faces.join(", ")
             }
             Button {
+                id: removeButton
+                anchors.right: expansionCaret.left
+                anchors.top: parent.top
+                anchors.margins: 2
                 text: "Remove"
                 objectName: "removePixelButton"
                 onClicked: pixelData.remove_pixel(index)
@@ -127,6 +160,34 @@ Rectangle {
                     // darker button when hovered-over, or tab-selected
                     color: (parent.hovered || parent.activeFocus) ? "#f88" : "#faa"
                 }
+            }
+            Image {
+                id: expansionCaret
+                width: 20; height: 20;
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 2
+                source: "file:images/caret.svg"
+                transformOrigin: Item.Center
+                rotation: 0
+            }
+
+            Rectangle {
+                id: extendedContent
+                anchors.left: parent.left
+                anchors.top: removeButton.bottom
+                visible: false
+                Text{
+                    text: "I have been extended"
+                }
+            }
+
+            states: State {
+                name: "Extended"
+
+                PropertyChanges { target: pixelBox; height: 80 }
+                PropertyChanges { target: extendedContent; visible: true }
+                PropertyChanges { target: expansionCaret; rotation: 180 }
             }
         }
     }
