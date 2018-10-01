@@ -171,7 +171,7 @@ Rectangle {
                 anchors.fill: expansionCaret
                 onClicked: pixelBox.state = (pixelBox.state == "Extended") ? "" : "Extended"
             }
-            
+
             Rectangle {
                 id: extendedContent
                 anchors.left: parent.left
