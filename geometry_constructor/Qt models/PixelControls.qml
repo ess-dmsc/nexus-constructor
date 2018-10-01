@@ -132,10 +132,6 @@ Rectangle {
                 width: 100
                 text: "<b>Name:</b>" + name
             }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: pixelBox.state = (pixelBox.state == "Extended") ? "" : "Extended"
-            }
             Text {
                 id: faceLabel
                 anchors.left: nameLabel.right
@@ -147,7 +143,7 @@ Rectangle {
             }
             Button {
                 id: removeButton
-                anchors.right: parent.right
+                anchors.right: expansionCaret.left
                 anchors.top: parent.top
                 anchors.margins: 2
                 text: "Remove"
@@ -161,6 +157,21 @@ Rectangle {
                     color: (parent.hovered || parent.activeFocus) ? "#f88" : "#faa"
                 }
             }
+            Image {
+                id: expansionCaret
+                width: 20; height: 20;
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 2
+                source: "file:images/caret.svg"
+                transformOrigin: Item.Center
+                rotation: 0
+            }
+            MouseArea { // Add an expansion caret symbol in the corner instead of a whole thing click
+                anchors.fill: expansionCaret
+                onClicked: pixelBox.state = (pixelBox.state == "Extended") ? "" : "Extended"
+            }
+            
             Rectangle {
                 id: extendedContent
                 anchors.left: parent.left
@@ -176,6 +187,7 @@ Rectangle {
 
                 PropertyChanges { target: pixelBox; height: 80 }
                 PropertyChanges { target: extendedContent; visible: true }
+                PropertyChanges { target: expansionCaret; rotation: 180 }
             }
         }
     }
