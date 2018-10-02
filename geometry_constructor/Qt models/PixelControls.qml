@@ -4,8 +4,7 @@ import Qt.labs.platform 1.0
 import MyWriters 1.0
 import MyModels 1.0
 
-Rectangle {
-    anchors.margins:2
+Pane {
 
     Row {
         id: textRow
@@ -43,11 +42,12 @@ Rectangle {
         }
     }
 
-    Rectangle {
+    Frame {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: facesRow.bottom
         anchors.bottom: writeButtonRow.top
+        padding: 1
         ListView {
             id: pixelListView
             objectName: "pixelListView"
@@ -55,12 +55,6 @@ Rectangle {
             delegate: pixelDelegate
             anchors.fill: parent
             clip: true
-        }
-        Rectangle {
-            anchors.fill: parent
-            border.width: 1
-            border.color: "black"
-            color: "transparent"
         }
     }
 
@@ -118,66 +112,73 @@ Rectangle {
 
     Component {
         id: pixelDelegate
-        Rectangle {
+        Frame {
             id: pixelBox
-            height: 45
-            border.width: 1
-            border.color: "black"
+            padding: 5
+            contentHeight: mainContent.height + extendedContent.height
             width: pixelListView.width
+
             MouseArea {
-                anchors.fill: pixelBox
+                anchors.fill: parent
                 onClicked: pixelBox.state = (pixelBox.state == "Extended") ? "" : "Extended"
             }
-            Text {
-                id: nameLabel
+
+            Item {
+                id: mainContent
                 anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.margins: 2
-                width: 100
-                text: "<b>Name:</b>" + name
-            }
-            Text {
-                id: faceLabel
-                anchors.left: nameLabel.right
-                anchors.right: removeButton.left
-                anchors.top: parent.top
-                anchors.margins: 2
-                width: 185
-                text: "<b>Faces:</b>" + faces.join(", ")
-            }
-            Button {
-                id: removeButton
-                anchors.right: expansionCaret.left
-                anchors.top: parent.top
-                anchors.margins: 2
-                text: "Remove"
-                objectName: "removePixelButton"
-                onClicked: pixelData.remove_pixel(index)
-                background: Rectangle {
-                    border.color: "#f00"
-                    border.width: parent.pressed ? 2 : 1
-                    radius: 8
-                    // darker button when hovered-over, or tab-selected
-                    color: (parent.hovered || parent.activeFocus) ? "#f88" : "#faa"
+                anchors.right: parent.right
+                height: removeButton.height
+                Text {
+                    id: nameLabel
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    width: 100
+                    text: "<b>Name:</b>" + name
+                }
+                Text {
+                    id: faceLabel
+                    anchors.left: nameLabel.right
+                    anchors.right: removeButton.left
+                    anchors.top: parent.top
+                    width: 185
+                    text: "<b>Faces:</b>" + faces.join(", ")
+                }
+                Button {
+                    id: removeButton
+                    anchors.right: expansionCaret.left
+                    anchors.rightMargin: 5
+                    anchors.top: parent.top
+                    text: "Remove"
+                    objectName: "removePixelButton"
+                    onClicked: pixelData.remove_pixel(index)
+                    background: Rectangle {
+                        border.color: "#f00"
+                        border.width: parent.pressed ? 2 : 1
+                        radius: 8
+                        // darker button when hovered-over, or tab-selected
+                        color: (parent.hovered || parent.activeFocus) ? "#f88" : "#faa"
+                    }
+                }
+                Image {
+                    id: expansionCaret
+                    width: 20; height: 20;
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    source: "file:images/caret.svg"
+                    transformOrigin: Item.Center
+                    rotation: 0
                 }
             }
-            Image {
-                id: expansionCaret
-                width: 20; height: 20;
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.margins: 2
-                source: "file:images/caret.svg"
-                transformOrigin: Item.Center
-                rotation: 0
-            }
 
-            Rectangle {
+            Item {
                 id: extendedContent
+                anchors.top: mainContent.bottom
                 anchors.left: parent.left
-                anchors.top: removeButton.bottom
+                anchors.right: parent.right
+                height: 0
                 visible: false
                 Text{
+                    id: extendedText
                     text: "I have been extended"
                 }
             }
@@ -185,7 +186,7 @@ Rectangle {
             states: State {
                 name: "Extended"
 
-                PropertyChanges { target: pixelBox; height: 80 }
+                PropertyChanges { target: extendedContent; height: extendedText.height }
                 PropertyChanges { target: extendedContent; visible: true }
                 PropertyChanges { target: expansionCaret; rotation: 180 }
             }
