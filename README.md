@@ -12,6 +12,11 @@ Python dependencies are listed in requirements.txt at the root of the
 repository. They can be installed from a terminal by running
 `pip install -r requirements.txt`
 
+## Running the application
+
+The Nexus Geometry test app is run from the python script `main.py`
+located in the root of the repository.
+
 ## Running unit tests
 
 Unit tests are written to use [pytest](https://docs.pytest.org/en/latest/).
@@ -28,3 +33,19 @@ pytest --cov=geometry_constructor
 flake8 is used to check [pep8](https://www.python.org/dev/peps/pep-0008/?) 
 compliance. It is installed via pip and can be run as `flake8` in the project's 
 root directory. 
+
+## Building a distributable version
+
+A distributable version of the app, with the required python interpreter and
+libraries included can be built using [cx_Freeze](https://cx-freeze.readthedocs.io).
+It is included in the project's requirements file, and these must be installed
+in order to build the distributable. A build can be run with the following
+command in the projects root directory:
+```
+python setup.py build_exe
+```
+This will create the executable and copy it's required files to the `build`
+subdirectory
+
+cx_Freeze is capable of building distributable versions for Windows, OS X, and
+Linux, but can only do so from a machine running that operating system.

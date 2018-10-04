@@ -164,7 +164,7 @@ Pane {
                     width: 20; height: 20;
                     anchors.right: parent.right
                     anchors.top: parent.top
-                    source: "file:images/caret.svg"
+                    source: "file:resources/images/caret.svg"
                     transformOrigin: Item.Center
                     rotation: 0
                 }
