@@ -10,6 +10,10 @@ from cx_Freeze import setup, Executable
 # Dependencies are automatically detected, but it struggles with some parts of numpy.
 build_exe_options = {"packages": ["numpy.core._methods",
                                   "numpy.lib.format"],
+                     "excludes": ["pytest",
+                                  "pytest-cov",
+                                  "pytest-qt"
+                                  ],
                      "include_files": ["resources"]}
 
 # GUI applications require a different base on Windows (the default is for a console application).
