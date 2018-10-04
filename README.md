@@ -37,7 +37,7 @@ root directory.
 ## Building a distributable version
 
 A distributable version of the app, with the required python interpreter and
-libraries included can be built using (cx_Freeze)[https://cx-freeze.readthedocs.io].
+libraries included can be built using [cx_Freeze](https://cx-freeze.readthedocs.io).
 It is included in the project's requirements file, and these must be installed
 in order to build the distributable. A build can be run with the following
 command in the projects root directory:
