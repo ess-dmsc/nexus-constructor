@@ -5,6 +5,7 @@ See https://cx-freeze.readthedocs.io/en/latest/distutils.html for documentation
 """
 
 import sys
+import shutil
 from pathlib import Path
 from cx_Freeze import setup, Executable
 
@@ -21,13 +22,17 @@ unix_removable = ["lib/PySide2/Qt/lib/libQt5WebEngine.so.5",
                   "lib/PySide2/Qt/lib/libQt5WebEngineCore.so.5",
                   "lib/PySide2/Qt/lib/libQt5WebEngineWidgets.so.5",
                   "lib/PySide2/QtWidgets.abi3.so",
-                  "lib/PySide2/libclang.so.6"]
+                  "lib/PySide2/libclang.so.6",
+                  "lib/PySide2/Qt/resources/",
+                  "lib/PySide2/Qt/translations/"]
 
 win_removable = ["lib/PySide2/Qt5WebEngine.dll",
                  "lib/PySide2/Qt5WebEngineCore.dll",
                  "lib/PySide2/Qt5WebEngineWidgets.dll",
                  "lib/PySide2/QtWidgets.pyd",
-                 "lib/PySide2/libclang.dll"]
+                 "lib/PySide2/libclang.dll",
+                 "lib/PySide2/resources/",
+                 "lib/PySide2/translations/"]
 
 # GUI applications require a different base on Windows (the default is for a console application).
 if sys.platform == "win32":
@@ -49,7 +54,11 @@ for file in removable:
     for build_dir in Path('.').glob('build/*'):
         full_path = build_dir / file
         if full_path.exists():
-            print('Removing file: ' + str(full_path))
-            full_path.unlink()
+            if full_path.is_dir():
+                print('Removing dir: ' + str(full_path))
+                shutil.rmtree(str(full_path))
+            else:
+                print('Removing file: ' + str(full_path))
+                full_path.unlink()
         else:
-            print('File: "' + str(full_path) + '" does not exist, and cannot be deleted')
+            print('Path: "' + str(full_path) + '" does not exist, and cannot be deleted')
