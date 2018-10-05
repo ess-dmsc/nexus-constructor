@@ -49,26 +49,3 @@ subdirectory
 
 cx_Freeze is capable of building distributable versions for Windows, OS X, and
 Linux, but can only do so from a machine running that operating system.
-
-## Updating resources.qrc
-
-Documentation for the python Qt resources system can be found
-[here](https://doc.qt.io/qtforpython/overviews/resources.html). However, as of
-4th October 2018, it is barely adapted from the c++ original, with none of it's
-examples being written for python or the PySide2 tools.
-
-For a c++ project, `.qrc` files would be compiled using `qmake` and `rcc`, then
-loaded into the program using the `QResource` class. It would appear that the
-compiled `.rcc` binary files [can be loaded into python through this method](https://github.com/AlexanderBerx/DynaEditor/blob/638f9c0cdd012e1a057315ea3550f933237f99de/dynaeditor/main.py#L13)
-but to do so would require those compiler tools to build the file.
-
-Fortunately there's a workaround in PySide2. Within the python environment's
-`lib/site-packages/PySide2` directory is the executable `pyside2-rcc`. This can
-compile the resources file to a python script, that when imported into the
-program will initialise the properties that were originally specified in the
-resource files. Any changes to the resources.qrc or files it references will
-not be reflected in the code automatically, so the compiler must be rerun. This
-can be done from the repo's root directory with:
-```
-pyside2-rcc resources/resources.qrc -o geometry_constructor/resources.py
-```
