@@ -60,7 +60,7 @@ examples being written for python or the PySide2 tools.
 For a c++ project, `.qrc` files would be compiled using `qmake` and `rcc`, then
 loaded into the program using the `QResource` class. It would appear that the
 compiled `.rcc` binary files [can be loaded into python through this method](https://github.com/AlexanderBerx/DynaEditor/blob/638f9c0cdd012e1a057315ea3550f933237f99de/dynaeditor/main.py#L13)
-but to do so would, require those compiler tools to build the file.
+but to do so would require those compiler tools to build the file.
 
 Fortunately there's a workaround in PySide2. Within the python environment's
 `lib/site-packages/PySide2` directory is the executable `pyside2-rcc`. This can
