@@ -1,20 +1,17 @@
 import h5py
-from geometry_constructor.Models import PixelModel
+import pprint
+from geometry_constructor.Models import InstrumentModel
 from PySide2.QtCore import QObject, Slot
 
 
 class HdfWriter(QObject):
 
     @Slot(str, 'QVariant')
-    def write_pixels(self, filename, model: PixelModel):
+    def write_instrument(self, filename, model: InstrumentModel):
         print(filename)
-        pixels = model.my_list
-        print(len(pixels))
-        print(pixels)
-        with h5py.File(filename, 'w') as file:
-            pixel_group = file.create_group("pixels")
-            for pixel in pixels:
-                pixel_group.create_dataset(name=pixel.name, dtype='i', data=pixel.faces)
+        components = model.components
+        print(len(components))
+        pprint.pprint(components)
 
 
 class Logger(QObject):

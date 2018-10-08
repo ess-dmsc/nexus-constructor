@@ -2,21 +2,21 @@ from geometry_constructor import Models
 
 
 def test_initialise_model():
-    model = Models.PixelModel()
+    model = Models.InstrumentModel()
     assert model.rowCount() == 1
 
 
-def test_add_pixel():
-    model = Models.PixelModel()
-    model.add_pixel("Fib", "0,1,1 ,2, 3, 5 ")
+def test_add_component():
+    model = Models.InstrumentModel()
+    model.add_detector("My Detector")
     assert model.rowCount() == 2
-    assert model.my_list[1] == Models.Pixel(name="Fib", faces=[0, 1, 1, 2, 3, 5])
-    assert Models.Pixel(name="Fib", faces=[0, 1, 1, 2, 3, 5]) in model.my_list
+    assert model.components[1] == Models.Detector(name="My Detector")
+    assert Models.Detector(name="My Detector") in model.components
 
 
-def test_remove_pixel():
-    model = Models.PixelModel()
-    model.add_pixel("Fib", "0,1,1 ,2, 3, 5 ")
-    model.remove_pixel(1)
+def test_remove_component():
+    model = Models.InstrumentModel()
+    model.add_detector("My Detector")
+    model.remove_component(1)
     assert model.rowCount() == 1
-    assert Models.Pixel(name="Fib", faces=[0, 1, 1, 2, 3, 5]) not in model.my_list
+    assert Models.Detector(name="My Detector") not in model.components
