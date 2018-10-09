@@ -1,4 +1,5 @@
 import attr
+from enum import Enum
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
 
 
@@ -21,9 +22,9 @@ class Geometry:
 
 @attr.s
 class CylindricalGeometry(Geometry):
-    bottom = attr.ib(Vector)
-    top = attr.ib(Vector)
-    radius = attr.ib(int)
+    bottom_center = attr.ib(Vector)
+    top_center = attr.ib(Vector)
+    bottom_edge = attr.ib(Vector)
 
 
 @attr.s
@@ -34,10 +35,43 @@ class OFFGeometry(Geometry):
 
 
 @attr.s
+class PixelData:
+    pass
+
+
+class CountDirection(Enum):
+    ROW = 1
+    COLUMN = 2
+
+
+class Corner(Enum):
+    TOP_LEFT = 1
+    TOP_RIGHT = 2
+    BOTTOM_LEFT = 3
+    BOTTOM_RIGHT = 4
+
+
+@attr.s
+class PixelGrid(PixelData):
+    rows = attr.ib(int)
+    columns = attr.ib(int)
+    row_height = attr.ib(float)
+    col_width = attr.ib(float)
+    first_id = attr.ib(int)
+    count_direction = attr.ib(CountDirection)
+    initial_count_corner = attr.ib(Corner)
+
+
+@attr.s
+class PixelMapping(PixelData):
+    pixel_ids = attr.ib(list)  # pixel_ids[face_number] returns the pixel the face is part of, or None
+
+
+@attr.s
 class Component:
     name = attr.ib(str)
     id = attr.ib(int)
-    translate_vector = attr.ib(default=Vector(0, 0, 0))
+    translate_vector = attr.ib(default=Vector(0, 0, 0), type=Vector)
     rotate_axis = attr.ib(default=Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
     rotate_angle = attr.ib(default=0)
     transform_parent_id = attr.ib(default=None)
@@ -52,6 +86,7 @@ class Sample(Component):
 @attr.s
 class Detector(Component):
     geometry = attr.ib(default=None, type=Geometry)
+    pixel_data = attr.ib(default=None, type=PixelData)
 
 
 class InstrumentModel(QAbstractListModel):
@@ -92,8 +127,11 @@ class InstrumentModel(QAbstractListModel):
     def add_detector(self, name):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self.components.append(Detector(name=name,
-                                        id=max(self.components, key=lambda x: x.id).id + 1,
-                                        transform_parent_id=self.components[0].id))
+                                        id=max(component.id for component in self.components) + 1,
+                                        transform_parent_id=self.components[0].id,
+                                        pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
+                                                             first_id=0, count_direction=CountDirection.ROW,
+                                                             initial_count_corner=Corner.TOP_LEFT)))
         self.endInsertRows()
 
     @Slot(int)

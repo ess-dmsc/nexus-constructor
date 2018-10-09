@@ -16,8 +16,8 @@ but they can still be navigated through the interface's parent-child tree struct
 """
 
 
-# Test that clicking the 'add pixel' button adds an extra item to the model
-def test_add_pixel_button(qtbot):
+# Test that clicking the 'add detector' button adds an extra item to the model
+def test_add_detector_button(qtbot):
     main = Application('resources')
     window = main.rootObjects()[0]
     qtbot.addWidget(window)

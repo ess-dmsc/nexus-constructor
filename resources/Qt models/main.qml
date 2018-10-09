@@ -29,12 +29,11 @@ ApplicationWindow {
             }
             Action {
                 text: "Save As"
-                enabled: false
-                onTriggered: myLogger.log("Hello World!")
+                onTriggered: fileDialog.open()
             }
             Action {
                 text: "Write to console"
-                onTriggered: hdfWriter.write_instrument("foo.txt", components)
+                onTriggered: hdfWriter.write_instrument(components)
             }
         }
     }
@@ -99,6 +98,7 @@ ApplicationWindow {
     Labs.FileDialog {
         id: fileDialog
         title: "Choose a file to write to"
+        nameFilters: ["Nexus files (*.nx5)", "HDF5 files (*.hdf5)"]
         fileMode: Labs.FileDialog.SaveFile
         onAccepted: {
             var path = fileDialog.file.toString()
@@ -107,7 +107,7 @@ ApplicationWindow {
             if (path.startsWith(prefix)){
                 path = path.substring(prefix.length)
             }
-            hdfWriter.write_instrument(path, components)
+            hdfWriter.save_instrument(path, components)
         }
     }
 }
