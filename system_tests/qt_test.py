@@ -1,6 +1,6 @@
 from geometry_constructor.Application import Application
 from geometry_constructor.Models import InstrumentModel
-from system_tests.Helpers import click_object, tree_search_items
+from system_tests.Helpers import click_object
 from PySide2.QtQuick import QQuickItem
 
 """
@@ -24,13 +24,3 @@ def test_add_pixel_button(qtbot):
     assert window.findChild(InstrumentModel, 'components').rowCount() == 1
     click_object(window.findChild(QQuickItem, 'addDetector'), window)
     assert window.findChild(InstrumentModel, 'components').rowCount() == 2
-
-
-# Test that clicking the first 'remove' button takes an item from the model
-def test_remove_pixel_button(qtbot):
-    main = Application('resources')
-    window = main.rootObjects()[0]
-    assert window.findChild(InstrumentModel, 'components').rowCount() == 1
-    pixels = window.findChild(QQuickItem, 'componentListView')
-    click_object(tree_search_items(pixels, 'removalButton'), window)
-    assert window.findChild(InstrumentModel, 'components').rowCount() == 0
