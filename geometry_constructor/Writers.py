@@ -29,56 +29,64 @@ class HdfWriter(QObject):
                     nx_component.attrs['NX_class'] = 'NXsample'
                 elif isinstance(component, Detector):
                     nx_component.attrs['NX_class'] = 'NXdetector'
-                    pixel_data = component.pixel_data
+                    self.store_pixel_data(nx_component, component)
 
-                    # if it's a repeating pixel shape
-                    if isinstance(pixel_data, PixelGrid):
-                        pixel_shape = nx_component.create_group('pixel_shape')
-                        self.store_geometry(pixel_shape, component.geometry)
+    def store_pixel_data(self, nx_detector: h5py.Group, detector: Detector):
+        pixel_data = detector.pixel_data
+        # if it's a repeating pixel shape
+        if isinstance(pixel_data, PixelGrid):
+            self.store_pixel_grid(nx_detector, detector.geometry, pixel_data)
+        # if it's a mapping
+        elif isinstance(pixel_data, PixelMapping):
+            self.store_pixel_mapping(nx_detector, detector.geometry, pixel_data)
 
-                        nx_component.create_dataset(
-                            'x_pixel_offset',
-                            data=[[x * pixel_data.col_width for x in range(pixel_data.columns)]] * pixel_data.rows)
+    def store_pixel_grid(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelGrid):
 
-                        nx_component.create_dataset(
-                            'y_pixel_offset',
-                            data=[[y * pixel_data.row_height] * pixel_data.columns for y in range(pixel_data.rows)])
+        pixel_shape = nx_detector.create_group('pixel_shape')
+        self.store_geometry(pixel_shape, geometry)
 
-                        nx_component.create_dataset(
-                            'z_pixel_offset',
-                            data=[[0] * pixel_data.columns] * pixel_data.rows)
+        nx_detector.create_dataset(
+            'x_pixel_offset',
+            data=[[x * pixel_data.col_width for x in range(pixel_data.columns)]] * pixel_data.rows)
 
-                        detector_numbers = nx_component.create_dataset(
-                            'detector_number',
-                            shape=(pixel_data.rows, pixel_data.columns),
-                            dtype='i')
-                        for id_offset in range(pixel_data.rows * pixel_data.columns):
-                            # Determine a coordinate for the id based on the count direction from (0,0)
-                            if pixel_data.count_direction == CountDirection.ROW:
-                                col = id_offset % pixel_data.columns
-                                row = id_offset // pixel_data.columns
-                            else:
-                                col = id_offset // pixel_data.rows
-                                row = id_offset % pixel_data.rows
-                            # Invert axes needed if starting in a different corner
-                            if pixel_data.initial_count_corner in (Corner.TOP_LEFT, Corner.TOP_RIGHT):
-                                row = pixel_data.rows - (1 + row)
-                            if pixel_data.initial_count_corner in (Corner.TOP_RIGHT, Corner.BOTTOM_RIGHT):
-                                col = pixel_data.columns - (1 + col)
-                            # Set the id at the calculated coordinate
-                            detector_numbers[row, col] = pixel_data.first_id + id_offset
+        nx_detector.create_dataset(
+            'y_pixel_offset',
+            data=[[y * pixel_data.row_height] * pixel_data.columns for y in range(pixel_data.rows)])
 
-                    # if it's a mapping
-                    elif isinstance(pixel_data, PixelMapping):
-                        detector_shape = nx_component.create_group('detector_shape')
-                        self.store_geometry(detector_shape, component.geometry)
-                        detector_shape.create_dataset(
-                            'detector_faces',
-                            dtype='i',
-                            data=[[face_id, pixel_data.pixel_ids[face_id]]
-                                  for face_id
-                                  in range(len(pixel_data.pixel_ids))
-                                  if pixel_data.pixel_ids[face_id] is not None])
+        nx_detector.create_dataset(
+            'z_pixel_offset',
+            data=[[0] * pixel_data.columns] * pixel_data.rows)
+
+        detector_numbers = nx_detector.create_dataset(
+            'detector_number',
+            shape=(pixel_data.rows, pixel_data.columns),
+            dtype='i')
+        for id_offset in range(pixel_data.rows * pixel_data.columns):
+            # Determine a coordinate for the id based on the count direction from (0,0)
+            if pixel_data.count_direction == CountDirection.ROW:
+                col = id_offset % pixel_data.columns
+                row = id_offset // pixel_data.columns
+            else:
+                col = id_offset // pixel_data.rows
+                row = id_offset % pixel_data.rows
+            # Invert axes needed if starting in a different corner
+            if pixel_data.initial_count_corner in (Corner.TOP_LEFT, Corner.TOP_RIGHT):
+                row = pixel_data.rows - (1 + row)
+            if pixel_data.initial_count_corner in (Corner.TOP_RIGHT, Corner.BOTTOM_RIGHT):
+                col = pixel_data.columns - (1 + col)
+            # Set the id at the calculated coordinate
+            detector_numbers[row, col] = pixel_data.first_id + id_offset
+
+    def store_pixel_mapping(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelMapping):
+        detector_shape = nx_detector.create_group('detector_shape')
+        self.store_geometry(detector_shape, geometry)
+        detector_shape.create_dataset(
+            'detector_faces',
+            dtype='i',
+            data=[[face_id, pixel_data.pixel_ids[face_id]]
+                  for face_id
+                  in range(len(pixel_data.pixel_ids))
+                  if pixel_data.pixel_ids[face_id] is not None])
 
     def store_geometry(self, nx_group: h5py.Group, geometry: Geometry):
         if isinstance(geometry, OFFGeometry):
