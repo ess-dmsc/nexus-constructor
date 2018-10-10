@@ -2,7 +2,7 @@ import h5py
 from pprint import pprint
 from geometry_constructor.Models import InstrumentModel, Sample, Detector, PixelGrid, PixelMapping, CountDirection,\
     Corner, Geometry, OFFGeometry, CylindricalGeometry
-from PySide2.QtCore import QObject, Slot
+from PySide2.QtCore import QObject, QUrl, Slot
 
 
 class HdfWriter(QObject):
@@ -13,8 +13,10 @@ class HdfWriter(QObject):
         print(len(components))
         pprint(components)
 
-    @Slot(str, 'QVariant')
-    def save_instrument(self, filename, model: InstrumentModel):
+    @Slot(QUrl, 'QVariant')
+    def save_instrument(self, file_url: QUrl, model: InstrumentModel):
+        filename = file_url.toString(options=QUrl.PreferLocalFile)
+        print(filename)
         with h5py.File(filename, 'w') as file:
             self.save_instrument_to_file(file, model)
 

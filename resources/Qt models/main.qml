@@ -100,14 +100,6 @@ ApplicationWindow {
         title: "Choose a file to write to"
         nameFilters: ["Nexus files (*.nx5)", "HDF5 files (*.hdf5)"]
         selectExisting: false
-        onAccepted: {
-            var path = fileDialog.fileUrl.toString()
-            // h5py requires a path, remove the file protocol if present
-            var prefix = "file:///"
-            if (path.startsWith(prefix)){
-                path = path.substring(prefix.length)
-            }
-            hdfWriter.save_instrument(path, components)
-        }
+        onAccepted: hdfWriter.save_instrument(fileDialog.fileUrl, components)
     }
 }
