@@ -11,8 +11,10 @@ Pane {
         contentHeight: addDetector.height
         padding: 1
 
-        Text {
+        Label {
             id: nameLabel
+            anchors.left: parent.left
+            anchors.verticalCenter: addDetector.verticalCenter
             text: "Components:"
         }
         Button {
@@ -62,7 +64,7 @@ Pane {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 height: removalButton.height
-                Text {
+                Label {
                     id: nameLabel
                     anchors.left: parent.left
                     anchors.top: parent.top
@@ -104,7 +106,7 @@ Pane {
                 anchors.right: parent.right
                 height: 0
                 visible: false
-                Text{
+                Label {
                     id: extendedText
                     text: "I have been extended"
                 }
