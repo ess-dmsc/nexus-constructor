@@ -1,7 +1,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Scene3D 2.0
-import Qt.labs.platform 1.0 as Labs
+import QtQuick.Dialogs 1.3
 import MyModels 1.0
 import MyWriters 1.0
 
@@ -95,13 +95,13 @@ ApplicationWindow {
         id: hdfWriter
     }
 
-    Labs.FileDialog {
+    FileDialog {
         id: fileDialog
         title: "Choose a file to write to"
         nameFilters: ["Nexus files (*.nx5)", "HDF5 files (*.hdf5)"]
-        fileMode: Labs.FileDialog.SaveFile
+        selectExisting: false
         onAccepted: {
-            var path = fileDialog.file.toString()
+            var path = fileDialog.fileUrl.toString()
             // h5py requires a path, remove the file protocol if present
             var prefix = "file:///"
             if (path.startsWith(prefix)){
