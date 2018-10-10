@@ -20,12 +20,12 @@ ApplicationWindow {
             Action {
                 text: "Open"
                 enabled: false
-                onTriggered: myLogger.log("Hello World!")
+                onTriggered: myLogger.log("'Open' menu item clicked")
             }
             Action {
                 text: "Save"
                 enabled: false
-                onTriggered: myLogger.log("Hello World!")
+                onTriggered: myLogger.log("'Save' menu item clicked")
             }
             Action {
                 text: "Save As"
