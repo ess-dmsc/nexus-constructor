@@ -46,9 +46,9 @@ class HdfWriter(QObject):
             self.store_pixel_mapping(nx_detector, detector.geometry, pixel_data)
 
     def store_pixel_grid(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelGrid):
-
-        pixel_shape = nx_detector.create_group('pixel_shape')
-        self.store_geometry(pixel_shape, geometry)
+        if pixel_data is not None:
+            pixel_shape = nx_detector.create_group('pixel_shape')
+            self.store_geometry(pixel_shape, geometry)
 
         nx_detector.create_dataset(
             'x_pixel_offset',
@@ -83,15 +83,16 @@ class HdfWriter(QObject):
             detector_numbers[row, col] = pixel_data.first_id + id_offset
 
     def store_pixel_mapping(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelMapping):
-        detector_shape = nx_detector.create_group('detector_shape')
-        self.store_geometry(detector_shape, geometry)
-        detector_shape.create_dataset(
-            'detector_faces',
-            dtype='i',
-            data=[[face_id, pixel_data.pixel_ids[face_id]]
-                  for face_id
-                  in range(len(pixel_data.pixel_ids))
-                  if pixel_data.pixel_ids[face_id] is not None])
+        if pixel_data is not None:
+            detector_shape = nx_detector.create_group('detector_shape')
+            self.store_geometry(detector_shape, geometry)
+            detector_shape.create_dataset(
+                'detector_faces',
+                dtype='i',
+                data=[[face_id, pixel_data.pixel_ids[face_id]]
+                      for face_id
+                      in range(len(pixel_data.pixel_ids))
+                      if pixel_data.pixel_ids[face_id] is not None])
 
     def store_geometry(self, nx_group: h5py.Group, geometry: Geometry):
         if isinstance(geometry, OFFGeometry):

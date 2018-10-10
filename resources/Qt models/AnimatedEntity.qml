@@ -23,7 +23,7 @@ Entity {
         RenderSettings {
             activeFrameGraph: ForwardRenderer {
                 camera: camera
-                clearColor: "white"
+                clearColor: "lightgrey"
             }
         },
         InputSettings { }
