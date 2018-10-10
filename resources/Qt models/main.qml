@@ -1,48 +1,105 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Scene3D 2.0
+import QtQuick.Dialogs 1.3
+import MyModels 1.0
+import MyWriters 1.0
 
-Pane {
+ApplicationWindow {
+
+    title: "Nexus Geometry Constructor"
+    id: window
+    objectName: "window"
+    visible: true
     width: 700
     height: 300
-    padding: 5
-    focus: true
 
-    PixelControls {
-        id: pixelFieldsArea
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        leftPadding: 0
-
-        width: 365;
+    menuBar: MenuBar {
+        Menu {
+            title: "File"
+            Action {
+                text: "Open"
+                enabled: false
+                onTriggered: myLogger.log("'Open' menu item clicked")
+            }
+            Action {
+                text: "Save"
+                enabled: false
+                onTriggered: myLogger.log("'Save' menu item clicked")
+            }
+            Action {
+                text: "Save As"
+                onTriggered: fileDialog.open()
+            }
+            Action {
+                text: "Write to console"
+                onTriggered: hdfWriter.print_instrument_to_console(components)
+            }
+        }
     }
 
-    Frame {
-        id: instrumentViewArea
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: pixelFieldsArea.right
-        anchors.right: parent.right
-        contentWidth: scene3d.implicitWidth
-        contentHeight: scene3d.implicitHeight
+    Pane {
+        padding: 5
         focus: true
-        padding: 1
+        anchors.fill: parent
 
-        Scene3D {
-            id: scene3d
-            anchors.fill: parent
+        ComponentControls {
+            id: componentFieldsArea
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            leftPadding: 0
+
+            width: 365;
+        }
+
+        Frame {
+            id: instrumentViewArea
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: componentFieldsArea.right
+            anchors.right: parent.right
+            contentWidth: scene3d.implicitWidth
+            contentHeight: scene3d.implicitHeight
             focus: true
-            aspects: ["input", "logic"]
-            cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+            padding: 1
 
-            AnimatedEntity {}
-        }
+            Scene3D {
+                id: scene3d
+                anchors.fill: parent
+                focus: true
+                aspects: ["input", "logic"]
+                cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
 
-        MouseArea {
-            anchors.fill: scene3d
-            onClicked: instrumentViewArea.focus = true
-            enabled: !instrumentViewArea.focus
+                AnimatedEntity {}
+            }
+
+            MouseArea {
+                anchors.fill: scene3d
+                onClicked: instrumentViewArea.focus = true
+                enabled: !instrumentViewArea.focus
+            }
         }
+    }
+
+    InstrumentModel{
+        id: components
+        objectName: "components"
+    }
+
+    Logger {
+        id: myLogger
+    }
+
+    HdfWriter {
+        id: hdfWriter
+    }
+
+    FileDialog {
+        id: fileDialog
+        title: "Choose a file to write to"
+        nameFilters: ["Nexus files (*.nxs)", "HDF5 files (*.hdf5)"]
+        selectExisting: false
+        onAccepted: hdfWriter.save_instrument(fileDialog.fileUrl, components)
     }
 }
