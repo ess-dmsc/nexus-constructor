@@ -11,9 +11,9 @@ def assess_pixel_grid_direction(direction, corner, expected_data):
                                           pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
                                                                first_id=0, count_direction=direction,
                                                                initial_count_corner=corner)))
-    filename = 'grid_direction_testfile.hdf5'
-    HdfWriter().save_instrument(filename, instrument)
-    with h5py.File(filename, 'r') as file:
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('grid_direction_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
         dataset = file['/entry/instrument/detector/detector_number'][::].tolist()
         assert dataset == expected_data
 

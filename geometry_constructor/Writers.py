@@ -16,20 +16,23 @@ class HdfWriter(QObject):
     @Slot(str, 'QVariant')
     def save_instrument(self, filename, model: InstrumentModel):
         with h5py.File(filename, 'w') as file:
-            root = file.create_group('entry')
-            root.attrs['NX_class'] = 'NXentry'
+            self.save_instrument_to_file(file, model)
 
-            instrument = root.create_group('instrument')
-            instrument.attrs['NX_class'] = 'NXinstrument'
+    def save_instrument_to_file(self, file: h5py.File, model: InstrumentModel):
+        root = file.create_group('entry')
+        root.attrs['NX_class'] = 'NXentry'
 
-            for component in model.components:
-                nx_component = instrument.create_group(component.name)
+        instrument = root.create_group('instrument')
+        instrument.attrs['NX_class'] = 'NXinstrument'
 
-                if isinstance(component, Sample):
-                    nx_component.attrs['NX_class'] = 'NXsample'
-                elif isinstance(component, Detector):
-                    nx_component.attrs['NX_class'] = 'NXdetector'
-                    self.store_pixel_data(nx_component, component)
+        for component in model.components:
+            nx_component = instrument.create_group(component.name)
+
+            if isinstance(component, Sample):
+                nx_component.attrs['NX_class'] = 'NXsample'
+            elif isinstance(component, Detector):
+                nx_component.attrs['NX_class'] = 'NXdetector'
+                self.store_pixel_data(nx_component, component)
 
     def store_pixel_data(self, nx_detector: h5py.Group, detector: Detector):
         pixel_data = detector.pixel_data
