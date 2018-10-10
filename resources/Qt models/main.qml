@@ -33,7 +33,7 @@ ApplicationWindow {
             }
             Action {
                 text: "Write to console"
-                onTriggered: hdfWriter.write_instrument(components)
+                onTriggered: hdfWriter.print_instrument_to_console(components)
             }
         }
     }

@@ -8,7 +8,7 @@ from PySide2.QtCore import QObject, Slot
 class HdfWriter(QObject):
 
     @Slot('QVariant')
-    def write_instrument(self, model: InstrumentModel):
+    def print_instrument_to_console(self, model: InstrumentModel):
         components = model.components
         print(len(components))
         pprint(components)
