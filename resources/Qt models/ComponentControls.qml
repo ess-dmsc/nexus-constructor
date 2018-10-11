@@ -57,13 +57,7 @@ Pane {
             MouseArea {
                 id: expansionClickArea
                 anchors.fill: parent
-                onClicked: {
-                    if (componentBox.state == "Extended") {
-                        componentBox.state = ""
-                    } else {
-                        componentBox.state = "Extended"
-                    }
-                }
+                onClicked: componentBox.state = (componentBox.state == "Extended") ? "": "Extended"
             }
 
             Image {
