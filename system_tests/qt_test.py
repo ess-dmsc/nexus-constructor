@@ -1,5 +1,5 @@
 from geometry_constructor.Application import Application
-from geometry_constructor.Models import InstrumentModel
+from geometry_constructor.QmlModel import InstrumentModel
 from system_tests.Helpers import click_object
 from PySide2.QtQuick import QQuickItem
 

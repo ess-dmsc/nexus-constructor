@@ -1,7 +1,7 @@
 import sys
 from os import path, environ
 from geometry_constructor.Application import Application
-from geometry_constructor.Models import InstrumentModel
+from geometry_constructor.QmlModel import InstrumentModel
 from geometry_constructor.Writers import HdfWriter, Logger
 from PySide2.QtGui import QGuiApplication
 from PySide2.QtQml import qmlRegisterType

@@ -1,7 +1,8 @@
 import h5py
 from pprint import pprint
-from geometry_constructor.Models import InstrumentModel, Sample, Detector, PixelGrid, PixelMapping, CountDirection,\
-    Corner, Geometry, OFFGeometry, CylindricalGeometry
+from geometry_constructor.DataModel import Sample, Detector, PixelGrid, PixelMapping, CountDirection, Corner, \
+    Geometry, OFFGeometry, CylindricalGeometry
+from geometry_constructor.QmlModel import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
 
 

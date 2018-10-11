@@ -1,6 +1,7 @@
 import h5py
 from geometry_constructor.Writers import HdfWriter
-from geometry_constructor.Models import InstrumentModel, Detector, PixelGrid, Corner, CountDirection
+from geometry_constructor.DataModel import Detector, PixelGrid, Corner, CountDirection
+from geometry_constructor.QmlModel import InstrumentModel
 
 
 def test_save_pixel_grid_coordinates():
