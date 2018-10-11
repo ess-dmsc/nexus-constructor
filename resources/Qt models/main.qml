@@ -11,8 +11,8 @@ ApplicationWindow {
     id: window
     objectName: "window"
     visible: true
-    width: 700
-    height: 300
+    width: 800
+    height: 500
 
     menuBar: MenuBar {
         Menu {
