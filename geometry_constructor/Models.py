@@ -92,9 +92,14 @@ class Detector(Component):
 class InstrumentModel(QAbstractListModel):
 
     NameRole = Qt.UserRole + 1
-    TranslateVectorRole = Qt.UserRole + 2
-    RotateAxisRole = Qt.UserRole + 3
-    RotateAngleRole = Qt.UserRole + 4
+    TranslateVectorXRole = Qt.UserRole + 2
+    TranslateVectorYRole = Qt.UserRole + 3
+    TranslateVectorZRole = Qt.UserRole + 4
+    RotateAxisXRole = Qt.UserRole + 5
+    RotateAxisYRole = Qt.UserRole + 6
+    RotateAxisZRole = Qt.UserRole + 7
+    RotateAngleRole = Qt.UserRole + 8
+    TransformParentIndexRole = Qt.UserRole + 9
 
     def __init__(self):
         super().__init__()
@@ -108,19 +113,79 @@ class InstrumentModel(QAbstractListModel):
         item = self.components[row]
         if role == InstrumentModel.NameRole:
             return item.name
-        if role == InstrumentModel.TranslateVectorRole:
-            return item.translate_vector
-        if role == InstrumentModel.RotateAxisRole:
-            return item.rotate_axis
+        if role == InstrumentModel.TranslateVectorXRole:
+            return item.translate_vector.x
+        if role == InstrumentModel.TranslateVectorYRole:
+            return item.translate_vector.y
+        if role == InstrumentModel.TranslateVectorZRole:
+            return item.translate_vector.z
+        if role == InstrumentModel.RotateAxisXRole:
+            return item.rotate_axis.x
+        if role == InstrumentModel.RotateAxisYRole:
+            return item.rotate_axis.y
+        if role == InstrumentModel.RotateAxisZRole:
+            return item.rotate_axis.z
         if role == InstrumentModel.RotateAngleRole:
             return item.rotate_angle
+        if role == InstrumentModel.TransformParentIndexRole:
+            for i in range(len(self.components)):
+                if self.components[i].id == item.transform_parent_id:
+                    return i
+            return 0
+
+    # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
+    def setData(self, index, value, role):
+        row = index.row()
+        item = self.components[row]
+        changed = False
+        if role == InstrumentModel.NameRole:
+            changed = item.name != value
+            item.name = value
+        elif role == InstrumentModel.TranslateVectorXRole:
+            changed = item.translate_vector.x != value
+            item.translate_vector.x = value
+        elif role == InstrumentModel.TranslateVectorYRole:
+            changed = item.translate_vector.y != value
+            item.translate_vector.y = value
+        elif role == InstrumentModel.TranslateVectorZRole:
+            changed = item.translate_vector.z != value
+            item.translate_vector.z = value
+        elif role == InstrumentModel.RotateAxisXRole:
+            changed = item.rotate_axis.x != value
+            item.rotate_axis.x = value
+        elif role == InstrumentModel.RotateAxisYRole:
+            changed = item.rotate_axis.y != value
+            item.rotate_axis.y = value
+        elif role == InstrumentModel.RotateAxisZRole:
+            changed = item.rotate_axis.z != value
+            item.rotate_axis.z = value
+        elif role == InstrumentModel.RotateAngleRole:
+            changed = item.rotate_angle != value
+            item.rotate_angle = value
+        elif role == InstrumentModel.TransformParentIndexRole:
+            parent_id = self.components[value].id
+            if parent_id < 0:
+                parent_id = 0
+            changed = item.transform_parent_id != parent_id
+            item.transform_parent_id = parent_id
+        if changed:
+            self.dataChanged.emit(index, index, role)
+        return changed
+
+    def flags(self, index):
+        return super().flags(index) | Qt.ItemIsEditable
 
     def roleNames(self):
         return {
             InstrumentModel.NameRole: b'name',
-            InstrumentModel.TranslateVectorRole: b'translate_vector',
-            InstrumentModel.RotateAxisRole: b'rotate_axis',
+            InstrumentModel.TranslateVectorXRole: b'translate_x',
+            InstrumentModel.TranslateVectorYRole: b'translate_y',
+            InstrumentModel.TranslateVectorZRole: b'translate_z',
+            InstrumentModel.RotateAxisXRole: b'rotate_x',
+            InstrumentModel.RotateAxisYRole: b'rotate_y',
+            InstrumentModel.RotateAxisZRole: b'rotate_z',
             InstrumentModel.RotateAngleRole: b'rotate_angle',
+            InstrumentModel.TransformParentIndexRole: b'transform_parent_index'
         }
 
     @Slot(str)
