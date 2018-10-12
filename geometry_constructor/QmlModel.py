@@ -16,7 +16,7 @@ class InstrumentModel(QAbstractListModel):
 
     def __init__(self):
         super().__init__()
-        self.components = [Sample(name='Sample', id=0)]
+        self.components = [Sample(name='Sample')]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.components)
@@ -41,9 +41,8 @@ class InstrumentModel(QAbstractListModel):
         if role == InstrumentModel.RotateAngleRole:
             return item.rotate_angle
         if role == InstrumentModel.TransformParentIndexRole:
-            for i in range(len(self.components)):
-                if self.components[i].id == item.transform_parent_id:
-                    return i
+            if item.transform_parent in self.components:
+                return self.components.index(item.transform_parent)
             return 0
 
     # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
@@ -76,11 +75,12 @@ class InstrumentModel(QAbstractListModel):
             changed = item.rotate_angle != value
             item.rotate_angle = value
         elif role == InstrumentModel.TransformParentIndexRole:
-            parent_id = self.components[value].id
-            if parent_id < 0:
-                parent_id = 0
-            changed = item.transform_parent_id != parent_id
-            item.transform_parent_id = parent_id
+            if 0 <= value < len(self.components):
+                selected = self.components[value]
+            else:
+                selected = None
+            changed = item.transform_parent != selected
+            item.transform_parent = selected
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
@@ -105,8 +105,7 @@ class InstrumentModel(QAbstractListModel):
     def add_detector(self, name):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self.components.append(Detector(name=name,
-                                        id=max(component.id for component in self.components) + 1,
-                                        transform_parent_id=self.components[0].id,
+                                        transform_parent=self.components[0],
                                         pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
                                                              first_id=0, count_direction=CountDirection.ROW,
                                                              initial_count_corner=Corner.TOP_LEFT)))

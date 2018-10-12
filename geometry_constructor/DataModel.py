@@ -1,5 +1,6 @@
 import attr
 from enum import Enum
+from math import sqrt
 
 
 def validate_nonzero_vector(instance, attribute, value):
@@ -12,6 +13,13 @@ class Vector:
     x = attr.ib(float)
     y = attr.ib(float)
     z = attr.ib(float)
+
+    def magnitude(self):
+        return sqrt(self.x**2 + self.y**2 + self.z**2)
+
+    def unit_list(self):
+        magnitude = self.magnitude()
+        return [self.x / magnitude, self.y / magnitude, self.z / magnitude]
 
 
 @attr.s
@@ -69,11 +77,10 @@ class PixelMapping(PixelData):
 @attr.s
 class Component:
     name = attr.ib(str)
-    id = attr.ib(int)
+    transform_parent = attr.ib(default=None, type=object)
     translate_vector = attr.ib(default=Vector(0, 0, 0), type=Vector)
     rotate_axis = attr.ib(default=Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
     rotate_angle = attr.ib(default=0)
-    transform_parent_id = attr.ib(default=None)
     geometry = attr.ib(default=None, type=Geometry)
 
 

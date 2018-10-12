@@ -1,7 +1,7 @@
 import h5py
 from pprint import pprint
 from geometry_constructor.DataModel import Sample, Detector, PixelGrid, PixelMapping, CountDirection, Corner, \
-    Geometry, OFFGeometry, CylindricalGeometry
+    Geometry, OFFGeometry, CylindricalGeometry, Component
 from geometry_constructor.QmlModel import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
 
@@ -30,12 +30,41 @@ class HdfWriter(QObject):
 
         for component in model.components:
             nx_component = instrument.create_group(component.name)
+            self.store_transformations(nx_component, component)
 
             if isinstance(component, Sample):
                 nx_component.attrs['NX_class'] = 'NXsample'
             elif isinstance(component, Detector):
                 nx_component.attrs['NX_class'] = 'NXdetector'
                 self.store_pixel_data(nx_component, component)
+
+    def store_transformations(self, nx_component: h5py.Group, component: Component):
+        if component.transform_parent is None or component.transform_parent == component:
+            dependent_on = '.'
+        else:
+            dependent_on = '/entry/instrument/' + component.transform_parent.name + '/translate'
+
+        # store the rotation
+        rotate = nx_component.create_dataset(
+            'rotate',
+            data=[component.rotate_angle])
+        rotate.attrs['NX_class'] = 'NXtransformations'
+        rotate.attrs['depends_on'] = dependent_on
+        rotate.attrs['transformation_type'] = 'rotation'
+        rotate.attrs['units'] = 'degrees'
+        rotate.attrs['vector'] = component.rotate_axis.unit_list()
+        # store the translation
+        magnitude = component.translate_vector.magnitude()
+        translate = nx_component.create_dataset(
+            'translate',
+            data=[magnitude])
+        translate.attrs['NX_class'] = 'NXtransformations'
+        translate.attrs['depends_on'] = 'rotate'
+        translate.attrs['transformation_type'] = 'translation'
+        translate.attrs['units'] = 'm'
+        translate.attrs['vector'] = component.translate_vector.unit_list() if magnitude != 0 else [0, 0, 1]
+
+        nx_component.attrs['depends_on'] = 'translate'
 
     def store_pixel_data(self, nx_detector: h5py.Group, detector: Detector):
         pixel_data = detector.pixel_data
