@@ -12,11 +12,11 @@ import QtQuick.Controls 2.4
 Item {
     height: nameField.height +
             relativePicker.height +
-            translateLabel.height +
-            xField.height +
             rotateLabel.height +
             xRotField.height +
-            angleField.height
+            angleField.height +
+            translateLabel.height +
+            xField.height
     width: parent.width
 
     Label {
@@ -50,58 +50,8 @@ Item {
     }
 
     Label {
-        id: translateLabel
-        anchors.top: relativePicker.bottom
-        anchors.left: parent.left
-        text: "Translate"
-    }
-
-    Label {
-        id: xLabel
-        anchors.top: xField.top
-        anchors.left: parent.left
-        text: "x:"
-    }
-    TextField {
-        id: xField
-        anchors.top: translateLabel.bottom
-        anchors.left: xLabel.right
-        width: 100
-        text: translate_x
-        onEditingFinished: translate_x = parseFloat(text)
-    }
-    Label {
-        id: yLabel
-        anchors.top: xField.top
-        anchors.left: xField.right
-        text: "y:"
-    }
-    TextField {
-        id: yField
-        anchors.top: xField.top
-        anchors.left: yLabel.right
-        width: 100
-        text: translate_y
-        onEditingFinished: translate_y = parseFloat(text)
-    }
-    Label {
-        id: zLabel
-        anchors.top: xField.top
-        anchors.left: yField.right
-        text: "z:"
-    }
-    TextField {
-        id: zField
-        anchors.top: xField.top
-        anchors.left: zLabel.right
-        width: 100
-        text: translate_z
-        onEditingFinished: translate_z = parseFloat(text)
-    }
-
-    Label {
         id: rotateLabel
-        anchors.top: xField.bottom
+        anchors.top: relativePicker.bottom
         anchors.left: parent.left
         text: "Rotate"
     }
@@ -161,5 +111,55 @@ Item {
         anchors.left: angleLabel.right
         text: rotate_angle
         onEditingFinished: rotate_angle = parseFloat(text)
+    }
+
+    Label {
+        id: translateLabel
+        anchors.top: angleField.bottom
+        anchors.left: parent.left
+        text: "Translate"
+    }
+
+    Label {
+        id: xLabel
+        anchors.top: xField.top
+        anchors.left: parent.left
+        text: "x:"
+    }
+    TextField {
+        id: xField
+        anchors.top: translateLabel.bottom
+        anchors.left: xLabel.right
+        width: 100
+        text: translate_x
+        onEditingFinished: translate_x = parseFloat(text)
+    }
+    Label {
+        id: yLabel
+        anchors.top: xField.top
+        anchors.left: xField.right
+        text: "y:"
+    }
+    TextField {
+        id: yField
+        anchors.top: xField.top
+        anchors.left: yLabel.right
+        width: 100
+        text: translate_y
+        onEditingFinished: translate_y = parseFloat(text)
+    }
+    Label {
+        id: zLabel
+        anchors.top: xField.top
+        anchors.left: yField.right
+        text: "z:"
+    }
+    TextField {
+        id: zField
+        anchors.top: xField.top
+        anchors.left: zLabel.right
+        width: 100
+        text: translate_z
+        onEditingFinished: translate_z = parseFloat(text)
     }
 }
