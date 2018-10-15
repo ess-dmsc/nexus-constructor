@@ -19,7 +19,6 @@ Pane {
         }
         Button {
             id: addDetector
-            objectName: "addDetector"
             anchors.right: parent.right
 
             text: "Add detector"
@@ -38,7 +37,6 @@ Pane {
         padding: 1
         ListView {
             id: componentListView
-            objectName: "componentListView"
             model: components
             delegate: componentDelegate
             anchors.fill: parent

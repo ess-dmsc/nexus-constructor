@@ -9,7 +9,6 @@ ApplicationWindow {
 
     title: "Nexus Geometry Constructor"
     id: window
-    objectName: "window"
     visible: true
     width: 800
     height: 500
@@ -84,7 +83,6 @@ ApplicationWindow {
 
     InstrumentModel{
         id: components
-        objectName: "components"
     }
 
     Logger {
