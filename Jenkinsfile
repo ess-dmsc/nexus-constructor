@@ -61,9 +61,15 @@ node("docker") {
                     testsError = err
                     currentBuild.result = 'FAILURE'
                 }
-            sh """build_env/bin/pytest --cov=geometry_constructor --cov-report=xml"""
+            sh """docker exec ${container_name} ${sh_cmd} -c \"
+                cd ${project}
+                build_env/bin/pytest --cov=geometry_constructor --cov-report=xml
+                \""""
             withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
-                sh """build_env/bin/codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml"""
+                sh """docker exec ${container_name} ${sh_cmd} -c \"
+                    cd ${project}
+                    build_env/bin/codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
+                    \""""
             }
             junit "test_results.xml"
         }
