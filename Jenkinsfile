@@ -71,7 +71,7 @@ node("docker") {
                     build_env/bin/codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
                     \""""
             }
-            junit "test_results.xml"
+            junit "${project}/test_results.xml"
         }
     } finally {
         container.stop()
