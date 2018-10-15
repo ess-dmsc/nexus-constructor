@@ -71,10 +71,8 @@ node("docker") {
                     build_env/bin/codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
                     \""""
             }
-            sh """docker exec ${container_name} ${sh_cmd} -c \"
-                cd ${project}
-                junit test_results.xml
-                \""""
+            sh "docker cp ${container_name}:/home/jenkins/${project}/test_results.xml test_results.xml"
+            junit "test_results.xml"
         }
     } finally {
         container.stop()
