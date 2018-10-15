@@ -112,3 +112,4 @@ venv.bak/
 # Any hdf5 or nexus files generated as program output
 *.hdf5
 *.nxs
+*.nx5

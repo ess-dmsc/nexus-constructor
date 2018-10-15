@@ -98,7 +98,8 @@ ApplicationWindow {
     FileDialog {
         id: fileDialog
         title: "Choose a file to write to"
-        nameFilters: ["Nexus files (*.nxs)", "HDF5 files (*.hdf5)"]
+        nameFilters: ["Nexus files (*.nxs *.nx5)", "HDF5 files (*.hdf5)"]
+        defaultSuffix: "nxs"
         selectExisting: false
         onAccepted: hdfWriter.save_instrument(fileDialog.fileUrl, components)
     }
