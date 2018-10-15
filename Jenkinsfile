@@ -38,7 +38,8 @@ node("docker") {
                 cd ${project}
                 build_env/bin/pip --proxy ${http_proxy} install --upgrade pip
                 build_env/bin/pip --proxy ${http_proxy} install -r requirements.txt
-                build_env/bin/pip --proxy ${env.http_proxy} install codecov"""
+                build_env/bin/pip --proxy ${env.http_proxy} install codecov
+                \""""
         }
 
         stage("Run Linter") {
