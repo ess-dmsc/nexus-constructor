@@ -1,5 +1,5 @@
 import h5py
-from geometry_constructor.DataModel import PixelModel
+from geometry_constructor.Models import PixelModel
 from PySide2.QtCore import QObject, Slot
 
 

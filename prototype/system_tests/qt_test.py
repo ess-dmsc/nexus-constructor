@@ -1,5 +1,5 @@
 from geometry_constructor.Window import Window
-from geometry_constructor.DataModel import PixelModel
+from geometry_constructor.Models import PixelModel
 from system_tests.Helpers import click_object, tree_search_items
 from PySide2.QtQuick import QQuickItem
 

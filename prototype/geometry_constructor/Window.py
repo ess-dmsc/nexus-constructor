@@ -1,5 +1,5 @@
 import sys
-from geometry_constructor.DataModel import PixelModel
+from geometry_constructor.Models import PixelModel
 from geometry_constructor.Writers import HdfWriter, Logger
 from os import path
 from PySide2.QtQuick import QQuickView
