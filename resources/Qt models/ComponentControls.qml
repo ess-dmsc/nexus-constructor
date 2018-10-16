@@ -98,30 +98,34 @@ Pane {
                         id: transformControls
                     }
 
-                    Button{
+                    PaddedButton{
                         id: editorButton
                         anchors.top: transformControls.bottom
                         anchors.left: parent.left
+                        width: parent.width / 4
                         text: "Full editor"
                     }
-                    Button{
+                    PaddedButton{
                         id: applyButton
                         anchors.top: editorButton.top
                         anchors.left: editorButton.right
+                        width: parent.width / 4
                         text: "Apply changes"
                         onClicked: transformControls.saveFields()
                     }
-                    Button{
+                    PaddedButton{
                         id: discardButton
                         anchors.top: editorButton.top
                         anchors.left: applyButton.right
+                        width: parent.width / 4
                         text: "Discard changes"
                         onClicked: transformControls.resetFields()
                     }
-                    Button{
+                    PaddedButton{
                         id: deleteButton
                         anchors.top: editorButton.top
                         anchors.left: discardButton.right
+                        width: parent.width / 4
                         text: "Delete"
                         onClicked: components.remove_component(index)
                     }

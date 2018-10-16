@@ -80,14 +80,14 @@ Item {
     LabeledTextField {
         id: yRotField
         anchors.top: xRotField.top
-        anchors.left: xRotField.right
+        anchors.horizontalCenter: parent.horizontalCenter
         labelText: "y:"
         editorText: rotate_y
     }
     LabeledTextField {
         id: zRotField
         anchors.top: xRotField.top
-        anchors.left: yRotField.right
+        anchors.right: parent.right
         labelText: "z:"
         editorText: rotate_z
     }
@@ -117,14 +117,14 @@ Item {
     LabeledTextField {
         id: yField
         anchors.top: xField.top
-        anchors.left: xField.right
+        anchors.horizontalCenter: parent.horizontalCenter
         labelText: "y:"
         editorText: translate_y
     }
     LabeledTextField {
         id: zField
         anchors.top: xField.top
-        anchors.left: yField.right
+        anchors.right: parent.right
         labelText: "z:"
         editorText: translate_z
     }
