@@ -13,7 +13,7 @@ def assess_unit_length_3d_vector(vector, original):
     assert original[0] / vector[0] == approx(original[2] / vector[2])
 
 
-def test_save_transformations():
+def make_instrument_with_sample_transform():
     instrument = InstrumentModel()
     instrument.components[0].translate_vector = Vector(7, 8, 9)
     instrument.components[0].rotate_axis = Vector(10, 11, 12)
@@ -23,12 +23,16 @@ def test_save_transformations():
                                           translate_vector=Vector(1, 2, 3),
                                           rotate_axis=Vector(4, 5, 6),
                                           rotate_angle=90))
+    return instrument
+
+
+def test_save_root_component_translate():
+    instrument = make_instrument_with_sample_transform()
     # use an in memory file to avoid disk usage during tests
     with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
         HdfWriter().save_instrument_to_file(file, instrument)
-        print(file)
-        # test stored transforms for the sample
         sample = file['entry/instrument/Sample']
+
         assert sample.attrs['NX_class'] == 'NXsample'
         assert sample.attrs['depends_on'] == 'translate'
 
@@ -40,6 +44,14 @@ def test_save_transformations():
         assess_unit_length_3d_vector(sample_translate.attrs['vector'], [7, 8, 9])
         assert sample_translate.attrs['depends_on'] == 'rotate'
 
+
+def test_save_root_component_rotate():
+    instrument = make_instrument_with_sample_transform()
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
+        sample = file['entry/instrument/Sample']
+
         sample_rotate = sample['rotate']
         assert sample_rotate[0] == 45
         assert sample_rotate.attrs['NX_class'] == 'NXtransformations'
@@ -48,8 +60,14 @@ def test_save_transformations():
         assess_unit_length_3d_vector(sample_rotate.attrs['vector'], [10, 11, 12])
         assert sample_rotate.attrs['depends_on'] == '.'
 
-        # test stored transforms for the detector
+
+def test_save_dependent_component_translate():
+    instrument = make_instrument_with_sample_transform()
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
         detector = file['entry/instrument/detector1']
+
         assert detector.attrs['NX_class'] == 'NXdetector'
         assert detector.attrs['depends_on'] == 'translate'
 
@@ -60,6 +78,14 @@ def test_save_transformations():
         assert detector_translate.attrs['units'] == 'm'
         assess_unit_length_3d_vector(detector_translate.attrs['vector'], [1, 2, 3])
         assert detector_translate.attrs['depends_on'] == 'rotate'
+
+
+def test_save_dependent_component_rotate():
+    instrument = make_instrument_with_sample_transform()
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
+        detector = file['entry/instrument/detector1']
 
         detector_rotate = detector['rotate']
         assert detector_rotate[0] == 90
