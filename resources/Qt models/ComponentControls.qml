@@ -105,9 +105,16 @@ Pane {
                         text: "Full editor"
                     }
                     Button{
-                        id: discardButton
+                        id: applyButton
                         anchors.top: editorButton.top
                         anchors.left: editorButton.right
+                        text: "Apply changes"
+                        onClicked: transformControls.saveFields()
+                    }
+                    Button{
+                        id: discardButton
+                        anchors.top: editorButton.top
+                        anchors.left: applyButton.right
                         text: "Discard changes"
                     }
                     Button{

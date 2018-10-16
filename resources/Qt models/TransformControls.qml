@@ -19,11 +19,22 @@ Item {
             xField.height
     width: parent.width
 
+    function saveFields(){
+        name = nameField.editorText
+        transform_parent_index = relativePicker.currentIndex
+        rotate_x = parseFloat(xRotField.editorText)
+        rotate_y = parseFloat(yRotField.editorText)
+        rotate_z = parseFloat(zRotField.editorText)
+        rotate_angle = parseFloat(angleField.editorText)
+        translate_x = parseFloat(xField.editorText)
+        translate_y = parseFloat(yField.editorText)
+        translate_z = parseFloat(zField.editorText)
+    }
+
     LabeledTextField {
         id: nameField
         labelText: "Name:"
         editorText: name
-        onEditingFinished: name = editorText
     }
 
     Label {
@@ -39,7 +50,6 @@ Item {
         model: components
         textRole: "name"
         currentIndex: transform_parent_index
-        onCurrentIndexChanged: transform_parent_index = currentIndex
     }
 
     Label {
@@ -55,7 +65,6 @@ Item {
         anchors.left: parent.left
         labelText: "x:"
         editorText: rotate_x
-        onEditingFinished: rotate_x = parseFloat(editorText)
     }
     LabeledTextField {
         id: yRotField
@@ -63,7 +72,6 @@ Item {
         anchors.left: xRotField.right
         labelText: "y:"
         editorText: rotate_y
-        onEditingFinished: rotate_y = parseFloat(editorText)
     }
     LabeledTextField {
         id: zRotField
@@ -71,7 +79,6 @@ Item {
         anchors.left: yRotField.right
         labelText: "z:"
         editorText: rotate_z
-        onEditingFinished: rotate_z = parseFloat(editorText)
     }
 
     LabeledTextField {
@@ -80,7 +87,6 @@ Item {
         anchors.right: zRotField.right
         labelText: "angle (degrees):"
         editorText: rotate_angle
-        onEditingFinished: rotate_angle = parseFloat(editorText)
     }
 
     Label {
@@ -96,7 +102,6 @@ Item {
         anchors.left: parent.left
         labelText: "x:"
         editorText: translate_x
-        onEditingFinished: translate_x = parseFloat(editorText)
     }
     LabeledTextField {
         id: yField
@@ -104,7 +109,6 @@ Item {
         anchors.left: xField.right
         labelText: "y:"
         editorText: translate_y
-        onEditingFinished: translate_y = parseFloat(editorText)
     }
     LabeledTextField {
         id: zField
@@ -112,6 +116,5 @@ Item {
         anchors.left: yField.right
         labelText: "z:"
         editorText: translate_z
-        onEditingFinished: translate_z = parseFloat(editorText)
     }
 }
