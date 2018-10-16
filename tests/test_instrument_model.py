@@ -1,5 +1,5 @@
 from geometry_constructor import datamodel
-from geometry_constructor.qmlmodel import InstrumentModel
+from geometry_constructor.instrument_model import InstrumentModel
 
 
 def test_initialise_model():

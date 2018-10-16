@@ -3,7 +3,7 @@ from math import sqrt
 from pytest import approx
 from geometry_constructor.writers import HdfWriter
 from geometry_constructor.datamodel import Detector, PixelGrid, Corner, CountDirection, Vector
-from geometry_constructor.qmlmodel import InstrumentModel
+from geometry_constructor.instrument_model import InstrumentModel
 
 
 def assess_unit_length_3d_vector(vector, original):
