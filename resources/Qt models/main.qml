@@ -49,7 +49,7 @@ ApplicationWindow {
             anchors.left: parent.left
             leftPadding: 0
 
-            width: 365;
+            width: 400;
         }
 
         Frame {
