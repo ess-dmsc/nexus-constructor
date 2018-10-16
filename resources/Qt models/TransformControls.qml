@@ -30,6 +30,17 @@ Item {
         translate_y = parseFloat(yField.editorText)
         translate_z = parseFloat(zField.editorText)
     }
+    function resetFields(){
+        nameField.editorText = name
+        relativePicker.currentIndex = transform_parent_index
+        xRotField.editorText = rotate_x
+        yRotField.editorText = rotate_y
+        zRotField.editorText = rotate_z
+        angleField.editorText = rotate_angle
+        xField.editorText = translate_x
+        yField.editorText = translate_y
+        zField.editorText = translate_z
+    }
 
     LabeledTextField {
         id: nameField

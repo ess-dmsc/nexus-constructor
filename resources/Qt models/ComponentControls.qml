@@ -116,6 +116,7 @@ Pane {
                         anchors.top: editorButton.top
                         anchors.left: applyButton.right
                         text: "Discard changes"
+                        onClicked: transformControls.resetFields()
                     }
                     Button{
                         id: deleteButton
