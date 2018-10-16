@@ -1,7 +1,7 @@
 import sys
 from os import path
-from geometry_constructor.Models import InstrumentModel
-from geometry_constructor.Writers import HdfWriter, Logger
+from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 
@@ -24,6 +24,6 @@ class Application(QQmlApplicationEngine):
                 print("Unable to load from url: {0}\nExiting".format(target_url.toString()), file=sys.stderr)
                 sys.exit(-1)
 
-        url = QUrl.fromLocalFile(path.join(resource_folder, 'Qt models', 'main.qml'))
+        url = QUrl.fromLocalFile(path.join(resource_folder, 'Qt models', 'Main.qml'))
         self.objectCreated.connect(load_listener)
         self.load(url)

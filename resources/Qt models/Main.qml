@@ -9,10 +9,9 @@ ApplicationWindow {
 
     title: "Nexus Geometry Constructor"
     id: window
-    objectName: "window"
     visible: true
-    width: 700
-    height: 300
+    width: 800
+    height: 500
 
     menuBar: MenuBar {
         Menu {
@@ -50,7 +49,7 @@ ApplicationWindow {
             anchors.left: parent.left
             leftPadding: 0
 
-            width: 365;
+            width: 400;
         }
 
         Frame {
@@ -84,7 +83,6 @@ ApplicationWindow {
 
     InstrumentModel{
         id: components
-        objectName: "components"
     }
 
     Logger {
@@ -98,7 +96,8 @@ ApplicationWindow {
     FileDialog {
         id: fileDialog
         title: "Choose a file to write to"
-        nameFilters: ["Nexus files (*.nxs)", "HDF5 files (*.hdf5)"]
+        nameFilters: ["Nexus files (*.nxs *.nx5)", "HDF5 files (*.hdf5)"]
+        defaultSuffix: "nxs"
         selectExisting: false
         onAccepted: hdfWriter.save_instrument(fileDialog.fileUrl, components)
     }

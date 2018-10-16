@@ -1,13 +1,104 @@
 import h5py
-from geometry_constructor.Writers import HdfWriter
-from geometry_constructor.Models import InstrumentModel, Detector, PixelGrid, Corner, CountDirection
+from math import sqrt
+from pytest import approx
+from geometry_constructor.writers import HdfWriter
+from geometry_constructor.data_model import Detector, PixelGrid, Corner, CountDirection, Vector
+from geometry_constructor.instrument_model import InstrumentModel
+
+
+def assess_unit_length_3d_vector(vector, original):
+    assert len(vector) == 3
+    assert sum(i**2 for i in vector) == approx(1)
+    assert original[0] / vector[0] == approx(original[1] / vector[1])
+    assert original[0] / vector[0] == approx(original[2] / vector[2])
+
+
+def make_instrument_with_sample_transform():
+    instrument = InstrumentModel()
+    instrument.components[0].translate_vector = Vector(7, 8, 9)
+    instrument.components[0].rotate_axis = Vector(10, 11, 12)
+    instrument.components[0].rotate_angle = 45
+    instrument.components.append(Detector(name='detector1',
+                                          transform_parent=instrument.components[0],
+                                          translate_vector=Vector(1, 2, 3),
+                                          rotate_axis=Vector(4, 5, 6),
+                                          rotate_angle=90))
+    return instrument
+
+
+def test_save_root_component_translate():
+    instrument = make_instrument_with_sample_transform()
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
+        sample = file['entry/instrument/Sample']
+
+        assert sample.attrs['NX_class'] == 'NXsample'
+        assert sample.attrs['depends_on'] == 'translate'
+
+        sample_translate = sample['translate']
+        assert sample_translate[0] == approx(sqrt(sum(i**2 for i in [7, 8, 9])))
+        assert sample_translate.attrs['NX_class'] == 'NXtransformations'
+        assert sample_translate.attrs['transformation_type'] == 'translation'
+        assert sample_translate.attrs['units'] == 'm'
+        assess_unit_length_3d_vector(sample_translate.attrs['vector'], [7, 8, 9])
+        assert sample_translate.attrs['depends_on'] == 'rotate'
+
+
+def test_save_root_component_rotate():
+    instrument = make_instrument_with_sample_transform()
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
+        sample = file['entry/instrument/Sample']
+
+        sample_rotate = sample['rotate']
+        assert sample_rotate[0] == 45
+        assert sample_rotate.attrs['NX_class'] == 'NXtransformations'
+        assert sample_rotate.attrs['transformation_type'] == 'rotation'
+        assert sample_rotate.attrs['units'] == 'degrees'
+        assess_unit_length_3d_vector(sample_rotate.attrs['vector'], [10, 11, 12])
+        assert sample_rotate.attrs['depends_on'] == '.'
+
+
+def test_save_dependent_component_translate():
+    instrument = make_instrument_with_sample_transform()
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
+        detector = file['entry/instrument/detector1']
+
+        assert detector.attrs['NX_class'] == 'NXdetector'
+        assert detector.attrs['depends_on'] == 'translate'
+
+        detector_translate = detector['translate']
+        assert detector_translate[0] == approx(sqrt(sum(i**2 for i in [1, 2, 3])))
+        assert detector_translate.attrs['NX_class'] == 'NXtransformations'
+        assert detector_translate.attrs['transformation_type'] == 'translation'
+        assert detector_translate.attrs['units'] == 'm'
+        assess_unit_length_3d_vector(detector_translate.attrs['vector'], [1, 2, 3])
+        assert detector_translate.attrs['depends_on'] == 'rotate'
+
+
+def test_save_dependent_component_rotate():
+    instrument = make_instrument_with_sample_transform()
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
+        detector = file['entry/instrument/detector1']
+
+        detector_rotate = detector['rotate']
+        assert detector_rotate[0] == 90
+        assert detector_rotate.attrs['NX_class'] == 'NXtransformations'
+        assert detector_rotate.attrs['transformation_type'] == 'rotation'
+        assert detector_rotate.attrs['units'] == 'degrees'
+        assess_unit_length_3d_vector(detector_rotate.attrs['vector'], [4, 5, 6])
+        assert detector_rotate.attrs['depends_on'] == '/entry/instrument/Sample/translate'
 
 
 def test_save_pixel_grid_coordinates():
     instrument = InstrumentModel()
     instrument.components.append(Detector(name='detector',
-                                          id=1,
-                                          transform_parent_id=0,
                                           pixel_data=PixelGrid(rows=3, columns=4, row_height=1.5, col_width=2,
                                                                first_id=0, count_direction=CountDirection.ROW,
                                                                initial_count_corner=Corner.BOTTOM_LEFT)))
@@ -31,8 +122,6 @@ def test_save_pixel_grid_coordinates():
 def assess_pixel_grid_direction(direction, corner, expected_data):
     instrument = InstrumentModel()
     instrument.components.append(Detector(name='detector',
-                                          id=1,
-                                          transform_parent_id=0,
                                           pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
                                                                first_id=0, count_direction=direction,
                                                                initial_count_corner=corner)))
