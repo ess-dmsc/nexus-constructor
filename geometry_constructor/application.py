@@ -1,7 +1,7 @@
 import sys
 from os import path
-from geometry_constructor.QmlModel import InstrumentModel
-from geometry_constructor.Writers import HdfWriter, Logger
+from geometry_constructor.qmlmodel import InstrumentModel
+from geometry_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 

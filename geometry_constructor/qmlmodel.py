@@ -1,4 +1,4 @@
-from geometry_constructor.DataModel import Sample, Detector, PixelGrid, CountDirection, Corner
+from geometry_constructor.datamodel import Sample, Detector, PixelGrid, CountDirection, Corner
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
 
 

@@ -1,6 +1,6 @@
 import sys
 from os import path, environ
-from geometry_constructor.Application import Application
+from geometry_constructor.application import Application
 from PySide2.QtGui import QGuiApplication
 
 
