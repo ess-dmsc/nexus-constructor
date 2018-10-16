@@ -23,8 +23,18 @@ Pane {
 
             text: "Add detector"
             onClicked: {
-                myLogger.log("Adding detector")
-                components.add_detector("A detector")
+                myLogger.log("Opening add detector window")
+                modalLoader.source = "AddDetectorWindow.qml"
+                modalLoader.item.components = components
+                modalLoader.item.show()
+                myLogger.log("Add detector window opened")
+            }
+            Loader {
+                id: modalLoader
+                Connections {
+                    target: modalLoader.item
+                    onClosing: modalLoader.source = ""
+                }
             }
         }
     }
