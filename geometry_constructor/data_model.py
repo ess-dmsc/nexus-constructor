@@ -29,9 +29,9 @@ class Geometry:
 
 @attr.s
 class CylindricalGeometry(Geometry):
-    bottom_center = attr.ib(Vector)
-    top_center = attr.ib(Vector)
-    bottom_edge = attr.ib(Vector)
+    axis_direction = attr.ib(default=Vector(1, 0, 0), type=Vector)
+    height = attr.ib(default=1, type=float)
+    radius = attr.ib(default=1, type=float)
 
 
 @attr.s
@@ -60,13 +60,13 @@ class Corner(Enum):
 
 @attr.s
 class PixelGrid(PixelData):
-    rows = attr.ib(int)
-    columns = attr.ib(int)
-    row_height = attr.ib(float)
-    col_width = attr.ib(float)
-    first_id = attr.ib(int)
-    count_direction = attr.ib(CountDirection)
-    initial_count_corner = attr.ib(Corner)
+    rows = attr.ib(default=1, type=int)
+    columns = attr.ib(default=1, type=int)
+    row_height = attr.ib(default=1, type=float)
+    col_width = attr.ib(default=1, type=float)
+    first_id = attr.ib(default=0, type=int)
+    count_direction = attr.ib(default=CountDirection.ROW, type=CountDirection)
+    initial_count_corner = attr.ib(default=Corner.BOTTOM_LEFT, type=Corner)
 
 
 @attr.s

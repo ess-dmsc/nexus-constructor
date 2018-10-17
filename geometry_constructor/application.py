@@ -1,6 +1,6 @@
 import sys
 from os import path
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.instrument_model import InstrumentModel, CylinderModel, OFFModel
 from geometry_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
@@ -9,6 +9,8 @@ from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 qmlRegisterType(Logger, 'MyWriters', 1, 0, 'Logger')
 qmlRegisterType(HdfWriter, 'MyWriters', 1, 0, 'HdfWriter')
 qmlRegisterType(InstrumentModel, 'MyModels', 1, 0, 'InstrumentModel')
+qmlRegisterType(CylinderModel, 'MyModels', 1, 0, 'CylinderModel')
+qmlRegisterType(OFFModel, 'MyModels', 1, 0, 'OFFModel')
 
 
 class Application(QQmlApplicationEngine):
