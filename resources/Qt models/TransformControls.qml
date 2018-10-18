@@ -3,15 +3,24 @@ import QtQuick.Controls 2.4
 
 /*
  * Controls for defining a components transformation to detector space.
- * Should be used as part of a delegate in a view on an InstrumentModel.
- * That instrumentModel should be available from the containing qml file
- * with the id 'components' so that it can be read to select a
- * transformation parent.
+ * Should be used in an environment where the following variables exist:
+ * - components (InstrumentModel)
+ * - transform_parent_index (integer)
+ * - rotate_x   (float)
+ * - rotate_y   (float)
+ * - rotate_z   (float)
+ * - rotate_angle   (float)
+ * - translate_x    (float)
+ * - translate_y    (float)
+ * - translate_z    (float)
+ *
+ * This can be acomplished by including it in a delegate in a view on an
+ * InstrumentModel, or by defining them as properties in the root object
+ * of a file in the 'document tree' these controls are included in.
  */
 
 Item {
-    height: nameField.height +
-            relativePicker.height +
+    height: relativePicker.height +
             rotateLabel.height +
             xRotField.height +
             angleField.height +
@@ -20,7 +29,6 @@ Item {
     width: parent.width
 
     function saveFields(){
-        name = nameField.editorText
         transform_parent_index = relativePicker.currentIndex
         rotate_x = parseFloat(xRotField.editorText)
         rotate_y = parseFloat(yRotField.editorText)
@@ -31,7 +39,6 @@ Item {
         translate_z = parseFloat(zField.editorText)
     }
     function resetFields(){
-        nameField.editorText = name
         relativePicker.currentIndex = transform_parent_index
         xRotField.editorText = rotate_x
         yRotField.editorText = rotate_y
@@ -42,12 +49,6 @@ Item {
         zField.editorText = translate_z
     }
 
-    LabeledTextField {
-        id: nameField
-        labelText: "Name:"
-        editorText: name
-    }
-
     Label {
         id: relativeLabel
         anchors.verticalCenter: relativePicker.verticalCenter
@@ -56,7 +57,7 @@ Item {
     }
     ComboBox {
         id: relativePicker
-        anchors.top: nameField.bottom
+        anchors.top: parent.top
         anchors.left: relativeLabel.right
         model: components
         textRole: "name"

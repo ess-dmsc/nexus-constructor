@@ -148,9 +148,9 @@ class HdfWriter(QObject):
         nx_group.attrs['NX_class'] = 'NXcylindrical_geometry'
         nx_group.create_dataset(
             'vertices',
-            data=[[vector.x, vector.y, vector.z]
-                  for vector
-                  in [geometry.bottom_center, geometry.bottom_edge, geometry.top_center]])
+            data=[[0, 0, 0],
+                  [],  # calculate the coordinates of a point on the radius of the base
+                  [x * geometry.height for x in geometry.axis_direction.unit_list()]])
         nx_group.create_dataset(
             'cylinders',
             dtype='i',

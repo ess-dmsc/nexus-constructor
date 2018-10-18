@@ -200,8 +200,8 @@ class CylinderModel(QAbstractListModel):
             CylinderModel.AxisXRole: b'axis_x',
             CylinderModel.AxisYRole: b'axis_y',
             CylinderModel.AxisZRole: b'axis_z',
-            CylinderModel.HeightRole: b'height',
-            CylinderModel.RadiusRole: b'radius'
+            CylinderModel.HeightRole: b'cylinder_height',
+            CylinderModel.RadiusRole: b'cylinder_radius'
         }
 
     def get_geometry(self):
@@ -234,7 +234,6 @@ class OFFModel(QAbstractListModel):
         if role == OFFModel.WindingOrderRole:
             return self.geometry.winding_order
 
-
     # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
         changed = False
@@ -243,9 +242,9 @@ class OFFModel(QAbstractListModel):
             self.file_path = value
             if changed:
                 self.load_data()
-                self.dataChanged.emit(index, index, OFFModel.VerticesRole)
-                self.dataChanged.emit(index, index, OFFModel.FacesRole)
-                self.dataChanged.emit(index, index, OFFModel.WindingOrderRole)
+                self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
+                                                     OFFModel.FacesRole,
+                                                     OFFModel.WindingOrderRole])
         if role == OFFModel.VerticesRole:
             changed = self.geometry.vertices != value
             self.geometry.vertices = value
@@ -264,11 +263,10 @@ class OFFModel(QAbstractListModel):
 
     def roleNames(self):
         return {
-            CylinderModel.AxisXRole: b'axis_x',
-            CylinderModel.AxisYRole: b'axis_y',
-            CylinderModel.AxisZRole: b'axis_z',
-            CylinderModel.HeightRole: b'height',
-            CylinderModel.RadiusRole: b'radius'
+            OFFModel.FileNameRole: b'filename',
+            OFFModel.VerticesRole: b'vertices',
+            OFFModel.FacesRole: b'faces',
+            OFFModel.WindingOrderRole: b'winding_order'
         }
 
     # Read the OFF file into self.geometry

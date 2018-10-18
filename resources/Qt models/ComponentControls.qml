@@ -97,12 +97,19 @@ Pane {
                 height: 0
                 visible: false
                 Item {
-                    height: transformControls.height + editorButton.height
+                    height: nameField.height + transformControls.height + editorButton.height
                     width: parent.width
                     id: extendedText
 
+                    LabeledTextField {
+                        id: nameField
+                        labelText: "Name:"
+                        editorText: name
+                    }
+
                     TransformControls {
                         id: transformControls
+                        anchors.top: nameField.bottom
                     }
 
                     PaddedButton {

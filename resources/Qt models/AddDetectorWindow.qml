@@ -37,7 +37,7 @@ Window {
                 id: offButton
                 text: "Repeatable OFF"
                 onClicked: {
-                    geometryPicker.state = "OFF"
+                    geometryControls.state = "OFF"
                     contentPane.state = "EnterDetails"
                 }
             }
@@ -47,7 +47,7 @@ Window {
                 anchors.top: offButton.bottom
                 text: "Repeatable Cylinder"
                 onClicked: {
-                    geometryPicker.state = "Cylinder"
+                    geometryControls.state = "Cylinder"
                     contentPane.state = "EnterDetails"
                 }
             }
@@ -58,26 +58,48 @@ Window {
             anchors.fill: parent
             visible: false
 
-            TransformControls {
-                id: transformControls
+            LabeledTextField {
+                id: nameField
+                labelText: "Name:"
+                editorText: name
             }
 
             LabeledTextField {
                 id: descriptionField
                 anchors.left: parent.left
-                anchors.top: transformControls.bottom
+                anchors.top: nameField.bottom
                 labelText: "Description:"
             }
 
-            GeometryPicker {
-                id: geometryPicker
+            Label {
+                id: transformLabel
                 anchors.top: descriptionField.bottom
                 anchors.left: parent.left
+                text: "Transform"
+            }
+
+            Frame {
+                id: transformFrame
+                anchors.top: transformLabel.bottom
+                anchors.left: parent.left
                 anchors.right: parent.right
+                contentHeight: transformControls.height
+                TransformControls {
+                    id: transformControls
+                }
+            }
+
+            GeometryControls {
+                id: geometryControls
+                anchors.top: transformFrame.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: addButton.top
             }
 
             Button {
-                anchors.top: geometryPicker.bottom
+                id: addButton
+                anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 text: "Add"
                 onClicked: {
@@ -85,7 +107,7 @@ Window {
                     components.add_detector(name, transform_parent_index,
                                             translate_x, translate_y, translate_z,
                                             rotate_x, rotate_y, rotate_z, rotate_angle)
-                    components.set_geometry(components.rowCount() - 1, geometryPicker.geometryModel)
+                    components.set_geometry(components.rowCount() - 1, geometryControls.geometryModel)
                     addDetectorWindow.close()
                 }
             }
