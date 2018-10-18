@@ -36,9 +36,9 @@ Pane {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 labelText: "OFF file:"
-                editorText: filename
+                editorText: file_url
                 editorWidth: 200
-                onEditingFinished: filename = editorText
+                onEditingFinished: file_url = editorText
             }
             Button {
                 id: chooseFileButton
@@ -52,8 +52,8 @@ Pane {
                 title: "Choose geometry file"
                 nameFilters: ["Object File Format (*.off)", "All files (*)"]
                 onAccepted: {
-                    filename = filePicker.fileUrl
-                    fileTextField.editorText = filePicker.fileUrl
+                    file_url = filePicker.fileUrl
+                    fileTextField.editorText = file_url
                 }
             }
         }

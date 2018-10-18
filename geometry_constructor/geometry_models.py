@@ -1,5 +1,6 @@
 from geometry_constructor.data_model import Vector, CylindricalGeometry, OFFGeometry
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex
+from nexusutils.readwriteoff import parse_off_file
+from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl
 
 
 class CylinderModel(QAbstractListModel):
@@ -77,15 +78,14 @@ class OFFModel(QAbstractListModel):
     def __init__(self):
         super().__init__()
         self.geometry = OFFGeometry()
-        self.file_path = ''
-        self.load_data()
+        self.file_url = QUrl('')
 
     def rowCount(self, parent=QModelIndex()):
         return 1
 
     def data(self, index, role=Qt.DisplayRole):
         if role == OFFModel.FileNameRole:
-            return self.file_path
+            return self.file_url
         if role == OFFModel.VerticesRole:
             return self.geometry.vertices
         if role == OFFModel.FacesRole:
@@ -97,8 +97,8 @@ class OFFModel(QAbstractListModel):
     def setData(self, index, value, role):
         changed = False
         if role == OFFModel.FileNameRole:
-            changed = self.file_path != value
-            self.file_path = value
+            changed = self.file_url != value
+            self.file_url = value
             if changed:
                 self.load_data()
                 self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
@@ -122,7 +122,7 @@ class OFFModel(QAbstractListModel):
 
     def roleNames(self):
         return {
-            OFFModel.FileNameRole: b'filename',
+            OFFModel.FileNameRole: b'file_url',
             OFFModel.VerticesRole: b'vertices',
             OFFModel.FacesRole: b'faces',
             OFFModel.WindingOrderRole: b'winding_order'
@@ -130,27 +130,17 @@ class OFFModel(QAbstractListModel):
 
     # Read the OFF file into self.geometry
     def load_data(self):
-        self.geometry.vertices = [
-            Vector(1.0, 0.0, 1.0),
-            Vector(0.0, 1.0, 1.0),
-            Vector(-1.0, 0.0, 1.0),
-            Vector(0.0, -1.0, 1.0),
-            Vector(1.0, 0.0, 0.0),
-            Vector(0.0, 1.0, 0.0),
-            Vector(-1.0, 0.0, 0.0),
-            Vector(0.0, -1.0, 0.0)
-        ]
-        self.geometry.faces = [
-            0, 1, 2, 3,
-            7, 4, 0, 3,
-            4, 5, 1, 0,
-            5, 6, 2, 1,
-            3, 2, 6, 7,
-            6, 5, 4, 1
-        ]
-        self.geometry.winding_order = [
-            0, 4, 8, 12, 16, 20
-        ]
+        filename = self.file_url.toString(options=QUrl.PreferLocalFile)
+        with open(filename) as file:
+            vertices, faces = parse_off_file(file)
+
+        self.geometry.vertices = [Vector(x, y, z) for x, y, z in (vertex for vertex in vertices)]
+
+        self.geometry.faces = [point for face in faces for point in face[1:]]
+
+        face_sizes = [face[0] for face in faces]
+
+        self.geometry.winding_order = [sum(face_sizes[0:i]) for i in range(len(faces))]
 
     def get_geometry(self):
         return self.geometry
