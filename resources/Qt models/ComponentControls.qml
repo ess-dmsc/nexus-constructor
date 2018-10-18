@@ -23,7 +23,6 @@ Pane {
             text: "Add detector"
             onClicked: {
                 modalLoader.source = "AddDetectorWindow.qml"
-                modalLoader.item.components = components
                 modalLoader.item.show()
             }
             Loader {
@@ -125,7 +124,10 @@ Pane {
                         anchors.left: editorButton.right
                         width: parent.width / 4
                         text: "Apply changes"
-                        onClicked: transformControls.saveFields()
+                        onClicked: {
+                            name = nameField.editorText
+                            transformControls.saveFields()
+                        }
                     }
                     PaddedButton {
                         id: discardButton
@@ -133,7 +135,10 @@ Pane {
                         anchors.left: applyButton.right
                         width: parent.width / 4
                         text: "Discard changes"
-                        onClicked: transformControls.resetFields()
+                        onClicked: {
+                            nameField.editorText = name
+                            transformControls.resetFields()
+                        }
                     }
                     PaddedButton {
                         id: deleteButton

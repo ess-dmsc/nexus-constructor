@@ -5,16 +5,17 @@ from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
 class InstrumentModel(QAbstractListModel):
 
     NameRole = Qt.UserRole + 1
-    TranslateVectorXRole = Qt.UserRole + 2
-    TranslateVectorYRole = Qt.UserRole + 3
-    TranslateVectorZRole = Qt.UserRole + 4
-    RotateAxisXRole = Qt.UserRole + 5
-    RotateAxisYRole = Qt.UserRole + 6
-    RotateAxisZRole = Qt.UserRole + 7
-    RotateAngleRole = Qt.UserRole + 8
-    TransformParentIndexRole = Qt.UserRole + 9
-    PixelDataRole = Qt.UserRole + 10
-    GeometryRole = Qt.UserRole + 11
+    DescriptionRole = Qt.UserRole + 2
+    TranslateVectorXRole = Qt.UserRole + 3
+    TranslateVectorYRole = Qt.UserRole + 4
+    TranslateVectorZRole = Qt.UserRole + 5
+    RotateAxisXRole = Qt.UserRole + 6
+    RotateAxisYRole = Qt.UserRole + 7
+    RotateAxisZRole = Qt.UserRole + 8
+    RotateAngleRole = Qt.UserRole + 9
+    TransformParentIndexRole = Qt.UserRole + 10
+    PixelDataRole = Qt.UserRole + 11
+    GeometryRole = Qt.UserRole + 12
 
     def __init__(self):
         super().__init__()
@@ -28,6 +29,8 @@ class InstrumentModel(QAbstractListModel):
         item = self.components[row]
         if role == InstrumentModel.NameRole:
             return item.name
+        if role == InstrumentModel.DescriptionRole:
+            return item.description
         if role == InstrumentModel.TranslateVectorXRole:
             return item.translate_vector.x
         if role == InstrumentModel.TranslateVectorYRole:
@@ -61,6 +64,9 @@ class InstrumentModel(QAbstractListModel):
         if role == InstrumentModel.NameRole:
             changed = item.name != value
             item.name = value
+        elif role == InstrumentModel.DescriptionRole:
+            changed = item.description != value
+            item.description = value
         elif role == InstrumentModel.TranslateVectorXRole:
             changed = item.translate_vector.x != value
             item.translate_vector.x = value
@@ -99,6 +105,7 @@ class InstrumentModel(QAbstractListModel):
     def roleNames(self):
         return {
             InstrumentModel.NameRole: b'name',
+            InstrumentModel.DescriptionRole: b'description',
             InstrumentModel.TranslateVectorXRole: b'translate_x',
             InstrumentModel.TranslateVectorYRole: b'translate_y',
             InstrumentModel.TranslateVectorZRole: b'translate_z',
@@ -112,12 +119,13 @@ class InstrumentModel(QAbstractListModel):
         }
 
     @Slot(str)
-    @Slot(str, int, float, float, float, float, float, float, float)
-    def add_detector(self, name, parent_index=0,
+    @Slot(str, str, int, float, float, float, float, float, float, float)
+    def add_detector(self, name, description, parent_index=0,
                      translate_x=0, translate_y=0, translate_z=0,
                      rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self.components.append(Detector(name=name,
+                                        description=description,
                                         transform_parent=self.components[parent_index],
                                         translate_vector=Vector(translate_x, translate_y, translate_z),
                                         rotate_axis=Vector(rotate_x, rotate_y, rotate_z),

@@ -6,6 +6,7 @@ import MyModels 1.0
 Window {
 
     property string name: "Detector"
+    property string description: ""
     property real transform_parent_index: 0
     property real rotate_x: 0
     property real rotate_y: 0
@@ -14,9 +15,6 @@ Window {
     property real translate_x: 0
     property real translate_y: 0
     property real translate_z: 0
-
-    property InstrumentModel components
-    property string geometryType: ""
 
     title: "Add Detector"
     id: addDetectorWindow
@@ -62,6 +60,7 @@ Window {
                 id: nameField
                 labelText: "Name:"
                 editorText: name
+                onEditingFinished: name = editorText
             }
 
             LabeledTextField {
@@ -69,6 +68,8 @@ Window {
                 anchors.left: parent.left
                 anchors.top: nameField.bottom
                 labelText: "Description:"
+                editorText: description
+                onEditingFinished: description = editorText
             }
 
             Label {
@@ -104,7 +105,7 @@ Window {
                 text: "Add"
                 onClicked: {
                     transformControls.saveFields()
-                    components.add_detector(name, transform_parent_index,
+                    components.add_detector(name, description, transform_parent_index,
                                             translate_x, translate_y, translate_z,
                                             rotate_x, rotate_y, rotate_z, rotate_angle)
                     components.set_geometry(components.rowCount() - 1, geometryControls.geometryModel)

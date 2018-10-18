@@ -77,6 +77,7 @@ class PixelMapping(PixelData):
 @attr.s
 class Component:
     name = attr.ib(str)
+    description = attr.ib(str)
     transform_parent = attr.ib(default=None, type=object)
     translate_vector = attr.ib(default=Vector(0, 0, 0), type=Vector)
     rotate_axis = attr.ib(default=Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
