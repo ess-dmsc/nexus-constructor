@@ -1,6 +1,8 @@
 from geometry_constructor.data_model import Vector, CylindricalGeometry, OFFGeometry
 from nexusutils.readwriteoff import parse_off_file
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl
+from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Slot
+
+from geometry_constructor.instrument_model import InstrumentModel
 
 
 class CylinderModel(QAbstractListModel):
@@ -67,13 +69,19 @@ class CylinderModel(QAbstractListModel):
     def get_geometry(self):
         return self.cylinder
 
+    @Slot(int, 'QVariant')
+    def set_geometry(self, index, instrument: InstrumentModel):
+        geometry = instrument.components[index].geometry
+        print("cylinder set to: ")
+        print(geometry)
+        self.cylinder = geometry
+
 
 class OFFModel(QAbstractListModel):
 
     FileNameRole = Qt.UserRole + 200
     VerticesRole = Qt.UserRole + 201
     FacesRole = Qt.UserRole + 202
-    WindingOrderRole = Qt.UserRole + 203
 
     def __init__(self):
         super().__init__()
@@ -90,8 +98,6 @@ class OFFModel(QAbstractListModel):
             return self.geometry.vertices
         if role == OFFModel.FacesRole:
             return self.geometry.faces
-        if role == OFFModel.WindingOrderRole:
-            return self.geometry.winding_order
 
     # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
@@ -102,17 +108,13 @@ class OFFModel(QAbstractListModel):
             if changed:
                 self.load_data()
                 self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
-                                                     OFFModel.FacesRole,
-                                                     OFFModel.WindingOrderRole])
+                                                     OFFModel.FacesRole])
         if role == OFFModel.VerticesRole:
             changed = self.geometry.vertices != value
             self.geometry.vertices = value
         if role == OFFModel.FacesRole:
             changed = self.geometry.faces != value
             self.geometry.faces = value
-        if role == OFFModel.WindingOrderRole:
-            changed = self.geometry.winding_order != value
-            self.geometry.winding_order = value
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
@@ -124,8 +126,7 @@ class OFFModel(QAbstractListModel):
         return {
             OFFModel.FileNameRole: b'file_url',
             OFFModel.VerticesRole: b'vertices',
-            OFFModel.FacesRole: b'faces',
-            OFFModel.WindingOrderRole: b'winding_order'
+            OFFModel.FacesRole: b'faces'
         }
 
     # Read the OFF file into self.geometry
@@ -134,13 +135,18 @@ class OFFModel(QAbstractListModel):
         with open(filename) as file:
             vertices, faces = parse_off_file(file)
 
+        print(vertices)
+        print(faces)
+
         self.geometry.vertices = [Vector(x, y, z) for x, y, z in (vertex for vertex in vertices)]
-
-        self.geometry.faces = [point for face in faces for point in face[1:]]
-
-        face_sizes = [face[0] for face in faces]
-
-        self.geometry.winding_order = [sum(face_sizes[0:i]) for i in range(len(faces))]
+        self.geometry.faces = [face.tolist()[1:] for face in faces]
 
     def get_geometry(self):
         return self.geometry
+
+    @Slot(int, 'QVariant')
+    def set_geometry(self, index, instrument: InstrumentModel):
+        geometry = instrument.components[index].geometry
+        print("OFF data set to: ")
+        print(geometry)
+        self.geometry = geometry

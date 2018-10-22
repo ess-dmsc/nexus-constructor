@@ -1,5 +1,8 @@
-from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDirection, Corner, Vector
+from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDirection, Corner, Vector,\
+    CylindricalGeometry, OFFGeometry, Component
+from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
+from PySide2.Qt3DExtras import Qt3DExtras
 
 
 class InstrumentModel(QAbstractListModel):
@@ -16,10 +19,34 @@ class InstrumentModel(QAbstractListModel):
     TransformParentIndexRole = Qt.UserRole + 10
     PixelDataRole = Qt.UserRole + 11
     GeometryRole = Qt.UserRole + 12
+    MeshRole = Qt.UserRole + 13
 
     def __init__(self):
         super().__init__()
-        self.components = [Sample(name='Sample')]
+        self.components = [
+            Sample(
+                name='OFF Sample',
+                geometry=OFFGeometry(
+                    vertices=[Vector(x=-0.5, y=-0.5, z=0.5),
+                              Vector(x=0.5, y=-0.5, z=0.5),
+                              Vector(x=-0.5, y=0.5, z=0.5),
+                              Vector(x=0.5, y=0.5, z=0.5),
+                              Vector(x=-0.5, y=0.5, z=-0.5),
+                              Vector(x=0.5, y=0.5, z=-0.5),
+                              Vector(x=-0.5, y=-0.5, z=-0.5),
+                              Vector(x=0.5, y=-0.5, z=-0.5)],
+                    faces=[[0, 1, 3, 2],
+                           [2, 3, 5, 4],
+                           [4, 5, 7, 6],
+                           [6, 7, 1, 0],
+                           [1, 7, 5, 3],
+                           [6, 0, 2, 4]]
+                )),
+            Detector(
+                name='Cylinder Detector',
+                geometry=CylindricalGeometry(radius=1, height=3),
+                translate_vector=Vector(0, 3, 0)
+            )]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.components)
@@ -55,6 +82,8 @@ class InstrumentModel(QAbstractListModel):
             return None
         if role == InstrumentModel.GeometryRole:
             return item.geometry
+        if role == InstrumentModel.MeshRole:
+            return self.generate_mesh(item)
 
     # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
@@ -115,7 +144,7 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.RotateAngleRole: b'rotate_angle',
             InstrumentModel.TransformParentIndexRole: b'transform_parent_index',
             InstrumentModel.PixelDataRole: b'pixel_data',
-            InstrumentModel.GeometryRole: b'geometry'
+            InstrumentModel.MeshRole: b'mesh'
         }
 
     @Slot(str)
@@ -148,3 +177,14 @@ class InstrumentModel(QAbstractListModel):
     def set_geometry(self, index, geometry_model):
         print(geometry_model)
         self.components[index].geometry = geometry_model.get_geometry()
+        self.dataChanged.emit(index, index, [InstrumentModel.GeometryRole,
+                                             InstrumentModel.MeshRole])
+
+    def generate_mesh(self, component: Component):
+        if isinstance(component.geometry, CylindricalGeometry):
+            geometry = Qt3DExtras.QCylinderMesh()
+            geometry.setLength(component.geometry.height)
+            geometry.setRadius(component.geometry.radius)
+            return geometry
+        if isinstance(component.geometry, OFFGeometry):
+            return OffMesh(component.geometry)

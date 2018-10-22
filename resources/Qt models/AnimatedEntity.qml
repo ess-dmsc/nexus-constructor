@@ -2,9 +2,13 @@ import Qt3D.Core 2.0
 import Qt3D.Extras 2.0
 import Qt3D.Input 2.0
 import Qt3D.Render 2.0
+import QtQuick 2.11
+import MyModels 1.0
 
 Entity {
     id: sceneRoot
+
+    property InstrumentModel instrument
 
     Camera {
         id: camera
@@ -50,6 +54,12 @@ Entity {
         ambient: "blue"
         diffuse: "blue"
         alpha: 0.5
+    }
+
+    PhongMaterial {
+        id: greenMaterial
+        ambient: "green"
+        diffuse: "green"
     }
 
     TorusMesh {
@@ -146,15 +156,33 @@ Entity {
         timespanOffset: -23
     }
 
-    Entity {
-        id: targetEntity
-        components: [ sphereMesh, redMaterial ]
-    }
-
     CylinderMesh {
         id: cylinderMesh
         length: 40
         radius: 2.5
+    }
+
+    NodeInstantiator  {
+        id: componentRenderList
+        model: instrument
+
+        Entity {
+            id: repeaterEntity
+            Transform {
+                id: repeaterTransform
+                matrix: {
+                    var m = Qt.matrix4x4()
+                    m.rotate(rotate_angle, Qt.vector3d(rotate_x, rotate_y, rotate_z))
+                    m.translate(Qt.vector3d(translate_x, translate_y, translate_z))
+                    return m;
+                }
+            }
+            components: [
+                mesh,
+                index == 0 ? redMaterial : greenMaterial,
+                repeaterTransform
+            ]
+        }
     }
 
     Transform {

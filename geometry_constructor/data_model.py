@@ -36,9 +36,17 @@ class CylindricalGeometry(Geometry):
 
 @attr.s
 class OFFGeometry(Geometry):
-    vertices = attr.ib(factory=list)
-    faces = attr.ib(factory=list)
-    winding_order = attr.ib(factory=list)
+    vertices = attr.ib(factory=list)  # list of Vector objects
+    faces = attr.ib(factory=list)  # List of lists. Each sublist is a polygon's points, as index numbers into vertices
+
+    @property
+    def flat_faces(self):
+        return [point for face in self.faces for point in face]
+
+    @property
+    def winding_order(self):
+        face_sizes = [len(face) for face in self.faces]
+        return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
 
 @attr.s
