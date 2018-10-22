@@ -92,5 +92,4 @@ class Sample(Component):
 
 @attr.s
 class Detector(Component):
-    geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)
