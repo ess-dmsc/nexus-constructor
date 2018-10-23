@@ -1,9 +1,11 @@
 import h5py
+from math import acos, cos, sin
 from pprint import pprint
 from geometry_constructor.data_model import Sample, Detector, PixelGrid, PixelMapping, CountDirection, Corner, \
     Geometry, OFFGeometry, CylindricalGeometry, Component
 from geometry_constructor.instrument_model import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
+from PySide2.QtGui import QVector2D
 
 
 class HdfWriter(QObject):
@@ -146,11 +148,19 @@ class HdfWriter(QObject):
 
     def store_cylindrical_geometry(self, nx_group: h5py.Group, geometry: CylindricalGeometry):
         nx_group.attrs['NX_class'] = 'NXcylindrical_geometry'
+
+        # project the cylinder axis onto the XY plane
+        flattened_axis = QVector2D(geometry.axis_direction.x, geometry.axis_direction.y)
+        y_axis = QVector2D(0, 1)
+        # calculate the angle between the cylinder axis and the y axis on the XY plane
+        angle = acos(QVector2D.dotProduct(flattened_axis, y_axis) / (flattened_axis.length() * y_axis.length()))
+        # that angle will also be the one between the cylinder base and X axis
+        
         nx_group.create_dataset(
             'vertices',
-            data=[[0, 0, 0],
-                  [],  # calculate the coordinates of a point on the radius of the base
-                  [x * geometry.height for x in geometry.axis_direction.unit_list()]])
+            data=[[0, 0, 0],  # center of the base
+                  [geometry.radius * cos(angle), geometry.radius * sin(angle), 0],  # a point on the radius of the base
+                  [x * geometry.height for x in geometry.axis_direction.unit_list()]])  # center of the top
         nx_group.create_dataset(
             'cylinders',
             dtype='i',
