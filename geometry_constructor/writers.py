@@ -155,7 +155,7 @@ class HdfWriter(QObject):
         # calculate the angle between the cylinder axis and the y axis on the XY plane
         angle = acos(QVector2D.dotProduct(flattened_axis, y_axis) / (flattened_axis.length() * y_axis.length()))
         # that angle will also be the one between the cylinder base and X axis
-        
+
         nx_group.create_dataset(
             'vertices',
             data=[[0, 0, 0],  # center of the base
