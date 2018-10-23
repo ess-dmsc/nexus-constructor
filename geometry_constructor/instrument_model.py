@@ -24,7 +24,7 @@ class InstrumentModel(QAbstractListModel):
         super().__init__()
         self.components = [
             Sample(
-                name='OFF Sample',
+                name='Sample',
                 geometry=OFFGeometry(
                     vertices=[Vector(x=-0.5, y=-0.5, z=0.5),
                               Vector(x=0.5, y=-0.5, z=0.5),
@@ -40,12 +40,7 @@ class InstrumentModel(QAbstractListModel):
                            [6, 7, 1, 0],
                            [1, 7, 5, 3],
                            [6, 0, 2, 4]]
-                )),
-            Detector(
-                name='Cylinder Detector',
-                geometry=CylindricalGeometry(radius=1, height=3),
-                translate_vector=Vector(0, 3, 0)
-            )]
+                ))]
         self.meshes = [self.generate_mesh(component) for component in self.components]
 
     def rowCount(self, parent=QModelIndex()):
@@ -149,7 +144,7 @@ class InstrumentModel(QAbstractListModel):
 
     @Slot(str)
     @Slot(str, str, int, float, float, float, float, float, float, float, 'QVariant')
-    def add_detector(self, name, description, parent_index=0,
+    def add_detector(self, name, description='', parent_index=0,
                      translate_x=0, translate_y=0, translate_z=0,
                      rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0,
                      geometry_model=None):
