@@ -103,8 +103,8 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                     for face in model.faces
                 ]
                 vertices += [
-                    Vector(vec.x + (col * grid.col_width) - (grid.col_width * grid.columns / 2),
-                           vec.y + (row * grid.row_height) - (grid.row_height * grid.rows / 2),
+                    Vector(vec.x + (col * grid.col_width),
+                           vec.y + (row * grid.row_height),
                            vec.z)
                     for vec in model.vertices
                 ]
