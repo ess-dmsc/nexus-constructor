@@ -45,10 +45,6 @@ Entity {
         diffuse: "red"
     }
 
-    PhongMaterial {
-        id: detectorMaterial
-    }
-
     PhongAlphaMaterial {
         id: beamMaterial
         ambient: "blue"
@@ -60,36 +56,6 @@ Entity {
         id: greenMaterial
         ambient: "green"
         diffuse: "green"
-    }
-
-    TorusMesh {
-        id: torusMesh
-        radius: 7
-        minorRadius: 1
-        rings: 100
-        slices: 20
-    }
-
-    Transform {
-        id: torusTransform
-        scale3D: Qt.vector3d(1, 1, 0.5)
-        rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), 45)
-    }
-
-    Entity {
-        id: torusEntity
-        components: [ torusMesh, detectorMaterial, torusTransform ]
-    }
-
-    Transform {
-        id: torusTransform2
-        scale3D: Qt.vector3d(1, 1, 0.5)
-        rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), 135)
-    }
-
-    Entity {
-        id: torusEntity2
-        components: [ torusMesh, detectorMaterial, torusTransform2 ]
     }
 
     SphereMesh {
@@ -196,7 +162,7 @@ Entity {
     }
 
     Entity {
-        id: detectorEntity
+        id: beamEntity
         components: [ cylinderMesh, beamMaterial, beamTransform ]
     }
 }
