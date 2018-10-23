@@ -2,7 +2,6 @@ from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDi
     CylindricalGeometry, OFFGeometry, Component
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
-from PySide2.Qt3DExtras import Qt3DExtras
 
 
 class InstrumentModel(QAbstractListModel):
@@ -182,9 +181,9 @@ class InstrumentModel(QAbstractListModel):
 
     def generate_mesh(self, component: Component):
         if isinstance(component.geometry, CylindricalGeometry):
-            geometry = Qt3DExtras.QCylinderMesh()
-            geometry.setLength(component.geometry.height)
-            geometry.setRadius(component.geometry.radius)
-            return geometry
-        if isinstance(component.geometry, OFFGeometry):
-            return OffMesh(component.geometry)
+            geometry = component.geometry.as_off_geometry()
+        elif isinstance(component.geometry, OFFGeometry):
+            geometry = component.geometry
+        else:
+            return
+        return OffMesh(geometry)

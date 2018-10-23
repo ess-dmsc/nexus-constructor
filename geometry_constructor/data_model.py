@@ -1,6 +1,7 @@
 import attr
 from enum import Enum
-from math import sqrt
+from math import sqrt, sin, cos, pi, acos
+from PySide2.QtGui import QVector3D, QMatrix4x4
 
 
 def validate_nonzero_vector(instance, attribute, value):
@@ -32,6 +33,36 @@ class CylindricalGeometry(Geometry):
     axis_direction = attr.ib(default=Vector(1, 0, 0), type=Vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
+
+    def as_off_geometry(self, steps=20):
+        default_axis = QVector3D(0, 0, 1)
+        desired_axis = QVector3D(self.axis_direction.x,
+                                 self.axis_direction.y,
+                                 self.axis_direction.z)
+        rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
+        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis) / self.axis_direction.magnitude())
+        rotate_degrees = rotate_radians * 360 / (2 * pi)
+        vertices = [QVector3D(sin(2 * pi * i / steps) * self.radius,
+                              cos(2 * pi * i / steps) * self.radius,
+                              0)
+                    for i in range(steps)] + \
+                   [QVector3D(sin(2 * pi * i / steps) * self.radius,
+                              cos(2 * pi * i / steps) * self.radius,
+                              self.height)
+                    for i in range(steps)]
+        rotate_matrix = QMatrix4x4()
+        rotate_matrix.rotate(rotate_degrees, rotate_axis)
+        vectors = []
+        for vertex in vertices:
+            rotated = vertex * rotate_matrix
+            vectors.append(Vector(rotated.x(), rotated.y(), rotated.z()))
+        return OFFGeometry(
+            vertices=vectors,
+            faces=[[i, steps + i, steps + ((i + 1) % steps), (i + 1) % steps]
+                   for i in range(steps)] +
+                  [[i for i in range(steps)],
+                   [i for i in range((2 * steps) - 1, steps - 1, -1)]]
+        )
 
 
 @attr.s
