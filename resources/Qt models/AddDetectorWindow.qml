@@ -107,8 +107,8 @@ Window {
                     transformControls.saveFields()
                     components.add_detector(name, description, transform_parent_index,
                                             translate_x, translate_y, translate_z,
-                                            rotate_x, rotate_y, rotate_z, rotate_angle)
-                    components.set_geometry(components.rowCount() - 1, geometryControls.geometryModel)
+                                            rotate_x, rotate_y, rotate_z, rotate_angle,
+                                            geometryControls.geometryModel)
                     addDetectorWindow.close()
                 }
             }

@@ -147,17 +147,20 @@ class InstrumentModel(QAbstractListModel):
         }
 
     @Slot(str)
-    @Slot(str, str, int, float, float, float, float, float, float, float)
+    @Slot(str, str, int, float, float, float, float, float, float, float, 'QVariant')
     def add_detector(self, name, description, parent_index=0,
                      translate_x=0, translate_y=0, translate_z=0,
-                     rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0):
+                     rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0,
+                     geometry_model=None):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        geometry = None if geometry_model is None else geometry_model.get_geometry()
         self.components.append(Detector(name=name,
                                         description=description,
                                         transform_parent=self.components[parent_index],
                                         translate_vector=Vector(translate_x, translate_y, translate_z),
                                         rotate_axis=Vector(rotate_x, rotate_y, rotate_z),
                                         rotate_angle=rotate_angle,
+                                        geometry=geometry,
                                         pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
                                                              first_id=0, count_direction=CountDirection.ROW,
                                                              initial_count_corner=Corner.TOP_LEFT)))
