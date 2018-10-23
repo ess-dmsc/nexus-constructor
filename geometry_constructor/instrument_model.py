@@ -46,6 +46,7 @@ class InstrumentModel(QAbstractListModel):
                 geometry=CylindricalGeometry(radius=1, height=3),
                 translate_vector=Vector(0, 3, 0)
             )]
+        self.meshes = [self.generate_mesh(component) for component in self.components]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.components)
@@ -82,7 +83,7 @@ class InstrumentModel(QAbstractListModel):
         if role == InstrumentModel.GeometryRole:
             return item.geometry
         if role == InstrumentModel.MeshRole:
-            return self.generate_mesh(item)
+            return self.meshes[row]
 
     # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
@@ -154,16 +155,18 @@ class InstrumentModel(QAbstractListModel):
                      geometry_model=None):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         geometry = None if geometry_model is None else geometry_model.get_geometry()
-        self.components.append(Detector(name=name,
-                                        description=description,
-                                        transform_parent=self.components[parent_index],
-                                        translate_vector=Vector(translate_x, translate_y, translate_z),
-                                        rotate_axis=Vector(rotate_x, rotate_y, rotate_z),
-                                        rotate_angle=rotate_angle,
-                                        geometry=geometry,
-                                        pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
-                                                             first_id=0, count_direction=CountDirection.ROW,
-                                                             initial_count_corner=Corner.TOP_LEFT)))
+        detector = Detector(name=name,
+                            description=description,
+                            transform_parent=self.components[parent_index],
+                            translate_vector=Vector(translate_x, translate_y, translate_z),
+                            rotate_axis=Vector(rotate_x, rotate_y, rotate_z),
+                            rotate_angle=rotate_angle,
+                            geometry=geometry,
+                            pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
+                                                 first_id=0, count_direction=CountDirection.ROW,
+                                                 initial_count_corner=Corner.TOP_LEFT))
+        self.components.append(detector)
+        self.meshes.append(self.generate_mesh(detector))
         self.endInsertRows()
 
     @Slot(int)
@@ -172,13 +175,15 @@ class InstrumentModel(QAbstractListModel):
         if index == 0:
             return
         self.beginRemoveRows(QModelIndex(), index, index)
-        self.components = self.components[0:index] + self.components[index + 1:self.rowCount()]
+        self.components.pop(index)
+        self.meshes.pop(index)
         self.endRemoveRows()
 
     @Slot(int, 'QVariant')
     def set_geometry(self, index, geometry_model):
         print(geometry_model)
         self.components[index].geometry = geometry_model.get_geometry()
+        self.meshes[index] = self.generate_mesh(self.components[index])
         self.dataChanged.emit(index, index, [InstrumentModel.GeometryRole,
                                              InstrumentModel.MeshRole])
 
