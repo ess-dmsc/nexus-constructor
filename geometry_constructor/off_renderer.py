@@ -30,6 +30,12 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                     vertex_buffer_values.append(vertex.x)
                     vertex_buffer_values.append(vertex.y)
                     vertex_buffer_values.append(vertex.z)
+                # repeat with the opposite winding to ensure the face is rendered regardless of winding in loaded model
+                for point_index in [face[0], face[i + 2], face[i + 1]]:
+                    vertex = vertices[point_index]
+                    vertex_buffer_values.append(vertex.x)
+                    vertex_buffer_values.append(vertex.y)
+                    vertex_buffer_values.append(vertex.z)
 
         normal_buffer_values = []
         for face in faces:
@@ -44,6 +50,11 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                     normal_buffer_values.append(normal.x())
                     normal_buffer_values.append(normal.y())
                     normal_buffer_values.append(normal.z())
+                # repeat with the opposite normal to ensure the face is rendered regardless of winding in loaded model
+                for j in range(3):
+                    normal_buffer_values.append(-normal.x())
+                    normal_buffer_values.append(-normal.y())
+                    normal_buffer_values.append(-normal.z())
 
         vertexBuffer = Qt3DRender.QBuffer(self)
         vertexBuffer.setData(
