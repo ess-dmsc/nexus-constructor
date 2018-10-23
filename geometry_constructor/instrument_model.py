@@ -186,4 +186,6 @@ class InstrumentModel(QAbstractListModel):
             geometry = component.geometry
         else:
             return
+        if isinstance(component, Detector):
+            return OffMesh(geometry, component.pixel_data)
         return OffMesh(geometry)

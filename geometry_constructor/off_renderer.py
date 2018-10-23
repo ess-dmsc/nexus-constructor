@@ -1,4 +1,4 @@
-from geometry_constructor.data_model import OFFGeometry
+from geometry_constructor.data_model import OFFGeometry, PixelData, PixelGrid, Vector
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct
@@ -12,40 +12,46 @@ import struct
 
 class QtOFFGeometry(Qt3DRender.QGeometry):
 
-    def __init__(self, model: OFFGeometry, parent=None):
+    def __init__(self, model: OFFGeometry, pixel_data: PixelData, parent=None):
         super().__init__(parent)
 
-        # for each point in each triangle in each face, add its points to the vertices list
-        vertices = []
-        for face in model.faces:
-            for i in range(len(face) - 2):
-                for point in [face[0], face[i + 1], face[i + 2]]:
-                    vertex = model.vertices[point]
-                    vertices.append(vertex.x)
-                    vertices.append(vertex.y)
-                    vertices.append(vertex.z)
+        if isinstance(pixel_data, PixelGrid):
+            faces, vertices = self.repeat_shape_over_grid(model, pixel_data)
+        else:
+            faces = model.faces
+            vertices = model.vertices
 
-        normals = []
-        for face in model.faces:
+        # for each point in each triangle in each face, add its points to the vertices list
+        vertex_buffer_values = []
+        for face in faces:
             for i in range(len(face) - 2):
-                p1 = model.vertices[face[0]]
-                p2 = model.vertices[face[i + 1]]
-                p3 = model.vertices[face[i + 2]]
+                for point_index in [face[0], face[i + 1], face[i + 2]]:
+                    vertex = vertices[point_index]
+                    vertex_buffer_values.append(vertex.x)
+                    vertex_buffer_values.append(vertex.y)
+                    vertex_buffer_values.append(vertex.z)
+
+        normal_buffer_values = []
+        for face in faces:
+            for i in range(len(face) - 2):
+                p1 = vertices[face[0]]
+                p2 = vertices[face[i + 1]]
+                p3 = vertices[face[i + 2]]
                 normal = QVector3D.normal(QVector3D(p1.x, p1.y, p1.z),
                                           QVector3D(p2.x, p2.y, p2.z),
                                           QVector3D(p3.x, p3.y, p3.z))
                 for j in range(3):
-                    normals.append(normal.x())
-                    normals.append(normal.y())
-                    normals.append(normal.z())
+                    normal_buffer_values.append(normal.x())
+                    normal_buffer_values.append(normal.y())
+                    normal_buffer_values.append(normal.z())
 
         vertexBuffer = Qt3DRender.QBuffer(self)
         vertexBuffer.setData(
-            struct.pack('%sf' % len(vertices), *vertices)
+            struct.pack('%sf' % len(vertex_buffer_values), *vertex_buffer_values)
         )
         normalBuffer = Qt3DRender.QBuffer(self)
         normalBuffer.setData(
-            struct.pack('%sf' % len(normals), *normals)
+            struct.pack('%sf' % len(normal_buffer_values), *normal_buffer_values)
         )
 
         float_size = len(struct.pack('f', 0.0))
@@ -57,7 +63,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         positionAttribute.setDataSize(3)
         positionAttribute.setByteOffset(0)
         positionAttribute.setByteStride(3 * float_size)
-        positionAttribute.setCount(len(vertices))
+        positionAttribute.setCount(len(vertex_buffer_values))
         positionAttribute.setName(Qt3DRender.QAttribute.defaultPositionAttributeName())
 
         normalAttribute = Qt3DRender.QAttribute(self)
@@ -67,22 +73,39 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         normalAttribute.setDataSize(3)
         normalAttribute.setByteOffset(0)
         normalAttribute.setByteStride(3 * float_size)
-        normalAttribute.setCount(len(normals))
+        normalAttribute.setCount(len(normal_buffer_values))
         normalAttribute.setName(Qt3DRender.QAttribute.defaultNormalAttributeName())
 
         self.addAttribute(positionAttribute)
         self.addAttribute(normalAttribute)
-        self.vertex_count = len(vertices) // 3
+        self.vertex_count = len(vertex_buffer_values) // 3
 
         print('Qt mesh built')
+
+    def repeat_shape_over_grid(self, model: OFFGeometry, grid: PixelGrid):
+        faces = []
+        vertices = []
+        for row in range(grid.rows):
+            for col in range(grid.columns):
+                faces += [
+                    [i + (col + (row * grid.columns)) * len(model.vertices) for i in face]
+                    for face in model.faces
+                ]
+                vertices += [
+                    Vector(vec.x + (col * grid.col_width) - (grid.col_width * grid.columns / 2),
+                           vec.y + (row * grid.row_height) - (grid.row_height * grid.rows / 2),
+                           vec.z)
+                    for vec in model.vertices
+                ]
+        return faces, vertices
 
 
 class OffMesh(Qt3DRender.QGeometryRenderer):
 
-    def __init__(self, geometry: OFFGeometry, parent=None):
+    def __init__(self, geometry: OFFGeometry, pixel_data: PixelData=None, parent=None):
         super().__init__(parent)
 
-        qt_geometry = QtOFFGeometry(geometry, self)
+        qt_geometry = QtOFFGeometry(geometry, pixel_data, self)
 
         self.setInstanceCount(1)
         self.setFirstVertex(0)
