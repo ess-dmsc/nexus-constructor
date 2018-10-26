@@ -19,20 +19,33 @@ Window {
     title: "Add Detector"
     id: addDetectorWindow
     modality: Qt.ApplicationModal
-    width: 200
-    height: 200
+    minimumHeight: contentPane.height
+    minimumWidth: contentPane.width
+    height: minimumHeight
+    width: minimumWidth
+    maximumHeight: minimumHeight
+    maximumWidth: minimumWidth
 
     Pane {
         id: contentPane
-        anchors.fill: parent
+        contentWidth: geometrySelectionPane.width
+        contentHeight: geometrySelectionPane.height
+        padding: 0
 
         Pane {
             id: geometrySelectionPane
-            anchors.fill: parent
+            contentWidth: Math.max(geometryLabel.width, offButton.width, cylinderButton.width)
+            contentHeight: geometryLabel.height + offButton.height + cylinderButton.height
             visible: true
 
-            Button {
+            Label {
+                id: geometryLabel
+                text: "Pick detector geometry type:"
+            }
+
+            PaddedButton {
                 id: offButton
+                anchors.top: geometryLabel.bottom
                 text: "Repeatable OFF"
                 onClicked: {
                     geometryControls.state = "OFF"
@@ -40,7 +53,7 @@ Window {
                 }
             }
 
-            Button {
+            PaddedButton {
                 id: cylinderButton
                 anchors.top: offButton.bottom
                 text: "Repeatable Cylinder"
@@ -53,7 +66,13 @@ Window {
 
         Pane {
             id: detailsPane
-            anchors.fill: parent
+            contentWidth: Math.max(transformFrame.width, geometryControls.width)
+            contentHeight: nameField.height
+                           + descriptionField.height
+                           + transformLabel.height
+                           + transformFrame.height
+                           + geometryControls.height
+                           + addButton.height
             visible: false
 
             LabeledTextField {
@@ -82,9 +101,8 @@ Window {
             Frame {
                 id: transformFrame
                 anchors.top: transformLabel.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
                 contentHeight: transformControls.height
+                contentWidth: transformControls.width
                 TransformControls {
                     id: transformControls
                 }
@@ -93,14 +111,11 @@ Window {
             GeometryControls {
                 id: geometryControls
                 anchors.top: transformFrame.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: addButton.top
             }
 
-            Button {
+            PaddedButton {
                 id: addButton
-                anchors.bottom: parent.bottom
+                anchors.top: geometryControls.bottom
                 anchors.left: parent.left
                 text: "Add"
                 onClicked: {
@@ -123,8 +138,8 @@ Window {
 
                 PropertyChanges { target: geometrySelectionPane; visible: false }
                 PropertyChanges { target: detailsPane; visible: true }
-                PropertyChanges { target: addDetectorWindow; height: 400 }
-                PropertyChanges { target: addDetectorWindow; width: 400 }
+                PropertyChanges { target: contentPane; contentHeight: detailsPane.height }
+                PropertyChanges { target: contentPane; contentWidth: detailsPane.width }
             }
         ]
     }

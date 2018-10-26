@@ -9,10 +9,12 @@ Pane {
 
     id: pane
     padding: 0
+    contentWidth: view.width
+    contentHeight: view.height
 
     ListView {
         id: view
-        anchors.fill: parent
+        height: contentHeight
         interactive: false
     }
 
@@ -76,8 +78,8 @@ Pane {
             Frame {
                 id: fields
                 anchors.top: cylinderLabel.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
+                contentWidth: Math.max(heightField.width + radiusField.width,
+                                       axisXField.width + axisYField.width + axisZField.width)
                 contentHeight: heightField.height + directionLabel.height + axisXField.height
 
                 LabeledTextField {

@@ -26,7 +26,7 @@ Item {
             angleField.height +
             translateLabel.height +
             xField.height
-    width: parent.width
+    width: xRotField.width + yRotField.width + zRotField.width
 
     function saveFields(){
         transform_parent_index = relativePicker.currentIndex
