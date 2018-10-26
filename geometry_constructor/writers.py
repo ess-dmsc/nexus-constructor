@@ -33,6 +33,7 @@ class HdfWriter(QObject):
         for component in model.components:
             nx_component = instrument.create_group(component.name)
             self.store_transformations(nx_component, component)
+            nx_component.attrs['description'] = component.description
 
             if isinstance(component, Sample):
                 nx_component.attrs['NX_class'] = 'NXsample'
