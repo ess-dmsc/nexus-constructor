@@ -140,6 +140,8 @@ Window {
                 PropertyChanges { target: detailsPane; visible: true }
                 PropertyChanges { target: contentPane; contentHeight: detailsPane.height }
                 PropertyChanges { target: contentPane; contentWidth: detailsPane.width }
+                PropertyChanges { target: detailsPane; focus: true}
+                PropertyChanges { target: nameField; focus: true}
             }
         ]
     }

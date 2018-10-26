@@ -20,6 +20,7 @@ Pane {
     }
     TextField {
         id: field
+        focus: true
         anchors.top: parent.top
         anchors.left: label.right
         width: editorWidth
