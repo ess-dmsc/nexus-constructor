@@ -15,12 +15,18 @@ class Vector:
     y = attr.ib(float)
     z = attr.ib(float)
 
+    @property
     def magnitude(self):
         return sqrt(self.x**2 + self.y**2 + self.z**2)
 
+    @property
+    def xyz_list(self):
+        return [self.x, self.y, self.z]
+
+    @property
     def unit_list(self):
-        magnitude = self.magnitude()
-        return [self.x / magnitude, self.y / magnitude, self.z / magnitude]
+        magnitude = self.magnitude
+        return [value / magnitude for value in self.xyz_list]
 
 
 @attr.s
@@ -30,9 +36,32 @@ class Geometry:
 
 @attr.s
 class CylindricalGeometry(Geometry):
-    axis_direction = attr.ib(default=Vector(1, 0, 0), type=Vector)
+    axis_direction = attr.ib(default=Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
+
+    @property
+    def base_center_point(self):
+        return Vector(0, 0, 0)
+
+    @property
+    def base_edge_point(self):
+        default_axis = QVector3D(0, 0, 1)
+        desired_axis = QVector3D(self.axis_direction.x,
+                                 self.axis_direction.y,
+                                 self.axis_direction.z)
+        rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
+        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis) / self.axis_direction.magnitude)
+        rotate_degrees = rotate_radians * 360 / (2 * pi)
+        rotate_matrix = QMatrix4x4()
+        rotate_matrix.rotate(rotate_degrees, rotate_axis)
+        edge_point = QVector3D(self.radius, 0, 0) * rotate_matrix
+        return Vector(edge_point.x(), edge_point.y(), edge_point.z())
+
+    @property
+    def top_center_point(self):
+        values = [x * self.height for x in self.axis_direction.unit_list]
+        return Vector(values[0], values[1], values[2])
 
     def as_off_geometry(self, steps=20):
         default_axis = QVector3D(0, 0, 1)
@@ -40,7 +69,7 @@ class CylindricalGeometry(Geometry):
                                  self.axis_direction.y,
                                  self.axis_direction.z)
         rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
-        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis) / self.axis_direction.magnitude())
+        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis) / self.axis_direction.magnitude)
         rotate_degrees = rotate_radians * 360 / (2 * pi)
         vertices = [QVector3D(sin(2 * pi * i / steps) * self.radius,
                               cos(2 * pi * i / steps) * self.radius,
