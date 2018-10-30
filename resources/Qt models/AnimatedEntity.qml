@@ -136,12 +136,7 @@ Entity {
             id: repeaterEntity
             Transform {
                 id: repeaterTransform
-                matrix: {
-                    var m = Qt.matrix4x4()
-                    m.rotate(rotate_angle, Qt.vector3d(rotate_x, rotate_y, rotate_z))
-                    m.translate(Qt.vector3d(translate_x, translate_y, translate_z))
-                    return m;
-                }
+                matrix: transform_matrix
             }
             components: [
                 mesh,

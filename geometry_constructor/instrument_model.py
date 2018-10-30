@@ -2,6 +2,7 @@ from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDi
     CylindricalGeometry, OFFGeometry, Component
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
+from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
 class InstrumentModel(QAbstractListModel):
@@ -19,6 +20,7 @@ class InstrumentModel(QAbstractListModel):
     PixelDataRole = Qt.UserRole + 11
     GeometryRole = Qt.UserRole + 12
     MeshRole = Qt.UserRole + 13
+    TransformMatrixRole = Qt.UserRole + 14
 
     def __init__(self):
         super().__init__()
@@ -79,6 +81,8 @@ class InstrumentModel(QAbstractListModel):
             return item.geometry
         if role == InstrumentModel.MeshRole:
             return self.meshes[row]
+        if role == InstrumentModel.TransformMatrixRole:
+            return self.generate_matrix(item)
 
     # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
@@ -94,24 +98,31 @@ class InstrumentModel(QAbstractListModel):
         elif role == InstrumentModel.TranslateVectorXRole:
             changed = item.translate_vector.x != value
             item.translate_vector.x = value
+            self.update_child_transforms(item)
         elif role == InstrumentModel.TranslateVectorYRole:
             changed = item.translate_vector.y != value
             item.translate_vector.y = value
+            self.update_child_transforms(item)
         elif role == InstrumentModel.TranslateVectorZRole:
             changed = item.translate_vector.z != value
             item.translate_vector.z = value
+            self.update_child_transforms(item)
         elif role == InstrumentModel.RotateAxisXRole:
             changed = item.rotate_axis.x != value
             item.rotate_axis.x = value
+            self.update_child_transforms(item)
         elif role == InstrumentModel.RotateAxisYRole:
             changed = item.rotate_axis.y != value
             item.rotate_axis.y = value
+            self.update_child_transforms(item)
         elif role == InstrumentModel.RotateAxisZRole:
             changed = item.rotate_axis.z != value
             item.rotate_axis.z = value
+            self.update_child_transforms(item)
         elif role == InstrumentModel.RotateAngleRole:
             changed = item.rotate_angle != value
             item.rotate_angle = value
+            self.update_child_transforms(item)
         elif role == InstrumentModel.TransformParentIndexRole:
             if 0 <= value < len(self.components):
                 selected = self.components[value]
@@ -119,6 +130,7 @@ class InstrumentModel(QAbstractListModel):
                 selected = None
             changed = item.transform_parent != selected
             item.transform_parent = selected
+            self.update_child_transforms(item)
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
@@ -139,7 +151,8 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.RotateAngleRole: b'rotate_angle',
             InstrumentModel.TransformParentIndexRole: b'transform_parent_index',
             InstrumentModel.PixelDataRole: b'pixel_data',
-            InstrumentModel.MeshRole: b'mesh'
+            InstrumentModel.MeshRole: b'mesh',
+            InstrumentModel.TransformMatrixRole: b'transform_matrix',
         }
 
     @Slot(str)
@@ -179,8 +192,9 @@ class InstrumentModel(QAbstractListModel):
         print(geometry_model)
         self.components[index].geometry = geometry_model.get_geometry()
         self.meshes[index] = self.generate_mesh(self.components[index])
-        self.dataChanged.emit(index, index, [InstrumentModel.GeometryRole,
-                                             InstrumentModel.MeshRole])
+        model_index = self.createIndex(index, 0)
+        self.dataChanged.emit(model_index, model_index, [InstrumentModel.GeometryRole,
+                                                         InstrumentModel.MeshRole])
 
     def generate_mesh(self, component: Component):
         if isinstance(component.geometry, CylindricalGeometry):
@@ -192,3 +206,28 @@ class InstrumentModel(QAbstractListModel):
         if isinstance(component, Detector):
             return OffMesh(geometry, component.pixel_data)
         return OffMesh(geometry)
+
+    def generate_matrix(self, component: Component):
+        matrix = QMatrix4x4()
+
+        def apply_transforms(item: Component):
+            if item.transform_parent is not None and item != item.transform_parent:
+                apply_transforms(item.transform_parent)
+
+            matrix.rotate(item.rotate_angle,
+                          QVector3D(item.rotate_axis.x,
+                                    item.rotate_axis.y,
+                                    item.rotate_axis.z))
+            matrix.translate(item.translate_vector.x,
+                             item.translate_vector.y,
+                             item.translate_vector.z)
+        apply_transforms(component)
+        return matrix
+
+    def update_child_transforms(self, component):
+        for i in range(len(self.components)):
+            candidate = self.components[i]
+            if candidate.transform_parent is component and candidate is not component:
+                model_index = self.createIndex(i, 0)
+                self.dataChanged.emit(model_index, model_index, InstrumentModel.TransformMatrixRole)
+                self.update_child_transforms(candidate)
