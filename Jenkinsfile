@@ -36,9 +36,9 @@ node("docker") {
         stage("Install requirements") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
-                build_env/bin/pip -E install --upgrade pip
-                build_env/bin/pip -E install -r requirements.txt
-                build_env/bin/pip -E install codecov
+                build_env/bin/pip install --upgrade pip
+                build_env/bin/pip install -r requirements.txt
+                build_env/bin/pip install codecov
                 \""""
         }
 
