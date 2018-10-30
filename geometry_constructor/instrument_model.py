@@ -170,7 +170,7 @@ class InstrumentModel(QAbstractListModel):
                             rotate_axis=Vector(rotate_x, rotate_y, rotate_z),
                             rotate_angle=rotate_angle,
                             geometry=geometry,
-                            pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
+                            pixel_data=PixelGrid(rows=3, columns=4, row_height=2, col_width=3,
                                                  first_id=0, count_direction=CountDirection.ROW,
                                                  initial_count_corner=Corner.TOP_LEFT))
         self.components.append(detector)
