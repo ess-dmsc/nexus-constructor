@@ -100,11 +100,11 @@ class OFFGeometry(Geometry):
     faces = attr.ib(factory=list)  # List of lists. Each sublist is a polygon's points, as index numbers into vertices
 
     @property
-    def flat_faces(self):
+    def winding_order(self):
         return [point for face in self.faces for point in face]
 
     @property
-    def winding_order(self):
+    def winding_order_indices(self):
         face_sizes = [len(face) for face in self.faces]
         return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
