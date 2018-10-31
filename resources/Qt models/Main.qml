@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Scene3D 2.0
 import QtQuick.Dialogs 1.3
+import MyJson 1.0
 import MyModels 1.0
 import MyWriters 1.0
 
@@ -18,17 +19,15 @@ ApplicationWindow {
             title: "File"
             Action {
                 text: "Open"
-                enabled: false
-                onTriggered: myLogger.log("'Open' menu item clicked")
+                onTriggered: jsonLoadDialog.open()
             }
             Action {
                 text: "Save"
-                enabled: false
-                onTriggered: myLogger.log("'Save' menu item clicked")
+                onTriggered: jsonSaveDialog.open()
             }
             Action {
                 text: "Save As"
-                onTriggered: fileDialog.open()
+                onTriggered: nexusFileDialog.open()
             }
             Action {
                 text: "Write to console"
@@ -95,12 +94,36 @@ ApplicationWindow {
         id: hdfWriter
     }
 
+    JsonWriter {
+        id: jsonWriter
+    }
+
+    JsonLoader {
+        id: jsonLoader
+    }
+
     FileDialog {
-        id: fileDialog
+        id: nexusFileDialog
         title: "Choose a file to write to"
         nameFilters: ["Nexus files (*.nxs *.nx5)", "HDF5 files (*.hdf5)"]
         defaultSuffix: "nxs"
         selectExisting: false
-        onAccepted: hdfWriter.save_instrument(fileDialog.fileUrl, components)
+        onAccepted: hdfWriter.save_instrument(fileUrl, components)
+    }
+
+    FileDialog {
+        id: jsonSaveDialog
+        title: "Choose file to save to"
+        nameFilters: ["JSON file (*.json)"]
+        defaultSuffix: "json"
+        selectExisting: false
+        onAccepted: jsonWriter.save_json(fileUrl, components)
+    }
+
+    FileDialog {
+        id: jsonLoadDialog
+        title: "Choose file to load from"
+        nameFilters: ["JSON (*.json)", "All files (*)"]
+        onAccepted: jsonLoader.load_file_into_instrument_model(fileUrl, components)
     }
 }

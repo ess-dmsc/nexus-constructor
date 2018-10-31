@@ -8,7 +8,7 @@ from geometry_constructor.instrument_model import InstrumentModel
 class JsonWriter(QObject):
 
     @Slot('QVariant')
-    def write_json(self, model: InstrumentModel):
+    def print_json_to_console(self, model: InstrumentModel):
         print(self.generate_json(model))
 
     @Slot(QUrl, 'QVariant')

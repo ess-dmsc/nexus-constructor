@@ -27,13 +27,13 @@ class JsonLoader(QObject):
         components = [sample]
         for component_data in data['components']:
             components.append(self.load_component(component_data))
-        # TODO: Transform ID's
+
         for (child_id, parent_id) in self.transform_parent_ids.items():
             child = self.transform_id_mapping[child_id]
             parent = self.transform_id_mapping[parent_id]
             child.transform_parent = parent
 
-        model.components = components
+        model.replace_contents(components)
 
     def load_component(self, json_obj: dict):
         component_type = json_obj['type']

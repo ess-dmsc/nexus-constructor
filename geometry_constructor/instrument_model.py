@@ -196,6 +196,17 @@ class InstrumentModel(QAbstractListModel):
         self.dataChanged.emit(model_index, model_index, [InstrumentModel.GeometryRole,
                                                          InstrumentModel.MeshRole])
 
+    def replace_contents(self, components):
+        self.beginRemoveRows(QModelIndex(), 0, len(self.components) - 1)
+        self.components = []
+        self.meshes = []
+        self.endRemoveRows()
+
+        self.beginInsertRows(QModelIndex(), 0, len(components) - 1)
+        self.components = components
+        self.meshes = [self.generate_mesh(component) for component in self.components]
+        self.endInsertRows()
+
     def generate_mesh(self, component: Component):
         if isinstance(component.geometry, CylindricalGeometry):
             geometry = component.geometry.as_off_geometry()

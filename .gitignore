@@ -116,3 +116,6 @@ venv.bak/
 
 # Geometry files
 *.off
+
+# Saved JSON files
+*.json
