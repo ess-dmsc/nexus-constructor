@@ -90,50 +90,41 @@ class InstrumentModel(QAbstractListModel):
         item = self.components[row]
         changed = False
         if role == InstrumentModel.NameRole:
-            changed = item.name != value
-            item.name = value
+            changed = self.change_value(item, 'name', value)
         elif role == InstrumentModel.DescriptionRole:
-            changed = item.description != value
-            item.description = value
+            changed = self.change_value(item, 'description', value)
         elif role == InstrumentModel.TranslateVectorXRole:
-            changed = item.translate_vector.x != value
-            item.translate_vector.x = value
-            self.update_child_transforms(item)
+            changed = self.change_value(item.translate_vector, 'x', value, transforms=True)
         elif role == InstrumentModel.TranslateVectorYRole:
-            changed = item.translate_vector.y != value
-            item.translate_vector.y = value
-            self.update_child_transforms(item)
+            changed = self.change_value(item.translate_vector, 'y', value, transforms=True)
         elif role == InstrumentModel.TranslateVectorZRole:
-            changed = item.translate_vector.z != value
-            item.translate_vector.z = value
-            self.update_child_transforms(item)
+            changed = self.change_value(item.translate_vector, 'z', value, transforms=True)
         elif role == InstrumentModel.RotateAxisXRole:
-            changed = item.rotate_axis.x != value
-            item.rotate_axis.x = value
-            self.update_child_transforms(item)
+            changed = self.change_value(item.rotate_axis, 'x', value, transforms=True)
         elif role == InstrumentModel.RotateAxisYRole:
-            changed = item.rotate_axis.y != value
-            item.rotate_axis.y = value
-            self.update_child_transforms(item)
+            changed = self.change_value(item.rotate_axis, 'y', value, transforms=True)
         elif role == InstrumentModel.RotateAxisZRole:
-            changed = item.rotate_axis.z != value
-            item.rotate_axis.z = value
-            self.update_child_transforms(item)
+            changed = self.change_value(item.rotate_axis, 'z', value, transforms=True)
         elif role == InstrumentModel.RotateAngleRole:
-            changed = item.rotate_angle != value
-            item.rotate_angle = value
-            self.update_child_transforms(item)
+            changed = self.change_value(item, 'rotate_angle', value, transforms=True)
         elif role == InstrumentModel.TransformParentIndexRole:
             if 0 <= value < len(self.components):
                 selected = self.components[value]
             else:
                 selected = None
-            changed = item.transform_parent != selected
-            item.transform_parent = selected
-            self.update_child_transforms(item)
+            changed = self.change_value(item, 'transform_parent', selected, transforms=True)
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
+
+    def change_value(self, item, attribute_name, value, transforms=False):
+        current_value = getattr(item, attribute_name)
+        different = value != current_value
+        if different:
+            setattr(item, attribute_name, value)
+            if transforms:
+                self.update_child_transforms(item)
+        return different
 
     def flags(self, index):
         return super().flags(index) | Qt.ItemIsEditable
