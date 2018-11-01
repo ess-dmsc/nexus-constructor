@@ -1,11 +1,17 @@
 import json
-from PySide2.QtCore import QObject, QUrl, Slot
+from PySide2.QtCore import QObject, QUrl, Signal, Slot
 from geometry_constructor.data_model import Component, Detector, Geometry, CylindricalGeometry, OFFGeometry,\
     PixelGrid, PixelMapping
 from geometry_constructor.instrument_model import InstrumentModel
 
 
 class JsonWriter(QObject):
+
+    requested_model_json = Signal(str)
+
+    @Slot('QVariant')
+    def request_model_json(self, model: InstrumentModel):
+        self.requested_model_json.emit(self.generate_json(model))
 
     @Slot('QVariant')
     def print_json_to_console(self, model: InstrumentModel):
@@ -14,9 +20,9 @@ class JsonWriter(QObject):
     @Slot(QUrl, 'QVariant')
     def save_json(self, file_url: QUrl, model: InstrumentModel):
         filename = file_url.toString(options=QUrl.PreferLocalFile)
-        json = self.generate_json(model)
+        json_data = self.generate_json(model)
         with open(filename, 'w') as file:
-            file.write(json)
+            file.write(json_data)
 
     def generate_json(self, model: InstrumentModel):
         data = {

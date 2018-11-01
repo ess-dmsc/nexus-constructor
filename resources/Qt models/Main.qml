@@ -11,7 +11,7 @@ ApplicationWindow {
     title: "Nexus Geometry Constructor"
     id: window
     visible: true
-    width: 800
+    width: 1100
     height: 500
 
     menuBar: MenuBar {
@@ -56,7 +56,7 @@ ApplicationWindow {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: componentFieldsArea.right
-            anchors.right: parent.right
+            anchors.right: jsonPane.left
             contentWidth: scene3d.implicitWidth
             contentHeight: scene3d.implicitHeight
             focus: true
@@ -80,6 +80,27 @@ ApplicationWindow {
                 enabled: !instrumentViewArea.focus
             }
         }
+
+        Pane {
+            id: jsonPane
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            width: 300
+
+            ScrollView {
+                anchors.fill: parent
+
+                TextArea {
+                    id: jsonTextArea
+                    enabled: false
+
+                    function setText(json_data){
+                        text = json_data
+                    }
+                }
+            }
+        }
     }
 
     InstrumentModel{
@@ -96,6 +117,14 @@ ApplicationWindow {
 
     JsonWriter {
         id: jsonWriter
+        Component.onCompleted: {
+            // When the model updates, request new json
+            components.model_updated.connect(jsonWriter.request_model_json)
+            // When requested json is produced, send it to the display area
+            jsonWriter.requested_model_json.connect(jsonTextArea.setText)
+            // Request initial json
+            jsonWriter.request_model_json(components)
+        }
     }
 
     JsonLoader {

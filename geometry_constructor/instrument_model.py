@@ -1,11 +1,13 @@
 from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDirection, Corner, Vector,\
     CylindricalGeometry, OFFGeometry, Component
 from geometry_constructor.off_renderer import OffMesh
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
+from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
 class InstrumentModel(QAbstractListModel):
+
+    model_updated = Signal('QVariant')
 
     NameRole = Qt.UserRole + 1
     DescriptionRole = Qt.UserRole + 2
@@ -24,6 +26,12 @@ class InstrumentModel(QAbstractListModel):
 
     def __init__(self):
         super().__init__()
+
+        self.dataChanged.connect(self.send_model_updated)
+        self.rowsInserted.connect(self.send_model_updated)
+        self.rowsRemoved.connect(self.send_model_updated)
+        self.modelReset.connect(self.send_model_updated)
+
         self.components = [
             Sample(
                 name='Sample',
@@ -196,16 +204,14 @@ class InstrumentModel(QAbstractListModel):
         self.dataChanged.emit(model_index, model_index, [InstrumentModel.GeometryRole,
                                                          InstrumentModel.MeshRole])
 
-    def replace_contents(self, components):
-        self.beginRemoveRows(QModelIndex(), 0, len(self.components) - 1)
-        self.components = []
-        self.meshes = []
-        self.endRemoveRows()
+    def send_model_updated(self):
+        self.model_updated.emit(self)
 
-        self.beginInsertRows(QModelIndex(), 0, len(components) - 1)
+    def replace_contents(self, components):
+        self.beginResetModel()
         self.components = components
         self.meshes = [self.generate_mesh(component) for component in self.components]
-        self.endInsertRows()
+        self.endResetModel()
 
     def generate_mesh(self, component: Component):
         if isinstance(component.geometry, CylindricalGeometry):
