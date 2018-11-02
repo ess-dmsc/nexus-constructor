@@ -89,7 +89,9 @@ class CylinderModel(QAbstractListModel):
 
     @Slot(int, 'QVariant')
     def set_geometry(self, index, instrument: InstrumentModel):
+        self.beginResetModel()
         self.cylinder = instrument.components[index].geometry
+        self.endResetModel()
 
 
 class OFFModel(QAbstractListModel):
@@ -163,4 +165,6 @@ class OFFModel(QAbstractListModel):
 
     @Slot(int, 'QVariant')
     def set_geometry(self, index, instrument: InstrumentModel):
+        self.beginResetModel()
         self.geometry = instrument.components[index].geometry
+        self.endResetModel()
