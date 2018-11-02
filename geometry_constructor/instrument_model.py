@@ -6,6 +6,28 @@ from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
 class InstrumentModel(QAbstractListModel):
+    """
+    A model that provides QML access to a list of components and their properties
+
+    When this class is exposed to Qt/Qml through a call to PySide2.QtQml.qmlRegisterType an instance of this object can
+    be created in Qml and used as a model for components like a listview, with a repeated visual representation of each
+    component in the model.
+    Within a components section of qml, any string specified in the roleNames method will link to a property of the
+    component through the mapped Role, and the 'data' and 'setData' methods.
+    For example, the following qml snippet would show all the component names:
+
+    ListView {
+        width: 100; height: 200
+
+        model: InstrumentModel {}
+        delegate: Text {
+            text: name
+        }
+    }
+
+    Guidance on how to correctly extend QAbstractListModel, including method signatures and required signals can be
+    found at http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
+    """
 
     NameRole = Qt.UserRole + 1
     DescriptionRole = Qt.UserRole + 2
@@ -84,7 +106,6 @@ class InstrumentModel(QAbstractListModel):
         if role == InstrumentModel.TransformMatrixRole:
             return self.generate_matrix(item)
 
-    # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
         row = index.row()
         item = self.components[row]

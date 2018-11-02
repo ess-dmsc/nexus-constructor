@@ -1,3 +1,10 @@
+"""
+ListModel implementations for accessing and manipulating Geometry models in QML
+
+See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on how to develop these classes, including
+what signals need to be emitted when changes to the data are made.
+"""
+
 from geometry_constructor.data_model import Vector, CylindricalGeometry, OFFGeometry
 from nexusutils.readwriteoff import parse_off_file
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Slot
@@ -6,6 +13,9 @@ from geometry_constructor.instrument_model import InstrumentModel
 
 
 class CylinderModel(QAbstractListModel):
+    """
+    A single item list model that allows properties of a Cylindrical geometry to be read and manipulated in QML
+    """
 
     AxisXRole = Qt.UserRole + 100
     AxisYRole = Qt.UserRole + 101
@@ -32,7 +42,6 @@ class CylinderModel(QAbstractListModel):
         if role == CylinderModel.RadiusRole:
             return self.cylinder.radius
 
-    # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
         changed = False
         if role == CylinderModel.AxisXRole:
@@ -75,6 +84,9 @@ class CylinderModel(QAbstractListModel):
 
 
 class OFFModel(QAbstractListModel):
+    """
+    A single item list model that allows properties of an OFF geometry to be read and manipulated in QML
+    """
 
     FileNameRole = Qt.UserRole + 200
     VerticesRole = Qt.UserRole + 201
@@ -96,7 +108,6 @@ class OFFModel(QAbstractListModel):
         if role == OFFModel.FacesRole:
             return self.geometry.faces
 
-    # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
         changed = False
         if role == OFFModel.FileNameRole:
