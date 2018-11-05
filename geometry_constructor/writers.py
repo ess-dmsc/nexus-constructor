@@ -7,6 +7,9 @@ from PySide2.QtCore import QObject, QUrl, Slot
 
 
 class HdfWriter(QObject):
+    """
+    Stores InstrumentModel data in nexus compliant hdf5 files
+    """
 
     @Slot('QVariant')
     def print_instrument_to_console(self, model: InstrumentModel):
@@ -31,6 +34,7 @@ class HdfWriter(QObject):
         for component in model.components:
             nx_component = instrument.create_group(component.name)
             self.store_transformations(nx_component, component)
+            nx_component.attrs['description'] = component.description
 
             if isinstance(component, Sample):
                 nx_component.attrs['NX_class'] = 'NXsample'
@@ -52,9 +56,9 @@ class HdfWriter(QObject):
         rotate.attrs['depends_on'] = dependent_on
         rotate.attrs['transformation_type'] = 'rotation'
         rotate.attrs['units'] = 'degrees'
-        rotate.attrs['vector'] = component.rotate_axis.unit_list()
+        rotate.attrs['vector'] = component.rotate_axis.unit_list
         # store the translation
-        magnitude = component.translate_vector.magnitude()
+        magnitude = component.translate_vector.magnitude
         translate = nx_component.create_dataset(
             'translate',
             data=[magnitude])
@@ -62,7 +66,7 @@ class HdfWriter(QObject):
         translate.attrs['depends_on'] = 'rotate'
         translate.attrs['transformation_type'] = 'translation'
         translate.attrs['units'] = 'm'
-        translate.attrs['vector'] = component.translate_vector.unit_list() if magnitude != 0 else [0, 0, 1]
+        translate.attrs['vector'] = component.translate_vector.unit_list if magnitude != 0 else [0, 0, 1]
 
         nx_component.attrs['depends_on'] = 'translate'
 
@@ -134,7 +138,7 @@ class HdfWriter(QObject):
         nx_group.attrs['NX_class'] = 'NXoff_geometry'
         nx_group.create_dataset(
             'vertices',
-            data=[[vector.x, vector.y, vector.z] for vector in geometry.vertices])
+            data=[vector.xyz_list for vector in geometry.vertices])
         nx_group.create_dataset(
             'winding_order',
             dtype='i',
@@ -146,11 +150,12 @@ class HdfWriter(QObject):
 
     def store_cylindrical_geometry(self, nx_group: h5py.Group, geometry: CylindricalGeometry):
         nx_group.attrs['NX_class'] = 'NXcylindrical_geometry'
+
         nx_group.create_dataset(
             'vertices',
-            data=[[vector.x, vector.y, vector.z]
-                  for vector
-                  in [geometry.bottom_center, geometry.bottom_edge, geometry.top_center]])
+            data=[geometry.base_center_point.xyz_list,
+                  geometry.base_edge_point.xyz_list,
+                  geometry.top_center_point.xyz_list])
         nx_group.create_dataset(
             'cylinders',
             dtype='i',
@@ -158,6 +163,11 @@ class HdfWriter(QObject):
 
 
 class Logger(QObject):
+    """
+    Provides methods to prints strings, lists and objects to console from QML.
+
+    While QML has console.log support through its javascript, it does not work in all terminal environments.
+    """
 
     @Slot(str)
     def log(self, message):

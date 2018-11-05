@@ -1,6 +1,13 @@
+"""
+Contains the main class for the nexus geometry constructor
+
+Loading this module also registers with QML the required custom classes to load the application's QML GUI
+"""
+
 import sys
 from os import path
 from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.geometry_models import CylinderModel, OFFModel
 from geometry_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
@@ -9,9 +16,12 @@ from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 qmlRegisterType(Logger, 'MyWriters', 1, 0, 'Logger')
 qmlRegisterType(HdfWriter, 'MyWriters', 1, 0, 'HdfWriter')
 qmlRegisterType(InstrumentModel, 'MyModels', 1, 0, 'InstrumentModel')
+qmlRegisterType(CylinderModel, 'MyModels', 1, 0, 'CylinderModel')
+qmlRegisterType(OFFModel, 'MyModels', 1, 0, 'OFFModel')
 
 
 class Application(QQmlApplicationEngine):
+    """Main gui class for the nexus geometry constructor"""
 
     def __init__(self, resource_folder):
         super().__init__()

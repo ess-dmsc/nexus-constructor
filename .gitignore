@@ -113,3 +113,6 @@ venv.bak/
 *.hdf5
 *.nxs
 *.nx5
+
+# Geometry files
+*.off

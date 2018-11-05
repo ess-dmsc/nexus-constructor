@@ -4,7 +4,7 @@ import QtQuick.Controls 2.4
 Pane {
 
     Pane {
-        id: textRow
+        id: headingRow
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -12,7 +12,6 @@ Pane {
         padding: 1
 
         Label {
-            id: nameLabel
             anchors.left: parent.left
             anchors.verticalCenter: addDetector.verticalCenter
             text: "Components:"
@@ -23,8 +22,15 @@ Pane {
 
             text: "Add detector"
             onClicked: {
-                myLogger.log("Adding detector")
-                components.add_detector("A detector")
+                modalLoader.source = "AddDetectorWindow.qml"
+                modalLoader.item.show()
+            }
+            Loader {
+                id: modalLoader
+                Connections {
+                    target: modalLoader.item
+                    onClosing: modalLoader.source = ""
+                }
             }
         }
     }
@@ -32,7 +38,7 @@ Pane {
     Frame {
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: textRow.bottom
+        anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
         padding: 1
         ListView {
@@ -90,38 +96,51 @@ Pane {
                 height: 0
                 visible: false
                 Item {
-                    height: transformControls.height + editorButton.height
+                    height: nameField.height + transformControls.height + editorButton.height
                     width: parent.width
                     id: extendedText
 
-                    TransformControls{
-                        id: transformControls
+                    LabeledTextField {
+                        id: nameField
+                        labelText: "Name:"
+                        editorText: name
                     }
 
-                    PaddedButton{
+                    TransformControls {
+                        id: transformControls
+                        anchors.top: nameField.bottom
+                    }
+
+                    PaddedButton {
                         id: editorButton
                         anchors.top: transformControls.bottom
                         anchors.left: parent.left
                         width: parent.width / 4
                         text: "Full editor"
                     }
-                    PaddedButton{
+                    PaddedButton {
                         id: applyButton
                         anchors.top: editorButton.top
                         anchors.left: editorButton.right
                         width: parent.width / 4
                         text: "Apply changes"
-                        onClicked: transformControls.saveFields()
+                        onClicked: {
+                            name = nameField.editorText
+                            transformControls.saveFields()
+                        }
                     }
-                    PaddedButton{
+                    PaddedButton {
                         id: discardButton
                         anchors.top: editorButton.top
                         anchors.left: applyButton.right
                         width: parent.width / 4
                         text: "Discard changes"
-                        onClicked: transformControls.resetFields()
+                        onClicked: {
+                            nameField.editorText = name
+                            transformControls.resetFields()
+                        }
                     }
-                    PaddedButton{
+                    PaddedButton {
                         id: deleteButton
                         anchors.top: editorButton.top
                         anchors.left: discardButton.right

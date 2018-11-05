@@ -5,3 +5,4 @@ pytest-cov>=2.6.0
 h5py==2.8.0
 flake8==3.5.0
 cx_Freeze==5.1.1
+git+https://github.com/ess-dmsc/python-nexus-utilities@6f5d2c7f1ca66063227aad2a111a2cc567d573f6#egg=nexusutils

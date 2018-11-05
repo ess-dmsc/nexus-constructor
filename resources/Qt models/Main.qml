@@ -70,7 +70,9 @@ ApplicationWindow {
                 aspects: ["input", "logic"]
                 cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
 
-                AnimatedEntity {}
+                AnimatedEntity {
+                    instrument: components
+                }
             }
 
             MouseArea {

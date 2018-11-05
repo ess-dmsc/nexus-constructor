@@ -2,9 +2,13 @@ import Qt3D.Core 2.0
 import Qt3D.Extras 2.0
 import Qt3D.Input 2.0
 import Qt3D.Render 2.0
+import QtQuick 2.11
+import MyModels 1.0
 
 Entity {
     id: sceneRoot
+
+    property InstrumentModel instrument
 
     Camera {
         id: camera
@@ -41,10 +45,6 @@ Entity {
         diffuse: "red"
     }
 
-    PhongMaterial {
-        id: detectorMaterial
-    }
-
     PhongAlphaMaterial {
         id: beamMaterial
         ambient: "blue"
@@ -52,34 +52,10 @@ Entity {
         alpha: 0.5
     }
 
-    TorusMesh {
-        id: torusMesh
-        radius: 7
-        minorRadius: 1
-        rings: 100
-        slices: 20
-    }
-
-    Transform {
-        id: torusTransform
-        scale3D: Qt.vector3d(1, 1, 0.5)
-        rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), 45)
-    }
-
-    Entity {
-        id: torusEntity
-        components: [ torusMesh, detectorMaterial, torusTransform ]
-    }
-
-    Transform {
-        id: torusTransform2
-        scale3D: Qt.vector3d(1, 1, 0.5)
-        rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), 135)
-    }
-
-    Entity {
-        id: torusEntity2
-        components: [ torusMesh, detectorMaterial, torusTransform2 ]
+    PhongMaterial {
+        id: greenMaterial
+        ambient: "green"
+        diffuse: "green"
     }
 
     SphereMesh {
@@ -146,15 +122,28 @@ Entity {
         timespanOffset: -23
     }
 
-    Entity {
-        id: targetEntity
-        components: [ sphereMesh, redMaterial ]
-    }
-
     CylinderMesh {
         id: cylinderMesh
         length: 40
         radius: 2.5
+    }
+
+    NodeInstantiator  {
+        id: componentRenderList
+        model: instrument
+
+        Entity {
+            id: repeaterEntity
+            Transform {
+                id: repeaterTransform
+                matrix: transform_matrix
+            }
+            components: [
+                mesh,
+                index == 0 ? redMaterial : greenMaterial,
+                repeaterTransform
+            ]
+        }
     }
 
     Transform {
@@ -168,7 +157,7 @@ Entity {
     }
 
     Entity {
-        id: detectorEntity
+        id: beamEntity
         components: [ cylinderMesh, beamMaterial, beamTransform ]
     }
 }
