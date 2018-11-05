@@ -1,3 +1,9 @@
+"""
+Contains the main class for the nexus geometry constructor
+
+Loading this module also registers with QML the required custom classes to load the application's QML GUI
+"""
+
 import sys
 from os import path
 from geometry_constructor.instrument_model import InstrumentModel
@@ -19,6 +25,7 @@ qmlRegisterType(JsonWriter, 'MyJson', 1, 0, 'JsonWriter')
 
 
 class Application(QQmlApplicationEngine):
+    """Main gui class for the nexus geometry constructor"""
 
     def __init__(self, resource_folder):
         super().__init__()

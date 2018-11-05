@@ -1,16 +1,21 @@
+"""
+Classes to render OFF geometries in Qt3D
+
+Based off of a qml custom mesh example at https://github.com/iLya84a/qt3d/blob/master/custom-mesh-qml/CustomMesh.cpp
+and a PyQt5 example from
+https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
+"""
+
 from geometry_constructor.data_model import OFFGeometry, PixelData, PixelGrid, Vector
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct
 
 
-# Basing off a C++ custom mesh implementation at:
-# https://github.com/iLya84a/qt3d/blob/master/custom-mesh-qml/CustomMesh.cpp
-# and a PyQt5 example can be found at:
-# https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
-
-
 class QtOFFGeometry(Qt3DRender.QGeometry):
+    """
+    Builds vertex and normal buffers from arbitrary OFF geometries so they can be rendered in Qt3D by an OffMesh
+    """
 
     def __init__(self, model: OFFGeometry, pixel_data: PixelData, parent=None):
         super().__init__(parent)
@@ -112,6 +117,9 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
 
 
 class OffMesh(Qt3DRender.QGeometryRenderer):
+    """
+    An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
+    """
 
     def __init__(self, geometry: OFFGeometry, pixel_data: PixelData=None, parent=None):
         super().__init__(parent)

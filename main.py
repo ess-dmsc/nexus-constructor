@@ -1,3 +1,8 @@
+"""
+Entry script for the nexus geometry constructor application.
+Requires Python 3.5+
+"""
+
 import sys
 from os import path, environ
 from geometry_constructor.application import Application

@@ -6,6 +6,28 @@ from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
 class InstrumentModel(QAbstractListModel):
+    """
+    A model that provides QML access to a list of components and their properties
+
+    When this class is exposed to Qt/Qml through a call to PySide2.QtQml.qmlRegisterType an instance of this object can
+    be created in Qml and used as a model for components like a listview, with a repeated visual representation of each
+    component in the model.
+    Within a components section of qml, any string specified in the roleNames method will link to a property of the
+    component through the mapped Role, and the 'data' and 'setData' methods.
+    For example, the following qml snippet would show all the component names:
+
+    ListView {
+        width: 100; height: 200
+
+        model: InstrumentModel {}
+        delegate: Text {
+            text: name
+        }
+    }
+
+    Guidance on how to correctly extend QAbstractListModel, including method signatures and required signals can be
+    found at http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
+    """
 
     model_updated = Signal('QVariant')
 
@@ -58,90 +80,67 @@ class InstrumentModel(QAbstractListModel):
 
     def data(self, index, role=Qt.DisplayRole):
         row = index.row()
-        item = self.components[row]
-        if role == InstrumentModel.NameRole:
-            return item.name
-        if role == InstrumentModel.DescriptionRole:
-            return item.description
-        if role == InstrumentModel.TranslateVectorXRole:
-            return item.translate_vector.x
-        if role == InstrumentModel.TranslateVectorYRole:
-            return item.translate_vector.y
-        if role == InstrumentModel.TranslateVectorZRole:
-            return item.translate_vector.z
-        if role == InstrumentModel.RotateAxisXRole:
-            return item.rotate_axis.x
-        if role == InstrumentModel.RotateAxisYRole:
-            return item.rotate_axis.y
-        if role == InstrumentModel.RotateAxisZRole:
-            return item.rotate_axis.z
-        if role == InstrumentModel.RotateAngleRole:
-            return item.rotate_angle
-        if role == InstrumentModel.TransformParentIndexRole:
-            if item.transform_parent in self.components:
-                return self.components.index(item.transform_parent)
-            return 0
-        if role == InstrumentModel.PixelDataRole:
-            if isinstance(item, Detector):
-                return item.pixel_data
-            return None
-        if role == InstrumentModel.GeometryRole:
-            return item.geometry
-        if role == InstrumentModel.MeshRole:
-            return self.meshes[row]
-        if role == InstrumentModel.TransformMatrixRole:
-            return self.generate_matrix(item)
+        component = self.components[row]
+        # lambdas prevent calculated properties from being generated each time any property is retrieved
+        accessors = {
+            InstrumentModel.NameRole: lambda: component.name,
+            InstrumentModel.DescriptionRole: lambda: component.description,
+            InstrumentModel.TranslateVectorXRole: lambda: component.translate_vector.x,
+            InstrumentModel.TranslateVectorYRole: lambda: component.translate_vector.y,
+            InstrumentModel.TranslateVectorZRole: lambda: component.translate_vector.z,
+            InstrumentModel.RotateAxisXRole: lambda: component.rotate_axis.x,
+            InstrumentModel.RotateAxisYRole: lambda: component.rotate_axis.y,
+            InstrumentModel.RotateAxisZRole: lambda: component.rotate_axis.z,
+            InstrumentModel.RotateAngleRole: lambda: component.rotate_angle,
+            InstrumentModel.TransformParentIndexRole:
+                lambda: self.components.index(component.transform_parent)
+                if component.transform_parent in self.components
+                else 0,
+            InstrumentModel.PixelDataRole:
+                lambda: component.pixel_data if isinstance(component, Detector) else None,
+            InstrumentModel.GeometryRole: lambda: component.geometry,
+            InstrumentModel.MeshRole: lambda: self.meshes[row],
+            InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(component),
+        }
+        if role in accessors:
+            return accessors[role]()
 
-    # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
         row = index.row()
         item = self.components[row]
         changed = False
-        if role == InstrumentModel.NameRole:
-            changed = item.name != value
-            item.name = value
-        elif role == InstrumentModel.DescriptionRole:
-            changed = item.description != value
-            item.description = value
-        elif role == InstrumentModel.TranslateVectorXRole:
-            changed = item.translate_vector.x != value
-            item.translate_vector.x = value
-            self.update_child_transforms(item)
-        elif role == InstrumentModel.TranslateVectorYRole:
-            changed = item.translate_vector.y != value
-            item.translate_vector.y = value
-            self.update_child_transforms(item)
-        elif role == InstrumentModel.TranslateVectorZRole:
-            changed = item.translate_vector.z != value
-            item.translate_vector.z = value
-            self.update_child_transforms(item)
-        elif role == InstrumentModel.RotateAxisXRole:
-            changed = item.rotate_axis.x != value
-            item.rotate_axis.x = value
-            self.update_child_transforms(item)
-        elif role == InstrumentModel.RotateAxisYRole:
-            changed = item.rotate_axis.y != value
-            item.rotate_axis.y = value
-            self.update_child_transforms(item)
-        elif role == InstrumentModel.RotateAxisZRole:
-            changed = item.rotate_axis.z != value
-            item.rotate_axis.z = value
-            self.update_child_transforms(item)
-        elif role == InstrumentModel.RotateAngleRole:
-            changed = item.rotate_angle != value
-            item.rotate_angle = value
-            self.update_child_transforms(item)
-        elif role == InstrumentModel.TransformParentIndexRole:
-            if 0 <= value < len(self.components):
-                selected = self.components[value]
-            else:
-                selected = None
-            changed = item.transform_parent != selected
-            item.transform_parent = selected
-            self.update_child_transforms(item)
+        param_options = {
+            InstrumentModel.NameRole: [item, 'name', value, False],
+            InstrumentModel.DescriptionRole: [item, 'description', value, False],
+            InstrumentModel.TranslateVectorXRole: [item.translate_vector, 'x', value, True],
+            InstrumentModel.TranslateVectorYRole: [item.translate_vector, 'y', value, True],
+            InstrumentModel.TranslateVectorZRole: [item.translate_vector, 'z', value, True],
+            InstrumentModel.RotateAxisXRole: [item.rotate_axis, 'x', value, True],
+            InstrumentModel.RotateAxisYRole: [item.rotate_axis, 'y', value, True],
+            InstrumentModel.RotateAxisZRole: [item.rotate_axis, 'z', value, True],
+            InstrumentModel.RotateAngleRole: [item, 'rotate_angle', value, True],
+            InstrumentModel.TransformParentIndexRole: [
+                item,
+                'transform_parent',
+                self.components[value] if value in range(len(self.components)) else None,
+                True,
+            ],
+        }
+        if role in param_options:
+            param_list = param_options[role]
+            changed = self.change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
+
+    def change_value(self, item, attribute_name, value, transforms):
+        current_value = getattr(item, attribute_name)
+        different = value != current_value
+        if different:
+            setattr(item, attribute_name, value)
+            if transforms:
+                self.update_child_transforms(item)
+        return different
 
     def flags(self, index):
         return super().flags(index) | Qt.ItemIsEditable

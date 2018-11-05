@@ -11,6 +11,7 @@ def validate_nonzero_vector(instance, attribute, value):
 
 @attr.s
 class Vector:
+    """A vector in 3D space, defined by x, y and z coordinates"""
     x = attr.ib(float)
     y = attr.ib(float)
     z = attr.ib(float)
@@ -31,11 +32,18 @@ class Vector:
 
 @attr.s
 class Geometry:
+    """Base class for geometry a detector component can take"""
     pass
 
 
 @attr.s
 class CylindricalGeometry(Geometry):
+    """
+    Describes the shape of a cylinder in 3D space
+
+    The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
+    described by the direction of its axis, its height, and radius.
+    """
     axis_direction = attr.ib(default=Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
@@ -46,16 +54,8 @@ class CylindricalGeometry(Geometry):
 
     @property
     def base_edge_point(self):
-        default_axis = QVector3D(0, 0, 1)
-        desired_axis = QVector3D(self.axis_direction.x,
-                                 self.axis_direction.y,
-                                 self.axis_direction.z)
-        rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
-        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis) / self.axis_direction.magnitude)
-        rotate_degrees = rotate_radians * 360 / (2 * pi)
-        rotate_matrix = QMatrix4x4()
-        rotate_matrix.rotate(rotate_degrees, rotate_axis)
-        edge_point = QVector3D(self.radius, 0, 0) * rotate_matrix
+        # rotate a point on the edge of a Z axis aligned cylinder by the rotation matrix
+        edge_point = QVector3D(self.radius, 0, 0) * self.rotation_matrix
         return Vector(edge_point.x(), edge_point.y(), edge_point.z())
 
     @property
@@ -64,13 +64,7 @@ class CylindricalGeometry(Geometry):
         return Vector(values[0], values[1], values[2])
 
     def as_off_geometry(self, steps=20):
-        default_axis = QVector3D(0, 0, 1)
-        desired_axis = QVector3D(self.axis_direction.x,
-                                 self.axis_direction.y,
-                                 self.axis_direction.z)
-        rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
-        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis) / self.axis_direction.magnitude)
-        rotate_degrees = rotate_radians * 360 / (2 * pi)
+        # steps number of points around the base, and steps number around the top, aligned with the Z axis
         vertices = [QVector3D(sin(2 * pi * i / steps) * self.radius,
                               cos(2 * pi * i / steps) * self.radius,
                               0)
@@ -79,12 +73,14 @@ class CylindricalGeometry(Geometry):
                               cos(2 * pi * i / steps) * self.radius,
                               self.height)
                     for i in range(steps)]
-        rotate_matrix = QMatrix4x4()
-        rotate_matrix.rotate(rotate_degrees, rotate_axis)
+        # rotate each vertex to produce the desired cylinder mesh
         vectors = []
+        rotate_matrix = self.rotation_matrix
         for vertex in vertices:
             rotated = vertex * rotate_matrix
             vectors.append(Vector(rotated.x(), rotated.y(), rotated.z()))
+        # faces are rectangles joining the top and bottom, followed by a steps-sided shapes for the base and top
+        # the final face uses steps of -1 to have the same winding order as the other faces
         return OFFGeometry(
             vertices=vectors,
             faces=[[i, steps + i, steps + ((i + 1) % steps), (i + 1) % steps]
@@ -93,11 +89,34 @@ class CylindricalGeometry(Geometry):
                    [i for i in range((2 * steps) - 1, steps - 1, -1)]]
         )
 
+    @property
+    def rotation_matrix(self):
+        """
+        :return: A QMatrix4x4 describing the rotation from the Z axis to the cylinder's axis
+        """
+        default_axis = QVector3D(0, 0, 1)
+        desired_axis = QVector3D(self.axis_direction.x,
+                                 self.axis_direction.y,
+                                 self.axis_direction.z)
+        rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
+        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis) / self.axis_direction.magnitude)
+        rotate_degrees = rotate_radians * 360 / (2 * pi)
+        rotate_matrix = QMatrix4x4()
+        rotate_matrix.rotate(rotate_degrees, rotate_axis)
+        return rotate_matrix
+
 
 @attr.s
 class OFFGeometry(Geometry):
-    vertices = attr.ib(factory=list)  # list of Vector objects
-    faces = attr.ib(factory=list)  # List of lists. Each sublist is a polygon's points, as index numbers into vertices
+    """
+    Stores arbitrary 3D geometry as a list of vertices and faces, based on the Object File Format
+
+    vertices:   list of Vector objects used as corners of polygons in the geometry
+    faces:  list of integer lists. Each sublist is a winding path around the corners of a polygon. Each sublist item is
+            an index into the vertices list to identify a specific point in 3D space
+    """
+    vertices = attr.ib(factory=list)
+    faces = attr.ib(factory=list)
 
     @property
     def winding_order(self):
@@ -111,6 +130,7 @@ class OFFGeometry(Geometry):
 
 @attr.s
 class PixelData:
+    """Base class for a detector's pixel description"""
     pass
 
 
@@ -128,6 +148,25 @@ class Corner(Enum):
 
 @attr.s
 class PixelGrid(PixelData):
+    """
+    Represents a grid of pixels arranged at regular intervals on a 2D plane
+
+    Rows and columns increase along the X and Y axis positive directions, with the origin in the bottom left corner,
+    the X axis increasing to the left, and the Y axis increasing upwards.
+
+    The center of the detector is located at the origin of the pixel grid.
+
+    ^ y
+    |
+    |    x
+    +---->
+
+    Detector numbers will be assigned from a starting value in the attribute 'first_id'
+    This count will increase by 1 for each instance of the pixel in the grid.
+    The corner that counting starts in, and whether counting should first happen along rows or columns can be set with
+    the 'count_direction' and 'initial_count_corner' attributes, which respectively take 'CountDirection' and 'Corner'
+    Enum values.
+    """
     rows = attr.ib(default=1, type=int)
     columns = attr.ib(default=1, type=int)
     row_height = attr.ib(default=1, type=float)
@@ -139,11 +178,22 @@ class PixelGrid(PixelData):
 
 @attr.s
 class PixelMapping(PixelData):
-    pixel_ids = attr.ib(list)  # pixel_ids[face_number] returns the pixel the face is part of, or None
+    """
+    Maps faces in a 3D geometry to the detector id's
+
+    To be used in conjunction with an OFFGeometry instance. This classes pixel_ids attribute should be the same length
+    as the geometry's faces list. The value of this list at any given index should be the detector id number that the
+    face is part of, or None if it isn't part of any detecting face or volume.
+
+    Used to populate the detector_faces dataset of the NXoff_geometry class.
+    See http://download.nexusformat.org/sphinx/classes/base_classes/NXoff_geometry.html
+    """
+    pixel_ids = attr.ib(list)
 
 
 @attr.s
 class Component:
+    """Base class for components of an instrument"""
     name = attr.ib(str)
     description = attr.ib(default='', type=str)
     transform_parent = attr.ib(default=None, type=object)
@@ -155,9 +205,11 @@ class Component:
 
 @attr.s
 class Sample(Component):
+    """The sample an instrument is making measurements of"""
     pass
 
 
 @attr.s
 class Detector(Component):
+    """A detector in an instrument"""
     pixel_data = attr.ib(default=None, type=PixelData)

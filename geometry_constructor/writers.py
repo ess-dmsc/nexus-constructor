@@ -7,6 +7,9 @@ from PySide2.QtCore import QObject, QUrl, Slot
 
 
 class HdfWriter(QObject):
+    """
+    Stores InstrumentModel data in nexus compliant hdf5 files
+    """
 
     @Slot('QVariant')
     def print_instrument_to_console(self, model: InstrumentModel):
@@ -160,6 +163,11 @@ class HdfWriter(QObject):
 
 
 class Logger(QObject):
+    """
+    Provides methods to prints strings, lists and objects to console from QML.
+
+    While QML has console.log support through its javascript, it does not work in all terminal environments.
+    """
 
     @Slot(str)
     def log(self, message):

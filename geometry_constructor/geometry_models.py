@@ -1,3 +1,10 @@
+"""
+ListModel implementations for accessing and manipulating Geometry models in QML
+
+See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on how to develop these classes, including
+what signals need to be emitted when changes to the data are made.
+"""
+
 from geometry_constructor.data_model import Vector, CylindricalGeometry, OFFGeometry
 from nexusutils.readwriteoff import parse_off_file
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Slot
@@ -5,7 +12,25 @@ from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Slot
 from geometry_constructor.instrument_model import InstrumentModel
 
 
+def change_value(item, attribute_name, value):
+    """
+    Updates the value of an items attribute
+    :param item: the object having an attribute updated
+    :param attribute_name: the name of the attribute to update
+    :param value: the value to set the attribute to
+    :return: whether the attribute value was changed
+    """
+    current_value = getattr(item, attribute_name)
+    different = value != current_value
+    if different:
+        setattr(item, attribute_name, value)
+    return different
+
+
 class CylinderModel(QAbstractListModel):
+    """
+    A single item list model that allows properties of a Cylindrical geometry to be read and manipulated in QML
+    """
 
     AxisXRole = Qt.UserRole + 100
     AxisYRole = Qt.UserRole + 101
@@ -21,35 +46,28 @@ class CylinderModel(QAbstractListModel):
         return 1
 
     def data(self, index, role=Qt.DisplayRole):
-        if role == CylinderModel.AxisXRole:
-            return self.cylinder.axis_direction.x
-        if role == CylinderModel.AxisYRole:
-            return self.cylinder.axis_direction.y
-        if role == CylinderModel.AxisZRole:
-            return self.cylinder.axis_direction.z
-        if role == CylinderModel.HeightRole:
-            return self.cylinder.height
-        if role == CylinderModel.RadiusRole:
-            return self.cylinder.radius
+        properties = {
+            CylinderModel.AxisXRole: self.cylinder.axis_direction.x,
+            CylinderModel.AxisYRole: self.cylinder.axis_direction.y,
+            CylinderModel.AxisZRole: self.cylinder.axis_direction.z,
+            CylinderModel.HeightRole: self.cylinder.height,
+            CylinderModel.RadiusRole: self.cylinder.radius,
+        }
+        if role in properties:
+            return properties[role]
 
-    # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
         changed = False
-        if role == CylinderModel.AxisXRole:
-            changed = self.cylinder.axis_direction.x != value
-            self.cylinder.axis_direction.x = value
-        if role == CylinderModel.AxisYRole:
-            changed = self.cylinder.axis_direction.y != value
-            self.cylinder.axis_direction.y = value
-        if role == CylinderModel.AxisZRole:
-            changed = self.cylinder.axis_direction.z != value
-            self.cylinder.axis_direction.z = value
-        if role == CylinderModel.HeightRole:
-            changed = self.cylinder.height != value
-            self.cylinder.height = value
-        if role == CylinderModel.RadiusRole:
-            changed = self.cylinder.radius != value
-            self.cylinder.radius = value
+        param_options = {
+            CylinderModel.AxisXRole: [self.cylinder.axis_direction, 'x', value],
+            CylinderModel.AxisYRole: [self.cylinder.axis_direction, 'y', value],
+            CylinderModel.AxisZRole: [self.cylinder.axis_direction, 'z', value],
+            CylinderModel.HeightRole: [self.cylinder, 'height', value],
+            CylinderModel.RadiusRole: [self.cylinder, 'radius', value],
+        }
+        if role in param_options:
+            param_list = param_options[role]
+            changed = change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
@@ -71,13 +89,15 @@ class CylinderModel(QAbstractListModel):
 
     @Slot(int, 'QVariant')
     def set_geometry(self, index, instrument: InstrumentModel):
-        geometry = instrument.components[index].geometry
-        print("cylinder set to: ")
-        print(geometry)
-        self.cylinder = geometry
+        self.beginResetModel()
+        self.cylinder = instrument.components[index].geometry
+        self.endResetModel()
 
 
 class OFFModel(QAbstractListModel):
+    """
+    A single item list model that allows properties of an OFF geometry to be read and manipulated in QML
+    """
 
     FileNameRole = Qt.UserRole + 200
     VerticesRole = Qt.UserRole + 201
@@ -92,29 +112,28 @@ class OFFModel(QAbstractListModel):
         return 1
 
     def data(self, index, role=Qt.DisplayRole):
-        if role == OFFModel.FileNameRole:
-            return self.file_url
-        if role == OFFModel.VerticesRole:
-            return self.geometry.vertices
-        if role == OFFModel.FacesRole:
-            return self.geometry.faces
+        properties = {
+            OFFModel.FileNameRole: self.file_url,
+            OFFModel.VerticesRole: self.geometry.vertices,
+            OFFModel.FacesRole: self.geometry.faces,
+        }
+        if role in properties:
+            return properties[role]
 
-    # continue, referring to: http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     def setData(self, index, value, role):
         changed = False
+        param_options = {
+            OFFModel.FileNameRole: [self, 'file_url', value],
+            OFFModel.VerticesRole: [self.geometry, 'vertices', value],
+            OFFModel.FacesRole: [self.geometry, 'faces', value],
+        }
+        if role in param_options:
+            param_list = param_options[role]
+            changed = change_value(*param_list)
         if role == OFFModel.FileNameRole:
-            changed = self.file_url != value
-            self.file_url = value
-            if changed:
-                self.load_data()
-                self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
-                                                     OFFModel.FacesRole])
-        if role == OFFModel.VerticesRole:
-            changed = self.geometry.vertices != value
-            self.geometry.vertices = value
-        if role == OFFModel.FacesRole:
-            changed = self.geometry.faces != value
-            self.geometry.faces = value
+            self.load_data()
+            self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
+                                                 OFFModel.FacesRole])
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
@@ -146,7 +165,6 @@ class OFFModel(QAbstractListModel):
 
     @Slot(int, 'QVariant')
     def set_geometry(self, index, instrument: InstrumentModel):
-        geometry = instrument.components[index].geometry
-        print("OFF data set to: ")
-        print(geometry)
-        self.geometry = geometry
+        self.beginResetModel()
+        self.geometry = instrument.components[index].geometry
+        self.endResetModel()
