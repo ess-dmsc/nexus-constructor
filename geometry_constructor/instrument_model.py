@@ -109,17 +109,18 @@ class InstrumentModel(QAbstractListModel):
         row = index.row()
         item = self.components[row]
         changed = False
+        # lambdas prevent non integer values indexing the components list
         param_options = {
-            InstrumentModel.NameRole: [item, 'name', value, False],
-            InstrumentModel.DescriptionRole: [item, 'description', value, False],
-            InstrumentModel.TranslateVectorXRole: [item.translate_vector, 'x', value, True],
-            InstrumentModel.TranslateVectorYRole: [item.translate_vector, 'y', value, True],
-            InstrumentModel.TranslateVectorZRole: [item.translate_vector, 'z', value, True],
-            InstrumentModel.RotateAxisXRole: [item.rotate_axis, 'x', value, True],
-            InstrumentModel.RotateAxisYRole: [item.rotate_axis, 'y', value, True],
-            InstrumentModel.RotateAxisZRole: [item.rotate_axis, 'z', value, True],
-            InstrumentModel.RotateAngleRole: [item, 'rotate_angle', value, True],
-            InstrumentModel.TransformParentIndexRole: [
+            InstrumentModel.NameRole: lambda: [item, 'name', value, False],
+            InstrumentModel.DescriptionRole: lambda: [item, 'description', value, False],
+            InstrumentModel.TranslateVectorXRole: lambda: [item.translate_vector, 'x', value, True],
+            InstrumentModel.TranslateVectorYRole: lambda: [item.translate_vector, 'y', value, True],
+            InstrumentModel.TranslateVectorZRole: lambda: [item.translate_vector, 'z', value, True],
+            InstrumentModel.RotateAxisXRole: lambda: [item.rotate_axis, 'x', value, True],
+            InstrumentModel.RotateAxisYRole: lambda: [item.rotate_axis, 'y', value, True],
+            InstrumentModel.RotateAxisZRole: lambda: [item.rotate_axis, 'z', value, True],
+            InstrumentModel.RotateAngleRole: lambda: [item, 'rotate_angle', value, True],
+            InstrumentModel.TransformParentIndexRole: lambda: [
                 item,
                 'transform_parent',
                 self.components[value] if value in range(len(self.components)) else None,
@@ -127,7 +128,7 @@ class InstrumentModel(QAbstractListModel):
             ],
         }
         if role in param_options:
-            param_list = param_options[role]
+            param_list = param_options[role]()
             changed = self.change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
