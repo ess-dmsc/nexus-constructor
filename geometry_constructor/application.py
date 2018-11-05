@@ -10,6 +10,7 @@ from geometry_constructor.instrument_model import InstrumentModel
 from geometry_constructor.geometry_models import CylinderModel, OFFModel
 from geometry_constructor.json_loader import JsonLoader
 from geometry_constructor.json_writer import JsonWriter
+from geometry_constructor.qml_json_model import FilteredJsonModel
 from geometry_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
@@ -20,6 +21,7 @@ qmlRegisterType(HdfWriter, 'MyWriters', 1, 0, 'HdfWriter')
 qmlRegisterType(InstrumentModel, 'MyModels', 1, 0, 'InstrumentModel')
 qmlRegisterType(CylinderModel, 'MyModels', 1, 0, 'CylinderModel')
 qmlRegisterType(OFFModel, 'MyModels', 1, 0, 'OFFModel')
+qmlRegisterType(FilteredJsonModel, 'MyModels', 1, 0, 'FilteredJsonModel')
 qmlRegisterType(JsonLoader, 'MyJson', 1, 0, 'JsonLoader')
 qmlRegisterType(JsonWriter, 'MyJson', 1, 0, 'JsonWriter')
 

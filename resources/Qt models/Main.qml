@@ -88,15 +88,23 @@ ApplicationWindow {
             anchors.right: parent.right
             width: 300
 
-            ScrollView {
+            ListView {
+                id: jsonListView
+                model: jsonModel
+                delegate: jsonLineDelegate
                 anchors.fill: parent
+                clip: true
+            }
 
-                TextArea {
-                    id: jsonTextArea
-                    enabled: false
-
-                    function setText(json_data){
-                        text = json_data
+            Component {
+                id: jsonLineDelegate
+                Label {
+                    text: (collapsed ? collapsed_text : full_text)
+                    wrapMode: Text.Wrap
+                    width: parent.width
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: collapsed = !collapsed
                     }
                 }
             }
@@ -105,6 +113,10 @@ ApplicationWindow {
 
     InstrumentModel{
         id: components
+    }
+
+    FilteredJsonModel {
+        id: jsonModel
     }
 
     Logger {
@@ -120,8 +132,8 @@ ApplicationWindow {
         Component.onCompleted: {
             // When the model updates, request new json
             components.model_updated.connect(jsonWriter.request_model_json)
-            // When requested json is produced, send it to the display area
-            jsonWriter.requested_model_json.connect(jsonTextArea.setText)
+            // When requested json is produced, update the model with it
+            jsonWriter.requested_model_json.connect(jsonModel.set_json)
             // Request initial json
             jsonWriter.request_model_json(components)
         }
