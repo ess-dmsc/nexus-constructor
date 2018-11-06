@@ -230,5 +230,5 @@ class FilteredJsonModel(QSortFilterProxyModel):
         self.setFilterFixedString('True')
 
     @Slot(str)
-    def set_json(self, json):
-        self.json_updated.emit(json)
+    def set_json(self, json_data):
+        self.json_updated.emit(json_data)
