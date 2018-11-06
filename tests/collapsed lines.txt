@@ -1,0 +1,47 @@
+{...}
+  "sample": {...},
+    "transforms": [...],
+      {...},
+        "angle": {...},
+          "unit": "degrees",
+          "value": 0
+        },
+        "axis": {...},
+          "y": 0,
+          "z": 1,
+          "x": 0
+        },
+        "type": "rotate"
+      },
+      {...}
+        "unit": "m",
+        "vector": {...},
+          "y": 0,
+          "z": 0,
+          "x": 0
+        },
+        "type": "translate"
+      }
+    ],
+    "transform_id": 0,
+    "name": "Sample",
+    "description": "",
+    "geometry": {...},
+      "vertices": [...],
+        [...],
+        [...],
+        [...],
+        [...],
+        [...],
+        [...],
+        [...],
+        [...]
+      ],
+      "faces": [...],
+      "winding_order": [...],
+      "type": "OFF"
+    },
+    "type": "Sample"
+  },
+  "components": []
+}

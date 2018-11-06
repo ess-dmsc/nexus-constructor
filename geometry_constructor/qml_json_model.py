@@ -1,5 +1,31 @@
 """
 Classes for modelling a pretty printed json file and including it as a model for a listview in QML
+
+For parsing to work correctly, all lists and objects should have their opening brackets at the end of a line, and their
+closing bracket and any required comma be the only non whitespace characters on their line.
+
+For example:
+{
+  "foo": [
+    1,
+    2,
+    -3.5
+  ],
+  "bar": {
+    "a": "hello",
+    "b": "world"
+  }
+}
+
+To give a condensed view, the lines of text comprising lists of numbers are combined into a single line, so the
+previous example would be displayed by the model as:
+{
+  "foo": [1, 2, -3.5],
+  "bar": {
+    "a": "hello",
+    "b": "world"
+  }
+}
 """
 
 import attr
@@ -24,8 +50,12 @@ class JsonLine:
     text = attr.ib(default='')
     collapsed_text = attr.ib(default='')
     collapsed = attr.ib(default=False)
-    indent = attr.ib(default=0)
+    line_number = attr.ib(default=0)
     parent = attr.ib(default=None)
+
+    @property
+    def indent(self):
+        return len(self.text) - len(self.text.lstrip(' '))
 
     @property
     def visible(self):
@@ -107,8 +137,8 @@ class JsonModel(QAbstractListModel):
         self.beginResetModel()
 
         json_lines = []
-        # split json into lines
-        lines = json.split('\n')
+        # split json into lines, ignoring any leading or trailing blank lines
+        lines = json.strip('\n').split('\n')
         collecting = False
         collection = []
 
@@ -119,17 +149,21 @@ class JsonModel(QAbstractListModel):
                         text=collection[0]
                         + ' '.join([ln.strip() for ln in collection[1:-1]])
                         + collection[-1].strip(),
-                        collapsed_text=collection[0] + '...' + collection[-1].strip()))
+                        collapsed_text=collection[0] + '...' + collection[-1].strip(),
+                        line_number=len(json_lines)
+                    ))
             else:
                 for stored_line in collection:
                     if stored_line.endswith('['):
-                        collapsed_text = stored_line + '...],'
+                        collapsed_text = stored_line + '...]'
                     elif stored_line.endswith('{'):
-                        collapsed_text = stored_line + '...},'
+                        collapsed_text = stored_line + '...}'
                     else:
                         collapsed_text = stored_line
                     json_lines.append(JsonLine(text=stored_line,
-                                               collapsed_text=collapsed_text))
+                                               collapsed_text=collapsed_text,
+                                               line_number=len(json_lines)
+                                               ))
             collection.clear()
         # if a line ends in a '[' and subsequent lines before its ']' only contain numbers,
         # combine those lines into a single JsonLine
@@ -152,8 +186,6 @@ class JsonModel(QAbstractListModel):
         store_collection()
 
         # for each non root level line in the json, set its parent
-        for line in json_lines:
-            line.indent = len(line.text) - len(line.text.lstrip(' '))
         for i in range(1, len(json_lines)):
             child = json_lines[i]
             lists = 0
@@ -175,6 +207,17 @@ class JsonModel(QAbstractListModel):
                     objects -= 1
                 if is_obj_start:
                     objects += 1
+
+        # add any required trailing commas to collapsed text
+        for line in json_lines:
+            if line.text.endswith(('[', '{')):
+                # find its last child
+                last_child = None
+                for candidate_child in json_lines:
+                    if candidate_child.parent == line:
+                        last_child = candidate_child
+                if last_child.text.endswith(','):
+                    line.collapsed_text += ','
 
         self.lines = json_lines
         self.endResetModel()
