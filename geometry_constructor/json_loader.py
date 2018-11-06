@@ -6,28 +6,48 @@ from geometry_constructor.instrument_model import InstrumentModel
 
 
 class JsonLoader(QObject):
+    """
+    Loads json produced by the JsonWriter class back into an InstrumentModel
+
+    transform_id_mapping is a mapping of components transform_id numbers to the component objects
+    transform_parent_ids is a mapping of transform_id numbers of components to the transform_id of their parent
+    """
 
     def __init__(self):
         super().__init__()
-        self.transform_id_mapping = {}  # transform_id -> component
-        self.transform_parent_ids = {}  # transform_id -> parent_id
+        # transform_id -> component
+        self.transform_id_mapping = {}
+        # transform_id -> parent's transform_id
+        self.transform_parent_ids = {}
 
     @Slot(QUrl, 'QVariant')
     def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
+        """
+        Loads a json file into an instrument model
+        :param file_url: The url of the file to load
+        :param model: The model that the loaded components will be stored in
+        """
         filename = file_url.toString(options=QUrl.PreferLocalFile)
         with open(filename, 'r') as file:
             json_data = file.read()
         self.load_json_into_instrument_model(json_data, model)
 
     def load_json_into_instrument_model(self, json_data: str, model: InstrumentModel):
+        """
+        Loads a json string into an instrument model
+        :param json_data: String containing the json data to load
+        :param model: The model the loaded components will be stored in
+        """
+        # Reset the transform mappings
         self.transform_id_mapping = {}
         self.transform_parent_ids = {}
+        # Build the sample and components from the data
         data = json.loads(json_data)
         sample = self.load_component(data['sample'])
         components = [sample]
         for component_data in data['components']:
             components.append(self.load_component(component_data))
-
+        # Set transform parent links
         for (child_id, parent_id) in self.transform_parent_ids.items():
             child = self.transform_id_mapping[child_id]
             parent = self.transform_id_mapping[parent_id]
@@ -36,6 +56,11 @@ class JsonLoader(QObject):
         model.replace_contents(components)
 
     def load_component(self, json_obj: dict):
+        """
+        Builds a component object from a dictionary containing its properties
+        :param json_obj: the dictionary build from json
+        :return: the loaded, populated component
+        """
         component_type = json_obj['type']
         if component_type == Sample.__name__:
             component = Sample()
@@ -84,6 +109,7 @@ class JsonLoader(QObject):
         return component
 
     def load_geometry(self, geometry_obj: dict):
+        """Builds and returns a Geometry instance based on the dictionary describing it"""
         if geometry_obj['type'] == 'OFF':
             wound_faces = geometry_obj['faces']
             face_indices = geometry_obj['winding_order'] + [len(wound_faces)]

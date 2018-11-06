@@ -155,10 +155,12 @@ class JsonModel(QAbstractListModel):
                 collecting = True
             elif collecting:
                 collection.append(line)
-                if re.match('],?$', line.strip()):  # end of a list
+                # end of a list
+                if re.match('],?$', line.strip()):
                     store_collection(collapse=True)
                     collecting = False
-                elif not re.match('^-?\d*\.?\d*,?$', line.strip()):  # list isn't just numbers
+                # list isn't just numbers
+                elif not re.match('^-?\d*\.?\d*,?$', line.strip()):
                     store_collection()
                     collecting = False
             else:

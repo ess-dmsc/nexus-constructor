@@ -6,41 +6,52 @@ from geometry_constructor.instrument_model import InstrumentModel
 
 
 class JsonWriter(QObject):
+    """
+    Converts the data from an InstrumentModel instance to json
+    """
 
     requested_model_json = Signal(str)
 
     @Slot('QVariant')
     def request_model_json(self, model: InstrumentModel):
+        """
+        Generates json from the InstrumentModel and sends it to slots connected to the requested_model_json signal
+        """
         self.requested_model_json.emit(self.generate_json(model))
 
     @Slot('QVariant')
     def print_json_to_console(self, model: InstrumentModel):
+        """Generates json from an InstrumentModel instance and writes it to the console"""
         print(self.generate_json(model))
 
     @Slot(QUrl, 'QVariant')
     def save_json(self, file_url: QUrl, model: InstrumentModel):
+        """Generates json from an InstrumentModel"""
         filename = file_url.toString(options=QUrl.PreferLocalFile)
         json_data = self.generate_json(model)
         with open(filename, 'w') as file:
             file.write(json_data)
 
     def generate_json(self, model: InstrumentModel):
+        """Returns a formatted json string built from the given InstrumentModel"""
         data = {
-            'sample': self.build_json_component(model.components[0], model),
-            'components': self.build_json_components(model)
+            'sample': self.build_component_dictionary(model.components[0], model),
+            'components': self.build_components_list(model)
         }
         return json.dumps(data, indent=2)
 
-    def build_json_components(self, model: InstrumentModel):
+    def build_components_list(self, model: InstrumentModel):
+        """Builds a list of dictionaries for the non sample components in the InstrumentModel"""
         data = []
         for component in model.components[1:]:
-            component_data = self.build_json_component(component, model)
+            component_data = self.build_component_dictionary(component, model)
             if isinstance(component, Detector):
-                self.add_detector_info(component_data, component)
+                self.add_detector_info_to_dictionary(component_data, component)
             data.append(component_data)
         return data
 
-    def build_json_component(self, component: Component, model: InstrumentModel):
+    def build_component_dictionary(self, component: Component, model: InstrumentModel):
+        """Builds a dictionary containing the data for a component in the model"""
         data = {
             'name': component.name,
             'description': component.description,
@@ -69,7 +80,7 @@ class JsonWriter(QObject):
                     'unit': 'm'
                 }
             ],
-            'geometry': self.build_json_geometry(component.geometry)
+            'geometry': self.build_geometry_dictionary(component.geometry)
         }
 
         parent = component.transform_parent
@@ -78,7 +89,8 @@ class JsonWriter(QObject):
 
         return data
 
-    def add_detector_info(self, json_data: dict, detector: Detector):
+    def add_detector_info_to_dictionary(self, json_data: dict, detector: Detector):
+        """Adds detector specific information to a component's data dictionary"""
         pixels = detector.pixel_data
         if isinstance(pixels, PixelGrid):
             json_data['pixel_grid'] = {
@@ -101,7 +113,8 @@ class JsonWriter(QObject):
                 if pixels.pixel_ids[face_no] is not None
             ]
 
-    def build_json_geometry(self, geometry: Geometry):
+    def build_geometry_dictionary(self, geometry: Geometry):
+        """Builds a dictionary containing geometry information for converting to json"""
         if isinstance(geometry, OFFGeometry):
             data = {
                 'type': 'OFF',
