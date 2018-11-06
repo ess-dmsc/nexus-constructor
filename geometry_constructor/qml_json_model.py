@@ -1,7 +1,7 @@
 """
-Classes for modelling json and including it as a model for a listview in QML
+Classes for modelling json so its lines can be used as a listview model in QML
 
-json is formatted with consistent indents and ordered keys when inserted into the model.
+Json is formatted with consistent indents and ordered keys when inserted into the model.
 To give a condensed view, lines of text comprising lists of numbers are combined into a single line.
 """
 
@@ -20,9 +20,11 @@ class JsonLine:
     collapsed_text: if the full text of the line ends by opening a list or object, this should have an appended
         representation of that item, such as [...] or {...}
     collapsed: whether in the current GUI this line should be shown as collapsed or full
-    indent: the number of spaces padding the start of the line
+    line_number: the line number this object represents in the formatted json. Differentiates between lines with
+                 identical text when determining parents
     parent: the JsonLine representing the start of the list or object this line is part of
 
+    indent: the number of spaces padding the start of the line
     visible: whether a line in this line's parent hierarchy is collapsed
     """
     text = attr.ib(default='')
@@ -47,7 +49,7 @@ class JsonLine:
 
 class JsonModel(QAbstractListModel):
     """
-    A list model for providing QML access to a list of lines in a pretty printed json file
+    A list model for providing QML access to the formatted lines of a json file
 
     Guidance on how to correctly extend QAbstractListModel, including method signatures and required signals can be
     found at http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
