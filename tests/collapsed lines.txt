@@ -1,32 +1,10 @@
 {...}
-  "sample": {...},
-    "transforms": [...],
-      {...},
-        "angle": {...},
-          "unit": "degrees",
-          "value": 0
-        },
-        "axis": {...},
-          "y": 0,
-          "z": 1,
-          "x": 0
-        },
-        "type": "rotate"
-      },
-      {...}
-        "unit": "m",
-        "vector": {...},
-          "y": 0,
-          "z": 0,
-          "x": 0
-        },
-        "type": "translate"
-      }
-    ],
-    "transform_id": 0,
-    "name": "Sample",
+  "components": [],
+  "sample": {...}
     "description": "",
     "geometry": {...},
+      "faces": [...],
+      "type": "OFF",
       "vertices": [...],
         [...],
         [...],
@@ -37,11 +15,33 @@
         [...],
         [...]
       ],
-      "faces": [...],
-      "winding_order": [...],
-      "type": "OFF"
+      "winding_order": [...]
     },
+    "name": "Sample",
+    "transform_id": 0,
+    "transforms": [...],
+      {...},
+        "angle": {...},
+          "unit": "degrees",
+          "value": 0
+        },
+        "axis": {...},
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "type": "rotate"
+      },
+      {...}
+        "type": "translate",
+        "unit": "m",
+        "vector": {...}
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      }
+    ],
     "type": "Sample"
-  },
-  "components": []
+  }
 }

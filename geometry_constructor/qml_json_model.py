@@ -1,34 +1,12 @@
 """
-Classes for modelling a pretty printed json file and including it as a model for a listview in QML
+Classes for modelling json and including it as a model for a listview in QML
 
-For parsing to work correctly, all lists and objects should have their opening brackets at the end of a line, and their
-closing bracket and any required comma be the only non whitespace characters on their line.
-
-For example:
-{
-  "foo": [
-    1,
-    2,
-    -3.5
-  ],
-  "bar": {
-    "a": "hello",
-    "b": "world"
-  }
-}
-
-To give a condensed view, the lines of text comprising lists of numbers are combined into a single line, so the
-previous example would be displayed by the model as:
-{
-  "foo": [1, 2, -3.5],
-  "bar": {
-    "a": "hello",
-    "b": "world"
-  }
-}
+json is formatted with consistent indents and ordered keys when inserted into the model.
+To give a condensed view, lines of text comprising lists of numbers are combined into a single line.
 """
 
 import attr
+import json
 import re
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
 
@@ -133,12 +111,12 @@ class JsonModel(QAbstractListModel):
         return super().flags(index) | Qt.ItemIsEditable
 
     @Slot(str)
-    def set_json(self, json):
+    def set_json(self, json_data):
         self.beginResetModel()
 
         json_lines = []
-        # split json into lines, ignoring any leading or trailing blank lines
-        lines = json.strip('\n').split('\n')
+        # prettify the json and split it into lines
+        lines = json.dumps(json.loads(json_data), indent=2, sort_keys=True).split('\n')
         collecting = False
         collection = []
 
