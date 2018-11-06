@@ -94,6 +94,10 @@ ApplicationWindow {
                 delegate: jsonLineDelegate
                 anchors.fill: parent
                 clip: true
+
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AlwaysOn
+                }
             }
 
             Component {
