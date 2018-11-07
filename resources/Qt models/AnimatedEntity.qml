@@ -16,7 +16,7 @@ Entity {
         fieldOfView: 45
         nearPlane : 0.1
         farPlane : 1000.0
-        position: Qt.vector3d( 0.0, 0.0, 40.0 )
+        position: Qt.vector3d( 6.0, 8.0, 30.0 )
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
@@ -83,42 +83,42 @@ Entity {
     Neutron {
         material: greyMaterial
         mesh: sphereMesh
-        zOffset: 2
+        xOffset: 2
         timespanOffset: 5
     }
     Neutron {
         material: greyMaterial
         mesh: sphereMesh
-        zOffset: -2
+        xOffset: -2
         timespanOffset: 7
     }
 
     Neutron {
         material: greyMaterial
         mesh: sphereMesh
+        xOffset: 1.4
         yOffset: 1.4
-        zOffset: 1.4
         timespanOffset: 19
     }
     Neutron {
         material: greyMaterial
         mesh: sphereMesh
+        xOffset: 1.4
         yOffset: -1.4
-        zOffset: 1.4
         timespanOffset: -19
     }
     Neutron {
         material: greyMaterial
         mesh: sphereMesh
+        xOffset: -1.4
         yOffset: 1.4
-        zOffset: -1.4
         timespanOffset: 23
     }
     Neutron {
         material: greyMaterial
         mesh: sphereMesh
+        xOffset: -1.4
         yOffset: -1.4
-        zOffset: -1.4
         timespanOffset: -23
     }
 
@@ -150,7 +150,7 @@ Entity {
         id: beamTransform
         matrix: {
             var m = Qt.matrix4x4()
-            m.rotate(270.0, Qt.vector3d(0,0,1))
+            m.rotate(270.0, Qt.vector3d(1,0,0))
             m.translate(Qt.vector3d(0, 20, 0))
             return m;
         }

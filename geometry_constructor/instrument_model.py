@@ -1,7 +1,7 @@
 from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDirection, Corner, Vector,\
     CylindricalGeometry, OFFGeometry, Component
 from geometry_constructor.off_renderer import OffMesh
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
+from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
@@ -29,6 +29,8 @@ class InstrumentModel(QAbstractListModel):
     found at http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
     """
 
+    model_updated = Signal('QVariant')
+
     NameRole = Qt.UserRole + 1
     DescriptionRole = Qt.UserRole + 2
     TranslateVectorXRole = Qt.UserRole + 3
@@ -46,6 +48,12 @@ class InstrumentModel(QAbstractListModel):
 
     def __init__(self):
         super().__init__()
+
+        self.dataChanged.connect(self.send_model_updated)
+        self.rowsInserted.connect(self.send_model_updated)
+        self.rowsRemoved.connect(self.send_model_updated)
+        self.modelReset.connect(self.send_model_updated)
+
         self.components = [
             Sample(
                 name='Sample',
@@ -101,17 +109,18 @@ class InstrumentModel(QAbstractListModel):
         row = index.row()
         item = self.components[row]
         changed = False
+        # lambdas prevent non integer values indexing the components list
         param_options = {
-            InstrumentModel.NameRole: [item, 'name', value, False],
-            InstrumentModel.DescriptionRole: [item, 'description', value, False],
-            InstrumentModel.TranslateVectorXRole: [item.translate_vector, 'x', value, True],
-            InstrumentModel.TranslateVectorYRole: [item.translate_vector, 'y', value, True],
-            InstrumentModel.TranslateVectorZRole: [item.translate_vector, 'z', value, True],
-            InstrumentModel.RotateAxisXRole: [item.rotate_axis, 'x', value, True],
-            InstrumentModel.RotateAxisYRole: [item.rotate_axis, 'y', value, True],
-            InstrumentModel.RotateAxisZRole: [item.rotate_axis, 'z', value, True],
-            InstrumentModel.RotateAngleRole: [item, 'rotate_angle', value, True],
-            InstrumentModel.TransformParentIndexRole: [
+            InstrumentModel.NameRole: lambda: [item, 'name', value, False],
+            InstrumentModel.DescriptionRole: lambda: [item, 'description', value, False],
+            InstrumentModel.TranslateVectorXRole: lambda: [item.translate_vector, 'x', value, True],
+            InstrumentModel.TranslateVectorYRole: lambda: [item.translate_vector, 'y', value, True],
+            InstrumentModel.TranslateVectorZRole: lambda: [item.translate_vector, 'z', value, True],
+            InstrumentModel.RotateAxisXRole: lambda: [item.rotate_axis, 'x', value, True],
+            InstrumentModel.RotateAxisYRole: lambda: [item.rotate_axis, 'y', value, True],
+            InstrumentModel.RotateAxisZRole: lambda: [item.rotate_axis, 'z', value, True],
+            InstrumentModel.RotateAngleRole: lambda: [item, 'rotate_angle', value, True],
+            InstrumentModel.TransformParentIndexRole: lambda: [
                 item,
                 'transform_parent',
                 self.components[value] if value in range(len(self.components)) else None,
@@ -119,7 +128,7 @@ class InstrumentModel(QAbstractListModel):
             ],
         }
         if role in param_options:
-            param_list = param_options[role]
+            param_list = param_options[role]()
             changed = self.change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
@@ -194,6 +203,15 @@ class InstrumentModel(QAbstractListModel):
         model_index = self.createIndex(index, 0)
         self.dataChanged.emit(model_index, model_index, [InstrumentModel.GeometryRole,
                                                          InstrumentModel.MeshRole])
+
+    def send_model_updated(self):
+        self.model_updated.emit(self)
+
+    def replace_contents(self, components):
+        self.beginResetModel()
+        self.components = components
+        self.meshes = [self.generate_mesh(component) for component in self.components]
+        self.endResetModel()
 
     def generate_mesh(self, component: Component):
         if isinstance(component.geometry, CylindricalGeometry):

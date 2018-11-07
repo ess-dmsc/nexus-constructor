@@ -28,8 +28,8 @@ def test_load_off_file():
         [1, 7, 5, 3],
         [6, 0, 2, 4]
     ]
-    assert off_geometry.flat_faces == [0, 1, 3, 2, 2, 3, 5, 4, 4, 5, 7, 6, 6, 7, 1, 0, 1, 7, 5, 3, 6, 0, 2, 4]
-    assert off_geometry.winding_order == [0, 4, 8, 12, 16, 20]
+    assert off_geometry.winding_order == [0, 1, 3, 2, 2, 3, 5, 4, 4, 5, 7, 6, 6, 7, 1, 0, 1, 7, 5, 3, 6, 0, 2, 4]
+    assert off_geometry.winding_order_indices == [0, 4, 8, 12, 16, 20]
 
 
 def test_generate_off_mesh_without_repeating_grid():

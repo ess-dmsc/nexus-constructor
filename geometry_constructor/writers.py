@@ -146,7 +146,7 @@ class HdfWriter(QObject):
         nx_group.create_dataset(
             'faces',
             dtype='i',
-            data=geometry.faces)
+            data=geometry.winding_order_indices)
 
     def store_cylindrical_geometry(self, nx_group: h5py.Group, geometry: CylindricalGeometry):
         nx_group.attrs['NX_class'] = 'NXcylindrical_geometry'
