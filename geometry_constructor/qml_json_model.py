@@ -130,10 +130,10 @@ class JsonModel(QAbstractListModel):
             if collapse:
                 json_lines.append(
                     JsonLine(
-                        text=collection[0]
-                        + ' '.join([ln.strip() for ln in collection[1:-1]])
-                        + collection[-1].strip(),
-                        collapsed_text=collection[0] + '...' + collection[-1].strip(),
+                        text='{}{}{}'.format(collection[0],
+                                             ' '.join([ln.strip() for ln in collection[1:-1]]),
+                                             collection[-1].strip()),
+                        collapsed_text='{}...{}'.format(collection[0], collection[-1].strip()),
                         line_number=len(json_lines)
                     ))
             else:
