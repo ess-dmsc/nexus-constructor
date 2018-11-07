@@ -24,6 +24,7 @@ class JsonLoader(QObject):
     def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
         """
         Loads a json file into an instrument model
+
         :param file_url: The url of the file to load
         :param model: The model that the loaded components will be stored in
         """
@@ -35,6 +36,7 @@ class JsonLoader(QObject):
     def load_json_into_instrument_model(self, json_data: str, model: InstrumentModel):
         """
         Loads a json string into an instrument model
+
         :param json_data: String containing the json data to load
         :param model: The model the loaded components will be stored in
         """
@@ -43,10 +45,10 @@ class JsonLoader(QObject):
         self.transform_parent_ids = {}
         # Build the sample and components from the data
         data = json.loads(json_data)
-        sample = self.load_component(data['sample'])
+        sample = self.build_component(data['sample'])
         components = [sample]
         for component_data in data['components']:
-            components.append(self.load_component(component_data))
+            components.append(self.build_component(component_data))
         # Set transform parent links
         for (child_id, parent_id) in self.transform_parent_ids.items():
             child = self.transform_id_mapping[child_id]
@@ -55,10 +57,11 @@ class JsonLoader(QObject):
 
         model.replace_contents(components)
 
-    def load_component(self, json_obj: dict):
+    def build_component(self, json_obj: dict):
         """
         Builds a component object from a dictionary containing its properties
-        :param json_obj: the dictionary build from json
+
+        :param json_obj: the dictionary built from json
         :return: the loaded, populated component
         """
         component_type = json_obj['type']
@@ -102,14 +105,19 @@ class JsonLoader(QObject):
                                                     transform['vector']['y'],
                                                     transform['vector']['z'])
 
-        component.geometry = self.load_geometry(json_obj['geometry'])
+        component.geometry = self.build_geometry(json_obj['geometry'])
         self.transform_id_mapping[json_obj['transform_id']] = component
         if 'transform_parent_id' in json_obj:
             self.transform_parent_ids[json_obj['transform_id']] = json_obj['transform_parent_id']
         return component
 
-    def load_geometry(self, geometry_obj: dict):
-        """Builds and returns a Geometry instance based on the dictionary describing it"""
+    def build_geometry(self, geometry_obj: dict):
+        """
+        Builds and returns a Geometry instance based on the dictionary describing it
+
+        :param geometry_obj: A dictionary built from json that describes the geometry
+        :return: An instance of OFFGeometry or CylindricalGeometry
+        """
         if geometry_obj['type'] == 'OFF':
             wound_faces = geometry_obj['faces']
             face_indices = geometry_obj['winding_order'] + [len(wound_faces)]

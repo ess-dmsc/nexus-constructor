@@ -23,9 +23,6 @@ class JsonLine:
     line_number: the line number this object represents in the formatted json. Differentiates between lines with
                  identical text when determining parents
     parent: the JsonLine representing the start of the list or object this line is part of
-
-    indent: the number of spaces padding the start of the line
-    visible: whether a line in this line's parent hierarchy is collapsed
     """
     text = attr.ib(default='')
     collapsed_text = attr.ib(default='')
@@ -35,10 +32,12 @@ class JsonLine:
 
     @property
     def indent(self):
+        """The number of spaces padding the start of the line"""
         return len(self.text) - len(self.text.lstrip(' '))
 
     @property
     def visible(self):
+        """Whether a line in this line's parent hierarchy is collapsed"""
         if self.parent is None:
             return True
         elif self.parent.collapsed:
@@ -114,10 +113,15 @@ class JsonModel(QAbstractListModel):
 
     @Slot(str)
     def set_json(self, json_data):
+        """
+        Replaces the current json in the model with new data, formatted from the given json string
+
+        :param json_data: The json string to populate this model with
+        """
         self.beginResetModel()
 
         json_lines = []
-        # prettify the json and split it into lines
+        # prettify and sort the json, then split it into lines
         lines = json.dumps(json.loads(json_data), indent=2, sort_keys=True).split('\n')
         collecting = False
         collection = []
