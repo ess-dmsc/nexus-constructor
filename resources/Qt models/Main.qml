@@ -26,7 +26,7 @@ ApplicationWindow {
                 onTriggered: jsonSaveDialog.open()
             }
             Action {
-                text: "Export to nexus file"
+                text: "Export to NeXus file"
                 onTriggered: nexusFileDialog.open()
             }
             Action {
