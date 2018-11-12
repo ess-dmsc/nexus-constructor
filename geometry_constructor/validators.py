@@ -14,7 +14,7 @@ class ValidatorOnInstrumentModel(QValidator):
 
     def __init__(self):
         super().__init__()
-        self.instrument_model = InstrumentModel(include_default_geometry=False)
+        self.instrument_model = InstrumentModel()
         self.model_index = -1
 
     def get_index(self):
