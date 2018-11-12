@@ -96,8 +96,7 @@ class InstrumentModel(QAbstractListModel):
                 lambda: self.components.index(component.transform_parent)
                 if component.transform_parent in self.components
                 else 0,
-            InstrumentModel.PixelDataRole:
-                lambda: component.pixel_data if isinstance(component, Detector) else None,
+            InstrumentModel.PixelDataRole: lambda: component.pixel_data if isinstance(component, Detector) else None,
             InstrumentModel.GeometryRole: lambda: component.geometry,
             InstrumentModel.MeshRole: lambda: self.meshes[row],
             InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(component),
