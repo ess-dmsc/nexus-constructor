@@ -10,6 +10,9 @@ class ValidatorOnInstrumentModel(QValidator):
 
     Exposes properties that can be set in QML for the component index, and instrument model.
     In QML these can be set with 'myindex' and 'model'
+
+    Getters and setters, while un-pythonic, are required for the Qt properties system
+    https://wiki.qt.io/Qt_for_Python_UsingQtProperties
     """
 
     def __init__(self):
@@ -45,9 +48,6 @@ class ValidatorOnInstrumentModel(QValidator):
 class TransformParentValidator(ValidatorOnInstrumentModel):
     """
     Validator to prevent circular transform parent dependencies being created in an instrument model
-
-    Getters and setters, while un-pythonic, are required for the Qt properties system
-    https://wiki.qt.io/Qt_for_Python_UsingQtProperties
     """
 
     def __init__(self):
