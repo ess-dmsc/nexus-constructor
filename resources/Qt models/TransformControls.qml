@@ -85,6 +85,7 @@ Item {
         anchors.left: parent.left
         labelText: "x:"
         editorText: rotate_x
+        validator: numberValidator
     }
     LabeledTextField {
         id: yRotField
@@ -92,6 +93,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         labelText: "y:"
         editorText: rotate_y
+        validator: numberValidator
     }
     LabeledTextField {
         id: zRotField
@@ -99,6 +101,7 @@ Item {
         anchors.right: parent.right
         labelText: "z:"
         editorText: rotate_z
+        validator: numberValidator
     }
 
     LabeledTextField {
@@ -107,6 +110,7 @@ Item {
         anchors.right: zRotField.right
         labelText: "angle (degrees):"
         editorText: rotate_angle
+        validator: angleValidator
     }
 
     Label {
@@ -122,6 +126,7 @@ Item {
         anchors.left: parent.left
         labelText: "x:"
         editorText: translate_x
+        validator: numberValidator
     }
     LabeledTextField {
         id: yField
@@ -129,6 +134,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         labelText: "y:"
         editorText: translate_y
+        validator: numberValidator
     }
     LabeledTextField {
         id: zField
@@ -136,6 +142,19 @@ Item {
         anchors.right: parent.right
         labelText: "z:"
         editorText: translate_z
+        validator: numberValidator
+    }
+
+    DoubleValidator {
+        id: numberValidator
+        notation: DoubleValidator.StandardNotation
+    }
+
+    DoubleValidator {
+        id: angleValidator
+        top: 360
+        bottom: -360
+        notation: DoubleValidator.StandardNotation
     }
 
     ParentValidator {
