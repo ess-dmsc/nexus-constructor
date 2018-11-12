@@ -1,11 +1,13 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import MyValidators 1.0
 
 /*
  * Controls for defining a components transformation to detector space.
  * Should be used in an environment where the following variables exist:
  * - components (InstrumentModel)
  * - transform_parent_index (integer)
+ * - index  (integer)
  * - rotate_x   (float)
  * - rotate_y   (float)
  * - rotate_z   (float)
@@ -62,6 +64,12 @@ Item {
         model: components
         textRole: "name"
         currentIndex: transform_parent_index
+        validator: parentValidator
+        onActivated: {
+            if(!acceptableInput){
+                currentIndex = transform_parent_index
+            }
+        }
     }
 
     Label {
@@ -128,5 +136,11 @@ Item {
         anchors.right: parent.right
         labelText: "z:"
         editorText: translate_z
+    }
+
+    ParentValidator {
+        id: parentValidator
+        model: components
+        myindex: index
     }
 }

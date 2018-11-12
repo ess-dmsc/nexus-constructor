@@ -1,5 +1,6 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import MyValidators 1.0
 
 Pane {
 
@@ -104,6 +105,10 @@ Pane {
                         id: nameField
                         labelText: "Name:"
                         editorText: name
+                        validator: NameValidator {
+                            model: components
+                            myindex: index
+                        }
                     }
 
                     TransformControls {

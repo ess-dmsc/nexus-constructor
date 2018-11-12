@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Window 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
+import MyValidators 1.0
 
 Window {
 
@@ -15,6 +16,8 @@ Window {
     property real translate_x: 0
     property real translate_y: 0
     property real translate_z: 0
+
+    property int index: -1
 
     title: "Add Detector"
     id: addDetectorWindow
@@ -80,6 +83,10 @@ Window {
                 labelText: "Name:"
                 editorText: name
                 onEditingFinished: name = editorText
+                validator: NameValidator {
+                    model: components
+                    myindex: -1
+                }
             }
 
             LabeledTextField {
