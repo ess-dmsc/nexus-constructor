@@ -152,9 +152,12 @@ Pane {
                         width: parent.width / 4
                         text: "Delete"
                         onClicked: components.remove_component(index)
-                        enabled: removable
+                        buttonEnabled: removable
                         // The sample (at index 0) should never be removed. Don't even show it as an option.
                         visible: index != 0
+                        ToolTip.visible: hovered & !removable
+                        ToolTip.delay: 400
+                        ToolTip.text: "Cannot remove a component that's in use as a transform parent"
                     }
                 }
             }
