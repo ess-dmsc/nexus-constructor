@@ -252,7 +252,7 @@ class InstrumentModel(QAbstractListModel):
     @Slot(str, result=str)
     def generate_component_name(self, base):
         """Generates a unique name for a new component using a common base string"""
-        regex = '^{}\d*$'.format(base)
+        regex = '^{}\d*$'.format(re.escape(base))
         similar_names = [component.name for component in self.components if re.match(regex, component.name)]
 
         if len(similar_names) == 0 or base not in similar_names:
