@@ -52,6 +52,7 @@ Window {
                 text: "Repeatable OFF"
                 onClicked: {
                     geometryControls.state = "OFF"
+                    name = components.generate_component_name("Detector")
                     contentPane.state = "EnterDetails"
                 }
             }
@@ -62,6 +63,7 @@ Window {
                 text: "Repeatable Cylinder"
                 onClicked: {
                     geometryControls.state = "Cylinder"
+                    name = components.generate_component_name("Detector")
                     contentPane.state = "EnterDetails"
                 }
             }

@@ -3,6 +3,7 @@ from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDi
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
+import re
 
 
 class InstrumentModel(QAbstractListModel):
@@ -247,3 +248,17 @@ class InstrumentModel(QAbstractListModel):
                 model_index = self.createIndex(i, 0)
                 self.dataChanged.emit(model_index, model_index, InstrumentModel.TransformMatrixRole)
                 self.update_child_transforms(candidate)
+
+    @Slot(str, result=str)
+    def generate_component_name(self, base):
+        """Generates a unique name for a new component using a common base string"""
+        regex = '^{}\d*$'.format(base)
+        similar_names = [component.name for component in self.components if re.match(regex, component.name)]
+
+        if len(similar_names) == 0 or base not in similar_names:
+            return base
+        if similar_names == [base]:
+            return base + '1'
+        # find the highest number in use, and go one higher
+        tailing_numbers = [int(name[len(base):]) for name in similar_names if name != base]
+        return base + str(max(tailing_numbers) + 1)

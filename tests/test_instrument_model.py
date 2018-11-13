@@ -33,3 +33,17 @@ def test_replace_contents():
     assert model.rowCount() == 2
     assert model.components == replacement_data
     assert len(model.meshes) == 2
+
+
+def test_generate_component_name():
+    model = InstrumentModel()
+    model.components = [
+        data_model.Component(name='Sample'),
+        data_model.Component(name='Detector'),
+        data_model.Component(name='Detector3'),
+        data_model.Component(name='Magnet2'),
+    ]
+    assert model.generate_component_name('Sample') == 'Sample1'
+    assert model.generate_component_name('Detector') == 'Detector4'
+    assert model.generate_component_name('Magnet') == 'Magnet'
+    assert model.generate_component_name('BeamGuide') == 'BeamGuide'
