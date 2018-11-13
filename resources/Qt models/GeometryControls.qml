@@ -37,7 +37,7 @@ Pane {
                 id: fileTextField
                 anchors.top: parent.top
                 anchors.left: parent.left
-                labelText: "OFF file:"
+                labelText: "Geometry file:"
                 editorText: file_url
                 editorWidth: 200
                 onEditingFinished: file_url = editorText
@@ -52,7 +52,7 @@ Pane {
             FileDialog {
                 id: filePicker
                 title: "Choose geometry file"
-                nameFilters: ["Object File Format (*.off)", "All files (*)"]
+                nameFilters: ["Geometry files (*.off *.stl)", "Object File Format (*.off)", "STL files (*.stl)"]
                 onAccepted: {
                     file_url = filePicker.fileUrl
                     fileTextField.editorText = file_url

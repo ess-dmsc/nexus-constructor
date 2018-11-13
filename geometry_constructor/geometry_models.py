@@ -8,6 +8,7 @@ what signals need to be emitted when changes to the data are made.
 from geometry_constructor.data_model import Vector, CylindricalGeometry, OFFGeometry
 from nexusutils.readwriteoff import parse_off_file
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Slot
+from stl import mesh
 
 from geometry_constructor.instrument_model import InstrumentModel
 
@@ -148,17 +149,26 @@ class OFFModel(QAbstractListModel):
             OFFModel.FacesRole: b'faces'
         }
 
-    # Read the OFF file into self.geometry
     def load_data(self):
+        """Read the currently selected file into self.geometry"""
         filename = self.file_url.toString(options=QUrl.PreferLocalFile)
-        with open(filename) as file:
-            vertices, faces = parse_off_file(file)
+        if filename.endswith('.off'):
+            with open(filename) as file:
+                vertices, faces = parse_off_file(file)
 
-        print(vertices)
-        print(faces)
-
-        self.geometry.vertices = [Vector(x, y, z) for x, y, z in (vertex for vertex in vertices)]
-        self.geometry.faces = [face.tolist()[1:] for face in faces]
+            self.geometry.vertices = [Vector(x, y, z) for x, y, z in (vertex for vertex in vertices)]
+            self.geometry.faces = [face.tolist()[1:] for face in faces]
+        elif filename.endswith('.stl'):
+            mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
+            # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
+            self.geometry.vertices = [Vector(float(corner[0]),
+                                             float(corner[1]),
+                                             float(corner[2]))
+                                      for triangle in mesh_data.vectors
+                                      for corner in triangle]
+            self.geometry.faces = [[i*3, (i*3)+1, (i*3)+2] for i in range(len(mesh_data.vectors))]
+        else:
+            return
 
     def get_geometry(self):
         return self.geometry

@@ -46,7 +46,7 @@ Window {
             PaddedButton {
                 id: offButton
                 anchors.top: geometryLabel.bottom
-                text: "Repeatable OFF"
+                text: "Repeatable Mesh"
                 onClicked: {
                     geometryControls.state = "OFF"
                     contentPane.state = "EnterDetails"
