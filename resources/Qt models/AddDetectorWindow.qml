@@ -6,7 +6,7 @@ import MyValidators 1.0
 
 Window {
 
-    property string name: "Detector"
+    property string name: components.generate_component_name("Component")
     property string description: ""
     property real transform_parent_index: 0
     property real rotate_x: 0
