@@ -152,6 +152,9 @@ Pane {
                         width: parent.width / 4
                         text: "Delete"
                         onClicked: components.remove_component(index)
+                        enabled: removable
+                        // The sample (at index 0) should never be removed. Don't even show it as an option.
+                        visible: index != 0
                     }
                 }
             }
