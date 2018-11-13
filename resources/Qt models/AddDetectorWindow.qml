@@ -88,6 +88,9 @@ Window {
                 validator: NameValidator {
                     model: components
                     myindex: -1
+                    onValidationFailed: {
+                        nameField.ToolTip.show("Component names must be unique", 3000)
+                    }
                 }
             }
 

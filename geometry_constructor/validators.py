@@ -10,6 +10,7 @@ class ValidatorOnInstrumentModel(QValidator):
 
     Exposes properties that can be set in QML for the component index, and instrument model.
     In QML these can be set with 'myindex' and 'model'
+    A signal 'validationFailed' is included so that error messages can be displayed in the UI to explain the failure.
 
     Getters and setters, while un-pythonic, are required for the Qt properties system
     https://wiki.qt.io/Qt_for_Python_UsingQtProperties
@@ -44,6 +45,8 @@ class ValidatorOnInstrumentModel(QValidator):
 
     model = Property('QVariant', get_model, set_model, notify=model_changed)
 
+    validationFailed = Signal()
+
 
 class TransformParentValidator(ValidatorOnInstrumentModel):
     """
@@ -57,6 +60,7 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
         """
         Validates the input as the name of a component's transform parent to check it won't cause a circular dependency
 
+        The signal 'validationFailed' is emitted only if a circular dependency is found
         (http://doc.qt.io/qt-5/qvalidator.html#validate)
         """
         parents = {}
@@ -85,6 +89,7 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
                 return QValidator.Acceptable
             if parent_index in visited:
                 # loop found
+                self.validationFailed.emit()
                 return QValidator.Invalid
             visited.add(parent_index)
             index = parent_index
@@ -98,6 +103,7 @@ class NameValidator(ValidatorOnInstrumentModel):
 
     Names must be unique as they are used to identify component objects in generated NeXus files, which must be named
     uniquely.
+    The validationFailed signal is emitted if an entered name is not unique.
     """
 
     def __init__(self):
@@ -108,5 +114,6 @@ class NameValidator(ValidatorOnInstrumentModel):
         # if any other component has the same name, it's invalid for this component
         for component in (components[i] for i in range(len(components)) if i != self.model_index):
             if component.name == input:
+                self.validationFailed.emit()
                 return QValidator.Invalid
         return QValidator.Acceptable

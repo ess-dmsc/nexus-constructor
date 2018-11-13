@@ -161,5 +161,8 @@ Item {
         id: parentValidator
         model: components
         myindex: index
+        onValidationFailed: {
+            relativePicker.ToolTip.show("Items cannot be selected if they would cause a circular dependency", 5000)
+        }
     }
 }
