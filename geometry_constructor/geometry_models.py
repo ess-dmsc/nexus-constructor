@@ -153,14 +153,15 @@ class OFFModel(QAbstractListModel):
             filename = self.file_url.toString(options=QUrl.PreferLocalFile)
         else:
             filename = self.file_url
-        if filename.endswith('.off'):
+        extension = filename[filename.rfind('.'):].lower()
+        if extension == '.off':
             with open(filename) as file:
                 vertices, faces = parse_off_file(file)
 
             self.geometry.vertices = [Vector(x, y, z) for x, y, z in (vertex for vertex in vertices)]
             self.geometry.faces = [face.tolist()[1:] for face in faces]
             print('OFF loaded')
-        elif filename.endswith('.stl'):
+        elif extension == '.stl':
             mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
             # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
             self.geometry.vertices = [Vector(float(corner[0]),
