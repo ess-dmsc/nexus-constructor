@@ -62,9 +62,13 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
 
         The signal 'validationFailed' is emitted only if a circular dependency is found
         (http://doc.qt.io/qt-5/qvalidator.html#validate)
+        :param input: The name of the component being considered for assignment as a transform parent
+        :param pos: The cursor position in input. Required to match the QValidator API, and not used.
         """
-        parents = {}
 
+        # A mapping of component indexes to the indexes of their parents
+        parents = {}
+        # Build the parents mapping, including the mapping that would be set by the new assignment
         candidate_parent_index = -1
         for component in self.instrument_model.components:
             index = self.instrument_model.components.index(component)
@@ -82,6 +86,7 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
 
         visited = {self.model_index}
         index = self.model_index
+        # Explore the parent mapping as a graph until all connections have been explored or a loop is found
         for _ in range(len(parents)):
             parent_index = parents[index]
             if parent_index == index:
