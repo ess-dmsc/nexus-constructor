@@ -133,8 +133,6 @@ class OFFModel(QAbstractListModel):
             changed = change_value(*param_list)
         if role == OFFModel.FileNameRole:
             self.load_data()
-            self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
-                                                 OFFModel.FacesRole])
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
@@ -176,6 +174,9 @@ class OFFModel(QAbstractListModel):
             self.geometry.vertices = []
             self.geometry.faces = []
             print('no geometry to load - vertex and face lists wiped')
+        index = self.createIndex(0, 0)
+        self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
+                                             OFFModel.FacesRole])
 
     def get_geometry(self):
         return self.geometry
