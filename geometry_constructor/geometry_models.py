@@ -151,7 +151,10 @@ class OFFModel(QAbstractListModel):
 
     def load_data(self):
         """Read the currently selected file into self.geometry"""
-        filename = self.file_url.toString(options=QUrl.PreferLocalFile)
+        if isinstance(self.file_url, QUrl):
+            filename = self.file_url.toString(options=QUrl.PreferLocalFile)
+        else:
+            filename = self.file_url
         if filename.endswith('.off'):
             with open(filename) as file:
                 vertices, faces = parse_off_file(file)
