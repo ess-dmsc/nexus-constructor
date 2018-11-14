@@ -5,10 +5,9 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 
-from geometry_constructor.data_model import Vector, CylindricalGeometry, OFFGeometry
-from nexusutils.readwriteoff import parse_off_file
+from geometry_constructor.data_model import CylindricalGeometry, OFFGeometry
+from geometry_constructor.geometry_loader import load_geometry
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Slot
-from stl import mesh
 
 from geometry_constructor.instrument_model import InstrumentModel
 
@@ -153,28 +152,7 @@ class OFFModel(QAbstractListModel):
             filename = self.file_url.toString(options=QUrl.PreferLocalFile)
         else:
             filename = self.file_url
-        extension = filename[filename.rfind('.'):].lower()
-        if extension == '.off':
-            with open(filename) as file:
-                vertices, faces = parse_off_file(file)
-
-            self.geometry.vertices = [Vector(x, y, z) for x, y, z in (vertex for vertex in vertices)]
-            self.geometry.faces = [face.tolist()[1:] for face in faces]
-            print('OFF loaded')
-        elif extension == '.stl':
-            mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
-            # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
-            self.geometry.vertices = [Vector(float(corner[0]),
-                                             float(corner[1]),
-                                             float(corner[2]))
-                                      for triangle in mesh_data.vectors
-                                      for corner in triangle]
-            self.geometry.faces = [[i*3, (i*3)+1, (i*3)+2] for i in range(len(mesh_data.vectors))]
-            print('STL loaded')
-        else:
-            self.geometry.vertices = []
-            self.geometry.faces = []
-            print('no geometry to load - vertex and face lists wiped')
+        self.geometry = load_geometry(filename)
         index = self.createIndex(0, 0)
         self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
                                              OFFModel.FacesRole])
