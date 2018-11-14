@@ -161,6 +161,7 @@ class OFFModel(QAbstractListModel):
 
             self.geometry.vertices = [Vector(x, y, z) for x, y, z in (vertex for vertex in vertices)]
             self.geometry.faces = [face.tolist()[1:] for face in faces]
+            print('OFF loaded')
         elif filename.endswith('.stl'):
             mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
             # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
@@ -170,9 +171,11 @@ class OFFModel(QAbstractListModel):
                                       for triangle in mesh_data.vectors
                                       for corner in triangle]
             self.geometry.faces = [[i*3, (i*3)+1, (i*3)+2] for i in range(len(mesh_data.vectors))]
+            print('STL loaded')
         else:
             self.geometry.vertices = []
             self.geometry.faces = []
+            print('no geometry to load - vertex and face lists wiped')
 
     def get_geometry(self):
         return self.geometry
