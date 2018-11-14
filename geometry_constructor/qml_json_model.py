@@ -61,8 +61,9 @@ class JsonModel(QAbstractListModel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.indent_level = 2
         self.lines = [
-            JsonLine(text='[\n1, 2, 3\n]', collapsed_text='[...]')
+            JsonLine(text='[\n  1, 2, 3\n]', collapsed_text='[...]')
         ]
 
     def rowCount(self, parent=QModelIndex()):
@@ -122,20 +123,25 @@ class JsonModel(QAbstractListModel):
 
         json_lines = []
         # prettify and sort the json, then split it into lines
-        lines = json.dumps(json.loads(json_data), indent=2, sort_keys=True).split('\n')
+        lines = json.dumps(json.loads(json_data), indent=self.indent_level, sort_keys=True).split('\n')
         collecting = False
         collection = []
 
         def store_collection(collapse=False):
+            """Stores the strings in the collection list as JsonLines in json_lines
+
+            :param collapse: Whether to store the collected strings as a single JsonLine
+            """
             if collapse:
-                json_lines.append(
-                    JsonLine(
+                line = JsonLine(
                         text='{}{}{}'.format(collection[0],
                                              ' '.join([ln.strip() for ln in collection[1:-1]]),
                                              collection[-1].strip()),
                         collapsed_text='{}...{}'.format(collection[0], collection[-1].strip()),
                         line_number=len(json_lines)
-                    ))
+                    )
+                assign_parent(line)
+                json_lines.append(line)
             else:
                 for stored_line in collection:
                     if stored_line.endswith('['):
@@ -144,11 +150,24 @@ class JsonModel(QAbstractListModel):
                         collapsed_text = stored_line + '...}'
                     else:
                         collapsed_text = stored_line
-                    json_lines.append(JsonLine(text=stored_line,
-                                               collapsed_text=collapsed_text,
-                                               line_number=len(json_lines)
-                                               ))
+                    line = JsonLine(text=stored_line,
+                                    collapsed_text=collapsed_text,
+                                    line_number=len(json_lines))
+                    assign_parent(line)
+                    json_lines.append(line)
             collection.clear()
+
+        # The first line shouldn't have a parent
+        latest_line_at_indent = {-self.indent_level: None}
+
+        def assign_parent(line: JsonLine):
+            """Set the line's parent based on the indent level of previous lines"""
+            indent = line.indent
+            closes = re.match('^[]}],?$', line.text.strip())
+            parent_indent = indent if closes else indent - self.indent_level
+            line.parent = latest_line_at_indent[parent_indent]
+            latest_line_at_indent[indent] = line
+
         # if a line ends in a '[' and subsequent lines before its ']' only contain numbers,
         # combine those lines into a single JsonLine
         for i in range(len(lines)):
@@ -170,29 +189,6 @@ class JsonModel(QAbstractListModel):
             else:
                 collection.append(line)
         store_collection()
-
-        # for each non root level line in the json, set its parent
-        for i in range(1, len(json_lines)):
-            child = json_lines[i]
-            lists = 0
-            objects = 0
-            for candidate_index in range(i - 1, -1, -1):
-                candidate_parent = json_lines[candidate_index]
-                is_list_end = re.match('^],?$', candidate_parent.text.strip())
-                is_list_start = candidate_parent.text.endswith('[')
-                is_obj_end = re.match('^},?$', candidate_parent.text.strip())
-                is_obj_start = candidate_parent.text.endswith('{')
-                if (is_obj_start or is_list_start) and lists == 0 and objects == 0:
-                    child.parent = candidate_parent
-                    break
-                if is_list_end:
-                    lists -= 1
-                if is_list_start:
-                    lists += 1
-                if is_obj_end:
-                    objects -= 1
-                if is_obj_start:
-                    objects += 1
 
         # add any required trailing commas to collapsed text
         for line in json_lines:
