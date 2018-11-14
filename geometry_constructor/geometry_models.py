@@ -171,7 +171,8 @@ class OFFModel(QAbstractListModel):
                                       for corner in triangle]
             self.geometry.faces = [[i*3, (i*3)+1, (i*3)+2] for i in range(len(mesh_data.vectors))]
         else:
-            return
+            self.geometry.vertices = []
+            self.geometry.faces = []
 
     def get_geometry(self):
         return self.geometry
