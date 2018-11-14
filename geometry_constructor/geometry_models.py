@@ -97,7 +97,7 @@ class CylinderModel(QAbstractListModel):
 
 class OFFModel(QAbstractListModel):
     """
-    A single item list model that allows properties of an OFF geometry to be read and manipulated in QML
+    A single item list model that allows properties of an OFFGeometry instance to be read and manipulated in QML
     """
 
     FileNameRole = Qt.UserRole + 200
