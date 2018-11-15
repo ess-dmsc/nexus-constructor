@@ -82,6 +82,12 @@ def test_load_stl_file():
         assert face_found
 
 
+def test_load_non_geometry_file():
+    geometry = load_geometry('tests/collapsed lines.txt')
+    assert len(geometry.vertices) == 0
+    assert len(geometry.faces) == 0
+
+
 def test_generate_off_mesh_without_repeating_grid():
     # A square with a triangle on the side
     off_geometry = OFFGeometry(vertices=[Vector(0, 0, 0),
