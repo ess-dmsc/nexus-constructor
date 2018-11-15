@@ -1,4 +1,4 @@
-"""Input validators to be used on QML input fields"""
+"""Validators to be used on QML input fields"""
 from geometry_constructor.instrument_model import InstrumentModel
 from PySide2.QtCore import Property, Signal
 from PySide2.QtGui import QValidator
@@ -56,18 +56,35 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
     def __init__(self):
         super().__init__()
 
-    def validate(self, input: str, pos: int):
+    def validate(self, proposed_parent_name: str, pos: int):
         """
         Validates the input as the name of a component's transform parent to check it won't cause a circular dependency
 
         The signal 'validationFailed' is emitted only if a circular dependency is found
         (http://doc.qt.io/qt-5/qvalidator.html#validate)
-        :param input: The name of the component being considered for assignment as a transform parent
-        :param pos: The cursor position in input. Required to match the QValidator API, and not used.
+        :param proposed_parent_name: The name of the component being considered for assignment as a transform parent
+        :param pos: The cursor position in proposed_parent_name. Required to match the QValidator API. Not used.
         """
 
         # A mapping of component indexes to the indexes of their parents
-        parents = {}
+        parents, fully_mapped = self.populate_parent_mapping(proposed_parent_name)
+        if not fully_mapped:
+            return QValidator.Invalid
+
+        if self.valid_parent_mapping(parents):
+            return QValidator.Acceptable
+        else:
+            return QValidator.Invalid
+
+    def populate_parent_mapping(self, proposed_parent_name):
+        """
+        Builds a dictionary that maps component indexes to the indexes of their parents
+
+        :param proposed_parent_name: The name of the component being considered as a parent for the component at this
+        validators index
+        :returns: The mapping, and a boolean indicating if the mapping was fully populated
+        """
+        mapping = {}
         # Build the parents mapping, including the mapping that would be set by the new assignment
         candidate_parent_index = -1
         for component in self.instrument_model.components:
@@ -76,14 +93,24 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
                 parent_index = 0
             else:
                 parent_index = self.instrument_model.components.index(component.transform_parent)
-            parents[index] = parent_index
-            if component.name == input:
+            mapping[index] = parent_index
+            if component.name == proposed_parent_name:
                 candidate_parent_index = index
         if candidate_parent_index == -1:
             # input is not a valid parent name
-            return QValidator.Invalid
-        parents[self.model_index] = candidate_parent_index
+            return mapping, False
+        mapping[self.model_index] = candidate_parent_index
+        return mapping, True
 
+    def valid_parent_mapping(self, parents):
+        """
+        Explores a parent id mapping dictionary from the validators index to determine if it's valid
+
+        A valid parent hierarchy is one that ends in a component being its own parent.
+        The validationFailed signal is emitted if a circular dependency is found.
+        :param parents: A mapping of component indexes to the indexes of their parent
+        :return: A boolean indicating if the component at the validators index has a valid parent hierarchy
+        """
         visited = {self.model_index}
         index = self.model_index
         # Explore the parent mapping as a graph until all connections have been explored or a loop is found
@@ -91,15 +118,15 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
             parent_index = parents[index]
             if parent_index == index:
                 # self looping, acceptable end of tree
-                return QValidator.Acceptable
+                return True
             if parent_index in visited:
                 # loop found
                 self.validationFailed.emit()
-                return QValidator.Invalid
+                return False
             visited.add(parent_index)
             index = parent_index
         # A result should have been found in the loop. Fail the validation
-        return QValidator.Invalid
+        return False
 
 
 class NameValidator(ValidatorOnInstrumentModel):
