@@ -12,6 +12,8 @@ Pane {
     contentWidth: view.width
     contentHeight: view.height
 
+    signal meshChanged()
+
     ListView {
         id: view
         height: contentHeight
@@ -20,6 +22,7 @@ Pane {
 
     OFFModel {
         id: offModel
+        onModelReset: pane.meshChanged()
     }
 
     CylinderModel {

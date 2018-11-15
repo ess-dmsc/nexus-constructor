@@ -1,7 +1,15 @@
 """Validators to be used on QML input fields"""
 from geometry_constructor.instrument_model import InstrumentModel
 from PySide2.QtCore import Property, Signal
-from PySide2.QtGui import QValidator
+from PySide2.QtGui import QValidator, QIntValidator
+
+
+class NullableIntValidator(QIntValidator):
+    def validate(self, input: str, pos: int):
+        if input == '':
+            return QValidator.Acceptable
+        else:
+            return super().validate(input, pos)
 
 
 class ValidatorOnInstrumentModel(QValidator):

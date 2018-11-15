@@ -152,10 +152,9 @@ class OFFModel(QAbstractListModel):
             filename = self.file_url.toString(options=QUrl.PreferLocalFile)
         else:
             filename = self.file_url
+        self.beginResetModel()
         self.geometry = load_geometry(filename)
-        index = self.createIndex(0, 0)
-        self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
-                                             OFFModel.FacesRole])
+        self.endResetModel()
 
     def get_geometry(self):
         return self.geometry

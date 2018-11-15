@@ -37,8 +37,8 @@ Window {
 
         Pane {
             id: geometrySelectionPane
-            contentWidth: Math.max(geometryLabel.width, offButton.width, cylinderButton.width)
-            contentHeight: geometryLabel.height + offButton.height + cylinderButton.height
+            contentWidth: Math.max(geometryLabel.width, offButton.width, cylinderButton.width, mappedMeshButton.width)
+            contentHeight: geometryLabel.height + offButton.height + cylinderButton.height + mappedMeshButton.height
             visible: true
 
             Label {
@@ -52,6 +52,7 @@ Window {
                 text: "Repeatable Mesh"
                 onClicked: {
                     geometryControls.state = "OFF"
+                    pixelControls.state = "Grid"
                     name = components.generate_component_name("Detector")
                     contentPane.state = "EnterDetails"
                 }
@@ -63,6 +64,19 @@ Window {
                 text: "Repeatable Cylinder"
                 onClicked: {
                     geometryControls.state = "Cylinder"
+                    pixelControls.state = "Grid"
+                    name = components.generate_component_name("Detector")
+                    contentPane.state = "EnterDetails"
+                }
+            }
+
+            PaddedButton {
+                id: mappedMeshButton
+                anchors.top: cylinderButton.bottom
+                text: "Pixel-Face Mapped Mesh"
+                onClicked: {
+                    geometryControls.state = "OFF"
+                    pixelControls.state = "Mapping"
                     name = components.generate_component_name("Detector")
                     contentPane.state = "EnterDetails"
                 }
@@ -77,6 +91,7 @@ Window {
                            + transformLabel.height
                            + transformFrame.height
                            + geometryControls.height
+                           + pixelControls.height
                            + addButton.height
             visible: false
 
@@ -107,7 +122,7 @@ Window {
                 id: transformLabel
                 anchors.top: descriptionField.bottom
                 anchors.left: parent.left
-                text: "Transform"
+                text: "Transform:"
             }
 
             Frame {
@@ -123,19 +138,30 @@ Window {
             GeometryControls {
                 id: geometryControls
                 anchors.top: transformFrame.bottom
+                onMeshChanged: pixelControls.restartMapping(geometryControls.geometryModel)
+            }
+
+            PixelControls {
+                id: pixelControls
+                anchors.top: geometryControls.bottom
+                anchors.right:parent.right
+                anchors.left: parent.left
+                width: parent.contentWidth
             }
 
             PaddedButton {
                 id: addButton
-                anchors.top: geometryControls.bottom
+                anchors.top: pixelControls.bottom
                 anchors.left: parent.left
+                leftPadding: 0
                 text: "Add"
                 onClicked: {
                     transformControls.saveFields()
                     components.add_detector(name, description, transform_parent_index,
                                             translate_x, translate_y, translate_z,
                                             rotate_x, rotate_y, rotate_z, rotate_angle,
-                                            geometryControls.geometryModel)
+                                            geometryControls.geometryModel,
+                                            pixelControls.pixelModel)
                     addDetectorWindow.close()
                 }
             }
