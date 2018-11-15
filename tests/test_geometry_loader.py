@@ -6,7 +6,7 @@ from PySide2.QtCore import QUrl
 import struct
 
 
-def test_load_off_file():
+def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     model = OFFModel()
     model.setData(0, QUrl('tests/cube.off'), OFFModel.FileNameRole)
     off_geometry = model.get_geometry()
@@ -33,7 +33,7 @@ def test_load_off_file():
     assert off_geometry.winding_order_indices == [0, 4, 8, 12, 16, 20]
 
 
-def test_load_stl_file():
+def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
     length = 30
     left_lower_rear = Vector(0, 0, 0)
     right_lower_rear = Vector(length, 0, 0)
@@ -82,7 +82,7 @@ def test_load_stl_file():
         assert face_found
 
 
-def test_load_non_geometry_file():
+def test_load_geometry_returns_empty_geometry_for_unrecognised_file_extension():
     geometry = load_geometry('tests/collapsed lines.txt')
     assert len(geometry.vertices) == 0
     assert len(geometry.faces) == 0
