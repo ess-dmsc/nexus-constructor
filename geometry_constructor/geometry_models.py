@@ -5,8 +5,8 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 
-from geometry_constructor.data_model import Vector, CylindricalGeometry, OFFGeometry
-from nexusutils.readwriteoff import parse_off_file
+from geometry_constructor.data_model import CylindricalGeometry, OFFGeometry
+from geometry_constructor.geometry_loader import load_geometry
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Slot
 
 from geometry_constructor.instrument_model import InstrumentModel
@@ -96,7 +96,7 @@ class CylinderModel(QAbstractListModel):
 
 class OFFModel(QAbstractListModel):
     """
-    A single item list model that allows properties of an OFF geometry to be read and manipulated in QML
+    A single item list model that allows properties of an OFFGeometry instance to be read and manipulated in QML
     """
 
     FileNameRole = Qt.UserRole + 200
@@ -132,8 +132,6 @@ class OFFModel(QAbstractListModel):
             changed = change_value(*param_list)
         if role == OFFModel.FileNameRole:
             self.load_data()
-            self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
-                                                 OFFModel.FacesRole])
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
@@ -148,17 +146,16 @@ class OFFModel(QAbstractListModel):
             OFFModel.FacesRole: b'faces'
         }
 
-    # Read the OFF file into self.geometry
     def load_data(self):
-        filename = self.file_url.toString(options=QUrl.PreferLocalFile)
-        with open(filename) as file:
-            vertices, faces = parse_off_file(file)
-
-        print(vertices)
-        print(faces)
-
-        self.geometry.vertices = [Vector(x, y, z) for x, y, z in (vertex for vertex in vertices)]
-        self.geometry.faces = [face.tolist()[1:] for face in faces]
+        """Read the currently selected file into self.geometry"""
+        if isinstance(self.file_url, QUrl):
+            filename = self.file_url.toString(options=QUrl.PreferLocalFile)
+        else:
+            filename = self.file_url
+        self.geometry = load_geometry(filename)
+        index = self.createIndex(0, 0)
+        self.dataChanged.emit(index, index, [OFFModel.VerticesRole,
+                                             OFFModel.FacesRole])
 
     def get_geometry(self):
         return self.geometry

@@ -49,7 +49,7 @@ Window {
             PaddedButton {
                 id: offButton
                 anchors.top: geometryLabel.bottom
-                text: "Repeatable OFF"
+                text: "Repeatable Mesh"
                 onClicked: {
                     geometryControls.state = "OFF"
                     name = components.generate_component_name("Detector")
