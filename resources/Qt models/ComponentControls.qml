@@ -1,5 +1,6 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import MyValidators 1.0
 
 Pane {
 
@@ -104,6 +105,13 @@ Pane {
                         id: nameField
                         labelText: "Name:"
                         editorText: name
+                        validator: NameValidator {
+                            model: components
+                            myindex: index
+                            onValidationFailed: {
+                                nameField.ToolTip.show("Component names must be unique", 3000)
+                            }
+                        }
                     }
 
                     TransformControls {
@@ -147,6 +155,12 @@ Pane {
                         width: parent.width / 4
                         text: "Delete"
                         onClicked: components.remove_component(index)
+                        buttonEnabled: removable
+                        // The sample (at index 0) should never be removed. Don't even show it as an option.
+                        visible: index != 0
+                        ToolTip.visible: hovered & !removable
+                        ToolTip.delay: 400
+                        ToolTip.text: "Cannot remove a component that's in use as a transform parent"
                     }
                 }
             }

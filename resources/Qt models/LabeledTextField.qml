@@ -6,6 +6,7 @@ Pane {
     property string labelText: ""
     property string editorText: ""
     property real editorWidth: 100
+    property var validator: null
     id: pane
     padding: 2
     contentHeight: Math.max(label.height, field.height)
@@ -24,6 +25,7 @@ Pane {
         anchors.top: parent.top
         anchors.left: label.right
         width: editorWidth
+        validator: pane.validator
 
         text: editorText
         onEditingFinished: {

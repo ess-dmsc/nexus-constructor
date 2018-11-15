@@ -3,6 +3,7 @@ from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDi
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
+import re
 
 
 class InstrumentModel(QAbstractListModel):
@@ -45,6 +46,7 @@ class InstrumentModel(QAbstractListModel):
     GeometryRole = Qt.UserRole + 12
     MeshRole = Qt.UserRole + 13
     TransformMatrixRole = Qt.UserRole + 14
+    RemovableRole = Qt.UserRole + 15
 
     def __init__(self):
         super().__init__()
@@ -96,11 +98,11 @@ class InstrumentModel(QAbstractListModel):
                 lambda: self.components.index(component.transform_parent)
                 if component.transform_parent in self.components
                 else 0,
-            InstrumentModel.PixelDataRole:
-                lambda: component.pixel_data if isinstance(component, Detector) else None,
+            InstrumentModel.PixelDataRole: lambda: component.pixel_data if isinstance(component, Detector) else None,
             InstrumentModel.GeometryRole: lambda: component.geometry,
             InstrumentModel.MeshRole: lambda: self.meshes[row],
             InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(component),
+            InstrumentModel.RemovableRole: lambda: self.is_removable(row),
         }
         if role in accessors:
             return accessors[role]()
@@ -132,6 +134,8 @@ class InstrumentModel(QAbstractListModel):
             changed = self.change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
+            if role == InstrumentModel.TransformParentIndexRole:
+                self.update_removable()
         return changed
 
     def change_value(self, item, attribute_name, value, transforms):
@@ -161,6 +165,7 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.PixelDataRole: b'pixel_data',
             InstrumentModel.MeshRole: b'mesh',
             InstrumentModel.TransformMatrixRole: b'transform_matrix',
+            InstrumentModel.RemovableRole: b'removable'
         }
 
     @Slot(str)
@@ -184,16 +189,16 @@ class InstrumentModel(QAbstractListModel):
         self.components.append(detector)
         self.meshes.append(self.generate_mesh(detector))
         self.endInsertRows()
+        self.update_removable()
 
     @Slot(int)
     def remove_component(self, index):
-        # Don't let the initial sample be removed
-        if index == 0:
-            return
-        self.beginRemoveRows(QModelIndex(), index, index)
-        self.components.pop(index)
-        self.meshes.pop(index)
-        self.endRemoveRows()
+        if self.is_removable(index):
+            self.beginRemoveRows(QModelIndex(), index, index)
+            self.components.pop(index)
+            self.meshes.pop(index)
+            self.endRemoveRows()
+            self.update_removable()
 
     @Slot(int, 'QVariant')
     def set_geometry(self, index, geometry_model):
@@ -248,3 +253,33 @@ class InstrumentModel(QAbstractListModel):
                 model_index = self.createIndex(i, 0)
                 self.dataChanged.emit(model_index, model_index, InstrumentModel.TransformMatrixRole)
                 self.update_child_transforms(candidate)
+
+    @Slot(str, result=str)
+    def generate_component_name(self, base):
+        """Generates a unique name for a new component using a common base string"""
+        regex = '^{}\d*$'.format(re.escape(base))
+        similar_names = [component.name for component in self.components if re.match(regex, component.name)]
+
+        if len(similar_names) == 0 or base not in similar_names:
+            return base
+        if similar_names == [base]:
+            return base + '1'
+        # find the highest number in use, and go one higher
+        tailing_numbers = [int(name[len(base):]) for name in similar_names if name != base]
+        return base + str(max(tailing_numbers) + 1)
+
+    def is_removable(self, index: int):
+        """
+        Determine if a component can be removed from the model
+
+        The initial sample should never be removable, and neither should transform parents of other components.
+        """
+        if index == 0:
+            return False
+        component = self.components[index]
+        return len([c for c in self.components if c.transform_parent is component and c is not component]) == 0
+
+    def update_removable(self):
+        self.dataChanged.emit(self.createIndex(0, 0),
+                              self.createIndex(len(self.components), 0),
+                              InstrumentModel.RemovableRole)

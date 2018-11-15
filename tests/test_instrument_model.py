@@ -22,6 +22,10 @@ def test_remove_component():
     model.remove_component(1)
     assert model.rowCount() == 1
     assert not isinstance(model.components[0], data_model.Detector)
+    # The sample at index 0 shouldn't be removable
+    model.remove_component(0)
+    assert model.rowCount() == 1
+    assert isinstance(model.components[0], data_model.Sample)
 
 
 def test_replace_contents():
@@ -33,3 +37,31 @@ def test_replace_contents():
     assert model.rowCount() == 2
     assert model.components == replacement_data
     assert len(model.meshes) == 2
+
+
+def test_generate_component_name():
+    model = InstrumentModel()
+    model.components = [
+        data_model.Component(name='Sample'),
+        data_model.Component(name='Detector'),
+        data_model.Component(name='Detector3'),
+        data_model.Component(name='Magnet2'),
+    ]
+    assert model.generate_component_name('Sample') == 'Sample1'
+    assert model.generate_component_name('Detector') == 'Detector4'
+    assert model.generate_component_name('Magnet') == 'Magnet'
+    assert model.generate_component_name('BeamGuide') == 'BeamGuide'
+
+
+def test_is_removable():
+    model = InstrumentModel()
+    model.components = [data_model.Component(name=str(i)) for i in range(4)]
+    model.components[0].transform_parent = model.components[0]
+    model.components[1].transform_parent = model.components[0]
+    model.components[2].transform_parent = model.components[1]
+    model.components[3].transform_parent = model.components[3]
+
+    assert not model.is_removable(0)
+    assert not model.is_removable(1)
+    assert model.is_removable(2)
+    assert model.is_removable(3)

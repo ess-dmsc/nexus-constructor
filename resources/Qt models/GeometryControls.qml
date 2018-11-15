@@ -89,6 +89,7 @@ Pane {
                     labelText: "height:"
                     editorText: cylinder_height
                     onEditingFinished: cylinder_height = parseFloat(editorText)
+                    validator: numberValidator
                 }
                 LabeledTextField {
                     id: radiusField
@@ -97,6 +98,7 @@ Pane {
                     labelText: "radius:"
                     editorText: cylinder_radius
                     onEditingFinished: cylinder_radius = parseFloat(editorText)
+                    validator: numberValidator
                 }
 
                 Label {
@@ -113,6 +115,7 @@ Pane {
                     labelText: "x:"
                     editorText: axis_x
                     onEditingFinished: axis_x = parseFloat(editorText)
+                    validator: numberValidator
                 }
                 LabeledTextField {
                     id: axisYField
@@ -121,6 +124,7 @@ Pane {
                     labelText: "y:"
                     editorText: axis_y
                     onEditingFinished: axis_y = parseFloat(editorText)
+                    validator: numberValidator
                 }
                 LabeledTextField {
                     id: axisZField
@@ -129,9 +133,15 @@ Pane {
                     labelText: "z:"
                     editorText: axis_z
                     onEditingFinished: axis_z = parseFloat(editorText)
+                    validator: numberValidator
                 }
             }
         }
+    }
+
+    DoubleValidator {
+        id: numberValidator
+        notation: DoubleValidator.StandardNotation
     }
 
 
