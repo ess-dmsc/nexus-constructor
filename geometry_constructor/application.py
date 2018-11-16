@@ -6,7 +6,7 @@ Loading this module also registers with QML the required custom classes to load 
 
 import sys
 from os import path
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.instrument_model import InstrumentModel, SingleComponentModel
 from geometry_constructor.geometry_models import CylinderModel, OFFModel
 from geometry_constructor.json_loader import JsonLoader
 from geometry_constructor.json_writer import JsonWriter
@@ -21,6 +21,7 @@ from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 qmlRegisterType(Logger, 'MyWriters', 1, 0, 'Logger')
 qmlRegisterType(HdfWriter, 'MyWriters', 1, 0, 'HdfWriter')
 qmlRegisterType(InstrumentModel, 'MyModels', 1, 0, 'InstrumentModel')
+qmlRegisterType(SingleComponentModel, 'MyModels', 1, 0, 'SingleComponentModel')
 qmlRegisterType(CylinderModel, 'MyModels', 1, 0, 'CylinderModel')
 qmlRegisterType(OFFModel, 'MyModels', 1, 0, 'OFFModel')
 qmlRegisterType(FilteredJsonModel, 'MyModels', 1, 0, 'FilteredJsonModel')

@@ -13,6 +13,7 @@ Pane {
     contentHeight: view.height
 
     signal meshChanged()
+    signal cylinderChanged()
 
     ListView {
         id: view
@@ -27,6 +28,7 @@ Pane {
 
     CylinderModel {
         id: cylinderModel
+        onDataChanged: pane.cylinderChanged()
     }
 
     Component {

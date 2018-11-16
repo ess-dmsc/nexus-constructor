@@ -153,7 +153,7 @@ class OFFModel(QAbstractListModel):
         else:
             filename = self.file_url
         self.beginResetModel()
-        self.geometry = load_geometry(filename)
+        load_geometry(filename, self.geometry)
         self.endResetModel()
 
     def get_geometry(self):

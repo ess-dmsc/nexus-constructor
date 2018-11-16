@@ -1,7 +1,7 @@
-from geometry_constructor.data_model import Sample, Detector, PixelGrid, CountDirection, Corner, Vector,\
+from geometry_constructor.data_model import Sample, Detector, PixelGrid, PixelMapping, Vector,\
     CylindricalGeometry, OFFGeometry, Component
 from geometry_constructor.off_renderer import OffMesh
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
+from PySide2.QtCore import Property, Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
 import re
 
@@ -42,8 +42,8 @@ class InstrumentModel(QAbstractListModel):
     RotateAxisZRole = Qt.UserRole + 8
     RotateAngleRole = Qt.UserRole + 9
     TransformParentIndexRole = Qt.UserRole + 10
-    PixelDataRole = Qt.UserRole + 11
-    GeometryRole = Qt.UserRole + 12
+    PixelStateRole = Qt.UserRole + 11
+    GeometryStateRole = Qt.UserRole + 12
     MeshRole = Qt.UserRole + 13
     TransformMatrixRole = Qt.UserRole + 14
     RemovableRole = Qt.UserRole + 15
@@ -98,8 +98,8 @@ class InstrumentModel(QAbstractListModel):
                 lambda: self.components.index(component.transform_parent)
                 if component.transform_parent in self.components
                 else 0,
-            InstrumentModel.PixelDataRole: lambda: component.pixel_data if isinstance(component, Detector) else None,
-            InstrumentModel.GeometryRole: lambda: component.geometry,
+            InstrumentModel.PixelStateRole: lambda: self.determine_pixel_state(component),
+            InstrumentModel.GeometryStateRole: lambda: self.determine_geometry_state(component),
             InstrumentModel.MeshRole: lambda: self.meshes[row],
             InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(component),
             InstrumentModel.RemovableRole: lambda: self.is_removable(row),
@@ -162,7 +162,8 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.RotateAxisZRole: b'rotate_z',
             InstrumentModel.RotateAngleRole: b'rotate_angle',
             InstrumentModel.TransformParentIndexRole: b'transform_parent_index',
-            InstrumentModel.PixelDataRole: b'pixel_data',
+            InstrumentModel.PixelStateRole: b'pixel_state',
+            InstrumentModel.GeometryStateRole: b'geometry_state',
             InstrumentModel.MeshRole: b'mesh',
             InstrumentModel.TransformMatrixRole: b'transform_matrix',
             InstrumentModel.RemovableRole: b'removable'
@@ -206,7 +207,7 @@ class InstrumentModel(QAbstractListModel):
         self.components[index].geometry = geometry_model.get_geometry()
         self.meshes[index] = self.generate_mesh(self.components[index])
         model_index = self.createIndex(index, 0)
-        self.dataChanged.emit(model_index, model_index, [InstrumentModel.GeometryRole,
+        self.dataChanged.emit(model_index, model_index, [InstrumentModel.GeometryStateRole,
                                                          InstrumentModel.MeshRole])
 
     def send_model_updated(self):
@@ -283,3 +284,69 @@ class InstrumentModel(QAbstractListModel):
         self.dataChanged.emit(self.createIndex(0, 0),
                               self.createIndex(len(self.components), 0),
                               InstrumentModel.RemovableRole)
+
+    @staticmethod
+    def determine_pixel_state(component):
+        """Returns a string identifying the state a PixelControls editor should be in for the given component"""
+        if isinstance(component, Detector):
+            if isinstance(component.pixel_data, PixelGrid):
+                return "Grid"
+            elif isinstance(component.pixel_data, PixelMapping):
+                return "Mapping"
+        return ""
+
+    @staticmethod
+    def determine_geometry_state(component):
+        """Returns a string identifying the state a GeometryControls editor should be in for the given component"""
+        if isinstance(component.geometry, CylindricalGeometry):
+            return "Cylinder"
+        elif isinstance(component.geometry, OFFGeometry):
+            return "OFF"
+        return ""
+
+    @Slot(int)
+    def update_mesh(self, index: int):
+        """
+        Slot to be called when another model updates properties that require a component's mesh to be updated
+
+        :param index: The index in this model of the component needing it's mesh updated
+        """
+        component = self.components[index]
+        self.meshes[index] = self.generate_mesh(component)
+
+        model_index = self.createIndex(index, 0)
+        self.dataChanged.emit(model_index, model_index, InstrumentModel.MeshRole)
+
+
+class SingleComponentModel(QSortFilterProxyModel):
+    """A filtered model that only displays a single component from an InstrumentModel"""
+
+    def __init__(self):
+        super().__init__()
+        self.desired_index = 0
+
+    def get_index(self):
+        return self.desired_index
+
+    def set_index(self, val):
+        self.desired_index = val
+        self.invalidateFilter()
+
+    index_changed = Signal()
+
+    index = Property(int, get_index, set_index, notify=index_changed)
+
+    def get_model(self):
+        return self.sourceModel()
+
+    def set_model(self, val):
+        self.setSourceModel(val)
+        self.invalidateFilter()
+
+    model_changed = Signal()
+
+    model = Property('QVariant', get_model, set_model, notify=model_changed)
+
+    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex):
+        """Overrides filterAcceptsRow to only accept the component at the given index"""
+        return source_row == self.desired_index

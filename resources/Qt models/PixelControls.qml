@@ -9,6 +9,8 @@ Item {
     id: pane
     height: pixelLabel.height + viewFrame.height
 
+    signal layoutChanged()
+
     function restartMapping(geometryModel){
         onGeometryModelChanged: mappingModel.restart_mapping(geometryModel)
     }
@@ -36,6 +38,7 @@ Item {
 
     PixelGridModel {
         id: gridModel
+        onDataChanged: pane.layoutChanged()
     }
 
     PixelMappingModel {

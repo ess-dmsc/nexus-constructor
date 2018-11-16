@@ -125,6 +125,18 @@ Pane {
                         anchors.left: parent.left
                         width: parent.width / 4
                         text: "Full editor"
+                        onClicked: {
+                            editorLoader.source = "EditComponentWindow.qml"
+                            editorLoader.item.componentIndex = index
+                            editorLoader.item.show()
+                        }
+                    }
+                    Loader {
+                        id: editorLoader
+                        Connections {
+                            target: editorLoader.item
+                            onClosing: editorLoader.source = ""
+                        }
                     }
                     PaddedButton {
                         id: applyButton
