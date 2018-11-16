@@ -7,18 +7,32 @@ Item {
     property var pixelModel
 
     id: pane
-    height: view.height
+    height: pixelLabel.height + viewFrame.height
 
     function restartMapping(geometryModel){
         onGeometryModelChanged: mappingModel.restart_mapping(geometryModel)
     }
 
-    ListView {
-        id: view
-        height: contentHeight
+    Label {
+        id: pixelLabel
+        anchors.top: parent.top
+        anchors.left: parent.left
+    }
+
+    Frame {
+        id: viewFrame
+        anchors.top: pixelLabel.bottom
+        contentHeight: view.height
         width: parent.width
-        interactive: false
-        clip: true
+        padding: 1
+        ListView {
+            id: view
+            anchors.top: pixelLabel.bottom
+            height: contentHeight
+            width: parent.width
+            interactive: false
+            clip: true
+        }
     }
 
     PixelGridModel {
@@ -32,112 +46,99 @@ Item {
     Component {
         id: gridDelegate
 
-        Item {
+        Pane {
+            id: gridFields
+            contentHeight: rowsField.height +
+                columnsField.height +
+                firstIdField.height +
+                cornerPicker.height +
+                directionPicker.height
             width: view.width
-            height: gridLabel.height + gridFields.height
 
-            Label {
-                id: gridLabel
+            LabeledTextField {
+                id: rowsField
                 anchors.top: parent.top
                 anchors.left: parent.left
-                text: "Pixel Grid:"
+                labelText: "Rows:"
+                editorText: rows
+                onEditingFinished: rows = parseInt(editorText)
+                validator: integerValidator
+            }
+            LabeledTextField {
+                id: rowHeightField
+                anchors.top: rowsField.top
+                anchors.left: rowsField.right
+                labelText: "Row height:"
+                editorText: row_height
+                onEditingFinished: row_height = parseFloat(editorText)
+                validator: numberValidator
             }
 
-            Frame {
-                id: gridFields
-                anchors.top: gridLabel.bottom
-                contentHeight: rowsField.height +
-                    columnsField.height +
-                    firstIdField.height +
-                    cornerPicker.height +
-                    directionPicker.height
-                width: parent.width
+            LabeledTextField {
+                id: columnsField
+                anchors.top: rowHeightField.bottom
+                anchors.left: parent.left
+                labelText: "Columns:"
+                editorText: columns
+                onEditingFinished: columns = parseInt(editorText)
+                validator: integerValidator
+            }
+            LabeledTextField {
+                id: columnWidthField
+                anchors.top: columnsField.top
+                anchors.left: columnsField.right
+                labelText: "Column width:"
+                editorText: col_width
+                onEditingFinished: col_width = parseFloat(editorText)
+                validator: numberValidator
+            }
 
-                LabeledTextField {
-                    id: rowsField
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    labelText: "Rows:"
-                    editorText: rows
-                    onEditingFinished: rows = parseInt(editorText)
-                    validator: integerValidator
-                }
-                LabeledTextField {
-                    id: rowHeightField
-                    anchors.top: rowsField.top
-                    anchors.left: rowsField.right
-                    labelText: "Row height:"
-                    editorText: row_height
-                    onEditingFinished: row_height = parseFloat(editorText)
-                    validator: numberValidator
-                }
+            LabeledTextField {
+                id: firstIdField
+                anchors.top: columnWidthField.bottom
+                anchors.left: parent.left
+                labelText: "First ID:"
+                editorText: first_id
+                onEditingFinished: first_id = parseInt(editorText)
+                validator: integerValidator
+            }
 
-                LabeledTextField {
-                    id: columnsField
-                    anchors.top: rowHeightField.bottom
-                    anchors.left: parent.left
-                    labelText: "Columns:"
-                    editorText: columns
-                    onEditingFinished: columns = parseInt(editorText)
-                    validator: integerValidator
+            Label {
+                id: cornerLabel
+                anchors.verticalCenter: cornerPicker.verticalCenter
+                anchors.left: parent.left
+                text: "Start counting ID's from:"
+            }
+            ComboBox {
+                id: cornerPicker
+                anchors.top: firstIdField.bottom
+                anchors.left: cornerLabel.right
+                textRole: "key"
+                model: ListModel {
+                    ListElement { key: "Bottom left"; value: "BOTTOM_LEFT" }
+                    ListElement { key: "Bottom right"; value: "BOTTOM_RIGHT" }
+                    ListElement { key: "Top left"; value: "TOP_LEFT" }
+                    ListElement { key: "Top right"; value: "TOP_RIGHT" }
                 }
-                LabeledTextField {
-                    id: columnWidthField
-                    anchors.top: columnsField.top
-                    anchors.left: columnsField.right
-                    labelText: "Column width:"
-                    editorText: col_width
-                    onEditingFinished: col_width = parseFloat(editorText)
-                    validator: numberValidator
-                }
+                onActivated: initial_count_corner = model.get(currentIndex).value
+            }
 
-                LabeledTextField {
-                    id: firstIdField
-                    anchors.top: columnWidthField.bottom
-                    anchors.left: parent.left
-                    labelText: "First ID:"
-                    editorText: first_id
-                    onEditingFinished: first_id = parseInt(editorText)
-                    validator: integerValidator
+            Label {
+                id: directionLabel
+                anchors.verticalCenter: directionPicker.verticalCenter
+                anchors.left: parent.left
+                text: "Count first along:"
+            }
+            ComboBox {
+                id: directionPicker
+                anchors.top: cornerPicker.bottom
+                anchors.left: directionLabel.right
+                textRole: "key"
+                model: ListModel {
+                    ListElement { key: "Rows"; value: "ROW" }
+                    ListElement { key: "Columns"; value: "COLUMN" }
                 }
-
-                Label {
-                    id: cornerLabel
-                    anchors.verticalCenter: cornerPicker.verticalCenter
-                    anchors.left: parent.left
-                    text: "Start counting ID's from:"
-                }
-                ComboBox {
-                    id: cornerPicker
-                    anchors.top: firstIdField.bottom
-                    anchors.left: cornerLabel.right
-                    textRole: "key"
-                    model: ListModel {
-                        ListElement { key: "Bottom left"; value: "BOTTOM_LEFT" }
-                        ListElement { key: "Bottom right"; value: "BOTTOM_RIGHT" }
-                        ListElement { key: "Top left"; value: "TOP_LEFT" }
-                        ListElement { key: "Top right"; value: "TOP_RIGHT" }
-                    }
-                    onActivated: initial_count_corner = model.get(currentIndex).value
-                }
-
-                Label {
-                    id: directionLabel
-                    anchors.verticalCenter: directionPicker.verticalCenter
-                    anchors.left: parent.left
-                    text: "Count first along:"
-                }
-                ComboBox {
-                    id: directionPicker
-                    anchors.top: cornerPicker.bottom
-                    anchors.left: directionLabel.right
-                    textRole: "key"
-                    model: ListModel {
-                        ListElement { key: "Rows"; value: "ROW" }
-                        ListElement { key: "Columns"; value: "COLUMN" }
-                    }
-                    onActivated: count_direction = model.get(currentIndex).value
-                }
+                onActivated: count_direction = model.get(currentIndex).value
             }
         }
     }
@@ -181,6 +182,7 @@ Item {
             PropertyChanges { target: pane; pixelModel: gridModel }
             PropertyChanges { target: view; model: gridModel }
             PropertyChanges { target: view; delegate: gridDelegate }
+            PropertyChanges { target: pixelLabel; text: "Pixel grid:" }
         },
         State {
             name: "Mapping"
@@ -189,6 +191,7 @@ Item {
             PropertyChanges { target: view; delegate: mappingDelegate }
             PropertyChanges { target: view; height: 200 }
             PropertyChanges { target: view; interactive: true }
+            PropertyChanges { target: pixelLabel; text: "Pixel mapping:" }
         }
     ]
 
