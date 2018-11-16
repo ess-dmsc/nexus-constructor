@@ -27,7 +27,6 @@ Item {
         padding: 1
         ListView {
             id: view
-            anchors.top: pixelLabel.bottom
             height: contentHeight
             width: parent.width
             interactive: false
