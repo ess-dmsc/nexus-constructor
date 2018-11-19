@@ -75,7 +75,6 @@ class InstrumentModel(QAbstractListModel):
                            [1, 7, 5, 3],
                            [6, 0, 2, 4]]
                 ))]
-        self.meshes = [self.generate_mesh(component) for component in self.components]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.components)
@@ -100,7 +99,7 @@ class InstrumentModel(QAbstractListModel):
                 else 0,
             InstrumentModel.PixelStateRole: lambda: self.determine_pixel_state(component),
             InstrumentModel.GeometryStateRole: lambda: self.determine_geometry_state(component),
-            InstrumentModel.MeshRole: lambda: self.meshes[row],
+            InstrumentModel.MeshRole: lambda: self.generate_mesh(component),
             InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(component),
             InstrumentModel.RemovableRole: lambda: self.is_removable(row),
         }
@@ -188,7 +187,6 @@ class InstrumentModel(QAbstractListModel):
                             geometry=geometry,
                             pixel_data=pixels)
         self.components.append(detector)
-        self.meshes.append(self.generate_mesh(detector))
         self.endInsertRows()
         self.update_removable()
 
@@ -197,7 +195,6 @@ class InstrumentModel(QAbstractListModel):
         if self.is_removable(index):
             self.beginRemoveRows(QModelIndex(), index, index)
             self.components.pop(index)
-            self.meshes.pop(index)
             self.endRemoveRows()
             self.update_removable()
 
@@ -205,7 +202,6 @@ class InstrumentModel(QAbstractListModel):
     def set_geometry(self, index, geometry_model):
         print(geometry_model)
         self.components[index].geometry = geometry_model.get_geometry()
-        self.meshes[index] = self.generate_mesh(self.components[index])
         model_index = self.createIndex(index, 0)
         self.dataChanged.emit(model_index, model_index, [InstrumentModel.GeometryStateRole,
                                                          InstrumentModel.MeshRole])
@@ -216,7 +212,6 @@ class InstrumentModel(QAbstractListModel):
     def replace_contents(self, components):
         self.beginResetModel()
         self.components = components
-        self.meshes = [self.generate_mesh(component) for component in self.components]
         self.endResetModel()
 
     def generate_mesh(self, component: Component):
@@ -312,7 +307,6 @@ class InstrumentModel(QAbstractListModel):
         :param index: The index in this model of the component needing it's mesh updated
         """
         component = self.components[index]
-        self.meshes[index] = self.generate_mesh(component)
 
         model_index = self.createIndex(index, 0)
         self.dataChanged.emit(model_index, model_index, InstrumentModel.MeshRole)
