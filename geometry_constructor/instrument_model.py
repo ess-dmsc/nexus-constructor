@@ -306,8 +306,6 @@ class InstrumentModel(QAbstractListModel):
 
         :param index: The index in this model of the component needing it's mesh updated
         """
-        component = self.components[index]
-
         model_index = self.createIndex(index, 0)
         self.dataChanged.emit(model_index, model_index, InstrumentModel.MeshRole)
 
