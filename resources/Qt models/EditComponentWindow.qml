@@ -84,6 +84,7 @@ Window {
                 contentWidth: transformControls.width
                 TransformControls {
                     id: transformControls
+                    autosave: true
                 }
             }
 
