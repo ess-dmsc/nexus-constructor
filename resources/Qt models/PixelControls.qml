@@ -60,7 +60,7 @@ Item {
             LabeledTextField {
                 id: rowsField
                 anchors.top: parent.top
-                anchors.left: parent.left
+                anchors.right: columnsField.right
                 labelText: "Rows:"
                 editorText: rows
                 onEditingFinished: rows = parseInt(editorText)
@@ -69,7 +69,7 @@ Item {
             LabeledTextField {
                 id: rowHeightField
                 anchors.top: rowsField.top
-                anchors.left: rowsField.right
+                anchors.right: columnWidthField.right
                 labelText: "Row height:"
                 editorText: row_height
                 onEditingFinished: row_height = parseFloat(editorText)
@@ -98,7 +98,7 @@ Item {
             LabeledTextField {
                 id: firstIdField
                 anchors.top: columnWidthField.bottom
-                anchors.left: parent.left
+                anchors.right: columnsField.right
                 labelText: "First ID:"
                 editorText: first_id
                 onEditingFinished: first_id = parseInt(editorText)
@@ -128,13 +128,13 @@ Item {
             Label {
                 id: directionLabel
                 anchors.verticalCenter: directionPicker.verticalCenter
-                anchors.left: parent.left
+                anchors.right: cornerLabel.right
                 text: "Count first along:"
             }
             ComboBox {
                 id: directionPicker
                 anchors.top: cornerPicker.bottom
-                anchors.left: directionLabel.right
+                anchors.left: cornerPicker.left
                 textRole: "key"
                 model: ListModel {
                     ListElement { key: "Rows"; value: "ROW" }
