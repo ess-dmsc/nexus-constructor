@@ -105,6 +105,7 @@ Pane {
                         id: nameField
                         labelText: "Name:"
                         editorText: name
+                        onEditingFinished: name = editorText
                         validator: NameValidator {
                             model: components
                             myindex: index
@@ -139,31 +140,9 @@ Pane {
                         }
                     }
                     PaddedButton {
-                        id: applyButton
-                        anchors.top: editorButton.top
-                        anchors.left: editorButton.right
-                        width: parent.width / 4
-                        text: "Apply changes"
-                        onClicked: {
-                            name = nameField.editorText
-                            transformControls.saveFields()
-                        }
-                    }
-                    PaddedButton {
-                        id: discardButton
-                        anchors.top: editorButton.top
-                        anchors.left: applyButton.right
-                        width: parent.width / 4
-                        text: "Discard changes"
-                        onClicked: {
-                            nameField.editorText = name
-                            transformControls.resetFields()
-                        }
-                    }
-                    PaddedButton {
                         id: deleteButton
                         anchors.top: editorButton.top
-                        anchors.left: discardButton.right
+                        anchors.right: parent.right
                         width: parent.width / 4
                         text: "Delete"
                         onClicked: components.remove_component(index)

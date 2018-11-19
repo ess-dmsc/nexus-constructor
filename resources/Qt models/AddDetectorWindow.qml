@@ -156,7 +156,6 @@ Window {
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
-                    transformControls.saveFields()
                     components.add_detector(name, description, transform_parent_index,
                                             translate_x, translate_y, translate_z,
                                             rotate_x, rotate_y, rotate_z, rotate_angle,
