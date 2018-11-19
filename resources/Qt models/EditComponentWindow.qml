@@ -23,6 +23,7 @@ Window {
             height: contentHeight
             model: component
             delegate: editorDelegate
+            interactive: false
         }
     }
 
