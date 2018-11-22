@@ -138,6 +138,7 @@ Entity {
         id: cylinderMesh
         length: 40
         radius: 2.5
+        rings: 2
     }
 
     NodeInstantiator  {
