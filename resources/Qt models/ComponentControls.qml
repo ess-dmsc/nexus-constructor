@@ -4,6 +4,8 @@ import MyValidators 1.0
 
 Pane {
 
+    contentWidth: listContainer.width
+
     Pane {
         id: headingRow
         anchors.left: parent.left
@@ -37,8 +39,9 @@ Pane {
     }
 
     Frame {
+        id: listContainer
         anchors.left: parent.left
-        anchors.right: parent.right
+        contentWidth: componentListView.width
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
         padding: 1
@@ -46,7 +49,8 @@ Pane {
             id: componentListView
             model: components
             delegate: componentDelegate
-            anchors.fill: parent
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
             clip: true
         }
     }
@@ -57,7 +61,9 @@ Pane {
             id: componentBox
             padding: 5
             contentHeight: Math.max(mainContent.height, expansionCaret.height)
-            width: componentListView.width
+            contentWidth: transformControls.width
+
+            Component.onCompleted: componentListView.width = componentBox.width
 
             MouseArea {
                 id: expansionClickArea
