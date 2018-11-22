@@ -47,7 +47,7 @@ Entity {
 
     PhongMaterial {
         id: greyMaterial
-        ambient: "grey"
+        ambient: "black"
         diffuse: "grey"
     }
 
@@ -60,7 +60,7 @@ Entity {
     PhongAlphaMaterial {
         id: beamMaterial
         ambient: "blue"
-        diffuse: "blue"
+        diffuse: "lightblue"
         alpha: 0.5
     }
 
