@@ -3,11 +3,11 @@ import QtQuick.Controls 2.4
 
 
 Pane {
-    property string labelText: ""
-    property string editorText: ""
+    property alias labelText: label.text
+    property alias editorText: field.text
     property alias editorWidth: field.width
+    property alias validator: field.validator
     property bool anchoredEditor: false
-    property var validator: null
     id: pane
     padding: 2
     contentHeight: Math.max(label.height, field.height)
@@ -18,7 +18,6 @@ Pane {
         id: label
         anchors.verticalCenter: field.verticalCenter
         anchors.left: parent.left
-        text: labelText
     }
     TextField {
         id: field
@@ -27,12 +26,7 @@ Pane {
         anchors.left: label.right
         anchors.right: anchoredEditor ? parent.right : undefined
         width: 100
-        validator: pane.validator
 
-        text: editorText
-        onEditingFinished: {
-            editorText = text
-            pane.editingFinished()
-        }
+        onEditingFinished: pane.editingFinished()
     }
 }
