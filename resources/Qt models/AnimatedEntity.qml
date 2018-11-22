@@ -25,9 +25,21 @@ Entity {
 
     components: [
         RenderSettings {
-            activeFrameGraph: ForwardRenderer {
-                camera: camera
-                clearColor: "lightgrey"
+            activeFrameGraph: RenderSurfaceSelector {
+                ClearBuffers {
+                    buffers: ClearBuffers.ColorDepthBuffer
+                    clearColor: "lightgrey"
+
+                    CameraSelector {
+                        camera: camera
+                        RenderStateSet {
+                            renderStates: [
+                                CullFace { mode: CullFace.NoCulling },
+                                DepthTest { depthFunction: DepthTest.LessOrEqual}
+                            ]
+                        }
+                    }
+                }
             }
         },
         InputSettings { }
