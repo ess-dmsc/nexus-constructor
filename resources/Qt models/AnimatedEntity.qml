@@ -25,9 +25,21 @@ Entity {
 
     components: [
         RenderSettings {
-            activeFrameGraph: ForwardRenderer {
-                camera: camera
-                clearColor: "lightgrey"
+            activeFrameGraph: RenderSurfaceSelector {
+                ClearBuffers {
+                    buffers: ClearBuffers.ColorDepthBuffer
+                    clearColor: "lightgrey"
+
+                    CameraSelector {
+                        camera: camera
+                        RenderStateSet {
+                            renderStates: [
+                                CullFace { mode: CullFace.NoCulling },
+                                DepthTest { depthFunction: DepthTest.LessOrEqual}
+                            ]
+                        }
+                    }
+                }
             }
         },
         InputSettings { }
@@ -35,20 +47,20 @@ Entity {
 
     PhongMaterial {
         id: greyMaterial
-        ambient: "grey"
+        ambient: "black"
         diffuse: "grey"
     }
 
     PhongMaterial {
         id: redMaterial
         ambient: "red"
-        diffuse: "red"
+        diffuse: "#b00"
     }
 
     PhongAlphaMaterial {
         id: beamMaterial
         ambient: "blue"
-        diffuse: "blue"
+        diffuse: "lightblue"
         alpha: 0.5
     }
 
@@ -126,6 +138,7 @@ Entity {
         id: cylinderMesh
         length: 40
         radius: 2.5
+        rings: 2
     }
 
     NodeInstantiator  {
