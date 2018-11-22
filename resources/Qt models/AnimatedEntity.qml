@@ -54,7 +54,7 @@ Entity {
     PhongMaterial {
         id: redMaterial
         ambient: "red"
-        diffuse: "red"
+        diffuse: "#b00"
     }
 
     PhongAlphaMaterial {
