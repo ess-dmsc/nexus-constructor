@@ -85,7 +85,7 @@ Window {
 
         Pane {
             id: detailsPane
-            contentWidth: Math.max(transformFrame.width, geometryControls.width)
+            contentWidth: transformFrame.width
             contentHeight: nameField.height
                            + descriptionField.height
                            + transformLabel.height
@@ -112,7 +112,9 @@ Window {
             LabeledTextField {
                 id: descriptionField
                 anchors.left: parent.left
+                anchors.right: parent.right
                 anchors.top: nameField.bottom
+                anchoredEditor: true
                 labelText: "Description:"
                 editorText: description
                 onEditingFinished: description = editorText
@@ -138,6 +140,8 @@ Window {
             GeometryControls {
                 id: geometryControls
                 anchors.top: transformFrame.bottom
+                anchors.right:parent.right
+                anchors.left: parent.left
                 onMeshChanged: pixelControls.restartMapping(geometryControls.geometryModel)
             }
 
@@ -146,7 +150,6 @@ Window {
                 anchors.top: geometryControls.bottom
                 anchors.right:parent.right
                 anchors.left: parent.left
-                width: parent.contentWidth
             }
 
             PaddedButton {

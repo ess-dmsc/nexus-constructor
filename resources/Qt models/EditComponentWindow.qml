@@ -64,7 +64,9 @@ Window {
             LabeledTextField {
                 id: descriptionField
                 anchors.left: parent.left
+                anchors.right: parent.right
                 anchors.top: nameField.bottom
+                anchoredEditor: true
                 labelText: "Description:"
                 editorText: description
                 onEditingFinished: description = editorText
@@ -91,6 +93,8 @@ Window {
             GeometryControls {
                 id: geometryControls
                 anchors.top: transformFrame.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
                 state: geometry_state
 
                 Component.onCompleted: geometryControls.geometryModel.set_geometry(componentIndex, components)

@@ -18,6 +18,7 @@ Pane {
     ListView {
         id: view
         height: contentHeight
+        width: parent.width
         interactive: false
     }
 
@@ -42,15 +43,16 @@ Pane {
                 id: fileTextField
                 anchors.top: parent.top
                 anchors.left: parent.left
+                anchors.right: chooseFileButton.left
                 labelText: "Geometry file:"
                 editorText: file_url
-                editorWidth: 200
+                anchoredEditor: true
                 onEditingFinished: file_url = editorText
             }
             Button {
                 id: chooseFileButton
                 anchors.verticalCenter: fileTextField.verticalCenter
-                anchors.left: fileTextField.right
+                anchors.right: parent.right
                 text: "Choose file"
                 onClicked: filePicker.open()
             }
