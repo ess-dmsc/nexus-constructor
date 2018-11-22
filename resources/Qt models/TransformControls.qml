@@ -23,8 +23,6 @@ import MyValidators 1.0
 
 Item {
 
-    property bool autosave: false
-
     height: relativePicker.height +
             rotateLabel.height +
             xRotField.height +
