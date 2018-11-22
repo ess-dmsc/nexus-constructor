@@ -98,8 +98,8 @@ def test_generate_off_mesh_without_repeating_grid():
                                faces=[[0, 1, 2, 3],
                                       [2, 3, 4]])
     qt_geometry = QtOFFGeometry(off_geometry, None)
-    # 2 sides per shape, 3 triangles total, 3 points per triangle
-    assert qt_geometry.vertex_count == 2 * 3 * 3
+    # 3 triangles total, 3 points per triangle
+    assert qt_geometry.vertex_count == 3 * 3
     vertex_data_bytes = eval(str(qt_geometry.attributes()[0].buffer().data()))
     vertex_data = list(struct.unpack('%sf' % (qt_geometry.vertex_count * 3), vertex_data_bytes))
     generated_triangles = [vertex_data[i:i + 9] for i in range(0, len(vertex_data), 9)]
@@ -113,10 +113,9 @@ def test_generate_off_mesh_without_repeating_grid():
                  [1, 1, 0,
                   1, 0, 0,
                   1.5, 0.5, 0]]
-    # check the triangle and its inverted winding are present
+    # check the triangles are present
     for triangle in triangles:
         assert triangle in generated_triangles
-        assert triangle[0:3] + triangle[6:9] + triangle[3:6] in generated_triangles
 
 
 def test_generate_off_mesh_with_repeating_grid():
@@ -136,8 +135,8 @@ def test_generate_off_mesh_with_repeating_grid():
                                                         row_height=row_height,
                                                         columns=columns,
                                                         col_width=column_width))
-    # rows of copies, 2 sides per shape, 3 triangles total, 3 points per triangle
-    assert qt_geometry.vertex_count == rows * columns * 2 * 3 * 3
+    # rows of copies, 3 triangles total, 3 points per triangle
+    assert qt_geometry.vertex_count == rows * columns * 3 * 3
 
     vertex_data_bytes = eval(str(qt_geometry.attributes()[0].buffer().data()))
     vertex_data = list(struct.unpack('%sf' % (qt_geometry.vertex_count * 3), vertex_data_bytes))
@@ -156,7 +155,6 @@ def test_generate_off_mesh_with_repeating_grid():
                          [1+x_offset, 1+y_offset, 0,
                           1+x_offset, 0+y_offset, 0,
                           1.5+x_offset, 0.5+y_offset, 0]]
-            # check the triangle and its inverted winding are present
+            # check the triangles are present
             for triangle in triangles:
                 assert triangle in generated_triangles
-                assert triangle[0:3] + triangle[6:9] + triangle[3:6] in generated_triangles
