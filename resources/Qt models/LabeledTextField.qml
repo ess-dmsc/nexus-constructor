@@ -5,7 +5,8 @@ import QtQuick.Controls 2.4
 Pane {
     property string labelText: ""
     property string editorText: ""
-    property real editorWidth: 100
+    property alias editorWidth: field.width
+    property bool anchoredEditor: false
     property var validator: null
     id: pane
     padding: 2
@@ -24,7 +25,8 @@ Pane {
         focus: true
         anchors.top: parent.top
         anchors.left: label.right
-        width: editorWidth
+        anchors.right: anchoredEditor ? parent.right : undefined
+        width: 100
         validator: pane.validator
 
         text: editorText
