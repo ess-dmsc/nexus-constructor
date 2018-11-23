@@ -37,7 +37,7 @@ Window {
         id: editorDelegate
         Pane {
             id: detailsPane
-            contentWidth: Math.max(transformFrame.width, geometryControls.width)
+            contentWidth: Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
             contentHeight: nameField.height
                            + descriptionField.height
                            + transformLabel.height
