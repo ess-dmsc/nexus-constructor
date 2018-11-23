@@ -4,7 +4,8 @@ import MyValidators 1.0
 
 Pane {
 
-    contentWidth: listContainer.width
+    contentWidth: listContainer.implicitWidth
+    contentHeight: headingRow.implicitHeight + listContainer.implicitHeight
 
     Pane {
         id: headingRow
@@ -46,6 +47,7 @@ Pane {
         id: listContainer
         anchors.left: parent.left
         contentWidth: componentListView.width
+        contentHeight: 100
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
         padding: 1

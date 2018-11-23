@@ -13,6 +13,8 @@ ApplicationWindow {
     visible: true
     width: 1100
     height: 500
+    minimumWidth: windowPane.implicitWidth
+    minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
 
     menuBar: MenuBar {
         Menu {
@@ -37,9 +39,12 @@ ApplicationWindow {
     }
 
     Pane {
+        id: windowPane
         padding: 5
         focus: true
         anchors.fill: parent
+        contentWidth: componentFieldsArea.implicitWidth + instrumentViewArea.implicitWidth + jsonPane.implicitWidth
+        contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
 
         ComponentControls {
             id: componentFieldsArea
@@ -55,8 +60,8 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             anchors.left: componentFieldsArea.right
             anchors.right: jsonPane.left
-            contentWidth: scene3d.implicitWidth
-            contentHeight: scene3d.implicitHeight
+            contentWidth: 100
+            contentHeight: 100
             focus: true
             padding: 1
 
@@ -84,7 +89,7 @@ ApplicationWindow {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            width: 300
+            contentWidth: 300
 
             ListView {
                 id: jsonListView
