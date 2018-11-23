@@ -9,7 +9,7 @@ Pane {
 
     id: pane
     padding: 0
-    contentWidth: view.width
+    contentWidth: view.implicitWidth
     contentHeight: view.height
 
     signal meshChanged()
@@ -18,7 +18,8 @@ Pane {
     ListView {
         id: view
         height: contentHeight
-        width: parent.width
+        anchors.left: parent.left
+        anchors.right: parent.right
         interactive: false
     }
 
@@ -36,8 +37,11 @@ Pane {
         id: offDelegate
         Item {
             id: offContainer
-            width: parent.width
+            width: view.width
+            implicitWidth: fileTextField.implicitWidth + chooseFileButton.width
             height: Math.max(fileTextField.height, chooseFileButton.height)
+
+            Component.onCompleted: view.implicitWidth = offContainer.implicitWidth
 
             LabeledTextField {
                 id: fileTextField
@@ -72,8 +76,11 @@ Pane {
         id: cylinderDelegate
         Item {
             id: cylinderContainer
-            width: parent.width
+            width: view.width
+            implicitWidth: fields.implicitWidth
             height: cylinderLabel.height + fields.height
+
+            Component.onCompleted: view.implicitWidth = cylinderContainer.implicitWidth
 
             Label {
                 id: cylinderLabel
@@ -85,9 +92,11 @@ Pane {
             Frame {
                 id: fields
                 anchors.top: cylinderLabel.bottom
-                contentWidth: Math.max(heightField.width + radiusField.width,
-                                       axisXField.width + axisYField.width + axisZField.width)
-                contentHeight: heightField.height + directionLabel.height + axisXField.height
+                anchors.left: parent.left
+                anchors.right: parent.right
+                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth,
+                                       axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
+                contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
 
                 LabeledTextField {
                     id: heightField

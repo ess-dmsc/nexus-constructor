@@ -11,7 +11,7 @@ Pane {
     id: pane
     padding: 2
     contentHeight: Math.max(label.height, field.height)
-    contentWidth: label.width + field.width
+    contentWidth: label.width + (anchoredEditor ? field.implicitWidth : field.width)
     signal editingFinished
 
     Label {
@@ -25,7 +25,7 @@ Pane {
         anchors.top: parent.top
         anchors.left: label.right
         anchors.right: anchoredEditor ? parent.right : undefined
-        width: 100
+        implicitWidth: 100
 
         onEditingFinished: pane.editingFinished()
     }

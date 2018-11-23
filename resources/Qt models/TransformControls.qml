@@ -30,6 +30,7 @@ Item {
             translateLabel.height +
             xField.height
     width: xRotField.width + yRotField.width + zRotField.width
+    implicitWidth: xRotField.implicitWidth + yRotField.implicitWidth + zRotField.implicitWidth
 
     Label {
         id: relativeLabel

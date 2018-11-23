@@ -8,6 +8,8 @@ Item {
 
     id: pane
     height: pixelLabel.height + viewFrame.height
+    width: viewFrame.width
+    implicitWidth: viewFrame.implicitWidth
 
     signal layoutChanged()
 
@@ -24,13 +26,16 @@ Item {
     Frame {
         id: viewFrame
         anchors.top: pixelLabel.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
         contentHeight: view.height
-        width: parent.width
+        contentWidth: view.implicitWidth
         padding: 1
         ListView {
             id: view
+            anchors.left: parent.left
+            anchors.right: parent.right
             height: contentHeight
-            width: parent.width
             interactive: false
             clip: true
         }
@@ -50,12 +55,18 @@ Item {
 
         Pane {
             id: gridFields
+            width: view.width
             contentHeight: rowsField.height +
                 columnsField.height +
                 firstIdField.height +
                 cornerPicker.height +
                 directionPicker.height
-            width: view.width
+            contentWidth: Math.max(
+                rowsField.implicitWidth + rowHeightField.implicitWidth,
+                columnsField.implicitWidth + columnWidthField.implicitWidth
+            )
+
+            Component.onCompleted: view.implicitWidth = gridFields.implicitWidth
 
             LabeledTextField {
                 id: rowsField
@@ -149,9 +160,13 @@ Item {
         id: mappingDelegate
 
         Frame {
+            id: mappingItem
             width: view.width
-            contentHeight: pixelIdField.height
+            contentWidth: pixelIdField.implicitWidth
+            contentHeight: pixelIdField.implicitHeight
             padding: 2
+
+            Component.onCompleted: view.implicitWidth = mappingItem.implicitWidth
 
             LabeledTextField {
                 id: pixelIdField

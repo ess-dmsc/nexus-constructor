@@ -85,7 +85,7 @@ Window {
 
         Pane {
             id: detailsPane
-            contentWidth: transformFrame.width
+            contentWidth:  Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
             contentHeight: nameField.height
                            + descriptionField.height
                            + transformLabel.height
@@ -131,9 +131,13 @@ Window {
                 id: transformFrame
                 anchors.top: transformLabel.bottom
                 contentHeight: transformControls.height
-                contentWidth: transformControls.width
+                contentWidth: transformControls.implicitWidth
+                anchors.left: parent.left
+                anchors.right: parent.right
                 TransformControls {
                     id: transformControls
+                    anchors.left: parent.left
+                    anchors.right: parent.right
                 }
             }
 
