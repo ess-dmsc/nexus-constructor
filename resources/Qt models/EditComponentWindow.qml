@@ -49,7 +49,7 @@ Window {
                            + geometryControls.height
                            + pixelControls.height
 
-            Component.onCompleted: view.width = detailsPane.width
+            onWidthChanged: view.width = detailsPane.width
 
             LabeledTextField {
                 id: nameField
@@ -87,9 +87,13 @@ Window {
                 id: transformFrame
                 anchors.top: transformLabel.bottom
                 contentHeight: transformControls.height
-                contentWidth: transformControls.width
+                contentWidth: transformControls.implicitWidth
+                anchors.left: parent.left
+                anchors.right: parent.right
                 TransformControls {
                     id: transformControls
+                    anchors.left: parent.left
+                    anchors.right: parent.right
                 }
             }
 
@@ -113,7 +117,6 @@ Window {
                 anchors.top: geometryControls.bottom
                 anchors.right:parent.right
                 anchors.left: parent.left
-                width: parent.contentWidth
                 state: pixel_state
                 visible: pixel_state != ""
 
