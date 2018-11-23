@@ -25,8 +25,12 @@ Pane {
 
             text: "Add detector"
             onClicked: {
-                modalLoader.source = "AddDetectorWindow.qml"
-                modalLoader.item.show()
+                if (modalLoader.source == ""){
+                    modalLoader.source = "AddDetectorWindow.qml"
+                    modalLoader.item.show()
+                } else {
+                    modalLoader.item.requestActivate()
+                }
             }
             Loader {
                 id: modalLoader
@@ -133,9 +137,13 @@ Pane {
                         width: parent.width / 4
                         text: "Full editor"
                         onClicked: {
-                            editorLoader.source = "EditComponentWindow.qml"
-                            editorLoader.item.componentIndex = index
-                            editorLoader.item.show()
+                            if (editorLoader.source == ""){
+                                editorLoader.source = "EditComponentWindow.qml"
+                                editorLoader.item.componentIndex = index
+                                editorLoader.item.show()
+                            } else {
+                                editorLoader.item.requestActivate()
+                            }
                         }
                     }
                     Loader {

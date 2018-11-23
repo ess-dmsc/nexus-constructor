@@ -21,7 +21,6 @@ Window {
 
     title: "Add Detector"
     id: addDetectorWindow
-    modality: Qt.ApplicationModal
     minimumHeight: contentPane.height
     minimumWidth: contentPane.width
     height: minimumHeight

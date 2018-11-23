@@ -10,7 +10,6 @@ Window {
 
     title: "Component Editor"
     id: editComponentWindow
-    modality: Qt.ApplicationModal
     minimumHeight: view.height
     minimumWidth: view.width
     height: minimumHeight
