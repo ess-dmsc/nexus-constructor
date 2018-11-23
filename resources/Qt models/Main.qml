@@ -13,6 +13,8 @@ ApplicationWindow {
     visible: true
     width: 1100
     height: 500
+    minimumWidth: windowPane.implicitWidth
+    minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
 
     menuBar: MenuBar {
         Menu {
@@ -36,10 +38,29 @@ ApplicationWindow {
         }
     }
 
+    function positionChildWindow(child) {
+        // position child window in the center of the main window
+        var centralX = window.x + ((window.width - child.width) / 2)
+        var centralY = window.y + ((window.height - child.height) / 2)
+        // if that's offscreen, position its upper left corner in center of the screen
+        var screenX = centralX - window.screen.virtualX
+        var screenY = centralY - window.screen.virtualY
+        if (screenX > window.screen.width || screenY > window.screen.height || screenX < 0 || screenY < 0){
+            centralX = window.screen.width / 2
+            centralY = window.screen.height / 2
+        }
+
+        child.x = centralX
+        child.y = centralY
+    }
+
     Pane {
+        id: windowPane
         padding: 5
         focus: true
         anchors.fill: parent
+        contentWidth: componentFieldsArea.implicitWidth + instrumentViewArea.implicitWidth + jsonPane.implicitWidth
+        contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
 
         ComponentControls {
             id: componentFieldsArea
@@ -47,8 +68,6 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             leftPadding: 0
-
-            width: 400;
         }
 
         Frame {
@@ -57,8 +76,8 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             anchors.left: componentFieldsArea.right
             anchors.right: jsonPane.left
-            contentWidth: scene3d.implicitWidth
-            contentHeight: scene3d.implicitHeight
+            contentWidth: 100
+            contentHeight: 100
             focus: true
             padding: 1
 
@@ -86,7 +105,7 @@ ApplicationWindow {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            width: 300
+            contentWidth: 300
 
             ListView {
                 id: jsonListView

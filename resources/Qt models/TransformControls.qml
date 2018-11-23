@@ -22,6 +22,7 @@ import MyValidators 1.0
  */
 
 Item {
+
     height: relativePicker.height +
             rotateLabel.height +
             xRotField.height +
@@ -29,27 +30,7 @@ Item {
             translateLabel.height +
             xField.height
     width: xRotField.width + yRotField.width + zRotField.width
-
-    function saveFields(){
-        transform_parent_index = relativePicker.currentIndex
-        rotate_x = parseFloat(xRotField.editorText)
-        rotate_y = parseFloat(yRotField.editorText)
-        rotate_z = parseFloat(zRotField.editorText)
-        rotate_angle = parseFloat(angleField.editorText)
-        translate_x = parseFloat(xField.editorText)
-        translate_y = parseFloat(yField.editorText)
-        translate_z = parseFloat(zField.editorText)
-    }
-    function resetFields(){
-        relativePicker.currentIndex = transform_parent_index
-        xRotField.editorText = rotate_x
-        yRotField.editorText = rotate_y
-        zRotField.editorText = rotate_z
-        angleField.editorText = rotate_angle
-        xField.editorText = translate_x
-        yField.editorText = translate_y
-        zField.editorText = translate_z
-    }
+    implicitWidth: xRotField.implicitWidth + yRotField.implicitWidth + zRotField.implicitWidth
 
     Label {
         id: relativeLabel
@@ -66,7 +47,9 @@ Item {
         currentIndex: transform_parent_index
         validator: parentValidator
         onActivated: {
-            if(!acceptableInput){
+            if(acceptableInput){
+                transform_parent_index = currentIndex
+            } else {
                 currentIndex = transform_parent_index
             }
         }
@@ -86,6 +69,7 @@ Item {
         labelText: "x:"
         editorText: rotate_x
         validator: numberValidator
+        onEditingFinished: rotate_x = parseFloat(editorText)
     }
     LabeledTextField {
         id: yRotField
@@ -94,6 +78,7 @@ Item {
         labelText: "y:"
         editorText: rotate_y
         validator: numberValidator
+        onEditingFinished: rotate_y = parseFloat(editorText)
     }
     LabeledTextField {
         id: zRotField
@@ -102,6 +87,7 @@ Item {
         labelText: "z:"
         editorText: rotate_z
         validator: numberValidator
+        onEditingFinished: rotate_z = parseFloat(editorText)
     }
 
     LabeledTextField {
@@ -111,6 +97,7 @@ Item {
         labelText: "angle (degrees):"
         editorText: rotate_angle
         validator: angleValidator
+        onEditingFinished: rotate_angle = parseFloat(editorText)
     }
 
     Label {
@@ -127,6 +114,7 @@ Item {
         labelText: "x:"
         editorText: translate_x
         validator: numberValidator
+        onEditingFinished: translate_x = parseFloat(editorText)
     }
     LabeledTextField {
         id: yField
@@ -135,6 +123,7 @@ Item {
         labelText: "y:"
         editorText: translate_y
         validator: numberValidator
+        onEditingFinished: translate_y = parseFloat(editorText)
     }
     LabeledTextField {
         id: zField
@@ -143,6 +132,7 @@ Item {
         labelText: "z:"
         editorText: translate_z
         validator: numberValidator
+        onEditingFinished: translate_z = parseFloat(editorText)
     }
 
     DoubleValidator {

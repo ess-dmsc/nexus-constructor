@@ -4,6 +4,9 @@ import MyValidators 1.0
 
 Pane {
 
+    contentWidth: listContainer.implicitWidth
+    contentHeight: headingRow.implicitHeight + listContainer.implicitHeight
+
     Pane {
         id: headingRow
         anchors.left: parent.left
@@ -23,8 +26,13 @@ Pane {
 
             text: "Add detector"
             onClicked: {
-                modalLoader.source = "AddDetectorWindow.qml"
-                modalLoader.item.show()
+                if (modalLoader.source == ""){
+                    modalLoader.source = "AddDetectorWindow.qml"
+                    window.positionChildWindow(modalLoader.item)
+                    modalLoader.item.show()
+                } else {
+                    modalLoader.item.requestActivate()
+                }
             }
             Loader {
                 id: modalLoader
@@ -32,13 +40,19 @@ Pane {
                     target: modalLoader.item
                     onClosing: modalLoader.source = ""
                 }
+                Connections {
+                    target: window
+                    onClosing: modalLoader.source = ""
+                }
             }
         }
     }
 
     Frame {
+        id: listContainer
         anchors.left: parent.left
-        anchors.right: parent.right
+        contentWidth: componentListView.width
+        contentHeight: 100
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
         padding: 1
@@ -46,7 +60,8 @@ Pane {
             id: componentListView
             model: components
             delegate: componentDelegate
-            anchors.fill: parent
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
             clip: true
         }
     }
@@ -57,7 +72,9 @@ Pane {
             id: componentBox
             padding: 5
             contentHeight: Math.max(mainContent.height, expansionCaret.height)
-            width: componentListView.width
+            contentWidth: transformControls.width
+
+            Component.onCompleted: componentListView.width = componentBox.width
 
             MouseArea {
                 id: expansionClickArea
@@ -105,6 +122,7 @@ Pane {
                         id: nameField
                         labelText: "Name:"
                         editorText: name
+                        onEditingFinished: name = editorText
                         validator: NameValidator {
                             model: components
                             myindex: index
@@ -125,33 +143,32 @@ Pane {
                         anchors.left: parent.left
                         width: parent.width / 4
                         text: "Full editor"
-                    }
-                    PaddedButton {
-                        id: applyButton
-                        anchors.top: editorButton.top
-                        anchors.left: editorButton.right
-                        width: parent.width / 4
-                        text: "Apply changes"
                         onClicked: {
-                            name = nameField.editorText
-                            transformControls.saveFields()
+                            if (editorLoader.source == ""){
+                                editorLoader.source = "EditComponentWindow.qml"
+                                editorLoader.item.componentIndex = index
+                                window.positionChildWindow(editorLoader.item)
+                                editorLoader.item.show()
+                            } else {
+                                editorLoader.item.requestActivate()
+                            }
                         }
                     }
-                    PaddedButton {
-                        id: discardButton
-                        anchors.top: editorButton.top
-                        anchors.left: applyButton.right
-                        width: parent.width / 4
-                        text: "Discard changes"
-                        onClicked: {
-                            nameField.editorText = name
-                            transformControls.resetFields()
+                    Loader {
+                        id: editorLoader
+                        Connections {
+                            target: editorLoader.item
+                            onClosing: editorLoader.source = ""
+                        }
+                        Connections {
+                            target: window
+                            onClosing: editorLoader.source = ""
                         }
                     }
                     PaddedButton {
                         id: deleteButton
                         anchors.top: editorButton.top
-                        anchors.left: discardButton.right
+                        anchors.right: parent.right
                         width: parent.width / 4
                         text: "Delete"
                         onClicked: components.remove_component(index)

@@ -36,7 +36,6 @@ def test_replace_contents():
     model.replace_contents(replacement_data)
     assert model.rowCount() == 2
     assert model.components == replacement_data
-    assert len(model.meshes) == 2
 
 
 def test_generate_component_name():

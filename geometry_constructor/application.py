@@ -6,12 +6,13 @@ Loading this module also registers with QML the required custom classes to load 
 
 import sys
 from os import path
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.instrument_model import InstrumentModel, SingleComponentModel
 from geometry_constructor.geometry_models import CylinderModel, OFFModel
 from geometry_constructor.json_loader import JsonLoader
 from geometry_constructor.json_writer import JsonWriter
+from geometry_constructor.pixel_models import PixelGridModel, PixelMappingModel
 from geometry_constructor.qml_json_model import FilteredJsonModel
-from geometry_constructor.validators import NameValidator, TransformParentValidator
+from geometry_constructor.validators import NameValidator, TransformParentValidator, NullableIntValidator
 from geometry_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
@@ -20,12 +21,16 @@ from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 qmlRegisterType(Logger, 'MyWriters', 1, 0, 'Logger')
 qmlRegisterType(HdfWriter, 'MyWriters', 1, 0, 'HdfWriter')
 qmlRegisterType(InstrumentModel, 'MyModels', 1, 0, 'InstrumentModel')
+qmlRegisterType(SingleComponentModel, 'MyModels', 1, 0, 'SingleComponentModel')
 qmlRegisterType(CylinderModel, 'MyModels', 1, 0, 'CylinderModel')
 qmlRegisterType(OFFModel, 'MyModels', 1, 0, 'OFFModel')
 qmlRegisterType(FilteredJsonModel, 'MyModels', 1, 0, 'FilteredJsonModel')
+qmlRegisterType(PixelGridModel, 'MyModels', 1, 0, 'PixelGridModel')
+qmlRegisterType(PixelMappingModel, 'MyModels', 1, 0, 'PixelMappingModel')
 qmlRegisterType(JsonLoader, 'MyJson', 1, 0, 'JsonLoader')
 qmlRegisterType(JsonWriter, 'MyJson', 1, 0, 'JsonWriter')
 qmlRegisterType(NameValidator, 'MyValidators', 1, 0, 'NameValidator')
+qmlRegisterType(NullableIntValidator, 'MyValidators', 1, 0, 'NullableIntValidator')
 qmlRegisterType(TransformParentValidator, 'MyValidators', 1, 0, 'ParentValidator')
 
 
