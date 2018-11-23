@@ -38,6 +38,22 @@ ApplicationWindow {
         }
     }
 
+    function positionChildWindow(child) {
+        // position child window in the center of the main window
+        var centralX = window.x + ((window.width - child.width) / 2)
+        var centralY = window.y + ((window.height - child.height) / 2)
+        // if that's offscreen, position its upper left corner in center of the screen
+        var screenX = centralX - window.screen.virtualX
+        var screenY = centralY - window.screen.virtualY
+        if (screenX > window.screen.width || screenY > window.screen.height || screenX < 0 || screenY < 0){
+            centralX = window.screen.width / 2
+            centralY = window.screen.height / 2
+        }
+
+        child.x = centralX
+        child.y = centralY
+    }
+
     Pane {
         id: windowPane
         padding: 5

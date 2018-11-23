@@ -28,8 +28,7 @@ Pane {
             onClicked: {
                 if (modalLoader.source == ""){
                     modalLoader.source = "AddDetectorWindow.qml"
-                    modalLoader.item.x = window.x + ((window.width - modalLoader.item.width) / 2)
-                    modalLoader.item.y = window.y + ((window.height - modalLoader.item.height) / 2)
+                    window.positionChildWindow(modalLoader.item)
                     modalLoader.item.show()
                 } else {
                     modalLoader.item.requestActivate()
@@ -148,8 +147,7 @@ Pane {
                             if (editorLoader.source == ""){
                                 editorLoader.source = "EditComponentWindow.qml"
                                 editorLoader.item.componentIndex = index
-                                editorLoader.item.x = window.x + ((window.width - editorLoader.item.width) / 2)
-                                editorLoader.item.y = window.y + ((window.height - editorLoader.item.height) / 2)
+                                window.positionChildWindow(editorLoader.item)
                                 editorLoader.item.show()
                             } else {
                                 editorLoader.item.requestActivate()
