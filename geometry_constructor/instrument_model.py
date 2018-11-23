@@ -130,20 +130,20 @@ class InstrumentModel(QAbstractListModel):
         }
         if role in param_options:
             param_list = param_options[role]()
-            changed = self.change_value(*param_list)
+            changed = self.change_value(item, *param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
             if role == InstrumentModel.TransformParentIndexRole:
                 self.update_removable()
         return changed
 
-    def change_value(self, item, attribute_name, value, transforms):
+    def change_value(self, component, item, attribute_name, value, transforms):
         current_value = getattr(item, attribute_name)
         different = value != current_value
         if different:
             setattr(item, attribute_name, value)
             if transforms:
-                self.update_child_transforms(item)
+                self.update_child_transforms(component)
         return different
 
     def flags(self, index):
