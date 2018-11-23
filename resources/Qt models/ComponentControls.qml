@@ -41,6 +41,10 @@ Pane {
                     target: modalLoader.item
                     onClosing: modalLoader.source = ""
                 }
+                Connections {
+                    target: window
+                    onClosing: modalLoader.source = ""
+                }
             }
         }
     }
@@ -156,6 +160,10 @@ Pane {
                         id: editorLoader
                         Connections {
                             target: editorLoader.item
+                            onClosing: editorLoader.source = ""
+                        }
+                        Connections {
+                            target: window
                             onClosing: editorLoader.source = ""
                         }
                     }
