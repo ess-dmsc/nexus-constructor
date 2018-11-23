@@ -13,6 +13,10 @@ Window {
     modality: Qt.ApplicationModal
     minimumHeight: view.height
     minimumWidth: view.width
+    height: minimumHeight
+    width: minimumWidth
+    maximumHeight: minimumHeight
+    maximumWidth: minimumWidth
 
     Pane {
         id: viewContainer
