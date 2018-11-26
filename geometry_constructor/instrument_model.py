@@ -1,4 +1,4 @@
-from geometry_constructor.data_model import Sample, Detector, PixelGrid, PixelMapping, Vector,\
+from geometry_constructor.data_model import Sample, Detector, Monitor, PixelGrid, PixelMapping, Vector,\
     CylindricalGeometry, OFFGeometry, Component
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Property, Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
@@ -175,7 +175,6 @@ class InstrumentModel(QAbstractListModel):
                      rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0,
                      geometry_model=None,
                      pixel_model=None):
-        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         geometry = None if geometry_model is None else geometry_model.get_geometry()
         pixels = None if pixel_model is None else pixel_model.get_pixel_model()
         detector = Detector(name=name,
@@ -186,7 +185,28 @@ class InstrumentModel(QAbstractListModel):
                             rotate_angle=rotate_angle,
                             geometry=geometry,
                             pixel_data=pixels)
-        self.components.append(detector)
+        self.add_component(detector)
+
+    @Slot(str, int, float, float, float, float, float, float, float, 'QVariant', 'QVariant')
+    def add_monitor(self, name, parent_index=0,
+                    translate_x=0, translate_y=0, translate_z=0,
+                    rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0,
+                    geometry_model=None,
+                    pixel_model=None):
+        geometry = None if geometry_model is None else geometry_model.get_geometry()
+        pixel_data = None if pixel_model is None else pixel_model.get_pixel_model()
+        monitor = Monitor(name=name,
+                          transform_parent=self.components[parent_index],
+                          translate_vector=Vector(translate_x, translate_y, translate_z),
+                          rotate_axis=Vector(rotate_x, rotate_y, rotate_z),
+                          rotate_angle=rotate_angle,
+                          geometry=geometry,
+                          pixel_data=pixel_data)
+        self.add_component(monitor)
+
+    def add_component(self, component: Component):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self.components.append(component)
         self.endInsertRows()
         self.update_removable()
 
@@ -288,6 +308,8 @@ class InstrumentModel(QAbstractListModel):
                 return "Grid"
             elif isinstance(component.pixel_data, PixelMapping):
                 return "Mapping"
+        elif isinstance(component, Monitor):
+            return "SinglePixel"
         return ""
 
     @staticmethod

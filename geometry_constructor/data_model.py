@@ -192,6 +192,12 @@ class PixelMapping(PixelData):
 
 
 @attr.s
+class SinglePixelId(PixelData):
+    """Pixel data for components that only have a single detector ID"""
+    pixel_id = attr.ib(int)
+
+
+@attr.s
 class Component:
     """Base class for components of an instrument"""
     name = attr.ib(str)
@@ -201,6 +207,7 @@ class Component:
     rotate_axis = attr.ib(default=Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
     rotate_angle = attr.ib(default=0)
     geometry = attr.ib(default=None, type=Geometry)
+    pixel_data = attr.ib(default=None, type=PixelData)
 
 
 @attr.s
@@ -211,5 +218,19 @@ class Sample(Component):
 
 @attr.s
 class Detector(Component):
-    """A detector in an instrument"""
-    pixel_data = attr.ib(default=None, type=PixelData)
+    """
+    A detector in an instrument
+
+    It's pixel_data should be a PixelMapping or PixelGrid
+    """
+    pass
+
+
+@attr.s
+class Monitor(Component):
+    """
+    A monitor of incident beam data in an instrument
+
+    It's pixel_data should be an instance of SinglePixelId
+    """
+    pass

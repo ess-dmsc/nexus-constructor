@@ -50,6 +50,10 @@ Item {
         id: mappingModel
     }
 
+    SinglePixelModel {
+        id: singlePixelModel
+    }
+
     Component {
         id: gridDelegate
 
@@ -178,6 +182,20 @@ Item {
         }
     }
 
+    Component {
+        id: singlePixelDelegate
+
+        LabeledTextField {
+            id: pixelIdField
+            anchors.right: parent.right
+            padding: 10
+            labelText: "Detector ID:"
+            editorText: pixel_id == null ? "" : pixel_id
+            onEditingFinished: pixel_id = parseInt(editorText)
+            validator: nullableIntValidator
+        }
+    }
+
     NullableIntValidator {
         id: nullableIntValidator
         bottom: 0
@@ -209,6 +227,14 @@ Item {
             PropertyChanges { target: view; height: 200 }
             PropertyChanges { target: view; interactive: true }
             PropertyChanges { target: pixelLabel; text: "Pixel mapping:" }
+        },
+        State {
+            name: "SinglePixel"
+            PropertyChanges { target: pane; pixelModel: singlePixelModel }
+            PropertyChanges { target: view; model: singlePixelModel }
+            PropertyChanges { target: view; delegate: singlePixelDelegate }
+            PropertyChanges { target: pixelLabel; text: "Pixel data:" }
+
         }
     ]
 
