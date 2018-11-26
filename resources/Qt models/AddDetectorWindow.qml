@@ -6,7 +6,7 @@ import MyValidators 1.0
 
 Window {
 
-    property string name: components.generate_component_name("Component")
+    property string name: components.generate_component_name(componentType)
     property string description: ""
     property real transform_parent_index: 0
     property real rotate_x: 0
@@ -19,7 +19,9 @@ Window {
 
     property int index: -1
 
-    title: "Add Detector"
+    property string componentType: "Component"
+
+    title: "Add " + componentType
     id: addDetectorWindow
     minimumHeight: contentPane.height
     minimumWidth: contentPane.width
@@ -36,48 +38,95 @@ Window {
 
         Pane {
             id: geometrySelectionPane
-            contentWidth: Math.max(geometryLabel.width, offButton.width, cylinderButton.width, mappedMeshButton.width)
-            contentHeight: geometryLabel.height + offButton.height + cylinderButton.height + mappedMeshButton.height
+            contentWidth: Math.max(detectorLabel.width, detectorPane.width, monitorLabel.width, monitorPane.width, 200)
+            contentHeight: detectorLabel.height + detectorPane.height + monitorLabel.height + monitorPane.height
             visible: true
 
             Label {
-                id: geometryLabel
-                text: "Pick detector geometry type:"
+                id: detectorLabel
+                text: "Detector:"
             }
 
-            PaddedButton {
-                id: offButton
-                anchors.top: geometryLabel.bottom
-                text: "Repeatable Mesh"
-                onClicked: {
-                    geometryControls.state = "OFF"
-                    pixelControls.state = "Grid"
-                    name = components.generate_component_name("Detector")
-                    contentPane.state = "EnterDetails"
+            Pane {
+                id: detectorPane
+                anchors.top: detectorLabel.bottom
+                contentHeight: offDetectorButton.height
+                contentWidth: offDetectorButton.width + cylinderDetectorButton.width + mappedMeshButton.width
+
+                PaddedButton {
+                    id: offDetectorButton
+                    anchors.top: parent.top
+                    text: "Repeatable Mesh"
+                    onClicked: {
+                        geometryControls.state = "OFF"
+                        pixelControls.state = "Grid"
+                        componentType = "Detector"
+                        contentPane.state = "EnterDetails"
+                    }
+                }
+
+                PaddedButton {
+                    id: cylinderDetectorButton
+                    anchors.top: offDetectorButton.top
+                    anchors.left: offDetectorButton.right
+                    text: "Repeatable Cylinder"
+                    onClicked: {
+                        geometryControls.state = "Cylinder"
+                        pixelControls.state = "Grid"
+                        componentType = "Detector"
+                        contentPane.state = "EnterDetails"
+                    }
+                }
+
+                PaddedButton {
+                    id: mappedMeshButton
+                    anchors.top: offDetectorButton.top
+                    anchors.left: cylinderDetectorButton.right
+                    text: "Pixel-Face Mapped Mesh"
+                    onClicked: {
+                        geometryControls.state = "OFF"
+                        pixelControls.state = "Mapping"
+                        componentType = "Detector"
+                        contentPane.state = "EnterDetails"
+                    }
                 }
             }
 
-            PaddedButton {
-                id: cylinderButton
-                anchors.top: offButton.bottom
-                text: "Repeatable Cylinder"
-                onClicked: {
-                    geometryControls.state = "Cylinder"
-                    pixelControls.state = "Grid"
-                    name = components.generate_component_name("Detector")
-                    contentPane.state = "EnterDetails"
-                }
+            Label {
+                id: monitorLabel
+                anchors.top: detectorPane.bottom
+                text: "Monitor:"
             }
 
-            PaddedButton {
-                id: mappedMeshButton
-                anchors.top: cylinderButton.bottom
-                text: "Pixel-Face Mapped Mesh"
-                onClicked: {
-                    geometryControls.state = "OFF"
-                    pixelControls.state = "Mapping"
-                    name = components.generate_component_name("Detector")
-                    contentPane.state = "EnterDetails"
+            Pane {
+                id: monitorPane
+                anchors.top: monitorLabel.bottom
+                contentHeight: meshMonitorButton.height
+                contentWidth: cylinderMonitorButton.width + meshMonitorButton.width
+
+                PaddedButton {
+                    id: meshMonitorButton
+                    anchors.top: parent.top
+                    text: "Mesh"
+                    onClicked: {
+                        geometryControls.state = "OFF"
+                        pixelControls.state = "SinglePixel"
+                        componentType = "Monitor"
+                        contentPane.state = "EnterDetails"
+                    }
+                }
+
+                PaddedButton {
+                    id: cylinderMonitorButton
+                    anchors.top: meshMonitorButton.top
+                    anchors.left: meshMonitorButton.right
+                    text: "Cylinder"
+                    onClicked: {
+                        geometryControls.state = "Cylinder"
+                        pixelControls.state = "SinglePixel"
+                        componentType = "Monitor"
+                        contentPane.state = "EnterDetails"
+                    }
                 }
             }
         }
@@ -162,11 +211,22 @@ Window {
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
-                    components.add_detector(name, description, transform_parent_index,
-                                            translate_x, translate_y, translate_z,
-                                            rotate_x, rotate_y, rotate_z, rotate_angle,
-                                            geometryControls.geometryModel,
-                                            pixelControls.pixelModel)
+                    switch (componentType) {
+                        case "Detector":
+                            components.add_detector(name, description, transform_parent_index,
+                                                    translate_x, translate_y, translate_z,
+                                                    rotate_x, rotate_y, rotate_z, rotate_angle,
+                                                    geometryControls.geometryModel,
+                                                    pixelControls.pixelModel)
+                            break
+                        case "Monitor":
+                            components.add_monitor(name, transform_parent_index,
+                                                   translate_x, translate_y, translate_z,
+                                                   rotate_x, rotate_y, rotate_z, rotate_angle,
+                                                   geometryControls.geometryModel,
+                                                   pixelControls.pixelModel)
+                            break
+                    }
                     addDetectorWindow.close()
                 }
             }
