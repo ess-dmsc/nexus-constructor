@@ -26,23 +26,23 @@ Pane {
 
             text: "Add component"
             onClicked: {
-                if (modalLoader.source == ""){
-                    modalLoader.source = "AddComponentWindow.qml"
-                    window.positionChildWindow(modalLoader.item)
-                    modalLoader.item.show()
+                if (windowLoader.source == ""){
+                    windowLoader.source = "AddComponentWindow.qml"
+                    window.positionChildWindow(windowLoader.item)
+                    windowLoader.item.show()
                 } else {
-                    modalLoader.item.requestActivate()
+                    windowLoader.item.requestActivate()
                 }
             }
             Loader {
-                id: modalLoader
+                id: windowLoader
                 Connections {
-                    target: modalLoader.item
-                    onClosing: modalLoader.source = ""
+                    target: windowLoader.item
+                    onClosing: windowLoader.source = ""
                 }
                 Connections {
                     target: window
-                    onClosing: modalLoader.source = ""
+                    onClosing: windowLoader.source = ""
                 }
             }
         }
