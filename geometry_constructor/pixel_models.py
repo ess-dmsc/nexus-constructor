@@ -112,7 +112,7 @@ class PixelMappingModel(QAbstractListModel):
             row = index.row()
             current_value = self.pixel_mapping.pixel_ids[row]
             if current_value != value:
-                self.pixel_mapping.pixel_ids[row] = None if isnan(value) else value
+                self.pixel_mapping.pixel_ids[row] = None if isnan(value) else int(value)
                 self.dataChanged.emit(index, index, role)
                 changed = True
         return changed
