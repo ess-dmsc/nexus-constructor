@@ -1,5 +1,5 @@
 import attr
-from enum import Enum
+from enum import Enum, unique
 from math import sqrt, sin, cos, pi, acos
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
@@ -197,9 +197,21 @@ class SinglePixelId(PixelData):
     pixel_id = attr.ib(int)
 
 
+@unique
+class ComponentType(Enum):
+    SAMPLE = 'Sample'
+    DETECTOR = 'Detector'
+    MONITOR = 'Monitor'
+
+    @classmethod
+    def values(cls):
+        return [item.value for item in cls]
+
+
 @attr.s
 class Component:
-    """Base class for components of an instrument"""
+    """Components of an instrument"""
+    component_type = attr.ib(ComponentType)
     name = attr.ib(str)
     description = attr.ib(default='', type=str)
     transform_parent = attr.ib(default=None, type=object)
@@ -208,29 +220,3 @@ class Component:
     rotate_angle = attr.ib(default=0)
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)
-
-
-@attr.s
-class Sample(Component):
-    """The sample an instrument is making measurements of"""
-    pass
-
-
-@attr.s
-class Detector(Component):
-    """
-    A detector in an instrument
-
-    It's pixel_data should be a PixelMapping or PixelGrid
-    """
-    pass
-
-
-@attr.s
-class Monitor(Component):
-    """
-    A monitor of incident beam data in an instrument
-
-    It's pixel_data should be an instance of SinglePixelId
-    """
-    pass

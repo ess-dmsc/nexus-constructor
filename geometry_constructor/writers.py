@@ -1,6 +1,6 @@
 import h5py
 from pprint import pprint
-from geometry_constructor.data_model import Sample, Detector, PixelGrid, PixelMapping, CountDirection, Corner, \
+from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, CountDirection, Corner, \
     Geometry, OFFGeometry, CylindricalGeometry, Component
 from geometry_constructor.instrument_model import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
@@ -36,9 +36,9 @@ class HdfWriter(QObject):
             self.store_transformations(nx_component, component)
             nx_component.attrs['description'] = component.description
 
-            if isinstance(component, Sample):
+            if component.component_type == ComponentType.SAMPLE:
                 nx_component.attrs['NX_class'] = 'NXsample'
-            elif isinstance(component, Detector):
+            elif component.component_type == ComponentType.DETECTOR:
                 nx_component.attrs['NX_class'] = 'NXdetector'
                 self.store_pixel_data(nx_component, component)
 
@@ -70,14 +70,14 @@ class HdfWriter(QObject):
 
         nx_component.attrs['depends_on'] = 'translate'
 
-    def store_pixel_data(self, nx_detector: h5py.Group, detector: Detector):
-        pixel_data = detector.pixel_data
+    def store_pixel_data(self, nx_detector: h5py.Group, component: Component):
+        pixel_data = component.pixel_data
         # if it's a repeating pixel shape
         if isinstance(pixel_data, PixelGrid):
-            self.store_pixel_grid(nx_detector, detector.geometry, pixel_data)
+            self.store_pixel_grid(nx_detector, component.geometry, pixel_data)
         # if it's a mapping
         elif isinstance(pixel_data, PixelMapping):
-            self.store_pixel_mapping(nx_detector, detector.geometry, pixel_data)
+            self.store_pixel_mapping(nx_detector, component.geometry, pixel_data)
 
     def store_pixel_grid(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelGrid):
         if pixel_data is not None:

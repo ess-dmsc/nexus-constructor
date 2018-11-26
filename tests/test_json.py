@@ -1,7 +1,7 @@
 import json
 import jsonschema
-from geometry_constructor.data_model import Detector, CylindricalGeometry, PixelMapping, PixelGrid, Vector,\
-    CountDirection, Corner
+from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, PixelMapping, PixelGrid,\
+    SinglePixelId, Vector, CountDirection, Corner
 from geometry_constructor.geometry_models import OFFModel
 from geometry_constructor.instrument_model import InstrumentModel
 from geometry_constructor.json_writer import JsonWriter
@@ -17,26 +17,36 @@ def build_sample_model():
     off_geometry = offmodel.get_geometry()
 
     model.components += [
-        Detector(name='Detector 1',
-                 description='Pixel mapped cube',
-                 translate_vector=Vector(3, 7, 5),
-                 rotate_axis=Vector(1, 2, 0),
-                 rotate_angle=45,
-                 geometry=off_geometry,
-                 pixel_data=PixelMapping(pixel_ids=[1, 2, None, 3, None, 5])),
-        Detector(name='Detector 2',
-                 description='Cylinder array',
-                 translate_vector=Vector(-1.3, 0.1, -3.14),
-                 rotate_axis=Vector(0.7, 0.7, 0.7),
-                 rotate_angle=63.4,
-                 geometry=CylindricalGeometry(axis_direction=Vector(2, 2, 1),
-                                              height=0.7,
-                                              radius=0.1),
-                 pixel_data=PixelGrid(rows=3, columns=5,
-                                      row_height=0.5, col_width=0.4,
-                                      first_id=10,
-                                      count_direction=CountDirection.ROW,
-                                      initial_count_corner=Corner.TOP_LEFT))
+        Component(component_type=ComponentType.DETECTOR,
+                  name='Detector 1',
+                  description='Pixel mapped cube',
+                  translate_vector=Vector(3, 7, 5),
+                  rotate_axis=Vector(1, 2, 0),
+                  rotate_angle=45,
+                  geometry=off_geometry,
+                  pixel_data=PixelMapping(pixel_ids=[1, 2, None, 3, None, 5])),
+        Component(component_type=ComponentType.DETECTOR,
+                  name='Detector 2',
+                  description='Cylinder array',
+                  translate_vector=Vector(-1.3, 0.1, -3.14),
+                  rotate_axis=Vector(0.7, 0.7, 0.7),
+                  rotate_angle=63.4,
+                  geometry=CylindricalGeometry(axis_direction=Vector(2, 2, 1),
+                                               height=0.7,
+                                               radius=0.1),
+                  pixel_data=PixelGrid(rows=3, columns=5,
+                                       row_height=0.5, col_width=0.4,
+                                       first_id=10,
+                                       count_direction=CountDirection.ROW,
+                                       initial_count_corner=Corner.TOP_LEFT)),
+        Component(component_type=ComponentType.MONITOR,
+                  name='Monitor Alpha',
+                  description='A geometry-less monitor',
+                  translate_vector=Vector(1, 2, 3),
+                  rotate_axis=Vector(-1, 0, -1.5),
+                  rotate_angle=0.0,
+                  geometry=CylindricalGeometry(),
+                  pixel_data=SinglePixelId(42)),
     ]
     # set transform parents
     model.components[0].transform_parent = None

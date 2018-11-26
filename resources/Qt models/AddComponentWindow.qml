@@ -211,22 +211,11 @@ Window {
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
-                    switch (componentType) {
-                        case "Detector":
-                            components.add_detector(name, description, transform_parent_index,
-                                                    translate_x, translate_y, translate_z,
-                                                    rotate_x, rotate_y, rotate_z, rotate_angle,
-                                                    geometryControls.geometryModel,
-                                                    pixelControls.pixelModel)
-                            break
-                        case "Monitor":
-                            components.add_monitor(name, transform_parent_index,
-                                                   translate_x, translate_y, translate_z,
-                                                   rotate_x, rotate_y, rotate_z, rotate_angle,
-                                                   geometryControls.geometryModel,
-                                                   pixelControls.pixelModel)
-                            break
-                    }
+                    components.add_component(componentType, name, description, transform_parent_index,
+                                             translate_x, translate_y, translate_z,
+                                             rotate_x, rotate_y, rotate_z, rotate_angle,
+                                             geometryControls.geometryModel,
+                                             pixelControls.pixelModel)
                     addComponentWindow.close()
                 }
             }
