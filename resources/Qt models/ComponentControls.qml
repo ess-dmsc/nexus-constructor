@@ -12,22 +12,22 @@ Pane {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        contentHeight: addDetector.height
+        contentHeight: addComponentButton.height
         padding: 1
 
         Label {
             anchors.left: parent.left
-            anchors.verticalCenter: addDetector.verticalCenter
+            anchors.verticalCenter: addComponentButton.verticalCenter
             text: "Components:"
         }
         Button {
-            id: addDetector
+            id: addComponentButton
             anchors.right: parent.right
 
-            text: "Add detector"
+            text: "Add component"
             onClicked: {
                 if (modalLoader.source == ""){
-                    modalLoader.source = "AddDetectorWindow.qml"
+                    modalLoader.source = "AddComponentWindow.qml"
                     window.positionChildWindow(modalLoader.item)
                     modalLoader.item.show()
                 } else {

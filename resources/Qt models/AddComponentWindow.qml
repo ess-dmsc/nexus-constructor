@@ -22,7 +22,7 @@ Window {
     property string componentType: "Component"
 
     title: "Add " + componentType
-    id: addDetectorWindow
+    id: addComponentWindow
     minimumHeight: contentPane.height
     minimumWidth: contentPane.width
     height: minimumHeight
@@ -227,7 +227,7 @@ Window {
                                                    pixelControls.pixelModel)
                             break
                     }
-                    addDetectorWindow.close()
+                    addComponentWindow.close()
                 }
             }
         }
