@@ -38,8 +38,10 @@ Window {
 
         Pane {
             id: geometrySelectionPane
-            contentWidth: Math.max(detectorLabel.width, detectorPane.width, monitorLabel.width, monitorPane.width, 200)
-            contentHeight: detectorLabel.height + detectorPane.height + monitorLabel.height + monitorPane.height
+            contentWidth: Math.max(detectorPane.width, monitorPane.width, sourcePane.width, 200)
+            contentHeight: detectorLabel.height + detectorPane.height +
+                           monitorLabel.height + monitorPane.height +
+                           sourceLabel.height + sourcePane.height
             visible: true
 
             Label {
@@ -125,6 +127,42 @@ Window {
                         geometryControls.state = "Cylinder"
                         pixelControls.state = "SinglePixel"
                         componentType = "Monitor"
+                        contentPane.state = "EnterDetails"
+                    }
+                }
+            }
+
+            Label {
+                id: sourceLabel
+                anchors.top: monitorPane.bottom
+                text: "Source:"
+            }
+
+            Pane {
+                id: sourcePane
+                anchors.top: sourceLabel.bottom
+                contentHeight: meshSourceButton.height
+                contentWidth: cylinderSourceButton.width + meshSourceButton.width
+
+                PaddedButton {
+                    id: meshSourceButton
+                    anchors.top: parent.top
+                    text: "Mesh"
+                    onClicked: {
+                        geometryControls.state = "OFF"
+                        componentType = "Source"
+                        contentPane.state = "EnterDetails"
+                    }
+                }
+
+                PaddedButton {
+                    id: cylinderSourceButton
+                    anchors.top: meshSourceButton.top
+                    anchors.left: meshSourceButton.right
+                    text: "Cylinder"
+                    onClicked: {
+                        geometryControls.state = "Cylinder"
+                        componentType = "Source"
                         contentPane.state = "EnterDetails"
                     }
                 }

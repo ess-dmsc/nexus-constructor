@@ -15,7 +15,8 @@
       "items": {
         "oneOf": [
           {"$ref": "#/definitions/detector"},
-          {"$ref": "#/definitions/monitor"}
+          {"$ref": "#/definitions/monitor"},
+          {"$ref": "#/definitions/source"}
         ]
       }
     }
@@ -109,6 +110,17 @@
       "oneOf": [
         {"$ref": "#/definitions/singlePixelIdProperty"}
       ]
+    },
+    "source": {
+      "description": "The neutron or x-ray storage ring/facility an instrument is connected to",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Source" ]
+        }
+      }
     },
     "pixelMappedDetectorProperties": {
       "description": "Properties for a detector with a pixelmapping, meaning it must have an OFF geometry",

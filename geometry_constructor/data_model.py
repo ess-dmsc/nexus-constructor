@@ -202,6 +202,7 @@ class ComponentType(Enum):
     SAMPLE = 'Sample'
     DETECTOR = 'Detector'
     MONITOR = 'Monitor'
+    SOURCE = 'Source'
 
     @classmethod
     def values(cls):

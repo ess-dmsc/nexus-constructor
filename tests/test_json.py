@@ -47,6 +47,13 @@ def build_sample_model():
                   rotate_angle=0.0,
                   geometry=CylindricalGeometry(),
                   pixel_data=SinglePixelId(42)),
+        Component(component_type=ComponentType.SOURCE,
+                  name='Uranium chunk #742',
+                  description='A lump of radiation emitting material',
+                  translate_vector=Vector(0, 0, -20),
+                  rotate_axis=Vector(0, 1, 0),
+                  rotate_angle=0.0,
+                  geometry=CylindricalGeometry()),
     ]
     # set transform parents
     model.components[0].transform_parent = None
