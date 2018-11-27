@@ -38,10 +38,10 @@ Window {
 
         Pane {
             id: geometrySelectionPane
-            contentWidth: Math.max(detectorPane.width, monitorPane.width, sourcePane.width, 200)
+            contentWidth: Math.max(detectorPane.width,
+                                   generalComponentPane.width)
             contentHeight: detectorLabel.height + detectorPane.height +
-                           monitorLabel.height + monitorPane.height +
-                           sourceLabel.height + sourcePane.height
+                           generalComponentLabel.height + generalComponentPane.height
             visible: true
 
             Label {
@@ -95,75 +95,74 @@ Window {
             }
 
             Label {
-                id: monitorLabel
+                id: generalComponentLabel
                 anchors.top: detectorPane.bottom
-                text: "Monitor:"
+                text: "General Components:"
             }
 
             Pane {
-                id: monitorPane
-                anchors.top: monitorLabel.bottom
-                contentHeight: meshMonitorButton.height
-                contentWidth: cylinderMonitorButton.width + meshMonitorButton.width
+                id: generalComponentPane
+                anchors.top: generalComponentLabel.bottom
+                contentHeight: typePicker.height + meshButton.height
+                contentWidth: Math.max(typeLabel.width + typePicker.width,
+                                       geometryLabel.width + meshButton.width + cylinderButton.width)
 
-                PaddedButton {
-                    id: meshMonitorButton
+                Label {
+                    id: typeLabel
+                    anchors.left: parent.left
+                    anchors.verticalCenter: typePicker.verticalCenter
+                    text: "Component type:"
+                }
+                ComboBox {
+                    id: typePicker
+                    anchors.left: typeLabel.right
                     anchors.top: parent.top
+                    model: componentTypeModel
+                    textRole: "name"
+                }
+
+                Label {
+                    id: geometryLabel
+                    anchors.left: parent.left
+                    anchors.verticalCenter: meshButton.verticalCenter
+                    text: "Geometry:"
+                }
+                PaddedButton {
+                    id: meshButton
+                    anchors.top: typePicker.bottom
+                    anchors.left: geometryLabel.right
                     text: "Mesh"
                     onClicked: {
+                        var selectedType = componentTypeModel.get(typePicker.currentIndex)
                         geometryControls.state = "OFF"
-                        pixelControls.state = "SinglePixel"
-                        componentType = "Monitor"
+                        pixelControls.state = selectedType.pixelState
+                        componentType = selectedType.name
                         contentPane.state = "EnterDetails"
                     }
                 }
-
                 PaddedButton {
-                    id: cylinderMonitorButton
-                    anchors.top: meshMonitorButton.top
-                    anchors.left: meshMonitorButton.right
+                    id: cylinderButton
+                    anchors.top: meshButton.top
+                    anchors.left: meshButton.right
                     text: "Cylinder"
                     onClicked: {
+                        var selectedType = componentTypeModel.get(typePicker.currentIndex)
                         geometryControls.state = "Cylinder"
-                        pixelControls.state = "SinglePixel"
-                        componentType = "Monitor"
-                        contentPane.state = "EnterDetails"
-                    }
-                }
-            }
-
-            Label {
-                id: sourceLabel
-                anchors.top: monitorPane.bottom
-                text: "Source:"
-            }
-
-            Pane {
-                id: sourcePane
-                anchors.top: sourceLabel.bottom
-                contentHeight: meshSourceButton.height
-                contentWidth: cylinderSourceButton.width + meshSourceButton.width
-
-                PaddedButton {
-                    id: meshSourceButton
-                    anchors.top: parent.top
-                    text: "Mesh"
-                    onClicked: {
-                        geometryControls.state = "OFF"
-                        componentType = "Source"
+                        pixelControls.state = selectedType.pixelState
+                        componentType = selectedType.name
                         contentPane.state = "EnterDetails"
                     }
                 }
 
-                PaddedButton {
-                    id: cylinderSourceButton
-                    anchors.top: meshSourceButton.top
-                    anchors.left: meshSourceButton.right
-                    text: "Cylinder"
-                    onClicked: {
-                        geometryControls.state = "Cylinder"
-                        componentType = "Source"
-                        contentPane.state = "EnterDetails"
+                ListModel {
+                    id: componentTypeModel
+                    ListElement {
+                        name: "Monitor"
+                        pixelState: "SinglePixel"
+                    }
+                    ListElement {
+                        name: "Source"
+                        pixelState: ""
                     }
                 }
             }
