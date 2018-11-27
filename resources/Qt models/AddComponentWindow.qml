@@ -164,6 +164,18 @@ Window {
                         name: "Source"
                         pixelState: ""
                     }
+                    ListElement {
+                        name: "Slit"
+                        pixelState: ""
+                    }
+                    ListElement {
+                        name: "Moderator"
+                        pixelState: ""
+                    }
+                    ListElement {
+                        name: "Disk Chopper"
+                        pixelState: ""
+                    }
                 }
             }
         }

@@ -203,6 +203,9 @@ class ComponentType(Enum):
     DETECTOR = 'Detector'
     MONITOR = 'Monitor'
     SOURCE = 'Source'
+    SLIT = 'Slit'
+    MODERATOR = 'Moderator'
+    DISK_CHOPPER = 'Disk Chopper'
 
     @classmethod
     def values(cls):

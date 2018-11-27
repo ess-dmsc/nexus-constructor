@@ -16,7 +16,10 @@
         "oneOf": [
           {"$ref": "#/definitions/detector"},
           {"$ref": "#/definitions/monitor"},
-          {"$ref": "#/definitions/source"}
+          {"$ref": "#/definitions/source"},
+          {"$ref": "#/definitions/slit"},
+          {"$ref": "#/definitions/moderator"},
+          {"$ref": "#/definitions/diskChopper"}
         ]
       }
     }
@@ -119,6 +122,39 @@
       "properties": {
         "type": {
           "enum": [ "Source" ]
+        }
+      }
+    },
+    "slit": {
+      "description": "A diffraction slit",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Slit" ]
+        }
+      }
+    },
+    "moderator": {
+      "description": "A neutron moderator",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Moderator" ]
+        }
+      }
+    },
+    "diskChopper": {
+      "description": "A disk chopper",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Disk Chopper" ]
         }
       }
     },
