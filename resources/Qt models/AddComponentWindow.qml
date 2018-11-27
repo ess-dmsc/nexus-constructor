@@ -240,6 +240,7 @@ Window {
                 anchors.top: geometryControls.bottom
                 anchors.right:parent.right
                 anchors.left: parent.left
+                visible: state != ""
             }
 
             PaddedButton {
