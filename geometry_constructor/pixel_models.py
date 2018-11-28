@@ -1,11 +1,11 @@
 """
-ListModel implementations for accessing and manipulating detector pixel data in QML
+ListModel implementations for accessing and manipulating pixel data in QML
 
 See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on how to develop these classes, including
 what signals need to be emitted when changes to the data are made.
 """
 from geometry_constructor.geometry_models import change_value, OFFModel
-from geometry_constructor.data_model import PixelMapping, PixelGrid, Detector, Corner, CountDirection
+from geometry_constructor.data_model import PixelMapping, PixelGrid, SinglePixelId, Corner, CountDirection
 from geometry_constructor.instrument_model import InstrumentModel
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
 from math import isnan
@@ -83,7 +83,7 @@ class PixelGridModel(QAbstractListModel):
     @Slot(int, 'QVariant')
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
-        if isinstance(component, Detector) and isinstance(component.pixel_data, PixelGrid):
+        if isinstance(component.pixel_data, PixelGrid):
             self.beginResetModel()
             self.pixel_grid = component.pixel_data
             self.endResetModel()
@@ -112,7 +112,7 @@ class PixelMappingModel(QAbstractListModel):
             row = index.row()
             current_value = self.pixel_mapping.pixel_ids[row]
             if current_value != value:
-                self.pixel_mapping.pixel_ids[row] = None if isnan(value) else value
+                self.pixel_mapping.pixel_ids[row] = None if isnan(value) else int(value)
                 self.dataChanged.emit(index, index, role)
                 changed = True
         return changed
@@ -131,7 +131,7 @@ class PixelMappingModel(QAbstractListModel):
     @Slot(int, 'QVariant')
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
-        if isinstance(component, Detector) and isinstance(component.pixel_data, PixelMapping):
+        if isinstance(component.pixel_data, PixelMapping):
             self.beginResetModel()
             self.pixel_mapping = component.pixel_data
             self.endResetModel()
@@ -141,4 +141,52 @@ class PixelMappingModel(QAbstractListModel):
         if isinstance(geometry_model, OFFModel):
             self.beginResetModel()
             self.pixel_mapping.pixel_ids = [None for _ in range(len(geometry_model.geometry.faces))]
+            self.endResetModel()
+
+
+class SinglePixelModel(QAbstractListModel):
+    """
+    A single item list model that allows properties of a SinglePixelId to be read and manipulated in QML
+    """
+
+    PixelIdRole = Qt.UserRole + 600
+
+    def __init__(self):
+        super().__init__()
+        self.pixel_model = SinglePixelId(pixel_id=0)
+
+    def rowCount(self, parent=QModelIndex()):
+        return 1
+
+    def data(self, index, role=Qt.DisplayRole):
+        if role == SinglePixelModel.PixelIdRole:
+            return self.pixel_model.pixel_id
+
+    def setData(self, index, value, role):
+        changed = False
+        if role == SinglePixelModel.PixelIdRole:
+            current_value = self.pixel_model.pixel_id
+            if current_value != value:
+                self.pixel_model.pixel_id = None if isnan(value) else int(value)
+                self.dataChanged.emit(index, index, role)
+                changed = True
+        return changed
+
+    def flags(self, index):
+        return super().flags(index) | Qt.ItemIsEditable
+
+    def roleNames(self):
+        return {
+            SinglePixelModel.PixelIdRole: b'pixel_id',
+        }
+
+    def get_pixel_model(self):
+        return self.pixel_model
+
+    @Slot(int, 'QVariant')
+    def set_pixel_model(self, index, instrument: InstrumentModel):
+        component = instrument.components[index]
+        if isinstance(component.pixel_data, SinglePixelId):
+            self.beginResetModel()
+            self.pixel_model = component.pixel_data
             self.endResetModel()

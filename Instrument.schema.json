@@ -13,7 +13,14 @@
       "description": "The components that make up the instrument",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/detector"
+        "oneOf": [
+          {"$ref": "#/definitions/detector"},
+          {"$ref": "#/definitions/monitor"},
+          {"$ref": "#/definitions/source"},
+          {"$ref": "#/definitions/slit"},
+          {"$ref": "#/definitions/moderator"},
+          {"$ref": "#/definitions/diskChopper"}
+        ]
       }
     }
   },
@@ -93,6 +100,64 @@
         {"$ref": "#/definitions/repeatedPixelDetectorProperties"}
       ]
     },
+    "monitor": {
+      "description": "Monitor components of an instrument",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Monitor" ]
+        }
+      },
+      "oneOf": [
+        {"$ref": "#/definitions/singlePixelIdProperty"}
+      ]
+    },
+    "source": {
+      "description": "The neutron or x-ray storage ring/facility an instrument is connected to",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Source" ]
+        }
+      }
+    },
+    "slit": {
+      "description": "A diffraction slit",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Slit" ]
+        }
+      }
+    },
+    "moderator": {
+      "description": "A neutron moderator",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Moderator" ]
+        }
+      }
+    },
+    "diskChopper": {
+      "description": "A disk chopper",
+      "allOf": [
+        {"$ref": "#/definitions/component"}
+      ],
+      "properties": {
+        "type": {
+          "enum": [ "Disk Chopper" ]
+        }
+      }
+    },
     "pixelMappedDetectorProperties": {
       "description": "Properties for a detector with a pixelmapping, meaning it must have an OFF geometry",
       "properties": {
@@ -113,6 +178,15 @@
         }
       },
       "required": [ "pixel_grid" ]
+    },
+    "singlePixelIdProperty": {
+      "description": "The pixel id for a monitor component",
+      "properties": {
+        "pixel_id": {
+          "type": "integer"
+        }
+      },
+      "required": [ "pixel_id" ]
     },
     "transform": {
       "description": "A transformation to position an object in 3D space",
@@ -233,13 +307,6 @@
         }
       },
       "required": [ "type", "axis_direction", "height", "radius", "base_center", "base_edge", "top_center" ]
-    },
-    "pixelData": {
-      "description": "How pixels in a detector are arranged",
-      "oneOf": [
-        { "$ref": "#/definitions/pixelGrid" },
-        { "$ref": "#/definitions/pixelMapping" }
-      ]
     },
     "pixelGrid": {
       "description": "A regular grid of pixels, starting in the bottom left corner, which is the local coordinate origin",

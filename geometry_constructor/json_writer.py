@@ -1,7 +1,7 @@
 import json
 from PySide2.QtCore import QObject, QUrl, Signal, Slot
-from geometry_constructor.data_model import Component, Detector, Geometry, CylindricalGeometry, OFFGeometry,\
-    PixelGrid, PixelMapping
+from geometry_constructor.data_model import Component, Geometry, CylindricalGeometry, OFFGeometry,\
+    PixelGrid, PixelMapping, SinglePixelId
 from geometry_constructor.instrument_model import InstrumentModel
 
 
@@ -63,8 +63,6 @@ class JsonWriter(QObject):
         data = []
         for component in model.components[1:]:
             component_data = self.build_component_dictionary(component, model)
-            if isinstance(component, Detector):
-                self.add_detector_info_to_dictionary(component_data, component)
             data.append(component_data)
         return data
 
@@ -79,7 +77,7 @@ class JsonWriter(QObject):
         data = {
             'name': component.name,
             'description': component.description,
-            'type': type(component).__name__,
+            'type': component.component_type.value,
             'transform_id': model.components.index(component),
             'transforms': [
                 {
@@ -107,13 +105,16 @@ class JsonWriter(QObject):
             'geometry': self.build_geometry_dictionary(component.geometry)
         }
 
+        if component.pixel_data is not None:
+            self.add_pixel_info_to_dictionary(data, component)
+
         parent = component.transform_parent
         if parent is not None and parent != component:
             data['transform_parent_id'] = model.components.index(parent)
 
         return data
 
-    def add_detector_info_to_dictionary(self, json_data: dict, detector: Detector):
+    def add_pixel_info_to_dictionary(self, json_data: dict, detector: Component):
         """
         Adds detector specific information to a component's data dictionary
 
@@ -141,6 +142,8 @@ class JsonWriter(QObject):
                 in range(len(pixels.pixel_ids))
                 if pixels.pixel_ids[face_no] is not None
             ]
+        elif isinstance(pixels, SinglePixelId):
+            json_data['pixel_id'] = pixels.pixel_id
 
     def build_geometry_dictionary(self, geometry: Geometry):
         """

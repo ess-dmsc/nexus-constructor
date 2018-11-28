@@ -2,7 +2,7 @@ import h5py
 from math import sqrt
 from pytest import approx
 from geometry_constructor.writers import HdfWriter
-from geometry_constructor.data_model import Detector, PixelGrid, Corner, CountDirection, Vector
+from geometry_constructor.data_model import Component, ComponentType, PixelGrid, Corner, CountDirection, Vector
 from geometry_constructor.instrument_model import InstrumentModel
 
 
@@ -18,11 +18,12 @@ def make_instrument_with_sample_transform():
     instrument.components[0].translate_vector = Vector(7, 8, 9)
     instrument.components[0].rotate_axis = Vector(10, 11, 12)
     instrument.components[0].rotate_angle = 45
-    instrument.components.append(Detector(name='detector1',
-                                          transform_parent=instrument.components[0],
-                                          translate_vector=Vector(1, 2, 3),
-                                          rotate_axis=Vector(4, 5, 6),
-                                          rotate_angle=90))
+    instrument.components.append(Component(component_type=ComponentType.DETECTOR,
+                                           name='detector1',
+                                           transform_parent=instrument.components[0],
+                                           translate_vector=Vector(1, 2, 3),
+                                           rotate_axis=Vector(4, 5, 6),
+                                           rotate_angle=90))
     return instrument
 
 
@@ -98,10 +99,11 @@ def test_save_dependent_component_rotate():
 
 def test_save_pixel_grid_coordinates():
     instrument = InstrumentModel()
-    instrument.components.append(Detector(name='detector',
-                                          pixel_data=PixelGrid(rows=3, columns=4, row_height=1.5, col_width=2,
-                                                               first_id=0, count_direction=CountDirection.ROW,
-                                                               initial_count_corner=Corner.BOTTOM_LEFT)))
+    instrument.components.append(Component(component_type=ComponentType.DETECTOR,
+                                           name='detector',
+                                           pixel_data=PixelGrid(rows=3, columns=4, row_height=1.5, col_width=2,
+                                                                first_id=0, count_direction=CountDirection.ROW,
+                                                                initial_count_corner=Corner.BOTTOM_LEFT)))
     # use an in memory file to avoid disk usage during tests
     with h5py.File('grid_coordinate_testfile', driver='core', backing_store=False) as file:
         HdfWriter().save_instrument_to_file(file, instrument)
@@ -121,10 +123,11 @@ def test_save_pixel_grid_coordinates():
 
 def assess_pixel_grid_direction(direction, corner, expected_data):
     instrument = InstrumentModel()
-    instrument.components.append(Detector(name='detector',
-                                          pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
-                                                               first_id=0, count_direction=direction,
-                                                               initial_count_corner=corner)))
+    instrument.components.append(Component(component_type=ComponentType.DETECTOR,
+                                           name='detector',
+                                           pixel_data=PixelGrid(rows=3, columns=4, row_height=0.1, col_width=0.3,
+                                                                first_id=0, count_direction=direction,
+                                                                initial_count_corner=corner)))
     # use an in memory file to avoid disk usage during tests
     with h5py.File('grid_direction_testfile', driver='core', backing_store=False) as file:
         HdfWriter().save_instrument_to_file(file, instrument)

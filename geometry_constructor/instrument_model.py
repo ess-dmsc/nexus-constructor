@@ -1,4 +1,4 @@
-from geometry_constructor.data_model import Sample, Detector, PixelGrid, PixelMapping, Vector,\
+from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, Vector,\
     CylindricalGeometry, OFFGeometry, Component
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Property, Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
@@ -57,7 +57,8 @@ class InstrumentModel(QAbstractListModel):
         self.modelReset.connect(self.send_model_updated)
 
         self.components = [
-            Sample(
+            Component(
+                component_type=ComponentType.SAMPLE,
                 name='Sample',
                 geometry=OFFGeometry(
                     vertices=[Vector(x=-0.5, y=-0.5, z=0.5),
@@ -168,27 +169,26 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.RemovableRole: b'removable'
         }
 
-    @Slot(str)
-    @Slot(str, str, int, float, float, float, float, float, float, float, 'QVariant', 'QVariant')
-    def add_detector(self, name, description='', parent_index=0,
-                     translate_x=0, translate_y=0, translate_z=0,
-                     rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0,
-                     geometry_model=None,
-                     pixel_model=None):
-        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        geometry = None if geometry_model is None else geometry_model.get_geometry()
-        pixels = None if pixel_model is None else pixel_model.get_pixel_model()
-        detector = Detector(name=name,
-                            description=description,
-                            transform_parent=self.components[parent_index],
-                            translate_vector=Vector(translate_x, translate_y, translate_z),
-                            rotate_axis=Vector(rotate_x, rotate_y, rotate_z),
-                            rotate_angle=rotate_angle,
-                            geometry=geometry,
-                            pixel_data=pixels)
-        self.components.append(detector)
-        self.endInsertRows()
-        self.update_removable()
+    @Slot(str, str, str, int, float, float, float, float, float, float, float, 'QVariant', 'QVariant')
+    def add_component(self, component_type, name, description='', parent_index=0,
+                      translate_x=0, translate_y=0, translate_z=0,
+                      rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0,
+                      geometry_model=None,
+                      pixel_model=None):
+        if component_type in ComponentType.values():
+            component = Component(component_type=ComponentType(component_type),
+                                  name=name,
+                                  description=description,
+                                  transform_parent=self.components[parent_index],
+                                  translate_vector=Vector(translate_x, translate_y, translate_z),
+                                  rotate_axis=Vector(rotate_x, rotate_y, rotate_z),
+                                  rotate_angle=rotate_angle,
+                                  geometry=None if geometry_model is None else geometry_model.get_geometry(),
+                                  pixel_data=None if pixel_model is None else pixel_model.get_pixel_model())
+            self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+            self.components.append(component)
+            self.endInsertRows()
+            self.update_removable()
 
     @Slot(int)
     def remove_component(self, index):
@@ -221,7 +221,7 @@ class InstrumentModel(QAbstractListModel):
             geometry = component.geometry
         else:
             return
-        if isinstance(component, Detector):
+        if component.component_type == ComponentType.DETECTOR:
             return OffMesh(geometry, component.pixel_data)
         return OffMesh(geometry)
 
@@ -283,11 +283,13 @@ class InstrumentModel(QAbstractListModel):
     @staticmethod
     def determine_pixel_state(component):
         """Returns a string identifying the state a PixelControls editor should be in for the given component"""
-        if isinstance(component, Detector):
+        if component.component_type == ComponentType.DETECTOR:
             if isinstance(component.pixel_data, PixelGrid):
                 return "Grid"
             elif isinstance(component.pixel_data, PixelMapping):
                 return "Mapping"
+        elif component.component_type == ComponentType.MONITOR:
+            return "SinglePixel"
         return ""
 
     @staticmethod

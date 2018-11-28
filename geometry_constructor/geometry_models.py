@@ -7,7 +7,7 @@ what signals need to be emitted when changes to the data are made.
 
 from geometry_constructor.data_model import CylindricalGeometry, OFFGeometry
 from geometry_constructor.geometry_loader import load_geometry
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Slot
+from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
 
 from geometry_constructor.instrument_model import InstrumentModel
 
@@ -103,6 +103,8 @@ class OFFModel(QAbstractListModel):
     VerticesRole = Qt.UserRole + 201
     FacesRole = Qt.UserRole + 202
 
+    meshLoaded = Signal()
+
     def __init__(self):
         super().__init__()
         self.geometry = OFFGeometry()
@@ -155,6 +157,7 @@ class OFFModel(QAbstractListModel):
         self.beginResetModel()
         load_geometry(filename, self.geometry)
         self.endResetModel()
+        self.meshLoaded.emit()
 
     def get_geometry(self):
         return self.geometry

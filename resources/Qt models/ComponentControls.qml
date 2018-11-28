@@ -12,37 +12,37 @@ Pane {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        contentHeight: addDetector.height
+        contentHeight: addComponentButton.height
         padding: 1
 
         Label {
             anchors.left: parent.left
-            anchors.verticalCenter: addDetector.verticalCenter
+            anchors.verticalCenter: addComponentButton.verticalCenter
             text: "Components:"
         }
         Button {
-            id: addDetector
+            id: addComponentButton
             anchors.right: parent.right
 
-            text: "Add detector"
+            text: "Add component"
             onClicked: {
-                if (modalLoader.source == ""){
-                    modalLoader.source = "AddDetectorWindow.qml"
-                    window.positionChildWindow(modalLoader.item)
-                    modalLoader.item.show()
+                if (windowLoader.source == ""){
+                    windowLoader.source = "AddComponentWindow.qml"
+                    window.positionChildWindow(windowLoader.item)
+                    windowLoader.item.show()
                 } else {
-                    modalLoader.item.requestActivate()
+                    windowLoader.item.requestActivate()
                 }
             }
             Loader {
-                id: modalLoader
+                id: windowLoader
                 Connections {
-                    target: modalLoader.item
-                    onClosing: modalLoader.source = ""
+                    target: windowLoader.item
+                    onClosing: windowLoader.source = ""
                 }
                 Connections {
                     target: window
-                    onClosing: modalLoader.source = ""
+                    onClosing: windowLoader.source = ""
                 }
             }
         }
