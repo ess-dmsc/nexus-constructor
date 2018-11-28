@@ -67,3 +67,48 @@ def test_is_removable():
     assert not model.is_removable(1)
     assert model.is_removable(2)
     assert model.is_removable(3)
+
+
+def test_determine_geometry_state_produces_expected_strings():
+    # geometry state should be independent of component type
+    for component_type in data_model.ComponentType:
+        components = [
+            data_model.Component(component_type=component_type,
+                                 name='',
+                                 geometry=data_model.CylindricalGeometry()),
+            data_model.Component(component_type=component_type,
+                                 name='',
+                                 geometry=data_model.OFFGeometry()),
+            data_model.Component(component_type=component_type,
+                                 name='',
+                                 geometry=None),
+        ]
+        expected_states = [
+            "Cylinder",
+            "OFF",
+            "",
+        ]
+        assert len(components) == len(expected_states)
+
+        for i in range(len(components)):
+            assert InstrumentModel.determine_geometry_state(components[i]) == expected_states[i]
+
+
+def test_determine_pixel_state_produces_expected_strings():
+    for component_type in data_model.ComponentType:
+        component = data_model.Component(component_type=component_type,
+                                         name='')
+        if component_type == data_model.ComponentType.DETECTOR:
+            expected_states = ['Mapping', 'Grid']
+            pixel_options = [data_model.PixelMapping([]), data_model.PixelGrid()]
+        elif component_type == data_model.ComponentType.MONITOR:
+            expected_states = ['SinglePixel']
+            pixel_options = [data_model.SinglePixelId(42)]
+        else:
+            expected_states = ['']
+            pixel_options = [None]
+
+        assert len(expected_states) == len(pixel_options)
+        for i in range(len(pixel_options)):
+            component.pixel_data = pixel_options[i]
+            assert InstrumentModel.determine_pixel_state(component) == expected_states[i]
