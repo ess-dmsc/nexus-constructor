@@ -121,8 +121,8 @@ class OFFGeometry(Geometry):
     faces:  list of integer lists. Each sublist is a winding path around the corners of a polygon. Each sublist item is
             an index into the vertices list to identify a specific point in 3D space
     """
-    vertices = attr.ib(factory=list)
-    faces = attr.ib(factory=list)
+    vertices = attr.ib(factory=list, type=List[Vector])
+    faces = attr.ib(factory=list, type=List[List[int]])
 
     @property
     def winding_order(self):
