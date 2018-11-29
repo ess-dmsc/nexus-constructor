@@ -1,7 +1,7 @@
 import json
 from PySide2.QtCore import QObject, QUrl, Slot
 from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
-    PixelMapping, SinglePixelId, CountDirection, Corner, Vector
+    PixelMapping, SinglePixelId, CountDirection, Corner, Vector, Translation, Rotation
 from geometry_constructor.instrument_model import InstrumentModel
 
 
@@ -99,14 +99,14 @@ class JsonLoader(QObject):
         component.description = json_obj['description']
         for transform in json_obj['transforms']:
             if transform['type'] == 'rotate':
-                component.rotate_axis = Vector(transform['axis']['x'],
-                                               transform['axis']['y'],
-                                               transform['axis']['z'])
-                component.rotate_angle = transform['angle']['value']
+                component.transforms.append(Rotation(axis=Vector(transform['axis']['x'],
+                                                                 transform['axis']['y'],
+                                                                 transform['axis']['z']),
+                                                     angle=transform['angle']['value']))
             elif transform['type'] == 'translate':
-                component.translate_vector = Vector(transform['vector']['x'],
-                                                    transform['vector']['y'],
-                                                    transform['vector']['z'])
+                component.transforms.append(Translation(Vector(transform['vector']['x'],
+                                                               transform['vector']['y'],
+                                                               transform['vector']['z'])))
 
         component.geometry = self.build_geometry(json_obj['geometry'])
         self.transform_id_mapping[json_obj['transform_id']] = component

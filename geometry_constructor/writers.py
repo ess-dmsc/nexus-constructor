@@ -1,7 +1,7 @@
 import h5py
 from pprint import pprint
 from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, CountDirection, Corner, \
-    Geometry, OFFGeometry, CylindricalGeometry, Component
+    Geometry, OFFGeometry, CylindricalGeometry, Component, Rotation, Translation
 from geometry_constructor.instrument_model import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
 
@@ -46,29 +46,46 @@ class HdfWriter(QObject):
         if component.transform_parent is None or component.transform_parent == component:
             dependent_on = '.'
         else:
-            dependent_on = '/entry/instrument/' + component.transform_parent.name + '/translate'
+            dependent_on = '.'
+            dependent_found = False
+            no_dependent = False
+            ancestor = component.transform_parent
+            while not (dependent_found or no_dependent):
+                if len(ancestor.transforms) > 0:
+                    dependent_on = '/entry/instrument/{}/transform{}'.format(ancestor.name,
+                                                                             len(ancestor.transforms) - 1)
+                    dependent_found = True
+                elif ancestor.transform_parent is None or ancestor.transform_parent == ancestor:
+                    no_dependent = True
+                else:
+                    ancestor = ancestor.transform_parent
 
-        # store the rotation
-        rotate = nx_component.create_dataset(
-            'rotate',
-            data=[component.rotate_angle])
-        rotate.attrs['NX_class'] = 'NXtransformations'
-        rotate.attrs['depends_on'] = dependent_on
-        rotate.attrs['transformation_type'] = 'rotation'
-        rotate.attrs['units'] = 'degrees'
-        rotate.attrs['vector'] = component.rotate_axis.unit_list
-        # store the translation
-        magnitude = component.translate_vector.magnitude
-        translate = nx_component.create_dataset(
-            'translate',
-            data=[magnitude])
-        translate.attrs['NX_class'] = 'NXtransformations'
-        translate.attrs['depends_on'] = 'rotate'
-        translate.attrs['transformation_type'] = 'translation'
-        translate.attrs['units'] = 'm'
-        translate.attrs['vector'] = component.translate_vector.unit_list if magnitude != 0 else [0, 0, 1]
+        for i in range(len(component.transforms)):
+            transform = component.transforms[i]
+            name = 'transform{}'.format(i)
+            if isinstance(transform, Rotation):
+                rotate = nx_component.create_dataset(
+                    name,
+                    data=[transform.angle])
+                rotate.attrs['NX_class'] = 'NXtransformations'
+                rotate.attrs['depends_on'] = dependent_on
+                rotate.attrs['transformation_type'] = 'rotation'
+                rotate.attrs['units'] = 'degrees'
+                rotate.attrs['vector'] = transform.axis.unit_list
+                dependent_on = name
+            elif isinstance(transform, Translation):
+                magnitude = transform.vector.magnitude
+                translate = nx_component.create_dataset(
+                    name,
+                    data=[magnitude])
+                translate.attrs['NX_class'] = 'NXtransformations'
+                translate.attrs['depends_on'] = dependent_on
+                translate.attrs['transformation_type'] = 'translation'
+                translate.attrs['units'] = 'm'
+                translate.attrs['vector'] = transform.vector.unit_list if magnitude != 0 else [0, 0, 1]
+                dependent_on = name
 
-        nx_component.attrs['depends_on'] = 'translate'
+        nx_component.attrs['depends_on'] = dependent_on
 
     def store_pixel_data(self, nx_detector: h5py.Group, component: Component):
         pixel_data = component.pixel_data

@@ -1,5 +1,5 @@
 from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, Vector,\
-    CylindricalGeometry, OFFGeometry, Component
+    CylindricalGeometry, OFFGeometry, Component, Rotation, Translation
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Property, Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
@@ -34,19 +34,12 @@ class InstrumentModel(QAbstractListModel):
 
     NameRole = Qt.UserRole + 1
     DescriptionRole = Qt.UserRole + 2
-    TranslateVectorXRole = Qt.UserRole + 3
-    TranslateVectorYRole = Qt.UserRole + 4
-    TranslateVectorZRole = Qt.UserRole + 5
-    RotateAxisXRole = Qt.UserRole + 6
-    RotateAxisYRole = Qt.UserRole + 7
-    RotateAxisZRole = Qt.UserRole + 8
-    RotateAngleRole = Qt.UserRole + 9
-    TransformParentIndexRole = Qt.UserRole + 10
-    PixelStateRole = Qt.UserRole + 11
-    GeometryStateRole = Qt.UserRole + 12
-    MeshRole = Qt.UserRole + 13
-    TransformMatrixRole = Qt.UserRole + 14
-    RemovableRole = Qt.UserRole + 15
+    TransformParentIndexRole = Qt.UserRole + 3
+    PixelStateRole = Qt.UserRole + 4
+    GeometryStateRole = Qt.UserRole + 5
+    MeshRole = Qt.UserRole + 6
+    TransformMatrixRole = Qt.UserRole + 7
+    RemovableRole = Qt.UserRole + 8
 
     def __init__(self):
         super().__init__()
@@ -87,13 +80,6 @@ class InstrumentModel(QAbstractListModel):
         accessors = {
             InstrumentModel.NameRole: lambda: component.name,
             InstrumentModel.DescriptionRole: lambda: component.description,
-            InstrumentModel.TranslateVectorXRole: lambda: component.translate_vector.x,
-            InstrumentModel.TranslateVectorYRole: lambda: component.translate_vector.y,
-            InstrumentModel.TranslateVectorZRole: lambda: component.translate_vector.z,
-            InstrumentModel.RotateAxisXRole: lambda: component.rotate_axis.x,
-            InstrumentModel.RotateAxisYRole: lambda: component.rotate_axis.y,
-            InstrumentModel.RotateAxisZRole: lambda: component.rotate_axis.z,
-            InstrumentModel.RotateAngleRole: lambda: component.rotate_angle,
             InstrumentModel.TransformParentIndexRole:
                 lambda: self.components.index(component.transform_parent)
                 if component.transform_parent in self.components
@@ -115,13 +101,6 @@ class InstrumentModel(QAbstractListModel):
         param_options = {
             InstrumentModel.NameRole: lambda: [item, 'name', value, False],
             InstrumentModel.DescriptionRole: lambda: [item, 'description', value, False],
-            InstrumentModel.TranslateVectorXRole: lambda: [item.translate_vector, 'x', value, True],
-            InstrumentModel.TranslateVectorYRole: lambda: [item.translate_vector, 'y', value, True],
-            InstrumentModel.TranslateVectorZRole: lambda: [item.translate_vector, 'z', value, True],
-            InstrumentModel.RotateAxisXRole: lambda: [item.rotate_axis, 'x', value, True],
-            InstrumentModel.RotateAxisYRole: lambda: [item.rotate_axis, 'y', value, True],
-            InstrumentModel.RotateAxisZRole: lambda: [item.rotate_axis, 'z', value, True],
-            InstrumentModel.RotateAngleRole: lambda: [item, 'rotate_angle', value, True],
             InstrumentModel.TransformParentIndexRole: lambda: [
                 item,
                 'transform_parent',
@@ -154,13 +133,6 @@ class InstrumentModel(QAbstractListModel):
         return {
             InstrumentModel.NameRole: b'name',
             InstrumentModel.DescriptionRole: b'description',
-            InstrumentModel.TranslateVectorXRole: b'translate_x',
-            InstrumentModel.TranslateVectorYRole: b'translate_y',
-            InstrumentModel.TranslateVectorZRole: b'translate_z',
-            InstrumentModel.RotateAxisXRole: b'rotate_x',
-            InstrumentModel.RotateAxisYRole: b'rotate_y',
-            InstrumentModel.RotateAxisZRole: b'rotate_z',
-            InstrumentModel.RotateAngleRole: b'rotate_angle',
             InstrumentModel.TransformParentIndexRole: b'transform_parent_index',
             InstrumentModel.PixelStateRole: b'pixel_state',
             InstrumentModel.GeometryStateRole: b'geometry_state',
@@ -169,10 +141,8 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.RemovableRole: b'removable'
         }
 
-    @Slot(str, str, str, int, float, float, float, float, float, float, float, 'QVariant', 'QVariant')
+    @Slot(str, str, str, int, 'QVariant', 'QVariant')
     def add_component(self, component_type, name, description='', parent_index=0,
-                      translate_x=0, translate_y=0, translate_z=0,
-                      rotate_x=0, rotate_y=0, rotate_z=1, rotate_angle=0,
                       geometry_model=None,
                       pixel_model=None):
         if component_type in ComponentType.values():
@@ -180,9 +150,6 @@ class InstrumentModel(QAbstractListModel):
                                   name=name,
                                   description=description,
                                   transform_parent=self.components[parent_index],
-                                  translate_vector=Vector(translate_x, translate_y, translate_z),
-                                  rotate_axis=Vector(rotate_x, rotate_y, rotate_z),
-                                  rotate_angle=rotate_angle,
                                   geometry=None if geometry_model is None else geometry_model.get_geometry(),
                                   pixel_data=None if pixel_model is None else pixel_model.get_pixel_model())
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
@@ -232,13 +199,16 @@ class InstrumentModel(QAbstractListModel):
             if item.transform_parent is not None and item != item.transform_parent:
                 apply_transforms(item.transform_parent)
 
-            matrix.rotate(item.rotate_angle,
-                          QVector3D(item.rotate_axis.x,
-                                    item.rotate_axis.y,
-                                    item.rotate_axis.z))
-            matrix.translate(item.translate_vector.x,
-                             item.translate_vector.y,
-                             item.translate_vector.z)
+            for transform in item.transforms:
+                if isinstance(transform, Translation):
+                    matrix.translate(transform.vector.x,
+                                     transform.vector.y,
+                                     transform.vector.z)
+                elif isinstance(transform, Rotation):
+                    matrix.rotate(transform.angle,
+                                  QVector3D(transform.axis.x,
+                                            transform.axis.y,
+                                            transform.axis.z))
         apply_transforms(component)
         return matrix
 

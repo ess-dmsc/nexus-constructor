@@ -1,12 +1,18 @@
 import attr
 from enum import Enum, unique
 from math import sqrt, sin, cos, pi, acos
+from typing import List
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
 
 def validate_nonzero_vector(instance, attribute, value):
     if value.x == 0 and value.y == 0 and value.z == 0:
         raise ValueError('Vector is zero length')
+
+
+def validate_list_contains_transformations(instance, attribute, value):
+    for item in value:
+        assert isinstance(item, Transformation)
 
 
 @attr.s
@@ -197,6 +203,22 @@ class SinglePixelId(PixelData):
     pixel_id = attr.ib(int)
 
 
+@attr.s
+class Transformation:
+    pass
+
+
+@attr.s
+class Rotation(Transformation):
+    axis = attr.ib(default=Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
+    angle = attr.ib(default=0)
+
+
+@attr.s
+class Translation(Transformation):
+    vector = attr.ib(default=Vector(0, 0, 0), type=Vector)
+
+
 @unique
 class ComponentType(Enum):
     SAMPLE = 'Sample'
@@ -219,8 +241,6 @@ class Component:
     name = attr.ib(str)
     description = attr.ib(default='', type=str)
     transform_parent = attr.ib(default=None, type=object)
-    translate_vector = attr.ib(default=Vector(0, 0, 0), type=Vector)
-    rotate_axis = attr.ib(default=Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
-    rotate_angle = attr.ib(default=0)
+    transforms = attr.ib(factory=list, type=List[Transformation], validator=validate_list_contains_transformations)
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)
