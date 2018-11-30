@@ -1,5 +1,6 @@
 from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, Vector,\
     CylindricalGeometry, OFFGeometry, Component, Rotation, Translation
+from geometry_constructor.models import change_value
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Property, Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
@@ -99,32 +100,23 @@ class InstrumentModel(QAbstractListModel):
         changed = False
         # lambdas prevent non integer values indexing the components list
         param_options = {
-            InstrumentModel.NameRole: lambda: [item, 'name', value, False],
-            InstrumentModel.DescriptionRole: lambda: [item, 'description', value, False],
+            InstrumentModel.NameRole: lambda: [item, 'name', value],
+            InstrumentModel.DescriptionRole: lambda: [item, 'description', value],
             InstrumentModel.TransformParentIndexRole: lambda: [
                 item,
                 'transform_parent',
                 self.components[value] if value in range(len(self.components)) else None,
-                True,
             ],
         }
         if role in param_options:
             param_list = param_options[role]()
-            changed = self.change_value(item, *param_list)
+            changed = change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
             if role == InstrumentModel.TransformParentIndexRole:
                 self.update_removable()
+                self.update_child_transforms(item)
         return changed
-
-    def change_value(self, component, item, attribute_name, value, transforms):
-        current_value = getattr(item, attribute_name)
-        different = value != current_value
-        if different:
-            setattr(item, attribute_name, value)
-            if transforms:
-                self.update_child_transforms(component)
-        return different
 
     def flags(self, index):
         return super().flags(index) | Qt.ItemIsEditable

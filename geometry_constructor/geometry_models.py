@@ -7,24 +7,10 @@ what signals need to be emitted when changes to the data are made.
 
 from geometry_constructor.data_model import CylindricalGeometry, OFFGeometry
 from geometry_constructor.geometry_loader import load_geometry
+from geometry_constructor.models import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
 
 from geometry_constructor.instrument_model import InstrumentModel
-
-
-def change_value(item, attribute_name, value):
-    """
-    Updates the value of an items attribute
-    :param item: the object having an attribute updated
-    :param attribute_name: the name of the attribute to update
-    :param value: the value to set the attribute to
-    :return: whether the attribute value was changed
-    """
-    current_value = getattr(item, attribute_name)
-    different = value != current_value
-    if different:
-        setattr(item, attribute_name, value)
-    return different
 
 
 class CylinderModel(QAbstractListModel):
