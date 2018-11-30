@@ -50,7 +50,7 @@ class CylindricalGeometry(Geometry):
     The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
     described by the direction of its axis, its height, and radius.
     """
-    axis_direction = attr.ib(default=Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
+    axis_direction = attr.ib(factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
 
@@ -210,13 +210,13 @@ class Transformation:
 
 @attr.s
 class Rotation(Transformation):
-    axis = attr.ib(default=Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
+    axis = attr.ib(factory=lambda: Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
     angle = attr.ib(default=0)
 
 
 @attr.s
 class Translation(Transformation):
-    vector = attr.ib(default=Vector(0, 0, 0), type=Vector)
+    vector = attr.ib(factory=lambda: Vector(0, 0, 0), type=Vector)
 
 
 @unique
