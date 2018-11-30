@@ -12,6 +12,7 @@ from geometry_constructor.json_loader import JsonLoader
 from geometry_constructor.json_writer import JsonWriter
 from geometry_constructor.pixel_models import PixelGridModel, PixelMappingModel, SinglePixelModel
 from geometry_constructor.qml_json_model import FilteredJsonModel
+from geometry_constructor.transform_model import TransformationModel
 from geometry_constructor.validators import NameValidator, TransformParentValidator, NullableIntValidator
 from geometry_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
@@ -29,6 +30,7 @@ qmlRegisterType(FilteredJsonModel, 'MyModels', 1, 0, 'FilteredJsonModel')
 qmlRegisterType(PixelGridModel, 'MyModels', 1, 0, 'PixelGridModel')
 qmlRegisterType(PixelMappingModel, 'MyModels', 1, 0, 'PixelMappingModel')
 qmlRegisterType(SinglePixelModel, 'MyModels', 1, 0, 'SinglePixelModel')
+qmlRegisterType(TransformationModel, 'MyModels', 1, 0, 'TransformationModel')
 
 qmlRegisterType(JsonLoader, 'MyJson', 1, 0, 'JsonLoader')
 qmlRegisterType(JsonWriter, 'MyJson', 1, 0, 'JsonWriter')

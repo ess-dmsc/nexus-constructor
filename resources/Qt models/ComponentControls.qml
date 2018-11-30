@@ -4,7 +4,7 @@ import MyValidators 1.0
 
 Pane {
 
-    contentWidth: listContainer.implicitWidth
+    contentWidth: Math.max(headingRow.implicitWidth, listContainer.implicitWidth)
     contentHeight: headingRow.implicitHeight + listContainer.implicitHeight
 
     Pane {
@@ -13,9 +13,11 @@ Pane {
         anchors.right: parent.right
         anchors.top: parent.top
         contentHeight: addComponentButton.height
+        contentWidth: componentsLabel.width + addComponentButton.width
         padding: 1
 
         Label {
+            id: componentsLabel
             anchors.left: parent.left
             anchors.verticalCenter: addComponentButton.verticalCenter
             text: "Components:"
@@ -51,7 +53,8 @@ Pane {
     Frame {
         id: listContainer
         anchors.left: parent.left
-        contentWidth: componentListView.width
+        anchors.right: parent.right
+        contentWidth: componentListView.implicitWidth
         contentHeight: 100
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
@@ -72,9 +75,13 @@ Pane {
             id: componentBox
             padding: 5
             contentHeight: Math.max(mainContent.height, expansionCaret.height)
-            contentWidth: transformControls.width
+            contentWidth: Math.max(mainContent.implicitWidth, extendedContent.implicitWidth)
 
-            Component.onCompleted: componentListView.width = componentBox.width
+            onImplicitWidthChanged: {
+                if (componentListView.implicitWidth < componentBox.implicitWidth){
+                    componentListView.implicitWidth = componentBox.implicitWidth
+                }
+            }
 
             MouseArea {
                 id: expansionClickArea
@@ -97,6 +104,7 @@ Pane {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 height: mainNameLabel.height
+                implicitWidth: mainNameLabel.width + expansionCaret.width
                 visible: true
                 Label {
                     id: mainNameLabel
@@ -112,10 +120,15 @@ Pane {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 height: 0
+                implicitWidth: extendedText.implicitWidth
                 visible: false
                 Item {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
                     height: nameField.height + transformControls.height + editorButton.height
-                    width: parent.width
+                    implicitWidth: Math.max(nameField.implicitWidth,
+                                            transformControls.implicitWidth,
+                                            editorButton.implicitWidth + deleteButton.implicitWidth)
                     id: extendedText
 
                     LabeledTextField {
@@ -135,13 +148,17 @@ Pane {
                     TransformControls {
                         id: transformControls
                         anchors.top: nameField.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+
+                        Component.onCompleted: transformControls.model.set_component(index, components)
+                        onTransformsChanged: {myLogger.log("change signal recieved"); components.transforms_updated(index)}
                     }
 
                     PaddedButton {
                         id: editorButton
                         anchors.top: transformControls.bottom
                         anchors.left: parent.left
-                        width: parent.width / 4
                         text: "Full editor"
                         onClicked: {
                             if (editorLoader.source == ""){
@@ -169,7 +186,6 @@ Pane {
                         id: deleteButton
                         anchors.top: editorButton.top
                         anchors.right: parent.right
-                        width: parent.width / 4
                         text: "Delete"
                         onClicked: components.remove_component(index)
                         buttonEnabled: removable

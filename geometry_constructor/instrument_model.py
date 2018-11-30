@@ -133,17 +133,19 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.RemovableRole: b'removable'
         }
 
-    @Slot(str, str, str, int, 'QVariant', 'QVariant')
+    @Slot(str, str, str, int, 'QVariant', 'QVariant', 'QVariant')
     def add_component(self, component_type, name, description='', parent_index=0,
                       geometry_model=None,
-                      pixel_model=None):
+                      pixel_model=None,
+                      transform_model=None):
         if component_type in ComponentType.values():
             component = Component(component_type=ComponentType(component_type),
                                   name=name,
                                   description=description,
                                   transform_parent=self.components[parent_index],
                                   geometry=None if geometry_model is None else geometry_model.get_geometry(),
-                                  pixel_data=None if pixel_model is None else pixel_model.get_pixel_model())
+                                  pixel_data=None if pixel_model is None else pixel_model.get_pixel_model(),
+                                  transforms=[] if transform_model is None else transform_model.transforms)
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
             self.components.append(component)
             self.endInsertRows()
@@ -203,6 +205,14 @@ class InstrumentModel(QAbstractListModel):
                                             transform.axis.z))
         apply_transforms(component)
         return matrix
+
+    @Slot(int)
+    def transforms_updated(self, index: int):
+        if index in range(self.rowCount()):
+            component = self.components[index]
+            model_index = self.createIndex(index, 0)
+            self.dataChanged.emit(model_index, model_index, InstrumentModel.TransformMatrixRole)
+            self.update_child_transforms(component)
 
     def update_child_transforms(self, component):
         for i in range(len(self.components)):

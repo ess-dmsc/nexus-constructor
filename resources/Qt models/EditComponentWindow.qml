@@ -93,6 +93,9 @@ Window {
                     id: transformControls
                     anchors.left: parent.left
                     anchors.right: parent.right
+
+                    Component.onCompleted: transformControls.model.set_component(componentIndex, components)
+                    onTransformsChanged: components.transforms_updated(index)
                 }
             }
 

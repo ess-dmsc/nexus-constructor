@@ -330,7 +330,8 @@ Window {
                 onClicked: {
                     components.add_component(componentType, name, description, transform_parent_index,
                                              geometryControls.geometryModel,
-                                             pixelControls.pixelModel)
+                                             pixelControls.pixelModel,
+                                             transformControls.model)
                     addComponentWindow.close()
                 }
             }
