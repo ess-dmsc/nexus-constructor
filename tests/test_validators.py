@@ -1,7 +1,7 @@
 """Tests for custom validators in the geometry_constructor.validators module"""
-from geometry_constructor.validators import NameValidator, TransformParentValidator
-from geometry_constructor.instrument_model import InstrumentModel
 from geometry_constructor.data_model import Component
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from geometry_constructor.validators import NameValidator, TransformParentValidator
 from PySide2.QtGui import QValidator
 
 

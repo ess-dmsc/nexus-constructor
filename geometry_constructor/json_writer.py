@@ -3,7 +3,7 @@ from typing import List
 from PySide2.QtCore import QObject, QUrl, Signal, Slot
 from geometry_constructor.data_model import Component, Geometry, CylindricalGeometry, OFFGeometry,\
     PixelGrid, PixelMapping, SinglePixelId, Transformation, Translation, Rotation
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class JsonWriter(QObject):

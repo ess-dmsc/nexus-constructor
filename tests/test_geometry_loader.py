@@ -1,7 +1,7 @@
 from geometry_constructor.data_model import Vector, OFFGeometry, PixelGrid
 from geometry_constructor.geometry_loader import load_geometry
-from geometry_constructor.geometry_models import OFFModel
 from geometry_constructor.off_renderer import QtOFFGeometry
+from geometry_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
 import struct
 

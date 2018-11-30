@@ -1,10 +1,10 @@
 import h5py
 from math import sqrt
 from pytest import approx
-from geometry_constructor.writers import HdfWriter
 from geometry_constructor.data_model import Component, ComponentType, PixelGrid, Corner, CountDirection, Vector,\
     Rotation, Translation
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from geometry_constructor.writers import HdfWriter
 
 
 def assess_unit_length_3d_vector(vector, original):

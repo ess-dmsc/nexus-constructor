@@ -1,7 +1,7 @@
 from PySide2.QtCore import QAbstractListModel, Qt, QModelIndex, Signal, Slot
 from geometry_constructor.data_model import Transformation, Translation, Rotation
-from geometry_constructor.models import change_value
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.qml_models import change_value
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class TransformationModel(QAbstractListModel):

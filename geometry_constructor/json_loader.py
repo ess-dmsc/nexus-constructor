@@ -2,7 +2,7 @@ import json
 from PySide2.QtCore import QObject, QUrl, Slot
 from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
     PixelMapping, SinglePixelId, CountDirection, Corner, Vector, Translation, Rotation
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class JsonLoader(QObject):

@@ -2,7 +2,7 @@ import h5py
 from pprint import pprint
 from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, CountDirection, Corner, \
     Geometry, OFFGeometry, CylindricalGeometry, Component, Rotation, Translation
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
 
 

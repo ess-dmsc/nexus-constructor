@@ -1,6 +1,6 @@
 from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, Vector,\
     CylindricalGeometry, OFFGeometry, Component, Rotation, Translation
-from geometry_constructor.models import change_value
+from geometry_constructor.qml_models import change_value
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Property, Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
