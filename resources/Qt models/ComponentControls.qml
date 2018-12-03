@@ -152,7 +152,7 @@ Pane {
                         anchors.right: parent.right
 
                         Component.onCompleted: transformControls.model.set_component(index, components)
-                        onTransformsChanged: {myLogger.log("change signal recieved"); components.transforms_updated(index)}
+                        onTransformsChanged: components.transforms_updated(index)
                     }
 
                     PaddedButton {
