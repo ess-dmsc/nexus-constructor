@@ -76,6 +76,7 @@ Pane {
             padding: 5
             contentHeight: Math.max(mainContent.height, expansionCaret.height)
             contentWidth: Math.max(mainContent.implicitWidth, extendedContent.implicitWidth)
+            width: componentListView.width
 
             onImplicitWidthChanged: {
                 if (componentListView.implicitWidth < componentBox.implicitWidth){
