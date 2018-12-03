@@ -102,18 +102,25 @@ Item {
                 id: translatePane
                 padding: 0
                 contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
-                contentHeight: translateLabel.height + xField.height
+                contentHeight: translateNameField.height + xField.height
 
                 Label {
                     id: translateLabel
-                    anchors.top: parent.top
+                    anchors.verticalCenter: translateNameField.verticalCenter
                     anchors.left: parent.left
-                    text: "Translate"
+                    text: "Translation"
+                }
+                LabeledTextField {
+                    id: translateNameField
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    labelText: "Name:"
+                    editorText: name
                 }
 
                 LabeledTextField {
                     id: xField
-                    anchors.top: translateLabel.bottom
+                    anchors.top: translateNameField.bottom
                     anchors.left: parent.left
                     labelText: "x:"
                     editorText: translate_x
@@ -144,18 +151,25 @@ Item {
                 id: rotatePane
                 padding: 0
                 contentWidth: xRotField.implicitWidth + yRotField.implicitWidth + zRotField.implicitWidth
-                contentHeight: rotateLabel.height + xRotField.height + angleField.height
+                contentHeight: rotateNameField.height + xRotField.height + angleField.height
 
                 Label {
                     id: rotateLabel
-                    anchors.top: parent.top
+                    anchors.verticalCenter: rotateNameField.verticalCenter
                     anchors.left: parent.left
-                    text: "Rotate"
+                    text: "Rotation"
+                }
+                LabeledTextField {
+                    id: rotateNameField
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    labelText: "Name:"
+                    editorText: name
                 }
 
                 LabeledTextField {
                     id: xRotField
-                    anchors.top: rotateLabel.bottom
+                    anchors.top: rotateNameField.bottom
                     anchors.left: parent.left
                     labelText: "x:"
                     editorText: rotate_x
