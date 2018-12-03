@@ -167,6 +167,10 @@ class InstrumentModel(QAbstractListModel):
             self.transform_models.pop(index)
             self.endRemoveRows()
             self.update_removable()
+            # If parent indexes aren't refreshed, the UI could be displaying the wrong parent
+            self.dataChanged.emit(self.createIndex(0, 0),
+                                  self.createIndex(self.rowCount() - 1, 0),
+                                  InstrumentModel.TransformParentIndexRole)
 
     @Slot(int, 'QVariant')
     def set_geometry(self, index, geometry_model):
