@@ -19,10 +19,10 @@ Item {
     id: transformsItem
 
     height: relativePicker.height +
-            transformsListView.height +
+            transformsListContainer.height +
             addTranslate.height
     implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth,
-                            transformsListView.implicitWidth,
+                            transformsListContainer.implicitWidth,
                             addTranslate.implicitWidth + addRotate.implicitWidth)
     property TransformationModel model: transformModel
 
@@ -51,20 +51,29 @@ Item {
         }
     }
 
-    ListView {
-        id: transformsListView
+    Frame {
+        id: transformsListContainer
         anchors.top: relativePicker.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        model: transformModel
-        delegate: transformDelegate
-        height: contentHeight
-        clip: true
+        contentWidth: transformsListView.implicitWidth
+        contentHeight: transformsListView.implicitHeight
+        visible: contentHeight > 0
+        padding: 1
+
+        ListView {
+            id: transformsListView
+            anchors.fill: parent
+            model: transformModel
+            delegate: transformDelegate
+            implicitHeight: (contentHeight < 250) ? contentHeight : 250
+            clip: true
+        }
     }
 
     PaddedButton {
         id: addTranslate
-        anchors.top: transformsListView.bottom
+        anchors.top: transformsListContainer.bottom
         anchors.left: parent.left
         text: "Add translation"
         onClicked: transformModel.add_translate()
