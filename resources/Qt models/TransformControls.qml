@@ -116,6 +116,12 @@ Item {
                     anchors.right: parent.right
                     labelText: "Name:"
                     editorText: name
+                    onEditingFinished: name = editorText
+                    validator: NameValidator {
+                        model: transformModel
+                        myindex: index
+                        onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                    }
                 }
 
                 LabeledTextField {
@@ -165,6 +171,12 @@ Item {
                     anchors.right: parent.right
                     labelText: "Name:"
                     editorText: name
+                    onEditingFinished: name = editorText
+                    validator: NameValidator {
+                        model: transformModel
+                        myindex: index
+                        onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                    }
                 }
 
                 LabeledTextField {
