@@ -1,14 +1,11 @@
 from PySide2.QtCore import QAbstractListModel, Qt, QModelIndex, Signal, Slot
 from geometry_constructor.data_model import Transformation, Translation, Rotation
 from geometry_constructor.qml_models import change_value, generate_unique_name
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class TransformationModel(QAbstractListModel):
     """
     A listview model for a component's transform list
-
-    The component should be set using the set_component slot
 
     Guidance on how to correctly extend QAbstractListModel, including method signatures and required signals can be
     found at http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing
@@ -24,12 +21,11 @@ class TransformationModel(QAbstractListModel):
     RotateZRole = Qt.UserRole + 752
     RotateAngleRole = Qt.UserRole + 753
 
-    transformsUpdated = Signal(int)
+    transformsUpdated = Signal()
 
-    def __init__(self):
+    def __init__(self, transforms: list=None):
         super().__init__()
-        self.component_index = -1
-        self.transforms = []
+        self.transforms = [] if transforms is None else transforms
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.transforms)
@@ -87,7 +83,7 @@ class TransformationModel(QAbstractListModel):
             changed = change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
-            self.transformsUpdated.emit(self.component_index)
+            self.transformsUpdated.emit()
         return changed
 
     def flags(self, index):
@@ -119,7 +115,7 @@ class TransformationModel(QAbstractListModel):
         self.beginRemoveRows(QModelIndex(), index, index)
         self.transforms.pop(index)
         self.endRemoveRows()
-        self.transformsUpdated.emit(self.component_index)
+        self.transformsUpdated.emit()
 
     @Slot(int, int)
     def change_position(self, index: int, new_index: int):
@@ -131,21 +127,10 @@ class TransformationModel(QAbstractListModel):
             self.beginInsertRows(QModelIndex(), new_index, new_index)
             self.transforms.insert(new_index, transform)
             self.endInsertRows()
-            self.transformsUpdated.emit(self.component_index)
+            self.transformsUpdated.emit()
 
     def add_transform(self, transform: Transformation):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self.transforms.append(transform)
         self.endInsertRows()
-        self.transformsUpdated.emit(self.component_index)
-
-    @Slot(int, 'QVariant')
-    def set_component(self, component_index: int, instrument: InstrumentModel):
-        print("setting transform model component index to: {}".format(component_index))
-        self.beginResetModel()
-        self.component_index = component_index
-        if component_index in range(instrument.rowCount()):
-            self.transforms = instrument.components[component_index].transforms
-        else:
-            self.transforms = []
-        self.endResetModel()
+        self.transformsUpdated.emit()

@@ -148,12 +148,14 @@ Pane {
 
                     TransformControls {
                         id: transformControls
+                        transformModel: transform_model
                         anchors.top: nameField.bottom
                         anchors.left: parent.left
                         anchors.right: parent.right
-
-                        Component.onCompleted: transformControls.model.set_component(index, components)
-                        onTransformsChanged: components.transforms_updated(index)
+                    }
+                    Connections {
+                        target: transform_model
+                        onTransformsUpdated: components.transforms_updated(index)
                     }
 
                     PaddedButton {

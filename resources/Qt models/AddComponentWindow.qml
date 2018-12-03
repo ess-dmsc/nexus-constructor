@@ -300,6 +300,7 @@ Window {
                 anchors.right: parent.right
                 TransformControls {
                     id: transformControls
+                    transformModel: TransformationModel {}
                     anchors.left: parent.left
                     anchors.right: parent.right
                 }
@@ -331,7 +332,7 @@ Window {
                     components.add_component(componentType, name, description, transform_parent_index,
                                              geometryControls.geometryModel,
                                              pixelControls.pixelModel,
-                                             transformControls.model)
+                                             transformControls.transformModel)
                     addComponentWindow.close()
                 }
             }

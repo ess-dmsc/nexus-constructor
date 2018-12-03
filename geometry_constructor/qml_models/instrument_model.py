@@ -1,6 +1,7 @@
 from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, Vector,\
     CylindricalGeometry, OFFGeometry, Component, Rotation, Translation
 from geometry_constructor.qml_models import change_value, generate_unique_name
+from geometry_constructor.qml_models.transform_model import TransformationModel
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Property, Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
@@ -40,6 +41,7 @@ class InstrumentModel(QAbstractListModel):
     MeshRole = Qt.UserRole + 6
     TransformMatrixRole = Qt.UserRole + 7
     RemovableRole = Qt.UserRole + 8
+    TransformModelRole = Qt.UserRole + 9
 
     def __init__(self):
         super().__init__()
@@ -69,6 +71,10 @@ class InstrumentModel(QAbstractListModel):
                            [1, 7, 5, 3],
                            [6, 0, 2, 4]]
                 ))]
+        self.transform_models = [
+            TransformationModel(self.components[i].transforms)
+            for i in range(len(self.components))
+        ]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.components)
@@ -89,6 +95,7 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.MeshRole: lambda: self.generate_mesh(component),
             InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(component),
             InstrumentModel.RemovableRole: lambda: self.is_removable(row),
+            InstrumentModel.TransformModelRole: lambda: self.transform_models[row]
         }
         if role in accessors:
             return accessors[role]()
@@ -129,7 +136,8 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.GeometryStateRole: b'geometry_state',
             InstrumentModel.MeshRole: b'mesh',
             InstrumentModel.TransformMatrixRole: b'transform_matrix',
-            InstrumentModel.RemovableRole: b'removable'
+            InstrumentModel.RemovableRole: b'removable',
+            InstrumentModel.TransformModelRole: b'transform_model'
         }
 
     @Slot(str, str, str, int, 'QVariant', 'QVariant', 'QVariant')
@@ -147,6 +155,7 @@ class InstrumentModel(QAbstractListModel):
                                   transforms=[] if transform_model is None else transform_model.transforms)
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
             self.components.append(component)
+            self.transform_models.append(TransformationModel(component.transforms))
             self.endInsertRows()
             self.update_removable()
 
@@ -155,6 +164,7 @@ class InstrumentModel(QAbstractListModel):
         if self.is_removable(index):
             self.beginRemoveRows(QModelIndex(), index, index)
             self.components.pop(index)
+            self.transform_models.pop(index)
             self.endRemoveRows()
             self.update_removable()
 
@@ -172,6 +182,7 @@ class InstrumentModel(QAbstractListModel):
     def replace_contents(self, components):
         self.beginResetModel()
         self.components = components
+        self.transform_models = [TransformationModel(component.transforms) for component in components]
         self.endResetModel()
 
     def generate_mesh(self, component: Component):

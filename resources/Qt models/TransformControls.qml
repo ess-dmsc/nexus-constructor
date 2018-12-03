@@ -24,9 +24,7 @@ Item {
     implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth,
                             transformsListContainer.implicitWidth,
                             addTranslate.implicitWidth + addRotate.implicitWidth)
-    property TransformationModel model: transformModel
-
-    signal transformsChanged()
+    property TransformationModel transformModel
 
     Label {
         id: relativeLabel
@@ -85,11 +83,6 @@ Item {
         anchors.left: addTranslate.right
         text: "Add rotation"
         onClicked: transformModel.add_rotate()
-    }
-
-    TransformationModel {
-        id: transformModel
-        onTransformsUpdated: transformsItem.transformsChanged()
     }
 
     Component {
