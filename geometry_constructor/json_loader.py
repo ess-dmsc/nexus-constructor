@@ -99,14 +99,16 @@ class JsonLoader(QObject):
         component.description = json_obj['description']
         for transform in json_obj['transforms']:
             if transform['type'] == 'rotate':
-                component.transforms.append(Rotation(axis=Vector(transform['axis']['x'],
+                component.transforms.append(Rotation(name=transform['name'],
+                                                     axis=Vector(transform['axis']['x'],
                                                                  transform['axis']['y'],
                                                                  transform['axis']['z']),
                                                      angle=transform['angle']['value']))
             elif transform['type'] == 'translate':
-                component.transforms.append(Translation(Vector(transform['vector']['x'],
-                                                               transform['vector']['y'],
-                                                               transform['vector']['z'])))
+                component.transforms.append(Translation(name=transform['name'],
+                                                        vector=Vector(transform['vector']['x'],
+                                                                      transform['vector']['y'],
+                                                                      transform['vector']['z'])))
 
         component.geometry = self.build_geometry(json_obj['geometry'])
         self.transform_id_mapping[json_obj['transform_id']] = component

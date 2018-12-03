@@ -52,8 +52,8 @@ class HdfWriter(QObject):
             ancestor = component.transform_parent
             while not (dependent_found or no_dependent):
                 if len(ancestor.transforms) > 0:
-                    dependent_on = '/entry/instrument/{}/transform{}'.format(ancestor.name,
-                                                                             len(ancestor.transforms) - 1)
+                    dependent_on = '/entry/instrument/{}/{}'.format(ancestor.name,
+                                                                    ancestor.transforms[-1].name)
                     dependent_found = True
                 elif ancestor.transform_parent is None or ancestor.transform_parent == ancestor:
                     no_dependent = True
@@ -62,7 +62,7 @@ class HdfWriter(QObject):
 
         for i in range(len(component.transforms)):
             transform = component.transforms[i]
-            name = 'transform{}'.format(i)
+            name = transform.name
             if isinstance(transform, Rotation):
                 rotate = nx_component.create_dataset(
                     name,

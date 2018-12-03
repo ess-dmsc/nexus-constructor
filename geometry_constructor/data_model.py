@@ -205,7 +205,7 @@ class SinglePixelId(PixelData):
 
 @attr.s
 class Transformation:
-    pass
+    name = attr.ib(str)
 
 
 @attr.s

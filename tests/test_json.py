@@ -21,8 +21,8 @@ def build_sample_model():
                   name='Detector 1',
                   description='Pixel mapped cube',
                   transforms=[
-                      Rotation(axis=Vector(1, 2, 0), angle=45),
-                      Translation(Vector(3, 7, 5))
+                      Rotation(name='rotate', axis=Vector(1, 2, 0), angle=45),
+                      Translation(name='translate', vector=Vector(3, 7, 5))
                   ],
                   geometry=off_geometry,
                   pixel_data=PixelMapping(pixel_ids=[1, 2, None, 3, None, 5])),
@@ -30,8 +30,8 @@ def build_sample_model():
                   name='Detector 2',
                   description='Cylinder array',
                   transforms=[
-                      Rotation(axis=Vector(0.7, 0.7, 0.7), angle=63.4),
-                      Translation(Vector(-1.3, 0.1, -3.14))
+                      Rotation(name='rotate', axis=Vector(0.7, 0.7, 0.7), angle=63.4),
+                      Translation(name='translate', vector=Vector(-1.3, 0.1, -3.14))
                   ],
                   geometry=CylindricalGeometry(axis_direction=Vector(2, 2, 1),
                                                height=0.7,
@@ -45,8 +45,8 @@ def build_sample_model():
                   name='Monitor Alpha',
                   description='A geometry-less monitor',
                   transforms=[
-                      Rotation(axis=Vector(-1, 0, -1.5), angle=0.0),
-                      Translation(Vector(1, 2, 3))
+                      Rotation(name='rotate', axis=Vector(-1, 0, -1.5), angle=0.0),
+                      Translation(name='translate', vector=Vector(1, 2, 3))
                   ],
                   geometry=CylindricalGeometry(),
                   pixel_data=SinglePixelId(42)),
@@ -54,32 +54,32 @@ def build_sample_model():
                   name='Uranium chunk #742',
                   description='A lump of radiation emitting material',
                   transforms=[
-                      Rotation(axis=Vector(0, 1, 0), angle=0.0),
-                      Translation(Vector(0, 0, -20))
+                      Rotation(name='rotate', axis=Vector(0, 1, 0), angle=0.0),
+                      Translation(name='translate', vector=Vector(0, 0, -20))
                   ],
                   geometry=CylindricalGeometry()),
         Component(component_type=ComponentType.SLIT,
                   name='Slit One',
                   description='A hole in a thing',
                   transforms=[
-                      Rotation(axis=Vector(0, 1, 0), angle=0.0),
-                      Translation(Vector(0, 0, -5))
+                      Rotation(name='rotate', axis=Vector(0, 1, 0), angle=0.0),
+                      Translation(name='translate', vector=Vector(0, 0, -5))
                   ],
                   geometry=CylindricalGeometry()),
         Component(component_type=ComponentType.MODERATOR,
                   name='My Moderator',
                   description='Some sort of moderator I guess',
                   transforms=[
-                      Rotation(axis=Vector(0, 1, 0), angle=0.0),
-                      Translation(Vector(0, 0, -17))
+                      Rotation(name='rotate', axis=Vector(0, 1, 0), angle=0.0),
+                      Translation(name='translate', vector=Vector(0, 0, -17))
                   ],
                   geometry=CylindricalGeometry()),
         Component(component_type=ComponentType.DISK_CHOPPER,
                   name='Spinny thing',
                   description='A spinning disk with some holes in it',
                   transforms=[
-                      Rotation(axis=Vector(0, 1, 0), angle=0.0),
-                      Translation(Vector(0, 0, -10))
+                      Rotation(name='rotate', axis=Vector(0, 1, 0), angle=0.0),
+                      Translation(name='translate', vector=Vector(0, 0, -10))
                   ],
                   geometry=CylindricalGeometry(axis_direction=Vector(0, 0, 1),
                                                height=0.3, radius=1.5)),

@@ -201,6 +201,9 @@
         "type": {
           "enum": [ "rotate" ]
         },
+        "name": {
+          "type": "string"
+        },
         "axis": {
           "$ref": "#/definitions/3D"
         },
@@ -224,6 +227,9 @@
       "properties": {
         "type": {
           "enum": [ "translate" ]
+        },
+        "name": {
+          "type": "string"
         },
         "vector": {
           "$ref": "#/definitions/3D"

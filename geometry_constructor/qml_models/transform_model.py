@@ -1,6 +1,6 @@
 from PySide2.QtCore import QAbstractListModel, Qt, QModelIndex, Signal, Slot
 from geometry_constructor.data_model import Transformation, Translation, Rotation
-from geometry_constructor.qml_models import change_value
+from geometry_constructor.qml_models import change_value, generate_unique_name
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
@@ -15,9 +15,10 @@ class TransformationModel(QAbstractListModel):
     """
 
     TransformTypeRole = Qt.UserRole + 700
-    TranslateXRole = Qt.UserRole + 701
-    TranslateYRole = Qt.UserRole + 702
-    TranslateZRole = Qt.UserRole + 703
+    TransformNameRole = Qt.UserRole + 701
+    TranslateXRole = Qt.UserRole + 720
+    TranslateYRole = Qt.UserRole + 721
+    TranslateZRole = Qt.UserRole + 722
     RotateXRole = Qt.UserRole + 750
     RotateYRole = Qt.UserRole + 751
     RotateZRole = Qt.UserRole + 752
@@ -38,6 +39,7 @@ class TransformationModel(QAbstractListModel):
         if isinstance(transform, Translation):
             properties = {
                 TransformationModel.TransformTypeRole: 'Translate',
+                TransformationModel.TransformNameRole: transform.name,
                 TransformationModel.TranslateXRole: transform.vector.x,
                 TransformationModel.TranslateYRole: transform.vector.y,
                 TransformationModel.TranslateZRole: transform.vector.z,
@@ -45,6 +47,7 @@ class TransformationModel(QAbstractListModel):
         elif isinstance(transform, Rotation):
             properties = {
                 TransformationModel.TransformTypeRole: 'Rotate',
+                TransformationModel.TransformNameRole: transform.name,
                 TransformationModel.RotateXRole: transform.axis.x,
                 TransformationModel.RotateYRole: transform.axis.y,
                 TransformationModel.RotateZRole: transform.axis.z,
@@ -61,12 +64,14 @@ class TransformationModel(QAbstractListModel):
 
         if isinstance(transform, Translation):
             param_options = {
+                TransformationModel.TransformNameRole: [transform, 'name', value],
                 TransformationModel.TranslateXRole: [transform.vector, 'x', value],
                 TransformationModel.TranslateYRole: [transform.vector, 'y', value],
                 TransformationModel.TranslateZRole: [transform.vector, 'z', value],
             }
         elif isinstance(transform, Rotation):
             param_options = {
+                TransformationModel.TransformNameRole: [transform, 'name', value],
                 TransformationModel.RotateXRole: [transform.axis, 'x', value],
                 TransformationModel.RotateYRole: [transform.axis, 'y', value],
                 TransformationModel.RotateZRole: [transform.axis, 'z', value],
@@ -89,6 +94,7 @@ class TransformationModel(QAbstractListModel):
     def roleNames(self):
         return {
             TransformationModel.TransformTypeRole: b'transform_type',
+            TransformationModel.TransformNameRole: b'name',
             TransformationModel.TranslateXRole: b'translate_x',
             TransformationModel.TranslateYRole: b'translate_y',
             TransformationModel.TranslateZRole: b'translate_z',
@@ -100,11 +106,11 @@ class TransformationModel(QAbstractListModel):
 
     @Slot()
     def add_translate(self):
-        self.add_transform(Translation())
+        self.add_transform(Translation(name=generate_unique_name('Translate', self.transforms)))
 
     @Slot()
     def add_rotate(self):
-        self.add_transform(Rotation())
+        self.add_transform(Rotation(name=generate_unique_name('Rotate', self.transforms)))
 
     @Slot(int)
     def delete_transform(self, index: int):

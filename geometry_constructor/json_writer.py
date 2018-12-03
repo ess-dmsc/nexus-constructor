@@ -100,6 +100,7 @@ class JsonWriter(QObject):
                 data.append(
                     {
                         'type': 'translate',
+                        'name': transform.name,
                         'vector': {
                             'x': transform.vector.x,
                             'y': transform.vector.y,
@@ -112,6 +113,7 @@ class JsonWriter(QObject):
                 data.append(
                     {
                         'type': 'rotate',
+                        'name': transform.name,
                         'axis': {
                             'x': transform.axis.x,
                             'y': transform.axis.y,

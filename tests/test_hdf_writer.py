@@ -17,15 +17,15 @@ def assess_unit_length_3d_vector(vector, original):
 def make_instrument_with_sample_transform():
     instrument = InstrumentModel()
     instrument.components[0].transforms = [
-        Rotation(axis=Vector(10, 11, 12), angle=45),
-        Translation(Vector(7, 8, 9))
+        Rotation(name='rotate', axis=Vector(10, 11, 12), angle=45),
+        Translation(name='translate', vector=Vector(7, 8, 9))
     ]
     instrument.components.append(Component(component_type=ComponentType.DETECTOR,
                                            name='detector1',
                                            transform_parent=instrument.components[0],
                                            transforms=[
-                                               Rotation(axis=Vector(4, 5, 6), angle=90),
-                                               Translation(Vector(1, 2, 3))
+                                               Rotation(name='rotate', axis=Vector(4, 5, 6), angle=90),
+                                               Translation(name='translate', vector=Vector(1, 2, 3))
                                            ]))
     return instrument
 
@@ -38,15 +38,15 @@ def test_save_root_component_translate():
         sample = file['entry/instrument/Sample']
 
         assert sample.attrs['NX_class'] == 'NXsample'
-        assert sample.attrs['depends_on'] == 'transform1'
+        assert sample.attrs['depends_on'] == 'translate'
 
-        sample_translate = sample['transform1']
+        sample_translate = sample['translate']
         assert sample_translate[0] == approx(sqrt(sum(i**2 for i in [7, 8, 9])))
         assert sample_translate.attrs['NX_class'] == 'NXtransformations'
         assert sample_translate.attrs['transformation_type'] == 'translation'
         assert sample_translate.attrs['units'] == 'm'
         assess_unit_length_3d_vector(sample_translate.attrs['vector'], [7, 8, 9])
-        assert sample_translate.attrs['depends_on'] == 'transform0'
+        assert sample_translate.attrs['depends_on'] == 'rotate'
 
 
 def test_save_root_component_rotate():
@@ -56,7 +56,7 @@ def test_save_root_component_rotate():
         HdfWriter().save_instrument_to_file(file, instrument)
         sample = file['entry/instrument/Sample']
 
-        sample_rotate = sample['transform0']
+        sample_rotate = sample['rotate']
         assert sample_rotate[0] == 45
         assert sample_rotate.attrs['NX_class'] == 'NXtransformations'
         assert sample_rotate.attrs['transformation_type'] == 'rotation'
@@ -73,15 +73,15 @@ def test_save_dependent_component_translate():
         detector = file['entry/instrument/detector1']
 
         assert detector.attrs['NX_class'] == 'NXdetector'
-        assert detector.attrs['depends_on'] == 'transform1'
+        assert detector.attrs['depends_on'] == 'translate'
 
-        detector_translate = detector['transform1']
+        detector_translate = detector['translate']
         assert detector_translate[0] == approx(sqrt(sum(i**2 for i in [1, 2, 3])))
         assert detector_translate.attrs['NX_class'] == 'NXtransformations'
         assert detector_translate.attrs['transformation_type'] == 'translation'
         assert detector_translate.attrs['units'] == 'm'
         assess_unit_length_3d_vector(detector_translate.attrs['vector'], [1, 2, 3])
-        assert detector_translate.attrs['depends_on'] == 'transform0'
+        assert detector_translate.attrs['depends_on'] == 'rotate'
 
 
 def test_save_dependent_component_rotate():
@@ -91,13 +91,13 @@ def test_save_dependent_component_rotate():
         HdfWriter().save_instrument_to_file(file, instrument)
         detector = file['entry/instrument/detector1']
 
-        detector_rotate = detector['transform0']
+        detector_rotate = detector['rotate']
         assert detector_rotate[0] == 90
         assert detector_rotate.attrs['NX_class'] == 'NXtransformations'
         assert detector_rotate.attrs['transformation_type'] == 'rotation'
         assert detector_rotate.attrs['units'] == 'degrees'
         assess_unit_length_3d_vector(detector_rotate.attrs['vector'], [4, 5, 6])
-        assert detector_rotate.attrs['depends_on'] == '/entry/instrument/Sample/transform1'
+        assert detector_rotate.attrs['depends_on'] == '/entry/instrument/Sample/translate'
 
 
 def test_save_pixel_grid_coordinates():
