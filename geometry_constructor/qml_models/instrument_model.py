@@ -4,7 +4,6 @@ from geometry_constructor.qml_models import change_value, generate_unique_name
 from geometry_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Property, Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
-import re
 
 
 class InstrumentModel(QAbstractListModel):
