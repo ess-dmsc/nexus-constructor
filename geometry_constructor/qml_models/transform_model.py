@@ -57,6 +57,8 @@ class TransformationModel(QAbstractListModel):
             properties = {}
         if role in properties:
             return properties[role]
+        else:
+            return ''
 
     def setData(self, index, value, role):
         changed = False
