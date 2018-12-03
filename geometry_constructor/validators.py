@@ -1,6 +1,6 @@
 """Validators to be used on QML input fields"""
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
-from PySide2.QtCore import Property, Signal
+from PySide2.QtCore import Property, Qt, Signal
 from PySide2.QtGui import QValidator, QIntValidator
 
 
@@ -12,7 +12,7 @@ class NullableIntValidator(QIntValidator):
             return super().validate(input, pos)
 
 
-class ValidatorOnInstrumentModel(QValidator):
+class ValidatorOnListModel(QValidator):
     """
     Base class for validators that check an indexed item against other components in an InstrumentModel
 
@@ -26,7 +26,7 @@ class ValidatorOnInstrumentModel(QValidator):
 
     def __init__(self):
         super().__init__()
-        self.instrument_model = InstrumentModel()
+        self.list_model = InstrumentModel()
         self.model_index = 0
 
     def get_index(self):
@@ -42,10 +42,10 @@ class ValidatorOnInstrumentModel(QValidator):
     myindex = Property(int, get_index, set_index, notify=index_changed)
 
     def get_model(self):
-        return self.instrument_model
+        return self.list_model
 
     def set_model(self, val: InstrumentModel):
-        self.instrument_model = val
+        self.list_model = val
 
     @Signal
     def model_changed(self):
@@ -56,7 +56,7 @@ class ValidatorOnInstrumentModel(QValidator):
     validationFailed = Signal()
 
 
-class TransformParentValidator(ValidatorOnInstrumentModel):
+class TransformParentValidator(ValidatorOnListModel):
     """
     Validator to prevent circular transform parent dependencies being created in an instrument model
     """
@@ -95,12 +95,12 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
         mapping = {}
         # Build the parents mapping, including the mapping that would be set by the new assignment
         candidate_parent_index = -1
-        for component in self.instrument_model.components:
-            index = self.instrument_model.components.index(component)
+        for component in self.list_model.components:
+            index = self.list_model.components.index(component)
             if component.transform_parent is None:
                 parent_index = 0
             else:
-                parent_index = self.instrument_model.components.index(component.transform_parent)
+                parent_index = self.list_model.components.index(component.transform_parent)
             mapping[index] = parent_index
             if component.name == proposed_parent_name:
                 candidate_parent_index = index
@@ -137,12 +137,10 @@ class TransformParentValidator(ValidatorOnInstrumentModel):
         return False
 
 
-class NameValidator(ValidatorOnInstrumentModel):
+class NameValidator(ValidatorOnListModel):
     """
-    Validator to ensure component names are unique within a model
+    Validator to ensure item names are unique within a model that has a 'name' property
 
-    Names must be unique as they are used to identify component objects in generated NeXus files, which must be named
-    uniquely.
     The validationFailed signal is emitted if an entered name is not unique.
     """
 
@@ -150,10 +148,16 @@ class NameValidator(ValidatorOnInstrumentModel):
         super().__init__()
 
     def validate(self, input: str, pos: int):
-        components = self.instrument_model.components
-        # if any other component has the same name, it's invalid for this component
-        for component in (components[i] for i in range(len(components)) if i != self.model_index):
-            if component.name == input:
-                self.validationFailed.emit()
-                return QValidator.Invalid
+        name_role = Qt.DisplayRole
+        for role, name in self.list_model.roleNames().items():
+            if name == b'name':
+                name_role = role
+                break
+        for i in range(self.list_model.rowCount()):
+            if i != self.model_index:
+                index = self.list_model.createIndex(i, 0)
+                name_at_index = self.list_model.data(index, name_role)
+                if name_at_index == input:
+                    self.validationFailed.emit()
+                    return QValidator.Invalid
         return QValidator.Acceptable

@@ -1,6 +1,7 @@
 """Tests for custom validators in the geometry_constructor.validators module"""
-from geometry_constructor.data_model import Component
+from geometry_constructor.data_model import Component, Translation
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from geometry_constructor.qml_models.transform_model import TransformationModel
 from geometry_constructor.validators import NameValidator, TransformParentValidator
 from PySide2.QtGui import QValidator
 
@@ -24,7 +25,7 @@ def assess_component_tree(count: int, parent_mappings: dict, results: dict):
     model.components = components
 
     validator = TransformParentValidator()
-    validator.instrument_model = model
+    validator.list_model = model
 
     for index, expected_result in results.items():
         validator.model_index = index
@@ -117,20 +118,38 @@ def test_parent_validator_chain_beside_loop():
     assess_component_tree(4, parent_mappings, results)
 
 
-def assess_component_names(names: list, index, new_name, expected_validity):
+def assess_names(names: list, index, new_name, expected_validity):
     """
-    Tests the validity of a given name at a given index in an InstrumentModel with an existing list of named components
+    Tests the validity of a given name at a given index in a TransformationModel and InstrumentModel with an existing
+    list of named transforms
 
-    :param names: The names to give to components in the model before validating a change
+    :param names: The names to give to items in the model before validating a change
     :param index: The index to change/insert the new name at in the model
     :param new_name: The name to check the validity of a change/insert into the model
     :param expected_validity: Whether the name change/insert is expected to be valid
     """
-    model = InstrumentModel()
-    model.components = [Component(name=name) for name in names]
+    models = [
+        TransformationModel(),
+        InstrumentModel()
+    ]
+    models[0].transforms = [Translation(name=name) for name in names]
+    models[1].components = [Component(name=name) for name in names]
 
+    for model in models:
+        assess_names_in_model(model, index, new_name, expected_validity)
+
+
+def assess_names_in_model(model, index, new_name, expected_validity):
+    """
+    Tests the validity of a given name at a given index in a model of named items
+
+    :param model: The model of named items to test against
+    :param index: The index to change/insert the new name at in the model
+    :param new_name: The name to check the validity of a change/insert into the model
+    :param expected_validity: Whether the name change/insert is expected to be valid
+    """
     validator = NameValidator()
-    validator.instrument_model = model
+    validator.list_model = model
     validator.model_index = index
 
     assert (validator.validate(new_name, 0) == QValidator.Acceptable) == expected_validity
@@ -138,24 +157,24 @@ def assess_component_names(names: list, index, new_name, expected_validity):
 
 def test_name_validator_new_unique_name():
     """A name that's not already in the model, being added at a new index should be valid"""
-    assess_component_names(['foo', 'bar', 'baz'], 3, 'asdf', True)
+    assess_names(['foo', 'bar', 'baz'], 3, 'asdf', True)
 
 
 def test_name_validator_new_existing_name():
     """A name that is already in the model is not valid at a new index"""
-    assess_component_names(['foo', 'bar', 'baz'], 3, 'foo', False)
+    assess_names(['foo', 'bar', 'baz'], 3, 'foo', False)
 
 
 def test_name_validator_set_to_new_name():
     """A name that's not in the model should be valid at an existing index"""
-    assess_component_names(['foo', 'bar', 'baz'], 1, 'asdf', True)
+    assess_names(['foo', 'bar', 'baz'], 1, 'asdf', True)
 
 
 def test_name_validator_set_to_current_name():
     """A name should be valid at an index where it's already present"""
-    assess_component_names(['foo', 'bar', 'baz'], 1, 'bar', True)
+    assess_names(['foo', 'bar', 'baz'], 1, 'bar', True)
 
 
 def test_name_validator_set_to_duplicate_name():
     """A name that's already at an index should not be valid at another index"""
-    assess_component_names(['foo', 'bar', 'baz'], 1, 'foo', False)
+    assess_names(['foo', 'bar', 'baz'], 1, 'foo', False)
