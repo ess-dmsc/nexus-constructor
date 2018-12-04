@@ -23,6 +23,7 @@ def make_instrument_with_sample_transform():
     instrument.components.append(Component(component_type=ComponentType.DETECTOR,
                                            name='detector1',
                                            transform_parent=instrument.components[0],
+                                           dependent_transform=instrument.components[0].transforms[0],
                                            transforms=[
                                                Rotation(name='rotate', axis=Vector(4, 5, 6), angle=90),
                                                Translation(name='translate', vector=Vector(1, 2, 3))
@@ -97,7 +98,7 @@ def test_save_dependent_component_rotate():
         assert detector_rotate.attrs['transformation_type'] == 'rotation'
         assert detector_rotate.attrs['units'] == 'degrees'
         assess_unit_length_3d_vector(detector_rotate.attrs['vector'], [4, 5, 6])
-        assert detector_rotate.attrs['depends_on'] == '/entry/instrument/Sample/translate'
+        assert detector_rotate.attrs['depends_on'] == '/entry/instrument/Sample/rotate'
 
 
 def test_save_pixel_grid_coordinates():

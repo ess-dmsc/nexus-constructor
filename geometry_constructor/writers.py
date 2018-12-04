@@ -50,14 +50,21 @@ class HdfWriter(QObject):
             dependent_found = False
             no_dependent = False
             ancestor = component.transform_parent
+            index = -1
+            if component.dependent_transform is not None:
+                index = component.transform_parent.transforms.index(component.dependent_transform)
             while not (dependent_found or no_dependent):
                 if len(ancestor.transforms) > 0:
                     dependent_on = '/entry/instrument/{}/{}'.format(ancestor.name,
-                                                                    ancestor.transforms[-1].name)
+                                                                    ancestor.transforms[index].name)
                     dependent_found = True
                 elif ancestor.transform_parent is None or ancestor.transform_parent == ancestor:
                     no_dependent = True
                 else:
+                    if ancestor.dependent_transform is None:
+                        index = -1
+                    else:
+                        index = component.transform_parent.transforms.index(component.dependent_transform)
                     ancestor = ancestor.transform_parent
 
         for i in range(len(component.transforms)):
