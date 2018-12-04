@@ -79,7 +79,8 @@ def build_sample_model():
                   description='A spinning disk with some holes in it',
                   transforms=[
                       Rotation(name='rotate', axis=Vector(0, 1, 0), angle=0.0),
-                      Translation(name='translate', vector=Vector(0, 0, -10))
+                      Translation(name='translate', vector=Vector(0, 0, -10)),
+                      Translation(name='translate2', vector=Vector(0, 0, -10))
                   ],
                   geometry=CylindricalGeometry(axis_direction=Vector(0, 0, 1),
                                                height=0.3, radius=1.5)),
@@ -92,7 +93,7 @@ def build_sample_model():
 
     model.components[2].dependent_transform = model.components[1].transforms[0]
     model.components[3].dependent_transform = model.components[2].transforms[1]
-    
+
     return model
 
 

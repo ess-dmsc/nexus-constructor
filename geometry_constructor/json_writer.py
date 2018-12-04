@@ -91,6 +91,10 @@ class JsonWriter(QObject):
         if parent is not None and parent != component:
             data['transform_parent_id'] = model.components.index(parent)
 
+            dependent_transform = component.dependent_transform
+            if dependent_transform is not None:
+                data['parent_transform_index'] = parent.transforms.index(dependent_transform)
+
         return data
 
     def build_transform_list(self, transforms: List[Transformation]):

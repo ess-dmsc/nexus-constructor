@@ -19,6 +19,8 @@ class JsonLoader(QObject):
         self.transform_id_mapping = {}
         # transform_id -> parent's transform_id
         self.transform_parent_ids = {}
+        # transform_id -> dependent transform index
+        self.dependent_indexes = {}
 
     @Slot(QUrl, 'QVariant')
     def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
@@ -43,6 +45,7 @@ class JsonLoader(QObject):
         # Reset the transform mappings
         self.transform_id_mapping = {}
         self.transform_parent_ids = {}
+        self.dependent_indexes = {}
         # Build the sample and components from the data
         data = json.loads(json_data)
         sample = self.build_component(data['sample'])
@@ -54,6 +57,9 @@ class JsonLoader(QObject):
             child = self.transform_id_mapping[child_id]
             parent = self.transform_id_mapping[parent_id]
             child.transform_parent = parent
+            if child_id in self.dependent_indexes:
+                dependent_index = self.dependent_indexes[child_id]
+                child.dependent_transform = parent.transforms[dependent_index]
 
         model.replace_contents(components)
 
@@ -111,9 +117,12 @@ class JsonLoader(QObject):
                                                                       transform['vector']['z'])))
 
         component.geometry = self.build_geometry(json_obj['geometry'])
-        self.transform_id_mapping[json_obj['transform_id']] = component
+        transform_id = json_obj['transform_id']
+        self.transform_id_mapping[transform_id] = component
         if 'transform_parent_id' in json_obj:
-            self.transform_parent_ids[json_obj['transform_id']] = json_obj['transform_parent_id']
+            self.transform_parent_ids[transform_id] = json_obj['transform_parent_id']
+            if 'parent_transform_index' in json_obj:
+                self.dependent_indexes[transform_id] = json_obj['parent_transform_index']
         return component
 
     def build_geometry(self, geometry_obj: dict):
