@@ -8,8 +8,9 @@ import sys
 from os import path
 from geometry_constructor.json_loader import JsonLoader
 from geometry_constructor.json_writer import JsonWriter
+from geometry_constructor.qml_models.component_filters import SingleComponentModel
 from geometry_constructor.qml_models.geometry_models import CylinderModel, OFFModel
-from geometry_constructor.qml_models.instrument_model import InstrumentModel, SingleComponentModel
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
 from geometry_constructor.qml_models.json_model import FilteredJsonModel
 from geometry_constructor.qml_models.pixel_models import PixelGridModel, PixelMappingModel, SinglePixelModel
 from geometry_constructor.qml_models.transform_model import TransformationModel
