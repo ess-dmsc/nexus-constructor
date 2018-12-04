@@ -133,6 +133,7 @@ def assess_names(names: list, index, new_name, expected_validity):
         InstrumentModel()
     ]
     models[0].transforms = [Translation(name=name) for name in names]
+    models[0].deletable = [True for _ in names]
     models[1].components = [Component(name=name) for name in names]
 
     for model in models:

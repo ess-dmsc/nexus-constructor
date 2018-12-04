@@ -241,7 +241,7 @@ class Component:
     name = attr.ib(str)
     description = attr.ib(default='', type=str)
     transform_parent = attr.ib(default=None, type=object)
-    dependent_transform_index = attr.ib(default=-1, type=int)
+    dependent_transform = attr.ib(default=None, type=Transformation)
     transforms = attr.ib(factory=list, type=List[Transformation], validator=validate_list_contains_transformations)
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)

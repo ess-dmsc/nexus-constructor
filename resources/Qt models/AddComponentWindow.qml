@@ -10,13 +10,6 @@ Window {
     property string description: ""
     property real transform_parent_index: 0
     property real dependent_transform_index: 0
-    property real rotate_x: 0
-    property real rotate_y: 0
-    property real rotate_z: 1
-    property real rotate_angle: 0
-    property real translate_x: 0
-    property real translate_y: 0
-    property real translate_z: 0
 
     property int index: -1
 
@@ -330,7 +323,7 @@ Window {
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
-                    components.add_component(componentType, name, description, transform_parent_index,
+                    components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                              geometryControls.geometryModel,
                                              pixelControls.pixelModel,
                                              transformControls.transformModel)

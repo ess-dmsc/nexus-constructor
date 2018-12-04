@@ -76,8 +76,6 @@ class InstrumentModel(QAbstractListModel):
             TransformationModel(self.components[i].transforms)
             for i in range(len(self.components))
         ]
-        for model in self.transform_models:
-            model.transformsUpdated.connect(self.update_transforms_deletable())
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.components)
@@ -94,7 +92,10 @@ class InstrumentModel(QAbstractListModel):
                 if component.transform_parent in self.components
                 else 0,
             InstrumentModel.DependentTransformIndexRole:
-                lambda: component.dependent_transform_index,
+                lambda: component.transform_parent.transforms.index(component.dependent_transform)
+                if component.transform_parent is not None
+                and component.dependent_transform in component.transform_parent.transforms
+                else -1,
             InstrumentModel.PixelStateRole: lambda: self.determine_pixel_state(component),
             InstrumentModel.GeometryStateRole: lambda: self.determine_geometry_state(component),
             InstrumentModel.MeshRole: lambda: self.generate_mesh(component),
@@ -120,23 +121,25 @@ class InstrumentModel(QAbstractListModel):
             ],
             InstrumentModel.DependentTransformIndexRole: lambda: [
                 item,
-                'dependent_transform_index',
-                value if value in range(len(item.transform_parent.transforms)) else -1
+                'dependent_transform',
+                item.transform_parent.transforms[value]
+                if value in range(len(item.transform_parent.transforms))
+                else None
             ],
         }
         if role in param_options:
             param_list = param_options[role]()
             changed = change_value(*param_list)
         if changed:
-            self.dataChanged.emit(index, index, role)
             if role == InstrumentModel.TransformParentIndexRole:
+                self.setData(index, -1, InstrumentModel.DependentTransformIndexRole)
                 self.update_removable()
                 self.update_child_transforms(item)
-                self.setData(index, -1, InstrumentModel.DependentTransformIndexRole)
                 self.update_transforms_deletable()
             if role == InstrumentModel.DependentTransformIndexRole:
                 self.update_child_transforms(item)
                 self.update_transforms_deletable()
+            self.dataChanged.emit(index, index, role)
         return changed
 
     def flags(self, index):
@@ -156,23 +159,26 @@ class InstrumentModel(QAbstractListModel):
             InstrumentModel.TransformModelRole: b'transform_model'
         }
 
-    @Slot(str, str, str, int, 'QVariant', 'QVariant', 'QVariant')
-    def add_component(self, component_type, name, description='', parent_index=0,
+    @Slot(str, str, str, int, int, 'QVariant', 'QVariant', 'QVariant')
+    def add_component(self, component_type, name, description='', parent_index=0, transform_index=-1,
                       geometry_model=None,
                       pixel_model=None,
                       transform_model=None):
         if component_type in ComponentType.values():
+            dependent_transform = None
+            if transform_index in range(len(self.components[parent_index].transforms)):
+                dependent_transform = self.components[parent_index].transforms[transform_index]
             component = Component(component_type=ComponentType(component_type),
                                   name=name,
                                   description=description,
                                   transform_parent=self.components[parent_index],
+                                  dependent_transform=dependent_transform,
                                   geometry=None if geometry_model is None else geometry_model.get_geometry(),
                                   pixel_data=None if pixel_model is None else pixel_model.get_pixel_model(),
                                   transforms=[] if transform_model is None else transform_model.transforms)
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
             self.components.append(component)
             self.transform_models.append(TransformationModel(component.transforms))
-            self.transform_models[-1].transformsUpdated.connect(self.update_transforms_deletable())
             self.endInsertRows()
             self.update_removable()
             self.update_transforms_deletable()
@@ -203,20 +209,43 @@ class InstrumentModel(QAbstractListModel):
         self.model_updated.emit(self)
 
     def update_transforms_deletable(self):
+        """
+        Called by
+         - the same transformsUpdated signal
+         - when removing and adding components
+         - or changing transform parent settings
+        """
         for transform_model in self.transform_models:
             transform_model.reset_deletable()
         for component in self.components:
-            if component.transform_parent is not None:
+            if component.transform_parent is not None and component.dependent_transform is not None:
                 parent_index = self.components.index(component.transform_parent)
                 transform_model = self.transform_models[parent_index]
-                transform_model.set_deletable(component.dependent_transform_index, False)
+                transform_index = component.transform_parent.transforms.index(component.dependent_transform)
+                transform_model.set_deletable(transform_index, False)
+
+        self.dataChanged.emit(
+            self.createIndex(0, 0),
+            self.createIndex(self.rowCount(), 0),
+            [InstrumentModel.DependentTransformIndexRole]
+        )
+
+    @Slot(int)
+    def transforms_updated(self, index: int):
+        """
+        Updates the transform matrices for components at, or dependent on, transforms at the index.
+        As well as updating the de
+        """
+        if index in range(self.rowCount()):
+            component = self.components[index]
+            model_index = self.createIndex(index, 0)
+            self.dataChanged.emit(model_index, model_index, InstrumentModel.TransformMatrixRole)
+            self.update_child_transforms(component)
 
     def replace_contents(self, components):
         self.beginResetModel()
         self.components = components
         self.transform_models = [TransformationModel(component.transforms) for component in components]
-        for model in self.transform_models:
-            model.transformsUpdated.connect(self.update_transforms_deletable())
         self.endResetModel()
 
     def generate_mesh(self, component: Component):
@@ -235,7 +264,11 @@ class InstrumentModel(QAbstractListModel):
 
         def apply_transforms(item: Component, dependent_index: int):
             if item.transform_parent is not None and item != item.transform_parent:
-                apply_transforms(item.transform_parent, item.dependent_transform_index)
+                if item.dependent_transform is None:
+                    index = -1
+                else:
+                    index = item.transform_parent.transforms.index(item.dependent_transform)
+                apply_transforms(item.transform_parent, index)
 
             if dependent_index == -1:
                 transforms = item.transforms
@@ -254,14 +287,6 @@ class InstrumentModel(QAbstractListModel):
                                             transform.axis.z))
         apply_transforms(component, -1)
         return matrix
-
-    @Slot(int)
-    def transforms_updated(self, index: int):
-        if index in range(self.rowCount()):
-            component = self.components[index]
-            model_index = self.createIndex(index, 0)
-            self.dataChanged.emit(model_index, model_index, InstrumentModel.TransformMatrixRole)
-            self.update_child_transforms(component)
 
     def update_child_transforms(self, component):
         for i in range(len(self.components)):
