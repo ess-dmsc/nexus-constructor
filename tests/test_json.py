@@ -88,7 +88,11 @@ def build_sample_model():
     model.components[0].transform_parent = None
     model.components[1].transform_parent = model.components[0]
     model.components[2].transform_parent = model.components[1]
+    model.components[3].transform_parent = model.components[2]
 
+    model.components[2].dependent_transform = model.components[1].transforms[0]
+    model.components[3].dependent_transform = model.components[2].transforms[1]
+    
     return model
 
 
