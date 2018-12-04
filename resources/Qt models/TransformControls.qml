@@ -35,9 +35,13 @@ Item {
     }
     ComboBox {
         id: relativePicker
+        property int componentIndex: index
         anchors.top: parent.top
         anchors.left: relativeLabel.right
-        model: components
+        model: ExcludedComponentModel {
+            model: components
+            index: relativePicker.componentIndex
+        }
         textRole: "name"
         currentIndex: transform_parent_index
         validator: parentValidator

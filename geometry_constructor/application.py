@@ -8,7 +8,7 @@ import sys
 from os import path
 from geometry_constructor.json_loader import JsonLoader
 from geometry_constructor.json_writer import JsonWriter
-from geometry_constructor.qml_models.component_filters import SingleComponentModel
+from geometry_constructor.qml_models.component_filters import SingleComponentModel, ExcludedComponentModel
 from geometry_constructor.qml_models.geometry_models import CylinderModel, OFFModel
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 from geometry_constructor.qml_models.json_model import FilteredJsonModel
@@ -25,6 +25,7 @@ qmlRegisterType(HdfWriter, 'MyWriters', 1, 0, 'HdfWriter')
 
 qmlRegisterType(InstrumentModel, 'MyModels', 1, 0, 'InstrumentModel')
 qmlRegisterType(SingleComponentModel, 'MyModels', 1, 0, 'SingleComponentModel')
+qmlRegisterType(ExcludedComponentModel, 'MyModels', 1, 0, 'ExcludedComponentModel')
 qmlRegisterType(CylinderModel, 'MyModels', 1, 0, 'CylinderModel')
 qmlRegisterType(OFFModel, 'MyModels', 1, 0, 'OFFModel')
 qmlRegisterType(FilteredJsonModel, 'MyModels', 1, 0, 'FilteredJsonModel')
