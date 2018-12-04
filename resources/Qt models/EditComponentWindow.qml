@@ -92,12 +92,20 @@ Window {
                 TransformControls {
                     id: transformControls
                     transformModel: transform_model
+                    componentIndex: editComponentWindow.componentIndex
                     anchors.left: parent.left
                     anchors.right: parent.right
                 }
                 Connections {
                     target: transform_model
                     onTransformsUpdated: components.transforms_updated(index)
+                }
+                states: State {
+                    name: "hidden"; when: componentIndex == 0
+                    PropertyChanges { target: transformFrame; height: 0 }
+                    PropertyChanges { target: transformFrame; visible: false }
+                    PropertyChanges { target: transformLabel; height: 0 }
+                    PropertyChanges { target: transformLabel; visible: false }
                 }
             }
 

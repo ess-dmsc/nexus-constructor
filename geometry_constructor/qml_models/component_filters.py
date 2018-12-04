@@ -16,7 +16,6 @@ class InstrumentModelFilter(QSortFilterProxyModel):
 
     def set_index(self, val):
         self.desired_index = val
-        print('setting index to:{}'.format(val))
         self.invalidateFilter()
 
     index_changed = Signal()

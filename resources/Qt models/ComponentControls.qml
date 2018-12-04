@@ -149,6 +149,7 @@ Pane {
                     TransformControls {
                         id: transformControls
                         transformModel: transform_model
+                        componentIndex: index
                         anchors.top: nameField.bottom
                         anchors.left: parent.left
                         anchors.right: parent.right
@@ -156,6 +157,11 @@ Pane {
                     Connections {
                         target: transform_model
                         onTransformsUpdated: components.transforms_updated(index)
+                    }
+                    states: State {
+                        name: "hidden"; when: index == 0
+                        PropertyChanges { target: transformControls; height: 0 }
+                        PropertyChanges { target: transformControls; visible: false }
                     }
 
                     PaddedButton {

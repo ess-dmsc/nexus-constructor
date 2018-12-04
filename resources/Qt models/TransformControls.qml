@@ -26,6 +26,7 @@ Item {
                             transformsListContainer.implicitWidth,
                             addTranslate.implicitWidth + addRotate.implicitWidth)
     property TransformationModel transformModel
+    property int componentIndex
 
     Label {
         id: relativeLabel
@@ -35,13 +36,10 @@ Item {
     }
     ComboBox {
         id: relativePicker
-        property int componentIndex: index
         anchors.top: parent.top
         anchors.left: relativeLabel.right
-        model: ExcludedComponentModel {
-            model: components
-            index: relativePicker.componentIndex
-        }
+        // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
+        model: (componentIndex == 0) ? components : filteredModel
         textRole: "name"
         currentIndex: transform_parent_index
         validator: parentValidator
@@ -52,6 +50,11 @@ Item {
                 currentIndex = transform_parent_index
             }
         }
+    }
+    ExcludedComponentModel {
+        id: filteredModel
+        model: components
+        index: componentIndex
     }
     ComboBox {
         id: parentTransformPicker
@@ -299,7 +302,7 @@ Item {
     ParentValidator {
         id: parentValidator
         model: components
-        myindex: index
+        myindex: componentIndex
         onValidationFailed: {
             relativePicker.ToolTip.show("Items cannot be selected if they would cause a circular dependency", 5000)
         }

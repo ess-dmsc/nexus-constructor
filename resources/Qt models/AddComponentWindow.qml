@@ -295,6 +295,7 @@ Window {
                 TransformControls {
                     id: transformControls
                     transformModel: TransformationModel {}
+                    componentIndex: index
                     anchors.left: parent.left
                     anchors.right: parent.right
                 }
