@@ -13,6 +13,7 @@ class TransformationModel(QAbstractListModel):
 
     TransformTypeRole = Qt.UserRole + 700
     TransformNameRole = Qt.UserRole + 701
+    DeletableRole = Qt.UserRole + 702
     TranslateXRole = Qt.UserRole + 720
     TranslateYRole = Qt.UserRole + 721
     TranslateZRole = Qt.UserRole + 722
@@ -26,6 +27,7 @@ class TransformationModel(QAbstractListModel):
     def __init__(self, transforms: list=None):
         super().__init__()
         self.transforms = [] if transforms is None else transforms
+        self.deletable = [True for _ in self.transforms]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.transforms)
@@ -36,6 +38,7 @@ class TransformationModel(QAbstractListModel):
             properties = {
                 TransformationModel.TransformTypeRole: 'Translate',
                 TransformationModel.TransformNameRole: transform.name,
+                TransformationModel.DeletableRole: self.deletable[index.row()],
                 TransformationModel.TranslateXRole: transform.vector.x,
                 TransformationModel.TranslateYRole: transform.vector.y,
                 TransformationModel.TranslateZRole: transform.vector.z,
@@ -44,6 +47,7 @@ class TransformationModel(QAbstractListModel):
             properties = {
                 TransformationModel.TransformTypeRole: 'Rotate',
                 TransformationModel.TransformNameRole: transform.name,
+                TransformationModel.DeletableRole: self.deletable[index.row()],
                 TransformationModel.RotateXRole: transform.axis.x,
                 TransformationModel.RotateYRole: transform.axis.y,
                 TransformationModel.RotateZRole: transform.axis.z,
@@ -83,7 +87,8 @@ class TransformationModel(QAbstractListModel):
             changed = change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
-            self.transformsUpdated.emit()
+            if role != TransformationModel.DeletableRole:
+                self.transformsUpdated.emit()
         return changed
 
     def flags(self, index):
@@ -93,6 +98,7 @@ class TransformationModel(QAbstractListModel):
         return {
             TransformationModel.TransformTypeRole: b'transform_type',
             TransformationModel.TransformNameRole: b'name',
+            TransformationModel.DeletableRole: b'deletable',
             TransformationModel.TranslateXRole: b'translate_x',
             TransformationModel.TranslateYRole: b'translate_y',
             TransformationModel.TranslateZRole: b'translate_z',
@@ -112,25 +118,44 @@ class TransformationModel(QAbstractListModel):
 
     @Slot(int)
     def delete_transform(self, index: int):
-        self.beginRemoveRows(QModelIndex(), index, index)
-        self.transforms.pop(index)
-        self.endRemoveRows()
-        self.transformsUpdated.emit()
+        if self.deletable[index]:
+            self.beginRemoveRows(QModelIndex(), index, index)
+            self.transforms.pop(index)
+            self.deletable.pop(index)
+            self.endRemoveRows()
+            self.transformsUpdated.emit()
 
     @Slot(int, int)
     def change_position(self, index: int, new_index: int):
         if new_index in range(self.rowCount()) and index in range(self.rowCount()):
             self.beginRemoveRows(QModelIndex(), index, index)
             transform = self.transforms.pop(index)
+            deletable = self.deletable.pop(index)
             self.endRemoveRows()
 
             self.beginInsertRows(QModelIndex(), new_index, new_index)
             self.transforms.insert(new_index, transform)
+            self.deletable.insert(new_index, deletable)
             self.endInsertRows()
             self.transformsUpdated.emit()
 
     def add_transform(self, transform: Transformation):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self.transforms.append(transform)
+        self.deletable.append(True)
         self.endInsertRows()
         self.transformsUpdated.emit()
+
+    def reset_deletable(self):
+        self.deletable = [True for _ in self.transforms]
+        self.dataChanged.emit(
+            self.createIndex(0, 0),
+            self.createIndex(self.rowCount(), 0),
+            TransformationModel.DeletableRole
+        )
+
+    def set_deletable(self, index: int, deletable: bool):
+        if index in range(self.rowCount()):
+            self.deletable[index] = deletable
+            model_index = self.createIndex(index, 0)
+            self.dataChanged.emit(model_index, model_index, TransformationModel.DeletableRole)

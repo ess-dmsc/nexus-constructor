@@ -8,6 +8,7 @@ import MyValidators 1.0
  * Should be used in an environment where the following variables exist:
  * - components (InstrumentModel)
  * - transform_parent_index (integer)
+ * - dependent_transform_index (integer)
  * - index  (integer)
  *
  * This can be acomplished by including it in a delegate in a view on an
@@ -21,7 +22,7 @@ Item {
     height: relativePicker.height +
             transformsListContainer.height +
             addTranslate.height
-    implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth,
+    implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth + parentTransformPicker.implicitWidth,
                             transformsListContainer.implicitWidth,
                             addTranslate.implicitWidth + addRotate.implicitWidth)
     property TransformationModel transformModel
@@ -47,6 +48,15 @@ Item {
                 currentIndex = transform_parent_index
             }
         }
+    }
+    ComboBox {
+        id: parentTransformPicker
+        anchors.top: relativePicker.top
+        anchors.left: relativePicker.right
+        model: components.get_transform_model(transform_parent_index)
+        textRole: "name"
+        currentIndex: dependent_transform_index
+        onActivated: dependent_transform_index = currentIndex
     }
 
     Frame {
@@ -248,6 +258,10 @@ Item {
                     anchors.right: parent.right
                     text: "Delete"
                     onClicked: transformModel.delete_transform(index)
+                    buttonEnabled: deletable
+                    ToolTip.visible: hovered & !deletable
+                    ToolTip.delay: 400
+                    ToolTip.text: "Cannot remove a transform that's in use as a transform parent"
                 }
             }
 

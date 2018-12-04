@@ -9,6 +9,7 @@ Window {
     property string name: components.generate_component_name(componentType)
     property string description: ""
     property real transform_parent_index: 0
+    property real dependent_transform_index: 0
     property real rotate_x: 0
     property real rotate_y: 0
     property real rotate_z: 1
