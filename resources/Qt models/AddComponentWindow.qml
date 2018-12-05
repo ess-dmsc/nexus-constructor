@@ -253,6 +253,7 @@ ExpandingWindow {
             LabeledTextField {
                 id: nameField
                 labelText: "Name:"
+                editorWidth: 200
                 editorText: name
                 onEditingFinished: name = editorText
                 validator: NameValidator {

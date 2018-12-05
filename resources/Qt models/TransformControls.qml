@@ -133,6 +133,8 @@ Item {
                     id: translateNameField
                     anchors.top: parent.top
                     anchors.right: parent.right
+                    anchors.left: yField.left
+                    anchoredEditor: true
                     labelText: "Name:"
                     editorText: name
                     onEditingFinished: name = editorText
@@ -188,6 +190,8 @@ Item {
                     id: rotateNameField
                     anchors.top: parent.top
                     anchors.right: parent.right
+                    anchors.left: yRotField.left
+                    anchoredEditor: true
                     labelText: "Name:"
                     editorText: name
                     onEditingFinished: name = editorText
