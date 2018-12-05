@@ -1,10 +1,9 @@
 import QtQuick 2.11
-import QtQuick.Window 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
 
-Window {
+ExpandingWindow {
 
     property string name: components.generate_component_name(componentType)
     property string description: ""
@@ -17,17 +16,14 @@ Window {
 
     title: "Add " + componentType
     id: addComponentWindow
-    minimumHeight: contentPane.height
-    minimumWidth: contentPane.width
-    height: minimumHeight
-    width: minimumWidth
-    maximumHeight: minimumHeight
-    maximumWidth: minimumWidth
+    minimumHeight: contentPane.implicitHeight
+    minimumWidth: contentPane.implicitWidth
 
     Pane {
         id: contentPane
-        contentWidth: setupPane.width
-        contentHeight: setupPane.height
+        contentWidth: setupPane.implicitWidth
+        contentHeight: setupPane.implicitHeight
+        anchors.fill: parent
         padding: 0
 
         Pane {
@@ -251,6 +247,7 @@ Window {
                            + geometryControls.height
                            + pixelControls.height
                            + addButton.height
+            anchors.fill: parent
             visible: false
 
             LabeledTextField {
@@ -342,8 +339,8 @@ Window {
 
                 PropertyChanges { target: setupPane; visible: false }
                 PropertyChanges { target: detailsPane; visible: true }
-                PropertyChanges { target: contentPane; contentHeight: detailsPane.height }
-                PropertyChanges { target: contentPane; contentWidth: detailsPane.width }
+                PropertyChanges { target: contentPane; contentHeight: detailsPane.implicitHeight }
+                PropertyChanges { target: contentPane; contentWidth: detailsPane.implicitWidth }
                 PropertyChanges { target: detailsPane; focus: true}
                 PropertyChanges { target: nameField; focus: true}
             }

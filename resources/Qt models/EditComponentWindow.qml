@@ -1,21 +1,16 @@
 import QtQuick 2.11
-import QtQuick.Window 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
 
-Window {
+ExpandingWindow {
 
     property int componentIndex: 0
 
     title: "Component Editor"
     id: editComponentWindow
-    minimumHeight: view.height
-    minimumWidth: view.width
-    height: minimumHeight
-    width: minimumWidth
-    maximumHeight: minimumHeight
-    maximumWidth: minimumWidth
+    minimumHeight: view.implicitHeight
+    minimumWidth: view.implicitWidth
 
     Pane {
         id: viewContainer
@@ -23,7 +18,9 @@ Window {
         anchors.fill: parent
         ListView {
             id: view
-            height: contentHeight
+            implicitHeight: contentHeight
+            anchors.fill: parent
+
             model: component
             delegate: editorDelegate
             interactive: false
@@ -47,8 +44,9 @@ Window {
                            + transformFrame.height
                            + geometryControls.height
                            + pixelControls.height
+            width: view.width
 
-            onWidthChanged: view.width = detailsPane.width
+            onImplicitWidthChanged: view.implicitWidth = detailsPane.implicitWidth
 
             LabeledTextField {
                 id: nameField
