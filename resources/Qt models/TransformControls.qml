@@ -19,10 +19,10 @@ import MyValidators 1.0
 Item {
     id: transformsItem
 
-    height: relativePicker.height +
-            parentTransformPicker.height +
-            transformsListContainer.height +
-            addTranslate.height
+    implicitHeight: relativePicker.implicitHeight +
+                    parentTransformPicker.implicitHeight +
+                    transformsListContainer.implicitHeight +
+                    addTranslate.implicitHeight
     implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth,
                             transformsListContainer.implicitWidth,
                             addTranslate.implicitWidth + addRotate.implicitWidth)
@@ -73,6 +73,7 @@ Item {
     Frame {
         id: transformsListContainer
         anchors.top: parentTransformPicker.bottom
+        anchors.bottom: addTranslate.top
         anchors.left: parent.left
         anchors.right: parent.right
         contentWidth: transformsListView.implicitWidth
@@ -92,7 +93,7 @@ Item {
 
     PaddedButton {
         id: addTranslate
-        anchors.top: transformsListContainer.bottom
+        anchors.bottom: parent.bottom
         anchors.left: parent.left
         text: "Add translation"
         onClicked: transformModel.add_translate()

@@ -18,7 +18,6 @@ ExpandingWindow {
         anchors.fill: parent
         ListView {
             id: view
-            implicitHeight: contentHeight
             anchors.fill: parent
 
             model: component
@@ -38,15 +37,16 @@ ExpandingWindow {
         Pane {
             id: detailsPane
             contentWidth: Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
-            contentHeight: nameField.height
-                           + descriptionField.height
-                           + transformLabel.height
-                           + transformFrame.height
-                           + geometryControls.height
-                           + pixelControls.height
+            contentHeight: nameField.implicitHeight
+                           + descriptionField.implicitHeight
+                           + transformLabel.implicitHeight
+                           + transformFrame.implicitHeight
+                           + geometryControls.implicitHeight
+                           + pixelControls.implicitHeight
             width: view.width
-
+            height: viewContainer.height
             onImplicitWidthChanged: view.implicitWidth = detailsPane.implicitWidth
+            onImplicitHeightChanged: view.implicitHeight = detailsPane.implicitHeight
 
             LabeledTextField {
                 id: nameField
@@ -84,7 +84,8 @@ ExpandingWindow {
             Frame {
                 id: transformFrame
                 anchors.top: transformLabel.bottom
-                contentHeight: transformControls.height
+                anchors.bottom: geometryControls.top
+                contentHeight: transformControls.implicitHeight
                 contentWidth: transformControls.implicitWidth
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -92,8 +93,7 @@ ExpandingWindow {
                     id: transformControls
                     transformModel: transform_model
                     componentIndex: editComponentWindow.componentIndex
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                    anchors.fill: parent
                 }
                 Connections {
                     target: transform_model
@@ -101,16 +101,17 @@ ExpandingWindow {
                 }
                 states: State {
                     name: "hidden"; when: componentIndex == 0
-                    PropertyChanges { target: transformFrame; height: 0 }
+                    PropertyChanges { target: transformFrame; implicitHeight: 0 }
                     PropertyChanges { target: transformFrame; visible: false }
-                    PropertyChanges { target: transformLabel; height: 0 }
+                    PropertyChanges { target: transformLabel; implicitHeight: 0 }
                     PropertyChanges { target: transformLabel; visible: false }
+                    PropertyChanges { target: editComponentWindow; height: minimumHeight}
                 }
             }
 
             GeometryControls {
                 id: geometryControls
-                anchors.top: transformFrame.bottom
+                anchors.bottom: pixelControls.top
                 anchors.left: parent.left
                 anchors.right: parent.right
                 state: geometry_state
@@ -125,7 +126,7 @@ ExpandingWindow {
 
             PixelControls {
                 id: pixelControls
-                anchors.top: geometryControls.bottom
+                anchors.bottom: parent.bottom
                 anchors.right:parent.right
                 anchors.left: parent.left
                 state: pixel_state

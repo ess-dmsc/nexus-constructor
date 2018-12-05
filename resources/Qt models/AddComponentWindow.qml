@@ -240,13 +240,13 @@ ExpandingWindow {
         Pane {
             id: detailsPane
             contentWidth:  Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
-            contentHeight: nameField.height
-                           + descriptionField.height
-                           + transformLabel.height
-                           + transformFrame.height
-                           + geometryControls.height
-                           + pixelControls.height
-                           + addButton.height
+            contentHeight: nameField.implicitHeight
+                           + descriptionField.implicitHeight
+                           + transformLabel.implicitHeight
+                           + transformFrame.implicitHeight
+                           + geometryControls.implicitHeight
+                           + pixelControls.implicitHeight
+                           + addButton.implicitHeight
             anchors.fill: parent
             visible: false
 
@@ -286,7 +286,8 @@ ExpandingWindow {
             Frame {
                 id: transformFrame
                 anchors.top: transformLabel.bottom
-                contentHeight: transformControls.height
+                anchors.bottom: geometryControls.top
+                contentHeight: transformControls.implicitHeight
                 contentWidth: transformControls.implicitWidth
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -294,14 +295,13 @@ ExpandingWindow {
                     id: transformControls
                     transformModel: TransformationModel {}
                     componentIndex: index
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                    anchors.fill: parent
                 }
             }
 
             GeometryControls {
                 id: geometryControls
-                anchors.top: transformFrame.bottom
+                anchors.bottom: pixelControls.top
                 anchors.right:parent.right
                 anchors.left: parent.left
                 onMeshChanged: pixelControls.restartMapping(geometryControls.geometryModel)
@@ -309,7 +309,7 @@ ExpandingWindow {
 
             PixelControls {
                 id: pixelControls
-                anchors.top: geometryControls.bottom
+                anchors.bottom: addButton.top
                 anchors.right:parent.right
                 anchors.left: parent.left
                 visible: state != ""
@@ -317,7 +317,7 @@ ExpandingWindow {
 
             PaddedButton {
                 id: addButton
-                anchors.top: pixelControls.bottom
+                anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 leftPadding: 0
                 text: "Add"
