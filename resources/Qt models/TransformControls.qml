@@ -20,9 +20,10 @@ Item {
     id: transformsItem
 
     height: relativePicker.height +
+            parentTransformPicker.height +
             transformsListContainer.height +
             addTranslate.height
-    implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth + parentTransformPicker.implicitWidth,
+    implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth,
                             transformsListContainer.implicitWidth,
                             addTranslate.implicitWidth + addRotate.implicitWidth)
     property TransformationModel transformModel
@@ -38,6 +39,8 @@ Item {
         id: relativePicker
         anchors.top: parent.top
         anchors.left: relativeLabel.right
+        anchors.right: parent.right
+        implicitWidth: 250
         // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
         model: (componentIndex == 0) ? components : filteredModel
         textRole: "name"
@@ -58,8 +61,9 @@ Item {
     }
     ComboBox {
         id: parentTransformPicker
-        anchors.top: relativePicker.top
-        anchors.left: relativePicker.right
+        anchors.top: relativePicker.bottom
+        anchors.left: relativePicker.left
+        anchors.right: relativePicker.right
         model: components.get_transform_model(transform_parent_index)
         textRole: "name"
         currentIndex: dependent_transform_index
@@ -68,7 +72,7 @@ Item {
 
     Frame {
         id: transformsListContainer
-        anchors.top: relativePicker.bottom
+        anchors.top: parentTransformPicker.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         contentWidth: transformsListView.implicitWidth
