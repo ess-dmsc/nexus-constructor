@@ -1,5 +1,6 @@
 from geometry_constructor import data_model
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from geometry_constructor.qml_models.transform_model import TransformationModel
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
@@ -115,7 +116,7 @@ def test_determine_pixel_state_produces_expected_strings():
             assert InstrumentModel.determine_pixel_state(component) == expected_states[i]
 
 
-def test_generate_matrix_combines_dependent_transforms():
+def build_model_with_sample_transforms():
     instrument = InstrumentModel()
     instrument.components.append(
         data_model.Component(
@@ -152,6 +153,13 @@ def test_generate_matrix_combines_dependent_transforms():
             ]
         )
     )
+    # Use replace_contents to build the required transform models
+    instrument.replace_contents(instrument.components)
+    return instrument
+
+
+def test_generate_matrix_combines_dependent_transforms():
+    instrument = build_model_with_sample_transforms()
 
     def rotate_matrix(matrix: QMatrix4x4, rotate: data_model.Rotation):
         matrix.rotate(rotate.angle,
@@ -185,3 +193,12 @@ def test_generate_matrix_combines_dependent_transforms():
     translate_matrix(target_matrix, instrument.components[3].transforms[1])
     translate_matrix(target_matrix, instrument.components[3].transforms[2])
     assert instrument.generate_matrix(instrument.components[3]) == target_matrix
+
+
+def test_transforms_deletable_set():
+    instrument = build_model_with_sample_transforms()
+
+    assert instrument.transform_models[0].deletable == []
+    assert instrument.transform_models[1].deletable == [False, True]
+    assert instrument.transform_models[2].deletable == [True, True]
+    assert instrument.transform_models[3].deletable == [True, True, True]

@@ -246,6 +246,7 @@ class InstrumentModel(QAbstractListModel):
         self.beginResetModel()
         self.components = components
         self.transform_models = [TransformationModel(component.transforms) for component in components]
+        self.update_transforms_deletable()
         self.endResetModel()
 
     def generate_mesh(self, component: Component):
