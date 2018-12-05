@@ -72,10 +72,7 @@ class InstrumentModel(QAbstractListModel):
                            [1, 7, 5, 3],
                            [6, 0, 2, 4]]
                 ))]
-        self.transform_models = [
-            TransformationModel(self.components[i].transforms)
-            for i in range(len(self.components))
-        ]
+        self.transform_models = [TransformationModel(component.transforms) for component in self.components]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.components)
