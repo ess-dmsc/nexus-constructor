@@ -1,6 +1,5 @@
 from geometry_constructor import data_model
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
-from geometry_constructor.qml_models.transform_model import TransformationModel
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
