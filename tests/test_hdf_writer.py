@@ -16,22 +16,33 @@ def assess_unit_length_3d_vector(vector, original):
 
 def make_instrument_with_sample_transform():
     instrument = InstrumentModel()
-    instrument.components[0].transforms = [
-        Rotation(name='rotate', axis=Vector(10, 11, 12), angle=45),
-        Translation(name='translate', vector=Vector(7, 8, 9))
-    ]
     instrument.components.append(Component(component_type=ComponentType.DETECTOR,
                                            name='detector1',
                                            transform_parent=instrument.components[0],
-                                           dependent_transform=instrument.components[0].transforms[0],
                                            transforms=[
                                                Rotation(name='rotate', axis=Vector(4, 5, 6), angle=90),
                                                Translation(name='translate', vector=Vector(1, 2, 3))
                                            ]))
+    instrument.components.append(Component(component_type=ComponentType.DETECTOR,
+                                           name='detector2',
+                                           transform_parent=instrument.components[1],
+                                           dependent_transform=instrument.components[1].transforms[0],
+                                           transforms=[
+                                               Translation(name='translate', vector=Vector(1, 2, 3)),
+                                               Rotation(name='rotate', axis=Vector(4, 5, 6), angle=90)
+                                           ]))
+    instrument.components.append(Component(component_type=ComponentType.DETECTOR,
+                                           name='detector3',
+                                           transform_parent=instrument.components[1],
+                                           transforms=[
+                                               Rotation(name='rotate', axis=Vector(4, 5, 6), angle=90),
+                                               Translation(name='translate', vector=Vector(1, 2, 3)),
+                                               Translation(name='translate2', vector=Vector(1, 2, 3))
+                                           ]))
     return instrument
 
 
-def test_save_root_component_translate():
+def test_saved_root_component_has_no_transforms():
     instrument = make_instrument_with_sample_transform()
     # use an in memory file to avoid disk usage during tests
     with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
@@ -39,34 +50,13 @@ def test_save_root_component_translate():
         sample = file['entry/instrument/Sample']
 
         assert sample.attrs['NX_class'] == 'NXsample'
-        assert sample.attrs['depends_on'] == 'translate'
+        assert sample.attrs['depends_on'] == '.'
 
-        sample_translate = sample['translate']
-        assert sample_translate[0] == approx(sqrt(sum(i**2 for i in [7, 8, 9])))
-        assert sample_translate.attrs['NX_class'] == 'NXtransformations'
-        assert sample_translate.attrs['transformation_type'] == 'translation'
-        assert sample_translate.attrs['units'] == 'm'
-        assess_unit_length_3d_vector(sample_translate.attrs['vector'], [7, 8, 9])
-        assert sample_translate.attrs['depends_on'] == 'rotate'
+        assert 'translate' not in sample
+        assert 'rotate' not in sample
 
 
-def test_save_root_component_rotate():
-    instrument = make_instrument_with_sample_transform()
-    # use an in memory file to avoid disk usage during tests
-    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
-        HdfWriter().save_instrument_to_file(file, instrument)
-        sample = file['entry/instrument/Sample']
-
-        sample_rotate = sample['rotate']
-        assert sample_rotate[0] == 45
-        assert sample_rotate.attrs['NX_class'] == 'NXtransformations'
-        assert sample_rotate.attrs['transformation_type'] == 'rotation'
-        assert sample_rotate.attrs['units'] == 'degrees'
-        assess_unit_length_3d_vector(sample_rotate.attrs['vector'], [10, 11, 12])
-        assert sample_rotate.attrs['depends_on'] == '.'
-
-
-def test_save_dependent_component_translate():
+def test_saved_component_translate():
     instrument = make_instrument_with_sample_transform()
     # use an in memory file to avoid disk usage during tests
     with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
@@ -85,7 +75,7 @@ def test_save_dependent_component_translate():
         assert detector_translate.attrs['depends_on'] == 'rotate'
 
 
-def test_save_dependent_component_rotate():
+def test_saved_component_rotate():
     instrument = make_instrument_with_sample_transform()
     # use an in memory file to avoid disk usage during tests
     with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
@@ -98,7 +88,31 @@ def test_save_dependent_component_rotate():
         assert detector_rotate.attrs['transformation_type'] == 'rotation'
         assert detector_rotate.attrs['units'] == 'degrees'
         assess_unit_length_3d_vector(detector_rotate.attrs['vector'], [4, 5, 6])
-        assert detector_rotate.attrs['depends_on'] == '/entry/instrument/Sample/rotate'
+        assert detector_rotate.attrs['depends_on'] == '.'
+
+
+def test_saved_instrument_dependencies():
+
+    instrument = make_instrument_with_sample_transform()
+    # use an in memory file to avoid disk usage during tests
+    with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
+        HdfWriter().save_instrument_to_file(file, instrument)
+
+        detector = file['entry/instrument/detector1']
+        assert detector.attrs['depends_on'] == 'translate'
+        assert detector['translate'].attrs['depends_on'] == 'rotate'
+        assert detector['rotate'].attrs['depends_on'] == '.'
+
+        detector = file['entry/instrument/detector2']
+        assert detector.attrs['depends_on'] == 'rotate'
+        assert detector['rotate'].attrs['depends_on'] == 'translate'
+        assert detector['translate'].attrs['depends_on'] == '/entry/instrument/detector1/rotate'
+
+        detector = file['entry/instrument/detector3']
+        assert detector.attrs['depends_on'] == 'translate2'
+        assert detector['translate2'].attrs['depends_on'] == 'translate'
+        assert detector['translate'].attrs['depends_on'] == 'rotate'
+        assert detector['rotate'].attrs['depends_on'] == '/entry/instrument/detector1/translate'
 
 
 def test_save_pixel_grid_coordinates():
