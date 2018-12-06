@@ -2,8 +2,8 @@ import json
 import jsonschema
 from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, PixelMapping, PixelGrid,\
     SinglePixelId, Vector, CountDirection, Corner, Translation, Rotation
-from geometry_constructor.json_writer import JsonWriter
-from geometry_constructor.json_loader import JsonLoader
+from geometry_constructor.json.json_writer import JsonWriter
+from geometry_constructor.json.json_loader import JsonLoader
 from geometry_constructor.qml_models.geometry_models import OFFModel
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QUrl

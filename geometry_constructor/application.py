@@ -6,8 +6,8 @@ Loading this module also registers with QML the required custom classes to load 
 
 import sys
 from os import path
-from geometry_constructor.json_loader import JsonLoader
-from geometry_constructor.json_writer import JsonWriter
+from geometry_constructor.json.json_loader import JsonLoader
+from geometry_constructor.json.json_writer import JsonWriter
 from geometry_constructor.qml_models.component_filters import SingleComponentModel, ExcludedComponentModel
 from geometry_constructor.qml_models.geometry_models import CylinderModel, OFFModel
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
