@@ -7,6 +7,10 @@ class NexusEncoder:
     """
 
     @staticmethod
+    def component_class_name(component: Component):
+        return 'NX{}'.format(component.component_type.name.lower())
+
+    @staticmethod
     def pixel_mapping(mapping: PixelMapping):
         """
         Returns a list of two item lists. Each sublist contains a face ID followed by the face's detector ID.

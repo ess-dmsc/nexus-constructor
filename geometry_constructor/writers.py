@@ -1,6 +1,6 @@
 import h5py
 from pprint import pprint
-from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, \
+from geometry_constructor.data_model import PixelGrid, PixelMapping, SinglePixelId, \
     Geometry, OFFGeometry, CylindricalGeometry, Component, Rotation, Translation
 from geometry_constructor.nexus import NexusEncoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
@@ -29,19 +29,21 @@ class HdfWriter(QObject):
         root = file.create_group('entry')
         root.attrs['NX_class'] = 'NXentry'
 
+        # Store the sample separately to the instrument
+        self.store_component(root, model.components[0])
+
         instrument = root.create_group('instrument')
         instrument.attrs['NX_class'] = 'NXinstrument'
 
-        for component in model.components:
-            nx_component = instrument.create_group(component.name)
-            self.store_transformations(nx_component, component)
-            nx_component.attrs['description'] = component.description
+        for component in model.components[1:]:
+            self.store_component(instrument, component)
 
-            if component.component_type == ComponentType.SAMPLE:
-                nx_component.attrs['NX_class'] = 'NXsample'
-            elif component.component_type == ComponentType.DETECTOR:
-                nx_component.attrs['NX_class'] = 'NXdetector'
-                self.store_pixel_data(nx_component, component)
+    def store_component(self, parent_group: h5py.Group, component: Component):
+        nx_component = parent_group.create_group(component.name)
+        nx_component.attrs['description'] = component.description
+        nx_component.attrs['NX_class'] = NexusEncoder.component_class_name(component)
+        self.store_transformations(nx_component, component)
+        self.store_pixel_data(nx_component, component)
 
     def store_transformations(self, nx_component: h5py.Group, component: Component):
         dependent_on = NexusEncoder.ancestral_dependent_transform(component)
@@ -81,6 +83,12 @@ class HdfWriter(QObject):
         # if it's a mapping
         elif isinstance(pixel_data, PixelMapping):
             self.store_pixel_mapping(nx_detector, component.geometry, pixel_data)
+        # if it's got a single pixel id
+        elif isinstance(pixel_data, SinglePixelId):
+            self.store_monitor_detector_id(nx_detector, component.geometry, pixel_data)
+        else:
+            geometry_group = nx_detector.create_group('geometry')
+            self.store_geometry(geometry_group, component.geometry)
 
     def store_pixel_grid(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelGrid):
         if pixel_data is not None:
@@ -114,6 +122,16 @@ class HdfWriter(QObject):
                 'detector_faces',
                 dtype='i',
                 data=NexusEncoder.pixel_mapping(pixel_data))
+
+    def store_monitor_detector_id(self, nx_monitor: h5py.Group, geometry: Geometry, pixel_data: SinglePixelId):
+        component_shape = nx_monitor.create_group('detector_shape')
+        self.store_geometry(component_shape, geometry)
+        # TODO: Replace this Mantid compatibility dataset, with the nexus standard's way (once it exists)
+        component_shape.create_dataset(
+            'detector_id',
+            dtype='i',
+            data=[pixel_data.pixel_id]
+        )
 
     def store_geometry(self, nx_group: h5py.Group, geometry: Geometry):
         if isinstance(geometry, OFFGeometry):

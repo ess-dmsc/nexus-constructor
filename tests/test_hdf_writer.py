@@ -47,7 +47,7 @@ def test_saved_root_component_has_no_transforms():
     # use an in memory file to avoid disk usage during tests
     with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
         HdfWriter().save_instrument_to_file(file, instrument)
-        sample = file['entry/instrument/Sample']
+        sample = file['entry/Sample']
 
         assert sample.attrs['NX_class'] == 'NXsample'
         assert sample.attrs['depends_on'] == '.'
