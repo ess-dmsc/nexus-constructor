@@ -1,7 +1,8 @@
 import h5py
 from pprint import pprint
-from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, CountDirection, Corner, \
+from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, \
     Geometry, OFFGeometry, CylindricalGeometry, Component, Rotation, Translation
+from geometry_constructor.nexus import NexusEncoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
 
@@ -43,29 +44,7 @@ class HdfWriter(QObject):
                 self.store_pixel_data(nx_component, component)
 
     def store_transformations(self, nx_component: h5py.Group, component: Component):
-        if component.transform_parent is None or component.transform_parent == component:
-            dependent_on = '.'
-        else:
-            dependent_on = '.'
-            dependent_found = False
-            no_dependent = False
-            ancestor = component.transform_parent
-            index = -1
-            if component.dependent_transform is not None:
-                index = component.transform_parent.transforms.index(component.dependent_transform)
-            while not (dependent_found or no_dependent):
-                if len(ancestor.transforms) > 0:
-                    dependent_on = '/entry/instrument/{}/{}'.format(ancestor.name,
-                                                                    ancestor.transforms[index].name)
-                    dependent_found = True
-                elif ancestor.transform_parent is None or ancestor.transform_parent == ancestor:
-                    no_dependent = True
-                else:
-                    if ancestor.dependent_transform is None:
-                        index = -1
-                    else:
-                        index = component.transform_parent.transforms.index(component.dependent_transform)
-                    ancestor = ancestor.transform_parent
+        dependent_on = NexusEncoder.ancestral_dependent_transform(component)
 
         for i in range(len(component.transforms)):
             transform = component.transforms[i]
@@ -110,35 +89,22 @@ class HdfWriter(QObject):
 
         nx_detector.create_dataset(
             'x_pixel_offset',
-            data=[[x * pixel_data.col_width for x in range(pixel_data.columns)]] * pixel_data.rows)
+            data=NexusEncoder.pixel_grid_x_offsets(pixel_data))
 
         nx_detector.create_dataset(
             'y_pixel_offset',
-            data=[[y * pixel_data.row_height] * pixel_data.columns for y in range(pixel_data.rows)])
+            data=NexusEncoder.pixel_grid_y_offsets(pixel_data))
 
         nx_detector.create_dataset(
             'z_pixel_offset',
-            data=[[0] * pixel_data.columns] * pixel_data.rows)
+            data=NexusEncoder.pixel_grid_z_offsets(pixel_data))
 
-        detector_numbers = nx_detector.create_dataset(
+        nx_detector.create_dataset(
             'detector_number',
             shape=(pixel_data.rows, pixel_data.columns),
-            dtype='i')
-        for id_offset in range(pixel_data.rows * pixel_data.columns):
-            # Determine a coordinate for the id based on the count direction from (0,0)
-            if pixel_data.count_direction == CountDirection.ROW:
-                col = id_offset % pixel_data.columns
-                row = id_offset // pixel_data.columns
-            else:
-                col = id_offset // pixel_data.rows
-                row = id_offset % pixel_data.rows
-            # Invert axes needed if starting in a different corner
-            if pixel_data.initial_count_corner in (Corner.TOP_LEFT, Corner.TOP_RIGHT):
-                row = pixel_data.rows - (1 + row)
-            if pixel_data.initial_count_corner in (Corner.TOP_RIGHT, Corner.BOTTOM_RIGHT):
-                col = pixel_data.columns - (1 + col)
-            # Set the id at the calculated coordinate
-            detector_numbers[row, col] = pixel_data.first_id + id_offset
+            dtype='i',
+            data=NexusEncoder.pixel_grid_detector_ids(pixel_data)
+        )
 
     def store_pixel_mapping(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelMapping):
         if pixel_data is not None:
@@ -147,10 +113,7 @@ class HdfWriter(QObject):
             detector_shape.create_dataset(
                 'detector_faces',
                 dtype='i',
-                data=[[face_id, pixel_data.pixel_ids[face_id]]
-                      for face_id
-                      in range(len(pixel_data.pixel_ids))
-                      if pixel_data.pixel_ids[face_id] is not None])
+                data=NexusEncoder.pixel_mapping(pixel_data))
 
     def store_geometry(self, nx_group: h5py.Group, geometry: Geometry):
         if isinstance(geometry, OFFGeometry):
