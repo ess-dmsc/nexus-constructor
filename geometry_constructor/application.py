@@ -8,6 +8,7 @@ import sys
 from os import path
 from geometry_constructor.json.json_loader import JsonLoader
 from geometry_constructor.json.json_writer import JsonWriter
+from geometry_constructor.nexus_json.writer import Writer
 from geometry_constructor.qml_models.component_filters import SingleComponentModel, ExcludedComponentModel
 from geometry_constructor.qml_models.geometry_models import CylinderModel, OFFModel
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
@@ -36,6 +37,7 @@ qmlRegisterType(TransformationModel, 'MyModels', 1, 0, 'TransformationModel')
 
 qmlRegisterType(JsonLoader, 'MyJson', 1, 0, 'JsonLoader')
 qmlRegisterType(JsonWriter, 'MyJson', 1, 0, 'JsonWriter')
+qmlRegisterType(Writer, 'MyJson', 1, 0, 'NexusWriter')
 
 qmlRegisterType(NameValidator, 'MyValidators', 1, 0, 'NameValidator')
 qmlRegisterType(NullableIntValidator, 'MyValidators', 1, 0, 'NullableIntValidator')

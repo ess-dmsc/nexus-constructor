@@ -28,6 +28,10 @@ ApplicationWindow {
                 onTriggered: jsonSaveDialog.open()
             }
             Action {
+                text: "Export to FileWriter"
+                onTriggered: nexusSaveDialog.open()
+            }
+            Action {
                 text: "Export to NeXus file"
                 onTriggered: nexusFileDialog.open()
             }
@@ -166,6 +170,10 @@ ApplicationWindow {
         id: jsonLoader
     }
 
+    NexusWriter {
+        id: nexusWriter
+    }
+
     FileDialog {
         id: nexusFileDialog
         title: "Choose a file to write to"
@@ -189,5 +197,14 @@ ApplicationWindow {
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
         onAccepted: jsonLoader.load_file_into_instrument_model(fileUrl, components)
+    }
+
+    FileDialog {
+        id: nexusSaveDialog
+        title: "Save FileWriter json to"
+        nameFilters: ["JSON file (*.json)"]
+        defaultSuffix: "json"
+        selectExisting: false
+        onAccepted: nexusWriter.save_json(fileUrl, components)
     }
 }
