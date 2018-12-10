@@ -1,4 +1,4 @@
-from geometry_constructor.data_model import Component, PixelGrid, PixelMapping, CountDirection, Corner
+from geometry_constructor.data_model import Component, ComponentType, PixelGrid, PixelMapping, CountDirection, Corner
 
 
 class NexusEncoder:
@@ -7,8 +7,8 @@ class NexusEncoder:
     """
 
     @staticmethod
-    def component_class_name(component: Component):
-        return 'NX{}'.format(component.component_type.name.lower())
+    def component_class_name(component_type: ComponentType):
+        return 'NX{}'.format(component_type.name.lower())
 
     @staticmethod
     def pixel_mapping(mapping: PixelMapping):

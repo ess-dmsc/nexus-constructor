@@ -41,7 +41,7 @@ class HdfWriter(QObject):
     def store_component(self, parent_group: h5py.Group, component: Component):
         nx_component = parent_group.create_group(component.name)
         nx_component.attrs['description'] = component.description
-        nx_component.attrs['NX_class'] = NexusEncoder.component_class_name(component)
+        nx_component.attrs['NX_class'] = NexusEncoder.component_class_name(component.component_type)
         self.store_transformations(nx_component, component)
         self.store_pixel_data(nx_component, component)
 

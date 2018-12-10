@@ -62,7 +62,7 @@ class Writer(QObject):
             'type': 'group',
             'name': component.name,
             'attributes': {
-                'NX_class': component.component_type.nexus_class,
+                'NX_class': NexusEncoder.component_class_name(component.component_type),
                 'description': component.description,
             },
             'children': []
