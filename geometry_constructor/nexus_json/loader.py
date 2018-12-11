@@ -1,36 +1,19 @@
-import json
-from PySide2.QtCore import QObject, QUrl, Slot
 from geometry_constructor.data_model import Component, ComponentType, Rotation, Translation, Vector, OFFGeometry,\
     CylindricalGeometry, SinglePixelId
 from geometry_constructor.nexus import NexusEncoder, NexusDecoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
-class Loader(QObject):
+class Loader:
     """
     Loads data from a nexus FileWriter JSON command into an InstrumentModel
     """
 
-    @Slot(QUrl, 'QVariant')
-    def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
-        """
-        Loads a nexus filewriter json file into an instrument model
-
-        :param file_url: The url of the file to load
-        :param model: The model that the loaded components will be stored in
-        """
-        filename = file_url.toString(options=QUrl.PreferLocalFile)
-        with open(filename, 'r') as file:
-            json_data = file.read()
-        Loader.load_json_into_instrument_model(json_data, model)
-
     @staticmethod
-    def load_json_into_instrument_model(json_data: str, model: InstrumentModel):
-        data = json.loads(json_data)
-
+    def load_json_into_instrument_model(json_data: dict, model: InstrumentModel):
         nx_instrument = None
         nx_sample = None
-        for child in data['nexus_structure']['children']:
+        for child in json_data['nexus_structure']['children']:
             if Loader.has_nx_class(child):
                 if child['attributes']['NX_class'] == 'NXinstrument':
                     nx_instrument = child

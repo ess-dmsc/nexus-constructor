@@ -1,29 +1,15 @@
 import json
-from PySide2.QtCore import QObject, QUrl, Slot
 from geometry_constructor.data_model import Component, Translation, Rotation, CylindricalGeometry, OFFGeometry,\
     PixelGrid, PixelMapping, SinglePixelId
 from geometry_constructor.nexus import NexusEncoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
-class Writer(QObject):
+class Writer:
     """
     Loads data from a nexus FileWriter JSON command into an InstrumentModel
     Format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
     """
-
-    @Slot(QUrl, 'QVariant')
-    def save_json(self, file_url: QUrl, model: InstrumentModel):
-        """
-        Writes a json file containing a representation of an InstrumentModel
-
-        :param file_url: The url to save the json file to
-        :param model: The model to generate the json from
-        """
-        filename = file_url.toString(options=QUrl.PreferLocalFile)
-        json_data = Writer.generate_json(model)
-        with open(filename, 'w') as file:
-            file.write(json_data)
 
     @staticmethod
     def generate_json(model: InstrumentModel):

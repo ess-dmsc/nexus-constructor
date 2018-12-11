@@ -1,12 +1,10 @@
-import json
-from PySide2.QtCore import QObject, QUrl, Slot
 from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
     PixelMapping, SinglePixelId, CountDirection, Corner, Vector, Translation, Rotation
 from geometry_constructor.nexus import NexusDecoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
-class JsonLoader(QObject):
+class JsonLoader:
     """
     Loads json produced by the JsonWriter class back into an InstrumentModel
 
@@ -23,20 +21,8 @@ class JsonLoader(QObject):
         # transform_id -> dependent transform index
         self.dependent_indexes = {}
 
-    @Slot(QUrl, 'QVariant')
-    def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
-        """
-        Loads a json file into an instrument model
 
-        :param file_url: The url of the file to load
-        :param model: The model that the loaded components will be stored in
-        """
-        filename = file_url.toString(options=QUrl.PreferLocalFile)
-        with open(filename, 'r') as file:
-            json_data = file.read()
-        self.load_json_into_instrument_model(json_data, model)
-
-    def load_json_into_instrument_model(self, json_data: str, model: InstrumentModel):
+    def load_json_object_into_instrument_model(self, json_data: dict, model: InstrumentModel):
         """
         Loads a json string into an instrument model
 
@@ -48,10 +34,9 @@ class JsonLoader(QObject):
         self.transform_parent_ids = {}
         self.dependent_indexes = {}
         # Build the sample and components from the data
-        data = json.loads(json_data)
-        sample = self.build_component(data['sample'])
+        sample = self.build_component(json_data['sample'])
         components = [sample]
-        for component_data in data['components']:
+        for component_data in json_data['components']:
             components.append(self.build_component(component_data))
         # Set transform parent links
         for (child_id, parent_id) in self.transform_parent_ids.items():

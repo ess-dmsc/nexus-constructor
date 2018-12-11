@@ -154,24 +154,16 @@ ApplicationWindow {
         id: hdfWriter
     }
 
-    JsonWriter {
-        id: jsonWriter
+    JsonConnector {
+        id: jsonConnector
         Component.onCompleted: {
             // When the model updates, request new json
-            components.model_updated.connect(jsonWriter.request_model_json)
+            components.model_updated.connect(jsonConnector.request_geometry_constructor_json)
             // When requested json is produced, update the model with it
-            jsonWriter.requested_model_json.connect(jsonModel.set_json)
+            jsonConnector.requested_geometry_constructor_json.connect(jsonModel.set_json)
             // Request initial json
-            jsonWriter.request_model_json(components)
+            request_geometry_constructor_json(components)
         }
-    }
-
-    JsonLoader {
-        id: jsonLoader
-    }
-
-    NexusWriter {
-        id: nexusWriter
     }
 
     FileDialog {
@@ -189,14 +181,14 @@ ApplicationWindow {
         nameFilters: ["JSON file (*.json)"]
         defaultSuffix: "json"
         selectExisting: false
-        onAccepted: jsonWriter.save_json(fileUrl, components)
+        onAccepted: jsonConnector.save_to_geometry_constructor_json(fileUrl, components)
     }
 
     FileDialog {
         id: jsonLoadDialog
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
-        onAccepted: jsonLoader.load_file_into_instrument_model(fileUrl, components)
+        onAccepted: jsonConnector.load_file_into_instrument_model(fileUrl, components)
     }
 
     FileDialog {
@@ -205,6 +197,6 @@ ApplicationWindow {
         nameFilters: ["JSON file (*.json)"]
         defaultSuffix: "json"
         selectExisting: false
-        onAccepted: nexusWriter.save_json(fileUrl, components)
+        onAccepted: jsonConnector.save_to_filewriter_json(fileUrl, components)
     }
 }
