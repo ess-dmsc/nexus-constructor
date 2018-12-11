@@ -12,16 +12,6 @@ class JsonLoader:
     transform_parent_ids is a mapping of transform_id numbers of components to the transform_id of their parent
     """
 
-    def __init__(self):
-        super().__init__()
-        # transform_id -> component
-        self.transform_id_mapping = {}
-        # transform_id -> parent's transform_id
-        self.transform_parent_ids = {}
-        # transform_id -> dependent transform index
-        self.dependent_indexes = {}
-
-
     def load_json_object_into_instrument_model(self, json_data: dict, model: InstrumentModel):
         """
         Loads a json string into an instrument model
@@ -29,22 +19,34 @@ class JsonLoader:
         :param json_data: String containing the json data to load
         :param model: The model the loaded components will be stored in
         """
-        # Reset the transform mappings
-        self.transform_id_mapping = {}
-        self.transform_parent_ids = {}
-        self.dependent_indexes = {}
         # Build the sample and components from the data
-        sample = self.build_component(json_data['sample'])
+        sample, transform_id, _, _ = self.build_component(json_data['sample'])
+
+        # transform_id -> component
+        transform_id_mapping = {
+            transform_id: sample
+        }
+        # transform_id -> parent's transform_id
+        transform_parent_ids = {}
+        # transform_id -> dependent transform index
+        dependent_indexes = {}
+
         components = [sample]
         for component_data in json_data['components']:
-            components.append(self.build_component(component_data))
+            component, transform_id, transform_parent_id, dependent_index = self.build_component(component_data)
+            components.append(component)
+            transform_id_mapping[transform_id] = component
+            if transform_parent_id is not None:
+                transform_parent_ids[transform_id] = transform_parent_id
+                if dependent_index is not None:
+                    dependent_indexes[transform_id] = dependent_index
         # Set transform parent links
-        for (child_id, parent_id) in self.transform_parent_ids.items():
-            child = self.transform_id_mapping[child_id]
-            parent = self.transform_id_mapping[parent_id]
+        for (child_id, parent_id) in transform_parent_ids.items():
+            child = transform_id_mapping[child_id]
+            parent = transform_id_mapping[parent_id]
             child.transform_parent = parent
-            if child_id in self.dependent_indexes:
-                dependent_index = self.dependent_indexes[child_id]
+            if child_id in dependent_indexes:
+                dependent_index = dependent_indexes[child_id]
                 child.dependent_transform = parent.transforms[dependent_index]
 
         model.replace_contents(components)
@@ -104,12 +106,13 @@ class JsonLoader:
 
         component.geometry = self.build_geometry(json_obj['geometry'])
         transform_id = json_obj['transform_id']
-        self.transform_id_mapping[transform_id] = component
+        transform_parent_id = None
+        dependent_index = None
         if 'transform_parent_id' in json_obj:
-            self.transform_parent_ids[transform_id] = json_obj['transform_parent_id']
+            transform_parent_id = json_obj['transform_parent_id']
             if 'parent_transform_index' in json_obj:
-                self.dependent_indexes[transform_id] = json_obj['parent_transform_index']
-        return component
+                dependent_index = json_obj['parent_transform_index']
+        return component, transform_id, transform_parent_id, dependent_index
 
     def build_geometry(self, geometry_obj: dict):
         """
