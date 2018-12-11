@@ -2,6 +2,7 @@ import json
 from PySide2.QtCore import QObject, QUrl, Slot
 from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
     PixelMapping, SinglePixelId, CountDirection, Corner, Vector, Translation, Rotation
+from geometry_constructor.nexus import NexusDecoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
@@ -136,13 +137,11 @@ class JsonLoader(QObject):
             return None
         elif geometry_obj['type'] == 'OFF':
             wound_faces = geometry_obj['faces']
-            face_indices = geometry_obj['winding_order'] + [len(wound_faces)]
+            face_indices = geometry_obj['winding_order']
             return OFFGeometry(vertices=[Vector(vertex[0], vertex[1], vertex[2])
                                          for vertex
                                          in geometry_obj['vertices']],
-                               faces=[wound_faces[face_indices[i]:face_indices[i+1]]
-                                      for i
-                                      in range(len(face_indices) - 1)])
+                               faces=NexusDecoder.unwound_off_faces(wound_faces, face_indices))
         elif geometry_obj['type'] == 'Cylinder':
             axis_direction = Vector(geometry_obj['axis_direction']['x'],
                                     geometry_obj['axis_direction']['y'],
