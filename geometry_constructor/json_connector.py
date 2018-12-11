@@ -1,9 +1,7 @@
 from PySide2.QtCore import QObject, QUrl, Slot, Signal
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
-from geometry_constructor.geometry_constructor_json.loader import JsonLoader as GCJsonLoader
-from geometry_constructor.geometry_constructor_json.writer import JsonWriter as GCJsonWriter
-from geometry_constructor.nexus_filewriter_json.loader import Loader as NexusJsonLoader
-from geometry_constructor.nexus_filewriter_json.writer import Writer as NexusJsonWriter
+import geometry_constructor.geometry_constructor_json as gc_json
+import geometry_constructor.nexus_filewriter_json as nf_json
 import json
 import jsonschema
 
@@ -30,18 +28,18 @@ class JsonConnector(QObject):
             geometry_constructor_json = False
 
         if geometry_constructor_json:
-            GCJsonLoader.load_json_object_into_instrument_model(data, model)
+            gc_json.load_json_object_into_instrument_model(data, model)
         else:
-            NexusJsonLoader.load_json_into_instrument_model(data, model)
+            nf_json.load_json_object_into_instrument_model(data, model)
 
     @Slot(QUrl, 'QVariant')
     def save_to_filewriter_json(self, file_url: QUrl, model: InstrumentModel):
-        json_string = NexusJsonWriter.generate_json(model)
+        json_string = nf_json.generate_json(model)
         self.save_to_file(json_string, file_url)
 
     @Slot(QUrl, 'QVariant')
     def save_to_geometry_constructor_json(self, file_url: QUrl, model: InstrumentModel):
-        json_string = GCJsonWriter.generate_json(model)
+        json_string = gc_json.generate_json(model)
         self.save_to_file(json_string, file_url)
 
     @staticmethod
@@ -54,10 +52,10 @@ class JsonConnector(QObject):
 
     @Slot('QVariant')
     def request_geometry_constructor_json(self, model: InstrumentModel):
-        self.requested_geometry_constructor_json.emit(GCJsonWriter.generate_json(model))
+        self.requested_geometry_constructor_json.emit(gc_json.generate_json(model))
 
     requested_filewriter_json = Signal(str)
 
     @Slot('QVariant')
     def request_filewriter_json(self, model: InstrumentModel):
-        self.request_filewriter_json.emit(NexusJsonWriter.generate_json(model))
+        self.requested_filewriter_json.emit(nf_json.generate_json(model))
