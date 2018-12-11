@@ -1,5 +1,5 @@
-from geometry_constructor.nexus_json.loader import Loader
-from geometry_constructor.nexus_json.writer import Writer
+from geometry_constructor.nexus_filewriter_json.loader import Loader
+from geometry_constructor.nexus_filewriter_json.writer import Writer
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 from tests.test_json import build_sample_model
 import json

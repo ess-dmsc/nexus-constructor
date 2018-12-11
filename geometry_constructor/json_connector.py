@@ -1,9 +1,9 @@
 from PySide2.QtCore import QObject, QUrl, Slot, Signal
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
-from geometry_constructor.json.json_loader import JsonLoader as GCJsonLoader
-from geometry_constructor.json.json_writer import JsonWriter as GCJsonWriter
-from geometry_constructor.nexus_json.loader import Loader as NexusJsonLoader
-from geometry_constructor.nexus_json.writer import Writer as NexusJsonWriter
+from geometry_constructor.geometry_constructor_json.loader import JsonLoader as GCJsonLoader
+from geometry_constructor.geometry_constructor_json.writer import JsonWriter as GCJsonWriter
+from geometry_constructor.nexus_filewriter_json.loader import Loader as NexusJsonLoader
+from geometry_constructor.nexus_filewriter_json.writer import Writer as NexusJsonWriter
 import json
 import jsonschema
 
