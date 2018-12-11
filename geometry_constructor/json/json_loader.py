@@ -7,12 +7,10 @@ from geometry_constructor.qml_models.instrument_model import InstrumentModel
 class JsonLoader:
     """
     Loads json produced by the JsonWriter class back into an InstrumentModel
-
-    transform_id_mapping is a mapping of components transform_id numbers to the component objects
-    transform_parent_ids is a mapping of transform_id numbers of components to the transform_id of their parent
     """
 
-    def load_json_object_into_instrument_model(self, json_data: dict, model: InstrumentModel):
+    @staticmethod
+    def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
         """
         Loads a json string into an instrument model
 
@@ -20,7 +18,7 @@ class JsonLoader:
         :param model: The model the loaded components will be stored in
         """
         # Build the sample and components from the data
-        sample, transform_id, _, _ = self.build_component(json_data['sample'])
+        sample, transform_id, _, _ = JsonLoader.build_component(json_data['sample'])
 
         # transform_id -> component
         transform_id_mapping = {
@@ -33,7 +31,7 @@ class JsonLoader:
 
         components = [sample]
         for component_data in json_data['components']:
-            component, transform_id, transform_parent_id, dependent_index = self.build_component(component_data)
+            component, transform_id, transform_parent_id, dependent_index = JsonLoader.build_component(component_data)
             components.append(component)
             transform_id_mapping[transform_id] = component
             if transform_parent_id is not None:
@@ -51,12 +49,17 @@ class JsonLoader:
 
         model.replace_contents(components)
 
-    def build_component(self, json_obj: dict):
+    @staticmethod
+    def build_component(json_obj: dict):
         """
         Builds a component object from a dictionary containing its properties
 
+        If the relevant parameters aren't set in the object, the parent's transform id, and dependent transform index
+        will be None
+
         :param json_obj: the dictionary built from json
-        :return: the loaded, populated component
+        :return: A tuple of the loaded and populated component, the transform_id, the transform_id of its parent, and
+        the index of the transform in the parent that it's dependent on
         """
         component_type = ComponentType(json_obj['type'])
 
@@ -104,7 +107,7 @@ class JsonLoader:
                                                                       transform['vector']['y'],
                                                                       transform['vector']['z'])))
 
-        component.geometry = self.build_geometry(json_obj['geometry'])
+        component.geometry = JsonLoader.build_geometry(json_obj['geometry'])
         transform_id = json_obj['transform_id']
         transform_parent_id = None
         dependent_index = None
@@ -114,7 +117,8 @@ class JsonLoader:
                 dependent_index = json_obj['parent_transform_index']
         return component, transform_id, transform_parent_id, dependent_index
 
-    def build_geometry(self, geometry_obj: dict):
+    @staticmethod
+    def build_geometry(geometry_obj: dict):
         """
         Builds and returns a Geometry instance based on the dictionary describing it
 

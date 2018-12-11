@@ -30,7 +30,7 @@ class JsonConnector(QObject):
             geometry_constructor_json = False
 
         if geometry_constructor_json:
-            GCJsonLoader().load_json_object_into_instrument_model(data, model)
+            GCJsonLoader.load_json_object_into_instrument_model(data, model)
         else:
             NexusJsonLoader.load_json_into_instrument_model(data, model)
 
@@ -41,7 +41,7 @@ class JsonConnector(QObject):
 
     @Slot(QUrl, 'QVariant')
     def save_to_geometry_constructor_json(self, file_url: QUrl, model: InstrumentModel):
-        json_string = GCJsonWriter().generate_json(model)
+        json_string = GCJsonWriter.generate_json(model)
         self.save_to_file(json_string, file_url)
 
     @staticmethod
@@ -54,7 +54,7 @@ class JsonConnector(QObject):
 
     @Slot('QVariant')
     def request_geometry_constructor_json(self, model: InstrumentModel):
-        self.requested_geometry_constructor_json.emit(GCJsonWriter().generate_json(model))
+        self.requested_geometry_constructor_json.emit(GCJsonWriter.generate_json(model))
 
     requested_filewriter_json = Signal(str)
 

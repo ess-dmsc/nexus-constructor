@@ -10,19 +10,21 @@ class JsonWriter:
     Converts the data from an InstrumentModel instance to json
     """
 
-    def generate_json(self, model: InstrumentModel):
+    @staticmethod
+    def generate_json(model: InstrumentModel):
         """
         Returns a formatted json string built from a given InstrumentModel
 
         :param model: The model to generate a json representation of
         :return: A string containing a json representation of the model"""
         data = {
-            'sample': self.build_component_dictionary(model.components[0], model),
-            'components': self.build_components_list(model)
+            'sample': JsonWriter.build_component_dictionary(model.components[0], model),
+            'components': JsonWriter.build_components_list(model)
         }
         return json.dumps(data, indent=2)
 
-    def build_components_list(self, model: InstrumentModel):
+    @staticmethod
+    def build_components_list(model: InstrumentModel):
         """
         Builds a list of dictionaries for the non sample components in the InstrumentModel
 
@@ -31,11 +33,12 @@ class JsonWriter:
         """
         data = []
         for component in model.components[1:]:
-            component_data = self.build_component_dictionary(component, model)
+            component_data = JsonWriter.build_component_dictionary(component, model)
             data.append(component_data)
         return data
 
-    def build_component_dictionary(self, component: Component, model: InstrumentModel):
+    @staticmethod
+    def build_component_dictionary(component: Component, model: InstrumentModel):
         """
         Builds a dictionary containing the data for a component in the model
 
@@ -48,12 +51,12 @@ class JsonWriter:
             'description': component.description,
             'type': component.component_type.value,
             'transform_id': model.components.index(component),
-            'transforms': self.build_transform_list(component.transforms),
-            'geometry': self.build_geometry_dictionary(component.geometry)
+            'transforms': JsonWriter.build_transform_list(component.transforms),
+            'geometry': JsonWriter.build_geometry_dictionary(component.geometry)
         }
 
         if component.pixel_data is not None:
-            self.add_pixel_info_to_dictionary(data, component)
+            JsonWriter.add_pixel_info_to_dictionary(data, component)
 
         parent = component.transform_parent
         if parent is not None and parent != component:
@@ -65,7 +68,8 @@ class JsonWriter:
 
         return data
 
-    def build_transform_list(self, transforms: List[Transformation]):
+    @staticmethod
+    def build_transform_list(transforms: List[Transformation]):
         data = []
         for transform in transforms:
             if isinstance(transform, Translation):
@@ -99,7 +103,8 @@ class JsonWriter:
                 )
         return data
 
-    def add_pixel_info_to_dictionary(self, json_data: dict, detector: Component):
+    @staticmethod
+    def add_pixel_info_to_dictionary(json_data: dict, detector: Component):
         """
         Adds detector specific information to a component's data dictionary
 
@@ -130,7 +135,8 @@ class JsonWriter:
         elif isinstance(pixels, SinglePixelId):
             json_data['pixel_id'] = pixels.pixel_id
 
-    def build_geometry_dictionary(self, geometry: Geometry):
+    @staticmethod
+    def build_geometry_dictionary(geometry: Geometry):
         """
         Builds a dictionary containing geometry information for converting to json
 
