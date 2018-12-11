@@ -23,7 +23,7 @@ def test_nexus_json_generation_and_loading_is_consistent():
     json_string = Writer.generate_json(instrument_model)
 
     loader_model = InstrumentModel()
-    Loader.load_json_into_instrument_model(json_string, loader_model)
+    Loader.load_json_into_instrument_model(json.loads(json_string), loader_model)
 
     loaded_json = Writer.generate_json(loader_model)
 

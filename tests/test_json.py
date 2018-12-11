@@ -102,10 +102,10 @@ def test_loading_generated_json():
 
     assert model.components == model.components
 
-    json = JsonWriter().generate_json(model)
+    json_string = JsonWriter().generate_json(model)
 
     loaded_model = InstrumentModel()
-    JsonLoader().load_json_string_into_instrument_model(json, loaded_model)
+    JsonLoader().load_json_object_into_instrument_model(json.loads(json_string), loaded_model)
 
     assert model.components == loaded_model.components
 
