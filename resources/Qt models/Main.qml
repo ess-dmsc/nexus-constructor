@@ -16,6 +16,8 @@ ApplicationWindow {
     minimumWidth: windowPane.implicitWidth
     minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
 
+    property string jsonMode: "liveFW"
+
     menuBar: MenuBar {
         Menu {
             title: "File"
@@ -38,6 +40,37 @@ ApplicationWindow {
             Action {
                 text: "Write to console"
                 onTriggered: hdfWriter.print_instrument_to_console(components)
+            }
+        }
+        Menu {
+            title: "JSON"
+            ActionGroup {
+                id: jsonGroup
+            }
+            Action {
+                checked: true
+                checkable: true
+                text: "Show Nexus FileWriter JSON"
+                onTriggered: {
+                    jsonMode = "liveFW"
+                    jsonConnector.request_filewriter_json(components)
+                }
+                ActionGroup.group: jsonGroup
+            }
+            Action {
+                checkable: true
+                text: "Show Geometry Constructor JSON"
+                onTriggered: {
+                    jsonMode = "liveGC"
+                    jsonConnector.request_geometry_constructor_json(components)
+                }
+                ActionGroup.group: jsonGroup
+            }
+            Action {
+                checkable: true
+                text: "Hide JSON display"
+                onTriggered: jsonMode = "hidden"
+                ActionGroup.group: jsonGroup
             }
         }
     }
@@ -135,6 +168,12 @@ ApplicationWindow {
                     }
                 }
             }
+
+            states: State {
+                name: "hidden"; when: jsonMode == "hidden"
+                PropertyChanges { target: jsonPane; visible: false }
+                PropertyChanges { target: jsonPane; width: 0 }
+            }
         }
     }
 
@@ -157,13 +196,23 @@ ApplicationWindow {
     JsonConnector {
         id: jsonConnector
         Component.onCompleted: {
-            // When the model updates, request new json
-            components.model_updated.connect(jsonConnector.request_geometry_constructor_json)
-            // When requested json is produced, update the model with it
+            // When requested json is produced, update the json model with it
             jsonConnector.requested_geometry_constructor_json.connect(jsonModel.set_json)
+            jsonConnector.requested_filewriter_json.connect(jsonModel.set_json)
             // Request initial json
-            request_geometry_constructor_json(components)
+            request_filewriter_json(components)
         }
+    }
+    // When the model updates, request new json for the view if desired
+    Connections {
+        target: components
+        onModel_updated: jsonConnector.request_filewriter_json(components)
+        enabled: jsonMode == "liveFW"
+    }
+    Connections {
+        target: components
+        onModel_updated: jsonConnector.request_geometry_constructor_json(components)
+        enabled: jsonMode == "liveGC"
     }
 
     FileDialog {
