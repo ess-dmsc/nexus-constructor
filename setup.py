@@ -17,7 +17,12 @@ build_exe_options = {'packages': ['numpy.core._methods',
                                   'pytest-cov',
                                   'pytest-qt',
                                   ],
-                     'include_files': ['resources']}
+                     'include_files':
+                         [
+                             'resources',
+                             'Instrument.schema.json',
+                         ],
+                     }
 
 unix_removable = ['lib/PySide2/Qt/lib/libQt5WebEngine.so.5',
                   'lib/PySide2/Qt/lib/libQt5WebEngineCore.so.5',
