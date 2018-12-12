@@ -67,13 +67,13 @@ def add_transform_data(json_data: dict, component: Component):
     for transform in component.transforms:
         if isinstance(transform, Rotation):
             type_name = 'rotation'
-            units = 'degrees',
-            vector = transform.axis.xyz_list
+            units = 'degrees'
+            vector = transform.axis.unit_list if transform.axis.magnitude != 0 else [0, 0, 0]
             value = transform.angle
         elif isinstance(transform, Translation):
             type_name = 'translation'
             units = 'm'
-            vector = transform.vector.unit_list
+            vector = transform.vector.unit_list if transform.vector.magnitude != 0 else [0, 0, 0]
             value = transform.vector.magnitude
         else:
             continue
@@ -86,14 +86,34 @@ def add_transform_data(json_data: dict, component: Component):
                     'type': 'float',
                     'size': [1],
                 },
-                'attributes': {
-                    'NX_class': 'NXtransformations',
-                    'transformation_type': type_name,
-                    'depends_on': dependent_on,
-                    'units': units,
-                    'offset': [0.0, 0.0, 0.0],
-                    'vector': vector,
-                },
+                'attributes': [
+                    {
+                        'name': 'NX_class',
+                        'values': 'NXtransformations',
+                    },
+                    {
+                        'name': 'transformation_type',
+                        'values': type_name,
+                    },
+                    {
+                        'name': 'depends_on',
+                        'values': dependent_on,
+                    },
+                    {
+                        'name': 'units',
+                        'values': units,
+                    },
+                    {
+                        'name': 'offset',
+                        'values': [0.0, 0.0, 0.0],
+                        'type': 'float',
+                    },
+                    {
+                        'name': 'vector',
+                        'values': vector,
+                        'type': 'float',
+                    },
+                ],
                 'values': value,
             }
         )

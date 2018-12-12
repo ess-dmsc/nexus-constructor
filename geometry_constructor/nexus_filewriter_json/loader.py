@@ -24,9 +24,9 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
     nx_sample = None
     for child in json_data['nexus_structure']['children']:
         if has_nx_class(child):
-            if child['attributes']['NX_class'] == 'NXinstrument':
+            if attribute_value(child, 'NX_class') == 'NXinstrument':
                 nx_instrument = child
-            elif child['attributes']['NX_class'] == 'NXsample':
+            elif attribute_value(child, 'NX_class') == 'NXsample':
                 nx_sample = child
 
     components = []
@@ -50,7 +50,7 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
     }
 
     for child in nx_instrument['children']:
-        if has_nx_class(child) and child['attributes']['NX_class'] in component_classes:
+        if has_nx_class(child) and attribute_value(child, 'NX_class') in component_classes:
             component, parent_name, dependent_transform_name = generate_component(child)
             components.append(component)
             parent_names.append(parent_name)
@@ -76,7 +76,27 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
 
 def has_nx_class(json_object: dict):
     """Returns whether a json object has a nexus class"""
-    return 'attributes' in json_object and 'NX_class' in json_object['attributes']
+    if 'attributes' in json_object:
+        attributes = json_object['attributes']
+        if isinstance(attributes, list):
+            for attribute in attributes:
+                if attribute['name'] == 'NX_class':
+                    return True
+        elif isinstance(attributes, dict):
+            return 'NX_class' in attributes
+    return False
+
+
+def attribute_value(json_object: dict, attribute_name: str):
+    if 'attributes' in json_object:
+        attributes = json_object['attributes']
+        if isinstance(attributes, list):
+            for attribute in attributes:
+                if attribute['name'] == attribute_name:
+                    return attribute['values']
+        elif isinstance(attributes, dict):
+            return attributes[attribute_name]
+    raise KeyError('{} does not contain attribute {}'.format(json_object, attribute_name))
 
 
 def generate_component(json_component: dict):
@@ -88,8 +108,8 @@ def generate_component(json_component: dict):
     that it's dependent on
     """
     name = json_component['name']
-    component_type = NexusDecoder.component_type_from_classname(json_component['attributes']['NX_class'])
-    description = json_component['attributes']['description']
+    component_type = NexusDecoder.component_type_from_classname(attribute_value(json_component, 'NX_class'))
+    description = attribute_value(json_component, 'description')
     geometry, pixel_data = generate_geometry_and_pixel_data(json_component)
 
     transforms, dependent_on = generate_transforms(json_component)
@@ -127,7 +147,7 @@ def generate_geometry_and_pixel_data(json_component: dict):
             geometry = None
             if not has_nx_class(child):
                 continue
-            if child['attributes']['NX_class'] == 'NXcylindrical_geometry':
+            if attribute_value(child, 'NX_class') == 'NXcylindrical_geometry':
                 vectors = []
                 cylinders = []
                 for subchild in child['children']:
@@ -145,7 +165,7 @@ def generate_geometry_and_pixel_data(json_component: dict):
                 height = top_center.magnitude
 
                 geometry = CylindricalGeometry(axis_direction=top_center, radius=radius, height=height)
-            elif child['attributes']['NX_class'] == 'NXoff_geometry':
+            elif attribute_value(child, 'NX_class') == 'NXoff_geometry':
                 vertices = None
                 winding_order = None
                 winding_order_indexes = None
@@ -201,23 +221,25 @@ def generate_transforms(json_component: dict):
     dependencies = {}
 
     for child in json_component['children']:
-        if has_nx_class(child) and child['attributes']['NX_class'] == 'NXtransformations':
+        if has_nx_class(child) and attribute_value(child, 'NX_class') == 'NXtransformations':
             name = child['name']
-            if child['attributes']['transformation_type'] == 'rotation':
+            if attribute_value(child, 'transformation_type') == 'rotation':
                 angle = child['values']
-                x = child['attributes']['vector'][0]
-                y = child['attributes']['vector'][1]
-                z = child['attributes']['vector'][2]
+                vector = attribute_value(child, 'vector')
+                x = vector[0]
+                y = vector[1]
+                z = vector[2]
                 transform = Rotation(
                     axis=Vector(x, y, z),
                     angle=angle,
                     name=name
                 )
-            elif child['attributes']['transformation_type'] == 'translation':
+            elif attribute_value(child, 'transformation_type') == 'translation':
                 magnitude = child['values']
-                x = child['attributes']['vector'][0] * magnitude
-                y = child['attributes']['vector'][1] * magnitude
-                z = child['attributes']['vector'][2] * magnitude
+                vector = attribute_value(child, 'vector')
+                x = vector[0] * magnitude
+                y = vector[1] * magnitude
+                z = vector[2] * magnitude
                 transform = Translation(
                     vector=Vector(x, y, z),
                     name=name
@@ -225,9 +247,9 @@ def generate_transforms(json_component: dict):
             else:
                 continue
             transforms.append(transform)
-            dependencies[name] = child['attributes']['depends_on']
+            dependencies[name] = attribute_value(child, 'depends_on')
 
-    dependent_on = json_component['attributes']['depends_on']
+    dependent_on = attribute_value(json_component, 'depends_on')
     while dependent_on in dependencies:
         dependent_on = dependencies[dependent_on]
 
