@@ -1,14 +1,17 @@
+"""
+Functions to write data in an InstrumentModel to nexus filewriter json
+
+This module contains all the functions used to format the data.
+It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
+only the required root function to generate the json
+
+Json format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
+"""
 import json
 from geometry_constructor.data_model import Component, Translation, Rotation, CylindricalGeometry, OFFGeometry,\
     PixelGrid, PixelMapping, SinglePixelId
 from geometry_constructor.nexus import NexusEncoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
-
-
-"""
-Loads data from a nexus FileWriter JSON command into an InstrumentModel
-Format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
-"""
 
 
 def generate_json(model: InstrumentModel):

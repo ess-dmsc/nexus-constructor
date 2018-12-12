@@ -1,22 +1,23 @@
+"""
+Functions to load Geometry Constructor Instrument json schema compliant data into an InstrumentModel
+
+This module contains all the parsing functions used to load the data.
+It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
+only the required root function to load the json
+"""
 from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
     PixelMapping, SinglePixelId, CountDirection, Corner, Vector, Translation, Rotation
 from geometry_constructor.nexus import NexusDecoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
-"""
-Loads json produced by the JsonWriter class back into an InstrumentModel
-"""
-
-
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
     """
-    Loads a json string into an instrument model
+    Loads an object representation of geometry constructor instrument json into an InstrumentModel
 
-    :param json_data: String containing the json data to load
+    :param json_data: Dictionary containing the json data to load
     :param model: The model the loaded components will be stored in
     """
-    # Build the sample and components from the data
     sample, transform_id, _, _ = build_component(json_data['sample'])
 
     # transform_id -> component

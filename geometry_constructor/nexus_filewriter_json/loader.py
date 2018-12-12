@@ -1,15 +1,25 @@
+"""
+Functions to load nexus filewriter json data into an InstrumentModel
+
+This module contains all the parsing functions used to load the data.
+It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
+only the required root function to load the json
+
+Json format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
+"""
 from geometry_constructor.data_model import Component, ComponentType, Rotation, Translation, Vector, OFFGeometry,\
     CylindricalGeometry, SinglePixelId
 from geometry_constructor.nexus import NexusEncoder, NexusDecoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
-"""
-Loads data from a nexus FileWriter JSON command into an InstrumentModel
-"""
-
-
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
+    """
+    Loads an object representation of filewriter json into an InstrumentModel
+
+    :param json_data: Dictionary containing the json data to load
+    :param model: The model the loaded components will be stored in
+    """
     nx_instrument = None
     nx_sample = None
     for child in json_data['nexus_structure']['children']:
@@ -65,10 +75,18 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
 
 
 def has_nx_class(json_object: dict):
+    """Returns whether a json object has a nexus class"""
     return 'attributes' in json_object and 'NX_class' in json_object['attributes']
 
 
 def generate_component(json_component: dict):
+    """
+    Builds a Component instance using data from the json object that describes it
+
+    :param json_component: The json object describing the component
+    :return: A tuple of the component, the name of its transform parent, and the name of the transform in its parent
+    that it's dependent on
+    """
     name = json_component['name']
     component_type = NexusDecoder.component_type_from_classname(json_component['attributes']['NX_class'])
     description = json_component['attributes']['description']
@@ -90,6 +108,12 @@ def generate_component(json_component: dict):
 
 
 def generate_geometry_and_pixel_data(json_component: dict):
+    """
+    Builds Geometry and PixelData instances populated with data from the given component's json object
+
+    :param json_component: The json object describing the component whose geometry and pixel data is being extracted
+    :return: A tuple of the components Geometry and PixelData objects
+    """
     geometry = None
     pixel_data = None
 
@@ -167,6 +191,12 @@ def generate_geometry_and_pixel_data(json_component: dict):
 
 
 def generate_transforms(json_component: dict):
+    """
+    Builds a list of transforms that belong to the given component
+
+    :param json_component: The json object describing the component whose transforms are being extracted
+    :return: A tuple of the list of transforms, and the string of the path to the component's dependent transform
+    """
     transforms = []
     dependencies = {}
 

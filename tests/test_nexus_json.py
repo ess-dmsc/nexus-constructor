@@ -11,10 +11,11 @@ def test_nexus_json_generation_and_loading_is_consistent():
     The process of going from data_model classes to FileWriter/NeXus format is slightly lossy
     For instance, data_model can work with no selected transform in the parent, but FileWriter requires it explicitly.
     Certain properties also require floating point calculations to be performed, resulting in some slight variation.
+    These mean we can't just save a model, load it, and compare the two like with geometry_constructor_json.
 
     This builds a sample instrument, and saves it to json.
     That json is then loaded, saved again, and the initial json compared to this new json.
-    If the object representations of the json's are identical, save for floating point inaccuracies, this passes
+    If the object representations of the json's are identical, save for floating point inaccuracies, this passes.
     """
 
     instrument_model = build_sample_model()

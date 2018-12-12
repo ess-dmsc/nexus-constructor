@@ -7,6 +7,24 @@ import jsonschema
 
 
 class JsonConnector(QObject):
+    """
+    Exposes the json parsers to be callable via QML
+
+    Data can be saved to filewriter or geometry constructor json with the following methods:
+    - save_to_filewriter_json
+    - save_to_geometry_constructor_json
+
+    And can be loaded from a file containing either format using
+    - load_file_into_instrument_model
+
+    Slots and signals also exist to allow the json to be generated on the fly and propagated to other sources:
+    Calls to:
+    - request_geometry_constructor_json
+    - request_filewriter_json
+    Will generate the json in the requested format, and send it in the relevant signal:
+    - requested_geometry_constructor_json
+    - requested_filewriter_json
+    """
 
     def __init__(self):
         super().__init__()
