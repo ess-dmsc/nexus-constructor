@@ -110,8 +110,8 @@ Rectangle {
 }
 Rectangle {
     implicitWidth: 100
-    anchors.left: text1.left
-    anchors.right: text1.right
+    anchors.left: rectangle1.left
+    anchors.right: rectangle1.right
 }
 ```
 A key use of the distinction between the types of width is used in the editor
