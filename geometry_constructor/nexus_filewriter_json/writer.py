@@ -83,7 +83,7 @@ def add_transform_data(json_data: dict, component: Component):
                 'type': 'dataset',
                 'name': transform.name,
                 'dataset': {
-                    'type': 'float',
+                    'type': 'double',
                     'size': [1],
                 },
                 'attributes': [
@@ -106,12 +106,12 @@ def add_transform_data(json_data: dict, component: Component):
                     {
                         'name': 'offset',
                         'values': [0.0, 0.0, 0.0],
-                        'type': 'float',
+                        'type': 'double',
                     },
                     {
                         'name': 'vector',
                         'values': vector,
-                        'type': 'float',
+                        'type': 'double',
                     },
                 ],
                 'values': value,
@@ -138,7 +138,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     'type': 'dataset',
                     'name': 'vertices',
                     'dataset': {
-                        'type': 'float',
+                        'type': 'double',
                         'size': [3, 3],
                     },
                     'values': [
@@ -170,7 +170,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     'type': 'dataset',
                     'name': 'vertices',
                     'dataset': {
-                        'type': 'float',
+                        'type': 'double',
                         'size': [len(geometry.vertices), 3]
                     },
                     'values': [vertex.xyz_list for vertex in geometry.vertices],
@@ -217,7 +217,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                 'type': 'dataset',
                 'name': 'x_pixel_offset',
                 'dataset': {
-                    'type': 'float',
+                    'type': 'double',
                     'size': [pixel_data.rows, pixel_data.columns]
                 },
                 'values': NexusEncoder.pixel_grid_x_offsets(pixel_data),
@@ -228,7 +228,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                 'type': 'dataset',
                 'name': 'y_pixel_offset',
                 'dataset': {
-                    'type': 'float',
+                    'type': 'double',
                     'size': [pixel_data.rows, pixel_data.columns]
                 },
                 'values': NexusEncoder.pixel_grid_y_offsets(pixel_data),
@@ -239,7 +239,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                 'type': 'dataset',
                 'name': 'z_pixel_offset',
                 'dataset': {
-                    'type': 'float',
+                    'type': 'double',
                     'size': [pixel_data.rows, pixel_data.columns]
                 },
                 'values': NexusEncoder.pixel_grid_z_offsets(pixel_data),
