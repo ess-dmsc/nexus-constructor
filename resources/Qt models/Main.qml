@@ -44,34 +44,29 @@ ApplicationWindow {
         }
         Menu {
             title: "JSON"
-            ActionGroup {
-                id: jsonGroup
-            }
-            Action {
-                checked: true
-                checkable: true
+            id: jsonMenu
+            RadioButton {
                 text: "Show Nexus FileWriter JSON"
-                onTriggered: {
+                checked: true
+                onClicked: {
                     jsonMode = "liveFW"
                     jsonConnector.request_filewriter_json(components)
                 }
-                ActionGroup.group: jsonGroup
             }
-            Action {
-                checkable: true
+            RadioButton {
                 text: "Show Geometry Constructor JSON"
-                onTriggered: {
+                onClicked: {
                     jsonMode = "liveGC"
                     jsonConnector.request_geometry_constructor_json(components)
                 }
-                ActionGroup.group: jsonGroup
             }
-            Action {
-                checkable: true
+            RadioButton {
                 text: "Hide JSON display"
-                onTriggered: jsonMode = "hidden"
-                ActionGroup.group: jsonGroup
+                onClicked: jsonMode = "hidden"
             }
+        }
+        ButtonGroup {
+            buttons: jsonMenu.children
         }
     }
 
