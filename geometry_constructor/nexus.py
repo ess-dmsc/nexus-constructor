@@ -1,5 +1,6 @@
-from geometry_constructor.data_model import Component, ComponentType, PixelGrid, PixelMapping, CountDirection, Corner
-from typing import List
+from geometry_constructor.data_model import Component, ComponentType, PixelGrid, PixelMapping, CountDirection, Corner,\
+    Transformation
+from typing import List, Union
 
 
 class NexusEncoder:
@@ -90,10 +91,7 @@ class NexusEncoder:
                 index = component.transform_parent.transforms.index(component.dependent_transform)
             while not (dependent_found or no_dependent):
                 if len(ancestor.transforms) > 0:
-                    dependent_on = '/entry/instrument/{}/transforms/{}'.format(
-                        ancestor.name,
-                        ancestor.transforms[index].name
-                    )
+                    dependent_on = NexusEncoder.absolute_transform_path_name(ancestor.transforms[index], ancestor)
                     dependent_found = True
                 elif ancestor.transform_parent is None or ancestor.transform_parent == ancestor:
                     no_dependent = True
@@ -104,6 +102,29 @@ class NexusEncoder:
                         index = component.transform_parent.transforms.index(component.dependent_transform)
                     ancestor = ancestor.transform_parent
         return dependent_on
+
+    @staticmethod
+    def absolute_transform_path_name(
+            transform: Union[Transformation, str],
+            containing_component: Union[Component, str]):
+        """
+        Determine the absolute path to a transform in a nexus file
+        :param transform: The transform, or its name
+        :param containing_component: The component that contains the transform, or its name
+        :return: The path to the transform in the nexus file
+        """
+        if isinstance(transform, Transformation):
+            transform_name = transform.name
+        else:
+            transform_name = transform
+        if isinstance(containing_component, Component):
+            component_name = containing_component.name
+        else:
+            component_name = containing_component
+        return '/entry/instrument/{}/transforms/{}'.format(
+            component_name,
+            transform_name
+        )
 
 
 class NexusDecoder:

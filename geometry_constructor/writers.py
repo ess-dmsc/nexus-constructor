@@ -63,7 +63,6 @@ class HdfWriter(QObject):
                     rotate.attrs['transformation_type'] = 'rotation'
                     rotate.attrs['units'] = 'degrees'
                     rotate.attrs['vector'] = transform.axis.unit_list
-                    dependent_on = name
                 elif isinstance(transform, Translation):
                     magnitude = transform.vector.magnitude
                     translate = nx_transforms.create_dataset(
@@ -73,8 +72,9 @@ class HdfWriter(QObject):
                     translate.attrs['transformation_type'] = 'translation'
                     translate.attrs['units'] = 'm'
                     translate.attrs['vector'] = transform.vector.unit_list if magnitude != 0 else [0, 0, 1]
-                    dependent_on = name
-            dependent_on = 'transforms/{}'.format(dependent_on)
+                else:
+                    continue
+                dependent_on = NexusEncoder.absolute_transform_path_name(transform, component)
 
         nx_component.attrs['depends_on'] = dependent_on
 

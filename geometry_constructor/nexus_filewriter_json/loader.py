@@ -248,12 +248,10 @@ def generate_transforms(json_component: dict):
                 else:
                     continue
                 transforms.append(transform)
-                dependencies[name] = attribute_value(dataset, 'depends_on')
+                transform_path = NexusEncoder.absolute_transform_path_name(name, json_component['name'])
+                dependencies[transform_path] = attribute_value(dataset, 'depends_on')
 
     dependent_on = attribute_value(json_component, 'depends_on')
-    # if its a local transform, extract its name
-    if dependent_on.count('/') == 1:
-        dependent_on = dependent_on.split('/')[-1]
 
     while dependent_on in dependencies:
         dependent_on = dependencies[dependent_on]

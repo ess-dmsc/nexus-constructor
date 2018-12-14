@@ -124,8 +124,7 @@ def add_transform_data(json_data: dict, component: Component):
                     'values': value,
                 }
             )
-            dependent_on = transform.name
-        dependent_on = 'transforms/{}'.format(dependent_on)
+            dependent_on = NexusEncoder.absolute_transform_path_name(transform, component)
         json_data['children'].append(nx_transforms)
 
     json_data['attributes']['depends_on'] = dependent_on

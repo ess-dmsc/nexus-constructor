@@ -63,7 +63,7 @@ def test_saved_component_translate():
         detector = file['entry/instrument/detector1']
 
         assert detector.attrs['NX_class'] == 'NXdetector'
-        assert detector.attrs['depends_on'] == 'transforms/translate'
+        assert detector.attrs['depends_on'] == '/entry/instrument/detector1/transforms/translate'
 
         transformations = detector['transforms']
         assert transformations.attrs['NX_class'] == 'NXtransformations'
@@ -73,7 +73,7 @@ def test_saved_component_translate():
         assert detector_translate.attrs['transformation_type'] == 'translation'
         assert detector_translate.attrs['units'] == 'm'
         assess_unit_length_3d_vector(detector_translate.attrs['vector'], [1, 2, 3])
-        assert detector_translate.attrs['depends_on'] == 'rotate'
+        assert detector_translate.attrs['depends_on'] == '/entry/instrument/detector1/transforms/rotate'
 
 
 def test_saved_component_rotate():
@@ -99,19 +99,20 @@ def test_saved_instrument_dependencies():
         HdfWriter().save_instrument_to_file(file, instrument)
 
         detector = file['entry/instrument/detector1']
-        assert detector.attrs['depends_on'] == 'transforms/translate'
-        assert detector['transforms/translate'].attrs['depends_on'] == 'rotate'
+        assert detector.attrs['depends_on'] == '/entry/instrument/detector1/transforms/translate'
+        assert detector['transforms/translate'].attrs['depends_on'] == '/entry/instrument/detector1/transforms/rotate'
         assert detector['transforms/rotate'].attrs['depends_on'] == '.'
 
         detector = file['entry/instrument/detector2']
-        assert detector.attrs['depends_on'] == 'transforms/rotate'
-        assert detector['transforms/rotate'].attrs['depends_on'] == 'translate'
+        assert detector.attrs['depends_on'] == '/entry/instrument/detector2/transforms/rotate'
+        assert detector['transforms/rotate'].attrs['depends_on'] == '/entry/instrument/detector2/transforms/translate'
         assert detector['transforms/translate'].attrs['depends_on'] == '/entry/instrument/detector1/transforms/rotate'
 
         detector = file['entry/instrument/detector3']
-        assert detector.attrs['depends_on'] == 'transforms/translate2'
-        assert detector['transforms/translate2'].attrs['depends_on'] == 'translate'
-        assert detector['transforms/translate'].attrs['depends_on'] == 'rotate'
+        assert detector.attrs['depends_on'] == '/entry/instrument/detector3/transforms/translate2'
+        assert detector['transforms/translate2'].attrs['depends_on'] == \
+            '/entry/instrument/detector3/transforms/translate'
+        assert detector['transforms/translate'].attrs['depends_on'] == '/entry/instrument/detector3/transforms/rotate'
         assert detector['transforms/rotate'].attrs['depends_on'] == '/entry/instrument/detector1/transforms/translate'
 
 
