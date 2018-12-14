@@ -18,18 +18,14 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
     :param json_data: Dictionary containing the json data to load
     :param model: The model the loaded components will be stored in
     """
-    sample, transform_id, _, _ = build_component(json_data['sample'])
-
     # transform_id -> component
-    transform_id_mapping = {
-        transform_id: sample
-    }
+    transform_id_mapping = {}
     # transform_id -> parent's transform_id
     transform_parent_ids = {}
     # transform_id -> dependent transform index
     dependent_indexes = {}
 
-    components = [sample]
+    components = []
     for component_data in json_data['components']:
         component, transform_id, transform_parent_id, dependent_index = build_component(component_data)
         components.append(component)

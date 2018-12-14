@@ -19,7 +19,6 @@ def generate_json(model: InstrumentModel):
     :param model: The model to generate a json representation of
     :return: A string containing a json representation of the model"""
     data = {
-        'sample': build_component_dictionary(model.components[0], model),
         'components': build_components_list(model)
     }
     return json.dumps(data, indent=2)
@@ -33,7 +32,7 @@ def build_components_list(model: InstrumentModel):
     :return: A list of dictionaries containing components data
     """
     data = []
-    for component in model.components[1:]:
+    for component in model.components:
         component_data = build_component_dictionary(component, model)
         data.append(component_data)
     return data
