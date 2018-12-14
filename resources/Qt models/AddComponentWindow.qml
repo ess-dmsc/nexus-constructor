@@ -109,10 +109,6 @@ ExpandingWindow {
                     }
                 }
             }
-            ButtonGroup {
-                id: geometryRadioGroup
-                buttons: geometryPane.children
-            }
 
             Label {
                 id: pixelLabel
@@ -171,10 +167,6 @@ ExpandingWindow {
                     enabled: setupPane.selectedType.allowNoPixels
                     onCheckedChanged: if (checked) setupPane.pixelState = ""
                 }
-            }
-            ButtonGroup {
-                id: pixelRadioGroup
-                buttons: pixelPane.children
             }
 
             PaddedButton {

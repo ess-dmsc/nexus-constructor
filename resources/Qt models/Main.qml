@@ -44,7 +44,6 @@ ApplicationWindow {
         }
         Menu {
             title: "JSON"
-            id: jsonMenu
             RadioButton {
                 text: "Show Nexus FileWriter JSON"
                 checked: true
@@ -64,9 +63,6 @@ ApplicationWindow {
                 text: "Hide JSON display"
                 onClicked: jsonMode = "hidden"
             }
-        }
-        ButtonGroup {
-            buttons: jsonMenu.children
         }
     }
 
