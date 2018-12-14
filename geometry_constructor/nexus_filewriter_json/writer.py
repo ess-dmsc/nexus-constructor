@@ -64,60 +64,69 @@ def add_transform_data(json_data: dict, component: Component):
     """Adds properties to a dictionary describing the transforms in the component"""
     dependent_on = NexusEncoder.ancestral_dependent_transform(component)
 
-    for transform in component.transforms:
-        if isinstance(transform, Rotation):
-            type_name = 'rotation'
-            units = 'degrees'
-            vector = transform.axis.unit_list if transform.axis.magnitude != 0 else [0, 0, 0]
-            value = transform.angle
-        elif isinstance(transform, Translation):
-            type_name = 'translation'
-            units = 'm'
-            vector = transform.vector.unit_list if transform.vector.magnitude != 0 else [0, 0, 0]
-            value = transform.vector.magnitude
-        else:
-            continue
+    if len(component.transforms) > 0:
 
-        json_data['children'].append(
-            {
-                'type': 'dataset',
-                'name': transform.name,
-                'dataset': {
-                    'type': 'double',
-                    'size': [1],
-                },
-                'attributes': [
-                    {
-                        'name': 'NX_class',
-                        'values': 'NXtransformations',
-                    },
-                    {
-                        'name': 'transformation_type',
-                        'values': type_name,
-                    },
-                    {
-                        'name': 'depends_on',
-                        'values': dependent_on,
-                    },
-                    {
-                        'name': 'units',
-                        'values': units,
-                    },
-                    {
-                        'name': 'offset',
-                        'values': [0.0, 0.0, 0.0],
+        nx_transforms = {
+            'type': 'group',
+            'name': 'transforms',
+            'attributes': {
+                'NX_class': 'NXtransformations',
+            },
+            'children': [],
+        }
+
+        for transform in component.transforms:
+            if isinstance(transform, Rotation):
+                type_name = 'rotation'
+                units = 'degrees'
+                vector = transform.axis.unit_list if transform.axis.magnitude != 0 else [0, 0, 0]
+                value = transform.angle
+            elif isinstance(transform, Translation):
+                type_name = 'translation'
+                units = 'm'
+                vector = transform.vector.unit_list if transform.vector.magnitude != 0 else [0, 0, 0]
+                value = transform.vector.magnitude
+            else:
+                continue
+
+            nx_transforms['children'].append(
+                {
+                    'type': 'dataset',
+                    'name': transform.name,
+                    'dataset': {
                         'type': 'double',
+                        'size': [1],
                     },
-                    {
-                        'name': 'vector',
-                        'values': vector,
-                        'type': 'double',
-                    },
-                ],
-                'values': value,
-            }
-        )
-        dependent_on = transform.name
+                    'attributes': [
+                        {
+                            'name': 'transformation_type',
+                            'values': type_name,
+                        },
+                        {
+                            'name': 'depends_on',
+                            'values': dependent_on,
+                        },
+                        {
+                            'name': 'units',
+                            'values': units,
+                        },
+                        {
+                            'name': 'offset',
+                            'values': [0.0, 0.0, 0.0],
+                            'type': 'double',
+                        },
+                        {
+                            'name': 'vector',
+                            'values': vector,
+                            'type': 'double',
+                        },
+                    ],
+                    'values': value,
+                }
+            )
+            dependent_on = transform.name
+        dependent_on = 'transforms/{}'.format(dependent_on)
+        json_data['children'].append(nx_transforms)
 
     json_data['attributes']['depends_on'] = dependent_on
 

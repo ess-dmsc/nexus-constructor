@@ -90,8 +90,10 @@ class NexusEncoder:
                 index = component.transform_parent.transforms.index(component.dependent_transform)
             while not (dependent_found or no_dependent):
                 if len(ancestor.transforms) > 0:
-                    dependent_on = '/entry/instrument/{}/{}'.format(ancestor.name,
-                                                                    ancestor.transforms[index].name)
+                    dependent_on = '/entry/instrument/{}/transforms/{}'.format(
+                        ancestor.name,
+                        ancestor.transforms[index].name
+                    )
                     dependent_found = True
                 elif ancestor.transform_parent is None or ancestor.transform_parent == ancestor:
                     no_dependent = True
@@ -226,4 +228,4 @@ class NexusDecoder:
             return None, None
 
         parts = dependency_path.split('/')
-        return parts[-2], parts[-1]
+        return parts[-3], parts[-1]

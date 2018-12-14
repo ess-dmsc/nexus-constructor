@@ -48,30 +48,33 @@ class HdfWriter(QObject):
     def store_transformations(self, nx_component: h5py.Group, component: Component):
         dependent_on = NexusEncoder.ancestral_dependent_transform(component)
 
-        for i in range(len(component.transforms)):
-            transform = component.transforms[i]
-            name = transform.name
-            if isinstance(transform, Rotation):
-                rotate = nx_component.create_dataset(
-                    name,
-                    data=[transform.angle])
-                rotate.attrs['NX_class'] = 'NXtransformations'
-                rotate.attrs['depends_on'] = dependent_on
-                rotate.attrs['transformation_type'] = 'rotation'
-                rotate.attrs['units'] = 'degrees'
-                rotate.attrs['vector'] = transform.axis.unit_list
-                dependent_on = name
-            elif isinstance(transform, Translation):
-                magnitude = transform.vector.magnitude
-                translate = nx_component.create_dataset(
-                    name,
-                    data=[magnitude])
-                translate.attrs['NX_class'] = 'NXtransformations'
-                translate.attrs['depends_on'] = dependent_on
-                translate.attrs['transformation_type'] = 'translation'
-                translate.attrs['units'] = 'm'
-                translate.attrs['vector'] = transform.vector.unit_list if magnitude != 0 else [0, 0, 1]
-                dependent_on = name
+        if len(component.transforms) > 0:
+            nx_transforms = nx_component.create_group('transforms')
+            nx_transforms.attrs['NX_class'] = 'NXtransformations'
+
+            for i in range(len(component.transforms)):
+                transform = component.transforms[i]
+                name = transform.name
+                if isinstance(transform, Rotation):
+                    rotate = nx_transforms.create_dataset(
+                        name,
+                        data=[transform.angle])
+                    rotate.attrs['depends_on'] = dependent_on
+                    rotate.attrs['transformation_type'] = 'rotation'
+                    rotate.attrs['units'] = 'degrees'
+                    rotate.attrs['vector'] = transform.axis.unit_list
+                    dependent_on = name
+                elif isinstance(transform, Translation):
+                    magnitude = transform.vector.magnitude
+                    translate = nx_transforms.create_dataset(
+                        name,
+                        data=[magnitude])
+                    translate.attrs['depends_on'] = dependent_on
+                    translate.attrs['transformation_type'] = 'translation'
+                    translate.attrs['units'] = 'm'
+                    translate.attrs['vector'] = transform.vector.unit_list if magnitude != 0 else [0, 0, 1]
+                    dependent_on = name
+            dependent_on = 'transforms/{}'.format(dependent_on)
 
         nx_component.attrs['depends_on'] = dependent_on
 

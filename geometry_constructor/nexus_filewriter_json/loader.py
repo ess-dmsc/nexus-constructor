@@ -222,34 +222,39 @@ def generate_transforms(json_component: dict):
 
     for child in json_component['children']:
         if has_nx_class(child) and attribute_value(child, 'NX_class') == 'NXtransformations':
-            name = child['name']
-            if attribute_value(child, 'transformation_type') == 'rotation':
-                angle = child['values']
-                vector = attribute_value(child, 'vector')
-                x = vector[0]
-                y = vector[1]
-                z = vector[2]
-                transform = Rotation(
-                    axis=Vector(x, y, z),
-                    angle=angle,
-                    name=name
-                )
-            elif attribute_value(child, 'transformation_type') == 'translation':
-                magnitude = child['values']
-                vector = attribute_value(child, 'vector')
-                x = vector[0] * magnitude
-                y = vector[1] * magnitude
-                z = vector[2] * magnitude
-                transform = Translation(
-                    vector=Vector(x, y, z),
-                    name=name
-                )
-            else:
-                continue
-            transforms.append(transform)
-            dependencies[name] = attribute_value(child, 'depends_on')
+            for dataset in child['children']:
+                name = dataset['name']
+                if attribute_value(dataset, 'transformation_type') == 'rotation':
+                    angle = dataset['values']
+                    vector = attribute_value(dataset, 'vector')
+                    x = vector[0]
+                    y = vector[1]
+                    z = vector[2]
+                    transform = Rotation(
+                        axis=Vector(x, y, z),
+                        angle=angle,
+                        name=name
+                    )
+                elif attribute_value(dataset, 'transformation_type') == 'translation':
+                    magnitude = dataset['values']
+                    vector = attribute_value(dataset, 'vector')
+                    x = vector[0] * magnitude
+                    y = vector[1] * magnitude
+                    z = vector[2] * magnitude
+                    transform = Translation(
+                        vector=Vector(x, y, z),
+                        name=name
+                    )
+                else:
+                    continue
+                transforms.append(transform)
+                dependencies[name] = attribute_value(dataset, 'depends_on')
 
     dependent_on = attribute_value(json_component, 'depends_on')
+    # if its a local transform, extract its name
+    if dependent_on.count('/') == 1:
+        dependent_on = dependent_on.split('/')[-1]
+
     while dependent_on in dependencies:
         dependent_on = dependencies[dependent_on]
 
