@@ -1,21 +1,14 @@
 import QtQuick 2.11
-import QtQuick.Window 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
 
-Window {
+ExpandingWindow {
 
     property string name: components.generate_component_name(componentType)
     property string description: ""
     property real transform_parent_index: 0
-    property real rotate_x: 0
-    property real rotate_y: 0
-    property real rotate_z: 1
-    property real rotate_angle: 0
-    property real translate_x: 0
-    property real translate_y: 0
-    property real translate_z: 0
+    property real dependent_transform_index: 0
 
     property int index: -1
 
@@ -23,17 +16,14 @@ Window {
 
     title: "Add " + componentType
     id: addComponentWindow
-    minimumHeight: contentPane.height
-    minimumWidth: contentPane.width
-    height: minimumHeight
-    width: minimumWidth
-    maximumHeight: minimumHeight
-    maximumWidth: minimumWidth
+    minimumHeight: contentPane.implicitHeight
+    minimumWidth: contentPane.implicitWidth
 
     Pane {
         id: contentPane
-        contentWidth: setupPane.width
-        contentHeight: setupPane.height
+        contentWidth: setupPane.implicitWidth
+        contentHeight: setupPane.implicitHeight
+        anchors.fill: parent
         padding: 0
 
         Pane {
@@ -250,18 +240,20 @@ Window {
         Pane {
             id: detailsPane
             contentWidth:  Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
-            contentHeight: nameField.height
-                           + descriptionField.height
-                           + transformLabel.height
-                           + transformFrame.height
-                           + geometryControls.height
-                           + pixelControls.height
-                           + addButton.height
+            contentHeight: nameField.implicitHeight
+                           + descriptionField.implicitHeight
+                           + transformLabel.implicitHeight
+                           + transformFrame.implicitHeight
+                           + geometryControls.implicitHeight
+                           + pixelControls.implicitHeight
+                           + addButton.implicitHeight
+            anchors.fill: parent
             visible: false
 
             LabeledTextField {
                 id: nameField
                 labelText: "Name:"
+                editorWidth: 200
                 editorText: name
                 onEditingFinished: name = editorText
                 validator: NameValidator {
@@ -294,20 +286,22 @@ Window {
             Frame {
                 id: transformFrame
                 anchors.top: transformLabel.bottom
-                contentHeight: transformControls.height
+                anchors.bottom: geometryControls.top
+                contentHeight: transformControls.implicitHeight
                 contentWidth: transformControls.implicitWidth
                 anchors.left: parent.left
                 anchors.right: parent.right
                 TransformControls {
                     id: transformControls
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                    transformModel: TransformationModel {}
+                    componentIndex: index
+                    anchors.fill: parent
                 }
             }
 
             GeometryControls {
                 id: geometryControls
-                anchors.top: transformFrame.bottom
+                anchors.bottom: pixelControls.top
                 anchors.right:parent.right
                 anchors.left: parent.left
                 onMeshChanged: pixelControls.restartMapping(geometryControls.geometryModel)
@@ -315,7 +309,7 @@ Window {
 
             PixelControls {
                 id: pixelControls
-                anchors.top: geometryControls.bottom
+                anchors.bottom: addButton.top
                 anchors.right:parent.right
                 anchors.left: parent.left
                 visible: state != ""
@@ -323,16 +317,15 @@ Window {
 
             PaddedButton {
                 id: addButton
-                anchors.top: pixelControls.bottom
+                anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
-                    components.add_component(componentType, name, description, transform_parent_index,
-                                             translate_x, translate_y, translate_z,
-                                             rotate_x, rotate_y, rotate_z, rotate_angle,
+                    components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                              geometryControls.geometryModel,
-                                             pixelControls.pixelModel)
+                                             pixelControls.pixelModel,
+                                             transformControls.transformModel)
                     addComponentWindow.close()
                 }
             }
@@ -347,8 +340,8 @@ Window {
 
                 PropertyChanges { target: setupPane; visible: false }
                 PropertyChanges { target: detailsPane; visible: true }
-                PropertyChanges { target: contentPane; contentHeight: detailsPane.height }
-                PropertyChanges { target: contentPane; contentWidth: detailsPane.width }
+                PropertyChanges { target: contentPane; contentHeight: detailsPane.implicitHeight }
+                PropertyChanges { target: contentPane; contentWidth: detailsPane.implicitWidth }
                 PropertyChanges { target: detailsPane; focus: true}
                 PropertyChanges { target: nameField; focus: true}
             }

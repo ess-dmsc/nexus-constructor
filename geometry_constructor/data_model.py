@@ -1,12 +1,18 @@
 import attr
 from enum import Enum, unique
 from math import sqrt, sin, cos, pi, acos
+from typing import List
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
 
 def validate_nonzero_vector(instance, attribute, value):
     if value.x == 0 and value.y == 0 and value.z == 0:
         raise ValueError('Vector is zero length')
+
+
+def validate_list_contains_transformations(instance, attribute, value):
+    for item in value:
+        assert isinstance(item, Transformation)
 
 
 @attr.s
@@ -44,7 +50,7 @@ class CylindricalGeometry(Geometry):
     The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
     described by the direction of its axis, its height, and radius.
     """
-    axis_direction = attr.ib(default=Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
+    axis_direction = attr.ib(factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
 
@@ -115,8 +121,8 @@ class OFFGeometry(Geometry):
     faces:  list of integer lists. Each sublist is a winding path around the corners of a polygon. Each sublist item is
             an index into the vertices list to identify a specific point in 3D space
     """
-    vertices = attr.ib(factory=list)
-    faces = attr.ib(factory=list)
+    vertices = attr.ib(factory=list, type=List[Vector])
+    faces = attr.ib(factory=list, type=List[List[int]])
 
     @property
     def winding_order(self):
@@ -197,6 +203,22 @@ class SinglePixelId(PixelData):
     pixel_id = attr.ib(int)
 
 
+@attr.s
+class Transformation:
+    name = attr.ib(str)
+
+
+@attr.s
+class Rotation(Transformation):
+    axis = attr.ib(factory=lambda: Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
+    angle = attr.ib(default=0)
+
+
+@attr.s
+class Translation(Transformation):
+    vector = attr.ib(factory=lambda: Vector(0, 0, 0), type=Vector)
+
+
 @unique
 class ComponentType(Enum):
     SAMPLE = 'Sample'
@@ -219,8 +241,7 @@ class Component:
     name = attr.ib(str)
     description = attr.ib(default='', type=str)
     transform_parent = attr.ib(default=None, type=object)
-    translate_vector = attr.ib(default=Vector(0, 0, 0), type=Vector)
-    rotate_axis = attr.ib(default=Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
-    rotate_angle = attr.ib(default=0)
+    dependent_transform = attr.ib(default=None, type=Transformation)
+    transforms = attr.ib(factory=list, type=List[Transformation], validator=validate_list_contains_transformations)
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)

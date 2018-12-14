@@ -1,5 +1,5 @@
 """
-ListModel implementations for accessing and manipulating Geometry models in QML
+ListModel implementations for accessing and manipulating Geometry qml_models in QML
 
 See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on how to develop these classes, including
 what signals need to be emitted when changes to the data are made.
@@ -7,24 +7,10 @@ what signals need to be emitted when changes to the data are made.
 
 from geometry_constructor.data_model import CylindricalGeometry, OFFGeometry
 from geometry_constructor.geometry_loader import load_geometry
+from geometry_constructor.qml_models import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
 
-from geometry_constructor.instrument_model import InstrumentModel
-
-
-def change_value(item, attribute_name, value):
-    """
-    Updates the value of an items attribute
-    :param item: the object having an attribute updated
-    :param attribute_name: the name of the attribute to update
-    :param value: the value to set the attribute to
-    :return: whether the attribute value was changed
-    """
-    current_value = getattr(item, attribute_name)
-    different = value != current_value
-    if different:
-        setattr(item, attribute_name, value)
-    return different
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class CylinderModel(QAbstractListModel):

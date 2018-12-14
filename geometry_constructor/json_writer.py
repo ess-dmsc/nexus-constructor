@@ -1,8 +1,9 @@
 import json
+from typing import List
 from PySide2.QtCore import QObject, QUrl, Signal, Slot
 from geometry_constructor.data_model import Component, Geometry, CylindricalGeometry, OFFGeometry,\
-    PixelGrid, PixelMapping, SinglePixelId
-from geometry_constructor.instrument_model import InstrumentModel
+    PixelGrid, PixelMapping, SinglePixelId, Transformation, Translation, Rotation
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class JsonWriter(QObject):
@@ -79,29 +80,7 @@ class JsonWriter(QObject):
             'description': component.description,
             'type': component.component_type.value,
             'transform_id': model.components.index(component),
-            'transforms': [
-                {
-                    'type': 'rotate',
-                    'axis': {
-                        'x': component.rotate_axis.x,
-                        'y': component.rotate_axis.y,
-                        'z': component.rotate_axis.z
-                    },
-                    'angle': {
-                        'unit': 'degrees',
-                        'value': component.rotate_angle
-                    }
-                },
-                {
-                    'type': 'translate',
-                    'vector': {
-                        'x': component.translate_vector.x,
-                        'y': component.translate_vector.y,
-                        'z': component.translate_vector.z
-                    },
-                    'unit': 'm'
-                }
-            ],
+            'transforms': self.build_transform_list(component.transforms),
             'geometry': self.build_geometry_dictionary(component.geometry)
         }
 
@@ -112,6 +91,44 @@ class JsonWriter(QObject):
         if parent is not None and parent != component:
             data['transform_parent_id'] = model.components.index(parent)
 
+            dependent_transform = component.dependent_transform
+            if dependent_transform is not None:
+                data['parent_transform_index'] = parent.transforms.index(dependent_transform)
+
+        return data
+
+    def build_transform_list(self, transforms: List[Transformation]):
+        data = []
+        for transform in transforms:
+            if isinstance(transform, Translation):
+                data.append(
+                    {
+                        'type': 'translate',
+                        'name': transform.name,
+                        'vector': {
+                            'x': transform.vector.x,
+                            'y': transform.vector.y,
+                            'z': transform.vector.z
+                        },
+                        'unit': 'm'
+                    }
+                )
+            elif isinstance(transform, Rotation):
+                data.append(
+                    {
+                        'type': 'rotate',
+                        'name': transform.name,
+                        'axis': {
+                            'x': transform.axis.x,
+                            'y': transform.axis.y,
+                            'z': transform.axis.z
+                        },
+                        'angle': {
+                            'unit': 'degrees',
+                            'value': transform.angle
+                        }
+                    }
+                )
         return data
 
     def add_pixel_info_to_dictionary(self, json_data: dict, detector: Component):

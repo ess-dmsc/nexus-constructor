@@ -7,7 +7,7 @@ Item {
     property var pixelModel
 
     id: pane
-    height: pixelLabel.height + viewFrame.height
+    implicitHeight: pixelLabel.implicitHeight + viewFrame.implicitHeight
     width: viewFrame.width
     implicitWidth: viewFrame.implicitWidth
 

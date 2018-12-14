@@ -1,4 +1,4 @@
-from geometry_constructor.qml_json_model import JsonModel, FilteredJsonModel
+from geometry_constructor.qml_models.json_model import JsonModel, FilteredJsonModel
 
 
 def read_json():

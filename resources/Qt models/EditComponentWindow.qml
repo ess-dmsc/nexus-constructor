@@ -1,21 +1,16 @@
 import QtQuick 2.11
-import QtQuick.Window 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
 
-Window {
+ExpandingWindow {
 
     property int componentIndex: 0
 
     title: "Component Editor"
     id: editComponentWindow
-    minimumHeight: view.height
-    minimumWidth: view.width
-    height: minimumHeight
-    width: minimumWidth
-    maximumHeight: minimumHeight
-    maximumWidth: minimumWidth
+    minimumHeight: view.implicitHeight
+    minimumWidth: view.implicitWidth
 
     Pane {
         id: viewContainer
@@ -23,7 +18,8 @@ Window {
         anchors.fill: parent
         ListView {
             id: view
-            height: contentHeight
+            anchors.fill: parent
+
             model: component
             delegate: editorDelegate
             interactive: false
@@ -41,18 +37,21 @@ Window {
         Pane {
             id: detailsPane
             contentWidth: Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
-            contentHeight: nameField.height
-                           + descriptionField.height
-                           + transformLabel.height
-                           + transformFrame.height
-                           + geometryControls.height
-                           + pixelControls.height
-
-            onWidthChanged: view.width = detailsPane.width
+            contentHeight: nameField.implicitHeight
+                           + descriptionField.implicitHeight
+                           + transformLabel.implicitHeight
+                           + transformFrame.implicitHeight
+                           + geometryControls.implicitHeight
+                           + pixelControls.implicitHeight
+            width: view.width
+            height: viewContainer.height
+            onImplicitWidthChanged: view.implicitWidth = detailsPane.implicitWidth
+            onImplicitHeightChanged: view.implicitHeight = detailsPane.implicitHeight
 
             LabeledTextField {
                 id: nameField
                 labelText: "Name:"
+                editorWidth: 200
                 editorText: name
                 onEditingFinished: name = editorText
                 validator: NameValidator {
@@ -85,20 +84,34 @@ Window {
             Frame {
                 id: transformFrame
                 anchors.top: transformLabel.bottom
-                contentHeight: transformControls.height
+                anchors.bottom: geometryControls.top
+                contentHeight: transformControls.implicitHeight
                 contentWidth: transformControls.implicitWidth
                 anchors.left: parent.left
                 anchors.right: parent.right
                 TransformControls {
                     id: transformControls
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                    transformModel: transform_model
+                    componentIndex: editComponentWindow.componentIndex
+                    anchors.fill: parent
+                }
+                Connections {
+                    target: transform_model
+                    onTransformsUpdated: components.transforms_updated(index)
+                }
+                states: State {
+                    name: "hidden"; when: componentIndex == 0
+                    PropertyChanges { target: transformFrame; implicitHeight: 0 }
+                    PropertyChanges { target: transformFrame; visible: false }
+                    PropertyChanges { target: transformLabel; implicitHeight: 0 }
+                    PropertyChanges { target: transformLabel; visible: false }
+                    PropertyChanges { target: editComponentWindow; height: minimumHeight}
                 }
             }
 
             GeometryControls {
                 id: geometryControls
-                anchors.top: transformFrame.bottom
+                anchors.bottom: pixelControls.top
                 anchors.left: parent.left
                 anchors.right: parent.right
                 state: geometry_state
@@ -113,7 +126,7 @@ Window {
 
             PixelControls {
                 id: pixelControls
-                anchors.top: geometryControls.bottom
+                anchors.bottom: parent.bottom
                 anchors.right:parent.right
                 anchors.left: parent.left
                 state: pixel_state

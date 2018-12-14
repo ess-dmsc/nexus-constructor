@@ -1,5 +1,6 @@
 from geometry_constructor import data_model
-from geometry_constructor.instrument_model import InstrumentModel
+from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
 def test_initialise_model():
@@ -112,3 +113,91 @@ def test_determine_pixel_state_produces_expected_strings():
         for i in range(len(pixel_options)):
             component.pixel_data = pixel_options[i]
             assert InstrumentModel.determine_pixel_state(component) == expected_states[i]
+
+
+def build_model_with_sample_transforms():
+    instrument = InstrumentModel()
+    instrument.components.append(
+        data_model.Component(
+            component_type=data_model.ComponentType.DETECTOR,
+            name='detector1',
+            transform_parent=instrument.components[0],
+            transforms=[
+                data_model.Rotation(name='rotate', axis=data_model.Vector(4, 5, 6), angle=90),
+                data_model.Translation(name='translate', vector=data_model.Vector(1, 2, 3))
+            ]
+        )
+    )
+    instrument.components.append(
+        data_model.Component(
+            component_type=data_model.ComponentType.DETECTOR,
+            name='detector2',
+            transform_parent=instrument.components[1],
+            dependent_transform=instrument.components[1].transforms[0],
+            transforms=[
+                data_model.Translation(name='translate', vector=data_model.Vector(1, 2, 3)),
+                data_model.Rotation(name='rotate', axis=data_model.Vector(4, 5, 6), angle=90)
+            ]
+        )
+    )
+    instrument.components.append(
+        data_model.Component(
+            component_type=data_model.ComponentType.DETECTOR,
+            name='detector3',
+            transform_parent=instrument.components[1],
+            transforms=[
+                data_model.Rotation(name='rotate', axis=data_model.Vector(4, 5, 6), angle=90),
+                data_model.Translation(name='translate', vector=data_model.Vector(1, 2, 3)),
+                data_model.Translation(name='translate2', vector=data_model.Vector(1, 2, 3))
+            ]
+        )
+    )
+    # Use replace_contents to build the required transform models
+    instrument.replace_contents(instrument.components)
+    return instrument
+
+
+def test_generate_matrix_combines_dependent_transforms():
+    instrument = build_model_with_sample_transforms()
+
+    def rotate_matrix(matrix: QMatrix4x4, rotate: data_model.Rotation):
+        matrix.rotate(rotate.angle,
+                      QVector3D(rotate.axis.x,
+                                rotate.axis.y,
+                                rotate.axis.z))
+
+    def translate_matrix(matrix: QMatrix4x4, translate: data_model.Translation):
+        matrix.translate(translate.vector.x,
+                         translate.vector.y,
+                         translate.vector.z)
+
+    target_matrix = QMatrix4x4()
+    assert instrument.generate_matrix(instrument.components[0]) == target_matrix
+
+    target_matrix = QMatrix4x4()
+    rotate_matrix(target_matrix, instrument.components[1].transforms[0])
+    translate_matrix(target_matrix, instrument.components[1].transforms[1])
+    assert instrument.generate_matrix(instrument.components[1]) == target_matrix
+
+    target_matrix = QMatrix4x4()
+    rotate_matrix(target_matrix, instrument.components[1].transforms[0])
+    translate_matrix(target_matrix, instrument.components[2].transforms[0])
+    rotate_matrix(target_matrix, instrument.components[2].transforms[1])
+    assert instrument.generate_matrix(instrument.components[2]) == target_matrix
+
+    target_matrix = QMatrix4x4()
+    rotate_matrix(target_matrix, instrument.components[1].transforms[0])
+    translate_matrix(target_matrix, instrument.components[1].transforms[1])
+    rotate_matrix(target_matrix, instrument.components[3].transforms[0])
+    translate_matrix(target_matrix, instrument.components[3].transforms[1])
+    translate_matrix(target_matrix, instrument.components[3].transforms[2])
+    assert instrument.generate_matrix(instrument.components[3]) == target_matrix
+
+
+def test_transforms_deletable_set():
+    instrument = build_model_with_sample_transforms()
+
+    assert instrument.transform_models[0].deletable == []
+    assert instrument.transform_models[1].deletable == [False, True]
+    assert instrument.transform_models[2].deletable == [True, True]
+    assert instrument.transform_models[3].deletable == [True, True, True]

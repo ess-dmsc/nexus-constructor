@@ -61,6 +61,9 @@
         "transform_parent_id": {
           "type": "integer"
         },
+        "parent_transform_index": {
+          "type": "integer"
+        },
         "transforms": {
           "type": "array",
           "items": {
@@ -201,6 +204,9 @@
         "type": {
           "enum": [ "rotate" ]
         },
+        "name": {
+          "type": "string"
+        },
         "axis": {
           "$ref": "#/definitions/3D"
         },
@@ -224,6 +230,9 @@
       "properties": {
         "type": {
           "enum": [ "translate" ]
+        },
+        "name": {
+          "type": "string"
         },
         "vector": {
           "$ref": "#/definitions/3D"
