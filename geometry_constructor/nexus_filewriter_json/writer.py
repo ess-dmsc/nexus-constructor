@@ -12,6 +12,7 @@ from geometry_constructor.data_model import Component, Translation, Rotation, Cy
     PixelGrid, PixelMapping, SinglePixelId
 from geometry_constructor.nexus import NexusEncoder
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from typing import List
 
 
 def generate_json(model: InstrumentModel):
@@ -21,6 +22,15 @@ def generate_json(model: InstrumentModel):
     :param model: The model to generate a json representation of
     :return: A string containing a json representation of the model
     """
+    internal_components = [
+        component for component in model.components
+        if component.component_type not in NexusEncoder.external_component_types()
+    ]
+    external_components = [
+        component for component in model.components
+        if component.component_type in NexusEncoder.external_component_types()
+    ]
+
     data = {
         'nexus_structure': {
             'children': [
@@ -30,18 +40,21 @@ def generate_json(model: InstrumentModel):
                     'attributes': {
                         'NX_class': 'NXinstrument',
                     },
-                    'children': generate_component_list(model),
+                    'children': generate_component_list(internal_components),
                 },
                 generate_component_data(model.components[0])
             ],
         },
     }
+    data['nexus_structure']['children'].extend(
+        generate_component_list(external_components)
+    )
     return json.dumps(data, indent=2)
 
 
-def generate_component_list(model: InstrumentModel):
-    """Returns a list of dictionaries describing the (non sample) components of the model"""
-    return [generate_component_data(component) for component in model.components[1:]]
+def generate_component_list(components: List[Component]):
+    """Returns a list of dictionaries describing the components provided"""
+    return [generate_component_data(component) for component in components]
 
 
 def generate_component_data(component: Component):
@@ -124,7 +137,11 @@ def add_transform_data(json_data: dict, component: Component):
                     'values': value,
                 }
             )
-            dependent_on = NexusEncoder.absolute_transform_path_name(transform, component)
+            dependent_on = NexusEncoder.absolute_transform_path_name(
+                transform,
+                component,
+                component.component_type not in NexusEncoder.external_component_types()
+            )
         json_data['children'].append(nx_transforms)
 
     json_data['attributes']['depends_on'] = dependent_on

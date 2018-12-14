@@ -20,16 +20,21 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
     :param json_data: Dictionary containing the json data to load
     :param model: The model the loaded components will be stored in
     """
+    components = []
+
+    component_classes = [NexusEncoder.component_class_name(component_type) for component_type in ComponentType]
     nx_instrument = None
     nx_sample = None
+    nx_components = []
     for child in json_data['nexus_structure']['children']:
         if has_nx_class(child):
             if attribute_value(child, 'NX_class') == 'NXinstrument':
                 nx_instrument = child
             elif attribute_value(child, 'NX_class') == 'NXsample':
                 nx_sample = child
+            elif attribute_value(child, 'NX_class') in component_classes:
+                nx_components.append(child)
 
-    components = []
     if nx_sample is None:
         sample = Component(
             component_type=ComponentType.SAMPLE,
@@ -39,23 +44,25 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
         sample, _, _ = generate_component(nx_sample)
     components.append(sample)
 
-    component_classes = [NexusEncoder.component_class_name(component_type)
-                         for component_type in ComponentType
-                         if component_type != ComponentType.SAMPLE]
-
     parent_names = [None]
     dependent_transform_names = [None]
     named_components = {
         sample.name: sample
     }
 
+    def process_component(nx_component):
+        component, parent_name, dependent_transform_name = generate_component(nx_component)
+        components.append(component)
+        parent_names.append(parent_name)
+        dependent_transform_names.append(dependent_transform_name)
+        named_components[component.name] = component
+
+    for nx_component in nx_components:
+        process_component(nx_component)
+
     for child in nx_instrument['children']:
         if has_nx_class(child) and attribute_value(child, 'NX_class') in component_classes:
-            component, parent_name, dependent_transform_name = generate_component(child)
-            components.append(component)
-            parent_names.append(parent_name)
-            dependent_transform_names.append(dependent_transform_name)
-            named_components[component.name] = component
+            process_component(child)
 
     # assign parent components and transforms
     for i in range(len(components)):
@@ -99,6 +106,10 @@ def attribute_value(json_object: dict, attribute_name: str):
     raise KeyError('{} does not contain attribute {}'.format(json_object, attribute_name))
 
 
+def generate_component_type(json_component: dict):
+    return NexusDecoder.component_type_from_classname(attribute_value(json_component, 'NX_class'))
+
+
 def generate_component(json_component: dict):
     """
     Builds a Component instance using data from the json object that describes it
@@ -108,7 +119,7 @@ def generate_component(json_component: dict):
     that it's dependent on
     """
     name = json_component['name']
-    component_type = NexusDecoder.component_type_from_classname(attribute_value(json_component, 'NX_class'))
+    component_type = generate_component_type(json_component)
     description = attribute_value(json_component, 'description')
     geometry, pixel_data = generate_geometry_and_pixel_data(json_component)
 
@@ -248,7 +259,8 @@ def generate_transforms(json_component: dict):
                 else:
                     continue
                 transforms.append(transform)
-                transform_path = NexusEncoder.absolute_transform_path_name(name, json_component['name'])
+                in_instrument = attribute_value(json_component, 'depends_on').startswith('/entry/instrument/')
+                transform_path = NexusEncoder.absolute_transform_path_name(name, json_component['name'], in_instrument)
                 dependencies[transform_path] = attribute_value(dataset, 'depends_on')
 
     dependent_on = attribute_value(json_component, 'depends_on')

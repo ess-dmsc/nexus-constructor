@@ -29,14 +29,15 @@ class HdfWriter(QObject):
         root = file.create_group('entry')
         root.attrs['NX_class'] = 'NXentry'
 
-        # Store the sample separately to the instrument
-        self.store_component(root, model.components[0])
-
         instrument = root.create_group('instrument')
         instrument.attrs['NX_class'] = 'NXinstrument'
 
-        for component in model.components[1:]:
-            self.store_component(instrument, component)
+        external_types = NexusEncoder.external_component_types()
+        for component in model.components:
+            if component.component_type in external_types:
+                self.store_component(root, component)
+            else:
+                self.store_component(instrument, component)
 
     def store_component(self, parent_group: h5py.Group, component: Component):
         nx_component = parent_group.create_group(component.name)
@@ -74,7 +75,10 @@ class HdfWriter(QObject):
                     translate.attrs['vector'] = transform.vector.unit_list if magnitude != 0 else [0, 0, 1]
                 else:
                     continue
-                dependent_on = NexusEncoder.absolute_transform_path_name(transform, component)
+                dependent_on = NexusEncoder.absolute_transform_path_name(
+                    transform,
+                    component,
+                    component.component_type not in NexusEncoder.external_component_types())
 
         nx_component.attrs['depends_on'] = dependent_on
 

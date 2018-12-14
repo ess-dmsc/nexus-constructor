@@ -91,7 +91,11 @@ class NexusEncoder:
                 index = component.transform_parent.transforms.index(component.dependent_transform)
             while not (dependent_found or no_dependent):
                 if len(ancestor.transforms) > 0:
-                    dependent_on = NexusEncoder.absolute_transform_path_name(ancestor.transforms[index], ancestor)
+                    dependent_on = NexusEncoder.absolute_transform_path_name(
+                        ancestor.transforms[index],
+                        ancestor,
+                        ancestor.component_type not in NexusEncoder.external_component_types()
+                    )
                     dependent_found = True
                 elif ancestor.transform_parent is None or ancestor.transform_parent == ancestor:
                     no_dependent = True
@@ -106,11 +110,14 @@ class NexusEncoder:
     @staticmethod
     def absolute_transform_path_name(
             transform: Union[Transformation, str],
-            containing_component: Union[Component, str]):
+            containing_component: Union[Component, str],
+            in_instrument: bool,
+    ):
         """
         Determine the absolute path to a transform in a nexus file
         :param transform: The transform, or its name
         :param containing_component: The component that contains the transform, or its name
+        :param in_instrument: Whether or not the containing component is located in /entry/instrument
         :return: The path to the transform in the nexus file
         """
         if isinstance(transform, Transformation):
@@ -121,10 +128,24 @@ class NexusEncoder:
             component_name = containing_component.name
         else:
             component_name = containing_component
-        return '/entry/instrument/{}/transforms/{}'.format(
+        if in_instrument:
+            parent = '/entry/instrument'
+        else:
+            parent = '/entry'
+
+        return '{}/{}/transforms/{}'.format(
+            parent,
             component_name,
             transform_name
         )
+
+    @staticmethod
+    def external_component_types():
+        """Returns a set of component types that should be stored separately to /entry/instrument in a nexus file"""
+        return {
+            ComponentType.SAMPLE,
+            ComponentType.MONITOR,
+        }
 
 
 class NexusDecoder:
