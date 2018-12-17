@@ -42,7 +42,6 @@ def generate_json(model: InstrumentModel):
                     },
                     'children': generate_component_list(internal_components),
                 },
-                generate_component_data(model.components[0])
             ],
         },
     }
