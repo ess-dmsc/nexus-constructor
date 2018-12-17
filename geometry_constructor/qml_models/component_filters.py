@@ -1,7 +1,7 @@
 """
 Filtered models for an instance of InstrumentModel
 """
-from PySide2.QtCore import Property, QModelIndex, QSortFilterProxyModel, Signal
+from PySide2.QtCore import Property, QModelIndex, QSortFilterProxyModel, Signal, Slot
 
 
 class InstrumentModelFilter(QSortFilterProxyModel):
@@ -48,3 +48,17 @@ class ExcludedComponentModel(InstrumentModelFilter):
     def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex):
         """Overrides filterAcceptsRow to reject only the component at the given index"""
         return source_row != self.index
+
+    @Slot(int, result=int)
+    def source_index(self, index: int):
+        """Calculates the index in the source model for the given index into this filtered model"""
+        if index < self.desired_index:
+            return index
+        return index + 1
+
+    @Slot(int, result=int)
+    def filtered_index(self, index: int):
+        """Calculates the index in this filtered model for the given index into the source model"""
+        if index < self.desired_index:
+            return index
+        return index - 1
