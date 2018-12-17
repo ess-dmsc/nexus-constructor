@@ -33,7 +33,7 @@ Item {
         id: relativeLabel
         anchors.verticalCenter: relativePicker.verticalCenter
         anchors.left: parent.left
-        text: "Transform relative to:"
+        text: "Transform parent:"
     }
     ComboBox {
         id: relativePicker

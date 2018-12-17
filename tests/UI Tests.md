@@ -109,7 +109,7 @@ Click 'Continue'.
 Set the cylinders axis direction to (x=1, y=1, z=0), its height to 3, and its radius to 1.
 Add a translation with values (x=-2.5, y=0.5, z=-0.5).
 Add a rotation, of 315 degrees around axis (x=0, y=0, z=1).
-Set the 'Transform relative to' dropdowns to 'Cube Detector' and 'cube transform'.
+Set the 'Transform parent' dropdowns to 'Cube Detector' and 'cube transform'.
 Click 'Add'.
 - The add component window will close.
 - A cylinder should appear in the 3D view. One flat end should be flush with the leftmost side of
@@ -135,9 +135,9 @@ editor' and 'delete'.
 - The translate should be above the rotate.
 
 Rename the transform in 'Cube detector' to just 'translate'.
-- The name change should be reflected in 'Monitor's second transform relative dropdown.
+- The name change should be reflected in 'Monitor's second transform parent dropdown.
 
-Set the monitors 'transform relative to' to 'Sample'.
+Set the monitors 'transform parent' to 'Sample'.
 - The graphic of the cylinder should allign its right face with the right face of the sample cube.
 - The delete buttons of 'Cube detector' and its transform should no longer be greyed out or show
 tooltips on hover.
@@ -219,7 +219,7 @@ group 'entry'.
 
 ## Removing components
 
-Set Monitor's transform relative to 'Cube Detector'.
+Set Monitor's transform parent to 'Cube Detector'.
 - Cube Detector's delete button should grey out, and clicking it result in nothing.
 
 Click Monitor's delete button.
@@ -257,12 +257,12 @@ pointing up and to the right.
 ## Other validation
 
 Expand the component sections for Cube detector and Monitor.
-- The first 'transform relative to' dropdown in Cube detector should only show 'Sample' and
+- The first 'transform parent' dropdown in Cube detector should only show 'Sample' and
 'Monitor' as options.
-- The first 'transform relative to' dropdown in Monitor should only show 'Sample' and 'Cube
+- The first 'transform parent' dropdown in Monitor should only show 'Sample' and 'Cube
 Detector' as options.
 
-Set the transform relative of Monitor to Cube Detector.
-Attempt to set Cube Detector's transform relative to Monitor.
+Set the transform parent of Monitor to Cube Detector.
+Attempt to set Cube Detector's transform parent to Monitor.
 - The drop down in Cube Detector should revert to its previous value.
 - Tooltext should appear explaining that this loop is invalid.
