@@ -53,7 +53,7 @@ Pane {
                 anchoredEditor: true
                 onEditingFinished: file_url = editorText
             }
-            Button {
+            PaddedButton {
                 id: chooseFileButton
                 anchors.verticalCenter: fileTextField.verticalCenter
                 anchors.right: parent.right
