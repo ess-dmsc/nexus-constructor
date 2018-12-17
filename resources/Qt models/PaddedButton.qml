@@ -3,8 +3,8 @@ import QtQuick.Controls 2.4
 
 
 Pane {
-    property string text: ""
-    property bool buttonEnabled: true
+    property alias text: button.text
+    property alias buttonEnabled: button.enabled
     id: pane
     padding: 2
     signal clicked
@@ -12,8 +12,6 @@ Pane {
     Button {
         id: button
         anchors.fill: parent
-        text: pane.text
-        enabled: buttonEnabled
         onClicked: pane.clicked()
     }
 }
