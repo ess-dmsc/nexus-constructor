@@ -34,6 +34,10 @@ flake8 is used to check [pep8](https://www.python.org/dev/peps/pep-0008/?)
 compliance. It is installed via pip and can be run as `flake8` in the project's 
 root directory. 
 
+## Testing the UI
+
+A script for testing the UI's functionality can be found at [tests/UI Tests.md](tests/UI Tests.md)
+
 ## Building a distributable version
 
 A distributable version of the app, with the required python interpreter and
