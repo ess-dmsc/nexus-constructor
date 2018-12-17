@@ -66,7 +66,6 @@ Pane {
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
                     file_url = filePicker.fileUrl
-                    fileTextField.editorText = file_url
                 }
             }
         }
