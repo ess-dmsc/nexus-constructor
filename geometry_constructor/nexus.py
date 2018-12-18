@@ -147,6 +147,27 @@ class NexusEncoder:
             ComponentType.MONITOR,
         }
 
+    @staticmethod
+    def geometry_group_name(component: Component):
+        """
+        Returns the name the component's geometry group should have
+
+        For NXdetector groups:
+            'detector_shape' if NXoff_geometry containing 'detector_faces', or NXcylindrical_geometry containing
+        'detector_number'. 'pixel_shape' otherwise
+        For other groups:
+            'shape'
+        """
+        # As of writing, Geometry constructor NXcylindrical_geometry's don't contain 'detector_number', simplifying the
+        # logic here
+        if component.component_type == ComponentType.DETECTOR:
+            if isinstance(component.pixel_data, PixelMapping):
+                return 'detector_shape'
+            else:
+                return 'pixel_shape'
+        else:
+            return 'shape'
+
 
 class NexusDecoder:
 

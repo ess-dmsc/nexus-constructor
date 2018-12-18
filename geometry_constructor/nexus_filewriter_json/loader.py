@@ -154,7 +154,7 @@ def generate_geometry_and_pixel_data(json_component: dict):
     detector_numbers = None
 
     for child in json_component['children']:
-        if child['name'] == 'geometry':
+        if child['name'] in ('shape', 'pixel_shape', 'detector_shape'):
             geometry = None
             if not has_nx_class(child):
                 continue

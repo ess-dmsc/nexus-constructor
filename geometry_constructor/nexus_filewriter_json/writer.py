@@ -150,10 +150,12 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
     """Adds properties describing the geometry and pixel data of the component to its json dictionary"""
     geometry = component.geometry
     pixel_data = component.pixel_data
+    geometry_group_name = NexusEncoder.geometry_group_name(component)
+
     if isinstance(geometry, CylindricalGeometry):
         nexus_geometry = {
             'type': 'group',
-            'name': 'geometry',
+            'name': geometry_group_name,
             'attributes': {
                 'NX_class': 'NXcylindrical_geometry'
             },
@@ -185,7 +187,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
     elif isinstance(geometry, OFFGeometry):
         nexus_geometry = {
             'type': 'group',
-            'name': 'geometry',
+            'name': geometry_group_name,
             'attributes': {
                 'NX_class': 'NXoff_geometry',
             },
