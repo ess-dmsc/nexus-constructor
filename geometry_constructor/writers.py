@@ -82,24 +82,30 @@ class HdfWriter(QObject):
 
         nx_component.attrs['depends_on'] = dependent_on
 
-    def store_pixel_data(self, nx_detector: h5py.Group, component: Component):
+    def store_pixel_data(self, nx_component: h5py.Group, component: Component):
         pixel_data = component.pixel_data
+        geometry_group_name = NexusEncoder.geometry_group_name(component)
         # if it's a repeating pixel shape
         if isinstance(pixel_data, PixelGrid):
-            self.store_pixel_grid(nx_detector, component.geometry, pixel_data)
+            self.store_pixel_grid(nx_component, component.geometry, geometry_group_name, pixel_data)
         # if it's a mapping
         elif isinstance(pixel_data, PixelMapping):
-            self.store_pixel_mapping(nx_detector, component.geometry, pixel_data)
+            self.store_pixel_mapping(nx_component, component.geometry, geometry_group_name, pixel_data)
         # if it's got a single pixel id
         elif isinstance(pixel_data, SinglePixelId):
-            self.store_monitor_detector_id(nx_detector, component.geometry, pixel_data)
+            self.store_monitor_detector_id(nx_component, component.geometry, pixel_data)
         else:
-            geometry_group = nx_detector.create_group('geometry')
+            geometry_group = nx_component.create_group(geometry_group_name)
             self.store_geometry(geometry_group, component.geometry)
 
-    def store_pixel_grid(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelGrid):
+    def store_pixel_grid(
+            self,
+            nx_detector: h5py.Group,
+            geometry: Geometry,
+            geometry_group_name: str,
+            pixel_data: PixelGrid):
         if pixel_data is not None:
-            pixel_shape = nx_detector.create_group('pixel_shape')
+            pixel_shape = nx_detector.create_group(geometry_group_name)
             self.store_geometry(pixel_shape, geometry)
 
         nx_detector.create_dataset(
@@ -121,17 +127,27 @@ class HdfWriter(QObject):
             data=NexusEncoder.pixel_grid_detector_ids(pixel_data)
         )
 
-    def store_pixel_mapping(self, nx_detector: h5py.Group, geometry: Geometry, pixel_data: PixelMapping):
+    def store_pixel_mapping(
+            self,
+            nx_detector: h5py.Group,
+            geometry: Geometry,
+            geometry_group_name: str,
+            pixel_data: PixelMapping):
         if pixel_data is not None:
-            detector_shape = nx_detector.create_group('detector_shape')
+            detector_shape = nx_detector.create_group(geometry_group_name)
             self.store_geometry(detector_shape, geometry)
             detector_shape.create_dataset(
                 'detector_faces',
                 dtype='i',
                 data=NexusEncoder.pixel_mapping(pixel_data))
 
-    def store_monitor_detector_id(self, nx_monitor: h5py.Group, geometry: Geometry, pixel_data: SinglePixelId):
-        component_shape = nx_monitor.create_group('detector_shape')
+    def store_monitor_detector_id(
+            self,
+            nx_monitor: h5py.Group,
+            geometry: Geometry,
+            geometry_group_name: str,
+            pixel_data: SinglePixelId):
+        component_shape = nx_monitor.create_group(geometry_group_name)
         self.store_geometry(component_shape, geometry)
         # TODO: Replace this Mantid compatibility dataset, with the nexus standard's way (once it exists)
         component_shape.create_dataset(
