@@ -117,8 +117,19 @@ ApplicationWindow {
                 cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
 
                 AnimatedEntity {
+                    id: instrumentEntity
                     instrument: components
                 }
+            }
+
+            AxisIndicator {
+                id: axisIndicator
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                width: 100
+                height: 100
+
+                targetCamera: instrumentEntity.camera
             }
 
             MouseArea {
