@@ -53,7 +53,7 @@ Pane {
                 anchoredEditor: true
                 onEditingFinished: file_url = editorText
             }
-            Button {
+            PaddedButton {
                 id: chooseFileButton
                 anchors.verticalCenter: fileTextField.verticalCenter
                 anchors.right: parent.right
@@ -66,7 +66,6 @@ Pane {
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
                     file_url = filePicker.fileUrl
-                    fileTextField.editorText = file_url
                 }
             }
         }

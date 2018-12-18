@@ -39,7 +39,7 @@ ExpandingWindow {
             contentWidth: Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
             contentHeight: nameField.implicitHeight
                            + descriptionField.implicitHeight
-                           + transformLabel.implicitHeight
+                           + transformLabel.height
                            + transformFrame.implicitHeight
                            + geometryControls.implicitHeight
                            + pixelControls.implicitHeight
@@ -103,7 +103,7 @@ ExpandingWindow {
                     name: "hidden"; when: componentIndex == 0
                     PropertyChanges { target: transformFrame; implicitHeight: 0 }
                     PropertyChanges { target: transformFrame; visible: false }
-                    PropertyChanges { target: transformLabel; implicitHeight: 0 }
+                    PropertyChanges { target: transformLabel; height: 0 }
                     PropertyChanges { target: transformLabel; visible: false }
                     PropertyChanges { target: editComponentWindow; height: minimumHeight}
                 }

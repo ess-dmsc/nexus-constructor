@@ -33,7 +33,7 @@ Item {
         id: relativeLabel
         anchors.verticalCenter: relativePicker.verticalCenter
         anchors.left: parent.left
-        text: "Transform relative to:"
+        text: "Transform parent:"
     }
     ComboBox {
         id: relativePicker
@@ -44,13 +44,13 @@ Item {
         // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
         model: (componentIndex == 0) ? components : filteredModel
         textRole: "name"
-        currentIndex: transform_parent_index
+        currentIndex: (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
         validator: parentValidator
         onActivated: {
             if(acceptableInput){
-                transform_parent_index = currentIndex
+                transform_parent_index = model.source_index(currentIndex)
             } else {
-                currentIndex = transform_parent_index
+                currentIndex = (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
             }
         }
     }

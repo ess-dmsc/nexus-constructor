@@ -7,7 +7,7 @@ Item {
     property var pixelModel
 
     id: pane
-    implicitHeight: pixelLabel.implicitHeight + viewFrame.implicitHeight
+    implicitHeight: pixelLabel.height + viewFrame.implicitHeight
     width: viewFrame.width
     implicitWidth: viewFrame.implicitWidth
 
@@ -21,6 +21,7 @@ Item {
         id: pixelLabel
         anchors.top: parent.top
         anchors.left: parent.left
+        height: 0
     }
 
     Frame {
@@ -218,6 +219,7 @@ Item {
             PropertyChanges { target: view; model: gridModel }
             PropertyChanges { target: view; delegate: gridDelegate }
             PropertyChanges { target: pixelLabel; text: "Pixel grid:" }
+            PropertyChanges { target: pixelLabel; height: implicitHeight }
         },
         State {
             name: "Mapping"
@@ -227,6 +229,7 @@ Item {
             PropertyChanges { target: view; height: 200 }
             PropertyChanges { target: view; interactive: true }
             PropertyChanges { target: pixelLabel; text: "Pixel mapping:" }
+            PropertyChanges { target: pixelLabel; height: implicitHeight }
         },
         State {
             name: "SinglePixel"
@@ -234,6 +237,7 @@ Item {
             PropertyChanges { target: view; model: singlePixelModel }
             PropertyChanges { target: view; delegate: singlePixelDelegate }
             PropertyChanges { target: pixelLabel; text: "Pixel data:" }
+            PropertyChanges { target: pixelLabel; height: implicitHeight }
 
         }
     ]
