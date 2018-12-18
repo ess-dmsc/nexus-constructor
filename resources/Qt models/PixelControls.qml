@@ -26,7 +26,7 @@ Item {
 
     Frame {
         id: viewFrame
-        anchors.top: parent.top
+        anchors.top: pixelLabel.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         contentHeight: view.height
