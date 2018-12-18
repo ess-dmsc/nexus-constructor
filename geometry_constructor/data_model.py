@@ -101,11 +101,12 @@ class CylindricalGeometry(Geometry):
         :return: A QMatrix4x4 describing the rotation from the Z axis to the cylinder's axis
         """
         default_axis = QVector3D(0, 0, 1)
-        desired_axis = QVector3D(self.axis_direction.x,
-                                 self.axis_direction.y,
-                                 self.axis_direction.z)
+        unit_axis = self.axis_direction.unit_list
+        desired_axis = QVector3D(unit_axis[0],
+                                 unit_axis[1],
+                                 unit_axis[2])
         rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
-        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis) / self.axis_direction.magnitude)
+        rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis))
         rotate_degrees = rotate_radians * 360 / (2 * pi)
         rotate_matrix = QMatrix4x4()
         rotate_matrix.rotate(rotate_degrees, rotate_axis)

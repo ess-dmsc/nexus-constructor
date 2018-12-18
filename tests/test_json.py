@@ -2,8 +2,7 @@ import json
 import jsonschema
 from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, PixelMapping, PixelGrid,\
     SinglePixelId, Vector, CountDirection, Corner, Translation, Rotation
-from geometry_constructor.json_writer import JsonWriter
-from geometry_constructor.json_loader import JsonLoader
+import geometry_constructor.geometry_constructor_json as gc_json
 from geometry_constructor.qml_models.geometry_models import OFFModel
 from geometry_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QUrl
@@ -102,10 +101,10 @@ def test_loading_generated_json():
 
     assert model.components == model.components
 
-    json = JsonWriter().generate_json(model)
+    json_string = gc_json.generate_json(model)
 
     loaded_model = InstrumentModel()
-    JsonLoader().load_json_into_instrument_model(json, loaded_model)
+    gc_json.load_json_object_into_instrument_model(json.loads(json_string), loaded_model)
 
     assert model.components == loaded_model.components
 
@@ -115,7 +114,7 @@ def test_json_schema_compliance():
         schema = json.load(file)
 
     model = build_sample_model()
-    model_json = JsonWriter().generate_json(model)
+    model_json = gc_json.generate_json(model)
     model_data = json.loads(model_json)
 
     jsonschema.validate(model_data, schema)

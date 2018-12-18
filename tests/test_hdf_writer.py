@@ -47,13 +47,12 @@ def test_saved_root_component_has_no_transforms():
     # use an in memory file to avoid disk usage during tests
     with h5py.File('transforms_testfile', driver='core', backing_store=False) as file:
         HdfWriter().save_instrument_to_file(file, instrument)
-        sample = file['entry/instrument/Sample']
+        sample = file['entry/Sample']
 
         assert sample.attrs['NX_class'] == 'NXsample'
         assert sample.attrs['depends_on'] == '.'
 
-        assert 'translate' not in sample
-        assert 'rotate' not in sample
+        assert 'transforms' not in sample
 
 
 def test_saved_component_translate():
@@ -64,15 +63,17 @@ def test_saved_component_translate():
         detector = file['entry/instrument/detector1']
 
         assert detector.attrs['NX_class'] == 'NXdetector'
-        assert detector.attrs['depends_on'] == 'translate'
+        assert detector.attrs['depends_on'] == '/entry/instrument/detector1/transforms/translate'
 
-        detector_translate = detector['translate']
+        transformations = detector['transforms']
+        assert transformations.attrs['NX_class'] == 'NXtransformations'
+
+        detector_translate = transformations['translate']
         assert detector_translate[0] == approx(sqrt(sum(i**2 for i in [1, 2, 3])))
-        assert detector_translate.attrs['NX_class'] == 'NXtransformations'
         assert detector_translate.attrs['transformation_type'] == 'translation'
         assert detector_translate.attrs['units'] == 'm'
         assess_unit_length_3d_vector(detector_translate.attrs['vector'], [1, 2, 3])
-        assert detector_translate.attrs['depends_on'] == 'rotate'
+        assert detector_translate.attrs['depends_on'] == '/entry/instrument/detector1/transforms/rotate'
 
 
 def test_saved_component_rotate():
@@ -82,9 +83,8 @@ def test_saved_component_rotate():
         HdfWriter().save_instrument_to_file(file, instrument)
         detector = file['entry/instrument/detector1']
 
-        detector_rotate = detector['rotate']
+        detector_rotate = detector['transforms/rotate']
         assert detector_rotate[0] == 90
-        assert detector_rotate.attrs['NX_class'] == 'NXtransformations'
         assert detector_rotate.attrs['transformation_type'] == 'rotation'
         assert detector_rotate.attrs['units'] == 'degrees'
         assess_unit_length_3d_vector(detector_rotate.attrs['vector'], [4, 5, 6])
@@ -99,20 +99,21 @@ def test_saved_instrument_dependencies():
         HdfWriter().save_instrument_to_file(file, instrument)
 
         detector = file['entry/instrument/detector1']
-        assert detector.attrs['depends_on'] == 'translate'
-        assert detector['translate'].attrs['depends_on'] == 'rotate'
-        assert detector['rotate'].attrs['depends_on'] == '.'
+        assert detector.attrs['depends_on'] == '/entry/instrument/detector1/transforms/translate'
+        assert detector['transforms/translate'].attrs['depends_on'] == '/entry/instrument/detector1/transforms/rotate'
+        assert detector['transforms/rotate'].attrs['depends_on'] == '.'
 
         detector = file['entry/instrument/detector2']
-        assert detector.attrs['depends_on'] == 'rotate'
-        assert detector['rotate'].attrs['depends_on'] == 'translate'
-        assert detector['translate'].attrs['depends_on'] == '/entry/instrument/detector1/rotate'
+        assert detector.attrs['depends_on'] == '/entry/instrument/detector2/transforms/rotate'
+        assert detector['transforms/rotate'].attrs['depends_on'] == '/entry/instrument/detector2/transforms/translate'
+        assert detector['transforms/translate'].attrs['depends_on'] == '/entry/instrument/detector1/transforms/rotate'
 
         detector = file['entry/instrument/detector3']
-        assert detector.attrs['depends_on'] == 'translate2'
-        assert detector['translate2'].attrs['depends_on'] == 'translate'
-        assert detector['translate'].attrs['depends_on'] == 'rotate'
-        assert detector['rotate'].attrs['depends_on'] == '/entry/instrument/detector1/translate'
+        assert detector.attrs['depends_on'] == '/entry/instrument/detector3/transforms/translate2'
+        assert detector['transforms/translate2'].attrs['depends_on'] == \
+            '/entry/instrument/detector3/transforms/translate'
+        assert detector['transforms/translate'].attrs['depends_on'] == '/entry/instrument/detector3/transforms/rotate'
+        assert detector['transforms/rotate'].attrs['depends_on'] == '/entry/instrument/detector1/transforms/translate'
 
 
 def test_save_pixel_grid_coordinates():

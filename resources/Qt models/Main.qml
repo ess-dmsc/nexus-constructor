@@ -16,6 +16,8 @@ ApplicationWindow {
     minimumWidth: windowPane.implicitWidth
     minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
 
+    property string jsonMode: "liveFW"
+
     menuBar: MenuBar {
         Menu {
             title: "File"
@@ -28,12 +30,38 @@ ApplicationWindow {
                 onTriggered: jsonSaveDialog.open()
             }
             Action {
+                text: "Export to FileWriter"
+                onTriggered: nexusSaveDialog.open()
+            }
+            Action {
                 text: "Export to NeXus file"
                 onTriggered: nexusFileDialog.open()
             }
             Action {
                 text: "Write to console"
                 onTriggered: hdfWriter.print_instrument_to_console(components)
+            }
+        }
+        Menu {
+            title: "JSON"
+            RadioButton {
+                text: "Show Nexus FileWriter JSON"
+                checked: true
+                onClicked: {
+                    jsonMode = "liveFW"
+                    jsonConnector.request_filewriter_json(components)
+                }
+            }
+            RadioButton {
+                text: "Show Geometry Constructor JSON"
+                onClicked: {
+                    jsonMode = "liveGC"
+                    jsonConnector.request_geometry_constructor_json(components)
+                }
+            }
+            RadioButton {
+                text: "Hide JSON display"
+                onClicked: jsonMode = "hidden"
             }
         }
     }
@@ -131,6 +159,12 @@ ApplicationWindow {
                     }
                 }
             }
+
+            states: State {
+                name: "hidden"; when: jsonMode == "hidden"
+                PropertyChanges { target: jsonPane; visible: false }
+                PropertyChanges { target: jsonPane; width: 0 }
+            }
         }
     }
 
@@ -150,20 +184,26 @@ ApplicationWindow {
         id: hdfWriter
     }
 
-    JsonWriter {
-        id: jsonWriter
+    JsonConnector {
+        id: jsonConnector
         Component.onCompleted: {
-            // When the model updates, request new json
-            components.model_updated.connect(jsonWriter.request_model_json)
-            // When requested json is produced, update the model with it
-            jsonWriter.requested_model_json.connect(jsonModel.set_json)
+            // When requested json is produced, update the json model with it
+            jsonConnector.requested_geometry_constructor_json.connect(jsonModel.set_json)
+            jsonConnector.requested_filewriter_json.connect(jsonModel.set_json)
             // Request initial json
-            jsonWriter.request_model_json(components)
+            request_filewriter_json(components)
         }
     }
-
-    JsonLoader {
-        id: jsonLoader
+    // When the model updates, request new json for the view if desired
+    Connections {
+        target: components
+        onModel_updated: jsonConnector.request_filewriter_json(components)
+        enabled: jsonMode == "liveFW"
+    }
+    Connections {
+        target: components
+        onModel_updated: jsonConnector.request_geometry_constructor_json(components)
+        enabled: jsonMode == "liveGC"
     }
 
     FileDialog {
@@ -181,13 +221,22 @@ ApplicationWindow {
         nameFilters: ["JSON file (*.json)"]
         defaultSuffix: "json"
         selectExisting: false
-        onAccepted: jsonWriter.save_json(fileUrl, components)
+        onAccepted: jsonConnector.save_to_geometry_constructor_json(fileUrl, components)
     }
 
     FileDialog {
         id: jsonLoadDialog
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
-        onAccepted: jsonLoader.load_file_into_instrument_model(fileUrl, components)
+        onAccepted: jsonConnector.load_file_into_instrument_model(fileUrl, components)
+    }
+
+    FileDialog {
+        id: nexusSaveDialog
+        title: "Save FileWriter json to"
+        nameFilters: ["JSON file (*.json)"]
+        defaultSuffix: "json"
+        selectExisting: false
+        onAccepted: jsonConnector.save_to_filewriter_json(fileUrl, components)
     }
 }
