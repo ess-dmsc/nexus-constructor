@@ -1,6 +1,6 @@
 [![License (2-Clause BSD)](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)](https://github.com/ess-dmsc/nexus-geometry-constructor/blob/master/LICENSE) [![codecov](https://codecov.io/gh/ess-dmsc/nexus-geometry-constructor/branch/master/graph/badge.svg)](https://codecov.io/gh/ess-dmsc/nexus-geometry-constructor) [![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-geometry-constructor/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-geometry-constructor/job/master/)
 
-# nexus-geometry-constructor
+# nexus-constructor
 Construct NeXus files with instrument geometry information using a GUI
 
 ## Installing dependencies
@@ -14,8 +14,7 @@ repository. They can be installed from a terminal by running
 
 ## Running the application
 
-The Nexus Geometry test app is run from the python script `main.py`
-located in the root of the repository.
+Run the python script `main.py` located in the root of the repository.
 
 ## Running unit tests
 
@@ -56,7 +55,7 @@ Linux, but can only do so from a machine running that operating system.
 
 ## Developer notes
 
-The Nexus Geometry Constructor uses a Qt-QML UI through the 'Qt for Python' (aka
+The Nexus Constructor uses a Qt-QML UI through the 'Qt for Python' (aka
 'PySide2') bindings. While not as widely used as the PyQt5 library, it is an
 official set of bindings produced by Qt, and most existing examples in PyQt5,
 can be adapted with fairly little effort. Most methods are also named similarly
@@ -129,7 +128,7 @@ width would be in a circular dependency with the width of its parent item.
 
 ### JSON formats
 
-The nexus geometry constructor supports two different json formats, each with a
+The NeXus Constructor supports two different json formats, each with a
 different purpose.
 
 Geometry Constructor json is designed to mirror the structure of the 
