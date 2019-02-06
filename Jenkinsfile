@@ -17,7 +17,6 @@ centos = 'essdmscdm/centos7-build-node:3.1.0'
 container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 sh_cmd = "/usr/bin/scl enable rh-python35 -- /bin/bash -e"
 
-
 def get_win10_pipeline() {
 return {
     node('windows10') {
@@ -35,7 +34,7 @@ return {
 	    python3 -m pip install -r requirements.txt
 	    """
 	} // stage
-        stage("win10: Build") {
+        stage("win10: Build Executable") {
           bat """cd _build
 	    python3 ..\\setup.py build_exe"""
         }  // stage
@@ -44,16 +43,44 @@ return {
       }
 } // node
 } // return
-
 } // def
 
 def get_macos_pipeline() {
+return {
+node('macos') {
 
+cleanWs()
+dir("${project}/code") {
+
+ stage('macOS: Checkout') {
+ try {
+    checkout scm
+ } catch (e) {
+    failure_function(e, 'MacOSX / Checkout failed')
+ }
+ }
+
+ stage('macOS: Setup'){
+    sh "python3 -m pip install -r requirements.txt"
+ }
+
+ stage('macOS: Build Executable') {
+    sh "python3 setup.py build_exe"
+ }
+} // dir
+} // node
+} // return
+} // def
+
+def get_linux_pipeline(container_name) {
+return {
+node("docker") {
+stage('Centos7: Build Executable'){
+    sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python3 setup.py build_exe  \" "
 }
-
-def get_linux_pipeline(image_key) {
-
-}
+} // node
+} // return
+} // def
 
 
 
@@ -97,10 +124,7 @@ node("docker") {
         stage("Build Executables") {
 
         def builders = [:]
-        for (x in images.keySet()) {
-            builders[x] = get_pipeline(x)
-        }
-
+        builders['centos7'] = get_linux_pipeline(${container_name})
         builders['macOS'] = get_macos_pipeline()
         builders['windows10'] = get_win10_pipeline()
 
