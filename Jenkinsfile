@@ -1,9 +1,61 @@
-project = "nexus-geometry-constructor"
+project = "nexus-constructor"
+
+// Set number of old artefacts to keep.
+properties([
+    buildDiscarder(
+        logRotator(
+            artifactDaysToKeepStr: '',
+            artifactNumToKeepStr: '5',
+            daysToKeepStr: '',
+            numToKeepStr: ''
+        )
+    )
+])
 
 centos = 'essdmscdm/centos7-build-node:3.1.0'
 
 container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 sh_cmd = "/usr/bin/scl enable rh-python35 -- /bin/bash -e"
+
+
+def get_win10_pipeline() {
+return {
+    node('windows10') {
+      // Use custom location to avoid Win32 path length issues
+      ws('c:\\jenkins\\') {
+      cleanWs()
+      dir("${project}") {
+        stage("win10: Checkout") {
+          checkout scm
+        }  // stage
+
+	stage("win10: Setup") {
+          bat """if exist _build rd /q /s _build
+	    mkdir _build
+	    python3 -m pip install -r requirements.txt
+	    """
+	} // stage
+        stage("win10: Build") {
+          bat """cd _build
+	    python3 ..\\setup.py build_exe"""
+        }  // stage
+
+      }  // dir
+      }
+} // node
+} // return
+
+} // def
+
+def get_macos_pipeline() {
+
+}
+
+def get_linux_pipeline(image_key) {
+
+}
+
+
 
 node("docker") {
     cleanWs()
@@ -41,6 +93,25 @@ node("docker") {
                 build_env/bin/pip --proxy ${https_proxy} install codecov
                 \""""
         }
+
+        stage("Build Executables") {
+
+        def builders = [:]
+        for (x in images.keySet()) {
+            builders[x] = get_pipeline(x)
+        }
+
+        builders['macOS'] = get_macos_pipeline()
+        builders['windows10'] = get_win10_pipeline()
+
+        try {
+            parallel builders
+        } catch (e) {
+            pipeline_builder.handleFailureMessages()
+            throw e
+        }
+
+        } // stage
 
         stage("Run Linter") {
         sh """docker exec ${container_name} ${sh_cmd} -c \"
