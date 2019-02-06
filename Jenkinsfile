@@ -36,7 +36,7 @@ return {
 	} // stage
         stage("win10: Build Executable") {
           bat """cd _build
-	    python3 ..\\setup.py build_exe"""
+	    python ..\\setup.py build_exe"""
         }  // stage
 
       }  // dir
