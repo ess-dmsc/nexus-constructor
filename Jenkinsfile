@@ -128,12 +128,7 @@ node("docker") {
         builders['macOS'] = get_macos_pipeline()
         builders['windows10'] = get_win10_pipeline()
 
-        try {
-            parallel builders
-        } catch (e) {
-            pipeline_builder.handleFailureMessages()
-            throw e
-        }
+        parallel builders
 
         } // stage
 
