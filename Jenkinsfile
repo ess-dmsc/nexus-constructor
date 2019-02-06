@@ -37,7 +37,7 @@ return {
 	    python setup.py build_exe"""
         }  // stage
     stage('win10: Archive Executable'){
-    powershell label: '', script: 'Compress-Archive -Path /build -DestinationPath windowsbuild.zip'
+    powershell label: '', script: 'Compress-Archive -Path .\build -DestinationPath windowsbuild.zip'
     archiveArtifacts 'windowsbuild.zip'
     } // stage
 
