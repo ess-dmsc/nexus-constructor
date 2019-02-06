@@ -81,7 +81,7 @@ stage('Centos7: Build Executable'){
     sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python3 setup.py build_exe  \" "
 }
 stage('Centos7: Archive Executable') {
-    sh "docker cp ${container_name}:/${project}/build/* ./build && tar czvf linuxbuild.tar.gz ./build "
+    sh "docker cp ${container_name}:/home/jenkins/${project}/build/* ./build && tar czvf linuxbuild.tar.gz ./build "
     archiveArtifacts artifacts: 'linuxbuild.tar.gz', fingerprint: true
 }
 } // return
