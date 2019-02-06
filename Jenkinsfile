@@ -38,11 +38,13 @@ return {
         }  // stage
     stage('win10: Archive Executable'){
 
+    bat """tree .  """
+
 
     } // stage
 
       }  // dir
-      }
+      } //ws
 } // node
 } // return
 } // def
