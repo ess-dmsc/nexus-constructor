@@ -37,10 +37,8 @@ return {
 	    python setup.py build_exe"""
         }  // stage
     stage('win10: Archive Executable'){
-
-    bat """tree .  """
-
-
+    powershell label: '', script: 'Compress-Archive -Path /build -DestinationPath windowsbuild.zip'
+    archiveArtifacts 'windowsbuild.zip'
     } // stage
 
       }  // dir
@@ -135,9 +133,6 @@ node("docker") {
         builders['windows10'] = get_win10_pipeline()
 
         parallel builders
-
-        archiveArtifacts artifacts: 'builds/**/**/NexusConstructor*', fingerprint: true
-
         } // stage
 
         stage("Run Linter") {
