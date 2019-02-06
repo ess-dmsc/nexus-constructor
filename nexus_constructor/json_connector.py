@@ -10,7 +10,7 @@ class JsonConnector(QObject):
     """
     Exposes the json parsers to be callable via QML
 
-    Data can be saved to filewriter or geometry constructor json with the following methods:
+    Data can be saved to filewriter or nexus constructor json with the following methods:
     - save_to_filewriter_json
     - save_to_nexus_constructor_json
 

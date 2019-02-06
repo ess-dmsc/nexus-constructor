@@ -1,5 +1,5 @@
 """
-Functions to write data in an InstrumentModel to json that complies with the Geometry Constructor Instrument schema
+Functions to write data in an InstrumentModel to json that complies with the Nexus Constructor Instrument schema
 
 This module contains all the functions used to format the data.
 It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes

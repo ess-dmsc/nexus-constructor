@@ -53,7 +53,7 @@ ApplicationWindow {
                 }
             }
             RadioButton {
-                text: "Show Geometry Constructor JSON"
+                text: "Show Nexus Constructor JSON"
                 onClicked: {
                     jsonMode = "liveGC"
                     jsonConnector.request_nexus_constructor_json(components)
