@@ -31,7 +31,7 @@ return {
 	stage("win10: Setup") {
           bat """if exist _build rd /q /s _build
 	    mkdir _build
-	    python3 -m pip install -r requirements.txt
+	    python3 -m pip install --user -r requirements.txt
 	    """
 	} // stage
         stage("win10: Build Executable") {
@@ -61,7 +61,7 @@ dir("${project}/code") {
  }
 
  stage('macOS: Setup'){
-    sh "python3 -m pip install -r requirements.txt"
+    sh "python3 -m pip install --user -r requirements.txt"
  }
 
  stage('macOS: Build Executable') {
@@ -74,11 +74,9 @@ dir("${project}/code") {
 
 def get_linux_pipeline() {
 return {
-node("docker") {
 stage('Centos7: Build Executable'){
     sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python3 setup.py build_exe  \" "
 }
-} // node
 } // return
 } // def
 
