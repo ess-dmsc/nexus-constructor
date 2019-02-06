@@ -1,5 +1,5 @@
 attrs==18.2.0
-PySide2==5.11.2
+PySide2==5.12.1
 pytest==3.8.2
 pytest-cov>=2.6.0
 h5py==2.8.0
