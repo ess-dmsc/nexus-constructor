@@ -72,7 +72,7 @@ dir("${project}/code") {
 } // return
 } // def
 
-def get_linux_pipeline(container_name) {
+def get_linux_pipeline() {
 return {
 node("docker") {
 stage('Centos7: Build Executable'){
@@ -81,8 +81,6 @@ stage('Centos7: Build Executable'){
 } // node
 } // return
 } // def
-
-
 
 node("docker") {
     cleanWs()
@@ -124,7 +122,7 @@ node("docker") {
         stage("Build Executables") {
 
         def builders = [:]
-        builders['centos7'] = get_linux_pipeline(${container_name})
+        builders['centos7'] = get_linux_pipeline()
         builders['macOS'] = get_macos_pipeline()
         builders['windows10'] = get_win10_pipeline()
 
