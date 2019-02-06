@@ -1,6 +1,6 @@
 # UI Tests
 
-Due to difficulties combining the UI and testing libraries we use, the Geometry Constructor's
+Due to difficulties combining the UI and testing libraries we use, the Nexus Constructor's
 interface isn't able to be easily tested programaticaly. The following are a description of the
 manual steps that should be taken, and the expected outcomes, to test the user interface.
 
@@ -25,7 +25,7 @@ With the application open, click on the 'Sample' box in the 'Components' pane.
 Change the value of the name field, and tab out of the text field.
 - The JSON display should automatically update to show the name value on the relevant line.
 
-Open the 'JSON' menu at the top of the application window, and click the "Show Geometry Constructor
+Open the 'JSON' menu at the top of the application window, and click the "Show Nexus Constructor
 JSON" radio button.
 - The format of the JSON display should change, but the new name value should still be contained in
 it.
@@ -246,7 +246,7 @@ In the menu bar, select 'File' > 'Open' and select 'gc_ui_test.json'.
 - The monitor cylinder should reappear with its larger radius, to the left of the sample cube,
 pointing up and to the right.
 
-Close and re-open the Geometry Constructor.
+Close and re-open the Nexus Constructor.
 In the menu bar, select 'File' > 'Open' and select 'fw_ui_test.json'.
 - Three components should exist in the components box, named 'Sample', 'Cube Detector', and
 'Monitor'.

@@ -1,8 +1,8 @@
-from geometry_constructor.data_model import ComponentType, PixelGrid, PixelMapping, Vector,\
+from nexus_constructor.data_model import ComponentType, PixelGrid, PixelMapping, Vector,\
     CylindricalGeometry, OFFGeometry, Component, Rotation, Translation
-from geometry_constructor.qml_models import change_value, generate_unique_name
-from geometry_constructor.qml_models.transform_model import TransformationModel
-from geometry_constructor.off_renderer import OffMesh
+from nexus_constructor.qml_models import change_value, generate_unique_name
+from nexus_constructor.qml_models.transform_model import TransformationModel
+from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
 

@@ -1,19 +1,19 @@
 """
-Functions to load Geometry Constructor Instrument json schema compliant data into an InstrumentModel
+Functions to load Nexus Constructor Instrument json schema compliant data into an InstrumentModel
 
 This module contains all the parsing functions used to load the data.
 It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
 only the required root function to load the json
 """
-from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
+from nexus_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
     PixelMapping, SinglePixelId, CountDirection, Corner, Vector, Translation, Rotation
-from geometry_constructor.nexus import NexusDecoder
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.nexus import NexusDecoder
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
     """
-    Loads an object representation of geometry constructor instrument json into an InstrumentModel
+    Loads an object representation of Nexus constructor instrument json into an InstrumentModel
 
     :param json_data: Dictionary containing the json data to load
     :param model: The model the loaded components will be stored in

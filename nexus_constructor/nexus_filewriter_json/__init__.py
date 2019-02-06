@@ -8,7 +8,7 @@ explicitly defined dependent transform in their transform parent will have one a
 """
 
 from . import loader, writer
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 def generate_json(model: InstrumentModel):
@@ -24,7 +24,7 @@ def generate_json(model: InstrumentModel):
 
 def load_json_object_into_instrument_model(json_object: dict, model: InstrumentModel):
     """
-    Loads an object representation of Geometry Constructor json into a given instrument model
+    Loads an object representation of Nexus Constructor json into a given instrument model
 
     The object representation should be a dictionary, built by pythons json package load functions, and conform to the
     nexus filewriter format

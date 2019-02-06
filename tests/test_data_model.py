@@ -1,4 +1,4 @@
-from geometry_constructor.data_model import CylindricalGeometry, Vector
+from nexus_constructor.data_model import CylindricalGeometry, Vector
 from pytest import approx, raises
 
 

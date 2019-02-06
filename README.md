@@ -1,4 +1,4 @@
-[![License (2-Clause BSD)](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)](https://github.com/ess-dmsc/nexus-geometry-constructor/blob/master/LICENSE) [![codecov](https://codecov.io/gh/ess-dmsc/nexus-geometry-constructor/branch/master/graph/badge.svg)](https://codecov.io/gh/ess-dmsc/nexus-geometry-constructor) [![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-geometry-constructor/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-geometry-constructor/job/master/)
+[![License (2-Clause BSD)](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)](https://github.com/ess-dmsc/nexus-constructor/blob/master/LICENSE) [![codecov](https://codecov.io/gh/ess-dmsc/nexus-constructor/branch/master/graph/badge.svg)](https://codecov.io/gh/ess-dmsc/nexus-constructor) [![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-constructor/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-constructor/job/master/)
 
 # nexus-constructor
 Construct NeXus files with instrument geometry information using a GUI
@@ -24,7 +24,7 @@ the project's root directory by running the command `pytest`.
 
 Test coverage can be checked by running the following from the root of the repository:
 ```
-pytest --cov=geometry_constructor
+pytest --cov=nexus_constructor
 ```
 
 ## Linter
@@ -64,13 +64,13 @@ enough that c++ examples can be extremely useful too.
 ### Python and QML
 
 The data classes that internally model an instrument's geometry are found in the
-`geometry_constructor.data_model` module. The data that these classes contain is
+`nexus_constructor.data_model` module. The data that these classes contain is
 then exposed to the QML interface through a series of model classes defined in
-`geometry_constructor.qml_models`. These models create a set of named
+`nexus_constructor.qml_models`. These models create a set of named
 properties, or Roles, that can be read and edited through the QML UI.
 
 For these custom models to be accessible in QML, they need to be registered to a
-module. This is done in `geometry_constructor/application.py` alongside the
+module. This is done in `nexus_constructor/application.py` alongside the
 class that loads the QML files.
 
 To use a custom model and its properties, import its qml module, create an
@@ -131,7 +131,7 @@ width would be in a circular dependency with the width of its parent item.
 The NeXus Constructor supports two different json formats, each with a
 different purpose.
 
-Geometry Constructor json is designed to mirror the structure of the 
+Nexus Constructor json is designed to mirror the structure of the 
 InstrumentModel and data_model classes. Thus it can be used to store and reload
 identical representations of the data in them for saving and returning to at a
 later time. Its format is defined in `Instrument.schema.json`
@@ -141,7 +141,7 @@ Nexus FileWriter json stores an instrument's data in the format required by
 to produce a standard compliant [nexus file](https://www.nexusformat.org/).
 As a result, certain transformations are made to the data before it goes into
 this format which cannot be reversed, making saving and reloading into the
-geometry constructor from this format slightly lossy. This is mostly due to
+nexus constructor from this format slightly lossy. This is mostly due to
 floating point calculation inaccuracies, but also includes explicitly stating
 the dependent transform in a parent if the model was implicitly using the last
 one before exporting.

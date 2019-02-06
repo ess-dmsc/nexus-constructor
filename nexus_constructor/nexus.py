@@ -1,4 +1,4 @@
-from geometry_constructor.data_model import Component, ComponentType, PixelGrid, PixelMapping, CountDirection, Corner,\
+from nexus_constructor.data_model import Component, ComponentType, PixelGrid, PixelMapping, CountDirection, Corner,\
     Transformation
 from typing import List, Union
 
@@ -158,7 +158,7 @@ class NexusEncoder:
         For other groups:
             'shape'
         """
-        # As of writing, Geometry constructor NXcylindrical_geometry's don't contain 'detector_number', simplifying the
+        # As of writing, Nexus constructor NXcylindrical_geometry's don't contain 'detector_number', simplifying the
         # logic here
         if component.component_type == ComponentType.DETECTOR:
             if isinstance(component.pixel_data, PixelMapping):
