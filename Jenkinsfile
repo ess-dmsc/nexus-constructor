@@ -37,8 +37,10 @@ return {
 	    python setup.py build_exe"""
         }  // stage
     stage('win10: Archive Executable'){
+    if (env.CHANGE_ID) {
     powershell label: '', script: 'Compress-Archive -Path .\\build -DestinationPath windowsbuild.zip'
     archiveArtifacts 'windowsbuild.zip'
+    }
     } // stage
 
       }  // dir
@@ -95,8 +97,10 @@ stage('Centos7: Build Executable'){
     sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python3 setup.py build_exe  \" "
 }
 stage('Centos7: Archive Executable') {
+    if (env.CHANGE_ID) {
     sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf linuxbuild.tar.gz ./build "
     archiveArtifacts artifacts: 'linuxbuild.tar.gz', fingerprint: true
+    }
 }
 stage("Centos7: Run Linter") {
         sh """docker exec ${container_name} ${sh_cmd} -c \"
