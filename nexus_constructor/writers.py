@@ -20,7 +20,7 @@ class HdfWriter(QObject):
 
     @Slot(QUrl, 'QVariant')
     def save_instrument(self, file_url: QUrl, model: InstrumentModel):
-        filename = file_url.toString(options=QUrl.PreferLocalFile)
+        filename = file_url.toString()
         print(filename)
         with h5py.File(filename, 'w') as file:
             self.save_instrument_to_file(file, model)
