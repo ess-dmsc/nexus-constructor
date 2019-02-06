@@ -8,7 +8,7 @@ explicitly defined dependent transform in their transform parent will have one a
 """
 
 from . import loader, writer
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 def generate_json(model: InstrumentModel):

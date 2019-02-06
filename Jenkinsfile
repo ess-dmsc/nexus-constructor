@@ -1,4 +1,4 @@
-project = "nexus-geometry-constructor"
+project = "nexus-constructor"
 
 centos = 'essdmscdm/centos7-build-node:3.1.0'
 

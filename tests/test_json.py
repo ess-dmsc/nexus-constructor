@@ -1,10 +1,10 @@
 import json
 import jsonschema
-from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, PixelMapping, PixelGrid,\
+from nexus_constructor.data_model import Component, ComponentType, CylindricalGeometry, PixelMapping, PixelGrid,\
     SinglePixelId, Vector, CountDirection, Corner, Translation, Rotation
-import geometry_constructor.geometry_constructor_json as gc_json
-from geometry_constructor.qml_models.geometry_models import OFFModel
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+import nexus_constructor.nexus_constructor_json as gc_json
+from nexus_constructor.qml_models.geometry_models import OFFModel
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QUrl
 
 

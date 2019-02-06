@@ -1,4 +1,4 @@
-from geometry_constructor.data_model import OFFGeometry, Vector
+from nexus_constructor.data_model import OFFGeometry, Vector
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 

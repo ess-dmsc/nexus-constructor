@@ -5,10 +5,10 @@ This module contains all the parsing functions used to load the data.
 It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
 only the required root function to load the json
 """
-from geometry_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
+from nexus_constructor.data_model import Component, ComponentType, CylindricalGeometry, OFFGeometry, PixelGrid,\
     PixelMapping, SinglePixelId, CountDirection, Corner, Vector, Translation, Rotation
-from geometry_constructor.nexus import NexusDecoder
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.nexus import NexusDecoder
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):

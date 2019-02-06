@@ -1,20 +1,20 @@
 """
-Contains the main class for the nexus geometry constructor
+Contains the main class for the nexus constructor
 
 Loading this module also registers with QML the required custom classes to load the application's QML GUI
 """
 
 import sys
 from os import path
-from geometry_constructor.json_connector import JsonConnector
-from geometry_constructor.qml_models.component_filters import SingleComponentModel, ExcludedComponentModel
-from geometry_constructor.qml_models.geometry_models import CylinderModel, OFFModel
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
-from geometry_constructor.qml_models.json_model import FilteredJsonModel
-from geometry_constructor.qml_models.pixel_models import PixelGridModel, PixelMappingModel, SinglePixelModel
-from geometry_constructor.qml_models.transform_model import TransformationModel
-from geometry_constructor.validators import NameValidator, TransformParentValidator, NullableIntValidator
-from geometry_constructor.writers import HdfWriter, Logger
+from nexus_constructor.json_connector import JsonConnector
+from nexus_constructor.qml_models.component_filters import SingleComponentModel, ExcludedComponentModel
+from nexus_constructor.qml_models.geometry_models import CylinderModel, OFFModel
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.json_model import FilteredJsonModel
+from nexus_constructor.qml_models.pixel_models import PixelGridModel, PixelMappingModel, SinglePixelModel
+from nexus_constructor.qml_models.transform_model import TransformationModel
+from nexus_constructor.validators import NameValidator, TransformParentValidator, NullableIntValidator
+from nexus_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 
@@ -41,7 +41,7 @@ qmlRegisterType(TransformParentValidator, 'MyValidators', 1, 0, 'ParentValidator
 
 
 class Application(QQmlApplicationEngine):
-    """Main gui class for the nexus geometry constructor"""
+    """Main gui class for the nexus constructor"""
 
     def __init__(self, resource_folder):
         super().__init__()

@@ -1,4 +1,4 @@
-from geometry_constructor.data_model import Component, ComponentType, PixelGrid, PixelMapping, CountDirection, Corner,\
+from nexus_constructor.data_model import Component, ComponentType, PixelGrid, PixelMapping, CountDirection, Corner,\
     Transformation
 from typing import List, Union
 

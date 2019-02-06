@@ -3,7 +3,7 @@ Package for loading and creating json representations of an InstrumentModel that
 Instrument json schema
 """
 from . import writer, loader
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 def generate_json(model: InstrumentModel):

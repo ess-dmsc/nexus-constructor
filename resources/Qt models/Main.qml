@@ -8,7 +8,7 @@ import MyWriters 1.0
 
 ApplicationWindow {
 
-    title: "Nexus Geometry Constructor"
+    title: "Nexus Constructor"
     id: window
     visible: true
     width: 1100
@@ -56,7 +56,7 @@ ApplicationWindow {
                 text: "Show Geometry Constructor JSON"
                 onClicked: {
                     jsonMode = "liveGC"
-                    jsonConnector.request_geometry_constructor_json(components)
+                    jsonConnector.request_nexus_constructor_json(components)
                 }
             }
             RadioButton {
@@ -188,7 +188,7 @@ ApplicationWindow {
         id: jsonConnector
         Component.onCompleted: {
             // When requested json is produced, update the json model with it
-            jsonConnector.requested_geometry_constructor_json.connect(jsonModel.set_json)
+            jsonConnector.requested_nexus_constructor_json.connect(jsonModel.set_json)
             jsonConnector.requested_filewriter_json.connect(jsonModel.set_json)
             // Request initial json
             request_filewriter_json(components)
@@ -202,7 +202,7 @@ ApplicationWindow {
     }
     Connections {
         target: components
-        onModel_updated: jsonConnector.request_geometry_constructor_json(components)
+        onModel_updated: jsonConnector.request_nexus_constructor_json(components)
         enabled: jsonMode == "liveGC"
     }
 
@@ -221,7 +221,7 @@ ApplicationWindow {
         nameFilters: ["JSON file (*.json)"]
         defaultSuffix: "json"
         selectExisting: false
-        onAccepted: jsonConnector.save_to_geometry_constructor_json(fileUrl, components)
+        onAccepted: jsonConnector.save_to_nexus_constructor_json(fileUrl, components)
     }
 
     FileDialog {

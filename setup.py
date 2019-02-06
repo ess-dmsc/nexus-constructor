@@ -52,11 +52,11 @@ else:
     removable = unix_removable
     extension = ''
 
-setup(name='Nexus Geometry Test App',
+setup(name='Nexus Constructor Test App',
       version='0.1',
-      description='Technology test program for the nexus geometry constructor',
+      description='Technology test program for the nexus constructor',
       options={'build_exe': build_exe_options},
-      executables=[Executable('main.py', base=base, targetName='NexusGeometry' + extension)])
+      executables=[Executable('main.py', base=base, targetName='NexusConstructor' + extension)])
 
 for file in removable:
     for build_dir in Path('.').glob('build/*'):

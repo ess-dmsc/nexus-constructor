@@ -1,8 +1,8 @@
-"""Tests for custom validators in the geometry_constructor.validators module"""
-from geometry_constructor.data_model import Component, Translation
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
-from geometry_constructor.qml_models.transform_model import TransformationModel
-from geometry_constructor.validators import NameValidator, TransformParentValidator
+"""Tests for custom validators in the nexus_constructor.validators module"""
+from nexus_constructor.data_model import Component, Translation
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.transform_model import TransformationModel
+from nexus_constructor.validators import NameValidator, TransformParentValidator
 from PySide2.QtGui import QValidator
 
 

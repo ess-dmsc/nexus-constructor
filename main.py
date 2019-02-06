@@ -1,11 +1,11 @@
 """
-Entry script for the nexus geometry constructor application.
+Entry script for the nexus constructor application.
 Requires Python 3.5+
 """
 
 import sys
 from os import path, environ
-from geometry_constructor.application import Application
+from nexus_constructor.application import Application
 from PySide2.QtGui import QGuiApplication
 
 

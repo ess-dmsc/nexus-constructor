@@ -1,7 +1,7 @@
 from PySide2.QtCore import QObject, QUrl, Slot, Signal
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
-import geometry_constructor.geometry_constructor_json as gc_json
-import geometry_constructor.nexus_filewriter_json as nf_json
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
+import nexus_constructor.nexus_constructor_json as gc_json
+import nexus_constructor.nexus_filewriter_json as nf_json
 import json
 import jsonschema
 
@@ -12,17 +12,17 @@ class JsonConnector(QObject):
 
     Data can be saved to filewriter or geometry constructor json with the following methods:
     - save_to_filewriter_json
-    - save_to_geometry_constructor_json
+    - save_to_nexus_constructor_json
 
     And can be loaded from a file containing either format using
     - load_file_into_instrument_model
 
     Slots and signals also exist to allow the json to be generated on the fly and propagated to other sources:
     Calls to:
-    - request_geometry_constructor_json
+    - request_nexus_constructor_json
     - request_filewriter_json
     Will generate the json in the requested format, and send it in the relevant signal:
-    - requested_geometry_constructor_json
+    - requested_nexus_constructor_json
     - requested_filewriter_json
     """
 
@@ -39,13 +39,13 @@ class JsonConnector(QObject):
             json_string = file.read()
         data = json.loads(json_string)
 
-        geometry_constructor_json = True
+        nexus_constructor_json = True
         try:
             jsonschema.validate(data, self.schema)
         except jsonschema.exceptions.ValidationError:
-            geometry_constructor_json = False
+            nexus_constructor_json = False
 
-        if geometry_constructor_json:
+        if nexus_constructor_json:
             gc_json.load_json_object_into_instrument_model(data, model)
         else:
             nf_json.load_json_object_into_instrument_model(data, model)
@@ -56,7 +56,7 @@ class JsonConnector(QObject):
         self.save_to_file(json_string, file_url)
 
     @Slot(QUrl, 'QVariant')
-    def save_to_geometry_constructor_json(self, file_url: QUrl, model: InstrumentModel):
+    def save_to_nexus_constructor_json(self, file_url: QUrl, model: InstrumentModel):
         json_string = gc_json.generate_json(model)
         self.save_to_file(json_string, file_url)
 
@@ -66,11 +66,11 @@ class JsonConnector(QObject):
         with open(filename, 'w') as file:
             file.write(data)
 
-    requested_geometry_constructor_json = Signal(str)
+    requested_nexus_constructor_json = Signal(str)
 
     @Slot('QVariant')
-    def request_geometry_constructor_json(self, model: InstrumentModel):
-        self.requested_geometry_constructor_json.emit(gc_json.generate_json(model))
+    def request_nexus_constructor_json(self, model: InstrumentModel):
+        self.requested_nexus_constructor_json.emit(gc_json.generate_json(model))
 
     requested_filewriter_json = Signal(str)
 

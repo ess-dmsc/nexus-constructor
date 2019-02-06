@@ -7,9 +7,9 @@ only the required root function to generate the json.
 """
 import json
 from typing import List
-from geometry_constructor.data_model import Component, Geometry, CylindricalGeometry, OFFGeometry,\
+from nexus_constructor.data_model import Component, Geometry, CylindricalGeometry, OFFGeometry,\
     PixelGrid, PixelMapping, SinglePixelId, Transformation, Translation, Rotation
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 def generate_json(model: InstrumentModel):
