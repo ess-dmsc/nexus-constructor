@@ -29,14 +29,12 @@ return {
         }  // stage
 
 	stage("win10: Setup") {
-          bat """if exist _build rd /q /s _build
-	    mkdir _build
-	    python -m pip install --user -r requirements.txt
+          bat """python -m pip install --user -r requirements.txt
 	    """
 	} // stage
         stage("win10: Build Executable") {
-          bat """cd _build
-	    python ..\\setup.py build_exe"""
+          bat """
+	    python setup.py build_exe"""
         }  // stage
 
       }  // dir
@@ -50,7 +48,7 @@ return {
 node('macos') {
 
 cleanWs()
-dir("${project}/code") {
+dir("${project}") {
 
  stage('macOS: Checkout') {
  try {
