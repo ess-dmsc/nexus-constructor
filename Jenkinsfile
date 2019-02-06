@@ -36,6 +36,10 @@ return {
           bat """
 	    python setup.py build_exe"""
         }  // stage
+    stage('win10: Archive Executable'){
+
+
+    } // stage
 
       }  // dir
       }
@@ -65,6 +69,7 @@ dir("${project}") {
  stage('macOS: Build Executable') {
     sh "python3 setup.py build_exe"
  }
+ // archive as well
 } // dir
 } // node
 } // return
@@ -74,6 +79,10 @@ def get_linux_pipeline() {
 return {
 stage('Centos7: Build Executable'){
     sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python3 setup.py build_exe  \" "
+}
+stage('Centos7: Archive Executable') {
+    sh "docker cp ${container_name}:/${project}/build/exe.linux-x86_64* ./build && tar czvf linuxbuild.tar.gz ./build "
+    archiveArtifacts artifacts: 'linuxbuild.tar.gz', fingerprint: true
 }
 } // return
 } // def
@@ -124,6 +133,8 @@ node("docker") {
         builders['windows10'] = get_win10_pipeline()
 
         parallel builders
+
+        archiveArtifacts artifacts: 'builds/**/**/NexusConstructor*', fingerprint: true
 
         } // stage
 
