@@ -148,7 +148,7 @@ node("docker") {
                 }
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
-                build_env/bin/pytest --cov=geometry_constructor --cov-report=xml
+                build_env/bin/pytest --cov=nexus_constructor --cov-report=xml
                 \""""
             withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
                 sh """docker exec ${container_name} ${sh_cmd} -c \"

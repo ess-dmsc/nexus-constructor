@@ -1,5 +1,5 @@
 """
-Functions to write data in an InstrumentModel to json that complies with the Geometry Constructor Instrument schema
+Functions to write data in an InstrumentModel to json that complies with the Nexus Constructor Instrument schema
 
 This module contains all the functions used to format the data.
 It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
@@ -7,9 +7,9 @@ only the required root function to generate the json.
 """
 import json
 from typing import List
-from geometry_constructor.data_model import Component, Geometry, CylindricalGeometry, OFFGeometry,\
+from nexus_constructor.data_model import Component, Geometry, CylindricalGeometry, OFFGeometry,\
     PixelGrid, PixelMapping, SinglePixelId, Transformation, Translation, Rotation
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 def generate_json(model: InstrumentModel):

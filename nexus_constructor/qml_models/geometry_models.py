@@ -5,12 +5,12 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 
-from geometry_constructor.data_model import CylindricalGeometry, OFFGeometry
-from geometry_constructor.geometry_loader import load_geometry
-from geometry_constructor.qml_models import change_value
+from nexus_constructor.data_model import CylindricalGeometry, OFFGeometry
+from nexus_constructor.geometry_loader import load_geometry
+from nexus_constructor.qml_models import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
 
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class CylinderModel(QAbstractListModel):

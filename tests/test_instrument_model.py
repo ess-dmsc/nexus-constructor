@@ -1,5 +1,5 @@
-from geometry_constructor import data_model
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor import data_model
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 

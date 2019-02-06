@@ -1,9 +1,9 @@
 import h5py
 from pprint import pprint
-from geometry_constructor.data_model import PixelGrid, PixelMapping, SinglePixelId, \
+from nexus_constructor.data_model import PixelGrid, PixelMapping, SinglePixelId, \
     Geometry, OFFGeometry, CylindricalGeometry, Component, Rotation, Translation
-from geometry_constructor.nexus import NexusEncoder
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.nexus import NexusEncoder
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
 
 

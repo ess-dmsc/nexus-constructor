@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "$id": "https://raw.githubusercontent.com/ess-dmsc/nexus-geometry-constructor/master/Instrument.schema.json",
+  "$id": "https://raw.githubusercontent.com/ess-dmsc/nexus-constructor/master/Instrument.schema.json",
   "title": "Instrument",
   "description": "An experimental setup of an instrument on a beamline, containing a sample and set of components based on the NeXus data format",
   "type": "object",
