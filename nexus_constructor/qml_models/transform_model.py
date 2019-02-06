@@ -24,7 +24,7 @@ class TransformationModel(QAbstractListModel):
 
     transformsUpdated = Signal()
 
-    def __init__(self, transforms: list=None):
+    def __init__(self, transforms: list = None):
         super().__init__()
         self.transforms = [] if transforms is None else transforms
         self.deletable = [True for _ in self.transforms]
@@ -36,7 +36,7 @@ class TransformationModel(QAbstractListModel):
         transform = self.transforms[index.row()]
         if isinstance(transform, Translation):
             properties = {
-                TransformationModel.TransformTypeRole: 'Translate',
+                TransformationModel.TransformTypeRole: "Translate",
                 TransformationModel.TransformNameRole: transform.name,
                 TransformationModel.DeletableRole: self.deletable[index.row()],
                 TransformationModel.TranslateXRole: transform.vector.x,
@@ -45,7 +45,7 @@ class TransformationModel(QAbstractListModel):
             }
         elif isinstance(transform, Rotation):
             properties = {
-                TransformationModel.TransformTypeRole: 'Rotate',
+                TransformationModel.TransformTypeRole: "Rotate",
                 TransformationModel.TransformNameRole: transform.name,
                 TransformationModel.DeletableRole: self.deletable[index.row()],
                 TransformationModel.RotateXRole: transform.axis.x,
@@ -58,7 +58,7 @@ class TransformationModel(QAbstractListModel):
         if role in properties:
             return properties[role]
         else:
-            return ''
+            return ""
 
     def setData(self, index, value, role):
         changed = False
@@ -66,18 +66,18 @@ class TransformationModel(QAbstractListModel):
 
         if isinstance(transform, Translation):
             param_options = {
-                TransformationModel.TransformNameRole: [transform, 'name', value],
-                TransformationModel.TranslateXRole: [transform.vector, 'x', value],
-                TransformationModel.TranslateYRole: [transform.vector, 'y', value],
-                TransformationModel.TranslateZRole: [transform.vector, 'z', value],
+                TransformationModel.TransformNameRole: [transform, "name", value],
+                TransformationModel.TranslateXRole: [transform.vector, "x", value],
+                TransformationModel.TranslateYRole: [transform.vector, "y", value],
+                TransformationModel.TranslateZRole: [transform.vector, "z", value],
             }
         elif isinstance(transform, Rotation):
             param_options = {
-                TransformationModel.TransformNameRole: [transform, 'name', value],
-                TransformationModel.RotateXRole: [transform.axis, 'x', value],
-                TransformationModel.RotateYRole: [transform.axis, 'y', value],
-                TransformationModel.RotateZRole: [transform.axis, 'z', value],
-                TransformationModel.RotateAngleRole: [transform, 'angle', value],
+                TransformationModel.TransformNameRole: [transform, "name", value],
+                TransformationModel.RotateXRole: [transform.axis, "x", value],
+                TransformationModel.RotateYRole: [transform.axis, "y", value],
+                TransformationModel.RotateZRole: [transform.axis, "z", value],
+                TransformationModel.RotateAngleRole: [transform, "angle", value],
             }
         else:
             param_options = {}
@@ -96,25 +96,29 @@ class TransformationModel(QAbstractListModel):
 
     def roleNames(self):
         return {
-            TransformationModel.TransformTypeRole: b'transform_type',
-            TransformationModel.TransformNameRole: b'name',
-            TransformationModel.DeletableRole: b'deletable',
-            TransformationModel.TranslateXRole: b'translate_x',
-            TransformationModel.TranslateYRole: b'translate_y',
-            TransformationModel.TranslateZRole: b'translate_z',
-            TransformationModel.RotateXRole: b'rotate_x',
-            TransformationModel.RotateYRole: b'rotate_y',
-            TransformationModel.RotateZRole: b'rotate_z',
-            TransformationModel.RotateAngleRole: b'rotate_angle',
+            TransformationModel.TransformTypeRole: b"transform_type",
+            TransformationModel.TransformNameRole: b"name",
+            TransformationModel.DeletableRole: b"deletable",
+            TransformationModel.TranslateXRole: b"translate_x",
+            TransformationModel.TranslateYRole: b"translate_y",
+            TransformationModel.TranslateZRole: b"translate_z",
+            TransformationModel.RotateXRole: b"rotate_x",
+            TransformationModel.RotateYRole: b"rotate_y",
+            TransformationModel.RotateZRole: b"rotate_z",
+            TransformationModel.RotateAngleRole: b"rotate_angle",
         }
 
     @Slot()
     def add_translate(self):
-        self.add_transform(Translation(name=generate_unique_name('Translate', self.transforms)))
+        self.add_transform(
+            Translation(name=generate_unique_name("Translate", self.transforms))
+        )
 
     @Slot()
     def add_rotate(self):
-        self.add_transform(Rotation(name=generate_unique_name('Rotate', self.transforms)))
+        self.add_transform(
+            Rotation(name=generate_unique_name("Rotate", self.transforms))
+        )
 
     @Slot(int)
     def delete_transform(self, index: int):
@@ -151,11 +155,13 @@ class TransformationModel(QAbstractListModel):
         self.dataChanged.emit(
             self.createIndex(0, 0),
             self.createIndex(self.rowCount(), 0),
-            TransformationModel.DeletableRole
+            TransformationModel.DeletableRole,
         )
 
     def set_deletable(self, index: int, deletable: bool):
         if index in range(self.rowCount()):
             self.deletable[index] = deletable
             model_index = self.createIndex(index, 0)
-            self.dataChanged.emit(model_index, model_index, TransformationModel.DeletableRole)
+            self.dataChanged.emit(
+                model_index, model_index, TransformationModel.DeletableRole
+            )

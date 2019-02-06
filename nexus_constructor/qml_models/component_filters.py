@@ -31,7 +31,7 @@ class InstrumentModelFilter(QSortFilterProxyModel):
 
     model_changed = Signal()
 
-    model = Property('QVariant', get_model, set_model, notify=model_changed)
+    model = Property("QVariant", get_model, set_model, notify=model_changed)
 
 
 class SingleComponentModel(InstrumentModelFilter):
