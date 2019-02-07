@@ -1,0 +1,2 @@
+# qmldir
+singleton LongRunningTask LongRunningTask.qml

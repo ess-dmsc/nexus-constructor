@@ -5,6 +5,7 @@ import QtQuick.Dialogs 1.3
 import MyJson 1.0
 import MyModels 1.0
 import MyWriters 1.0
+import "."
 
 ApplicationWindow {
 
@@ -178,7 +179,7 @@ ApplicationWindow {
                 text: "Running..."
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
-                visible: longRunningTask
+                visible: LongRunningTask.running
 
             }
         }
