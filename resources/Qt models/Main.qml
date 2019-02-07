@@ -246,7 +246,10 @@ ApplicationWindow {
     statusBar: StatusBar {
         RowLayout {
             anchors.fill: parent
-            Label { text: "" }
-           }
-           }
+            BusyIndicator {
+                height: 15
+                running: true
+            }
+        }
+    }
 }
