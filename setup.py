@@ -22,7 +22,8 @@ build_exe_options = {'packages': ['numpy.core._methods',
                              'resources',
                              'Instrument.schema.json',
                          ],
-                     'bin_includes': ['libssl.so']
+                     'bin_includes': ['libssl.so'],
+                     'includes': ['pkg_resources']
                      }
 
 unix_removable = ['lib/PySide2/Qt/lib/libQt5WebEngine.so.5',
