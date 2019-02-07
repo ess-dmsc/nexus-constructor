@@ -12,6 +12,7 @@ from cx_Freeze import setup, Executable
 # Dependencies are automatically detected, but it struggles with some parts of numpy.
 build_exe_options = {'packages': ['numpy.core._methods',
                                   'numpy.lib.format',
+                                  'hashlib'
                                   ],
                      'excludes': ['pytest',
                                   'pytest-cov',
