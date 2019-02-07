@@ -5,8 +5,6 @@ import QtQuick.Dialogs 1.3
 import MyJson 1.0
 import MyModels 1.0
 import MyWriters 1.0
-import QtQuick.Layouts 1.0
-import QtQuick.Controls 1.2
 
 ApplicationWindow {
 
@@ -96,7 +94,7 @@ ApplicationWindow {
         ComponentControls {
             id: componentFieldsArea
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.bottom: statusPane.top
             anchors.left: parent.left
             leftPadding: 0
         }
@@ -104,7 +102,7 @@ ApplicationWindow {
         Frame {
             id: instrumentViewArea
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.bottom: statusPane.top
             anchors.left: componentFieldsArea.right
             anchors.right: jsonPane.left
             contentWidth: 100
@@ -134,7 +132,7 @@ ApplicationWindow {
         Pane {
             id: jsonPane
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.bottom: statusPane.top
             anchors.right: parent.right
             contentWidth: 300
 
@@ -170,6 +168,13 @@ ApplicationWindow {
             }
         }
 
+        Pane {
+            id: statusPane
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            anchors.left: parent.left
+            height: 15
+        }
     }
 
     InstrumentModel{
@@ -205,7 +210,6 @@ ApplicationWindow {
             longRunningTask: true
             jsonConnector.request_filewriter_json(components)
             longRunningTask: false
-            }
         }
         enabled: jsonMode == "liveFW"
     }
@@ -215,7 +219,7 @@ ApplicationWindow {
             longRunningTask: true
             jsonConnector.request_nexus_constructor_json(components)
             longRunningTask: false
-            }
+        }
         enabled: jsonMode == "liveGC"
     }
 
@@ -229,7 +233,7 @@ ApplicationWindow {
             longRunningTask: true
             hdfWriter.save_instrument(fileUrl, components)
             longRunningTask: false
-            }
+        }
     }
 
     FileDialog {
@@ -266,15 +270,6 @@ ApplicationWindow {
             longRunningTask: true
             jsonConnector.save_to_filewriter_json(fileUrl, components)
             longRunningTask: false
-        }
-    }
-
-    statusBar: StatusBar {
-        RowLayout {
-            anchors.fill: parent
-            BusyIndicator {
-                running: longRunningTask
-            }
         }
     }
 }
