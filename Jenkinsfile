@@ -14,6 +14,8 @@ properties([
 
 centos = 'essdmscdm/centos7-build-node:3.1.0'
 
+git_commit_short = scm_vars.GIT_COMMIT.substring(0,6)
+
 container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 sh_cmd = "/usr/bin/scl enable rh-python35 -- /bin/bash -e"
 
@@ -38,7 +40,7 @@ return {
         }  // stage
     stage('win10: Archive Executable'){
     if (env.CHANGE_ID) {
-    powershell label: '', script: 'Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${scm_vars.GIT_COMMIT}.zip'
+    powershell label: '', script: 'Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip'
     archiveArtifacts 'nexus-constructor*.zip'
     }
     } // stage
@@ -98,7 +100,7 @@ stage('Centos7: Build Executable'){
 }
 stage('Centos7: Archive Executable') {
     if (env.CHANGE_ID) {
-    sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf nexus-constructor_linux_${scm_vars.GIT_COMMIT}.tar.gz ./build "
+    sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
     archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
     }
 }

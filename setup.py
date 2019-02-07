@@ -12,7 +12,6 @@ from cx_Freeze import setup, Executable
 # Dependencies are automatically detected, but it struggles with some parts of numpy.
 build_exe_options = {'packages': ['numpy.core._methods',
                                   'numpy.lib.format',
-                                  'hashlib'
                                   ],
                      'excludes': ['pytest',
                                   'pytest-cov',
@@ -32,6 +31,7 @@ unix_removable = ['lib/PySide2/Qt/lib/libQt5WebEngine.so.5',
                   'lib/PySide2/libclang.so.6',
                   'lib/PySide2/Qt/resources/',
                   'lib/PySide2/Qt/translations/',
+                  'lib/'
                   ]
 
 win_removable = ['lib/PySide2/Qt5WebEngine.dll',
