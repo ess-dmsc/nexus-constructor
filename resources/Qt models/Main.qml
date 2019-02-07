@@ -173,11 +173,13 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             anchors.left: parent.left
-            height: 45
-            BusyIndicator {
+            height: 20
+            Text {
+                text: "Running..."
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
-                running: longRunningTask
+                visible: longRunningTask
+
             }
         }
     }
