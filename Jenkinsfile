@@ -25,7 +25,7 @@ return {
       cleanWs()
       dir("${project}") {
         stage("win10: Checkout") {
-          checkout scm
+          scm_vars = checkout scm
         }  // stage
 
 	stage("win10: Setup") {
@@ -38,9 +38,9 @@ return {
         }  // stage
     stage('win10: Archive Executable'){
     if (env.CHANGE_ID) {
-    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-    powershell label: '', script: 'Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip'
-    archiveArtifacts 'nexus-constructor*.zip'
+        def git_commit_short = scm_vars.GIT_COMMIT.take(7)
+        powershell label: '', script: 'Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip'
+        archiveArtifacts 'nexus-constructor*.zip'
     }
     } // stage
 
