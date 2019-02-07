@@ -38,7 +38,7 @@ return {
         }  // stage
     stage('win10: Archive Executable'){
     if (env.CHANGE_ID) {
-    powershell label: '', script: 'Compress-Archive -Path .\\build -DestinationPath windowsbuild.zip'
+    powershell label: '', script: 'Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${scm_vars.GIT_COMMIT}.zip'
     archiveArtifacts 'windowsbuild.zip'
     }
     } // stage
@@ -99,7 +99,7 @@ stage('Centos7: Build Executable'){
 stage('Centos7: Archive Executable') {
     if (env.CHANGE_ID) {
     sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf linuxbuild.tar.gz ./build "
-    archiveArtifacts artifacts: 'linuxbuild.tar.gz', fingerprint: true
+    archiveArtifacts artifacts: 'nexus-constructor_linux_${scm_vars.GIT_COMMIT}.tar.gz', fingerprint: true
     }
 }
 stage("Centos7: Run Linter") {
