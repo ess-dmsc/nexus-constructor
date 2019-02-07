@@ -14,7 +14,7 @@ properties([
 
 centos = 'essdmscdm/centos7-build-node:3.1.0'
 
-def git_commit_short = scm_vars.GIT_COMMIT[0..6]
+def git_commit_short = ""
 
 container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 sh_cmd = "/usr/bin/scl enable rh-python35 -- /bin/bash -e"
@@ -143,6 +143,7 @@ node("docker") {
     dir("${project}") {
         stage("Checkout") {
             scm_vars = checkout scm
+            git_commit_short = sh (script: "git rev-parse --short ${scm_vars.GIT_COMMIT}", returnStdout: true)
         }
     }
     try {
