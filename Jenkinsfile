@@ -38,6 +38,7 @@ return {
         }  // stage
     stage('win10: Archive Executable'){
     if (env.CHANGE_ID) {
+    def git_commit_short = ${scm_vars.GIT_COMMIT}.take(7)
     powershell label: '', script: 'Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip'
     archiveArtifacts 'nexus-constructor*.zip'
     }
@@ -98,6 +99,7 @@ stage('Centos7: Build Executable'){
 }
 stage('Centos7: Archive Executable') {
     if (env.CHANGE_ID) {
+    def git_commit_short = ${scm_vars.GIT_COMMIT}.take(7)
     sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
     archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
     }
@@ -141,7 +143,6 @@ node("docker") {
     dir("${project}") {
         stage("Checkout") {
             scm_vars = checkout scm
-            git_commit_short = sh (script: "git rev-parse --short HEAD", returnStdout: true)
         }
     }
     try {
