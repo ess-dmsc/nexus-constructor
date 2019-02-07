@@ -14,7 +14,7 @@ properties([
 
 centos = 'essdmscdm/centos7-build-node:3.1.0'
 
-git_commit_short = ${scm_vars.GIT_COMMIT}[0..6]
+def git_commit_short = scm_vars.GIT_COMMIT[0..6]
 
 container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 sh_cmd = "/usr/bin/scl enable rh-python35 -- /bin/bash -e"
