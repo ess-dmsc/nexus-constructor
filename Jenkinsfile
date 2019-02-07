@@ -95,7 +95,7 @@ stage("Centos7: Install requirements") {
         \""""
 }
 stage('Centos7: Build Executable'){
-    sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python3.5 setup.py build_exe  \" "
+    sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python setup.py build_exe  \" "
 }
 stage('Centos7: Archive Executable') {
     if (env.CHANGE_ID) {
