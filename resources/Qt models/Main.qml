@@ -18,7 +18,6 @@ ApplicationWindow {
     minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
 
     property string jsonMode: "liveFW"
-    property bool longRunningTask: false
 
     menuBar: MenuBar {
         Menu {
@@ -215,18 +214,18 @@ ApplicationWindow {
     Connections {
         target: components
         onModel_updated: {
-            longRunningTask: true
+            LongRunningTask.running = true
             jsonConnector.request_filewriter_json(components)
-            longRunningTask: false
+            LongRunningTask.running = false
         }
         enabled: jsonMode == "liveFW"
     }
     Connections {
         target: components
         onModel_updated: {
-            longRunningTask: true
+            LongRunningTask.running = true
             jsonConnector.request_nexus_constructor_json(components)
-            longRunningTask: false
+            LongRunningTask.running = false
         }
         enabled: jsonMode == "liveGC"
     }
@@ -238,9 +237,9 @@ ApplicationWindow {
         defaultSuffix: "nxs"
         selectExisting: false
         onAccepted: {
-            longRunningTask: true
+            LongRunningTask.running = true
             hdfWriter.save_instrument(fileUrl, components)
-            longRunningTask: false
+            LongRunningTask.running = false
         }
     }
 
@@ -251,9 +250,9 @@ ApplicationWindow {
         defaultSuffix: "json"
         selectExisting: false
         onAccepted: {
-            longRunningTask: true
+            LongRunningTask.running = true
             jsonConnector.save_to_nexus_constructor_json(fileUrl, components)
-            longRunningTask: false
+            LongRunningTask.running = false
         }
     }
 
@@ -262,9 +261,9 @@ ApplicationWindow {
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
         onAccepted: {
-            longRunningTask: true
+            LongRunningTask.running = true
             jsonConnector.load_file_into_instrument_model(fileUrl, components)
-            longRunningTask: false
+            LongRunningTask.running = false
         }
     }
 
@@ -275,9 +274,9 @@ ApplicationWindow {
         defaultSuffix: "json"
         selectExisting: false
         onAccepted: {
-            longRunningTask: true
+            LongRunningTask.running = true
             jsonConnector.save_to_filewriter_json(fileUrl, components)
-            longRunningTask: false
+            LongRunningTask.running = false
         }
     }
 }

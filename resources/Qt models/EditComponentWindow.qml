@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
+import "."
 
 ExpandingWindow {
 
@@ -118,10 +119,16 @@ ExpandingWindow {
 
                 Component.onCompleted: geometryControls.geometryModel.set_geometry(componentIndex, components)
                 onMeshChanged: {
+                    LongRunningTask.running: true
                     pixelControls.restartMapping(geometryControls.geometryModel)
                     components.update_mesh(componentIndex)
+                    LongRunningTask.running: false
                 }
-                onCylinderChanged: components.update_mesh(componentIndex)
+                onCylinderChanged: {
+                    LongRunningTask.running: true
+                    components.update_mesh(componentIndex)
+                    LongRunningTask.running: false
+                }
             }
 
             PixelControls {
