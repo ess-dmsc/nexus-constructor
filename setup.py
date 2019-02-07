@@ -22,6 +22,7 @@ build_exe_options = {'packages': ['numpy.core._methods',
                              'resources',
                              'Instrument.schema.json',
                          ],
+                     'bin_includes': ['libssl.so']
                      }
 
 unix_removable = ['lib/PySide2/Qt/lib/libQt5WebEngine.so.5',
@@ -55,7 +56,7 @@ else:
 setup(name='Nexus Constructor Test App',
       version='0.1',
       description='Technology test program for the nexus constructor',
-      options={'build_exe': build_exe_options, 'bin_includes': ['libssl.so']},
+      options={'build_exe': build_exe_options},
       executables=[Executable('main.py', base=base, targetName='NexusConstructor' + extension)])
 
 for file in removable:

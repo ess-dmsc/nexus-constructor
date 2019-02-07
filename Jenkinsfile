@@ -158,7 +158,7 @@ node("docker") {
             chown -R jenkins.jenkins /home/jenkins/${project}
         \""""
 
-        stage("Build Executables") {
+        stage("Build") {
 
         def builders = [:]
         builders['centos7'] = get_linux_pipeline()
