@@ -19,7 +19,7 @@ ApplicationWindow {
     minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
 
     property string jsonMode: "liveFW"
-    property bool fileIO: false
+    property bool longRunningTask: false
 
     menuBar: MenuBar {
         Menu {
@@ -201,12 +201,21 @@ ApplicationWindow {
     // When the model updates, request new json for the view if desired
     Connections {
         target: components
-        onModel_updated: jsonConnector.request_filewriter_json(components)
+        onModel_updated: {
+            longRunningTask: true
+            jsonConnector.request_filewriter_json(components)
+            longRunningTask: false
+            }
+        }
         enabled: jsonMode == "liveFW"
     }
     Connections {
         target: components
-        onModel_updated: jsonConnector.request_nexus_constructor_json(components)
+        onModel_updated: {
+            longRunningTask: true
+            jsonConnector.request_nexus_constructor_json(components)
+            longRunningTask: false
+            }
         enabled: jsonMode == "liveGC"
     }
 
@@ -216,7 +225,11 @@ ApplicationWindow {
         nameFilters: ["Nexus files (*.nxs *.nx5)", "HDF5 files (*.hdf5)"]
         defaultSuffix: "nxs"
         selectExisting: false
-        onAccepted: hdfWriter.save_instrument(fileUrl, components)
+        onAccepted: {
+            longRunningTask: true
+            hdfWriter.save_instrument(fileUrl, components)
+            longRunningTask: false
+            }
     }
 
     FileDialog {
@@ -226,9 +239,9 @@ ApplicationWindow {
         defaultSuffix: "json"
         selectExisting: false
         onAccepted: {
-            fileIO: true
+            longRunningTask: true
             jsonConnector.save_to_nexus_constructor_json(fileUrl, components)
-            fileIO: false
+            longRunningTask: false
         }
     }
 
@@ -237,9 +250,9 @@ ApplicationWindow {
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
         onAccepted: {
-            fileIO: true
+            longRunningTask: true
             jsonConnector.load_file_into_instrument_model(fileUrl, components)
-            fileIO: false
+            longRunningTask: false
         }
     }
 
@@ -250,9 +263,9 @@ ApplicationWindow {
         defaultSuffix: "json"
         selectExisting: false
         onAccepted: {
-            fileIO: true
+            longRunningTask: true
             jsonConnector.save_to_filewriter_json(fileUrl, components)
-            fileIO: false
+            longRunningTask: false
         }
     }
 
@@ -260,7 +273,7 @@ ApplicationWindow {
         RowLayout {
             anchors.fill: parent
             BusyIndicator {
-                running: fileIO
+                running: longRunningTask
             }
         }
     }
