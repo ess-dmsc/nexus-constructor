@@ -19,6 +19,7 @@ ApplicationWindow {
     minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
 
     property string jsonMode: "liveFW"
+    property bool fileIO: false
 
     menuBar: MenuBar {
         Menu {
@@ -224,14 +225,22 @@ ApplicationWindow {
         nameFilters: ["JSON file (*.json)"]
         defaultSuffix: "json"
         selectExisting: false
-        onAccepted: jsonConnector.save_to_nexus_constructor_json(fileUrl, components)
+        onAccepted: {
+            fileIO: true
+            jsonConnector.save_to_nexus_constructor_json(fileUrl, components)
+            fileIO: false
+        }
     }
 
     FileDialog {
         id: jsonLoadDialog
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
-        onAccepted: jsonConnector.load_file_into_instrument_model(fileUrl, components)
+        onAccepted: {
+            fileIO: true
+            jsonConnector.load_file_into_instrument_model(fileUrl, components)
+            fileIO: false
+        }
     }
 
     FileDialog {
@@ -240,15 +249,18 @@ ApplicationWindow {
         nameFilters: ["JSON file (*.json)"]
         defaultSuffix: "json"
         selectExisting: false
-        onAccepted: jsonConnector.save_to_filewriter_json(fileUrl, components)
+        onAccepted: {
+            fileIO: true
+            jsonConnector.save_to_filewriter_json(fileUrl, components)
+            fileIO: false
+        }
     }
 
     statusBar: StatusBar {
         RowLayout {
             anchors.fill: parent
             BusyIndicator {
-                height: 15
-                running: true
+                running: fileIO
             }
         }
     }
