@@ -5,6 +5,8 @@ import QtQuick.Dialogs 1.3
 import MyJson 1.0
 import MyModels 1.0
 import MyWriters 1.0
+import QtQuick.Layouts 1.0
+import QtQuick.Controls 1.2
 
 ApplicationWindow {
 
@@ -166,6 +168,7 @@ ApplicationWindow {
                 PropertyChanges { target: jsonPane; width: 0 }
             }
         }
+
     }
 
     InstrumentModel{
@@ -239,4 +242,11 @@ ApplicationWindow {
         selectExisting: false
         onAccepted: jsonConnector.save_to_filewriter_json(fileUrl, components)
     }
+
+    statusBar: StatusBar {
+        RowLayout {
+            anchors.fill: parent
+            Label { text: "" }
+           }
+           }
 }
