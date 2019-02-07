@@ -108,6 +108,18 @@ ExpandingWindow {
                         }
                     }
                 }
+                RadioButton {
+                    id: noShapeRadio
+                    anchors.left: cylinderRadio.right
+                    anchors.top: cylinderRadio.top
+                    text: "None"
+                    onClicked: {
+                        setupPane.geometryState = "None"
+                        noPixelRadio.checked = true
+                        pixelLabel.enabled = false
+                        pixelPane.enabled = false
+                    }
+                }
             }
 
             Label {
