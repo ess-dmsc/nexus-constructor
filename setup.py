@@ -31,7 +31,6 @@ unix_removable = ['lib/PySide2/Qt/lib/libQt5WebEngine.so.5',
                   'lib/PySide2/libclang.so.6',
                   'lib/PySide2/Qt/resources/',
                   'lib/PySide2/Qt/translations/',
-                  'lib/'
                   ]
 
 win_removable = ['lib/PySide2/Qt5WebEngine.dll',
