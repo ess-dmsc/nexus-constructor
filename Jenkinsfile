@@ -159,8 +159,6 @@ node("docker") {
             chown -R jenkins.jenkins /home/jenkins/${project}
         \""""
 
-        stage("Build") {
-
         def builders = [:]
         builders['centos7'] = get_linux_pipeline()
         // disabled for now as the build isn't setup for Mac OS just yet.
@@ -168,8 +166,6 @@ node("docker") {
         builders['windows10'] = get_win10_pipeline()
 
         parallel builders
-        } // stage
-
 
     } finally {
         container.stop()
