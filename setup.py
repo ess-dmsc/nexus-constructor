@@ -23,7 +23,7 @@ build_exe_options = {'packages': ['numpy.core._methods',
                              'resources',
                              'Instrument.schema.json',
                          ],
-                     'bin_includes': ['lib/libssl.so.1.1'],
+                     'bin_includes': ['libssl.so'],
                      'includes': ['pkg_resources']
                      }
 
