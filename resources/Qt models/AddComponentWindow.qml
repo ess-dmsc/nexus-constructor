@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
+import "."
 
 ExpandingWindow {
 
@@ -314,11 +315,13 @@ ExpandingWindow {
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
+                    LongRunningTask.running = true
                     components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                              geometryControls.geometryModel,
                                              pixelControls.pixelModel,
                                              transformControls.transformModel)
                     addComponentWindow.close()
+                    LongRunningTask.running = false
                 }
             }
         }
