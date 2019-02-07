@@ -55,7 +55,7 @@ else:
 setup(name='Nexus Constructor Test App',
       version='0.1',
       description='Technology test program for the nexus constructor',
-      options={'build_exe': build_exe_options},
+      options={'build_exe': build_exe_options, 'bin_includes': ['libssl.so']},
       executables=[Executable('main.py', base=base, targetName='NexusConstructor' + extension)])
 
 for file in removable:
