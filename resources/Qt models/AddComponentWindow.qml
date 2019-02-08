@@ -121,6 +121,7 @@ ExpandingWindow {
                 anchors.left: parent.left
                 anchors.top: geometryPane.bottom
                 text: "Pixels:"
+                enabled: !noShapeRadio.checked
             }
             Pane {
                 id: pixelPane
