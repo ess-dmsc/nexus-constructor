@@ -88,8 +88,8 @@ ApplicationWindow {
         padding: 5
         focus: true
         anchors.fill: parent
-        contentWidth: componentFieldsArea.implicitWidth + instrumentViewArea.implicitWidth + jsonPane.implicitWidth
-        contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
+        contentWidth: componentFieldsArea.implicitWidth + instrumentStack.implicitWidth + jsonPane.implicitWidth
+        contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentStack.implicitHeight, jsonPane.implicitHeight)
 
         ComponentControls {
             id: componentFieldsArea
@@ -99,34 +99,61 @@ ApplicationWindow {
             leftPadding: 0
         }
 
-        Frame {
-            id: instrumentViewArea
-            anchors.top: parent.top
-            anchors.bottom: statusPane.top
+        StackView {
+
+            id: instrumentStack
+            initialItem: instrumentViewArea
             anchors.left: componentFieldsArea.right
             anchors.right: jsonPane.left
-            contentWidth: 100
-            contentHeight: 100
-            focus: true
-            padding: 1
+            anchors.top: parent.top
+            anchors.bottom: statusPane.top
 
-            Scene3D {
-                id: scene3d
+            Frame {
+
+                id: instrumentViewArea
                 anchors.fill: parent
+                contentWidth: 100
+                contentHeight: 100
                 focus: true
-                aspects: ["input", "logic"]
-                cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+                padding: 1
 
-                AnimatedEntity {
-                    instrument: components
+                Scene3D {
+                    id: scene3d
+                    anchors.fill: parent
+                    focus: true
+                    aspects: ["input", "logic"]
+                    cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+
+                    AnimatedEntity {
+                        instrument: components
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: scene3d
+                    onClicked: instrumentViewArea.focus = true
+                    enabled: !instrumentViewArea.focus
                 }
             }
 
-            MouseArea {
-                anchors.fill: scene3d
-                onClicked: instrumentViewArea.focus = true
-                enabled: !instrumentViewArea.focus
+            Component {
+
+                id: busyIndicatorPane
+
+                Pane {
+
+                    anchors.fill: parent
+
+                    BusyIndicator {
+
+                       anchors.centerIn: parent
+                       running: true
+                    }
+
+                }
+
             }
+
         }
 
         Pane {
@@ -261,9 +288,9 @@ ApplicationWindow {
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
         onAccepted: {
-            LongRunningTask.running = true
+            instrumentStack.push(busyIndicatorPane)
             jsonConnector.load_file_into_instrument_model(fileUrl, components)
-            LongRunningTask.running = false
+            instrumentStack.push(instrumentViewArea)
         }
     }
 
