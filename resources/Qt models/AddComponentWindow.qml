@@ -113,12 +113,6 @@ ExpandingWindow {
                     anchors.left: cylinderRadio.right
                     anchors.top: cylinderRadio.top
                     text: "None"
-                    onClicked: {
-                        setupPane.geometryState = "None"
-                        noPixelRadio.checked = true
-                        pixelLabel.enabled = false
-                        pixelPane.enabled = false
-                    }
                 }
             }
 
@@ -140,6 +134,7 @@ ExpandingWindow {
                               pixelGridRadio.height +
                               mappedMeshRadio.height +
                               noPixelRadio.height
+                enabled: !noShapeRadio.checked
 
                 function checkFirstEnabled(){
                     var buttons = [singlePixelRadio, pixelGridRadio, mappedMeshRadio, noPixelRadio]
