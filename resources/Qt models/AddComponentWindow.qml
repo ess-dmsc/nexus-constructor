@@ -113,6 +113,7 @@ ExpandingWindow {
                     anchors.left: cylinderRadio.right
                     anchors.top: cylinderRadio.top
                     text: "None"
+                    onClicked: setupPane.geometryState = "None", setupPane.pixelState = ""
                 }
             }
 
