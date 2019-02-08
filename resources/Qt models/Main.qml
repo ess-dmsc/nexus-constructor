@@ -103,7 +103,7 @@ ApplicationWindow {
         StackLayout {
 
             id: instrumentStack
-            currentIndex: 0
+            currentIndex: LongRunningTask.running ? 1 : 0
             anchors.left: componentFieldsArea.right
             anchors.right: jsonPane.left
             anchors.top: parent.top
@@ -112,7 +112,6 @@ ApplicationWindow {
             Frame {
 
                 id: instrumentViewArea
-                // anchors.fill: parent
                 contentWidth: 100
                 contentHeight: 100
                 focus: true
@@ -282,9 +281,9 @@ ApplicationWindow {
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
         onAccepted: {
-            instrumentStack.push(busyIndicatorPane)
+            LongRunningTask.running = true
             jsonConnector.load_file_into_instrument_model(fileUrl, components)
-            instrumentStack.push(instrumentViewArea)
+            LongRunningTask.running = false
         }
     }
 
