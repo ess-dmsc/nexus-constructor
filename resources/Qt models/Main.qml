@@ -103,7 +103,7 @@ ApplicationWindow {
         StackLayout {
 
             id: instrumentStack
-            currentIndex: LongRunningTask.running ? 1 : 0
+            currentIndex: LongRunningTask.running ? 0 : 1
             anchors.left: componentFieldsArea.right
             anchors.right: jsonPane.left
             anchors.top: parent.top
@@ -116,6 +116,7 @@ ApplicationWindow {
                 contentHeight: 100
                 focus: true
                 padding: 1
+                Layout.alignment: Qt.AlignLeft
 
                 Scene3D {
                     id: scene3d
@@ -136,15 +137,12 @@ ApplicationWindow {
                 }
             }
 
-            Pane {
-
+            BusyIndicator {
                 id: busyIndicatorPane
-
-                BusyIndicator {
-                    anchors.centerIn: parent
-                    running: true
-                }
-
+                Layout.alignment: Qt.AlignLeft
+                anchors.centerIn: parent
+                running: true
+                scale: 0.3
             }
 
         }
