@@ -65,6 +65,10 @@ ApplicationWindow {
                 text: "Hide JSON display"
                 onClicked: jsonMode = "hidden"
             }
+            MenuItem { // Extra menu item to see if transitions work for the StackLayout...
+                text: "Change the Stack"
+                onClicked: LongRunningTask.running = !LongRunningTask.running
+            }
         }
     }
 
@@ -103,7 +107,7 @@ ApplicationWindow {
         StackLayout {
 
             id: instrumentStack
-            currentIndex: LongRunningTask.running ? 0 : 1
+            currentIndex: LongRunningTask.running ? 1 : 0
             anchors.left: componentFieldsArea.right
             anchors.right: jsonPane.left
             anchors.top: parent.top
@@ -116,7 +120,7 @@ ApplicationWindow {
                 contentHeight: 100
                 focus: true
                 padding: 1
-                Layout.alignment: Qt.AlignLeft
+                // Layout.alignment: Qt.AlignLeft
 
                 Scene3D {
                     id: scene3d
@@ -131,7 +135,7 @@ ApplicationWindow {
                 }
 
                 MouseArea {
-                    anchors.fill: scene3d
+                    // anchors.fill: scene3d
                     onClicked: instrumentViewArea.focus = true
                     enabled: !instrumentViewArea.focus
                 }
@@ -139,10 +143,10 @@ ApplicationWindow {
 
             BusyIndicator {
                 id: busyIndicatorPane
-                Layout.alignment: Qt.AlignLeft
-                anchors.centerIn: parent
+                // Layout.alignment: Qt.AlignLeft
+                // anchors.centerIn: parent
                 running: true
-                scale: 0.3
+                scale: 0.2
             }
 
         }
