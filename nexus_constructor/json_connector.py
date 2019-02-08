@@ -32,7 +32,7 @@ class JsonConnector(QObject):
         with open('Instrument.schema.json') as file:
             self.schema = json.load(file)
 
-    @Slot(QUrl, 'QVariant')
+    @Slot(QUrl, 'QVariant', result=bool)
     def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
         filename = file_url.toString(options=QUrl.PreferLocalFile)
         with open(filename, 'r') as file:
@@ -45,10 +45,15 @@ class JsonConnector(QObject):
         except jsonschema.exceptions.ValidationError:
             nexus_constructor_json = False
 
-        if nexus_constructor_json:
-            gc_json.load_json_object_into_instrument_model(data, model)
-        else:
-            nf_json.load_json_object_into_instrument_model(data, model)
+        try:
+            if nexus_constructor_json:
+                gc_json.load_json_object_into_instrument_model(data, model)
+            else:
+                nf_json.load_json_object_into_instrument_model(data, model)
+        except KeyError:
+            return False
+
+        return True
 
     @Slot(QUrl, 'QVariant')
     def save_to_filewriter_json(self, file_url: QUrl, model: InstrumentModel):

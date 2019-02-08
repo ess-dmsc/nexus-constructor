@@ -200,10 +200,20 @@ ApplicationWindow {
         onModel_updated: jsonConnector.request_filewriter_json(components)
         enabled: jsonMode == "liveFW"
     }
+
     Connections {
         target: components
         onModel_updated: jsonConnector.request_nexus_constructor_json(components)
         enabled: jsonMode == "liveGC"
+    }
+
+    MessageDialog {
+        id: messageDialog
+        title: "Error"
+        text: "Couldn't parse JSON file."
+        onAccepted: {
+            messageDialog.close()
+        }
     }
 
     FileDialog {
@@ -228,7 +238,16 @@ ApplicationWindow {
         id: jsonLoadDialog
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
-        onAccepted: jsonConnector.load_file_into_instrument_model(fileUrl, components)
+        property var loadSuccessful: true
+        onAccepted: {
+
+            loadSuccessful = jsonConnector.load_file_into_instrument_model(fileUrl, components)
+
+            if (!loadSuccessful) {
+                messageDialog.open()
+            }
+
+        }
     }
 
     FileDialog {
