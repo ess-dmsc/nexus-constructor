@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Scene3D 2.0
 import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.11
 import MyJson 1.0
 import MyModels 1.0
 import MyWriters 1.0
@@ -99,10 +100,10 @@ ApplicationWindow {
             leftPadding: 0
         }
 
-        StackView {
+        StackLayout {
 
             id: instrumentStack
-            initialItem: instrumentViewArea
+            currentIndex: 0
             anchors.left: componentFieldsArea.right
             anchors.right: jsonPane.left
             anchors.top: parent.top
@@ -111,7 +112,7 @@ ApplicationWindow {
             Frame {
 
                 id: instrumentViewArea
-                anchors.fill: parent
+                // anchors.fill: parent
                 contentWidth: 100
                 contentHeight: 100
                 focus: true
@@ -136,20 +137,13 @@ ApplicationWindow {
                 }
             }
 
-            Component {
+            Pane {
 
                 id: busyIndicatorPane
 
-                Pane {
-
-                    anchors.fill: parent
-
-                    BusyIndicator {
-
-                       anchors.centerIn: parent
-                       running: true
-                    }
-
+                BusyIndicator {
+                    anchors.centerIn: parent
+                    running: true
                 }
 
             }
