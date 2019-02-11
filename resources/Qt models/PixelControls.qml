@@ -32,6 +32,7 @@ Item {
         contentHeight: view.height
         contentWidth: view.implicitWidth
         padding: 1
+
         ListView {
             id: view
             anchors.left: parent.left
@@ -39,6 +40,20 @@ Item {
             height: contentHeight
             interactive: false
             clip: true
+            ScrollBar.vertical: bar
+        }
+
+        ScrollBar {
+
+            id: bar
+
+            active: true
+
+            anchors {
+                left: view.right
+                top: view.top
+                bottom: view.bottom
+            }
         }
     }
 
