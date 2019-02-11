@@ -37,7 +37,11 @@ class JsonConnector(QObject):
         filename = file_url.toString(options=QUrl.PreferLocalFile)
         with open(filename, 'r') as file:
             json_string = file.read()
-        data = json.loads(json_string)
+
+        try:
+            data = json.loads(json_string)
+        except json.decoder.JSONDecodeError:
+            return False
 
         nexus_constructor_json = True
         try:

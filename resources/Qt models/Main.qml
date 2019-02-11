@@ -208,11 +208,11 @@ ApplicationWindow {
     }
 
     MessageDialog {
-        id: messageDialog
+        id: jsonParseErrorMessage
         title: "Error"
         text: "Couldn't parse JSON file."
         onAccepted: {
-            messageDialog.close()
+            jsonParseErrorMessage.close()
         }
     }
 
@@ -244,7 +244,7 @@ ApplicationWindow {
             loadSuccessful = jsonConnector.load_file_into_instrument_model(fileUrl, components)
 
             if (!loadSuccessful) {
-                messageDialog.open()
+                jsonParseErrorMessage.open()
             }
 
         }
