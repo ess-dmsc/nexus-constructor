@@ -41,6 +41,7 @@ Item {
             interactive: false
             clip: true
             ScrollBar.vertical: bar
+            boundsBehavior: Flickable.StopAtBounds
         }
 
         ScrollBar {
