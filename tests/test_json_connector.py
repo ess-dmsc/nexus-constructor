@@ -6,6 +6,7 @@ def test_valid_json_returns_true():
 
     json_connector = JsonConnector()
 
+    # Simple JSON string representing a single point. This should be a valid file.
     valid_json = (r'{'
                   r'"components": [],'
                   r'"sample": {'
@@ -26,10 +27,21 @@ def test_invalid_jsons_returns_false():
 
     json_connector = JsonConnector()
 
-    with open("tests/wrongformat.json", mode="r") as file:
-        json_string = file.read()
+    # JSON string minus the "type" field. This should be an invalid file.
+    invalid_json = (r'{'
+                  r'"components": [],'
+                  r'"sample": {'
+                  r'"geometry": {'
+                  r'"type": "OFF",'
+                  r'"vertices": ['
+                  r'[-0.5, -0.5, 0.5]'
+                  r']'
+                  r'},'
+                  r'}'
+                  r'}')
 
-    assert not json_connector.json_string_to_instrument_model(json_string, model())
+    assert not json_connector.json_string_to_instrument_model(invalid_json, model())
 
-    empty_json = ""
+    # JSON string with no information. This should be an invalid file.
+    empty_json = ''
     assert not json_connector.json_string_to_instrument_model(empty_json, model())
