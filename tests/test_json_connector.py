@@ -11,6 +11,7 @@ def test_good_json_returns_true():
 
     assert json_connector.json_string_to_instrument_model(json_string, model())
 
+
 def test_bad_jsons_returns_false():
 
     json_connector = JsonConnector()
