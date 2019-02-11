@@ -48,6 +48,7 @@ Item {
             id: bar
 
             active: true
+            policy: view.contentHeight > view.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
 
             anchors {
                 left: view.right
