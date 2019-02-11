@@ -1,7 +1,5 @@
 from nexus_constructor.json_connector import JsonConnector
 from nexus_constructor.qml_models.instrument_model import InstrumentModel as model
-import json
-import pytest
 
 
 def test_good_json_returns_true():
