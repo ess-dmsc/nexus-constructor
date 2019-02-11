@@ -27,9 +27,8 @@ def test_invalid_jsons_returns_false():
 
     json_connector = JsonConnector()
 
-    # JSON string minus the "type" field. This should be an invalid file.
+    # JSON string minus the "components" field. This should be an invalid file.
     invalid_json = (r'{'
-                    r'"components": [],'
                     r'"sample": {'
                     r'"geometry": {'
                     r'"type": "OFF",'
@@ -37,6 +36,7 @@ def test_invalid_jsons_returns_false():
                     r'[-0.5, -0.5, 0.5]'
                     r']'
                     r'},'
+                    r'"type": "Sample"'
                     r'}'
                     r'}')
 

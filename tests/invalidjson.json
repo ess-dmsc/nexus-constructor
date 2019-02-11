@@ -1,0 +1,11 @@
+{
+    "sample": {
+        "geometry": {
+            "type": "OFF",
+            "vertices": [
+                [-0.5, -0.5, 0.5]
+            ]
+        },
+        "type" : "Sample"
+    }
+}
