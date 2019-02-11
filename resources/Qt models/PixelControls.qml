@@ -36,8 +36,8 @@ Item {
         ListView {
             id: view
             anchors.left: parent.left
-            anchors.right: parent.right
             height: contentHeight
+            width: parent.width - 10
             interactive: false
             clip: true
             ScrollBar.vertical: bar
