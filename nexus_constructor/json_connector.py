@@ -38,6 +38,10 @@ class JsonConnector(QObject):
         with open(filename, 'r') as file:
             json_string = file.read()
 
+        return self.json_string_to_instrument_model(json_string, model)
+
+    def json_string_to_instrument_model(self, json_string, model: InstrumentModel):
+
         try:
             data = json.loads(json_string)
         except json.decoder.JSONDecodeError:
