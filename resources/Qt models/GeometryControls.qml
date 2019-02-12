@@ -61,12 +61,25 @@ Pane {
                 text: "Choose file"
                 onClicked: filePicker.open()
             }
+            FileDialog {
+                id: filePicker
+                title: "Choose geometry file"
+                nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
+                onAccepted: {
+                    file_url = filePicker.fileUrl
+                    unitSelection.open()
+                    visible: false
+                }
+            }
             Dialog {
                 id: unitSelection
-                visible: false
-                title: "Select Units"
 
-                RowLayout {
+                title: "Select Units"
+                visible: true
+                standardButtons: StandardButton.NoButton
+                property var acceptUnits
+
+                ColumnLayout {
 
                     anchors.fill: parent
                     Text {
@@ -78,16 +91,18 @@ Pane {
                         id: textBox
                         Layout.fillWidth: true
                     }
-                }
-            }
-            FileDialog {
-                id: filePicker
-                title: "Choose geometry file"
-                nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
-                onAccepted: {
-                    file_url = filePicker.fileUrl
-                    unitSelection.open()
-                    console.log(unitSelection.visible)
+                    Text {
+                        id: invalidUnitWarning
+                        text: "Units not recognised. Please enter a different type."
+                        color: "red"
+                        Layout.fillWidth: true
+                        visible: false
+                    }
+                    Button {
+                        id: acceptButton
+                        text: "OK"
+                        onClicked: invalidUnitWarning.visible = true
+                    }
                 }
             }
         }
