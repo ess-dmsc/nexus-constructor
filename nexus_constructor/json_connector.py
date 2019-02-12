@@ -34,7 +34,7 @@ class JsonConnector(QObject):
 
     @Slot(QUrl, 'QVariant', result=bool)
     def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
-        filename = file_url.toString()
+        filename = file_url.toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
         with open(filename, 'r') as file:
             json_string = file.read()
 
