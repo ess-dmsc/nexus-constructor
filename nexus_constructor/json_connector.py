@@ -75,7 +75,7 @@ class JsonConnector(QObject):
 
     @staticmethod
     def save_to_file(data: str, file_url: QUrl):
-        filename = file_url.toString()
+        filename = file_url.toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
         with open(filename, 'w') as file:
             file.write(data)
 
