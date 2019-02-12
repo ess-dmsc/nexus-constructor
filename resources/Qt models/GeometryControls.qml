@@ -78,6 +78,7 @@ Pane {
                 visible: true
                 standardButtons: StandardButton.NoButton
                 property var validUnitsEntered: false
+                width: 350
 
                 ColumnLayout {
 
@@ -88,7 +89,7 @@ Pane {
                         Layout.fillWidth: true
                     }
                     TextField {
-                        id: textBox
+                        id: unitInput
                         Layout.fillWidth: true
                     }
                     Text {
@@ -107,6 +108,7 @@ Pane {
                             if (!parent.validUnitsEntered) {
                                 invalidUnitWarning.text = "Units not recognised. Please enter a different type."
                                 console.log(parent.width)
+                                unitInput.text = ""
                             }
                             else {
                                 unitSelection.close()
