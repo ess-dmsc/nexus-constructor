@@ -60,12 +60,23 @@ Pane {
                 text: "Choose file"
                 onClicked: filePicker.open()
             }
+            Dialog {
+                id: unitSelection
+                visible: true
+                title: "Select Units"
+                Text {
+                    text: "Enter the geometry units: "
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
             FileDialog {
                 id: filePicker
                 title: "Choose geometry file"
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
                     file_url = filePicker.fileUrl
+                    unitSelection.open()
                 }
             }
         }
