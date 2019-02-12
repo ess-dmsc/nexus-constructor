@@ -32,13 +32,30 @@ Item {
         contentHeight: view.height
         contentWidth: view.implicitWidth
         padding: 1
+
         ListView {
             id: view
             anchors.left: parent.left
-            anchors.right: parent.right
             height: contentHeight
+            width: parent.width - 10
             interactive: false
             clip: true
+            ScrollBar.vertical: bar
+            boundsBehavior: Flickable.StopAtBounds
+        }
+
+        ScrollBar {
+
+            id: bar
+
+            active: true
+            policy: view.contentHeight > view.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+
+            anchors {
+                left: view.right
+                top: view.top
+                bottom: view.bottom
+            }
         }
     }
 

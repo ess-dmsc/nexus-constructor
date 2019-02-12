@@ -45,11 +45,11 @@ class CylinderModel(QAbstractListModel):
     def setData(self, index, value, role):
         changed = False
         param_options = {
-            CylinderModel.AxisXRole: [self.cylinder.axis_direction, 'x', value],
-            CylinderModel.AxisYRole: [self.cylinder.axis_direction, 'y', value],
-            CylinderModel.AxisZRole: [self.cylinder.axis_direction, 'z', value],
-            CylinderModel.HeightRole: [self.cylinder, 'height', value],
-            CylinderModel.RadiusRole: [self.cylinder, 'radius', value],
+            CylinderModel.AxisXRole: [self.cylinder.axis_direction, "x", value],
+            CylinderModel.AxisYRole: [self.cylinder.axis_direction, "y", value],
+            CylinderModel.AxisZRole: [self.cylinder.axis_direction, "z", value],
+            CylinderModel.HeightRole: [self.cylinder, "height", value],
+            CylinderModel.RadiusRole: [self.cylinder, "radius", value],
         }
         if role in param_options:
             param_list = param_options[role]
@@ -63,17 +63,17 @@ class CylinderModel(QAbstractListModel):
 
     def roleNames(self):
         return {
-            CylinderModel.AxisXRole: b'axis_x',
-            CylinderModel.AxisYRole: b'axis_y',
-            CylinderModel.AxisZRole: b'axis_z',
-            CylinderModel.HeightRole: b'cylinder_height',
-            CylinderModel.RadiusRole: b'cylinder_radius'
+            CylinderModel.AxisXRole: b"axis_x",
+            CylinderModel.AxisYRole: b"axis_y",
+            CylinderModel.AxisZRole: b"axis_z",
+            CylinderModel.HeightRole: b"cylinder_height",
+            CylinderModel.RadiusRole: b"cylinder_radius",
         }
 
     def get_geometry(self):
         return self.cylinder
 
-    @Slot(int, 'QVariant')
+    @Slot(int, "QVariant")
     def set_geometry(self, index, instrument: InstrumentModel):
         self.beginResetModel()
         self.cylinder = instrument.components[index].geometry
@@ -94,7 +94,7 @@ class OFFModel(QAbstractListModel):
     def __init__(self):
         super().__init__()
         self.geometry = OFFGeometry()
-        self.file_url = QUrl('')
+        self.file_url = QUrl("")
 
     def rowCount(self, parent=QModelIndex()):
         return 1
@@ -111,9 +111,9 @@ class OFFModel(QAbstractListModel):
     def setData(self, index, value, role):
         changed = False
         param_options = {
-            OFFModel.FileNameRole: [self, 'file_url', value],
-            OFFModel.VerticesRole: [self.geometry, 'vertices', value],
-            OFFModel.FacesRole: [self.geometry, 'faces', value],
+            OFFModel.FileNameRole: [self, "file_url", value],
+            OFFModel.VerticesRole: [self.geometry, "vertices", value],
+            OFFModel.FacesRole: [self.geometry, "faces", value],
         }
         if role in param_options:
             param_list = param_options[role]
@@ -129,9 +129,9 @@ class OFFModel(QAbstractListModel):
 
     def roleNames(self):
         return {
-            OFFModel.FileNameRole: b'file_url',
-            OFFModel.VerticesRole: b'vertices',
-            OFFModel.FacesRole: b'faces'
+            OFFModel.FileNameRole: b"file_url",
+            OFFModel.VerticesRole: b"vertices",
+            OFFModel.FacesRole: b"faces",
         }
 
     def load_data(self):
@@ -145,7 +145,7 @@ class OFFModel(QAbstractListModel):
     def get_geometry(self):
         return self.geometry
 
-    @Slot(int, 'QVariant')
+    @Slot(int, "QVariant")
     def set_geometry(self, index, instrument: InstrumentModel):
         self.beginResetModel()
         self.geometry = instrument.components[index].geometry

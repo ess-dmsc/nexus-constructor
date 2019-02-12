@@ -8,8 +8,16 @@ only the required root function to generate the json
 Json format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
 """
 import json
-from nexus_constructor.data_model import Component, Translation, Rotation, CylindricalGeometry, OFFGeometry,\
-    PixelGrid, PixelMapping, SinglePixelId
+from nexus_constructor.data_model import (
+    Component,
+    Translation,
+    Rotation,
+    CylindricalGeometry,
+    OFFGeometry,
+    PixelGrid,
+    PixelMapping,
+    SinglePixelId,
+)
 from nexus_constructor.nexus import NexusEncoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from typing import List
@@ -23,29 +31,29 @@ def generate_json(model: InstrumentModel):
     :return: A string containing a json representation of the model
     """
     internal_components = [
-        component for component in model.components
+        component
+        for component in model.components
         if component.component_type not in NexusEncoder.external_component_types()
     ]
     external_components = [
-        component for component in model.components
+        component
+        for component in model.components
         if component.component_type in NexusEncoder.external_component_types()
     ]
 
     data = {
-        'nexus_structure': {
-            'children': [
+        "nexus_structure": {
+            "children": [
                 {
-                    'type': 'group',
-                    'name': 'instrument',
-                    'attributes': {
-                        'NX_class': 'NXinstrument',
-                    },
-                    'children': generate_component_list(internal_components),
-                },
-            ],
-        },
+                    "type": "group",
+                    "name": "instrument",
+                    "attributes": {"NX_class": "NXinstrument"},
+                    "children": generate_component_list(internal_components),
+                }
+            ]
+        }
     }
-    data['nexus_structure']['children'].extend(
+    data["nexus_structure"]["children"].extend(
         generate_component_list(external_components)
     )
     return json.dumps(data, indent=2)
@@ -59,13 +67,13 @@ def generate_component_list(components: List[Component]):
 def generate_component_data(component: Component):
     """Builds and returns a dictionary containing the details of the given component that can be written to json"""
     data = {
-        'type': 'group',
-        'name': component.name,
-        'attributes': {
-            'NX_class': NexusEncoder.component_class_name(component.component_type),
-            'description': component.description,
+        "type": "group",
+        "name": component.name,
+        "attributes": {
+            "NX_class": NexusEncoder.component_class_name(component.component_type),
+            "description": component.description,
         },
-        'children': []
+        "children": [],
     }
     add_transform_data(data, component)
     add_geometry_and_pixel_data(data, component)
@@ -79,71 +87,57 @@ def add_transform_data(json_data: dict, component: Component):
     if len(component.transforms) > 0:
 
         nx_transforms = {
-            'type': 'group',
-            'name': 'transforms',
-            'attributes': {
-                'NX_class': 'NXtransformations',
-            },
-            'children': [],
+            "type": "group",
+            "name": "transforms",
+            "attributes": {"NX_class": "NXtransformations"},
+            "children": [],
         }
 
         for transform in component.transforms:
             if isinstance(transform, Rotation):
-                type_name = 'rotation'
-                units = 'degrees'
-                vector = transform.axis.unit_list if transform.axis.magnitude != 0 else [0, 0, 0]
+                type_name = "rotation"
+                units = "degrees"
+                vector = (
+                    transform.axis.unit_list
+                    if transform.axis.magnitude != 0
+                    else [0, 0, 0]
+                )
                 value = transform.angle
             elif isinstance(transform, Translation):
-                type_name = 'translation'
-                units = 'm'
-                vector = transform.vector.unit_list if transform.vector.magnitude != 0 else [0, 0, 0]
+                type_name = "translation"
+                units = "m"
+                vector = (
+                    transform.vector.unit_list
+                    if transform.vector.magnitude != 0
+                    else [0, 0, 0]
+                )
                 value = transform.vector.magnitude
             else:
                 continue
 
-            nx_transforms['children'].append(
+            nx_transforms["children"].append(
                 {
-                    'type': 'dataset',
-                    'name': transform.name,
-                    'dataset': {
-                        'type': 'double',
-                        'size': [1],
-                    },
-                    'attributes': [
-                        {
-                            'name': 'transformation_type',
-                            'values': type_name,
-                        },
-                        {
-                            'name': 'depends_on',
-                            'values': dependent_on,
-                        },
-                        {
-                            'name': 'units',
-                            'values': units,
-                        },
-                        {
-                            'name': 'offset',
-                            'values': [0.0, 0.0, 0.0],
-                            'type': 'double',
-                        },
-                        {
-                            'name': 'vector',
-                            'values': vector,
-                            'type': 'double',
-                        },
+                    "type": "dataset",
+                    "name": transform.name,
+                    "dataset": {"type": "double", "size": [1]},
+                    "attributes": [
+                        {"name": "transformation_type", "values": type_name},
+                        {"name": "depends_on", "values": dependent_on},
+                        {"name": "units", "values": units},
+                        {"name": "offset", "values": [0.0, 0.0, 0.0], "type": "double"},
+                        {"name": "vector", "values": vector, "type": "double"},
                     ],
-                    'values': value,
+                    "values": value,
                 }
             )
             dependent_on = NexusEncoder.absolute_transform_path_name(
                 transform,
                 component,
-                component.component_type not in NexusEncoder.external_component_types()
+                component.component_type not in NexusEncoder.external_component_types(),
             )
-        json_data['children'].append(nx_transforms)
+        json_data["children"].append(nx_transforms)
 
-    json_data['attributes']['depends_on'] = dependent_on
+    json_data["attributes"]["depends_on"] = dependent_on
 
 
 def add_geometry_and_pixel_data(json_data: dict, component: Component):
@@ -154,146 +148,124 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
 
     if isinstance(geometry, CylindricalGeometry):
         nexus_geometry = {
-            'type': 'group',
-            'name': geometry_group_name,
-            'attributes': {
-                'NX_class': 'NXcylindrical_geometry'
-            },
-            'children': [
+            "type": "group",
+            "name": geometry_group_name,
+            "attributes": {"NX_class": "NXcylindrical_geometry"},
+            "children": [
                 {
-                    'type': 'dataset',
-                    'name': 'vertices',
-                    'dataset': {
-                        'type': 'double',
-                        'size': [3, 3],
-                    },
-                    'values': [
+                    "type": "dataset",
+                    "name": "vertices",
+                    "dataset": {"type": "double", "size": [3, 3]},
+                    "values": [
                         geometry.base_center_point.xyz_list,
                         geometry.base_edge_point.xyz_list,
                         geometry.top_center_point.xyz_list,
                     ],
                 },
                 {
-                    'type': 'dataset',
-                    'name': 'cylinders',
-                    'dataset': {
-                        'type': 'int64',
-                        'size': [1, 3],
-                    },
-                    'values': [[0, 1, 2]],
+                    "type": "dataset",
+                    "name": "cylinders",
+                    "dataset": {"type": "int64", "size": [1, 3]},
+                    "values": [[0, 1, 2]],
                 },
             ],
         }
     elif isinstance(geometry, OFFGeometry):
         nexus_geometry = {
-            'type': 'group',
-            'name': geometry_group_name,
-            'attributes': {
-                'NX_class': 'NXoff_geometry',
-            },
-            'children': [
+            "type": "group",
+            "name": geometry_group_name,
+            "attributes": {"NX_class": "NXoff_geometry"},
+            "children": [
                 {
-                    'type': 'dataset',
-                    'name': 'vertices',
-                    'dataset': {
-                        'type': 'double',
-                        'size': [len(geometry.vertices), 3]
-                    },
-                    'values': [vertex.xyz_list for vertex in geometry.vertices],
+                    "type": "dataset",
+                    "name": "vertices",
+                    "dataset": {"type": "double", "size": [len(geometry.vertices), 3]},
+                    "values": [vertex.xyz_list for vertex in geometry.vertices],
                 },
                 {
-                    'type': 'dataset',
-                    'name': 'winding_order',
-                    'dataset': {
-                        'type': 'int64',
-                        'size': [len(geometry.winding_order)]
-                    },
-                    'values': geometry.winding_order,
+                    "type": "dataset",
+                    "name": "winding_order",
+                    "dataset": {"type": "int64", "size": [len(geometry.winding_order)]},
+                    "values": geometry.winding_order,
                 },
                 {
-                    'type': 'dataset',
-                    'name': 'faces',
-                    'dataset': {
-                        'type': 'int64',
-                        'size': [len(geometry.winding_order_indices)]
+                    "type": "dataset",
+                    "name": "faces",
+                    "dataset": {
+                        "type": "int64",
+                        "size": [len(geometry.winding_order_indices)],
                     },
-                    'values': geometry.winding_order_indices,
+                    "values": geometry.winding_order_indices,
                 },
             ],
         }
         if isinstance(pixel_data, PixelMapping):
             mapping_list = NexusEncoder.pixel_mapping(pixel_data)
-            nexus_geometry['children'].append(
+            nexus_geometry["children"].append(
                 {
-                    'type': 'dataset',
-                    'name': 'detector_faces',
-                    'dataset': {
-                        'type': 'int64',
-                        'size': [len(mapping_list), 2]
-                    },
-                    'values': mapping_list,
+                    "type": "dataset",
+                    "name": "detector_faces",
+                    "dataset": {"type": "int64", "size": [len(mapping_list), 2]},
+                    "values": mapping_list,
                 }
             )
     else:
         return
 
     if isinstance(pixel_data, PixelGrid):
-        json_data['children'].append(
+        json_data["children"].append(
             {
-                'type': 'dataset',
-                'name': 'x_pixel_offset',
-                'dataset': {
-                    'type': 'double',
-                    'size': [pixel_data.rows, pixel_data.columns]
+                "type": "dataset",
+                "name": "x_pixel_offset",
+                "dataset": {
+                    "type": "double",
+                    "size": [pixel_data.rows, pixel_data.columns],
                 },
-                'values': NexusEncoder.pixel_grid_x_offsets(pixel_data),
+                "values": NexusEncoder.pixel_grid_x_offsets(pixel_data),
             }
         )
-        json_data['children'].append(
+        json_data["children"].append(
             {
-                'type': 'dataset',
-                'name': 'y_pixel_offset',
-                'dataset': {
-                    'type': 'double',
-                    'size': [pixel_data.rows, pixel_data.columns]
+                "type": "dataset",
+                "name": "y_pixel_offset",
+                "dataset": {
+                    "type": "double",
+                    "size": [pixel_data.rows, pixel_data.columns],
                 },
-                'values': NexusEncoder.pixel_grid_y_offsets(pixel_data),
+                "values": NexusEncoder.pixel_grid_y_offsets(pixel_data),
             }
         )
-        json_data['children'].append(
+        json_data["children"].append(
             {
-                'type': 'dataset',
-                'name': 'z_pixel_offset',
-                'dataset': {
-                    'type': 'double',
-                    'size': [pixel_data.rows, pixel_data.columns]
+                "type": "dataset",
+                "name": "z_pixel_offset",
+                "dataset": {
+                    "type": "double",
+                    "size": [pixel_data.rows, pixel_data.columns],
                 },
-                'values': NexusEncoder.pixel_grid_z_offsets(pixel_data),
+                "values": NexusEncoder.pixel_grid_z_offsets(pixel_data),
             }
         )
-        json_data['children'].append(
+        json_data["children"].append(
             {
-                'type': 'dataset',
-                'name': 'detector_number',
-                'dataset': {
-                    'type': 'int64',
-                    'size': [pixel_data.rows, pixel_data.columns]
+                "type": "dataset",
+                "name": "detector_number",
+                "dataset": {
+                    "type": "int64",
+                    "size": [pixel_data.rows, pixel_data.columns],
                 },
-                'values': NexusEncoder.pixel_grid_detector_ids(pixel_data),
+                "values": NexusEncoder.pixel_grid_detector_ids(pixel_data),
             }
         )
     elif isinstance(pixel_data, SinglePixelId):
         # TODO: Replace this Mantid compatibility dataset, with the nexus standard's way (once it exists)
-        json_data['children'].append(
+        json_data["children"].append(
             {
-                'type': 'dataset',
-                'name': 'detector_id',
-                'dataset': {
-                    'type': 'int64',
-                    'size': [1]
-                },
-                'values': pixel_data.pixel_id,
+                "type": "dataset",
+                "name": "detector_id",
+                "dataset": {"type": "int64", "size": [1]},
+                "values": pixel_data.pixel_id,
             }
         )
 
-    json_data['children'].append(nexus_geometry)
+    json_data["children"].append(nexus_geometry)

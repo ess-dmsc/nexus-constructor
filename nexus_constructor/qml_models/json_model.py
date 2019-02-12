@@ -8,7 +8,14 @@ To give a condensed view, lines of text comprising lists of numbers are combined
 import attr
 import json
 import re
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QSortFilterProxyModel, Signal, Slot
+from PySide2.QtCore import (
+    Qt,
+    QAbstractListModel,
+    QModelIndex,
+    QSortFilterProxyModel,
+    Signal,
+    Slot,
+)
 
 
 @attr.s
@@ -24,8 +31,9 @@ class JsonLine:
                  identical text when determining parents
     parent: the JsonLine representing the start of the list or object this line is part of
     """
-    text = attr.ib(default='')
-    collapsed_text = attr.ib(default='')
+
+    text = attr.ib(default="")
+    collapsed_text = attr.ib(default="")
     collapsed = attr.ib(default=False)
     line_number = attr.ib(default=0)
     parent = attr.ib(default=None)
@@ -33,7 +41,7 @@ class JsonLine:
     @property
     def indent(self):
         """The number of spaces padding the start of the line"""
-        return len(self.text) - len(self.text.lstrip(' '))
+        return len(self.text) - len(self.text.lstrip(" "))
 
     @property
     def visible(self):
@@ -62,19 +70,17 @@ class JsonModel(QAbstractListModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.indent_level = 2
-        self.lines = [
-            JsonLine(text='[\n  1, 2, 3\n]', collapsed_text='[...]')
-        ]
+        self.lines = [JsonLine(text="[\n  1, 2, 3\n]", collapsed_text="[...]")]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.lines)
 
     def roleNames(self):
         return {
-            JsonModel.TextRole: b'full_text',
-            JsonModel.CollapsedRole: b'collapsed',
-            JsonModel.CollapsedTextRole: b'collapsed_text',
-            JsonModel.VisibleRole: b'line_visible',
+            JsonModel.TextRole: b"full_text",
+            JsonModel.CollapsedRole: b"collapsed",
+            JsonModel.CollapsedTextRole: b"collapsed_text",
+            JsonModel.VisibleRole: b"line_visible",
         }
 
     def data(self, index, role=Qt.DisplayRole):
@@ -84,7 +90,7 @@ class JsonModel(QAbstractListModel):
             JsonModel.TextRole: line.text,
             JsonModel.CollapsedRole: line.collapsed,
             JsonModel.CollapsedTextRole: line.collapsed_text,
-            JsonModel.VisibleRole: line.visible
+            JsonModel.VisibleRole: line.visible,
         }
         if role in accessors:
             return accessors[role]
@@ -94,9 +100,9 @@ class JsonModel(QAbstractListModel):
         item = self.lines[row]
         changed = False
         attributes = {
-            JsonModel.TextRole: 'text',
-            JsonModel.CollapsedRole: 'collapsed',
-            JsonModel.CollapsedTextRole: 'collapsed_text',
+            JsonModel.TextRole: "text",
+            JsonModel.CollapsedRole: "collapsed",
+            JsonModel.CollapsedTextRole: "collapsed_text",
         }
         if role in attributes:
             attribute_name = attributes[role]
@@ -123,7 +129,9 @@ class JsonModel(QAbstractListModel):
 
         json_lines = []
         # prettify and sort the json, then split it into lines
-        lines = json.dumps(json.loads(json_data), indent=self.indent_level, sort_keys=True).split('\n')
+        lines = json.dumps(
+            json.loads(json_data), indent=self.indent_level, sort_keys=True
+        ).split("\n")
         collecting = False
         collection = []
 
@@ -134,25 +142,31 @@ class JsonModel(QAbstractListModel):
             """
             if collapse:
                 line = JsonLine(
-                        text='{}{}{}'.format(collection[0],
-                                             ' '.join([ln.strip() for ln in collection[1:-1]]),
-                                             collection[-1].strip()),
-                        collapsed_text='{}...{}'.format(collection[0], collection[-1].strip()),
-                        line_number=len(json_lines)
-                    )
+                    text="{}{}{}".format(
+                        collection[0],
+                        " ".join([ln.strip() for ln in collection[1:-1]]),
+                        collection[-1].strip(),
+                    ),
+                    collapsed_text="{}...{}".format(
+                        collection[0], collection[-1].strip()
+                    ),
+                    line_number=len(json_lines),
+                )
                 assign_parent(line)
                 json_lines.append(line)
             else:
                 for stored_line in collection:
-                    if stored_line.endswith('['):
-                        collapsed_text = stored_line + '...]'
-                    elif stored_line.endswith('{'):
-                        collapsed_text = stored_line + '...}'
+                    if stored_line.endswith("["):
+                        collapsed_text = stored_line + "...]"
+                    elif stored_line.endswith("{"):
+                        collapsed_text = stored_line + "...}"
                     else:
                         collapsed_text = stored_line
-                    line = JsonLine(text=stored_line,
-                                    collapsed_text=collapsed_text,
-                                    line_number=len(json_lines))
+                    line = JsonLine(
+                        text=stored_line,
+                        collapsed_text=collapsed_text,
+                        line_number=len(json_lines),
+                    )
                     assign_parent(line)
                     json_lines.append(line)
             collection.clear()
@@ -163,7 +177,7 @@ class JsonModel(QAbstractListModel):
         def assign_parent(line: JsonLine):
             """Set the line's parent based on the indent level of previous lines"""
             indent = line.indent
-            closes = re.match('^[]}],?$', line.text.strip())
+            closes = re.match("^[]}],?$", line.text.strip())
             parent_indent = indent if closes else indent - self.indent_level
             line.parent = latest_line_at_indent[parent_indent]
             latest_line_at_indent[indent] = line
@@ -172,18 +186,18 @@ class JsonModel(QAbstractListModel):
         # combine those lines into a single JsonLine
         for i in range(len(lines)):
             line = lines[i]
-            if line.endswith('['):
+            if line.endswith("["):
                 store_collection()
                 collection.append(line)
                 collecting = True
             elif collecting:
                 collection.append(line)
                 # end of a list
-                if re.match('],?$', line.strip()):
+                if re.match("],?$", line.strip()):
                     store_collection(collapse=True)
                     collecting = False
                 # list isn't just numbers
-                elif not re.match('^-?\d*\.?\d*,?$', line.strip()):
+                elif not re.match("^-?\d*\.?\d*,?$", line.strip()):
                     store_collection()
                     collecting = False
             else:
@@ -192,14 +206,14 @@ class JsonModel(QAbstractListModel):
 
         # add any required trailing commas to collapsed text
         for line in json_lines:
-            if line.text.endswith(('[', '{')):
+            if line.text.endswith(("[", "{")):
                 # find its last child
                 last_child = None
                 for candidate_child in json_lines:
                     if candidate_child.parent == line:
                         last_child = candidate_child
-                if last_child.text.endswith(','):
-                    line.collapsed_text += ','
+                if last_child.text.endswith(","):
+                    line.collapsed_text += ","
 
         self.lines = json_lines
         self.endResetModel()
@@ -209,9 +223,11 @@ class JsonModel(QAbstractListModel):
         for i in range(line_index + 1, len(self.lines)):
             candidate_closer = self.lines[i]
             if candidate_closer.indent == line.indent:
-                self.dataChanged.emit(self.createIndex(line_index + 1, 0),
-                                      self.createIndex(i, 0),
-                                      JsonModel.VisibleRole)
+                self.dataChanged.emit(
+                    self.createIndex(line_index + 1, 0),
+                    self.createIndex(i, 0),
+                    JsonModel.VisibleRole,
+                )
                 return
 
 
@@ -229,7 +245,7 @@ class FilteredJsonModel(QSortFilterProxyModel):
         self.setSourceModel(json_model)
         self.setFilterRole(JsonModel.VisibleRole)
         self.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self.setFilterFixedString('True')
+        self.setFilterFixedString("True")
 
     @Slot(str)
     def set_json(self, json_data):

@@ -5,7 +5,13 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 from nexus_constructor.qml_models.geometry_models import OFFModel
-from nexus_constructor.data_model import PixelMapping, PixelGrid, SinglePixelId, Corner, CountDirection
+from nexus_constructor.data_model import (
+    PixelMapping,
+    PixelGrid,
+    SinglePixelId,
+    Corner,
+    CountDirection,
+)
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.qml_models import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
@@ -49,13 +55,37 @@ class PixelGridModel(QAbstractListModel):
         changed = False
         # lambda wrappings prevent casting errors when setting other types
         param_options = {
-            PixelGridModel.RowsRole: lambda: [self.pixel_grid, 'rows', int(value)],
-            PixelGridModel.ColumnsRole: lambda: [self.pixel_grid, 'columns', int(value)],
-            PixelGridModel.RowHeightRole: lambda: [self.pixel_grid, 'row_height', value],
-            PixelGridModel.ColumnWidthRole: lambda: [self.pixel_grid, 'col_width', value],
-            PixelGridModel.FirstIdRole: lambda: [self.pixel_grid, 'first_id', int(value)],
-            PixelGridModel.CountDirectionRole: lambda: [self.pixel_grid, 'count_direction', CountDirection[value]],
-            PixelGridModel.InitialCountCornerRole: lambda: [self.pixel_grid, 'initial_count_corner', Corner[value]],
+            PixelGridModel.RowsRole: lambda: [self.pixel_grid, "rows", int(value)],
+            PixelGridModel.ColumnsRole: lambda: [
+                self.pixel_grid,
+                "columns",
+                int(value),
+            ],
+            PixelGridModel.RowHeightRole: lambda: [
+                self.pixel_grid,
+                "row_height",
+                value,
+            ],
+            PixelGridModel.ColumnWidthRole: lambda: [
+                self.pixel_grid,
+                "col_width",
+                value,
+            ],
+            PixelGridModel.FirstIdRole: lambda: [
+                self.pixel_grid,
+                "first_id",
+                int(value),
+            ],
+            PixelGridModel.CountDirectionRole: lambda: [
+                self.pixel_grid,
+                "count_direction",
+                CountDirection[value],
+            ],
+            PixelGridModel.InitialCountCornerRole: lambda: [
+                self.pixel_grid,
+                "initial_count_corner",
+                Corner[value],
+            ],
         }
         if role in param_options:
             param_list = param_options[role]()
@@ -69,19 +99,19 @@ class PixelGridModel(QAbstractListModel):
 
     def roleNames(self):
         return {
-            PixelGridModel.RowsRole: b'rows',
-            PixelGridModel.ColumnsRole: b'columns',
-            PixelGridModel.RowHeightRole: b'row_height',
-            PixelGridModel.ColumnWidthRole: b'col_width',
-            PixelGridModel.FirstIdRole: b'first_id',
-            PixelGridModel.CountDirectionRole: b'count_direction',
-            PixelGridModel.InitialCountCornerRole: b'initial_count_corner',
+            PixelGridModel.RowsRole: b"rows",
+            PixelGridModel.ColumnsRole: b"columns",
+            PixelGridModel.RowHeightRole: b"row_height",
+            PixelGridModel.ColumnWidthRole: b"col_width",
+            PixelGridModel.FirstIdRole: b"first_id",
+            PixelGridModel.CountDirectionRole: b"count_direction",
+            PixelGridModel.InitialCountCornerRole: b"initial_count_corner",
         }
 
     def get_pixel_model(self):
         return self.pixel_grid
 
-    @Slot(int, 'QVariant')
+    @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
         if isinstance(component.pixel_data, PixelGrid):
@@ -122,14 +152,12 @@ class PixelMappingModel(QAbstractListModel):
         return super().flags(index) | Qt.ItemIsEditable
 
     def roleNames(self):
-        return {
-            PixelMappingModel.PixelIdRole: b'pixel_id',
-        }
+        return {PixelMappingModel.PixelIdRole: b"pixel_id"}
 
     def get_pixel_model(self):
         return self.pixel_mapping
 
-    @Slot(int, 'QVariant')
+    @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
         if isinstance(component.pixel_data, PixelMapping):
@@ -137,11 +165,13 @@ class PixelMappingModel(QAbstractListModel):
             self.pixel_mapping = component.pixel_data
             self.endResetModel()
 
-    @Slot('QVariant')
+    @Slot("QVariant")
     def restart_mapping(self, geometry_model):
         if isinstance(geometry_model, OFFModel):
             self.beginResetModel()
-            self.pixel_mapping.pixel_ids = [None for _ in range(len(geometry_model.geometry.faces))]
+            self.pixel_mapping.pixel_ids = [
+                None for _ in range(len(geometry_model.geometry.faces))
+            ]
             self.endResetModel()
 
 
@@ -177,14 +207,12 @@ class SinglePixelModel(QAbstractListModel):
         return super().flags(index) | Qt.ItemIsEditable
 
     def roleNames(self):
-        return {
-            SinglePixelModel.PixelIdRole: b'pixel_id',
-        }
+        return {SinglePixelModel.PixelIdRole: b"pixel_id"}
 
     def get_pixel_model(self):
         return self.pixel_model
 
-    @Slot(int, 'QVariant')
+    @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
         if isinstance(component.pixel_data, SinglePixelId):
