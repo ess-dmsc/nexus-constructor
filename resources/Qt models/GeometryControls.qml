@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Dialogs 1.3
 import MyModels 1.0
+import QtQuick.Layouts 1.11
 
 
 Pane {
@@ -60,42 +61,33 @@ Pane {
                 text: "Choose file"
                 onClicked: filePicker.open()
             }
-            MessageDialog {
-                id: jsonParseErrorMessage
-                title: "Error"
-                text: "Couldn't parse JSON file."
-                onAccepted: {
-                    jsonParseErrorMessage.close()
-                }
-            }
-            /*
             Dialog {
                 id: unitSelection
                 visible: false
                 title: "Select Units"
-                Text {
-                    id: inputText
-                    text: "Enter the geometry units: "
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-                TextInput {
-                   text: "Text!"
-                   cursorVisible: false
-                   anchors.bottom: parent.bottom
-                   anchors.top: inputText.bottom
-                   anchors.right: parent.right
-                   anchors.left: parent.left
+
+                RowLayout {
+
+                    anchors.fill: parent
+                    Text {
+                        id: inputText
+                        text: "Enter the geometry units: "
+                        Layout.fillWidth: true
+                    }
+                    TextField {
+                        id: textBox
+                        Layout.fillWidth: true
+                    }
                 }
             }
-            */
             FileDialog {
                 id: filePicker
                 title: "Choose geometry file"
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
                     file_url = filePicker.fileUrl
-                    // jsonParseErrorMessage.open()
+                    unitSelection.open()
+                    console.log(unitSelection.visible)
                 }
             }
         }
