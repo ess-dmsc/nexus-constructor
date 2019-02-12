@@ -72,45 +72,58 @@ Pane {
                 }
             }
             Dialog {
-                id: unitSelection
 
+                id: unitSelection
                 title: "Select Units"
-                visible: true
+                visible: false
+
+                // Remove standard buttons so that custom OK button can be used that only accepts valid units
                 standardButtons: StandardButton.NoButton
+
+                // Bool for checking if valid units were given
                 property var validUnitsEntered: false
+
+                // Prevent the window from suddenly expanding when the invalid units message is shown
                 width: 350
 
                 ColumnLayout {
 
                     anchors.fill: parent
+
                     Text {
                         id: inputText
                         text: "Enter the geometry units: "
                         Layout.fillWidth: true
                     }
+
                     TextField {
                         id: unitInput
                         Layout.fillWidth: true
                     }
+
                     Text {
+
+                        // Blank invalid unit warning - only set if unit validation function returns false
                         id: invalidUnitWarning
                         text: ""
                         color: "red"
                         Layout.fillWidth: true
                         visible: true
                     }
+
                     Button {
-                        id: acceptButton
+                        id: acceptUnitsButton
                         text: "OK"
                         Layout.alignment: Qt.AlignRight
                         onClicked: {
 
                             if (!parent.validUnitsEntered) {
+                                // Invalid units given - Show a message and clear input box
                                 invalidUnitWarning.text = "Units not recognised. Please enter a different type."
-                                console.log(parent.width)
                                 unitInput.text = ""
                             }
                             else {
+                                // Valid units given - Close the box
                                 unitSelection.close()
                             }
                         }

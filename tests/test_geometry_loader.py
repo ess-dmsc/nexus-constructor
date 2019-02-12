@@ -1,5 +1,5 @@
 from nexus_constructor.data_model import Vector, OFFGeometry, PixelGrid
-from nexus_constructor.geometry_loader import load_geometry
+from nexus_constructor.geometry_loader import load_geometry, validate_units
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
@@ -250,3 +250,15 @@ def test_generate_off_mesh_with_repeating_grid():
             # check the triangles are present
             for triangle in triangles:
                 assert triangle in generated_triangles
+
+
+def test_validate_units():
+
+    valid_units = ["mile", "cm", "centimetre", "yard", "km"]
+    invalid_units = ["minute", "hour", "ounce", "stone", "pound"]
+
+    for unit in valid_units:
+        assert validate_units(unit)
+
+    for unit in invalid_units:
+        assert not validate_units(unit)
