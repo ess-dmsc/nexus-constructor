@@ -77,7 +77,7 @@ Pane {
                 title: "Select Units"
                 visible: true
                 standardButtons: StandardButton.NoButton
-                property var acceptUnits
+                property var validUnitsEntered: false
 
                 ColumnLayout {
 
@@ -93,15 +93,25 @@ Pane {
                     }
                     Text {
                         id: invalidUnitWarning
-                        text: "Units not recognised. Please enter a different type."
+                        text: ""
                         color: "red"
                         Layout.fillWidth: true
-                        visible: false
+                        visible: true
                     }
                     Button {
                         id: acceptButton
                         text: "OK"
-                        onClicked: invalidUnitWarning.visible = true
+                        Layout.alignment: Qt.AlignRight
+                        onClicked: {
+
+                            if (!parent.validUnitsEntered) {
+                                invalidUnitWarning.text = "Units not recognised. Please enter a different type."
+                                console.log(parent.width)
+                            }
+                            else {
+                                unitSelection.close()
+                            }
+                        }
                     }
                 }
             }
