@@ -3,6 +3,7 @@ from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 import pint
 
+
 def load_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
     """
     Loads geometry from a file into an OFFGeometry instance
