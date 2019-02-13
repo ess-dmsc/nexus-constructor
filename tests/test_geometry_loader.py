@@ -255,13 +255,11 @@ def test_generate_off_mesh_with_repeating_grid():
 
 def test_is_length():
 
-    ureg = pint.UnitRegistry()
-
     lengths = ["mile", "cm", "centimetre", "yard", "km"]
-    not_lengths = ["minute", "hour", "ounce", "stone", "pound", "amp"]
+    not_lengths = ["minute", "hour", "ounce", "stone", "pound", "amp", "abc"]
 
     for unit in lengths:
-        assert is_length(ureg(unit))
+        assert is_length(unit)
 
     for unit in not_lengths:
-        assert not is_length(ureg(unit))
+        assert not is_length(unit)
