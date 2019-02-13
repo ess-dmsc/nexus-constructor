@@ -1,9 +1,7 @@
 from nexus_constructor.data_model import OFFGeometry, Vector
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
-import pint
 
-ureg = pint.UnitRegistry()
 
 def load_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
     """
@@ -67,12 +65,12 @@ def load_stl_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
     return geometry
 
 
-def validate_units(str):
+def is_length(unit):
     """
 
-    :param units:
+    :param unit:
     :return:
     """
 
-    return ureg(str).dimensionality['[length]'] == 1.0
+    return unit.dimensionality['[length]'] == 1.0
 

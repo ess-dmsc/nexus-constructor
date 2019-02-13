@@ -1,9 +1,10 @@
 from nexus_constructor.data_model import Vector, OFFGeometry, PixelGrid
-from nexus_constructor.geometry_loader import load_geometry, validate_units
+from nexus_constructor.geometry_loader import load_geometry, is_length
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
 import struct
+import pint
 
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
@@ -252,13 +253,15 @@ def test_generate_off_mesh_with_repeating_grid():
                 assert triangle in generated_triangles
 
 
-def test_validate_units():
+def test_is_length():
 
-    valid_units = ["mile", "cm", "centimetre", "yard", "km"]
-    invalid_units = ["minute", "hour", "ounce", "stone", "pound"]
+    ureg = pint.UnitRegistry()
 
-    for unit in valid_units:
-        assert validate_units(unit)
+    lengths = ["mile", "cm", "centimetre", "yard", "km"]
+    not_lengths = ["minute", "hour", "ounce", "stone", "pound", "amp"]
 
-    for unit in invalid_units:
-        assert not validate_units(unit)
+    for unit in lengths:
+        assert is_length(ureg(unit))
+
+    for unit in not_lengths:
+        assert not is_length(ureg(unit))
