@@ -4,7 +4,6 @@ from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
 import struct
-import pint
 
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
