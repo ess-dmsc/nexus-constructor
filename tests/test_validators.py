@@ -2,7 +2,7 @@
 from nexus_constructor.data_model import Component, Translation
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.qml_models.transform_model import TransformationModel
-from nexus_constructor.validators import NameValidator, TransformParentValidator
+from nexus_constructor.validators import NameValidator, TransformParentValidator, UnitValidator
 from PySide2.QtGui import QValidator
 
 
@@ -130,3 +130,17 @@ def test_name_validator_set_to_current_name():
 def test_name_validator_set_to_duplicate_name():
     """A name that's already at an index should not be valid at another index"""
     assess_names(["foo", "bar", "baz"], 1, "foo", False)
+
+def test_unit_validator():
+
+    validator = UnitValidator()
+
+
+    lengths = ["mile", "cm", "centimetre", "yard", "km"]
+    not_lengths = ["minute", "hour", "ounce", "stone", "pound", "amp", "abc"]
+
+    for unit in lengths:
+        assert validator.validate(unit, 0) == QValidator.Acceptable
+
+    for unit in not_lengths:
+        assert validator.validate(unit, 0) == QValidator.Invalid

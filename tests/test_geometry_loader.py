@@ -1,5 +1,5 @@
 from nexus_constructor.data_model import Vector, OFFGeometry, PixelGrid
-from nexus_constructor.geometry_loader import load_geometry, is_length
+from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
@@ -250,16 +250,3 @@ def test_generate_off_mesh_with_repeating_grid():
             # check the triangles are present
             for triangle in triangles:
                 assert triangle in generated_triangles
-
-'''
-def test_is_length():
-
-    lengths = ["mile", "cm", "centimetre", "yard", "km"]
-    not_lengths = ["minute", "hour", "ounce", "stone", "pound", "amp", "abc"]
-
-    for unit in lengths:
-        assert is_length(unit)
-
-    for unit in not_lengths:
-        assert not is_length(unit)
-'''
