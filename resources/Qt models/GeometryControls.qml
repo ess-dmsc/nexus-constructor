@@ -66,7 +66,6 @@ Pane {
                 title: "Choose geometry file"
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
-                    file_url = filePicker.fileUrl
                     unitSelection.open()
                     visible: false
                 }
@@ -124,6 +123,7 @@ Pane {
                             }
                             else {
                                 // Valid units given - Close the box
+                                file_url = filePicker.fileUrl
                                 unitSelection.close()
                             }
                         }
