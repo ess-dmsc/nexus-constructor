@@ -63,4 +63,3 @@ def load_stl_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
     geometry.faces = [[i * 3, (i * 3) + 1, (i * 3) + 2] for i in range(len(mesh_data.vectors))]
     print('STL loaded')
     return geometry
-

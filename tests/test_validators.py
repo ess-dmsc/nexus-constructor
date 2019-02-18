@@ -131,10 +131,10 @@ def test_name_validator_set_to_duplicate_name():
     """A name that's already at an index should not be valid at another index"""
     assess_names(["foo", "bar", "baz"], 1, "foo", False)
 
+
 def test_unit_validator():
 
     validator = UnitValidator()
-
 
     lengths = ["mile", "cm", "centimetre", "yard", "km"]
     not_lengths = ["minute", "hour", "ounce", "stone", "pound", "amp", "abc"]
