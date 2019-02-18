@@ -28,7 +28,9 @@ class UnitValidator(QValidator):
         except pint.errors.UndefinedUnitError:
             return QValidator.Invalid
 
-        if unit.dimensionality['[length]'] != 1.0:
+        try:
+            self.ureg.metre.from_(unit)
+        except (pint.errors.DimensionalityError, ValueError):
             return QValidator.Invalid
 
         return QValidator.Acceptable

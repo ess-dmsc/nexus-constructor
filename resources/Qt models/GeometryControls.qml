@@ -120,16 +120,23 @@ Pane {
                         Layout.alignment: Qt.AlignRight
                         onClicked: {
 
+                             console.log(unitInput.acceptableInput)
+                             console.log(unitInput.text)
+
                             if (!unitInput.acceptableInput) {
                                 // Invalid units given - Show a message and clear input box
+                                console.log("Bad units!")
                                 invalidUnitWarning.text = "Units not recognised. Please enter a different type."
-                                unitInput.text = ""
                             }
                             else {
+                                console.log("Good units!")
                                 // Valid units given - Close the box
                                 file_url = filePicker.fileUrl
                                 unitSelection.close()
                             }
+
+                            // Clear the unit input
+                            unitInput.text = ""
                         }
                     }
                 }
