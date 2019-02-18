@@ -1,7 +1,6 @@
 from nexus_constructor.data_model import OFFGeometry, Vector
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
-import pint
 
 
 def load_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
@@ -65,19 +64,3 @@ def load_stl_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
     print('STL loaded')
     return geometry
 
-
-def is_length(str):
-    """
-    Checks that a string argument is a unit of length.
-
-    :param str: A unit in the form of a string
-    :return: True if the string is a unit of length and false if it is not.
-    """
-    ureg = pint.UnitRegistry()
-
-    try:
-        unit = ureg(str)
-    except pint.errors.UndefinedUnitError:
-        return False
-
-    return unit.dimensionality['[length]'] == 1.0

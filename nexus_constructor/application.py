@@ -13,7 +13,7 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.qml_models.json_model import FilteredJsonModel
 from nexus_constructor.qml_models.pixel_models import PixelGridModel, PixelMappingModel, SinglePixelModel
 from nexus_constructor.qml_models.transform_model import TransformationModel
-from nexus_constructor.validators import NameValidator, TransformParentValidator, NullableIntValidator
+from nexus_constructor.validators import NameValidator, TransformParentValidator, NullableIntValidator, UnitValidator
 from nexus_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
@@ -36,6 +36,7 @@ qmlRegisterType(TransformationModel, 'MyModels', 1, 0, 'TransformationModel')
 qmlRegisterType(JsonConnector, 'MyJson', 1, 0, 'JsonConnector')
 
 qmlRegisterType(NameValidator, 'MyValidators', 1, 0, 'NameValidator')
+qmlRegisterType(UnitValidator, 'MyValidators', 1, 0, 'UnitValidator')
 qmlRegisterType(NullableIntValidator, 'MyValidators', 1, 0, 'NullableIntValidator')
 qmlRegisterType(TransformParentValidator, 'MyValidators', 1, 0, 'ParentValidator')
 

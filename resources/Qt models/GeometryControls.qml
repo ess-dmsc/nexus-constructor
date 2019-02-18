@@ -3,6 +3,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Dialogs 1.3
 import MyModels 1.0
 import QtQuick.Layouts 1.11
+import MyValidators 1.0
 
 
 Pane {
@@ -98,6 +99,7 @@ Pane {
                     TextField {
                         id: unitInput
                         Layout.fillWidth: true
+                        validator: UnitValidator
                     }
 
                     Text {
@@ -115,8 +117,8 @@ Pane {
                         text: "OK"
                         Layout.alignment: Qt.AlignRight
                         onClicked: {
-
-                            if (!parent.validUnitsEntered) {
+                            system.log(unitInput.acceptableInput)
+                            if (!unitInput.acceptableInput) {
                                 // Invalid units given - Show a message and clear input box
                                 invalidUnitWarning.text = "Units not recognised. Please enter a different type."
                                 unitInput.text = ""

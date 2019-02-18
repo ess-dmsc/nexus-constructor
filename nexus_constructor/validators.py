@@ -2,6 +2,7 @@
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import Property, Qt, Signal
 from PySide2.QtGui import QValidator, QIntValidator
+import pint
 
 
 class NullableIntValidator(QIntValidator):
@@ -10,6 +11,27 @@ class NullableIntValidator(QIntValidator):
             return QValidator.Acceptable
         else:
             return super().validate(input, pos)
+
+
+class UnitValidator(QValidator):
+    """
+    Validator to ensure the the text entered is a valid unit of length.
+    """
+    def __init__(self):
+        super().__init__()
+        self.ureg = pint.UnitRegistry()
+
+    def validate(self, input: str, pos: int):
+
+        try:
+            unit = self.ureg(input)
+        except pint.errors.UndefinedUnitError:
+            return QValidator.Invalid
+
+        if unit.dimensionality['[length]'] != 1.0:
+            return QValidator.Invalid
+
+        return QValidator.Acceptable
 
 
 class ValidatorOnListModel(QValidator):
