@@ -137,7 +137,7 @@ def test_unit_validator():
     validator = UnitValidator()
 
     lengths = ["mile", "cm", "centimetre", "yard", "km"]
-    not_lengths = ["minute", "hour", "ounce", "stone", "pound", "amp", "abc", "c", "3.0", "123"]
+    not_lengths = ["minute", "hour", "ounce", "stone", "pound", "amp", "abc", "c", "3.0", "123", "", "`?@#", "}"]
 
     for unit in lengths:
         assert validator.validate(unit, 0) == QValidator.Acceptable

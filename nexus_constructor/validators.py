@@ -25,10 +25,11 @@ class UnitValidator(QValidator):
 
         try:
             unit = self.ureg(input)
-        except pint.errors.UndefinedUnitError:
+        except (pint.errors.UndefinedUnitError, AttributeError, pint.compat.tokenize.TokenError):
             return QValidator.Invalid
 
         try:
+            # Attempt to find 1 metre in terms of the unit
             self.ureg.metre.from_(unit)
         except (pint.errors.DimensionalityError, ValueError):
             return QValidator.Invalid
