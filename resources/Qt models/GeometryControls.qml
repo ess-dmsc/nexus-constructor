@@ -99,7 +99,9 @@ Pane {
                     TextField {
                         id: unitInput
                         Layout.fillWidth: true
-                        validator: UnitValidator
+                        validator: UnitValidator {
+                            id: unitValidator
+                        }
                     }
 
                     Text {
@@ -117,7 +119,7 @@ Pane {
                         text: "OK"
                         Layout.alignment: Qt.AlignRight
                         onClicked: {
-                            system.log(unitInput.acceptableInput)
+
                             if (!unitInput.acceptableInput) {
                                 // Invalid units given - Show a message and clear input box
                                 invalidUnitWarning.text = "Units not recognised. Please enter a different type."
