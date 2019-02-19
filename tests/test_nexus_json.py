@@ -23,7 +23,9 @@ def test_nexus_json_generation_and_loading_is_consistent():
     json_string = nf_json.generate_json(instrument_model)
 
     loader_model = InstrumentModel()
-    nf_json.load_json_object_into_instrument_model(json.loads(json_string), loader_model)
+    nf_json.load_json_object_into_instrument_model(
+        json.loads(json_string), loader_model
+    )
 
     loaded_json = nf_json.generate_json(loader_model)
 
