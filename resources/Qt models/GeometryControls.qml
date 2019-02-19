@@ -106,7 +106,7 @@ Pane {
                         onEditingFinished: units = editorText
 
                         validator: UnitValidator {
-                            id: unitValidator
+                            id: meshUnitValidator
                             onValidationFailed: { validUnits = false }
                             onValidationSuccess: { validUnits = true }
                         }
@@ -183,7 +183,7 @@ Pane {
                 anchors.top: cylinderLabel.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth,
+                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
 
@@ -204,6 +204,20 @@ Pane {
                     editorText: cylinder_radius
                     onEditingFinished: cylinder_radius = parseFloat(editorText)
                     validator: numberValidator
+                }
+
+                LabeledTextField {
+                    id: unitsField
+                    anchors.top: heightField.top
+                    anchors.left: radiusField.right
+                    labelText: "Units:"
+                    editorText: cylinder_units
+                    // onEditingFinished: cylinder_radius = parseFloat(editorText)
+                    validator: UnitValidator {
+                                   id: cylinderUnitValidator
+                                   // onValidationFailed: { validUnits = false }
+                                   // onValidationSuccess: { validUnits = true }
+                               }
                 }
 
                 Label {

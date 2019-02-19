@@ -23,10 +23,12 @@ class CylinderModel(QAbstractListModel):
     AxisZRole = Qt.UserRole + 102
     HeightRole = Qt.UserRole + 103
     RadiusRole = Qt.UserRole + 104
+    UnitsRole = Qt.UserRole + 105
 
     def __init__(self):
         super().__init__()
         self.cylinder = CylindricalGeometry()
+        self.units = ""
 
     def rowCount(self, parent=QModelIndex()):
         return 1
@@ -38,6 +40,7 @@ class CylinderModel(QAbstractListModel):
             CylinderModel.AxisZRole: self.cylinder.axis_direction.z,
             CylinderModel.HeightRole: self.cylinder.height,
             CylinderModel.RadiusRole: self.cylinder.radius,
+            CylinderModel.UnitsRole: self.units,
         }
         if role in properties:
             return properties[role]
@@ -50,6 +53,7 @@ class CylinderModel(QAbstractListModel):
             CylinderModel.AxisZRole: [self.cylinder.axis_direction, "z", value],
             CylinderModel.HeightRole: [self.cylinder, "height", value],
             CylinderModel.RadiusRole: [self.cylinder, "radius", value],
+            CylinderModel.UnitsRole: [self, "units", value],
         }
         if role in param_options:
             param_list = param_options[role]
@@ -68,6 +72,7 @@ class CylinderModel(QAbstractListModel):
             CylinderModel.AxisZRole: b"axis_z",
             CylinderModel.HeightRole: b"cylinder_height",
             CylinderModel.RadiusRole: b"cylinder_radius",
+            CylinderModel.UnitsRole: b"units",
         }
 
     def get_geometry(self):
