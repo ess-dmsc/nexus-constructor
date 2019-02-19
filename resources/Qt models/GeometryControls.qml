@@ -8,6 +8,7 @@ import MyValidators 1.0
 
 Pane {
     property var geometryModel
+    property var validUnits: false
 
     id: pane
     padding: 0
@@ -103,11 +104,11 @@ Pane {
                         Layout.fillWidth: true
                         anchoredEditor: true
                         onEditingFinished: units = editorText
-                        property var validUnits: false
+
                         validator: UnitValidator {
                             id: unitValidator
-                            onValidationFailed: { validUnits: false }
-                            onValidationSuccess: { validUnits: true }
+                            onValidationFailed: { validUnits = false }
+                            onValidationSuccess: { validUnits = true }
                         }
                     }
 
@@ -128,14 +129,13 @@ Pane {
                             text: "OK"
                             onClicked: {
 
-                                if (!unitInput.validUnits) {
+                                if (!validUnits) {
                                     // Invalid units given - Show a message and clear input box
                                     invalidUnitWarning.text = "Units not recognised. Please enter a different type."
                                 }
                                 else {
                                     // Valid units given - Close the box
                                     file_url = filePicker.fileUrl
-                                    units = unitInput.text
                                     validUnits = false
                                     unitSelection.close()
                                 }

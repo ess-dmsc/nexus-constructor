@@ -119,7 +119,7 @@ class OFFModel(QAbstractListModel):
             OFFModel.VerticesRole: [self.geometry, "vertices", value],
             OFFModel.FacesRole: [self.geometry, "faces", value],
         }
-        print(value)
+
         if role in param_options:
             param_list = param_options[role]
             changed = change_value(*param_list)
@@ -143,6 +143,7 @@ class OFFModel(QAbstractListModel):
     def load_data(self):
         """Read the currently selected file into self.geometry"""
         filename = QUrl(self.file_url).toString(options=QUrl.PreferLocalFile)
+        print("The units are " + self.units)
         self.beginResetModel()
         load_geometry(filename, self.units, self.geometry)
         self.endResetModel()
