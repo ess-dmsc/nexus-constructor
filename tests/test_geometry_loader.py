@@ -8,6 +8,7 @@ import struct
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     model = OFFModel()
+    model.setData(1, "cm", OFFModel.UnitsRole)
     model.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
     off_geometry = model.get_geometry()
     assert isinstance(off_geometry, OFFGeometry)
@@ -93,7 +94,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         [left_upper_rear, left_upper_front, right_upper_front, right_upper_rear],  # top
     ]
 
-    geometry = load_geometry("tests/cube.stl")
+    geometry = load_geometry("tests/cube.stl", "m")
     # 2 triangles per face, 6 faces in the cube
     assert len(geometry.faces) == 6 * 2
     assert geometry.winding_order_indices == [i * 3 for i in range(12)]
@@ -137,7 +138,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
 
 
 def test_load_geometry_returns_empty_geometry_for_unrecognised_file_extension():
-    geometry = load_geometry("tests/collapsed lines.txt")
+    geometry = load_geometry("tests/collapsed lines.txt", "m")
     assert len(geometry.vertices) == 0
     assert len(geometry.faces) == 0
 

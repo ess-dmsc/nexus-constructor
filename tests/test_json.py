@@ -23,6 +23,7 @@ def build_sample_model():
     model = InstrumentModel()
 
     offmodel = OFFModel()
+    offmodel.setData(1, "m", OFFModel.UnitsRole)
     offmodel.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
     off_geometry = offmodel.get_geometry()
 

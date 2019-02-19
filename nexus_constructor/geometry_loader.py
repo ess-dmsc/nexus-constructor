@@ -1,7 +1,7 @@
 from nexus_constructor.data_model import OFFGeometry, Vector
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
-
+import pint
 
 def load_geometry(filename: str, units: str, geometry: OFFGeometry=OFFGeometry()):
     """
@@ -15,11 +15,16 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry=OFFGeometry()
     unsupported
     """
 
+    ureg = pint.UnitRegistry()
+    units = ureg(units)
+    units = ureg.m.from_(units)
+    mult_factor = units.magnitude
+
     extension = filename[filename.rfind('.'):].lower()
     if extension == '.off':
-        load_off_geometry(filename, geometry)
+        load_off_geometry(filename, mult_factor, geometry)
     elif extension == '.stl':
-        load_stl_geometry(filename, geometry)
+        load_stl_geometry(filename, mult_factor, geometry)
     else:
         geometry.faces = []
         geometry.vertices = []
@@ -27,7 +32,7 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry=OFFGeometry()
     return geometry
 
 
-def load_off_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
+def load_off_geometry(filename: str, mult_factor: float, geometry: OFFGeometry=OFFGeometry()):
     """
     Loads geometry from an OFF file into an OFFGeometry instance
 
@@ -45,7 +50,7 @@ def load_off_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
     return geometry
 
 
-def load_stl_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
+def load_stl_geometry(filename: str, mult_factor: float, geometry: OFFGeometry=OFFGeometry()):
     """
     Loads geometry from an STL file into an OFFGeometry instance
 

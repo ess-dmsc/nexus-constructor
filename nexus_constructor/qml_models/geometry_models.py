@@ -143,7 +143,6 @@ class OFFModel(QAbstractListModel):
     def load_data(self):
         """Read the currently selected file into self.geometry"""
         filename = QUrl(self.file_url).toString(options=QUrl.PreferLocalFile)
-        print("The units are " + self.units)
         self.beginResetModel()
         load_geometry(filename, self.units, self.geometry)
         self.endResetModel()
