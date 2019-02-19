@@ -96,11 +96,18 @@ Pane {
                         Layout.fillWidth: true
                     }
 
-                    TextField {
+                    LabeledTextField {
                         id: unitInput
+                        // labelText: "Geometry file:"
+                        editorText: units
                         Layout.fillWidth: true
+                        anchoredEditor: true
+                        onEditingFinished: units = editorText
+                        property var validUnits: false
                         validator: UnitValidator {
                             id: unitValidator
+                            onValidationFailed: { validUnits: false }
+                            onValidationSuccess: { validUnits: true }
                         }
                     }
 
@@ -121,18 +128,20 @@ Pane {
                             text: "OK"
                             onClicked: {
 
-                                if (!unitInput.acceptableInput) {
+                                if (!unitInput.validUnits) {
                                     // Invalid units given - Show a message and clear input box
                                     invalidUnitWarning.text = "Units not recognised. Please enter a different type."
                                 }
                                 else {
                                     // Valid units given - Close the box
                                     file_url = filePicker.fileUrl
+                                    units = unitInput.text
+                                    validUnits = false
                                     unitSelection.close()
                                 }
 
                                 // Clear the unit input
-                                unitInput.text = ""
+                                unitInput.editorText = ""
                             }
                         }
 
@@ -141,10 +150,9 @@ Pane {
                             text: "Cancel"
                             onClicked: {
 
-                                filePicker.fileUrl
                                 unitSelection.close()
                                 // Clear the unit input
-                                unitInput.text = ""
+                                unitInput.editorText = ""
                             }
                         }
                     }

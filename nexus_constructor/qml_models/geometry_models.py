@@ -86,8 +86,9 @@ class OFFModel(QAbstractListModel):
     """
 
     FileNameRole = Qt.UserRole + 200
-    VerticesRole = Qt.UserRole + 201
-    FacesRole = Qt.UserRole + 202
+    UnitsRole = Qt.UserRole + 201
+    VerticesRole = Qt.UserRole + 202
+    FacesRole = Qt.UserRole + 203
 
     meshLoaded = Signal()
 
@@ -95,6 +96,7 @@ class OFFModel(QAbstractListModel):
         super().__init__()
         self.geometry = OFFGeometry()
         self.file_url = QUrl("")
+        self.units = ""
 
     def rowCount(self, parent=QModelIndex()):
         return 1
@@ -102,6 +104,7 @@ class OFFModel(QAbstractListModel):
     def data(self, index, role=Qt.DisplayRole):
         properties = {
             OFFModel.FileNameRole: self.file_url,
+            OFFModel.UnitsRole: self.units,
             OFFModel.VerticesRole: self.geometry.vertices,
             OFFModel.FacesRole: self.geometry.faces,
         }
@@ -112,9 +115,11 @@ class OFFModel(QAbstractListModel):
         changed = False
         param_options = {
             OFFModel.FileNameRole: [self, "file_url", value],
+            OFFModel.UnitsRole: [self, "units", value],
             OFFModel.VerticesRole: [self.geometry, "vertices", value],
             OFFModel.FacesRole: [self.geometry, "faces", value],
         }
+        print(value)
         if role in param_options:
             param_list = param_options[role]
             changed = change_value(*param_list)
@@ -130,6 +135,7 @@ class OFFModel(QAbstractListModel):
     def roleNames(self):
         return {
             OFFModel.FileNameRole: b"file_url",
+            OFFModel.UnitsRole: b"units",
             OFFModel.VerticesRole: b"vertices",
             OFFModel.FacesRole: b"faces",
         }
@@ -138,7 +144,7 @@ class OFFModel(QAbstractListModel):
         """Read the currently selected file into self.geometry"""
         filename = QUrl(self.file_url).toString(options=QUrl.PreferLocalFile)
         self.beginResetModel()
-        load_geometry(filename, self.geometry)
+        load_geometry(filename, self.units, self.geometry)
         self.endResetModel()
         self.meshLoaded.emit()
 

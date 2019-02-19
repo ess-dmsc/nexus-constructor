@@ -116,7 +116,11 @@ ExpandingWindow {
                 anchors.right: parent.right
                 state: geometry_state
 
-                Component.onCompleted: geometryControls.geometryModel.set_geometry(componentIndex, components)
+                Component.onCompleted: {
+                    console.log("Loading the geometry.")
+                    geometryControls.geometryModel.set_geometry(componentIndex, components)
+                    system.log(geometryControls.unitInput.text)
+                }
                 onMeshChanged: {
                     pixelControls.restartMapping(geometryControls.geometryModel)
                     components.update_mesh(componentIndex)

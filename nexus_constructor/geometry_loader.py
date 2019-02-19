@@ -3,7 +3,7 @@ from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
 
-def load_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
+def load_geometry(filename: str, units: str, geometry: OFFGeometry=OFFGeometry()):
     """
     Loads geometry from a file into an OFFGeometry instance
 
@@ -14,6 +14,7 @@ def load_geometry(filename: str, geometry: OFFGeometry=OFFGeometry()):
     :return: An OFFGeometry instance containing that file's geometry, or an empty instance if filename's extension is
     unsupported
     """
+
     extension = filename[filename.rfind('.'):].lower()
     if extension == '.off':
         load_off_geometry(filename, geometry)
