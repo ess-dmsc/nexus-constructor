@@ -4,11 +4,10 @@ import QtQuick.Dialogs 1.3
 import MyModels 1.0
 import QtQuick.Layouts 1.11
 import MyValidators 1.0
-
+import "."
 
 Pane {
     property var geometryModel
-    property var validUnits: false
 
     id: pane
     padding: 0
@@ -81,9 +80,6 @@ Pane {
                 // Remove standard buttons so that custom OK button can be used that only accepts valid units
                 standardButtons: StandardButton.NoButton
 
-                // Bool for checking if valid units were given
-                property var validUnitsEntered: false
-
                 // Prevent the window from suddenly expanding when the invalid units message is shown
                 width: 350
 
@@ -107,8 +103,8 @@ Pane {
 
                         validator: UnitValidator {
                             id: meshUnitValidator
-                            onValidationFailed: { validUnits = false }
-                            onValidationSuccess: { validUnits = true }
+                            onValidationFailed: { ValidUnits.validMeshUnits = false }
+                            onValidationSuccess: { ValidUnits.validMeshUnits = true }
                         }
                     }
 
@@ -129,14 +125,13 @@ Pane {
                             text: "OK"
                             onClicked: {
 
-                                if (!validUnits) {
+                                if (!ValidUnits.validMeshUnits) {
                                     // Invalid units given - Show a message and clear input box
                                     invalidUnitWarning.text = "Units not recognised. Please enter a different type."
                                 }
                                 else {
                                     // Valid units given - Close the box
                                     file_url = filePicker.fileUrl
-                                    validUnits: false
                                     unitSelection.close()
                                 }
 
@@ -215,8 +210,8 @@ Pane {
                     // onEditingFinished: cylinder_radius = parseFloat(editorText)
                     validator: UnitValidator {
                                    id: cylinderUnitValidator
-                                   // onValidationFailed: { validUnits = false }
-                                   // onValidationSuccess: { validUnits = true }
+                                   onValidationFailed: { ValidUnits.validCylinderUnits = false }
+                                   onValidationSuccess: { ValidUnits.validCylinderUnits = true }
                                }
                 }
 
