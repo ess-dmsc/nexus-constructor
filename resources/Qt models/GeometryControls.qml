@@ -127,7 +127,7 @@ Pane {
 
                                 if (!ValidUnits.validMeshUnits) {
                                     // Invalid units given - Show a message and clear input box
-                                    invalidUnitWarning.text = "Units not recognised. Please enter a different type."
+                                    invalidMeshUnitWarning.text = "Units not recognised. Please enter a different type."
                                 }
                                 else {
                                     // Valid units given - Close the box
@@ -215,9 +215,20 @@ Pane {
                                }
                 }
 
+                Text {
+
+                    // Blank invalid unit warning - only set if unit validation function returns false
+                    id: invalidCylinderUnitWarning
+                    anchors.top: unitsField.bottom
+                    text: ValidUnits.cylinderUnitMessage ? "Units not recognised. Please enter a different type." : ""
+                    color: "red"
+                    Layout.fillWidth: true
+                    visible: true
+                 }
+
                 Label {
                     id: directionLabel
-                    anchors.top: radiusField.bottom
+                    anchors.top: invalidCylinderUnitWarning.bottom
                     anchors.left: parent.left
                     text: "axis direction:"
                 }
