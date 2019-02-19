@@ -5,4 +5,5 @@ QtObject {
     property bool validMeshUnits: false
     property bool validCylinderUnits: false
     property bool cylinderUnitMessage: false
+    readonly property string invalidUnitsText: "Units not recognised. Please enter a different type."
 }

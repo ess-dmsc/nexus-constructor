@@ -111,7 +111,7 @@ Pane {
                     Text {
 
                         // Blank invalid unit warning - only set if unit validation function returns false
-                        id: invalidUnitWarning
+                        id: invalidMeshUnitWarning
                         text: ""
                         color: "red"
                         Layout.fillWidth: true
@@ -127,7 +127,7 @@ Pane {
 
                                 if (!ValidUnits.validMeshUnits) {
                                     // Invalid units given - Show a message and clear input box
-                                    invalidMeshUnitWarning.text = "Units not recognised. Please enter a different type."
+                                    invalidMeshUnitWarning.text = ValidUnits.invalidUnitsText
                                 }
                                 else {
                                     // Valid units given - Close the box
@@ -221,7 +221,7 @@ Pane {
                     // Blank invalid unit warning - only set if unit validation function returns false
                     id: invalidCylinderUnitWarning
                     anchors.top: unitsField.bottom
-                    text: ValidUnits.cylinderUnitMessage ? "Units not recognised. Please enter a different type." : ""
+                    text: ValidUnits.cylinderUnitMessage ? ValidUnits.invalidUnitsText : ""
                     color: "red"
                     Layout.fillWidth: true
                     visible: true
