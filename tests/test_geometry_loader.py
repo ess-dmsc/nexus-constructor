@@ -6,6 +6,7 @@ from PySide2.QtCore import QUrl
 from pytest import approx
 import struct
 
+
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     model = OFFModel()
     model.setData(1, "m", OFFModel.UnitsRole)

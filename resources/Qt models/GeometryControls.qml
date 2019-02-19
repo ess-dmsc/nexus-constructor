@@ -136,7 +136,7 @@ Pane {
                                 else {
                                     // Valid units given - Close the box
                                     file_url = filePicker.fileUrl
-                                    validUnits = false
+                                    validUnits: false
                                     unitSelection.close()
                                 }
 
