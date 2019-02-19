@@ -181,6 +181,7 @@ Pane {
                 contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
+                               + invalidCylinderUnitWarning.implicitHeight
 
                 LabeledTextField {
                     id: heightField
