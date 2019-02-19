@@ -3,6 +3,14 @@ from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 import pint
 
+
+def calculate_unit_conversion_factor(units):
+    ureg = pint.UnitRegistry()
+    units = ureg(units)
+    units = ureg.m.from_(units)
+    return units.magnitude
+
+
 def load_geometry(filename: str, units: str, geometry: OFFGeometry=OFFGeometry()):
     """
     Loads geometry from a file into an OFFGeometry instance
@@ -15,10 +23,7 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry=OFFGeometry()
     unsupported
     """
 
-    ureg = pint.UnitRegistry()
-    units = ureg(units)
-    units = ureg.m.from_(units)
-    mult_factor = units.magnitude
+    mult_factor = calculate_unit_conversion_factor(units)
 
     extension = filename[filename.rfind('.'):].lower()
     if extension == '.off':

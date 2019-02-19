@@ -1,10 +1,10 @@
 from nexus_constructor.data_model import Vector, OFFGeometry, PixelGrid
-from nexus_constructor.geometry_loader import load_geometry
+from nexus_constructor.geometry_loader import load_geometry, calculate_unit_conversion_factor
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
+from pytest import approx
 import struct
-
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     model = OFFModel()
@@ -251,3 +251,10 @@ def test_generate_off_mesh_with_repeating_grid():
             # check the triangles are present
             for triangle in triangles:
                 assert triangle in generated_triangles
+
+def test_unit_conversion_factor():
+
+    units = [("cm", 0.01), ("km", 1000), ("m", 1.0), ("inch", 0.0254), ("foot", 0.3048)]
+
+    for unit in units:
+        assert approx(calculate_unit_conversion_factor(unit[0])) == unit[1]
