@@ -8,7 +8,7 @@ import struct
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     model = OFFModel()
-    model.setData(1, "cm", OFFModel.UnitsRole)
+    model.setData(1, "m", OFFModel.UnitsRole)
     model.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
     off_geometry = model.get_geometry()
     assert isinstance(off_geometry, OFFGeometry)
@@ -252,8 +252,10 @@ def test_generate_off_mesh_with_repeating_grid():
             for triangle in triangles:
                 assert triangle in generated_triangles
 
+
 def test_unit_conversion_factor():
 
+    # List of units and their value in metres
     units = [("cm", 0.01), ("km", 1000), ("m", 1.0), ("inch", 0.0254), ("foot", 0.3048)]
 
     for unit in units:
