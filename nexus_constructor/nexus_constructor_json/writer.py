@@ -183,6 +183,7 @@ def build_geometry_dictionary(geometry: Geometry):
             },
             "height": geometry.height,
             "radius": geometry.radius,
+            "units": geometry.units,
         }
     else:
         data = None

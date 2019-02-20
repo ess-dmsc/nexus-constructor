@@ -69,10 +69,10 @@ class CylindricalGeometry(Geometry):
     described by the direction of its axis, its height, and radius.
     """
 
-    units = attr.ib(default="feet", type=str)
     axis_direction = attr.ib(factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
+    units = attr.ib(default="", type=str)
 
     @property
     def base_center_point(self):

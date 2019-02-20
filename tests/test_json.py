@@ -48,7 +48,7 @@ def build_sample_model():
                 Translation(name="translate", vector=Vector(-1.3, 0.1, -3.14)),
             ],
             geometry=CylindricalGeometry(
-                axis_direction=Vector(2, 2, 1), height=0.7, radius=0.1
+                axis_direction=Vector(2, 2, 1), height=0.7, radius=0.1, units="m"
             ),
             pixel_data=PixelGrid(
                 rows=3,
@@ -111,7 +111,7 @@ def build_sample_model():
                 Translation(name="translate2", vector=Vector(0, 0, -10)),
             ],
             geometry=CylindricalGeometry(
-                axis_direction=Vector(0, 0, 1), height=0.3, radius=1.5
+                axis_direction=Vector(0, 0, 1), height=0.3, radius=1.5, units="m"
             ),
         ),
     ]

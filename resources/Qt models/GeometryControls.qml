@@ -208,7 +208,7 @@ Pane {
                     anchors.left: radiusField.right
                     labelText: "Units:"
                     editorText: cylinder_units
-                    // onEditingFinished: cylinder_radius = parseFloat(editorText)
+                    // onEditingFinished:
                     validator: UnitValidator {
                                    id: cylinderUnitValidator
                                    onValidationFailed: { ValidUnits.validCylinderUnits = false }
@@ -218,7 +218,8 @@ Pane {
 
                 Text {
 
-                    // Blank invalid unit warning - only set if unit validation function returns false
+                    // Blank invalid unit warning - only set to contain text if unit validation function returns false
+                    // and user presses "Add" button
                     id: invalidCylinderUnitWarning
                     anchors.top: unitsField.bottom
                     text: ValidUnits.cylinderUnitMessage ? ValidUnits.invalidUnitsText : ""
