@@ -322,13 +322,16 @@ ExpandingWindow {
                                                  geometryControls.geometryModel,
                                                  pixelControls.pixelModel,
                                                  transformControls.transformModel)
+
                         addComponentWindow.close()
+
                         ValidUnits.cylinderUnitMessage = false
+                        ValidUnits.validMeshUnits = false
+                        ValidUnits.validCylinderUnits = false
+
                     }
                     else {
 
-                        ValidUnits.validMeshUnits = false
-                        ValidUnits.validCylinderUnits = false
                         ValidUnits.cylinderUnitMessage = true
                         console.log("Can't accept these units.")
                     }

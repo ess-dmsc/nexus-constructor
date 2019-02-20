@@ -18,29 +18,28 @@ class CylinderModel(QAbstractListModel):
     A single item list model that allows properties of a Cylindrical geometry to be read and manipulated in QML
     """
 
-    AxisXRole = Qt.UserRole + 100
-    AxisYRole = Qt.UserRole + 101
-    AxisZRole = Qt.UserRole + 102
-    HeightRole = Qt.UserRole + 103
-    RadiusRole = Qt.UserRole + 104
-    UnitsRole = Qt.UserRole + 105
+    UnitsRole = Qt.UserRole + 100
+    AxisXRole = Qt.UserRole + 101
+    AxisYRole = Qt.UserRole + 102
+    AxisZRole = Qt.UserRole + 103
+    HeightRole = Qt.UserRole + 104
+    RadiusRole = Qt.UserRole + 105
 
     def __init__(self):
         super().__init__()
         self.cylinder = CylindricalGeometry()
-        self.units = ""
 
     def rowCount(self, parent=QModelIndex()):
         return 1
 
     def data(self, index, role=Qt.DisplayRole):
         properties = {
+            CylinderModel.UnitsRole: self.cylinder.units,
             CylinderModel.AxisXRole: self.cylinder.axis_direction.x,
             CylinderModel.AxisYRole: self.cylinder.axis_direction.y,
             CylinderModel.AxisZRole: self.cylinder.axis_direction.z,
             CylinderModel.HeightRole: self.cylinder.height,
             CylinderModel.RadiusRole: self.cylinder.radius,
-            CylinderModel.UnitsRole: self.units,
         }
         if role in properties:
             return properties[role]
@@ -48,13 +47,14 @@ class CylinderModel(QAbstractListModel):
     def setData(self, index, value, role):
         changed = False
         param_options = {
+            CylinderModel.UnitsRole: [self.cylinder, "units", value],
             CylinderModel.AxisXRole: [self.cylinder.axis_direction, "x", value],
             CylinderModel.AxisYRole: [self.cylinder.axis_direction, "y", value],
             CylinderModel.AxisZRole: [self.cylinder.axis_direction, "z", value],
             CylinderModel.HeightRole: [self.cylinder, "height", value],
             CylinderModel.RadiusRole: [self.cylinder, "radius", value],
-            CylinderModel.UnitsRole: [self, "units", value],
         }
+
         if role in param_options:
             param_list = param_options[role]
             changed = change_value(*param_list)
@@ -67,12 +67,12 @@ class CylinderModel(QAbstractListModel):
 
     def roleNames(self):
         return {
+            CylinderModel.UnitsRole: b"cylinder_units",
             CylinderModel.AxisXRole: b"axis_x",
             CylinderModel.AxisYRole: b"axis_y",
             CylinderModel.AxisZRole: b"axis_z",
             CylinderModel.HeightRole: b"cylinder_height",
             CylinderModel.RadiusRole: b"cylinder_radius",
-            CylinderModel.UnitsRole: b"units",
         }
 
     def get_geometry(self):
@@ -81,6 +81,7 @@ class CylinderModel(QAbstractListModel):
     @Slot(int, "QVariant")
     def set_geometry(self, index, instrument: InstrumentModel):
         self.beginResetModel()
+
         self.cylinder = instrument.components[index].geometry
         self.endResetModel()
 
