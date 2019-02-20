@@ -328,16 +328,13 @@ ExpandingWindow {
                         addComponentWindow.close()
 
                         // Reset the booleans for input validity
-                        ValidUnits.cylinderUnitMessage = false
-                        ValidUnits.validMeshUnits = false
-                        ValidUnits.validCylinderUnits = false
+                        resetUnitChecks()
 
                     }
                     else {
 
                         // Bad units given - Show the bad unit message without creating the geometry
                         ValidUnits.showCylinderUnitMessage = true
-                        console.log("Can't accept these units.")
                     }
 
                 }
@@ -359,5 +356,16 @@ ExpandingWindow {
                 PropertyChanges { target: nameField; focus: true}
             }
         ]
+    }
+
+    function resetUnitChecks() {
+        ValidUnits.cylinderUnitMessage = false
+        ValidUnits.validMeshUnits = false
+        ValidUnits.validCylinderUnits = true
+        ValidUnits.showCylinderUnitMessage = false
+    }
+
+    onClosing: {
+        resetUnitChecks()
     }
 }
