@@ -222,7 +222,7 @@ Pane {
                     // and user presses "Add" button
                     id: invalidCylinderUnitWarning
                     anchors.top: unitsField.bottom
-                    text: ValidUnits.cylinderUnitMessage ? ValidUnits.invalidUnitsText : ""
+                    text: ValidUnits.showCylinderUnitMessage ? ValidUnits.invalidUnitsText : ""
                     color: "red"
                     Layout.fillWidth: true
                     visible: true

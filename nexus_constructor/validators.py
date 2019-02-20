@@ -23,7 +23,7 @@ class UnitValidator(QValidator):
 
     def validate(self, input: str, pos: int):
 
-        # Attempt to convert the string to a unit
+        # Attempt to convert the string argument to a unit
         try:
             unit = self.ureg(input)
         except (pint.errors.UndefinedUnitError, AttributeError, pint.compat.tokenize.TokenError):
@@ -45,6 +45,7 @@ class UnitValidator(QValidator):
         self.validationSuccess.emit()
         return QValidator.Acceptable
 
+    # Create signals because the QML LabeledTextField doesn't have "onAccepted"
     validationSuccess = Signal()
     validationFailed = Signal()
 

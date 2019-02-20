@@ -316,6 +316,8 @@ ExpandingWindow {
                 text: "Add"
                 onClicked: {
 
+                    // Check that either the mesh or the cylinder were given a valid unit argument because it is not
+                    // known which geometry has just been created.
                     if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits) {
 
                         components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
@@ -325,6 +327,7 @@ ExpandingWindow {
 
                         addComponentWindow.close()
 
+                        // Reset the booleans for input validity
                         ValidUnits.cylinderUnitMessage = false
                         ValidUnits.validMeshUnits = false
                         ValidUnits.validCylinderUnits = false
@@ -332,7 +335,8 @@ ExpandingWindow {
                     }
                     else {
 
-                        ValidUnits.cylinderUnitMessage = true
+                        // Bad units given - Show the bad unit message without creating the geometry
+                        ValidUnits.showCylinderUnitMessage = true
                         console.log("Can't accept these units.")
                     }
 
