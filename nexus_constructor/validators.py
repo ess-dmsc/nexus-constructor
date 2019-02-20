@@ -28,19 +28,19 @@ class UnitValidator(QValidator):
             unit = self.ureg(input)
         except (pint.errors.UndefinedUnitError, AttributeError, pint.compat.tokenize.TokenError):
             self.validationFailed.emit()
-            return QValidator.Invalid
+            return QValidator.Intermediate
 
         # Attempt to find 1 metre in terms of the unit. This will ensure that it's a length.
         try:
             self.ureg.metre.from_(unit)
         except (pint.errors.DimensionalityError, ValueError):
             self.validationFailed.emit()
-            return QValidator.Invalid
+            return QValidator.Intermediate
 
         # Reject input in the form of "2 metres," "40 cm," etc
         if unit.magnitude != 1:
             self.validationFailed.emit()
-            return QValidator.Invalid
+            return QValidator.Intermediate
 
         self.validationSuccess.emit()
         return QValidator.Acceptable

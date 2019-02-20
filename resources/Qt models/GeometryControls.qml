@@ -210,9 +210,9 @@ Pane {
                     editorText: cylinder_units
                     onEditingFinished: cylinder_units = editorText
                     validator: UnitValidator {
-                                   id: cylinderUnitValidator
-                                   onValidationFailed: { ValidUnits.validCylinderUnits = false }
-                                   onValidationSuccess: { ValidUnits.validCylinderUnits = true }
+                                    id: cylinderUnitValidator
+                                    onValidationFailed: { ValidUnits.validCylinderUnits = false }
+                                    onValidationSuccess: { ValidUnits.validCylinderUnits = true }
                                }
                 }
 

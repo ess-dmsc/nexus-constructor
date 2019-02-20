@@ -143,4 +143,4 @@ def test_unit_validator():
         assert validator.validate(unit, 0) == QValidator.Acceptable
 
     for unit in not_lengths:
-        assert validator.validate(unit, 0) == QValidator.Invalid
+        assert validator.validate(unit, 0) == QValidator.Intermediate
