@@ -99,3 +99,9 @@ These packages expose the following methods:
  - `load_json_object_into_instrument_model(json_object: dict, model: InstrumentModel)`
  populates a model with data from a json_object, which can be obtained from the
  load methods in python's `json` package
+
+### Adding Geometries
+
+#### Unit Conversion
+
+The program enables users to specify a unit of length when adding components. This is implemented with the `pint` library which is capable of taking inputs such as "meter," "metre," "m," etc and recognising that these mean the same thing. This gives the user more leeway when giving units. The conversion is carried out by viewing meters as the default unit of length and multiplying the relevant values by length in meters. For example, loading a geometry in centimeters will result in its points being multiplied by 0.01.

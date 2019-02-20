@@ -3,24 +3,7 @@ from enum import Enum, unique
 from math import sqrt, sin, cos, pi, acos
 from typing import List
 from PySide2.QtGui import QVector3D, QMatrix4x4
-import pint
-
-
-def calculate_unit_conversion_factor(units):
-    """
-    Determines the factor for multiplying the geometry file points in order to convert it from its original units to
-    metres.
-
-    :param units: A unit of length in the form of a string.
-    :return: A float value for converting between metres and the unit argument.
-    """
-    try:
-        ureg = pint.UnitRegistry()
-        units = ureg(units)
-        units = ureg.m.from_(units)
-        return units.magnitude
-    except Exception:
-        print(units)
+from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 
 
 def validate_nonzero_vector(instance, attribute, value):
@@ -68,11 +51,10 @@ class CylindricalGeometry(Geometry):
     The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
     described by the direction of its axis, its height, and radius.
     """
-
+    units = attr.ib(default="",type=str)
     axis_direction = attr.ib(factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
-    units = attr.ib(default="", type=str)
 
     @property
     def base_center_point(self):
@@ -81,7 +63,6 @@ class CylindricalGeometry(Geometry):
     @property
     def base_edge_point(self):
         # rotate a point on the edge of a Z axis aligned cylinder by the rotation matrix
-        print(self.units)
         edge_point = QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0) * self.rotation_matrix
         return Vector(edge_point.x(), edge_point.y(), edge_point.z())
 

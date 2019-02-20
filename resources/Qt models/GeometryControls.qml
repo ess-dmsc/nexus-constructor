@@ -208,7 +208,7 @@ Pane {
                     anchors.left: radiusField.right
                     labelText: "Units:"
                     editorText: cylinder_units
-                    // onEditingFinished:
+                    onEditingFinished: cylinder_units = editorText
                     validator: UnitValidator {
                                    id: cylinderUnitValidator
                                    onValidationFailed: { ValidUnits.validCylinderUnits = false }
