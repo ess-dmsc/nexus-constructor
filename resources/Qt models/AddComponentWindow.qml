@@ -359,9 +359,8 @@ ExpandingWindow {
     }
 
     function resetUnitChecks() {
-        ValidUnits.cylinderUnitMessage = false
         ValidUnits.validMeshUnits = false
-        ValidUnits.validCylinderUnits = true
+        ValidUnits.validCylinderUnits = false
         ValidUnits.showCylinderUnitMessage = false
     }
 
