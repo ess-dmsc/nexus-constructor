@@ -51,7 +51,7 @@ class CylindricalGeometry(Geometry):
     The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
     described by the direction of its axis, its height, and radius.
     """
-    units = attr.ib(default="m",type=str)
+    units = attr.ib(default="m", type=str)
     axis_direction = attr.ib(factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
