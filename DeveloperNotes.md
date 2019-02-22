@@ -115,7 +115,10 @@ Custom Validators can be created by extending the `QValidator` class and creatin
 
 Once a new validator has been added to `validators.py` it must be registered in order for QML to recongise it. This is done by placing a statement in `application.py` similar to the one below:
 ```python
+
+from nexus_constructor.validators import NameValidator, TransformParentValidator, NullableIntValidator, UnitValidator, MyCustomValidator
 qmlRegisterType(MyCustomValidator, 'MyValidators', 1, 0, 'MyCustomValidator')
+
 ```
 
 This then makes it possible to access your new custom validator (along with the other validators in `validators.py`) by using the following import statement at the top of a QML file:  
