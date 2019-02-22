@@ -35,7 +35,6 @@ node("docker") {
 
         stage("Install requirements") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
-                yum install mesa-libGL.x86_64
                 cd ${project}
                 build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
                 build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
