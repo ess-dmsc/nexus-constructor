@@ -102,16 +102,16 @@ These packages expose the following methods:
  
 ## QML Validators
 
-The `LabeledTextField` is used throughout the QML to allow for user input. These make use of Validators that prevent a user from entering invalid input. The Validators are contained in the `validators.py` file and are tested in `test_validators.py` 
-
-Custom Validators can be created by extending the `QValidator` class and creating a set of checks for user input that may return the following values:
+The input given to a `LabeledTextField` can be checked before it is accepted by using custom Python _Validators_. We define our Validator classes in `validators.py` and place their tests tested in `test_validators.py`  A Validator may return one of the following three inputs to inform QML if the input should be accepted:
 - `Acceptable`
 - `Intermediate`
 - `Invalid`
 
+An explanation of when to use these different return values can be found [here](https://doc.qt.io/qt-5/qvalidator.html).
+
 ### Creating Custom Validators
 
-The Python code for a Validator must be placed in `validator.py`. The example below shows what a custom validator might look like.
+The example below shows what a custom validator might look like. All Validators must implement a `validate` function where the first argument is the input provided by the user.
 
 ```python
 class MyCustomValidator(QValidator):
@@ -137,9 +137,13 @@ class MyCustomValidator(QValidator):
     validationFailed = Signal()
 ```
 
-The constructor can be used for creating any important objects/variables that are used to help validate the input. Note that the signals are declared _outside_ the constructor. Here returning `QValidator.Intermediate` rather than `QValidator.Invalid` prevents our `LabeledTextField` from "freezing" as soon as it receives _any_ valid input.
+The constructor can be used for creating any important objects/variables that are used to help validate the input. In addition, a developer may wish to create further helper functions for checking input or import them from elsewhere. In the above example, we return `QValidator.Intermediate` rather than `QValidator.Invalid` as this prevents our `LabeledTextField` from "freezing" as soon as it has _any_ valid input. This can be helpful when the text field has a default value and attempting to replace it with something else causes the input to become invalid. Should a validator return `QValidator.Invalid` in this case, QML will attempt to preserve the default input and effectively freeze the `LabeledTextField`. 
 
-A test for this validator may then look like
+In addition to returning `Acceptable`/`Invalid`/`Intermediate` we also make use of custom signals. Such signals are necessary when you wish to program a response to the user input in QML (such as displaying a message if input is unsuitable). These signals are not always required.
+
+Note that the signals are declared _outside_ the constructor but are still accessed with the `self` prefix.
+
+A test for the custom validator may look like the example below:
 
 ```python
 def test_custom_validator():
@@ -156,19 +160,18 @@ def test_custom_validator():
         assert custom_validator.validate(input, 0) == QValidator.Intermediate
 ```
 
-Once a new validator has been created in Python it must be registered in order for QML to recognise it. This is done by placing some statements in `application.py` similar to the ones below:
+Once a new validator has been created it must be registered in order for QML to recognise it. This is done by placing some statements in `application.py` similar to the ones below:
 ```python
-
 from nexus_constructor.validators import MyCustomValidator
-
 qmlRegisterType(MyCustomValidator, 'MyValidators', 1, 0, 'MyCustomValidator')
-
 ```
 
 This then makes it possible to access your new custom validator (along with the other validators) by using the following import statement at the top of a QML file:  
-`import MyValidators 1.0`.
+```
+import MyValidators 1.0
+```
 
-Once imported, a custom Validator can then be used within a QML field by assigning `validatior: MyCustomValidator`. The example below shows how this is done in the case of the `UnitValidator`.  
+Once imported, a custom Validator can then be used within a `LabeledTextField` by using the assignment `validatior: MyCustomValidator`. The example below shows how this is done in the case of a field that checks for valid unit import using the `UnitValidator`.  
 
 ```qml
 LabeledTextField {
@@ -185,8 +188,6 @@ LabeledTextField {
     }
 }
 ```
-
-where `onValidationFailed` and `onValidationSuccess` are custom signals emitted from a `UnitValidator`. As `LabeledTextField` does not 
 
 ### Validator Overview
 
