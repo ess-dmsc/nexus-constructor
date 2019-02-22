@@ -193,9 +193,18 @@ LabeledTextField {
 
 #### UnitValidator
 
+The `UnitValidator` uses the `pint` library to check if a text input matches a valid unit of length. It will return `QValidator.Intermediate` and emit the `ValidationFailed` signal if:
+- the input could not be converted to a known unit
+- the input is a unit of time/volume/area/etc
+- the input has no units and simply consists of a number
+- the input has a magnitude other than 1 (e.g. "40 cm")
+
+Some of these inputs are required because `pint` is flexible about what it regards as an acceptable physical quantity object. If given an empty string, `pint` will convert this to `1 dimensionless` instead of throwing an Exception. This behaviour can then cause problems if a `dimensionless` object is allowed to propagate further into the program and be passed to functions that assume it is a length. In light of this, some care may be required when using `pint` for checking lengths as you might assume it will reject inputs that it is actually able to accept. 
+
+If the input passes all of the above checks then the `UnitValidator` will return `QValidator.Acceptable` and emit the `ValidationSuccess` signal.
 
 ## Adding Geometries
 
 ### Unit Conversion
 
-The program enables users to specify a unit of length when adding components. This is implemented with the `pint` library which is capable of taking inputs such as "meter," "metre," "m," etc and recognising that these mean the same thing. This gives the user more leeway when giving units. The conversion is carried out by viewing meters as the default unit of length and multiplying the relevant values by length in meters. For example, loading a geometry in centimeters will result in its points being multiplied by 0.01.
+The program is capable of taking inputs such as "meter," "metre," "m," etc and recognising that these mean the same thing. This gives the user more leeway when giving units. The conversion is carried out by viewing meters as the default unit of length and multiplying the relevant values by length in meters. For example, loading a geometry in centimeters will result in its points being multiplied by 0.01.
