@@ -54,7 +54,7 @@ node("docker") {
             try {
                 sh """docker exec ${container_name} ${sh_cmd} -c \"
                     cd ${project}
-                    build_env/bin/pytest ./tests --ignore=build_env --junitxml=/home/jenkins/${project}/test_results.xml
+                    build_env/bin/python -m pytest ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml
                 \""""
                 }
                 catch(err) {
@@ -63,7 +63,7 @@ node("docker") {
                 }
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
-                build_env/bin/pytest --cov=nexus_constructor --cov-report=xml
+                build_env/bin/python -m pytest --cov=nexus_constructor --cov-report=xml
                 \""""
             withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
                 sh """docker exec ${container_name} ${sh_cmd} -c \"
