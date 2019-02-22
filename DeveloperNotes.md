@@ -99,6 +99,39 @@ These packages expose the following methods:
  - `load_json_object_into_instrument_model(json_object: dict, model: InstrumentModel)`
  populates a model with data from a json_object, which can be obtained from the
  load methods in python's `json` package
+ 
+## QML Validators
+
+The `LabeledTextField` is used throughout the QML to allow for user input. These make use of Validators that prevent a user from entering invalid input. The Validators are contained in the `validators.py` file and are tested in `test_validators.py` 
+
+Custom Validators can be created by extending the `QValidator` class and creating a set of checks for user input that may return the following values:
+- `Acceptable`
+- `Intermediate`
+- `Invalid`
+
+### UnitValidator
+
+### Creating Custom Validators
+
+A custom Validator can then be used within a QML field by using
+
+```qml
+LabeledTextField {
+    id: unitInput
+    editorText: units
+    Layout.fillWidth: true
+    anchoredEditor: true
+    onEditingFinished: units = editorText
+
+    validator: UnitValidator {
+        id: meshUnitValidator
+        onValidationFailed: { ValidUnits.validMeshUnits = false }
+        onValidationSuccess: { ValidUnits.validMeshUnits = true }
+    }
+}
+```
+
+where `onValidationFailed` and `onValidationSuccess` are custom signals emitted from a validator.
 
 ### Adding Geometries
 
