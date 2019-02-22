@@ -148,6 +148,7 @@ Pane {
                                 unitSelection.close()
                                 // Clear the unit input
                                 unitInput.editorText = ""
+                                invalidMeshUnitWarning.text = ""
                             }
                         }
                     }
