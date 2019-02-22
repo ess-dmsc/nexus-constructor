@@ -5,12 +5,71 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 
-from nexus_constructor.data_model import CylindricalGeometry, OFFGeometry
+from nexus_constructor.data_model import CylindricalGeometry, OFFGeometry, NoShapeGeometry
 from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.qml_models import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
 
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
+
+
+class NoShapeModel(QAbstractListModel):
+    def __init__(self):
+        super().__init__()
+        self.cylinder = NoShapeGeometry()
+
+    AxisXRole = Qt.UserRole + 100
+    AxisYRole = Qt.UserRole + 101
+    AxisZRole = Qt.UserRole + 102
+    RadiusRole = Qt.UserRole + 104
+
+    def rowCount(self, parent=QModelIndex()):
+        return 1
+
+    def data(self, index, role=Qt.DisplayRole):
+        properties = {
+            CylinderModel.AxisXRole: self.cylinder.axis_direction.x,
+            CylinderModel.AxisYRole: self.cylinder.axis_direction.y,
+            CylinderModel.AxisZRole: self.cylinder.axis_direction.z,
+            CylinderModel.RadiusRole: self.cylinder.radius,
+        }
+        if role in properties:
+            return properties[role]
+
+    def setData(self, index, value, role):
+        changed = False
+        param_options = {
+            CylinderModel.AxisXRole: [self.cylinder.axis_direction, "x", value],
+            CylinderModel.AxisYRole: [self.cylinder.axis_direction, "y", value],
+            CylinderModel.AxisZRole: [self.cylinder.axis_direction, "z", value],
+            CylinderModel.RadiusRole: [self.cylinder, "radius", value],
+        }
+        if role in param_options:
+            param_list = param_options[role]
+            changed = change_value(*param_list)
+        if changed:
+            self.dataChanged.emit(index, index, role)
+        return changed
+
+    def flags(self, index):
+        return super().flags(index) | Qt.ItemIsEditable
+
+    def roleNames(self):
+        return {
+            CylinderModel.AxisXRole: b"axis_x",
+            CylinderModel.AxisYRole: b"axis_y",
+            CylinderModel.AxisZRole: b"axis_z",
+            CylinderModel.RadiusRole: b"cylinder_radius",
+        }
+
+    def get_geometry(self):
+        return self.cylinder
+
+    @Slot(int, "QVariant")
+    def set_geometry(self, index, instrument: InstrumentModel):
+        self.beginResetModel()
+        self.cylinder = instrument.components[index].geometry
+        self.endResetModel()
 
 
 class CylinderModel(QAbstractListModel):

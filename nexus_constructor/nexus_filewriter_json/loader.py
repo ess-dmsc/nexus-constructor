@@ -15,6 +15,7 @@ from nexus_constructor.data_model import (
     Vector,
     OFFGeometry,
     CylindricalGeometry,
+    NoShapeGeometry,
     SinglePixelId,
 )
 from nexus_constructor.nexus import NexusEncoder, NexusDecoder
@@ -234,6 +235,10 @@ def generate_geometry_and_pixel_data(json_component: dict):
                     pixel_data = NexusDecoder.unmap_pixel_ids(
                         detector_ids, len(winding_order_indexes)
                     )
+            elif attribute_value(child, 'NX_class') == "NXno_geometry":
+                geometry = CylindricalGeometry(
+                    axis_direction=1, radius=1, height=1
+                )
 
         elif child["name"] == "x_pixel_offset":
             x_offsets = child["values"]

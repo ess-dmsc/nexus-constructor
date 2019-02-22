@@ -10,6 +10,7 @@ from nexus_constructor.data_model import (
     ComponentType,
     CylindricalGeometry,
     OFFGeometry,
+    NoShapeGeometry,
     PixelGrid,
     PixelMapping,
     SinglePixelId,
@@ -154,7 +155,7 @@ def build_geometry(geometry_obj: dict):
     :return: An instance of OFFGeometry or CylindricalGeometry
     """
     if geometry_obj is None:
-        return None
+        return NoShapeGeometry()
     elif geometry_obj["type"] == "OFF":
         wound_faces = geometry_obj["faces"]
         face_indices = geometry_obj["winding_order"]
@@ -176,5 +177,7 @@ def build_geometry(geometry_obj: dict):
             height=geometry_obj["height"],
             radius=geometry_obj["radius"],
         )
+    elif geometry_obj["type"] == "None":
+        return NoShapeGeometry()
     else:
         return None

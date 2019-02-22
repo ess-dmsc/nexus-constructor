@@ -5,6 +5,7 @@ from nexus_constructor.data_model import (
     Vector,
     CylindricalGeometry,
     OFFGeometry,
+    NoShapeGeometry,
     Component,
     Rotation,
     Translation,
@@ -309,6 +310,8 @@ class InstrumentModel(QAbstractListModel):
             geometry = component.geometry.as_off_geometry()
         elif isinstance(component.geometry, OFFGeometry):
             geometry = component.geometry
+        elif isinstance(component.geometry, NoShapeGeometry):
+            geometry = component.geometry
         else:
             return
         if component.component_type == ComponentType.DETECTOR:
@@ -412,6 +415,8 @@ class InstrumentModel(QAbstractListModel):
             return "Cylinder"
         elif isinstance(component.geometry, OFFGeometry):
             return "OFF"
+        elif isinstance(component.geometry, NoShapeGeometry):
+            return "None"
         return ""
 
     @Slot(int)

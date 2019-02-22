@@ -136,6 +136,18 @@ class OFFGeometry(Geometry):
 
 
 @attr.s
+class NoShapeGeometry(Geometry):
+    """
+    Dummy object for components with no geometry - sphere
+    """
+    radius = attr.ib(default=1, type=float)
+
+    @property
+    def base_center_point(self):
+        return Vector(0, 0, 0)
+
+
+@attr.s
 class PixelData:
     """Base class for a detector's pixel description"""
     pass

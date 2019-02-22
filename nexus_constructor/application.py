@@ -8,7 +8,7 @@ import sys
 from os import path
 from nexus_constructor.json_connector import JsonConnector
 from nexus_constructor.qml_models.component_filters import SingleComponentModel, ExcludedComponentModel
-from nexus_constructor.qml_models.geometry_models import CylinderModel, OFFModel
+from nexus_constructor.qml_models.geometry_models import CylinderModel, OFFModel, NoShapeModel
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.qml_models.json_model import FilteredJsonModel
 from nexus_constructor.qml_models.pixel_models import PixelGridModel, PixelMappingModel, SinglePixelModel
@@ -27,6 +27,7 @@ qmlRegisterType(SingleComponentModel, 'MyModels', 1, 0, 'SingleComponentModel')
 qmlRegisterType(ExcludedComponentModel, 'MyModels', 1, 0, 'ExcludedComponentModel')
 qmlRegisterType(CylinderModel, 'MyModels', 1, 0, 'CylinderModel')
 qmlRegisterType(OFFModel, 'MyModels', 1, 0, 'OFFModel')
+qmlRegisterType(NoShapeModel, 'MyModels', 1, 0, 'NoShapeModel')
 qmlRegisterType(FilteredJsonModel, 'MyModels', 1, 0, 'FilteredJsonModel')
 qmlRegisterType(PixelGridModel, 'MyModels', 1, 0, 'PixelGridModel')
 qmlRegisterType(PixelMappingModel, 'MyModels', 1, 0, 'PixelMappingModel')
