@@ -118,10 +118,10 @@ Once a new validator has been added to `validators.py` it must be registered in 
 qmlRegisterType(MyCustomValidator, 'MyValidators', 1, 0, 'MyCustomValidator')
 ```
 
-This then makes it possible to access your new custom validator (along with the other validators in `validators.py`) by using the following import statement in a QML file:
+This then makes it possible to access your new custom validator (along with the other validators in `validators.py`) by using the following import statement at the top of a QML file:  
 `import MyValidators 1.0`.
 
-A custom Validator can then be used within a QML field by using
+Once imported, a custom Validator can then be used within a QML field by assigning `validation: MyCustomValidator` in a `LabeledTextField`. The example below shows how this is done in the case of the `UnitValidator`.  
 
 ```qml
 LabeledTextField {
