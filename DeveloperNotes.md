@@ -20,7 +20,7 @@ class that loads the QML files.
 
 To use a custom model and its properties, import its qml module, create an
 instance, and use it as the model for a ListView component.
-```
+```qml
 ...
 import MyModels 1.0
 
@@ -51,7 +51,7 @@ and `contentHeight` parameters.
  
 Components with a set implicit size can be larger, for instance if they have
 been anchored to other components that are wider.
-```
+```qml
 Rectangle {
     id: rectangle1
     width: 200
@@ -121,7 +121,7 @@ qmlRegisterType(MyCustomValidator, 'MyValidators', 1, 0, 'MyCustomValidator')
 This then makes it possible to access your new custom validator (along with the other validators in `validators.py`) by using the following import statement at the top of a QML file:  
 `import MyValidators 1.0`.
 
-Once imported, a custom Validator can then be used within a QML field by assigning `validation: MyCustomValidator` in a `LabeledTextField`. The example below shows how this is done in the case of the `UnitValidator`.  
+Once imported, a custom Validator can then be used within a QML field by assigning `validation: MyCustomValidator`. The example below shows how this is done in the case of the `UnitValidator`.  
 
 ```qml
 LabeledTextField {
