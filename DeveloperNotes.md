@@ -113,6 +113,14 @@ Custom Validators can be created by extending the `QValidator` class and creatin
 
 ### Creating Custom Validators
 
+Once a new validator has been added to `validators.py` it must be registered in order for QML to recongise it. This is done by placing a statement in `application.py` similar to the one below:
+```python
+qmlRegisterType(MyCustomValidator, 'MyValidators', 1, 0, 'MyCustomValidator')
+```
+
+This then makes it possible to access your new custom validator (along with the other validators in `validators.py`) by using the following import statement in a QML file:
+`import MyValidators 1.0`.
+
 A custom Validator can then be used within a QML field by using
 
 ```qml
@@ -131,7 +139,7 @@ LabeledTextField {
 }
 ```
 
-where `onValidationFailed` and `onValidationSuccess` are custom signals emitted from a validator.
+where `onValidationFailed` and `onValidationSuccess` are custom signals emitted from a `UnitValidator`.
 
 ### Adding Geometries
 
