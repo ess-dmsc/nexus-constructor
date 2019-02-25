@@ -81,9 +81,12 @@ class JsonConnector(QObject):
             file.write(data)
 
     @Slot('QVariant')
-    def copy_to_clipboard(self, model: InstrumentModel):
-        json_string = nf_json.generate_json(model)
-        pyperclip.copy(json_string)
+    def copy_nexus_filewriter_json_to_clipboard(self, model: InstrumentModel):
+        pyperclip.copy(nf_json.generate_json(model))
+
+    @Slot('QVariant')
+    def copy_nexus_constructor_json_to_clipboard(self, model: InstrumentModel):
+        pyperclip.copy(gc_json.generate_json(model))
 
     requested_nexus_constructor_json = Signal(str)
 

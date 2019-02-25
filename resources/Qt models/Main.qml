@@ -160,7 +160,13 @@ ApplicationWindow {
                     Layout.minimumHeight: 20
                     Layout.fillWidth: true
                     onClicked: {
-                        jsonConnector.copy_to_clipboard(components)
+
+                        if (jsonMode == "liveFW") {
+                            jsonConnector.copy_nexus_filewriter_json_to_clipboard(components)
+                        }
+                        if (jsonMode == "liveGC") {
+                            jsonConnector.copy_nexus_constructor_json_to_clipboard(components)
+                        }
                     }
                 }
 
