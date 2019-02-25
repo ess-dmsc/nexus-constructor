@@ -149,17 +149,14 @@ ApplicationWindow {
 
             Component {
                 id: jsonLineDelegate
-                TextArea {
+                Label {
                     text: (collapsed ? collapsed_text : full_text)
                     wrapMode: Text.Wrap
                     width: parent.width
-                    readOnly: true
-                    /*
                     MouseArea {
                         anchors.fill: parent
                         onClicked: collapsed = !collapsed
                     }
-                    */
                 }
             }
 
