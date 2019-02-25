@@ -160,7 +160,7 @@ ApplicationWindow {
                     Layout.minimumHeight: 20
                     Layout.fillWidth: true
                     onClicked: {
-                        console.log(jsonText)
+                        jsonConnector.copy_to_clipboard(components)
                     }
                 }
 

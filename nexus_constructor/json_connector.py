@@ -4,6 +4,7 @@ import nexus_constructor.nexus_constructor_json as gc_json
 import nexus_constructor.nexus_filewriter_json as nf_json
 import json
 import jsonschema
+import pyperclip
 
 
 class JsonConnector(QObject):
@@ -78,6 +79,11 @@ class JsonConnector(QObject):
         filename = file_url.toString(options=QUrl.PreferLocalFile)
         with open(filename, 'w') as file:
             file.write(data)
+
+    @Slot('QVariant')
+    def copy_to_clipboard(self, model: InstrumentModel):
+        json_string = nf_json.generate_json(model)
+        pyperclip.copy(json_string)
 
     requested_nexus_constructor_json = Signal(str)
 
