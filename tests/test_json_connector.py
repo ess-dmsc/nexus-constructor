@@ -1,7 +1,6 @@
 from nexus_constructor.json_connector import JsonConnector
 from nexus_constructor.qml_models.instrument_model import InstrumentModel as model
 import nexus_constructor.nexus_filewriter_json as nf_json
-import json
 import pyperclip
 
 
