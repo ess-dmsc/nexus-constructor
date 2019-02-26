@@ -161,9 +161,12 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     onClicked: {
 
+                        // Filewriter mode - Copy the Filewriter JSON to the clipboard
                         if (jsonMode == "liveFW") {
                             jsonConnector.copy_nexus_filewriter_json_to_clipboard(components)
                         }
+
+                        // Nexus Constructor mode - Copy the Nexus Constructor JSON to the clipboard
                         if (jsonMode == "liveGC") {
                             jsonConnector.copy_nexus_constructor_json_to_clipboard(components)
                         }
@@ -260,6 +263,7 @@ ApplicationWindow {
     }
 
     FileDialog {
+
         id: jsonLoadDialog
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
@@ -268,6 +272,7 @@ ApplicationWindow {
 
             loadSuccessful = jsonConnector.load_file_into_instrument_model(fileUrl, components)
 
+            // Display a message if loading the file failed
             if (!loadSuccessful) {
                 jsonParseErrorMessage.open()
             }

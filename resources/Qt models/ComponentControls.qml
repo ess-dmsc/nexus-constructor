@@ -137,15 +137,8 @@ Pane {
                         labelText: "Name:"
                         editorWidth: 200
                         editorText: name
-                        selectByMouse: true
                         onEditingFinished: name = editorText
-                        validator: NameValidator {
-                            model: components
-                            myindex: index
-                            onValidationFailed: {
-                                nameField.ToolTip.show("Component names must be unique", 3000)
-                            }
-                        }
+
                     }
 
                     TransformControls {

@@ -8,7 +8,7 @@ Pane {
     property alias editorWidth: field.width
     property alias validator: field.validator
     property bool anchoredEditor: false
-    property alias selectByMouse: field.selectByMouse
+    property bool selectable: true
 
     id: pane
     padding: 2
@@ -29,6 +29,6 @@ Pane {
         anchors.right: anchoredEditor ? parent.right : undefined
         implicitWidth: 100
         onEditingFinished: pane.editingFinished()
-        selectByMouse: true
+        selectByMouse: selectable
     }
 }
