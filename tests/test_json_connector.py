@@ -1,8 +1,5 @@
 from nexus_constructor.json_connector import JsonConnector
 from nexus_constructor.qml_models.instrument_model import InstrumentModel as model
-import nexus_constructor.nexus_constructor_json as gc_json
-import nexus_constructor.nexus_filewriter_json as nf_json
-import pyperclip
 
 
 def test_valid_json_returns_true():
@@ -48,4 +45,3 @@ def test_invalid_jsons_returns_false():
     # JSON string with no information. This should be an invalid file.
     empty_json = ''
     assert not json_connector.json_string_to_instrument_model(empty_json, model())
-
