@@ -12,6 +12,13 @@ Python dependencies are listed in requirements.txt at the root of the
 repository. They can be installed from a terminal by running
 `pip install -r requirements.txt`
 
+Note: 
+For the "Copy to clipboard" feature on Linux, Xclip is required. 
+
+On Debian or other apt-based systems: `sudo apt-get install xclip`
+
+On Centos/RH: `yum install xclip`
+
 The black pre-commit hook (installed by [pre-commit](https://pre-commit.com/)) requires Python 3.6 or above.
 
 ## Running the application
