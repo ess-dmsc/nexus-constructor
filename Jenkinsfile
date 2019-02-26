@@ -1,6 +1,6 @@
 project = "nexus-constructor"
 
-centos = 'essdmscdm/centos7-build-node:3.1.0'
+centos = 'essdmscdm/centos7-build-node:3.8.0'
 
 container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 sh_cmd = "/usr/bin/scl enable rh-python35 -- /bin/bash -e"
