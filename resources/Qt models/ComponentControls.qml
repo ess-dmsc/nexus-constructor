@@ -137,6 +137,7 @@ Pane {
                         labelText: "Name:"
                         editorWidth: 200
                         editorText: name
+                        selectByMouse: true
                         onEditingFinished: name = editorText
                         validator: NameValidator {
                             model: components
