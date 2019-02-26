@@ -311,7 +311,7 @@ class InstrumentModel(QAbstractListModel):
         elif isinstance(component.geometry, OFFGeometry):
             geometry = component.geometry
         elif isinstance(component.geometry, NoShapeGeometry):
-            geometry = component.geometry
+            return OffMesh(False)
         else:
             return
         if component.component_type == ComponentType.DETECTOR:

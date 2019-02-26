@@ -182,7 +182,7 @@ Pane {
             PropertyChanges { target: view; delegate: cylinderDelegate}
         },
         State {
-            name: "NoShape"
+            name: "None"
             PropertyChanges { target: pane; geometryModel: noShapeModel }
             PropertyChanges { target: view; model: noShapeModel }
         }

@@ -16,59 +16,21 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 class NoShapeModel(QAbstractListModel):
     def __init__(self):
         super().__init__()
-        self.cylinder = NoShapeGeometry()
+        self.geometry = NoShapeGeometry()
 
-    AxisXRole = Qt.UserRole + 100
-    AxisYRole = Qt.UserRole + 101
-    AxisZRole = Qt.UserRole + 102
-    RadiusRole = Qt.UserRole + 104
-
-    def rowCount(self, parent=QModelIndex()):
-        return 1
-
-    def data(self, index, role=Qt.DisplayRole):
-        properties = {
-            CylinderModel.AxisXRole: self.cylinder.axis_direction.x,
-            CylinderModel.AxisYRole: self.cylinder.axis_direction.y,
-            CylinderModel.AxisZRole: self.cylinder.axis_direction.z,
-            CylinderModel.RadiusRole: self.cylinder.radius,
-        }
-        if role in properties:
-            return properties[role]
-
-    def setData(self, index, value, role):
-        changed = False
-        param_options = {
-            CylinderModel.AxisXRole: [self.cylinder.axis_direction, "x", value],
-            CylinderModel.AxisYRole: [self.cylinder.axis_direction, "y", value],
-            CylinderModel.AxisZRole: [self.cylinder.axis_direction, "z", value],
-            CylinderModel.RadiusRole: [self.cylinder, "radius", value],
-        }
-        if role in param_options:
-            param_list = param_options[role]
-            changed = change_value(*param_list)
-        if changed:
-            self.dataChanged.emit(index, index, role)
-        return changed
+    def get_geometry(self):
+        return self.geometry
 
     def flags(self, index):
         return super().flags(index) | Qt.ItemIsEditable
 
-    def roleNames(self):
-        return {
-            CylinderModel.AxisXRole: b"axis_x",
-            CylinderModel.AxisYRole: b"axis_y",
-            CylinderModel.AxisZRole: b"axis_z",
-            CylinderModel.RadiusRole: b"cylinder_radius",
-        }
-
-    def get_geometry(self):
-        return self.cylinder
+    def rowCount(self, parent=QModelIndex()):
+        return 1
 
     @Slot(int, "QVariant")
     def set_geometry(self, index, instrument: InstrumentModel):
         self.beginResetModel()
-        self.cylinder = instrument.components[index].geometry
+        self.geometry = instrument.components[index].geometry
         self.endResetModel()
 
 

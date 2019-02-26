@@ -140,7 +140,7 @@ class NoShapeGeometry(Geometry):
     """
     Dummy object for components with no geometry - sphere
     """
-    radius = attr.ib(default=1, type=float)
+    # radius = attr.ib(default=1, type=float)
 
     @property
     def base_center_point(self):
