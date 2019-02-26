@@ -1,9 +1,9 @@
 project = "nexus-constructor"
 
-centos = 'essdmscdm/centos7-build-node:3.1.0'
+centos = 'essdmscdm/centos7-build-node:4.0.0'
 
 container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
-sh_cmd = "/usr/bin/scl enable rh-python35 -- /bin/bash -e"
+sh_cmd = "/bin/bash -e"
 
 node("docker") {
     cleanWs()
@@ -29,7 +29,7 @@ node("docker") {
         stage("Create virtualenv") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
-                python -m venv build_env
+                python3.6 -m venv build_env
             \""""
         }
 
@@ -38,7 +38,7 @@ node("docker") {
                 cd ${project}
                 build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
                 build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
-                build_env/bin/pip --proxy ${https_proxy} install codecov
+                build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15
                 \""""
         }
 
@@ -54,7 +54,7 @@ node("docker") {
             try {
                 sh """docker exec ${container_name} ${sh_cmd} -c \"
                     cd ${project}
-                    build_env/bin/pytest ./tests --ignore=build_env --junitxml=/home/jenkins/${project}/test_results.xml
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain
                 \""""
                 }
                 catch(err) {
@@ -63,7 +63,7 @@ node("docker") {
                 }
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
-                build_env/bin/pytest --cov=nexus_constructor --cov-report=xml
+                build_env/bin/python -m pytest -s --cov=nexus_constructor --cov-report=xml --assert=plain
                 \""""
             withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
                 sh """docker exec ${container_name} ${sh_cmd} -c \"

@@ -34,7 +34,7 @@ class JsonConnector(QObject):
 
     @Slot(QUrl, 'QVariant', result=bool)
     def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
-        filename = file_url.toString(options=QUrl.PreferLocalFile)
+        filename = file_url.toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
         with open(filename, 'r') as file:
             json_string = file.read()
 
@@ -75,7 +75,7 @@ class JsonConnector(QObject):
 
     @staticmethod
     def save_to_file(data: str, file_url: QUrl):
-        filename = file_url.toString(options=QUrl.PreferLocalFile)
+        filename = file_url.toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
         with open(filename, 'w') as file:
             file.write(data)
 
