@@ -9,6 +9,7 @@ Pane {
     property alias validator: field.validator
     property bool anchoredEditor: false
     property bool selectable: true
+    property alias readOnly: field.readOnly
 
     id: pane
     padding: 2
