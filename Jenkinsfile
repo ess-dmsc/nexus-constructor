@@ -1,9 +1,9 @@
 project = "nexus-constructor"
 
-centos = 'essdmscdm/centos7-build-node:3.8.0'
+centos = 'essdmscdm/centos7-build-node:4.0.0'
 
 container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
-sh_cmd = "/usr/bin/scl enable rh-python35 -- /bin/bash -e"
+sh_cmd = "/bin/bash -e"
 
 node("docker") {
     cleanWs()
@@ -29,7 +29,7 @@ node("docker") {
         stage("Create virtualenv") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
-                python -m venv build_env
+                python3.6 -m venv build_env
             \""""
         }
 
