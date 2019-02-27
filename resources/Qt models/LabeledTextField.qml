@@ -8,7 +8,6 @@ Pane {
     property alias editorWidth: field.width
     property alias validator: field.validator
     property bool anchoredEditor: false
-    property bool selectable: true
     property alias readOnly: field.readOnly
 
     id: pane
@@ -30,6 +29,6 @@ Pane {
         anchors.right: anchoredEditor ? parent.right : undefined
         implicitWidth: 100
         onEditingFinished: pane.editingFinished()
-        selectByMouse: selectable
+        selectByMouse: true
     }
 }
