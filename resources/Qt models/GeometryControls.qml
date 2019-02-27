@@ -54,6 +54,7 @@ Pane {
                 editorText: file_url
                 anchoredEditor: true
                 onEditingFinished: file_url = editorText
+                readOnly: true
             }
             PaddedButton {
                 id: chooseFileButton
