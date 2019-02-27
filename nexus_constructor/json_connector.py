@@ -1,10 +1,10 @@
 from PySide2.QtCore import QObject, QUrl, Slot, Signal
+from PySide2.QtGui import QGuiApplication
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 import nexus_constructor.nexus_constructor_json as gc_json
 import nexus_constructor.nexus_filewriter_json as nf_json
 import json
 import jsonschema
-import pyperclip
 
 
 class JsonConnector(QObject):
@@ -29,6 +29,7 @@ class JsonConnector(QObject):
 
     def __init__(self):
         super().__init__()
+        self.clipboard = QGuiApplication.clipboard()
 
         with open('Instrument.schema.json') as file:
             self.schema = json.load(file)
@@ -82,11 +83,11 @@ class JsonConnector(QObject):
 
     @Slot('QVariant')
     def copy_nexus_filewriter_json_to_clipboard(self, model: InstrumentModel):
-        pyperclip.copy(nf_json.generate_json(model))
+        self.clipboard.setText(nf_json.generate_json(model))
 
     @Slot('QVariant')
     def copy_nexus_constructor_json_to_clipboard(self, model: InstrumentModel):
-        pyperclip.copy(gc_json.generate_json(model))
+        self.clipboard.setText(gc_json.generate_json(model))
 
     requested_nexus_constructor_json = Signal(str)
 
