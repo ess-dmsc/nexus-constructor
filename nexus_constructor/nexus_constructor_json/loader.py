@@ -175,6 +175,7 @@ def build_geometry(geometry_obj: dict):
             axis_direction=axis_direction,
             height=geometry_obj["height"],
             radius=geometry_obj["radius"],
+            units=geometry_obj["units"],
         )
     else:
         return None

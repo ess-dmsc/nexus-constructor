@@ -9,3 +9,4 @@ git+https://github.com/ess-dmsc/python-nexus-utilities@6f5d2c7f1ca66063227aad2a1
 jsonschema==2.6.0
 numpy-stl==2.7.0
 pre-commit
+pint
