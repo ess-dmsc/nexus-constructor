@@ -1,7 +1,5 @@
 from nexus_constructor.off_renderer import QtOFFGeometry, create_vertex_buffer, create_normal_buffer
-from nexus_constructor.data_model import OFFGeometry, Vector, PixelGrid
-from PySide2.QtCore import QUrl
-import struct
+from nexus_constructor.data_model import OFFGeometry, Vector
 import itertools
 
 TRIANGLES_IN_SQUARE = 2
