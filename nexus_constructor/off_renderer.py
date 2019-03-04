@@ -86,7 +86,8 @@ def create_normal_buffer(vertices, faces):
 
 class QtOFFGeometry(Qt3DRender.QGeometry):
     """
-    Builds vertex and normal buffers from arbitrary OFF geometries so they can be rendered in Qt3D by an OffMesh
+    Builds vertex and normal buffers from arbitrary OFF geometry files that contain the faces in the geometry - these need to be converted to a list of triangles so they can be rendered in Qt3d by an OffMesh.
+    
     """
 
     q_attribute = Qt3DRender.QAttribute
