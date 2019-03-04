@@ -16,6 +16,10 @@ environ['QT_QUICK_CONTROLS_CONF'] = path.join(resource_folder, 'qtquickcontrols2
 
 app = QGuiApplication(sys.argv)
 
+# Non-blank name and organisation name are required by DefaultFileDialog
+app.setOrganizationName("name")
+app.setOrganizationDomain("domain")
+
 window = Application(resource_folder)
 
 res = app.exec_()

@@ -2,6 +2,7 @@
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import Property, Qt, Signal
 from PySide2.QtGui import QValidator, QIntValidator
+import pint
 
 
 class NullableIntValidator(QIntValidator):
@@ -10,6 +11,43 @@ class NullableIntValidator(QIntValidator):
             return QValidator.Acceptable
         else:
             return super().validate(input, pos)
+
+
+class UnitValidator(QValidator):
+    """
+    Validator to ensure the the text entered is a valid unit of length.
+    """
+    def __init__(self):
+        super().__init__()
+        self.ureg = pint.UnitRegistry()
+
+    def validate(self, input: str, pos: int):
+
+        # Attempt to convert the string argument to a unit
+        try:
+            unit = self.ureg(input)
+        except (pint.errors.UndefinedUnitError, AttributeError, pint.compat.tokenize.TokenError):
+            self.validationFailed.emit()
+            return QValidator.Intermediate
+
+        # Attempt to find 1 metre in terms of the unit. This will ensure that it's a length.
+        try:
+            self.ureg.metre.from_(unit)
+        except (pint.errors.DimensionalityError, ValueError):
+            self.validationFailed.emit()
+            return QValidator.Intermediate
+
+        # Reject input in the form of "2 metres," "40 cm," etc
+        if unit.magnitude != 1:
+            self.validationFailed.emit()
+            return QValidator.Intermediate
+
+        self.validationSuccess.emit()
+        return QValidator.Acceptable
+
+    # Create signals because the QML LabeledTextField doesn't have "onAccepted"
+    validationSuccess = Signal()
+    validationFailed = Signal()
 
 
 class ValidatorOnListModel(QValidator):

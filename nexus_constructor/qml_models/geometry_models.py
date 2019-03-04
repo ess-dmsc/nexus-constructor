@@ -18,11 +18,12 @@ class CylinderModel(QAbstractListModel):
     A single item list model that allows properties of a Cylindrical geometry to be read and manipulated in QML
     """
 
-    AxisXRole = Qt.UserRole + 100
-    AxisYRole = Qt.UserRole + 101
-    AxisZRole = Qt.UserRole + 102
-    HeightRole = Qt.UserRole + 103
-    RadiusRole = Qt.UserRole + 104
+    UnitsRole = Qt.UserRole + 100
+    AxisXRole = Qt.UserRole + 101
+    AxisYRole = Qt.UserRole + 102
+    AxisZRole = Qt.UserRole + 103
+    HeightRole = Qt.UserRole + 104
+    RadiusRole = Qt.UserRole + 105
 
     def __init__(self):
         super().__init__()
@@ -33,6 +34,7 @@ class CylinderModel(QAbstractListModel):
 
     def data(self, index, role=Qt.DisplayRole):
         properties = {
+            CylinderModel.UnitsRole: self.cylinder.units,
             CylinderModel.AxisXRole: self.cylinder.axis_direction.x,
             CylinderModel.AxisYRole: self.cylinder.axis_direction.y,
             CylinderModel.AxisZRole: self.cylinder.axis_direction.z,
@@ -45,12 +47,14 @@ class CylinderModel(QAbstractListModel):
     def setData(self, index, value, role):
         changed = False
         param_options = {
+            CylinderModel.UnitsRole: [self.cylinder, "units", value],
             CylinderModel.AxisXRole: [self.cylinder.axis_direction, "x", value],
             CylinderModel.AxisYRole: [self.cylinder.axis_direction, "y", value],
             CylinderModel.AxisZRole: [self.cylinder.axis_direction, "z", value],
             CylinderModel.HeightRole: [self.cylinder, "height", value],
             CylinderModel.RadiusRole: [self.cylinder, "radius", value],
         }
+
         if role in param_options:
             param_list = param_options[role]
             changed = change_value(*param_list)
@@ -63,6 +67,7 @@ class CylinderModel(QAbstractListModel):
 
     def roleNames(self):
         return {
+            CylinderModel.UnitsRole: b"cylinder_units",
             CylinderModel.AxisXRole: b"axis_x",
             CylinderModel.AxisYRole: b"axis_y",
             CylinderModel.AxisZRole: b"axis_z",
@@ -76,6 +81,7 @@ class CylinderModel(QAbstractListModel):
     @Slot(int, "QVariant")
     def set_geometry(self, index, instrument: InstrumentModel):
         self.beginResetModel()
+
         self.cylinder = instrument.components[index].geometry
         self.endResetModel()
 
@@ -86,8 +92,9 @@ class OFFModel(QAbstractListModel):
     """
 
     FileNameRole = Qt.UserRole + 200
-    VerticesRole = Qt.UserRole + 201
-    FacesRole = Qt.UserRole + 202
+    UnitsRole = Qt.UserRole + 201
+    VerticesRole = Qt.UserRole + 202
+    FacesRole = Qt.UserRole + 203
 
     meshLoaded = Signal()
 
@@ -95,6 +102,7 @@ class OFFModel(QAbstractListModel):
         super().__init__()
         self.geometry = OFFGeometry()
         self.file_url = QUrl("")
+        self.units = ""
 
     def rowCount(self, parent=QModelIndex()):
         return 1
@@ -102,6 +110,7 @@ class OFFModel(QAbstractListModel):
     def data(self, index, role=Qt.DisplayRole):
         properties = {
             OFFModel.FileNameRole: self.file_url,
+            OFFModel.UnitsRole: self.units,
             OFFModel.VerticesRole: self.geometry.vertices,
             OFFModel.FacesRole: self.geometry.faces,
         }
@@ -112,9 +121,11 @@ class OFFModel(QAbstractListModel):
         changed = False
         param_options = {
             OFFModel.FileNameRole: [self, "file_url", value],
+            OFFModel.UnitsRole: [self, "units", value],
             OFFModel.VerticesRole: [self.geometry, "vertices", value],
             OFFModel.FacesRole: [self.geometry, "faces", value],
         }
+
         if role in param_options:
             param_list = param_options[role]
             changed = change_value(*param_list)
@@ -130,15 +141,16 @@ class OFFModel(QAbstractListModel):
     def roleNames(self):
         return {
             OFFModel.FileNameRole: b"file_url",
+            OFFModel.UnitsRole: b"units",
             OFFModel.VerticesRole: b"vertices",
             OFFModel.FacesRole: b"faces",
         }
 
     def load_data(self):
         """Read the currently selected file into self.geometry"""
-        filename = QUrl(self.file_url).toString(options=QUrl.PreferLocalFile)
+        filename = QUrl(self.file_url).toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
         self.beginResetModel()
-        load_geometry(filename, self.geometry)
+        load_geometry(filename, self.units, self.geometry)
         self.endResetModel()
         self.meshLoaded.emit()
 

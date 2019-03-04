@@ -8,6 +8,8 @@ Pane {
     property alias editorWidth: field.width
     property alias validator: field.validator
     property bool anchoredEditor: false
+    property alias readOnly: field.readOnly
+
     id: pane
     padding: 2
     contentHeight: Math.max(label.height, field.height)
@@ -26,7 +28,7 @@ Pane {
         anchors.left: label.right
         anchors.right: anchoredEditor ? parent.right : undefined
         implicitWidth: 100
-
         onEditingFinished: pane.editingFinished()
+        selectByMouse: true
     }
 }

@@ -23,6 +23,7 @@ def build_sample_model():
     model = InstrumentModel()
 
     offmodel = OFFModel()
+    offmodel.setData(1, "m", OFFModel.UnitsRole)
     offmodel.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
     off_geometry = offmodel.get_geometry()
 
@@ -47,7 +48,7 @@ def build_sample_model():
                 Translation(name="translate", vector=Vector(-1.3, 0.1, -3.14)),
             ],
             geometry=CylindricalGeometry(
-                axis_direction=Vector(2, 2, 1), height=0.7, radius=0.1
+                units="m", axis_direction=Vector(2, 2, 1), height=0.7, radius=0.1
             ),
             pixel_data=PixelGrid(
                 rows=3,
@@ -67,7 +68,7 @@ def build_sample_model():
                 Rotation(name="rotate", axis=Vector(-1, 0, -1.5), angle=0.0),
                 Translation(name="translate", vector=Vector(1, 2, 3)),
             ],
-            geometry=CylindricalGeometry(),
+            geometry=CylindricalGeometry(units="m"),
             pixel_data=SinglePixelId(42),
         ),
         Component(
@@ -78,7 +79,7 @@ def build_sample_model():
                 Rotation(name="rotate", axis=Vector(0, 1, 0), angle=0.0),
                 Translation(name="translate", vector=Vector(0, 0, -20)),
             ],
-            geometry=CylindricalGeometry(),
+            geometry=CylindricalGeometry(units="m"),
         ),
         Component(
             component_type=ComponentType.SLIT,
@@ -88,7 +89,7 @@ def build_sample_model():
                 Rotation(name="rotate", axis=Vector(0, 1, 0), angle=0.0),
                 Translation(name="translate", vector=Vector(0, 0, -5)),
             ],
-            geometry=CylindricalGeometry(),
+            geometry=CylindricalGeometry(units="m"),
         ),
         Component(
             component_type=ComponentType.MODERATOR,
@@ -98,7 +99,7 @@ def build_sample_model():
                 Rotation(name="rotate", axis=Vector(0, 1, 0), angle=0.0),
                 Translation(name="translate", vector=Vector(0, 0, -17)),
             ],
-            geometry=CylindricalGeometry(),
+            geometry=CylindricalGeometry(units="m"),
         ),
         Component(
             component_type=ComponentType.DISK_CHOPPER,
@@ -110,7 +111,7 @@ def build_sample_model():
                 Translation(name="translate2", vector=Vector(0, 0, -10)),
             ],
             geometry=CylindricalGeometry(
-                axis_direction=Vector(0, 0, 1), height=0.3, radius=1.5
+                axis_direction=Vector(0, 0, 1), height=0.3, radius=1.5, units="m"
             ),
         ),
     ]

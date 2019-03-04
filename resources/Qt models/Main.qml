@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Scene3D 2.0
 import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.11
 import MyJson 1.0
 import MyModels 1.0
 import MyWriters 1.0
@@ -135,35 +136,62 @@ ApplicationWindow {
             anchors.right: parent.right
             contentWidth: 300
 
-            ListView {
-                id: jsonListView
-                model: jsonModel
-                delegate: jsonLineDelegate
+            ColumnLayout {
+
                 anchors.fill: parent
-                clip: true
 
-                ScrollBar.vertical: ScrollBar {
-                    policy: ScrollBar.AlwaysOn
-                }
-            }
+                ListView {
+                    id: jsonListView
+                    model: jsonModel
+                    delegate: jsonLineDelegate
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    clip: true
 
-            Component {
-                id: jsonLineDelegate
-                Label {
-                    text: (collapsed ? collapsed_text : full_text)
-                    wrapMode: Text.Wrap
-                    width: parent.width
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: collapsed = !collapsed
+                    ScrollBar.vertical: ScrollBar {
+                        policy: ScrollBar.AlwaysOn
                     }
                 }
-            }
 
-            states: State {
-                name: "hidden"; when: jsonMode == "hidden"
-                PropertyChanges { target: jsonPane; visible: false }
-                PropertyChanges { target: jsonPane; width: 0 }
+                Button {
+                    id: copyButton
+                    text: "Copy to Clipboard"
+                    Layout.maximumHeight: 20
+                    Layout.minimumHeight: 20
+                    Layout.fillWidth: true
+                    onClicked: {
+
+                        // Filewriter mode - Copy the Filewriter JSON to the clipboard
+                        if (jsonMode == "liveFW") {
+                            jsonConnector.copy_nexus_filewriter_json_to_clipboard(components)
+                        }
+
+                        // Nexus Constructor mode - Copy the Nexus Constructor JSON to the clipboard
+                        if (jsonMode == "liveGC") {
+                            jsonConnector.copy_nexus_constructor_json_to_clipboard(components)
+                        }
+                    }
+                }
+
+                Component {
+                    id: jsonLineDelegate
+                    Label {
+                        id: jsonText
+                        text: (collapsed ? collapsed_text : full_text)
+                        wrapMode: Text.Wrap
+                        width: parent.width
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: collapsed = !collapsed
+                        }
+                    }
+                }
+
+                states: State {
+                    name: "hidden"; when: jsonMode == "hidden"
+                    PropertyChanges { target: jsonPane; visible: false }
+                    PropertyChanges { target: jsonPane; width: 0 }
+                }
             }
         }
     }
@@ -235,6 +263,7 @@ ApplicationWindow {
     }
 
     FileDialog {
+
         id: jsonLoadDialog
         title: "Choose file to load from"
         nameFilters: ["JSON (*.json)", "All files (*)"]
@@ -243,6 +272,7 @@ ApplicationWindow {
 
             loadSuccessful = jsonConnector.load_file_into_instrument_model(fileUrl, components)
 
+            // Display a message if loading the file failed
             if (!loadSuccessful) {
                 jsonParseErrorMessage.open()
             }

@@ -37,7 +37,7 @@ Item {
             id: view
             anchors.left: parent.left
             height: contentHeight
-            width: parent.width - 10
+            width: view.contentHeight > view.height ? parent.width - 10 : parent.width
             interactive: false
             clip: true
             ScrollBar.vertical: bar
