@@ -16,6 +16,8 @@ build_exe_options = {'packages': ['numpy.core._methods',
                      'excludes': ['pytest',
                                   'pytest-cov',
                                   'pytest-qt',
+                                  'PyQt4', 'tcl', 'tk', 'ttk', 'tkinter', 'Tkconstants', 'Tkinter', "collections.sys", "collections._weakref"
+
                                   ],
                      'include_files':
                          [
@@ -23,7 +25,7 @@ build_exe_options = {'packages': ['numpy.core._methods',
                              'Instrument.schema.json',
                          ],
                      'bin_includes': ['libssl.so'],
-                     'includes': ['pkg_resources']
+                     'includes': ['pkg_resources', 'atexit']
                      }
 
 unix_removable = ['lib/PySide2/Qt/lib/libQt5WebEngine.so.5',
