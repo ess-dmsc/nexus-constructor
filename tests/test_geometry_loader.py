@@ -138,7 +138,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
 
 
 def test_load_geometry_returns_empty_geometry_for_unrecognised_file_extension():
-    geometry = load_geometry("tests/collapsed lines.txt", "m")
+    geometry = load_geometry("tests/collapsed_lines.txt", "m")
     assert len(geometry.vertices) == 0
     assert len(geometry.faces) == 0
 

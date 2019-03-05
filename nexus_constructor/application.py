@@ -55,6 +55,6 @@ class Application(QQmlApplicationEngine):
                 print("Unable to load from url: {0}\nExiting".format(target_url.toString()), file=sys.stderr)
                 sys.exit(-1)
 
-        url = QUrl.fromLocalFile(path.join(resource_folder, 'Qt models', 'Main.qml'))
+        url = QUrl.fromLocalFile(path.join(resource_folder, 'Qtmodels', 'Main.qml'))
         self.objectCreated.connect(load_listener)
         self.load(url)
