@@ -1,6 +1,7 @@
 import attr
 from enum import Enum, unique
 from math import sqrt, sin, cos, pi, acos
+import h5py
 from typing import List
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
@@ -209,20 +210,51 @@ class SinglePixelId(PixelData):
     pixel_id = attr.ib(int)
 
 
-@attr.s
 class Transformation:
-    name = attr.ib(str)
+
+    def __init__(self, name):
+        self.nexus_file = h5py.File('transformation' + name, driver='core', backing_store=False)
+        self.transformation = self.nexus_file.create_group(name)
+        self.transformation.attrs['NX_class'] = 'NXtransformation'
+
+    @property
+    def name(self):
+        return self.transformation.name[1:]
 
 
-@attr.s
 class Rotation(Transformation):
-    axis = attr.ib(factory=lambda: Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
-    angle = attr.ib(default=0)
+
+    def __init__(self, name=None, axis=Vector(0,0,1), angle=0):
+        super().__init__(name)
+        self.transformation.attrs['transformation_type'] = 'rotation'
+        self._angle = angle
+        self._axis = axis
+
+    @property
+    def angle(self):
+        return self._angle
+
+    @property
+    def axis(self):
+        return self._axis
+
+    # axis = attr.ib(factory=lambda: Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
+    # angle = attr.ib(default=0)
 
 
-@attr.s
 class Translation(Transformation):
-    vector = attr.ib(factory=lambda: Vector(0, 0, 0), type=Vector)
+
+    def __init__(self, name='translation', vector=Vector(0, 0, 0)):
+        super().__init__(name)
+        self.transformation.attrs['transformation_type'] = 'translation'
+        self._vector = vector
+        self.transformation.attrs['vector'] = [vector.x, vector.y, vector.z]
+
+    @property
+    def vector(self):
+        return self._vector
+
+    # vector = attr.ib(factory=lambda: Vector(0, 0, 0), type=Vector)
 
 
 @unique

@@ -30,8 +30,8 @@ def make_instrument_with_sample_transform():
             name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
-                Rotation(name="rotate", axis=Vector(4, 5, 6), angle=90),
-                Translation(name="translate", vector=Vector(1, 2, 3)),
+                Rotation(name="rotate1", axis=Vector(4, 5, 6), angle=90),
+                Translation(name="translate1", vector=Vector(1, 2, 3)),
             ],
         )
     )
@@ -42,8 +42,8 @@ def make_instrument_with_sample_transform():
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
             transforms=[
-                Translation(name="translate", vector=Vector(1, 2, 3)),
-                Rotation(name="rotate", axis=Vector(4, 5, 6), angle=90),
+                Translation(name="translate2", vector=Vector(1, 2, 3)),
+                Rotation(name="rotate2", axis=Vector(4, 5, 6), angle=90),
             ],
         )
     )
@@ -53,9 +53,9 @@ def make_instrument_with_sample_transform():
             name="detector3",
             transform_parent=instrument.components[1],
             transforms=[
-                Rotation(name="rotate", axis=Vector(4, 5, 6), angle=90),
-                Translation(name="translate", vector=Vector(1, 2, 3)),
-                Translation(name="translate2", vector=Vector(1, 2, 3)),
+                Rotation(name="rotate3", axis=Vector(4, 5, 6), angle=90),
+                Translation(name="translate3a", vector=Vector(1, 2, 3)),
+                Translation(name="translate3b", vector=Vector(1, 2, 3)),
             ],
         )
     )
@@ -85,7 +85,7 @@ def test_saved_component_translate():
         assert detector.attrs["NX_class"] == "NXdetector"
         assert (
             detector.attrs["depends_on"]
-            == "/entry/instrument/detector1/transforms/translate"
+            == "/entry/instrument/detector1/transforms/translate1"
         )
 
         transformations = detector["transforms"]
@@ -98,7 +98,7 @@ def test_saved_component_translate():
         assess_unit_length_3d_vector(detector_translate.attrs["vector"], [1, 2, 3])
         assert (
             detector_translate.attrs["depends_on"]
-            == "/entry/instrument/detector1/transforms/rotate"
+            == "/entry/instrument/detector1/transforms/rotate1"
         )
 
 
