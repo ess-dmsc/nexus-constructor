@@ -8,7 +8,7 @@ def read_json():
     """
     with open("tests/sample.json", mode="r") as file:
         data = file.read()
-    with open("tests/formattedsample.json", mode="r") as file:
+    with open("tests/formatted_sample.json", mode="r") as file:
         formatted_lines = file.read().splitlines()
     return data, formatted_lines
 
@@ -18,7 +18,7 @@ def read_collapsed_data():
     Reads the expected collapsed lines for a model based on the sample json data
     :return: a list of strings containing the collapsed lines
     """
-    with open("tests/collapsedlines.txt") as file:
+    with open("tests/collapsed_lines.txt") as file:
         return file.read().splitlines()
 
 
