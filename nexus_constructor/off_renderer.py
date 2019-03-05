@@ -43,9 +43,11 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                 p1 = vertices[face[0]]
                 p2 = vertices[face[i + 1]]
                 p3 = vertices[face[i + 2]]
-                normal = QVector3D.normal(QVector3D(p1.x, p1.y, p1.z),
-                                          QVector3D(p2.x, p2.y, p2.z),
-                                          QVector3D(p3.x, p3.y, p3.z))
+                normal = QVector3D.normal(
+                    QVector3D(p1.x, p1.y, p1.z),
+                    QVector3D(p2.x, p2.y, p2.z),
+                    QVector3D(p3.x, p3.y, p3.z),
+                )
                 for j in range(3):
                     normal_buffer_values.append(normal.x())
                     normal_buffer_values.append(normal.y())
@@ -53,14 +55,14 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
 
         vertexBuffer = Qt3DRender.QBuffer(self)
         vertexBuffer.setData(
-            struct.pack('%sf' % len(vertex_buffer_values), *vertex_buffer_values)
+            struct.pack("%sf" % len(vertex_buffer_values), *vertex_buffer_values)
         )
         normalBuffer = Qt3DRender.QBuffer(self)
         normalBuffer.setData(
-            struct.pack('%sf' % len(normal_buffer_values), *normal_buffer_values)
+            struct.pack("%sf" % len(normal_buffer_values), *normal_buffer_values)
         )
 
-        float_size = len(struct.pack('f', 0.0))
+        float_size = len(struct.pack("f", 0.0))
 
         positionAttribute = Qt3DRender.QAttribute(self)
         positionAttribute.setAttributeType(Qt3DRender.QAttribute.VertexAttribute)
@@ -86,7 +88,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         self.addAttribute(normalAttribute)
         self.vertex_count = len(vertex_buffer_values) // 3
 
-        print('Qt mesh built')
+        print("Qt mesh built")
 
     def repeat_shape_over_grid(self, model: OFFGeometry, grid: PixelGrid):
         faces = []
@@ -94,13 +96,18 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         for row in range(grid.rows):
             for col in range(grid.columns):
                 faces += [
-                    [i + (col + (row * grid.columns)) * len(model.vertices) for i in face]
+                    [
+                        i + (col + (row * grid.columns)) * len(model.vertices)
+                        for i in face
+                    ]
                     for face in model.faces
                 ]
                 vertices += [
-                    Vector(vec.x + (col * grid.col_width),
-                           vec.y + (row * grid.row_height),
-                           vec.z)
+                    Vector(
+                        vec.x + (col * grid.col_width),
+                        vec.y + (row * grid.row_height),
+                        vec.z,
+                    )
                     for vec in model.vertices
                 ]
         return faces, vertices
@@ -111,18 +118,36 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
     """
 
-    def __init__(self, geometry: OFFGeometry, pixel_data: PixelData=None, parent=None):
+    def __init__(
+        self, geometry: OFFGeometry, pixel_data: PixelData = None, parent=None
+    ):
         super().__init__(parent)
 
         self.setInstanceCount(1)
         if not geometry:
-            qt_geometry = Qt3DExtras.QSphereGeometry()
-            # qt_geometry.radius = 1
-            # self.radius(1)
+            # Add a dummy shape - note this is only for the mesh renderer and not the Nexus file/json
+            qt_geometry = self.create_dummy_object()
         else:
             qt_geometry = QtOFFGeometry(geometry, pixel_data, self)
-            self.setVertexCount(qt_geometry.vertex_count)
+        self.setVertexCount(qt_geometry.vertex_count)
         self.setFirstVertex(0)
         self.setPrimitiveType(Qt3DRender.QGeometryRenderer.Triangles)
         self.setFirstInstance(0)
         self.setGeometry(qt_geometry)
+
+    def create_dummy_object(self):
+        """
+        Create a dummy OFF geometry that displays as a square for when the component has no geometry.
+        :return: A QtOFFGeometry to be rendered by Qt3D
+        """
+        geometry = OFFGeometry(
+            vertices=[
+                Vector(0, 0, 0),
+                Vector(0, 1, 0),
+                Vector(1, 1, 0),
+                Vector(1, 0, 0),
+            ],
+            faces=[[0, 1, 2, 3]],
+        )
+        qt_geometry = QtOFFGeometry(geometry, None, parent=self)
+        return qt_geometry
