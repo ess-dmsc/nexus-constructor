@@ -210,13 +210,10 @@ class SinglePixelId(PixelData):
 
 class Transformation:
 
-    _counter = 0
-
     def __init__(self, name):
-        self.nexus_file = h5py.File(name + str(Transformation._counter), driver='core', backing_store=False)
+        self.nexus_file = h5py.File(name, driver='core', backing_store=False)
         self.transformation = self.nexus_file.create_group(name)
         self.transformation.attrs['NX_class'] = 'NXtransformation'
-        Transformation._counter += 1
 
     @property
     def name(self):
@@ -225,7 +222,7 @@ class Transformation:
 
 class Rotation(Transformation):
 
-    def __init__(self, name=None, axis=Vector(0,0,1), angle=0):
+    def __init__(self, name=None, axis=Vector(0, 0, 1), angle=0):
         super().__init__(name)
         self.transformation.attrs['transformation_type'] = 'rotation'
         self._angle = angle

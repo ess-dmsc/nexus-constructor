@@ -4,7 +4,7 @@ from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from stl import mesh
 
 
-def load_geometry(filename: str, units: str, geometry: OFFGeometry=OFFGeometry()):
+def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry()):
     """
     Loads geometry from a file into an OFFGeometry instance
 
@@ -30,7 +30,7 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry=OFFGeometry()
     return geometry
 
 
-def load_off_geometry(filename: str, mult_factor: float, geometry: OFFGeometry=OFFGeometry()):
+def load_off_geometry(filename: str, mult_factor: float, geometry: OFFGeometry = OFFGeometry()):
     """
     Loads geometry from an OFF file into an OFFGeometry instance
 
@@ -49,7 +49,7 @@ def load_off_geometry(filename: str, mult_factor: float, geometry: OFFGeometry=O
     return geometry
 
 
-def load_stl_geometry(filename: str, mult_factor: float, geometry: OFFGeometry=OFFGeometry()):
+def load_stl_geometry(filename: str, mult_factor: float, geometry: OFFGeometry = OFFGeometry()):
     """
     Loads geometry from an STL file into an OFFGeometry instance
 
