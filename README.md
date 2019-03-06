@@ -5,7 +5,7 @@ Construct NeXus files with instrument geometry information using a GUI
 
 ## Installing dependencies
 
-This project is developed for Python 3.5, so an install of 3.5 or higher
+This project is developed for Python 3.6, so an install of 3.6 or higher
 is required. https://www.python.org/downloads/
 
 Python dependencies are listed in requirements.txt at the root of the

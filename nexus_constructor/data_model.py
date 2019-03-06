@@ -3,6 +3,7 @@ from enum import Enum, unique
 from math import sqrt, sin, cos, pi, acos
 from typing import List
 from PySide2.QtGui import QVector3D, QMatrix4x4
+from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 
 
 def validate_nonzero_vector(instance, attribute, value):
@@ -50,6 +51,7 @@ class CylindricalGeometry(Geometry):
     The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
     described by the direction of its axis, its height, and radius.
     """
+    units = attr.ib(default="m", type=str)
     axis_direction = attr.ib(factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
@@ -61,23 +63,26 @@ class CylindricalGeometry(Geometry):
     @property
     def base_edge_point(self):
         # rotate a point on the edge of a Z axis aligned cylinder by the rotation matrix
-        edge_point = QVector3D(self.radius, 0, 0) * self.rotation_matrix
+        edge_point = QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0) * self.rotation_matrix
         return Vector(edge_point.x(), edge_point.y(), edge_point.z())
 
     @property
     def top_center_point(self):
-        values = [x * self.height for x in self.axis_direction.unit_list]
+        values = [x * self.height * calculate_unit_conversion_factor(self.units) for x in self.axis_direction.unit_list]
         return Vector(values[0], values[1], values[2])
 
     def as_off_geometry(self, steps=20):
+
+        unit_conversion_factor = calculate_unit_conversion_factor(self.units)
+
         # steps number of points around the base, and steps number around the top, aligned with the Z axis
-        vertices = [QVector3D(sin(2 * pi * i / steps) * self.radius,
-                              cos(2 * pi * i / steps) * self.radius,
+        vertices = [QVector3D(sin(2 * pi * i / steps) * self.radius * unit_conversion_factor,
+                              cos(2 * pi * i / steps) * self.radius * unit_conversion_factor,
                               0)
                     for i in range(steps)] + \
-                   [QVector3D(sin(2 * pi * i / steps) * self.radius,
-                              cos(2 * pi * i / steps) * self.radius,
-                              self.height)
+                   [QVector3D(sin(2 * pi * i / steps) * self.radius * unit_conversion_factor,
+                              cos(2 * pi * i / steps) * self.radius * unit_conversion_factor,
+                              self.height * unit_conversion_factor)
                     for i in range(steps)]
         # rotate each vertex to produce the desired cylinder mesh
         vectors = []

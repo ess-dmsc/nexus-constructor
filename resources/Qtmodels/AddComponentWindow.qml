@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
+import "."
 
 ExpandingWindow {
 
@@ -323,11 +324,28 @@ ExpandingWindow {
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
-                    components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
-                                             geometryControls.geometryModel,
-                                             pixelControls.pixelModel,
-                                             transformControls.transformModel)
-                    addComponentWindow.close()
+
+                    // Check that either the mesh or the cylinder were given a valid unit argument because it is not
+                    // known which geometry has just been created.
+                    if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits) {
+
+                        components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
+                                                 geometryControls.geometryModel,
+                                                 pixelControls.pixelModel,
+                                                 transformControls.transformModel)
+
+                        addComponentWindow.close()
+
+                        // Reset the booleans for input validity
+                        resetUnitChecks()
+
+                    }
+                    else {
+
+                        // Bad units given - Show the bad unit message without creating the geometry
+                        ValidUnits.showCylinderUnitMessage = true
+                    }
+
                 }
             }
         }
@@ -347,5 +365,15 @@ ExpandingWindow {
                 PropertyChanges { target: nameField; focus: true}
             }
         ]
+    }
+
+    function resetUnitChecks() {
+        ValidUnits.validMeshUnits = false
+        ValidUnits.validCylinderUnits = false
+        ValidUnits.showCylinderUnitMessage = false
+    }
+
+    onClosing: {
+        resetUnitChecks()
     }
 }

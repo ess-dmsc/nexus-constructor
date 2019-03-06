@@ -11,7 +11,7 @@ import MyValidators 1.0
  * - dependent_transform_index (integer)
  * - index  (integer)
  *
- * This can be acomplished by including it in a delegate in a view on an
+ * This can be accomplished by including it in a delegate in a view on an
  * InstrumentModel, or by defining them as properties in the root object
  * of a file in the 'document tree' these controls are included in.
  */
