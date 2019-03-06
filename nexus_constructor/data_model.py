@@ -212,10 +212,13 @@ class SinglePixelId(PixelData):
 
 class Transformation:
 
+    _counter = 0
+
     def __init__(self, name):
-        self.nexus_file = h5py.File('transformation' + name, driver='core', backing_store=False)
+        self.nexus_file = h5py.File(name + str(Transformation._counter), driver='core', backing_store=False)
         self.transformation = self.nexus_file.create_group(name)
         self.transformation.attrs['NX_class'] = 'NXtransformation'
+        Transformation._counter += 1
 
     @property
     def name(self):

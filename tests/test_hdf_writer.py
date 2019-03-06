@@ -91,7 +91,7 @@ def test_saved_component_translate():
         transformations = detector["transforms"]
         assert transformations.attrs["NX_class"] == "NXtransformations"
 
-        detector_translate = transformations["translate"]
+        detector_translate = transformations["translate1"]
         assert detector_translate[0] == approx(sqrt(sum(i ** 2 for i in [1, 2, 3])))
         assert detector_translate.attrs["transformation_type"] == "translation"
         assert detector_translate.attrs["units"] == "m"
@@ -109,7 +109,7 @@ def test_saved_component_rotate():
         HdfWriter().save_instrument_to_file(file, instrument)
         detector = file["entry/instrument/detector1"]
 
-        detector_rotate = detector["transforms/rotate"]
+        detector_rotate = detector["transforms/rotate1"]
         assert detector_rotate[0] == 90
         assert detector_rotate.attrs["transformation_type"] == "rotation"
         assert detector_rotate.attrs["units"] == "degrees"
@@ -127,44 +127,44 @@ def test_saved_instrument_dependencies():
         detector = file["entry/instrument/detector1"]
         assert (
             detector.attrs["depends_on"]
-            == "/entry/instrument/detector1/transforms/translate"
+            == "/entry/instrument/detector1/transforms/translate1"
         )
         assert (
-            detector["transforms/translate"].attrs["depends_on"]
-            == "/entry/instrument/detector1/transforms/rotate"
+            detector["transforms/translate1"].attrs["depends_on"]
+            == "/entry/instrument/detector1/transforms/rotate1"
         )
-        assert detector["transforms/rotate"].attrs["depends_on"] == "."
+        assert detector["transforms/rotate1"].attrs["depends_on"] == "."
 
         detector = file["entry/instrument/detector2"]
         assert (
             detector.attrs["depends_on"]
-            == "/entry/instrument/detector2/transforms/rotate"
+            == "/entry/instrument/detector2/transforms/rotate2"
         )
         assert (
-            detector["transforms/rotate"].attrs["depends_on"]
-            == "/entry/instrument/detector2/transforms/translate"
+            detector["transforms/rotate2"].attrs["depends_on"]
+            == "/entry/instrument/detector2/transforms/translate2"
         )
         assert (
-            detector["transforms/translate"].attrs["depends_on"]
-            == "/entry/instrument/detector1/transforms/rotate"
+            detector["transforms/translate2"].attrs["depends_on"]
+            == "/entry/instrument/detector1/transforms/rotate1"
         )
 
         detector = file["entry/instrument/detector3"]
         assert (
             detector.attrs["depends_on"]
-            == "/entry/instrument/detector3/transforms/translate2"
+            == "/entry/instrument/detector3/transforms/translate3b"
         )
         assert (
-            detector["transforms/translate2"].attrs["depends_on"]
-            == "/entry/instrument/detector3/transforms/translate"
+            detector["transforms/translate3b"].attrs["depends_on"]
+            == "/entry/instrument/detector3/transforms/translate3a"
         )
         assert (
-            detector["transforms/translate"].attrs["depends_on"]
-            == "/entry/instrument/detector3/transforms/rotate"
+            detector["transforms/translate3a"].attrs["depends_on"]
+            == "/entry/instrument/detector3/transforms/rotate3"
         )
         assert (
-            detector["transforms/rotate"].attrs["depends_on"]
-            == "/entry/instrument/detector1/transforms/translate"
+            detector["transforms/rotate3"].attrs["depends_on"]
+            == "/entry/instrument/detector1/transforms/translate1"
         )
 
 
