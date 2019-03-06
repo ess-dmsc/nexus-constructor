@@ -32,8 +32,8 @@ def test_GIVEN_a_set_of_triangle_faces_WHEN_creating_vertex_buffer_THEN_length_i
     NUM_OF_TRIANGLES = len(faces)
 
     assert (
-            len(list(vertex_buffer))
-            == NUM_OF_TRIANGLES * VERTICES_IN_TRIANGLE * POINTS_IN_VERTEX
+        len(list(vertex_buffer))
+        == NUM_OF_TRIANGLES * VERTICES_IN_TRIANGLE * POINTS_IN_VERTEX
     )
 
 
@@ -44,8 +44,8 @@ def test_GIVEN_a_square_WHEN_creating_vertex_buffer_THEN_length_is_correct():
     vertex_buffer = create_vertex_buffer(vertices, faces)
 
     assert (
-            len(list(vertex_buffer))
-            == TRIANGLES_IN_SQUARE * VERTICES_IN_TRIANGLE * POINTS_IN_VERTEX
+        len(list(vertex_buffer))
+        == TRIANGLES_IN_SQUARE * VERTICES_IN_TRIANGLE * POINTS_IN_VERTEX
     )
 
 
@@ -83,7 +83,9 @@ def test_GIVEN_a_triangle_WHEN_creating_off_geometry_with_no_pixel_data_THEN_ver
 
 def test_GIVEN_no_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_square_with_6_vertices():
     off_mesh = OffMesh(None)
-    assert off_mesh.geometry().vertex_count == VERTICES_IN_TRIANGLE * TRIANGLES_IN_SQUARE
+    assert (
+        off_mesh.geometry().vertex_count == VERTICES_IN_TRIANGLE * TRIANGLES_IN_SQUARE
+    )
 
 
 def test_GIVEN_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_original_geometry():

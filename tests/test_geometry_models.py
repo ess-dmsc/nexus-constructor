@@ -21,7 +21,7 @@ def test_GIVEN_nothing_WHEN_creating_OFF_model_THEN_geometry_is_OFF_geometry():
     assert model.rowCount() == 1
 
 
-def test_GIVEN_nothing_WHEN_creating_OFF_model_THEN_geometry_is_OFF_geometry():
+def test_GIVEN_nothing_WHEN_creating_cylinder_model_THEN_geometry_is_cylindrical_geometry():
     model = CylinderModel()
     geometry = model.get_geometry()
     assert isinstance(geometry, CylindricalGeometry)
