@@ -143,10 +143,10 @@ def build_model_with_sample_transforms():
             transform_parent=instrument.components[0],
             transforms=[
                 data_model.Rotation(
-                    name="rotate", axis=data_model.Vector(4, 5, 6), angle=90
+                    name="rotate1", axis=data_model.Vector(4, 5, 6), angle=90
                 ),
                 data_model.Translation(
-                    name="translate", vector=data_model.Vector(1, 2, 3)
+                    name="translate1", vector=data_model.Vector(1, 2, 3)
                 ),
             ],
         )
@@ -159,10 +159,10 @@ def build_model_with_sample_transforms():
             dependent_transform=instrument.components[1].transforms[0],
             transforms=[
                 data_model.Translation(
-                    name="translate", vector=data_model.Vector(1, 2, 3)
+                    name="translate2", vector=data_model.Vector(1, 2, 3)
                 ),
                 data_model.Rotation(
-                    name="rotate", axis=data_model.Vector(4, 5, 6), angle=90
+                    name="rotate2", axis=data_model.Vector(4, 5, 6), angle=90
                 ),
             ],
         )
@@ -174,13 +174,13 @@ def build_model_with_sample_transforms():
             transform_parent=instrument.components[1],
             transforms=[
                 data_model.Rotation(
-                    name="rotate", axis=data_model.Vector(4, 5, 6), angle=90
+                    name="rotate3", axis=data_model.Vector(4, 5, 6), angle=90
                 ),
                 data_model.Translation(
-                    name="translate", vector=data_model.Vector(1, 2, 3)
+                    name="translate3a", vector=data_model.Vector(1, 2, 3)
                 ),
                 data_model.Translation(
-                    name="translate2", vector=data_model.Vector(1, 2, 3)
+                    name="translate3b", vector=data_model.Vector(1, 2, 3)
                 ),
             ],
         )
