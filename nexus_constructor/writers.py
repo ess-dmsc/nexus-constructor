@@ -162,7 +162,7 @@ class HdfWriter(QObject):
         elif isinstance(geometry, CylindricalGeometry):
             self.store_cylindrical_geometry(nx_group, geometry)
         elif isinstance(geometry, NoShapeGeometry):
-            self.store_no_shape_geometry(nx_group, geometry)
+            pass
 
     def store_off_geometry(self, nx_group: h5py.Group, geometry: OFFGeometry):
         nx_group.attrs['NX_class'] = 'NXoff_geometry'
@@ -191,12 +191,6 @@ class HdfWriter(QObject):
             dtype='i',
             data=[0, 1, 2])
 
-    def store_no_shape_geometry(self, nx_group: h5py.Group, geometry: NoShapeGeometry):
-        nx_group.attrs['NX_class'] = 'NX_geometry'
-        nx_group.create_dataset(
-            'vertices',
-            data=[geometry.base_center_point.xyz_list, geometry.radius]
-        )
 
 class Logger(QObject):
     """

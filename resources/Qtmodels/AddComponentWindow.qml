@@ -326,8 +326,8 @@ ExpandingWindow {
                 onClicked: {
 
                     // Check that either the mesh or the cylinder were given a valid unit argument because it is not
-                    // known which geometry has just been created.
-                    if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits) {
+                    // known which geometry has just been created. If the component has no shape, add anyway.
+                    if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits || setupPane.geometryState == "None") {
 
                         components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                                  geometryControls.geometryModel,
