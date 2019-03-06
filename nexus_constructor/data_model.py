@@ -95,10 +95,8 @@ class CylindricalGeometry(Geometry):
         # the final face uses steps of -1 to have the same winding order as the other faces
         return OFFGeometry(
             vertices=vectors,
-            faces=[[i, steps + i, steps + ((i + 1) % steps), (i + 1) % steps]
-                   for i in range(steps)] +
-                  [[i for i in range(steps)],
-                   [i for i in range((2 * steps) - 1, steps - 1, -1)]]
+            faces=[[i, steps + i, steps + ((i + 1) % steps), (i + 1) % steps] for i in range(steps)]
+            + [[i for i in range(steps)], [i for i in range((2 * steps) - 1, steps - 1, -1)]]
         )
 
     @property
