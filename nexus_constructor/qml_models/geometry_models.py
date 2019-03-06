@@ -5,7 +5,11 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 
-from nexus_constructor.data_model import CylindricalGeometry, OFFGeometry, NoShapeGeometry
+from nexus_constructor.data_model import (
+    CylindricalGeometry,
+    OFFGeometry,
+    NoShapeGeometry,
+)
 from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.qml_models import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
@@ -21,17 +25,8 @@ class NoShapeModel(QAbstractListModel):
     def get_geometry(self):
         return self.geometry
 
-    def flags(self, index):
-        return super().flags(index) | Qt.ItemIsEditable
-
     def rowCount(self, parent=QModelIndex()):
         return 1
-
-    @Slot(int, "QVariant")
-    def set_geometry(self, index, instrument: InstrumentModel):
-        self.beginResetModel()
-        self.geometry = instrument.components[index].geometry
-        self.endResetModel()
 
 
 class CylinderModel(QAbstractListModel):
@@ -169,7 +164,9 @@ class OFFModel(QAbstractListModel):
 
     def load_data(self):
         """Read the currently selected file into self.geometry"""
-        filename = QUrl(self.file_url).toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
+        filename = QUrl(self.file_url).toString(
+            options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
+        )
         self.beginResetModel()
         load_geometry(filename, self.units, self.geometry)
         self.endResetModel()
