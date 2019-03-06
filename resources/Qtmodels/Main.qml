@@ -179,6 +179,7 @@ ApplicationWindow {
                     Label {
                         id: jsonText
                         text: (collapsed ? collapsed_text : full_text)
+                        font.family: "Courier New"
                         wrapMode: Text.Wrap
                         width: parent.width
                         MouseArea {
