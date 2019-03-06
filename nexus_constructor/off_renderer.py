@@ -8,7 +8,6 @@ https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342
 
 from nexus_constructor.data_model import OFFGeometry, PixelData, PixelGrid, Vector
 from PySide2.Qt3DRender import Qt3DRender
-from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.QtGui import QVector3D
 import struct
 

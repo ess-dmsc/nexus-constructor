@@ -198,15 +198,17 @@ class InstrumentModel(QAbstractListModel):
     ):
         if component_type in ComponentType.values():
             dependent_transform = None
-            if self.components and transform_index in range(0, len(self.components[parent_index-1].transforms)):
-                dependent_transform = self.components[parent_index-1].transforms[
+            if self.components and transform_index in range(
+                0, len(self.components[parent_index - 1].transforms)
+            ):
+                dependent_transform = self.components[parent_index - 1].transforms[
                     transform_index
                 ]
             component = Component(
                 component_type=ComponentType(component_type),
                 name=name,
                 description=description,
-                transform_parent=self.components[parent_index-1],
+                transform_parent=self.components[parent_index - 1],
                 dependent_transform=dependent_transform,
                 geometry=None
                 if geometry_model is None
