@@ -3,6 +3,7 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QMatrix4x4, QVector3D
 from nexus_constructor.transformation import Rotation, Translation
 
+
 def test_initialise_model():
     model = InstrumentModel()
     assert model.rowCount() == 1
@@ -142,12 +143,8 @@ def build_model_with_sample_transforms():
             name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
-                Rotation(
-                    name="rotate1", axis=data_model.Vector(4, 5, 6), angle=90
-                ),
-                Translation(
-                    name="translate1", vector=data_model.Vector(1, 2, 3)
-                ),
+                Rotation(name="rotate1", axis=data_model.Vector(4, 5, 6), angle=90),
+                Translation(name="translate1", vector=data_model.Vector(1, 2, 3)),
             ],
         )
     )
@@ -158,12 +155,8 @@ def build_model_with_sample_transforms():
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
             transforms=[
-                Translation(
-                    name="translate2", vector=data_model.Vector(1, 2, 3)
-                ),
-                Rotation(
-                    name="rotate2", axis=data_model.Vector(4, 5, 6), angle=90
-                ),
+                Translation(name="translate2", vector=data_model.Vector(1, 2, 3)),
+                Rotation(name="rotate2", axis=data_model.Vector(4, 5, 6), angle=90),
             ],
         )
     )
@@ -173,15 +166,9 @@ def build_model_with_sample_transforms():
             name="detector3",
             transform_parent=instrument.components[1],
             transforms=[
-                Rotation(
-                    name="rotate3", axis=data_model.Vector(4, 5, 6), angle=90
-                ),
-                Translation(
-                    name="translate3a", vector=data_model.Vector(1, 2, 3)
-                ),
-                Translation(
-                    name="translate3b", vector=data_model.Vector(1, 2, 3)
-                ),
+                Rotation(name="rotate3", axis=data_model.Vector(4, 5, 6), angle=90),
+                Translation(name="translate3a", vector=data_model.Vector(1, 2, 3)),
+                Translation(name="translate3b", vector=data_model.Vector(1, 2, 3)),
             ],
         )
     )
