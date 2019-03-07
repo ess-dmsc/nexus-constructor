@@ -223,6 +223,10 @@ def test_generate_matrix_combines_dependent_transforms():
     translate_matrix(target_matrix, instrument.components[3].transforms[2])
     assert instrument.generate_matrix(instrument.components[3]) == target_matrix
 
+    for component in instrument.components:
+        for transform in component.transforms:
+            transform.close()
+
 
 def test_transforms_deletable_set():
     instrument = build_model_with_sample_transforms()

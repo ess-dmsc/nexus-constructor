@@ -219,6 +219,9 @@ class Transformation:
     def name(self):
         return self.transformation.name[1:]
 
+    def close(self):
+        self.nexus_file.close()
+
 
 class Rotation(Transformation):
 
