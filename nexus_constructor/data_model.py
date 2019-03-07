@@ -26,15 +26,15 @@ class Vector:
 
     @property
     def x(self):
-        return self.vector[0]
+        return self.vector[0].item()
 
     @property
     def y(self):
-        return self.vector[1]
+        return self.vector[1].item()
 
     @property
     def z(self):
-        return self.vector[2]
+        return self.vector[2].item()
 
     @property
     def magnitude(self):
