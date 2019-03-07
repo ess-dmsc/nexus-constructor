@@ -28,13 +28,25 @@ class Vector:
     def x(self):
         return self.vector[0].item()
 
+    @x.setter
+    def x(self, value):
+        self.vector[0] = value
+
     @property
     def y(self):
         return self.vector[1].item()
 
+    @y.setter
+    def y(self, value):
+        self.vector[1] = value
+
     @property
     def z(self):
         return self.vector[2].item()
+
+    @z.setter
+    def z(self, value):
+        self.vector[2] = value
 
     @property
     def magnitude(self):
