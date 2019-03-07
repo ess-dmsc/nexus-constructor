@@ -1,8 +1,22 @@
 from nexus_constructor import data_model
+from nexus_constructor.data_model import CylindricalGeometry, Vector
 from nexus_constructor.off_renderer import QtOFFGeometry
-from nexus_constructor.qml_models.geometry_models import NoShapeModel, OFFModel, OFFGeometry
-from nexus_constructor.qml_models.instrument_model import InstrumentModel, generate_mesh, determine_pixel_state, \
-    determine_geometry_state, Component, ComponentType, PixelGrid, PixelMapping
+from nexus_constructor.qml_models.geometry_models import (
+    NoShapeModel,
+    OFFModel,
+    OFFGeometry,
+    CylinderModel,
+)
+from nexus_constructor.qml_models.instrument_model import (
+    InstrumentModel,
+    generate_mesh,
+    determine_pixel_state,
+    determine_geometry_state,
+    Component,
+    ComponentType,
+    PixelGrid,
+    PixelMapping,
+)
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
@@ -90,32 +104,6 @@ def test_is_removable():
     assert model.is_removable(3)
 
 
-def test_determine_geometry_state_produces_expected_strings():
-    # geometry state should be independent of component type
-    for component_type in data_model.ComponentType:
-        components = [
-            data_model.Component(
-                component_type=component_type,
-                name="",
-                geometry=data_model.CylindricalGeometry(),
-            ),
-            data_model.Component(
-                component_type=component_type,
-                name="",
-                geometry=data_model.OFFGeometry(),
-            ),
-            data_model.Component(component_type=component_type, name="", geometry=None),
-        ]
-        expected_states = ["Cylinder", "OFF", ""]
-        assert len(components) == len(expected_states)
-
-        for i in range(len(components)):
-            assert (
-                determine_geometry_state(components[i])
-                == expected_states[i]
-            )
-
-
 def test_determine_pixel_state_produces_expected_strings():
     for component_type in data_model.ComponentType:
         component = data_model.Component(component_type=component_type, name="")
@@ -132,9 +120,7 @@ def test_determine_pixel_state_produces_expected_strings():
         assert len(expected_states) == len(pixel_options)
         for i in range(len(pixel_options)):
             component.pixel_data = pixel_options[i]
-            assert (
-                determine_pixel_state(component) == expected_states[i]
-            )
+            assert determine_pixel_state(component) == expected_states[i]
 
 
 def build_model_with_sample_transforms():
@@ -255,6 +241,26 @@ def test_GIVEN_off_with_geometry_WHEN_generating_mesh_THEN_returns_off_mesh():
     assert isinstance(generate_mesh(component).geometry(), QtOFFGeometry)
 
 
+def test_GIVEN_component_with_cylinder_geometry_WHEN_generating_mesh_THEN_returns_off_mesh():
+    component = Component(ComponentType.MONITOR, "")
+    component.geometry = CylindricalGeometry()
+    assert isinstance(generate_mesh(component).geometry(), QtOFFGeometry)
+
+
+def test_GIVEN_component_with_detector_type_WHEN_generating_mesh_THEN_contains_pixel_data():
+    component = Component(ComponentType.DETECTOR, "")
+    ROWS = 2
+    COLUMNS = 1
+
+    component.pixel_data = PixelGrid(rows=2, columns=1)
+    component.geometry = OFFGeometry(
+        vertices=[Vector(0, 0, 0), Vector(0, 1, 0), Vector(1, 0, 0)], faces=[[0, 1, 2]]
+    )
+    generated = generate_mesh(component)
+    assert isinstance(generated.geometry(), QtOFFGeometry)
+    assert generated.vertexCount() == 3 * ROWS * COLUMNS
+
+
 def test_GIVEN_none_WHEN_determine_pixel_state_THEN_returns_empty_string():
     component = Component(False, "")
     assert determine_pixel_state(component) == ""
@@ -285,3 +291,13 @@ def test_GIVEN_slit_WHEN_determine_pixel_state_THEN_returns_empty_string():
 def test_GIVEN_NoShapeModel_WHEN_determine_geometry_state_THEN_returns_none():
     component = NoShapeModel()
     assert determine_geometry_state(component) == "None"
+
+
+def test_GIVEN_cylindricalModel_WHEN_determine_geometry_state_THEN_returns_cylinder():
+    component = CylinderModel()
+    assert determine_geometry_state(component) == "Cylinder"
+
+
+def test_GIVEN_offmodel_WHEN_determine_geometry_state_THEN_returns_off():
+    component = OFFModel()
+    assert determine_geometry_state(component) == "OFF"

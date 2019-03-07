@@ -46,11 +46,11 @@ def determine_pixel_state(component):
 
 def determine_geometry_state(component):
     """Returns a string identifying the state a GeometryControls editor should be in for the given component"""
-    if isinstance(component.geometry, CylindricalGeometry):
+    if isinstance(component.get_geometry(), CylindricalGeometry):
         return "Cylinder"
-    elif isinstance(component.geometry, OFFGeometry):
+    elif isinstance(component.get_geometry(), OFFGeometry):
         return "OFF"
-    elif isinstance(component.geometry, NoShapeGeometry):
+    elif isinstance(component.get_geometry(), NoShapeGeometry):
         return "None"
     return ""
 
