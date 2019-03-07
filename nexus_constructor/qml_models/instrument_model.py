@@ -17,6 +17,44 @@ from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
+def generate_mesh(component: Component):
+    if isinstance(component.geometry, CylindricalGeometry):
+        geometry = component.geometry.as_off_geometry()
+    elif isinstance(component.geometry, OFFGeometry):
+        geometry = component.geometry
+    elif isinstance(component.geometry, NoShapeGeometry):
+        # create a dummy object
+        return OffMesh(False)
+    else:
+        return
+    if component.component_type == ComponentType.DETECTOR:
+        return OffMesh(geometry, component.pixel_data)
+    return OffMesh(geometry)
+
+
+def determine_pixel_state(component):
+    """Returns a string identifying the state a PixelControls editor should be in for the given component"""
+    if component.component_type == ComponentType.DETECTOR:
+        if isinstance(component.pixel_data, PixelGrid):
+            return "Grid"
+        elif isinstance(component.pixel_data, PixelMapping):
+            return "Mapping"
+    elif component.component_type == ComponentType.MONITOR:
+        return "SinglePixel"
+    return ""
+
+
+def determine_geometry_state(component):
+    """Returns a string identifying the state a GeometryControls editor should be in for the given component"""
+    if isinstance(component.geometry, CylindricalGeometry):
+        return "Cylinder"
+    elif isinstance(component.geometry, OFFGeometry):
+        return "OFF"
+    elif isinstance(component.geometry, NoShapeGeometry):
+        return "None"
+    return ""
+
+
 class InstrumentModel(QAbstractListModel):
     """
     A model that provides QML access to a list of components and their properties
@@ -113,13 +151,13 @@ class InstrumentModel(QAbstractListModel):
             if component.transform_parent is not None
             and component.dependent_transform in component.transform_parent.transforms
             else -1,
-            InstrumentModel.PixelStateRole: lambda: self.determine_pixel_state(
+            InstrumentModel.PixelStateRole: lambda: determine_pixel_state(
                 component
             ),
-            InstrumentModel.GeometryStateRole: lambda: self.determine_geometry_state(
+            InstrumentModel.GeometryStateRole: lambda: determine_geometry_state(
                 component
             ),
-            InstrumentModel.MeshRole: lambda: self.generate_mesh(component),
+            InstrumentModel.MeshRole: lambda: generate_mesh(component),
             InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(
                 component
             ),
@@ -128,6 +166,20 @@ class InstrumentModel(QAbstractListModel):
         }
         if role in accessors:
             return accessors[role]()
+
+    def roleNames(self):
+        return {
+            InstrumentModel.NameRole: b"name",
+            InstrumentModel.DescriptionRole: b"description",
+            InstrumentModel.TransformParentIndexRole: b"transform_parent_index",
+            InstrumentModel.DependentTransformIndexRole: b"dependent_transform_index",
+            InstrumentModel.PixelStateRole: b"pixel_state",
+            InstrumentModel.GeometryStateRole: b"geometry_state",
+            InstrumentModel.MeshRole: b"mesh",
+            InstrumentModel.TransformMatrixRole: b"transform_matrix",
+            InstrumentModel.RemovableRole: b"removable",
+            InstrumentModel.TransformModelRole: b"transform_model",
+        }
 
     def setData(self, index, value, role):
         row = index.row()
@@ -169,20 +221,6 @@ class InstrumentModel(QAbstractListModel):
 
     def flags(self, index):
         return super().flags(index) | Qt.ItemIsEditable
-
-    def roleNames(self):
-        return {
-            InstrumentModel.NameRole: b"name",
-            InstrumentModel.DescriptionRole: b"description",
-            InstrumentModel.TransformParentIndexRole: b"transform_parent_index",
-            InstrumentModel.DependentTransformIndexRole: b"dependent_transform_index",
-            InstrumentModel.PixelStateRole: b"pixel_state",
-            InstrumentModel.GeometryStateRole: b"geometry_state",
-            InstrumentModel.MeshRole: b"mesh",
-            InstrumentModel.TransformMatrixRole: b"transform_matrix",
-            InstrumentModel.RemovableRole: b"removable",
-            InstrumentModel.TransformModelRole: b"transform_model",
-        }
 
     @Slot(str, str, str, int, int, "QVariant", "QVariant", "QVariant")
     def add_component(
@@ -307,18 +345,7 @@ class InstrumentModel(QAbstractListModel):
         self.update_transforms_deletable()
         self.endResetModel()
 
-    def generate_mesh(self, component: Component):
-        if isinstance(component.geometry, CylindricalGeometry):
-            geometry = component.geometry.as_off_geometry()
-        elif isinstance(component.geometry, OFFGeometry):
-            geometry = component.geometry
-        elif isinstance(component.geometry, NoShapeGeometry):
-            return OffMesh(False)
-        else:
-            return
-        if component.component_type == ComponentType.DETECTOR:
-            return OffMesh(geometry, component.pixel_data)
-        return OffMesh(geometry)
+
 
     def generate_matrix(self, component: Component):
         matrix = QMatrix4x4()
@@ -397,29 +424,6 @@ class InstrumentModel(QAbstractListModel):
             self.createIndex(len(self.components), 0),
             InstrumentModel.RemovableRole,
         )
-
-    @staticmethod
-    def determine_pixel_state(component):
-        """Returns a string identifying the state a PixelControls editor should be in for the given component"""
-        if component.component_type == ComponentType.DETECTOR:
-            if isinstance(component.pixel_data, PixelGrid):
-                return "Grid"
-            elif isinstance(component.pixel_data, PixelMapping):
-                return "Mapping"
-        elif component.component_type == ComponentType.MONITOR:
-            return "SinglePixel"
-        return ""
-
-    @staticmethod
-    def determine_geometry_state(component):
-        """Returns a string identifying the state a GeometryControls editor should be in for the given component"""
-        if isinstance(component.geometry, CylindricalGeometry):
-            return "Cylinder"
-        elif isinstance(component.geometry, OFFGeometry):
-            return "OFF"
-        elif isinstance(component.geometry, NoShapeGeometry):
-            return "None"
-        return ""
 
     @Slot(int)
     def update_mesh(self, index: int):

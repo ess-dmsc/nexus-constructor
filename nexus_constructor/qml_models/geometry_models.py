@@ -41,6 +41,15 @@ class CylinderModel(QAbstractListModel):
     HeightRole = Qt.UserRole + 104
     RadiusRole = Qt.UserRole + 105
 
+    role_names = {
+            UnitsRole: b"cylinder_units",
+            AxisXRole: b"axis_x",
+            AxisYRole: b"axis_y",
+            AxisZRole: b"axis_z",
+            HeightRole: b"cylinder_height",
+            RadiusRole: b"cylinder_radius",
+        }
+
     def __init__(self):
         super().__init__()
         self.cylinder = CylindricalGeometry()
@@ -82,14 +91,7 @@ class CylinderModel(QAbstractListModel):
         return super().flags(index) | Qt.ItemIsEditable
 
     def roleNames(self):
-        return {
-            CylinderModel.UnitsRole: b"cylinder_units",
-            CylinderModel.AxisXRole: b"axis_x",
-            CylinderModel.AxisYRole: b"axis_y",
-            CylinderModel.AxisZRole: b"axis_z",
-            CylinderModel.HeightRole: b"cylinder_height",
-            CylinderModel.RadiusRole: b"cylinder_radius",
-        }
+        return self.role_names
 
     def get_geometry(self):
         return self.cylinder
@@ -113,6 +115,13 @@ class OFFModel(QAbstractListModel):
     FacesRole = Qt.UserRole + 203
 
     meshLoaded = Signal()
+
+    role_names = {
+            FileNameRole: b"file_url",
+            UnitsRole: b"units",
+            VerticesRole: b"vertices",
+            FacesRole: b"faces",
+        }
 
     def __init__(self):
         super().__init__()
@@ -155,12 +164,7 @@ class OFFModel(QAbstractListModel):
         return super().flags(index) | Qt.ItemIsEditable
 
     def roleNames(self):
-        return {
-            OFFModel.FileNameRole: b"file_url",
-            OFFModel.UnitsRole: b"units",
-            OFFModel.VerticesRole: b"vertices",
-            OFFModel.FacesRole: b"faces",
-        }
+        return self.role_names
 
     def load_data(self):
         """Read the currently selected file into self.geometry"""

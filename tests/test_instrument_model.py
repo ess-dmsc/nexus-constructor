@@ -1,5 +1,7 @@
 from nexus_constructor import data_model
-from nexus_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor.qml_models.geometry_models import NoShapeModel, OFFModel, OFFGeometry
+from nexus_constructor.qml_models.instrument_model import InstrumentModel, generate_mesh, determine_pixel_state, \
+    determine_geometry_state, Component, ComponentType, PixelGrid, PixelMapping
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
@@ -108,7 +110,7 @@ def test_determine_geometry_state_produces_expected_strings():
 
         for i in range(len(components)):
             assert (
-                InstrumentModel.determine_geometry_state(components[i])
+                determine_geometry_state(components[i])
                 == expected_states[i]
             )
 
@@ -130,7 +132,7 @@ def test_determine_pixel_state_produces_expected_strings():
         for i in range(len(pixel_options)):
             component.pixel_data = pixel_options[i]
             assert (
-                InstrumentModel.determine_pixel_state(component) == expected_states[i]
+                determine_pixel_state(component) == expected_states[i]
             )
 
 
@@ -231,3 +233,55 @@ def test_transforms_deletable_set():
     assert instrument.transform_models[1].deletable == [False, True]
     assert instrument.transform_models[2].deletable == [True, True]
     assert instrument.transform_models[3].deletable == [True, True, True]
+
+
+def test_GIVEN_no_geometry_WHEN_generating_mesh_THEN_square_off_mesh_is_created():
+    component = NoShapeModel()
+    actual_output = generate_mesh(component)
+
+    assert actual_output.geometry().vertex_count == 6
+
+
+def test_GIVEN_off_with_no_geometry_WHEN_generating_mesh_THEN_returns_nothing():
+    component = OFFModel()
+    component.geometry = False
+    assert not generate_mesh(component)
+
+
+def test_GIVEN_off_with_geometry_WHEN_generating_mesh_THEN_returns_off_mesh():
+    component = Component(ComponentType.MONITOR, "")
+    component.geometry = OFFGeometry()
+
+    assert generate_mesh(component) == component
+
+
+def test_GIVEN_none_WHEN_determine_pixel_state_THEN_returns_empty_string():
+    component = Component(False, "")
+    assert determine_pixel_state(component) == ""
+
+
+def test_GIVEN_monitor_WHEN_determine_pixel_state_THEN_returns_SinglePixel():
+    component = Component(ComponentType.MONITOR, "")
+    assert determine_pixel_state(component) == "SinglePixel"
+
+
+def test_GIVEN_detector_with_PixelGrid_WHEN_determine_pixel_state_THEN_returns_Grid():
+    component = Component(ComponentType.DETECTOR, "")
+    component.pixel_data = PixelGrid()
+    assert determine_pixel_state(component) == "Grid"
+
+
+def test_GIVEN_detector_with_PixelMapping_WHEN_determine_pixel_state_THEN_returns_Mapping():
+    component = Component(ComponentType.DETECTOR, "")
+    component.pixel_data = PixelMapping([])
+    assert determine_pixel_state(component) == "Mapping"
+
+
+def test_GIVEN_slit_WHEN_determine_pixel_state_THEN_returns_empty_string():
+    component = Component(ComponentType.SLIT, "")
+    assert determine_pixel_state(component) == ""
+
+
+def test_GIVEN_NoShapeModel_WHEN_determine_geometry_state_THEN_returns_none():
+    component = NoShapeModel()
+    assert determine_geometry_state(component) == "None"
