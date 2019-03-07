@@ -1,4 +1,5 @@
 from nexus_constructor import data_model
+from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import NoShapeModel, OFFModel, OFFGeometry
 from nexus_constructor.qml_models.instrument_model import InstrumentModel, generate_mesh, determine_pixel_state, \
     determine_geometry_state, Component, ComponentType, PixelGrid, PixelMapping
@@ -251,8 +252,7 @@ def test_GIVEN_off_with_no_geometry_WHEN_generating_mesh_THEN_returns_nothing():
 def test_GIVEN_off_with_geometry_WHEN_generating_mesh_THEN_returns_off_mesh():
     component = Component(ComponentType.MONITOR, "")
     component.geometry = OFFGeometry()
-
-    assert generate_mesh(component) == component
+    assert isinstance(generate_mesh(component).geometry(), QtOFFGeometry)
 
 
 def test_GIVEN_none_WHEN_determine_pixel_state_THEN_returns_empty_string():
