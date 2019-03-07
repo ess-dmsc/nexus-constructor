@@ -4,6 +4,8 @@ from math import sqrt, sin, cos, pi, acos
 from typing import List
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
+from numpy import array, allclose
+from numpy.linalg import norm
 
 
 def validate_nonzero_vector(instance, attribute, value):
@@ -16,26 +18,40 @@ def validate_list_contains_transformations(instance, attribute, value):
         assert isinstance(item, Transformation)
 
 
-@attr.s
 class Vector:
     """A vector in 3D space, defined by x, y and z coordinates"""
-    x = attr.ib(float)
-    y = attr.ib(float)
-    z = attr.ib(float)
+
+    def __init__(self, x, y, z):
+        self.vector = array([x, y, z], dtype=float)
+
+    @property
+    def x(self):
+        return self.vector[0]
+
+    @property
+    def y(self):
+        return self.vector[1]
+
+    @property
+    def z(self):
+        return self.vector[2]
 
     @property
     def magnitude(self):
-        return sqrt(self.x**2 + self.y**2 + self.z**2)
+        return norm(self.vector)
 
     @property
     def xyz_list(self):
-        return [self.x, self.y, self.z]
+        return self.vector.tolist()
 
     @property
     def unit_list(self):
-        magnitude = self.magnitude
-        return [value / magnitude for value in self.xyz_list]
+        return self.vector / self.magnitude
 
+    def __eq__(self, other):
+        ...
+        return self.__class__ == other.__class__ \
+            and allclose(self.vector, other.vector)
 
 @attr.s
 class Geometry:
