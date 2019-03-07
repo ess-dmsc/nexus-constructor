@@ -18,6 +18,7 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QUrl
 import pytest
 
+
 def build_sample_model():
     model = InstrumentModel()
 

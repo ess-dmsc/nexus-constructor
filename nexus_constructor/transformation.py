@@ -12,9 +12,9 @@ class Transformation:
         Creates an in-memory nexus file with a named entry containing an NXTransformation attribute.
         :param name: The name of the root entry in the nexus file.
         """
-        self.nexus_file = h5py.File(name, driver='core', backing_store=False)
+        self.nexus_file = h5py.File(name, driver="core", backing_store=False)
         self.transformation = self.nexus_file.create_group(name)
-        self.transformation.attrs['NX_class'] = 'NXtransformation'
+        self.transformation.attrs["NX_class"] = "NXtransformation"
 
     @property
     def name(self):
@@ -22,8 +22,7 @@ class Transformation:
 
 
 class Rotation(Transformation):
-
-    def __init__(self, angle: int, name='rotation', axis=Vector(0, 0, 1)):
+    def __init__(self, angle: int, name="rotation", axis=Vector(0, 0, 1)):
         """
         Creates a rotation in the in-memory Nexus file under
         :param angle: The angle to rotate the object by.
@@ -31,7 +30,7 @@ class Rotation(Transformation):
         :param axis: The point to rotate the object.
         """
         super().__init__(name)
-        self.transformation.attrs['transformation_type'] = 'rotation'
+        self.transformation.attrs["transformation_type"] = "rotation"
         self._angle = angle
         self._axis = axis
 
@@ -43,25 +42,19 @@ class Rotation(Transformation):
     def axis(self):
         return self._axis
 
-    # axis = attr.ib(factory=lambda: Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
-    # angle = attr.ib(default=0)
-
 
 class Translation(Transformation):
-
-    def __init__(self, name='translation', vector=Vector(0, 0, 0)):
+    def __init__(self, name="translation", vector=Vector(0, 0, 0)):
         """
         Creates a translation in the in-memory Nexus file
         :param name: The root entry name for the nexus file.
         :param vector: The vector for the translation.
         """
         super().__init__(name)
-        self.transformation.attrs['transformation_type'] = 'translation'
+        self.transformation.attrs["transformation_type"] = "translation"
         self._vector = vector
-        self.transformation.attrs['vector'] = vector.xyz_list
+        self.transformation.attrs["vector"] = vector.xyz_list
 
     @property
     def vector(self):
         return self._vector
-
-    # vector = attr.ib(factory=lambda: Vector(0, 0, 0), type=Vector)

@@ -1,10 +1,4 @@
-from nexus_constructor.transformation import *
-import h5py
-
-# open a file that has closed
-# check the nexus file name is set when transformation.name is set
-# transformation type for all classes
-# rotation
+from nexus_constructor.transformation import Rotation, Translation, Vector
 
 
 def test_GIVEN_name_WHEN_creating_transformation_THEN_name_appears_in_nexus_attribute():
