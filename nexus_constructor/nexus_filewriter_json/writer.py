@@ -56,6 +56,7 @@ def generate_json(model: InstrumentModel):
     data["nexus_structure"]["children"].extend(
         generate_component_list(external_components)
     )
+
     return json.dumps(data, indent=2)
 
 
@@ -98,7 +99,7 @@ def add_transform_data(json_data: dict, component: Component):
                 type_name = "rotation"
                 units = "degrees"
                 vector = (
-                    transform.axis.unit_list
+                    transform.axis.unit_list.tolist()
                     if transform.axis.magnitude != 0
                     else [0, 0, 0]
                 )
@@ -107,7 +108,7 @@ def add_transform_data(json_data: dict, component: Component):
                 type_name = "translation"
                 units = "m"
                 vector = (
-                    transform.vector.unit_list
+                    transform.vector.unit_list.tolist()
                     if transform.vector.magnitude != 0
                     else [0, 0, 0]
                 )
