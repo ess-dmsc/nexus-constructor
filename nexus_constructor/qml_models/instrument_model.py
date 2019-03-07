@@ -151,9 +151,7 @@ class InstrumentModel(QAbstractListModel):
             if component.transform_parent is not None
             and component.dependent_transform in component.transform_parent.transforms
             else -1,
-            InstrumentModel.PixelStateRole: lambda: determine_pixel_state(
-                component
-            ),
+            InstrumentModel.PixelStateRole: lambda: determine_pixel_state(component),
             InstrumentModel.GeometryStateRole: lambda: determine_geometry_state(
                 component
             ),
@@ -344,8 +342,6 @@ class InstrumentModel(QAbstractListModel):
         ]
         self.update_transforms_deletable()
         self.endResetModel()
-
-
 
     def generate_matrix(self, component: Component):
         matrix = QMatrix4x4()

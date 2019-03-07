@@ -42,13 +42,13 @@ class CylinderModel(QAbstractListModel):
     RadiusRole = Qt.UserRole + 105
 
     role_names = {
-            UnitsRole: b"cylinder_units",
-            AxisXRole: b"axis_x",
-            AxisYRole: b"axis_y",
-            AxisZRole: b"axis_z",
-            HeightRole: b"cylinder_height",
-            RadiusRole: b"cylinder_radius",
-        }
+        UnitsRole: b"cylinder_units",
+        AxisXRole: b"axis_x",
+        AxisYRole: b"axis_y",
+        AxisZRole: b"axis_z",
+        HeightRole: b"cylinder_height",
+        RadiusRole: b"cylinder_radius",
+    }
 
     def __init__(self):
         super().__init__()
@@ -117,11 +117,11 @@ class OFFModel(QAbstractListModel):
     meshLoaded = Signal()
 
     role_names = {
-            FileNameRole: b"file_url",
-            UnitsRole: b"units",
-            VerticesRole: b"vertices",
-            FacesRole: b"faces",
-        }
+        FileNameRole: b"file_url",
+        UnitsRole: b"units",
+        VerticesRole: b"vertices",
+        FacesRole: b"faces",
+    }
 
     def __init__(self):
         super().__init__()
