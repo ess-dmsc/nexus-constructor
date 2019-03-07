@@ -15,10 +15,8 @@ from nexus_constructor.data_model import (
     PixelGrid,
     PixelMapping,
     SinglePixelId,
-    Transformation,
-    Translation,
-    Rotation,
 )
+from nexus_constructor.transformation import Transformation, Translation, Rotation
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 

@@ -1,7 +1,7 @@
 from nexus_constructor import data_model
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QMatrix4x4, QVector3D
-
+from nexus_constructor.transformation import Rotation, Translation
 
 def test_initialise_model():
     model = InstrumentModel()
@@ -142,10 +142,10 @@ def build_model_with_sample_transforms():
             name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
-                data_model.Rotation(
+                Rotation(
                     name="rotate1", axis=data_model.Vector(4, 5, 6), angle=90
                 ),
-                data_model.Translation(
+                Translation(
                     name="translate1", vector=data_model.Vector(1, 2, 3)
                 ),
             ],
@@ -158,10 +158,10 @@ def build_model_with_sample_transforms():
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
             transforms=[
-                data_model.Translation(
+                Translation(
                     name="translate2", vector=data_model.Vector(1, 2, 3)
                 ),
-                data_model.Rotation(
+                Rotation(
                     name="rotate2", axis=data_model.Vector(4, 5, 6), angle=90
                 ),
             ],
@@ -173,13 +173,13 @@ def build_model_with_sample_transforms():
             name="detector3",
             transform_parent=instrument.components[1],
             transforms=[
-                data_model.Rotation(
+                Rotation(
                     name="rotate3", axis=data_model.Vector(4, 5, 6), angle=90
                 ),
-                data_model.Translation(
+                Translation(
                     name="translate3a", vector=data_model.Vector(1, 2, 3)
                 ),
-                data_model.Translation(
+                Translation(
                     name="translate3b", vector=data_model.Vector(1, 2, 3)
                 ),
             ],
@@ -193,12 +193,12 @@ def build_model_with_sample_transforms():
 def test_generate_matrix_combines_dependent_transforms():
     instrument = build_model_with_sample_transforms()
 
-    def rotate_matrix(matrix: QMatrix4x4, rotate: data_model.Rotation):
+    def rotate_matrix(matrix: QMatrix4x4, rotate: Rotation):
         matrix.rotate(
             rotate.angle, QVector3D(rotate.axis.x, rotate.axis.y, rotate.axis.z)
         )
 
-    def translate_matrix(matrix: QMatrix4x4, translate: data_model.Translation):
+    def translate_matrix(matrix: QMatrix4x4, translate: Translation):
         matrix.translate(translate.vector.x, translate.vector.y, translate.vector.z)
 
     target_matrix = QMatrix4x4()
@@ -222,10 +222,6 @@ def test_generate_matrix_combines_dependent_transforms():
     translate_matrix(target_matrix, instrument.components[3].transforms[1])
     translate_matrix(target_matrix, instrument.components[3].transforms[2])
     assert instrument.generate_matrix(instrument.components[3]) == target_matrix
-
-    for component in instrument.components:
-        for transform in component.transforms:
-            transform.close()
 
 
 def test_transforms_deletable_set():

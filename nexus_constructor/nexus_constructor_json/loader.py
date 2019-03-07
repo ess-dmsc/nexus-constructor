@@ -16,9 +16,8 @@ from nexus_constructor.data_model import (
     CountDirection,
     Corner,
     Vector,
-    Translation,
-    Rotation,
 )
+from nexus_constructor.transformation import Translation, Rotation
 from nexus_constructor.nexus import NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 

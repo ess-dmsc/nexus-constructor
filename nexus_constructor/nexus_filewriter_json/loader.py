@@ -10,13 +10,12 @@ Json format description can be found at https://github.com/ess-dmsc/kafka-to-nex
 from nexus_constructor.data_model import (
     Component,
     ComponentType,
-    Rotation,
-    Translation,
     Vector,
     OFFGeometry,
     CylindricalGeometry,
     SinglePixelId,
 )
+from nexus_constructor.transformation import Rotation, Translation
 from nexus_constructor.nexus import NexusEncoder, NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 

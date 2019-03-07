@@ -1,5 +1,6 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
-from nexus_constructor.data_model import Component, Translation
+from nexus_constructor.data_model import Component
+from nexus_constructor.transformation import Translation
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.validators import NameValidator, TransformParentValidator, UnitValidator
