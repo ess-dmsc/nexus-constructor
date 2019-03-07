@@ -301,3 +301,9 @@ def test_GIVEN_cylindricalModel_WHEN_determine_geometry_state_THEN_returns_cylin
 def test_GIVEN_offmodel_WHEN_determine_geometry_state_THEN_returns_off():
     component = OFFModel()
     assert determine_geometry_state(component) == "OFF"
+
+
+def test_GIVEN_no_model_WHEN_determine_geometry_state_THEN_returns_empty_string():
+    component = NoShapeModel()
+    component.geometry = False
+    assert determine_geometry_state(component) == ""
