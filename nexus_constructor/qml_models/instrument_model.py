@@ -67,7 +67,7 @@ class InstrumentModel(QAbstractListModel):
                 name="Sample",
                 geometry=OFFGeometry(
                     vertices=[
-                        Vector(x=-0.5, y=-0.5, z=0.5),
+                        QVector(x=-0.5, y=-0.5, z=0.5),
                         Vector(x=0.5, y=-0.5, z=0.5),
                         Vector(x=-0.5, y=0.5, z=0.5),
                         Vector(x=0.5, y=0.5, z=0.5),

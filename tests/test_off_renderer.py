@@ -5,6 +5,7 @@ from nexus_constructor.off_renderer import (
 )
 from nexus_constructor.data_model import OFFGeometry, Vector
 import itertools
+from PySide2.QtGui import QVector3D
 
 TRIANGLES_IN_SQUARE = 2
 VERTICIES_IN_TRIANGLE = 3
@@ -72,7 +73,7 @@ def test_GIVEN_a_square_face_WHEN_creating_normal_buffer_THEN_output_is_correct(
 
 def test_GIVEN_a_triangle_WHEN_creating_off_geometry_with_no_pixel_data_THEN_vertex_count_equals_3():
     off_geometry = OFFGeometry(
-        vertices=[Vector(0, 0, 0), Vector(0, 1, 0), Vector(1, 1, 0)], faces=[[0, 1, 2]]
+        vertices=[QVector3D(0, 0, 0), QVector3D(0, 1, 0), QVector3D(1, 1, 0)], faces=[[0, 1, 2]]
     )
 
     qt_geometry = QtOFFGeometry(off_geometry, None)

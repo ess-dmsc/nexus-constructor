@@ -62,7 +62,7 @@ def create_vertex_buffer(vertices, faces):
     flattened_triangles = flatten(triangles)
 
     return flatten(
-        vertices[point_index].vector.tolist() for point_index in flattened_triangles
+        vertices[point_index].toTuple() for point_index in flattened_triangles
     )
 
 
@@ -80,9 +80,10 @@ def create_normal_buffer(vertices, faces):
         # Get the vertices of each triangle
         points = [vertices[p] for p in triangle]
         # Convert our vector objects into Qt Vectors
-        q_vectors = [QVector3D(*p.vector.tolist()) for p in points]
+        # q_vectors = [QVector3D(*p.vector.tolist()) for p in points]
         # Calculate the normal, leveraging Qt
-        normal = QVector3D.normal(*q_vectors)
+        # normal = QVector3D.normal(*q_vectors)
+        normal = QVector3D.normal(*points)
         # Need to have a normal for each vector
         normal_buffer_values.extend(normal.toTuple() * 3)
     return normal_buffer_values
@@ -151,10 +152,10 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                     for face in model.faces
                 ]
                 vertices += [
-                    Vector(
-                        vec.x + (col * grid.col_width),
-                        vec.y + (row * grid.row_height),
-                        vec.z,
+                    QVector3D(
+                        vec.x() + (col * grid.col_width),
+                        vec.y() + (row * grid.row_height),
+                        vec.z(),
                     )
                     for vec in model.vertices
                 ]

@@ -2,6 +2,7 @@ from nexus_constructor.data_model import OFFGeometry, Vector
 from nexusutils.readwriteoff import parse_off_file
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from stl import mesh
+from PySide2.QtGui import QVector3D
 
 
 def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry()):
@@ -46,7 +47,7 @@ def load_off_geometry(
         vertices, faces = parse_off_file(file)
 
     geometry.vertices = [
-        Vector(x * mult_factor, y * mult_factor, z * mult_factor)
+        QVector3D(x * mult_factor, y * mult_factor, z * mult_factor)
         for x, y, z in (vertex for vertex in vertices)
     ]
     geometry.faces = [face.tolist()[1:] for face in faces]

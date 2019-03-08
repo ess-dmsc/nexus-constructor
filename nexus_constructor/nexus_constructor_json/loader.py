@@ -161,7 +161,7 @@ def build_geometry(geometry_obj: dict):
         face_indices = geometry_obj["winding_order"]
         return OFFGeometry(
             vertices=[
-                Vector(vertex[0], vertex[1], vertex[2])
+                QVector3D(vertex[0], vertex[1], vertex[2])
                 for vertex in geometry_obj["vertices"]
             ],
             faces=NexusDecoder.unwound_off_faces(wound_faces, face_indices),

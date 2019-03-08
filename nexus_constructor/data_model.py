@@ -134,8 +134,7 @@ class CylindricalGeometry(Geometry):
         vectors = []
         rotate_matrix = self.rotation_matrix
         for vertex in vertices:
-            rotated = vertex * rotate_matrix
-            vectors.append(Vector(rotated.x(), rotated.y(), rotated.z()))
+            vectors.append(vertex * rotate_matrix)
         # faces are rectangles joining the top and bottom, followed by a steps-sided shapes for the base and top
         # the final face uses steps of -1 to have the same winding order as the other faces
         return OFFGeometry(
@@ -176,7 +175,7 @@ class OFFGeometry(Geometry):
             an index into the vertices list to identify a specific point in 3D space
     """
 
-    vertices = attr.ib(factory=list, type=List[Vector])
+    vertices = attr.ib(factory=list, type=List[QVector3D])
     faces = attr.ib(factory=list, type=List[List[int]])
 
     @property
