@@ -22,6 +22,12 @@ class Vector:
     """A vector in 3D space, defined by x, y and z coordinates"""
 
     def __init__(self, x, y, z):
+        """
+
+        :param x: The x coordinate.
+        :param y: The y coordinate.
+        :param z: The z coordinate.
+        """
         self.vector = array([x, y, z], dtype=float)
 
     @property
@@ -53,10 +59,6 @@ class Vector:
         return norm(self.vector)
 
     @property
-    def xyz_list(self):
-        return self.vector.tolist()
-
-    @property
     def unit_list(self):
         return self.vector / self.magnitude
 
@@ -83,7 +85,7 @@ class CylindricalGeometry(Geometry):
 
     units = attr.ib(default="m", type=str)
     axis_direction = attr.ib(
-        factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector
+        factory=lambda: QVector3D(1, 0, 0), type=QVector3D, validator=validate_nonzero_vector
     )
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
@@ -105,7 +107,7 @@ class CylindricalGeometry(Geometry):
     def top_center_point(self):
         values = [
             x * self.height * calculate_unit_conversion_factor(self.units)
-            for x in self.axis_direction.unit_list
+            for x in self.axis_direction.normalized()
         ]
         return Vector(values[0], values[1], values[2])
 
@@ -155,8 +157,8 @@ class CylindricalGeometry(Geometry):
         :return: A QMatrix4x4 describing the rotation from the Z axis to the cylinder's axis
         """
         default_axis = QVector3D(0, 0, 1)
-        unit_axis = self.axis_direction.unit_list
-        desired_axis = QVector3D(unit_axis[0], unit_axis[1], unit_axis[2])
+        # unit_axis = self.axis_direction.unit_list
+        desired_axis = self.axis_direction.normalized()
         rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
         rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis))
         rotate_degrees = rotate_radians * 360 / (2 * pi)
