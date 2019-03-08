@@ -197,7 +197,7 @@ class HdfWriter(QObject):
             data=[
                 geometry.base_center_point.toTuple(),
                 geometry.base_edge_point.toTuple(),
-                geometry.top_center_point.vector.tolist(),
+                geometry.top_center_point.toTuple(),
             ],
         )
         nx_group.create_dataset("cylinders", dtype="i", data=[0, 1, 2])

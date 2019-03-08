@@ -17,9 +17,9 @@ def test_x_axis_aligned_cylindrical_geometry_points():
         radius ** 2
     )
 
-    assert cylinder.top_center_point.x == approx(height)
-    assert cylinder.top_center_point.y == approx(0)
-    assert cylinder.top_center_point.z == approx(0)
+    assert cylinder.top_center_point.x() == approx(height)
+    assert cylinder.top_center_point.y() == approx(0)
+    assert cylinder.top_center_point.z() == approx(0)
 
 
 def test_y_axis_aligned_cylindrical_geometry_points():
@@ -36,9 +36,9 @@ def test_y_axis_aligned_cylindrical_geometry_points():
         radius ** 2
     )
 
-    assert cylinder.top_center_point.x == approx(0)
-    assert cylinder.top_center_point.y == approx(height)
-    assert cylinder.top_center_point.z == approx(0)
+    assert cylinder.top_center_point.x() == approx(0)
+    assert cylinder.top_center_point.y() == approx(height)
+    assert cylinder.top_center_point.z() == approx(0)
 
 
 def test_z_axis_aligned_cylindrical_geometry_points():
@@ -55,9 +55,9 @@ def test_z_axis_aligned_cylindrical_geometry_points():
         radius ** 2
     )
 
-    assert cylinder.top_center_point.x == approx(0)
-    assert cylinder.top_center_point.y == approx(0)
-    assert cylinder.top_center_point.z == approx(height)
+    assert cylinder.top_center_point.x() == approx(0)
+    assert cylinder.top_center_point.y() == approx(0)
+    assert cylinder.top_center_point.z() == approx(height)
 
 
 def test_axis_direction_must_be_non_zero():

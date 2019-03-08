@@ -108,11 +108,7 @@ class CylindricalGeometry(Geometry):
 
     @property
     def top_center_point(self):
-        values = [
-            x * self.height * calculate_unit_conversion_factor(self.units)
-            for x in self.axis_direction.normalized().toTuple()
-        ]
-        return Vector(values[0], values[1], values[2])
+        return self.axis_direction.normalized() * self.height * calculate_unit_conversion_factor(self.units)
 
     def as_off_geometry(self, steps=20):
 
