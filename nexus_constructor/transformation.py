@@ -31,12 +31,13 @@ class Rotation(Transformation):
         """
         super().__init__(name)
         self.transformation.attrs["transformation_type"] = "rotation"
-        self._angle = angle
+        self.transformation.attrs["angle"] = angle
+        self.transformation.attrs["axis"] = axis.xyz_list
         self._axis = axis
 
     @property
     def angle(self):
-        return self._angle
+        return self.transformation.attrs["angle"]
 
     @property
     def axis(self):
@@ -52,8 +53,8 @@ class Translation(Transformation):
         """
         super().__init__(name)
         self.transformation.attrs["transformation_type"] = "translation"
-        self._vector = vector
         self.transformation.attrs["vector"] = vector.xyz_list
+        self._vector = vector
 
     @property
     def vector(self):
