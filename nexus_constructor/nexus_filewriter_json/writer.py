@@ -181,7 +181,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "type": "dataset",
                     "name": "vertices",
                     "dataset": {"type": "double", "size": [len(geometry.vertices), 3]},
-                    "values": [vertex.vector.tolist() for vertex in geometry.vertices],
+                    "values": [vertex.toTuple() for vertex in geometry.vertices],
                 },
                 {
                     "type": "dataset",

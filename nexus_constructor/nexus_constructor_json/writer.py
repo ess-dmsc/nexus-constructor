@@ -154,7 +154,7 @@ def build_geometry_dictionary(geometry: Geometry):
     if isinstance(geometry, OFFGeometry):
         data = {
             "type": "OFF",
-            "vertices": [vector.vector.tolist() for vector in geometry.vertices],
+            "vertices": [vector.toTuple() for vector in geometry.vertices],
             "winding_order": geometry.winding_order_indices,
             "faces": geometry.winding_order,
         }
