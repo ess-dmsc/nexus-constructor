@@ -12,9 +12,12 @@ def validate_nonzero_vector(instance, attribute, value):
     if value.x == 0 and value.y == 0 and value.z == 0:
         raise ValueError("Vector is zero length")
 
+
+# Temporary method here until the one above is no longer needed
 def validate_nonzero_qvector(instance, attribute, value):
     if value.x() == 0 and value.y() == 0 and value.z() == 0:
         raise ValueError("Vector is zero length")
+
 
 def validate_list_contains_transformations(instance, attribute, value):
     for item in value:
