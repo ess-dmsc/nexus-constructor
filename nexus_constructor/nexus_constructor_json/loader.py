@@ -21,6 +21,7 @@ from nexus_constructor.data_model import (
 )
 from nexus_constructor.nexus import NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
+from PySide2.QtGui import QVector3D
 
 
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
@@ -166,7 +167,7 @@ def build_geometry(geometry_obj: dict):
             faces=NexusDecoder.unwound_off_faces(wound_faces, face_indices),
         )
     elif geometry_obj["type"] == "Cylinder":
-        axis_direction = Vector(
+        axis_direction = QVector3D(
             geometry_obj["axis_direction"]["x"],
             geometry_obj["axis_direction"]["y"],
             geometry_obj["axis_direction"]["z"],

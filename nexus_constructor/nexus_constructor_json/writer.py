@@ -177,9 +177,9 @@ def build_geometry_dictionary(geometry: Geometry):
                 "z": geometry.top_center_point.z,
             },
             "axis_direction": {
-                "x": geometry.axis_direction.x,
-                "y": geometry.axis_direction.y,
-                "z": geometry.axis_direction.z,
+                "x": geometry.axis_direction.x(),
+                "y": geometry.axis_direction.y(),
+                "z": geometry.axis_direction.z(),
             },
             "height": geometry.height,
             "radius": geometry.radius,
