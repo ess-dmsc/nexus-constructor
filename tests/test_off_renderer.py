@@ -17,7 +17,7 @@ def test_GIVEN_a_single_triangle_face_WHEN_creating_vertex_buffer_THEN_output_is
 
     vertex_buffer = create_vertex_buffer(vertices, faces)
 
-    expected_output = itertools.chain.from_iterable([v.xyz_list for v in vertices])
+    expected_output = itertools.chain.from_iterable([v.vector.tolist() for v in vertices])
 
     assert list(vertex_buffer) == list(expected_output)
 

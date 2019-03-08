@@ -190,7 +190,7 @@ def generate_geometry_and_pixel_data(json_component: dict):
                 base_center = vectors[cylinders[0][0]]
                 base_edge = vectors[cylinders[0][1]]
                 top_center = vectors[cylinders[0][2]]
-                assert base_center.xyz_list == [
+                assert base_center.vector.tolist() == [
                     0,
                     0,
                     0,

@@ -158,9 +158,9 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "name": "vertices",
                     "dataset": {"type": "double", "size": [3, 3]},
                     "values": [
-                        geometry.base_center_point.xyz_list,
-                        geometry.base_edge_point.xyz_list,
-                        geometry.top_center_point.xyz_list,
+                        geometry.base_center_point.vector.tolist(),
+                        geometry.base_edge_point.vector.tolist(),
+                        geometry.top_center_point.vector.tolist(),
                     ],
                 },
                 {
@@ -181,7 +181,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "type": "dataset",
                     "name": "vertices",
                     "dataset": {"type": "double", "size": [len(geometry.vertices), 3]},
-                    "values": [vertex.xyz_list for vertex in geometry.vertices],
+                    "values": [vertex.vector.tolist() for vertex in geometry.vertices],
                 },
                 {
                     "type": "dataset",
