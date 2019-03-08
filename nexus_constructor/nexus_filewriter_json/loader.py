@@ -196,8 +196,8 @@ def generate_geometry_and_pixel_data(json_component: dict):
                     0,
                     0,
                 ), "Cylindrical geometry requires a center at its origin"
-                radius = base_edge.magnitude
-                height = top_center.magnitude
+                radius = base_edge.length()
+                height = top_center.length()
 
                 geometry = CylindricalGeometry(
                     axis_direction=top_center, radius=radius, height=height
