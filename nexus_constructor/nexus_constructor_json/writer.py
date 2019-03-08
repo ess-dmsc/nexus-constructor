@@ -167,9 +167,9 @@ def build_geometry_dictionary(geometry: Geometry):
                 "z": geometry.base_center_point.z(),
             },
             "base_edge": {
-                "x": geometry.base_edge_point.x,
-                "y": geometry.base_edge_point.y,
-                "z": geometry.base_edge_point.z,
+                "x": geometry.base_edge_point.x(),
+                "y": geometry.base_edge_point.y(),
+                "z": geometry.base_edge_point.z(),
             },
             "top_center": {
                 "x": geometry.top_center_point.x,

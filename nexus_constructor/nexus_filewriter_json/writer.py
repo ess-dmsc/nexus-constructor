@@ -159,7 +159,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "dataset": {"type": "double", "size": [3, 3]},
                     "values": [
                         geometry.base_center_point.toTuple(),
-                        geometry.base_edge_point.vector.tolist(),
+                        geometry.base_edge_point.toTuple(),
                         geometry.top_center_point.vector.tolist(),
                     ],
                 },
