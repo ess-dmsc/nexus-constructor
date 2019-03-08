@@ -12,6 +12,9 @@ def validate_nonzero_vector(instance, attribute, value):
     if value.x == 0 and value.y == 0 and value.z == 0:
         raise ValueError("Vector is zero length")
 
+def validate_nonzero_qvector(instance, attribute, value):
+    if value.x() == 0 and value.y() == 0 and value.z() == 0:
+        raise ValueError("Vector is zero length")
 
 def validate_list_contains_transformations(instance, attribute, value):
     for item in value:
@@ -85,7 +88,7 @@ class CylindricalGeometry(Geometry):
 
     units = attr.ib(default="m", type=str)
     axis_direction = attr.ib(
-        factory=lambda: QVector3D(1, 0, 0), type=QVector3D, validator=validate_nonzero_vector
+        factory=lambda: QVector3D(1, 0, 0), type=QVector3D, validator=validate_nonzero_qvector
     )
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
@@ -107,7 +110,7 @@ class CylindricalGeometry(Geometry):
     def top_center_point(self):
         values = [
             x * self.height * calculate_unit_conversion_factor(self.units)
-            for x in self.axis_direction.normalized()
+            for x in self.axis_direction.normalized().toTuple()
         ]
         return Vector(values[0], values[1], values[2])
 
