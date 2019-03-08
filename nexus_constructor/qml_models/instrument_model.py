@@ -67,14 +67,14 @@ class InstrumentModel(QAbstractListModel):
                 name="Sample",
                 geometry=OFFGeometry(
                     vertices=[
-                        QVector(x=-0.5, y=-0.5, z=0.5),
-                        Vector(x=0.5, y=-0.5, z=0.5),
-                        Vector(x=-0.5, y=0.5, z=0.5),
-                        Vector(x=0.5, y=0.5, z=0.5),
-                        Vector(x=-0.5, y=0.5, z=-0.5),
-                        Vector(x=0.5, y=0.5, z=-0.5),
-                        Vector(x=-0.5, y=-0.5, z=-0.5),
-                        Vector(x=0.5, y=-0.5, z=-0.5),
+                        QVector3D(x=-0.5, y=-0.5, z=0.5),
+                        QVector3D(x=0.5, y=-0.5, z=0.5),
+                        QVector3D(x=-0.5, y=0.5, z=0.5),
+                        QVector3D(x=0.5, y=0.5, z=0.5),
+                        QVector3D(x=-0.5, y=0.5, z=-0.5),
+                        QVector3D(x=0.5, y=0.5, z=-0.5),
+                        QVector3D(x=-0.5, y=-0.5, z=-0.5),
+                        QVector3D(x=0.5, y=-0.5, z=-0.5),
                     ],
                     faces=[
                         [0, 1, 3, 2],
