@@ -91,7 +91,9 @@ class CylindricalGeometry(Geometry):
 
     units = attr.ib(default="m", type=str)
     axis_direction = attr.ib(
-        factory=lambda: QVector3D(1, 0, 0), type=QVector3D, validator=validate_nonzero_qvector
+        factory=lambda: QVector3D(1, 0, 0),
+        type=QVector3D,
+        validator=validate_nonzero_qvector,
     )
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
@@ -103,12 +105,18 @@ class CylindricalGeometry(Geometry):
     @property
     def base_edge_point(self):
         # rotate a point on the edge of a Z axis aligned cylinder by the rotation matrix
-        return QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0) \
+        return (
+            QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0)
             * self.rotation_matrix
+        )
 
     @property
     def top_center_point(self):
-        return self.axis_direction.normalized() * self.height * calculate_unit_conversion_factor(self.units)
+        return (
+            self.axis_direction.normalized()
+            * self.height
+            * calculate_unit_conversion_factor(self.units)
+        )
 
     def as_off_geometry(self, steps=20):
 
