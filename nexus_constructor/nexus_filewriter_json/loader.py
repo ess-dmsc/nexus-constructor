@@ -19,6 +19,7 @@ from nexus_constructor.data_model import (
 )
 from nexus_constructor.nexus import NexusEncoder, NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
+from PySide2.QtGui import QVector3D
 
 
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
@@ -181,7 +182,7 @@ def generate_geometry_and_pixel_data(json_component: dict):
                 for subchild in child["children"]:
                     if subchild["name"] == "vertices":
                         for vertex in subchild["values"]:
-                            vectors.append(Vector(vertex[0], vertex[1], vertex[2]))
+                            vectors.append(QVector3D(vertex[0], vertex[1], vertex[2]))
                     elif subchild["name"] == "cylinders":
                         cylinders = subchild["values"]
                 assert (
@@ -190,11 +191,11 @@ def generate_geometry_and_pixel_data(json_component: dict):
                 base_center = vectors[cylinders[0][0]]
                 base_edge = vectors[cylinders[0][1]]
                 top_center = vectors[cylinders[0][2]]
-                assert base_center.vector.tolist() == [
+                assert base_center.toTuple() == (
                     0,
                     0,
                     0,
-                ], "Cylindrical geometry requires a center at its origin"
+                ), "Cylindrical geometry requires a center at its origin"
                 radius = base_edge.magnitude
                 height = top_center.magnitude
 
