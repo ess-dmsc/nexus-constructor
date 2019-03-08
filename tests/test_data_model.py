@@ -10,7 +10,7 @@ def test_x_axis_aligned_cylindrical_geometry_points():
         axis_direction=QVector3D(1, 0, 0), height=height, radius=radius, units="m"
     )
 
-    assert cylinder.base_center_point == Vector(0, 0, 0)
+    assert cylinder.base_center_point == QVector3D(0, 0, 0)
 
     assert cylinder.base_edge_point.x == approx(0)
     assert cylinder.base_edge_point.y ** 2 + cylinder.base_edge_point.z ** 2 == approx(
@@ -29,7 +29,7 @@ def test_y_axis_aligned_cylindrical_geometry_points():
         axis_direction=QVector3D(0, 1, 0), height=height, radius=radius, units="m"
     )
 
-    assert cylinder.base_center_point == Vector(0, 0, 0)
+    assert cylinder.base_center_point == QVector3D(0, 0, 0)
 
     assert cylinder.base_edge_point.y == approx(0)
     assert cylinder.base_edge_point.x ** 2 + cylinder.base_edge_point.z ** 2 == approx(
@@ -48,7 +48,7 @@ def test_z_axis_aligned_cylindrical_geometry_points():
         axis_direction=QVector3D(0, 0, 1), height=height, radius=radius, units="m"
     )
 
-    assert cylinder.base_center_point == Vector(0, 0, 0)
+    assert cylinder.base_center_point == QVector3D(0, 0, 0)
 
     assert cylinder.base_edge_point.z == approx(0)
     assert cylinder.base_edge_point.x ** 2 + cylinder.base_edge_point.y ** 2 == approx(

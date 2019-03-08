@@ -98,7 +98,7 @@ class CylindricalGeometry(Geometry):
 
     @property
     def base_center_point(self):
-        return Vector(0, 0, 0)
+        return QVector3D(0, 0, 0)
 
     @property
     def base_edge_point(self):

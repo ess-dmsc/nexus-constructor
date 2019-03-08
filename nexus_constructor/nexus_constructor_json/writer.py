@@ -162,9 +162,9 @@ def build_geometry_dictionary(geometry: Geometry):
         data = {
             "type": "Cylinder",
             "base_center": {
-                "x": geometry.base_center_point.x,
-                "y": geometry.base_center_point.y,
-                "z": geometry.base_center_point.z,
+                "x": geometry.base_center_point.x(),
+                "y": geometry.base_center_point.y(),
+                "z": geometry.base_center_point.z(),
             },
             "base_edge": {
                 "x": geometry.base_edge_point.x,
