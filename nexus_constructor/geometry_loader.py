@@ -70,7 +70,7 @@ def load_stl_geometry(
     mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
     # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
     geometry.vertices = [
-        Vector(
+        QVector3D(
             float(corner[0]) * mult_factor,
             float(corner[1]) * mult_factor,
             float(corner[2]) * mult_factor,

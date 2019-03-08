@@ -62,14 +62,14 @@ def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
 
 def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
     length = 30
-    left_lower_rear = Vector(0, 0, 0)
-    right_lower_rear = Vector(length, 0, 0)
-    left_upper_rear = Vector(0, length, 0)
-    right_upper_rear = Vector(length, length, 0)
-    left_lower_front = Vector(0, 0, length)
-    right_lower_front = Vector(length, 0, length)
-    left_upper_front = Vector(0, length, length)
-    right_upper_front = Vector(length, length, length)
+    left_lower_rear = QVector3D(0, 0, 0)
+    right_lower_rear = QVector3D(length, 0, 0)
+    left_upper_rear = QVector3D(0, length, 0)
+    right_upper_rear = QVector3D(length, length, 0)
+    left_lower_front = QVector3D(0, 0, length)
+    right_lower_front = QVector3D(length, 0, length)
+    left_upper_front = QVector3D(0, length, length)
+    right_upper_front = QVector3D(length, length, length)
     # faces on a cube with a right hand winding order
     faces = [
         [

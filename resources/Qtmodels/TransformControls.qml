@@ -50,6 +50,7 @@ Item {
             if(acceptableInput){
                 transform_parent_index = model.source_index(currentIndex)
             } else {
+                system.log(model)
                 currentIndex = (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
             }
         }
