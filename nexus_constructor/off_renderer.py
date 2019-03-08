@@ -106,6 +106,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
             faces = model.faces
             vertices = model.vertices
 
+
         vertex_buffer_values = list(create_vertex_buffer(vertices, faces))
         normal_buffer_values = create_normal_buffer(vertices, faces)
 
@@ -151,6 +152,8 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                     ]
                     for face in model.faces
                 ]
+                print(col)
+                print(row)
                 vertices += [
                     QVector3D(
                         vec.x() + (col * grid.col_width),
@@ -159,6 +162,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                     )
                     for vec in model.vertices
                 ]
+
         return faces, vertices
 
 
@@ -180,3 +184,4 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
         self.setPrimitiveType(Qt3DRender.QGeometryRenderer.Triangles)
         self.setGeometry(qt_geometry)
         self.setVertexCount(qt_geometry.vertex_count)
+

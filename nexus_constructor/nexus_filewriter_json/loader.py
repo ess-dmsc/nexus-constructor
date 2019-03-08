@@ -211,6 +211,7 @@ def generate_geometry_and_pixel_data(json_component: dict):
                     if subchild["name"] == "vertices":
                         vertices = []
                         for vertex in subchild["values"]:
+                            # print(vertex)
                             vertices.append(QVector3D(vertex[0], vertex[1], vertex[2]))
                     elif subchild["name"] == "winding_order":
                         winding_order = subchild["values"]

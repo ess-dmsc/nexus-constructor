@@ -67,14 +67,14 @@ class InstrumentModel(QAbstractListModel):
                 name="Sample",
                 geometry=OFFGeometry(
                     vertices=[
-                        QVector3D(x=-0.5, y=-0.5, z=0.5),
-                        QVector3D(x=0.5, y=-0.5, z=0.5),
-                        QVector3D(x=-0.5, y=0.5, z=0.5),
-                        QVector3D(x=0.5, y=0.5, z=0.5),
-                        QVector3D(x=-0.5, y=0.5, z=-0.5),
-                        QVector3D(x=0.5, y=0.5, z=-0.5),
-                        QVector3D(x=-0.5, y=-0.5, z=-0.5),
-                        QVector3D(x=0.5, y=-0.5, z=-0.5),
+                        QVector3D(-0.5, -0.5, 0.5),
+                        QVector3D(0.5, -0.5, 0.5),
+                        QVector3D(-0.5, 0.5, 0.5),
+                        QVector3D(0.5, 0.5, 0.5),
+                        QVector3D(-0.5, 0.5, -0.5),
+                        QVector3D(0.5, 0.5, -0.5),
+                        QVector3D(-0.5, -0.5, -0.5),
+                        QVector3D(0.5, -0.5, -0.5),
                     ],
                     faces=[
                         [0, 1, 3, 2],
@@ -87,6 +87,7 @@ class InstrumentModel(QAbstractListModel):
                 ),
             )
         ]
+        print(self.components)
         self.transform_models = [
             TransformationModel(component.transforms) for component in self.components
         ]
@@ -95,8 +96,10 @@ class InstrumentModel(QAbstractListModel):
         return len(self.components)
 
     def data(self, index, role=Qt.DisplayRole):
+
         row = index.row()
         component = self.components[row]
+        # print(component)
         # lambdas prevent calculated properties from being generated each time any property is retrieved
         accessors = {
             InstrumentModel.NameRole: lambda: component.name,
@@ -308,6 +311,7 @@ class InstrumentModel(QAbstractListModel):
         if isinstance(component.geometry, CylindricalGeometry):
             geometry = component.geometry.as_off_geometry()
         elif isinstance(component.geometry, OFFGeometry):
+
             geometry = component.geometry
         else:
             return
