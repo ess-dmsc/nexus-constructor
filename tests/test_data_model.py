@@ -1,4 +1,4 @@
-from nexus_constructor.data_model import CylindricalGeometry, Vector
+from nexus_constructor.data_model import CylindricalGeometry
 from pytest import approx, raises
 from PySide2.QtGui import QVector3D
 
