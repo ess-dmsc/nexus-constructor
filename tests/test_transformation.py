@@ -25,7 +25,7 @@ def test_GIVEN_name_WHEN_creating_rotation_THEN_group_and_class_is_created_corre
     transformation = Rotation(0, axis=Vector(1, 0, 0), name=name)
     dataset = transformation.nexus_file.get(name)
     assert dataset.name[1:] == name
-    assert dataset.attrs["NX_class"] == "NXtransformation"
+    assert dataset.attrs["NX_class"] == "NXtransformations"
 
 
 def test_GIVEN_name_WHEN_creating_translation_THEN_group_and_class_is_created_correctly():
@@ -34,7 +34,7 @@ def test_GIVEN_name_WHEN_creating_translation_THEN_group_and_class_is_created_co
     transformation = Translation(vector=Vector(1, 0, 0), name=name)
     dataset = transformation.nexus_file.get(name)
     assert dataset.name[1:] == name
-    assert dataset.attrs["NX_class"] == "NXtransformation"
+    assert dataset.attrs["NX_class"] == "NXtransformations"
 
 
 def test_GIVEN_vector_WHEN_creating_translation_THEN_translation_is_set_correctly():
