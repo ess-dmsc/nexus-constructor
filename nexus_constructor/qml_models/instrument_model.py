@@ -86,7 +86,6 @@ class InstrumentModel(QAbstractListModel):
                 ),
             )
         ]
-        print(self.components)
         self.transform_models = [
             TransformationModel(component.transforms) for component in self.components
         ]
