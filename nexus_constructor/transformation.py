@@ -1,6 +1,5 @@
 import h5py
 from nexus_constructor.vector import Vector
-from abc import ABC, abstractmethod
 
 
 class Transformation:
