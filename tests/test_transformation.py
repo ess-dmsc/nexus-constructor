@@ -68,6 +68,7 @@ def test_GIVEN_vector_WHEN_creating_translation_THEN_vector_attribute_is_correct
 
 def test_GIVEN_nothing_WHEN_creating_transformation_THEN_fails_due_to_abstract_class():
     from nexus_constructor.transformation import Transformation
+
     try:
         Transformation("")
         assert False
