@@ -163,7 +163,6 @@ class CylindricalGeometry(Geometry):
         :return: A QMatrix4x4 describing the rotation from the Z axis to the cylinder's axis
         """
         default_axis = QVector3D(0, 0, 1)
-        # unit_axis = self.axis_direction.unit_list
         desired_axis = self.axis_direction.normalized()
         rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
         rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis))
