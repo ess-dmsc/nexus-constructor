@@ -80,9 +80,7 @@ def create_normal_buffer(vertices, faces):
         # Get the vertices of each triangle
         points = [vertices[p] for p in triangle]
         # Convert our vector objects into Qt Vectors
-        # q_vectors = [QVector3D(*p.vector.tolist()) for p in points]
         # Calculate the normal, leveraging Qt
-        # normal = QVector3D.normal(*q_vectors)
         normal = QVector3D.normal(*points)
         # Need to have a normal for each vector
         normal_buffer_values.extend(normal.toTuple() * 3)
