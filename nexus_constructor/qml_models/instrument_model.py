@@ -98,7 +98,6 @@ class InstrumentModel(QAbstractListModel):
 
         row = index.row()
         component = self.components[row]
-        # print(component)
         # lambdas prevent calculated properties from being generated each time any property is retrieved
         accessors = {
             InstrumentModel.NameRole: lambda: component.name,
