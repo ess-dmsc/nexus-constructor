@@ -67,6 +67,12 @@ Pane {
             anchors.bottom: parent.bottom
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+
+            ScrollBar.vertical: ScrollBar {
+                // policy: ScrollBar.AlwaysOn
+                policy:  componentListView.contentHeight > componentListView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+
+            }
         }
     }
 
