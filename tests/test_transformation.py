@@ -64,3 +64,12 @@ def test_GIVEN_vector_WHEN_creating_translation_THEN_vector_attribute_is_correct
     vector = Vector(1, 1, 1)
     transformation = Translation(name, vector)
     transformation.nexus_file.get(name).attrs["vector"] == vector.xyz_list
+
+
+def test_GIVEN_nothing_WHEN_creating_transformation_THEN_fails_due_to_abstract_class():
+    from nexus_constructor.transformation import Transformation
+    try:
+        Transformation("")
+        assert False
+    except TypeError:
+        assert True
