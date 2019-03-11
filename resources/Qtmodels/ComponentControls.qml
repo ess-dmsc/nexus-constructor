@@ -53,9 +53,10 @@ Pane {
     Frame {
         id: listContainer
         anchors.left: parent.left
-        anchors.right: parent.right
-        contentWidth: componentListView.implicitWidth
+        // anchors.right: bar.left
+        // contentWidth: componentListView.implicitWidth
         contentHeight: 100
+        width: ComponentList.showScrollBar ? componentListView.implicitWidth - 20 : componentListView.implicitWidth
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
         padding: 1
@@ -69,9 +70,18 @@ Pane {
             boundsBehavior: Flickable.StopAtBounds
 
             ScrollBar.vertical: ScrollBar {
-                // policy: ScrollBar.AlwaysOn
+                id: bar
                 policy:  componentListView.contentHeight > componentListView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
 
+            }
+
+            onContentHeightChanged: {
+                if (componentListView.contentHeight > componentListView.height) {
+                    ComponentList.showScrollBar = true
+                }
+                else {
+                    ComponentList.showScrollBar = false
+                }
             }
         }
     }
