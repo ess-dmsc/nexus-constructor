@@ -149,8 +149,6 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                     ]
                     for face in model.faces
                 ]
-                print(col)
-                print(row)
                 vertices += [
                     QVector3D(
                         vec.x() + (col * grid.col_width),
