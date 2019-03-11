@@ -53,13 +53,12 @@ Pane {
     Frame {
         id: listContainer
         anchors.left: parent.left
-        // anchors.right: bar.left
-        // contentWidth: componentListView.implicitWidth
         contentHeight: 100
         width: ComponentList.showScrollBar ? componentListView.implicitWidth - 20 : componentListView.implicitWidth
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
         padding: 1
+
         ListView {
             id: componentListView
             model: components
@@ -68,14 +67,15 @@ Pane {
             anchors.bottom: parent.bottom
             clip: true
             boundsBehavior: Flickable.StopAtBounds
-
-            ScrollBar.vertical: ScrollBar {
-                id: bar
-                policy:  componentListView.contentHeight > componentListView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-
-            }
+            ScrollBar.vertical:           ScrollBar  {
+            id: bar
+            policy: ComponentList.showScrollBar ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            active: true
+        }
 
             onContentHeightChanged: {
+
+                // Set a bool indicating that the content height in the component view has changed
                 if (componentListView.contentHeight > componentListView.height) {
                     ComponentList.showScrollBar = true
                 }
@@ -84,7 +84,10 @@ Pane {
                 }
             }
         }
+
     }
+
+
 
     Component {
         id: componentDelegate
@@ -93,7 +96,7 @@ Pane {
             padding: 5
             contentHeight: Math.max(mainContent.height, expansionCaret.height)
             contentWidth: Math.max(mainContent.implicitWidth, extendedContent.implicitWidth)
-            width: componentListView.width
+            width: ComponentList.showScrollBar ? componentListView.width - 10 : componentListView.width
 
             onImplicitWidthChanged: {
                 if (componentListView.implicitWidth < componentBox.implicitWidth){

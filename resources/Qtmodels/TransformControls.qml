@@ -114,6 +114,7 @@ Item {
         Frame {
             id: transformBox
             width: transformsListView.width
+            // width: ComponentList.showScrollBar ? transformsListView.width : transformsListView.width - 20
             contentHeight: translatePane.height + rotatePane.height + transformButtons.height
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
 
@@ -254,6 +255,7 @@ Item {
                 anchors.right: parent.right
                 contentWidth: moveUpButton.implicitWidth + moveDownButton.implicitWidth + 10 + deleteButton.implicitWidth
                 contentHeight: moveUpButton.implicitHeight
+                width: transformsListView.width
 
                 PaddedButton {
                     id: moveUpButton
