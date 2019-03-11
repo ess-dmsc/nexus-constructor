@@ -79,33 +79,33 @@ Item {
                 rings: 2
             }
 
-            // cylinder mesh axis is y alligned, origin in center
+            // cylinder mesh axis is y aligned, origin in center
             Transform {
                 id: xTransform
                 matrix: {
-                    var m = Qt.matrix4x4()
-                    m.rotate(270.0, Qt.vector3d(0,0,1))
-                    m.translate(Qt.vector3d(0, 0.5, 0))
-                    return m;
+                    var matrix = Qt.matrix4x4()
+                    matrix.rotate(270.0, Qt.vector3d(0,0,1))
+                    matrix.translate(Qt.vector3d(0, 0.5, 0))
+                    return matrix;
                 }
             }
 
             Transform {
                 id: yTransform
                 matrix: {
-                    var m = Qt.matrix4x4()
-                    m.translate(Qt.vector3d(0, 0.5, 0))
-                    return m;
+                    var matrix = Qt.matrix4x4()
+                    matrix.translate(Qt.vector3d(0, 0.5, 0))
+                    return matrix;
                 }
             }
 
             Transform {
                 id: zTransform
                 matrix: {
-                    var m = Qt.matrix4x4()
-                    m.rotate(90.0, Qt.vector3d(1,0,0))
-                    m.translate(Qt.vector3d(0, 0.5, 0))
-                    return m;
+                    var matrix = Qt.matrix4x4()
+                    matrix.rotate(90.0, Qt.vector3d(1,0,0))
+                    matrix.translate(Qt.vector3d(0, 0.5, 0))
+                    return matrix;
                 }
             }
 
