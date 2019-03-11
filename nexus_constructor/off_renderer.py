@@ -6,7 +6,7 @@ and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
 
-from nexus_constructor.data_model import OFFGeometry, PixelData, PixelGrid, Vector
+from nexus_constructor.data_model import OFFGeometry, PixelData, PixelGrid
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct
@@ -106,7 +106,6 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
             faces = model.faces
             vertices = model.vertices
 
-
         vertex_buffer_values = list(create_vertex_buffer(vertices, faces))
         normal_buffer_values = create_normal_buffer(vertices, faces)
 
@@ -184,4 +183,3 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
         self.setPrimitiveType(Qt3DRender.QGeometryRenderer.Triangles)
         self.setGeometry(qt_geometry)
         self.setVertexCount(qt_geometry.vertex_count)
-

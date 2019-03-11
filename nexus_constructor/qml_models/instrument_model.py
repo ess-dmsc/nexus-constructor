@@ -2,7 +2,6 @@ from nexus_constructor.data_model import (
     ComponentType,
     PixelGrid,
     PixelMapping,
-    Vector,
     CylindricalGeometry,
     OFFGeometry,
     Component,
