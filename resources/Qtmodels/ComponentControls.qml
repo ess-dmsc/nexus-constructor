@@ -66,6 +66,7 @@ Pane {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             clip: true
+            boundsBehavior: Flickable.StopAtBounds
         }
     }
 
