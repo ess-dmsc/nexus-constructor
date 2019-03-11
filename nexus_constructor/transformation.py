@@ -3,12 +3,11 @@ from nexus_constructor.vector import Vector
 from abc import ABC, abstractmethod
 
 
-class Transformation(ABC):
+class Transformation:
     """
     Parent class for transformations on the model.
     """
 
-    @abstractmethod
     def __init__(self, name):
         """
         Creates an in-memory nexus file with a named entry containing an NXTransformation attribute.
@@ -16,7 +15,7 @@ class Transformation(ABC):
         """
         self.nexus_file = h5py.File(name, driver="core", backing_store=False)
         self.transformation = self.nexus_file.create_group(name)
-        self.transformation.attrs["NX_class"] = "NXtransformation"
+        self.transformation.attrs["NX_class"] = "NXtransformations"
 
     @property
     def name(self):
