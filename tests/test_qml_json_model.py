@@ -1,4 +1,4 @@
-from geometry_constructor.qml_models.json_model import JsonModel, FilteredJsonModel
+from nexus_constructor.qml_models.json_model import JsonModel, FilteredJsonModel
 
 
 def read_json():
@@ -6,9 +6,9 @@ def read_json():
     Reads the test data from json files
     :return: a string containing the sample json, and a list of lines for its formatted form
     """
-    with open('tests/sample.json', mode='r') as file:
+    with open("tests/sample.json", mode="r") as file:
         data = file.read()
-    with open('tests/formatted sample.json', mode='r') as file:
+    with open("tests/formatted_sample.json", mode="r") as file:
         formatted_lines = file.read().splitlines()
     return data, formatted_lines
 
@@ -18,7 +18,7 @@ def read_collapsed_data():
     Reads the expected collapsed lines for a model based on the sample json data
     :return: a list of strings containing the collapsed lines
     """
-    with open('tests/collapsed lines.txt') as file:
+    with open("tests/collapsed_lines.txt") as file:
         return file.read().splitlines()
 
 
@@ -65,7 +65,7 @@ def test_collapse_model_root():
 
     # Collapse the first item in the model, the objects opening bracket, filtering out all other items
     model.setData(starting_index, True, JsonModel.CollapsedRole)
-    check_model_contents(model, ['{'])
+    check_model_contents(model, ["{"])
 
     # Un-collapse it, restoring the other items
     model.setData(starting_index, False, JsonModel.CollapsedRole)

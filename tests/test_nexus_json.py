@@ -1,5 +1,5 @@
-import geometry_constructor.nexus_filewriter_json as nf_json
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+import nexus_constructor.nexus_filewriter_json as nf_json
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from tests.test_json import build_sample_model
 import json
 from numbers import Number
@@ -11,7 +11,7 @@ def test_nexus_json_generation_and_loading_is_consistent():
     The process of going from data_model classes to FileWriter/NeXus format is slightly lossy
     For instance, data_model can work with no selected transform in the parent, but FileWriter requires it explicitly.
     Certain properties also require floating point calculations to be performed, resulting in some slight variation.
-    These mean we can't just save a model, load it, and compare the two like with geometry_constructor_json.
+    These mean we can't just save a model, load it, and compare the two like with nexus_constructor_json.
 
     This builds a sample instrument, and saves it to json.
     That json is then loaded, saved again, and the initial json compared to this new json.
@@ -23,7 +23,9 @@ def test_nexus_json_generation_and_loading_is_consistent():
     json_string = nf_json.generate_json(instrument_model)
 
     loader_model = InstrumentModel()
-    nf_json.load_json_object_into_instrument_model(json.loads(json_string), loader_model)
+    nf_json.load_json_object_into_instrument_model(
+        json.loads(json_string), loader_model
+    )
 
     loaded_json = nf_json.generate_json(loader_model)
 

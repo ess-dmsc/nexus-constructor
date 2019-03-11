@@ -1,5 +1,5 @@
-from geometry_constructor import data_model
-from geometry_constructor.qml_models.instrument_model import InstrumentModel
+from nexus_constructor import data_model
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
@@ -11,15 +11,15 @@ def test_initialise_model():
 
 def test_add_component():
     model = InstrumentModel()
-    model.add_component('Detector', 'My Detector')
+    model.add_component("Detector", "My Detector")
     assert model.rowCount() == 2
     assert model.components[1].component_type == data_model.ComponentType.DETECTOR
-    assert model.components[1].name == 'My Detector'
+    assert model.components[1].name == "My Detector"
 
 
 def test_remove_component():
     model = InstrumentModel()
-    model.add_component('Detector', 'My Detector')
+    model.add_component("Detector", "My Detector")
     model.remove_component(1)
     assert model.rowCount() == 1
     assert not model.components[0].component_type == data_model.ComponentType.DETECTOR
@@ -31,11 +31,16 @@ def test_remove_component():
 
 def test_replace_contents():
     model = InstrumentModel()
-    replacement_data = [data_model.Component(component_type=data_model.ComponentType.SAMPLE,
-                                             name='Replacement sample'),
-                        data_model.Component(component_type=data_model.ComponentType.DETECTOR,
-                                             name='Replacement Detector',
-                                             geometry=data_model.OFFGeometry())]
+    replacement_data = [
+        data_model.Component(
+            component_type=data_model.ComponentType.SAMPLE, name="Replacement sample"
+        ),
+        data_model.Component(
+            component_type=data_model.ComponentType.DETECTOR,
+            name="Replacement Detector",
+            geometry=data_model.OFFGeometry(),
+        ),
+    ]
     model.replace_contents(replacement_data)
     assert model.rowCount() == 2
     assert model.components == replacement_data
@@ -44,21 +49,33 @@ def test_replace_contents():
 def test_generate_component_name():
     model = InstrumentModel()
     model.components = [
-        data_model.Component(component_type=data_model.ComponentType.SAMPLE, name='Sample'),
-        data_model.Component(component_type=data_model.ComponentType.SAMPLE, name='Detector'),
-        data_model.Component(component_type=data_model.ComponentType.SAMPLE, name='Detector3'),
-        data_model.Component(component_type=data_model.ComponentType.SAMPLE, name='Magnet2'),
+        data_model.Component(
+            component_type=data_model.ComponentType.SAMPLE, name="Sample"
+        ),
+        data_model.Component(
+            component_type=data_model.ComponentType.SAMPLE, name="Detector"
+        ),
+        data_model.Component(
+            component_type=data_model.ComponentType.SAMPLE, name="Detector3"
+        ),
+        data_model.Component(
+            component_type=data_model.ComponentType.SAMPLE, name="Magnet2"
+        ),
     ]
-    assert model.generate_component_name('Sample') == 'Sample1'
-    assert model.generate_component_name('Detector') == 'Detector4'
-    assert model.generate_component_name('Magnet') == 'Magnet'
-    assert model.generate_component_name('BeamGuide') == 'BeamGuide'
+    assert model.generate_component_name("Sample") == "Sample1"
+    assert model.generate_component_name("Detector") == "Detector4"
+    assert model.generate_component_name("Magnet") == "Magnet"
+    assert model.generate_component_name("BeamGuide") == "BeamGuide"
 
 
 def test_is_removable():
     model = InstrumentModel()
-    model.components = [data_model.Component(component_type=data_model.ComponentType.SAMPLE,
-                                             name=str(i)) for i in range(4)]
+    model.components = [
+        data_model.Component(
+            component_type=data_model.ComponentType.SAMPLE, name=str(i)
+        )
+        for i in range(4)
+    ]
     model.components[0].transform_parent = model.components[0]
     model.components[1].transform_parent = model.components[0]
     model.components[2].transform_parent = model.components[1]
@@ -74,45 +91,47 @@ def test_determine_geometry_state_produces_expected_strings():
     # geometry state should be independent of component type
     for component_type in data_model.ComponentType:
         components = [
-            data_model.Component(component_type=component_type,
-                                 name='',
-                                 geometry=data_model.CylindricalGeometry()),
-            data_model.Component(component_type=component_type,
-                                 name='',
-                                 geometry=data_model.OFFGeometry()),
-            data_model.Component(component_type=component_type,
-                                 name='',
-                                 geometry=None),
+            data_model.Component(
+                component_type=component_type,
+                name="",
+                geometry=data_model.CylindricalGeometry(),
+            ),
+            data_model.Component(
+                component_type=component_type,
+                name="",
+                geometry=data_model.OFFGeometry(),
+            ),
+            data_model.Component(component_type=component_type, name="", geometry=None),
         ]
-        expected_states = [
-            "Cylinder",
-            "OFF",
-            "",
-        ]
+        expected_states = ["Cylinder", "OFF", ""]
         assert len(components) == len(expected_states)
 
         for i in range(len(components)):
-            assert InstrumentModel.determine_geometry_state(components[i]) == expected_states[i]
+            assert (
+                InstrumentModel.determine_geometry_state(components[i])
+                == expected_states[i]
+            )
 
 
 def test_determine_pixel_state_produces_expected_strings():
     for component_type in data_model.ComponentType:
-        component = data_model.Component(component_type=component_type,
-                                         name='')
+        component = data_model.Component(component_type=component_type, name="")
         if component_type == data_model.ComponentType.DETECTOR:
-            expected_states = ['Mapping', 'Grid']
+            expected_states = ["Mapping", "Grid"]
             pixel_options = [data_model.PixelMapping([]), data_model.PixelGrid()]
         elif component_type == data_model.ComponentType.MONITOR:
-            expected_states = ['SinglePixel']
+            expected_states = ["SinglePixel"]
             pixel_options = [data_model.SinglePixelId(42)]
         else:
-            expected_states = ['']
+            expected_states = [""]
             pixel_options = [None]
 
         assert len(expected_states) == len(pixel_options)
         for i in range(len(pixel_options)):
             component.pixel_data = pixel_options[i]
-            assert InstrumentModel.determine_pixel_state(component) == expected_states[i]
+            assert (
+                InstrumentModel.determine_pixel_state(component) == expected_states[i]
+            )
 
 
 def build_model_with_sample_transforms():
@@ -120,36 +139,50 @@ def build_model_with_sample_transforms():
     instrument.components.append(
         data_model.Component(
             component_type=data_model.ComponentType.DETECTOR,
-            name='detector1',
+            name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
-                data_model.Rotation(name='rotate', axis=data_model.Vector(4, 5, 6), angle=90),
-                data_model.Translation(name='translate', vector=data_model.Vector(1, 2, 3))
-            ]
+                data_model.Rotation(
+                    name="rotate", axis=data_model.Vector(4, 5, 6), angle=90
+                ),
+                data_model.Translation(
+                    name="translate", vector=data_model.Vector(1, 2, 3)
+                ),
+            ],
         )
     )
     instrument.components.append(
         data_model.Component(
             component_type=data_model.ComponentType.DETECTOR,
-            name='detector2',
+            name="detector2",
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
             transforms=[
-                data_model.Translation(name='translate', vector=data_model.Vector(1, 2, 3)),
-                data_model.Rotation(name='rotate', axis=data_model.Vector(4, 5, 6), angle=90)
-            ]
+                data_model.Translation(
+                    name="translate", vector=data_model.Vector(1, 2, 3)
+                ),
+                data_model.Rotation(
+                    name="rotate", axis=data_model.Vector(4, 5, 6), angle=90
+                ),
+            ],
         )
     )
     instrument.components.append(
         data_model.Component(
             component_type=data_model.ComponentType.DETECTOR,
-            name='detector3',
+            name="detector3",
             transform_parent=instrument.components[1],
             transforms=[
-                data_model.Rotation(name='rotate', axis=data_model.Vector(4, 5, 6), angle=90),
-                data_model.Translation(name='translate', vector=data_model.Vector(1, 2, 3)),
-                data_model.Translation(name='translate2', vector=data_model.Vector(1, 2, 3))
-            ]
+                data_model.Rotation(
+                    name="rotate", axis=data_model.Vector(4, 5, 6), angle=90
+                ),
+                data_model.Translation(
+                    name="translate", vector=data_model.Vector(1, 2, 3)
+                ),
+                data_model.Translation(
+                    name="translate2", vector=data_model.Vector(1, 2, 3)
+                ),
+            ],
         )
     )
     # Use replace_contents to build the required transform models
@@ -161,15 +194,12 @@ def test_generate_matrix_combines_dependent_transforms():
     instrument = build_model_with_sample_transforms()
 
     def rotate_matrix(matrix: QMatrix4x4, rotate: data_model.Rotation):
-        matrix.rotate(rotate.angle,
-                      QVector3D(rotate.axis.x,
-                                rotate.axis.y,
-                                rotate.axis.z))
+        matrix.rotate(
+            rotate.angle, QVector3D(rotate.axis.x, rotate.axis.y, rotate.axis.z)
+        )
 
     def translate_matrix(matrix: QMatrix4x4, translate: data_model.Translation):
-        matrix.translate(translate.vector.x,
-                         translate.vector.y,
-                         translate.vector.z)
+        matrix.translate(translate.vector.x, translate.vector.y, translate.vector.z)
 
     target_matrix = QMatrix4x4()
     assert instrument.generate_matrix(instrument.components[0]) == target_matrix

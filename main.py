@@ -1,11 +1,11 @@
 """
-Entry script for the nexus geometry constructor application.
+Entry script for the nexus constructor application.
 Requires Python 3.5+
 """
 
 import sys
 from os import path, environ
-from geometry_constructor.application import Application
+from nexus_constructor.application import Application
 from PySide2.QtGui import QGuiApplication
 
 
@@ -15,6 +15,10 @@ resource_folder = path.join(path.dirname(location), 'resources')
 environ['QT_QUICK_CONTROLS_CONF'] = path.join(resource_folder, 'qtquickcontrols2.conf')
 
 app = QGuiApplication(sys.argv)
+
+# Non-blank name and organisation name are required by DefaultFileDialog
+app.setOrganizationName("name")
+app.setOrganizationDomain("domain")
 
 window = Application(resource_folder)
 
