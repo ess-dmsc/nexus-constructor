@@ -57,7 +57,7 @@ Pane {
         width: ComponentList.showScrollBar ? componentListView.implicitWidth - 10 : componentListView.implicitWidth
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
-        padding: 1
+        padding: 3
 
         ListView {
             id: componentListView
