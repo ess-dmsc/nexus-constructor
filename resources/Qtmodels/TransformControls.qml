@@ -126,11 +126,11 @@ Item {
             }
 
             Pane {
+
+                property var paneWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
                 id: translatePane
-                // contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
-                width: transformsListView.width
+                contentWidth: ComponentList.showScrollBar ? paneWidth - 20 : paneWidth
                 contentHeight: translateNameField.height + xField.height
-                property var fieldWidth: 5
                 padding: 0
 
 
