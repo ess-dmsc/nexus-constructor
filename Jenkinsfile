@@ -44,7 +44,8 @@ node("docker") {
                               
         stage("Check formatting") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
-                ls ${project}
+                cd ${project}
+                build_env/bin/python -m black . --check --exclude ./build_env/
             \""""
                               }
 
