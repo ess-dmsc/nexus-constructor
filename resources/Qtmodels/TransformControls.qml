@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
+import QtQuick.Layouts 1.11
 
 /*
  * Controls for defining a components transformation to detector space.
@@ -129,62 +130,64 @@ Item {
 
                 property var paneWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
                 id: translatePane
-                contentWidth: ComponentList.showScrollBar ? paneWidth - 20 : paneWidth
+                contentWidth: ComponentList.showScrollBar ? paneWidth - 15 : paneWidth
                 contentHeight: translateNameField.height + xField.height
                 padding: 0
 
+                ColumnLayout {
 
-                Label {
-                    id: translateLabel
-                    anchors.verticalCenter: translateNameField.verticalCenter
-                    anchors.left: parent.left
-                    text: "Translation"
-                }
-                LabeledTextField {
-                    id: translateNameField
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.left: yField.left
-                    anchoredEditor: true
-                    labelText: "Name: "
-                    editorText: name
-                    onEditingFinished: name = editorText
-                    validator: NameValidator {
-                        model: transformModel
-                        myindex: index
-                        onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                    Layout.fillHeight: true
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Label {
+                            id: translateLabel
+                            Layout.alignment: Qt.AlignLeft
+                            text: "Translation"
+                        }
+                        LabeledTextField {
+                            id: translateNameField
+                            Layout.alignment: Qt.AlignLeft
+                            anchoredEditor: true
+                            labelText: "Name: "
+                            editorText: name
+                            onEditingFinished: name = editorText
+                            validator: NameValidator {
+                                model: transformModel
+                                myindex: index
+                                onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                            }
+                        }
                     }
-                }
-
-                LabeledTextField {
-                    id: xField
-                    anchors.top: translateNameField.bottom
-                    anchors.left: parent.left
-                    labelText: "x:"
-                    editorText: translate_x
-                    validator: numberValidator
-                    onEditingFinished: translate_x = parseFloat(editorText)
-                    width: parent.fieldWidth
-                }
-                LabeledTextField {
-                    id: yField
-                    anchors.top: xField.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    labelText: "y:"
-                    editorText: translate_y
-                    validator: numberValidator
-                    onEditingFinished: translate_y = parseFloat(editorText)
-                    width: parent.fieldWidth
-                }
-                LabeledTextField {
-                    id: zField
-                    anchors.top: xField.top
-                    anchors.right: parent.right
-                    labelText: "z:"
-                    editorText: translate_z
-                    validator: numberValidator
-                    onEditingFinished: translate_z = parseFloat(editorText)
-                    width: parent.fieldWidth
+                    RowLayout {
+                        Layout.fillWidth: true
+                        LabeledTextField {
+                            id: xField
+                            Layout.alignment: Qt.AlignLeft
+                            labelText: "x:"
+                            editorText: translate_x
+                            validator: numberValidator
+                            onEditingFinished: translate_x = parseFloat(editorText)
+                            width: parent.fieldWidth
+                        }
+                        LabeledTextField {
+                            id: yField
+                            Layout.alignment: Qt.AlignLeft
+                            labelText: "y:"
+                            editorText: translate_y
+                            validator: numberValidator
+                            onEditingFinished: translate_y = parseFloat(editorText)
+                            width: parent.fieldWidth
+                        }
+                        LabeledTextField {
+                            id: zField
+                            Layout.alignment: Qt.AlignLeft
+                            labelText: "z:"
+                            editorText: translate_z
+                            validator: numberValidator
+                            onEditingFinished: translate_z = parseFloat(editorText)
+                            width: parent.fieldWidth
+                        }
+                    }
                 }
             }
 
