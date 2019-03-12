@@ -40,7 +40,7 @@ Item {
         anchors.top: parent.top
         anchors.left: relativeLabel.right
         anchors.right: parent.right
-        implicitWidth: 250
+        implicitWidth: 230
         // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
         model: (componentIndex == 0) ? components : filteredModel
         textRole: "name"
@@ -111,6 +111,7 @@ Item {
     Component {
         id: transformDelegate
 
+
         Frame {
             id: transformBox
             width: transformsListView.width
@@ -127,8 +128,10 @@ Item {
             Pane {
                 id: translatePane
                 padding: 0
-                contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
+                // contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
+                width: transformsListView.width
                 contentHeight: translateNameField.height + xField.height
+                property var fieldWidth: 5
 
                 Label {
                     id: translateLabel
@@ -160,6 +163,7 @@ Item {
                     editorText: translate_x
                     validator: numberValidator
                     onEditingFinished: translate_x = parseFloat(editorText)
+                    width: parent.fieldWidth
                 }
                 LabeledTextField {
                     id: yField
@@ -169,6 +173,7 @@ Item {
                     editorText: translate_y
                     validator: numberValidator
                     onEditingFinished: translate_y = parseFloat(editorText)
+                    width: parent.fieldWidth
                 }
                 LabeledTextField {
                     id: zField
@@ -178,6 +183,7 @@ Item {
                     editorText: translate_z
                     validator: numberValidator
                     onEditingFinished: translate_z = parseFloat(editorText)
+                    width: parent.fieldWidth
                 }
             }
 
