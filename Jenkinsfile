@@ -45,7 +45,7 @@ node("docker") {
         stage("Check formatting") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
-                build_env/bin/black . --check
+                build_env/bin/python3 -m black . --check
             \""""
                               }
 
