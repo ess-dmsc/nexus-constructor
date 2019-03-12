@@ -1,5 +1,6 @@
 import h5py
 from nexus_constructor.vector import Vector
+from uuid import uuid4
 
 
 class Transformation:
@@ -12,7 +13,8 @@ class Transformation:
         Creates an in-memory nexus file with a named entry containing an NXTransformation attribute.
         :param name: The name of the root entry in the nexus file.
         """
-        self.nexus_file = h5py.File(name, driver="core", backing_store=False)
+        file_name = str(uuid4())
+        self.nexus_file = h5py.File(file_name, driver="core", backing_store=False)
         self.transformation = self.nexus_file.create_group(name)
         self.transformation.attrs["NX_class"] = "NXtransformations"
 

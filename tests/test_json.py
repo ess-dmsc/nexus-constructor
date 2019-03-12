@@ -127,7 +127,6 @@ def build_sample_model():
     return model
 
 
-@pytest.mark.skip(reason="TODO: disabled while changing to nexus model")
 def test_loading_generated_json():
     model = build_sample_model()
 
@@ -143,7 +142,6 @@ def test_loading_generated_json():
     assert model.components == loaded_model.components
 
 
-@pytest.mark.skip(reason="TODO: disabled while changing to nexus model")
 def test_json_schema_compliance():
     with open("Instrument.schema.json") as file:
         schema = json.load(file)

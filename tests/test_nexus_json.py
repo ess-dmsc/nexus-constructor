@@ -6,7 +6,6 @@ from numbers import Number
 from pytest import approx, mark
 
 
-@mark.skip(reason="TODO: disabled while changing to nexus model")
 def test_nexus_json_generation_and_loading_is_consistent():
     """
     The process of going from data_model classes to FileWriter/NeXus format is slightly lossy
