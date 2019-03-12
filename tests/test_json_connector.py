@@ -22,6 +22,7 @@ def test_valid_json_returns_true():
         r"}"
     )
 
+
     assert json_connector.json_string_to_instrument_model(valid_json, model())
 
 
