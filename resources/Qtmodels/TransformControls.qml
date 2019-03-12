@@ -40,7 +40,7 @@ Item {
         anchors.top: parent.top
         anchors.left: relativeLabel.right
         anchors.right: parent.right
-        implicitWidth: 230
+        implicitWidth: 250
         // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
         model: (componentIndex == 0) ? components : filteredModel
         textRole: "name"
@@ -79,7 +79,7 @@ Item {
         contentWidth: transformsListView.implicitWidth
         contentHeight: transformsListView.implicitHeight
         visible: contentHeight > 0
-        padding: 1
+        padding: 0
 
         ListView {
             id: transformsListView
@@ -115,7 +115,6 @@ Item {
         Frame {
             id: transformBox
             width: transformsListView.width
-            // width: ComponentList.showScrollBar ? transformsListView.width : transformsListView.width - 20
             contentHeight: translatePane.height + rotatePane.height + transformButtons.height
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
 
@@ -145,7 +144,7 @@ Item {
                     anchors.right: parent.right
                     anchors.left: yField.left
                     anchoredEditor: true
-                    labelText: "Name:"
+                    labelText: "Name: "
                     editorText: name
                     onEditingFinished: name = editorText
                     validator: NameValidator {
@@ -205,7 +204,7 @@ Item {
                     anchors.right: parent.right
                     anchors.left: yRotField.left
                     anchoredEditor: true
-                    labelText: "Name:"
+                    labelText: "Name: "
                     editorText: name
                     onEditingFinished: name = editorText
                     validator: NameValidator {

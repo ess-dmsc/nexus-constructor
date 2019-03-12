@@ -54,10 +54,9 @@ Pane {
         id: listContainer
         anchors.left: parent.left
         contentHeight: 100
-        width: ComponentList.showScrollBar ? componentListView.implicitWidth - 10 : componentListView.implicitWidth
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
-        padding: 3
+        padding: 0
 
         ListView {
             id: componentListView
@@ -96,7 +95,7 @@ Pane {
             padding: 5
             contentHeight: Math.max(mainContent.height, expansionCaret.height)
             contentWidth: Math.max(mainContent.implicitWidth, extendedContent.implicitWidth)
-            width: ComponentList.showScrollBar ? componentListView.width - 10 : componentListView.width
+            width: ComponentList.showScrollBar ? componentListView.width - 7 : componentListView.width
 
             onImplicitWidthChanged: {
                 if (componentListView.implicitWidth < componentBox.implicitWidth){
@@ -131,7 +130,7 @@ Pane {
                     id: mainNameLabel
                     anchors.left: parent.left
                     anchors.top: parent.top
-                    text: "Name:" + name
+                    text: "Name: " + name
                 }
             }
 
@@ -154,7 +153,7 @@ Pane {
 
                     LabeledTextField {
                         id: nameField
-                        labelText: "Name:"
+                        labelText: "Name: "
                         editorWidth: 200
                         editorText: name
                         onEditingFinished: name = editorText
