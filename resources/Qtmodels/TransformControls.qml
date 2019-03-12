@@ -117,6 +117,7 @@ Item {
             width: transformsListView.width
             contentHeight: translatePane.height + rotatePane.height + transformButtons.height
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
+            // padding: 3
 
             Component.onCompleted: {
                 if (transformsListView.implicitWidth < transformBox.implicitWidth) {
@@ -126,11 +127,12 @@ Item {
 
             Pane {
                 id: translatePane
-                padding: 0
                 // contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
                 width: transformsListView.width
                 contentHeight: translateNameField.height + xField.height
                 property var fieldWidth: 5
+                padding: 0
+
 
                 Label {
                     id: translateLabel

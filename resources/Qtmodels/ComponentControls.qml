@@ -57,6 +57,7 @@ Pane {
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
         padding: 0
+        contentWidth: componentListView.implicitWidth
 
         ListView {
             id: componentListView
@@ -95,7 +96,7 @@ Pane {
             padding: 5
             contentHeight: Math.max(mainContent.height, expansionCaret.height)
             contentWidth: Math.max(mainContent.implicitWidth, extendedContent.implicitWidth)
-            width: ComponentList.showScrollBar ? componentListView.width - 7 : componentListView.width
+            width: ComponentList.showScrollBar ? componentListView.width - 10 : componentListView.width
 
             onImplicitWidthChanged: {
                 if (componentListView.implicitWidth < componentBox.implicitWidth){
