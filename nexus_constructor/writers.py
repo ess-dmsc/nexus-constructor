@@ -182,7 +182,7 @@ class HdfWriter(QObject):
     def store_off_geometry(self, nx_group: h5py.Group, geometry: OFFGeometry):
         nx_group.attrs["NX_class"] = "NXoff_geometry"
         nx_group.create_dataset(
-            "vertices", data=[vector.xyz_list for vector in geometry.vertices]
+            "vertices", data=[vector.toTuple() for vector in geometry.vertices]
         )
         nx_group.create_dataset("winding_order", dtype="i", data=geometry.winding_order)
         nx_group.create_dataset("faces", dtype="i", data=geometry.winding_order_indices)
@@ -195,9 +195,9 @@ class HdfWriter(QObject):
         nx_group.create_dataset(
             "vertices",
             data=[
-                geometry.base_center_point.xyz_list,
-                geometry.base_edge_point.xyz_list,
-                geometry.top_center_point.xyz_list,
+                geometry.base_center_point.toTuple(),
+                geometry.base_edge_point.toTuple(),
+                geometry.top_center_point.toTuple(),
             ],
         )
         nx_group.create_dataset("cylinders", dtype="i", data=[0, 1, 2])
