@@ -198,7 +198,7 @@ class OFFGeometry(Geometry):
 @attr.s
 class NoShapeGeometry(Geometry):
     """
-    Dummy object for components with no geometry - sphere
+    Dummy object for components with no geometry.
     """
 
 

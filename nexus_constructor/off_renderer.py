@@ -184,7 +184,7 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
 
     def create_dummy_object(self):
         """
-        Create a dummy OFF geometry that displays as a square for when the component has no geometry.
+        Create a dummy OFF geometry that displays as a cube for when the component has no geometry.
         :return: A QtOFFGeometry to be rendered by Qt3D
         """
         geometry = OFFGeometry(
