@@ -38,9 +38,16 @@ node("docker") {
                 cd ${project}
                 build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
                 build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
-                build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15
+                build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
                 \""""
         }
+                              
+        stage("Check formatting") {
+            sh """docker exec ${container_name} ${sh_cmd} -c \"
+                cd ${project}
+                build_env/bin/python -m black . --check --exclude=build_env/
+            \""""
+                              }
 
         stage("Run Linter") {
         sh """docker exec ${container_name} ${sh_cmd} -c \"
