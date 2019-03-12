@@ -31,13 +31,15 @@ class JsonConnector(QObject):
         super().__init__()
         self.clipboard = QGuiApplication.clipboard()
 
-        with open('Instrument.schema.json') as file:
+        with open("Instrument.schema.json") as file:
             self.schema = json.load(file)
 
-    @Slot(QUrl, 'QVariant', result=bool)
+    @Slot(QUrl, "QVariant", result=bool)
     def load_file_into_instrument_model(self, file_url: QUrl, model: InstrumentModel):
-        filename = file_url.toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
-        with open(filename, 'r') as file:
+        filename = file_url.toString(
+            options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
+        )
+        with open(filename, "r") as file:
             json_string = file.read()
 
         return self.json_string_to_instrument_model(json_string, model)
@@ -65,38 +67,40 @@ class JsonConnector(QObject):
 
         return True
 
-    @Slot(QUrl, 'QVariant')
+    @Slot(QUrl, "QVariant")
     def save_to_filewriter_json(self, file_url: QUrl, model: InstrumentModel):
         json_string = nf_json.generate_json(model)
         self.save_to_file(json_string, file_url)
 
-    @Slot(QUrl, 'QVariant')
+    @Slot(QUrl, "QVariant")
     def save_to_nexus_constructor_json(self, file_url: QUrl, model: InstrumentModel):
         json_string = gc_json.generate_json(model)
         self.save_to_file(json_string, file_url)
 
     @staticmethod
     def save_to_file(data: str, file_url: QUrl):
-        filename = file_url.toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
-        with open(filename, 'w') as file:
+        filename = file_url.toString(
+            options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
+        )
+        with open(filename, "w") as file:
             file.write(data)
 
-    @Slot('QVariant')
+    @Slot("QVariant")
     def copy_nexus_filewriter_json_to_clipboard(self, model: InstrumentModel):
         self.clipboard.setText(nf_json.generate_json(model))
 
-    @Slot('QVariant')
+    @Slot("QVariant")
     def copy_nexus_constructor_json_to_clipboard(self, model: InstrumentModel):
         self.clipboard.setText(gc_json.generate_json(model))
 
     requested_nexus_constructor_json = Signal(str)
 
-    @Slot('QVariant')
+    @Slot("QVariant")
     def request_nexus_constructor_json(self, model: InstrumentModel):
         self.requested_nexus_constructor_json.emit(gc_json.generate_json(model))
 
     requested_filewriter_json = Signal(str)
 
-    @Slot('QVariant')
+    @Slot("QVariant")
     def request_filewriter_json(self, model: InstrumentModel):
         self.requested_filewriter_json.emit(nf_json.generate_json(model))

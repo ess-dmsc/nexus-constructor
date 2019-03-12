@@ -6,7 +6,7 @@ and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
 
-from nexus_constructor.data_model import OFFGeometry, PixelData, PixelGrid, Vector
+from nexus_constructor.data_model import OFFGeometry, PixelData, PixelGrid
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct
@@ -28,7 +28,7 @@ def convert_to_bytes(vectors):
     :param vectors: The list of vectors to convert
     :return: The byte representation
     """
-    return struct.pack(f'{len(vectors)}f', *vectors)
+    return struct.pack(f"{len(vectors)}f", *vectors)
 
 
 def convert_faces_into_triangles(faces):
@@ -40,7 +40,9 @@ def convert_faces_into_triangles(faces):
     triangles = []
     for face in faces:
         triangles_in_face = len(face) - 2
-        triangles.extend([[face[0], face[i + 1], face[i + 2]] for i in range(triangles_in_face)])
+        triangles.extend(
+            [[face[0], face[i + 1], face[i + 2]] for i in range(triangles_in_face)]
+        )
     return triangles
 
 
@@ -59,7 +61,9 @@ def create_vertex_buffer(vertices, faces):
 
     flattened_triangles = flatten(triangles)
 
-    return flatten(vertices[point_index].xyz_list for point_index in flattened_triangles)
+    return flatten(
+        vertices[point_index].toTuple() for point_index in flattened_triangles
+    )
 
 
 def create_normal_buffer(vertices, faces):
@@ -76,9 +80,8 @@ def create_normal_buffer(vertices, faces):
         # Get the vertices of each triangle
         points = [vertices[p] for p in triangle]
         # Convert our vector objects into Qt Vectors
-        q_vectors = [QVector3D(*p.xyz_list) for p in points]
         # Calculate the normal, leveraging Qt
-        normal = QVector3D.normal(*q_vectors)
+        normal = QVector3D.normal(*points)
         # Need to have a normal for each vector
         normal_buffer_values.extend(normal.toTuple() * 3)
     return normal_buffer_values
@@ -104,14 +107,18 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         vertex_buffer_values = list(create_vertex_buffer(vertices, faces))
         normal_buffer_values = create_normal_buffer(vertices, faces)
 
-        positionAttribute = self.create_attribute(vertex_buffer_values, self.q_attribute.defaultPositionAttributeName())
-        normalAttribute = self.create_attribute(normal_buffer_values, self.q_attribute.defaultNormalAttributeName())
+        positionAttribute = self.create_attribute(
+            vertex_buffer_values, self.q_attribute.defaultPositionAttributeName()
+        )
+        normalAttribute = self.create_attribute(
+            normal_buffer_values, self.q_attribute.defaultNormalAttributeName()
+        )
 
         self.addAttribute(positionAttribute)
         self.addAttribute(normalAttribute)
         self.vertex_count = len(vertex_buffer_values) // 3
 
-        print('Qt mesh built')
+        print("Qt mesh built")
 
     def create_attribute(self, buffer_values, name):
         SIZE_OF_FLOAT_IN_STRUCT = 4
@@ -136,15 +143,21 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         for row in range(grid.rows):
             for col in range(grid.columns):
                 faces += [
-                    [i + (col + (row * grid.columns)) * len(model.vertices) for i in face]
+                    [
+                        i + (col + (row * grid.columns)) * len(model.vertices)
+                        for i in face
+                    ]
                     for face in model.faces
                 ]
                 vertices += [
-                    Vector(vec.x + (col * grid.col_width),
-                           vec.y + (row * grid.row_height),
-                           vec.z)
+                    QVector3D(
+                        vec.x() + (col * grid.col_width),
+                        vec.y() + (row * grid.row_height),
+                        vec.z(),
+                    )
                     for vec in model.vertices
                 ]
+
         return faces, vertices
 
 
@@ -153,7 +166,9 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
     """
 
-    def __init__(self, geometry: OFFGeometry, pixel_data: PixelData=None, parent=None):
+    def __init__(
+        self, geometry: OFFGeometry, pixel_data: PixelData = None, parent=None
+    ):
         super().__init__(parent)
 
         qt_geometry = QtOFFGeometry(geometry, pixel_data, self)
