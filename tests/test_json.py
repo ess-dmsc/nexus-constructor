@@ -16,7 +16,6 @@ import nexus_constructor.nexus_constructor_json as gc_json
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QUrl
-import pytest
 
 
 def build_sample_model():

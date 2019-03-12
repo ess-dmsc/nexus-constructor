@@ -3,7 +3,7 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from tests.test_json import build_sample_model
 import json
 from numbers import Number
-from pytest import approx, mark
+from pytest import approx
 
 
 def test_nexus_json_generation_and_loading_is_consistent():
