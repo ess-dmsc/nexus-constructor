@@ -38,7 +38,7 @@ node("docker") {
                 cd ${project}
                 build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
                 build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
-                build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15
+                build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
                 \""""
         }
                               
