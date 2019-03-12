@@ -6,7 +6,7 @@ and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
 
-from nexus_constructor.data_model import OFFGeometry, PixelData, PixelGrid, Vector
+from nexus_constructor.data_model import OFFGeometry, PixelData, PixelGrid
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct
@@ -62,7 +62,7 @@ def create_vertex_buffer(vertices, faces):
     flattened_triangles = flatten(triangles)
 
     return flatten(
-        vertices[point_index].xyz_list for point_index in flattened_triangles
+        vertices[point_index].toTuple() for point_index in flattened_triangles
     )
 
 
@@ -80,9 +80,8 @@ def create_normal_buffer(vertices, faces):
         # Get the vertices of each triangle
         points = [vertices[p] for p in triangle]
         # Convert our vector objects into Qt Vectors
-        q_vectors = [QVector3D(*p.xyz_list) for p in points]
         # Calculate the normal, leveraging Qt
-        normal = QVector3D.normal(*q_vectors)
+        normal = QVector3D.normal(*points)
         # Need to have a normal for each vector
         normal_buffer_values.extend(normal.toTuple() * 3)
     return normal_buffer_values
@@ -150,13 +149,14 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
                     for face in model.faces
                 ]
                 vertices += [
-                    Vector(
-                        vec.x + (col * grid.col_width),
-                        vec.y + (row * grid.row_height),
-                        vec.z,
+                    QVector3D(
+                        vec.x() + (col * grid.col_width),
+                        vec.y() + (row * grid.row_height),
+                        vec.z(),
                     )
                     for vec in model.vertices
                 ]
+
         return faces, vertices
 
 
@@ -189,10 +189,10 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
         """
         geometry = OFFGeometry(
             vertices=[
-                Vector(0, 0, 0),
-                Vector(0, 1, 0),
-                Vector(1, 1, 0),
-                Vector(1, 0, 0),
+                QVector3D(0, 0, 0),
+                QVector3D(0, 1, 0),
+                QVector3D(1, 1, 0),
+                QVector3D(1, 0, 0),
             ],
             faces=[[0, 1, 2, 3]],
         )

@@ -254,7 +254,8 @@ def test_GIVEN_component_with_detector_type_WHEN_generating_mesh_THEN_contains_p
 
     component.pixel_data = PixelGrid(rows=2, columns=1)
     component.geometry = OFFGeometry(
-        vertices=[Vector(0, 0, 0), Vector(0, 1, 0), Vector(1, 0, 0)], faces=[[0, 1, 2]]
+        vertices=[QVector3D(0, 0, 0), QVector3D(0, 1, 0), QVector3D(1, 0, 0)],
+        faces=[[0, 1, 2]],
     )
     generated = generate_mesh(component)
     assert isinstance(generated.geometry(), QtOFFGeometry)

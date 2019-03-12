@@ -2,7 +2,6 @@ from nexus_constructor.data_model import (
     ComponentType,
     PixelGrid,
     PixelMapping,
-    Vector,
     CylindricalGeometry,
     OFFGeometry,
     NoShapeGeometry,
@@ -106,14 +105,14 @@ class InstrumentModel(QAbstractListModel):
                 name="Sample",
                 geometry=OFFGeometry(
                     vertices=[
-                        Vector(x=-0.5, y=-0.5, z=0.5),
-                        Vector(x=0.5, y=-0.5, z=0.5),
-                        Vector(x=-0.5, y=0.5, z=0.5),
-                        Vector(x=0.5, y=0.5, z=0.5),
-                        Vector(x=-0.5, y=0.5, z=-0.5),
-                        Vector(x=0.5, y=0.5, z=-0.5),
-                        Vector(x=-0.5, y=-0.5, z=-0.5),
-                        Vector(x=0.5, y=-0.5, z=-0.5),
+                        QVector3D(-0.5, -0.5, 0.5),
+                        QVector3D(0.5, -0.5, 0.5),
+                        QVector3D(-0.5, 0.5, 0.5),
+                        QVector3D(0.5, 0.5, 0.5),
+                        QVector3D(-0.5, 0.5, -0.5),
+                        QVector3D(0.5, 0.5, -0.5),
+                        QVector3D(-0.5, -0.5, -0.5),
+                        QVector3D(0.5, -0.5, -0.5),
                     ],
                     faces=[
                         [0, 1, 3, 2],
@@ -134,6 +133,7 @@ class InstrumentModel(QAbstractListModel):
         return len(self.components)
 
     def data(self, index, role=Qt.DisplayRole):
+
         row = index.row()
         component = self.components[row]
         # lambdas prevent calculated properties from being generated each time any property is retrieved
