@@ -8,7 +8,7 @@ from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 
 def validate_nonzero_vector(instance, attribute, value):
     if value.x == 0 and value.y == 0 and value.z == 0:
-        raise ValueError('Vector is zero length')
+        raise ValueError("Vector is zero length")
 
 
 def validate_list_contains_transformations(instance, attribute, value):
@@ -19,13 +19,14 @@ def validate_list_contains_transformations(instance, attribute, value):
 @attr.s
 class Vector:
     """A vector in 3D space, defined by x, y and z coordinates"""
+
     x = attr.ib(float)
     y = attr.ib(float)
     z = attr.ib(float)
 
     @property
     def magnitude(self):
-        return sqrt(self.x**2 + self.y**2 + self.z**2)
+        return sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
 
     @property
     def xyz_list(self):
@@ -40,6 +41,7 @@ class Vector:
 @attr.s
 class Geometry:
     """Base class for geometry a detector component can take"""
+
     pass
 
 
@@ -51,8 +53,11 @@ class CylindricalGeometry(Geometry):
     The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
     described by the direction of its axis, its height, and radius.
     """
+
     units = attr.ib(default="m", type=str)
-    axis_direction = attr.ib(factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector)
+    axis_direction = attr.ib(
+        factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector
+    )
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
 
@@ -63,12 +68,18 @@ class CylindricalGeometry(Geometry):
     @property
     def base_edge_point(self):
         # rotate a point on the edge of a Z axis aligned cylinder by the rotation matrix
-        edge_point = QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0) * self.rotation_matrix
+        edge_point = (
+            QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0)
+            * self.rotation_matrix
+        )
         return Vector(edge_point.x(), edge_point.y(), edge_point.z())
 
     @property
     def top_center_point(self):
-        values = [x * self.height * calculate_unit_conversion_factor(self.units) for x in self.axis_direction.unit_list]
+        values = [
+            x * self.height * calculate_unit_conversion_factor(self.units)
+            for x in self.axis_direction.unit_list
+        ]
         return Vector(values[0], values[1], values[2])
 
     def as_off_geometry(self, steps=20):
@@ -76,14 +87,21 @@ class CylindricalGeometry(Geometry):
         unit_conversion_factor = calculate_unit_conversion_factor(self.units)
 
         # steps number of points around the base, and steps number around the top, aligned with the Z axis
-        vertices = [QVector3D(sin(2 * pi * i / steps) * self.radius * unit_conversion_factor,
-                              cos(2 * pi * i / steps) * self.radius * unit_conversion_factor,
-                              0)
-                    for i in range(steps)] + \
-                   [QVector3D(sin(2 * pi * i / steps) * self.radius * unit_conversion_factor,
-                              cos(2 * pi * i / steps) * self.radius * unit_conversion_factor,
-                              self.height * unit_conversion_factor)
-                    for i in range(steps)]
+        vertices = [
+            QVector3D(
+                sin(2 * pi * i / steps) * self.radius * unit_conversion_factor,
+                cos(2 * pi * i / steps) * self.radius * unit_conversion_factor,
+                0,
+            )
+            for i in range(steps)
+        ] + [
+            QVector3D(
+                sin(2 * pi * i / steps) * self.radius * unit_conversion_factor,
+                cos(2 * pi * i / steps) * self.radius * unit_conversion_factor,
+                self.height * unit_conversion_factor,
+            )
+            for i in range(steps)
+        ]
         # rotate each vertex to produce the desired cylinder mesh
         vectors = []
         rotate_matrix = self.rotation_matrix
@@ -94,10 +112,14 @@ class CylindricalGeometry(Geometry):
         # the final face uses steps of -1 to have the same winding order as the other faces
         return OFFGeometry(
             vertices=vectors,
-            faces=[[i, steps + i, steps + ((i + 1) % steps), (i + 1) % steps]
-                   for i in range(steps)] +
-                  [[i for i in range(steps)],
-                   [i for i in range((2 * steps) - 1, steps - 1, -1)]]
+            faces=[
+                [i, steps + i, steps + ((i + 1) % steps), (i + 1) % steps]
+                for i in range(steps)
+            ]
+            + [
+                [i for i in range(steps)],
+                [i for i in range((2 * steps) - 1, steps - 1, -1)],
+            ],
         )
 
     @property
@@ -107,9 +129,7 @@ class CylindricalGeometry(Geometry):
         """
         default_axis = QVector3D(0, 0, 1)
         unit_axis = self.axis_direction.unit_list
-        desired_axis = QVector3D(unit_axis[0],
-                                 unit_axis[1],
-                                 unit_axis[2])
+        desired_axis = QVector3D(unit_axis[0], unit_axis[1], unit_axis[2])
         rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
         rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis))
         rotate_degrees = rotate_radians * 360 / (2 * pi)
@@ -127,6 +147,7 @@ class OFFGeometry(Geometry):
     faces:  list of integer lists. Each sublist is a winding path around the corners of a polygon. Each sublist item is
             an index into the vertices list to identify a specific point in 3D space
     """
+
     vertices = attr.ib(factory=list, type=List[Vector])
     faces = attr.ib(factory=list, type=List[List[int]])
 
@@ -150,6 +171,7 @@ class NoShapeGeometry(Geometry):
 @attr.s
 class PixelData:
     """Base class for a detector's pixel description"""
+
     pass
 
 
@@ -186,6 +208,7 @@ class PixelGrid(PixelData):
     the 'count_direction' and 'initial_count_corner' attributes, which respectively take 'CountDirection' and 'Corner'
     Enum values.
     """
+
     rows = attr.ib(default=1, type=int)
     columns = attr.ib(default=1, type=int)
     row_height = attr.ib(default=1, type=float)
@@ -207,12 +230,14 @@ class PixelMapping(PixelData):
     Used to populate the detector_faces dataset of the NXoff_geometry class.
     See http://download.nexusformat.org/sphinx/classes/base_classes/NXoff_geometry.html
     """
+
     pixel_ids = attr.ib(list)
 
 
 @attr.s
 class SinglePixelId(PixelData):
     """Pixel data for components that only have a single detector ID"""
+
     pixel_id = attr.ib(int)
 
 
@@ -223,7 +248,9 @@ class Transformation:
 
 @attr.s
 class Rotation(Transformation):
-    axis = attr.ib(factory=lambda: Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector)
+    axis = attr.ib(
+        factory=lambda: Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector
+    )
     angle = attr.ib(default=0)
 
 
@@ -234,13 +261,13 @@ class Translation(Transformation):
 
 @unique
 class ComponentType(Enum):
-    SAMPLE = 'Sample'
-    DETECTOR = 'Detector'
-    MONITOR = 'Monitor'
-    SOURCE = 'Source'
-    SLIT = 'Slit'
-    MODERATOR = 'Moderator'
-    DISK_CHOPPER = 'Disk Chopper'
+    SAMPLE = "Sample"
+    DETECTOR = "Detector"
+    MONITOR = "Monitor"
+    SOURCE = "Source"
+    SLIT = "Slit"
+    MODERATOR = "Moderator"
+    DISK_CHOPPER = "Disk Chopper"
 
     @classmethod
     def values(cls):
@@ -250,11 +277,16 @@ class ComponentType(Enum):
 @attr.s
 class Component:
     """Components of an instrument"""
+
     component_type = attr.ib(ComponentType)
     name = attr.ib(str)
-    description = attr.ib(default='', type=str)
+    description = attr.ib(default="", type=str)
     transform_parent = attr.ib(default=None, type=object)
     dependent_transform = attr.ib(default=None, type=Transformation)
-    transforms = attr.ib(factory=list, type=List[Transformation], validator=validate_list_contains_transformations)
+    transforms = attr.ib(
+        factory=list,
+        type=List[Transformation],
+        validator=validate_list_contains_transformations,
+    )
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)

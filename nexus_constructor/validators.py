@@ -7,7 +7,7 @@ import pint
 
 class NullableIntValidator(QIntValidator):
     def validate(self, input: str, pos: int):
-        if input == '':
+        if input == "":
             return QValidator.Acceptable
         else:
             return super().validate(input, pos)
@@ -17,6 +17,7 @@ class UnitValidator(QValidator):
     """
     Validator to ensure the the text entered is a valid unit of length.
     """
+
     def __init__(self):
         super().__init__()
         self.ureg = pint.UnitRegistry()
@@ -26,7 +27,11 @@ class UnitValidator(QValidator):
         # Attempt to convert the string argument to a unit
         try:
             unit = self.ureg(input)
-        except (pint.errors.UndefinedUnitError, AttributeError, pint.compat.tokenize.TokenError):
+        except (
+            pint.errors.UndefinedUnitError,
+            AttributeError,
+            pint.compat.tokenize.TokenError,
+        ):
             self.validationFailed.emit()
             return QValidator.Intermediate
 
@@ -89,7 +94,7 @@ class ValidatorOnListModel(QValidator):
     def model_changed(self):
         pass
 
-    model = Property('QVariant', get_model, set_model, notify=model_changed)
+    model = Property("QVariant", get_model, set_model, notify=model_changed)
 
     validationFailed = Signal()
 
@@ -138,7 +143,9 @@ class TransformParentValidator(ValidatorOnListModel):
             if component.transform_parent is None:
                 parent_index = 0
             else:
-                parent_index = self.list_model.components.index(component.transform_parent)
+                parent_index = self.list_model.components.index(
+                    component.transform_parent
+                )
             mapping[index] = parent_index
             if component.name == proposed_parent_name:
                 candidate_parent_index = index
@@ -188,7 +195,7 @@ class NameValidator(ValidatorOnListModel):
     def validate(self, input: str, pos: int):
         name_role = Qt.DisplayRole
         for role, name in self.list_model.roleNames().items():
-            if name == b'name':
+            if name == b"name":
                 name_role = role
                 break
         for i in range(self.list_model.rowCount()):

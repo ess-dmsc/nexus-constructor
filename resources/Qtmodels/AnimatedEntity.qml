@@ -9,6 +9,7 @@ Entity {
     id: sceneRoot
 
     property InstrumentModel instrument
+    property alias camera: camera
 
     Camera {
         id: camera

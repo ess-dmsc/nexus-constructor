@@ -28,7 +28,7 @@ def convert_to_bytes(vectors):
     :param vectors: The list of vectors to convert
     :return: The byte representation
     """
-    return struct.pack(f'{len(vectors)}f', *vectors)
+    return struct.pack(f"{len(vectors)}f", *vectors)
 
 
 def convert_faces_into_triangles(faces):
@@ -40,7 +40,9 @@ def convert_faces_into_triangles(faces):
     triangles = []
     for face in faces:
         triangles_in_face = len(face) - 2
-        triangles.extend([[face[0], face[i + 1], face[i + 2]] for i in range(triangles_in_face)])
+        triangles.extend(
+            [[face[0], face[i + 1], face[i + 2]] for i in range(triangles_in_face)]
+        )
     return triangles
 
 
@@ -59,7 +61,9 @@ def create_vertex_buffer(vertices, faces):
 
     flattened_triangles = flatten(triangles)
 
-    return flatten(vertices[point_index].xyz_list for point_index in flattened_triangles)
+    return flatten(
+        vertices[point_index].xyz_list for point_index in flattened_triangles
+    )
 
 
 def create_normal_buffer(vertices, faces):
@@ -103,8 +107,12 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         vertex_buffer_values = list(create_vertex_buffer(vertices, faces))
         normal_buffer_values = create_normal_buffer(vertices, faces)
 
-        positionAttribute = self.create_attribute(vertex_buffer_values, self.q_attribute.defaultPositionAttributeName())
-        normalAttribute = self.create_attribute(normal_buffer_values, self.q_attribute.defaultNormalAttributeName())
+        positionAttribute = self.create_attribute(
+            vertex_buffer_values, self.q_attribute.defaultPositionAttributeName()
+        )
+        normalAttribute = self.create_attribute(
+            normal_buffer_values, self.q_attribute.defaultNormalAttributeName()
+        )
 
         self.addAttribute(positionAttribute)
         self.addAttribute(normalAttribute)
