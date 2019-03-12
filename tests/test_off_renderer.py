@@ -11,6 +11,7 @@ from PySide2.QtGui import QVector3D
 TRIANGLES_IN_SQUARE = 2
 VERTICES_IN_TRIANGLE = 3
 POINTS_IN_VERTEX = 3
+VERTICES_IN_CUBE = 6
 
 
 def test_GIVEN_a_single_triangle_face_WHEN_creating_vertex_buffer_THEN_output_is_correct():
@@ -98,10 +99,11 @@ def test_GIVEN_a_triangle_WHEN_creating_off_geometry_with_no_pixel_data_THEN_ver
     assert qt_geometry.vertex_count == 3
 
 
-def test_GIVEN_no_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_square_with_6_vertices():
+def test_GIVEN_no_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_cube():
     off_mesh = OffMesh(None)
     assert (
-        off_mesh.geometry().vertex_count == VERTICES_IN_TRIANGLE * TRIANGLES_IN_SQUARE
+        off_mesh.geometry().vertex_count
+        == VERTICES_IN_TRIANGLE * TRIANGLES_IN_SQUARE * VERTICES_IN_CUBE
     )
 
 

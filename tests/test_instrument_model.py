@@ -226,7 +226,7 @@ def test_GIVEN_no_geometry_WHEN_generating_mesh_THEN_square_off_mesh_is_created(
     component = NoShapeModel()
     actual_output = generate_mesh(component)
 
-    assert actual_output.geometry().vertex_count == 6
+    assert actual_output.geometry().vertex_count == 36
 
 
 def test_GIVEN_off_with_no_geometry_WHEN_generating_mesh_THEN_returns_nothing():
