@@ -1,5 +1,5 @@
 from nexus_constructor import data_model
-from nexus_constructor.data_model import CylindricalGeometry, Vector
+from nexus_constructor.data_model import CylindricalGeometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import (
     NoShapeModel,
