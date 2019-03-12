@@ -41,6 +41,13 @@ node("docker") {
                 build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15
                 \""""
         }
+                              
+        stage("Check formatting") {
+            sh """docker exec ${container_name} ${sh_cmd} -c \"
+                cd ${project}
+                build_env/bin/black . --check
+            \""""
+                              }
 
         stage("Run Linter") {
         sh """docker exec ${container_name} ${sh_cmd} -c \"
