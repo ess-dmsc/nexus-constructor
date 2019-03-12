@@ -130,13 +130,15 @@ Item {
 
                 property var paneWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
                 id: translatePane
-                contentWidth: ComponentList.showScrollBar ? paneWidth - 15 : paneWidth
+                contentWidth: ComponentList.showScrollBar ? paneWidth - 15 : paneWidth - 50
                 contentHeight: translateNameField.height + xField.height
                 padding: 0
 
                 ColumnLayout {
 
-                    Layout.fillHeight: true
+                    spacing: 1
+                    Layout.maximumWidth: parent.width - 5
+
                     RowLayout {
                         Layout.fillWidth: true
                         Label {
@@ -146,7 +148,7 @@ Item {
                         }
                         LabeledTextField {
                             id: translateNameField
-                            Layout.alignment: Qt.AlignLeft
+                            Layout.alignment: Qt.AlignRight
                             anchoredEditor: true
                             labelText: "Name: "
                             editorText: name
@@ -167,25 +169,25 @@ Item {
                             editorText: translate_x
                             validator: numberValidator
                             onEditingFinished: translate_x = parseFloat(editorText)
-                            width: parent.fieldWidth
+                            editorWidth: 70
                         }
                         LabeledTextField {
                             id: yField
-                            Layout.alignment: Qt.AlignLeft
+                            Layout.alignment: Qt.AlignCenter
                             labelText: "y:"
                             editorText: translate_y
                             validator: numberValidator
                             onEditingFinished: translate_y = parseFloat(editorText)
-                            width: parent.fieldWidth
+                            editorWidth: 70
                         }
                         LabeledTextField {
                             id: zField
-                            Layout.alignment: Qt.AlignLeft
+                            Layout.alignment: Qt.AlignRight
                             labelText: "z:"
                             editorText: translate_z
                             validator: numberValidator
                             onEditingFinished: translate_z = parseFloat(editorText)
-                            width: parent.fieldWidth
+                            editorWidth: 70
                         }
                     }
                 }
