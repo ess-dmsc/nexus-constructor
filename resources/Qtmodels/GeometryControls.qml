@@ -16,6 +16,7 @@ Pane {
 
     signal meshChanged()
     signal cylinderChanged()
+    signal noShapeChanged()
 
     ListView {
         id: view
@@ -33,6 +34,11 @@ Pane {
     CylinderModel {
         id: cylinderModel
         onDataChanged: pane.cylinderChanged()
+    }
+
+    NoShapeModel {
+        id: noShapeModel
+        onDataChanged: pane.noShapeChanged()
     }
 
     Component {
@@ -288,6 +294,11 @@ Pane {
 
             PropertyChanges { target: view; model: cylinderModel}
             PropertyChanges { target: view; delegate: cylinderDelegate}
+        },
+        State {
+            name: "None"
+            PropertyChanges { target: pane; geometryModel: noShapeModel }
+            PropertyChanges { target: view; model: noShapeModel }
         }
     ]
 }

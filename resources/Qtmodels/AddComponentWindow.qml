@@ -109,6 +109,13 @@ ExpandingWindow {
                         }
                     }
                 }
+                RadioButton {
+                    id: noShapeRadio
+                    anchors.left: cylinderRadio.right
+                    anchors.top: cylinderRadio.top
+                    text: "None"
+                    onClicked: setupPane.geometryState = "None", setupPane.pixelState = ""
+                }
             }
 
             Label {
@@ -116,6 +123,7 @@ ExpandingWindow {
                 anchors.left: parent.left
                 anchors.top: geometryPane.bottom
                 text: "Pixels:"
+                enabled: !noShapeRadio.checked
             }
             Pane {
                 id: pixelPane
@@ -129,6 +137,7 @@ ExpandingWindow {
                               pixelGridRadio.height +
                               mappedMeshRadio.height +
                               noPixelRadio.height
+                enabled: !noShapeRadio.checked
 
                 function checkFirstEnabled(){
                     var buttons = [singlePixelRadio, pixelGridRadio, mappedMeshRadio, noPixelRadio]
@@ -317,8 +326,8 @@ ExpandingWindow {
                 onClicked: {
 
                     // Check that either the mesh or the cylinder were given a valid unit argument because it is not
-                    // known which geometry has just been created.
-                    if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits) {
+                    // known which geometry has just been created. If the component has no shape, add anyway.
+                    if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits || setupPane.geometryState == "None") {
 
                         components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                                  geometryControls.geometryModel,
