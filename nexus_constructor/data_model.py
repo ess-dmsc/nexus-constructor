@@ -196,6 +196,13 @@ class OFFGeometry(Geometry):
 
 
 @attr.s
+class NoShapeGeometry(Geometry):
+    """
+    Dummy object for components with no geometry.
+    """
+
+
+@attr.s
 class PixelData:
     """Base class for a detector's pixel description"""
 

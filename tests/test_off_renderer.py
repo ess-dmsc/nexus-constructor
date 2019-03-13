@@ -2,14 +2,16 @@ from nexus_constructor.off_renderer import (
     QtOFFGeometry,
     create_vertex_buffer,
     create_normal_buffer,
+    OffMesh,
 )
 from nexus_constructor.data_model import OFFGeometry
 import itertools
 from PySide2.QtGui import QVector3D
 
 TRIANGLES_IN_SQUARE = 2
-VERTICIES_IN_TRIANGLE = 3
+VERTICES_IN_TRIANGLE = 3
 POINTS_IN_VERTEX = 3
+VERTICES_IN_CUBE = 6
 
 
 def test_GIVEN_a_single_triangle_face_WHEN_creating_vertex_buffer_THEN_output_is_correct():
@@ -38,7 +40,7 @@ def test_GIVEN_a_set_of_triangle_faces_WHEN_creating_vertex_buffer_THEN_length_i
 
     assert (
         len(list(vertex_buffer))
-        == NUM_OF_TRIANGLES * VERTICIES_IN_TRIANGLE * POINTS_IN_VERTEX
+        == NUM_OF_TRIANGLES * VERTICES_IN_TRIANGLE * POINTS_IN_VERTEX
     )
 
 
@@ -55,7 +57,7 @@ def test_GIVEN_a_square_WHEN_creating_vertex_buffer_THEN_length_is_correct():
 
     assert (
         len(list(vertex_buffer))
-        == TRIANGLES_IN_SQUARE * VERTICIES_IN_TRIANGLE * POINTS_IN_VERTEX
+        == TRIANGLES_IN_SQUARE * VERTICES_IN_TRIANGLE * POINTS_IN_VERTEX
     )
 
 
@@ -81,7 +83,7 @@ def test_GIVEN_a_square_face_WHEN_creating_normal_buffer_THEN_output_is_correct(
 
     normal = create_normal_buffer(vertices, faces)
 
-    expected_output = [0.0, 0.0, -1.0] * TRIANGLES_IN_SQUARE * VERTICIES_IN_TRIANGLE
+    expected_output = [0.0, 0.0, -1.0] * TRIANGLES_IN_SQUARE * VERTICES_IN_TRIANGLE
 
     assert list(normal) == expected_output
 
@@ -95,3 +97,22 @@ def test_GIVEN_a_triangle_WHEN_creating_off_geometry_with_no_pixel_data_THEN_ver
     qt_geometry = QtOFFGeometry(off_geometry, None)
 
     assert qt_geometry.vertex_count == 3
+
+
+def test_GIVEN_no_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_cube():
+    off_mesh = OffMesh(None)
+    assert (
+        off_mesh.geometry().vertex_count
+        == VERTICES_IN_TRIANGLE * TRIANGLES_IN_SQUARE * VERTICES_IN_CUBE
+    )
+
+
+def test_GIVEN_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_original_geometry():
+    off_output = OFFGeometry(
+        vertices=[QVector3D(0, 0, 0), QVector3D(0, 1, 0), QVector3D(1, 1, 0)],
+        faces=[[0, 1, 2]],
+    )
+
+    off_mesh = OffMesh(off_output)
+
+    assert off_mesh.geometry().vertex_count == VERTICES_IN_TRIANGLE

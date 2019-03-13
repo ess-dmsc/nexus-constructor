@@ -22,7 +22,8 @@ Entity {
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
 
-    FirstPersonCameraController { camera: camera }
+    FirstPersonCameraController { camera: camera
+     linearSpeed: 20}
 
     components: [
         RenderSettings {
