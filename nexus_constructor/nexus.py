@@ -1,5 +1,12 @@
-from nexus_constructor.data_model import Component, ComponentType, PixelGrid, PixelMapping, CountDirection, Corner,\
-    Transformation
+from nexus_constructor.data_model import (
+    Component,
+    ComponentType,
+    PixelGrid,
+    PixelMapping,
+    CountDirection,
+    Corner,
+    Transformation,
+)
 from typing import List, Union
 
 
@@ -10,7 +17,7 @@ class NexusEncoder:
 
     @staticmethod
     def component_class_name(component_type: ComponentType):
-        return 'NX{}'.format(component_type.name.lower())
+        return "NX{}".format(component_type.name.lower())
 
     @staticmethod
     def pixel_mapping(mapping: PixelMapping):
@@ -18,10 +25,11 @@ class NexusEncoder:
         Returns a list of two-item lists. Each sublist contains a face ID followed by the face's detector ID.
         Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
         """
-        return [[face_id, mapping.pixel_ids[face_id]]
-                for face_id
-                in range(len(mapping.pixel_ids))
-                if mapping.pixel_ids[face_id] is not None]
+        return [
+            [face_id, mapping.pixel_ids[face_id]]
+            for face_id in range(len(mapping.pixel_ids))
+            if mapping.pixel_ids[face_id] is not None
+        ]
 
     @staticmethod
     def pixel_grid_x_offsets(grid: PixelGrid):
@@ -79,39 +87,50 @@ class NexusEncoder:
         """
         Returns a string of the nexus location of the transform the given component is positioned relative to.
         """
-        if component.transform_parent is None or component.transform_parent == component:
-            dependent_on = '.'
+        if (
+            component.transform_parent is None
+            or component.transform_parent == component
+        ):
+            dependent_on = "."
         else:
-            dependent_on = '.'
+            dependent_on = "."
             dependent_found = False
             no_dependent = False
             ancestor = component.transform_parent
             index = -1
             if component.dependent_transform is not None:
-                index = component.transform_parent.transforms.index(component.dependent_transform)
+                index = component.transform_parent.transforms.index(
+                    component.dependent_transform
+                )
             while not (dependent_found or no_dependent):
                 if len(ancestor.transforms) > 0:
                     dependent_on = NexusEncoder.absolute_transform_path_name(
                         ancestor.transforms[index],
                         ancestor,
-                        ancestor.component_type not in NexusEncoder.external_component_types()
+                        ancestor.component_type
+                        not in NexusEncoder.external_component_types(),
                     )
                     dependent_found = True
-                elif ancestor.transform_parent is None or ancestor.transform_parent == ancestor:
+                elif (
+                    ancestor.transform_parent is None
+                    or ancestor.transform_parent == ancestor
+                ):
                     no_dependent = True
                 else:
                     if ancestor.dependent_transform is None:
                         index = -1
                     else:
-                        index = component.transform_parent.transforms.index(component.dependent_transform)
+                        index = component.transform_parent.transforms.index(
+                            component.dependent_transform
+                        )
                     ancestor = ancestor.transform_parent
         return dependent_on
 
     @staticmethod
     def absolute_transform_path_name(
-            transform: Union[Transformation, str],
-            containing_component: Union[Component, str],
-            in_instrument: bool,
+        transform: Union[Transformation, str],
+        containing_component: Union[Component, str],
+        in_instrument: bool,
     ):
         """
         Determine the absolute path to a transform in a nexus file
@@ -129,23 +148,16 @@ class NexusEncoder:
         else:
             component_name = containing_component
         if in_instrument:
-            parent = '/entry/instrument'
+            parent = "/entry/instrument"
         else:
-            parent = '/entry'
+            parent = "/entry"
 
-        return '{}/{}/transforms/{}'.format(
-            parent,
-            component_name,
-            transform_name
-        )
+        return "{}/{}/transforms/{}".format(parent, component_name, transform_name)
 
     @staticmethod
     def external_component_types():
         """Returns a set of component types that should be stored separately to /entry/instrument in a nexus file"""
-        return {
-            ComponentType.SAMPLE,
-            ComponentType.MONITOR,
-        }
+        return {ComponentType.SAMPLE, ComponentType.MONITOR}
 
     @staticmethod
     def geometry_group_name(component: Component):
@@ -162,15 +174,14 @@ class NexusEncoder:
         # logic here
         if component.component_type == ComponentType.DETECTOR:
             if isinstance(component.pixel_data, PixelMapping):
-                return 'detector_shape'
+                return "detector_shape"
             else:
-                return 'pixel_shape'
+                return "pixel_shape"
         else:
-            return 'shape'
+            return "shape"
 
 
 class NexusDecoder:
-
     @staticmethod
     def component_type_from_classname(class_name: str):
         """
@@ -193,9 +204,8 @@ class NexusDecoder:
         """
         slicing_indices = face_indices + [len(wound_faces)]
         return [
-            wound_faces[slicing_indices[i]:slicing_indices[i + 1]]
-            for i
-            in range(len(face_indices))
+            wound_faces[slicing_indices[i] : slicing_indices[i + 1]]
+            for i in range(len(face_indices))
         ]
 
     @staticmethod
@@ -220,10 +230,11 @@ class NexusDecoder:
 
     @staticmethod
     def build_pixel_grid(
-            x_offsets: List[List[int]],
-            y_offsets: List[List[int]],
-            z_offsets: List[List[int]],
-            detector_ids: List[List[int]]):
+        x_offsets: List[List[int]],
+        y_offsets: List[List[int]],
+        z_offsets: List[List[int]],
+        detector_ids: List[List[int]],
+    ):
         # Lists of 'row' sublists of 'column' length
 
         # Each array must be the same shape
@@ -287,8 +298,8 @@ class NexusDecoder:
     @staticmethod
     def extract_dependency_names(dependency_path: str):
         """Takes the path to a nexus transform, and returns the name of the component and transform from it"""
-        if dependency_path == '.':
+        if dependency_path == ".":
             return None, None
 
-        parts = dependency_path.split('/')
+        parts = dependency_path.split("/")
         return parts[-3], parts[-1]
