@@ -7,10 +7,10 @@ from nexus_constructor.data_model import (
     PixelMapping,
     PixelGrid,
     SinglePixelId,
-    Vector,
     CountDirection,
     Corner,
 )
+from nexus_constructor.vector import Vector
 from nexus_constructor.transformation import Translation, Rotation
 import nexus_constructor.nexus_constructor_json as gc_json
 from nexus_constructor.qml_models.geometry_models import OFFModel

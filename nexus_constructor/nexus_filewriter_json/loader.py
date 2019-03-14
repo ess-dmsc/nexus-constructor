@@ -10,7 +10,6 @@ Json format description can be found at https://github.com/ess-dmsc/kafka-to-nex
 from nexus_constructor.data_model import (
     Component,
     ComponentType,
-    Vector,
     OFFGeometry,
     CylindricalGeometry,
     SinglePixelId,

@@ -16,7 +16,6 @@ from nexus_constructor.data_model import (
     SinglePixelId,
     CountDirection,
     Corner,
-    Vector,
 )
 from nexus_constructor.transformation import Translation, Rotation
 from nexus_constructor.nexus import NexusDecoder
