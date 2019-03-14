@@ -6,10 +6,18 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from nexus_constructor.transformation import Transformation
 from nexus_constructor.vector import Vector
+from numpy import array, allclose
+from numpy.linalg import norm
 
 
 def validate_nonzero_vector(instance, attribute, value):
     if value.x == 0 and value.y == 0 and value.z == 0:
+        raise ValueError("Vector is zero length")
+
+
+# Temporary method here until the one above is no longer needed
+def validate_nonzero_qvector(instance, attribute, value):
+    if value.x() == 0 and value.y() == 0 and value.z() == 0:
         raise ValueError("Vector is zero length")
 
 
@@ -36,31 +44,32 @@ class CylindricalGeometry(Geometry):
 
     units = attr.ib(default="m", type=str)
     axis_direction = attr.ib(
-        factory=lambda: Vector(1, 0, 0), type=Vector, validator=validate_nonzero_vector
+        factory=lambda: QVector3D(1, 0, 0),
+        type=QVector3D,
+        validator=validate_nonzero_qvector,
     )
     height = attr.ib(default=1, type=float)
     radius = attr.ib(default=1, type=float)
 
     @property
     def base_center_point(self):
-        return Vector(0, 0, 0)
+        return QVector3D(0, 0, 0)
 
     @property
     def base_edge_point(self):
         # rotate a point on the edge of a Z axis aligned cylinder by the rotation matrix
-        edge_point = (
+        return (
             QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0)
             * self.rotation_matrix
         )
-        return Vector(edge_point.x(), edge_point.y(), edge_point.z())
 
     @property
     def top_center_point(self):
-        values = [
-            x * self.height * calculate_unit_conversion_factor(self.units)
-            for x in self.axis_direction.unit_list
-        ]
-        return Vector(values[0], values[1], values[2])
+        return (
+            self.axis_direction.normalized()
+            * self.height
+            * calculate_unit_conversion_factor(self.units)
+        )
 
     def as_off_geometry(self, steps=20):
 
@@ -86,8 +95,7 @@ class CylindricalGeometry(Geometry):
         vectors = []
         rotate_matrix = self.rotation_matrix
         for vertex in vertices:
-            rotated = vertex * rotate_matrix
-            vectors.append(Vector(rotated.x(), rotated.y(), rotated.z()))
+            vectors.append(vertex * rotate_matrix)
         # faces are rectangles joining the top and bottom, followed by a steps-sided shapes for the base and top
         # the final face uses steps of -1 to have the same winding order as the other faces
         return OFFGeometry(
@@ -108,8 +116,7 @@ class CylindricalGeometry(Geometry):
         :return: A QMatrix4x4 describing the rotation from the Z axis to the cylinder's axis
         """
         default_axis = QVector3D(0, 0, 1)
-        unit_axis = self.axis_direction.unit_list
-        desired_axis = QVector3D(unit_axis[0], unit_axis[1], unit_axis[2])
+        desired_axis = self.axis_direction.normalized()
         rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
         rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis))
         rotate_degrees = rotate_radians * 360 / (2 * pi)
@@ -128,7 +135,7 @@ class OFFGeometry(Geometry):
             an index into the vertices list to identify a specific point in 3D space
     """
 
-    vertices = attr.ib(factory=list, type=List[Vector])
+    vertices = attr.ib(factory=list, type=List[QVector3D])
     faces = attr.ib(factory=list, type=List[List[int]])
 
     @property
@@ -139,6 +146,13 @@ class OFFGeometry(Geometry):
     def winding_order_indices(self):
         face_sizes = [len(face) for face in self.faces]
         return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
+
+
+@attr.s
+class NoShapeGeometry(Geometry):
+    """
+    Dummy object for components with no geometry.
+    """
 
 
 @attr.s

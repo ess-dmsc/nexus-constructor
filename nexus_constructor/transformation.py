@@ -24,7 +24,7 @@ class Transformation:
 
 
 class Rotation(Transformation):
-    def __init__(self, angle: int, name="rotation", axis=Vector(0, 0, 1)):
+    def __init__(self, angle=0.0, name="rotation", axis=Vector(0, 0, 1)):
         """
         Creates a rotation in the in-memory Nexus file under
         :param angle: The angle to rotate the object by.
@@ -34,12 +34,16 @@ class Rotation(Transformation):
         super().__init__(name)
         self.transformation.attrs["transformation_type"] = "rotation"
         self.transformation.attrs["angle"] = angle
-        self.transformation.attrs["axis"] = axis.xyz_list
+        self.transformation.attrs["axis"] = axis.vector.tolist()
         self._axis = axis
 
     @property
     def angle(self):
         return self.transformation.attrs["angle"]
+
+    @angle.setter
+    def angle(self, angle):
+        self.transformation.attrs["angle"] = angle
 
     @property
     def axis(self):
@@ -55,7 +59,7 @@ class Translation(Transformation):
         """
         super().__init__(name)
         self.transformation.attrs["transformation_type"] = "translation"
-        self.transformation.attrs["vector"] = vector.xyz_list
+        self.transformation.attrs["vector"] = vector.vector.tolist()
         self._vector = vector
 
     @property

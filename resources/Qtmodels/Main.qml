@@ -118,8 +118,19 @@ ApplicationWindow {
                 cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
 
                 AnimatedEntity {
+                    id: instrumentEntity
                     instrument: components
                 }
+            }
+
+            AxisIndicator {
+                id: axisIndicator
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                width: 100
+                height: 100
+
+                targetCamera: instrumentEntity.camera
             }
 
             MouseArea {
@@ -147,6 +158,7 @@ ApplicationWindow {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     clip: true
+                    boundsBehavior: Flickable.StopAtBounds
 
                     ScrollBar.vertical: ScrollBar {
                         policy: ScrollBar.AlwaysOn
@@ -178,6 +190,7 @@ ApplicationWindow {
                     Label {
                         id: jsonText
                         text: (collapsed ? collapsed_text : full_text)
+                        font.family: "Courier New"
                         wrapMode: Text.Wrap
                         width: parent.width
                         MouseArea {
