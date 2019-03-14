@@ -19,6 +19,8 @@ from nexus_constructor.nexus import NexusEncoder, NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.vector import Vector
+
 
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
     """
