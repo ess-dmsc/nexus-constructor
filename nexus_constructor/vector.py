@@ -1,4 +1,3 @@
-import attr
 from numpy import array, allclose
 from numpy.linalg import norm
 
