@@ -131,7 +131,6 @@ Item {
                 property var paneWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
                 id: translatePane
                 contentHeight: translateNameField.height + xField.height
-                padding: 0
 
                 ColumnLayout {
 
@@ -267,7 +266,6 @@ Item {
                 anchors.right: parent.right
                 contentWidth: moveUpButton.implicitWidth + moveDownButton.implicitWidth + 10 + deleteButton.implicitWidth
                 contentHeight: moveUpButton.implicitHeight
-                width: transformsListView.width
 
                 PaddedButton {
                     id: moveUpButton
