@@ -1,5 +1,9 @@
 from nexus_constructor.data_model import OFFGeometry, PixelGrid
-from nexus_constructor.geometry_loader import load_geometry, load_off_geometry
+from nexus_constructor.geometry_loader import (
+    load_geometry,
+    load_off_geometry,
+    load_stl_geometry,
+)
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
@@ -287,3 +291,9 @@ def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
 
     with patch("builtins.open", mock_open(read_data=invalid_off_file)):
         assert load_off_geometry(filename="invalidfile", mult_factor=1.0) is False
+
+
+def test_GIVEN_empty_file_WHEN_loading_STL_file_THEN_returns_false():
+
+    with patch("builtins.open", mock_open(read_data=" ")):
+        assert load_stl_geometry(filename="emptyfile", mult_factor=1.0) is False
