@@ -267,33 +267,107 @@ def test_GIVEN_empty_file_WHEN_loading_OFF_file_THEN_returns_false():
 
 def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
 
-    # This is a OFF file that describes a cube but is missing a point
-    invalid_off_file = (
-        r"OFF"
-        r"#  cube.off"
-        r"#  A cube"
-        r""
-        r"8 6 0"
-        r"-0.500000 -0.500000 0.500000"
-        r"0.500000 -0.500000 0.500000"
-        r"-0.500000 0.500000 0.500000"
-        r"0.500000 0.500000 0.500000"
-        r"-0.500000 0.500000 -0.500000"
-        r"0.500000 0.500000 -0.500000"
-        r"-0.500000 -0.500000 -0.500000"
-        r"4 0 1 3 2"
-        r"4 2 3 5 4"
-        r"4 4 5 7 6"
-        r"4 6 7 1 0"
-        r"4 1 7 5 3"
-        r"4 6 0 2 4"
-    )
+    invalid_off_files = [
+        (   # File missing a point
+            r"OFF"
+            r"#  cube.off"
+            r"#  A cube"
+            r""
+            r"8 6 0"
+            r"-0.500000 -0.500000 0.500000"
+            r"0.500000 -0.500000 0.500000"
+            r"-0.500000 0.500000 0.500000"
+            r"0.500000 0.500000 0.500000"
+            r"-0.500000 0.500000 -0.500000"
+            r"0.500000 0.500000 -0.500000"
+            r"-0.500000 -0.500000 -0.500000"
+            r"4 0 1 3 2"
+            r"4 2 3 5 4"
+            r"4 4 5 7 6"
+            r"4 6 7 1 0"
+            r"4 1 7 5 3"
+            r"4 6 0 2 4"
+        ),
+        (  # File with text in place of a z-coordinate
+            r"OFF"
+            r"#  cube.off"
+            r"#  A cube"
+            r""
+            r"8 6 0"
+            r"-0.500000 -0.500000 0.500000"
+            r"0.500000 -0.500000 0.500000"
+            r"-0.500000 0.500000 0.500000"
+            r"0.500000 0.500000 0.500000"
+            r"-0.500000 0.500000 -0.500000"
+            r"0.500000 0.500000 -0.500000"
+            r"-0.500000 -0.500000 aaaaa"
+            r"0.500000 -0.500000 -0.500000"
+            r"4 0 1 3 2"
+            r"4 2 3 5 4"
+            r"4 4 5 7 6"
+            r"4 6 7 1 0"
+            r"4 1 7 5 3"
+            r"4 6 0 2 4"
+        ),
+        (  # File with a missing z-coordinate
+            r"OFF"
+            r"#  cube.off"
+            r"#  A cube"
+            r""
+            r"8 6 0"
+            r"-0.500000 -0.500000 0.500000"
+            r"0.500000 -0.500000 0.500000"
+            r"-0.500000 0.500000 0.500000"
+            r"0.500000 0.500000 0.500000"
+            r"-0.500000 0.500000 -0.500000"
+            r"0.500000 0.500000 -0.500000"
+            r"-0.500000 -0.500000"
+            r"0.500000 -0.500000 -0.500000"
+            r"4 0 1 3 2"
+            r"4 2 3 5 4"
+            r"4 4 5 7 6"
+            r"4 6 7 1 0"
+            r"4 1 7 5 3"
+            r"4 6 0 2 4"
+        ),
+        (r"OFF" r"#  cube.off" r"#  A cube"),  # File with no points
+        (  # File that doesn't start with "OFF"
+            r"#  cube.off"
+            r"#  A cube"
+            r""
+            r"8 6 0"
+            r"-0.500000 -0.500000 0.500000"
+            r"0.500000 -0.500000 0.500000"
+            r"-0.500000 0.500000 0.500000"
+            r"0.500000 0.500000 0.500000"
+            r"-0.500000 0.500000 -0.500000"
+            r"0.500000 0.500000 -0.500000"
+            r"-0.500000 -0.500000 -0.500000"
+            r"0.500000 -0.500000 -0.500000"
+            r"4 0 1 3 2"
+            r"4 2 3 5 4"
+            r"4 4 5 7 6"
+            r"4 6 7 1 0"
+            r"4 1 7 5 3"
+            r"4 6 0 2 4"
+        ),
+    ]
 
-    with patch("builtins.open", mock_open(read_data=invalid_off_file)):
-        assert load_off_geometry(filename="invalidfile", mult_factor=1.0) is False
+    for invalid_off_file in invalid_off_files:
+        with patch("builtins.open", mock_open(read_data=invalid_off_file)):
+            assert load_off_geometry(filename="invalidfile", mult_factor=1.0) is False
 
 
 def test_GIVEN_empty_file_WHEN_loading_STL_file_THEN_returns_false():
 
     with patch("builtins.open", mock_open(read_data=" ")):
         assert load_stl_geometry(filename="emptyfile", mult_factor=1.0) is False
+
+
+def test_GIVEN_invalid_file_WHEN_loading_STL_file_THEN_returns_false():
+
+    # Cube with a coordinate that's missing a z-value
+    invalid_stl_file = "abcd"
+
+    with patch("builtins.open", mock_open(read_data=invalid_stl_file)):
+        assert load_stl_geometry(filename="invalidfile", mult_factor=1.0) is False
