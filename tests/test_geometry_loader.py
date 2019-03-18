@@ -1,11 +1,13 @@
 from nexus_constructor.data_model import OFFGeometry, PixelGrid
-from nexus_constructor.geometry_loader import load_geometry
+from nexus_constructor.geometry_loader import load_geometry, load_off_geometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
 from PySide2.QtGui import QVector3D
 import struct
-
+import mock
+import pytest
+from mock import mock_open
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     model = OFFModel()
@@ -252,3 +254,9 @@ def test_generate_off_mesh_with_repeating_grid():
             # check the triangles are present
             for triangle in triangles:
                 assert triangle in generated_triangles
+
+
+def test_GIVEN_empty_file_WHEN_loading_OFF_file_THEN_returns_false():
+
+    with mock.patch("builtins.open", mock_open(read_data=" ")):
+        assert load_off_geometry(filename="emptyfile", mult_factor=1.0) is False

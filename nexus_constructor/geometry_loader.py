@@ -47,8 +47,8 @@ def load_off_geometry(
         try:
             vertices, faces = parse_off_file(file)
         except (ValueError, TypeError):
-            print("Invalid file.")
-            return
+            # File is empty or invalid
+            return False
 
     geometry.vertices = [
         QVector3D(x * mult_factor, y * mult_factor, z * mult_factor)
