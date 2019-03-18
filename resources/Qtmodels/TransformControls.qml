@@ -128,7 +128,6 @@ Item {
 
             Pane {
 
-                property var paneWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
                 id: translatePane
                 contentHeight: translateNameField.height + xField.height
 
