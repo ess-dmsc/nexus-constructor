@@ -44,7 +44,11 @@ def load_off_geometry(
     :return: An OFFGeometry instance containing that file's geometry
     """
     with open(filename) as file:
-        vertices, faces = parse_off_file(file)
+        try:
+            vertices, faces = parse_off_file(file)
+        except (ValueError, TypeError):
+            print("Invalid file.")
+            return
 
     geometry.vertices = [
         QVector3D(x * mult_factor, y * mult_factor, z * mult_factor)
