@@ -53,13 +53,12 @@ Pane {
     Frame {
         id: listContainer
         anchors.left: parent.left
-        contentHeight: 100
         anchors.right: parent.right
+        contentWidth: componentListView.implicitWidth
+        contentHeight: 100
         anchors.top: headingRow.bottom
         anchors.bottom: parent.bottom
         padding: 1
-        contentWidth: componentListView.implicitWidth
-
         ListView {
             id: componentListView
             model: components
