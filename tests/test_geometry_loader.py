@@ -5,8 +5,8 @@ from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
 from PySide2.QtGui import QVector3D
 import struct
-import mock
-from mock import mock_open
+from mock import mock_open, patch
+
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     model = OFFModel()
@@ -257,30 +257,33 @@ def test_generate_off_mesh_with_repeating_grid():
 
 def test_GIVEN_empty_file_WHEN_loading_OFF_file_THEN_returns_false():
 
-    with mock.patch("builtins.open", mock_open(read_data=" ")):
+    with patch("builtins.open", mock_open(read_data=" ")):
         assert load_off_geometry(filename="emptyfile", mult_factor=1.0) is False
+
 
 def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
 
-    # This is a OFF file that's missing a point
-    invalid_off_file = ("OFF"
-                        "#  cube.off"
-                        "#  A cube"
-                        ""
-                        "8 6 0"
-                        "-0.500000 -0.500000 0.500000"
-                        "0.500000 -0.500000 0.500000"
-                        "-0.500000 0.500000 0.500000"
-                        "0.500000 0.500000 0.500000"
-                        "-0.500000 0.500000 -0.500000"
-                        "0.500000 0.500000 -0.500000"
-                        "-0.500000 -0.500000 -0.500000"
-                        "4 0 1 3 2"
-                        "4 2 3 5 4"
-                        "4 4 5 7 6"
-                        "4 6 7 1 0"
-                        "4 1 7 5 3"
-                        "4 6 0 2 4")
+    # This is a OFF file that describes a cube but is missing a point
+    invalid_off_file = (
+        r"OFF"
+        r"#  cube.off"
+        r"#  A cube"
+        r""
+        r"8 6 0"
+        r"-0.500000 -0.500000 0.500000"
+        r"0.500000 -0.500000 0.500000"
+        r"-0.500000 0.500000 0.500000"
+        r"0.500000 0.500000 0.500000"
+        r"-0.500000 0.500000 -0.500000"
+        r"0.500000 0.500000 -0.500000"
+        r"-0.500000 -0.500000 -0.500000"
+        r"4 0 1 3 2"
+        r"4 2 3 5 4"
+        r"4 4 5 7 6"
+        r"4 6 7 1 0"
+        r"4 1 7 5 3"
+        r"4 6 0 2 4"
+    )
 
-    with mock.patch("builtins.open", mock_open(read_data=invalid_off_file)):
+    with patch("builtins.open", mock_open(read_data=invalid_off_file)):
         assert load_off_geometry(filename="invalidfile", mult_factor=1.0) is False
