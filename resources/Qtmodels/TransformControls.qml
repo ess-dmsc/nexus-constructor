@@ -130,6 +130,7 @@ Item {
 
                 id: translatePane
                 contentHeight: translateNameField.height + xField.height
+                contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
 
                 ColumnLayout {
 
