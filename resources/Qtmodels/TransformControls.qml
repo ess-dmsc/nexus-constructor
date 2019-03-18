@@ -80,7 +80,7 @@ Item {
         contentWidth: transformsListView.implicitWidth
         contentHeight: transformsListView.implicitHeight
         visible: contentHeight > 0
-        padding: 0
+        padding: 1
 
         ListView {
             id: transformsListView
@@ -118,7 +118,7 @@ Item {
             width: transformsListView.width
             contentHeight: translatePane.height + rotatePane.height + transformButtons.height
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
-            // padding: 3
+            padding: 1
 
             Component.onCompleted: {
                 if (transformsListView.implicitWidth < transformBox.implicitWidth) {
