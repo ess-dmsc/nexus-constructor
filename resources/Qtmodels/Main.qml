@@ -54,13 +54,6 @@ ApplicationWindow {
                 }
             }
             RadioButton {
-                text: "Show Nexus Constructor JSON"
-                onClicked: {
-                    jsonMode = "liveGC"
-                    jsonConnector.request_nexus_constructor_json(components)
-                }
-            }
-            RadioButton {
                 text: "Hide JSON display"
                 onClicked: jsonMode = "hidden"
             }
@@ -208,10 +201,17 @@ ApplicationWindow {
             }
         }
     }
-
-    InstrumentModel{
-        id: components
+    NexusModel {
+        id: nxsModel
     }
+
+    InstrumentModel {
+        id: components
+        Component.onCompleted: {
+            request_instrument_group(nxsModel.instrumentGroup)
+        }
+    }
+
 
     FilteredJsonModel {
         id: jsonModel
@@ -221,9 +221,6 @@ ApplicationWindow {
         id: myLogger
     }
 
-    HdfWriter {
-        id: hdfWriter
-    }
 
     JsonConnector {
         id: jsonConnector

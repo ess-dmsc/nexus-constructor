@@ -1,3 +1,5 @@
+import h5py
+
 from nexus_constructor.data_model import (
     ComponentType,
     PixelGrid,
@@ -13,6 +15,13 @@ from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
+from nexus_constructor.nexus_model import NexusModel
+
+
+def create_group(name, nx_class, parent):
+    group = parent.create_group(name)
+    group.attrs["NX_class"] = nx_class
+    return group
 
 
 def generate_mesh(component: Component):
@@ -92,12 +101,10 @@ class InstrumentModel(QAbstractListModel):
 
     def __init__(self):
         super().__init__()
-
         self.dataChanged.connect(self.send_model_updated)
         self.rowsInserted.connect(self.send_model_updated)
         self.rowsRemoved.connect(self.send_model_updated)
         self.modelReset.connect(self.send_model_updated)
-
         self.components = [
             Component(
                 component_type=ComponentType.SAMPLE,
@@ -219,6 +226,10 @@ class InstrumentModel(QAbstractListModel):
     def flags(self, index):
         return super().flags(index) | Qt.ItemIsEditable
 
+    @Slot("QVariant")
+    def request_instrument_group(self, group):
+        self.group = group
+
     @Slot(str, str, str, int, int, "QVariant", "QVariant", "QVariant")
     def add_component(
         self,
@@ -255,6 +266,8 @@ class InstrumentModel(QAbstractListModel):
                 if transform_model is None
                 else transform_model.transforms,
             )
+            # TODO: do something with this group
+            component_group = create_group(name, "component", self.group)
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
             self.components.append(component)
             self.transform_models.append(TransformationModel(component.transforms))

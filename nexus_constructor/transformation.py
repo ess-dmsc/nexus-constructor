@@ -1,6 +1,4 @@
-import h5py
 from nexus_constructor.vector import Vector
-from uuid import uuid4
 
 
 class Transformation:
@@ -8,14 +6,12 @@ class Transformation:
     Parent class for transformations on the model.
     """
 
-    def __init__(self, name):
+    def __init__(self, nexus_dataset, name):
         """
         Creates an in-memory nexus file with a named entry containing an NXTransformation attribute.
         :param name: The name of the root entry in the nexus file.
         """
-        file_name = str(uuid4())
-        self.nexus_file = h5py.File(file_name, driver="core", backing_store=False)
-        self.transformation = self.nexus_file.create_group(name)
+        self.transformation = nexus_dataset[name]
         self.transformation.attrs["NX_class"] = "NXtransformations"
 
     @property
@@ -24,14 +20,14 @@ class Transformation:
 
 
 class Rotation(Transformation):
-    def __init__(self, angle=0.0, name="rotation", axis=Vector(0, 0, 1)):
+    def __init__(self, nexus_dataset, angle=0.0, name="rotation", axis=Vector(0, 0, 1)):
         """
         Creates a rotation in the in-memory Nexus file under
         :param angle: The angle to rotate the object by.
         :param name: The root entry name for the nexus file.
         :param axis: The point to rotate the object.
         """
-        super().__init__(name)
+        super().__init__(name, nexus_dataset)
         self.transformation.attrs["transformation_type"] = "rotation"
         self.transformation.attrs["angle"] = angle
         self.transformation.attrs["axis"] = axis.vector.tolist()
@@ -51,13 +47,13 @@ class Rotation(Transformation):
 
 
 class Translation(Transformation):
-    def __init__(self, name="translation", vector=Vector(0, 0, 0)):
+    def __init__(self, nexus_dataset, name="translation", vector=Vector(0, 0, 0)):
         """
         Creates a translation in the in-memory Nexus file
         :param name: The root entry name for the nexus file.
         :param vector: The vector for the translation.
         """
-        super().__init__(name)
+        super().__init__(name, nexus_dataset)
         self.transformation.attrs["transformation_type"] = "translation"
         self.transformation.attrs["vector"] = vector.vector.tolist()
         self._vector = vector
