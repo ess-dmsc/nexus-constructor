@@ -112,13 +112,11 @@ Item {
     Component {
         id: transformDelegate
 
-
         Frame {
             id: transformBox
             width: transformsListView.width
             contentHeight: translatePane.height + rotatePane.height + transformButtons.height
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
-            padding: 1
 
             Component.onCompleted: {
                 if (transformsListView.implicitWidth < transformBox.implicitWidth) {
@@ -127,7 +125,6 @@ Item {
             }
 
             Pane {
-
                 id: translatePane
                 contentHeight: translateNameField.height + xField.height
                 contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
