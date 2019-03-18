@@ -125,9 +125,10 @@ Item {
             }
 
             Pane {
+                padding: 0
+                contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
                 id: translatePane
                 contentHeight: translateNameField.height + xField.height
-                contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
 
                 ColumnLayout {
 
