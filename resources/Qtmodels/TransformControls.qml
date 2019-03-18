@@ -89,6 +89,9 @@ Item {
             implicitHeight: (contentHeight < 250) ? contentHeight : 250
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+            ScrollBar.vertical: ScrollBar {
+                policy: transformsListView.contentHeight > transformsListView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            }
         }
     }
 
