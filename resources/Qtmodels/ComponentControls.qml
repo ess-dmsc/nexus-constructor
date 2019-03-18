@@ -132,7 +132,7 @@ Pane {
                     id: mainNameLabel
                     anchors.left: parent.left
                     anchors.top: parent.top
-                    text: "Name: " + name
+                    text: "Name:" + name
                 }
             }
 
@@ -155,7 +155,7 @@ Pane {
 
                     LabeledTextField {
                         id: nameField
-                        labelText: "Name: "
+                        labelText: "Name:"
                         editorWidth: 200
                         editorText: name
                         onEditingFinished: name = editorText

@@ -254,7 +254,7 @@ ExpandingWindow {
 
             LabeledTextField {
                 id: nameField
-                labelText: "Name: "
+                labelText: "Name:"
                 editorWidth: 200
                 editorText: name
                 onEditingFinished: name = editorText

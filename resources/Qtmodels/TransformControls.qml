@@ -149,7 +149,7 @@ Item {
                             id: translateNameField
                             Layout.alignment: Qt.AlignRight
                             anchoredEditor: true
-                            labelText: "Name: "
+                            labelText: "Name:"
                             editorText: name
                             onEditingFinished: name = editorText
                             validator: NameValidator {
@@ -165,7 +165,7 @@ Item {
                         LabeledTextField {
                             id: xField
                             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            labelText: "x: "
+                            labelText: "x:"
                             editorText: translate_x
                             validator: numberValidator
                             onEditingFinished: translate_x = parseFloat(editorText)
@@ -174,7 +174,7 @@ Item {
                         LabeledTextField {
                             id: yField
                             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                            labelText: "y: "
+                            labelText: "y:"
                             editorText: translate_y
                             validator: numberValidator
                             onEditingFinished: translate_y = parseFloat(editorText)
@@ -183,7 +183,7 @@ Item {
                         LabeledTextField {
                             id: zField
                             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                            labelText: "z: "
+                            labelText: "z:"
                             editorText: translate_z
                             validator: numberValidator
                             onEditingFinished: translate_z = parseFloat(editorText)
@@ -211,7 +211,7 @@ Item {
                     anchors.right: parent.right
                     anchors.left: yRotField.left
                     anchoredEditor: true
-                    labelText: "Name: "
+                    labelText: "Name:"
                     editorText: name
                     onEditingFinished: name = editorText
                     validator: NameValidator {

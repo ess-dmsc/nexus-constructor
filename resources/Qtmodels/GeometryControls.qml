@@ -247,7 +247,7 @@ Pane {
                     id: axisXField
                     anchors.top: directionLabel.bottom
                     anchors.left: parent.left
-                    labelText: "x: "
+                    labelText: "x:"
                     editorText: axis_x
                     onEditingFinished: axis_x = parseFloat(editorText)
                     validator: numberValidator
@@ -256,7 +256,7 @@ Pane {
                     id: axisYField
                     anchors.top: axisXField.top
                     anchors.horizontalCenter: parent.horizontalCenter
-                    labelText: "y: "
+                    labelText: "y:"
                     editorText: axis_y
                     onEditingFinished: axis_y = parseFloat(editorText)
                     validator: numberValidator
@@ -265,7 +265,7 @@ Pane {
                     id: axisZField
                     anchors.top: axisXField.top
                     anchors.right: parent.right
-                    labelText: "z: "
+                    labelText: "z:"
                     editorText: axis_z
                     onEditingFinished: axis_z = parseFloat(editorText)
                     validator: numberValidator
