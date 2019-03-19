@@ -521,6 +521,31 @@ def test_GIVEN_invalid_file_WHEN_loading_STL_file_THEN_returns_false():
             "endfacet\n"
             "endsolid dart\n"
         ),
+        (  # Vertex missing a coordinate
+            "solid dart\n"
+            "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+            "vertex 1.00000E+000 2.50000E-001 1.00000E+000\n"
+            "endloop\n"
+            "endfacet\n"
+            "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+            "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+            "endloop\n"
+            "endfacet\n"
+            "facet normal 8.09000E-001 5.87800E-001 0.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001 6.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001\n"
+            "endloop\n"
+            "endfacet\n"
+            "endsolid dart\n"
+        ),
         (  # Empty loop
             "solid dart\n"
             "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
@@ -543,7 +568,7 @@ def test_GIVEN_invalid_file_WHEN_loading_STL_file_THEN_returns_false():
             "endfacet\n"
             "endsolid dart\n"
         ),
-        (
+        (  # Vertex that contains characters
             "solid dart\n"
             "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
             "outer loop\n"
