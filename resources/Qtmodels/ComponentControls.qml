@@ -67,11 +67,16 @@ Pane {
             anchors.bottom: parent.bottom
             clip: true
             boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical:           ScrollBar  {
-            id: bar
-            policy: ComponentList.showScrollBar ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            active: true
-        }
+            ScrollBar.vertical: ScrollBar  {
+                    id: bar
+                    policy: ScrollBar.AsNeeded
+                    active: true
+                    anchors.left: parent.right
+                    onActiveChanged: {
+                        if (!active)
+                            active = true;
+                    }
+                }
 
             onContentHeightChanged: {
 
