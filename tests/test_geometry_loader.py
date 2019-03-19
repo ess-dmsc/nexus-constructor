@@ -259,6 +259,36 @@ def test_generate_off_mesh_with_repeating_grid():
                 assert triangle in generated_triangles
 
 
+def test_GIVEN_valid_file_WHEN_loading_OFF_file_THEN_returns_geometry():
+
+    valid_off_file = (
+        "OFF\n"
+        "#  cube.off\n"
+        "#  A cube\n"
+        "8 6 0\n"
+        "-0.500000 -0.500000 0.500000\n"
+        "0.500000 -0.500000 0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "0.500000 0.500000 0.500000\n"
+        "-0.500000 0.500000 -0.500000\n"
+        "0.500000 0.500000 -0.500000\n"
+        "-0.500000 -0.500000 -0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "4 0 1 3 2\n"
+        "4 2 3 5 4\n"
+        "4 4 5 7 6\n"
+        "4 6 7 1 0\n"
+        "4 1 7 5 3\n"
+        "4 6 0 2 4\n"
+    )
+
+    with patch("builtins.open", mock_open(read_data=valid_off_file)):
+        assert (
+            type(load_off_geometry(filename="validfile", mult_factor=1.0))
+            is OFFGeometry
+        )
+
+
 def test_GIVEN_empty_file_WHEN_loading_OFF_file_THEN_returns_false():
 
     with patch("builtins.open", mock_open(read_data=" ")):
@@ -269,7 +299,7 @@ def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
 
     invalid_off_files = [
         (  # File missing a point
-            "OFF"
+            "OFF\n"
             "#  cube.off\n"
             "#  A cube\n"
             "8 6 0\n"
@@ -365,7 +395,7 @@ def test_GIVEN_invalid_file_WHEN_loading_STL_file_THEN_returns_false():
     # Cube with a coordinate that's missing a z-value
     invalid_stl_files = [
         "abcd",
-        (   # File with missing endloop statement
+        (  # File with missing endloop statement
             "solid dart\n"
             "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
             "outer loop\n"
@@ -389,7 +419,7 @@ def test_GIVEN_invalid_file_WHEN_loading_STL_file_THEN_returns_false():
             "endfacet\n"
             "endsolid dart\n"
         ),
-        (   # File with missing end solid statement
+        (  # File with missing end solid statement
             "solid dart\n"
             "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
             "outer loop\n"
