@@ -260,6 +260,7 @@ def test_generate_off_mesh_with_repeating_grid():
 
 
 def test_GIVEN_valid_file_WHEN_loading_OFF_file_THEN_returns_geometry():
+    """ Test that giving a valid OFF file causes the `load_off_geometry` function to return an OFFGeometry object """
 
     valid_off_file = (
         "OFF\n"
@@ -289,15 +290,12 @@ def test_GIVEN_valid_file_WHEN_loading_OFF_file_THEN_returns_geometry():
         )
 
 
-def test_GIVEN_empty_file_WHEN_loading_OFF_file_THEN_returns_false():
-
-    with patch("builtins.open", mock_open(read_data=" ")):
-        assert load_off_geometry(filename="emptyfile", mult_factor=1.0) is False
-
-
 def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
+    """ Test that the `load_off_geometry` function returns False when given an invalid file. """
 
     invalid_off_files = [
+        # Empty file
+        " ",
         (  # File missing a point
             "OFF\n"
             "#  cube.off\n"
@@ -357,7 +355,7 @@ def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
             "4 1 7 5 3\n"
             "4 6 0 2 4\n"
         ),
-        ("OFF" r"#  cube.off" r"#  A cube"),  # File with no points
+        "OFF\n#  cube.off\n#  A cube\n",  # File with no points
         (  # File that doesn't start with "OFF"
             "#  cube.off\n"
             "#  A cube\n"
@@ -384,16 +382,47 @@ def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
             assert load_off_geometry(filename="invalidfile", mult_factor=1.0) is False
 
 
-def test_GIVEN_empty_file_WHEN_loading_STL_file_THEN_returns_false():
+def test_GIVEN_valid_file_WHEN_loading_STL_file_THEN_returns_geometry():
 
-    with patch("builtins.open", mock_open(read_data=" ")):
-        assert load_stl_geometry(filename="emptyfile", mult_factor=1.0) is False
+    valid_stl_file = (
+        "solid dart\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "vertex 1.00000E+000 2.50000E-001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 8.09000E-001 5.87800E-001 0.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 6.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "endsolid dart\n"
+    )
+
+    with patch("builtins.open", mock_open(read_data=valid_stl_file)):
+        assert (
+            type(load_stl_geometry(filename="invalidfile", mult_factor=1.0))
+            is OFFGeometry
+        )
 
 
 def test_GIVEN_invalid_file_WHEN_loading_STL_file_THEN_returns_false():
+    """ Test that the `load_off_geometry` function returns False when given an invalid file. """
 
-    # Cube with a coordinate that's missing a z-value
     invalid_stl_files = [
+        # Empty file
+        " ",
         "abcd",
         (  # File with missing endloop statement
             "solid dart\n"

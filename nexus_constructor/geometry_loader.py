@@ -46,7 +46,7 @@ def load_off_geometry(
     with open(filename) as file:
         try:
             vertices, faces = parse_off_file(file)
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, StopIteration):
             # File is empty or invalid
             return False
 
