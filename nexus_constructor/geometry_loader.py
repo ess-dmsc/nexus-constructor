@@ -73,7 +73,7 @@ def load_stl_geometry(
     """
     try:
         mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
-    except (TypeError, AssertionError, RuntimeError):
+    except (TypeError, AssertionError, RuntimeError, ValueError):
         return False
     # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
     geometry.vertices = [
