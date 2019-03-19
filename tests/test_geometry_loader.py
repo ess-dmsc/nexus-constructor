@@ -272,7 +272,6 @@ def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
             "OFF"
             "#  cube.off\n"
             "#  A cube\n"
-            
             "8 6 0\n"
             "-0.500000 -0.500000 0.500000\n"
             "0.500000 -0.500000 0.500000\n"
@@ -292,7 +291,6 @@ def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
             "OFF\n"
             "#  cube.off\n"
             "#  A cube\n"
-            
             "8 6 0\n"
             "-0.500000 -0.500000 0.500000\n"
             "0.500000 -0.500000 0.500000\n"
@@ -313,7 +311,6 @@ def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
             "OFF\n"
             "#  cube.off\n"
             "#  A cube\n"
-            
             "8 6 0\n"
             "-0.500000 -0.500000 0.500000\n"
             "0.500000 -0.500000 0.500000\n"
@@ -334,7 +331,6 @@ def test_GIVEN_invalid_file_WHEN_loading_OFF_file_THEN_returns_false():
         (  # File that doesn't start with "OFF"
             "#  cube.off\n"
             "#  A cube\n"
-            
             "8 6 0\n"
             "-0.500000 -0.500000 0.500000\n"
             "0.500000 -0.500000 0.500000\n"
@@ -369,30 +365,53 @@ def test_GIVEN_invalid_file_WHEN_loading_STL_file_THEN_returns_false():
     # Cube with a coordinate that's missing a z-value
     invalid_stl_files = [
         "abcd",
-        (
-            """solid dart
-        facet normal 0.00000E+000 0.00000E+000 -1.00000E+000
-        outer loop
-        vertex 3.10000E+001 4.15500E+001 1.00000E+000
-        vertex 3.10000E+001 1.00000E+001 1.00000E+000
-        vertex 1.00000E+000 2.50000E-001 1.00000E+000
-        endloop
-        endfacet
-        facet normal 0.00000E+000 0.00000E+000 -1.00000E+000
-        outer loop
-        vertex 3.10000E+001 4.15500E+001 1.00000E+000
-        vertex 6.10000E+001 2.50000E-001 1.00000E+000
-        vertex 3.10000E+001 1.00000E+001 1.00000E+000
-        endloop
-        endfacet
-        facet normal 8.09000E-001 5.87800E-001 0.00000E+000
-        outer loop
-        vertex 3.10000E+001 4.15500E+001 1.00000E+000
-        vertex 6.10000E+001 2.50000E-001 6.00000E+000
-        vertex 6.10000E+001 2.50000E-001 1.00000E+000
-        endloop
-        endfacet
-        endsolid dart"""
+        (   # File with missing endloop statement
+            "solid dart\n"
+            "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+            "vertex 1.00000E+000 2.50000E-001 1.00000E+000\n"
+            "endloop\n"
+            "endfacet\n"
+            "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+            "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+            "endloop\n"
+            "endfacet\n"
+            "facet normal 8.09000E-001 5.87800E-001 0.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001 6.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+            "endfacet\n"
+            "endsolid dart\n"
+        ),
+        (   # File with missing end solid statement
+            "solid dart\n"
+            "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+            "vertex 1.00000E+000 2.50000E-001 1.00000E+000\n"
+            "endloop\n"
+            "endfacet\n"
+            "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+            "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+            "endloop\n"
+            "endfacet\n"
+            "facet normal 8.09000E-001 5.87800E-001 0.00000E+000\n"
+            "outer loop\n"
+            "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001 6.00000E+000\n"
+            "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+            "endloop\n"
+            "endfacet\n"
         ),
     ]
 
