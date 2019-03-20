@@ -4,10 +4,12 @@ import QtQuick.Dialogs 1.3
 import MyModels 1.0
 import QtQuick.Layouts 1.11
 import MyValidators 1.0
+import GeometryValidator 1.0
 import "."
 
 Pane {
     property var geometryModel
+    property bool validGeometry
 
     id: pane
     padding: 0
@@ -39,6 +41,10 @@ Pane {
     NoShapeModel {
         id: noShapeModel
         onDataChanged: pane.noShapeChanged()
+    }
+
+    GeometryValidator {
+        id: geometryValidator
     }
 
     Component {
@@ -74,6 +80,8 @@ Pane {
                 title: "Choose geometry file"
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
+                    validGeometry = geometryValidator.validate_geometry_file(file_url)
+                    console.log(validGeometry)
                     unitSelection.open()
                     visible: false
                 }
