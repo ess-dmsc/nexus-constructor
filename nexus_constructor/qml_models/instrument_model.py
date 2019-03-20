@@ -43,17 +43,6 @@ def determine_pixel_state(component):
     return ""
 
 
-def determine_geometry_state(component):
-    """Returns a string identifying the state a GeometryControls editor should be in for the given component"""
-    if isinstance(component.get_geometry(), CylindricalGeometry):
-        return "Cylinder"
-    elif isinstance(component.get_geometry(), OFFGeometry):
-        return "OFF"
-    elif isinstance(component.get_geometry(), NoShapeGeometry):
-        return "None"
-    return ""
-
-
 class InstrumentModel(QAbstractListModel):
     """
     A model that provides QML access to a list of components and their properties
@@ -152,9 +141,7 @@ class InstrumentModel(QAbstractListModel):
             and component.dependent_transform in component.transform_parent.transforms
             else -1,
             InstrumentModel.PixelStateRole: lambda: determine_pixel_state(component),
-            InstrumentModel.GeometryStateRole: lambda: determine_geometry_state(
-                component
-            ),
+            InstrumentModel.GeometryStateRole: lambda: component.geometry.geometry_str,
             InstrumentModel.MeshRole: lambda: generate_mesh(component),
             InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(
                 component
@@ -246,9 +233,7 @@ class InstrumentModel(QAbstractListModel):
                 description=description,
                 transform_parent=self.components[parent_index - 1],
                 dependent_transform=dependent_transform,
-                geometry=None
-                if geometry_model is None
-                else geometry_model.get_geometry(),
+                geometry=geometry_model.get_geometry(),
                 pixel_data=None
                 if pixel_model is None
                 else pixel_model.get_pixel_model(),

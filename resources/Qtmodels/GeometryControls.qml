@@ -7,7 +7,7 @@ import MyValidators 1.0
 import "."
 
 Pane {
-    property var geometryModel
+    property var geometryModel: noShapeModel
 
     id: pane
     padding: 0

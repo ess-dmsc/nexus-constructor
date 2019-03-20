@@ -11,7 +11,6 @@ from nexus_constructor.qml_models.instrument_model import (
     InstrumentModel,
     generate_mesh,
     determine_pixel_state,
-    determine_geometry_state,
     Component,
     ComponentType,
     PixelGrid,
@@ -287,24 +286,3 @@ def test_GIVEN_detector_with_PixelMapping_WHEN_determine_pixel_state_THEN_return
 def test_GIVEN_slit_WHEN_determine_pixel_state_THEN_returns_empty_string():
     component = Component(ComponentType.SLIT, "")
     assert determine_pixel_state(component) == ""
-
-
-def test_GIVEN_NoShapeModel_WHEN_determine_geometry_state_THEN_returns_none():
-    component = NoShapeModel()
-    assert determine_geometry_state(component) == "None"
-
-
-def test_GIVEN_cylindricalModel_WHEN_determine_geometry_state_THEN_returns_cylinder():
-    component = CylinderModel()
-    assert determine_geometry_state(component) == "Cylinder"
-
-
-def test_GIVEN_offmodel_WHEN_determine_geometry_state_THEN_returns_off():
-    component = OFFModel()
-    assert determine_geometry_state(component) == "OFF"
-
-
-def test_GIVEN_no_model_WHEN_determine_geometry_state_THEN_returns_empty_string():
-    component = NoShapeModel()
-    component.geometry = False
-    assert determine_geometry_state(component) == ""

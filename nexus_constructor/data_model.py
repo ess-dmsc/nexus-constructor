@@ -6,6 +6,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from numpy import array, allclose
 from numpy.linalg import norm
+from abc import ABC
 
 
 def validate_nonzero_vector(instance, attribute, value):
@@ -74,10 +75,9 @@ class Vector:
 
 
 @attr.s
-class Geometry:
-    """Base class for geometry a detector component can take"""
-
-    pass
+class Geometry(ABC):
+    """Base class for geometry a component can take"""
+    geometry_str = None  # A string describing the geometry type to the user
 
 
 @attr.s
@@ -88,7 +88,7 @@ class CylindricalGeometry(Geometry):
     The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
     described by the direction of its axis, its height, and radius.
     """
-
+    geometry_str = "Cylinder"
     units = attr.ib(default="m", type=str)
     axis_direction = attr.ib(
         factory=lambda: QVector3D(1, 0, 0),
@@ -181,7 +181,7 @@ class OFFGeometry(Geometry):
     faces:  list of integer lists. Each sublist is a winding path around the corners of a polygon. Each sublist item is
             an index into the vertices list to identify a specific point in 3D space
     """
-
+    geometry_str = "OFF"
     vertices = attr.ib(factory=list, type=List[QVector3D])
     faces = attr.ib(factory=list, type=List[List[int]])
 
@@ -200,7 +200,7 @@ class NoShapeGeometry(Geometry):
     """
     Dummy object for components with no geometry.
     """
-
+    geometry_str = "None"
 
 @attr.s
 class PixelData:
