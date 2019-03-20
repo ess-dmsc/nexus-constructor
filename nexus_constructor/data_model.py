@@ -1,6 +1,6 @@
 import attr
 from enum import Enum, unique
-from math import sin, cos, pi, acos
+from math import sin, cos, pi, acos, degrees
 from typing import List
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
@@ -122,39 +122,42 @@ class CylindricalGeometry(Geometry):
 
         unit_conversion_factor = calculate_unit_conversion_factor(self.units)
 
-        # steps number of points around the base, and steps number around the top, aligned with the Z axis
-        vertices = [
-            QVector3D(
-                sin(2 * pi * i / steps) * self.radius * unit_conversion_factor,
-                cos(2 * pi * i / steps) * self.radius * unit_conversion_factor,
-                0,
-            )
-            for i in range(steps)
-        ] + [
-            QVector3D(
-                sin(2 * pi * i / steps) * self.radius * unit_conversion_factor,
-                cos(2 * pi * i / steps) * self.radius * unit_conversion_factor,
-                self.height * unit_conversion_factor,
-            )
-            for i in range(steps)
-        ]
+        # A list of vertices describing the circle at the bottom of the cylinder
+        bottom_circle = [QVector3D(sin(2 * pi * i / steps), cos(2 * pi * i / steps), 0) * self.radius
+                         for i in range(steps)]
+
+        # The top of the cylinder is the bottom shifted upwards
+        top_circle = [vector + QVector3D(0, 0, self.height) for vector in bottom_circle]
+
+        # The true cylinder are all vertices from the unit cylinder multiplied by the conversion factor
+        vertices = [vector * unit_conversion_factor for vector in bottom_circle + top_circle]
+
         # rotate each vertex to produce the desired cylinder mesh
-        vectors = []
         rotate_matrix = self.rotation_matrix
-        for vertex in vertices:
-            vectors.append(vertex * rotate_matrix)
-        # faces are rectangles joining the top and bottom, followed by a steps-sided shapes for the base and top
-        # the final face uses steps of -1 to have the same winding order as the other faces
+        vertices = [vector * rotate_matrix for vector in vertices]
+
+        def vertex_above(vertex):
+            """
+            Returns the index of the vertex above this one in the cylinder.
+            """
+            return vertex + steps
+
+        def next_vertex(vertex):
+            """
+            Returns the next vertex around in the top or bottom circle of the cylinder.
+            """
+            return (vertex + 1) % steps
+
+        # Rectangular faces joining the top and bottom
+        rectangle_faces = [[i, vertex_above(i), vertex_above(next_vertex(i)), next_vertex(i)] for i in range(steps)]
+
+        # Step sided shapes describing the top and bottom
+        # The bottom uses steps of -1 to preserve winding order
+        top_bottom_faces = [[i for i in range(steps)], [i for i in range((2 * steps) - 1, steps - 1, -1)], ]
+
         return OFFGeometry(
-            vertices=vectors,
-            faces=[
-                [i, steps + i, steps + ((i + 1) % steps), (i + 1) % steps]
-                for i in range(steps)
-            ]
-            + [
-                [i for i in range(steps)],
-                [i for i in range((2 * steps) - 1, steps - 1, -1)],
-            ],
+            vertices=vertices,
+            faces=rectangle_faces + top_bottom_faces
         )
 
     @property
@@ -166,9 +169,8 @@ class CylindricalGeometry(Geometry):
         desired_axis = self.axis_direction.normalized()
         rotate_axis = QVector3D.crossProduct(desired_axis, default_axis)
         rotate_radians = acos(QVector3D.dotProduct(desired_axis, default_axis))
-        rotate_degrees = rotate_radians * 360 / (2 * pi)
         rotate_matrix = QMatrix4x4()
-        rotate_matrix.rotate(rotate_degrees, rotate_axis)
+        rotate_matrix.rotate(degrees(rotate_radians), rotate_axis)
         return rotate_matrix
 
 
@@ -201,6 +203,7 @@ class NoShapeGeometry(Geometry):
     Dummy object for components with no geometry.
     """
     geometry_str = "None"
+
 
 @attr.s
 class PixelData:
