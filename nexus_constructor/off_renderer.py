@@ -160,28 +160,6 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         return faces, vertices
 
 
-OFFCube = OFFGeometry(
-            vertices=[
-                QVector3D(-0.5, -0.5, 0.5),
-                QVector3D(0.5, -0.5, 0.5),
-                QVector3D(-0.5, 0.5, 0.5),
-                QVector3D(0.5, 0.5, 0.5),
-                QVector3D(-0.5, 0.5, -0.5),
-                QVector3D(0.5, 0.5, -0.5),
-                QVector3D(-0.5, -0.5, -0.5),
-                QVector3D(0.5, -0.5, -0.5),
-            ],
-            faces=[
-                [0, 1, 3, 2],
-                [2, 3, 5, 4],
-                [4, 5, 7, 6],
-                [6, 7, 1, 0],
-                [1, 7, 5, 3],
-                [6, 0, 2, 4],
-            ],
-        )
-
-
 class OffMesh(Qt3DRender.QGeometryRenderer):
     """
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D

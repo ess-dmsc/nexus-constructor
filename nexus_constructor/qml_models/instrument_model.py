@@ -8,27 +8,20 @@ from nexus_constructor.data_model import (
     Component,
     Rotation,
     Translation,
+    OFFCube
 )
 from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
-from nexus_constructor.off_renderer import OffMesh, OFFCube
+from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
 def generate_mesh(component: Component):
-    if isinstance(component.geometry, CylindricalGeometry):
-        geometry = component.geometry.as_off_geometry()
-    elif isinstance(component.geometry, OFFGeometry):
-        geometry = component.geometry
-    elif isinstance(component.geometry, NoShapeGeometry):
-        # create a dummy object
-        return OffMesh(OFFCube)
-    else:
-        return
     if component.component_type == ComponentType.DETECTOR:
-        return OffMesh(geometry, component.pixel_data)
-    return OffMesh(geometry)
+        return OffMesh(component.geometry.off_geometry, component.pixel_data)
+    else:
+        return OffMesh(component.geometry.off_geometry)
 
 
 def determine_pixel_state(component):

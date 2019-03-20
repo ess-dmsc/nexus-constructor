@@ -6,7 +6,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from numpy import array, allclose
 from numpy.linalg import norm
-from abc import ABC
+from abc import ABC, abstractmethod
 
 
 def validate_nonzero_vector(instance, attribute, value):
@@ -18,11 +18,6 @@ def validate_nonzero_vector(instance, attribute, value):
 def validate_nonzero_qvector(instance, attribute, value):
     if value.x() == 0 and value.y() == 0 and value.z() == 0:
         raise ValueError("Vector is zero length")
-
-
-def validate_list_contains_transformations(instance, attribute, value):
-    for item in value:
-        assert isinstance(item, Transformation)
 
 
 class Vector:
@@ -73,12 +68,15 @@ class Vector:
         ...
         return self.__class__ == other.__class__ and allclose(self.vector, other.vector)
 
-
 @attr.s
 class Geometry(ABC):
     """Base class for geometry a component can take"""
     geometry_str = None  # A string describing the geometry type to the user
 
+    @property
+    @abstractmethod
+    def off_geometry(self):
+        pass
 
 @attr.s
 class CylindricalGeometry(Geometry):
@@ -118,7 +116,8 @@ class CylindricalGeometry(Geometry):
             * calculate_unit_conversion_factor(self.units)
         )
 
-    def as_off_geometry(self, steps=20):
+    @property
+    def off_geometry(self, steps=20):
 
         unit_conversion_factor = calculate_unit_conversion_factor(self.units)
 
@@ -196,6 +195,10 @@ class OFFGeometry(Geometry):
         face_sizes = [len(face) for face in self.faces]
         return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
+    @property
+    def off_geometry(self):
+        return self
+
 
 @attr.s
 class NoShapeGeometry(Geometry):
@@ -203,6 +206,32 @@ class NoShapeGeometry(Geometry):
     Dummy object for components with no geometry.
     """
     geometry_str = "None"
+
+    @property
+    def off_geometry(self):
+        return OFFCube
+
+
+OFFCube = OFFGeometry(
+            vertices=[
+                QVector3D(-0.5, -0.5, 0.5),
+                QVector3D(0.5, -0.5, 0.5),
+                QVector3D(-0.5, 0.5, 0.5),
+                QVector3D(0.5, 0.5, 0.5),
+                QVector3D(-0.5, 0.5, -0.5),
+                QVector3D(0.5, 0.5, -0.5),
+                QVector3D(-0.5, -0.5, -0.5),
+                QVector3D(0.5, -0.5, -0.5),
+            ],
+            faces=[
+                [0, 1, 3, 2],
+                [2, 3, 5, 4],
+                [4, 5, 7, 6],
+                [6, 7, 1, 0],
+                [1, 7, 5, 3],
+                [6, 0, 2, 4],
+            ],
+        )
 
 
 @attr.s
@@ -322,8 +351,7 @@ class Component:
     dependent_transform = attr.ib(default=None, type=Transformation)
     transforms = attr.ib(
         factory=list,
-        type=List[Transformation],
-        validator=validate_list_contains_transformations,
+        type=List[Transformation]
     )
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)
