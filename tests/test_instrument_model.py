@@ -27,7 +27,7 @@ def test_initialise_model():
 
 def test_add_component():
     model = InstrumentModel()
-    model.add_component("Detector", "My Detector")
+    model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     assert model.rowCount() == 2
     assert model.components[1].component_type == data_model.ComponentType.DETECTOR
     assert model.components[1].name == "My Detector"
@@ -35,7 +35,7 @@ def test_add_component():
 
 def test_remove_component():
     model = InstrumentModel()
-    model.add_component("Detector", "My Detector")
+    model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     model.remove_component(1)
     assert model.rowCount() == 1
     assert not model.components[0].component_type == data_model.ComponentType.DETECTOR
