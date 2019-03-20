@@ -160,34 +160,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         return faces, vertices
 
 
-class OffMesh(Qt3DRender.QGeometryRenderer):
-    """
-    An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
-    """
-
-    def __init__(
-        self, geometry: OFFGeometry, pixel_data: PixelData = None, parent=None
-    ):
-        super().__init__(parent)
-
-        self.setInstanceCount(1)
-        if not geometry:
-            # Add a dummy shape - note this is only for the mesh renderer and not the Nexus file/json
-            qt_geometry = self.create_dummy_object()
-        else:
-            qt_geometry = QtOFFGeometry(geometry, pixel_data, self)
-        self.setVertexCount(qt_geometry.vertex_count)
-        self.setFirstVertex(0)
-        self.setPrimitiveType(Qt3DRender.QGeometryRenderer.Triangles)
-        self.setFirstInstance(0)
-        self.setGeometry(qt_geometry)
-
-    def create_dummy_object(self):
-        """
-        Create a dummy OFF geometry that displays as a cube for when the component has no geometry.
-        :return: A QtOFFGeometry to be rendered by Qt3D
-        """
-        geometry = OFFGeometry(
+OFFCube = OFFGeometry(
             vertices=[
                 QVector3D(-0.5, -0.5, 0.5),
                 QVector3D(0.5, -0.5, 0.5),
@@ -207,5 +180,22 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
                 [6, 0, 2, 4],
             ],
         )
-        qt_geometry = QtOFFGeometry(geometry, None, parent=self)
-        return qt_geometry
+
+
+class OffMesh(Qt3DRender.QGeometryRenderer):
+    """
+    An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
+    """
+
+    def __init__(
+        self, geometry: OFFGeometry, pixel_data: PixelData = None
+    ):
+        super().__init__(None)
+
+        self.setInstanceCount(1)
+        qt_geometry = QtOFFGeometry(geometry, pixel_data, self)
+        self.setVertexCount(qt_geometry.vertex_count)
+        self.setFirstVertex(0)
+        self.setPrimitiveType(Qt3DRender.QGeometryRenderer.Triangles)
+        self.setFirstInstance(0)
+        self.setGeometry(qt_geometry)

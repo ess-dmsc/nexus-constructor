@@ -11,7 +11,7 @@ from nexus_constructor.data_model import (
 )
 from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
-from nexus_constructor.off_renderer import OffMesh
+from nexus_constructor.off_renderer import OffMesh, OFFCube
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
@@ -23,7 +23,7 @@ def generate_mesh(component: Component):
         geometry = component.geometry
     elif isinstance(component.geometry, NoShapeGeometry):
         # create a dummy object
-        return OffMesh(False)
+        return OffMesh(OFFCube)
     else:
         return
     if component.component_type == ComponentType.DETECTOR:
@@ -92,26 +92,7 @@ class InstrumentModel(QAbstractListModel):
             Component(
                 component_type=ComponentType.SAMPLE,
                 name="Sample",
-                geometry=OFFGeometry(
-                    vertices=[
-                        QVector3D(-0.5, -0.5, 0.5),
-                        QVector3D(0.5, -0.5, 0.5),
-                        QVector3D(-0.5, 0.5, 0.5),
-                        QVector3D(0.5, 0.5, 0.5),
-                        QVector3D(-0.5, 0.5, -0.5),
-                        QVector3D(0.5, 0.5, -0.5),
-                        QVector3D(-0.5, -0.5, -0.5),
-                        QVector3D(0.5, -0.5, -0.5),
-                    ],
-                    faces=[
-                        [0, 1, 3, 2],
-                        [2, 3, 5, 4],
-                        [4, 5, 7, 6],
-                        [6, 7, 1, 0],
-                        [1, 7, 5, 3],
-                        [6, 0, 2, 4],
-                    ],
-                ),
+                geometry=OFFCube,
             )
         ]
         self.transform_models = [
