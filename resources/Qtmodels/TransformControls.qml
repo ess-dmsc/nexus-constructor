@@ -89,14 +89,7 @@ Item {
             implicitHeight: (contentHeight < 250) ? contentHeight : 250
             clip: true
             boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: ScrollBar {
-                    policy: ScrollBar.AsNeeded
-                    active: true
-                    onActiveChanged: {
-                        if (!active)
-                            active = true;
-                    }
-                }
+            ScrollBar.vertical: ActiveScrollBar {}
         }
     }
 
