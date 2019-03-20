@@ -86,8 +86,6 @@ Pane {
         }
     }
 
-
-
     Component {
         id: componentDelegate
         Frame {

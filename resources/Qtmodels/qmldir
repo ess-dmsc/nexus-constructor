@@ -1,3 +1,2 @@
 # qmldir
 singleton ValidUnits ValidUnits.qml
-singleton ComponentList ComponentList.qml
