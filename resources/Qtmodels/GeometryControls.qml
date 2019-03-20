@@ -80,7 +80,7 @@ Pane {
                 title: "Choose geometry file"
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
-                    validGeometry = geometryValidator.validate_geometry_file(file_url)
+                    validGeometry = geometryValidator.validate_geometry_file(fileUrl)
                     console.log(validGeometry)
                     unitSelection.open()
                     visible: false
