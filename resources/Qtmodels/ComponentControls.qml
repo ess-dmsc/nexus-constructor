@@ -67,16 +67,20 @@ Pane {
             anchors.bottom: parent.bottom
             clip: true
             boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: ScrollBar  {
+            ScrollBar.vertical: bar
+        }
+        ScrollBar  {
                                     id: bar
                                     policy: ScrollBar.AsNeeded
                                     active: true
                                     anchors.left: parent.right
+                                    anchors.top: parent.top
+                                    anchors.bottom: parent.bottom
                                     onActiveChanged: {
-                                        if (!active)
+                                        if (!active) {
                                             active = true;
+                                        }
                                 }
-            }
         }
     }
 
@@ -89,7 +93,7 @@ Pane {
             padding: 5
             contentHeight: Math.max(mainContent.height, expansionCaret.height)
             contentWidth: Math.max(mainContent.implicitWidth, extendedContent.implicitWidth)
-            width: ComponentList.showScrollBar ? componentListView.width - 10 : componentListView.width
+            width: componentListView.width
 
             onImplicitWidthChanged: {
                 if (componentListView.implicitWidth < componentBox.implicitWidth){
