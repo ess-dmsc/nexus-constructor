@@ -245,17 +245,6 @@ class InstrumentModel(QAbstractListModel):
             )
             self.update_transforms_deletable()
 
-    @Slot(int, "QVariant")
-    def set_geometry(self, index, geometry_model):
-        print(geometry_model)
-        self.components[index].geometry = geometry_model.get_geometry()
-        model_index = self.createIndex(index, 0)
-        self.dataChanged.emit(
-            model_index,
-            model_index,
-            [InstrumentModel.GeometryStateRole, InstrumentModel.MeshRole],
-        )
-
     def send_model_updated(self):
         self.model_updated.emit(self)
 
