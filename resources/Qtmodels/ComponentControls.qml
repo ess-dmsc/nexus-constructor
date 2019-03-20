@@ -68,28 +68,16 @@ Pane {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: ScrollBar  {
-                    id: bar
-                    policy: ScrollBar.AsNeeded
-                    active: true
-                    anchors.left: parent.right
-                    onActiveChanged: {
-                        if (!active)
-                            active = true;
-                    }
-                }
-
-            onContentHeightChanged: {
-
-                // Set a bool indicating that the content height in the component view has changed
-                if (componentListView.contentHeight > componentListView.height) {
-                    ComponentList.showScrollBar = true
-                }
-                else {
-                    ComponentList.showScrollBar = false
-                }
+                                    id: bar
+                                    policy: ScrollBar.AsNeeded
+                                    active: true
+                                    anchors.left: parent.right
+                                    onActiveChanged: {
+                                        if (!active)
+                                            active = true;
+                                }
             }
         }
-
     }
 
 
