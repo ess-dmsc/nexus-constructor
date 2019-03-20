@@ -67,6 +67,14 @@ Pane {
             anchors.bottom: parent.bottom
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+            ScrollBar.vertical: bar
+        }
+        ActiveScrollBar {
+            // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
+            id: bar
+            anchors.left: parent.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
         }
     }
 
