@@ -69,20 +69,12 @@ Pane {
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: bar
         }
-        ScrollBar  {
+        ActiveScrollBar {
             // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
             id: bar
-            policy: ScrollBar.AsNeeded
-            active: true
             anchors.left: parent.right
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            onActiveChanged: {
-                if (!active) {
-                    // Have the scrollbar appear without the mouse being over the ListView
-                    active = true;
-                }
-            }
         }
     }
 
