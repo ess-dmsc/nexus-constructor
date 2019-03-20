@@ -90,8 +90,13 @@ Item {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: ScrollBar {
-                policy: transformsListView.contentHeight > transformsListView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            }
+                    policy: ScrollBar.AsNeeded
+                    active: true
+                    onActiveChanged: {
+                        if (!active)
+                            active = true;
+                    }
+                }
         }
     }
 
