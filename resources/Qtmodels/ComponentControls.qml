@@ -70,17 +70,19 @@ Pane {
             ScrollBar.vertical: bar
         }
         ScrollBar  {
-                                    id: bar
-                                    policy: ScrollBar.AsNeeded
-                                    active: true
-                                    anchors.left: parent.right
-                                    anchors.top: parent.top
-                                    anchors.bottom: parent.bottom
-                                    onActiveChanged: {
-                                        if (!active) {
-                                            active = true;
-                                        }
-                                }
+            // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
+            id: bar
+            policy: ScrollBar.AsNeeded
+            active: true
+            anchors.left: parent.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            onActiveChanged: {
+                if (!active) {
+                    // Have the scrollbar appear without the mouse being over the ListView
+                    active = true;
+                }
+            }
         }
     }
 
