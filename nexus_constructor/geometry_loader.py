@@ -44,11 +44,7 @@ def load_off_geometry(
     :return: An OFFGeometry instance containing that file's geometry
     """
     with open(filename) as file:
-        try:
-            vertices, faces = parse_off_file(file)
-        except (ValueError, TypeError, StopIteration):
-            # File is empty or invalid
-            return False
+        vertices, faces = parse_off_file(file)
 
     geometry.vertices = [
         QVector3D(x * mult_factor, y * mult_factor, z * mult_factor)
@@ -71,10 +67,9 @@ def load_stl_geometry(
     returned
     :return: An OFFGeometry instance containing that file's geometry
     """
-    try:
-        mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
-    except (TypeError, AssertionError, RuntimeError, ValueError):
-        return False
+
+    mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
+
     # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
     geometry.vertices = [
         QVector3D(

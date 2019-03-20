@@ -1,16 +1,30 @@
 from PySide2.QtCore import QObject, QUrl, Slot
+from nexusutils.readwriteoff import parse_off_file
+from stl import mesh
 
 
 class GeometryFileValidator(QObject):
     @Slot(QUrl, result=bool)
     def validate_geometry_file(self, file_url: QUrl):
 
-        ext = file_url.toString(
+        filename = file_url.toString(
             options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
-        ).lower()[-3:]
+        )
+        ext = filename.lower()[-3:]
 
         if ext == "off":
-            pass
+            try:
+                with open(filename) as file:
+                    if parse_off_file(file) is None:
+                        return False
+            except (ValueError, TypeError, StopIteration):
+                # File is invalid
+                return False
 
         elif ext == "stl":
-            pass
+            try:
+                mesh.Mesh.from_file(filename, calculate_normals=False)
+            except (TypeError, AssertionError, RuntimeError, ValueError):
+                return False
+
+        return True
