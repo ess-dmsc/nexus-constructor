@@ -2,11 +2,12 @@ from PySide2.QtCore import QObject, QUrl, Slot
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 from io import TextIOWrapper
+from os.path import splitext
 
 
 def _validate_geometry_file(file: TextIOWrapper, filename: str):
-    file_extension = filename.lower()[-3:]
-    if file_extension == "off":
+    file_extension = splitext(filename)[-1].lower()
+    if file_extension == ".off":
         try:
             if parse_off_file(file) is None:
                 return False
@@ -14,7 +15,7 @@ def _validate_geometry_file(file: TextIOWrapper, filename: str):
             # File is invalid
             return False
 
-    elif file_extension == "stl":
+    elif file_extension == ".stl":
         try:
             mesh.Mesh.from_file("", fh=file, calculate_normals=False)
         except (TypeError, AssertionError, RuntimeError, ValueError):
