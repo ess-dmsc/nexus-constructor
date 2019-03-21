@@ -86,9 +86,18 @@ Pane {
                     }
                     else {
                         // Invalid Geometry file given - Reject file
-                        console.log("Invalid geometry file given.")
+                        reject()
+                        // fileTextField.editorText = ""
+                        invalidGeometryFile.open()
                     }
                 }
+            }
+            MessageDialog {
+                id: invalidGeometryFile
+                icon: StandardIcon.Critical
+                title: "Invalid Geometry File"
+                text: "Invalid Geometry file given. Please select a different file."
+                visible: false
             }
             Dialog {
 
