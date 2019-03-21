@@ -87,7 +87,6 @@ Pane {
                     else {
                         // Invalid Geometry file given - Reject file
                         reject()
-                        // fileTextField.editorText = ""
                         invalidGeometryFile.open()
                     }
                 }
