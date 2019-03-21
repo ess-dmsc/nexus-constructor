@@ -1,6 +1,4 @@
-from nexus_constructor.geometry_file_validator import GeometryFileValidator, _validate_geometry_file
-from PySide2.QtCore import QUrl
-from unittest.mock import patch, mock_open
+from nexus_constructor.geometry_file_validator import _validate_geometry_file
 from io import StringIO
 
 
