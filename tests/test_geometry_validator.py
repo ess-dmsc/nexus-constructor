@@ -1,6 +1,7 @@
-from nexus_constructor.geometry_file_validator import GeometryFileValidator
+from nexus_constructor.geometry_file_validator import GeometryFileValidator, _validate_geometry_file
 from PySide2.QtCore import QUrl
 from unittest.mock import patch, mock_open
+from io import StringIO
 
 
 def test_GIVEN_valid_file_WHEN_validating_OFF_file_THEN_returns_true():
@@ -38,7 +39,7 @@ def test_GIVEN_invalid_file_WHEN_validating_OFF_file_THEN_returns_false():
 
     invalid_off_files = [
         # Empty file
-        "",
+        [""],
         (  # File missing a point
             "OFF\n"
             "#  cube.off\n"
@@ -121,10 +122,8 @@ def test_GIVEN_invalid_file_WHEN_validating_OFF_file_THEN_returns_false():
     ]
 
     for invalid_off_file in invalid_off_files:
-        with patch("builtins.open", mock_open(read_data=invalid_off_file)):
-            assert not GeometryFileValidator().validate_geometry_file(
-                QUrl("mock_invalid_file.off")
-            )
+        file = StringIO("".join(invalid_off_file))
+        assert not _validate_geometry_file(file, "invalid_file.off")
 
 
 def test_GIVEN_valid_file_WHEN_validating_STL_file_THEN_returns_true():
