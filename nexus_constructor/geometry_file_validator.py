@@ -16,6 +16,7 @@ class GeometryFileValidator(QObject):
             try:
                 with open(filename) as file:
                     if parse_off_file(file) is None:
+                        # In some cases a bad file causes the function to return None
                         return False
             except (ValueError, TypeError, StopIteration):
                 # File is invalid
@@ -25,6 +26,7 @@ class GeometryFileValidator(QObject):
             try:
                 mesh.Mesh.from_file(filename, calculate_normals=False)
             except (TypeError, AssertionError, RuntimeError, ValueError):
+                # File is invalid
                 return False
 
         return True
