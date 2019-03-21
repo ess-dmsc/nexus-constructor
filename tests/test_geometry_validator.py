@@ -128,6 +128,7 @@ def test_GIVEN_invalid_file_WHEN_validating_OFF_file_THEN_returns_false():
             )
 
 
+@pytest.mark.skip()
 def test_GIVEN_valid_file_WHEN_validating_STL_file_THEN_returns_true():
 
     valid_stl_file = (
