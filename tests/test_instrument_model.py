@@ -186,9 +186,7 @@ def test_generate_matrix_combines_dependent_transforms():
         matrix.rotate(rotate.angle, rotate.axis)
 
     def translate_matrix(matrix: QMatrix4x4, translate: data_model.Translation):
-        matrix.translate(
-            translate.vector.x(), translate.vector.y(), translate.vector.z()
-        )
+        matrix.translate(translate.vector)
 
     target_matrix = QMatrix4x4()
     assert instrument.generate_matrix(instrument.components[0]) == target_matrix
