@@ -28,10 +28,8 @@ def test_GIVEN_valid_file_WHEN_validating_OFF_file_THEN_returns_true():
         "4 6 0 2 4\n"
     )
 
-    with patch("builtins.open", mock_open(read_data=valid_off_file)):
-        assert GeometryFileValidator().validate_geometry_file(
-            QUrl("mock_valid_file.off")
-        )
+    file = StringIO("".join(valid_off_file))
+    assert _validate_geometry_file(file, "valid_file.off")
 
 
 def test_GIVEN_invalid_file_WHEN_validating_OFF_file_THEN_returns_false():
@@ -154,10 +152,8 @@ def test_GIVEN_valid_file_WHEN_validating_STL_file_THEN_returns_true():
         "endsolid dart\n"
     )
 
-    with patch("builtins.open", mock_open(read_data=valid_stl_file)):
-        assert GeometryFileValidator().validate_geometry_file(
-            QUrl("mock_valid_file.stl")
-        )
+    file = StringIO("".join(valid_stl_file))
+    assert _validate_geometry_file(file, "valid_file.stl")
 
 
 def test_GIVEN_invalid_file_WHEN_validating_STL_file_THEN_returns_false():
@@ -391,7 +387,5 @@ def test_GIVEN_invalid_file_WHEN_validating_STL_file_THEN_returns_false():
     ]
 
     for invalid_stl_file in invalid_stl_files:
-        with patch("builtins.open", mock_open(read_data=invalid_stl_file)):
-            assert not GeometryFileValidator().validate_geometry_file(
-                QUrl("mock_valid_file.stl")
-            )
+        file = StringIO("".join(invalid_stl_file))
+        assert not _validate_geometry_file(file, "invalid_file.stl")
