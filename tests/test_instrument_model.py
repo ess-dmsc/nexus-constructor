@@ -5,7 +5,6 @@ from nexus_constructor.qml_models.geometry_models import (
     NoShapeModel,
     OFFModel,
     OFFGeometry,
-    CylinderModel,
 )
 from nexus_constructor.qml_models.instrument_model import (
     InstrumentModel,
