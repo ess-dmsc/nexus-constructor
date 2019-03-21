@@ -99,8 +99,8 @@ def add_transform_data(json_data: dict, component: Component):
                 type_name = "rotation"
                 units = "degrees"
                 vector = (
-                    transform.axis.unit_list.tolist()
-                    if transform.axis.magnitude != 0
+                    transform.axis.toTuple()
+                    if transform.axis.length() != 0
                     else [0, 0, 0]
                 )
                 value = transform.angle
@@ -108,11 +108,11 @@ def add_transform_data(json_data: dict, component: Component):
                 type_name = "translation"
                 units = "m"
                 vector = (
-                    transform.vector.unit_list.tolist()
-                    if transform.vector.magnitude != 0
+                    transform.vector.normalized().toTuple()
+                    if transform.vector.length() != 0
                     else [0, 0, 0]
                 )
-                value = transform.vector.magnitude
+                value = transform.vector.length()
             else:
                 continue
 

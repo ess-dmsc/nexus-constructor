@@ -363,14 +363,9 @@ class InstrumentModel(QAbstractListModel):
 
             for transform in transforms:
                 if isinstance(transform, Translation):
-                    matrix.translate(
-                        transform.vector.x, transform.vector.y, transform.vector.z
-                    )
+                    matrix.translate(transform.vector)
                 elif isinstance(transform, Rotation):
-                    matrix.rotate(
-                        transform.angle,
-                        QVector3D(transform.axis.x, transform.axis.y, transform.axis.z),
-                    )
+                    matrix.rotate(transform.angle, transform.axis)
 
         apply_transforms(component, -1)
         return matrix

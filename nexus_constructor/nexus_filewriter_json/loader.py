@@ -12,7 +12,6 @@ from nexus_constructor.data_model import (
     ComponentType,
     Rotation,
     Translation,
-    Vector,
     OFFGeometry,
     CylindricalGeometry,
     SinglePixelId,
@@ -283,14 +282,16 @@ def generate_transforms(json_component: dict):
                     x = vector[0]
                     y = vector[1]
                     z = vector[2]
-                    transform = Rotation(axis=Vector(x, y, z), angle=angle, name=name)
+                    transform = Rotation(
+                        axis=QVector3D(x, y, z), angle=angle, name=name
+                    )
                 elif attribute_value(dataset, "transformation_type") == "translation":
                     magnitude = dataset["values"]
                     vector = attribute_value(dataset, "vector")
                     x = vector[0] * magnitude
                     y = vector[1] * magnitude
                     z = vector[2] * magnitude
-                    transform = Translation(vector=Vector(x, y, z), name=name)
+                    transform = Translation(vector=QVector3D(x, y, z), name=name)
                 else:
                     continue
                 transforms.append(transform)

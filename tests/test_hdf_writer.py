@@ -1,5 +1,7 @@
 import h5py
 from math import sqrt
+
+from PySide2.QtGui import QVector3D
 from pytest import approx
 from nexus_constructor.data_model import (
     Component,
@@ -7,7 +9,6 @@ from nexus_constructor.data_model import (
     PixelGrid,
     Corner,
     CountDirection,
-    Vector,
     Rotation,
     Translation,
 )
@@ -30,8 +31,8 @@ def make_instrument_with_sample_transform():
             name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
-                Rotation(name="rotate", axis=Vector(4, 5, 6), angle=90),
-                Translation(name="translate", vector=Vector(1, 2, 3)),
+                Rotation(name="rotate", axis=QVector3D(4, 5, 6), angle=90),
+                Translation(name="translate", vector=QVector3D(1, 2, 3)),
             ],
         )
     )
@@ -42,8 +43,8 @@ def make_instrument_with_sample_transform():
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
             transforms=[
-                Translation(name="translate", vector=Vector(1, 2, 3)),
-                Rotation(name="rotate", axis=Vector(4, 5, 6), angle=90),
+                Translation(name="translate", vector=QVector3D(1, 2, 3)),
+                Rotation(name="rotate", axis=QVector3D(4, 5, 6), angle=90),
             ],
         )
     )
@@ -53,9 +54,9 @@ def make_instrument_with_sample_transform():
             name="detector3",
             transform_parent=instrument.components[1],
             transforms=[
-                Rotation(name="rotate", axis=Vector(4, 5, 6), angle=90),
-                Translation(name="translate", vector=Vector(1, 2, 3)),
-                Translation(name="translate2", vector=Vector(1, 2, 3)),
+                Rotation(name="rotate", axis=QVector3D(4, 5, 6), angle=90),
+                Translation(name="translate", vector=QVector3D(1, 2, 3)),
+                Translation(name="translate2", vector=QVector3D(1, 2, 3)),
             ],
         )
     )
