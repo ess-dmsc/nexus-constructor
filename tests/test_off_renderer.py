@@ -3,7 +3,7 @@ from nexus_constructor.off_renderer import (
     create_vertex_buffer,
     create_normal_buffer,
     OffMesh,
-    OFFCube
+    OFFCube,
 )
 from nexus_constructor.data_model import OFFGeometry
 import itertools

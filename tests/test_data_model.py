@@ -63,4 +63,3 @@ def test_z_axis_aligned_cylindrical_geometry_points():
 def test_axis_direction_must_be_non_zero():
     with raises(ValueError):
         CylindricalGeometry(axis_direction=QVector3D(0, 0, 0))
-

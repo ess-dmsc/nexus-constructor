@@ -8,7 +8,7 @@ from nexus_constructor.data_model import (
     Component,
     Rotation,
     Translation,
-    OFFCube
+    OFFCube,
 )
 from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
@@ -83,9 +83,7 @@ class InstrumentModel(QAbstractListModel):
 
         self.components = [
             Component(
-                component_type=ComponentType.SAMPLE,
-                name="Sample",
-                geometry=OFFCube,
+                component_type=ComponentType.SAMPLE, name="Sample", geometry=OFFCube
             )
         ]
         self.transform_models = [

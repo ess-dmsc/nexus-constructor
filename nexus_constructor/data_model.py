@@ -68,15 +68,18 @@ class Vector:
         ...
         return self.__class__ == other.__class__ and allclose(self.vector, other.vector)
 
+
 @attr.s
 class Geometry(ABC):
     """Base class for geometry a component can take"""
+
     geometry_str = None  # A string describing the geometry type to the user
 
     @property
     @abstractmethod
     def off_geometry(self):
         pass
+
 
 @attr.s
 class CylindricalGeometry(Geometry):
@@ -86,6 +89,7 @@ class CylindricalGeometry(Geometry):
     The cylinder is assumed to have the center of its base located at the origin of the local coordinate system, and is
     described by the direction of its axis, its height, and radius.
     """
+
     geometry_str = "Cylinder"
     units = attr.ib(default="m", type=str)
     axis_direction = attr.ib(
@@ -122,14 +126,18 @@ class CylindricalGeometry(Geometry):
         unit_conversion_factor = calculate_unit_conversion_factor(self.units)
 
         # A list of vertices describing the circle at the bottom of the cylinder
-        bottom_circle = [QVector3D(sin(2 * pi * i / steps), cos(2 * pi * i / steps), 0) * self.radius
-                         for i in range(steps)]
+        bottom_circle = [
+            QVector3D(sin(2 * pi * i / steps), cos(2 * pi * i / steps), 0) * self.radius
+            for i in range(steps)
+        ]
 
         # The top of the cylinder is the bottom shifted upwards
         top_circle = [vector + QVector3D(0, 0, self.height) for vector in bottom_circle]
 
         # The true cylinder are all vertices from the unit cylinder multiplied by the conversion factor
-        vertices = [vector * unit_conversion_factor for vector in bottom_circle + top_circle]
+        vertices = [
+            vector * unit_conversion_factor for vector in bottom_circle + top_circle
+        ]
 
         # rotate each vertex to produce the desired cylinder mesh
         rotate_matrix = self.rotation_matrix
@@ -148,16 +156,19 @@ class CylindricalGeometry(Geometry):
             return (vertex + 1) % steps
 
         # Rectangular faces joining the top and bottom
-        rectangle_faces = [[i, vertex_above(i), vertex_above(next_vertex(i)), next_vertex(i)] for i in range(steps)]
+        rectangle_faces = [
+            [i, vertex_above(i), vertex_above(next_vertex(i)), next_vertex(i)]
+            for i in range(steps)
+        ]
 
         # Step sided shapes describing the top and bottom
         # The bottom uses steps of -1 to preserve winding order
-        top_bottom_faces = [[i for i in range(steps)], [i for i in range((2 * steps) - 1, steps - 1, -1)], ]
+        top_bottom_faces = [
+            [i for i in range(steps)],
+            [i for i in range((2 * steps) - 1, steps - 1, -1)],
+        ]
 
-        return OFFGeometry(
-            vertices=vertices,
-            faces=rectangle_faces + top_bottom_faces
-        )
+        return OFFGeometry(vertices=vertices, faces=rectangle_faces + top_bottom_faces)
 
     @property
     def rotation_matrix(self):
@@ -182,6 +193,7 @@ class OFFGeometry(Geometry):
     faces:  list of integer lists. Each sublist is a winding path around the corners of a polygon. Each sublist item is
             an index into the vertices list to identify a specific point in 3D space
     """
+
     geometry_str = "OFF"
     vertices = attr.ib(factory=list, type=List[QVector3D])
     faces = attr.ib(factory=list, type=List[List[int]])
@@ -205,6 +217,7 @@ class NoShapeGeometry(Geometry):
     """
     Dummy object for components with no geometry.
     """
+
     geometry_str = "None"
 
     @property
@@ -213,25 +226,25 @@ class NoShapeGeometry(Geometry):
 
 
 OFFCube = OFFGeometry(
-            vertices=[
-                QVector3D(-0.5, -0.5, 0.5),
-                QVector3D(0.5, -0.5, 0.5),
-                QVector3D(-0.5, 0.5, 0.5),
-                QVector3D(0.5, 0.5, 0.5),
-                QVector3D(-0.5, 0.5, -0.5),
-                QVector3D(0.5, 0.5, -0.5),
-                QVector3D(-0.5, -0.5, -0.5),
-                QVector3D(0.5, -0.5, -0.5),
-            ],
-            faces=[
-                [0, 1, 3, 2],
-                [2, 3, 5, 4],
-                [4, 5, 7, 6],
-                [6, 7, 1, 0],
-                [1, 7, 5, 3],
-                [6, 0, 2, 4],
-            ],
-        )
+    vertices=[
+        QVector3D(-0.5, -0.5, 0.5),
+        QVector3D(0.5, -0.5, 0.5),
+        QVector3D(-0.5, 0.5, 0.5),
+        QVector3D(0.5, 0.5, 0.5),
+        QVector3D(-0.5, 0.5, -0.5),
+        QVector3D(0.5, 0.5, -0.5),
+        QVector3D(-0.5, -0.5, -0.5),
+        QVector3D(0.5, -0.5, -0.5),
+    ],
+    faces=[
+        [0, 1, 3, 2],
+        [2, 3, 5, 4],
+        [4, 5, 7, 6],
+        [6, 7, 1, 0],
+        [1, 7, 5, 3],
+        [6, 0, 2, 4],
+    ],
+)
 
 
 @attr.s
@@ -349,9 +362,6 @@ class Component:
     description = attr.ib(default="", type=str)
     transform_parent = attr.ib(default=None, type=object)
     dependent_transform = attr.ib(default=None, type=Transformation)
-    transforms = attr.ib(
-        factory=list,
-        type=List[Transformation]
-    )
+    transforms = attr.ib(factory=list, type=List[Transformation])
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)
