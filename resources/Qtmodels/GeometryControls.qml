@@ -9,7 +9,6 @@ import "."
 
 Pane {
     property var geometryModel
-    property bool validGeometry
 
     id: pane
     padding: 0
@@ -80,10 +79,15 @@ Pane {
                 title: "Choose geometry file"
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
-                    validGeometry = geometryValidator.validate_geometry_file(fileUrl)
-                    console.log(validGeometry)
-                    unitSelection.open()
-                    visible: false
+                    if (geometryValidator.validate_geometry_file(fileUrl)) {
+                        // Valid Geometry file given - Accept file and ask user to give the units
+                        unitSelection.open()
+                        visible: false
+                    }
+                    else {
+                        // Invalid Geometry file given - Reject file
+                        console.log("Invalid geometry file given.")
+                    }
                 }
             }
             Dialog {
