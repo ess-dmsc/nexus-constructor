@@ -4,8 +4,6 @@ from math import sin, cos, pi, acos
 from typing import List
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
-from numpy import array, allclose
-from numpy.linalg import norm
 
 
 def validate_nonzero_vector(instance, attribute, value):
