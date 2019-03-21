@@ -227,6 +227,7 @@ class SinglePixelId(PixelData):
 @attr.s
 class Transformation:
     name = attr.ib(str)
+    type = "Transformation"
 
 
 @attr.s
@@ -237,11 +238,13 @@ class Rotation(Transformation):
         validator=validate_nonzero_vector,
     )
     angle = attr.ib(default=0)
+    type = "Rotation"
 
 
 @attr.s
 class Translation(Transformation):
     vector = attr.ib(factory=lambda: QVector3D(0, 0, 0), type=QVector3D)
+    type = "Translation"
 
 
 @unique
