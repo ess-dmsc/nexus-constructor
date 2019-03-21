@@ -157,7 +157,7 @@ def test_GIVEN_valid_file_WHEN_validating_STL_file_THEN_returns_true():
 
     with patch("builtins.open", mock_open(read_data=valid_stl_file)):
         assert GeometryFileValidator().validate_geometry_file(
-            QUrl("mock_invalid_file.stl")
+            QUrl("mock_valid_file.stl")
         )
 
 
