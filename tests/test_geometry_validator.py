@@ -387,3 +387,9 @@ def test_GIVEN_invalid_file_WHEN_validating_STL_file_THEN_returns_false():
     for invalid_stl_file in invalid_stl_files:
         file = StringIO("".join(invalid_stl_file))
         assert not _validate_geometry_file(file, "invalid_file.stl")
+
+
+def test_GIVEN_unrecognised_filename_WHEN_validating_geometry_file_THEN_returns_false():
+
+    assert not _validate_geometry_file(StringIO(), "invalid_extens.ion")
+    assert not _validate_geometry_file(StringIO(), "no_extension")

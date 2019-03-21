@@ -10,6 +10,7 @@ def _validate_geometry_file(file: TextIOWrapper, filename: str):
     if file_extension == ".off":
         try:
             if parse_off_file(file) is None:
+                # An invalid file can cause the function to return None
                 return False
         except (ValueError, TypeError, StopIteration, IndexError):
             # File is invalid
@@ -19,7 +20,12 @@ def _validate_geometry_file(file: TextIOWrapper, filename: str):
         try:
             mesh.Mesh.from_file("", fh=file, calculate_normals=False)
         except (TypeError, AssertionError, RuntimeError, ValueError):
+            # File is invalid
             return False
+
+    else:
+        # File has unrecognised/no extension
+        return False
 
     return True
 
