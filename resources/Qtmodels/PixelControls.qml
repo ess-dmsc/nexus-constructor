@@ -37,20 +37,15 @@ Item {
             id: view
             anchors.left: parent.left
             height: contentHeight
-            width: view.contentHeight > view.height ? parent.width - 10 : parent.width
+            width: parent.width
             interactive: false
             clip: true
             ScrollBar.vertical: bar
             boundsBehavior: Flickable.StopAtBounds
         }
 
-        ScrollBar {
-
+        ActiveScrollBar {
             id: bar
-
-            active: true
-            policy: view.contentHeight > view.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-
             anchors {
                 left: view.right
                 top: view.top
