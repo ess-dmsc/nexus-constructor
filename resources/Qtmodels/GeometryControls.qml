@@ -5,7 +5,6 @@ import MyModels 1.0
 import QtQuick.Layouts 1.11
 import MyValidators 1.0
 import GeometryValidator 1.0
-import "."
 
 Pane {
     property var geometryModel
