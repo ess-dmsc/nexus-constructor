@@ -71,7 +71,11 @@ Pane {
                 anchors.verticalCenter: fileTextField.verticalCenter
                 anchors.right: parent.right
                 text: "Choose file"
-                onClicked: filePicker.open()
+                onClicked: {
+                    console.log("Opening file picker.")
+                    filePicker.open()
+                    console.log("Done with the file picker.")
+                }
             }
             FileDialog {
                 id: filePicker
@@ -87,12 +91,12 @@ Pane {
                     else {
                         // Invalid Geometry file given - Reject file
                         reject()
-                        invalidGeometryFile.open()
+                        invalidGeometryFileDialog.open()
                     }
                 }
             }
             MessageDialog {
-                id: invalidGeometryFile
+                id: invalidGeometryFileDialog
                 icon: StandardIcon.Critical
                 title: "Invalid Geometry File"
                 text: "Invalid Geometry file given. Please select a different file."
