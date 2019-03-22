@@ -91,7 +91,10 @@ ExpandingWindow {
                     anchors.left: parent.left
                     anchors.top: parent.top
                     text: "Mesh"
-                    onClicked: setupPane.geometryState = "OFF"
+                    onClicked: {
+                        setupPane.geometryState = "OFF"
+                        GeometryFileSelected.geometryFileSelected = false
+                    }
 
                     checked: true
                     Component.onCompleted: setupPane.geometryState = "OFF"
@@ -323,6 +326,11 @@ ExpandingWindow {
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
+
+                    if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false)
+                    {
+                        console.log("Geometry file not given.")
+                    }
 
                     // Check that either the mesh or the cylinder were given a valid unit argument because it is not
                     // known which geometry has just been created. If the component has no shape, add anyway.
