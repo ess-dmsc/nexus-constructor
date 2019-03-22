@@ -6,7 +6,8 @@ and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
 
-from nexus_constructor.data_model import OFFGeometry, PixelData, PixelGrid
+from nexus_constructor.data_model import PixelData, PixelGrid
+from nexus_constructor.geometry_types import OFFGeometry
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct

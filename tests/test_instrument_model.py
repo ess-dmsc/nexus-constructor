@@ -1,9 +1,9 @@
 from nexus_constructor import data_model
-from nexus_constructor.data_model import CylindricalGeometry
+from nexus_constructor.geometry_types import CylindricalGeometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import (
     NoShapeModel,
-    OFFModel,
+    NoShapeGeometry,
     OFFGeometry,
 )
 from nexus_constructor.qml_models.instrument_model import (
@@ -53,7 +53,7 @@ def test_replace_contents():
         data_model.Component(
             component_type=data_model.ComponentType.DETECTOR,
             name="Replacement Detector",
-            geometry=data_model.OFFGeometry(),
+            geometry=data_model,
         ),
     ]
     model.replace_contents(replacement_data)
@@ -221,16 +221,20 @@ def test_transforms_deletable_set():
 
 
 def test_GIVEN_no_geometry_WHEN_generating_mesh_THEN_square_off_mesh_is_created():
-    component = NoShapeModel()
+    component = Component(ComponentType.MONITOR, "")
+    component.geometry = NoShapeGeometry()
     actual_output = generate_mesh(component)
 
     assert actual_output.geometry().vertex_count == 36
 
 
 def test_GIVEN_off_with_no_geometry_WHEN_generating_mesh_THEN_returns_nothing():
-    component = OFFModel()
-    component.geometry = False
-    assert not generate_mesh(component)
+    component = Component(ComponentType.MONITOR, "")
+
+    component.geometry = OFFGeometry()
+    actual_output = generate_mesh(component)
+
+    assert actual_output.geometry().vertex_count == 0
 
 
 def test_GIVEN_off_with_geometry_WHEN_generating_mesh_THEN_returns_off_mesh():

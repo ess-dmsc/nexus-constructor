@@ -3,9 +3,8 @@ from nexus_constructor.off_renderer import (
     create_vertex_buffer,
     create_normal_buffer,
     OffMesh,
-    OFFCube,
 )
-from nexus_constructor.data_model import OFFGeometry
+from nexus_constructor.geometry_types import OFFCube, OFFGeometry
 import itertools
 from PySide2.QtGui import QVector3D
 
