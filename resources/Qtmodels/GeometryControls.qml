@@ -86,13 +86,13 @@ Pane {
                         // Valid Geometry file given - Accept file and ask user to give the units
                         unitSelection.open()
                         visible: false
-                        GeometryFileSelected.geometryFileSelected = (fileUrl.replace(/^\s*/, "").replace(/\s*$/, "").length == 0);
                     }
                     else {
                         // Invalid Geometry file given - Reject file
                         reject()
                         invalidGeometryFileDialog.open()
                     }
+                    GeometryFileSelected.geometryFileSelected = (fileUrl.length == 0);
                 }
             }
             MessageDialog {

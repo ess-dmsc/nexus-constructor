@@ -18,7 +18,11 @@ def _validate_geometry_file(file: TextIOWrapper, filename: str):
 
     elif file_extension == ".stl":
         try:
-            mesh.Mesh.from_file("", fh=file, calculate_normals=False)
+            try:
+                mesh.Mesh.from_file("temp.stl", fh=file, calculate_normals=False)
+            except UnicodeDecodeError:
+                # File is in binary format
+                mesh.Mesh.from_file(filename, calculate_normals=False)
         except (TypeError, AssertionError, RuntimeError, ValueError):
             # File is invalid
             return False
