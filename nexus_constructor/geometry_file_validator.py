@@ -22,7 +22,7 @@ def _validate_geometry_file(file: TextIOWrapper, filename: str):
                 mesh.Mesh.from_file("", fh=file, calculate_normals=False)
             except UnicodeDecodeError:
                 # File is in binary format - load it again
-                with open(filename,"rb") as file:
+                with open(filename, "rb") as file:
                     mesh.Mesh.from_file("", fh=file, calculate_normals=False)
         except (TypeError, AssertionError, RuntimeError, ValueError):
             # File is invalid
