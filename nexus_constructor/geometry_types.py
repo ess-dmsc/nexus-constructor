@@ -51,16 +51,16 @@ class CylindricalGeometry(Geometry):
     def base_edge_point(self):
         # rotate a point on the edge of a Z axis aligned cylinder by the rotation matrix
         return (
-                QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0)
-                * self.rotation_matrix
+            QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0)
+            * self.rotation_matrix
         )
 
     @property
     def top_center_point(self):
         return (
-                self.axis_direction.normalized()
-                * self.height
-                * calculate_unit_conversion_factor(self.units)
+            self.axis_direction.normalized()
+            * self.height
+            * calculate_unit_conversion_factor(self.units)
         )
 
     @property
