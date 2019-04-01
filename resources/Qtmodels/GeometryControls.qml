@@ -6,7 +6,7 @@ import QtQuick.Layouts 1.11
 import MyValidators 1.0
 
 Pane {
-    property var geometryModel
+    property var geometryModel: noShapeModel
 
     id: pane
     padding: 0

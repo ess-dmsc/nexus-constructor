@@ -1,17 +1,15 @@
 from nexus_constructor import data_model
-from nexus_constructor.data_model import CylindricalGeometry
+from nexus_constructor.geometry_types import CylindricalGeometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import (
     NoShapeModel,
-    OFFModel,
+    NoShapeGeometry,
     OFFGeometry,
-    CylinderModel,
 )
 from nexus_constructor.qml_models.instrument_model import (
     InstrumentModel,
     generate_mesh,
     determine_pixel_state,
-    determine_geometry_state,
     Component,
     ComponentType,
     PixelGrid,
@@ -28,7 +26,7 @@ def test_initialise_model():
 
 def test_add_component():
     model = InstrumentModel()
-    model.add_component("Detector", "My Detector")
+    model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     assert model.rowCount() == 2
     assert model.components[1].component_type == data_model.ComponentType.DETECTOR
     assert model.components[1].name == "My Detector"
@@ -36,7 +34,7 @@ def test_add_component():
 
 def test_remove_component():
     model = InstrumentModel()
-    model.add_component("Detector", "My Detector")
+    model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     model.remove_component(1)
     assert model.rowCount() == 1
     assert not model.components[0].component_type == data_model.ComponentType.DETECTOR
@@ -55,7 +53,7 @@ def test_replace_contents():
         data_model.Component(
             component_type=data_model.ComponentType.DETECTOR,
             name="Replacement Detector",
-            geometry=data_model.OFFGeometry(),
+            geometry=data_model,
         ),
     ]
     model.replace_contents(replacement_data)
@@ -223,16 +221,20 @@ def test_transforms_deletable_set():
 
 
 def test_GIVEN_no_geometry_WHEN_generating_mesh_THEN_square_off_mesh_is_created():
-    component = NoShapeModel()
+    component = Component(ComponentType.MONITOR, "")
+    component.geometry = NoShapeGeometry()
     actual_output = generate_mesh(component)
 
     assert actual_output.geometry().vertex_count == 36
 
 
 def test_GIVEN_off_with_no_geometry_WHEN_generating_mesh_THEN_returns_nothing():
-    component = OFFModel()
-    component.geometry = False
-    assert not generate_mesh(component)
+    component = Component(ComponentType.MONITOR, "")
+
+    component.geometry = OFFGeometry()
+    actual_output = generate_mesh(component)
+
+    assert actual_output.geometry().vertex_count == 0
 
 
 def test_GIVEN_off_with_geometry_WHEN_generating_mesh_THEN_returns_off_mesh():
@@ -287,24 +289,3 @@ def test_GIVEN_detector_with_PixelMapping_WHEN_determine_pixel_state_THEN_return
 def test_GIVEN_slit_WHEN_determine_pixel_state_THEN_returns_empty_string():
     component = Component(ComponentType.SLIT, "")
     assert determine_pixel_state(component) == ""
-
-
-def test_GIVEN_NoShapeModel_WHEN_determine_geometry_state_THEN_returns_none():
-    component = NoShapeModel()
-    assert determine_geometry_state(component) == "None"
-
-
-def test_GIVEN_cylindricalModel_WHEN_determine_geometry_state_THEN_returns_cylinder():
-    component = CylinderModel()
-    assert determine_geometry_state(component) == "Cylinder"
-
-
-def test_GIVEN_offmodel_WHEN_determine_geometry_state_THEN_returns_off():
-    component = OFFModel()
-    assert determine_geometry_state(component) == "OFF"
-
-
-def test_GIVEN_no_model_WHEN_determine_geometry_state_THEN_returns_empty_string():
-    component = NoShapeModel()
-    component.geometry = False
-    assert determine_geometry_state(component) == ""
