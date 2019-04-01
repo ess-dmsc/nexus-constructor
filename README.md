@@ -18,6 +18,10 @@ The black pre-commit hook (installed by [pre-commit](https://pre-commit.com/)) r
 
 Run the python script `main.py` located in the root of the repository.
 
+## [WIKI](https://github.com/ess-dmsc/nexus-constructor/wiki)
+
+Contains developer notes, general QML approaches
+
 ## Running unit tests
 
 Unit tests are written to use [pytest](https://docs.pytest.org/en/latest/).
@@ -55,6 +59,3 @@ subdirectory
 cx_Freeze is capable of building distributable versions for Windows, OS X, and
 Linux, but can only do so from a machine running that operating system.
 
-## Developer notes
-
-see [Developer Notes](DeveloperNotes.md)
