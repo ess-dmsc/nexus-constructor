@@ -11,9 +11,6 @@ from nexus_constructor.geometry_types import (
 )
 from pytest import raises
 
-# Test:
-#
-
 
 def test_GIVEN_nothing_WHEN_constructing_Geometry_THEN_AbstractError():
     with raises(TypeError):
@@ -86,3 +83,71 @@ def test_GIVEN_faces_WHEN_calling_winding_order_on_OFF_THEN_order_is_correct():
     expected = [point for face in faces for point in face]
 
     assert expected == geom.winding_order
+
+
+def test_GIVEN_faces_WHEN_calling_winding_order_indices_on_OFF_THEN_order_is_correct():
+    vertices = [
+        QVector3D(0, 0, 1),
+        QVector3D(0, 1, 0),
+        QVector3D(0, 0, 0),
+        QVector3D(0, 1, 1),
+    ]
+
+    faces = [[0, 1, 2, 3]]
+
+    geom = OFFGeometry(vertices, faces)
+
+    expected = [0]  # only one face
+
+    assert expected == geom.winding_order_indices
+
+
+def test_GIVEN_nothing_WHEN_calling_off_geometry_on_noshapegeometry_THEN_OFFCube_is_returned():
+    geom = NoShapeGeometry()
+    assert geom.off_geometry == OFFCube
+
+
+def test_GIVEN_off_gemetry_WHEN_calling_off_geometry_on_offGeometry_THEN_original_geometry_is_returned():
+    vertices = [
+        QVector3D(0, 0, 1),
+        QVector3D(0, 1, 0),
+        QVector3D(0, 0, 0),
+        QVector3D(0, 1, 1),
+    ]
+
+    faces = [[0, 1, 2, 3]]
+    geom = OFFGeometry(vertices, faces)
+
+    assert geom.faces == faces
+    assert geom.vertices == vertices
+    assert geom.off_geometry == geom
+
+
+def test_GIVEN_nothing_WHEN_creating_cylindricalGeometry_THEN_base_center_point_is_origin():
+    unit = "m"
+    axis_direction = QVector3D(1, 2, 3)
+    height = 2.0
+    radius = 1.0
+    geom = CylindricalGeometry(unit, axis_direction, height, radius)
+
+    assert geom.base_center_point == QVector3D(0, 0, 0)
+
+
+def test_GIVEN_nothing_WHEN_creating_cylindricalGeometry_THEN_top_center_point_is_correct():
+    unit = "m"
+    axis_direction = QVector3D(1, 2, 3)
+    height = 2.0
+    radius = 1.0
+    geom = CylindricalGeometry(unit, axis_direction, height, radius)
+
+    assert geom.top_center_point == (axis_direction.normalized() * height)
+
+
+def test_GIVEN_nothing_WHEN_creating_cylindricalGeometry_THEN_base_edge_point_is_correct():
+    unit = "m"
+    axis_direction = QVector3D(1, 2, 3)
+    height = 2.0
+    radius = 1.0
+    geom = CylindricalGeometry(unit, axis_direction, height, radius)
+
+    assert geom.base_edge_point == (QVector3D(radius, 0, 0) * geom.rotation_matrix)
