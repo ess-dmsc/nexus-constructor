@@ -10,7 +10,7 @@ from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
-from PySide2.QtGui import QMatrix4x4, QVector3D
+from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
 
 
