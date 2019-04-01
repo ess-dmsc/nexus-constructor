@@ -72,9 +72,7 @@ Pane {
                 anchors.right: parent.right
                 text: "Choose file"
                 onClicked: {
-                    console.log("Opening file picker.")
                     filePicker.open()
-                    console.log("Done with the file picker.")
                 }
             }
             FileDialog {
