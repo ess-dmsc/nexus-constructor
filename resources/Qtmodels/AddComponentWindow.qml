@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
+import QtQuick.Dialogs 1.3
 
 ExpandingWindow {
 
@@ -91,7 +92,10 @@ ExpandingWindow {
                     anchors.left: parent.left
                     anchors.top: parent.top
                     text: "Mesh"
-                    onClicked: setupPane.geometryState = "OFF"
+                    onClicked: {
+                        setupPane.geometryState = "OFF"
+                        GeometryFileSelected.geometryFileSelected = false
+                    }
 
                     checked: true
                     Component.onCompleted: setupPane.geometryState = "OFF"
@@ -324,9 +328,13 @@ ExpandingWindow {
                 text: "Add"
                 onClicked: {
 
+                    if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false)
+                    {
+                        noGeometryFileDialog.open()
+                    }
                     // Check that either the mesh or the cylinder were given a valid unit argument because it is not
                     // known which geometry has just been created. If the component has no shape, add anyway.
-                    if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits || setupPane.geometryState == "None") {
+                    else if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits || setupPane.geometryState == "None") {
 
                         components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                                  geometryControls.geometryModel,
@@ -346,6 +354,13 @@ ExpandingWindow {
                     }
 
                 }
+            }
+            MessageDialog {
+                id: noGeometryFileDialog
+                icon: StandardIcon.Critical
+                title: "No Geometry File Given."
+                text: "No Geometry file given. Please select a geometry file in order to create a mesh."
+                visible: false
             }
         }
 
