@@ -37,32 +37,28 @@ def test_GIVEN_nothing_WHEN_constructing_OFFGeometry_THEN_geometry_str_is_correc
     assert geom.geometry_str == "OFF"
 
 
+UNIT = "m"
+AXIS_DIRECTION = QVector3D(1, 2, 3)
+HEIGHT = 2.0
+RADIUS = 1.0
+
+
 def test_GIVEN_cylinder_WHEN_constructing_CylindricalGeometry_THEN_off_geometry_returns_correct_off():
-    unit = "m"
-    axis_direction = QVector3D(1, 2, 3)
-    height = 2.0
-    radius = 1.0
+    geom = CylindricalGeometry(UNIT, AXIS_DIRECTION, HEIGHT, RADIUS)
 
-    geom = CylindricalGeometry(unit, axis_direction, height, radius)
-
-    assert geom.radius == radius
-    assert geom.height == height
-    assert geom.axis_direction.toTuple() == axis_direction.toTuple()
-    assert geom.units == unit
+    assert geom.radius == RADIUS
+    assert geom.height == HEIGHT
+    assert geom.axis_direction.toTuple() == AXIS_DIRECTION.toTuple()
+    assert geom.units == UNIT
 
 
 def test_GIVEN_nothing_WHEN_constructing_CylindricalGeometry_THEN_rotation_matrix_is_correct():
-    unit = "m"
-    axis_direction = QVector3D(1, 2, 3)
-    height = 2.0
-    radius = 1.0
-
-    geom = CylindricalGeometry(unit, axis_direction, height, radius)
+    geom = CylindricalGeometry(UNIT, AXIS_DIRECTION, HEIGHT, RADIUS)
 
     default_axis = QVector3D(0, 0, 1)
-    cross_product = QVector3D.crossProduct(axis_direction.normalized(), default_axis)
+    cross_product = QVector3D.crossProduct(AXIS_DIRECTION.normalized(), default_axis)
     rotate_radians = acos(
-        QVector3D.dotProduct(axis_direction.normalized(), default_axis)
+        QVector3D.dotProduct(AXIS_DIRECTION.normalized(), default_axis)
     )
     matrix = QMatrix4x4()
     matrix.rotate(degrees(rotate_radians), cross_product)
@@ -124,30 +120,18 @@ def test_GIVEN_off_gemetry_WHEN_calling_off_geometry_on_offGeometry_THEN_origina
 
 
 def test_GIVEN_nothing_WHEN_creating_cylindricalGeometry_THEN_base_center_point_is_origin():
-    unit = "m"
-    axis_direction = QVector3D(1, 2, 3)
-    height = 2.0
-    radius = 1.0
-    geom = CylindricalGeometry(unit, axis_direction, height, radius)
+    geom = CylindricalGeometry(UNIT, AXIS_DIRECTION, HEIGHT, RADIUS)
 
     assert geom.base_center_point == QVector3D(0, 0, 0)
 
 
 def test_GIVEN_nothing_WHEN_creating_cylindricalGeometry_THEN_top_center_point_is_correct():
-    unit = "m"
-    axis_direction = QVector3D(1, 2, 3)
-    height = 2.0
-    radius = 1.0
-    geom = CylindricalGeometry(unit, axis_direction, height, radius)
+    geom = CylindricalGeometry(UNIT, AXIS_DIRECTION, HEIGHT, RADIUS)
 
-    assert geom.top_center_point == (axis_direction.normalized() * height)
+    assert geom.top_center_point == (AXIS_DIRECTION.normalized() * HEIGHT)
 
 
 def test_GIVEN_nothing_WHEN_creating_cylindricalGeometry_THEN_base_edge_point_is_correct():
-    unit = "m"
-    axis_direction = QVector3D(1, 2, 3)
-    height = 2.0
-    radius = 1.0
-    geom = CylindricalGeometry(unit, axis_direction, height, radius)
+    geom = CylindricalGeometry(UNIT, AXIS_DIRECTION, HEIGHT, RADIUS)
 
-    assert geom.base_edge_point == (QVector3D(radius, 0, 0) * geom.rotation_matrix)
+    assert geom.base_edge_point == (QVector3D(RADIUS, 0, 0) * geom.rotation_matrix)
