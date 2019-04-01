@@ -74,13 +74,13 @@ def test_GIVEN_nothing_WHEN_constructing_CylindricalGeometry_THEN_rotation_matri
 
 def test_GIVEN_faces_WHEN_calling_winding_order_on_OFF_THEN_order_is_correct():
     vertices = [
-        QVector3D(0,0,1),
-        QVector3D(0,1,0),
-        QVector3D(0,0,0),
-        QVector3D(0,1,1),
+        QVector3D(0, 0, 1),
+        QVector3D(0, 1, 0),
+        QVector3D(0, 0, 0),
+        QVector3D(0, 1, 1),
     ]
 
-    faces = [[0,1,2,3]]
+    faces = [[0, 1, 2, 3]]
 
     geom = OFFGeometry(vertices, faces)
     expected = [point for face in faces for point in face]
