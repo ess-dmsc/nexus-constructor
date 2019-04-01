@@ -12,10 +12,9 @@ from nexus_constructor.data_model import (
     ComponentType,
     Rotation,
     Translation,
-    OFFGeometry,
-    CylindricalGeometry,
     SinglePixelId,
 )
+from nexus_constructor.geometry_types import OFFGeometry, CylindricalGeometry
 from nexus_constructor.nexus import NexusEncoder, NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QVector3D

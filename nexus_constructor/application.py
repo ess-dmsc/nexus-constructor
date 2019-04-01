@@ -30,6 +30,7 @@ from nexus_constructor.validators import (
     NullableIntValidator,
     UnitValidator,
 )
+from nexus_constructor.geometry_file_validator import GeometryFileValidator
 from nexus_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
@@ -51,6 +52,7 @@ qmlRegisterType(SinglePixelModel, "MyModels", 1, 0, "SinglePixelModel")
 qmlRegisterType(TransformationModel, "MyModels", 1, 0, "TransformationModel")
 
 qmlRegisterType(JsonConnector, "MyJson", 1, 0, "JsonConnector")
+qmlRegisterType(GeometryFileValidator, "GeometryValidator", 1, 0, "GeometryValidator")
 
 qmlRegisterType(NameValidator, "MyValidators", 1, 0, "NameValidator")
 qmlRegisterType(UnitValidator, "MyValidators", 1, 0, "UnitValidator")
