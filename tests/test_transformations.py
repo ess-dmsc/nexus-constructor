@@ -62,6 +62,6 @@ def test_GIVEN_nothing_WHEN_creating_translation_THEN_transformation_type_is_cor
     assert transformation.type == translation_type
 
 
-def test_GIVEN_nothing_WHEN_creating_translation_THEN_transformation_type_is_correct():
+def test_GIVEN_nothing_WHEN_creating_transformation_THEN_transformation_type_is_correct():
     transformation = Transformation(name="")
     assert transformation.type == transform_type
