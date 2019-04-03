@@ -5,11 +5,6 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.geometry_types import Geometry
 
 
-def validate_nonzero_vector(instance, attribute, vector):
-    if vector.x() == 0 and vector.y() == 0 and vector.z() == 0:
-        raise ValueError("Vector is zero length")
-
-
 @attr.s
 class PixelData:
     """Base class for a detector's pixel description"""
@@ -87,6 +82,13 @@ class SinglePixelId(PixelData):
 class Transformation:
     name = attr.ib(str)
     type = "Transformation"
+
+
+def validate_nonzero_vector(instance, attribute, vector: QVector3D):
+    """
+    Returns True if the vector does not contain (0,0,0), otherwise returns False
+    """
+    return not vector.isNull()
 
 
 @attr.s
