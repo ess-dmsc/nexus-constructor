@@ -3,7 +3,6 @@ import jsonschema
 from nexus_constructor.data_model import (
     Component,
     ComponentType,
-    CylindricalGeometry,
     PixelMapping,
     PixelGrid,
     SinglePixelId,
@@ -14,6 +13,7 @@ from nexus_constructor.data_model import (
     Rotation,
 )
 from nexus_constructor.nexus_constructor_json import writer, loader
+from nexus_constructor.geometry_types import CylindricalGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QUrl

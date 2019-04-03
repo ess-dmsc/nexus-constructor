@@ -2,9 +2,6 @@ from nexus_constructor.data_model import (
     ComponentType,
     PixelGrid,
     PixelMapping,
-    CylindricalGeometry,
-    OFFGeometry,
-    NoShapeGeometry,
     Component,
     Rotation,
     Translation,
@@ -14,21 +11,14 @@ from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4, QVector3D
+from nexus_constructor.geometry_types import OFFCube
 
 
 def generate_mesh(component: Component):
-    if isinstance(component.geometry, CylindricalGeometry):
-        geometry = component.geometry.as_off_geometry()
-    elif isinstance(component.geometry, OFFGeometry):
-        geometry = component.geometry
-    elif isinstance(component.geometry, NoShapeGeometry):
-        # create a dummy object
-        return OffMesh(False)
-    else:
-        return
     if component.component_type == ComponentType.DETECTOR:
-        return OffMesh(geometry, component.pixel_data)
-    return OffMesh(geometry)
+        return OffMesh(component.geometry.off_geometry, component.pixel_data)
+    else:
+        return OffMesh(component.geometry.off_geometry)
 
 
 def determine_pixel_state(component):
@@ -40,17 +30,6 @@ def determine_pixel_state(component):
             return "Mapping"
     elif component.component_type == ComponentType.MONITOR:
         return "SinglePixel"
-    return ""
-
-
-def determine_geometry_state(component):
-    """Returns a string identifying the state a GeometryControls editor should be in for the given component"""
-    if isinstance(component.get_geometry(), CylindricalGeometry):
-        return "Cylinder"
-    elif isinstance(component.get_geometry(), OFFGeometry):
-        return "OFF"
-    elif isinstance(component.get_geometry(), NoShapeGeometry):
-        return "None"
     return ""
 
 
@@ -101,28 +80,7 @@ class InstrumentModel(QAbstractListModel):
 
         self.components = [
             Component(
-                component_type=ComponentType.SAMPLE,
-                name="Sample",
-                geometry=OFFGeometry(
-                    vertices=[
-                        QVector3D(-0.5, -0.5, 0.5),
-                        QVector3D(0.5, -0.5, 0.5),
-                        QVector3D(-0.5, 0.5, 0.5),
-                        QVector3D(0.5, 0.5, 0.5),
-                        QVector3D(-0.5, 0.5, -0.5),
-                        QVector3D(0.5, 0.5, -0.5),
-                        QVector3D(-0.5, -0.5, -0.5),
-                        QVector3D(0.5, -0.5, -0.5),
-                    ],
-                    faces=[
-                        [0, 1, 3, 2],
-                        [2, 3, 5, 4],
-                        [4, 5, 7, 6],
-                        [6, 7, 1, 0],
-                        [1, 7, 5, 3],
-                        [6, 0, 2, 4],
-                    ],
-                ),
+                component_type=ComponentType.SAMPLE, name="Sample", geometry=OFFCube
             )
         ]
         self.transform_models = [
@@ -152,9 +110,7 @@ class InstrumentModel(QAbstractListModel):
             and component.dependent_transform in component.transform_parent.transforms
             else -1,
             InstrumentModel.PixelStateRole: lambda: determine_pixel_state(component),
-            InstrumentModel.GeometryStateRole: lambda: determine_geometry_state(
-                component
-            ),
+            InstrumentModel.GeometryStateRole: lambda: component.geometry.geometry_str,
             InstrumentModel.MeshRole: lambda: generate_mesh(component),
             InstrumentModel.TransformMatrixRole: lambda: self.generate_matrix(
                 component
@@ -246,9 +202,7 @@ class InstrumentModel(QAbstractListModel):
                 description=description,
                 transform_parent=self.components[parent_index - 1],
                 dependent_transform=dependent_transform,
-                geometry=None
-                if geometry_model is None
-                else geometry_model.get_geometry(),
+                geometry=geometry_model.get_geometry(),
                 pixel_data=None
                 if pixel_model is None
                 else pixel_model.get_pixel_model(),
@@ -278,17 +232,6 @@ class InstrumentModel(QAbstractListModel):
                 InstrumentModel.TransformParentIndexRole,
             )
             self.update_transforms_deletable()
-
-    @Slot(int, "QVariant")
-    def set_geometry(self, index, geometry_model):
-        print(geometry_model)
-        self.components[index].geometry = geometry_model.get_geometry()
-        model_index = self.createIndex(index, 0)
-        self.dataChanged.emit(
-            model_index,
-            model_index,
-            [InstrumentModel.GeometryStateRole, InstrumentModel.MeshRole],
-        )
 
     def send_model_updated(self):
         self.model_updated.emit(self)

@@ -8,9 +8,6 @@ only the required root function to load the json
 from nexus_constructor.data_model import (
     Component,
     ComponentType,
-    CylindricalGeometry,
-    OFFGeometry,
-    NoShapeGeometry,
     PixelGrid,
     PixelMapping,
     SinglePixelId,
@@ -19,6 +16,11 @@ from nexus_constructor.data_model import (
     Vector,
     Translation,
     Rotation,
+)
+from nexus_constructor.geometry_types import (
+    CylindricalGeometry,
+    OFFGeometry,
+    NoShapeGeometry,
 )
 from nexus_constructor.nexus import NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel

@@ -5,7 +5,7 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 
-from nexus_constructor.data_model import (
+from nexus_constructor.geometry_types import (
     CylindricalGeometry,
     OFFGeometry,
     NoShapeGeometry,
