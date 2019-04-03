@@ -86,7 +86,6 @@ stage("Centos7: Create virtualenv") {
                 python3.6 -m venv build_env
             \""""
         }
-<<<<<<< HEAD
 stage("Centos7: Install requirements") {
     sh """docker exec ${container_name} ${sh_cmd} -c \"
         cd ${project}
