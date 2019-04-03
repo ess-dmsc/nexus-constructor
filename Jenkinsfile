@@ -57,7 +57,7 @@ node('macos') {
 cleanWs()
 dir("${project}") {
 
- stage('macOS: Checkout') {
+ stage('Checkout') {
  try {
     checkout scm
  } catch (e) {
@@ -65,11 +65,11 @@ dir("${project}") {
  }
  }
 
- stage('macOS: Setup'){
+ stage('Setup'){
     sh "python3 -m pip install --user -r requirements.txt"
  }
 
- stage('macOS: Build Executable') {
+ stage('Build Executable') {
     sh "python3 setup.py build_exe"
  }
  // archive as well
@@ -80,13 +80,13 @@ dir("${project}") {
 
 def get_linux_pipeline() {
 return {
-stage("Centos7: Create virtualenv") {
+stage("Create virtualenv") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
                 python3.6 -m venv build_env
             \""""
         }
-stage("Centos7: Install requirements") {
+stage("Install requirements") {
     sh """docker exec ${container_name} ${sh_cmd} -c \"
         cd ${project}
         build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
@@ -95,19 +95,19 @@ stage("Centos7: Install requirements") {
         \""""
 }
 
-stage("Centos7: Check formatting") {
+stage("Check formatting") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
                 build_env/bin/python -m black . --check --exclude=build_env/
             \""""
                               }
-stage("Centos7: Run Linter") {
+stage("Run Linter") {
         sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
                 build_env/bin/flake8
             \""""
 }
-stage("Centos7: Run tests") {
+stage("Run tests") {
             def testsError = null
             try {
                 sh """docker exec ${container_name} ${sh_cmd} -c \"
@@ -129,10 +129,10 @@ stage("Centos7: Run tests") {
             junit "test_results.xml"
         }
 
-stage('Centos7: Build Executable'){
+stage('Build Executable'){
     sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python setup.py build_exe  \" "
 }
-stage('Centos7: Archive Executable') {
+stage('Archive Executable') {
     if (env.CHANGE_ID) {
     def git_commit_short = scm_vars.GIT_COMMIT.take(7)
     sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
