@@ -11,8 +11,22 @@ from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it struggles with some parts of numpy.
 build_exe_options = {
-    "packages": ["numpy.core._methods", "numpy.lib.format"],
-    "excludes": ["pytest", "pytest-cov", "pytest-qt"],
+    "packages": ["numpy.core._methods", "numpy.lib.format", "pkg_resources._vendor"],
+    "excludes": [
+        "pytest",
+        "pytest-cov",
+        "pytest-qt",
+        "PyQt4",
+        "tcl",
+        "tk",
+        "ttk",
+        "tkinter",
+        "Tkconstants",
+        "Tkinter",
+        "collections.sys",
+        "collections._weakref",
+    ],
+    "bin_includes": ["libssl.so"],
     "include_files": ["resources", "Instrument.schema.json"],
 }
 
