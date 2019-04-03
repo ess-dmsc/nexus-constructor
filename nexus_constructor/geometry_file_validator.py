@@ -38,7 +38,6 @@ def _validate_geometry_file(file: TextIOWrapper, filename: str):
 class GeometryFileValidator(QObject):
     @Slot(QUrl, result=bool)
     def validate_geometry_file(self, file_url: QUrl):
-
         filename = file_url.toString(
             options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
         )

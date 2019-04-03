@@ -13,7 +13,6 @@ from nexus_constructor.data_model import (
     SinglePixelId,
     CountDirection,
     Corner,
-    Vector,
     Translation,
     Rotation,
 )
@@ -119,7 +118,7 @@ def build_component(json_obj: dict):
             component.transforms.append(
                 Rotation(
                     name=transform["name"],
-                    axis=Vector(
+                    axis=QVector3D(
                         transform["axis"]["x"],
                         transform["axis"]["y"],
                         transform["axis"]["z"],
@@ -131,7 +130,7 @@ def build_component(json_obj: dict):
             component.transforms.append(
                 Translation(
                     name=transform["name"],
-                    vector=Vector(
+                    vector=QVector3D(
                         transform["vector"]["x"],
                         transform["vector"]["y"],
                         transform["vector"]["z"],

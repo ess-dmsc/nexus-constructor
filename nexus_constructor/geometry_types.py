@@ -65,7 +65,6 @@ class CylindricalGeometry(Geometry):
 
     @property
     def off_geometry(self, steps=20):
-
         unit_conversion_factor = calculate_unit_conversion_factor(self.units)
 
         # A list of vertices describing the circle at the bottom of the cylinder
