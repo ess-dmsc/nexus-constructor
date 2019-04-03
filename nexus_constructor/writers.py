@@ -6,9 +6,8 @@ from nexus_constructor.data_model import (
     SinglePixelId,
     Geometry,
     Component,
-    Rotation,
-    Translation,
 )
+from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.geometry_types import (
     OFFGeometry,
     CylindricalGeometry,
