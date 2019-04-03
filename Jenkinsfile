@@ -94,16 +94,7 @@ stage("Centos7: Install requirements") {
         build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
         \""""
 }
-stage('Centos7: Build Executable'){
-    sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python setup.py build_exe  \" "
-}
-stage('Centos7: Archive Executable') {
-    if (env.CHANGE_ID) {
-    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-    sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
-    archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
-    }
-}
+
 stage("Centos7: Check formatting") {
             sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
@@ -137,6 +128,17 @@ stage("Centos7: Run tests") {
             sh "docker cp ${container_name}:/home/jenkins/${project}/test_results.xml test_results.xml"
             junit "test_results.xml"
         }
+
+stage('Centos7: Build Executable'){
+    sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python setup.py build_exe  \" "
+}
+stage('Centos7: Archive Executable') {
+    if (env.CHANGE_ID) {
+    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
+    sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
+    archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
+    }
+}
 } // return
 } // def
 
