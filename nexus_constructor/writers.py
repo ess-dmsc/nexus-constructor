@@ -5,12 +5,14 @@ from nexus_constructor.data_model import (
     PixelMapping,
     SinglePixelId,
     Geometry,
-    OFFGeometry,
-    CylindricalGeometry,
-    NoShapeGeometry,
     Component,
     Rotation,
     Translation,
+)
+from nexus_constructor.geometry_types import (
+    OFFGeometry,
+    CylindricalGeometry,
+    NoShapeGeometry,
 )
 from nexus_constructor.nexus import NexusEncoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel

@@ -4,7 +4,7 @@ from nexus_constructor.off_renderer import (
     create_normal_buffer,
     OffMesh,
 )
-from nexus_constructor.data_model import OFFGeometry
+from nexus_constructor.geometry_types import OFFCube, OFFGeometry
 import itertools
 from PySide2.QtGui import QVector3D
 
@@ -99,8 +99,8 @@ def test_GIVEN_a_triangle_WHEN_creating_off_geometry_with_no_pixel_data_THEN_ver
     assert qt_geometry.vertex_count == 3
 
 
-def test_GIVEN_no_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_cube():
-    off_mesh = OffMesh(None)
+def test_WHEN_creating_off_mesh_with_cube_THEN_geometry_contains_cube():
+    off_mesh = OffMesh(OFFCube)
     assert (
         off_mesh.geometry().vertex_count
         == VERTICES_IN_TRIANGLE * TRIANGLES_IN_SQUARE * VERTICES_IN_CUBE
