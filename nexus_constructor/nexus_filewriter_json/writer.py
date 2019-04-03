@@ -12,12 +12,11 @@ from nexus_constructor.data_model import (
     Component,
     Translation,
     Rotation,
-    CylindricalGeometry,
-    OFFGeometry,
     PixelGrid,
     PixelMapping,
     SinglePixelId,
 )
+from nexus_constructor.geometry_types import CylindricalGeometry, OFFGeometry
 from nexus_constructor.nexus import NexusEncoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from typing import List
@@ -56,6 +55,7 @@ def generate_json(model: InstrumentModel):
     data["nexus_structure"]["children"].extend(
         generate_component_list(external_components)
     )
+
     return json.dumps(data, indent=2)
 
 
@@ -98,7 +98,7 @@ def add_transform_data(json_data: dict, component: Component):
                 type_name = "rotation"
                 units = "degrees"
                 vector = (
-                    transform.axis.unit_list
+                    transform.axis.unit_list.tolist()
                     if transform.axis.magnitude != 0
                     else [0, 0, 0]
                 )
@@ -107,7 +107,7 @@ def add_transform_data(json_data: dict, component: Component):
                 type_name = "translation"
                 units = "m"
                 vector = (
-                    transform.vector.unit_list
+                    transform.vector.unit_list.tolist()
                     if transform.vector.magnitude != 0
                     else [0, 0, 0]
                 )
@@ -157,9 +157,9 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "name": "vertices",
                     "dataset": {"type": "double", "size": [3, 3]},
                     "values": [
-                        geometry.base_center_point.xyz_list,
-                        geometry.base_edge_point.xyz_list,
-                        geometry.top_center_point.xyz_list,
+                        geometry.base_center_point.toTuple(),
+                        geometry.base_edge_point.toTuple(),
+                        geometry.top_center_point.toTuple(),
                     ],
                 },
                 {
@@ -180,7 +180,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "type": "dataset",
                     "name": "vertices",
                     "dataset": {"type": "double", "size": [len(geometry.vertices), 3]},
-                    "values": [vertex.xyz_list for vertex in geometry.vertices],
+                    "values": [vertex.toTuple() for vertex in geometry.vertices],
                 },
                 {
                     "type": "dataset",

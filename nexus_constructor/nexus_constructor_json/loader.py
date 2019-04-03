@@ -8,8 +8,6 @@ only the required root function to load the json
 from nexus_constructor.data_model import (
     Component,
     ComponentType,
-    CylindricalGeometry,
-    OFFGeometry,
     PixelGrid,
     PixelMapping,
     SinglePixelId,
@@ -19,8 +17,14 @@ from nexus_constructor.data_model import (
     Translation,
     Rotation,
 )
+from nexus_constructor.geometry_types import (
+    CylindricalGeometry,
+    OFFGeometry,
+    NoShapeGeometry,
+)
 from nexus_constructor.nexus import NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
+from PySide2.QtGui import QVector3D
 
 
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
@@ -154,19 +158,19 @@ def build_geometry(geometry_obj: dict):
     :return: An instance of OFFGeometry or CylindricalGeometry
     """
     if geometry_obj is None:
-        return None
+        return NoShapeGeometry()
     elif geometry_obj["type"] == "OFF":
         wound_faces = geometry_obj["faces"]
         face_indices = geometry_obj["winding_order"]
         return OFFGeometry(
             vertices=[
-                Vector(vertex[0], vertex[1], vertex[2])
+                QVector3D(vertex[0], vertex[1], vertex[2])
                 for vertex in geometry_obj["vertices"]
             ],
             faces=NexusDecoder.unwound_off_faces(wound_faces, face_indices),
         )
     elif geometry_obj["type"] == "Cylinder":
-        axis_direction = Vector(
+        axis_direction = QVector3D(
             geometry_obj["axis_direction"]["x"],
             geometry_obj["axis_direction"]["y"],
             geometry_obj["axis_direction"]["z"],
@@ -177,5 +181,7 @@ def build_geometry(geometry_obj: dict):
             radius=geometry_obj["radius"],
             units=geometry_obj["units"],
         )
+    elif geometry_obj["type"] == "None":
+        return NoShapeGeometry()
     else:
         return None

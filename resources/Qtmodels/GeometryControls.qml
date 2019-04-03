@@ -4,10 +4,10 @@ import QtQuick.Dialogs 1.3
 import MyModels 1.0
 import QtQuick.Layouts 1.11
 import MyValidators 1.0
-import "."
+import GeometryValidator 1.0
 
 Pane {
-    property var geometryModel
+    property var geometryModel: noShapeModel
 
     id: pane
     padding: 0
@@ -16,6 +16,7 @@ Pane {
 
     signal meshChanged()
     signal cylinderChanged()
+    signal noShapeChanged()
 
     ListView {
         id: view
@@ -33,6 +34,15 @@ Pane {
     CylinderModel {
         id: cylinderModel
         onDataChanged: pane.cylinderChanged()
+    }
+
+    NoShapeModel {
+        id: noShapeModel
+        onDataChanged: pane.noShapeChanged()
+    }
+
+    GeometryValidator {
+        id: geometryValidator
     }
 
     Component {
@@ -61,16 +71,35 @@ Pane {
                 anchors.verticalCenter: fileTextField.verticalCenter
                 anchors.right: parent.right
                 text: "Choose file"
-                onClicked: filePicker.open()
+                onClicked: {
+                    filePicker.open()
+                }
             }
             FileDialog {
                 id: filePicker
                 title: "Choose geometry file"
                 nameFilters: ["Geometry files (*.off *.stl *.OFF *.STL)", "Object File Format (*.off *.OFF)", "STL files (*.stl *.STL)"]
                 onAccepted: {
-                    unitSelection.open()
-                    visible: false
+                    if (geometryValidator.validate_geometry_file(fileUrl)) {
+                        // Valid Geometry file given - Accept file and ask user to give the units
+                        unitSelection.open()
+                        visible: false
+                        GeometryFileSelected.geometryFileSelected = true
+                    }
+                    else {
+                        // Invalid Geometry file given - Reject file
+                        reject()
+                        invalidGeometryFileDialog.open()
+                        GeometryFileSelected.geometryFileSelected = false
+                    }
                 }
+            }
+            MessageDialog {
+                id: invalidGeometryFileDialog
+                icon: StandardIcon.Critical
+                title: "Invalid Geometry File"
+                text: "Invalid Geometry file given. Please select a different file."
+                visible: false
             }
             Dialog {
 
@@ -288,6 +317,11 @@ Pane {
 
             PropertyChanges { target: view; model: cylinderModel}
             PropertyChanges { target: view; delegate: cylinderDelegate}
+        },
+        State {
+            name: "None"
+            PropertyChanges { target: pane; geometryModel: noShapeModel }
+            PropertyChanges { target: view; model: noShapeModel }
         }
     ]
 }

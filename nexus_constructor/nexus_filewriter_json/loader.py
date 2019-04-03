@@ -13,12 +13,12 @@ from nexus_constructor.data_model import (
     Rotation,
     Translation,
     Vector,
-    OFFGeometry,
-    CylindricalGeometry,
     SinglePixelId,
 )
+from nexus_constructor.geometry_types import OFFGeometry, CylindricalGeometry
 from nexus_constructor.nexus import NexusEncoder, NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
+from PySide2.QtGui import QVector3D
 
 
 def load_json_object_into_instrument_model(json_data: dict, model: InstrumentModel):
@@ -181,7 +181,7 @@ def generate_geometry_and_pixel_data(json_component: dict):
                 for subchild in child["children"]:
                     if subchild["name"] == "vertices":
                         for vertex in subchild["values"]:
-                            vectors.append(Vector(vertex[0], vertex[1], vertex[2]))
+                            vectors.append(QVector3D(vertex[0], vertex[1], vertex[2]))
                     elif subchild["name"] == "cylinders":
                         cylinders = subchild["values"]
                 assert (
@@ -190,13 +190,13 @@ def generate_geometry_and_pixel_data(json_component: dict):
                 base_center = vectors[cylinders[0][0]]
                 base_edge = vectors[cylinders[0][1]]
                 top_center = vectors[cylinders[0][2]]
-                assert base_center.xyz_list == [
+                assert base_center.toTuple() == (
                     0,
                     0,
                     0,
-                ], "Cylindrical geometry requires a center at its origin"
-                radius = base_edge.magnitude
-                height = top_center.magnitude
+                ), "Cylindrical geometry requires a center at its origin"
+                radius = base_edge.length()
+                height = top_center.length()
 
                 geometry = CylindricalGeometry(
                     axis_direction=top_center, radius=radius, height=height
@@ -210,7 +210,7 @@ def generate_geometry_and_pixel_data(json_component: dict):
                     if subchild["name"] == "vertices":
                         vertices = []
                         for vertex in subchild["values"]:
-                            vertices.append(Vector(vertex[0], vertex[1], vertex[2]))
+                            vertices.append(QVector3D(vertex[0], vertex[1], vertex[2]))
                     elif subchild["name"] == "winding_order":
                         winding_order = subchild["values"]
                     elif subchild["name"] == "faces":

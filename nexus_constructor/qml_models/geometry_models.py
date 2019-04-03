@@ -5,12 +5,28 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 
-from nexus_constructor.data_model import CylindricalGeometry, OFFGeometry
+from nexus_constructor.geometry_types import (
+    CylindricalGeometry,
+    OFFGeometry,
+    NoShapeGeometry,
+)
 from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.qml_models import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
 
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
+
+
+class NoShapeModel(QAbstractListModel):
+    def __init__(self):
+        super().__init__()
+        self.geometry = NoShapeGeometry()
+
+    def get_geometry(self):
+        return self.geometry
+
+    def rowCount(self, parent=QModelIndex()):
+        return 1
 
 
 class CylinderModel(QAbstractListModel):
@@ -24,6 +40,15 @@ class CylinderModel(QAbstractListModel):
     AxisZRole = Qt.UserRole + 103
     HeightRole = Qt.UserRole + 104
     RadiusRole = Qt.UserRole + 105
+
+    role_names = {
+        UnitsRole: b"cylinder_units",
+        AxisXRole: b"axis_x",
+        AxisYRole: b"axis_y",
+        AxisZRole: b"axis_z",
+        HeightRole: b"cylinder_height",
+        RadiusRole: b"cylinder_radius",
+    }
 
     def __init__(self):
         super().__init__()
@@ -66,14 +91,7 @@ class CylinderModel(QAbstractListModel):
         return super().flags(index) | Qt.ItemIsEditable
 
     def roleNames(self):
-        return {
-            CylinderModel.UnitsRole: b"cylinder_units",
-            CylinderModel.AxisXRole: b"axis_x",
-            CylinderModel.AxisYRole: b"axis_y",
-            CylinderModel.AxisZRole: b"axis_z",
-            CylinderModel.HeightRole: b"cylinder_height",
-            CylinderModel.RadiusRole: b"cylinder_radius",
-        }
+        return self.role_names
 
     def get_geometry(self):
         return self.cylinder
@@ -97,6 +115,13 @@ class OFFModel(QAbstractListModel):
     FacesRole = Qt.UserRole + 203
 
     meshLoaded = Signal()
+
+    role_names = {
+        FileNameRole: b"file_url",
+        UnitsRole: b"units",
+        VerticesRole: b"vertices",
+        FacesRole: b"faces",
+    }
 
     def __init__(self):
         super().__init__()
@@ -139,16 +164,13 @@ class OFFModel(QAbstractListModel):
         return super().flags(index) | Qt.ItemIsEditable
 
     def roleNames(self):
-        return {
-            OFFModel.FileNameRole: b"file_url",
-            OFFModel.UnitsRole: b"units",
-            OFFModel.VerticesRole: b"vertices",
-            OFFModel.FacesRole: b"faces",
-        }
+        return self.role_names
 
     def load_data(self):
         """Read the currently selected file into self.geometry"""
-        filename = QUrl(self.file_url).toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
+        filename = QUrl(self.file_url).toString(
+            options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
+        )
         self.beginResetModel()
         load_geometry(filename, self.units, self.geometry)
         self.endResetModel()

@@ -1,8 +1,10 @@
-from nexus_constructor.data_model import Vector, OFFGeometry, PixelGrid
+from nexus_constructor.data_model import PixelGrid
+from nexus_constructor.geometry_types import OFFGeometry
 from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
+from PySide2.QtGui import QVector3D
 import struct
 
 
@@ -13,14 +15,14 @@ def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     off_geometry = model.get_geometry()
     assert isinstance(off_geometry, OFFGeometry)
     assert off_geometry.vertices == [
-        Vector(-0.5, -0.5, 0.5),
-        Vector(0.5, -0.5, 0.5),
-        Vector(-0.5, 0.5, 0.5),
-        Vector(0.5, 0.5, 0.5),
-        Vector(-0.5, 0.5, -0.5),
-        Vector(0.5, 0.5, -0.5),
-        Vector(-0.5, -0.5, -0.5),
-        Vector(0.5, -0.5, -0.5),
+        QVector3D(-0.5, -0.5, 0.5),
+        QVector3D(0.5, -0.5, 0.5),
+        QVector3D(-0.5, 0.5, 0.5),
+        QVector3D(0.5, 0.5, 0.5),
+        QVector3D(-0.5, 0.5, -0.5),
+        QVector3D(0.5, 0.5, -0.5),
+        QVector3D(-0.5, -0.5, -0.5),
+        QVector3D(0.5, -0.5, -0.5),
     ]
     assert off_geometry.faces == [
         [0, 1, 3, 2],
@@ -61,14 +63,14 @@ def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
 
 def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
     length = 30
-    left_lower_rear = Vector(0, 0, 0)
-    right_lower_rear = Vector(length, 0, 0)
-    left_upper_rear = Vector(0, length, 0)
-    right_upper_rear = Vector(length, length, 0)
-    left_lower_front = Vector(0, 0, length)
-    right_lower_front = Vector(length, 0, length)
-    left_upper_front = Vector(0, length, length)
-    right_upper_front = Vector(length, length, length)
+    left_lower_rear = QVector3D(0, 0, 0)
+    right_lower_rear = QVector3D(length, 0, 0)
+    left_upper_rear = QVector3D(0, length, 0)
+    right_upper_rear = QVector3D(length, length, 0)
+    left_lower_front = QVector3D(0, 0, length)
+    right_lower_front = QVector3D(length, 0, length)
+    left_upper_front = QVector3D(0, length, length)
+    right_upper_front = QVector3D(length, length, length)
     # faces on a cube with a right hand winding order
     faces = [
         [
@@ -138,7 +140,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
 
 
 def test_load_geometry_returns_empty_geometry_for_unrecognised_file_extension():
-    geometry = load_geometry("tests/collapsed lines.txt", "m")
+    geometry = load_geometry("tests/collapsed_lines.txt", "m")
     assert len(geometry.vertices) == 0
     assert len(geometry.faces) == 0
 
@@ -147,11 +149,11 @@ def test_generate_off_mesh_without_repeating_grid():
     # A square with a triangle on the side
     off_geometry = OFFGeometry(
         vertices=[
-            Vector(0, 0, 0),
-            Vector(0, 1, 0),
-            Vector(1, 1, 0),
-            Vector(1, 0, 0),
-            Vector(1.5, 0.5, 0),
+            QVector3D(0, 0, 0),
+            QVector3D(0, 1, 0),
+            QVector3D(1, 1, 0),
+            QVector3D(1, 0, 0),
+            QVector3D(1.5, 0.5, 0),
         ],
         faces=[[0, 1, 2, 3], [2, 3, 4]],
     )
@@ -184,11 +186,11 @@ def test_generate_off_mesh_with_repeating_grid():
     # A square with a triangle on the side
     off_geometry = OFFGeometry(
         vertices=[
-            Vector(0, 0, 0),
-            Vector(0, 1, 0),
-            Vector(1, 1, 0),
-            Vector(1, 0, 0),
-            Vector(1.5, 0.5, 0),
+            QVector3D(0, 0, 0),
+            QVector3D(0, 1, 0),
+            QVector3D(1, 1, 0),
+            QVector3D(1, 0, 0),
+            QVector3D(1.5, 0.5, 0),
         ],
         faces=[[0, 1, 2, 3], [2, 3, 4]],
     )

@@ -9,9 +9,6 @@ import json
 from typing import List
 from nexus_constructor.data_model import (
     Component,
-    Geometry,
-    CylindricalGeometry,
-    OFFGeometry,
     PixelGrid,
     PixelMapping,
     SinglePixelId,
@@ -19,6 +16,7 @@ from nexus_constructor.data_model import (
     Translation,
     Rotation,
 )
+from nexus_constructor.geometry_types import OFFGeometry, Geometry, CylindricalGeometry
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
@@ -154,7 +152,7 @@ def build_geometry_dictionary(geometry: Geometry):
     if isinstance(geometry, OFFGeometry):
         data = {
             "type": "OFF",
-            "vertices": [vector.xyz_list for vector in geometry.vertices],
+            "vertices": [vector.toTuple() for vector in geometry.vertices],
             "winding_order": geometry.winding_order_indices,
             "faces": geometry.winding_order,
         }
@@ -162,24 +160,24 @@ def build_geometry_dictionary(geometry: Geometry):
         data = {
             "type": "Cylinder",
             "base_center": {
-                "x": geometry.base_center_point.x,
-                "y": geometry.base_center_point.y,
-                "z": geometry.base_center_point.z,
+                "x": geometry.base_center_point.x(),
+                "y": geometry.base_center_point.y(),
+                "z": geometry.base_center_point.z(),
             },
             "base_edge": {
-                "x": geometry.base_edge_point.x,
-                "y": geometry.base_edge_point.y,
-                "z": geometry.base_edge_point.z,
+                "x": geometry.base_edge_point.x(),
+                "y": geometry.base_edge_point.y(),
+                "z": geometry.base_edge_point.z(),
             },
             "top_center": {
-                "x": geometry.top_center_point.x,
-                "y": geometry.top_center_point.y,
-                "z": geometry.top_center_point.z,
+                "x": geometry.top_center_point.x(),
+                "y": geometry.top_center_point.y(),
+                "z": geometry.top_center_point.z(),
             },
             "axis_direction": {
-                "x": geometry.axis_direction.x,
-                "y": geometry.axis_direction.y,
-                "z": geometry.axis_direction.z,
+                "x": geometry.axis_direction.x(),
+                "y": geometry.axis_direction.y(),
+                "z": geometry.axis_direction.z(),
             },
             "height": geometry.height,
             "radius": geometry.radius,

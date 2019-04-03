@@ -86,12 +86,13 @@ stage("Centos7: Create virtualenv") {
                 python3.6 -m venv build_env
             \""""
         }
+<<<<<<< HEAD
 stage("Centos7: Install requirements") {
     sh """docker exec ${container_name} ${sh_cmd} -c \"
         cd ${project}
         build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
         build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
-        build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15
+        build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
         \""""
 }
 stage('Centos7: Build Executable'){
@@ -104,6 +105,12 @@ stage('Centos7: Archive Executable') {
     archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
     }
 }
+stage("Centos7: Check formatting") {
+            sh """docker exec ${container_name} ${sh_cmd} -c \"
+                cd ${project}
+                build_env/bin/python -m black . --check --exclude=build_env/
+            \""""
+                              }
 stage("Centos7: Run Linter") {
         sh """docker exec ${container_name} ${sh_cmd} -c \"
                 cd ${project}
@@ -115,17 +122,13 @@ stage("Centos7: Run tests") {
             try {
                 sh """docker exec ${container_name} ${sh_cmd} -c \"
                     cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml
                 \""""
                 }
                 catch(err) {
                     testsError = err
                     currentBuild.result = 'FAILURE'
                 }
-            sh """docker exec ${container_name} ${sh_cmd} -c \"
-                cd ${project}
-                build_env/bin/python -m pytest -s --cov=nexus_constructor --cov-report=xml --assert=plain
-                \""""
             withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
                 sh """docker exec ${container_name} ${sh_cmd} -c \"
                     cd ${project}
