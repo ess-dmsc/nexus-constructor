@@ -1,63 +1,8 @@
 import attr
 from enum import Enum, unique
 from typing import List
-from numpy import array, allclose
-from numpy.linalg import norm
+from PySide2.QtGui import QVector3D
 from nexus_constructor.geometry_types import Geometry
-
-
-def validate_nonzero_vector(instance, attribute, value):
-    if value.x == 0 and value.y == 0 and value.z == 0:
-        raise ValueError("Vector is zero length")
-
-
-class Vector:
-    """A vector in 3D space, defined by x, y and z coordinates"""
-
-    def __init__(self, x, y, z):
-        """
-
-        :param x: The x coordinate.
-        :param y: The y coordinate.
-        :param z: The z coordinate.
-        """
-        self.vector = array([x, y, z], dtype=float)
-
-    @property
-    def x(self):
-        return self.vector[0].item()
-
-    @x.setter
-    def x(self, value):
-        self.vector[0] = value
-
-    @property
-    def y(self):
-        return self.vector[1].item()
-
-    @y.setter
-    def y(self, value):
-        self.vector[1] = value
-
-    @property
-    def z(self):
-        return self.vector[2].item()
-
-    @z.setter
-    def z(self, value):
-        self.vector[2] = value
-
-    @property
-    def magnitude(self):
-        return norm(self.vector)
-
-    @property
-    def unit_list(self):
-        return self.vector / self.magnitude
-
-    def __eq__(self, other):
-        ...
-        return self.__class__ == other.__class__ and allclose(self.vector, other.vector)
 
 
 @attr.s
@@ -136,19 +81,31 @@ class SinglePixelId(PixelData):
 @attr.s
 class Transformation:
     name = attr.ib(str)
+    type = "Transformation"
+
+
+def validate_nonzero_vector(instance, attribute, vector: QVector3D):
+    """
+    Returns True if the vector does not contain (0,0,0), otherwise returns False
+    """
+    return not vector.isNull()
 
 
 @attr.s
 class Rotation(Transformation):
     axis = attr.ib(
-        factory=lambda: Vector(0, 0, 1), type=Vector, validator=validate_nonzero_vector
+        factory=lambda: QVector3D(0, 0, 1),
+        type=QVector3D,
+        validator=validate_nonzero_vector,
     )
     angle = attr.ib(default=0)
+    type = "Rotation"
 
 
 @attr.s
 class Translation(Transformation):
-    vector = attr.ib(factory=lambda: Vector(0, 0, 0), type=Vector)
+    vector = attr.ib(factory=lambda: QVector3D(0, 0, 0), type=QVector3D)
+    type = "Translation"
 
 
 @unique

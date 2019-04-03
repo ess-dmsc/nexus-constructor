@@ -10,7 +10,7 @@ from nexus_constructor.qml_models.helpers import change_value, generate_unique_n
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
-from PySide2.QtGui import QMatrix4x4, QVector3D
+from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
 
 
@@ -306,14 +306,9 @@ class InstrumentModel(QAbstractListModel):
 
             for transform in transforms:
                 if isinstance(transform, Translation):
-                    matrix.translate(
-                        transform.vector.x, transform.vector.y, transform.vector.z
-                    )
+                    matrix.translate(transform.vector)
                 elif isinstance(transform, Rotation):
-                    matrix.rotate(
-                        transform.angle,
-                        QVector3D(transform.axis.x, transform.axis.y, transform.axis.z),
-                    )
+                    matrix.rotate(transform.angle, transform.axis)
 
         apply_transforms(component, -1)
         return matrix

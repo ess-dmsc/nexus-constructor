@@ -1,6 +1,6 @@
 from PySide2.QtCore import QAbstractListModel, Qt, QModelIndex, Signal, Slot
 from nexus_constructor.data_model import Transformation, Translation, Rotation
-from nexus_constructor.qml_models.helpers import change_value, generate_unique_name
+from nexus_constructor.qml_models.helpers import generate_unique_name
 
 
 class TransformationModel(QAbstractListModel):
@@ -64,27 +64,32 @@ class TransformationModel(QAbstractListModel):
         changed = False
         transform = self.transforms[index.row()]
 
-        if isinstance(transform, Translation):
-            param_options = {
-                TransformationModel.TransformNameRole: [transform, "name", value],
-                TransformationModel.TranslateXRole: [transform.vector, "x", value],
-                TransformationModel.TranslateYRole: [transform.vector, "y", value],
-                TransformationModel.TranslateZRole: [transform.vector, "z", value],
-            }
-        elif isinstance(transform, Rotation):
-            param_options = {
-                TransformationModel.TransformNameRole: [transform, "name", value],
-                TransformationModel.RotateXRole: [transform.axis, "x", value],
-                TransformationModel.RotateYRole: [transform.axis, "y", value],
-                TransformationModel.RotateZRole: [transform.axis, "z", value],
-                TransformationModel.RotateAngleRole: [transform, "angle", value],
-            }
-        else:
-            param_options = {}
+        if role == self.TransformNameRole:
+            transform.name = value
+            changed = True
+        if transform.type == "Translation":
+            changed = True
+            if role == self.TranslateXRole:
+                transform.vector.setX(value)
+            elif role == self.TranslateYRole:
+                transform.vector.setY(value)
+            elif role == self.TranslateZRole:
+                transform.vector.setZ(value)
+            else:
+                changed = False
+        elif transform.type == "Rotation":
+            changed = True
+            if role == self.RotateAngleRole:
+                transform.angle = value
+            elif role == self.RotateXRole:
+                transform.axis.setX(value)
+            elif role == self.RotateYRole:
+                transform.axis.setY(value)
+            elif role == self.RotateZRole:
+                transform.axis.setZ(value)
+            else:
+                changed = False
 
-        if role in param_options:
-            param_list = param_options[role]
-            changed = change_value(*param_list)
         if changed:
             self.dataChanged.emit(index, index, role)
             if role != TransformationModel.DeletableRole:

@@ -77,15 +77,17 @@ class HdfWriter(QObject):
                     rotate.attrs["depends_on"] = dependent_on
                     rotate.attrs["transformation_type"] = "rotation"
                     rotate.attrs["units"] = "degrees"
-                    rotate.attrs["vector"] = transform.axis.unit_list
+                    rotate.attrs["vector"] = transform.axis.normalized().toTuple()
                 elif isinstance(transform, Translation):
-                    magnitude = transform.vector.magnitude
+                    magnitude = transform.vector.length()
                     translate = nx_transforms.create_dataset(name, data=[magnitude])
                     translate.attrs["depends_on"] = dependent_on
                     translate.attrs["transformation_type"] = "translation"
                     translate.attrs["units"] = "m"
                     translate.attrs["vector"] = (
-                        transform.vector.unit_list if magnitude != 0 else [0, 0, 1]
+                        transform.vector.normalized().toTuple()
+                        if magnitude != 0
+                        else [0, 0, 1]
                     )
                 else:
                     continue
