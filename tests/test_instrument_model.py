@@ -294,23 +294,23 @@ def test_GIVEN_slit_WHEN_determine_pixel_state_THEN_returns_empty_string():
     assert determine_pixel_state(component) == ""
 
 
-def test_GIVEN_hdf_group_WHEN_request_instrument_group_THEN_sets_model_variable_correctly():
+def test_GIVEN_hdf_group_WHEN_request_instrument_group_THEN_sets_model_instrument_group_to_given_group():
     name = "testinstgroupinmodel"
     file = h5py.File(name, mode="w", driver="core", backing_store=False)
     group = file.create_group(name)
 
     model = InstrumentModel()
-    model.request_instrument_group(group)
+    model.set_instrument_group(group)
 
     assert model.instrument_group == group
 
 
-def test_GIVEN_hdf_group_WHEN_request_entry_group_THEN_sets_model_variable_correctly():
+def test_GIVEN_hdf_group_WHEN_request_entry_group_THEN_sets_model_entry_group_to_given_group():
     name = "testentrygroupinmodel"
     file = h5py.File(name, mode="w", driver="core", backing_store=False)
     group = file.create_group(name)
 
     model = InstrumentModel()
-    model.request_entry_group(group)
+    model.set_entry_group(group)
 
     assert model.entry_group == group

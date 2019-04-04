@@ -74,11 +74,11 @@ class InstrumentModel(QAbstractListModel):
     entry_group = False
 
     @Slot("QVariant")
-    def request_entry_group(self, group):
+    def set_entry_group(self, group):
         self.entry_group = group
 
     @Slot("QVariant")
-    def request_instrument_group(self, group):
+    def set_instrument_group(self, group):
         self.instrument_group = group
 
     def __init__(self):
