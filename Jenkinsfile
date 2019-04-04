@@ -166,7 +166,7 @@ node("docker") {
         def builders = [:]
         builders['centos7'] = get_linux_pipeline()
         // disabled for now as the build isn't setup for Mac OS just yet.
-        // builders['macOS'] = get_macos_pipeline()
+        builders['macOS'] = get_macos_pipeline()
         builders['windows10'] = get_win10_pipeline()
 
         parallel builders
