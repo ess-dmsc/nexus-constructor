@@ -1,6 +1,6 @@
 from uuid import uuid4
 import h5py
-from PySide2.QtCore import Qt, QObject, Signal, Property
+from PySide2.QtCore import QObject, Signal, Property
 from nexus_constructor.component_type import ComponentType
 
 

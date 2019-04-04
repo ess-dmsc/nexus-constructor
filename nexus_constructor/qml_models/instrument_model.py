@@ -9,7 +9,7 @@ from nexus_constructor.component_type import ComponentType
 from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot, Property
+from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
 from nexus_constructor.nexus_model import create_group, get_nx_class_for_component
@@ -228,7 +228,7 @@ class InstrumentModel(QAbstractListModel):
                 if transform_model is None
                 else transform_model.transforms,
             )
-            component_group = create_group(
+            create_group(
                 name, get_nx_class_for_component(component_type), self.instrument_group
             )
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
