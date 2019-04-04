@@ -22,6 +22,7 @@ ExpandingWindow {
     minimumWidth: contentPane.implicitWidth
 
     Pane {
+
         id: contentPane
         contentWidth: setupPane.implicitWidth
         contentHeight: setupPane.implicitHeight
@@ -69,9 +70,11 @@ ExpandingWindow {
                     text: "Geometry:"
                 }
                 Pane {
+
                     id: geometryPane
                     contentWidth: geometryButtonRow.width
                     contentHeight: Math.max(meshRadio.height, cylinderRadio.height)
+
                     RowLayout {
 
                         id: geometryButtonRow
@@ -111,15 +114,11 @@ ExpandingWindow {
                     enabled: !noShapeRadio.checked
                 }
                 Pane {
+
                     id: pixelPane
-                    contentWidth: Math.max(singlePixelRadio.width,
-                                           pixelGridRadio.width,
-                                           mappedMeshRadio.width,
-                                           noPixelRadio.width)
-                    contentHeight:singlePixelRadio.height +
-                                  pixelGridRadio.height +
-                                  mappedMeshRadio.height +
-                                  noPixelRadio.height
+
+                    Layout.fillWidth: true
+                    contentHeight: pixelTypes.height
                     enabled: !noShapeRadio.checked
 
                     function checkFirstEnabled(){
@@ -132,6 +131,9 @@ ExpandingWindow {
                         }
                     }
                     ColumnLayout {
+
+                        id: pixelTypes
+
                         RadioButton {
                             id: singlePixelRadio
                             text: "Single ID"
