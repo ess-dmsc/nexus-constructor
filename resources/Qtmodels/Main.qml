@@ -217,6 +217,7 @@ ApplicationWindow {
         id: components
         Component.onCompleted: {
             request_instrument_group(nxsModel.instrumentGroup)
+            request_entry_group(nxsModel.entryGroup)
         }
     }
 

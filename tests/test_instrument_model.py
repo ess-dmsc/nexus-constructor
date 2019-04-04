@@ -15,6 +15,7 @@ from nexus_constructor.qml_models.instrument_model import (
     PixelGrid,
     PixelMapping,
 )
+from nexus_constructor.nexus_model import NexusModel
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
@@ -26,14 +27,18 @@ def test_initialise_model():
 
 def test_add_component():
     model = InstrumentModel()
-    model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
+    model.instrument_group = NexusModel().getInstrumentGroup()
+    model.add_component("Detector", "MyDetector", geometry_model=NoShapeModel())
     assert model.rowCount() == 2
     assert model.components[1].component_type == data_model.ComponentType.DETECTOR
-    assert model.components[1].name == "My Detector"
+    assert model.components[1].name == "MyDetector"
+    assert "MyDetector" in model.instrument_group
+    assert model.instrument_group["MyDetector"].attrs["NX_class"] == "NXdetector"
 
 
 def test_remove_component():
     model = InstrumentModel()
+    model.instrument_group = NexusModel().getInstrumentGroup()
     model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     model.remove_component(1)
     assert model.rowCount() == 1

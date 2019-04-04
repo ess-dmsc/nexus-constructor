@@ -5,6 +5,7 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.geometry_types import Geometry
 from nexus_constructor.component_type import ComponentType
 
+
 @attr.s
 class PixelData:
     """Base class for a detector's pixel description"""

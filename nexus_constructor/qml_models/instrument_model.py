@@ -9,7 +9,7 @@ from nexus_constructor.component_type import ComponentType
 from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
+from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot, Property
 from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
 from nexus_constructor.nexus_model import create_group, get_nx_class_for_component
@@ -71,9 +71,15 @@ class InstrumentModel(QAbstractListModel):
     RemovableRole = Qt.UserRole + 9
     TransformModelRole = Qt.UserRole + 10
 
+    entry_group = False
+
+    @Slot("QVariant")
+    def request_entry_group(self, group):
+        self.entry_group = group
+
     @Slot("QVariant")
     def request_instrument_group(self, group):
-        self.group = group
+        self.instrument_group = group
 
     def __init__(self):
         super().__init__()
@@ -88,6 +94,13 @@ class InstrumentModel(QAbstractListModel):
                 component_type=ComponentType.SAMPLE, name="Sample", geometry=OFFCube
             )
         ]
+        if self.entry_group:
+            create_group(
+                "Sample",
+                get_nx_class_for_component(ComponentType.SAMPLE),
+                self.entry_group,
+            )
+
         self.transform_models = [
             TransformationModel(component.transforms) for component in self.components
         ]
@@ -216,7 +229,7 @@ class InstrumentModel(QAbstractListModel):
                 else transform_model.transforms,
             )
             component_group = create_group(
-                name, get_nx_class_for_component(component_type), self.group
+                name, get_nx_class_for_component(component_type), self.instrument_group
             )
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
             self.components.append(component)

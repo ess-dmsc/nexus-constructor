@@ -37,7 +37,9 @@ class NexusModel(QObject):
         file_name = str(uuid4())
         self.instrument = False
 
-        self.nexus_file = h5py.File(file_name, driver="core", backing_store=False)
+        self.nexus_file = h5py.File(
+            file_name, mode="w", driver="core", backing_store=False
+        )
 
         self.entry = create_group("entry", "NXentry", self.nexus_file)
 
