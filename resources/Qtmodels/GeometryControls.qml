@@ -63,7 +63,6 @@ Pane {
                 labelText: "Geometry file:"
                 editorText: file_url
                 anchoredEditor: true
-                onEditingFinished: file_url = editorText
                 readOnly: true
             }
             PaddedButton {
@@ -125,7 +124,6 @@ Pane {
 
                     LabeledTextField {
                         id: unitInput
-                        // labelText: "Geometry file:"
                         editorText: units
                         Layout.fillWidth: true
                         anchoredEditor: true
