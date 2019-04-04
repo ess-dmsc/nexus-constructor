@@ -70,7 +70,7 @@ dir("${project}") {
  }
 
  stage('Build Executable') {
-    sh "python3 setup.py build_exe"
+    sh "python3 setup.py bdist_mac"
  }
  // archive as well
 } // dir
