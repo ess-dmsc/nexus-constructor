@@ -123,7 +123,6 @@ def test_GIVEN_invalid_file_WHEN_validating_OFF_file_THEN_returns_false():
 
 
 def test_GIVEN_valid_file_WHEN_validating_STL_file_THEN_returns_true():
-
     valid_stl_file = (
         "solid dart\n"
         "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
@@ -390,6 +389,5 @@ def test_GIVEN_invalid_file_WHEN_validating_STL_file_THEN_returns_false():
 
 
 def test_GIVEN_unrecognised_filename_WHEN_validating_geometry_file_THEN_returns_false():
-
     assert not _validate_geometry_file(StringIO(), "invalid_extens.ion")
     assert not _validate_geometry_file(StringIO(), "no_extension")

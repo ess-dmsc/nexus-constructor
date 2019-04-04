@@ -92,9 +92,9 @@ def build_transform_list(transforms: List[Transformation]):
                     "type": "translate",
                     "name": transform.name,
                     "vector": {
-                        "x": transform.vector.x,
-                        "y": transform.vector.y,
-                        "z": transform.vector.z,
+                        "x": transform.vector.x(),
+                        "y": transform.vector.y(),
+                        "z": transform.vector.z(),
                     },
                     "unit": "m",
                 }
@@ -105,9 +105,9 @@ def build_transform_list(transforms: List[Transformation]):
                     "type": "rotate",
                     "name": transform.name,
                     "axis": {
-                        "x": transform.axis.x,
-                        "y": transform.axis.y,
-                        "z": transform.axis.z,
+                        "x": transform.axis.x(),
+                        "y": transform.axis.y(),
+                        "z": transform.axis.z(),
                     },
                     "angle": {"unit": "degrees", "value": transform.angle},
                 }
