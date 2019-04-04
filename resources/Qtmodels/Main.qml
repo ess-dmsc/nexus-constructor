@@ -209,8 +209,15 @@ ApplicationWindow {
         }
     }
 
+    NexusModel {
+        id: nxsModel
+    }
+
     InstrumentModel{
         id: components
+        Component.onCompleted: {
+            request_instrument_group(nxsModel.instrumentGroup)
+        }
     }
 
     FilteredJsonModel {

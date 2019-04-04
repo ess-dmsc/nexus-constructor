@@ -1,17 +1,18 @@
 from nexus_constructor.data_model import (
-    ComponentType,
     PixelGrid,
     PixelMapping,
     Component,
     Rotation,
     Translation,
 )
+from nexus_constructor.component_type import ComponentType
 from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
+from nexus_constructor.nexus_model import create_group, get_nx_class_for_component
 
 
 def generate_mesh(component: Component):
@@ -69,6 +70,10 @@ class InstrumentModel(QAbstractListModel):
     TransformMatrixRole = Qt.UserRole + 8
     RemovableRole = Qt.UserRole + 9
     TransformModelRole = Qt.UserRole + 10
+
+    @Slot("QVariant")
+    def request_instrument_group(self, group):
+        self.group = group
 
     def __init__(self):
         super().__init__()
@@ -209,6 +214,9 @@ class InstrumentModel(QAbstractListModel):
                 transforms=[]
                 if transform_model is None
                 else transform_model.transforms,
+            )
+            component_group = create_group(
+                name, get_nx_class_for_component(component_type), self.group
             )
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
             self.components.append(component)

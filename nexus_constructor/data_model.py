@@ -1,9 +1,9 @@
 import attr
-from enum import Enum, unique
+from enum import Enum
 from typing import List
 from PySide2.QtGui import QVector3D
 from nexus_constructor.geometry_types import Geometry
-
+from nexus_constructor.component_type import ComponentType
 
 @attr.s
 class PixelData:
@@ -106,21 +106,6 @@ class Rotation(Transformation):
 class Translation(Transformation):
     vector = attr.ib(factory=lambda: QVector3D(0, 0, 0), type=QVector3D)
     type = "Translation"
-
-
-@unique
-class ComponentType(Enum):
-    SAMPLE = "Sample"
-    DETECTOR = "Detector"
-    MONITOR = "Monitor"
-    SOURCE = "Source"
-    SLIT = "Slit"
-    MODERATOR = "Moderator"
-    DISK_CHOPPER = "Disk Chopper"
-
-    @classmethod
-    def values(cls):
-        return [item.value for item in cls]
 
 
 @attr.s
