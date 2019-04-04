@@ -8,7 +8,6 @@ import GeometryValidator 1.0
 
 Pane {
     property var geometryModel: noShapeModel
-    property string fileLocation
 
     id: pane
     padding: 0
