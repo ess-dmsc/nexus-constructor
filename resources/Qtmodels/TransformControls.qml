@@ -182,89 +182,15 @@ Item {
                 }
             }
 
-            Pane {
+            RotatePane {
                 id: rotatePane
-                padding: 0
-                // contentWidth: xRotField.implicitWidth + yRotField.implicitWidth + zRotField.implicitWidth
-                contentWidth: xyzInput.width
-                // contentHeight: rotateNameField.height + xRotField.height + angleField.height
-                contentHeight: xyzInput.height + rotateNameField.height + angleField.height
-
-                RowLayout {
-                    id: row
-                    Label {
-                        id: rotateLabel
-                        text: "Rotation"
-                        font.bold: true
-                    }
-                    LabeledTextField {
-                        id: rotateNameField
-                        anchoredEditor: true
-                        labelText: "Name: "
-                        editorText: name
-                        onEditingFinished: name = editorText
-                        validator: NameValidator {
-                            model: transformModel
-                            myindex: index
-                            onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
-                        }
-                    }
-                }
-                XYZInput {
-                    id: xyzInput
-                    anchors.top: row.bottom
-                    xEditorText: rotate_x
-                    yEditorText: rotate_y
-                    zEditorText: rotate_z
-
-                    onXEditingFinished: rotate_x = parseFloat(xEditorText)
-                    onYEditingFinished: rotate_y = parseFloat(yEditorText)
-                    onZEditingFinished: rotate_z = parseFloat(zEditorText)
-                }
-                LabeledTextField {
-                    id: angleField
-                    anchors.top: xyzInput.bottom
-                    anchors.right: xyzInput.right
-                    labelText: "Angle (Degrees): "
-                    editorText: rotate_angle
-                    validator: angleValidator
-                    onEditingFinished: rotate_angle = parseFloat(editorText)
-                }
             }
 
-            Pane {
+            TransformButtons {
                 id: transformButtons
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: moveUpButton.implicitWidth + moveDownButton.implicitWidth + 10 + deleteButton.implicitWidth
-                contentHeight: moveUpButton.implicitHeight
-
-                PaddedButton {
-                    id: moveUpButton
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    text: "Move up"
-                    onClicked: transformModel.change_position(index, index - 1)
-                }
-                PaddedButton {
-                    id: moveDownButton
-                    anchors.top: moveUpButton.top
-                    anchors.left: moveUpButton.right
-                    text: "Move down"
-                    onClicked: transformModel.change_position(index, index + 1)
-                }
-                PaddedButton {
-                    id: deleteButton
-                    anchors.top: moveUpButton.top
-                    anchors.right: parent.right
-                    text: "Delete"
-                    onClicked: transformModel.delete_transform(index)
-                    buttonEnabled: deletable
-                    ToolTip.visible: hovered & !deletable
-                    ToolTip.delay: 400
-                    ToolTip.text: "Cannot remove a transform that's in use as a transform parent"
-                }
             }
 
             states: [
