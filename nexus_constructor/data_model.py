@@ -1,9 +1,6 @@
 import attr
 from enum import Enum
-from typing import List
 from PySide2.QtGui import QVector3D
-from nexus_constructor.geometry_types import Geometry
-from nexus_constructor.component_type import ComponentType
 
 
 @attr.s
@@ -107,17 +104,3 @@ class Rotation(Transformation):
 class Translation(Transformation):
     vector = attr.ib(factory=lambda: QVector3D(0, 0, 0), type=QVector3D)
     type = "Translation"
-
-
-@attr.s
-class Component:
-    """Components of an instrument"""
-
-    component_type = attr.ib(ComponentType)
-    name = attr.ib(str)
-    description = attr.ib(default="", type=str)
-    transform_parent = attr.ib(default=None, type=object)
-    dependent_transform = attr.ib(default=None, type=Transformation)
-    transforms = attr.ib(factory=list, type=List[Transformation])
-    geometry = attr.ib(default=None, type=Geometry)
-    pixel_data = attr.ib(default=None, type=PixelData)

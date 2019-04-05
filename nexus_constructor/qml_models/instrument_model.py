@@ -1,10 +1,5 @@
-from nexus_constructor.data_model import (
-    PixelGrid,
-    PixelMapping,
-    Component,
-    Rotation,
-    Translation,
-)
+from nexus_constructor.data_model import PixelGrid, PixelMapping, Rotation, Translation
+from nexus_constructor.component import Component, create_component
 from nexus_constructor.component_type import ComponentType
 from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
@@ -214,7 +209,7 @@ class InstrumentModel(QAbstractListModel):
                 dependent_transform = self.components[parent_index - 1].transforms[
                     transform_index
                 ]
-            component = Component(
+            component = create_component(
                 component_type=ComponentType(component_type),
                 name=name,
                 description=description,
@@ -227,9 +222,7 @@ class InstrumentModel(QAbstractListModel):
                 transforms=[]
                 if transform_model is None
                 else transform_model.transforms,
-            )
-            create_group(
-                name, get_nx_class_for_component(component_type), self.instrument_group
+                parent_group=self.instrument_group,
             )
             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
             self.components.append(component)

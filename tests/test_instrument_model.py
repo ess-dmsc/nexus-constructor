@@ -22,7 +22,7 @@ from PySide2.QtGui import QMatrix4x4, QVector3D
 def test_initialise_model():
     model = InstrumentModel()
     assert model.rowCount() == 1
-    assert model.components[0].component_type == data_model.ComponentType.SAMPLE
+    assert model.components[0].component_type == ComponentType.SAMPLE
 
 
 def test_add_component():
@@ -30,7 +30,7 @@ def test_add_component():
     model.instrument_group = NexusModel().getInstrumentGroup()
     model.add_component("Detector", "MyDetector", geometry_model=NoShapeModel())
     assert model.rowCount() == 2
-    assert model.components[1].component_type == data_model.ComponentType.DETECTOR
+    assert model.components[1].component_type == ComponentType.DETECTOR
     assert model.components[1].name == "MyDetector"
     assert "MyDetector" in model.instrument_group
     assert model.instrument_group["MyDetector"].attrs["NX_class"] == "NXdetector"
@@ -42,21 +42,19 @@ def test_remove_component():
     model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     model.remove_component(1)
     assert model.rowCount() == 1
-    assert not model.components[0].component_type == data_model.ComponentType.DETECTOR
+    assert not model.components[0].component_type == ComponentType.DETECTOR
     # The sample at index 0 shouldn't be removable
     model.remove_component(0)
     assert model.rowCount() == 1
-    assert model.components[0].component_type == data_model.ComponentType.SAMPLE
+    assert model.components[0].component_type == ComponentType.SAMPLE
 
 
 def test_replace_contents():
     model = InstrumentModel()
     replacement_data = [
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Replacement sample"
-        ),
-        data_model.Component(
-            component_type=data_model.ComponentType.DETECTOR,
+        Component(component_type=ComponentType.SAMPLE, name="Replacement sample"),
+        Component(
+            component_type=ComponentType.DETECTOR,
             name="Replacement Detector",
             geometry=data_model,
         ),
@@ -69,18 +67,10 @@ def test_replace_contents():
 def test_generate_component_name():
     model = InstrumentModel()
     model.components = [
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Sample"
-        ),
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Detector"
-        ),
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Detector3"
-        ),
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Magnet2"
-        ),
+        Component(component_type=ComponentType.SAMPLE, name="Sample"),
+        Component(component_type=ComponentType.SAMPLE, name="Detector"),
+        Component(component_type=ComponentType.SAMPLE, name="Detector3"),
+        Component(component_type=ComponentType.SAMPLE, name="Magnet2"),
     ]
     assert model.generate_component_name("Sample") == "Sample1"
     assert model.generate_component_name("Detector") == "Detector4"
@@ -91,10 +81,7 @@ def test_generate_component_name():
 def test_is_removable():
     model = InstrumentModel()
     model.components = [
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name=str(i)
-        )
-        for i in range(4)
+        Component(component_type=ComponentType.SAMPLE, name=str(i)) for i in range(4)
     ]
     model.components[0].transform_parent = model.components[0]
     model.components[1].transform_parent = model.components[0]
@@ -108,12 +95,12 @@ def test_is_removable():
 
 
 def test_determine_pixel_state_produces_expected_strings():
-    for component_type in data_model.ComponentType:
-        component = data_model.Component(component_type=component_type, name="")
-        if component_type == data_model.ComponentType.DETECTOR:
+    for component_type in ComponentType:
+        component = Component(component_type=component_type, name="")
+        if component_type == ComponentType.DETECTOR:
             expected_states = ["Mapping", "Grid"]
             pixel_options = [data_model.PixelMapping([]), data_model.PixelGrid()]
-        elif component_type == data_model.ComponentType.MONITOR:
+        elif component_type == ComponentType.MONITOR:
             expected_states = ["SinglePixel"]
             pixel_options = [data_model.SinglePixelId(42)]
         else:
@@ -129,8 +116,8 @@ def test_determine_pixel_state_produces_expected_strings():
 def build_model_with_sample_transforms():
     instrument = InstrumentModel()
     instrument.components.append(
-        data_model.Component(
-            component_type=data_model.ComponentType.DETECTOR,
+        Component(
+            component_type=ComponentType.DETECTOR,
             name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
@@ -144,8 +131,8 @@ def build_model_with_sample_transforms():
         )
     )
     instrument.components.append(
-        data_model.Component(
-            component_type=data_model.ComponentType.DETECTOR,
+        Component(
+            component_type=ComponentType.DETECTOR,
             name="detector2",
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
@@ -160,8 +147,8 @@ def build_model_with_sample_transforms():
         )
     )
     instrument.components.append(
-        data_model.Component(
-            component_type=data_model.ComponentType.DETECTOR,
+        Component(
+            component_type=ComponentType.DETECTOR,
             name="detector3",
             transform_parent=instrument.components[1],
             transforms=[

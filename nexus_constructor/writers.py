@@ -4,12 +4,12 @@ from nexus_constructor.data_model import (
     PixelGrid,
     PixelMapping,
     SinglePixelId,
-    Geometry,
-    Component,
     Rotation,
     Translation,
 )
+from nexus_constructor.component import Component
 from nexus_constructor.geometry_types import (
+    Geometry,
     OFFGeometry,
     CylindricalGeometry,
     NoShapeGeometry,

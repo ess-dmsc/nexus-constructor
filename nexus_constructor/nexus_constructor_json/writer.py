@@ -8,7 +8,6 @@ only the required root function to generate the json.
 import json
 from typing import List
 from nexus_constructor.data_model import (
-    Component,
     PixelGrid,
     PixelMapping,
     SinglePixelId,
@@ -16,6 +15,7 @@ from nexus_constructor.data_model import (
     Translation,
     Rotation,
 )
+from nexus_constructor.component import Component
 from nexus_constructor.geometry_types import OFFGeometry, Geometry, CylindricalGeometry
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
