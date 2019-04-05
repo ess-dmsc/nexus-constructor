@@ -12,6 +12,7 @@ from nexus_constructor.data_model import (
 )
 from nexus_constructor.component import Component
 from nexus_constructor.component_type import ComponentType
+from nexus_constructor.nexus_model import NexusModel
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.writers import HdfWriter
 
@@ -25,6 +26,7 @@ def assess_unit_length_3d_vector(vector, original):
 
 def make_instrument_with_sample_transform():
     instrument = InstrumentModel()
+    instrument.initialise(NexusModel().entryGroup)
     instrument.components.append(
         Component(
             component_type=ComponentType.DETECTOR,

@@ -43,8 +43,6 @@ class NexusModel(QObject):
 
         self.entry = create_group("entry", "NXentry", self.nexus_file)
 
-        self.instrument = create_group("instrument", "NXinstrument", self.entry)
-
     @Signal
     def entry_group_changed(self):
         pass
@@ -60,24 +58,4 @@ class NexusModel(QObject):
 
     entryGroup = Property(
         "QVariant", getEntryGroup, setEntryGroup, notify=entry_group_changed
-    )
-
-    @Signal
-    def instrument_group_changed(self):
-        pass
-
-    def getInstrumentGroup(self):
-        return self.instrument
-
-    def setInstrumentGroup(self, group):
-        """
-        The variable itself should be read-only, so this function does nothing.
-        """
-        pass
-
-    instrumentGroup = Property(
-        "QVariant",
-        getInstrumentGroup,
-        setInstrumentGroup,
-        notify=instrument_group_changed,
     )

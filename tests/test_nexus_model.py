@@ -57,23 +57,11 @@ def test_GIVEN_nothing_WHEN_creating_nexus_model_THEN_creates_entry_group_with_c
     assert model.getEntryGroup().attrs["NX_class"] == entry_name
 
 
-def test_GIVEN_nothing_WHEN_creating_nexus_model_THEN_creates_instrument_group_with_correct_nx_class():
-    model = NexusModel()
-    assert model.getInstrumentGroup().attrs["NX_class"] == instrument_name
-
-
 def test_GIVEN_another_variable_WHEN_setting_entry_group_THEN_variable_does_not_change():
     model = NexusModel()
     original = model.getEntryGroup()
     model.setEntryGroup("test")
     assert original == model.getEntryGroup()
-
-
-def test_GIVEN_another_variable_WHEN_setting_instrument_group_THEN_variable_does_not_change():
-    model = NexusModel()
-    original = model.getInstrumentGroup()
-    model.setInstrumentGroup("test")
-    assert original == model.getInstrumentGroup()
 
 
 def test_GIVEN_nonstandard_nxclass_WHEN_creating_group_THEN_group_is_still_created():

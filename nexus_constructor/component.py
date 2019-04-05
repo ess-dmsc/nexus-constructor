@@ -9,13 +9,13 @@ from nexus_constructor.nexus_model import create_group, get_nx_class_for_compone
 def create_component(
     component_type,
     name,
-    description,
-    transform_parent,
-    dependent_transform,
-    transforms,
-    geometry,
-    pixel_data,
     parent_group,
+    description="",
+    transform_parent=None,
+    dependent_transform=None,
+    transforms=None,
+    geometry=None,
+    pixel_data=None,
 ):
     """
     Factory function for creating components
@@ -25,11 +25,13 @@ def create_component(
     :param transform_parent: The transform parent of the component to base transforms on.
     :param dependent_transform: The
     :param transforms: The transforms for this component.
-    :param geometry:
-    :param pixel_data:
-    :param parent_group:
-    :return:
+    :param geometry: The geometry information.
+    :param pixel_data: The pixel mapping information.
+    :param parent_group: The parent HDF group to add the component to.
+    :return: The created component object.
     """
+    if transforms is None:
+        transforms = []
     return Component(
         component_type=component_type,
         name=name,

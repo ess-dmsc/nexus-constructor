@@ -15,19 +15,20 @@ from nexus_constructor.qml_models.instrument_model import (
     PixelGrid,
     PixelMapping,
 )
-from nexus_constructor.nexus_model import NexusModel, h5py
+from nexus_constructor.nexus_model import NexusModel, h5py, create_group
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
-def test_initialise_model():
+def test_GIVEN_nothing_WHEN_initialising_model_THEN_sample_exists_as_first_component():
     model = InstrumentModel()
+    model.initialise(NexusModel().nexus_file)
     assert model.rowCount() == 1
     assert model.components[0].component_type == ComponentType.SAMPLE
 
 
 def test_add_component():
     model = InstrumentModel()
-    model.instrument_group = NexusModel().getInstrumentGroup()
+    model.initialise(NexusModel().getEntryGroup())
     model.add_component("Detector", "MyDetector", geometry_model=NoShapeModel())
     assert model.rowCount() == 2
     assert model.components[1].component_type == ComponentType.DETECTOR
@@ -38,7 +39,7 @@ def test_add_component():
 
 def test_remove_component():
     model = InstrumentModel()
-    model.instrument_group = NexusModel().getInstrumentGroup()
+    model.initialise(NexusModel().getEntryGroup())
     model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     model.remove_component(1)
     assert model.rowCount() == 1
@@ -47,6 +48,12 @@ def test_remove_component():
     model.remove_component(0)
     assert model.rowCount() == 1
     assert model.components[0].component_type == ComponentType.SAMPLE
+
+
+def test_GIVEN_nothing_WHEN_calling_create_instrument_group_THEN_instrument_group_is_created_and_added_to_model():
+    model = InstrumentModel()
+    model.initialise(NexusModel().getEntryGroup())
+    assert model.instrument_group.attrs["NX_class"] == "NXinstrument"
 
 
 def test_replace_contents():
@@ -115,6 +122,7 @@ def test_determine_pixel_state_produces_expected_strings():
 
 def build_model_with_sample_transforms():
     instrument = InstrumentModel()
+    instrument.initialise(NexusModel().entryGroup)
     instrument.components.append(
         Component(
             component_type=ComponentType.DETECTOR,
@@ -287,17 +295,6 @@ def test_GIVEN_hdf_group_WHEN_request_instrument_group_THEN_sets_model_instrumen
     group = file.create_group(name)
 
     model = InstrumentModel()
-    model.set_instrument_group(group)
+    model.initialise(group)
 
-    assert model.instrument_group == group
-
-
-def test_GIVEN_hdf_group_WHEN_request_entry_group_THEN_sets_model_entry_group_to_given_group():
-    name = "testentrygroupinmodel"
-    file = h5py.File(name, mode="w", driver="core", backing_store=False)
-    group = file.create_group(name)
-
-    model = InstrumentModel()
-    model.set_entry_group(group)
-
-    assert model.entry_group == group
+    assert group.name in model.instrument_group.name

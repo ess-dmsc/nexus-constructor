@@ -216,8 +216,7 @@ ApplicationWindow {
     InstrumentModel{
         id: components
         Component.onCompleted: {
-            set_instrument_group(nxsModel.instrumentGroup)
-            set_entry_group(nxsModel.entryGroup)
+            initialise(nxsModel.entryGroup)
         }
     }
 

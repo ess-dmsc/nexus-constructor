@@ -69,36 +69,46 @@ class InstrumentModel(QAbstractListModel):
     entry_group = False
 
     @Slot("QVariant")
-    def set_entry_group(self, group):
-        self.entry_group = group
-
-    @Slot("QVariant")
-    def set_instrument_group(self, group):
-        self.instrument_group = group
-
-    def __init__(self):
-        super().__init__()
-
-        self.dataChanged.connect(self.send_model_updated)
-        self.rowsInserted.connect(self.send_model_updated)
-        self.rowsRemoved.connect(self.send_model_updated)
-        self.modelReset.connect(self.send_model_updated)
-
-        self.components = [
-            Component(
-                component_type=ComponentType.SAMPLE, name="Sample", geometry=OFFCube
-            )
-        ]
-        if self.entry_group:
-            create_group(
-                "Sample",
-                get_nx_class_for_component(ComponentType.SAMPLE),
-                self.entry_group,
-            )
+    def initialise(self, group):
+        """
+        Called from QML immediately after the constructor and adds the sample to the entry group, then creates the instrument group.
+        :param group: The /entry/ group created by the Nexus Model.
+        """
+        sample = create_component(
+            component_type=ComponentType.SAMPLE,
+            name="Sample",
+            geometry=OFFCube,
+            parent_group=group,
+        )
 
         self.transform_models = [
             TransformationModel(component.transforms) for component in self.components
         ]
+
+        self.create_instrument_group(group)
+
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self.components.append(sample)
+        self.transform_models.append(TransformationModel(sample.transforms))
+        self.endInsertRows()
+        self.update_removable()
+        self.update_transforms_deletable()
+        self.send_model_updated()
+
+    def create_instrument_group(self, group):
+        """
+        Create group for instrument and store a link to it.
+        :param group: The parent group to create instrument under.
+        """
+        self.instrument_group = create_group("instrument", "NXinstrument", group)
+
+    def __init__(self):
+        super().__init__()
+        self.components = []
+        self.dataChanged.connect(self.send_model_updated)
+        self.rowsInserted.connect(self.send_model_updated)
+        self.rowsRemoved.connect(self.send_model_updated)
+        self.modelReset.connect(self.send_model_updated)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.components)

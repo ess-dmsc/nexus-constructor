@@ -13,6 +13,7 @@ from nexus_constructor.component import Component
 from nexus_constructor.component_type import ComponentType
 from nexus_constructor.geometry_types import CylindricalGeometry
 import nexus_constructor.nexus_constructor_json as gc_json
+from nexus_constructor.nexus_model import NexusModel
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QUrl
@@ -21,6 +22,7 @@ from PySide2.QtGui import QVector3D
 
 def build_sample_model():
     model = InstrumentModel()
+    model.initialise(NexusModel().entryGroup)
 
     offmodel = OFFModel()
     offmodel.setData(1, "m", OFFModel.UnitsRole)
@@ -135,6 +137,7 @@ def test_loading_generated_json():
     json_string = gc_json.generate_json(model)
 
     loaded_model = InstrumentModel()
+    loaded_model.initialise(NexusModel().entryGroup)
     gc_json.load_json_object_into_instrument_model(
         json.loads(json_string), loaded_model
     )
