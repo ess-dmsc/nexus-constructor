@@ -62,7 +62,7 @@ else:
 
 setup(
     name="Nexus Constructor",
-    version="0.1",
+    version="2.0-pre",
     description="NeXus file constructor with 3D view for components",
     options={"build_exe": build_exe_options},
     executables=[
