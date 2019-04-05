@@ -1,4 +1,3 @@
-
 project = "nexus-constructor"
 
 // Set number of old artefacts to keep.
