@@ -72,6 +72,13 @@ dir("${project}") {
  stage('Build Executable') {
     sh "python3.6 setup.py build_exe"
  }
+	
+	stage("Archive executable") {
+		sh "zip build/ nexus_constructor_macos_${git_commit_short}.zip"
+		archiveArtifacts artifacts: 'nexus-constructor*.zip', fingerprint: true
+
+		
+	}
  // archive as well
 } // dir
 } // node
