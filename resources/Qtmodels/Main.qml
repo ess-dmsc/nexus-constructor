@@ -14,8 +14,8 @@ ApplicationWindow {
     visible: true
     width: 1100
     height: 500
-    minimumWidth: windowPane.implicitWidth
-    minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
+    minimumWidth: row.implicitWidth
+    minimumHeight: menuBar.implicitHeight + row.implicitHeight
 
     property string jsonMode: "liveFW"
 
@@ -84,12 +84,11 @@ ApplicationWindow {
     }
 
     Pane {
-        id: windoPane
+        id: windowPane
         padding: 5
         focus: true
         anchors.fill: parent
         contentWidth: row.width
-        // contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
         contentHeight: row.height
 
         RowLayout {
