@@ -61,9 +61,9 @@ else:
     extension = ""
 
 setup(
-    name="Nexus Constructor Test App",
+    name="Nexus Constructor",
     version="0.1",
-    description="Technology test program for the nexus constructor",
+    description="NeXus file constructor with 3D view for components",
     options={"build_exe": build_exe_options},
     executables=[
         Executable("main.py", base=base, targetName="NexusConstructor" + extension)
