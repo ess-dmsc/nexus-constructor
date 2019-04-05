@@ -184,8 +184,10 @@ Item {
             Pane {
                 id: rotatePane
                 padding: 0
-                contentWidth: xRotField.implicitWidth + yRotField.implicitWidth + zRotField.implicitWidth
-                contentHeight: rotateNameField.height + xRotField.height + angleField.height
+                // contentWidth: xRotField.implicitWidth + yRotField.implicitWidth + zRotField.implicitWidth
+                contentWidth: xyzInput.width
+                // contentHeight: rotateNameField.height + xRotField.height + angleField.height
+                contentHeight: xyzInput.height + rotateNameField.height + angleField.height
 
                 Label {
                     id: rotateLabel
@@ -197,7 +199,8 @@ Item {
                     id: rotateNameField
                     anchors.top: parent.top
                     anchors.right: parent.right
-                    anchors.left: yRotField.left
+                    // anchors.left: yRotField.left
+                    anchors.left: xyzInput.left
                     anchoredEditor: true
                     labelText: "Name:"
                     editorText: name
@@ -208,7 +211,18 @@ Item {
                         onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
                     }
                 }
+                XYZInput {
+                    id: xyzInput
+                    anchors.top: rotateNameField.bottom
+                    xEditorText: rotate_x
+                    yEditorText: rotate_y
+                    zEditorText: rotate_z
 
+                    onXEditingFinished: rotate_x = parseFloat(xEditorText)
+                    onYEditingFinished: rotate_y = parseFloat(yEditorText)
+                    onZEditingFinished: rotate_z = parseFloat(zEditorText)
+                }
+                /*
                 LabeledTextField {
                     id: xRotField
                     anchors.top: rotateNameField.bottom
@@ -236,12 +250,14 @@ Item {
                     validator: numberValidator
                     onEditingFinished: rotate_z = parseFloat(editorText)
                 }
-
+                */
                 LabeledTextField {
                     id: angleField
-                    anchors.top: xRotField.bottom
-                    anchors.right: zRotField.right
-                    labelText: "angle (degrees):"
+                    // anchors.top: xRotField.bottom
+                    // anchors.right: zRotField.right
+                    anchors.top: xyzInput.bottom
+                    anchors.right: xyzInput.right
+                    labelText: "Angle (degrees):"
                     editorText: rotate_angle
                     validator: angleValidator
                     onEditingFinished: rotate_angle = parseFloat(editorText)
