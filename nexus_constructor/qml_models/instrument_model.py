@@ -7,7 +7,7 @@ from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
-from nexus_constructor.nexus_model import create_group, get_nx_class_for_component
+from nexus_constructor.nexus_model import create_group
 
 
 def generate_mesh(component: Component):

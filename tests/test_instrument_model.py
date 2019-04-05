@@ -15,7 +15,7 @@ from nexus_constructor.qml_models.instrument_model import (
     PixelGrid,
     PixelMapping,
 )
-from nexus_constructor.nexus_model import NexusModel, h5py, create_group
+from nexus_constructor.nexus_model import NexusModel, h5py
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
