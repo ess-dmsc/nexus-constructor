@@ -194,13 +194,13 @@ Item {
                     anchors.verticalCenter: rotateNameField.verticalCenter
                     anchors.left: parent.left
                     text: "Rotation"
+                    font.bold: true
                 }
                 LabeledTextField {
                     id: rotateNameField
                     anchors.top: parent.top
                     anchors.right: parent.right
-                    // anchors.left: yRotField.left
-                    anchors.left: xyzInput.left
+                    anchors.left: parent.left
                     anchoredEditor: true
                     labelText: "Name:"
                     editorText: name
@@ -222,42 +222,11 @@ Item {
                     onYEditingFinished: rotate_y = parseFloat(yEditorText)
                     onZEditingFinished: rotate_z = parseFloat(zEditorText)
                 }
-                /*
-                LabeledTextField {
-                    id: xRotField
-                    anchors.top: rotateNameField.bottom
-                    anchors.left: parent.left
-                    labelText: "x:"
-                    editorText: rotate_x
-                    validator: numberValidator
-                    onEditingFinished: rotate_x = parseFloat(editorText)
-                }
-                LabeledTextField {
-                    id: yRotField
-                    anchors.top: xRotField.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    labelText: "y:"
-                    editorText: rotate_y
-                    validator: numberValidator
-                    onEditingFinished: rotate_y = parseFloat(editorText)
-                }
-                LabeledTextField {
-                    id: zRotField
-                    anchors.top: xRotField.top
-                    anchors.right: parent.right
-                    labelText: "z:"
-                    editorText: rotate_z
-                    validator: numberValidator
-                    onEditingFinished: rotate_z = parseFloat(editorText)
-                }
-                */
                 LabeledTextField {
                     id: angleField
-                    // anchors.top: xRotField.bottom
-                    // anchors.right: zRotField.right
                     anchors.top: xyzInput.bottom
                     anchors.right: xyzInput.right
-                    labelText: "Angle (degrees):"
+                    labelText: "Angle (Degrees): "
                     editorText: rotate_angle
                     validator: angleValidator
                     onEditingFinished: rotate_angle = parseFloat(editorText)
