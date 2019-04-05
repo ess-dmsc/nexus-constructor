@@ -107,7 +107,7 @@ ApplicationWindow {
             Frame {
 
                 id: instrumentViewArea
-                // contentWidth: 100
+                Layout.minimumWidth: 200
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 focus: true
