@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
+import QtQuick.Layouts 1.11
 
 /*
  * Controls for defining a components transformation to detector space.
@@ -189,31 +190,29 @@ Item {
                 // contentHeight: rotateNameField.height + xRotField.height + angleField.height
                 contentHeight: xyzInput.height + rotateNameField.height + angleField.height
 
-                Label {
-                    id: rotateLabel
-                    anchors.verticalCenter: rotateNameField.verticalCenter
-                    anchors.left: parent.left
-                    text: "Rotation"
-                    font.bold: true
-                }
-                LabeledTextField {
-                    id: rotateNameField
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-                    anchoredEditor: true
-                    labelText: "Name:"
-                    editorText: name
-                    onEditingFinished: name = editorText
-                    validator: NameValidator {
-                        model: transformModel
-                        myindex: index
-                        onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                RowLayout {
+                    id: row
+                    Label {
+                        id: rotateLabel
+                        text: "Rotation"
+                        font.bold: true
+                    }
+                    LabeledTextField {
+                        id: rotateNameField
+                        anchoredEditor: true
+                        labelText: "Name: "
+                        editorText: name
+                        onEditingFinished: name = editorText
+                        validator: NameValidator {
+                            model: transformModel
+                            myindex: index
+                            onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                        }
                     }
                 }
                 XYZInput {
                     id: xyzInput
-                    anchors.top: rotateNameField.bottom
+                    anchors.top: row.bottom
                     xEditorText: rotate_x
                     yEditorText: rotate_y
                     zEditorText: rotate_z
