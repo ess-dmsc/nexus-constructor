@@ -66,11 +66,11 @@ dir("${project}") {
  }
 
  stage('Setup'){
-    sh "python3 -m pip install --user -r requirements.txt"
+    sh "python3.6 -m pip install --user -r requirements.txt"
  }
 
  stage('Build Executable') {
-    sh "python3 setup.py bdist_mac"
+    sh "python3.6 setup.py build_exe"
  }
  // archive as well
 } // dir
