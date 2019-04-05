@@ -108,6 +108,7 @@ ApplicationWindow {
 
                 id: instrumentViewArea
                 Layout.minimumWidth: 200
+                Layout.minimumHeight: 100
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 focus: true
@@ -145,7 +146,7 @@ ApplicationWindow {
 
             JSONPane {
                 id: jsonPane
-                contentWidth: 300
+                Layout.minimumWidth: 300
                 Layout.fillHeight: true
                 Layout.fillWidth: false
             }
