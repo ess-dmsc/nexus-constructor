@@ -24,6 +24,8 @@ def build_sample_model():
     model = InstrumentModel()
     model.initialise(NexusModel().entryGroup)
 
+    model.components[0].component_group = None
+
     offmodel = OFFModel()
     offmodel.setData(1, "m", OFFModel.UnitsRole)
     offmodel.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
