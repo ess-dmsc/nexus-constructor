@@ -84,12 +84,13 @@ ApplicationWindow {
     }
 
     Pane {
-        id: windowPane
+        id: windoPane
         padding: 5
         focus: true
         anchors.fill: parent
-        contentWidth: componentFieldsArea.implicitWidth + instrumentViewArea.implicitWidth + jsonPane.implicitWidth
-        contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
+        contentWidth: row.width
+        // contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
+        contentHeight: row.height
 
         RowLayout {
 
