@@ -24,28 +24,35 @@ Component {
             onClicked: componentBox.state = (componentBox.state == "Extended") ? "": "Extended"
         }
 
-        Image {
-            id: expansionCaret
-            width: 20; height: 20;
-            anchors.right: parent.right
-            anchors.top: parent.top
-            source: "file:resources/images/caret.svg"
-            transformOrigin: Item.Center
-            rotation: 0
-        }
+        RowLayout {
 
-        Item {
-            id: mainContent
-            anchors.left: parent.left
             anchors.right: parent.right
-            height: mainNameLabel.height
-            implicitWidth: mainNameLabel.width + expansionCaret.width
-            visible: true
-            Label {
-                id: mainNameLabel
-                anchors.left: parent.left
-                anchors.top: parent.top
-                text: "Name:" + name
+            anchors.left: parent.left
+
+            Item {
+                id: mainContent
+                height: mainNameLabel.height
+                implicitWidth: mainNameLabel.width + expansionCaret.width
+                Layout.fillHeight: false
+                visible: true
+                Label {
+                    id: mainNameLabel
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    text: "Name:" + name
+                }
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            Image {
+                id: expansionCaret
+                Layout.maximumHeight: 20
+                Layout.maximumWidth: 20
+                source: "file:resources/images/caret.svg"
+                transformOrigin: Item.Center
+                Layout.fillHeight: false
+                rotation: 0
             }
         }
 
