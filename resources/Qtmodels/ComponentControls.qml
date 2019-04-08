@@ -8,24 +8,22 @@ Pane {
     contentWidth: Math.max(headingRow.implicitWidth, listContainer.implicitWidth)
     contentHeight: headingRow.implicitHeight + listContainer.implicitHeight
 
-    Pane {
+    RowLayout {
+
         id: headingRow
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        contentHeight: addComponentButton.height
-        contentWidth: componentsLabel.width + addComponentButton.width
-        padding: 1
 
         Label {
             id: componentsLabel
-            anchors.left: parent.left
-            anchors.verticalCenter: addComponentButton.verticalCenter
             text: "Components:"
+        }
+        Item {
+            Layout.fillWidth: true
         }
         Button {
             id: addComponentButton
-            anchors.right: parent.right
 
             text: "Add component"
             onClicked: {
