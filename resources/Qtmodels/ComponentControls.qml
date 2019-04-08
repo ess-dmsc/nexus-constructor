@@ -5,75 +5,80 @@ import QtQuick.Layouts 1.11
 
 Pane {
 
-    contentWidth: Math.max(headingRow.implicitWidth, listContainer.implicitWidth)
-    contentHeight: headingRow.implicitHeight + listContainer.implicitHeight
+    contentWidth: mainCol.implicitWidth
+    contentHeight: mainCol.implicitHeight
 
-    RowLayout {
+    ColumnLayout {
 
-        id: headingRow
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
+        id: mainCol
+        anchors.fill: parent
 
-        Label {
-            id: componentsLabel
-            text: "Components:"
-        }
-        Item {
+        RowLayout {
+
+            id: headingRow
             Layout.fillWidth: true
-        }
-        Button {
-            id: addComponentButton
+            Layout.fillHeight: false
 
-            text: "Add component"
-            onClicked: {
-                if (windowLoader.source == ""){
-                    windowLoader.source = "AddComponentWindow.qml"
-                    window.positionChildWindow(windowLoader.item)
-                    windowLoader.item.show()
-                } else {
-                    windowLoader.item.requestActivate()
+            Label {
+                id: componentsLabel
+                text: "Components:"
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            Button {
+                id: addComponentButton
+
+                text: "Add component"
+                onClicked: {
+                    if (windowLoader.source == ""){
+                        windowLoader.source = "AddComponentWindow.qml"
+                        window.positionChildWindow(windowLoader.item)
+                        windowLoader.item.show()
+                    } else {
+                        windowLoader.item.requestActivate()
+                    }
+                }
+                Loader {
+                    id: windowLoader
+                    Connections {
+                        target: windowLoader.item
+                        onClosing: windowLoader.source = ""
+                    }
+                    Connections {
+                        target: window
+                        onClosing: windowLoader.source = ""
+                    }
                 }
             }
-            Loader {
-                id: windowLoader
-                Connections {
-                    target: windowLoader.item
-                    onClosing: windowLoader.source = ""
-                }
-                Connections {
-                    target: window
-                    onClosing: windowLoader.source = ""
-                }
-            }
         }
-    }
 
-    Frame {
-        id: listContainer
-        anchors.left: parent.left
-        anchors.right: parent.right
-        contentWidth: componentListView.implicitWidth
-        contentHeight: 100
-        anchors.top: headingRow.bottom
-        anchors.bottom: parent.bottom
-        padding: 1
-        ListView {
-            id: componentListView
-            model: components
-            delegate: componentDelegate
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: bar
-        }
-        ActiveScrollBar {
-            // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
-            id: bar
-            anchors.left: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+        Frame {
+
+            id: listContainer
+
+            contentWidth: componentListView.implicitWidth
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            padding: 1
+
+            ListView {
+                id: componentListView
+                model: components
+                delegate: componentDelegate
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollBar.vertical: bar
+            }
+            ActiveScrollBar {
+                // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
+                id: bar
+                anchors.left: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+            }
         }
     }
 
@@ -177,8 +182,6 @@ Pane {
 
                         PaddedButton {
                             id: editorButton
-                            // anchors.top: transformControls.bottom
-                            // anchors.left: parent.left
                             text: "Full editor"
                             onClicked: {
                                 if (editorLoader.source == ""){
@@ -207,8 +210,6 @@ Pane {
                         }
                         PaddedButton {
                             id: deleteButton
-                            // anchors.top: editorButton.top
-                            // anchors.right: parent.right
                             text: "Delete"
                             onClicked: components.remove_component(index)
                             buttonEnabled: removable
