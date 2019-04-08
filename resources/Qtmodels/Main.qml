@@ -238,7 +238,11 @@ ApplicationWindow {
     // When the model updates, request new json for the view if desired
     Connections {
         target: components
-        onModel_updated: jsonConnector.request_filewriter_json(components)
+        onModel_updated: {
+            jsonConnector.request_filewriter_json(components)
+            console.log("I just updated.")
+            instrumentEntity.camera.viewAll()
+        }
         enabled: jsonMode == "liveFW"
     }
 
