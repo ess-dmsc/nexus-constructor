@@ -1,6 +1,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyValidators 1.0
+import QtQuick.Layouts 1.11
 
 Pane {
 
@@ -133,86 +134,99 @@ Pane {
                 implicitWidth: extendedText.implicitWidth
                 visible: false
                 Item {
+
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: nameField.height + transformControls.height + editorButton.height
-                    implicitWidth: Math.max(nameField.implicitWidth,
-                                            transformControls.implicitWidth,
-                                            editorButton.implicitWidth + deleteButton.implicitWidth)
+                    height: col.height
+                    implicitWidth: transformControls.implicitWidth
                     id: extendedText
 
-                    LabeledTextField {
-                        id: nameField
-                        labelText: "Name:"
-                        editorWidth: 200
-                        editorText: name
-                        onEditingFinished: name = editorText
-                        validator: NameValidator {
-                            model: components
-                            myindex: index
-                            onValidationFailed: {
-                                nameField.ToolTip.show("Component names must be unique", 3000)
+                    ColumnLayout {
+
+                        id: col
+                        anchors.right: parent.right
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+
+                        LabeledTextField {
+                            id: nameField
+                            labelText: "Name:"
+                            editorWidth: 200
+                            editorText: name
+                            onEditingFinished: name = editorText
+                            validator: NameValidator {
+                                model: components
+                                myindex: index
+                                onValidationFailed: {
+                                    nameField.ToolTip.show("Component names must be unique", 3000)
+                                }
                             }
                         }
-                    }
 
-                    TransformControls {
-                        id: transformControls
-                        transformModel: transform_model
-                        componentIndex: index
-                        anchors.top: nameField.bottom
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                    }
-                    Connections {
-                        target: transform_model
-                        onTransformsUpdated: components.transforms_updated(index)
-                    }
-                    states: State {
-                        name: "hidden"; when: index == 0
-                        PropertyChanges { target: transformControls; height: 0 }
-                        PropertyChanges { target: transformControls; visible: false }
-                    }
+                        TransformControls {
+                            id: transformControls
+                            transformModel: transform_model
+                            componentIndex: index
+                        }
+                        Connections {
+                            target: transform_model
+                            onTransformsUpdated: components.transforms_updated(index)
+                        }
+                        states: State {
+                            name: "hidden"; when: index == 0
+                            PropertyChanges { target: transformControls; height: 0 }
+                            PropertyChanges { target: transformControls; visible: false }
+                        }
 
-                    PaddedButton {
-                        id: editorButton
-                        anchors.top: transformControls.bottom
-                        anchors.left: parent.left
-                        text: "Full editor"
-                        onClicked: {
-                            if (editorLoader.source == ""){
-                                editorLoader.source = "EditComponentWindow.qml"
-                                editorLoader.item.componentIndex = index
-                                window.positionChildWindow(editorLoader.item)
-                                editorLoader.item.show()
-                            } else {
-                                editorLoader.item.requestActivate()
+                        RowLayout {
+
+                            id: row
+                            Layout.fillWidth: true
+
+                            PaddedButton {
+                                id: editorButton
+                                // anchors.top: transformControls.bottom
+                                // anchors.left: parent.left
+                                text: "Full editor"
+                                onClicked: {
+                                    if (editorLoader.source == ""){
+                                        editorLoader.source = "EditComponentWindow.qml"
+                                        editorLoader.item.componentIndex = index
+                                        window.positionChildWindow(editorLoader.item)
+                                        editorLoader.item.show()
+                                    } else {
+                                        editorLoader.item.requestActivate()
+                                    }
+                                }
+                            }
+                            Loader {
+                                id: editorLoader
+                                Connections {
+                                    target: editorLoader.item
+                                    onClosing: editorLoader.source = ""
+                                }
+                                Connections {
+                                    target: window
+                                    onClosing: editorLoader.source = ""
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                            }
+                            PaddedButton {
+                                id: deleteButton
+                                // anchors.top: editorButton.top
+                                // anchors.right: parent.right
+                                text: "Delete"
+                                onClicked: components.remove_component(index)
+                                buttonEnabled: removable
+                                // The sample (at index 0) should never be removed. Don't even show it as an option.
+                                visible: index != 0
+                                ToolTip.visible: hovered & !removable
+                                ToolTip.delay: 400
+                                ToolTip.text: "Cannot remove a component that's in use as a transform parent"
                             }
                         }
-                    }
-                    Loader {
-                        id: editorLoader
-                        Connections {
-                            target: editorLoader.item
-                            onClosing: editorLoader.source = ""
-                        }
-                        Connections {
-                            target: window
-                            onClosing: editorLoader.source = ""
-                        }
-                    }
-                    PaddedButton {
-                        id: deleteButton
-                        anchors.top: editorButton.top
-                        anchors.right: parent.right
-                        text: "Delete"
-                        onClicked: components.remove_component(index)
-                        buttonEnabled: removable
-                        // The sample (at index 0) should never be removed. Don't even show it as an option.
-                        visible: index != 0
-                        ToolTip.visible: hovered & !removable
-                        ToolTip.delay: 400
-                        ToolTip.text: "Cannot remove a component that's in use as a transform parent"
                     }
                 }
             }
