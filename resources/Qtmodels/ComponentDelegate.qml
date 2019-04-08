@@ -28,6 +28,7 @@ Component {
 
             anchors.right: parent.right
             anchors.left: parent.left
+            id: contractedRow
 
             Item {
                 id: mainContent
@@ -59,7 +60,7 @@ Component {
         Item {
 
             id: extendedContent
-            anchors.top: mainContent.bottom
+            anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
             height: 0
@@ -122,17 +123,6 @@ Component {
                             }
                         }
                     }
-                    Loader {
-                        id: editorLoader
-                        Connections {
-                            target: editorLoader.item
-                            onClosing: editorLoader.source = ""
-                        }
-                        Connections {
-                            target: window
-                            onClosing: editorLoader.source = ""
-                        }
-                    }
                     Item {
                         Layout.fillWidth: true
                     }
@@ -146,6 +136,17 @@ Component {
                         ToolTip.visible: hovered & !removable
                         ToolTip.delay: 400
                         ToolTip.text: "Cannot remove a component that's in use as a transform parent"
+                    }
+                    Loader {
+                        id: editorLoader
+                        Connections {
+                            target: editorLoader.item
+                            onClosing: editorLoader.source = ""
+                        }
+                        Connections {
+                            target: window
+                            onClosing: editorLoader.source = ""
+                        }
                     }
                 }
             }
