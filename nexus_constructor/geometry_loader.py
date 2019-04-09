@@ -11,7 +11,7 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
 
     Supported file types are OFF and STL.
     :param filename: The name of the file to load geometry from
-    :param str: A unit of length in the form of a string. Used to determine the multiplication factor.
+    :param units: A unit of length in the form of a string. Used to determine the multiplication factor.
     :param geometry: The optional OFFGeometry to load the geometry data into. If not provided, a new instance will be
     returned
     :return: An OFFGeometry instance containing that file's geometry, or an empty instance if filename's extension is

@@ -119,12 +119,13 @@ class OFFModel(QObject):
     A single item list model that allows properties of an OFFGeometry instance to be read and manipulated in QML
     """
 
+    _file = QUrl("")
+    _units = "m"
+
     def __init__(self):
         super().__init__()
         self.geometry = OFFGeometry()
 
-    _file = QUrl("")
-    _units = "m"
     meshLoaded = Signal()
 
     dataChanged = Signal()
@@ -164,7 +165,8 @@ class OFFModel(QObject):
         filename = self._file.toString(
             options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
         )
-        load_geometry(filename, self.units, self.geometry)
+        self.geometry = load_geometry(filename, self._units, self.geometry)
+        self.dataChanged.emit()
         self.meshLoaded.emit()
 
     def get_geometry(self):
