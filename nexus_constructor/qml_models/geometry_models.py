@@ -73,16 +73,21 @@ class CylinderModel(QAbstractListModel):
         changed = False
         param_options = {
             CylinderModel.UnitsRole: [self.cylinder, "units", value],
-            CylinderModel.AxisXRole: [self.cylinder.axis_direction, "x", value],
-            CylinderModel.AxisYRole: [self.cylinder.axis_direction, "y", value],
-            CylinderModel.AxisZRole: [self.cylinder.axis_direction, "z", value],
             CylinderModel.HeightRole: [self.cylinder, "height", value],
             CylinderModel.RadiusRole: [self.cylinder, "radius", value],
+        }
+        vect_options = {
+            CylinderModel.AxisXRole: self.cylinder.axis_direction.setX,
+            CylinderModel.AxisYRole: self.cylinder.axis_direction.setY,
+            CylinderModel.AxisZRole: self.cylinder.axis_direction.setZ,
         }
 
         if role in param_options:
             param_list = param_options[role]
             changed = change_value(*param_list)
+        if role in vect_options:
+            vect_options[role](value)
+            changed = True
         if changed:
             self.dataChanged.emit(index, index, role)
         return changed
