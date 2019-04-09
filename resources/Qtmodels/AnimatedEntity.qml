@@ -23,11 +23,6 @@ Entity {
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
 
-    function updateView() {
-        console.log(camera.position)
-        camera.viewAll()
-    }
-
     FirstPersonCameraController { camera: camera
      linearSpeed: 20}
 
