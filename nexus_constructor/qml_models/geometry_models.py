@@ -119,7 +119,7 @@ class OFFModel(QObject):
     A single item list model that allows properties of an OFFGeometry instance to be read and manipulated in QML
     """
 
-    _file = QUrl("")
+    _file = False
     _units = "m"
 
     def __init__(self):
@@ -136,12 +136,6 @@ class OFFModel(QObject):
     def get_units(self):
         return self._units
 
-    def get_vertices(self):
-        return self.geometry.vertices
-
-    def get_faces(self):
-        return self.geometry.faces
-
     def set_file(self, file):
         self._file = file
         self.load_data()
@@ -149,16 +143,8 @@ class OFFModel(QObject):
     def set_units(self, units):
         self._units = units
 
-    def set_vertices(self, vertices):
-        self.geometry.vertices = vertices
-
-    def set_faces(self, faces):
-        self.geometry.faces = faces
-
     file_url = Property(QUrl, get_file, set_file, notify=dataChanged)
     units = Property(str, get_units, set_units, notify=dataChanged)
-    vertices = Property("QVariant", get_vertices, set_vertices, notify=dataChanged)
-    faces = Property("QVariant", get_faces, set_faces, notify=dataChanged)
 
     def load_data(self):
         """Read the currently selected file into self.geometry"""
