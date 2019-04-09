@@ -24,7 +24,6 @@ Entity {
     }
 
     function updateView() {
-        camera.translateWorld(camera.position.times(-1.0))
         console.log(camera.position)
         camera.viewAll()
     }
