@@ -10,8 +10,8 @@ import struct
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     model = OFFModel()
-    model.setData(1, "m", OFFModel.UnitsRole)
-    model.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
+    model.set_units("m")
+    model.set_file(QUrl("tests/cube.off"))
     off_geometry = model.get_geometry()
     assert isinstance(off_geometry, OFFGeometry)
     assert off_geometry.vertices == [

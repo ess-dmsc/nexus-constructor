@@ -111,10 +111,7 @@ class CylinderModel(QObject):
 
     @Slot(int, "QVariant")
     def set_geometry(self, index, instrument: InstrumentModel):
-        self.beginResetModel()
-
         self.cylinder = instrument.components[index].geometry
-        self.endResetModel()
 
 
 class OFFModel(QObject):
@@ -157,14 +154,14 @@ class OFFModel(QObject):
     def set_faces(self, faces):
         self.geometry.faces = faces
 
-    file_url = Property(str, get_file, set_file, notify=dataChanged)
+    file_url = Property(QUrl, get_file, set_file, notify=dataChanged)
     units = Property(str, get_units, set_units, notify=dataChanged)
     vertices = Property("QVariant", get_vertices, set_vertices, notify=dataChanged)
     faces = Property("QVariant", get_faces, set_faces, notify=dataChanged)
 
     def load_data(self):
         """Read the currently selected file into self.geometry"""
-        filename = QUrl(self._file).toString(
+        filename = self._file.toString(
             options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
         )
         load_geometry(filename, self.units, self.geometry)
