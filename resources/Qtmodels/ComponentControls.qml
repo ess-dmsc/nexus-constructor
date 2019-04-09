@@ -206,11 +206,7 @@ Pane {
                         anchors.top: editorButton.top
                         anchors.right: parent.right
                         text: "Delete"
-                        onClicked: {
-                            console.log("Gonna delete something.")
-                            components.remove_component(index)
-                            console.log("Done deleting something.")
-                        }
+                        onClicked: components.remove_component(index)
                         buttonEnabled: removable
                         // The sample (at index 0) should never be removed. Don't even show it as an option.
                         visible: index != 0

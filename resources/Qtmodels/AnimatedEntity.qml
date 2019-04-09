@@ -10,7 +10,6 @@ Entity {
 
     property InstrumentModel instrument
     property alias camera: camera
-    property real negativeOne: -1.0
 
     Camera {
         id: camera
