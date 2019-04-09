@@ -241,7 +241,7 @@ ApplicationWindow {
         onModel_updated: {
             jsonConnector.request_filewriter_json(components)
             console.log("I just updated.")
-            instrumentEntity.camera.viewAll()
+            instrumentEntity.updateView()
         }
         enabled: jsonMode == "liveFW"
     }

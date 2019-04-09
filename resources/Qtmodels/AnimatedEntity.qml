@@ -10,6 +10,7 @@ Entity {
 
     property InstrumentModel instrument
     property alias camera: camera
+    property real negativeOne: -1.0
 
     Camera {
         id: camera
@@ -20,6 +21,12 @@ Entity {
         position: Qt.vector3d( 6.0, 8.0, 30.0 )
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
+    }
+
+    function updateView() {
+        camera.translateWorld(camera.position.times(-1.0))
+        console.log(camera.position)
+        camera.viewAll()
     }
 
     FirstPersonCameraController { camera: camera
