@@ -85,7 +85,7 @@ class CylinderModel(QAbstractListModel):
         if role in param_options:
             param_list = param_options[role]
             changed = change_value(*param_list)
-        if role in vect_options:
+        elif role in vect_options:
             vect_options[role](value)
             changed = True
         if changed:
