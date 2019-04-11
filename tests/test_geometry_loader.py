@@ -6,6 +6,7 @@ from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtCore import QUrl
 from PySide2.QtGui import QVector3D
 import struct
+from io import StringIO
 
 
 def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
@@ -96,7 +97,9 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         [left_upper_rear, left_upper_front, right_upper_front, right_upper_rear],  # top
     ]
 
-    geometry = load_geometry("tests/cube.stl", ".stl", "m")
+    with open("tests/cube.stl", "rb") as file:
+        geometry = load_geometry(file, ".stl", "m")
+
     # 2 triangles per face, 6 faces in the cube
     assert len(geometry.faces) == 6 * 2
     assert geometry.winding_order_indices == [i * 3 for i in range(12)]
@@ -140,7 +143,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
 
 
 def test_load_geometry_returns_empty_geometry_for_unrecognised_file_extension():
-    geometry = load_geometry("tests/collapsed_lines.txt", ".txt", "m")
+    geometry = load_geometry(StringIO(), ".txt", "m")
     assert len(geometry.vertices) == 0
     assert len(geometry.faces) == 0
 

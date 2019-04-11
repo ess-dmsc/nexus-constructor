@@ -171,11 +171,16 @@ class OFFModel(QAbstractListModel):
         filename = QUrl(self.file_url).toString(
             options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
         )
-        self.beginResetModel()
         extension = filename[filename.rfind(".") :].lower()
-        load_geometry(filename, extension, self.units, self.geometry)
+        self.beginResetModel()
+        with open(filename) as file:
+            self._load_data(file, extension)
         self.endResetModel()
         self.meshLoaded.emit()
+
+    def _load_data(self, file, extension):
+
+        load_geometry(file, extension, self.units, self.geometry)
 
     def get_geometry(self):
         return self.geometry

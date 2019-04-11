@@ -3,10 +3,11 @@ from nexusutils.readwriteoff import parse_off_file
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from stl import mesh
 from PySide2.QtGui import QVector3D
+from io import StringIO
 
 
 def load_geometry(
-    filename: str, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
+    file: StringIO, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
 ):
     """
     Loads geometry from a file into an OFFGeometry instance
@@ -22,9 +23,9 @@ def load_geometry(
     mult_factor = calculate_unit_conversion_factor(units)
 
     if extension == ".off":
-        load_off_geometry(filename, mult_factor, geometry)
+        load_off_geometry(file, mult_factor, geometry)
     elif extension == ".stl":
-        load_stl_geometry(filename, mult_factor, geometry)
+        load_stl_geometry(file, mult_factor, geometry)
     else:
         geometry.faces = []
         geometry.vertices = []
@@ -33,7 +34,7 @@ def load_geometry(
 
 
 def load_off_geometry(
-    filename: str, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
+    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
 ):
     """
     Loads geometry from an OFF file into an OFFGeometry instance
@@ -44,8 +45,7 @@ def load_off_geometry(
     returned
     :return: An OFFGeometry instance containing that file's geometry
     """
-    with open(filename) as file:
-        vertices, faces = parse_off_file(file)
+    vertices, faces = parse_off_file(file)
 
     geometry.vertices = [
         QVector3D(x * mult_factor, y * mult_factor, z * mult_factor)
@@ -57,7 +57,7 @@ def load_off_geometry(
 
 
 def load_stl_geometry(
-    filename: str, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
+    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
 ):
     """
     Loads geometry from an STL file into an OFFGeometry instance
@@ -68,7 +68,7 @@ def load_stl_geometry(
     returned
     :return: An OFFGeometry instance containing that file's geometry
     """
-    mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
+    mesh_data = mesh.Mesh.from_file("", fh=file, calculate_normals=False)
     # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
     geometry.vertices = [
         QVector3D(
