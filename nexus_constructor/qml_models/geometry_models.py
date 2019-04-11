@@ -172,7 +172,8 @@ class OFFModel(QAbstractListModel):
             options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
         )
         self.beginResetModel()
-        load_geometry(filename, self.units, self.geometry)
+        extension = filename[filename.rfind(".") :].lower()
+        load_geometry(filename, extension, self.units, self.geometry)
         self.endResetModel()
         self.meshLoaded.emit()
 

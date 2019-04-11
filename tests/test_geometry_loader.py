@@ -96,7 +96,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         [left_upper_rear, left_upper_front, right_upper_front, right_upper_rear],  # top
     ]
 
-    geometry = load_geometry("tests/cube.stl", "m")
+    geometry = load_geometry("tests/cube.stl", ".stl", "m")
     # 2 triangles per face, 6 faces in the cube
     assert len(geometry.faces) == 6 * 2
     assert geometry.winding_order_indices == [i * 3 for i in range(12)]
@@ -140,7 +140,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
 
 
 def test_load_geometry_returns_empty_geometry_for_unrecognised_file_extension():
-    geometry = load_geometry("tests/collapsed_lines.txt", "m")
+    geometry = load_geometry("tests/collapsed_lines.txt", ".txt", "m")
     assert len(geometry.vertices) == 0
     assert len(geometry.faces) == 0
 

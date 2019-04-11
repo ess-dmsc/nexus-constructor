@@ -5,7 +5,9 @@ from stl import mesh
 from PySide2.QtGui import QVector3D
 
 
-def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry()):
+def load_geometry(
+    filename: str, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
+):
     """
     Loads geometry from a file into an OFFGeometry instance
 
@@ -19,7 +21,6 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
     """
     mult_factor = calculate_unit_conversion_factor(units)
 
-    extension = filename[filename.rfind(".") :].lower()
     if extension == ".off":
         load_off_geometry(filename, mult_factor, geometry)
     elif extension == ".stl":
