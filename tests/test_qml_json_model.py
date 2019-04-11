@@ -1,4 +1,5 @@
 from nexus_constructor.qml_models.json_model import JsonModel, FilteredJsonModel
+from io import StringIO
 
 
 def read_json():
@@ -6,8 +7,121 @@ def read_json():
     Reads the test data from json files
     :return: a string containing the sample json, and a list of lines for its formatted form
     """
-    with open("tests/sample.json", mode="r") as file:
-        data = file.read()
+    sample = (
+        "{\n"
+        '"sample": {\n'
+        '"transforms": [\n'
+        "{\n"
+        '"angle": {\n'
+        '"unit": "degrees",\n'
+        '"value": 0\n'
+        "},\n"
+        '"axis": {\n'
+        '"y": 0,\n'
+        '"z": 1,\n'
+        '"x": 0\n'
+        "},\n"
+        '"type": "rotate"\n'
+        "},\n"
+        "{\n"
+        '"unit": "m",\n'
+        '"vector": {\n'
+        '"y": 0,\n'
+        '"z": 0,\n'
+        '"x": 0\n'
+        "},\n"
+        '"type": "translate"\n'
+        "}\n"
+        "],\n"
+        '"transform_id": 0,\n'
+        '"name": "Sample",\n'
+        '"description": "",\n'
+        '"geometry": {\n'
+        '"vertices": [\n'
+        "[\n"
+        "-0.5,\n"
+        "-0.5,\n"
+        "0.5\n"
+        "],\n"
+        "[\n"
+        "0.5,\n"
+        "-0.5,\n"
+        "0.5\n"
+        "],\n"
+        "[\n"
+        "-0.5,\n"
+        "0.5,\n"
+        "0.5\n"
+        "],\n"
+        "[\n"
+        "0.5,\n"
+        "0.5,\n"
+        "0.5\n"
+        "],\n"
+        "[\n"
+        "-0.5,\n"
+        "0.5,\n"
+        "-0.5\n"
+        "],\n"
+        "[\n"
+        "0.5,\n"
+        "0.5,\n"
+        "-0.5\n"
+        "],\n"
+        "[\n"
+        "-0.5,\n"
+        "-0.5,\n"
+        "-0.5\n"
+        "],\n"
+        "[\n"
+        "0.5,\n"
+        "-0.5,\n"
+        "-0.5\n"
+        "]\n"
+        "],\n"
+        '"faces": [\n'
+        "0,\n"
+        "1,\n"
+        "3,\n"
+        "2,\n"
+        "2,\n"
+        "3,\n"
+        "5,\n"
+        "4,\n"
+        "4,\n"
+        "5,\n"
+        "7,\n"
+        "6,\n"
+        "6,\n"
+        "7,\n"
+        "1,\n"
+        "0,\n"
+        "1,\n"
+        "7,\n"
+        "5,\n"
+        "3,\n"
+        "6,\n"
+        "0,\n"
+        "2,\n"
+        "4\n"
+        "],\n"
+        '"winding_order": [\n'
+        "0,\n"
+        "4,\n"
+        "8,\n"
+        "12,\n"
+        "16,\n"
+        "20\n"
+        "],\n"
+        '"type": "OFF"\n'
+        "},\n"
+        '"type": "Sample"\n'
+        "},\n"
+        '"components": []\n'
+        "}\n"
+    )
+
+    data = StringIO(sample).read()
     with open("tests/formatted_sample.json", mode="r") as file:
         formatted_lines = file.read().splitlines()
     return data, formatted_lines

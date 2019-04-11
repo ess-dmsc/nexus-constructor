@@ -15,7 +15,6 @@ from nexus_constructor.geometry_types import CylindricalGeometry
 import nexus_constructor.nexus_constructor_json as gc_json
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from PySide2.QtCore import QUrl
 from PySide2.QtGui import QVector3D
 from io import StringIO
 

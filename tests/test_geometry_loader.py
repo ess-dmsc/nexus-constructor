@@ -3,7 +3,6 @@ from nexus_constructor.geometry_types import OFFGeometry
 from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
-from PySide2.QtCore import QUrl
 from PySide2.QtGui import QVector3D
 import struct
 from io import StringIO
@@ -36,7 +35,6 @@ def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
 
     model._load_data(StringIO(off_file), ".off")
 
-    # model.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
     off_geometry = model.get_geometry()
     assert isinstance(off_geometry, OFFGeometry)
     assert off_geometry.vertices == [
