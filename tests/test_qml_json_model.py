@@ -184,8 +184,58 @@ def read_collapsed_data():
     Reads the expected collapsed lines for a model based on the sample json data
     :return: a list of strings containing the collapsed lines
     """
-    with open("tests/collapsed_lines.txt") as file:
-        return file.read().splitlines()
+
+    collapsed_lines = (
+        "{...}\n"
+        '  "components": [],\n'
+        '  "sample": {...}\n'
+        '    "description": "",\n'
+        '    "geometry": {...},\n'
+        '      "faces": [...],\n'
+        '      "type": "OFF",\n'
+        '      "vertices": [...],\n'
+        "        [...],\n"
+        "        [...],\n"
+        "        [...],\n"
+        "        [...],\n"
+        "        [...],\n"
+        "        [...],\n"
+        "        [...],\n"
+        "        [...]\n"
+        "      ],\n"
+        '      "winding_order": [...]\n'
+        "    },\n"
+        '    "name": "Sample",\n'
+        '    "transform_id": 0,\n'
+        '    "transforms": [...],\n'
+        "      {...},\n"
+        '        "angle": {...},\n'
+        '          "unit": "degrees",\n'
+        '          "value": 0\n'
+        "        },\n"
+        '        "axis": {...},\n'
+        '          "x": 0,\n'
+        '          "y": 0,\n'
+        '          "z": 1\n'
+        "        },\n"
+        '        "type": "rotate"\n'
+        "      },\n"
+        "      {...}\n"
+        '        "type": "translate",\n'
+        '        "unit": "m",\n'
+        '        "vector": {...}\n'
+        '          "x": 0,\n'
+        '          "y": 0,\n'
+        '          "z": 0\n'
+        "        }\n"
+        "      }\n"
+        "    ],\n"
+        '    "type": "Sample"\n'
+        "  }\n"
+        "}\n"
+    )
+
+    return StringIO(collapsed_lines).read().splitlines()
 
 
 def check_model_contents(model, expected_values, role=JsonModel.TextRole):
