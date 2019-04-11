@@ -10,7 +10,7 @@ from nexus_constructor.geometry_types import (
     OFFGeometry,
     NoShapeGeometry,
 )
-from nexus_constructor.geometry_loader import load_geometry
+from nexus_constructor.geometry_loader import load_geometry, _load_geometry
 from nexus_constructor.qml_models import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
 
@@ -171,16 +171,13 @@ class OFFModel(QAbstractListModel):
         filename = QUrl(self.file_url).toString(
             options=QUrl.FormattingOptions(QUrl.PreferLocalFile)
         )
-        extension = filename[filename.rfind(".") :].lower()
         self.beginResetModel()
-        with open(filename) as file:
-            self._load_data(file, extension)
+        load_geometry(filename, self.units, self.geometry)
         self.endResetModel()
         self.meshLoaded.emit()
 
-    def _load_data(self, file, extension):
-
-        load_geometry(file, extension, self.units, self.geometry)
+    def load_file_to_geometry(self, file, extension):
+        _load_geometry(file, extension, self.units, self.geometry)
 
     def get_geometry(self):
         return self.geometry

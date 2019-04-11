@@ -6,9 +6,7 @@ from PySide2.QtGui import QVector3D
 from io import StringIO
 
 
-def load_geometry(
-    file: StringIO, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
-):
+def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry()):
     """
     Loads geometry from a file into an OFFGeometry instance
 
@@ -20,6 +18,21 @@ def load_geometry(
     :return: An OFFGeometry instance containing that file's geometry, or an empty instance if filename's extension is
     unsupported
     """
+
+    extension = filename[filename.rfind(".") :].lower()
+
+    try:
+        with open(filename) as file:
+            return _load_geometry(file, extension, units, geometry)
+    except UnicodeDecodeError:
+        with open(filename, "rb") as file:
+            return _load_geometry(file, extension, units, geometry)
+
+
+def _load_geometry(
+    file: StringIO, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
+):
+
     mult_factor = calculate_unit_conversion_factor(units)
 
     if extension == ".off":
@@ -30,6 +43,7 @@ def load_geometry(
         geometry.faces = []
         geometry.vertices = []
         print("geometry file extension not supported")
+
     return geometry
 
 

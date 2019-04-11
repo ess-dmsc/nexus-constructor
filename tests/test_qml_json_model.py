@@ -185,6 +185,7 @@ def read_collapsed_data():
     :return: a list of strings containing the collapsed lines
     """
 
+    # The spaces are needed for the tests to pass
     collapsed_lines = (
         "{...}\n"
         '  "components": [],\n'
