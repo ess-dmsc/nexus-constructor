@@ -25,7 +25,30 @@ def build_sample_model():
 
     offmodel = OFFModel()
     offmodel.setData(1, "m", OFFModel.UnitsRole)
-    offmodel.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
+
+    off_file = (
+        "OFF\n"
+        "#  cube.off\n"
+        "#  A cube\n"
+        "8 6 0\n"
+        "-0.500000 -0.500000 0.500000\n"
+        "0.500000 -0.500000 0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "0.500000 0.500000 0.500000\n"
+        "-0.500000 0.500000 -0.500000\n"
+        "0.500000 0.500000 -0.500000\n"
+        "-0.500000 -0.500000 -0.500000\n"
+        "0.500000 -0.500000 -0.500000\n"
+        "4 0 1 3 2\n"
+        "4 2 3 5 4\n"
+        "4 4 5 7 6\n"
+        "4 6 7 1 0\n"
+        "4 1 7 5 3\n"
+        "4 6 0 2 4\n"
+    )
+
+    offmodel._load_data(StringIO(off_file), ".off")
+
     off_geometry = offmodel.get_geometry()
 
     model.components += [
