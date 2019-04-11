@@ -122,8 +122,60 @@ def read_json():
     )
 
     data = StringIO(sample).read()
-    with open("tests/formatted_sample.json", mode="r") as file:
-        formatted_lines = file.read().splitlines()
+
+    # The spaces are needed for the tests to pass
+    formatted_sample = (
+        "{\n"
+        '  "components": [],\n'
+        '  "sample": {\n'
+        '    "description": "",\n'
+        '    "geometry": {\n'
+        '      "faces": [0, 1, 3, 2, 2, 3, 5, 4, 4, 5, 7, 6, 6, 7, 1, 0, 1, 7, 5, 3, 6, 0, 2, 4],\n'
+        '      "type": "OFF",\n'
+        '      "vertices": [\n'
+        "        [-0.5, -0.5, 0.5],\n"
+        "        [0.5, -0.5, 0.5],\n"
+        "        [-0.5, 0.5, 0.5],\n"
+        "        [0.5, 0.5, 0.5],\n"
+        "        [-0.5, 0.5, -0.5],\n"
+        "        [0.5, 0.5, -0.5],\n"
+        "        [-0.5, -0.5, -0.5],\n"
+        "        [0.5, -0.5, -0.5]\n"
+        "      ],\n"
+        '      "winding_order": [0, 4, 8, 12, 16, 20]\n'
+        "    },\n"
+        '    "name": "Sample",\n'
+        '    "transform_id": 0,\n'
+        '    "transforms": [\n'
+        "      {\n"
+        '        "angle": {\n'
+        '          "unit": "degrees",\n'
+        '          "value": 0\n'
+        "        },\n"
+        '        "axis": {\n'
+        '          "x": 0,\n'
+        '          "y": 0,\n'
+        '          "z": 1\n'
+        "        },\n"
+        '        "type": "rotate"\n'
+        "      },\n"
+        "      {\n"
+        '        "type": "translate",\n'
+        '        "unit": "m",\n'
+        '        "vector": {\n'
+        '          "x": 0,\n'
+        '          "y": 0,\n'
+        '          "z": 0\n'
+        "        }\n"
+        "      }\n"
+        "    ],\n"
+        '    "type": "Sample"\n'
+        "  }\n"
+        "}\n"
+    )
+
+    formatted_lines = StringIO(formatted_sample).read().splitlines()
+
     return data, formatted_lines
 
 
