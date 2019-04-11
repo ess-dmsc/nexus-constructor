@@ -1,6 +1,6 @@
 from nexus_constructor.data_model import PixelGrid
 from nexus_constructor.geometry_types import OFFGeometry
-from nexus_constructor.geometry_loader import load_geometry, _load_geometry
+from nexus_constructor.geometry_loader import _load_geometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtGui import QVector3D
@@ -208,7 +208,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         "endsolid vcg\n"
     )
 
-    geometry = _load_geometry(StringIO(cube),".stl","m")
+    geometry = _load_geometry(StringIO(cube), ".stl", "m")
 
     # 2 triangles per face, 6 faces in the cube
     assert len(geometry.faces) == 6 * 2

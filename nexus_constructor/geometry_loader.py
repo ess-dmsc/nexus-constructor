@@ -12,7 +12,7 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
 
     Supported file types are OFF and STL.
     :param filename: The name of the file to load geometry from
-    :param str: A unit of length in the form of a string. Used to determine the multiplication factor.
+    :param units: A unit of length in the form of a string. Used to determine the multiplication factor.
     :param geometry: The optional OFFGeometry to load the geometry data into. If not provided, a new instance will be
     returned
     :return: An OFFGeometry instance containing that file's geometry, or an empty instance if filename's extension is
@@ -32,6 +32,17 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
 def _load_geometry(
     file: StringIO, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
 ):
+    """
+    Loads geometry from a file into an OFFGeometry instance
+
+    Supported file types are OFF and STL.
+    :param file: The file to load the geometry from
+    :param units: A unit of length in the form of a string. Used to determine the multiplication factor.
+    :param geometry: The optional OFFGeometry to load the geometry data into. If not provided, a new instance will be
+    returned
+    :return: An OFFGeometry instance containing that file's geometry, or an empty instance if filename's extension is
+    unsupported
+    """
 
     mult_factor = calculate_unit_conversion_factor(units)
 
@@ -53,7 +64,7 @@ def load_off_geometry(
     """
     Loads geometry from an OFF file into an OFFGeometry instance
 
-    :param filename: The name of the OFF file to load geometry from
+    :param file: The file containing an OFF geometry
     :param mult_factor: The multiplication factor for unit conversion
     :param geometry: The optional OFFGeometry to load the OFF data into. If not provided, a new instance will be
     returned
@@ -76,7 +87,7 @@ def load_stl_geometry(
     """
     Loads geometry from an STL file into an OFFGeometry instance
 
-    :param filename: The name of the STL file to load geometry from
+    :param file: The file containing an OFF geometry
     :param mult_factor: The multiplication factor for unit conversion
     :param geometry: The optional OFFGeometry to load the STL data into. If not provided, a new instance will be
     returned
