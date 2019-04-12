@@ -12,7 +12,9 @@ def change_value(item, attribute_name, value):
     current_value = getattr(item, attribute_name)
 
     if callable(current_value):
-        raise AttributeError("Expected parameter but found function: {}".format(attribute_name))
+        raise AttributeError(
+            "Expected parameter but found function: {}".format(attribute_name)
+        )
 
     different = value != current_value
     if different:
