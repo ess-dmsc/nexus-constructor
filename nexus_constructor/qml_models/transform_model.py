@@ -61,34 +61,41 @@ class TransformationModel(QAbstractListModel):
             return ""
 
     def setData(self, index, value, role):
+
         changed = False
         transform = self.transforms[index.row()]
 
         if role == self.TransformNameRole:
             transform.name = value
             changed = True
+
         if transform.type == "Translation":
-            changed = True
-            if role == self.TranslateXRole:
-                transform.vector.setX(value)
-            elif role == self.TranslateYRole:
-                transform.vector.setY(value)
-            elif role == self.TranslateZRole:
-                transform.vector.setZ(value)
-            else:
-                changed = False
+
+            translation_options = {
+                self.TranslateXRole: transform.vector.setX,
+                self.TranslateYRole: transform.vector.setY,
+                self.TranslateZRole: transform.vector.setZ,
+            }
+
+            if role in translation_options:
+                translation_options[role](value)
+                changed = True
+
         elif transform.type == "Rotation":
-            changed = True
+
+            rotation_options = {
+                self.RotateXRole: transform.axis.setX,
+                self.RotateYRole: transform.axis.setY,
+                self.RotateZRole: transform.axis.setZ,
+            }
+
             if role == self.RotateAngleRole:
                 transform.angle = value
-            elif role == self.RotateXRole:
-                transform.axis.setX(value)
-            elif role == self.RotateYRole:
-                transform.axis.setY(value)
-            elif role == self.RotateZRole:
-                transform.axis.setZ(value)
-            else:
-                changed = False
+                changed = True
+
+            elif role in rotation_options:
+                rotation_options[role](value)
+                changed = True
 
         if changed:
             self.dataChanged.emit(index, index, role)
