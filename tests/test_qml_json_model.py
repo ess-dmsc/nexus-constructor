@@ -180,8 +180,7 @@ def read_collapsed_data():
     :return: a list of strings containing the collapsed lines
     """
 
-    collapsed_lines = (
-     """{...}
+    collapsed_lines = """{...}
           "components": [],
           "sample": {...}
             "description": "",
@@ -228,7 +227,6 @@ def read_collapsed_data():
             "type": "Sample"
           }
         }"""
-    )
 
     return StringIO(collapsed_lines).read().splitlines()
 

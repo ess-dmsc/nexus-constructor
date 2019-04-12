@@ -33,6 +33,8 @@ def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
         "4 6 0 2 4\n"
     )
 
+    print(off_file)
+
     model.load_file_to_geometry(StringIO(off_file), ".off")
 
     off_geometry = model.get_geometry()
@@ -119,94 +121,92 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         [left_upper_rear, left_upper_front, right_upper_front, right_upper_rear],  # top
     ]
 
-    cube = (
-        "solid vcg\n"
-        "facet normal -1.000000e+00  0.000000e+00  0.000000e+00\n"
-        "outer loop\n"
-        "vertex   0.000000e+00  3.000000e+01  0.000000e+00\n"
-        "vertex   0.000000e+00  0.000000e+00  3.000000e+01\n"
-        "vertex   0.000000e+00  3.000000e+01  3.000000e+01\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal -1.000000e+00  0.000000e+00  0.000000e+00\n"
-        "outer loop\n"
-        "vertex   0.000000e+00  0.000000e+00  0.000000e+00\n"
-        "vertex   0.000000e+00  0.000000e+00  3.000000e+01\n"
-        "vertex   0.000000e+00  3.000000e+01  0.000000e+00\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  1.000000e+00 -0.000000e+00  0.000000e+00\n"
-        "outer loop\n"
-        "vertex   3.000000e+01  0.000000e+00  3.000000e+01\n"
-        "vertex   3.000000e+01  3.000000e+01  0.000000e+00\n"
-        "vertex   3.000000e+01  3.000000e+01  3.000000e+01\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  1.000000e+00  0.000000e+00  0.000000e+00\n"
-        "outer loop\n"
-        "vertex   3.000000e+01  0.000000e+00  3.000000e+01\n"
-        "vertex   3.000000e+01  0.000000e+00  0.000000e+00\n"
-        "vertex   3.000000e+01  3.000000e+01  0.000000e+00\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  0.000000e+00 -1.000000e+00  0.000000e+00\n"
-        "outer loop\n"
-        "vertex   3.000000e+01  0.000000e+00  0.000000e+00\n"
-        "vertex   3.000000e+01  0.000000e+00  3.000000e+01\n"
-        "vertex   0.000000e+00  0.000000e+00  0.000000e+00\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  0.000000e+00 -1.000000e+00  0.000000e+00\n"
-        "outer loop\n"
-        "vertex   0.000000e+00  0.000000e+00  0.000000e+00\n"
-        "vertex   3.000000e+01  0.000000e+00  3.000000e+01\n"
-        "vertex   0.000000e+00  0.000000e+00  3.000000e+01\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  0.000000e+00  1.000000e+00  0.000000e+00\n"
-        "outer loop\n"
-        "vertex   3.000000e+01  3.000000e+01  3.000000e+01\n"
-        "vertex   3.000000e+01  3.000000e+01  0.000000e+00\n"
-        "vertex   0.000000e+00  3.000000e+01  0.000000e+00\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  0.000000e+00  1.000000e+00  0.000000e+00\n"
-        "outer loop\n"
-        "vertex   3.000000e+01  3.000000e+01  3.000000e+01\n"
-        "vertex   0.000000e+00  3.000000e+01  0.000000e+00\n"
-        "vertex   0.000000e+00  3.000000e+01  3.000000e+01\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  0.000000e+00  0.000000e+00 -1.000000e+00\n"
-        "outer loop\n"
-        "vertex   0.000000e+00  3.000000e+01  0.000000e+00\n"
-        "vertex   3.000000e+01  3.000000e+01  0.000000e+00\n"
-        "vertex   0.000000e+00  0.000000e+00  0.000000e+00\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  0.000000e+00  0.000000e+00 -1.000000e+00\n"
-        "outer loop\n"
-        "vertex   0.000000e+00  0.000000e+00  0.000000e+00\n"
-        "vertex   3.000000e+01  3.000000e+01  0.000000e+00\n"
-        "vertex   3.000000e+01  0.000000e+00  0.000000e+00\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  0.000000e+00  0.000000e+00  1.000000e+00\n"
-        "outer loop\n"
-        "vertex   3.000000e+01  3.000000e+01  3.000000e+01\n"
-        "vertex   0.000000e+00  3.000000e+01  3.000000e+01\n"
-        "vertex   0.000000e+00  0.000000e+00  3.000000e+01\n"
-        "endloop\n"
-        "endfacet\n"
-        "facet normal  0.000000e+00  0.000000e+00  1.000000e+00\n"
-        "outer loop\n"
-        "vertex   3.000000e+01  3.000000e+01  3.000000e+01\n"
-        "vertex   0.000000e+00  0.000000e+00  3.000000e+01\n"
-        "vertex   3.000000e+01  0.000000e+00  3.000000e+01\n"
-        "endloop\n"
-        "endfacet\n"
-        "endsolid vcg\n"
-    )
+    cube = """solid vcg
+        facet normal -1.000000e+00  0.000000e+00  0.000000e+00
+        outer loop
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        vertex   0.000000e+00  3.000000e+01  3.000000e+01
+        endloop
+        endfacet
+        facet normal -1.000000e+00  0.000000e+00  0.000000e+00
+        outer loop
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        endloop
+        endfacet
+        facet normal  1.000000e+00 -0.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        endloop
+        endfacet
+        facet normal  1.000000e+00  0.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        vertex   3.000000e+01  0.000000e+00  0.000000e+00
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00 -1.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  0.000000e+00  0.000000e+00
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00 -1.000000e+00  0.000000e+00
+        outer loop
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        endloop
+        endfacet
+        facet normal  0.000000e+00  1.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00  1.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        vertex   0.000000e+00  3.000000e+01  3.000000e+01
+        endloop
+        endfacet
+        facet normal  0.000000e+00  0.000000e+00 -1.000000e+00
+        outer loop
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00  0.000000e+00 -1.000000e+00
+        outer loop
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        vertex   3.000000e+01  0.000000e+00  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00  0.000000e+00  1.000000e+00
+        outer loop
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        vertex   0.000000e+00  3.000000e+01  3.000000e+01
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        endloop
+        endfacet
+        facet normal  0.000000e+00  0.000000e+00  1.000000e+00
+        outer loop
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        endloop
+        endfacet
+        endsolid vcg"""
 
     geometry = _load_geometry(StringIO(cube), ".stl", "m")
 
