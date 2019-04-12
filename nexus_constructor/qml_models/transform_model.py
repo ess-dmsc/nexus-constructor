@@ -39,6 +39,8 @@ class TransformationModel(QAbstractListModel):
                 TransformationModel.TransformTypeRole: "Translate",
                 TransformationModel.TransformNameRole: transform.name,
                 TransformationModel.DeletableRole: self.deletable[index.row()],
+            }
+            vector = {
                 TransformationModel.TranslateXRole: transform.vector.x,
                 TransformationModel.TranslateYRole: transform.vector.y,
                 TransformationModel.TranslateZRole: transform.vector.z,
@@ -48,15 +50,19 @@ class TransformationModel(QAbstractListModel):
                 TransformationModel.TransformTypeRole: "Rotate",
                 TransformationModel.TransformNameRole: transform.name,
                 TransformationModel.DeletableRole: self.deletable[index.row()],
+                TransformationModel.RotateAngleRole: transform.angle,
+            }
+            vector = {
                 TransformationModel.RotateXRole: transform.axis.x,
                 TransformationModel.RotateYRole: transform.axis.y,
                 TransformationModel.RotateZRole: transform.axis.z,
-                TransformationModel.RotateAngleRole: transform.angle,
             }
         else:
             properties = {}
         if role in properties:
             return properties[role]
+        elif role in vector:
+            return vector[role]()
         else:
             return ""
 
@@ -70,29 +76,24 @@ class TransformationModel(QAbstractListModel):
             changed = True
 
         if transform.type == "Translation":
-
             translation_options = {
                 self.TranslateXRole: transform.vector.setX,
                 self.TranslateYRole: transform.vector.setY,
                 self.TranslateZRole: transform.vector.setZ,
             }
-
             if role in translation_options:
                 translation_options[role](value)
                 changed = True
 
         elif transform.type == "Rotation":
-
             rotation_options = {
                 self.RotateXRole: transform.axis.setX,
                 self.RotateYRole: transform.axis.setY,
                 self.RotateZRole: transform.axis.setZ,
             }
-
             if role == self.RotateAngleRole:
                 transform.angle = value
                 changed = True
-
             elif role in rotation_options:
                 rotation_options[role](value)
                 changed = True

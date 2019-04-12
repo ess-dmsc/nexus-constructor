@@ -60,14 +60,18 @@ class CylinderModel(QAbstractListModel):
     def data(self, index, role=Qt.DisplayRole):
         properties = {
             CylinderModel.UnitsRole: self.cylinder.units,
-            CylinderModel.AxisXRole: self.cylinder.axis_direction.x,
-            CylinderModel.AxisYRole: self.cylinder.axis_direction.y,
-            CylinderModel.AxisZRole: self.cylinder.axis_direction.z,
             CylinderModel.HeightRole: self.cylinder.height,
             CylinderModel.RadiusRole: self.cylinder.radius,
         }
+        vector = {
+            CylinderModel.AxisXRole: self.cylinder.axis_direction.x,
+            CylinderModel.AxisYRole: self.cylinder.axis_direction.y,
+            CylinderModel.AxisZRole: self.cylinder.axis_direction.z,
+        }
         if role in properties:
             return properties[role]
+        elif role in vector:
+            return vector[role]()
 
     def setData(self, index, value, role):
         changed = False
