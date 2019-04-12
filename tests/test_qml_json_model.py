@@ -7,125 +7,121 @@ def read_json():
     Reads the test data from json files
     :return: a string containing the sample json, and a list of lines for its formatted form
     """
-    sample = (
-        "{\n"
-        '"sample": {\n'
-        '"transforms": [\n'
-        "{\n"
-        '"angle": {\n'
-        '"unit": "degrees",\n'
-        '"value": 0\n'
-        "},\n"
-        '"axis": {\n'
-        '"y": 0,\n'
-        '"z": 1,\n'
-        '"x": 0\n'
-        "},\n"
-        '"type": "rotate"\n'
-        "},\n"
-        "{\n"
-        '"unit": "m",\n'
-        '"vector": {\n'
-        '"y": 0,\n'
-        '"z": 0,\n'
-        '"x": 0\n'
-        "},\n"
-        '"type": "translate"\n'
-        "}\n"
-        "],\n"
-        '"transform_id": 0,\n'
-        '"name": "Sample",\n'
-        '"description": "",\n'
-        '"geometry": {\n'
-        '"vertices": [\n'
-        "[\n"
-        "-0.5,\n"
-        "-0.5,\n"
-        "0.5\n"
-        "],\n"
-        "[\n"
-        "0.5,\n"
-        "-0.5,\n"
-        "0.5\n"
-        "],\n"
-        "[\n"
-        "-0.5,\n"
-        "0.5,\n"
-        "0.5\n"
-        "],\n"
-        "[\n"
-        "0.5,\n"
-        "0.5,\n"
-        "0.5\n"
-        "],\n"
-        "[\n"
-        "-0.5,\n"
-        "0.5,\n"
-        "-0.5\n"
-        "],\n"
-        "[\n"
-        "0.5,\n"
-        "0.5,\n"
-        "-0.5\n"
-        "],\n"
-        "[\n"
-        "-0.5,\n"
-        "-0.5,\n"
-        "-0.5\n"
-        "],\n"
-        "[\n"
-        "0.5,\n"
-        "-0.5,\n"
-        "-0.5\n"
-        "]\n"
-        "],\n"
-        '"faces": [\n'
-        "0,\n"
-        "1,\n"
-        "3,\n"
-        "2,\n"
-        "2,\n"
-        "3,\n"
-        "5,\n"
-        "4,\n"
-        "4,\n"
-        "5,\n"
-        "7,\n"
-        "6,\n"
-        "6,\n"
-        "7,\n"
-        "1,\n"
-        "0,\n"
-        "1,\n"
-        "7,\n"
-        "5,\n"
-        "3,\n"
-        "6,\n"
-        "0,\n"
-        "2,\n"
-        "4\n"
-        "],\n"
-        '"winding_order": [\n'
-        "0,\n"
-        "4,\n"
-        "8,\n"
-        "12,\n"
-        "16,\n"
-        "20\n"
-        "],\n"
-        '"type": "OFF"\n'
-        "},\n"
-        '"type": "Sample"\n'
-        "},\n"
-        '"components": []\n'
-        "}\n"
-    )
+    sample = """{
+            "sample": {
+                "transforms": [
+                    {
+                        "angle": {
+                            "unit": "degrees",
+                            "value": 0
+                        },
+                        "axis": {
+                            "y": 0,
+                            "z": 1,
+                            "x": 0
+                        },
+                        "type": "rotate"
+                    },
+                    {
+                        "unit": "m",
+                        "vector": {
+                            "y": 0,
+                            "z": 0,
+                            "x": 0
+                        },
+                        "type": "translate"
+                    }
+                ],
+                "transform_id": 0,
+                "name": "Sample",
+                "description": "",
+                "geometry": {
+                    "vertices": [
+                        [
+                            -0.5,
+                            -0.5,
+                            0.5
+                        ],
+                        [
+                            0.5,
+                            -0.5,
+                            0.5
+                        ],
+                        [
+                            -0.5,
+                            0.5,
+                            0.5
+                        ],
+                        [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        [
+                            -0.5,
+                            0.5,
+                            -0.5
+                        ],
+                        [
+                            0.5,
+                            0.5,
+                            -0.5
+                        ],
+                        [
+                            -0.5,
+                            -0.5,
+                            -0.5
+                        ],
+                        [
+                            0.5,
+                            -0.5,
+                            -0.5
+                        ]
+                    ],
+                    "faces": [
+                        0,
+                        1,
+                        3,
+                        2,
+                        2,
+                        3,
+                        5,
+                        4,
+                        4,
+                        5,
+                        7,
+                        6,
+                        6,
+                        7,
+                        1,
+                        0,
+                        1,
+                        7,
+                        5,
+                        3,
+                        6,
+                        0,
+                        2,
+                        4
+                    ],
+                    "winding_order": [
+                        0,
+                        4,
+                        8,
+                        12,
+                        16,
+                        20
+                    ],
+                    "type": "OFF"
+                },
+                "type": "Sample"
+            },
+            "components": []
+        }"""
 
     data = StringIO(sample).read()
 
-    # The spaces are needed for the tests to pass
-    formatted_sample = (
-        """{
+    formatted_sample = """{
            "components": [],
            "sample": {
              "description": "",
@@ -172,7 +168,6 @@ def read_json():
             "type": "Sample"
           }
         }"""
-    )
 
     formatted_lines = StringIO(formatted_sample).read().splitlines()
 
@@ -185,55 +180,54 @@ def read_collapsed_data():
     :return: a list of strings containing the collapsed lines
     """
 
-    # The spaces are needed for the tests to pass
     collapsed_lines = (
-        "{...}\n"
-        '  "components": [],\n'
-        '  "sample": {...}\n'
-        '    "description": "",\n'
-        '    "geometry": {...},\n'
-        '      "faces": [...],\n'
-        '      "type": "OFF",\n'
-        '      "vertices": [...],\n'
-        "        [...],\n"
-        "        [...],\n"
-        "        [...],\n"
-        "        [...],\n"
-        "        [...],\n"
-        "        [...],\n"
-        "        [...],\n"
-        "        [...]\n"
-        "      ],\n"
-        '      "winding_order": [...]\n'
-        "    },\n"
-        '    "name": "Sample",\n'
-        '    "transform_id": 0,\n'
-        '    "transforms": [...],\n'
-        "      {...},\n"
-        '        "angle": {...},\n'
-        '          "unit": "degrees",\n'
-        '          "value": 0\n'
-        "        },\n"
-        '        "axis": {...},\n'
-        '          "x": 0,\n'
-        '          "y": 0,\n'
-        '          "z": 1\n'
-        "        },\n"
-        '        "type": "rotate"\n'
-        "      },\n"
-        "      {...}\n"
-        '        "type": "translate",\n'
-        '        "unit": "m",\n'
-        '        "vector": {...}\n'
-        '          "x": 0,\n'
-        '          "y": 0,\n'
-        '          "z": 0\n'
-        "        }\n"
-        "      }\n"
-        "    ],\n"
-        '    "type": "Sample"\n'
-        "  }\n"
-        "}\n"
+     """{...}
+          "components": [],
+          "sample": {...}
+            "description": "",
+            "geometry": {...},
+              "faces": [...],
+              "type": "OFF",
+              "vertices": [...],
+                [...],
+                [...],
+                [...],
+                [...],
+                [...],
+                [...],
+                [...],
+                [...]
+              ],
+              "winding_order": [...]
+            },
+            "name": "Sample",
+            "transform_id": 0,
+            "transforms": [...],
+              {...},
+                "angle": {...},
+                  "unit": "degrees",
+                  "value": 0
+                },
+                "axis": {...},
+                  "x": 0,
+                  "y": 0,
+                  "z": 1
+                },
+                "type": "rotate"
+              },
+              {...}
+                "type": "translate",
+                "unit": "m",
+                "vector": {...}
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                }
+              }
+            ],
+            "type": "Sample"
+          }
+        }"""
     )
 
     return StringIO(collapsed_lines).read().splitlines()

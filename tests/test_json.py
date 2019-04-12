@@ -167,8 +167,7 @@ def test_loading_generated_json():
 
 def test_json_schema_compliance():
 
-    file = (
-     '''{
+    file = """{
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$id": "https://raw.githubusercontent.com/ess-dmsc/nexus-constructor/master/Instrument.schema.json",
             "title": "Instrument",
@@ -541,8 +540,7 @@ def test_json_schema_compliance():
                     "enum": ["TOP_LEFT", "TOP_RIGHT", "BOTTOM_LEFT", "BOTTOM_RIGHT"]
                 }
             }
-        }'''
-    )
+        }"""
 
     schema = json.load(StringIO(file))
 
