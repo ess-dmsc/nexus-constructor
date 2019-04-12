@@ -125,53 +125,53 @@ def read_json():
 
     # The spaces are needed for the tests to pass
     formatted_sample = (
-        "{\n"
-        '  "components": [],\n'
-        '  "sample": {\n'
-        '    "description": "",\n'
-        '    "geometry": {\n'
-        '      "faces": [0, 1, 3, 2, 2, 3, 5, 4, 4, 5, 7, 6, 6, 7, 1, 0, 1, 7, 5, 3, 6, 0, 2, 4],\n'
-        '      "type": "OFF",\n'
-        '      "vertices": [\n'
-        "        [-0.5, -0.5, 0.5],\n"
-        "        [0.5, -0.5, 0.5],\n"
-        "        [-0.5, 0.5, 0.5],\n"
-        "        [0.5, 0.5, 0.5],\n"
-        "        [-0.5, 0.5, -0.5],\n"
-        "        [0.5, 0.5, -0.5],\n"
-        "        [-0.5, -0.5, -0.5],\n"
-        "        [0.5, -0.5, -0.5]\n"
-        "      ],\n"
-        '      "winding_order": [0, 4, 8, 12, 16, 20]\n'
-        "    },\n"
-        '    "name": "Sample",\n'
-        '    "transform_id": 0,\n'
-        '    "transforms": [\n'
-        "      {\n"
-        '        "angle": {\n'
-        '          "unit": "degrees",\n'
-        '          "value": 0\n'
-        "        },\n"
-        '        "axis": {\n'
-        '          "x": 0,\n'
-        '          "y": 0,\n'
-        '          "z": 1\n'
-        "        },\n"
-        '        "type": "rotate"\n'
-        "      },\n"
-        "      {\n"
-        '        "type": "translate",\n'
-        '        "unit": "m",\n'
-        '        "vector": {\n'
-        '          "x": 0,\n'
-        '          "y": 0,\n'
-        '          "z": 0\n'
-        "        }\n"
-        "      }\n"
-        "    ],\n"
-        '    "type": "Sample"\n'
-        "  }\n"
-        "}\n"
+        """{
+           "components": [],
+           "sample": {
+             "description": "",
+            "geometry": {
+              "faces": [0, 1, 3, 2, 2, 3, 5, 4, 4, 5, 7, 6, 6, 7, 1, 0, 1, 7, 5, 3, 6, 0, 2, 4],
+              "type": "OFF",
+              "vertices": [
+                [-0.5, -0.5, 0.5],
+                [0.5, -0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [-0.5, 0.5, -0.5],
+                [0.5, 0.5, -0.5],
+                [-0.5, -0.5, -0.5],
+                [0.5, -0.5, -0.5]
+              ],
+              "winding_order": [0, 4, 8, 12, 16, 20]
+            },
+            "name": "Sample",
+            "transform_id": 0,
+            "transforms": [
+              {
+                "angle": {
+                  "unit": "degrees",
+                  "value": 0
+                },
+                "axis": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 1
+                },
+                "type": "rotate"
+              },
+              {
+                "type": "translate",
+                "unit": "m",
+                "vector": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                }
+              }
+            ],
+            "type": "Sample"
+          }
+        }"""
     )
 
     formatted_lines = StringIO(formatted_sample).read().splitlines()
@@ -244,7 +244,7 @@ def check_model_contents(model, expected_values, role=JsonModel.TextRole):
     assert model.rowCount() == len(expected_values)
     for i in range(model.rowCount()):
         index = model.index(i, 0)
-        assert model.data(index, role) == expected_values[i]
+        assert model.data(index, role).strip() == expected_values[i].strip()
 
 
 def test_initialise_json_model():
