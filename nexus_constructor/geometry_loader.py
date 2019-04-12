@@ -19,12 +19,16 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
     unsupported
     """
 
-    extension = filename[filename.rfind(".") :].lower()
+    extension = filename[filename.rfind("."):].lower()
 
     try:
         with open(filename) as file:
             return _load_geometry(file, extension, units, geometry)
     except UnicodeDecodeError:
+        '''
+        Try again in case the file is in binary. At least one of these should work when a user selects a file because
+        GeometryFileValidator inspects the file beforehand to check that it's valid.
+        '''
         with open(filename, "rb") as file:
             return _load_geometry(file, extension, units, geometry)
 
@@ -87,7 +91,7 @@ def load_stl_geometry(
     """
     Loads geometry from an STL file into an OFFGeometry instance
 
-    :param file: The file containing an OFF geometry
+    :param file: The file containing an STL geometry
     :param mult_factor: The multiplication factor for unit conversion
     :param geometry: The optional OFFGeometry to load the STL data into. If not provided, a new instance will be
     returned
