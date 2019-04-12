@@ -168,380 +168,380 @@ def test_loading_generated_json():
 def test_json_schema_compliance():
 
     file = (
-        "{\n"
-        '"$schema": "http://json-schema.org/draft-04/schema#",\n'
-        '"$id": "https://raw.githubusercontent.com/ess-dmsc/nexus-constructor/master/Instrument.schema.json",\n'
-        '"title": "Instrument",\n'
-        '"description": "An experimental setup of an instrument on a beamline, containing a sample and set of components based on the NeXus data format",\n'
-        '"type": "object",\n'
-        '"properties": {\n'
-        '"components": {\n'
-        '"description": "The components that make up the instrument",\n'
-        '"type": "array",\n'
-        '"items": {\n'
-        '"oneOf": [\n'
-        '{"$ref": "#/definitions/sample"},\n'
-        '{"$ref": "#/definitions/detector"},\n'
-        '{"$ref": "#/definitions/monitor"},\n'
-        '{"$ref": "#/definitions/source"},\n'
-        '{"$ref": "#/definitions/slit"},\n'
-        '{"$ref": "#/definitions/moderator"},\n'
-        '{"$ref": "#/definitions/diskChopper"}\n'
-        "]\n"
-        "}\n"
-        "}\n"
-        "},\n"
-        '"required": ["components"],\n'
-        '"definitions": {\n'
-        '"3D": {\n'
-        '"description": "XYZ values representing a direction or point in 3D space",\n'
-        '"type": "object",\n'
-        '"properties": {\n'
-        '"x": {\n'
-        '"type": "number"\n'
-        "},\n"
-        '"y": {\n'
-        '"type": "number"\n'
-        "},\n"
-        '"z": {\n'
-        '"type": "number"\n'
-        "}\n"
-        "},\n"
-        '"required": ["x", "y", "z"]\n'
-        "},\n"
-        '"component": {\n'
-        '"description": "A component in an instrument",\n'
-        '"type": "object",\n'
-        '"properties": {\n'
-        '"name": {\n'
-        '"type": "string"\n'
-        "},\n"
-        '"description": {\n'
-        '"type": "string"\n'
-        "},\n"
-        '"type": {\n'
-        '"type": "string"\n'
-        "},\n"
-        '"transform_id": {\n'
-        '"type": "integer"\n'
-        "},\n"
-        '"transform_parent_id": {\n'
-        '"type": "integer"\n'
-        "},\n"
-        '"parent_transform_index": {\n'
-        '"type": "integer"\n'
-        "},\n"
-        '"transforms": {\n'
-        '"type": "array",\n'
-        '"items": {\n'
-        '"$ref": "#/definitions/transform"\n'
-        "}\n"
-        "},\n"
-        '"geometry": {\n'
-        '"$ref": "#/definitions/geometry"\n'
-        "}\n"
-        "},\n"
-        '"required": ["name", "description", "type", "transform_id", "transforms"]\n'
-        "},\n"
-        '"sample": {\n'
-        '"description": "The sample in an instrument",\n'
-        '"allOf": [\n'
-        '{"$ref": "#/definitions/component"}\n'
-        "],\n"
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["Sample"]\n'
-        "}\n"
-        "},\n"
-        '"required": ["type"]\n'
-        "},\n"
-        '"detector": {\n'
-        '"description": "Detector components of an instrument",\n'
-        '"allOf": [\n'
-        '{"$ref": "#/definitions/component"}\n'
-        "],\n"
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["Detector"]\n'
-        "}\n"
-        "},\n"
-        '"oneOf": [\n'
-        '{"$ref": "#/definitions/pixelMappedDetectorProperties"},\n'
-        '{"$ref": "#/definitions/repeatedPixelDetectorProperties"}\n'
-        "]\n"
-        "},\n"
-        '"monitor": {\n'
-        '"description": "Monitor components of an instrument",\n'
-        '"allOf": [\n'
-        '{"$ref": "#/definitions/component"}\n'
-        "],\n"
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["Monitor"]\n'
-        "}\n"
-        "},\n"
-        '"oneOf": [\n'
-        '{"$ref": "#/definitions/singlePixelIdProperty"}\n'
-        "]\n"
-        "},\n"
-        '"source": {\n'
-        '"description": "The neutron or x-ray storage ring/facility an instrument is connected to",\n'
-        '"allOf": [\n'
-        '{"$ref": "#/definitions/component"}\n'
-        "],\n"
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["Source"]\n'
-        "}\n"
-        "}\n"
-        "},\n"
-        '"slit": {\n'
-        '"description": "A diffraction slit",\n'
-        '"allOf": [\n'
-        '{"$ref": "#/definitions/component"}\n'
-        "],\n"
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["Slit"]\n'
-        "}\n"
-        "}\n"
-        "},\n"
-        '"moderator": {\n'
-        '"description": "A neutron moderator",\n'
-        '"allOf": [\n'
-        '{"$ref": "#/definitions/component"}\n'
-        "],\n"
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["Moderator"]\n'
-        "}\n"
-        "}\n"
-        "},\n"
-        '"diskChopper": {\n'
-        '"description": "A disk chopper",\n'
-        '"allOf": [\n'
-        '{"$ref": "#/definitions/component"}\n'
-        "],\n"
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["Disk Chopper"]\n'
-        "}\n"
-        "}\n"
-        "},\n"
-        '"pixelMappedDetectorProperties": {\n'
-        '"description": "Properties for a detector with a pixelmapping, meaning it must have an OFF geometry",\n'
-        '"properties": {\n'
-        '"geometry": {\n'
-        '"$ref": "#/definitions/offGeometry"\n'
-        "},\n"
-        '"pixel_mapping": {\n'
-        '"$ref": "#/definitions/pixelMapping"\n'
-        "}\n"
-        "},\n"
-        '"required": ["geometry", "pixel_mapping"]\n'
-        "},\n"
-        '"repeatedPixelDetectorProperties": {\n'
-        '"description": "Properties for a detector with a repeated pixel geometry. Unlike a pixel mapping, no further geometry restrictions are needed",\n'
-        '"properties": {\n'
-        '"pixel_grid": {\n'
-        '"$ref": "#/definitions/pixelGrid"\n'
-        "}\n"
-        "},\n"
-        '"required": ["pixel_grid"]\n'
-        "},\n"
-        '"singlePixelIdProperty": {\n'
-        '"description": "The pixel id for a monitor component",\n'
-        '"properties": {\n'
-        '"pixel_id": {\n'
-        '"type": "integer"\n'
-        "}\n"
-        "},\n"
-        '"required": ["pixel_id"]\n'
-        "},\n"
-        '"transform": {\n'
-        '"description": "A transformation to position an object in 3D space",\n'
-        '"oneOf": [\n'
-        '{"$ref": "#/definitions/rotate"},\n'
-        '{"$ref": "#/definitions/translate"}\n'
-        "]\n"
-        "},\n"
-        '"rotate": {\n'
-        '"description": "A transformation in 3D space by rotating about an axis",\n'
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["rotate"]\n'
-        "},\n"
-        '"name": {\n'
-        '"type": "string"\n'
-        "},\n"
-        '"axis": {\n'
-        '"$ref": "#/definitions/3D"\n'
-        "},\n"
-        '"angle": {\n'
-        '"type": "object",\n'
-        '"properties": {\n'
-        '"unit": {\n'
-        '"enum": ["degrees"]\n'
-        "},\n"
-        '"value": {\n'
-        '"type": "number"\n'
-        "}\n"
-        "},\n"
-        '"required": ["unit", "value"]\n'
-        "}\n"
-        "},\n"
-        '"required": ["type", "axis", "angle"]\n'
-        "},\n"
-        '"translate": {\n'
-        '"description": "A transformation in 3D space by translating along a vector",\n'
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["translate"]\n'
-        "},\n"
-        '"name": {\n'
-        '"type": "string"\n'
-        "},\n"
-        '"vector": {\n'
-        '"$ref": "#/definitions/3D"\n'
-        "},\n"
-        '"unit": {\n'
-        '"enum": ["m"]\n'
-        "}\n"
-        "},\n"
-        '"required": ["type", "vector", "unit"]\n'
-        "},\n"
-        '"geometry": {\n'
-        '"description": "The 3D geometry of a component in the instrument",\n'
-        '"oneOf": [\n'
-        '{"$ref": "#/definitions/offGeometry"},\n'
-        '{"$ref": "#/definitions/cylindricalGeometry"}\n'
-        "]\n"
-        "},\n"
-        '"offGeometry": {\n'
-        '"description": "A geometry of arbitrary polygons based on the NXoff_geometry class",\n'
-        '"type": "object",\n'
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["OFF"]\n'
-        "},\n"
-        '"vertices": {\n'
-        '"type": "array",\n'
-        '"items": {\n'
-        '"type": "array",\n'
-        '"minItems": 3,\n'
-        '"maxItems": 3,\n'
-        '"items": {\n'
-        '"type": "number"\n'
-        "}\n"
-        "}\n"
-        "},\n"
-        '"winding_order": {\n'
-        '"type": "array",\n'
-        '"items": {\n'
-        '"type": "integer",\n'
-        '"minimum": 0\n'
-        "}\n"
-        "},\n"
-        '"faces": {\n'
-        '"type": "array",\n'
-        '"items": {\n'
-        '"type": "integer",\n'
-        '"minimum": 0\n'
-        "}\n"
-        "}\n"
-        "},\n"
-        '"required": ["type", "vertices", "winding_order", "faces"]\n'
-        "},\n"
-        '"cylindricalGeometry": {\n'
-        '"description": "A geometry to model a cylinder with center of its base at the origin of its local coordinate system",\n'
-        '"type": "object",\n'
-        '"properties": {\n'
-        '"type": {\n'
-        '"enum": ["Cylinder"]\n'
-        "},\n"
-        '"axis_direction": {\n'
-        '"$ref": "#/definitions/3D"\n'
-        "},\n"
-        '"height": {\n'
-        '"type": "number",\n'
-        '"minimum": 0,\n'
-        '"exclusiveMinimum": true\n'
-        "},\n"
-        '"radius": {\n'
-        '"type": "number",\n'
-        '"minimum": 0,\n'
-        '"exclusiveMinimum": true\n'
-        "},\n"
-        '"base_center": {\n'
-        '"$ref": "#/definitions/3D"\n'
-        "},\n"
-        '"base_edge": {\n'
-        '"$ref": "#/definitions/3D"\n'
-        "},\n"
-        '"top_center": {\n'
-        '"$ref": "#/definitions/3D"\n'
-        "}\n"
-        "},\n"
-        '"required": ["type", "axis_direction", "height", "radius", "base_center", "base_edge", "top_center"]\n'
-        "},\n"
-        '"pixelGrid": {\n'
-        '"description": "A regular grid of pixels, starting in the bottom left corner, which is the local coordinate origin",\n'
-        '"type": "object",\n'
-        '"properties": {\n'
-        '"rows": {\n'
-        '"type": "integer",\n'
-        '"minimum": 1\n'
-        "},\n"
-        '"columns": {\n'
-        '"type": "integer",\n'
-        '"minimum": 1\n'
-        "},\n"
-        '"row_height": {\n'
-        '"type": "number"\n'
-        "},\n"
-        '"column_width": {\n'
-        '"type": "number"\n'
-        "},\n"
-        '"first_id": {\n'
-        '"type": "integer"\n'
-        "},\n"
-        '"count_direction": {\n'
-        '"$ref": "#/definitions/countDirection"\n'
-        "},\n"
-        '"starting_corner": {\n'
-        '"$ref": "#/definitions/corner"\n'
-        "}\n"
-        "},\n"
-        '"required": ["rows", "columns", "row_height", "column_width", "first_id", "count_direction",\n'
-        '"starting_corner"]\n'
-        "},\n"
-        '"pixelMapping": {\n'
-        '"description": "A mapping of off geometry face numbers to detector ids, mirroring the detector_faces property of the NXoff_geometry class",\n'
-        '"type": "array",\n'
-        '"items": {\n'
-        '"type": "object",\n'
-        '"properties": {\n'
-        '"face": {\n'
-        '"type": "integer",\n'
-        '"minimum": 0\n'
-        "},\n"
-        '"pixel_id": {\n'
-        '"type": "integer"\n'
-        "}\n"
-        "},\n"
-        '"required": ["face", "pixel_id"]\n'
-        "}\n"
-        "},\n"
-        '"countDirection": {\n'
-        '"description": "The direction a pixelGrid should increment its detector IDs along first",\n'
-        '"enum": ["ROW", "COLUMN"]\n'
-        "},\n"
-        '"corner": {\n'
-        '"description": "A corner of a 2D grid",\n'
-        '"enum": ["TOP_LEFT", "TOP_RIGHT", "BOTTOM_LEFT", "BOTTOM_RIGHT"]\n'
-        "}\n"
-        "}\n"
-        "}\n"
+     '''{
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$id": "https://raw.githubusercontent.com/ess-dmsc/nexus-constructor/master/Instrument.schema.json",
+            "title": "Instrument",
+            "description": "An experimental setup of an instrument on a beamline, containing a sample and set of components based on the NeXus data format",
+            "type": "object",
+            "properties": {
+                "components": {
+                    "description": "The components that make up the instrument",
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            {"$ref": "#/definitions/sample"},
+                            {"$ref": "#/definitions/detector"},
+                            {"$ref": "#/definitions/monitor"},
+                            {"$ref": "#/definitions/source"},
+                            {"$ref": "#/definitions/slit"},
+                            {"$ref": "#/definitions/moderator"},
+                            {"$ref": "#/definitions/diskChopper"}
+                        ]
+                    }
+                }
+            },
+            "required": ["components"],
+            "definitions": {
+                "3D": {
+                    "description": "XYZ values representing a direction or point in 3D space",
+                    "type": "object",
+                    "properties": {
+                        "x": {
+                            "type": "number"
+                        },
+                        "y": {
+                            "type": "number"
+                        },
+                        "z": {
+                            "type": "number"
+                        }
+                    },
+                    "required": ["x", "y", "z"]
+                },
+                "component": {
+                    "description": "A component in an instrument",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "transform_id": {
+                            "type": "integer"
+                        },
+                        "transform_parent_id": {
+                            "type": "integer"
+                        },
+                        "parent_transform_index": {
+                            "type": "integer"
+                        },
+                        "transforms": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/transform"
+                            }
+                        },
+                        "geometry": {
+                            "$ref": "#/definitions/geometry"
+                        }
+                    },
+                    "required": ["name", "description", "type", "transform_id", "transforms"]
+                },
+                "sample": {
+                    "description": "The sample in an instrument",
+                    "allOf": [
+                        {"$ref": "#/definitions/component"}
+                    ],
+                    "properties": {
+                        "type": {
+                            "enum": ["Sample"]
+                        }
+                    },
+                    "required": ["type"]
+                },
+                "detector": {
+                    "description": "Detector components of an instrument",
+                    "allOf": [
+                        {"$ref": "#/definitions/component"}
+                    ],
+                    "properties": {
+                        "type": {
+                            "enum": ["Detector"]
+                        }
+                    },
+                    "oneOf": [
+                        {"$ref": "#/definitions/pixelMappedDetectorProperties"},
+                        {"$ref": "#/definitions/repeatedPixelDetectorProperties"}
+                    ]
+                },
+                "monitor": {
+                    "description": "Monitor components of an instrument",
+                    "allOf": [
+                        {"$ref": "#/definitions/component"}
+                    ],
+                    "properties": {
+                        "type": {
+                            "enum": ["Monitor"]
+                        }
+                    },
+                    "oneOf": [
+                        {"$ref": "#/definitions/singlePixelIdProperty"}
+                    ]
+                },
+                "source": {
+                    "description": "The neutron or x-ray storage ring/facility an instrument is connected to",
+                    "allOf": [
+                        {"$ref": "#/definitions/component"}
+                    ],
+                    "properties": {
+                        "type": {
+                            "enum": ["Source"]
+                        }
+                    }
+                },
+                "slit": {
+                    "description": "A diffraction slit",
+                    "allOf": [
+                        {"$ref": "#/definitions/component"}
+                    ],
+                    "properties": {
+                        "type": {
+                            "enum": ["Slit"]
+                        }
+                    }
+                },
+                "moderator": {
+                    "description": "A neutron moderator",
+                    "allOf": [
+                        {"$ref": "#/definitions/component"}
+                    ],
+                    "properties": {
+                        "type": {
+                            "enum": ["Moderator"]
+                        }
+                    }
+                },
+                "diskChopper": {
+                    "description": "A disk chopper",
+                    "allOf": [
+                        {"$ref": "#/definitions/component"}
+                    ],
+                    "properties": {
+                        "type": {
+                            "enum": ["Disk Chopper"]
+                        }
+                    }
+                },
+                "pixelMappedDetectorProperties": {
+                    "description": "Properties for a detector with a pixelmapping, meaning it must have an OFF geometry",
+                    "properties": {
+                        "geometry": {
+                            "$ref": "#/definitions/offGeometry"
+                        },
+                        "pixel_mapping": {
+                            "$ref": "#/definitions/pixelMapping"
+                        }
+                    },
+                    "required": ["geometry", "pixel_mapping"]
+                },
+                "repeatedPixelDetectorProperties": {
+                    "description": "Properties for a detector with a repeated pixel geometry. Unlike a pixel mapping, no further geometry restrictions are needed",
+                    "properties": {
+                        "pixel_grid": {
+                            "$ref": "#/definitions/pixelGrid"
+                        }
+                    },
+                    "required": ["pixel_grid"]
+                },
+                "singlePixelIdProperty": {
+                    "description": "The pixel id for a monitor component",
+                    "properties": {
+                        "pixel_id": {
+                            "type": "integer"
+                        }
+                    },
+                    "required": ["pixel_id"]
+                },
+                "transform": {
+                    "description": "A transformation to position an object in 3D space",
+                    "oneOf": [
+                        {"$ref": "#/definitions/rotate"},
+                        {"$ref": "#/definitions/translate"}
+                    ]
+                },
+                "rotate": {
+                    "description": "A transformation in 3D space by rotating about an axis",
+                    "properties": {
+                        "type": {
+                            "enum": ["rotate"]
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "axis": {
+                            "$ref": "#/definitions/3D"
+                        },
+                        "angle": {
+                            "type": "object",
+                            "properties": {
+                                "unit": {
+                                    "enum": ["degrees"]
+                                },
+                                "value": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": ["unit", "value"]
+                        }
+                    },
+                    "required": ["type", "axis", "angle"]
+                },
+                "translate": {
+                    "description": "A transformation in 3D space by translating along a vector",
+                    "properties": {
+                        "type": {
+                            "enum": ["translate"]
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "vector": {
+                            "$ref": "#/definitions/3D"
+                        },
+                        "unit": {
+                            "enum": ["m"]
+                        }
+                    },
+                    "required": ["type", "vector", "unit"]
+                },
+                "geometry": {
+                    "description": "The 3D geometry of a component in the instrument",
+                    "oneOf": [
+                        {"$ref": "#/definitions/offGeometry"},
+                        {"$ref": "#/definitions/cylindricalGeometry"}
+                    ]
+                },
+                "offGeometry": {
+                    "description": "A geometry of arbitrary polygons based on the NXoff_geometry class",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "enum": ["OFF"]
+                        },
+                        "vertices": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "minItems": 3,
+                                "maxItems": 3,
+                                "items": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "winding_order": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        },
+                        "faces": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        }
+                    },
+                    "required": ["type", "vertices", "winding_order", "faces"]
+                },
+                "cylindricalGeometry": {
+                    "description": "A geometry to model a cylinder with center of its base at the origin of its local coordinate system",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "enum": ["Cylinder"]
+                        },
+                        "axis_direction": {
+                            "$ref": "#/definitions/3D"
+                        },
+                        "height": {
+                            "type": "number",
+                            "minimum": 0,
+                            "exclusiveMinimum": true
+                        },
+                        "radius": {
+                            "type": "number",
+                            "minimum": 0,
+                            "exclusiveMinimum": true
+                        },
+                        "base_center": {
+                            "$ref": "#/definitions/3D"
+                        },
+                        "base_edge": {
+                            "$ref": "#/definitions/3D"
+                        },
+                        "top_center": {
+                            "$ref": "#/definitions/3D"
+                        }
+                    },
+                    "required": ["type", "axis_direction", "height", "radius", "base_center", "base_edge", "top_center"]
+                },
+                "pixelGrid": {
+                    "description": "A regular grid of pixels, starting in the bottom left corner, which is the local coordinate origin",
+                    "type": "object",
+                    "properties": {
+                        "rows": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "columns": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "row_height": {
+                            "type": "number"
+                        },
+                        "column_width": {
+                            "type": "number"
+                        },
+                        "first_id": {
+                            "type": "integer"
+                        },
+                        "count_direction": {
+                            "$ref": "#/definitions/countDirection"
+                        },
+                        "starting_corner": {
+                            "$ref": "#/definitions/corner"
+                        }
+                    },
+                    "required": ["rows", "columns", "row_height", "column_width", "first_id", "count_direction",
+                                 "starting_corner"]
+                },
+                "pixelMapping": {
+                    "description": "A mapping of off geometry face numbers to detector id's, mirroring the detector_faces property of the NXoff_geometry class",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "face": {
+                                "type": "integer",
+                                "minimum": 0
+                            },
+                            "pixel_id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["face", "pixel_id"]
+                    }
+                },
+                "countDirection": {
+                    "description": "The direction a pixelGrid should increment its detector ID's along first",
+                    "enum": ["ROW", "COLUMN"]
+                },
+                "corner": {
+                    "description": "A corner of a 2D grid",
+                    "enum": ["TOP_LEFT", "TOP_RIGHT", "BOTTOM_LEFT", "BOTTOM_RIGHT"]
+                }
+            }
+        }'''
     )
 
     schema = json.load(StringIO(file))
