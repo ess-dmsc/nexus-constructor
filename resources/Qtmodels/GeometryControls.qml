@@ -83,7 +83,6 @@ Pane {
                         // Valid Geometry file given - Accept file and ask user to give the units
                         unitSelection.open()
                         visible: false
-                        GeometryFileSelected.geometryFileSelected = true
                     }
                     else {
                         // Invalid Geometry file given - Reject file
@@ -127,12 +126,17 @@ Pane {
                         editorText: units
                         Layout.fillWidth: true
                         anchoredEditor: true
-                        onEditingFinished: units = editorText
 
                         validator: UnitValidator {
                             id: meshUnitValidator
-                            onValidationFailed: { ValidUnits.validMeshUnits = false }
-                            onValidationSuccess: { ValidUnits.validMeshUnits = true }
+                            onValidationFailed: {
+                                acceptUnitsButton.enabled = false
+                                invalidMeshUnitWarning.visible = true
+                            }
+                            onValidationSuccess: {
+                                acceptUnitsButton.enabled = true
+                                invalidMeshUnitWarning.visible = false
+                            }
                         }
                     }
 
@@ -140,10 +144,10 @@ Pane {
 
                         // Blank invalid unit warning - only set if unit validation function returns false
                         id: invalidMeshUnitWarning
-                        text: ""
+                        text: ValidUnits.invalidUnitsText
                         color: "red"
                         Layout.fillWidth: true
-                        visible: true
+                        visible: false
                     }
 
                     RowLayout {
@@ -152,32 +156,18 @@ Pane {
                             id: acceptUnitsButton
                             text: "OK"
                             onClicked: {
-
-                                if (!ValidUnits.validMeshUnits) {
-                                    // Invalid units given - Show a message and clear input box
-                                    invalidMeshUnitWarning.text = ValidUnits.invalidUnitsText
-                                }
-                                else {
-                                    // Valid units given - Close the box
-                                    file_url = filePicker.fileUrl
-                                    unitSelection.close()
-                                }
-
-                                // Clear the unit input
-                                unitInput.editorText = ""
+                                // Close the box
+                                offModel.file_url = filePicker.fileUrl
+                                offModel.units = unitInput.editorText
+                                GeometryFileSelected.geometryFileSelected = true
+                                unitSelection.close()
                             }
                         }
 
                         Button {
                             id: cancelUnitsButton
                             text: "Cancel"
-                            onClicked: {
-
-                                unitSelection.close()
-                                // Clear the unit input
-                                unitInput.editorText = ""
-                                invalidMeshUnitWarning.text = ""
-                            }
+                            onClicked: unitSelection.close()
                         }
                     }
                 }
