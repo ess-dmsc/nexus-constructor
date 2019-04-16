@@ -13,7 +13,6 @@ from nexus_constructor.geometry_types import (
 from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.qml_models import change_value
 from PySide2.QtCore import Qt, QObject, QModelIndex, QUrl, Signal, Slot, Property
-from PySide2.QtGui import QVector3D
 
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
@@ -36,75 +35,54 @@ class CylinderModel(QObject):
 
     dataChanged = Signal()
 
-    def updateCylinder(self):
-        self.cylinder = CylindricalGeometry(
-            units=self.get_unit(),
-            axis_direction=QVector3D(self.axis_x, self.axis_z, self.axis_y),
-            height=self.get_cylinder_height(),
-            radius=self.get_radius(),
-        )
-        self.dataChanged.emit()
-
     def get_unit(self):
-        return self._unit
+        return self.cylinder.units
 
     def get_axis_x(self):
-        return self._axis_x
+        return self.cylinder.axis_direction.x()
 
     def get_axis_y(self):
-        return self._axis_y
+        return self.cylinder.axis_direction.y()
 
     def get_axis_z(self):
-        return self._axis_z
+        return self.cylinder.axis_direction.z()
 
     def get_cylinder_height(self):
-        return self._cylinder_height
+        return self.cylinder.height
 
     def get_radius(self):
-        return self._radius
+        return self.cylinder.radius
 
     def set_unit(self, unit):
-        self._unit = unit
-        self.updateCylinder()
+        self.cylinder.units = unit
 
     def set_axis_x(self, axis):
-        self._axis_x = axis
-        self.updateCylinder()
+        self.cylinder.axis_direction.setX(axis)
 
     def set_axis_y(self, axis):
-        self._axis_y = axis
-        self.updateCylinder()
+        self.cylinder.axis_direction.setY(axis)
 
     def set_axis_z(self, axis):
-        self._axis_z = axis
-        self.updateCylinder()
+        self.cylinder.axis_direction.setZ(axis)
 
     def set_cylinder_height(self, height):
-        self._cylinder_height = height
-        self.updateCylinder()
+        self.cylinder.height = height
 
     def set_radius(self, radius):
-        self._radius = radius
-        self.updateCylinder()
+        self.cylinder.radius = radius
 
     cylinder_units = Property(str, get_unit, set_unit, notify=dataChanged)
-    axis_x = Property(int, get_axis_x, set_axis_x, notify=dataChanged)
-    axis_y = Property(int, get_axis_y, set_axis_y, notify=dataChanged)
-    axis_z = Property(int, get_axis_z, set_axis_z, notify=dataChanged)
+    axis_x = Property(float, get_axis_x, set_axis_x, notify=dataChanged)
+    axis_y = Property(float, get_axis_y, set_axis_y, notify=dataChanged)
+    axis_z = Property(float, get_axis_z, set_axis_z, notify=dataChanged)
     cylinder_height = Property(
-        int, get_cylinder_height, set_cylinder_height, notify=dataChanged
+        float, get_cylinder_height, set_cylinder_height, notify=dataChanged
     )
-    cylinder_radius = Property(int, get_radius, set_radius, notify=dataChanged)
+    cylinder_radius = Property(float, get_radius, set_radius, notify=dataChanged)
 
     def __init__(self):
         super().__init__()
         self.cylinder = CylindricalGeometry()
-        self._unit = "m"
-        self._axis_x = 1
-        self._axis_y = 0
-        self._axis_z = 0
-        self._cylinder_height = 1
-        self._radius = 1
 
     def get_geometry(self):
         return self.cylinder
