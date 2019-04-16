@@ -11,8 +11,7 @@ from nexus_constructor.geometry_types import (
     NoShapeGeometry,
 )
 from nexus_constructor.geometry_loader import load_geometry
-from nexus_constructor.qml_models import change_value
-from PySide2.QtCore import Qt, QObject, QModelIndex, QUrl, Signal, Slot, Property
+from PySide2.QtCore import QObject, QUrl, Signal, Slot, Property
 
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
