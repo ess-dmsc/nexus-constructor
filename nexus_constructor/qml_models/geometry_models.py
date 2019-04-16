@@ -117,7 +117,7 @@ class OFFModel(QObject):
         return self._units
 
     def set_file(self, file):
-        self._file = file
+        self._file = QUrl(file)
         self.load_data()
 
     def set_units(self, units):
