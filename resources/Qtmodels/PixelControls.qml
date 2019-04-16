@@ -118,8 +118,8 @@ Item {
                 anchors.top: columnsField.top
                 anchors.left: columnsField.right
                 labelText: "Column width:"
-                editorText: col_width
-                onEditingFinished: col_width = parseFloat(editorText)
+                editorText: column_width
+                onEditingFinished: column_width = parseFloat(editorText)
                 validator: numberValidator
             }
 
@@ -188,8 +188,8 @@ Item {
             LabeledTextField {
                 id: pixelIdField
                 labelText: "Pixel ID for face no. " + index + ":"
-                editorText: pixel_id == null ? "" : pixel_id
-                onEditingFinished: pixel_id = parseInt(editorText)
+                editorText: mappingModel.pixel_id == null ? "" : mappingModel.pixel_id
+                onEditingFinished: mappingModel.pixel_id = parseInt(editorText)
                 validator: nullableIntValidator
             }
         }

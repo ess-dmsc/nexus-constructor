@@ -5,108 +5,89 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 from nexus_constructor.qml_models.geometry_models import OFFModel
-from nexus_constructor.data_model import (
-    PixelMapping,
-    PixelGrid,
-    SinglePixelId,
-    Corner,
-    CountDirection,
-)
+from nexus_constructor.data_model import PixelMapping, PixelGrid, SinglePixelId
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from nexus_constructor.qml_models import change_value
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
+from PySide2.QtCore import (
+    Qt,
+    QAbstractListModel,
+    QModelIndex,
+    Slot,
+    Property,
+    Signal,
+    QObject,
+)
 from math import isnan
 
 
-class PixelGridModel(QAbstractListModel):
+class PixelGridModel(QObject):
     """
-    A single item list model that allows properties of a PixelGrid to be read and manipulated in QML
+    A single item model that allows a PixelGrid to be read and manipulated in QML
     """
 
-    RowsRole = Qt.UserRole + 400
-    ColumnsRole = Qt.UserRole + 401
-    RowHeightRole = Qt.UserRole + 402
-    ColumnWidthRole = Qt.UserRole + 403
-    FirstIdRole = Qt.UserRole + 404
-    CountDirectionRole = Qt.UserRole + 405
-    InitialCountCornerRole = Qt.UserRole + 406
+    dataChanged = Signal()
+
+    def get_rows(self):
+        return self.pixel_grid.rows
+
+    def set_rows(self, rows):
+        self.pixel_grid.rows = rows
+
+    def get_columns(self):
+        return self.pixel_grid.columns
+
+    def set_columns(self, columns):
+        self.pixel_grid.columns = columns
+
+    def get_row_height(self):
+        return self.pixel_grid.row_height
+
+    def set_row_height(self, height):
+        self.pixel_grid.row_height = height
+
+    def get_column_width(self):
+        return self.pixel_grid.col_width
+
+    def set_column_width(self, width):
+        self.pixel_grid.col_width = width
+
+    def get_first_id(self):
+        return self.pixel_grid.first_id
+
+    def set_first_id(self, first_id):
+        self.pixel_grid.first_id = first_id
+
+    def get_count_direction(self):
+        return self.pixel_grid.count_direction
+
+    def set_count_direction(self, direction):
+        self.pixel_grid.count_direction = direction
+
+    def get_initial_count_corner(self):
+        return self.pixel_grid.initial_count_corner
+
+    def set_initial_count_corner(self, corner):
+        self.pixel_grid.initial_count_corner = corner
+
+    rows = Property(int, get_rows, set_rows, notify=dataChanged)
+    columns = Property(int, get_columns, set_columns, notify=dataChanged)
+    row_height = Property(float, get_row_height, set_row_height, notify=dataChanged)
+    column_width = Property(
+        float, get_column_width, set_column_width, notify=dataChanged
+    )
+    first_id = Property(int, get_first_id, set_first_id, notify=dataChanged)
+    count_direction = Property(
+        "QVariant", get_count_direction, set_count_direction, notify=dataChanged
+    )
+    initial_count_corner = Property(
+        "QVariant",
+        get_initial_count_corner,
+        set_initial_count_corner,
+        notify=dataChanged,
+    )
 
     def __init__(self):
         super().__init__()
         self.pixel_grid = PixelGrid()
-
-    def rowCount(self, parent=QModelIndex()):
-        return 1
-
-    def data(self, index, role=Qt.DisplayRole):
-        properties = {
-            PixelGridModel.RowsRole: self.pixel_grid.rows,
-            PixelGridModel.ColumnsRole: self.pixel_grid.columns,
-            PixelGridModel.RowHeightRole: self.pixel_grid.row_height,
-            PixelGridModel.ColumnWidthRole: self.pixel_grid.col_width,
-            PixelGridModel.FirstIdRole: self.pixel_grid.first_id,
-            PixelGridModel.CountDirectionRole: self.pixel_grid.count_direction,
-            PixelGridModel.InitialCountCornerRole: self.pixel_grid.initial_count_corner,
-        }
-        if role in properties:
-            return properties[role]
-
-    def setData(self, index, value, role):
-        changed = False
-        # lambda wrappings prevent casting errors when setting other types
-        param_options = {
-            PixelGridModel.RowsRole: lambda: [self.pixel_grid, "rows", int(value)],
-            PixelGridModel.ColumnsRole: lambda: [
-                self.pixel_grid,
-                "columns",
-                int(value),
-            ],
-            PixelGridModel.RowHeightRole: lambda: [
-                self.pixel_grid,
-                "row_height",
-                value,
-            ],
-            PixelGridModel.ColumnWidthRole: lambda: [
-                self.pixel_grid,
-                "col_width",
-                value,
-            ],
-            PixelGridModel.FirstIdRole: lambda: [
-                self.pixel_grid,
-                "first_id",
-                int(value),
-            ],
-            PixelGridModel.CountDirectionRole: lambda: [
-                self.pixel_grid,
-                "count_direction",
-                CountDirection[value],
-            ],
-            PixelGridModel.InitialCountCornerRole: lambda: [
-                self.pixel_grid,
-                "initial_count_corner",
-                Corner[value],
-            ],
-        }
-        if role in param_options:
-            param_list = param_options[role]()
-            changed = change_value(*param_list)
-        if changed:
-            self.dataChanged.emit(index, index, role)
-        return changed
-
-    def flags(self, index):
-        return super().flags(index) | Qt.ItemIsEditable
-
-    def roleNames(self):
-        return {
-            PixelGridModel.RowsRole: b"rows",
-            PixelGridModel.ColumnsRole: b"columns",
-            PixelGridModel.RowHeightRole: b"row_height",
-            PixelGridModel.ColumnWidthRole: b"col_width",
-            PixelGridModel.FirstIdRole: b"first_id",
-            PixelGridModel.CountDirectionRole: b"count_direction",
-            PixelGridModel.InitialCountCornerRole: b"initial_count_corner",
-        }
 
     def get_pixel_model(self):
         return self.pixel_grid
@@ -115,9 +96,8 @@ class PixelGridModel(QAbstractListModel):
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
         if isinstance(component.pixel_data, PixelGrid):
-            self.beginResetModel()
             self.pixel_grid = component.pixel_data
-            self.endResetModel()
+            self.dataChanged.emit()
 
 
 class PixelMappingModel(QAbstractListModel):
@@ -151,9 +131,6 @@ class PixelMappingModel(QAbstractListModel):
     def flags(self, index):
         return super().flags(index) | Qt.ItemIsEditable
 
-    def roleNames(self):
-        return {PixelMappingModel.PixelIdRole: b"pixel_id"}
-
     def get_pixel_model(self):
         return self.pixel_mapping
 
@@ -175,39 +152,24 @@ class PixelMappingModel(QAbstractListModel):
             self.endResetModel()
 
 
-class SinglePixelModel(QAbstractListModel):
+class SinglePixelModel(QObject):
     """
-    A single item list model that allows properties of a SinglePixelId to be read and manipulated in QML
+    A single item model that allows a SinglePixelId to be read and manipulated in QML
     """
 
-    PixelIdRole = Qt.UserRole + 600
+    dataChanged = Signal()
+
+    def get_pixel_id(self):
+        return self.pixel_model.pixel_id
+
+    def set_pixel_id(self, pixel_id):
+        self.pixel_model.pixel_id = pixel_id
+
+    pixel_id = Property(int, get_pixel_id, set_pixel_id, notify=dataChanged)
 
     def __init__(self):
         super().__init__()
         self.pixel_model = SinglePixelId(pixel_id=0)
-
-    def rowCount(self, parent=QModelIndex()):
-        return 1
-
-    def data(self, index, role=Qt.DisplayRole):
-        if role == SinglePixelModel.PixelIdRole:
-            return self.pixel_model.pixel_id
-
-    def setData(self, index, value, role):
-        changed = False
-        if role == SinglePixelModel.PixelIdRole:
-            current_value = self.pixel_model.pixel_id
-            if current_value != value:
-                self.pixel_model.pixel_id = None if isnan(value) else int(value)
-                self.dataChanged.emit(index, index, role)
-                changed = True
-        return changed
-
-    def flags(self, index):
-        return super().flags(index) | Qt.ItemIsEditable
-
-    def roleNames(self):
-        return {SinglePixelModel.PixelIdRole: b"pixel_id"}
 
     def get_pixel_model(self):
         return self.pixel_model
@@ -216,6 +178,5 @@ class SinglePixelModel(QAbstractListModel):
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
         if isinstance(component.pixel_data, SinglePixelId):
-            self.beginResetModel()
             self.pixel_model = component.pixel_data
-            self.endResetModel()
+            self.dataChanged.emit()
