@@ -18,6 +18,11 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class NoShapeModel(QObject):
+    """
+    A single item model that allows properties of an object with no geometry to be read and manipulated in QML
+
+    """
+
     dataChanged = Signal()
 
     def __init__(self):
@@ -30,7 +35,7 @@ class NoShapeModel(QObject):
 
 class CylinderModel(QObject):
     """
-    A single item list model that allows properties of a Cylindrical geometry to be read and manipulated in QML
+    A single item model that allows properties of a Cylindrical geometry to be read and manipulated in QML
     """
 
     dataChanged = Signal()
@@ -94,17 +99,15 @@ class CylinderModel(QObject):
 
 class OFFModel(QObject):
     """
-    A single item list model that allows properties of an OFFGeometry instance to be read and manipulated in QML
+    A single item model that allows properties of an OFFGeometry instance to be read and manipulated in QML
     """
 
-    _file = False
+    _file = QUrl("")
     _units = "m"
 
     def __init__(self):
         super().__init__()
         self.geometry = OFFGeometry()
-
-    meshLoaded = Signal()
 
     dataChanged = Signal()
 
@@ -131,7 +134,6 @@ class OFFModel(QObject):
         )
         self.geometry = load_geometry(filename, self._units, self.geometry)
         self.dataChanged.emit()
-        self.meshLoaded.emit()
 
     def get_geometry(self):
         return self.geometry

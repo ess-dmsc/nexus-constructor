@@ -28,7 +28,7 @@ Pane {
 
     OFFModel {
         id: offModel
-        onMeshLoaded: pane.meshChanged()
+        onDataChanged: pane.meshChanged()
     }
 
     CylinderModel {
