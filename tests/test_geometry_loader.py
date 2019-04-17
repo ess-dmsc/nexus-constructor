@@ -1,6 +1,6 @@
 from nexus_constructor.data_model import PixelGrid
 from nexus_constructor.geometry_types import OFFGeometry
-from nexus_constructor.geometry_loader import _load_geometry
+from nexus_constructor.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtGui import QVector3D
@@ -8,7 +8,7 @@ import struct
 from io import StringIO
 
 
-def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
+def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_vertices_and_faces_loaded_are_the_same_as_the_file():
     model = OFFModel()
     model.setData(1, "m", OFFModel.UnitsRole)
 
@@ -86,7 +86,7 @@ def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     assert off_geometry.winding_order_indices == [0, 4, 8, 12, 16, 20]
 
 
-def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
+def test_GIVEN_stl_file_with_cube_geometry_WHEN_loading_geometry_THEN_all_faces_are_present():
     length = 30
     left_lower_rear = QVector3D(0, 0, 0)
     right_lower_rear = QVector3D(length, 0, 0)
@@ -208,7 +208,7 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         endfacet
         endsolid vcg"""
 
-    geometry = _load_geometry(StringIO(cube), ".stl", "m")
+    geometry = load_geometry_from_file_object(StringIO(cube), ".stl", "m")
 
     # 2 triangles per face, 6 faces in the cube
     assert len(geometry.faces) == 6 * 2
@@ -252,9 +252,8 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         assert face_found
 
 
-def test_load_geometry_returns_empty_geometry_for_unrecognised_file_extension():
-
-    geometry = _load_geometry(StringIO(), ".txt", "m")
+def test_GIVEN_unrecognised_file_extension_WHEN_loading_geometry_THEN_returns_empty_geometry():
+    geometry = load_geometry_from_file_object(StringIO(), ".txt", "m")
     assert len(geometry.vertices) == 0
     assert len(geometry.faces) == 0
 
