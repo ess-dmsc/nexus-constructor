@@ -5,7 +5,7 @@ See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on ho
 what signals need to be emitted when changes to the data are made.
 """
 from nexus_constructor.qml_models.geometry_models import OFFModel
-from nexus_constructor.data_model import PixelMapping, PixelGrid, SinglePixelId
+from nexus_constructor.pixel_data import PixelMapping, PixelGrid, SinglePixelId
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import (
     Qt,
@@ -95,7 +95,7 @@ class PixelGridModel(QObject):
     @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
-        if isinstance(component.pixel_data, PixelGrid):
+        if component.pixel_data.type == "PixelGrid":
             self.pixel_grid = component.pixel_data
             self.dataChanged.emit()
 
@@ -131,13 +131,16 @@ class PixelMappingModel(QAbstractListModel):
     def flags(self, index):
         return super().flags(index) | Qt.ItemIsEditable
 
+    def roleNames(self):
+        return {PixelMappingModel.PixelIdRole: b"pixel_id"}
+
     def get_pixel_model(self):
         return self.pixel_mapping
 
     @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
-        if isinstance(component.pixel_data, PixelMapping):
+        if component.pixel_data.type == "PixelMapping":
             self.beginResetModel()
             self.pixel_mapping = component.pixel_data
             self.endResetModel()
@@ -177,6 +180,6 @@ class SinglePixelModel(QObject):
     @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
-        if isinstance(component.pixel_data, SinglePixelId):
+        if component.pixel_data.type == "SinglePixel":
             self.pixel_model = component.pixel_data
             self.dataChanged.emit()

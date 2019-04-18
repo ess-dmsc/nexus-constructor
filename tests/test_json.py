@@ -1,15 +1,12 @@
 import json
 import jsonschema
-from nexus_constructor.data_model import (
-    Component,
-    ComponentType,
+from nexus_constructor.data_model import Component, ComponentType, Translation, Rotation
+from nexus_constructor.pixel_data import (
     PixelMapping,
     PixelGrid,
     SinglePixelId,
     CountDirection,
     Corner,
-    Translation,
-    Rotation,
 )
 from nexus_constructor.geometry_types import CylindricalGeometry
 import nexus_constructor.nexus_constructor_json as gc_json

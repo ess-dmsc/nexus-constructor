@@ -1,4 +1,4 @@
-from nexus_constructor.data_model import PixelGrid
+from nexus_constructor.pixel_data import PixelGrid
 from nexus_constructor.geometry_types import OFFGeometry
 from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.off_renderer import QtOFFGeometry

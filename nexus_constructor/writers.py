@@ -1,14 +1,7 @@
 import h5py
 from pprint import pprint
-from nexus_constructor.data_model import (
-    PixelGrid,
-    PixelMapping,
-    SinglePixelId,
-    Geometry,
-    Component,
-    Rotation,
-    Translation,
-)
+from nexus_constructor.data_model import Geometry, Component, Rotation, Translation
+from nexus_constructor.pixel_data import PixelGrid, PixelMapping, SinglePixelId
 from nexus_constructor.geometry_types import (
     OFFGeometry,
     CylindricalGeometry,

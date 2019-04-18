@@ -12,9 +12,8 @@ from nexus_constructor.qml_models.instrument_model import (
     determine_pixel_state,
     Component,
     ComponentType,
-    PixelGrid,
-    PixelMapping,
 )
+from nexus_constructor.pixel_data import PixelMapping, PixelGrid, SinglePixelId
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
@@ -107,10 +106,10 @@ def test_determine_pixel_state_produces_expected_strings():
         component = data_model.Component(component_type=component_type, name="")
         if component_type == data_model.ComponentType.DETECTOR:
             expected_states = ["Mapping", "Grid"]
-            pixel_options = [data_model.PixelMapping([]), data_model.PixelGrid()]
+            pixel_options = [PixelMapping([]), PixelGrid()]
         elif component_type == data_model.ComponentType.MONITOR:
             expected_states = ["SinglePixel"]
-            pixel_options = [data_model.SinglePixelId(42)]
+            pixel_options = [SinglePixelId(42)]
         else:
             expected_states = [""]
             pixel_options = [None]

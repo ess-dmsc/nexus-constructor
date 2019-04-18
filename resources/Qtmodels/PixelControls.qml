@@ -188,8 +188,8 @@ Item {
             LabeledTextField {
                 id: pixelIdField
                 labelText: "Pixel ID for face no. " + index + ":"
-                editorText: mappingModel.pixel_id == null ? "" : mappingModel.pixel_id
-                onEditingFinished: mappingModel.pixel_id = parseInt(editorText)
+                editorText: pixel_id == null ? "" : pixel_id
+                onEditingFinished: pixel_id = parseInt(editorText)
                 validator: nullableIntValidator
             }
         }
