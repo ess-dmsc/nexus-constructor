@@ -10,7 +10,6 @@ from nexus_constructor.geometry_types import (
     OFFGeometry,
     NoShapeGeometry,
 )
-from nexus_constructor.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.geometry_loader import load_geometry
 from nexus_constructor.qml_models.helpers import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, QUrl, Signal, Slot
