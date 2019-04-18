@@ -9,6 +9,7 @@ from nexus_constructor.data_model import (
     CountDirection,
     Corner,
 )
+from nexus_constructor.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.nexus_constructor_json import writer, loader
 from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import CylindricalGeometry
@@ -45,7 +46,8 @@ def build_sample_model():
         "4 6 0 2 4\n"
     )
 
-    offmodel.load_file_to_geometry(StringIO(off_file), ".off")
+    load_geometry_from_file_object(StringIO(off_file), ".off", offmodel.units, offmodel.geometry)
+
 
     off_geometry = offmodel.get_geometry()
 

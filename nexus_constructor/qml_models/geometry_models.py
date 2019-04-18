@@ -177,9 +177,6 @@ class OFFModel(QAbstractListModel):
         self.endResetModel()
         self.meshLoaded.emit()
 
-    def load_file_to_geometry(self, file, extension):
-        load_geometry_from_file_object(file, extension, self.units, self.geometry)
-
     def get_geometry(self):
         return self.geometry
 
