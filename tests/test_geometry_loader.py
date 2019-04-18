@@ -33,7 +33,9 @@ def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_v
         "4 6 0 2 4\n"
     )
 
-    load_geometry_from_file_object(StringIO(off_file), ".off", model.units, model.geometry)
+    load_geometry_from_file_object(
+        StringIO(off_file), ".off", model.units, model.geometry
+    )
 
     off_geometry = model.get_geometry()
     assert isinstance(off_geometry, OFFGeometry)

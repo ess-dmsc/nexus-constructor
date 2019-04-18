@@ -46,8 +46,9 @@ def build_sample_model():
         "4 6 0 2 4\n"
     )
 
-    load_geometry_from_file_object(StringIO(off_file), ".off", offmodel.units, offmodel.geometry)
-
+    load_geometry_from_file_object(
+        StringIO(off_file), ".off", offmodel.units, offmodel.geometry
+    )
 
     off_geometry = offmodel.get_geometry()
 
