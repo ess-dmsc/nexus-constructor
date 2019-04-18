@@ -8,11 +8,10 @@ from nexus_constructor.data_model import (
     SinglePixelId,
     CountDirection,
     Corner,
-    Translation,
-    Rotation,
 )
+from nexus_constructor.nexus_constructor_json import writer, loader
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import CylindricalGeometry
-import nexus_constructor.nexus_constructor_json as gc_json
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QUrl
@@ -132,12 +131,10 @@ def test_loading_generated_json():
 
     assert model.components == model.components
 
-    json_string = gc_json.generate_json(model)
+    json_string = writer.generate_json(model)
 
     loaded_model = InstrumentModel()
-    gc_json.load_json_object_into_instrument_model(
-        json.loads(json_string), loaded_model
-    )
+    loader.load_json_object_into_instrument_model(json.loads(json_string), loaded_model)
 
     assert model.components == loaded_model.components
 
@@ -147,7 +144,7 @@ def test_json_schema_compliance():
         schema = json.load(file)
 
     model = build_sample_model()
-    model_json = gc_json.generate_json(model)
+    model_json = writer.generate_json(model)
     model_data = json.loads(model_json)
 
     jsonschema.validate(model_data, schema)

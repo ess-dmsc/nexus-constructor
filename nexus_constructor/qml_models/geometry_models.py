@@ -12,7 +12,6 @@ from nexus_constructor.geometry_types import (
 )
 from nexus_constructor.geometry_loader import load_geometry
 from PySide2.QtCore import QObject, QUrl, Signal, Slot, Property
-
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
