@@ -72,3 +72,31 @@ def test_GIVEN_nothing_WHEN_creating_SinglePixelModel_THEN_pixeldata_type_is_sin
 def test_GIVEN_nothing_WHEN_creating_PixelGridModel_THEN_pixeldata_type_is_pixel_grid():
     model = PixelGridModel()
     assert model.get_pixel_model().type == "PixelGrid"
+
+
+def test_GIVEN_same_pixelid_WHEN_setting_data_on_pixelMappingModel_THEN_returns_changed_as_false():
+    id = 1
+    component_index = 0
+    pixel_data = PixelMapping([id])
+    inst = InstrumentModel()
+    inst.components[component_index].pixel_data = pixel_data
+    model = PixelMappingModel()
+    model.set_pixel_model(component_index, inst)
+
+    assert not model.setData(inst.index(component_index), id, model.PixelIdRole)
+
+
+def test_GIVEN_different_pixelid_WHEN_setting_data_on_pixelMappingModel_THEN_model_is_updated():
+    component_index = 0
+    original_id = 0
+    pixel_data = PixelMapping([original_id])
+    inst = InstrumentModel()
+    inst.components[component_index].pixel_data = pixel_data
+    model = PixelMappingModel()
+    model.set_pixel_model(component_index, inst)
+
+    changed_id = 1
+
+    assert model.setData(inst.index(component_index), changed_id, model.PixelIdRole)
+
+    assert model.data(inst.index(component_index), model.PixelIdRole) == changed_id
