@@ -1,4 +1,5 @@
 from nexus_constructor.qml_models.json_model import JsonModel, FilteredJsonModel
+from io import StringIO
 
 
 def read_json():
@@ -6,10 +7,170 @@ def read_json():
     Reads the test data from json files
     :return: a string containing the sample json, and a list of lines for its formatted form
     """
-    with open("tests/sample.json", mode="r") as file:
-        data = file.read()
-    with open("tests/formatted_sample.json", mode="r") as file:
-        formatted_lines = file.read().splitlines()
+    sample = """{
+            "sample": {
+                "transforms": [
+                    {
+                        "angle": {
+                            "unit": "degrees",
+                            "value": 0
+                        },
+                        "axis": {
+                            "y": 0,
+                            "z": 1,
+                            "x": 0
+                        },
+                        "type": "rotate"
+                    },
+                    {
+                        "unit": "m",
+                        "vector": {
+                            "y": 0,
+                            "z": 0,
+                            "x": 0
+                        },
+                        "type": "translate"
+                    }
+                ],
+                "transform_id": 0,
+                "name": "Sample",
+                "description": "",
+                "geometry": {
+                    "vertices": [
+                        [
+                            -0.5,
+                            -0.5,
+                            0.5
+                        ],
+                        [
+                            0.5,
+                            -0.5,
+                            0.5
+                        ],
+                        [
+                            -0.5,
+                            0.5,
+                            0.5
+                        ],
+                        [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        [
+                            -0.5,
+                            0.5,
+                            -0.5
+                        ],
+                        [
+                            0.5,
+                            0.5,
+                            -0.5
+                        ],
+                        [
+                            -0.5,
+                            -0.5,
+                            -0.5
+                        ],
+                        [
+                            0.5,
+                            -0.5,
+                            -0.5
+                        ]
+                    ],
+                    "faces": [
+                        0,
+                        1,
+                        3,
+                        2,
+                        2,
+                        3,
+                        5,
+                        4,
+                        4,
+                        5,
+                        7,
+                        6,
+                        6,
+                        7,
+                        1,
+                        0,
+                        1,
+                        7,
+                        5,
+                        3,
+                        6,
+                        0,
+                        2,
+                        4
+                    ],
+                    "winding_order": [
+                        0,
+                        4,
+                        8,
+                        12,
+                        16,
+                        20
+                    ],
+                    "type": "OFF"
+                },
+                "type": "Sample"
+            },
+            "components": []
+        }"""
+
+    data = StringIO(sample).read()
+
+    formatted_sample = """{
+           "components": [],
+           "sample": {
+             "description": "",
+            "geometry": {
+              "faces": [0, 1, 3, 2, 2, 3, 5, 4, 4, 5, 7, 6, 6, 7, 1, 0, 1, 7, 5, 3, 6, 0, 2, 4],
+              "type": "OFF",
+              "vertices": [
+                [-0.5, -0.5, 0.5],
+                [0.5, -0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [-0.5, 0.5, -0.5],
+                [0.5, 0.5, -0.5],
+                [-0.5, -0.5, -0.5],
+                [0.5, -0.5, -0.5]
+              ],
+              "winding_order": [0, 4, 8, 12, 16, 20]
+            },
+            "name": "Sample",
+            "transform_id": 0,
+            "transforms": [
+              {
+                "angle": {
+                  "unit": "degrees",
+                  "value": 0
+                },
+                "axis": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 1
+                },
+                "type": "rotate"
+              },
+              {
+                "type": "translate",
+                "unit": "m",
+                "vector": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                }
+              }
+            ],
+            "type": "Sample"
+          }
+        }"""
+
+    formatted_lines = StringIO(formatted_sample).read().splitlines()
+
     return data, formatted_lines
 
 
@@ -18,8 +179,56 @@ def read_collapsed_data():
     Reads the expected collapsed lines for a model based on the sample json data
     :return: a list of strings containing the collapsed lines
     """
-    with open("tests/collapsed_lines.txt") as file:
-        return file.read().splitlines()
+
+    collapsed_lines = """{...}
+          "components": [],
+          "sample": {...}
+            "description": "",
+            "geometry": {...},
+              "faces": [...],
+              "type": "OFF",
+              "vertices": [...],
+                [...],
+                [...],
+                [...],
+                [...],
+                [...],
+                [...],
+                [...],
+                [...]
+              ],
+              "winding_order": [...]
+            },
+            "name": "Sample",
+            "transform_id": 0,
+            "transforms": [...],
+              {...},
+                "angle": {...},
+                  "unit": "degrees",
+                  "value": 0
+                },
+                "axis": {...},
+                  "x": 0,
+                  "y": 0,
+                  "z": 1
+                },
+                "type": "rotate"
+              },
+              {...}
+                "type": "translate",
+                "unit": "m",
+                "vector": {...}
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                }
+              }
+            ],
+            "type": "Sample"
+          }
+        }"""
+
+    return StringIO(collapsed_lines).read().splitlines()
 
 
 def check_model_contents(model, expected_values, role=JsonModel.TextRole):
@@ -27,7 +236,7 @@ def check_model_contents(model, expected_values, role=JsonModel.TextRole):
     assert model.rowCount() == len(expected_values)
     for i in range(model.rowCount()):
         index = model.index(i, 0)
-        assert model.data(index, role) == expected_values[i]
+        assert model.data(index, role).strip() == expected_values[i].strip()
 
 
 def test_initialise_json_model():
