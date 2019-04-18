@@ -28,8 +28,10 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
     """
     Loads an object representation of Nexus constructor instrument json into an InstrumentModel
 
-    :param json_data: Dictionary containing the json data to load
-    :param model: The model the loaded components will be stored in
+    The object representation should be a dictionary, built by pythons json package load functions, and conform to the
+    Nexus Constructors Instrument json schema
+    :param json_data: The dictionary of objects built from a json source
+    :param model: The model to populate with the json data
     """
     # transform_id -> component
     transform_id_mapping = {}
