@@ -1,8 +1,10 @@
 from PySide2.QtCore import QObject, QUrl, Slot, Signal
 from PySide2.QtGui import QGuiApplication
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
-import nexus_constructor.nexus_constructor_json as gc_json
-import nexus_constructor.nexus_filewriter_json as nf_json
+from nexus_constructor.nexus_constructor_json import writer as nc_writer
+from nexus_constructor.nexus_constructor_json import loader as nc_loader
+from nexus_constructor.nexus_filewriter_json import writer as nf_writer
+from nexus_constructor.nexus_filewriter_json import loader as nf_loader
 import json
 import jsonschema
 
@@ -59,9 +61,9 @@ class JsonConnector(QObject):
 
         try:
             if nexus_constructor_json:
-                gc_json.load_json_object_into_instrument_model(data, model)
+                nc_loader.load_json_object_into_instrument_model(data, model)
             else:
-                nf_json.load_json_object_into_instrument_model(data, model)
+                nf_loader.load_json_object_into_instrument_model(data, model)
         except KeyError:
             return False
 
@@ -69,12 +71,12 @@ class JsonConnector(QObject):
 
     @Slot(QUrl, "QVariant")
     def save_to_filewriter_json(self, file_url: QUrl, model: InstrumentModel):
-        json_string = nf_json.generate_json(model)
+        json_string = nf_writer.generate_json(model)
         self.save_to_file(json_string, file_url)
 
     @Slot(QUrl, "QVariant")
     def save_to_nexus_constructor_json(self, file_url: QUrl, model: InstrumentModel):
-        json_string = gc_json.generate_json(model)
+        json_string = nc_writer.generate_json(model)
         self.save_to_file(json_string, file_url)
 
     @staticmethod
@@ -87,20 +89,20 @@ class JsonConnector(QObject):
 
     @Slot("QVariant")
     def copy_nexus_filewriter_json_to_clipboard(self, model: InstrumentModel):
-        self.clipboard.setText(nf_json.generate_json(model))
+        self.clipboard.setText(nf_writer.generate_json(model))
 
     @Slot("QVariant")
     def copy_nexus_constructor_json_to_clipboard(self, model: InstrumentModel):
-        self.clipboard.setText(gc_json.generate_json(model))
+        self.clipboard.setText(nc_writer.generate_json(model))
 
     requested_nexus_constructor_json = Signal(str)
 
     @Slot("QVariant")
     def request_nexus_constructor_json(self, model: InstrumentModel):
-        self.requested_nexus_constructor_json.emit(gc_json.generate_json(model))
+        self.requested_nexus_constructor_json.emit(nc_writer.generate_json(model))
 
     requested_filewriter_json = Signal(str)
 
     @Slot("QVariant")
     def request_filewriter_json(self, model: InstrumentModel):
-        self.requested_filewriter_json.emit(nf_json.generate_json(model))
+        self.requested_filewriter_json.emit(nf_writer.generate_json(model))

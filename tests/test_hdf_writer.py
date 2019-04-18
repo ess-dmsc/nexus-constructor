@@ -9,9 +9,8 @@ from nexus_constructor.data_model import (
     PixelGrid,
     Corner,
     CountDirection,
-    Rotation,
-    Translation,
 )
+from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.writers import HdfWriter
 
