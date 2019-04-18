@@ -13,9 +13,8 @@ from nexus_constructor.data_model import (
     SinglePixelId,
     CountDirection,
     Corner,
-    Translation,
-    Rotation,
 )
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import (
     CylindricalGeometry,
     OFFGeometry,

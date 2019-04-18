@@ -8,10 +8,9 @@ from nexus_constructor.data_model import (
     SinglePixelId,
     CountDirection,
     Corner,
-    Translation,
-    Rotation,
 )
 from nexus_constructor.nexus_constructor_json import writer, loader
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import CylindricalGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
 from nexus_constructor.qml_models.instrument_model import InstrumentModel

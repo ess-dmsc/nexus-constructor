@@ -13,9 +13,8 @@ from nexus_constructor.data_model import (
     PixelMapping,
     SinglePixelId,
     Transformation,
-    Translation,
-    Rotation,
 )
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import OFFGeometry, Geometry, CylindricalGeometry
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
