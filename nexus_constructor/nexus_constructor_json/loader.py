@@ -5,7 +5,7 @@ This module contains all the parsing functions used to load the data.
 It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
 only the required root function to load the json
 """
-from nexus_constructor.data_model import Component, ComponentType, Translation, Rotation
+from nexus_constructor.data_model import Component, ComponentType
 from nexus_constructor.geometry_types import (
     CylindricalGeometry,
     OFFGeometry,
@@ -18,6 +18,7 @@ from nexus_constructor.pixel_data import (
     CountDirection,
     Corner,
 )
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.nexus import NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QVector3D

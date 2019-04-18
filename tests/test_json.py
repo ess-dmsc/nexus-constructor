@@ -1,6 +1,6 @@
 import json
 import jsonschema
-from nexus_constructor.data_model import Component, ComponentType, Translation, Rotation
+from nexus_constructor.data_model import Component, ComponentType
 from nexus_constructor.pixel_data import (
     PixelMapping,
     PixelGrid,
@@ -8,6 +8,7 @@ from nexus_constructor.pixel_data import (
     CountDirection,
     Corner,
 )
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import CylindricalGeometry
 import nexus_constructor.nexus_constructor_json as gc_json
 from nexus_constructor.qml_models.geometry_models import OFFModel

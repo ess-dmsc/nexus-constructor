@@ -6,6 +6,7 @@ from nexus_constructor.qml_models.geometry_models import (
     NoShapeGeometry,
     OFFGeometry,
 )
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.qml_models.instrument_model import (
     InstrumentModel,
     generate_mesh,
@@ -128,12 +129,8 @@ def build_model_with_sample_transforms():
             name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
-                data_model.Rotation(
-                    name="rotate", axis=data_model.QVector3D(4, 5, 6), angle=90
-                ),
-                data_model.Translation(
-                    name="translate", vector=data_model.QVector3D(1, 2, 3)
-                ),
+                Rotation(name="rotate", axis=QVector3D(4, 5, 6), angle=90),
+                Translation(name="translate", vector=QVector3D(1, 2, 3)),
             ],
         )
     )
@@ -144,12 +141,8 @@ def build_model_with_sample_transforms():
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
             transforms=[
-                data_model.Translation(
-                    name="translate", vector=data_model.QVector3D(1, 2, 3)
-                ),
-                data_model.Rotation(
-                    name="rotate", axis=data_model.QVector3D(4, 5, 6), angle=90
-                ),
+                Translation(name="translate", vector=QVector3D(1, 2, 3)),
+                Rotation(name="rotate", axis=QVector3D(4, 5, 6), angle=90),
             ],
         )
     )
@@ -159,15 +152,9 @@ def build_model_with_sample_transforms():
             name="detector3",
             transform_parent=instrument.components[1],
             transforms=[
-                data_model.Rotation(
-                    name="rotate", axis=data_model.QVector3D(4, 5, 6), angle=90
-                ),
-                data_model.Translation(
-                    name="translate", vector=data_model.QVector3D(1, 2, 3)
-                ),
-                data_model.Translation(
-                    name="translate2", vector=data_model.QVector3D(1, 2, 3)
-                ),
+                Rotation(name="rotate", axis=QVector3D(4, 5, 6), angle=90),
+                Translation(name="translate", vector=QVector3D(1, 2, 3)),
+                Translation(name="translate2", vector=QVector3D(1, 2, 3)),
             ],
         )
     )
@@ -179,10 +166,10 @@ def build_model_with_sample_transforms():
 def test_generate_matrix_combines_dependent_transforms():
     instrument = build_model_with_sample_transforms()
 
-    def rotate_matrix(matrix: QMatrix4x4, rotate: data_model.Rotation):
+    def rotate_matrix(matrix: QMatrix4x4, rotate: Rotation):
         matrix.rotate(rotate.angle, rotate.axis)
 
-    def translate_matrix(matrix: QMatrix4x4, translate: data_model.Translation):
+    def translate_matrix(matrix: QMatrix4x4, translate: Translation):
         matrix.translate(translate.vector)
 
     target_matrix = QMatrix4x4()

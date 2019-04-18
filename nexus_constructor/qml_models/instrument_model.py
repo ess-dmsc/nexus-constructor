@@ -1,5 +1,6 @@
-from nexus_constructor.data_model import ComponentType, Component, Rotation, Translation
+from nexus_constructor.data_model import ComponentType, Component
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
+from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.qml_models import change_value, generate_unique_name
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
