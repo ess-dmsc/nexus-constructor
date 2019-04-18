@@ -37,11 +37,9 @@ return {
 	    python setup.py build_exe"""
         }  // stage
     stage('win10: Archive Executable'){
-    if (env.CHANGE_ID) {
         def git_commit_short = scm_vars.GIT_COMMIT.take(7)
         powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
         archiveArtifacts 'nexus-constructor*.zip'
-    }
     } // stage
 
       }  // dir
@@ -128,17 +126,16 @@ stage("Run tests") {
             sh "docker cp ${container_name}:/home/jenkins/${project}/test_results.xml test_results.xml"
             junit "test_results.xml"
         }
-
-stage('Build Executable'){
-    sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python setup.py build_exe  \" "
-}
-stage('Archive Executable') {
-    if (env.CHANGE_ID) {
-    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-    sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
-    archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
+if (env.CHANGE_ID) {
+    stage('Build Executable'){
+        sh "docker exec ${container_name} ${sh_cmd} -c \" cd ${project} && build_env/bin/python setup.py build_exe  \" "
     }
-}
+    stage('Archive Executable') {
+        def git_commit_short = scm_vars.GIT_COMMIT.take(7)
+        sh "docker cp ${container_name}:/home/jenkins/${project}/build/ ./build && tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
+        archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
+    } // stage
+} // if
 } // return
 } // def
 
@@ -167,8 +164,11 @@ node("docker") {
         builders['centos7'] = get_linux_pipeline()
         // disabled for now as the build isn't setup for Mac OS just yet.
         // builders['macOS'] = get_macos_pipeline()
-        builders['windows10'] = get_win10_pipeline()
 
+        // Only build executables on windows if it is a PR build
+        if (env.CHANGE_ID) {
+            builders['windows10'] = get_win10_pipeline()
+        }
         parallel builders
 
     } finally {
