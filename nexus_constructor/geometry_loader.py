@@ -3,6 +3,7 @@ from nexusutils.readwriteoff import parse_off_file
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from stl import mesh
 from PySide2.QtGui import QVector3D
+from io import StringIO
 
 
 def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry()):
@@ -10,41 +11,71 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
     Loads geometry from a file into an OFFGeometry instance
 
     Supported file types are OFF and STL.
-    :param filename: The name of the file to load geometry from
+    :param filename: The name of the file to open.
     :param units: A unit of length in the form of a string. Used to determine the multiplication factor.
     :param geometry: The optional OFFGeometry to load the geometry data into. If not provided, a new instance will be
-    returned
+    returned.
     :return: An OFFGeometry instance containing that file's geometry, or an empty instance if filename's extension is
-    unsupported
+    unsupported.
     """
-    mult_factor = calculate_unit_conversion_factor(units)
 
     extension = filename[filename.rfind(".") :].lower()
+
+    try:
+        with open(filename) as file:
+            return load_geometry_from_file_object(file, extension, units, geometry)
+    except UnicodeDecodeError:
+        """
+        Try again in case the file is in binary. At least one of these should work when a user selects a file because
+        GeometryFileValidator inspects the file beforehand to check that it's valid.
+        """
+        with open(filename, "rb") as file:
+            return load_geometry_from_file_object(file, extension, units, geometry)
+
+
+def load_geometry_from_file_object(
+    file: StringIO, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
+):
+    """
+    Loads geometry from a file object into an OFFGeometry instance
+
+    Supported file types are OFF and STL.
+
+    :param file: The file object to load the geometry from.
+    :param units: A unit of length in the form of a string. Used to determine the multiplication factor.
+    :param geometry: The optional OFFGeometry to load the geometry data into. If not provided, a new instance will be
+    returned.
+    :return: An OFFGeometry instance containing that file's geometry, or an empty instance if filename's extension is
+    unsupported.
+    """
+
+    mult_factor = calculate_unit_conversion_factor(units)
+
     if extension == ".off":
-        load_off_geometry(filename, mult_factor, geometry)
+        load_off_geometry(file, mult_factor, geometry)
     elif extension == ".stl":
-        load_stl_geometry(filename, mult_factor, geometry)
+        load_stl_geometry(file, mult_factor, geometry)
     else:
         geometry.faces = []
         geometry.vertices = []
         print("geometry file extension not supported")
+
     return geometry
 
 
 def load_off_geometry(
-    filename: str, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
+    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
 ):
     """
-    Loads geometry from an OFF file into an OFFGeometry instance
+    Loads geometry from an OFF file into an OFFGeometry instance.
 
-    :param filename: The name of the OFF file to load geometry from
-    :param mult_factor: The multiplication factor for unit conversion
+    :param file: The file containing an OFF geometry.
+    :param mult_factor: The multiplication factor for unit conversion.
     :param geometry: The optional OFFGeometry to load the OFF data into. If not provided, a new instance will be
-    returned
-    :return: An OFFGeometry instance containing that file's geometry
+    returned.
+    :return: An OFFGeometry instance containing that file's geometry.
     """
-    with open(filename) as file:
-        vertices, faces = parse_off_file(file)
+    vertices, faces = parse_off_file(file)
 
     geometry.vertices = [
         QVector3D(x * mult_factor, y * mult_factor, z * mult_factor)
@@ -56,18 +87,18 @@ def load_off_geometry(
 
 
 def load_stl_geometry(
-    filename: str, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
+    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
 ):
     """
-    Loads geometry from an STL file into an OFFGeometry instance
+    Loads geometry from an STL file into an OFFGeometry instance.
 
-    :param filename: The name of the STL file to load geometry from
-    :param mult_factor: The multiplication factor for unit conversion
+    :param file: The file containing an STL geometry.
+    :param mult_factor: The multiplication factor for unit conversion.
     :param geometry: The optional OFFGeometry to load the STL data into. If not provided, a new instance will be
-    returned
-    :return: An OFFGeometry instance containing that file's geometry
+    returned.
+    :return: An OFFGeometry instance containing that file's geometry.
     """
-    mesh_data = mesh.Mesh.from_file(filename, calculate_normals=False)
+    mesh_data = mesh.Mesh.from_file("", fh=file, calculate_normals=False)
     # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
     geometry.vertices = [
         QVector3D(
