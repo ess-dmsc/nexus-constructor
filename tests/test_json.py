@@ -23,7 +23,8 @@ def build_sample_model():
     model = InstrumentModel()
 
     offmodel = OFFModel()
-    offmodel.setData(1, "m", OFFModel.UnitsRole)
+
+    offmodel.set_units("m")
 
     off_file = (
         "OFF\n"

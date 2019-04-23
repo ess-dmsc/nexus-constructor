@@ -10,7 +10,7 @@ from io import StringIO
 
 def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_vertices_and_faces_loaded_are_the_same_as_the_file():
     model = OFFModel()
-    model.setData(1, "m", OFFModel.UnitsRole)
+    model.set_units("m")
 
     off_file = (
         "OFF\n"
