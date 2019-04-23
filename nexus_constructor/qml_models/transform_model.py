@@ -1,6 +1,6 @@
 from PySide2.QtCore import QAbstractListModel, Qt, QModelIndex, Signal, Slot
-from nexus_constructor.data_model import Transformation, Translation, Rotation
-from nexus_constructor.qml_models import generate_unique_name
+from nexus_constructor.qml_models.helpers import generate_unique_name
+from nexus_constructor.transformations import Transformation, Translation, Rotation
 
 
 class TransformationModel(QAbstractListModel):

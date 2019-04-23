@@ -1,6 +1,7 @@
 import attr
 from nexus_constructor.component_type import ComponentType
-from nexus_constructor.data_model import Transformation, PixelData
+from nexus_constructor.transformations import Transformation
+from nexus_constructor.data_model import PixelData
 from nexus_constructor.geometry_types import Geometry
 from typing import List
 from nexus_constructor.nexus_model import create_group, get_nx_class_for_component

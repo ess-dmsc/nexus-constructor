@@ -3,16 +3,11 @@ from math import sqrt
 
 from PySide2.QtGui import QVector3D
 from pytest import approx
-from nexus_constructor.data_model import (
-    PixelGrid,
-    Corner,
-    CountDirection,
-    Rotation,
-    Translation,
-)
+from nexus_constructor.data_model import PixelGrid, Corner, CountDirection
 from nexus_constructor.component import Component
 from nexus_constructor.component_type import ComponentType
 from nexus_constructor.nexus_model import NexusModel
+from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.writers import HdfWriter
 

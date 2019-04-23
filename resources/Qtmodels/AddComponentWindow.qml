@@ -327,15 +327,15 @@ ExpandingWindow {
                 leftPadding: 0
                 text: "Add"
                 onClicked: {
-
                     if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false)
                     {
                         noGeometryFileDialog.open()
                     }
-                    // Check that either the mesh or the cylinder were given a valid unit argument because it is not
-                    // known which geometry has just been created. If the component has no shape, add anyway.
-                    else if (ValidUnits.validMeshUnits || ValidUnits.validCylinderUnits || setupPane.geometryState == "None") {
-
+                    // Check that the cylinder was given a valid unit argument
+                    else if (setupPane.geometryState == "Cylinder" && !ValidUnits.validCylinderUnits) {
+                        // Bad units given - Show the bad unit message without creating the geometry
+                        ValidUnits.showCylinderUnitMessage = true
+                    } else {
                         components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                                  geometryControls.geometryModel,
                                                  pixelControls.pixelModel,
@@ -346,11 +346,6 @@ ExpandingWindow {
                         // Reset the booleans for input validity
                         resetUnitChecks()
 
-                    }
-                    else {
-
-                        // Bad units given - Show the bad unit message without creating the geometry
-                        ValidUnits.showCylinderUnitMessage = true
                     }
 
                 }

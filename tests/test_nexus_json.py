@@ -1,4 +1,5 @@
-import nexus_constructor.nexus_filewriter_json as nf_json
+from nexus_constructor.nexus_filewriter_json import writer as nf_writer
+from nexus_constructor.nexus_filewriter_json import loader as nf_loader
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from tests.test_json import build_sample_model
 import json
@@ -21,15 +22,15 @@ def test_nexus_json_generation_and_loading_is_consistent():
 
     instrument_model = build_sample_model()
 
-    json_string = nf_json.generate_json(instrument_model)
+    json_string = nf_writer.generate_json(instrument_model)
 
     loader_model = InstrumentModel()
     loader_model.initialise(NexusModel().entryGroup)
-    nf_json.load_json_object_into_instrument_model(
+    nf_loader.load_json_object_into_instrument_model(
         json.loads(json_string), loader_model
     )
 
-    loaded_json = nf_json.generate_json(loader_model)
+    loaded_json = nf_writer.generate_json(loader_model)
 
     assert are_objects_equivalent(json.loads(json_string), json.loads(loaded_json))
 
