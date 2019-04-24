@@ -1,6 +1,6 @@
 from uuid import uuid4
 import h5py
-from PySide2.QtCore import QObject, Signal, Property
+from PySide2.QtCore import QObject, Property
 from nexus_constructor.component_type import ComponentType
 
 
@@ -30,32 +30,20 @@ def get_nx_class_for_component(component_type):
 class NexusModel(QObject):
     """
     Stores InstrumentModel data in NeXus compliant hdf5 files
+    The entry property is read-only.
     """
+
+    def getEntryGroup(self):
+        return self.entry
+
+    entryGroup = Property("QVariant", getEntryGroup, notify=lambda: None)
 
     def __init__(self):
         super().__init__()
         file_name = str(uuid4())
-        self.instrument = False
 
         self.nexus_file = h5py.File(
             file_name, mode="w", driver="core", backing_store=False
         )
 
         self.entry = create_group("entry", "NXentry", self.nexus_file)
-
-    @Signal
-    def entry_group_changed(self):
-        pass
-
-    def getEntryGroup(self):
-        return self.entry
-
-    def setEntryGroup(self, group):
-        """
-        The variable itself should be read-only, so this function does nothing.
-        """
-        pass
-
-    entryGroup = Property(
-        "QVariant", getEntryGroup, setEntryGroup, notify=entry_group_changed
-    )
