@@ -82,10 +82,6 @@ class InstrumentModel(QAbstractListModel):
             parent_group=group,
         )
 
-        self.transform_models = [
-            TransformationModel(component.transforms) for component in self.components
-        ]
-
         self.create_instrument_group(group)
 
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
@@ -106,6 +102,8 @@ class InstrumentModel(QAbstractListModel):
     def __init__(self):
         super().__init__()
         self.components = []
+        self.transform_models = []
+        self.instrument_group = None
         self.dataChanged.connect(self.send_model_updated)
         self.rowsInserted.connect(self.send_model_updated)
         self.rowsRemoved.connect(self.send_model_updated)
