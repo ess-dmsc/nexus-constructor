@@ -7,7 +7,6 @@ from nexus_constructor.data_model import (
     Geometry,
     Component,
 )
-from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.geometry_types import (
     OFFGeometry,
     CylindricalGeometry,
