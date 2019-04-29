@@ -13,7 +13,7 @@ from nexus_constructor.data_model import (
     CountDirection,
 )
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from nexus_constructor.qml_models import change_value
+from nexus_constructor.qml_models.helpers import change_value
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Slot
 from math import isnan
 

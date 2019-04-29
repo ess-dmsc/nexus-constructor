@@ -6,7 +6,7 @@ Requires Python 3.5+
 import sys
 from os import path, environ
 from nexus_constructor.application import Application
-from PySide2.QtGui import QGuiApplication
+from PySide2.QtGui import QGuiApplication, QIcon
 
 
 location = sys.executable if getattr(sys, "frozen", False) else __file__
@@ -19,6 +19,7 @@ app = QGuiApplication(sys.argv)
 # Non-blank name and organisation name are required by DefaultFileDialog
 app.setOrganizationName("name")
 app.setOrganizationDomain("domain")
+app.setWindowIcon(QIcon(path.join(resource_folder, "images", "icon.png")))
 
 window = Application(resource_folder)
 

@@ -3,10 +3,9 @@ from nexus_constructor.data_model import (
     PixelGrid,
     PixelMapping,
     Component,
-    Rotation,
-    Translation,
 )
-from nexus_constructor.qml_models import change_value, generate_unique_name
+from nexus_constructor.qml_models.helpers import change_value, generate_unique_name
+from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
@@ -325,7 +324,17 @@ class InstrumentModel(QAbstractListModel):
 
     @Slot(int, result="QVariant")
     def get_transform_model(self, index: int):
-        return self.transform_models[index]
+        """
+        Returns the transform model for the component.
+        The list is 1-based due to the 0 being no parent, so we have to use index-1 here
+        unless the component has no transform parent (for example the sample)
+        :param index: The component's transform parents index.
+        :return: The transform model for the component.
+        """
+        if index == 0:
+            return self.transform_models[index]
+        else:
+            return self.transform_models[index - 1]
 
     @Slot(str, result=str)
     def generate_component_name(self, base):
