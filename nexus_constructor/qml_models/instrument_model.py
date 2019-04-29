@@ -67,8 +67,6 @@ class InstrumentModel(QAbstractListModel):
     RemovableRole = Qt.UserRole + 9
     TransformModelRole = Qt.UserRole + 10
 
-    entry_group = False
-
     @Slot("QVariant")
     def initialise(self, group):
         """
