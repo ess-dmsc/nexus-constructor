@@ -200,7 +200,6 @@ Pane {
                 contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidUnitCross.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
-                               + invalidCylinderUnitWarning.implicitHeight
 
                 LabeledTextField {
                     id: heightField
@@ -251,21 +250,9 @@ Pane {
                     }
                 }
 
-                Text {
-
-                    // Blank invalid unit warning - only set to contain text if unit validation function returns false
-                    // and user presses "Add" button
-                    id: invalidCylinderUnitWarning
-                    anchors.top: unitsField.bottom
-                    text: ValidUnits.showCylinderUnitMessage ? ValidUnits.invalidUnitsText : ""
-                    color: "red"
-                    Layout.fillWidth: true
-                    visible: true
-                 }
-
                 Label {
                     id: directionLabel
-                    anchors.top: invalidCylinderUnitWarning.bottom
+                    anchors.top: heightField.bottom
                     anchors.left: parent.left
                     text: "axis direction:"
                 }
