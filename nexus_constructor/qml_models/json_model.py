@@ -197,7 +197,7 @@ class JsonModel(QAbstractListModel):
                     store_collection(collapse=True)
                     collecting = False
                 # list isn't just numbers
-                elif not re.match("^-?\d*\.?\d*,?$", line.strip()):
+                elif not re.match(r"^-?\d*\.?\d*,?$", line.strip()):
                     store_collection()
                     collecting = False
             else:
