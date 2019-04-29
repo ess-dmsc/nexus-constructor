@@ -8,7 +8,12 @@
 See [CONTRIBUTING.MD](CONTRIBUTING.MD) for more information on code standards etc.*
 
 ### Acceptance Criteria 
+
 *What you have changed, how the reviewer should test it*
+
+### UI tests
+
+*How you have updated the UI tests document to fit your changes*
 
 ### Nominate for Group Code Review
 
