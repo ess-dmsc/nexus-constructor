@@ -246,7 +246,7 @@ Pane {
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
-                        ToolTip.visible: invalidUnitCross.visible && hovered
+                        ToolTip.visible: invalidUnitCross.visible && containsMouse
                         ToolTip.text: ValidUnits.invalidUnitsText
                     }
                 }
