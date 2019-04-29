@@ -326,6 +326,10 @@ ExpandingWindow {
                 anchors.left: parent.left
                 leftPadding: 0
                 text: "Add"
+                buttonEnabled: {
+                    // Grey-out the Add button for Cylinder geometries if the units are invalid
+                    (setupPane.geometryState == "Cylinder" && ValidUnits.validCylinderUnits) || setupPane.geometryState != "Cylinder"
+                }
                 onClicked: {
                     if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false)
                     {
@@ -347,7 +351,6 @@ ExpandingWindow {
                         resetUnitChecks()
 
                     }
-
                 }
             }
             MessageDialog {
