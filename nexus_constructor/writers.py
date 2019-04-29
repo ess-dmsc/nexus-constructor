@@ -1,9 +1,11 @@
 import h5py
 from pprint import pprint
-from nexus_constructor.data_model import PixelGrid, PixelMapping, SinglePixelId
 from nexus_constructor.component import Component
-
-from nexus_constructor.transformations import Rotation, Translation
+from nexus_constructor.data_model import (
+    PixelGrid,
+    PixelMapping,
+    SinglePixelId,
+)
 from nexus_constructor.geometry_types import (
     Geometry,
     OFFGeometry,
@@ -13,6 +15,9 @@ from nexus_constructor.geometry_types import (
 from nexus_constructor.nexus import NexusEncoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import QObject, QUrl, Slot
+
+NX_CLASS = "NX_class"
+DEPENDS_ON = "depends_on"
 
 
 class HdfWriter(QObject):
@@ -37,10 +42,10 @@ class HdfWriter(QObject):
 
     def save_instrument_to_file(self, file: h5py.File, model: InstrumentModel):
         root = file.create_group("entry")
-        root.attrs["NX_class"] = "NXentry"
+        root.attrs[NX_CLASS] = "NXentry"
 
         instrument = root.create_group("instrument")
-        instrument.attrs["NX_class"] = "NXinstrument"
+        instrument.attrs[NX_CLASS] = "NXinstrument"
 
         external_types = NexusEncoder.external_component_types()
         for component in model.components:
@@ -52,7 +57,7 @@ class HdfWriter(QObject):
     def store_component(self, parent_group: h5py.Group, component: Component):
         nx_component = parent_group.create_group(component.name)
         nx_component.attrs["description"] = component.description
-        nx_component.attrs["NX_class"] = NexusEncoder.component_class_name(
+        nx_component.attrs[NX_CLASS] = NexusEncoder.component_class_name(
             component.component_type
         )
         self.store_transformations(nx_component, component)
@@ -63,22 +68,22 @@ class HdfWriter(QObject):
 
         if len(component.transforms) > 0:
             nx_transforms = nx_component.create_group("transforms")
-            nx_transforms.attrs["NX_class"] = "NXtransformations"
+            nx_transforms.attrs[NX_CLASS] = "NXtransformations"
 
             for i in range(len(component.transforms)):
                 transform = component.transforms[i]
                 name = transform.name
-                if isinstance(transform, Rotation):
+                if transform.type == "Rotation":
                     rotate = nx_transforms.create_dataset(name, data=[transform.angle])
-                    rotate.attrs["depends_on"] = dependent_on
-                    rotate.attrs["transformation_type"] = "rotation"
+                    rotate.attrs[DEPENDS_ON] = dependent_on
+                    rotate.attrs["transformation_type"] = transform.type.lower()
                     rotate.attrs["units"] = "degrees"
                     rotate.attrs["vector"] = transform.axis.normalized().toTuple()
-                elif isinstance(transform, Translation):
+                elif transform.type == "Translation":
                     magnitude = transform.vector.length()
                     translate = nx_transforms.create_dataset(name, data=[magnitude])
-                    translate.attrs["depends_on"] = dependent_on
-                    translate.attrs["transformation_type"] = "translation"
+                    translate.attrs[DEPENDS_ON] = dependent_on
+                    translate.attrs["transformation_type"] = transform.type.lower()
                     translate.attrs["units"] = "m"
                     translate.attrs["vector"] = (
                         transform.vector.normalized().toTuple()
@@ -94,7 +99,7 @@ class HdfWriter(QObject):
                     not in NexusEncoder.external_component_types(),
                 )
 
-        nx_component.attrs["depends_on"] = dependent_on
+        nx_component.attrs[DEPENDS_ON] = dependent_on
 
     def store_pixel_data(self, nx_component: h5py.Group, component: Component):
         pixel_data = component.pixel_data
@@ -183,7 +188,7 @@ class HdfWriter(QObject):
             pass
 
     def store_off_geometry(self, nx_group: h5py.Group, geometry: OFFGeometry):
-        nx_group.attrs["NX_class"] = "NXoff_geometry"
+        nx_group.attrs[NX_CLASS] = "NXoff_geometry"
         nx_group.create_dataset(
             "vertices", data=[vector.toTuple() for vector in geometry.vertices]
         )
@@ -193,7 +198,7 @@ class HdfWriter(QObject):
     def store_cylindrical_geometry(
         self, nx_group: h5py.Group, geometry: CylindricalGeometry
     ):
-        nx_group.attrs["NX_class"] = "NXcylindrical_geometry"
+        nx_group.attrs[NX_CLASS] = "NXcylindrical_geometry"
 
         nx_group.create_dataset(
             "vertices",
