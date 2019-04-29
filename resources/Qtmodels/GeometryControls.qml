@@ -197,7 +197,7 @@ Pane {
                 anchors.top: cylinderLabel.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth,
+                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidUnitCross.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
                                + invalidCylinderUnitWarning.implicitHeight
@@ -233,6 +233,15 @@ Pane {
                                     onValidationFailed: { ValidUnits.validCylinderUnits = false }
                                     onValidationSuccess: { ValidUnits.validCylinderUnits = true }
                                }
+                }
+                Text {
+                    id: invalidUnitCross
+                    anchors.left: unitsField.right
+                    anchors.right: parent.right
+                    text: "❌"
+                    color: "red"
+                    font.pointSize: 18
+                    visible: !ValidUnits.validCylinderUnits
                 }
 
                 Text {
