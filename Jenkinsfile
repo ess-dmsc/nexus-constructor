@@ -78,8 +78,7 @@ def get_macos_pipeline() {
                     sh "zip build/ nexus_constructor_macos_${git_commit_short}.zip"
 		            archiveArtifacts artifacts: 'nexus-constructor*.zip', fingerprint: true
                 } // stage
-                }
-                }
+                }  // endif
             } // dir
         } // node
     } // return
