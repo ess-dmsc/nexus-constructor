@@ -242,6 +242,13 @@ Pane {
                     color: "red"
                     font.pointSize: 18
                     visible: !ValidUnits.validCylinderUnits
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        ToolTip.visible: invalidUnitCross.visible && hovered
+                        ToolTip.text: ValidUnits.invalidUnitsText
+                    }
                 }
 
                 Text {
