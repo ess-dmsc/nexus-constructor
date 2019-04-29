@@ -51,7 +51,6 @@ class PixelGrid(PixelData):
     first_id = attr.ib(default=0, type=int)
     count_direction = attr.ib(default=CountDirection.ROW, type=CountDirection)
     initial_count_corner = attr.ib(default=Corner.BOTTOM_LEFT, type=Corner)
-    type = "PixelGrid"
 
 
 @attr.s
@@ -68,7 +67,6 @@ class PixelMapping(PixelData):
     """
 
     pixel_ids = attr.ib(list)
-    type = "PixelMapping"
 
 
 @attr.s
@@ -76,4 +74,3 @@ class SinglePixelId(PixelData):
     """Pixel data for components that only have a single detector ID"""
 
     pixel_id = attr.ib(int)
-    type = "SinglePixel"

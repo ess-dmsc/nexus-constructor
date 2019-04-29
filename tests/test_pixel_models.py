@@ -64,21 +64,6 @@ def test_GIVEN_pixel_object_WHEN_setting_pixel_model_on_mapping_model_THEN_model
     assert model.get_pixel_model() == pixel_data
 
 
-def test_GIVEN_nothing_WHEN_creating_PixelMappingModel_THEN_pixeldata_type_is_mapping():
-    model = PixelMappingModel()
-    assert model.get_pixel_model().type == "PixelMapping"
-
-
-def test_GIVEN_nothing_WHEN_creating_SinglePixelModel_THEN_pixeldata_type_is_single_pixel():
-    model = SinglePixelModel()
-    assert model.get_pixel_model().type == "SinglePixel"
-
-
-def test_GIVEN_nothing_WHEN_creating_PixelGridModel_THEN_pixeldata_type_is_pixel_grid():
-    model = PixelGridModel()
-    assert model.get_pixel_model().type == "PixelGrid"
-
-
 def test_GIVEN_same_pixelid_WHEN_setting_data_on_pixelMappingModel_THEN_returns_changed_as_false():
 
     inst = InstrumentModel()

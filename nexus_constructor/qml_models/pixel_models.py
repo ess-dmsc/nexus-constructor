@@ -95,7 +95,7 @@ class PixelGridModel(QObject):
     @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
-        if component.pixel_data.type == "PixelGrid":
+        if isinstance(component.pixel_data, PixelGrid):
             self.pixel_grid = component.pixel_data
             self.dataChanged.emit()
 
@@ -140,7 +140,7 @@ class PixelMappingModel(QAbstractListModel):
     @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
-        if component.pixel_data.type == "PixelMapping":
+        if isinstance(component.pixel_data, PixelMapping):
             self.beginResetModel()
             self.pixel_mapping = component.pixel_data
             self.endResetModel()
@@ -180,6 +180,6 @@ class SinglePixelModel(QObject):
     @Slot(int, "QVariant")
     def set_pixel_model(self, index, instrument: InstrumentModel):
         component = instrument.components[index]
-        if component.pixel_data.type == "SinglePixel":
+        if isinstance(component.pixel_data, SinglePixelId):
             self.pixel_model = component.pixel_data
             self.dataChanged.emit()
