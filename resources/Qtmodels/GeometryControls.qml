@@ -237,7 +237,7 @@ Pane {
                     id: invalidUnitCross
                     anchors.left: unitsField.right
                     anchors.right: parent.right
-                    text: "❌"
+                    text: "✖"
                     color: "red"
                     font.pointSize: 18
                     visible: !ValidUnits.validCylinderUnits
