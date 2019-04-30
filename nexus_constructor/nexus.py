@@ -1,12 +1,5 @@
-from nexus_constructor.data_model import (
-    Component,
-    ComponentType,
-    PixelGrid,
-    PixelMapping,
-    CountDirection,
-    Corner,
-    Transformation,
-)
+from nexus_constructor.data_model import Component, ComponentType, Transformation
+from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
 from typing import List, Union
 
 
