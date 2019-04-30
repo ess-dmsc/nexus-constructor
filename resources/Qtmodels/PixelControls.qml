@@ -118,8 +118,8 @@ Item {
                 anchors.top: columnsField.top
                 anchors.left: columnsField.right
                 labelText: "Column width:"
-                editorText: col_width
-                onEditingFinished: col_width = parseFloat(editorText)
+                editorText: column_width
+                onEditingFinished: column_width = parseFloat(editorText)
                 validator: numberValidator
             }
 
