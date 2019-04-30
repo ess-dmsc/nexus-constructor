@@ -326,16 +326,15 @@ ExpandingWindow {
                 anchors.left: parent.left
                 leftPadding: 0
                 text: "Add"
+                buttonEnabled: {
+                    // Grey-out the Add button for Cylinder geometries if the units are invalid
+                    (setupPane.geometryState == "Cylinder" && ValidUnits.validCylinderUnits) || setupPane.geometryState != "Cylinder"
+                }
                 onClicked: {
-                    if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false)
-                    {
+                    if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false) {
                         noGeometryFileDialog.open()
                     }
-                    // Check that the cylinder was given a valid unit argument
-                    else if (setupPane.geometryState == "Cylinder" && !ValidUnits.validCylinderUnits) {
-                        // Bad units given - Show the bad unit message without creating the geometry
-                        ValidUnits.showCylinderUnitMessage = true
-                    } else {
+                    else {
                         components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                                  geometryControls.geometryModel,
                                                  pixelControls.pixelModel,
@@ -347,7 +346,6 @@ ExpandingWindow {
                         resetUnitChecks()
 
                     }
-
                 }
             }
             MessageDialog {
@@ -379,7 +377,6 @@ ExpandingWindow {
     function resetUnitChecks() {
         ValidUnits.validMeshUnits = false
         ValidUnits.validCylinderUnits = false
-        ValidUnits.showCylinderUnitMessage = false
     }
 
     onClosing: {
