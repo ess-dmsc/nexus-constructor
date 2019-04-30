@@ -91,63 +91,64 @@ ApplicationWindow {
         contentWidth: componentFieldsArea.implicitWidth + instrumentViewArea.implicitWidth + jsonPane.implicitWidth
         contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
 
-        ComponentControls {
-            id: componentFieldsArea
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            leftPadding: 0
-        }
+        RowLayout {
 
-        Frame {
-            id: instrumentViewArea
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: componentFieldsArea.right
-            anchors.right: jsonPane.left
-            contentWidth: 100
-            contentHeight: 100
-            focus: true
-            padding: 1
+            id: centralRow
+            anchors.fill: parent
 
-            Scene3D {
-                id: scene3d
-                anchors.fill: parent
+            ComponentControls {
+                id: componentFieldsArea
+                leftPadding: 0
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+            }
+
+            Frame {
+                id: instrumentViewArea
+                contentWidth: 300
+                contentHeight: 100
+                Layout.fillHeight: true
+                Layout.fillWidth: true
                 focus: true
-                aspects: ["input", "logic"]
-                cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+                padding: 1
 
-                AnimatedEntity {
-                    id: instrumentEntity
-                    instrument: components
+                Scene3D {
+                    id: scene3d
+                    anchors.fill: parent
+                    focus: true
+                    aspects: ["input", "logic"]
+                    cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+
+                    AnimatedEntity {
+                        id: instrumentEntity
+                        instrument: components
+                    }
+                }
+
+                AxisIndicator {
+                    id: axisIndicator
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    width: 100
+                    height: 100
+
+                    targetCamera: instrumentEntity.camera
+                }
+
+                MouseArea {
+                    anchors.fill: scene3d
+                    onClicked: instrumentViewArea.focus = true
+                    enabled: !instrumentViewArea.focus
                 }
             }
 
-            AxisIndicator {
-                id: axisIndicator
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                width: 100
-                height: 100
-
-                targetCamera: instrumentEntity.camera
-            }
-
-            MouseArea {
-                anchors.fill: scene3d
-                onClicked: instrumentViewArea.focus = true
-                enabled: !instrumentViewArea.focus
+            JSONPane {
+                id: jsonPane
+                contentWidth: 300
+                Layout.fillHeight: true
+                Layout.fillWidth: false
             }
         }
-
-        JSONPane {
-            id: jsonPane
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            contentWidth: 300
-        }
-
     }
 
     InstrumentModel{
