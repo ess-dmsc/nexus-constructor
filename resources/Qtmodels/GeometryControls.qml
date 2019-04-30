@@ -237,9 +237,11 @@ Pane {
                     id: invalidUnitCross
                     anchors.left: unitsField.right
                     anchors.right: parent.right
-                    text: "✖"
+                    anchors.top: unitsField.top
+                    text: "×"
+                    font.bold: true
                     color: "red"
-                    font.pointSize: 18
+                    font.pointSize: 17
                     visible: !ValidUnits.validCylinderUnits
 
                     MouseArea {
