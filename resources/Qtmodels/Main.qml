@@ -90,7 +90,6 @@ ApplicationWindow {
         anchors.fill: parent
 
         RowLayout {
-
             id: centralRow
             anchors.fill: parent
 

@@ -17,6 +17,20 @@ Run the application (`python main.py` in the root directory).
 - In the center should be an animated neutron beam, pointing into a red cube.
 - To the right should be a scrollable JSON area.
 
+## Main Window
+
+Increase the width of the window.
+* This should cause only the Instrument View to increase in width while the other components retain a fixed with.
+
+Increase the height of the window.
+* This should cause all elements in the Main Window to expand in height.
+
+Decrease the width of the window as much as possible.
+* This should only affect the width of the Instrument View area while the other components retain a fixed width. It should also be noticed that the Instrument View area cannot become any narrower than 300 pixels.
+
+Decrease the height of the window as much as possible.
+* This should cause all components of the window to reach a minimum height of 100 pixels.
+
 ## JSON Display
 
 With the application open, click on the 'Sample' box in the 'Components' pane.
