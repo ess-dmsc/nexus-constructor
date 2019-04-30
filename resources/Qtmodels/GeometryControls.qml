@@ -197,10 +197,9 @@ Pane {
                 anchors.top: cylinderLabel.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth,
+                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidUnitCross.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
-                               + invalidCylinderUnitWarning.implicitHeight
 
                 LabeledTextField {
                     id: heightField
@@ -234,22 +233,28 @@ Pane {
                                     onValidationSuccess: { ValidUnits.validCylinderUnits = true }
                                }
                 }
-
                 Text {
-
-                    // Blank invalid unit warning - only set to contain text if unit validation function returns false
-                    // and user presses "Add" button
-                    id: invalidCylinderUnitWarning
-                    anchors.top: unitsField.bottom
-                    text: ValidUnits.showCylinderUnitMessage ? ValidUnits.invalidUnitsText : ""
+                    id: invalidUnitCross
+                    anchors.left: unitsField.right
+                    anchors.right: parent.right
+                    anchors.top: unitsField.top
+                    text: "×"
+                    font.bold: true
                     color: "red"
-                    Layout.fillWidth: true
-                    visible: true
-                 }
+                    font.pointSize: 17
+                    visible: !ValidUnits.validCylinderUnits
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        ToolTip.visible: invalidUnitCross.visible && containsMouse
+                        ToolTip.text: ValidUnits.invalidUnitsText
+                    }
+                }
 
                 Label {
                     id: directionLabel
-                    anchors.top: invalidCylinderUnitWarning.bottom
+                    anchors.top: heightField.bottom
                     anchors.left: parent.left
                     text: "axis direction:"
                 }
