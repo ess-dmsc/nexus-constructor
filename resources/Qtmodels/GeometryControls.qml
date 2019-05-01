@@ -239,7 +239,6 @@ Pane {
                     anchors.right: parent.right
                     anchors.top: unitsField.top
                     visible: !ValidUnits.validCylinderUnits
-                    toolTipVisible: invalidUnitCross.visible && containsMouse
                     toolTipMessage: ValidUnits.invalidUnitsText
                 }
 

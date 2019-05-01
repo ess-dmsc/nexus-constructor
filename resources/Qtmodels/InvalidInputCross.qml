@@ -4,7 +4,6 @@ import QtQuick.Controls 2.5
 Text {
     property alias toolTipVisible: toolTip.visible
     property alias toolTipMessage: toolTip.text
-    property alias containsMouse: mouseArea.containsMouse
 
     id: cross
     text: "×"
@@ -20,5 +19,6 @@ Text {
     ToolTip {
         id: toolTip
         parent: mouseArea
+        visible: cross.visible && mouseArea.containsMouse
     }
 }
