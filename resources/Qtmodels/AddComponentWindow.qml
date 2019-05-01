@@ -38,7 +38,6 @@ ExpandingWindow {
             property string pixelState
 
             ColumnLayout {
-                id: mainCol
                 anchors.fill: parent
 
                 Label {
@@ -295,7 +294,7 @@ ExpandingWindow {
                 text: "Add"
                 buttonEnabled: {
                     // Grey-out the Add button for Cylinder geometries if the units are invalid
-                    (setupPane.geometryState == "Cylinder" && ValidUnits.validCylinderUnits) || setupPane.geometryState != "Cylinder"
+                    setupPane.geometryState != "Cylinder" || (setupPane.geometryState == "Cylinder" && ValidUnits.validCylinderUnits)
                 }
                 onClicked: {
                     if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false) {
