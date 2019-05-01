@@ -2,7 +2,6 @@ import QtQuick 2.12
 import QtQuick.Controls 2.5
 
 Text {
-    property alias toolTipVisible: toolTip.visible
     property alias toolTipMessage: toolTip.text
 
     id: cross
