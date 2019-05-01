@@ -129,16 +129,16 @@ Pane {
                                 id: meshUnitValidator
                                 onValidationFailed: {
                                     acceptUnitsButton.enabled = false
-                                    invalidMeshUnitCross.visible = true
+                                    invalidMeshUnitsCross.visible = true
                                 }
                                 onValidationSuccess: {
                                     acceptUnitsButton.enabled = true
-                                    invalidMeshUnitCross.visible = false
+                                    invalidMeshUnitsCross.visible = false
                                 }
                             }
                         }
                         InvalidInputCross {
-                            id: invalidMeshUnitCross
+                            id: invalidMeshUnitsCross
                             toolTipMessage: ValidUnits.invalidUnitsText
                         }
                     }
@@ -189,7 +189,7 @@ Pane {
                 anchors.top: cylinderLabel.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidCylinderUnitCross.implicitWidth,
+                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidCylinderUnitsCross.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
 
@@ -221,15 +221,16 @@ Pane {
                     onEditingFinished: cylinder_units = editorText
                     validator: UnitValidator {
                                     id: cylinderUnitValidator
-                                    onValidationFailed: { invalidCylinderUnitCross.visible = true }
-                                    onValidationSuccess: { invalidCylinderUnitCross.visible = false }
+                                    onValidationFailed: { ValidUnits.validCylinderUnits = false }
+                                    onValidationSuccess: { ValidUnits.validCylinderUnits = true }
                                }
                 }
                 InvalidInputCross {
-                    id: invalidCylinderUnitCross
+                    id: invalidCylinderUnitsCross
                     anchors.left: unitsField.right
                     anchors.right: parent.right
                     anchors.top: unitsField.top
+                    visible: !ValidUnits.validCylinderUnits
                     toolTipMessage: ValidUnits.invalidUnitsText
                 }
 
