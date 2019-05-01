@@ -110,14 +110,6 @@ ExpandingWindow {
                 }
                 Pane {
                     id: pixelPane
-                    contentWidth: Math.max(singlePixelRadio.width,
-                                           pixelGridRadio.width,
-                                           mappedMeshRadio.width,
-                                           noPixelRadio.width)
-                    contentHeight:singlePixelRadio.height +
-                                  pixelGridRadio.height +
-                                  mappedMeshRadio.height +
-                                  noPixelRadio.height
                     enabled: !noShapeRadio.checked
 
                     function checkFirstEnabled(){
@@ -129,34 +121,32 @@ ExpandingWindow {
                             }
                         }
                     }
+                    ColumnLayout {
 
-                    RadioButton {
-                        id: singlePixelRadio
-                        anchors.top: parent.top
-                        text: "Single ID"
-                        enabled: setupPane.selectedType.allowSingleID
-                        onCheckedChanged: if (checked) setupPane.pixelState = "SinglePixel"
-                    }
-                    RadioButton {
-                        id: pixelGridRadio
-                        anchors.top: singlePixelRadio.bottom
-                        text: "Repeatable grid"
-                        enabled: setupPane.selectedType.allowPixelGrid
-                        onCheckedChanged: if (checked) setupPane.pixelState = "Grid"
-                    }
-                    RadioButton {
-                        id: mappedMeshRadio
-                        anchors.top: pixelGridRadio.bottom
-                        text: "Face mapped mesh"
-                        enabled: setupPane.selectedType.allowMappedMesh && meshRadio.checked
-                        onCheckedChanged: if (checked) setupPane.pixelState = "Mapping"
-                    }
-                    RadioButton {
-                        id: noPixelRadio
-                        anchors.top: mappedMeshRadio.bottom
-                        text: "None"
-                        enabled: setupPane.selectedType.allowNoPixels
-                        onCheckedChanged: if (checked) setupPane.pixelState = ""
+                        RadioButton {
+                            id: singlePixelRadio
+                            text: "Single ID"
+                            enabled: setupPane.selectedType.allowSingleID
+                            onCheckedChanged: if (checked) setupPane.pixelState = "SinglePixel"
+                        }
+                        RadioButton {
+                            id: pixelGridRadio
+                            text: "Repeatable grid"
+                            enabled: setupPane.selectedType.allowPixelGrid
+                            onCheckedChanged: if (checked) setupPane.pixelState = "Grid"
+                        }
+                        RadioButton {
+                            id: mappedMeshRadio
+                            text: "Face mapped mesh"
+                            enabled: setupPane.selectedType.allowMappedMesh && meshRadio.checked
+                            onCheckedChanged: if (checked) setupPane.pixelState = "Mapping"
+                        }
+                        RadioButton {
+                            id: noPixelRadio
+                            text: "None"
+                            enabled: setupPane.selectedType.allowNoPixels
+                            onCheckedChanged: if (checked) setupPane.pixelState = ""
+                        }
                     }
                 }
 
