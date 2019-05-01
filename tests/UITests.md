@@ -138,16 +138,30 @@ Click the 'Add component' button.
 Press 'Continue' without altering the default setup.  
 Click the 'Choose file' button next to the 'Geometry file:' textbox.  
 Open cube.stl from the repo's `~/tests` directory.  
-- The OK button on the 'Select Units' window will be clickable because the default units are valid.
+- The 'OK' button on the 'Select Units' window will start out enabled because the default units are valid.
 
 Enter gibberish into the unit text field.
 - A red cross will appear next to the text field.
-- The OK button will become greyed-out.
-- Placing your mouse over the red cross will cause a invalid units message to appear.
+- The 'OK' button will be disabled.
+- Placing your mouse over the red cross will cause an invalid units message to appear.
 
 Replace the gibberish with some valid units.
 - The red cross will disappear and the mouse-over message will no longer be accessible.
-- The OK button will become clickable again.
+- The 'OK' button will become enabled again.
+
+Close the 'Select Units' and 'Add Detector' windows.  
+Click 'Add component' again.  
+Select Cylinder geometry and click 'Continue'.
+- The Add button will start out enabled because the default units are valid.
+
+Enter gibberish into the unit text field.
+- A red cross will appear next to the text field.
+- The Add button will be disabled.
+- Placing your mouse over the red cross will cause an invalid units message to appear.
+
+Replace the gibberish with some valid units.
+- The red cross will disappear and the mouse-over message will no longer be accessible.
+- The 'Add' button will become enabled again.
 
 ## Transform ordering
 
