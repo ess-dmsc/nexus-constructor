@@ -134,10 +134,10 @@ of the cubes bottom faces.
 
 ## Validating Units 
 
-Click the 'Add component' button.
-Press 'Continue' without altering the default setup.
-Click the 'Choose file' button next to the 'Geometry file:' textbox.
-Open cube.stl from the repo's `~/tests` directory.
+Click the 'Add component' button.  
+Press 'Continue' without altering the default setup.  
+Click the 'Choose file' button next to the 'Geometry file:' textbox.  
+Open cube.stl from the repo's `~/tests` directory.  
 - The OK button on the 'Select Units' window will be clickable because the default units are valid.
 
 Enter gibberish into the unit text field.
