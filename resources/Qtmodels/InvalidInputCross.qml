@@ -16,8 +16,6 @@ Text {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
-        ToolTip.visible: toolTipVisible
-        ToolTip.text: toolTipMessage
     }
     ToolTip {
         id: toolTip
