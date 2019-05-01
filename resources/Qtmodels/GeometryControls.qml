@@ -233,23 +233,14 @@ Pane {
                                     onValidationSuccess: { ValidUnits.validCylinderUnits = true }
                                }
                 }
-                Text {
+                InvalidInputCross {
                     id: invalidUnitCross
                     anchors.left: unitsField.right
                     anchors.right: parent.right
                     anchors.top: unitsField.top
-                    text: "×"
-                    font.bold: true
-                    color: "red"
-                    font.pointSize: 17
                     visible: !ValidUnits.validCylinderUnits
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        ToolTip.visible: invalidUnitCross.visible && containsMouse
-                        ToolTip.text: ValidUnits.invalidUnitsText
-                    }
+                    toolTipVisible: invalidUnitCross.visible && containsMouse
+                    toolTipMessage: ValidUnits.invalidUnitsText
                 }
 
                 Label {
