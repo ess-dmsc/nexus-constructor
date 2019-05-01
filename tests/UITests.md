@@ -152,11 +152,11 @@ Replace the gibberish with some valid units.
 Close the 'Select Units' and 'Add Detector' windows.  
 Click 'Add component' again.  
 Select Cylinder geometry and click 'Continue'.
-- The Add button will start out enabled because the default units are valid.
+- The 'Add' button will start out enabled because the default units are valid.
 
 Enter gibberish into the unit text field.
 - A red cross will appear next to the text field.
-- The Add button will be disabled.
+- The 'Add' button will be disabled.
 - Placing your mouse over the red cross will cause an invalid units message to appear.
 
 Replace the gibberish with some valid units.
