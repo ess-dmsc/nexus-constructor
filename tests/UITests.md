@@ -135,7 +135,7 @@ of the cubes bottom faces.
 ## Validating Units 
 
 Click the 'Add component' button.  
-Press 'Continue' without altering the default setup.  
+Press 'Continue' without changing any of the other options.  
 Click the 'Choose file' button next to the 'Geometry file:' textbox.  
 Open cube.stl from the repo's `~/tests` directory.  
 - The 'OK' button on the 'Select Units' window will start out enabled because the default units are valid.
@@ -151,7 +151,7 @@ Replace the gibberish with some valid units.
 
 Close the 'Select Units' and 'Add Detector' windows.  
 Click 'Add component' again.  
-Select Cylinder geometry and click 'Continue'.
+Select Cylinder geometry and click 'Continue'. The other options can be left as their defaults.
 - The 'Add' button will start out enabled because the default units are valid.
 
 Enter gibberish into the unit text field.
