@@ -3,6 +3,7 @@ import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
 import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.11
 
 ExpandingWindow {
 
@@ -48,196 +49,187 @@ ExpandingWindow {
             property string geometryState
             property string pixelState
 
-            Label {
-                id: typeLabel
-                anchors.left: parent.left
-                anchors.top: parent.top
-                text: "Component type:"
-            }
+            ColumnLayout {
+                id: mainCol
+                anchors.fill: parent
 
-            Pane {
-                id: typePane
-                anchors.top: typeLabel.bottom
-                anchors.left: parent.left
-
-                ComboBox {
-                    id: typePicker
-                    model: componentTypeModel
-                    textRole: "name"
-                    onActivated: updateBackend()
-                    Component.onCompleted: updateBackend()
-
-                    function updateBackend() {
-                        setupPane.selectedType = componentTypeModel.get(typePicker.currentIndex)
-                        pixelPane.checkFirstEnabled()
-                    }
+                Label {
+                    id: typeLabel
+                    text: "Component type:"
                 }
-            }
 
-            Label {
-                id: geometryLabel
-                anchors.left: parent.left
-                anchors.top: typePane.bottom
-                text: "Geometry:"
-            }
-            Pane {
-                id: geometryPane
-                anchors.left: parent.left
-                anchors.top: geometryLabel.bottom
-                contentWidth: meshRadio.width + cylinderRadio.width
-                contentHeight: Math.max(meshRadio.height, cylinderRadio.height)
+                Pane {
+                    id: typePane
 
-                RadioButton {
-                    id: meshRadio
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    text: "Mesh"
-                    onClicked: {
-                        setupPane.geometryState = "OFF"
-                        GeometryFileSelected.geometryFileSelected = false
-                    }
+                    ComboBox {
+                        id: typePicker
+                        model: componentTypeModel
+                        textRole: "name"
+                        onActivated: updateBackend()
+                        Component.onCompleted: updateBackend()
 
-                    checked: true
-                    Component.onCompleted: setupPane.geometryState = "OFF"
-                }
-                RadioButton {
-                    id: cylinderRadio
-                    anchors.left: meshRadio.right
-                    anchors.top: meshRadio.top
-                    text: "Cylinder"
-                    onClicked: {
-                        setupPane.geometryState = "Cylinder"
-                        if (mappedMeshRadio.checked) {
+                        function updateBackend() {
+                            setupPane.selectedType = componentTypeModel.get(typePicker.currentIndex)
                             pixelPane.checkFirstEnabled()
                         }
                     }
                 }
-                RadioButton {
-                    id: noShapeRadio
-                    anchors.left: cylinderRadio.right
-                    anchors.top: cylinderRadio.top
-                    text: "None"
-                    onClicked: setupPane.geometryState = "None", setupPane.pixelState = ""
+
+                Label {
+                    id: geometryLabel
+                    text: "Geometry:"
                 }
-            }
+                Pane {
+                    id: geometryPane
+                    contentWidth: meshRadio.width + cylinderRadio.width
+                    contentHeight: Math.max(meshRadio.height, cylinderRadio.height)
 
-            Label {
-                id: pixelLabel
-                anchors.left: parent.left
-                anchors.top: geometryPane.bottom
-                text: "Pixels:"
-                enabled: !noShapeRadio.checked
-            }
-            Pane {
-                id: pixelPane
-                anchors.left: parent.left
-                anchors.top: pixelLabel.bottom
-                contentWidth: Math.max(singlePixelRadio.width,
-                                       pixelGridRadio.width,
-                                       mappedMeshRadio.width,
-                                       noPixelRadio.width)
-                contentHeight:singlePixelRadio.height +
-                              pixelGridRadio.height +
-                              mappedMeshRadio.height +
-                              noPixelRadio.height
-                enabled: !noShapeRadio.checked
-
-                function checkFirstEnabled(){
-                    var buttons = [singlePixelRadio, pixelGridRadio, mappedMeshRadio, noPixelRadio]
-                    for (var i = 0; i < buttons.length; i++) {
-                        if (buttons[i].enabled){
-                            buttons[i].checked = true
-                            return
+                    RadioButton {
+                        id: meshRadio
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        text: "Mesh"
+                        onClicked: {
+                            setupPane.geometryState = "OFF"
+                            GeometryFileSelected.geometryFileSelected = false
                         }
+
+                        checked: true
+                        Component.onCompleted: setupPane.geometryState = "OFF"
+                    }
+                    RadioButton {
+                        id: cylinderRadio
+                        anchors.left: meshRadio.right
+                        anchors.top: meshRadio.top
+                        text: "Cylinder"
+                        onClicked: {
+                            setupPane.geometryState = "Cylinder"
+                            if (mappedMeshRadio.checked) {
+                                pixelPane.checkFirstEnabled()
+                            }
+                        }
+                    }
+                    RadioButton {
+                        id: noShapeRadio
+                        anchors.left: cylinderRadio.right
+                        anchors.top: cylinderRadio.top
+                        text: "None"
+                        onClicked: setupPane.geometryState = "None", setupPane.pixelState = ""
                     }
                 }
 
-                RadioButton {
-                    id: singlePixelRadio
-                    anchors.top: parent.top
-                    text: "Single ID"
-                    enabled: setupPane.selectedType.allowSingleID
-                    onCheckedChanged: if (checked) setupPane.pixelState = "SinglePixel"
+                Label {
+                    id: pixelLabel
+                    text: "Pixels:"
+                    enabled: !noShapeRadio.checked
                 }
-                RadioButton {
-                    id: pixelGridRadio
-                    anchors.top: singlePixelRadio.bottom
-                    text: "Repeatable grid"
-                    enabled: setupPane.selectedType.allowPixelGrid
-                    onCheckedChanged: if (checked) setupPane.pixelState = "Grid"
-                }
-                RadioButton {
-                    id: mappedMeshRadio
-                    anchors.top: pixelGridRadio.bottom
-                    text: "Face mapped mesh"
-                    enabled: setupPane.selectedType.allowMappedMesh && meshRadio.checked
-                    onCheckedChanged: if (checked) setupPane.pixelState = "Mapping"
-                }
-                RadioButton {
-                    id: noPixelRadio
-                    anchors.top: mappedMeshRadio.bottom
-                    text: "None"
-                    enabled: setupPane.selectedType.allowNoPixels
-                    onCheckedChanged: if (checked) setupPane.pixelState = ""
-                }
-            }
+                Pane {
+                    id: pixelPane
+                    contentWidth: Math.max(singlePixelRadio.width,
+                                           pixelGridRadio.width,
+                                           mappedMeshRadio.width,
+                                           noPixelRadio.width)
+                    contentHeight:singlePixelRadio.height +
+                                  pixelGridRadio.height +
+                                  mappedMeshRadio.height +
+                                  noPixelRadio.height
+                    enabled: !noShapeRadio.checked
 
-            PaddedButton {
-                id: continueButton
-                anchors.top: pixelPane.bottom
-                anchors.left: parent.left
-                text: "Continue"
-                onClicked: {
-                    componentType = setupPane.selectedType.name
-                    pixelControls.state = setupPane.pixelState
-                    geometryControls.state = setupPane.geometryState
-                    contentPane.state = "EnterDetails"
-                }
-            }
+                    function checkFirstEnabled(){
+                        var buttons = [singlePixelRadio, pixelGridRadio, mappedMeshRadio, noPixelRadio]
+                        for (var i = 0; i < buttons.length; i++) {
+                            if (buttons[i].enabled){
+                                buttons[i].checked = true
+                                return
+                            }
+                        }
+                    }
 
-            ListModel {
-                id: componentTypeModel
-                ListElement {
-                    name: "Detector"
-                    allowSingleID: false
-                    allowPixelGrid: true
-                    allowMappedMesh: true
-                    allowNoPixels: false
+                    RadioButton {
+                        id: singlePixelRadio
+                        anchors.top: parent.top
+                        text: "Single ID"
+                        enabled: setupPane.selectedType.allowSingleID
+                        onCheckedChanged: if (checked) setupPane.pixelState = "SinglePixel"
+                    }
+                    RadioButton {
+                        id: pixelGridRadio
+                        anchors.top: singlePixelRadio.bottom
+                        text: "Repeatable grid"
+                        enabled: setupPane.selectedType.allowPixelGrid
+                        onCheckedChanged: if (checked) setupPane.pixelState = "Grid"
+                    }
+                    RadioButton {
+                        id: mappedMeshRadio
+                        anchors.top: pixelGridRadio.bottom
+                        text: "Face mapped mesh"
+                        enabled: setupPane.selectedType.allowMappedMesh && meshRadio.checked
+                        onCheckedChanged: if (checked) setupPane.pixelState = "Mapping"
+                    }
+                    RadioButton {
+                        id: noPixelRadio
+                        anchors.top: mappedMeshRadio.bottom
+                        text: "None"
+                        enabled: setupPane.selectedType.allowNoPixels
+                        onCheckedChanged: if (checked) setupPane.pixelState = ""
+                    }
                 }
-                ListElement {
-                    name: "Monitor"
-                    allowSingleID: true
-                    allowPixelGrid: false
-                    allowMappedMesh: false
-                    allowNoPixels: false
+
+                PaddedButton {
+                    id: continueButton
+                    text: "Continue"
+                    onClicked: {
+                        componentType = setupPane.selectedType.name
+                        pixelControls.state = setupPane.pixelState
+                        geometryControls.state = setupPane.geometryState
+                        contentPane.state = "EnterDetails"
+                    }
                 }
-                ListElement {
-                    name: "Source"
-                    allowSingleID: false
-                    allowPixelGrid: false
-                    allowMappedMesh: false
-                    allowNoPixels: true
-                }
-                ListElement {
-                    name: "Slit"
-                    allowSingleID: false
-                    allowPixelGrid: false
-                    allowMappedMesh: false
-                    allowNoPixels: true
-                }
-                ListElement {
-                    name: "Moderator"
-                    allowSingleID: false
-                    allowPixelGrid: false
-                    allowMappedMesh: false
-                    allowNoPixels: true
-                }
-                ListElement {
-                    name: "Disk Chopper"
-                    allowSingleID: false
-                    allowPixelGrid: false
-                    allowMappedMesh: false
-                    allowNoPixels: true
+
+                ListModel {
+                    id: componentTypeModel
+                    ListElement {
+                        name: "Detector"
+                        allowSingleID: false
+                        allowPixelGrid: true
+                        allowMappedMesh: true
+                        allowNoPixels: false
+                    }
+                    ListElement {
+                        name: "Monitor"
+                        allowSingleID: true
+                        allowPixelGrid: false
+                        allowMappedMesh: false
+                        allowNoPixels: false
+                    }
+                    ListElement {
+                        name: "Source"
+                        allowSingleID: false
+                        allowPixelGrid: false
+                        allowMappedMesh: false
+                        allowNoPixels: true
+                    }
+                    ListElement {
+                        name: "Slit"
+                        allowSingleID: false
+                        allowPixelGrid: false
+                        allowMappedMesh: false
+                        allowNoPixels: true
+                    }
+                    ListElement {
+                        name: "Moderator"
+                        allowSingleID: false
+                        allowPixelGrid: false
+                        allowMappedMesh: false
+                        allowNoPixels: true
+                    }
+                    ListElement {
+                        name: "Disk Chopper"
+                        allowSingleID: false
+                        allowPixelGrid: false
+                        allowMappedMesh: false
+                        allowNoPixels: true
+                    }
                 }
             }
         }
