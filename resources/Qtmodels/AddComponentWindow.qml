@@ -30,20 +30,8 @@ ExpandingWindow {
 
         Pane {
             id: setupPane
-            contentHeight: typeLabel.height +
-                           typePane.height +
-                           geometryLabel.height +
-                           geometryPane.height +
-                           pixelLabel.height +
-                           pixelPane.height +
-                           continueButton.height
-            contentWidth: Math.max(typeLabel.width,
-                                   typePane.width,
-                                   geometryLabel.width,
-                                   geometryPane.width,
-                                   pixelLabel.width,
-                                   pixelPane.width,
-                                   250)
+            height: childrenRect.height
+            width: childrenRect.width
 
             property var selectedType
             property string geometryState
@@ -81,40 +69,37 @@ ExpandingWindow {
                 }
                 Pane {
                     id: geometryPane
-                    contentWidth: meshRadio.width + cylinderRadio.width
-                    contentHeight: Math.max(meshRadio.height, cylinderRadio.height)
+                    Layout.fillWidth: true
 
-                    RadioButton {
-                        id: meshRadio
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        text: "Mesh"
-                        onClicked: {
-                            setupPane.geometryState = "OFF"
-                            GeometryFileSelected.geometryFileSelected = false
+                    RowLayout {
+                        id: radioButtonRow
+
+                        RadioButton {
+                            id: meshRadio
+                            text: "Mesh"
+                            onClicked: {
+                                setupPane.geometryState = "OFF"
+                                GeometryFileSelected.geometryFileSelected = false
+                            }
+
+                            checked: true
+                            Component.onCompleted: setupPane.geometryState = "OFF"
                         }
-
-                        checked: true
-                        Component.onCompleted: setupPane.geometryState = "OFF"
-                    }
-                    RadioButton {
-                        id: cylinderRadio
-                        anchors.left: meshRadio.right
-                        anchors.top: meshRadio.top
-                        text: "Cylinder"
-                        onClicked: {
-                            setupPane.geometryState = "Cylinder"
-                            if (mappedMeshRadio.checked) {
-                                pixelPane.checkFirstEnabled()
+                        RadioButton {
+                            id: cylinderRadio
+                            text: "Cylinder"
+                            onClicked: {
+                                setupPane.geometryState = "Cylinder"
+                                if (mappedMeshRadio.checked) {
+                                    pixelPane.checkFirstEnabled()
+                                }
                             }
                         }
-                    }
-                    RadioButton {
-                        id: noShapeRadio
-                        anchors.left: cylinderRadio.right
-                        anchors.top: cylinderRadio.top
-                        text: "None"
-                        onClicked: setupPane.geometryState = "None", setupPane.pixelState = ""
+                        RadioButton {
+                            id: noShapeRadio
+                            text: "None"
+                            onClicked: setupPane.geometryState = "None", setupPane.pixelState = ""
+                        }
                     }
                 }
 
