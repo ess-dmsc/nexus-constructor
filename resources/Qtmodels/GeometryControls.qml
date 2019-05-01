@@ -197,7 +197,7 @@ Pane {
                 anchors.top: cylinderLabel.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidUnitCross.implicitWidth,
+                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidCylinderUnitCross.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
 
@@ -229,16 +229,15 @@ Pane {
                     onEditingFinished: cylinder_units = editorText
                     validator: UnitValidator {
                                     id: cylinderUnitValidator
-                                    onValidationFailed: { ValidUnits.validCylinderUnits = false }
-                                    onValidationSuccess: { ValidUnits.validCylinderUnits = true }
+                                    onValidationFailed: { invalidCylinderUnitCross.visible = true }
+                                    onValidationSuccess: { invalidCylinderUnitCross.visible = false }
                                }
                 }
                 InvalidInputCross {
-                    id: invalidUnitCross
+                    id: invalidCylinderUnitCross
                     anchors.left: unitsField.right
                     anchors.right: parent.right
                     anchors.top: unitsField.top
-                    visible: !ValidUnits.validCylinderUnits
                     toolTipMessage: ValidUnits.invalidUnitsText
                 }
 
