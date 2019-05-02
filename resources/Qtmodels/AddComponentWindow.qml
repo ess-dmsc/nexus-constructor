@@ -220,7 +220,6 @@ ExpandingWindow {
                            + pixelControls.implicitHeight
                            + addButton.implicitHeight
             */
-            // contentHeight: childrenRect.height
             contentHeight: detailColumn.implicitHeight
             contentWidth: detailColumn.implicitWidth
             anchors.fill: parent
@@ -230,29 +229,39 @@ ExpandingWindow {
                 id: detailColumn
                 anchors.fill: parent
 
-                LabeledTextField {
-                    id: nameField
-                    labelText: "Name:"
-                    editorWidth: 200
-                    editorText: name
-                    onEditingFinished: name = editorText
-                    Layout.fillWidth: true
-                    validator: NameValidator {
-                        model: components
-                        myindex: -1
-                        onValidationFailed: {
-                            nameField.ToolTip.show("Component names must be unique", 3000)
+                GridLayout {
+                    rows: 2
+                    columns: 2
+
+                    Label {
+                        text: "Name: "
+                    }
+                    TextField {
+                        id: nameField
+                        text: name
+                        onEditingFinished: name = text
+                        Layout.fillWidth: true
+                        selectByMouse: true
+                        focus: true
+                        validator: NameValidator {
+                            model: components
+                            myindex: -1
+                            onValidationFailed: {
+                                nameField.ToolTip.show("Component names must be unique", 3000)
+                            }
                         }
                     }
-                }
 
-                LabeledTextField {
-                    id: descriptionField
-                    // anchoredEditor: true
-                    Layout.fillWidth: true
-                    labelText: "Description:"
-                    editorText: description
-                    onEditingFinished: description = editorText
+                    Label {
+                        text: "Description: "
+                    }
+                    TextField {
+                        id: descriptionField
+                        text: description
+                        onEditingFinished: description = text
+                        Layout.fillWidth: true
+                        selectByMouse: true
+                    }
                 }
 
                 Label {
@@ -266,6 +275,7 @@ ExpandingWindow {
                     // contentHeight: transformControls.implicitHeight
                     // contentWidth: transformControls.implicitWidth
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     TransformControls {
                         id: transformControls
                         transformModel: TransformationModel {}
