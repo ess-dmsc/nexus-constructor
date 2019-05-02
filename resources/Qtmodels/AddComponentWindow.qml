@@ -258,7 +258,7 @@ ExpandingWindow {
                 Label {
                     id: transformLabel
                     text: "Transform:"
-                    Layout.fillWidth: false
+                    Layout.fillWidth: true
                 }
 
                 Frame {
