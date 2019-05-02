@@ -20,7 +20,7 @@ Run the application (`python main.py` in the root directory).
 ## Main Window
 
 Increase the width of the window.
-* This should cause only the Instrument View to increase in width while the other components retain a fixed width.
+* This should cause only the (center) Instrument View to increase in width while the other components retain a fixed width.
 
 Increase the height of the window.
 * This should cause all elements in the Main Window to expand in height.
@@ -36,7 +36,7 @@ Decrease the height of the window as much as possible.
 With the application open, click on the 'Sample' box in the 'Components' pane.
 - It should expand, showing a text field to edit the name.
 
-Change the value of the name field, and tab out of the text field.
+Change the value of the name field, and press enter.
 - The JSON display should automatically update to show the name value on the relevant line.
 
 Open the 'JSON' menu at the top of the application window, and click the "Show Nexus Constructor
@@ -67,10 +67,10 @@ Reset the sample's name to 'Sample'.
 
 ## Adding components and transforms
 
-Press the 'add component' button.
+Press the 'Add component' button.
 - The "Add component" window should appear.
 - It should contain a selector for component type.
-- It should contain a pair of radio buttons for component geometry, 'Mesh' and 'Cylinder'.
+- It should contain a pair of radio buttons for component geometry, 'Mesh', 'Cylinder' and 'None'.
 - It should contain a set of radio buttons for pixel layout, 'Single ID', 'Repeatable grid', 'Face
 mapped mesh' and 'None'.
 - It should contain a 'Continue' button at the bottom.
@@ -84,8 +84,8 @@ Select 'Cylinder' as the geometry type.
 Select 'Monitor' as the component type.
 - Regardless of selected geometry type, only 'Single ID' can be selected as pixel type.
 
-Select any other component type.
-- Regardless of selected geometry type, only 'None' can be selected as pixel type.
+Select any other component type (except 'Monitor').
+- Regardless of selected geometry type (except 'None'), only 'None' can be selected as pixel type.
 
 Select 'Detector', 'Mesh', and 'Face mapped mesh'. Click 'Continue'.
 - The window should show controls for editing the properties of this new detector.
@@ -96,7 +96,7 @@ Open cube.stl from the repo's `~/tests` directory.
 - The 'Pixel mapping' area should populate with 12 empty numbered textboxes in a scrollable list.
 
 Enter '1' into the first such box. Click again on the 'Choose file' button, and open cube.off from
-the repo's `~/tests` directory.
+the repo's `~/tests` directory. When prompted, select "cm" as unit.
 - The 'Pixel mapping' area should re-populate with 6 empty numbered textboxes in a scrollable list.
 
 Click the 'add translation' button in the 'Transform:' section.
@@ -120,7 +120,7 @@ Click 'Continue'.
 - It should contain textboxes for height, radius, and x, y, z components of axis direction.
 - A 'pixel data' section should contain a single textbox for detector id.
 
-Set the cylinders axis direction to (x=1, y=1, z=0), its height to 3, and its radius to 1.
+Set the cylinders axis direction to (x=1, y=1, z=0), its height to 3, its radius to 1 and unit to "cm".
 Add a translation with values (x=-2.5, y=0.5, z=-0.5).
 Add a rotation, of 315 degrees around axis (x=0, y=0, z=1).
 Set the 'Transform parent' dropdowns to 'Cube Detector' and 'cube transform'.
