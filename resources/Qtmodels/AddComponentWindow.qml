@@ -210,107 +210,106 @@ ExpandingWindow {
 
         Pane {
             id: detailsPane
-            contentWidth:  Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
-            contentHeight: nameField.implicitHeight
-                           + descriptionField.implicitHeight
-                           + transformLabel.implicitHeight
-                           + transformFrame.implicitHeight
-                           + geometryControls.implicitHeight
-                           + pixelControls.implicitHeight
-                           + addButton.implicitHeight
+            contentHeight: detailColumn.implicitHeight
+            contentWidth: detailColumn.implicitWidth
             anchors.fill: parent
             visible: false
 
-            LabeledTextField {
-                id: nameField
-                labelText: "Name:"
-                editorWidth: 200
-                editorText: name
-                onEditingFinished: name = editorText
-                validator: NameValidator {
-                    model: components
-                    myindex: -1
-                    onValidationFailed: {
-                        nameField.ToolTip.show("Component names must be unique", 3000)
+            ColumnLayout {
+                id: detailColumn
+                anchors.fill: parent
+
+                GridLayout {
+                    rows: 2
+                    columns: 2
+                    Layout.fillWidth: true
+
+                    Label {
+                        text: "Name: "
+                    }
+                    TextField {
+                        id: nameField
+                        text: name
+                        onEditingFinished: name = text
+                        Layout.fillWidth: true
+                        selectByMouse: true
+                        focus: true
+                        validator: NameValidator {
+                            model: components
+                            myindex: -1
+                            onValidationFailed: {
+                                nameField.ToolTip.show("Component names must be unique", 3000)
+                            }
+                        }
+                    }
+
+                    Label {
+                        text: "Description: "
+                    }
+                    TextField {
+                        id: descriptionField
+                        text: description
+                        onEditingFinished: description = text
+                        Layout.fillWidth: true
+                        selectByMouse: true
                     }
                 }
-            }
 
-            LabeledTextField {
-                id: descriptionField
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: nameField.bottom
-                anchoredEditor: true
-                labelText: "Description:"
-                editorText: description
-                onEditingFinished: description = editorText
-            }
-
-            Label {
-                id: transformLabel
-                anchors.top: descriptionField.bottom
-                anchors.left: parent.left
-                text: "Transform:"
-            }
-
-            Frame {
-                id: transformFrame
-                anchors.top: transformLabel.bottom
-                anchors.bottom: geometryControls.top
-                contentHeight: transformControls.implicitHeight
-                contentWidth: transformControls.implicitWidth
-                anchors.left: parent.left
-                anchors.right: parent.right
-                TransformControls {
-                    id: transformControls
-                    transformModel: TransformationModel {}
-                    componentIndex: index
-                    anchors.fill: parent
+                Label {
+                    id: transformLabel
+                    text: "Transform:"
+                    Layout.fillWidth: true
                 }
-            }
 
-            GeometryControls {
-                id: geometryControls
-                anchors.bottom: pixelControls.top
-                anchors.right:parent.right
-                anchors.left: parent.left
-                onMeshChanged: pixelControls.restartMapping(geometryControls.geometryModel)
-            }
-
-            PixelControls {
-                id: pixelControls
-                anchors.bottom: addButton.top
-                anchors.right:parent.right
-                anchors.left: parent.left
-                visible: state != ""
-            }
-
-            PaddedButton {
-                id: addButton
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                leftPadding: 0
-                text: "Add"
-                buttonEnabled: {
-                    // Grey-out the Add button for Cylinder geometries if the units are invalid
-                    setupPane.geometryState != "Cylinder" || (setupPane.geometryState == "Cylinder" && ValidUnits.validCylinderUnits)
-                }
-                onClicked: {
-                    if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false) {
-                        noGeometryFileDialog.open()
+                Frame {
+                    id: transformFrame
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    TransformControls {
+                        id: transformControls
+                        transformModel: TransformationModel {}
+                        componentIndex: index
+                        anchors.fill: parent
                     }
-                    else {
-                        components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
-                                                 geometryControls.geometryModel,
-                                                 pixelControls.pixelModel,
-                                                 transformControls.transformModel)
+                }
 
-                        addComponentWindow.close()
+                GeometryControls {
+                    id: geometryControls
+                    Layout.fillWidth: true
+                    onMeshChanged: pixelControls.restartMapping(geometryControls.geometryModel)
+                }
 
-                        // Reset the booleans for input validity
-                        resetUnitChecks()
+                PixelControls {
+                    id: pixelControls
+                    visible: state != ""
+                    Layout.fillWidth: true
+                }
 
+                PaddedButton {
+                    id: addButton
+                    leftPadding: 0
+                    text: "Add"
+                    Layout.fillWidth: false
+                    buttonEnabled: {
+                        // Grey-out the Add button for Cylinder geometries if the units are invalid
+                        setupPane.geometryState != "Cylinder" || (setupPane.geometryState == "Cylinder" && ValidUnits.validCylinderUnits)
+                    }
+                    onClicked: {
+                        if (setupPane.geometryState == "OFF" && GeometryFileSelected.geometryFileSelected == false) {
+                            noGeometryFileDialog.open()
+                        }
+                        else {
+                            components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
+                                                     geometryControls.geometryModel,
+                                                     pixelControls.pixelModel,
+                                                     transformControls.transformModel)
+
+                            addComponentWindow.close()
+
+                            // Reset the booleans for input validity
+                            resetUnitChecks()
+
+                        }
                     }
                 }
             }
