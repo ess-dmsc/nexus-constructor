@@ -210,16 +210,6 @@ ExpandingWindow {
 
         Pane {
             id: detailsPane
-            // contentWidth:  Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
-            /*
-            contentHeight: nameField.implicitHeight
-                           + descriptionField.implicitHeight
-                           + transformLabel.implicitHeight
-                           + transformFrame.implicitHeight
-                           + geometryControls.implicitHeight
-                           + pixelControls.implicitHeight
-                           + addButton.implicitHeight
-            */
             contentHeight: detailColumn.implicitHeight
             contentWidth: detailColumn.implicitWidth
             anchors.fill: parent
@@ -232,6 +222,7 @@ ExpandingWindow {
                 GridLayout {
                     rows: 2
                     columns: 2
+                    Layout.fillWidth: true
 
                     Label {
                         text: "Name: "
@@ -272,8 +263,6 @@ ExpandingWindow {
 
                 Frame {
                     id: transformFrame
-                    // contentHeight: transformControls.implicitHeight
-                    // contentWidth: transformControls.implicitWidth
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     TransformControls {
