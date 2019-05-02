@@ -108,11 +108,7 @@ Pane {
                 // Remove standard buttons so that custom OK button can be used that only accepts valid units
                 standardButtons: StandardButton.NoButton
 
-                // Prevent the window from suddenly expanding when the invalid units message is shown
-                width: 350
-
                 ColumnLayout {
-
                     anchors.fill: parent
 
                     Text {
@@ -120,36 +116,32 @@ Pane {
                         text: "Enter the geometry units: "
                         Layout.fillWidth: true
                     }
-
-                    LabeledTextField {
-                        id: unitInput
-                        editorText: units
+                    RowLayout {
                         Layout.fillWidth: true
-                        anchoredEditor: true
+                        Layout.minimumWidth: 350
+                        LabeledTextField {
+                            id: unitInput
+                            editorText: units
+                            Layout.fillWidth: true
+                            anchoredEditor: true
 
-                        validator: UnitValidator {
-                            id: meshUnitValidator
-                            onValidationFailed: {
-                                acceptUnitsButton.enabled = false
-                                invalidMeshUnitWarning.visible = true
-                            }
-                            onValidationSuccess: {
-                                acceptUnitsButton.enabled = true
-                                invalidMeshUnitWarning.visible = false
+                            validator: UnitValidator {
+                                id: meshUnitValidator
+                                onValidationFailed: {
+                                    acceptUnitsButton.enabled = false
+                                    invalidMeshUnitsCross.visible = true
+                                }
+                                onValidationSuccess: {
+                                    acceptUnitsButton.enabled = true
+                                    invalidMeshUnitsCross.visible = false
+                                }
                             }
                         }
+                        InvalidInputCross {
+                            id: invalidMeshUnitsCross
+                            toolTipMessage: ValidUnits.invalidUnitsText
+                        }
                     }
-
-                    Text {
-
-                        // Blank invalid unit warning - only set if unit validation function returns false
-                        id: invalidMeshUnitWarning
-                        text: ValidUnits.invalidUnitsText
-                        color: "red"
-                        Layout.fillWidth: true
-                        visible: false
-                    }
-
                     RowLayout {
 
                         Button {
@@ -197,7 +189,7 @@ Pane {
                 anchors.top: cylinderLabel.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidUnitCross.implicitWidth,
+                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidCylinderUnitsCross.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
 
@@ -233,23 +225,13 @@ Pane {
                                     onValidationSuccess: { ValidUnits.validCylinderUnits = true }
                                }
                 }
-                Text {
-                    id: invalidUnitCross
+                InvalidInputCross {
+                    id: invalidCylinderUnitsCross
                     anchors.left: unitsField.right
                     anchors.right: parent.right
                     anchors.top: unitsField.top
-                    text: "×"
-                    font.bold: true
-                    color: "red"
-                    font.pointSize: 17
                     visible: !ValidUnits.validCylinderUnits
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        ToolTip.visible: invalidUnitCross.visible && containsMouse
-                        ToolTip.text: ValidUnits.invalidUnitsText
-                    }
+                    toolTipMessage: ValidUnits.invalidUnitsText
                 }
 
                 Label {

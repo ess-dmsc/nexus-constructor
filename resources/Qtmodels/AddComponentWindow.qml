@@ -341,7 +341,6 @@ ExpandingWindow {
     }
 
     function resetUnitChecks() {
-        ValidUnits.validMeshUnits = false
         ValidUnits.validCylinderUnits = false
     }
 
