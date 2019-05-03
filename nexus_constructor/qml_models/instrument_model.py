@@ -1,7 +1,7 @@
 from nexus_constructor.component import Component, create_component
 from nexus_constructor.component_type import ComponentType
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
-from nexus_constructor.qml_models.helpers import change_value, generate_unique_name
+from nexus_constructor.qml_models.helpers import generate_unique_name
 from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
@@ -9,6 +9,27 @@ from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
 from nexus_constructor.nexus_model import create_group
+
+
+def change_value(item, attribute_name, value):
+    """
+    Updates the value of an items attribute
+    :param item: the object having an attribute updated
+    :param attribute_name: the name of the attribute to update
+    :param value: the value to set the attribute to
+    :return: whether the attribute value was changed
+    """
+    try:
+        current_value = getattr(item, attribute_name)
+    except AttributeError:
+        print(
+            f"attribute {attribute_name} for {item} does not exist, can not change it."
+        )
+        return False
+    different = value != current_value
+    if different:
+        setattr(item, attribute_name, value)
+    return different
 
 
 def generate_mesh(component: Component):
@@ -71,6 +92,9 @@ class InstrumentModel(QAbstractListModel):
     def initialise(self, group):
         """
         Called from QML immediately after the constructor and adds the sample to the entry group, then creates the instrument group.
+
+        We cannot pass the group immediately through the constructor because QML looks at slots, signals and properties before
+        creating objects. Therefore this needs to be called by a signal to initialise the instrumentModel with the HDF group
         :param group: The /entry/ group created by the Nexus Model.
         """
         sample = create_component(

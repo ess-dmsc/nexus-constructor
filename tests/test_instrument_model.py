@@ -12,10 +12,34 @@ from nexus_constructor.qml_models.instrument_model import (
     determine_pixel_state,
     Component,
     ComponentType,
+    change_value,
 )
 from nexus_constructor.nexus_model import NexusModel, h5py
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, SinglePixelId
 from PySide2.QtGui import QMatrix4x4, QVector3D
+
+
+def test_GIVEN_different_attribute_WHEN_change_value_called_THEN_changes_attribute_to_new_value():
+    item = Component(ComponentType.SAMPLE, name="test")
+    change_value(item, "name", "hello")
+    assert item.name == "hello"
+
+
+def test_GIVEN_same_value_WHEN_change_value_called_THEN_does_not_change_attribute():
+    item = Component(ComponentType.SAMPLE, name="test")
+    change_value(item, "name", "test")
+    assert item.name == "test"
+
+
+def test_GIVEN_nonexistent_attr_WHEN_change_value_called_THEN_does_nothing():
+    item = Component(ComponentType.SAMPLE, name="test")
+    attribute_that_shouldnt_exist = "somethingthatdoesntexist"
+    change_value(item, attribute_that_shouldnt_exist, "test")
+    try:
+        getattr(item, attribute_that_shouldnt_exist)
+        assert False
+    except AttributeError:
+        assert True
 
 
 def test_GIVEN_nothing_WHEN_initialising_model_THEN_sample_exists_as_first_component():
