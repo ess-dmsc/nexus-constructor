@@ -1,6 +1,6 @@
 import json
 import jsonschema
-from nexus_constructor.data_model import (
+from nexus_constructor.pixel_data import (
     PixelMapping,
     PixelGrid,
     SinglePixelId,

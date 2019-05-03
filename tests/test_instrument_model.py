@@ -1,4 +1,3 @@
-from nexus_constructor import data_model
 from nexus_constructor.geometry_types import CylindricalGeometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import (
@@ -13,10 +12,9 @@ from nexus_constructor.qml_models.instrument_model import (
     determine_pixel_state,
     Component,
     ComponentType,
-    PixelGrid,
-    PixelMapping,
 )
 from nexus_constructor.nexus_model import NexusModel, h5py
+from nexus_constructor.pixel_data import PixelMapping, PixelGrid, SinglePixelId
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
@@ -64,7 +62,7 @@ def test_replace_contents():
         Component(
             component_type=ComponentType.DETECTOR,
             name="Replacement Detector",
-            geometry=data_model,
+            geometry=CylindricalGeometry,
         ),
     ]
     model.replace_contents(replacement_data)
@@ -107,10 +105,11 @@ def test_determine_pixel_state_produces_expected_strings():
         component = Component(component_type=component_type, name="")
         if component_type == ComponentType.DETECTOR:
             expected_states = ["Mapping", "Grid"]
-            pixel_options = [data_model.PixelMapping([]), data_model.PixelGrid()]
+
+            pixel_options = [PixelMapping([]), PixelGrid()]
         elif component_type == ComponentType.MONITOR:
             expected_states = ["SinglePixel"]
-            pixel_options = [data_model.SinglePixelId(42)]
+            pixel_options = [SinglePixelId(42)]
         else:
             expected_states = [""]
             pixel_options = [None]

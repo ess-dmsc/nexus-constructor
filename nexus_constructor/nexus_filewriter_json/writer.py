@@ -8,8 +8,8 @@ only the required root function to generate the json
 Json format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
 """
 import json
-from nexus_constructor.data_model import PixelGrid, PixelMapping, SinglePixelId
 from nexus_constructor.component import Component
+from nexus_constructor.pixel_data import PixelGrid, PixelMapping, SinglePixelId
 from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import CylindricalGeometry, OFFGeometry
 from nexus_constructor.nexus import NexusEncoder

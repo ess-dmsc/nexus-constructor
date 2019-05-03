@@ -14,8 +14,8 @@ ApplicationWindow {
     visible: true
     width: 1100
     height: 500
-    minimumWidth: windowPane.implicitWidth
-    minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
+    minimumWidth: centralRow.implicitWidth
+    minimumHeight: centralRow.implicitHeight + menuBar.implicitHeight
 
     property string jsonMode: "liveFW"
 
@@ -88,123 +88,62 @@ ApplicationWindow {
         padding: 5
         focus: true
         anchors.fill: parent
-        contentWidth: componentFieldsArea.implicitWidth + instrumentViewArea.implicitWidth + jsonPane.implicitWidth
-        contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
 
-        ComponentControls {
-            id: componentFieldsArea
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            leftPadding: 0
-        }
+        RowLayout {
+            id: centralRow
+            anchors.fill: parent
 
-        Frame {
-            id: instrumentViewArea
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: componentFieldsArea.right
-            anchors.right: jsonPane.left
-            contentWidth: 100
-            contentHeight: 100
-            focus: true
-            padding: 1
+            ComponentControls {
+                id: componentFieldsArea
+                leftPadding: 0
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+            }
 
-            Scene3D {
-                id: scene3d
-                anchors.fill: parent
+            Frame {
+                id: instrumentViewArea
+                contentWidth: 300
+                contentHeight: 100
+                Layout.fillHeight: true
+                Layout.fillWidth: true
                 focus: true
-                aspects: ["input", "logic"]
-                cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+                padding: 1
 
-                AnimatedEntity {
-                    id: instrumentEntity
-                    instrument: components
-                }
-            }
+                Scene3D {
+                    id: scene3d
+                    anchors.fill: parent
+                    focus: true
+                    aspects: ["input", "logic"]
+                    cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
 
-            AxisIndicator {
-                id: axisIndicator
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                width: 100
-                height: 100
-
-                targetCamera: instrumentEntity.camera
-            }
-
-            MouseArea {
-                anchors.fill: scene3d
-                onClicked: instrumentViewArea.focus = true
-                enabled: !instrumentViewArea.focus
-            }
-        }
-
-        Pane {
-            id: jsonPane
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            contentWidth: 300
-
-            ColumnLayout {
-
-                anchors.fill: parent
-
-                ListView {
-                    id: jsonListView
-                    model: jsonModel
-                    delegate: jsonLineDelegate
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
-
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
+                    AnimatedEntity {
+                        id: instrumentEntity
+                        instrument: components
                     }
                 }
 
-                Button {
-                    id: copyButton
-                    text: "Copy to Clipboard"
-                    Layout.maximumHeight: 20
-                    Layout.minimumHeight: 20
-                    Layout.fillWidth: true
-                    onClicked: {
+                AxisIndicator {
+                    id: axisIndicator
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    width: 100
+                    height: 100
 
-                        // Filewriter mode - Copy the Filewriter JSON to the clipboard
-                        if (jsonMode == "liveFW") {
-                            jsonConnector.copy_nexus_filewriter_json_to_clipboard(components)
-                        }
-
-                        // Nexus Constructor mode - Copy the Nexus Constructor JSON to the clipboard
-                        if (jsonMode == "liveGC") {
-                            jsonConnector.copy_nexus_constructor_json_to_clipboard(components)
-                        }
-                    }
+                    targetCamera: instrumentEntity.camera
                 }
 
-                Component {
-                    id: jsonLineDelegate
-                    Label {
-                        id: jsonText
-                        text: (collapsed ? collapsed_text : full_text)
-                        font.family: "Courier New"
-                        wrapMode: Text.Wrap
-                        width: parent.width
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: collapsed = !collapsed
-                        }
-                    }
+                MouseArea {
+                    anchors.fill: scene3d
+                    onClicked: instrumentViewArea.focus = true
+                    enabled: !instrumentViewArea.focus
                 }
+            }
 
-                states: State {
-                    name: "hidden"; when: jsonMode == "hidden"
-                    PropertyChanges { target: jsonPane; visible: false }
-                    PropertyChanges { target: jsonPane; width: 0 }
-                }
+            JSONPane {
+                id: jsonPane
+                contentWidth: 300
+                Layout.fillHeight: true
+                Layout.fillWidth: false
             }
         }
     }

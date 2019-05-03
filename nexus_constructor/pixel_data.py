@@ -1,12 +1,6 @@
+from abc import ABC
 import attr
 from enum import Enum
-
-
-@attr.s
-class PixelData:
-    """Base class for a detector's pixel description"""
-
-    pass
 
 
 class CountDirection(Enum):
@@ -19,6 +13,13 @@ class Corner(Enum):
     TOP_RIGHT = 2
     BOTTOM_LEFT = 3
     BOTTOM_RIGHT = 4
+
+
+class PixelData(ABC):
+    """Base class for a detector's pixel description"""
+
+    type = "PixelData"
+    pass
 
 
 @attr.s
