@@ -29,7 +29,7 @@ ExpandingWindow {
         padding: 0
 
         StackLayout {
-            id: stack
+            id: addComponentStack
             anchors.fill: parent
             currentIndex: 0
 
