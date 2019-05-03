@@ -106,12 +106,7 @@ class InstrumentModel(QAbstractListModel):
 
         self.create_instrument_group(group)
 
-        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self.components.append(sample)
-        self.transform_models.append(TransformationModel(sample.transforms))
-        self.endInsertRows()
-        self.update_removable()
-        self.update_transforms_deletable()
+        self.append_component_to_list(sample)
         self.send_model_updated()
 
     def create_instrument_group(self, group):
@@ -255,12 +250,19 @@ class InstrumentModel(QAbstractListModel):
                 else transform_model.transforms,
                 parent_group=self.instrument_group,
             )
-            self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-            self.components.append(component)
-            self.transform_models.append(TransformationModel(component.transforms))
-            self.endInsertRows()
-            self.update_removable()
-            self.update_transforms_deletable()
+            self.append_component_to_list(component)
+
+    def append_component_to_list(self, component):
+        """
+        Append a component object to the list of components.
+        :param component: Component object containing geometry, pixel data, and a reference to a HDF group.
+        """
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self.components.append(component)
+        self.transform_models.append(TransformationModel(component.transforms))
+        self.endInsertRows()
+        self.update_removable()
+        self.update_transforms_deletable()
 
     @Slot(int)
     def remove_component(self, index):
