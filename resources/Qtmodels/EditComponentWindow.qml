@@ -58,7 +58,7 @@ ExpandingWindow {
                     model: components
                     myindex: componentIndex
                     onValidationFailed: {
-                        nameField.ToolTip.show("Component names must be unique", 3000)
+                        nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
                     }
                 }
             }
