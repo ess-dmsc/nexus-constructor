@@ -165,7 +165,7 @@ ExpandingWindow {
                             contentPane.contentWidth = detailsPane.implicitWidth
                             detailsPane.focus = true
                             nameField.focus = true
-                            stack.currentIndex = 1
+                            addComponentStack.currentIndex = 1
                         }
                     }
 
