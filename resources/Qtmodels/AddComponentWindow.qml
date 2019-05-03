@@ -79,6 +79,7 @@ ExpandingWindow {
                             onClicked: {
                                 setupPane.geometryState = "OFF"
                                 GeometryFileSelected.geometryFileSelected = false
+                                pixelPane.checkFirstEnabled()
                             }
 
                             checked: true
@@ -89,15 +90,17 @@ ExpandingWindow {
                             text: "Cylinder"
                             onClicked: {
                                 setupPane.geometryState = "Cylinder"
-                                if (mappedMeshRadio.checked) {
-                                    pixelPane.checkFirstEnabled()
-                                }
+                                pixelPane.checkFirstEnabled()
                             }
                         }
                         RadioButton {
                             id: noShapeRadio
                             text: "None"
-                            onClicked: setupPane.geometryState = "None", setupPane.pixelState = ""
+                            onClicked: {
+                                setupPane.geometryState = "None"
+                                setupPane.pixelState = ""
+                                pixelPane.checkFirstEnabled()
+                            }
                         }
                     }
                 }
