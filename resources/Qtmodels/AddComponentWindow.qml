@@ -35,8 +35,10 @@ ExpandingWindow {
 
             Pane {
                 id: setupPane
-                height: childrenRect.height
-                width: childrenRect.width
+                // height: childrenRect.height
+                // width: childrenRect.width
+                // Layout.fillWidth: true
+                // Layout.fillheight: true
 
                 property var selectedType
                 property string geometryState
