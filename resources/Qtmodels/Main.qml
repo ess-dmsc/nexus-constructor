@@ -92,6 +92,7 @@ ApplicationWindow {
         RowLayout {
             id: centralRow
             anchors.fill: parent
+            Layout.minimumWidth: 100
 
             ComponentControls {
                 id: componentFieldsArea
@@ -111,8 +112,7 @@ ApplicationWindow {
 
                 Scene3D {
                     id: scene3d
-                    implicitWidth: 100
-                    implicitHeight: 100
+
                     anchors.fill: parent
                     focus: true
                     aspects: ["input", "logic"]
