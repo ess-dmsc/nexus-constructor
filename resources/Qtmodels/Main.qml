@@ -212,7 +212,7 @@ ApplicationWindow {
         nameFilters: ["Nexus files (*.nxs *.nx5)", "HDF5 files (*.hdf5)"]
         defaultSuffix: "nxs"
         selectExisting: false
-        onAccepted: hdfWriter.save_instrument(fileUrl, components)
+        onAccepted: nxsModel.write_to_file(fileUrl)
     }
 
     FileDialog {
