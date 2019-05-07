@@ -148,8 +148,15 @@ ApplicationWindow {
         }
     }
 
+    NexusModel {
+        id: nxsModel
+    }
+
     InstrumentModel{
         id: components
+        Component.onCompleted: {
+            initialise(nxsModel.entryGroup)
+        }
     }
 
     FilteredJsonModel {

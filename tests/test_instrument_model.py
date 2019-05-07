@@ -1,4 +1,3 @@
-from nexus_constructor import data_model
 from nexus_constructor.geometry_types import CylindricalGeometry
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import (
@@ -13,47 +12,81 @@ from nexus_constructor.qml_models.instrument_model import (
     determine_pixel_state,
     Component,
     ComponentType,
+    change_value,
 )
+from nexus_constructor.nexus_model import NexusModel, h5py
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, SinglePixelId
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
-def test_initialise_model():
+def test_GIVEN_different_attribute_WHEN_change_value_called_THEN_changes_attribute_to_new_value():
+    item = Component(ComponentType.SAMPLE, name="test")
+    change_value(item, "name", "hello")
+    assert item.name == "hello"
+
+
+def test_GIVEN_same_value_WHEN_change_value_called_THEN_does_not_change_attribute():
+    item = Component(ComponentType.SAMPLE, name="test")
+    change_value(item, "name", "test")
+    assert item.name == "test"
+
+
+def test_GIVEN_nonexistent_attr_WHEN_change_value_called_THEN_does_nothing():
+    item = Component(ComponentType.SAMPLE, name="test")
+    attribute_that_shouldnt_exist = "somethingthatdoesntexist"
+    change_value(item, attribute_that_shouldnt_exist, "test")
+    try:
+        getattr(item, attribute_that_shouldnt_exist)
+        assert False
+    except AttributeError:
+        assert True
+
+
+def test_GIVEN_nothing_WHEN_initialising_model_THEN_sample_exists_as_first_component():
     model = InstrumentModel()
+    model.initialise(NexusModel().nexus_file)
     assert model.rowCount() == 1
-    assert model.components[0].component_type == data_model.ComponentType.SAMPLE
+    assert model.components[0].component_type == ComponentType.SAMPLE
 
 
 def test_add_component():
     model = InstrumentModel()
-    model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
+    model.initialise(NexusModel().getEntryGroup())
+    model.add_component("Detector", "MyDetector", geometry_model=NoShapeModel())
     assert model.rowCount() == 2
-    assert model.components[1].component_type == data_model.ComponentType.DETECTOR
-    assert model.components[1].name == "My Detector"
+    assert model.components[1].component_type == ComponentType.DETECTOR
+    assert model.components[1].name == "MyDetector"
+    assert "MyDetector" in model.instrument_group
+    assert model.instrument_group["MyDetector"].attrs["NX_class"] == "NXdetector"
 
 
 def test_remove_component():
     model = InstrumentModel()
+    model.initialise(NexusModel().getEntryGroup())
     model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     model.remove_component(1)
     assert model.rowCount() == 1
-    assert not model.components[0].component_type == data_model.ComponentType.DETECTOR
+    assert not model.components[0].component_type == ComponentType.DETECTOR
     # The sample at index 0 shouldn't be removable
     model.remove_component(0)
     assert model.rowCount() == 1
-    assert model.components[0].component_type == data_model.ComponentType.SAMPLE
+    assert model.components[0].component_type == ComponentType.SAMPLE
+
+
+def test_GIVEN_nothing_WHEN_calling_create_instrument_group_THEN_instrument_group_is_created_and_added_to_model():
+    model = InstrumentModel()
+    model.initialise(NexusModel().getEntryGroup())
+    assert model.instrument_group.attrs["NX_class"] == "NXinstrument"
 
 
 def test_replace_contents():
     model = InstrumentModel()
     replacement_data = [
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Replacement sample"
-        ),
-        data_model.Component(
-            component_type=data_model.ComponentType.DETECTOR,
+        Component(component_type=ComponentType.SAMPLE, name="Replacement sample"),
+        Component(
+            component_type=ComponentType.DETECTOR,
             name="Replacement Detector",
-            geometry=data_model,
+            geometry=CylindricalGeometry,
         ),
     ]
     model.replace_contents(replacement_data)
@@ -64,18 +97,10 @@ def test_replace_contents():
 def test_generate_component_name():
     model = InstrumentModel()
     model.components = [
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Sample"
-        ),
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Detector"
-        ),
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Detector3"
-        ),
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name="Magnet2"
-        ),
+        Component(component_type=ComponentType.SAMPLE, name="Sample"),
+        Component(component_type=ComponentType.SAMPLE, name="Detector"),
+        Component(component_type=ComponentType.SAMPLE, name="Detector3"),
+        Component(component_type=ComponentType.SAMPLE, name="Magnet2"),
     ]
     assert model.generate_component_name("Sample") == "Sample1"
     assert model.generate_component_name("Detector") == "Detector4"
@@ -86,10 +111,7 @@ def test_generate_component_name():
 def test_is_removable():
     model = InstrumentModel()
     model.components = [
-        data_model.Component(
-            component_type=data_model.ComponentType.SAMPLE, name=str(i)
-        )
-        for i in range(4)
+        Component(component_type=ComponentType.SAMPLE, name=str(i)) for i in range(4)
     ]
     model.components[0].transform_parent = model.components[0]
     model.components[1].transform_parent = model.components[0]
@@ -103,12 +125,13 @@ def test_is_removable():
 
 
 def test_determine_pixel_state_produces_expected_strings():
-    for component_type in data_model.ComponentType:
-        component = data_model.Component(component_type=component_type, name="")
-        if component_type == data_model.ComponentType.DETECTOR:
+    for component_type in ComponentType:
+        component = Component(component_type=component_type, name="")
+        if component_type == ComponentType.DETECTOR:
             expected_states = ["Mapping", "Grid"]
+
             pixel_options = [PixelMapping([]), PixelGrid()]
-        elif component_type == data_model.ComponentType.MONITOR:
+        elif component_type == ComponentType.MONITOR:
             expected_states = ["SinglePixel"]
             pixel_options = [SinglePixelId(42)]
         else:
@@ -123,9 +146,10 @@ def test_determine_pixel_state_produces_expected_strings():
 
 def build_model_with_sample_transforms():
     instrument = InstrumentModel()
+    instrument.initialise(NexusModel().entryGroup)
     instrument.components.append(
-        data_model.Component(
-            component_type=data_model.ComponentType.DETECTOR,
+        Component(
+            component_type=ComponentType.DETECTOR,
             name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
@@ -135,8 +159,8 @@ def build_model_with_sample_transforms():
         )
     )
     instrument.components.append(
-        data_model.Component(
-            component_type=data_model.ComponentType.DETECTOR,
+        Component(
+            component_type=ComponentType.DETECTOR,
             name="detector2",
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
@@ -147,8 +171,8 @@ def build_model_with_sample_transforms():
         )
     )
     instrument.components.append(
-        data_model.Component(
-            component_type=data_model.ComponentType.DETECTOR,
+        Component(
+            component_type=ComponentType.DETECTOR,
             name="detector3",
             transform_parent=instrument.components[1],
             transforms=[
@@ -273,3 +297,14 @@ def test_GIVEN_detector_with_PixelMapping_WHEN_determine_pixel_state_THEN_return
 def test_GIVEN_slit_WHEN_determine_pixel_state_THEN_returns_empty_string():
     component = Component(ComponentType.SLIT, "")
     assert determine_pixel_state(component) == ""
+
+
+def test_GIVEN_hdf_group_WHEN_request_instrument_group_THEN_sets_model_instrument_group_to_given_group():
+    name = "testinstgroupinmodel"
+    file = h5py.File(name, mode="w", driver="core", backing_store=False)
+    group = file.create_group(name)
+
+    model = InstrumentModel()
+    model.initialise(group)
+
+    assert group.name in model.instrument_group.name
