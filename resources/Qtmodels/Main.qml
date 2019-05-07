@@ -111,6 +111,8 @@ ApplicationWindow {
 
                 Scene3D {
                     id: scene3d
+                    implicitWidth: 100
+                    implicitHeight: 100
                     anchors.fill: parent
                     focus: true
                     aspects: ["input", "logic"]
