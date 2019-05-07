@@ -91,9 +91,7 @@ ExpandingWindow {
                                 text: "Cylinder"
                                 onClicked: {
                                     setupPane.geometryState = "Cylinder"
-                                    if (mappedMeshRadio.checked) {
-                                        pixelPane.checkFirstEnabled()
-                                    }
+                                    pixelPane.checkFirstEnabled()
                                 }
                             }
                             RadioButton {
