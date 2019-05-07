@@ -23,8 +23,6 @@ ExpandingWindow {
 
     Pane {
         id: contentPane
-        // contentWidth: addComponentStack.implicitWidth
-        // contentHeight: addComponentStack.implicitHeight
         anchors.fill: parent
         padding: 0
 
@@ -35,10 +33,6 @@ ExpandingWindow {
 
             Pane {
                 id: setupPane
-                // height: childrenRect.height
-                // width: childrenRect.width
-                // Layout.fillWidth: true
-                // Layout.fillheight: true
 
                 property var selectedType
                 property string geometryState
