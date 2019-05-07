@@ -16,6 +16,7 @@ ApplicationWindow {
     height: 500
     minimumWidth: centralRow.implicitWidth
     minimumHeight: centralRow.implicitHeight + menuBar.implicitHeight
+    property var jsonPaneWidth: 300
 
     property string jsonMode: "liveFW"
 
@@ -49,6 +50,7 @@ ApplicationWindow {
                 text: "Show Nexus FileWriter JSON"
                 checked: true
                 onClicked: {
+                    makeRoomForReturnOfJSONPane()
                     jsonMode = "liveFW"
                     jsonConnector.request_filewriter_json(components)
                 }
@@ -56,6 +58,7 @@ ApplicationWindow {
             RadioButton {
                 text: "Show Nexus Constructor JSON"
                 onClicked: {
+                    makeRoomForReturnOfJSONPane()
                     jsonMode = "liveGC"
                     jsonConnector.request_nexus_constructor_json(components)
                 }
@@ -64,9 +67,15 @@ ApplicationWindow {
                 text: "Hide JSON display"
                 onClicked: jsonMode = "hidden"
             }
+
         }
     }
 
+    function makeRoomForReturnOfJSONPane() {
+        // Force the window to expand if the JSON pane was hidden and has been made visible again
+        if (jsonMode == "hidden" && window.width <= window.minimumWidth)
+            window.width += jsonPaneWidth
+    }
     function positionChildWindow(child) {
         // position child window in the center of the main window
         var centralX = window.x + ((window.width - child.width) / 2)
@@ -92,6 +101,7 @@ ApplicationWindow {
         RowLayout {
             id: centralRow
             anchors.fill: parent
+            Layout.minimumWidth: 100
 
             ComponentControls {
                 id: componentFieldsArea
@@ -141,7 +151,7 @@ ApplicationWindow {
 
             JSONPane {
                 id: jsonPane
-                contentWidth: 300
+                contentWidth: jsonPaneWidth
                 Layout.fillHeight: true
                 Layout.fillWidth: false
             }
