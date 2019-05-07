@@ -74,7 +74,7 @@ ApplicationWindow {
     function makeRoomForReturnOfJSONPane() {
         // Force the window to expand if the JSON pane was hidden and has been made visible again
         if (jsonMode == "hidden" && window.width <= window.minimumWidth)
-                window.width += jsonPaneWidth
+            window.width += jsonPaneWidth
     }
     function positionChildWindow(child) {
         // position child window in the center of the main window
