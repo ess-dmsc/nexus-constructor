@@ -1,6 +1,5 @@
 import json
 import jsonschema
-from nexus_constructor.data_model import Component, ComponentType
 from nexus_constructor.pixel_data import (
     PixelMapping,
     PixelGrid,
@@ -8,6 +7,9 @@ from nexus_constructor.pixel_data import (
     CountDirection,
     Corner,
 )
+from nexus_constructor.component import Component
+from nexus_constructor.component_type import ComponentType
+from nexus_constructor.nexus_model import NexusModel
 from nexus_constructor.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.nexus_constructor_json import writer, loader
 from nexus_constructor.transformations import Translation, Rotation
@@ -20,6 +22,9 @@ from io import StringIO
 
 def build_sample_model():
     model = InstrumentModel()
+    model.initialise(NexusModel().entryGroup)
+
+    model.components[0].component_group = None
 
     offmodel = OFFModel()
 
@@ -160,6 +165,8 @@ def test_loading_generated_json():
     json_string = writer.generate_json(model)
 
     loaded_model = InstrumentModel()
+    loaded_model.initialise(NexusModel().entryGroup)
+
     loader.load_json_object_into_instrument_model(json.loads(json_string), loaded_model)
 
     assert model.components == loaded_model.components

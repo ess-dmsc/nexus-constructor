@@ -63,24 +63,25 @@ ExpandingWindow {
                         }
                     }
 
-                    Label {
-                        id: geometryLabel
-                        text: "Geometry:"
-                    }
-                    Pane {
-                        id: geometryPane
-                        Layout.fillWidth: true
+                Label {
+                    id: geometryLabel
+                    text: "Geometry:"
+                }
+                Pane {
+                    id: geometryPane
+                    Layout.fillWidth: true
 
-                        RowLayout {
-                            id: radioButtonRow
+                    RowLayout {
+                        id: radioButtonRow
 
-                            RadioButton {
-                                id: meshRadio
-                                text: "Mesh"
-                                onClicked: {
-                                    setupPane.geometryState = "OFF"
-                                    GeometryFileSelected.geometryFileSelected = false
-                                }
+                        RadioButton {
+                            id: meshRadio
+                            text: "Mesh"
+                            onClicked: {
+                                setupPane.geometryState = "OFF"
+                                GeometryFileSelected.geometryFileSelected = false
+                                pixelPane.checkFirstEnabled()
+                            }
 
                                 checked: true
                                 Component.onCompleted: setupPane.geometryState = "OFF"
@@ -98,7 +99,11 @@ ExpandingWindow {
                             RadioButton {
                                 id: noShapeRadio
                                 text: "None"
-                                onClicked: setupPane.geometryState = "None", setupPane.pixelState = ""
+                                onClicked: {
+                                    setupPane.geometryState = "None"
+                                    setupPane.pixelState = ""
+                                    pixelPane.checkFirstEnabled()
+                                }
                             }
                         }
                     }

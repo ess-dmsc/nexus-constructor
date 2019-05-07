@@ -3,7 +3,9 @@ from math import sqrt
 
 from PySide2.QtGui import QVector3D
 from pytest import approx
-from nexus_constructor.data_model import Component, ComponentType
+from nexus_constructor.component import Component
+from nexus_constructor.component_type import ComponentType
+from nexus_constructor.nexus_model import NexusModel
 from nexus_constructor.pixel_data import PixelGrid, Corner, CountDirection
 from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
@@ -19,6 +21,7 @@ def assess_unit_length_3d_vector(vector, original):
 
 def make_instrument_with_sample_transform():
     instrument = InstrumentModel()
+    instrument.initialise(NexusModel().entryGroup)
     instrument.components.append(
         Component(
             component_type=ComponentType.DETECTOR,

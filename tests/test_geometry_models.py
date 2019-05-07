@@ -1,3 +1,4 @@
+import h5py
 from nexus_constructor.qml_models.geometry_models import (
     NoShapeModel,
     NoShapeGeometry,
@@ -50,8 +51,12 @@ def test_GIVEN_non_default_units_WHEN_setting_units_THEN_units_are_updated_corre
     assert model.get_units() == units
 
 
-def test_GIVEN_instrument_model_WHEN_settings_geometry_on_cylindricalmodel_THEN_instrument_model_contains_component_geometry():
+def test_GIVEN_instrument_model_WHEN_setting_geometry_on_cylindricalmodel_THEN_instrument_model_contains_component_geometry():
     inst = InstrumentModel()
+    nexus_file = h5py.File(
+        "test_cylinder_1", mode="w", driver="core", backing_store=False
+    )
+    inst.initialise(nexus_file)
     model = CylinderModel()
     model.set_geometry(0, inst)
 
@@ -60,6 +65,9 @@ def test_GIVEN_instrument_model_WHEN_settings_geometry_on_cylindricalmodel_THEN_
 
 def test_GIVEN_instrument_model_WHEN_setting_geometry_on_offmodel_THEN_instrument_model_contains_component_geometry():
     inst = InstrumentModel()
+    nexus_file = h5py.File("test_off_1", mode="w", driver="core", backing_store=False)
+    inst.initialise(nexus_file)
+
     model = OFFModel()
     model.set_geometry(0, inst)
 
