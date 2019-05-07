@@ -18,13 +18,13 @@ ExpandingWindow {
 
     title: "Add " + componentType
     id: addComponentWindow
-    minimumHeight: contentPane.implicitHeight
-    minimumWidth: contentPane.implicitWidth
+    minimumHeight: addComponentStack.implicitHeight
+    minimumWidth: addComponentStack.implicitWidth
 
     Pane {
         id: contentPane
-        contentWidth: setupPane.implicitWidth
-        contentHeight: setupPane.implicitHeight
+        // contentWidth: addComponentStack.implicitWidth
+        // contentHeight: addComponentStack.implicitHeight
         anchors.fill: parent
         padding: 0
 
@@ -219,8 +219,6 @@ ExpandingWindow {
 
             Pane {
                 id: detailsPane
-                contentHeight: detailColumn.implicitHeight
-                contentWidth: detailColumn.implicitWidth
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: false
@@ -274,6 +272,7 @@ ExpandingWindow {
                         id: transformFrame
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        Layout.minimumHeight: transformControls.implicitHeight
                         TransformControls {
                             id: transformControls
                             transformModel: TransformationModel {}
