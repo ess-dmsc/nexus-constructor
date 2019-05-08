@@ -225,6 +225,9 @@ Item {
                     TextField {
                         id: xRotationField
                         implicitWidth: transformTextFieldWidth
+                        text: rotate_x
+                        validator: numberValidator
+                        onEditingFinished: rotate_x = parseFloat(text)
                     }
                     Label {
                         text: "Y: "
@@ -232,6 +235,9 @@ Item {
                     TextField {
                         id: yRotationField
                         implicitWidth: transformTextFieldWidth
+                        text: rotate_y
+                        validator: numberValidator
+                        onEditingFinished: rotate_y = parseFloat(text)
                     }
                     Label {
                         text: "Z: "
@@ -239,6 +245,9 @@ Item {
                     TextField {
                         id: zRotationField
                         implicitWidth: transformTextFieldWidth
+                        text: rotate_y
+                        validator: numberValidator
+                        onEditingFinished: rotate_y = parseFloat(text)
                     }
                     Label {
                         text: "Angle (Degrees): "
@@ -248,6 +257,9 @@ Item {
                     TextField {
                         id: angleField
                         implicitWidth: transformTextFieldWidth
+                        text: rotate_angle
+                        validator: angleValidator
+                        onEditingFinished: rotate_angle = parseFloat(text)
                     }
                 }
 
@@ -257,18 +269,14 @@ Item {
                     anchors.top: rotateNameField.bottom
                     anchors.left: parent.left
                     labelText: "x:"
-                    editorText: rotate_x
-                    validator: numberValidator
-                    onEditingFinished: rotate_x = parseFloat(editorText)
+
                 }
                 LabeledTextField {
                     id: yRotField
                     anchors.top: xRotField.top
                     anchors.horizontalCenter: parent.horizontalCenter
                     labelText: "y:"
-                    editorText: rotate_y
-                    validator: numberValidator
-                    onEditingFinished: rotate_y = parseFloat(editorText)
+
                 }
                 LabeledTextField {
                     id: zRotField
