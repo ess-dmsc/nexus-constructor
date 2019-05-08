@@ -1,6 +1,6 @@
 [![License (2-Clause BSD)](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)](https://github.com/ess-dmsc/nexus-constructor/blob/master/LICENSE) [![codecov](https://codecov.io/gh/ess-dmsc/nexus-constructor/branch/master/graph/badge.svg)](https://codecov.io/gh/ess-dmsc/nexus-constructor) [![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-constructor/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-constructor/job/master/)
 
-# nexus-constructor
+# NeXus Constructor
 Construct NeXus files with instrument geometry information using a GUI
 
 ## Installing dependencies
@@ -18,7 +18,7 @@ The black pre-commit hook (installed by [pre-commit](https://pre-commit.com/)) r
 
 Run the python script `main.py` located in the root of the repository.
 
-## [WIKI](https://github.com/ess-dmsc/nexus-constructor/wiki)
+## [Wiki](https://github.com/ess-dmsc/nexus-constructor/wiki)
 
 Contains developer notes, general QML approaches
 
