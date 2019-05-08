@@ -5,6 +5,7 @@ from tests.test_json import build_sample_model
 import json
 from numbers import Number
 from pytest import approx
+from nexus_constructor.nexus_model import NexusModel
 
 
 def test_nexus_json_generation_and_loading_is_consistent():
@@ -24,6 +25,7 @@ def test_nexus_json_generation_and_loading_is_consistent():
     json_string = nf_writer.generate_json(instrument_model)
 
     loader_model = InstrumentModel()
+    loader_model.initialise(NexusModel().entryGroup)
     nf_loader.load_json_object_into_instrument_model(
         json.loads(json_string), loader_model
     )

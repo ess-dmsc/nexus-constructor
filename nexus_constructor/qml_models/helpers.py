@@ -1,27 +1,6 @@
 import re
 
 
-def change_value(item, attribute_name, value):
-    """
-    Updates the value of an items attribute
-    :param item: the object having an attribute updated
-    :param attribute_name: the name of the attribute to update
-    :param value: the value to set the attribute to
-    :return: whether the attribute value was changed
-    """
-    try:
-        current_value = getattr(item, attribute_name)
-    except AttributeError:
-        print(
-            f"attribute {attribute_name} for {item} does not exist, can not change it."
-        )
-        return False
-    different = value != current_value
-    if different:
-        setattr(item, attribute_name, value)
-    return different
-
-
 def generate_unique_name(base: str, items: list):
     """
     Generates a unique name for a new item using a common base string

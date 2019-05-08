@@ -7,7 +7,8 @@ only the required root function to load the json
 
 Json format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
 """
-from nexus_constructor.data_model import Component, ComponentType
+from nexus_constructor.component_type import ComponentType
+from nexus_constructor.component import Component
 from nexus_constructor.pixel_data import SinglePixelId
 from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.geometry_types import OFFGeometry, CylindricalGeometry
