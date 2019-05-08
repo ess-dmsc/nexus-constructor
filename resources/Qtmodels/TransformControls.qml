@@ -118,7 +118,7 @@ Item {
             id: transformBox
             // width: transformsListView.width
             // contentHeight: translatePane.height + rotatePane.height + transformButtons.height
-            contentHeight: transformBoxStack.implicitHeight + transformButtons.implicitHeight
+            contentHeight: transformBoxStack.height + transformButtons.implicitHeight
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
 
             Component.onCompleted: {
@@ -296,6 +296,7 @@ Item {
                     id: transformButtons
                     contentWidth: transformButtonsRow.implicitWidth
                     contentHeight: transformButtonsRow.implicitHeight
+                    Layout.fillWidth: true
 
                     RowLayout {
                         id: transformButtonsRow
@@ -314,13 +315,12 @@ Item {
                             onClicked: transformModel.change_position(index, index + 1)
                         }
                         Item {
-                            // Spacer item to force deleteButton to the right
                             Layout.fillWidth: true
                         }
                         PaddedButton {
                             id: deleteButton
-                            Layout.fillWidth: false
                             text: "Delete"
+                            Layout.alignment: Qt.AlignRight
                             onClicked: transformModel.delete_transform(index)
                             buttonEnabled: deletable
                             ToolTip.visible: hovered & !deletable
