@@ -116,7 +116,7 @@ Item {
 
         Frame {
             id: transformBox
-            contentHeight: transformBoxStack.height + transformButtons.implicitHeight
+            contentHeight: transformBoxColumn.height
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
             anchors.right: parent.right
             anchors.left: parent.left
