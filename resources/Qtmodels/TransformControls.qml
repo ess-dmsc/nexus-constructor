@@ -129,57 +129,70 @@ Item {
             Pane {
                 id: translatePane
                 padding: 0
-                contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
-                contentHeight: translateNameField.height + xField.height
+                contentWidth: translatePaneGrid.implicitWidth
+                contentHeight: translatePaneGrid.implicitHeight
 
-                Label {
-                    id: translateLabel
-                    anchors.verticalCenter: translateNameField.verticalCenter
-                    anchors.left: parent.left
-                    text: "Translation"
-                }
-                LabeledTextField {
-                    id: translateNameField
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.left: yField.left
-                    anchoredEditor: true
-                    labelText: "Name:"
-                    editorText: name
-                    onEditingFinished: name = editorText
-                    validator: NameValidator {
-                        model: transformModel
-                        myindex: index
-                        onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                GridLayout {
+                    id: translatePaneGrid
+                    rows: 2
+                    columns: 6
+
+                    Label {
+                        id: translateLabel
+                        text: "Translation"
+                        Layout.columnSpan: 2
                     }
-                }
-
-                LabeledTextField {
-                    id: xField
-                    anchors.top: translateNameField.bottom
-                    anchors.left: parent.left
-                    labelText: "x:"
-                    editorText: translate_x
-                    validator: numberValidator
-                    onEditingFinished: translate_x = parseFloat(editorText)
-                }
-                LabeledTextField {
-                    id: yField
-                    anchors.top: xField.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    labelText: "y:"
-                    editorText: translate_y
-                    validator: numberValidator
-                    onEditingFinished: translate_y = parseFloat(editorText)
-                }
-                LabeledTextField {
-                    id: zField
-                    anchors.top: xField.top
-                    anchors.right: parent.right
-                    labelText: "z:"
-                    editorText: translate_z
-                    validator: numberValidator
-                    onEditingFinished: translate_z = parseFloat(editorText)
+                    Label {
+                        id: translateNameLabel
+                        text: "Name: "
+                        Layout.columnSpan: 3
+                        Layout.alignment: Qt.AlignRight
+                    }
+                    TextField {
+                        id: translateNameField
+                        implicitWidth: transformTextFieldWidth
+                        text: name
+                        selectByMouse: true
+                        onEditingFinished: name = text
+                        validator: NameValidator {
+                            model: transformModel
+                            myindex: index
+                            onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                        }
+                    }
+                    Label {
+                        text: "X: "
+                    }
+                    TextField {
+                        id: xTranslationField
+                        implicitWidth: transformTextFieldWidth
+                        text: translate_x
+                        selectByMouse: true
+                        validator: numberValidator
+                        onEditingFinished: translate_x = parseFloat(text)
+                    }
+                    Label {
+                        text: "Y: "
+                    }
+                    TextField {
+                        id: yTranslationField
+                        implicitWidth: transformTextFieldWidth
+                        text: translate_y
+                        selectByMouse: true
+                        validator: numberValidator
+                        onEditingFinished: translate_y = parseFloat(text)
+                    }
+                    Label {
+                        text: "Z: "
+                    }
+                    TextField {
+                        id: zTranslationField
+                        implicitWidth: transformTextFieldWidth
+                        text: translate_z
+                        selectByMouse: true
+                        validator: numberValidator
+                        onEditingFinished: translate_z = parseFloat(text)
+                    }
                 }
             }
 
@@ -209,6 +222,7 @@ Item {
                     TextField {
                         id: rotateNameField
                         text: name
+                        selectByMouse: true
                         onEditingFinished: name = text
                         implicitWidth: transformTextFieldWidth
                         validator: NameValidator {
@@ -224,6 +238,7 @@ Item {
                         id: xRotationField
                         implicitWidth: transformTextFieldWidth
                         text: rotate_x
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: rotate_x = parseFloat(text)
                     }
@@ -234,6 +249,7 @@ Item {
                         id: yRotationField
                         implicitWidth: transformTextFieldWidth
                         text: rotate_y
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: rotate_y = parseFloat(text)
                     }
@@ -244,6 +260,7 @@ Item {
                         id: zRotationField
                         implicitWidth: transformTextFieldWidth
                         text: rotate_y
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: rotate_y = parseFloat(text)
                     }
@@ -256,6 +273,7 @@ Item {
                         id: angleField
                         implicitWidth: transformTextFieldWidth
                         text: rotate_angle
+                        selectByMouse: true
                         validator: angleValidator
                         onEditingFinished: rotate_angle = parseFloat(text)
                     }
