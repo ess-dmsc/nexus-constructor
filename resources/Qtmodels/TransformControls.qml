@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
+import QtQuick.Layouts 1.11
 
 /*
  * Controls for defining a components transformation to detector space.
@@ -256,30 +257,34 @@ Item {
                 contentWidth: moveUpButton.implicitWidth + moveDownButton.implicitWidth + 10 + deleteButton.implicitWidth
                 contentHeight: moveUpButton.implicitHeight
 
-                PaddedButton {
-                    id: moveUpButton
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    text: "Move up"
-                    onClicked: transformModel.change_position(index, index - 1)
-                }
-                PaddedButton {
-                    id: moveDownButton
-                    anchors.top: moveUpButton.top
-                    anchors.left: moveUpButton.right
-                    text: "Move down"
-                    onClicked: transformModel.change_position(index, index + 1)
-                }
-                PaddedButton {
-                    id: deleteButton
-                    anchors.top: moveUpButton.top
-                    anchors.right: parent.right
-                    text: "Delete"
-                    onClicked: transformModel.delete_transform(index)
-                    buttonEnabled: deletable
-                    ToolTip.visible: hovered & !deletable
-                    ToolTip.delay: 400
-                    ToolTip.text: "Cannot remove a transform that's in use as a transform parent"
+                RowLayout {
+                    anchors.fill: parent
+
+                    PaddedButton {
+                        id: moveUpButton
+                        Layout.fillWidth: false
+                        text: "Move up"
+                        onClicked: transformModel.change_position(index, index - 1)
+                    }
+                    PaddedButton {
+                        id: moveDownButton
+                        Layout.fillWidth: false
+                        text: "Move down"
+                        onClicked: transformModel.change_position(index, index + 1)
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                    }
+                    PaddedButton {
+                        id: deleteButton
+                        Layout.fillWidth: false
+                        text: "Delete"
+                        onClicked: transformModel.delete_transform(index)
+                        buttonEnabled: deletable
+                        ToolTip.visible: hovered & !deletable
+                        ToolTip.delay: 400
+                        ToolTip.text: "Cannot remove a transform that's in use as a transform parent"
+                    }
                 }
             }
 
