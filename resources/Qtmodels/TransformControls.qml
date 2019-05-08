@@ -186,10 +186,8 @@ Item {
             Pane {
                 id: rotatePane
                 padding: 0
-                // contentWidth: xRotField.implicitWidth + yRotField.implicitWidth + zRotField.implicitWidth
                 contentWidth: rotatePaneGrid.implicitWidth
                 contentHeight: rotatePaneGrid.implicitHeight
-                // contentHeight: rotateNameField.height + xRotField.height + angleField.height
 
                 GridLayout {
                     id: rotatePaneGrid
@@ -262,42 +260,6 @@ Item {
                         onEditingFinished: rotate_angle = parseFloat(text)
                     }
                 }
-
-                /*
-                LabeledTextField {
-                    id: xRotField
-                    anchors.top: rotateNameField.bottom
-                    anchors.left: parent.left
-                    labelText: "x:"
-
-                }
-                LabeledTextField {
-                    id: yRotField
-                    anchors.top: xRotField.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    labelText: "y:"
-
-                }
-                LabeledTextField {
-                    id: zRotField
-                    anchors.top: xRotField.top
-                    anchors.right: parent.right
-                    labelText: "z:"
-                    editorText: rotate_z
-                    validator: numberValidator
-                    onEditingFinished: rotate_z = parseFloat(editorText)
-                }
-
-                LabeledTextField {
-                    id: angleField
-                    anchors.top: xRotField.bottom
-                    anchors.right: zRotField.right
-                    labelText: "angle (degrees):"
-                    editorText: rotate_angle
-                    validator: angleValidator
-                    onEditingFinished: rotate_angle = parseFloat(editorText)
-                }
-                */
             }
 
             Pane {
