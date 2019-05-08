@@ -254,10 +254,11 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: moveUpButton.implicitWidth + moveDownButton.implicitWidth + 10 + deleteButton.implicitWidth
-                contentHeight: moveUpButton.implicitHeight
+                contentWidth: transformButtonsRow.implicitWidth
+                contentHeight: transformButtonsRow.implicitHeight
 
                 RowLayout {
+                    id: transformButtonsRow
                     anchors.fill: parent
 
                     PaddedButton {
