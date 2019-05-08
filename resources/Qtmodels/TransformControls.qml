@@ -29,6 +29,7 @@ Item {
                             addTranslate.implicitWidth + addRotate.implicitWidth)
     property TransformationModel transformModel
     property int componentIndex
+    property var transformTextFieldWidth: 90
 
     Label {
         id: relativeLabel
@@ -185,67 +186,79 @@ Item {
             Pane {
                 id: rotatePane
                 padding: 0
-                contentWidth: xRotField.implicitWidth + yRotField.implicitWidth + zRotField.implicitWidth
-                contentHeight: rotateNameField.height + xRotField.height + angleField.height
+                contentWidth: rotatePaneGrid.implicitWidth
+                contentHeight: rotatePaneGrid.implicitHeight
 
-                Label {
-                    id: rotateLabel
-                    anchors.verticalCenter: rotateNameField.verticalCenter
-                    anchors.left: parent.left
-                    text: "Rotation"
-                }
-                LabeledTextField {
-                    id: rotateNameField
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.left: yRotField.left
-                    anchoredEditor: true
-                    labelText: "Name:"
-                    editorText: name
-                    onEditingFinished: name = editorText
-                    validator: NameValidator {
-                        model: transformModel
-                        myindex: index
-                        onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                GridLayout {
+                    id: rotatePaneGrid
+                    anchors.fill: parent
+                    rows: 3
+                    columns: 6
+
+                    Label {
+                        id: rotateLabel
+                        text: "Rotation"
+                        Layout.columnSpan: 2
                     }
-                }
-
-                LabeledTextField {
-                    id: xRotField
-                    anchors.top: rotateNameField.bottom
-                    anchors.left: parent.left
-                    labelText: "x:"
-                    editorText: rotate_x
-                    validator: numberValidator
-                    onEditingFinished: rotate_x = parseFloat(editorText)
-                }
-                LabeledTextField {
-                    id: yRotField
-                    anchors.top: xRotField.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    labelText: "y:"
-                    editorText: rotate_y
-                    validator: numberValidator
-                    onEditingFinished: rotate_y = parseFloat(editorText)
-                }
-                LabeledTextField {
-                    id: zRotField
-                    anchors.top: xRotField.top
-                    anchors.right: parent.right
-                    labelText: "z:"
-                    editorText: rotate_z
-                    validator: numberValidator
-                    onEditingFinished: rotate_z = parseFloat(editorText)
-                }
-
-                LabeledTextField {
-                    id: angleField
-                    anchors.top: xRotField.bottom
-                    anchors.right: zRotField.right
-                    labelText: "angle (degrees):"
-                    editorText: rotate_angle
-                    validator: angleValidator
-                    onEditingFinished: rotate_angle = parseFloat(editorText)
+                    Label {
+                        id: rotateNameLabel
+                        text: "Name: "
+                        Layout.alignment: Qt.AlignRight
+                        Layout.columnSpan: 3
+                    }
+                    TextField {
+                        id: rotateNameField
+                        text: name
+                        onEditingFinished: name = text
+                        implicitWidth: transformTextFieldWidth
+                        validator: NameValidator {
+                            model: transformModel
+                            myindex: index
+                            onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                        }
+                    }
+                    Label {
+                        text: "X: "
+                    }
+                    TextField {
+                        id: xRotationField
+                        implicitWidth: transformTextFieldWidth
+                        text: rotate_x
+                        validator: numberValidator
+                        onEditingFinished: rotate_x = parseFloat(text)
+                    }
+                    Label {
+                        text: "Y: "
+                    }
+                    TextField {
+                        id: yRotationField
+                        implicitWidth: transformTextFieldWidth
+                        text: rotate_y
+                        validator: numberValidator
+                        onEditingFinished: rotate_y = parseFloat(text)
+                    }
+                    Label {
+                        text: "Z: "
+                    }
+                    TextField {
+                        id: zRotationField
+                        implicitWidth: transformTextFieldWidth
+                        text: rotate_y
+                        validator: numberValidator
+                        onEditingFinished: rotate_y = parseFloat(text)
+                    }
+                    Label {
+                        text: "Angle (Degrees): "
+                        Layout.alignment: Qt.AlignRight
+                        Layout.columnSpan: 5
+                    }
+                    TextField {
+                        id: angleField
+                        implicitWidth: transformTextFieldWidth
+                        text: rotate_angle
+                        validator: angleValidator
+                        onEditingFinished: rotate_angle = parseFloat(text)
+                    }
                 }
             }
 
