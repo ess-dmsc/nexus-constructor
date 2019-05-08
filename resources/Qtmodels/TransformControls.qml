@@ -116,211 +116,221 @@ Item {
 
         Frame {
             id: transformBox
-            width: transformsListView.width
-            contentHeight: translatePane.height + rotatePane.height + transformButtons.height
+            // width: transformsListView.width
+            // contentHeight: translatePane.height + rotatePane.height + transformButtons.height
+            contentHeight: transformBoxStack.implicitHeight + transformButtons.implicitHeight
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
 
             Component.onCompleted: {
                 if (transformsListView.implicitWidth < transformBox.implicitWidth) {
                     transformsListView.implicitWidth = transformBox.implicitWidth
                 }
+                console.log(transformBoxStack.implicitHeight)
             }
 
-            Pane {
-                id: translatePane
-                padding: 0
-                contentWidth: translatePaneGrid.implicitWidth
-                contentHeight: translatePaneGrid.implicitHeight
+            ColumnLayout {
+                id: transformBoxColumn
 
-                GridLayout {
-                    id: translatePaneGrid
-                    rows: 2
-                    columns: 6
+                StackLayout {
+                    id: transformBoxStack
+                    currentIndex: transform_type == "Translate" ? 0 : 1
+                    Layout.preferredHeight: currentIndex == 0 ? translatePane.implicitHeight : rotatePane.implicitHeight
 
-                    Label {
-                        id: translateLabel
-                        text: "Translation"
-                        Layout.columnSpan: 2
-                    }
-                    Label {
-                        id: translateNameLabel
-                        text: "Name: "
-                        Layout.columnSpan: 3
-                        Layout.alignment: Qt.AlignRight
-                    }
-                    TextField {
-                        id: translateNameField
-                        implicitWidth: transformTextFieldWidth
-                        text: name
-                        selectByMouse: true
-                        onEditingFinished: name = text
-                        validator: NameValidator {
-                            model: transformModel
-                            myindex: index
-                            onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                    Pane {
+                        id: translatePane
+                        padding: 0
+                        contentWidth: translatePaneGrid.implicitWidth
+                        contentHeight: translatePaneGrid.implicitHeight
+                        visible: true
+
+                        GridLayout {
+                            id: translatePaneGrid
+                            rows: 2
+                            columns: 6
+
+                            Label {
+                                id: translateLabel
+                                text: "Translation"
+                                Layout.columnSpan: 2
+                            }
+                            Label {
+                                id: translateNameLabel
+                                text: "Name: "
+                                Layout.columnSpan: 3
+                                Layout.alignment: Qt.AlignRight
+                            }
+                            TextField {
+                                id: translateNameField
+                                implicitWidth: transformTextFieldWidth
+                                text: name
+                                selectByMouse: true
+                                onEditingFinished: name = text
+                                validator: NameValidator {
+                                    model: transformModel
+                                    myindex: index
+                                    onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                                }
+                            }
+                            Label {
+                                text: "X: "
+                            }
+                            TextField {
+                                id: xTranslationField
+                                implicitWidth: transformTextFieldWidth
+                                text: translate_x
+                                selectByMouse: true
+                                validator: numberValidator
+                                onEditingFinished: translate_x = parseFloat(text)
+                            }
+                            Label {
+                                text: "Y: "
+                            }
+                            TextField {
+                                id: yTranslationField
+                                implicitWidth: transformTextFieldWidth
+                                text: translate_y
+                                selectByMouse: true
+                                validator: numberValidator
+                                onEditingFinished: translate_y = parseFloat(text)
+                            }
+                            Label {
+                                text: "Z: "
+                            }
+                            TextField {
+                                id: zTranslationField
+                                implicitWidth: transformTextFieldWidth
+                                text: translate_z
+                                selectByMouse: true
+                                validator: numberValidator
+                                onEditingFinished: translate_z = parseFloat(text)
+                            }
                         }
                     }
-                    Label {
-                        text: "X: "
-                    }
-                    TextField {
-                        id: xTranslationField
-                        implicitWidth: transformTextFieldWidth
-                        text: translate_x
-                        selectByMouse: true
-                        validator: numberValidator
-                        onEditingFinished: translate_x = parseFloat(text)
-                    }
-                    Label {
-                        text: "Y: "
-                    }
-                    TextField {
-                        id: yTranslationField
-                        implicitWidth: transformTextFieldWidth
-                        text: translate_y
-                        selectByMouse: true
-                        validator: numberValidator
-                        onEditingFinished: translate_y = parseFloat(text)
-                    }
-                    Label {
-                        text: "Z: "
-                    }
-                    TextField {
-                        id: zTranslationField
-                        implicitWidth: transformTextFieldWidth
-                        text: translate_z
-                        selectByMouse: true
-                        validator: numberValidator
-                        onEditingFinished: translate_z = parseFloat(text)
-                    }
-                }
-            }
 
-            Pane {
-                id: rotatePane
-                padding: 0
-                contentWidth: rotatePaneGrid.implicitWidth
-                contentHeight: rotatePaneGrid.implicitHeight
+                    Pane {
+                        id: rotatePane
+                        padding: 0
+                        contentWidth: rotatePaneGrid.implicitWidth
+                        contentHeight: rotatePaneGrid.implicitHeight
+                        visible: true
 
-                GridLayout {
-                    id: rotatePaneGrid
-                    anchors.fill: parent
-                    rows: 3
-                    columns: 6
+                        GridLayout {
+                            id: rotatePaneGrid
+                            anchors.fill: parent
+                            rows: 3
+                            columns: 6
 
-                    Label {
-                        id: rotateLabel
-                        text: "Rotation"
-                        Layout.columnSpan: 2
-                    }
-                    Label {
-                        id: rotateNameLabel
-                        text: "Name: "
-                        Layout.alignment: Qt.AlignRight
-                        Layout.columnSpan: 3
-                    }
-                    TextField {
-                        id: rotateNameField
-                        text: name
-                        selectByMouse: true
-                        onEditingFinished: name = text
-                        implicitWidth: transformTextFieldWidth
-                        validator: NameValidator {
-                            model: transformModel
-                            myindex: index
-                            onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                            Label {
+                                id: rotateLabel
+                                text: "Rotation"
+                                Layout.columnSpan: 2
+                            }
+                            Label {
+                                id: rotateNameLabel
+                                text: "Name: "
+                                Layout.alignment: Qt.AlignRight
+                                Layout.columnSpan: 3
+                            }
+                            TextField {
+                                id: rotateNameField
+                                text: name
+                                selectByMouse: true
+                                onEditingFinished: name = text
+                                implicitWidth: transformTextFieldWidth
+                                validator: NameValidator {
+                                    model: transformModel
+                                    myindex: index
+                                    onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                                }
+                            }
+                            Label {
+                                text: "X: "
+                            }
+                            TextField {
+                                id: xRotationField
+                                implicitWidth: transformTextFieldWidth
+                                text: rotate_x
+                                selectByMouse: true
+                                validator: numberValidator
+                                onEditingFinished: rotate_x = parseFloat(text)
+                            }
+                            Label {
+                                text: "Y: "
+                            }
+                            TextField {
+                                id: yRotationField
+                                implicitWidth: transformTextFieldWidth
+                                text: rotate_y
+                                selectByMouse: true
+                                validator: numberValidator
+                                onEditingFinished: rotate_y = parseFloat(text)
+                            }
+                            Label {
+                                text: "Z: "
+                            }
+                            TextField {
+                                id: zRotationField
+                                implicitWidth: transformTextFieldWidth
+                                text: rotate_y
+                                selectByMouse: true
+                                validator: numberValidator
+                                onEditingFinished: rotate_y = parseFloat(text)
+                            }
+                            Label {
+                                text: "Angle (Degrees): "
+                                Layout.alignment: Qt.AlignRight
+                                Layout.columnSpan: 5
+                            }
+                            TextField {
+                                id: angleField
+                                implicitWidth: transformTextFieldWidth
+                                text: rotate_angle
+                                selectByMouse: true
+                                validator: angleValidator
+                                onEditingFinished: rotate_angle = parseFloat(text)
+                            }
                         }
                     }
-                    Label {
-                        text: "X: "
-                    }
-                    TextField {
-                        id: xRotationField
-                        implicitWidth: transformTextFieldWidth
-                        text: rotate_x
-                        selectByMouse: true
-                        validator: numberValidator
-                        onEditingFinished: rotate_x = parseFloat(text)
-                    }
-                    Label {
-                        text: "Y: "
-                    }
-                    TextField {
-                        id: yRotationField
-                        implicitWidth: transformTextFieldWidth
-                        text: rotate_y
-                        selectByMouse: true
-                        validator: numberValidator
-                        onEditingFinished: rotate_y = parseFloat(text)
-                    }
-                    Label {
-                        text: "Z: "
-                    }
-                    TextField {
-                        id: zRotationField
-                        implicitWidth: transformTextFieldWidth
-                        text: rotate_y
-                        selectByMouse: true
-                        validator: numberValidator
-                        onEditingFinished: rotate_y = parseFloat(text)
-                    }
-                    Label {
-                        text: "Angle (Degrees): "
-                        Layout.alignment: Qt.AlignRight
-                        Layout.columnSpan: 5
-                    }
-                    TextField {
-                        id: angleField
-                        implicitWidth: transformTextFieldWidth
-                        text: rotate_angle
-                        selectByMouse: true
-                        validator: angleValidator
-                        onEditingFinished: rotate_angle = parseFloat(text)
+                }
+                Pane {
+                    id: transformButtons
+                    contentWidth: transformButtonsRow.implicitWidth
+                    contentHeight: transformButtonsRow.implicitHeight
+
+                    RowLayout {
+                        id: transformButtonsRow
+                        anchors.fill: parent
+
+                        PaddedButton {
+                            id: moveUpButton
+                            Layout.fillWidth: false
+                            text: "Move up"
+                            onClicked: transformModel.change_position(index, index - 1)
+                        }
+                        PaddedButton {
+                            id: moveDownButton
+                            Layout.fillWidth: false
+                            text: "Move down"
+                            onClicked: transformModel.change_position(index, index + 1)
+                        }
+                        Item {
+                            // Spacer item to force deleteButton to the right
+                            Layout.fillWidth: true
+                        }
+                        PaddedButton {
+                            id: deleteButton
+                            Layout.fillWidth: false
+                            text: "Delete"
+                            onClicked: transformModel.delete_transform(index)
+                            buttonEnabled: deletable
+                            ToolTip.visible: hovered & !deletable
+                            ToolTip.delay: 400
+                            ToolTip.text: "Cannot remove a transform that's in use as a transform parent"
+                        }
                     }
                 }
             }
-
-            Pane {
-                id: transformButtons
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                contentWidth: transformButtonsRow.implicitWidth
-                contentHeight: transformButtonsRow.implicitHeight
-
-                RowLayout {
-                    id: transformButtonsRow
-                    anchors.fill: parent
-
-                    PaddedButton {
-                        id: moveUpButton
-                        Layout.fillWidth: false
-                        text: "Move up"
-                        onClicked: transformModel.change_position(index, index - 1)
-                    }
-                    PaddedButton {
-                        id: moveDownButton
-                        Layout.fillWidth: false
-                        text: "Move down"
-                        onClicked: transformModel.change_position(index, index + 1)
-                    }
-                    Item {
-                        // Spacer item to force deleteButton to the right
-                        Layout.fillWidth: true
-                    }
-                    PaddedButton {
-                        id: deleteButton
-                        Layout.fillWidth: false
-                        text: "Delete"
-                        onClicked: transformModel.delete_transform(index)
-                        buttonEnabled: deletable
-                        ToolTip.visible: hovered & !deletable
-                        ToolTip.delay: 400
-                        ToolTip.text: "Cannot remove a transform that's in use as a transform parent"
-                    }
-                }
-            }
-
+            /*
             states: [
                 State {
                     name: "Translate"; when: transform_type == "Translate"
@@ -333,6 +343,7 @@ Item {
                     PropertyChanges { target: translatePane; height: 0 }
                 }
             ]
+            */
         }
     }
 
