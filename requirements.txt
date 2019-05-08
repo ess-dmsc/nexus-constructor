@@ -16,5 +16,5 @@ jsonschema==2.6.0
 git+https://github.com/anthony-tuininga/cx_Freeze.git@master
 
 # PySide2 has had some issues with new versions and packaging so we will pin it
-PySide2==5.12.2
+PySide2==5.12.3
 
