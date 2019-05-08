@@ -230,7 +230,6 @@ ExpandingWindow {
                         rows: 2
                         columns: 2
                         Layout.fillWidth: true
-
                         Label {
                             text: "Name: "
                         }
@@ -244,7 +243,7 @@ ExpandingWindow {
                                 model: components
                                 myindex: -1
                                 onValidationFailed: {
-                                    nameField.ToolTip.show("Component names must be unique", 3000)
+                                    nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
                                 }
                             }
                         }

@@ -139,7 +139,7 @@ Pane {
                         }
                         InvalidInputCross {
                             id: invalidMeshUnitsCross
-                            toolTipMessage: ValidUnits.invalidUnitsText
+                            toolTipMessage: ErrorMessages.invalidUnits
                         }
                     }
                     RowLayout {
@@ -231,7 +231,7 @@ Pane {
                     anchors.right: parent.right
                     anchors.top: unitsField.top
                     visible: !ValidUnits.validCylinderUnits
-                    toolTipMessage: ValidUnits.invalidUnitsText
+                    toolTipMessage: ErrorMessages.invalidUnits
                 }
 
                 Label {
