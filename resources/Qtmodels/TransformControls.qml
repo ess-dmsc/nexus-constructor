@@ -29,6 +29,7 @@ Item {
                             addTranslate.implicitWidth + addRotate.implicitWidth)
     property TransformationModel transformModel
     property int componentIndex
+    property var transformTextFieldWidth: 90
 
     Label {
         id: relativeLabel
@@ -211,6 +212,7 @@ Item {
                         id: rotateNameField
                         text: name
                         onEditingFinished: name = text
+                        implicitWidth: transformTextFieldWidth
                         validator: NameValidator {
                             model: transformModel
                             myindex: index
@@ -222,18 +224,21 @@ Item {
                     }
                     TextField {
                         id: xRotationField
+                        implicitWidth: transformTextFieldWidth
                     }
                     Label {
                         text: "Y: "
                     }
                     TextField {
                         id: yRotationField
+                        implicitWidth: transformTextFieldWidth
                     }
                     Label {
                         text: "Z: "
                     }
                     TextField {
                         id: zRotationField
+                        implicitWidth: transformTextFieldWidth
                     }
                     Label {
                         text: "Angle (Degrees): "
@@ -242,6 +247,7 @@ Item {
                     }
                     TextField {
                         id: angleField
+                        implicitWidth: transformTextFieldWidth
                     }
                 }
 
