@@ -152,6 +152,7 @@ Item {
                         id: translateNameField
                         implicitWidth: transformTextFieldWidth
                         text: name
+                        selectByMouse: true
                         onEditingFinished: name = text
                         validator: NameValidator {
                             model: transformModel
@@ -166,6 +167,7 @@ Item {
                         id: xTranslationField
                         implicitWidth: transformTextFieldWidth
                         text: translate_x
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: translate_x = parseFloat(text)
                     }
@@ -176,6 +178,7 @@ Item {
                         id: yTranslationField
                         implicitWidth: transformTextFieldWidth
                         text: translate_y
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: translate_y = parseFloat(text)
                     }
@@ -186,6 +189,7 @@ Item {
                         id: zTranslationField
                         implicitWidth: transformTextFieldWidth
                         text: translate_z
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: translate_z = parseFloat(text)
                     }
@@ -218,6 +222,7 @@ Item {
                     TextField {
                         id: rotateNameField
                         text: name
+                        selectByMouse: true
                         onEditingFinished: name = text
                         implicitWidth: transformTextFieldWidth
                         validator: NameValidator {
@@ -233,6 +238,7 @@ Item {
                         id: xRotationField
                         implicitWidth: transformTextFieldWidth
                         text: rotate_x
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: rotate_x = parseFloat(text)
                     }
@@ -243,6 +249,7 @@ Item {
                         id: yRotationField
                         implicitWidth: transformTextFieldWidth
                         text: rotate_y
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: rotate_y = parseFloat(text)
                     }
@@ -253,6 +260,7 @@ Item {
                         id: zRotationField
                         implicitWidth: transformTextFieldWidth
                         text: rotate_y
+                        selectByMouse: true
                         validator: numberValidator
                         onEditingFinished: rotate_y = parseFloat(text)
                     }
@@ -265,6 +273,7 @@ Item {
                         id: angleField
                         implicitWidth: transformTextFieldWidth
                         text: rotate_angle
+                        selectByMouse: true
                         validator: angleValidator
                         onEditingFinished: rotate_angle = parseFloat(text)
                     }
