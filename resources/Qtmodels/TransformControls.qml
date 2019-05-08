@@ -329,20 +329,6 @@ Item {
                     }
                 }
             }
-            /*
-            states: [
-                State {
-                    name: "Translate"; when: transform_type == "Translate"
-                    PropertyChanges { target: rotatePane; visible: false }
-                    PropertyChanges { target: rotatePane; height: 0 }
-                },
-                State {
-                    name: "Rotate"; when: transform_type == "Rotate"
-                    PropertyChanges { target: translatePane; visible: false }
-                    PropertyChanges { target: translatePane; height: 0 }
-                }
-            ]
-            */
         }
     }
 
