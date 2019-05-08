@@ -129,8 +129,8 @@ Item {
             Pane {
                 id: translatePane
                 padding: 0
-                contentWidth: xField.implicitWidth + yField.implicitWidth + zField.implicitWidth
-                contentHeight: translateNameField.height + xField.height
+                contentWidth: translatePaneGrid.implicitWidth
+                contentHeight: translatePaneGrid.implicitHeight
 
                 GridLayout {
                     id: translatePaneGrid
