@@ -141,7 +141,6 @@ Item {
                         padding: 0
                         contentWidth: translatePaneGrid.implicitWidth
                         contentHeight: translatePaneGrid.implicitHeight
-                        visible: true
 
                         GridLayout {
                             id: translatePaneGrid
