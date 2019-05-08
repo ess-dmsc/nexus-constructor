@@ -116,20 +116,20 @@ Item {
 
         Frame {
             id: transformBox
-            // width: transformsListView.width
-            // contentHeight: translatePane.height + rotatePane.height + transformButtons.height
             contentHeight: transformBoxStack.height + transformButtons.implicitHeight
             contentWidth: Math.max(translatePane.implicitWidth, rotatePane.implicitWidth, transformButtons.implicitWidth)
+            anchors.right: parent.right
+            anchors.left: parent.left
 
             Component.onCompleted: {
                 if (transformsListView.implicitWidth < transformBox.implicitWidth) {
                     transformsListView.implicitWidth = transformBox.implicitWidth
                 }
-                console.log(transformBoxStack.implicitHeight)
             }
 
             ColumnLayout {
                 id: transformBoxColumn
+                anchors.fill: parents
 
                 StackLayout {
                     id: transformBoxStack
