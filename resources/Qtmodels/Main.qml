@@ -5,7 +5,6 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.11
 import MyJson 1.0
 import MyModels 1.0
-import MyWriters 1.0
 
 ApplicationWindow {
 
@@ -38,10 +37,6 @@ ApplicationWindow {
             Action {
                 text: "Export to NeXus file"
                 onTriggered: nexusFileDialog.open()
-            }
-            Action {
-                text: "Write to console"
-                onTriggered: hdfWriter.print_instrument_to_console(components)
             }
         }
         Menu {
@@ -173,14 +168,6 @@ ApplicationWindow {
         id: jsonModel
     }
 
-    Logger {
-        id: myLogger
-    }
-
-    HdfWriter {
-        id: hdfWriter
-    }
-
     JsonConnector {
         id: jsonConnector
         Component.onCompleted: {
@@ -222,7 +209,7 @@ ApplicationWindow {
         nameFilters: ["Nexus files (*.nxs *.nx5)", "HDF5 files (*.hdf5)"]
         defaultSuffix: "nxs"
         selectExisting: false
-        onAccepted: hdfWriter.save_instrument(fileUrl, components)
+        onAccepted: nxsModel.write_to_file(fileUrl)
     }
 
     FileDialog {

@@ -32,13 +32,10 @@ from nexus_constructor.validators import (
     UnitValidator,
 )
 from nexus_constructor.geometry_file_validator import GeometryFileValidator
-from nexus_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 
 
-qmlRegisterType(Logger, "MyWriters", 1, 0, "Logger")
-qmlRegisterType(HdfWriter, "MyWriters", 1, 0, "HdfWriter")
 qmlRegisterType(NexusModel, "MyModels", 1, 0, "NexusModel")
 qmlRegisterType(InstrumentModel, "MyModels", 1, 0, "InstrumentModel")
 qmlRegisterType(SingleComponentModel, "MyModels", 1, 0, "SingleComponentModel")

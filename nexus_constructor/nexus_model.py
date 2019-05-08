@@ -1,6 +1,6 @@
 from uuid import uuid4
 import h5py
-from PySide2.QtCore import QObject, Property
+from PySide2.QtCore import QObject, Property, Slot, QUrl
 from nexus_constructor.component_type import ComponentType
 
 
@@ -27,6 +27,14 @@ def get_nx_class_for_component(component_type):
     return nxclass
 
 
+def append_nxs_extension(file_name):
+    extension = ".nxs"
+    if file_name.endswith(extension):
+        return file_name
+    else:
+        return file_name + extension
+
+
 class NexusModel(QObject):
     """
     Stores InstrumentModel data in NeXus compliant hdf5 files
@@ -47,3 +55,13 @@ class NexusModel(QObject):
         )
 
         self.entry = create_group("entry", "NXentry", self.nexus_file)
+
+    @Slot("QVariant")
+    def write_to_file(self, file_name):
+        output = h5py.File(
+            append_nxs_extension(
+                file_name.toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
+            ),
+            mode="w",
+        )
+        output.copy(source=self.getEntryGroup(), dest="/entry/")

@@ -12,7 +12,11 @@ from nexus_constructor.component import Component
 from nexus_constructor.pixel_data import SinglePixelId
 from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.geometry_types import OFFGeometry, CylindricalGeometry
-from nexus_constructor.nexus import NexusEncoder, NexusDecoder
+from nexus_constructor.nexus import (
+    NexusDecoder,
+    absolute_transform_path_name,
+    component_class_name,
+)
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QVector3D
 
@@ -27,8 +31,7 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
     components = []
 
     component_classes = [
-        NexusEncoder.component_class_name(component_type)
-        for component_type in ComponentType
+        component_class_name(component_type) for component_type in ComponentType
     ]
     nx_instrument = None
     nx_sample = None
@@ -294,7 +297,7 @@ def generate_transforms(json_component: dict):
                 in_instrument = attribute_value(
                     json_component, "depends_on"
                 ).startswith("/entry/instrument/")
-                transform_path = NexusEncoder.absolute_transform_path_name(
+                transform_path = absolute_transform_path_name(
                     name, json_component["name"], in_instrument
                 )
                 dependencies[transform_path] = attribute_value(dataset, "depends_on")
