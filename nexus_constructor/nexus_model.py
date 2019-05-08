@@ -62,6 +62,6 @@ class NexusModel(QObject):
             append_nxs_extension(
                 file_name.toString(options=QUrl.FormattingOptions(QUrl.PreferLocalFile))
             ),
-            mode="a",
+            mode="w",
         )
         output.copy(source=self.getEntryGroup(), dest="/entry/")

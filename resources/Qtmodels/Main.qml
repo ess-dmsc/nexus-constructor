@@ -5,7 +5,6 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.11
 import MyJson 1.0
 import MyModels 1.0
-import MyWriters 1.0
 
 ApplicationWindow {
 
@@ -37,10 +36,6 @@ ApplicationWindow {
             Action {
                 text: "Export to NeXus file"
                 onTriggered: nexusFileDialog.open()
-            }
-            Action {
-                text: "Write to console"
-                onTriggered: hdfWriter.print_instrument_to_console(components)
             }
         }
         Menu {
@@ -161,14 +156,6 @@ ApplicationWindow {
 
     FilteredJsonModel {
         id: jsonModel
-    }
-
-    Logger {
-        id: myLogger
-    }
-
-    HdfWriter {
-        id: hdfWriter
     }
 
     JsonConnector {

@@ -5,175 +5,165 @@ from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection
 from typing import List, Union
 
 
-class NexusEncoder:
+def pixel_mapping(mapping: PixelMapping):
     """
-    Wrapper class for methods used to transform properties from data_model classes to the format required by Nexus
+    Returns a list of two-item lists. Each sublist contains a face ID followed by the face's detector ID.
+    Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
+    """
+    return [
+        [face_id, mapping.pixel_ids[face_id]]
+        for face_id in range(len(mapping.pixel_ids))
+        if mapping.pixel_ids[face_id] is not None
+    ]
+
+
+def pixel_grid_x_offsets(grid: PixelGrid):
+    """
+    Returns a list of 'row' lists of 'column' length.
+    Each entry in the sublists are x positions of pixel instances in the given PixelGrid
+    """
+    return [[x * grid.col_width for x in range(grid.columns)]] * grid.rows
+
+
+def pixel_grid_y_offsets(grid: PixelGrid):
+    """
+    Returns a list of 'row' lists of 'column' length.
+    Each entry in the sublists are y positions of pixel instances in the given PixelGrid
+    """
+    return [[y * grid.row_height] * grid.columns for y in range(grid.rows)]
+
+
+def pixel_grid_z_offsets(grid: PixelGrid):
+    """
+    Returns a list of 'row' lists of 'column' length.
+    Each entry in the sublists are z positions of pixel instances in the given PixelGrid
+    """
+    return [[0] * grid.columns] * grid.rows
+
+
+def pixel_grid_detector_ids(grid: PixelGrid):
+    """
+    Returns a list of 'row' lists of 'column' length.
+    Each entry in the sublists are detector id's of pixel instances in the given PixelGrid
     """
 
-    @staticmethod
-    def component_class_name(component_type: ComponentType):
-        return "NX{}".format(component_type.name.lower())
+    ids = [[0] * grid.columns for _ in range(grid.rows)]
 
-    @staticmethod
-    def pixel_mapping(mapping: PixelMapping):
-        """
-        Returns a list of two-item lists. Each sublist contains a face ID followed by the face's detector ID.
-        Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
-        """
-        return [
-            [face_id, mapping.pixel_ids[face_id]]
-            for face_id in range(len(mapping.pixel_ids))
-            if mapping.pixel_ids[face_id] is not None
-        ]
-
-    @staticmethod
-    def pixel_grid_x_offsets(grid: PixelGrid):
-        """
-        Returns a list of 'row' lists of 'column' length.
-        Each entry in the sublists are x positions of pixel instances in the given PixelGrid
-        """
-        return [[x * grid.col_width for x in range(grid.columns)]] * grid.rows
-
-    @staticmethod
-    def pixel_grid_y_offsets(grid: PixelGrid):
-        """
-        Returns a list of 'row' lists of 'column' length.
-        Each entry in the sublists are y positions of pixel instances in the given PixelGrid
-        """
-        return [[y * grid.row_height] * grid.columns for y in range(grid.rows)]
-
-    @staticmethod
-    def pixel_grid_z_offsets(grid: PixelGrid):
-        """
-        Returns a list of 'row' lists of 'column' length.
-        Each entry in the sublists are z positions of pixel instances in the given PixelGrid
-        """
-        return [[0] * grid.columns] * grid.rows
-
-    @staticmethod
-    def pixel_grid_detector_ids(grid: PixelGrid):
-        """
-        Returns a list of 'row' lists of 'column' length.
-        Each entry in the sublists are detector id's of pixel instances in the given PixelGrid
-        """
-
-        ids = [[0] * grid.columns for _ in range(grid.rows)]
-
-        for id_offset in range(grid.rows * grid.columns):
-            # Determine a coordinate for the id based on the count direction from (0,0)
-            if grid.count_direction == CountDirection.ROW:
-                col = id_offset % grid.columns
-                row = id_offset // grid.columns
-            else:
-                col = id_offset // grid.rows
-                row = id_offset % grid.rows
-            # Invert axes needed if starting in a different corner
-            if grid.initial_count_corner in (Corner.TOP_LEFT, Corner.TOP_RIGHT):
-                row = grid.rows - (1 + row)
-            if grid.initial_count_corner in (Corner.TOP_RIGHT, Corner.BOTTOM_RIGHT):
-                col = grid.columns - (1 + col)
-            # Set the id at the calculated coordinate
-            ids[row][col] = grid.first_id + id_offset
-
-        return ids
-
-    @staticmethod
-    def ancestral_dependent_transform(component: Component):
-        """
-        Returns a string of the nexus location of the transform the given component is positioned relative to.
-        """
-        if (
-            component.transform_parent is None
-            or component.transform_parent == component
-        ):
-            dependent_on = "."
+    for id_offset in range(grid.rows * grid.columns):
+        # Determine a coordinate for the id based on the count direction from (0,0)
+        if grid.count_direction == CountDirection.ROW:
+            col = id_offset % grid.columns
+            row = id_offset // grid.columns
         else:
-            dependent_on = "."
-            dependent_found = False
-            no_dependent = False
-            ancestor = component.transform_parent
-            index = -1
-            if component.dependent_transform is not None:
-                index = component.transform_parent.transforms.index(
-                    component.dependent_transform
+            col = id_offset // grid.rows
+            row = id_offset % grid.rows
+        # Invert axes needed if starting in a different corner
+        if grid.initial_count_corner in (Corner.TOP_LEFT, Corner.TOP_RIGHT):
+            row = grid.rows - (1 + row)
+        if grid.initial_count_corner in (Corner.TOP_RIGHT, Corner.BOTTOM_RIGHT):
+            col = grid.columns - (1 + col)
+        # Set the id at the calculated coordinate
+        ids[row][col] = grid.first_id + id_offset
+
+    return ids
+
+
+def ancestral_dependent_transform(component: Component):
+    """
+    Returns a string of the nexus location of the transform the given component is positioned relative to.
+    """
+    if component.transform_parent is None or component.transform_parent == component:
+        dependent_on = "."
+    else:
+        dependent_on = "."
+        dependent_found = False
+        no_dependent = False
+        ancestor = component.transform_parent
+        index = -1
+        if component.dependent_transform is not None:
+            index = component.transform_parent.transforms.index(
+                component.dependent_transform
+            )
+        while not (dependent_found or no_dependent):
+            if len(ancestor.transforms) > 0:
+                dependent_on = absolute_transform_path_name(
+                    ancestor.transforms[index],
+                    ancestor,
+                    ancestor.component_type not in external_component_types(),
                 )
-            while not (dependent_found or no_dependent):
-                if len(ancestor.transforms) > 0:
-                    dependent_on = NexusEncoder.absolute_transform_path_name(
-                        ancestor.transforms[index],
-                        ancestor,
-                        ancestor.component_type
-                        not in NexusEncoder.external_component_types(),
-                    )
-                    dependent_found = True
-                elif (
-                    ancestor.transform_parent is None
-                    or ancestor.transform_parent == ancestor
-                ):
-                    no_dependent = True
-                else:
-                    if ancestor.dependent_transform is None:
-                        index = -1
-                    else:
-                        index = component.transform_parent.transforms.index(
-                            component.dependent_transform
-                        )
-                    ancestor = ancestor.transform_parent
-        return dependent_on
-
-    @staticmethod
-    def absolute_transform_path_name(
-        transform: Union[Transformation, str],
-        containing_component: Union[Component, str],
-        in_instrument: bool,
-    ):
-        """
-        Determine the absolute path to a transform in a nexus file
-        :param transform: The transform, or its name
-        :param containing_component: The component that contains the transform, or its name
-        :param in_instrument: Whether or not the containing component is located in /entry/instrument
-        :return: The path to the transform in the nexus file
-        """
-        if isinstance(transform, Transformation):
-            transform_name = transform.name
-        else:
-            transform_name = transform
-        if isinstance(containing_component, Component):
-            component_name = containing_component.name
-        else:
-            component_name = containing_component
-        if in_instrument:
-            parent = "/entry/instrument"
-        else:
-            parent = "/entry"
-
-        return "{}/{}/transforms/{}".format(parent, component_name, transform_name)
-
-    @staticmethod
-    def external_component_types():
-        """Returns a set of component types that should be stored separately to /entry/instrument in a nexus file"""
-        return {ComponentType.SAMPLE, ComponentType.MONITOR}
-
-    @staticmethod
-    def geometry_group_name(component: Component):
-        """
-        Returns the name the component's geometry group should have
-
-        For NXdetector groups:
-            'detector_shape' if NXoff_geometry containing 'detector_faces', or NXcylindrical_geometry containing
-        'detector_number'. 'pixel_shape' otherwise
-        For other groups:
-            'shape'
-        """
-        # As of writing, Nexus constructor NXcylindrical_geometry's don't contain 'detector_number', simplifying the
-        # logic here
-        if component.component_type == ComponentType.DETECTOR:
-            if isinstance(component.pixel_data, PixelMapping):
-                return "detector_shape"
+                dependent_found = True
+            elif (
+                ancestor.transform_parent is None
+                or ancestor.transform_parent == ancestor
+            ):
+                no_dependent = True
             else:
-                return "pixel_shape"
+                if ancestor.dependent_transform is None:
+                    index = -1
+                else:
+                    index = component.transform_parent.transforms.index(
+                        component.dependent_transform
+                    )
+                ancestor = ancestor.transform_parent
+    return dependent_on
+
+
+def absolute_transform_path_name(
+    transform: Union[Transformation, str],
+    containing_component: Union[Component, str],
+    in_instrument: bool,
+):
+    """
+    Determine the absolute path to a transform in a nexus file
+    :param transform: The transform, or its name
+    :param containing_component: The component that contains the transform, or its name
+    :param in_instrument: Whether or not the containing component is located in /entry/instrument
+    :return: The path to the transform in the nexus file
+    """
+    if isinstance(transform, Transformation):
+        transform_name = transform.name
+    else:
+        transform_name = transform
+    if isinstance(containing_component, Component):
+        component_name = containing_component.name
+    else:
+        component_name = containing_component
+    if in_instrument:
+        parent = "/entry/instrument"
+    else:
+        parent = "/entry"
+
+    return "{}/{}/transforms/{}".format(parent, component_name, transform_name)
+
+
+def external_component_types():
+    """Returns a set of component types that should be stored separately to /entry/instrument in a nexus file"""
+    return {ComponentType.SAMPLE, ComponentType.MONITOR}
+
+
+def geometry_group_name(component: Component):
+    """
+    Returns the name the component's geometry group should have
+
+    For NXdetector groups:
+        'detector_shape' if NXoff_geometry containing 'detector_faces', or NXcylindrical_geometry containing
+    'detector_number'. 'pixel_shape' otherwise
+    For other groups:
+        'shape'
+    """
+    # As of writing, Nexus constructor NXcylindrical_geometry's don't contain 'detector_number', simplifying the
+    # logic here
+    if component.component_type == ComponentType.DETECTOR:
+        if isinstance(component.pixel_data, PixelMapping):
+            return "detector_shape"
         else:
-            return "shape"
+            return "pixel_shape"
+    else:
+        return "shape"
+
+
+def component_class_name(component_type: ComponentType):
+    return "NX{}".format(component_type.name.lower())
 
 
 class NexusDecoder:
