@@ -143,6 +143,7 @@ Item {
                         Layout.columnSpan: 2
                     }
                     Label {
+                        id: translateNameLabel
                         text: "Name: "
                         Layout.columnSpan: 3
                         Layout.alignment: Qt.AlignRight
@@ -162,7 +163,7 @@ Item {
                         text: "X: "
                     }
                     TextField {
-                        id: translateXField
+                        id: xTranslationField
                         implicitWidth: transformTextFieldWidth
                         text: translate_x
                         validator: numberValidator
@@ -172,7 +173,7 @@ Item {
                         text: "Y: "
                     }
                     TextField {
-                        id: translateYField
+                        id: yTranslationField
                         implicitWidth: transformTextFieldWidth
                         text: translate_y
                         validator: numberValidator
@@ -182,7 +183,7 @@ Item {
                         text: "Z: "
                     }
                     TextField {
-                        id: translateZField
+                        id: zTranslationField
                         implicitWidth: transformTextFieldWidth
                         text: translate_z
                         validator: numberValidator
