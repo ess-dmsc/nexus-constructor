@@ -150,6 +150,13 @@ Item {
                     TextField {
                         id: translateNameField
                         implicitWidth: transformTextFieldWidth
+                        text: name
+                        onEditingFinished: name = text
+                        validator: NameValidator {
+                            model: transformModel
+                            myindex: index
+                            onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
+                        }
                     }
                     Label {
                         text: "X: "
@@ -157,6 +164,9 @@ Item {
                     TextField {
                         id: translateXField
                         implicitWidth: transformTextFieldWidth
+                        text: translate_x
+                        validator: numberValidator
+                        onEditingFinished: translate_x = parseFloat(text)
                     }
                     Label {
                         text: "Y: "
@@ -164,6 +174,9 @@ Item {
                     TextField {
                         id: translateYField
                         implicitWidth: transformTextFieldWidth
+                        text: translate_y
+                        validator: numberValidator
+                        onEditingFinished: translate_y = parseFloat(text)
                     }
                     Label {
                         text: "Z: "
@@ -171,53 +184,11 @@ Item {
                     TextField {
                         id: translateZField
                         implicitWidth: transformTextFieldWidth
+                        text: translate_z
+                        validator: numberValidator
+                        onEditingFinished: translate_z = parseFloat(text)
                     }
                 }
-                /*
-                LabeledTextField {
-
-                        anchors.top: parent.top
-                        anchors.right: parent.right
-                        anchors.left: yField.left
-                        anchoredEditor: true
-                        labelText: "Name:"
-                        editorText: name
-                        onEditingFinished: name = editorText
-                        validator: NameValidator {
-                            model: transformModel
-                            myindex: index
-                            onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
-                        }
-                    }
-
-                    LabeledTextField {
-                        id: xField
-                        anchors.top: translateNameField.bottom
-                        anchors.left: parent.left
-                        labelText: "x:"
-                        editorText: translate_x
-                        validator: numberValidator
-                        onEditingFinished: translate_x = parseFloat(editorText)
-                    }
-                    LabeledTextField {
-                        id: yField
-                        anchors.top: xField.top
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        labelText: "y:"
-                        editorText: translate_y
-                        validator: numberValidator
-                        onEditingFinished: translate_y = parseFloat(editorText)
-                    }
-                    LabeledTextField {
-                        id: zField
-                        anchors.top: xField.top
-                        anchors.right: parent.right
-                        labelText: "z:"
-                        editorText: translate_z
-                        validator: numberValidator
-                        onEditingFinished: translate_z = parseFloat(editorText)
-                    }
-                    */
             }
 
             Pane {
