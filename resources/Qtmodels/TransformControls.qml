@@ -274,7 +274,7 @@ Item {
                         onClicked: transformModel.change_position(index, index + 1)
                     }
                     Item {
-                        // Spacer Item
+                        // Spacer Item to force deleteButton to the right
                         Layout.fillWidth: true
                     }
                     PaddedButton {
