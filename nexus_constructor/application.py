@@ -24,6 +24,7 @@ from nexus_constructor.qml_models.pixel_models import (
     PixelMappingModel,
     SinglePixelModel,
 )
+from nexus_constructor.qml_models.component_model import ComponentModel
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.validators import (
     NameValidator,
@@ -34,7 +35,6 @@ from nexus_constructor.validators import (
 from nexus_constructor.geometry_file_validator import GeometryFileValidator
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
-
 
 qmlRegisterType(NexusModel, "MyModels", 1, 0, "NexusModel")
 qmlRegisterType(InstrumentModel, "MyModels", 1, 0, "InstrumentModel")
@@ -48,7 +48,7 @@ qmlRegisterType(PixelGridModel, "MyModels", 1, 0, "PixelGridModel")
 qmlRegisterType(PixelMappingModel, "MyModels", 1, 0, "PixelMappingModel")
 qmlRegisterType(SinglePixelModel, "MyModels", 1, 0, "SinglePixelModel")
 qmlRegisterType(TransformationModel, "MyModels", 1, 0, "TransformationModel")
-
+qmlRegisterType(ComponentModel, "MyModels", 1, 0, "ComponentModel")
 qmlRegisterType(JsonConnector, "MyJson", 1, 0, "JsonConnector")
 qmlRegisterType(GeometryFileValidator, "GeometryValidator", 1, 0, "GeometryValidator")
 
