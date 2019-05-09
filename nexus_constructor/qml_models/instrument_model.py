@@ -5,7 +5,7 @@ from nexus_constructor.qml_models.helpers import generate_unique_name
 from nexus_constructor.transformations import Rotation, Translation
 from nexus_constructor.qml_models.transform_model import TransformationModel
 from nexus_constructor.off_renderer import OffMesh
-from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
+from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot, Property
 from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
 from nexus_constructor.nexus_model import create_group
@@ -87,6 +87,11 @@ class InstrumentModel(QAbstractListModel):
     TransformMatrixRole = Qt.UserRole + 8
     RemovableRole = Qt.UserRole + 9
     TransformModelRole = Qt.UserRole + 10
+
+    def get_instrument_group(self):
+        return self.instrument_group
+
+    InstrumentGroup = Property("QVariant", get_instrument_group, notify=lambda: None)
 
     @Slot("QVariant")
     def initialise(self, group):

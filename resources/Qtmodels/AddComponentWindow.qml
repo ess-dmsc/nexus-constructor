@@ -7,6 +7,12 @@ import QtQuick.Layouts 1.11
 
 ExpandingWindow {
 
+
+                ComponentModel{
+                    id: componentModel
+
+                }
+
     property string name: components.generate_component_name(componentType)
     property string description: ""
     property real transform_parent_index: 0
@@ -165,6 +171,7 @@ ExpandingWindow {
                             detailsPane.focus = true
                             nameField.focus = true
                             addComponentStack.currentIndex = 1
+                            componentModel.create_component_group(name, componentType, components.InstrumentGroup)
                         }
                     }
 
@@ -221,6 +228,7 @@ ExpandingWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: false
+
 
                 ColumnLayout {
                     id: detailColumn

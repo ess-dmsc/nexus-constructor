@@ -11,7 +11,7 @@ class ComponentModel(QObject):
         super().__init__()
         self.group = None
 
-    @Slot(str, "Qvariant", "Qvariant")
+    @Slot(str, "QVariant", "QVariant")
     def create_component_group(self, name, component_type, parent_group):
         self.group = create_group(
             name, get_nx_class_for_component(component_type), parent_group
