@@ -129,7 +129,6 @@ Item {
 
             ColumnLayout {
                 id: transformBoxColumn
-                anchors.fill: parent
 
                 StackLayout {
                     id: transformBoxStack
