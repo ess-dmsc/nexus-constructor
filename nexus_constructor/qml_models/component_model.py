@@ -12,16 +12,15 @@ from nexus_constructor.nexus_model import (
 class ComponentModel(QObject):
     def __init__(self):
         super().__init__()
-        file_name = str(uuid4())
 
-        temp_file = h5py.File(file_name, mode="w", driver="core", backing_store=False)
+        temp_file = h5py.File(
+            str(uuid4()), mode="w", driver="core", backing_store=False
+        )
         self.group = temp_file.create_group("component")
         self.description_dataset = self.group.create_dataset(
             "/description", (100,), h5py.special_dtype(vlen=str)
         )
         self.description_dataset.data = ""
-        self.something = True
-        self.somethingelse = False
 
     @Slot("QVariant")
     def copy_component_to_instrument(self, instrument_group):
