@@ -1,9 +1,7 @@
 from uuid import uuid4
-
 import h5py
 from PySide2.QtCore import QObject, Signal, Slot, Property
 from nexus_constructor.nexus_model import (
-    create_group,
     get_nx_class_for_component,
     get_informal_name_for_nxcomponent,
 )
@@ -41,10 +39,10 @@ class ComponentModel(QObject):
             self.group = self.temp_file[name]
 
     def get_component_type(self):
-        return get_informal_name_for_nxcomponent(self.group.attr["NX_class"])
+        return get_informal_name_for_nxcomponent(self.group.attrs["NX_class"])
 
     def set_component_type(self, component_type):
-        self.group.attr["NX_class"] = get_nx_class_for_component(component_type)
+        self.group.attrs["NX_class"] = get_nx_class_for_component(component_type)
 
     def get_description(self):
         return self.description_dataset.data

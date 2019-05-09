@@ -171,6 +171,7 @@ ExpandingWindow {
                             detailsPane.focus = true
                             nameField.focus = true
                             addComponentStack.currentIndex = 1
+                            componentModel.component_type = componentType
                         }
                     }
 
@@ -312,7 +313,7 @@ ExpandingWindow {
                                 noGeometryFileDialog.open()
                             }
                             else {
-                                componentModel.copy_component_to_instrument(components.InstrumentGroup)
+                                componentModel.copy_component_to_instrument(components.group)
                                 components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                                          geometryControls.geometryModel,
                                                          pixelControls.pixelModel,

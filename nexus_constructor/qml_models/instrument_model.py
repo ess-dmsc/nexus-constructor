@@ -91,7 +91,7 @@ class InstrumentModel(QAbstractListModel):
     def get_instrument_group(self):
         return self.instrument_group
 
-    InstrumentGroup = Property("QVariant", get_instrument_group, notify=lambda: None)
+    group = Property("QVariant", get_instrument_group, notify=lambda: None)
 
     @Slot("QVariant")
     def initialise(self, group):
