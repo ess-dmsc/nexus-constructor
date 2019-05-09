@@ -42,9 +42,7 @@ def create_component(
         transforms=transforms,
         geometry=geometry,
         pixel_data=pixel_data,
-        component_group=create_group(
-            name, get_nx_class_for_component(component_type), parent_group
-        ),
+        component_group=None,
     )
 
 

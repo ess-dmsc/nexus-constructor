@@ -8,10 +8,10 @@ import QtQuick.Layouts 1.11
 ExpandingWindow {
 
 
-                ComponentModel{
-                    id: componentModel
+    ComponentModel{
+        id: componentModel
 
-                }
+    }
 
     property string name: components.generate_component_name(componentType)
     property string description: ""
@@ -171,7 +171,6 @@ ExpandingWindow {
                             detailsPane.focus = true
                             nameField.focus = true
                             addComponentStack.currentIndex = 1
-                            componentModel.create_component_group(name, componentType, components.InstrumentGroup)
                         }
                     }
 
@@ -243,8 +242,8 @@ ExpandingWindow {
                         }
                         TextField {
                             id: nameField
-                            text: name
-                            onEditingFinished: name = text
+                            text: componentModel.component_group_name
+                            onEditingFinished: componentModel.component_group_name = text
                             Layout.fillWidth: true
                             selectByMouse: true
                             validator: NameValidator {
@@ -261,8 +260,8 @@ ExpandingWindow {
                         }
                         TextField {
                             id: descriptionField
-                            text: description
-                            onEditingFinished: description = text
+                            text: componentModel.description
+                            onEditingFinished: componentModel.description = text
                             Layout.fillWidth: true
                             selectByMouse: true
                         }
@@ -313,6 +312,7 @@ ExpandingWindow {
                                 noGeometryFileDialog.open()
                             }
                             else {
+                                componentModel.copy_component_to_instrument(components.InstrumentModel)
                                 components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                                          geometryControls.geometryModel,
                                                          pixelControls.pixelModel,
