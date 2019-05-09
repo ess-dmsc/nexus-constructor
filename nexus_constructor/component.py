@@ -4,13 +4,11 @@ from nexus_constructor.transformations import Transformation
 from nexus_constructor.pixel_data import PixelData
 from nexus_constructor.geometry_types import Geometry
 from typing import List
-from nexus_constructor.nexus_model import create_group, get_nx_class_for_component
 
 
 def create_component(
     component_type,
     name,
-    parent_group,
     description="",
     transform_parent=None,
     dependent_transform=None,
@@ -42,7 +40,6 @@ def create_component(
         transforms=transforms,
         geometry=geometry,
         pixel_data=pixel_data,
-        component_group=None,
     )
 
 
@@ -58,4 +55,3 @@ class Component:
     transforms = attr.ib(factory=list, type=List[Transformation])
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)
-    component_group = attr.ib(default=None)

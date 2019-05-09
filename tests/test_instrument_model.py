@@ -56,8 +56,6 @@ def test_add_component():
     assert model.rowCount() == 2
     assert model.components[1].component_type == ComponentType.DETECTOR
     assert model.components[1].name == "MyDetector"
-    assert "MyDetector" in model.instrument_group
-    assert model.instrument_group["MyDetector"].attrs["NX_class"] == "NXdetector"
 
 
 def test_remove_component():

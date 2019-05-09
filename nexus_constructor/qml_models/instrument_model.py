@@ -103,10 +103,7 @@ class InstrumentModel(QAbstractListModel):
         :param group: The /entry/ group created by the Nexus Model.
         """
         sample = create_component(
-            component_type=ComponentType.SAMPLE,
-            name="Sample",
-            geometry=OFFCube,
-            parent_group=group,
+            component_type=ComponentType.SAMPLE, name="Sample", geometry=OFFCube
         )
 
         self.create_instrument_group(group)
@@ -253,7 +250,6 @@ class InstrumentModel(QAbstractListModel):
                 transforms=[]
                 if transform_model is None
                 else transform_model.transforms,
-                parent_group=self.instrument_group,
             )
             self.append_component_to_list(component)
 
