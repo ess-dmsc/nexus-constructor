@@ -91,3 +91,8 @@ def test_GIVEN_informal_name_WHEN_converting_to_informal_name_THEN_name_does_not
 def test_GIVEN_nxcomponent_name_with_underscore_WHEN_converting_to_informal_name_THEN_underscore_is_replaced_with_space():
     nxcomponent_name = "NXdisk_chopper"
     assert get_informal_name_for_nxcomponent(nxcomponent_name) == "Disk chopper"
+
+
+def test_GIVEN_nxcomponent_with_x_in_name_WHEN_converting_to_informal_name_THEN_x_is_not_stripped():
+    nxcomponent_name = "NXxraylens"
+    assert get_informal_name_for_nxcomponent(nxcomponent_name) == "Xraylens"
