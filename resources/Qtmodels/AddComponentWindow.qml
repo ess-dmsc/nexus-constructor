@@ -312,7 +312,7 @@ ExpandingWindow {
                                 noGeometryFileDialog.open()
                             }
                             else {
-                                componentModel.copy_component_to_instrument(components.InstrumentModel)
+                                componentModel.copy_component_to_instrument(components.InstrumentGroup)
                                 components.add_component(componentType, name, description, transform_parent_index, dependent_transform_index,
                                                          geometryControls.geometryModel,
                                                          pixelControls.pixelModel,

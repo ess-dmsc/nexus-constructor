@@ -13,10 +13,10 @@ class ComponentModel(QObject):
     def __init__(self):
         super().__init__()
 
-        temp_file = h5py.File(
+        self.temp_file = h5py.File(
             str(uuid4()), mode="w", driver="core", backing_store=False
         )
-        self.group = temp_file.create_group("component")
+        self.group = self.temp_file.create_group("component")
         self.description_dataset = self.group.create_dataset(
             "/description", (100,), h5py.special_dtype(vlen=str)
         )
@@ -24,15 +24,21 @@ class ComponentModel(QObject):
 
     @Slot("QVariant")
     def copy_component_to_instrument(self, instrument_group):
-        self.group.copy(instrument_group)
+        self.temp_file.copy(source=self.group, dest=instrument_group)
 
     component_changed = Signal()
 
     def get_group_name(self):
-        return self.group.name
+        return self.group.name.split("/")[-1]
 
     def set_group_name(self, name):
-        self.group.name = name
+        if name != self.get_group_name():
+            # create a new group with the new name and set the contents to the old group's contents
+            self.temp_file[name] = self.temp_file[self.group.name]
+            # delete the old group
+            del self.temp_file[self.group.name]
+            # set self.group to the new group
+            self.group = self.temp_file[name]
 
     def get_component_type(self):
         return get_informal_name_for_nxcomponent(self.group.attr["NX_class"])
