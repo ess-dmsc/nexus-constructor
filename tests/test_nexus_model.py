@@ -4,6 +4,7 @@ from nexus_constructor.nexus_model import (
     create_group,
     ComponentType,
     append_nxs_extension,
+    get_informal_name_for_nxcomponent,
 )
 import h5py
 
@@ -75,3 +76,18 @@ def test_GIVEN_string_ending_with_nxs_WHEN_appending_nxs_extension_THEN_string_i
 def test_GIVEN_string_not_ending_in_nxs_WHEN_appending_nxs_extension_THEN_extension_is_appended():
     file_name = "test"
     assert file_name + ".nxs" == append_nxs_extension(file_name)
+
+
+def test_GIVEN_nxcomponent_WHEN_converting_to_informal_name_THEN_correct_informal_name_is_given():
+    nxcomponent_name = "NXdetector"
+    assert get_informal_name_for_nxcomponent(nxcomponent_name) == "Detector"
+
+
+def test_GIVEN_informal_name_WHEN_converting_to_informal_name_THEN_name_does_not_change():
+    informal_name = "Detector"
+    assert get_informal_name_for_nxcomponent(informal_name) == informal_name
+
+
+def test_GIVEN_nxcomponent_name_with_underscore_WHEN_converting_to_informal_name_THEN_underscore_is_replaced_with_space():
+    nxcomponent_name = "NXdisk_chopper"
+    assert get_informal_name_for_nxcomponent(nxcomponent_name) == "Disk chopper"

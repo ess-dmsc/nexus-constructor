@@ -27,7 +27,7 @@ def get_nx_class_for_component(component_type):
 
 
 def get_informal_name_for_nxcomponent(component_name: str):
-    return component_name.lstrip("NX").replace("_", " ")
+    return component_name.lstrip("NX").replace("_", " ").capitalize()
 
 
 def append_nxs_extension(file_name):
