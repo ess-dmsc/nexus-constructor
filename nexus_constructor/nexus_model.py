@@ -23,8 +23,11 @@ def get_nx_class_for_component(component_type):
     :param component_type: the component type of the object being added
     :return: String containing the name of the NX class eg NXdetector
     """
-    nxclass = f"NX{ComponentType(component_type).name.lower()}".replace(" ", "_")
-    return nxclass
+    return f"NX{ComponentType(component_type).name.lower()}".replace(" ", "_")
+
+
+def get_informal_name_for_nxcomponent(component_name: str):
+    return component_name.lstrip("NX").replace("_", " ")
 
 
 def append_nxs_extension(file_name):
