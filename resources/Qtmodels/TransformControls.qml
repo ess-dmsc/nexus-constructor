@@ -19,96 +19,86 @@ import QtQuick.Layouts 1.11
 
 Item {
     id: transformsItem
-
-    implicitHeight: relativePicker.implicitHeight +
-                    parentTransformPicker.implicitHeight +
-                    transformsListContainer.implicitHeight +
-                    addTranslate.implicitHeight
-    implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth,
-                            transformsListContainer.implicitWidth,
-                            addTranslate.implicitWidth + addRotate.implicitWidth)
+    implicitWidth: transformColumn.implicitWidth
+    implicitHeight: transformColumn.implicitHeight
     property TransformationModel transformModel
     property int componentIndex
     property var transformTextFieldWidth: 90
 
-    Label {
-        id: relativeLabel
-        anchors.verticalCenter: relativePicker.verticalCenter
-        anchors.left: parent.left
-        text: "Transform parent:"
-    }
-    ComboBox {
-        id: relativePicker
-        anchors.top: parent.top
-        anchors.left: relativeLabel.right
-        anchors.right: parent.right
-        implicitWidth: 250
-        // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
-        model: (componentIndex == 0) ? components : filteredModel
-        textRole: "name"
-        currentIndex: (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
-        validator: parentValidator
-        onActivated: {
-            if(acceptableInput){
-                transform_parent_index = model.source_index(currentIndex)
-            } else {
-                currentIndex = (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
+    ColumnLayout {
+        id: transformColumn
+
+        GridLayout {
+            id: transformPickerGrid
+            rows: 2
+            columns: 2
+
+            Label {
+                id: relativeLabel
+                text: "Transform parent:"
+            }
+            ComboBox {
+                id: relativePicker
+                Layout.preferredWidth: 250
+                // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
+                model: (componentIndex == 0) ? components : filteredModel
+                textRole: "name"
+                currentIndex: (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
+                validator: parentValidator
+                onActivated: {
+                    if(acceptableInput){
+                        transform_parent_index = model.source_index(currentIndex)
+                    } else {
+                        currentIndex = (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
+                    }
+                }
+            }
+            ExcludedComponentModel {
+                id: filteredModel
+                model: components
+                index: componentIndex
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            ComboBox {
+                id: parentTransformPicker
+                Layout.preferredWidth: 250
+                model: components.get_transform_model(transform_parent_index)
+                textRole: "name"
+                currentIndex: dependent_transform_index
+                onActivated: dependent_transform_index = currentIndex
             }
         }
-    }
-    ExcludedComponentModel {
-        id: filteredModel
-        model: components
-        index: componentIndex
-    }
-    ComboBox {
-        id: parentTransformPicker
-        anchors.top: relativePicker.bottom
-        anchors.left: relativePicker.left
-        anchors.right: relativePicker.right
-        model: components.get_transform_model(transform_parent_index)
-        textRole: "name"
-        currentIndex: dependent_transform_index
-        onActivated: dependent_transform_index = currentIndex
-    }
+        Frame {
+            id: transformsListContainer
+            contentWidth: transformsListView.implicitWidth
+            contentHeight: transformsListView.implicitHeight
+            visible: contentHeight > 0
+            padding: 1
 
-    Frame {
-        id: transformsListContainer
-        anchors.top: parentTransformPicker.bottom
-        anchors.bottom: addTranslate.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        contentWidth: transformsListView.implicitWidth
-        contentHeight: transformsListView.implicitHeight
-        visible: contentHeight > 0
-        padding: 1
-
-        ListView {
-            id: transformsListView
-            anchors.fill: parent
-            model: transformModel
-            delegate: transformDelegate
-            implicitHeight: (contentHeight < 250) ? contentHeight : 250
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: ActiveScrollBar {}
+            ListView {
+                id: transformsListView
+                model: transformModel
+                delegate: transformDelegate
+                implicitHeight: (contentHeight < 250) ? contentHeight : 250
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollBar.vertical: ActiveScrollBar {}
+            }
         }
-    }
 
-    PaddedButton {
-        id: addTranslate
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        text: "Add translation"
-        onClicked: transformModel.add_translate()
-    }
+        PaddedButton {
+            id: addTranslate
+            text: "Add translation"
+            onClicked: transformModel.add_translate()
+        }
 
-    PaddedButton {
-        id: addRotate
-        anchors.top: addTranslate.top
-        anchors.left: addTranslate.right
-        text: "Add rotation"
-        onClicked: transformModel.add_rotate()
+        PaddedButton {
+            id: addRotate
+            text: "Add rotation"
+            onClicked: transformModel.add_rotate()
+        }
     }
 
     Component {
