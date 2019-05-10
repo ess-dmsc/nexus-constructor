@@ -74,17 +74,6 @@ Item {
         Pane {
             id: gridFields
             width: view.width
-            /*
-            contentHeight: rowsField.height +
-                columnsField.height +
-                firstIdField.height +
-                cornerPicker.height +
-                directionPicker.height
-            contentWidth: Math.max(
-                rowsField.implicitWidth + rowHeightField.implicitWidth,
-                columnsField.implicitWidth + columnWidthField.implicitWidth
-            )
-            */
             contentHeight: pixelGrid.implicitHeight
             contentWidth: pixelGrid.implicitWidth
 
