@@ -59,6 +59,7 @@ Item {
                 index: componentIndex
             }
             Item {
+                // Spacer Item to force parentTransformPicker to the bottom-right corner of the 4x4 grid
                 Layout.fillWidth: true
             }
             ComboBox {
@@ -87,17 +88,24 @@ Item {
                 ScrollBar.vertical: ActiveScrollBar {}
             }
         }
+        RowLayout {
+            id: addTransformationButtonsRow
 
-        PaddedButton {
-            id: addTranslate
-            text: "Add translation"
-            onClicked: transformModel.add_translate()
-        }
+            PaddedButton {
+                id: addTranslate
+                text: "Add translation"
+                onClicked: transformModel.add_translate()
+            }
 
-        PaddedButton {
-            id: addRotate
-            text: "Add rotation"
-            onClicked: transformModel.add_rotate()
+            PaddedButton {
+                id: addRotate
+                text: "Add rotation"
+                onClicked: transformModel.add_rotate()
+            }
+            Item {
+                // Spacer Item to force Add Transformation buttons to the LHS
+                Layout.fillWidth: true
+            }
         }
     }
 
