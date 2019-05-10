@@ -97,12 +97,46 @@ Item {
                 columns: 4
 
                 Label {
+                    text: "Row: "
+                }
+                TextField {
+                }
+                Label {
+                    text: "Row Height: "
+                }
+                TextField {
+                }
+                Label {
+                    text: "Columns: "
+                }
+                TextField {
+                }
+                Label {
+                    text: "Column Width: "
+                }
+                TextField {
+                }
+                Label {
+                    text: "First ID: "
+                }
+                TextField {
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                Label {
                     id: cornerLabel
                     text: "Start counting ID's from:"
+                    Layout.columnSpan: 2
                 }
                 ComboBox {
                     id: cornerPicker
                     textRole: "key"
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
                     model: ListModel {
                         ListElement { key: "Bottom left"; value: "BOTTOM_LEFT" }
                         ListElement { key: "Bottom right"; value: "BOTTOM_RIGHT" }
@@ -115,10 +149,13 @@ Item {
                 Label {
                     id: directionLabel
                     text: "Count first along:"
+                    Layout.columnSpan: 2
                 }
                 ComboBox {
                     id: directionPicker
                     textRole: "key"
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
                     model: ListModel {
                         ListElement { key: "Rows"; value: "ROW" }
                         ListElement { key: "Columns"; value: "COLUMN" }
