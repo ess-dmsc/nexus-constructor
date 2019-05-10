@@ -100,26 +100,46 @@ Item {
                     text: "Row: "
                 }
                 TextField {
+                    id: rowsField
+                    text: rows
+                    onEditingFinished: rows = parseInt(text)
+                    validator: integerValidator
                 }
                 Label {
                     text: "Row Height: "
                 }
                 TextField {
+                    id: rowHeightField
+                    text: row_height
+                    onEditingFinished: row_height = parseFloat(editorText)
+                    validator: numberValidator
                 }
                 Label {
                     text: "Columns: "
                 }
                 TextField {
+                    id: columnsField
+                    text: columns
+                    onEditingFinished: columns = parseInt(text)
+                    validator: integerValidator
                 }
                 Label {
                     text: "Column Width: "
                 }
                 TextField {
+                    id: columnWidthField
+                    text: column_width
+                    onEditingFinished: column_width = parseFloat(text)
+                    validator: numberValidator
                 }
                 Label {
                     text: "First ID: "
                 }
                 TextField {
+                    id: firstIdField
+                    text: first_id
+                    onEditingFinished: first_id = parseInt(text)
+                    validator: integerValidator
                 }
                 Item {
                     Layout.fillWidth: true
@@ -163,55 +183,6 @@ Item {
                     onActivated: count_direction = model.get(currentIndex).value
                 }
             }
-            /*
-            LabeledTextField {
-                    id: rowsField
-                    anchors.top: parent.top
-                    anchors.right: columnsField.right
-                    labelText: "Rows:"
-                    editorText: rows
-                    onEditingFinished: rows = parseInt(editorText)
-                    validator: integerValidator
-                }
-                LabeledTextField {
-                    id: rowHeightField
-                    anchors.top: rowsField.top
-                    anchors.right: columnWidthField.right
-                    labelText: "Row height:"
-                    editorText: row_height
-                    onEditingFinished: row_height = parseFloat(editorText)
-                    validator: numberValidator
-                }
-
-                LabeledTextField {
-                    id: columnsField
-                    anchors.top: rowHeightField.bottom
-                    anchors.left: parent.left
-                    labelText: "Columns:"
-                    editorText: columns
-                    onEditingFinished: columns = parseInt(editorText)
-                    validator: integerValidator
-                }
-                LabeledTextField {
-                    id: columnWidthField
-                    anchors.top: columnsField.top
-                    anchors.left: columnsField.right
-                    labelText: "Column width:"
-                    editorText: column_width
-                    onEditingFinished: column_width = parseFloat(editorText)
-                    validator: numberValidator
-                }
-
-                LabeledTextField {
-                    id: firstIdField
-                    anchors.top: columnWidthField.bottom
-                    anchors.right: columnsField.right
-                    labelText: "First ID:"
-                    editorText: first_id
-                    onEditingFinished: first_id = parseInt(editorText)
-                    validator: integerValidator
-                }
-                */
         }
     }
 
