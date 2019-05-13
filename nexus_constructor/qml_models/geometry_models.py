@@ -1,5 +1,6 @@
 """
 ListModel implementations for accessing and manipulating Geometry qml_models in QML
+
 See http://doc.qt.io/qt-5/qabstractlistmodel.html#subclassing for guidance on how to develop these classes, including
 what signals need to be emitted when changes to the data are made.
 """
@@ -17,6 +18,7 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 class NoShapeModel(QObject):
     """
     A single item model that allows properties of an object with no geometry to be read and manipulated in QML
+
     """
 
     dataChanged = Signal()
@@ -137,3 +139,4 @@ class OFFModel(QObject):
     @Slot(int, "QVariant")
     def set_geometry(self, index, instrument: InstrumentModel):
         self.geometry = instrument.components[index].geometry
+        
