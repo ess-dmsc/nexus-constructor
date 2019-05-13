@@ -139,4 +139,3 @@ class OFFModel(QObject):
     @Slot(int, "QVariant")
     def set_geometry(self, index, instrument: InstrumentModel):
         self.geometry = instrument.components[index].geometry
-        
