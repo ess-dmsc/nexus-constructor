@@ -28,7 +28,7 @@ Pane {
 
     OFFModel {
         id: offModel
-        onMeshLoaded: pane.meshChanged()
+        onDataChanged: pane.meshChanged()
     }
 
     CylinderModel {
@@ -83,7 +83,6 @@ Pane {
                         // Valid Geometry file given - Accept file and ask user to give the units
                         unitSelection.open()
                         visible: false
-                        GeometryFileSelected.geometryFileSelected = true
                     }
                     else {
                         // Invalid Geometry file given - Reject file
@@ -109,11 +108,7 @@ Pane {
                 // Remove standard buttons so that custom OK button can be used that only accepts valid units
                 standardButtons: StandardButton.NoButton
 
-                // Prevent the window from suddenly expanding when the invalid units message is shown
-                width: 350
-
                 ColumnLayout {
-
                     anchors.fill: parent
 
                     Text {
@@ -121,63 +116,50 @@ Pane {
                         text: "Enter the geometry units: "
                         Layout.fillWidth: true
                     }
-
-                    LabeledTextField {
-                        id: unitInput
-                        editorText: units
+                    RowLayout {
                         Layout.fillWidth: true
-                        anchoredEditor: true
-                        onEditingFinished: units = editorText
+                        Layout.minimumWidth: 350
+                        LabeledTextField {
+                            id: unitInput
+                            editorText: units
+                            Layout.fillWidth: true
+                            anchoredEditor: true
 
-                        validator: UnitValidator {
-                            id: meshUnitValidator
-                            onValidationFailed: { ValidUnits.validMeshUnits = false }
-                            onValidationSuccess: { ValidUnits.validMeshUnits = true }
+                            validator: UnitValidator {
+                                id: meshUnitValidator
+                                onValidationFailed: {
+                                    acceptUnitsButton.enabled = false
+                                    invalidMeshUnitsCross.visible = true
+                                }
+                                onValidationSuccess: {
+                                    acceptUnitsButton.enabled = true
+                                    invalidMeshUnitsCross.visible = false
+                                }
+                            }
+                        }
+                        InvalidInputCross {
+                            id: invalidMeshUnitsCross
+                            toolTipMessage: ErrorMessages.invalidUnits
                         }
                     }
-
-                    Text {
-
-                        // Blank invalid unit warning - only set if unit validation function returns false
-                        id: invalidMeshUnitWarning
-                        text: ""
-                        color: "red"
-                        Layout.fillWidth: true
-                        visible: true
-                    }
-
                     RowLayout {
 
                         Button {
                             id: acceptUnitsButton
                             text: "OK"
                             onClicked: {
-
-                                if (!ValidUnits.validMeshUnits) {
-                                    // Invalid units given - Show a message and clear input box
-                                    invalidMeshUnitWarning.text = ValidUnits.invalidUnitsText
-                                }
-                                else {
-                                    // Valid units given - Close the box
-                                    file_url = filePicker.fileUrl
-                                    unitSelection.close()
-                                }
-
-                                // Clear the unit input
-                                unitInput.editorText = ""
+                                // Close the box
+                                offModel.file_url = filePicker.fileUrl
+                                offModel.units = unitInput.editorText
+                                GeometryFileSelected.geometryFileSelected = true
+                                unitSelection.close()
                             }
                         }
 
                         Button {
                             id: cancelUnitsButton
                             text: "Cancel"
-                            onClicked: {
-
-                                unitSelection.close()
-                                // Clear the unit input
-                                unitInput.editorText = ""
-                                invalidMeshUnitWarning.text = ""
-                            }
+                            onClicked: unitSelection.close()
                         }
                     }
                 }
@@ -207,10 +189,9 @@ Pane {
                 anchors.top: cylinderLabel.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth,
+                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidCylinderUnitsCross.implicitWidth,
                                        axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
                 contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
-                               + invalidCylinderUnitWarning.implicitHeight
 
                 LabeledTextField {
                     id: heightField
@@ -244,22 +225,18 @@ Pane {
                                     onValidationSuccess: { ValidUnits.validCylinderUnits = true }
                                }
                 }
-
-                Text {
-
-                    // Blank invalid unit warning - only set to contain text if unit validation function returns false
-                    // and user presses "Add" button
-                    id: invalidCylinderUnitWarning
-                    anchors.top: unitsField.bottom
-                    text: ValidUnits.showCylinderUnitMessage ? ValidUnits.invalidUnitsText : ""
-                    color: "red"
-                    Layout.fillWidth: true
-                    visible: true
-                 }
+                InvalidInputCross {
+                    id: invalidCylinderUnitsCross
+                    anchors.left: unitsField.right
+                    anchors.right: parent.right
+                    anchors.top: unitsField.top
+                    visible: !ValidUnits.validCylinderUnits
+                    toolTipMessage: ErrorMessages.invalidUnits
+                }
 
                 Label {
                     id: directionLabel
-                    anchors.top: invalidCylinderUnitWarning.bottom
+                    anchors.top: heightField.bottom
                     anchors.left: parent.left
                     text: "axis direction:"
                 }

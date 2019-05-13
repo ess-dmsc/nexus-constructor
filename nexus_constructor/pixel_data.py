@@ -1,15 +1,6 @@
+from abc import ABC
 import attr
-from enum import Enum, unique
-from typing import List
-from PySide2.QtGui import QVector3D
-from nexus_constructor.geometry_types import Geometry
-
-
-@attr.s
-class PixelData:
-    """Base class for a detector's pixel description"""
-
-    pass
+from enum import Enum
 
 
 class CountDirection(Enum):
@@ -22,6 +13,13 @@ class Corner(Enum):
     TOP_RIGHT = 2
     BOTTOM_LEFT = 3
     BOTTOM_RIGHT = 4
+
+
+class PixelData(ABC):
+    """Base class for a detector's pixel description"""
+
+    type = "PixelData"
+    pass
 
 
 @attr.s
@@ -76,62 +74,3 @@ class SinglePixelId(PixelData):
     """Pixel data for components that only have a single detector ID"""
 
     pixel_id = attr.ib(int)
-
-
-@attr.s
-class Transformation:
-    name = attr.ib(str)
-    type = "Transformation"
-
-
-def validate_nonzero_vector(instance, attribute, vector: QVector3D):
-    """
-    Returns True if the vector does not contain (0,0,0), otherwise returns False
-    """
-    return not vector.isNull()
-
-
-@attr.s
-class Rotation(Transformation):
-    axis = attr.ib(
-        factory=lambda: QVector3D(0, 0, 1),
-        type=QVector3D,
-        validator=validate_nonzero_vector,
-    )
-    angle = attr.ib(default=0)
-    type = "Rotation"
-
-
-@attr.s
-class Translation(Transformation):
-    vector = attr.ib(factory=lambda: QVector3D(0, 0, 0), type=QVector3D)
-    type = "Translation"
-
-
-@unique
-class ComponentType(Enum):
-    SAMPLE = "Sample"
-    DETECTOR = "Detector"
-    MONITOR = "Monitor"
-    SOURCE = "Source"
-    SLIT = "Slit"
-    MODERATOR = "Moderator"
-    DISK_CHOPPER = "Disk Chopper"
-
-    @classmethod
-    def values(cls):
-        return [item.value for item in cls]
-
-
-@attr.s
-class Component:
-    """Components of an instrument"""
-
-    component_type = attr.ib(ComponentType)
-    name = attr.ib(str)
-    description = attr.ib(default="", type=str)
-    transform_parent = attr.ib(default=None, type=object)
-    dependent_transform = attr.ib(default=None, type=Transformation)
-    transforms = attr.ib(factory=list, type=List[Transformation])
-    geometry = attr.ib(default=None, type=Geometry)
-    pixel_data = attr.ib(default=None, type=PixelData)

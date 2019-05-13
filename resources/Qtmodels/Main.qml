@@ -5,7 +5,6 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.11
 import MyJson 1.0
 import MyModels 1.0
-import MyWriters 1.0
 
 ApplicationWindow {
 
@@ -14,8 +13,9 @@ ApplicationWindow {
     visible: true
     width: 1100
     height: 500
-    minimumWidth: windowPane.implicitWidth
-    minimumHeight: menuBar.implicitHeight + windowPane.implicitHeight
+    minimumWidth: centralRow.implicitWidth
+    minimumHeight: centralRow.implicitHeight + menuBar.implicitHeight
+    property var jsonPaneWidth: 300
 
     property string jsonMode: "liveFW"
 
@@ -38,10 +38,6 @@ ApplicationWindow {
                 text: "Export to NeXus file"
                 onTriggered: nexusFileDialog.open()
             }
-            Action {
-                text: "Write to console"
-                onTriggered: hdfWriter.print_instrument_to_console(components)
-            }
         }
         Menu {
             title: "JSON"
@@ -49,6 +45,7 @@ ApplicationWindow {
                 text: "Show Nexus FileWriter JSON"
                 checked: true
                 onClicked: {
+                    makeRoomForReturnOfJSONPane()
                     jsonMode = "liveFW"
                     jsonConnector.request_filewriter_json(components)
                 }
@@ -56,6 +53,7 @@ ApplicationWindow {
             RadioButton {
                 text: "Show Nexus Constructor JSON"
                 onClicked: {
+                    makeRoomForReturnOfJSONPane()
                     jsonMode = "liveGC"
                     jsonConnector.request_nexus_constructor_json(components)
                 }
@@ -64,9 +62,15 @@ ApplicationWindow {
                 text: "Hide JSON display"
                 onClicked: jsonMode = "hidden"
             }
+
         }
     }
 
+    function makeRoomForReturnOfJSONPane() {
+        // Force the window to expand if the JSON pane was hidden and has been made visible again
+        if (jsonMode == "hidden" && window.width <= window.minimumWidth)
+            window.width += jsonPaneWidth
+    }
     function positionChildWindow(child) {
         // position child window in the center of the main window
         var centralX = window.x + ((window.width - child.width) / 2)
@@ -88,141 +92,80 @@ ApplicationWindow {
         padding: 5
         focus: true
         anchors.fill: parent
-        contentWidth: componentFieldsArea.implicitWidth + instrumentViewArea.implicitWidth + jsonPane.implicitWidth
-        contentHeight: Math.max(componentFieldsArea.implicitHeight, instrumentViewArea.implicitHeight, jsonPane.implicitHeight)
 
-        ComponentControls {
-            id: componentFieldsArea
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            leftPadding: 0
-        }
+        RowLayout {
+            id: centralRow
+            anchors.fill: parent
+            Layout.minimumWidth: 100
 
-        Frame {
-            id: instrumentViewArea
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: componentFieldsArea.right
-            anchors.right: jsonPane.left
-            contentWidth: 100
-            contentHeight: 100
-            focus: true
-            padding: 1
+            ComponentControls {
+                id: componentFieldsArea
+                leftPadding: 0
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+            }
 
-            Scene3D {
-                id: scene3d
-                anchors.fill: parent
+            Frame {
+                id: instrumentViewArea
+                contentWidth: 300
+                contentHeight: 100
+                Layout.fillHeight: true
+                Layout.fillWidth: true
                 focus: true
-                aspects: ["input", "logic"]
-                cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+                padding: 1
 
-                AnimatedEntity {
-                    id: instrumentEntity
-                    instrument: components
+                Scene3D {
+                    id: scene3d
+                    anchors.fill: parent
+                    focus: true
+                    aspects: ["input", "logic"]
+                    cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+
+                    AnimatedEntity {
+                        id: instrumentEntity
+                        instrument: components
+                    }
+                }
+
+                AxisIndicator {
+                    id: axisIndicator
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    width: 100
+                    height: 100
+
+                    targetCamera: instrumentEntity.camera
+                }
+
+                MouseArea {
+                    anchors.fill: scene3d
+                    onClicked: instrumentViewArea.focus = true
+                    enabled: !instrumentViewArea.focus
                 }
             }
 
-            AxisIndicator {
-                id: axisIndicator
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                width: 100
-                height: 100
-
-                targetCamera: instrumentEntity.camera
-            }
-
-            MouseArea {
-                anchors.fill: scene3d
-                onClicked: instrumentViewArea.focus = true
-                enabled: !instrumentViewArea.focus
+            JSONPane {
+                id: jsonPane
+                contentWidth: jsonPaneWidth
+                Layout.fillHeight: true
+                Layout.fillWidth: false
             }
         }
+    }
 
-        Pane {
-            id: jsonPane
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            contentWidth: 300
-
-            ColumnLayout {
-
-                anchors.fill: parent
-
-                ListView {
-                    id: jsonListView
-                    model: jsonModel
-                    delegate: jsonLineDelegate
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
-
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                    }
-                }
-
-                Button {
-                    id: copyButton
-                    text: "Copy to Clipboard"
-                    Layout.maximumHeight: 20
-                    Layout.minimumHeight: 20
-                    Layout.fillWidth: true
-                    onClicked: {
-
-                        // Filewriter mode - Copy the Filewriter JSON to the clipboard
-                        if (jsonMode == "liveFW") {
-                            jsonConnector.copy_nexus_filewriter_json_to_clipboard(components)
-                        }
-
-                        // Nexus Constructor mode - Copy the Nexus Constructor JSON to the clipboard
-                        if (jsonMode == "liveGC") {
-                            jsonConnector.copy_nexus_constructor_json_to_clipboard(components)
-                        }
-                    }
-                }
-
-                Component {
-                    id: jsonLineDelegate
-                    Label {
-                        id: jsonText
-                        text: (collapsed ? collapsed_text : full_text)
-                        font.family: "Courier New"
-                        wrapMode: Text.Wrap
-                        width: parent.width
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: collapsed = !collapsed
-                        }
-                    }
-                }
-
-                states: State {
-                    name: "hidden"; when: jsonMode == "hidden"
-                    PropertyChanges { target: jsonPane; visible: false }
-                    PropertyChanges { target: jsonPane; width: 0 }
-                }
-            }
-        }
+    NexusModel {
+        id: nxsModel
     }
 
     InstrumentModel{
         id: components
+        Component.onCompleted: {
+            initialise(nxsModel.entryGroup)
+        }
     }
 
     FilteredJsonModel {
         id: jsonModel
-    }
-
-    Logger {
-        id: myLogger
-    }
-
-    HdfWriter {
-        id: hdfWriter
     }
 
     JsonConnector {
@@ -238,7 +181,10 @@ ApplicationWindow {
     // When the model updates, request new json for the view if desired
     Connections {
         target: components
-        onModel_updated: jsonConnector.request_filewriter_json(components)
+        onModel_updated: {
+            jsonConnector.request_filewriter_json(components)
+            instrumentEntity.camera.viewAll()
+        }
         enabled: jsonMode == "liveFW"
     }
 
@@ -263,7 +209,7 @@ ApplicationWindow {
         nameFilters: ["Nexus files (*.nxs *.nx5)", "HDF5 files (*.hdf5)"]
         defaultSuffix: "nxs"
         selectExisting: false
-        onAccepted: hdfWriter.save_instrument(fileUrl, components)
+        onAccepted: nxsModel.write_to_file(fileUrl)
     }
 
     FileDialog {

@@ -5,22 +5,22 @@ This module contains all the parsing functions used to load the data.
 It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
 only the required root function to load the json
 """
-from nexus_constructor.data_model import (
-    Component,
-    ComponentType,
-    PixelGrid,
-    PixelMapping,
-    SinglePixelId,
-    CountDirection,
-    Corner,
-    Translation,
-    Rotation,
-)
+
 from nexus_constructor.geometry_types import (
     CylindricalGeometry,
     OFFGeometry,
     NoShapeGeometry,
 )
+from nexus_constructor.pixel_data import (
+    PixelGrid,
+    PixelMapping,
+    SinglePixelId,
+    CountDirection,
+    Corner,
+)
+from nexus_constructor.component import Component
+from nexus_constructor.component_type import ComponentType
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.nexus import NexusDecoder
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtGui import QVector3D
@@ -30,8 +30,10 @@ def load_json_object_into_instrument_model(json_data: dict, model: InstrumentMod
     """
     Loads an object representation of Nexus constructor instrument json into an InstrumentModel
 
-    :param json_data: Dictionary containing the json data to load
-    :param model: The model the loaded components will be stored in
+    The object representation should be a dictionary, built by pythons json package load functions, and conform to the
+    Nexus Constructors Instrument json schema
+    :param json_data: The dictionary of objects built from a json source
+    :param model: The model to populate with the json data
     """
     # transform_id -> component
     transform_id_mapping = {}

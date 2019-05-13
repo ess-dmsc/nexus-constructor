@@ -1,17 +1,42 @@
-from nexus_constructor.data_model import PixelGrid
+from nexus_constructor.pixel_data import PixelGrid
 from nexus_constructor.geometry_types import OFFGeometry
-from nexus_constructor.geometry_loader import load_geometry
+from nexus_constructor.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.off_renderer import QtOFFGeometry
 from nexus_constructor.qml_models.geometry_models import OFFModel
-from PySide2.QtCore import QUrl
 from PySide2.QtGui import QVector3D
 import struct
+from io import StringIO
 
 
-def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
+def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_vertices_and_faces_loaded_are_the_same_as_the_file():
     model = OFFModel()
-    model.setData(1, "m", OFFModel.UnitsRole)
-    model.setData(0, QUrl("tests/cube.off"), OFFModel.FileNameRole)
+    model.set_units("m")
+
+    off_file = (
+        "OFF\n"
+        "#  cube.off\n"
+        "#  A cube\n"
+        "8 6 0\n"
+        "-0.500000 -0.500000 0.500000\n"
+        "0.500000 -0.500000 0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "0.500000 0.500000 0.500000\n"
+        "-0.500000 0.500000 -0.500000\n"
+        "0.500000 0.500000 -0.500000\n"
+        "-0.500000 -0.500000 -0.500000\n"
+        "0.500000 -0.500000 -0.500000\n"
+        "4 0 1 3 2\n"
+        "4 2 3 5 4\n"
+        "4 4 5 7 6\n"
+        "4 6 7 1 0\n"
+        "4 1 7 5 3\n"
+        "4 6 0 2 4\n"
+    )
+
+    load_geometry_from_file_object(
+        StringIO(off_file), ".off", model.units, model.geometry
+    )
+
     off_geometry = model.get_geometry()
     assert isinstance(off_geometry, OFFGeometry)
     assert off_geometry.vertices == [
@@ -61,7 +86,7 @@ def test_vertices_and_faces_loaded_correctly_from_off_cube_file():
     assert off_geometry.winding_order_indices == [0, 4, 8, 12, 16, 20]
 
 
-def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
+def test_GIVEN_stl_file_with_cube_geometry_WHEN_loading_geometry_THEN_all_faces_are_present():
     length = 30
     left_lower_rear = QVector3D(0, 0, 0)
     right_lower_rear = QVector3D(length, 0, 0)
@@ -96,7 +121,95 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         [left_upper_rear, left_upper_front, right_upper_front, right_upper_rear],  # top
     ]
 
-    geometry = load_geometry("tests/cube.stl", "m")
+    cube = """solid vcg
+        facet normal -1.000000e+00  0.000000e+00  0.000000e+00
+        outer loop
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        vertex   0.000000e+00  3.000000e+01  3.000000e+01
+        endloop
+        endfacet
+        facet normal -1.000000e+00  0.000000e+00  0.000000e+00
+        outer loop
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        endloop
+        endfacet
+        facet normal  1.000000e+00 -0.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        endloop
+        endfacet
+        facet normal  1.000000e+00  0.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        vertex   3.000000e+01  0.000000e+00  0.000000e+00
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00 -1.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  0.000000e+00  0.000000e+00
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00 -1.000000e+00  0.000000e+00
+        outer loop
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        endloop
+        endfacet
+        facet normal  0.000000e+00  1.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00  1.000000e+00  0.000000e+00
+        outer loop
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        vertex   0.000000e+00  3.000000e+01  3.000000e+01
+        endloop
+        endfacet
+        facet normal  0.000000e+00  0.000000e+00 -1.000000e+00
+        outer loop
+        vertex   0.000000e+00  3.000000e+01  0.000000e+00
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00  0.000000e+00 -1.000000e+00
+        outer loop
+        vertex   0.000000e+00  0.000000e+00  0.000000e+00
+        vertex   3.000000e+01  3.000000e+01  0.000000e+00
+        vertex   3.000000e+01  0.000000e+00  0.000000e+00
+        endloop
+        endfacet
+        facet normal  0.000000e+00  0.000000e+00  1.000000e+00
+        outer loop
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        vertex   0.000000e+00  3.000000e+01  3.000000e+01
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        endloop
+        endfacet
+        facet normal  0.000000e+00  0.000000e+00  1.000000e+00
+        outer loop
+        vertex   3.000000e+01  3.000000e+01  3.000000e+01
+        vertex   0.000000e+00  0.000000e+00  3.000000e+01
+        vertex   3.000000e+01  0.000000e+00  3.000000e+01
+        endloop
+        endfacet
+        endsolid vcg"""
+
+    geometry = load_geometry_from_file_object(StringIO(cube), ".stl", "m")
+
     # 2 triangles per face, 6 faces in the cube
     assert len(geometry.faces) == 6 * 2
     assert geometry.winding_order_indices == [i * 3 for i in range(12)]
@@ -139,8 +252,8 @@ def test_all_faces_present_in_geometry_loaded_from_stl_cube_file():
         assert face_found
 
 
-def test_load_geometry_returns_empty_geometry_for_unrecognised_file_extension():
-    geometry = load_geometry("tests/collapsed_lines.txt", "m")
+def test_GIVEN_unrecognised_file_extension_WHEN_loading_geometry_THEN_returns_empty_geometry():
+    geometry = load_geometry_from_file_object(StringIO(), ".txt", "m")
     assert len(geometry.vertices) == 0
     assert len(geometry.faces) == 0
 

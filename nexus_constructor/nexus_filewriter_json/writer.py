@@ -8,16 +8,22 @@ only the required root function to generate the json
 Json format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
 """
 import json
-from nexus_constructor.data_model import (
-    Component,
-    Translation,
-    Rotation,
-    PixelGrid,
-    PixelMapping,
-    SinglePixelId,
-)
+from nexus_constructor.component import Component
+from nexus_constructor.pixel_data import PixelGrid, PixelMapping, SinglePixelId
+from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import CylindricalGeometry, OFFGeometry
-from nexus_constructor.nexus import NexusEncoder
+from nexus_constructor.nexus import (
+    external_component_types,
+    component_class_name,
+    ancestral_dependent_transform,
+    absolute_transform_path_name,
+    pixel_mapping,
+    geometry_group_name,
+    pixel_grid_x_offsets,
+    pixel_grid_y_offsets,
+    pixel_grid_z_offsets,
+    pixel_grid_detector_ids,
+)
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from typing import List
 
@@ -32,12 +38,12 @@ def generate_json(model: InstrumentModel):
     internal_components = [
         component
         for component in model.components
-        if component.component_type not in NexusEncoder.external_component_types()
+        if component.component_type not in external_component_types()
     ]
     external_components = [
         component
         for component in model.components
-        if component.component_type in NexusEncoder.external_component_types()
+        if component.component_type in external_component_types()
     ]
 
     data = {
@@ -70,7 +76,7 @@ def generate_component_data(component: Component):
         "type": "group",
         "name": component.name,
         "attributes": {
-            "NX_class": NexusEncoder.component_class_name(component.component_type),
+            "NX_class": component_class_name(component.component_type),
             "description": component.description,
         },
         "children": [],
@@ -82,7 +88,7 @@ def generate_component_data(component: Component):
 
 def add_transform_data(json_data: dict, component: Component):
     """Adds properties to a dictionary describing the transforms in the component"""
-    dependent_on = NexusEncoder.ancestral_dependent_transform(component)
+    dependent_on = ancestral_dependent_transform(component)
 
     if len(component.transforms) > 0:
 
@@ -130,10 +136,10 @@ def add_transform_data(json_data: dict, component: Component):
                     "values": value,
                 }
             )
-            dependent_on = NexusEncoder.absolute_transform_path_name(
+            dependent_on = absolute_transform_path_name(
                 transform,
                 component,
-                component.component_type not in NexusEncoder.external_component_types(),
+                component.component_type not in external_component_types(),
             )
         json_data["children"].append(nx_transforms)
 
@@ -144,12 +150,12 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
     """Adds properties describing the geometry and pixel data of the component to its json dictionary"""
     geometry = component.geometry
     pixel_data = component.pixel_data
-    geometry_group_name = NexusEncoder.geometry_group_name(component)
+    geometry_group = geometry_group_name(component)
 
     if isinstance(geometry, CylindricalGeometry):
         nexus_geometry = {
             "type": "group",
-            "name": geometry_group_name,
+            "name": geometry_group,
             "attributes": {"NX_class": "NXcylindrical_geometry"},
             "children": [
                 {
@@ -173,7 +179,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
     elif isinstance(geometry, OFFGeometry):
         nexus_geometry = {
             "type": "group",
-            "name": geometry_group_name,
+            "name": geometry_group,
             "attributes": {"NX_class": "NXoff_geometry"},
             "children": [
                 {
@@ -200,7 +206,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
             ],
         }
         if isinstance(pixel_data, PixelMapping):
-            mapping_list = NexusEncoder.pixel_mapping(pixel_data)
+            mapping_list = pixel_mapping(pixel_data)
             nexus_geometry["children"].append(
                 {
                     "type": "dataset",
@@ -221,7 +227,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "type": "double",
                     "size": [pixel_data.rows, pixel_data.columns],
                 },
-                "values": NexusEncoder.pixel_grid_x_offsets(pixel_data),
+                "values": pixel_grid_x_offsets(pixel_data),
             }
         )
         json_data["children"].append(
@@ -232,7 +238,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "type": "double",
                     "size": [pixel_data.rows, pixel_data.columns],
                 },
-                "values": NexusEncoder.pixel_grid_y_offsets(pixel_data),
+                "values": pixel_grid_y_offsets(pixel_data),
             }
         )
         json_data["children"].append(
@@ -243,7 +249,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "type": "double",
                     "size": [pixel_data.rows, pixel_data.columns],
                 },
-                "values": NexusEncoder.pixel_grid_z_offsets(pixel_data),
+                "values": pixel_grid_z_offsets(pixel_data),
             }
         )
         json_data["children"].append(
@@ -254,7 +260,7 @@ def add_geometry_and_pixel_data(json_data: dict, component: Component):
                     "type": "int64",
                     "size": [pixel_data.rows, pixel_data.columns],
                 },
-                "values": NexusEncoder.pixel_grid_detector_ids(pixel_data),
+                "values": pixel_grid_detector_ids(pixel_data),
             }
         )
     elif isinstance(pixel_data, SinglePixelId):

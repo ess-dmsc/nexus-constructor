@@ -6,6 +6,7 @@ Loading this module also registers with QML the required custom classes to load 
 
 import sys
 from os import path
+from nexus_constructor.nexus_model import NexusModel
 from nexus_constructor.json_connector import JsonConnector
 from nexus_constructor.qml_models.component_filters import (
     SingleComponentModel,
@@ -31,14 +32,11 @@ from nexus_constructor.validators import (
     UnitValidator,
 )
 from nexus_constructor.geometry_file_validator import GeometryFileValidator
-from nexus_constructor.writers import HdfWriter, Logger
 from PySide2.QtCore import QUrl, QObject
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 
 
-qmlRegisterType(Logger, "MyWriters", 1, 0, "Logger")
-qmlRegisterType(HdfWriter, "MyWriters", 1, 0, "HdfWriter")
-
+qmlRegisterType(NexusModel, "MyModels", 1, 0, "NexusModel")
 qmlRegisterType(InstrumentModel, "MyModels", 1, 0, "InstrumentModel")
 qmlRegisterType(SingleComponentModel, "MyModels", 1, 0, "SingleComponentModel")
 qmlRegisterType(ExcludedComponentModel, "MyModels", 1, 0, "ExcludedComponentModel")

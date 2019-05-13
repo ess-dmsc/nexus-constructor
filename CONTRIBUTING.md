@@ -15,6 +15,8 @@ The names should start with the ticket number and contain a brief description se
 ## Pull Requests 
 There is a template for pull requests. This should contain enough information for the reviewer to be able to review the code efficiently.
 
+In the case of an in-progress pull request, don't assign any reviewers as it can clog up their github notifications and if someone starts reviewing that's outdated it can potentially cause issues. 
+
 ## Code style
 All code should be pep8 compliant, we have a linter built into the CI system. 
 [Black](https://black.readthedocs.io/en/stable/the_black_code_style.html) code style should be followed where possible unless readability is compromised. 
