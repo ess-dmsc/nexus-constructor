@@ -8,6 +8,7 @@ import GeometryValidator 1.0
 
 Pane {
     property var geometryModel: noShapeModel
+    property var textFieldWidth: 100
 
     id: pane
     padding: 0
