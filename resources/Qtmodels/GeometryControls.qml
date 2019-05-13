@@ -278,6 +278,7 @@ Pane {
                         implicitWidth: textFieldWidth
                     }
                     Item {
+                        // Spacer item to fill the remaining part of the grid
                         Layout.fillWidth: true
                     }
                 }
