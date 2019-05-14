@@ -8,6 +8,7 @@ import GeometryValidator 1.0
 
 Pane {
     property var geometryModel: noShapeModel
+    property var textFieldWidth: 100
 
     id: pane
     padding: 0
@@ -189,84 +190,97 @@ Pane {
                 anchors.top: cylinderLabel.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                contentWidth: Math.max(heightField.implicitWidth + radiusField.implicitWidth + unitsField.implicitWidth + invalidCylinderUnitsCross.implicitWidth,
-                                       axisXField.implicitWidth + axisYField.implicitWidth + axisZField.implicitWidth)
-                contentHeight: heightField.implicitHeight + directionLabel.implicitHeight + axisXField.implicitHeight
+                contentWidth: cylinderFieldGrid.implicitWidth
+                contentHeight: cylinderFieldGrid.implicitHeight
 
-                LabeledTextField {
-                    id: heightField
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    labelText: "height:"
-                    editorText: cylinder_height
-                    onEditingFinished: cylinder_height = parseFloat(editorText)
-                    validator: numberValidator
-                }
-                LabeledTextField {
-                    id: radiusField
-                    anchors.top: heightField.top
-                    anchors.left: heightField.right
-                    labelText: "radius:"
-                    editorText: cylinder_radius
-                    onEditingFinished: cylinder_radius = parseFloat(editorText)
-                    validator: numberValidator
-                }
+                GridLayout {
+                    id: cylinderFieldsGrid
+                    columns: 7
+                    rows: 3
 
-                LabeledTextField {
-                    id: unitsField
-                    anchors.top: heightField.top
-                    anchors.left: radiusField.right
-                    labelText: "Units:"
-                    editorText: cylinder_units
-                    onEditingFinished: cylinder_units = editorText
-                    validator: UnitValidator {
-                                    id: cylinderUnitValidator
-                                    onValidationFailed: { ValidUnits.validCylinderUnits = false }
-                                    onValidationSuccess: { ValidUnits.validCylinderUnits = true }
-                               }
-                }
-                InvalidInputCross {
-                    id: invalidCylinderUnitsCross
-                    anchors.left: unitsField.right
-                    anchors.right: parent.right
-                    anchors.top: unitsField.top
-                    visible: !ValidUnits.validCylinderUnits
-                    toolTipMessage: ErrorMessages.invalidUnits
-                }
-
-                Label {
-                    id: directionLabel
-                    anchors.top: heightField.bottom
-                    anchors.left: parent.left
-                    text: "axis direction:"
-                }
-
-                LabeledTextField {
-                    id: axisXField
-                    anchors.top: directionLabel.bottom
-                    anchors.left: parent.left
-                    labelText: "x:"
-                    editorText: axis_x
-                    onEditingFinished: axis_x = parseFloat(editorText)
-                    validator: numberValidator
-                }
-                LabeledTextField {
-                    id: axisYField
-                    anchors.top: axisXField.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    labelText: "y:"
-                    editorText: axis_y
-                    onEditingFinished: axis_y = parseFloat(editorText)
-                    validator: numberValidator
-                }
-                LabeledTextField {
-                    id: axisZField
-                    anchors.top: axisXField.top
-                    anchors.right: parent.right
-                    labelText: "z:"
-                    editorText: axis_z
-                    onEditingFinished: axis_z = parseFloat(editorText)
-                    validator: numberValidator
+                    Label {
+                        text: "Height: "
+                        Layout.alignment: Qt.AlignRight
+                    }
+                    TextField {
+                        id: heightField
+                        text: cylinder_height
+                        onEditingFinished: cylinder_height = parseFloat(text)
+                        validator: numberValidator
+                        implicitWidth: textFieldWidth
+                    }
+                    Label {
+                        text: "Radius: "
+                        Layout.alignment: Qt.AlignRight
+                    }
+                    TextField {
+                        id: radiusField
+                        text: cylinder_radius
+                        onEditingFinished: cylinder_radius = parseFloat(text)
+                        validator: numberValidator
+                        implicitWidth: textFieldWidth
+                    }
+                    Label {
+                        text: "Units: "
+                        Layout.alignment: Qt.AlignRight
+                    }
+                    TextField {
+                        id: unitsField
+                        text: cylinder_units
+                        onEditingFinished: cylinder_units = text
+                        validator: UnitValidator {
+                                       id: cylinderUnitValidator
+                                       onValidationFailed: { ValidUnits.validCylinderUnits = false }
+                                       onValidationSuccess: { ValidUnits.validCylinderUnits = true }
+                                   }
+                        implicitWidth: textFieldWidth
+                    }
+                    InvalidInputCross {
+                        id: invalidCylinderUnitsCross
+                        opacity: !ValidUnits.validCylinderUnits
+                        toolTipMessage: ErrorMessages.invalidUnits
+                    }
+                    Label {
+                        text: "Axis Direction:"
+                        Layout.columnSpan: 7
+                    }
+                    Label {
+                        text: "X:"
+                        Layout.alignment: Qt.AlignRight
+                    }
+                    TextField {
+                        id: axisXField
+                        text: axis_x
+                        onEditingFinished: axis_x = parseFloat(text)
+                        validator: numberValidator
+                        implicitWidth: textFieldWidth
+                    }
+                    Label {
+                        text: "Y:"
+                        Layout.alignment: Qt.AlignRight
+                    }
+                    TextField {
+                        id: axisYField
+                        text: axis_y
+                        onEditingFinished: axis_y = parseFloat(text)
+                        validator: numberValidator
+                        implicitWidth: textFieldWidth
+                    }
+                    Label {
+                        text: "Z: "
+                        Layout.alignment: Qt.AlignRight
+                    }
+                    TextField {
+                        id: axisZField
+                        text: axis_z
+                        onEditingFinished: axis_z = parseFloat(text)
+                        validator: numberValidator
+                        implicitWidth: textFieldWidth
+                    }
+                    Item {
+                        // Spacer item to fill the remaining part of the grid
+                        Layout.fillWidth: true
+                    }
                 }
             }
         }
