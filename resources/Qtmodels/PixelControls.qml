@@ -10,47 +10,49 @@ Item {
     id: pane
     implicitHeight: pixelLabel.height + viewFrame.implicitHeight
     width: viewFrame.width
-    implicitWidth: viewFrame.implicitWidth
-
+    implicitWidth: pixelColumn.implicitWidth
+    Layout.minimumWidth: pixelColumn.implicitWidth
     signal layoutChanged()
 
     function restartMapping(geometryModel){
         onGeometryModelChanged: mappingModel.restart_mapping(geometryModel)
     }
 
-    Label {
-        id: pixelLabel
-        anchors.top: parent.top
-        anchors.left: parent.left
-        height: 0
-    }
-
-    Frame {
-        id: viewFrame
-        anchors.top: pixelLabel.bottom
-        anchors.left: parent.left
+    ColumnLayout {
+        id: pixelColumn
         anchors.right: parent.right
-        contentHeight: view.height
-        contentWidth: view.implicitWidth
-        padding: 1
+        anchors.left: parent.left
 
-        ListView {
-            id: view
-            anchors.left: parent.left
-            height: contentHeight
-            width: parent.width
-            interactive: false
-            clip: true
-            ScrollBar.vertical: bar
-            boundsBehavior: Flickable.StopAtBounds
+        Label {
+            id: pixelLabel
+            height: 0
         }
 
-        ActiveScrollBar {
-            id: bar
-            anchors {
-                left: view.right
-                top: view.top
-                bottom: view.bottom
+        Frame {
+            id: viewFrame
+            contentHeight: view.height
+            contentWidth: view.implicitWidth
+            padding: 1
+            Layout.fillWidth: true
+
+            ListView {
+                id: view
+                anchors.left: parent.left
+                height: contentHeight
+                width: parent.width
+                interactive: false
+                clip: true
+                ScrollBar.vertical: bar
+                boundsBehavior: Flickable.StopAtBounds
+            }
+
+            ActiveScrollBar {
+                id: bar
+                anchors {
+                    left: view.right
+                    top: view.top
+                    bottom: view.bottom
+                }
             }
         }
     }
