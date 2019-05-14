@@ -26,6 +26,12 @@ def change_value(item, attribute_name, value):
             f"attribute {attribute_name} for {item} does not exist, can not change it."
         )
         return False
+
+    if callable(current_value):
+        raise AttributeError(
+            "Expected parameter but found function: {}".format(attribute_name)
+        )
+
     different = value != current_value
     if different:
         setattr(item, attribute_name, value)
