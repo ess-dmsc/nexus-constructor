@@ -51,28 +51,31 @@ Pane {
         Item {
             id: offContainer
             width: view.width
-            implicitWidth: fileTextField.implicitWidth + chooseFileButton.width
-            height: Math.max(fileTextField.height, chooseFileButton.height)
+            implicitWidth: geometryFileRow.implicitWidth
+            height: geometryFileRow.implicitHeight
 
             Component.onCompleted: view.implicitWidth = offContainer.implicitWidth
 
-            LabeledTextField {
-                id: fileTextField
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: chooseFileButton.left
-                labelText: "Geometry file:"
-                editorText: file_url
-                anchoredEditor: true
-                readOnly: true
-            }
-            PaddedButton {
-                id: chooseFileButton
-                anchors.verticalCenter: fileTextField.verticalCenter
+            RowLayout {
+                id: geometryFileRow
                 anchors.right: parent.right
-                text: "Choose file"
-                onClicked: {
-                    filePicker.open()
+                anchors.left: parent.left
+
+                Text {
+                    text: "Geometry File: "
+                }
+                TextField {
+                    id: fileTextField
+                    text: file_url
+                    readOnly: true
+                    Layout.fillWidth: true
+                }
+                PaddedButton {
+                    id: chooseFileButton
+                    text: "Choose file"
+                    onClicked: {
+                        filePicker.open()
+                    }
                 }
             }
             FileDialog {
