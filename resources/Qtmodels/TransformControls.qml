@@ -19,96 +19,103 @@ import QtQuick.Layouts 1.11
 
 Item {
     id: transformsItem
-
-    implicitHeight: relativePicker.implicitHeight +
-                    parentTransformPicker.implicitHeight +
-                    transformsListContainer.implicitHeight +
-                    addTranslate.implicitHeight
-    implicitWidth: Math.max(relativeLabel.implicitWidth + relativePicker.implicitWidth,
-                            transformsListContainer.implicitWidth,
-                            addTranslate.implicitWidth + addRotate.implicitWidth)
+    implicitWidth: transformColumn.implicitWidth
+    implicitHeight: transformColumn.implicitHeight
     property TransformationModel transformModel
     property int componentIndex
     property var transformTextFieldWidth: 90
 
-    Label {
-        id: relativeLabel
-        anchors.verticalCenter: relativePicker.verticalCenter
-        anchors.left: parent.left
-        text: "Transform parent:"
-    }
-    ComboBox {
-        id: relativePicker
-        anchors.top: parent.top
-        anchors.left: relativeLabel.right
+    ColumnLayout {
+        id: transformColumn
         anchors.right: parent.right
-        implicitWidth: 250
-        // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
-        model: (componentIndex == 0) ? components : filteredModel
-        textRole: "name"
-        currentIndex: (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
-        validator: parentValidator
-        onActivated: {
-            if(acceptableInput){
-                transform_parent_index = model.source_index(currentIndex)
-            } else {
-                currentIndex = (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
+        anchors.left: parent.left
+
+        GridLayout {
+            id: transformPickerGrid
+            rows: 2
+            columns: 2
+
+            Label {
+                id: relativeLabel
+                text: "Transform parent:"
+                Layout.fillWidth: false
+            }
+            ComboBox {
+                id: relativePicker
+                Layout.preferredWidth: 250
+                Layout.fillWidth: true
+                // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
+                model: (componentIndex == 0) ? components : filteredModel
+                textRole: "name"
+                currentIndex: (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
+                validator: parentValidator
+                onActivated: {
+                    if(acceptableInput){
+                        transform_parent_index = model.source_index(currentIndex)
+                    } else {
+                        currentIndex = (componentIndex == 0) ? transform_parent_index : model.filtered_index(transform_parent_index)
+                    }
+                }
+            }
+            ExcludedComponentModel {
+                id: filteredModel
+                model: components
+                index: componentIndex
+            }
+            Item {
+                // Spacer Item to force parentTransformPicker to the bottom-right corner of the 4x4 grid
+                Layout.preferredWidth: relativeLabel.width
+                Layout.fillWidth: false
+            }
+            ComboBox {
+                id: parentTransformPicker
+                Layout.preferredWidth: 250
+                Layout.fillWidth: true
+                model: components.get_transform_model(transform_parent_index)
+                textRole: "name"
+                currentIndex: dependent_transform_index
+                onActivated: dependent_transform_index = currentIndex
             }
         }
-    }
-    ExcludedComponentModel {
-        id: filteredModel
-        model: components
-        index: componentIndex
-    }
-    ComboBox {
-        id: parentTransformPicker
-        anchors.top: relativePicker.bottom
-        anchors.left: relativePicker.left
-        anchors.right: relativePicker.right
-        model: components.get_transform_model(transform_parent_index)
-        textRole: "name"
-        currentIndex: dependent_transform_index
-        onActivated: dependent_transform_index = currentIndex
-    }
+        Frame {
+            id: transformsListContainer
+            contentWidth: transformsListView.implicitWidth
+            contentHeight: transformsListView.implicitHeight
+            visible: contentHeight > 0
+            padding: 1
+            Layout.fillWidth: true
 
-    Frame {
-        id: transformsListContainer
-        anchors.top: parentTransformPicker.bottom
-        anchors.bottom: addTranslate.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        contentWidth: transformsListView.implicitWidth
-        contentHeight: transformsListView.implicitHeight
-        visible: contentHeight > 0
-        padding: 1
-
-        ListView {
-            id: transformsListView
-            anchors.fill: parent
-            model: transformModel
-            delegate: transformDelegate
-            implicitHeight: (contentHeight < 250) ? contentHeight : 250
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: ActiveScrollBar {}
+            ListView {
+                id: transformsListView
+                model: transformModel
+                delegate: transformDelegate
+                implicitHeight: (contentHeight < 250) ? contentHeight : 250
+                anchors.right: parent.right
+                anchors.left: parent.left
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollBar.vertical: ActiveScrollBar {}
+            }
         }
-    }
+        RowLayout {
+            id: addTransformationButtonsRow
 
-    PaddedButton {
-        id: addTranslate
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        text: "Add translation"
-        onClicked: transformModel.add_translate()
-    }
+            PaddedButton {
+                id: addTranslate
+                text: "Add translation"
+                onClicked: transformModel.add_translate()
+            }
 
-    PaddedButton {
-        id: addRotate
-        anchors.top: addTranslate.top
-        anchors.left: addTranslate.right
-        text: "Add rotation"
-        onClicked: transformModel.add_rotate()
+            PaddedButton {
+                id: addRotate
+                text: "Add rotation"
+                onClicked: transformModel.add_rotate()
+            }
+            Item {
+                // Spacer Item to force Add Transformation buttons to the LHS
+                Layout.fillWidth: true
+            }
+        }
     }
 
     Component {
@@ -129,22 +136,28 @@ Item {
 
             ColumnLayout {
                 id: transformBoxColumn
+                anchors.right: parent.right
+                anchors.left: parent.left
 
                 StackLayout {
                     id: transformBoxStack
                     currentIndex: transform_type == "Translate" ? 0 : 1
                     Layout.preferredHeight: currentIndex == 0 ? translatePane.implicitHeight : rotatePane.implicitHeight
+                    Layout.fillWidth: true
 
                     Pane {
                         id: translatePane
                         padding: 0
                         contentWidth: translatePaneGrid.implicitWidth
                         contentHeight: translatePaneGrid.implicitHeight
+                        Layout.fillWidth: true
 
                         GridLayout {
                             id: translatePaneGrid
                             rows: 2
                             columns: 6
+                            anchors.right: parent.right
+                            anchors.left: parent.left
 
                             Label {
                                 id: translateLabel
@@ -159,7 +172,7 @@ Item {
                             }
                             TextField {
                                 id: translateNameField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: name
                                 selectByMouse: true
                                 onEditingFinished: name = text
@@ -168,39 +181,43 @@ Item {
                                     myindex: index
                                     onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
                                 }
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "X: "
                             }
                             TextField {
                                 id: xTranslationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: translate_x
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: translate_x = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Y: "
                             }
                             TextField {
                                 id: yTranslationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: translate_y
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: translate_y = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Z: "
                             }
                             TextField {
                                 id: zTranslationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: translate_z
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: translate_z = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                         }
                     }
@@ -210,11 +227,13 @@ Item {
                         padding: 0
                         contentWidth: rotatePaneGrid.implicitWidth
                         contentHeight: rotatePaneGrid.implicitHeight
+                        Layout.fillWidth: true
                         visible: true
 
                         GridLayout {
                             id: rotatePaneGrid
-                            anchors.fill: parent
+                            anchors.right: parent.right
+                            anchors.left: parent.left
                             rows: 3
                             columns: 6
 
@@ -234,45 +253,49 @@ Item {
                                 text: name
                                 selectByMouse: true
                                 onEditingFinished: name = text
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 validator: NameValidator {
                                     model: transformModel
                                     myindex: index
                                     onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
                                 }
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "X: "
                             }
                             TextField {
                                 id: xRotationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: rotate_x
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: rotate_x = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Y: "
                             }
                             TextField {
                                 id: yRotationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: rotate_y
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: rotate_y = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Z: "
                             }
                             TextField {
                                 id: zRotationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: rotate_y
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: rotate_y = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Angle (Degrees): "
@@ -281,11 +304,12 @@ Item {
                             }
                             TextField {
                                 id: angleField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: rotate_angle
                                 selectByMouse: true
                                 validator: angleValidator
                                 onEditingFinished: rotate_angle = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                         }
                     }
