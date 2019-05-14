@@ -19,13 +19,13 @@ def change_value(item, attribute_name, value):
     :param value: the value to set the attribute to
     :return: whether the attribute value was changed
     """
-    try:
-        current_value = getattr(item, attribute_name)
-    except AttributeError:
-        print(
-            f"attribute {attribute_name} for {item} does not exist, can not change it."
+    current_value = getattr(item, attribute_name)
+
+    if callable(current_value):
+        raise AttributeError(
+            "Expected parameter but found function: {}".format(attribute_name)
         )
-        return False
+
     different = value != current_value
     if different:
         setattr(item, attribute_name, value)
