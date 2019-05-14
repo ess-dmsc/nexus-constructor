@@ -27,6 +27,8 @@ Item {
 
     ColumnLayout {
         id: transformColumn
+        anchors.right: parent.right
+        anchors.left: parent.left
 
         GridLayout {
             id: transformPickerGrid
@@ -36,10 +38,12 @@ Item {
             Label {
                 id: relativeLabel
                 text: "Transform parent:"
+                Layout.fillWidth: false
             }
             ComboBox {
                 id: relativePicker
                 Layout.preferredWidth: 250
+                Layout.fillWidth: true
                 // As the sample is its own transform parent, use an unfiltered model for it to prevent validation errors
                 model: (componentIndex == 0) ? components : filteredModel
                 textRole: "name"
@@ -60,11 +64,13 @@ Item {
             }
             Item {
                 // Spacer Item to force parentTransformPicker to the bottom-right corner of the 4x4 grid
-                Layout.fillWidth: true
+                Layout.preferredWidth: relativeLabel.width
+                Layout.fillWidth: false
             }
             ComboBox {
                 id: parentTransformPicker
                 Layout.preferredWidth: 250
+                Layout.fillWidth: true
                 model: components.get_transform_model(transform_parent_index)
                 textRole: "name"
                 currentIndex: dependent_transform_index
@@ -73,16 +79,19 @@ Item {
         }
         Frame {
             id: transformsListContainer
-            contentWidth: transformsListView.implicitWidth
+            // contentWidth: transformsListView.implicitWidth
             contentHeight: transformsListView.implicitHeight
             visible: contentHeight > 0
             padding: 1
+            Layout.fillWidth: true
 
             ListView {
                 id: transformsListView
                 model: transformModel
                 delegate: transformDelegate
                 implicitHeight: (contentHeight < 250) ? contentHeight : 250
+                anchors.right: parent.right
+                anchors.left: parent.left
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
                 ScrollBar.vertical: ActiveScrollBar {}
@@ -115,7 +124,7 @@ Item {
         Frame {
             id: transformBox
             contentHeight: transformBoxColumn.height
-            contentWidth: transformBoxColumn.width
+            // contentWidth: transformBoxColumn.width
             anchors.right: parent.right
             anchors.left: parent.left
 
@@ -127,22 +136,27 @@ Item {
 
             ColumnLayout {
                 id: transformBoxColumn
+                anchors.right: parent.right
+                anchors.left: parent.left
 
                 StackLayout {
                     id: transformBoxStack
                     currentIndex: transform_type == "Translate" ? 0 : 1
                     Layout.preferredHeight: currentIndex == 0 ? translatePane.implicitHeight : rotatePane.implicitHeight
+                    Layout.fillWidth: true
 
                     Pane {
                         id: translatePane
                         padding: 0
-                        contentWidth: translatePaneGrid.implicitWidth
+                        // contentWidth: translatePaneGrid.implicitWidth
                         contentHeight: translatePaneGrid.implicitHeight
+                        Layout.fillWidth: true
 
                         GridLayout {
                             id: translatePaneGrid
                             rows: 2
                             columns: 6
+                            Layout.fillWidth: true
 
                             Label {
                                 id: translateLabel
@@ -157,7 +171,7 @@ Item {
                             }
                             TextField {
                                 id: translateNameField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 text: name
                                 selectByMouse: true
                                 onEditingFinished: name = text
@@ -172,7 +186,7 @@ Item {
                             }
                             TextField {
                                 id: xTranslationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 text: translate_x
                                 selectByMouse: true
                                 validator: numberValidator
@@ -183,7 +197,7 @@ Item {
                             }
                             TextField {
                                 id: yTranslationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 text: translate_y
                                 selectByMouse: true
                                 validator: numberValidator
@@ -194,7 +208,7 @@ Item {
                             }
                             TextField {
                                 id: zTranslationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 text: translate_z
                                 selectByMouse: true
                                 validator: numberValidator
