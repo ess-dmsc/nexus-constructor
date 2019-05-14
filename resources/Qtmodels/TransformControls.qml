@@ -172,7 +172,7 @@ Item {
                             }
                             TextField {
                                 id: translateNameField
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: name
                                 selectByMouse: true
                                 onEditingFinished: name = text
@@ -187,7 +187,7 @@ Item {
                             }
                             TextField {
                                 id: xTranslationField
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: translate_x
                                 selectByMouse: true
                                 validator: numberValidator
@@ -198,7 +198,7 @@ Item {
                             }
                             TextField {
                                 id: yTranslationField
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: translate_y
                                 selectByMouse: true
                                 validator: numberValidator
@@ -209,7 +209,7 @@ Item {
                             }
                             TextField {
                                 id: zTranslationField
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: translate_z
                                 selectByMouse: true
                                 validator: numberValidator
@@ -249,7 +249,7 @@ Item {
                                 text: name
                                 selectByMouse: true
                                 onEditingFinished: name = text
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 validator: NameValidator {
                                     model: transformModel
                                     myindex: index
@@ -261,7 +261,7 @@ Item {
                             }
                             TextField {
                                 id: xRotationField
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: rotate_x
                                 selectByMouse: true
                                 validator: numberValidator
@@ -272,7 +272,7 @@ Item {
                             }
                             TextField {
                                 id: yRotationField
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: rotate_y
                                 selectByMouse: true
                                 validator: numberValidator
@@ -283,7 +283,7 @@ Item {
                             }
                             TextField {
                                 id: zRotationField
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: rotate_y
                                 selectByMouse: true
                                 validator: numberValidator
@@ -296,7 +296,7 @@ Item {
                             }
                             TextField {
                                 id: angleField
-                                Layout.minimumWidth: transformTextFieldWidth
+                                Layout.preferredWidth: transformTextFieldWidth
                                 text: rotate_angle
                                 selectByMouse: true
                                 validator: angleValidator
