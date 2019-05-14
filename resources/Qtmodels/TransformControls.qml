@@ -148,7 +148,7 @@ Item {
                     Pane {
                         id: translatePane
                         padding: 0
-                        // contentWidth: translatePaneGrid.implicitWidth
+                        contentWidth: translatePaneGrid.implicitWidth
                         contentHeight: translatePaneGrid.implicitHeight
                         Layout.fillWidth: true
 
@@ -156,7 +156,8 @@ Item {
                             id: translatePaneGrid
                             rows: 2
                             columns: 6
-                            Layout.fillWidth: true
+                            anchors.right: parent.right
+                            anchors.left: parent.left
 
                             Label {
                                 id: translateLabel
@@ -222,11 +223,13 @@ Item {
                         padding: 0
                         contentWidth: rotatePaneGrid.implicitWidth
                         contentHeight: rotatePaneGrid.implicitHeight
+                        Layout.fillWidth: true
                         visible: true
 
                         GridLayout {
                             id: rotatePaneGrid
-                            anchors.fill: parent
+                            anchors.right: parent.right
+                            anchors.left: parent.left
                             rows: 3
                             columns: 6
 
@@ -246,7 +249,7 @@ Item {
                                 text: name
                                 selectByMouse: true
                                 onEditingFinished: name = text
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 validator: NameValidator {
                                     model: transformModel
                                     myindex: index
@@ -258,7 +261,7 @@ Item {
                             }
                             TextField {
                                 id: xRotationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 text: rotate_x
                                 selectByMouse: true
                                 validator: numberValidator
@@ -269,7 +272,7 @@ Item {
                             }
                             TextField {
                                 id: yRotationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 text: rotate_y
                                 selectByMouse: true
                                 validator: numberValidator
@@ -280,7 +283,7 @@ Item {
                             }
                             TextField {
                                 id: zRotationField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 text: rotate_y
                                 selectByMouse: true
                                 validator: numberValidator
@@ -293,7 +296,7 @@ Item {
                             }
                             TextField {
                                 id: angleField
-                                implicitWidth: transformTextFieldWidth
+                                Layout.minimumWidth: transformTextFieldWidth
                                 text: rotate_angle
                                 selectByMouse: true
                                 validator: angleValidator
