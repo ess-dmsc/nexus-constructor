@@ -181,6 +181,7 @@ Item {
                                     myindex: index
                                     onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
                                 }
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "X: "
@@ -192,6 +193,7 @@ Item {
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: translate_x = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Y: "
@@ -203,6 +205,7 @@ Item {
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: translate_y = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Z: "
@@ -214,6 +217,7 @@ Item {
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: translate_z = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                         }
                     }
@@ -255,6 +259,7 @@ Item {
                                     myindex: index
                                     onValidationFailed: translateNameField.ToolTip.show("A component's transforms must have unique names", 3000)
                                 }
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "X: "
@@ -266,6 +271,7 @@ Item {
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: rotate_x = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Y: "
@@ -277,6 +283,7 @@ Item {
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: rotate_y = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Z: "
@@ -288,6 +295,7 @@ Item {
                                 selectByMouse: true
                                 validator: numberValidator
                                 onEditingFinished: rotate_y = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Angle (Degrees): "
@@ -301,6 +309,7 @@ Item {
                                 selectByMouse: true
                                 validator: angleValidator
                                 onEditingFinished: rotate_angle = parseFloat(text)
+                                Layout.fillWidth: true
                             }
                         }
                     }
