@@ -194,7 +194,7 @@ Pane {
                 contentHeight: cylinderFieldGrid.implicitHeight
 
                 GridLayout {
-                    id: cylinderFieldsGrid
+                    id: cylinderFieldGrid
                     columns: 7
                     rows: 3
 
