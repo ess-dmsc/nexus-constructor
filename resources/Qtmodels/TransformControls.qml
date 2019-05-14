@@ -124,7 +124,7 @@ Item {
         Frame {
             id: transformBox
             contentHeight: transformBoxColumn.height
-            // contentWidth: transformBoxColumn.width
+            contentWidth: transformBoxColumn.width
             anchors.right: parent.right
             anchors.left: parent.left
 
