@@ -79,7 +79,7 @@ Item {
         }
         Frame {
             id: transformsListContainer
-            // contentWidth: transformsListView.implicitWidth
+            contentWidth: transformsListView.implicitWidth
             contentHeight: transformsListView.implicitHeight
             visible: contentHeight > 0
             padding: 1
