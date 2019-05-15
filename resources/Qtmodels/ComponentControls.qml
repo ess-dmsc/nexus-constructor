@@ -133,7 +133,7 @@ Pane {
                 Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: nameField.height + transformControls.height + editorButton.height
+                    height: extendedGrid.height
                     implicitWidth: Math.max(nameField.implicitWidth,
                                             transformControls.implicitWidth,
                                             editorButton.implicitWidth + deleteButton.implicitWidth)
