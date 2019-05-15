@@ -107,8 +107,7 @@ Pane {
             StackLayout {
                 id: componentDetailsStack
                 currentIndex: 0
-                anchors.right: parent.right
-                anchors.left: parent.left
+                anchors.fill: parent
 
                 RowLayout {
                     id: shortenedContent
@@ -218,20 +217,6 @@ Pane {
                         }
                     }
                 }
-            }
-            states: State {
-                name: "Extended"
-
-                PropertyChanges { target: shortenedContent; height: 0 }
-                PropertyChanges { target: shortenedContent; visible: false }
-
-                // PropertyChanges { target: extendedContent; height: extendedCon.height }
-                PropertyChanges { target: extendedContent; visible: true }
-
-                PropertyChanges { target: componentBox; contentHeight: extendedContent.height}
-
-                // PropertyChanges { target: expansionCaret; rotation: 180 }
-                PropertyChanges { target: expansionCaret; visible: false }
             }
         }
     }
