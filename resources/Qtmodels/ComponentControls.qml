@@ -8,69 +8,68 @@ Pane {
     contentWidth: Math.max(headingRow.implicitWidth, listContainer.implicitWidth)
     contentHeight: headingRow.implicitHeight + listContainer.implicitHeight
 
-    RowLayout {
-        id: headingRow
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
+    ColumnLayout {
+        anchors.fill: parent
         Layout.margins: 1
 
-        Label {
-            id: componentsLabel
-            text: "Components: "
-        }
-        Button {
-            id: addComponentButton
-            Layout.alignment: Qt.AlignRight
-            text: "Add Component"
-            onClicked: {
-                if (windowLoader.source == ""){
-                    windowLoader.source = "AddComponentWindow.qml"
-                    window.positionChildWindow(windowLoader.item)
-                    windowLoader.item.show()
-                } else {
-                    windowLoader.item.requestActivate()
-                }
-            }
-            Loader {
-                id: windowLoader
-                Connections {
-                    target: windowLoader.item
-                    onClosing: windowLoader.source = ""
-                }
-                Connections {
-                    target: window
-                    onClosing: windowLoader.source = ""
-                }
-            }
-        }
-    }
+        RowLayout {
+            id: headingRow
 
-    Frame {
-        id: listContainer
-        anchors.left: parent.left
-        anchors.right: parent.right
-        contentWidth: componentListView.implicitWidth
-        contentHeight: 100
-        anchors.top: headingRow.bottom
-        anchors.bottom: parent.bottom
-        padding: 1
-        ListView {
-            id: componentListView
-            model: components
-            delegate: componentDelegate
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: bar
+            Label {
+                id: componentsLabel
+                text: "Components: "
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            Button {
+                id: addComponentButton
+                text: "Add Component"
+                onClicked: {
+                    if (windowLoader.source == ""){
+                        windowLoader.source = "AddComponentWindow.qml"
+                        window.positionChildWindow(windowLoader.item)
+                        windowLoader.item.show()
+                    } else {
+                        windowLoader.item.requestActivate()
+                    }
+                }
+                Loader {
+                    id: windowLoader
+                    Connections {
+                        target: windowLoader.item
+                        onClosing: windowLoader.source = ""
+                    }
+                    Connections {
+                        target: window
+                        onClosing: windowLoader.source = ""
+                    }
+                }
+            }
         }
-        ActiveScrollBar {
-            // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
-            id: bar
-            anchors.left: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+
+        Frame {
+            id: listContainer
+            contentWidth: componentListView.implicitWidth
+            contentHeight: 100
+            Layout.fillHeight: true
+
+            ListView {
+                id: componentListView
+                model: components
+                delegate: componentDelegate
+                anchors.fill: parent
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollBar.vertical: bar
+            }
+            ActiveScrollBar {
+                // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
+                id: bar
+                anchors.left: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+            }
         }
     }
 
