@@ -133,14 +133,10 @@ Pane {
                 Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: extendedGrid.height
-                    implicitWidth: Math.max(nameField.implicitWidth,
-                                            transformControls.implicitWidth,
-                                            editorButton.implicitWidth + deleteButton.implicitWidth)
-                    id: extendedText
 
                     ColumnLayout {
-                        id: extendedGrid
+                        id: extendedText
+                        implicitWidth: transformControls.implicitWidth
 
                         RowLayout {
                             Label {
