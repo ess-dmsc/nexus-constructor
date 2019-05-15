@@ -53,6 +53,7 @@ Pane {
             contentWidth: componentListView.implicitWidth
             contentHeight: 100
             Layout.fillHeight: true
+            padding: 1
 
             ListView {
                 id: componentListView
