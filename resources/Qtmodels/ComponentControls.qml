@@ -13,11 +13,10 @@ Pane {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        // padding: 1
+        Layout.margins: 1
 
         Label {
             id: componentsLabel
-            // anchors.verticalCenter: addComponentButton.verticalCenter
             text: "Components: "
         }
         Button {
