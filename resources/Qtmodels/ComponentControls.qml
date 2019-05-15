@@ -5,10 +5,11 @@ import QtQuick.Layouts 1.11
 
 Pane {
 
-    contentWidth: Math.max(headingRow.implicitWidth, listContainer.implicitWidth)
-    contentHeight: headingRow.implicitHeight + listContainer.implicitHeight
+    contentWidth: componentControlsColumn.implicitWidth
+    contentHeight: componentControlsColumn.implicitHeight
 
     ColumnLayout {
+        id: componentControlsColumn
         anchors.fill: parent
         Layout.margins: 1
 
@@ -59,7 +60,8 @@ Pane {
                 id: componentListView
                 model: components
                 delegate: componentDelegate
-                anchors.fill: parent
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
                 ScrollBar.vertical: bar
