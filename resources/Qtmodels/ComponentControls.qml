@@ -11,7 +11,6 @@ Pane {
     ColumnLayout {
         id: componentControlsColumn
         anchors.fill: parent
-        Layout.margins: 1
 
         RowLayout {
             id: headingRow
