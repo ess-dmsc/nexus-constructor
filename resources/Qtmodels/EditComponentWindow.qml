@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyModels 1.0
 import MyValidators 1.0
+import QtQuick.Layouts 1.11
 
 ExpandingWindow {
 
@@ -36,110 +37,104 @@ ExpandingWindow {
         id: editorDelegate
         Pane {
             id: detailsPane
-            contentWidth: Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
-            contentHeight: nameField.implicitHeight
-                           + descriptionField.implicitHeight
-                           + transformLabel.height
-                           + transformFrame.implicitHeight
-                           + geometryControls.implicitHeight
-                           + pixelControls.implicitHeight
+            contentWidth: editorColumn.implicitWidth
+            contentHeight: editorColumn.implicitHeight
             width: view.width
             height: viewContainer.height
             onImplicitWidthChanged: view.implicitWidth = detailsPane.implicitWidth
             onImplicitHeightChanged: view.implicitHeight = detailsPane.implicitHeight
 
-            LabeledTextField {
-                id: nameField
-                labelText: "Name:"
-                editorWidth: 200
-                editorText: name
-                onEditingFinished: name = editorText
-                validator: NameValidator {
-                    model: components
-                    myindex: componentIndex
-                    onValidationFailed: {
-                        nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+            GridLayout {
+                id: editorColumn
+                anchors.fill: parent
+                rows: 5
+                columns: 2
+
+                Label {
+                    text: "Name: "
+                }
+                TextField {
+                    id: nameField
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 200
+                    text: name
+                    onEditingFinished: name = text
+                    validator: NameValidator {
+                        model: components
+                        myindex: componentIndex
+                        onValidationFailed: {
+                            nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+                        }
                     }
                 }
-            }
-
-            LabeledTextField {
-                id: descriptionField
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: nameField.bottom
-                anchoredEditor: true
-                labelText: "Description:"
-                editorText: description
-                onEditingFinished: description = editorText
-            }
-
-            Label {
-                id: transformLabel
-                anchors.top: descriptionField.bottom
-                anchors.left: parent.left
-                text: "Transform:"
-            }
-
-            Frame {
-                id: transformFrame
-                anchors.top: transformLabel.bottom
-                anchors.bottom: geometryControls.top
-                contentHeight: transformControls.implicitHeight
-                contentWidth: transformControls.implicitWidth
-                anchors.left: parent.left
-                anchors.right: parent.right
-                TransformControls {
-                    id: transformControls
-                    transformModel: transform_model
-                    componentIndex: editComponentWindow.componentIndex
-                    anchors.fill: parent
+                Label {
+                    text: "Description: "
                 }
-                Connections {
-                    target: transform_model
-                    onTransformsUpdated: components.transforms_updated(index)
+                TextField {
+                    id: descriptionField
+                    Layout.fillWidth: true
+                    text: description
+                    onEditingFinished: description = text
                 }
-                states: State {
-                    name: "hidden"; when: componentIndex == 0
-                    PropertyChanges { target: transformFrame; implicitHeight: 0 }
-                    PropertyChanges { target: transformFrame; visible: false }
-                    PropertyChanges { target: transformLabel; height: 0 }
-                    PropertyChanges { target: transformLabel; visible: false }
-                    PropertyChanges { target: editComponentWindow; height: minimumHeight}
+                Label {
+                    id: transformLabel
+                    text: "Transform:"
+                    Layout.columnSpan: 2
                 }
-            }
 
-            GeometryControls {
-                id: geometryControls
-                anchors.bottom: pixelControls.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                state: geometry_state
-
-                Component.onCompleted: {
-                    geometryControls.geometryModel.set_geometry(componentIndex, components)
-                }
-                onMeshChanged: {
-                    pixelControls.restartMapping(geometryControls.geometryModel)
-                    components.update_mesh(componentIndex)
-                }
-                onCylinderChanged: components.update_mesh(componentIndex)
-            }
-
-            PixelControls {
-                id: pixelControls
-                anchors.bottom: parent.bottom
-                anchors.right:parent.right
-                anchors.left: parent.left
-                state: pixel_state
-                visible: pixel_state != ""
-
-                Component.onCompleted:{
-                    if (pixel_state != "") {
-                        pixelControls.pixelModel.set_pixel_model(componentIndex, components)
+                Frame {
+                    id: transformFrame
+                    Layout.columnSpan: 2
+                    contentHeight: transformControls.implicitHeight
+                    contentWidth: transformControls.implicitWidth
+                    Layout.fillWidth: true
+                    TransformControls {
+                        id: transformControls
+                        transformModel: transform_model
+                        componentIndex: editComponentWindow.componentIndex
+                        anchors.fill: parent
+                    }
+                    Connections {
+                        target: transform_model
+                        onTransformsUpdated: components.transforms_updated(index)
+                    }
+                    states: State {
+                        name: "hidden"; when: componentIndex == 0
+                        PropertyChanges { target: transformFrame; implicitHeight: 0 }
+                        PropertyChanges { target: transformFrame; visible: false }
+                        PropertyChanges { target: transformLabel; height: 0 }
+                        PropertyChanges { target: transformLabel; visible: false }
+                        PropertyChanges { target: editComponentWindow; height: minimumHeight}
                     }
                 }
-                onLayoutChanged: components.update_mesh(componentIndex)
+                GeometryControls {
+                    id: geometryControls
+                    state: geometry_state
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
+                    Component.onCompleted: {
+                        geometryControls.geometryModel.set_geometry(componentIndex, components)
+                    }
+                    onMeshChanged: {
+                        pixelControls.restartMapping(geometryControls.geometryModel)
+                        components.update_mesh(componentIndex)
+                    }
+                    onCylinderChanged: components.update_mesh(componentIndex)
+                }
+                PixelControls {
+                    id: pixelControls
+                    state: pixel_state
+                    visible: pixel_state != ""
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
+
+                    Component.onCompleted:{
+                        if (pixel_state != "") {
+                            pixelControls.pixelModel.set_pixel_model(componentIndex, components)
+                        }
+                    }
+                    onLayoutChanged: components.update_mesh(componentIndex)
+                }
             }
         }
     }
