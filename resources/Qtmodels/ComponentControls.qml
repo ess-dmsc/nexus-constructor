@@ -20,6 +20,7 @@ Pane {
                 text: "Components: "
             }
             Item {
+                // Spacer Item to force Components label and Add Component button to opposite ends of pane
                 Layout.fillWidth: true
             }
             Button {
@@ -52,8 +53,8 @@ Pane {
             id: listContainer
             contentWidth: componentListView.implicitWidth
             contentHeight: 100
-            Layout.fillHeight: true
             padding: 1
+            Layout.fillHeight: true
 
             ListView {
                 id: componentListView
