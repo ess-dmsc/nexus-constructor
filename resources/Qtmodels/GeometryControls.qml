@@ -176,113 +176,123 @@ Pane {
         Item {
             id: cylinderContainer
             width: view.width
-            implicitWidth: fields.implicitWidth
-            height: cylinderLabel.height + fields.height
+            implicitWidth: cylinderColumn.implicitWidth
+            height: cylinderColumn.implicitHeight
 
             Component.onCompleted: view.implicitWidth = cylinderContainer.implicitWidth
 
-            Label {
-                id: cylinderLabel
-                anchors.top: parent.top
-                anchors.left: parent.left
-                text: "Cylinder Geometry:"
-            }
+            ColumnLayout {
+                id: cylinderColumn
+                anchors.fill: parent
 
-            Frame {
-                id: fields
-                anchors.top: cylinderLabel.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                contentWidth: cylinderFieldGrid.implicitWidth
-                contentHeight: cylinderFieldGrid.implicitHeight
+                Label {
+                    id: cylinderLabel
+                    text: "Cylinder Geometry:"
+                }
 
-                GridLayout {
-                    id: cylinderFieldGrid
-                    columns: 7
-                    rows: 3
+                Frame {
+                    id: fields
+                    Layout.fillWidth: true
 
-                    Label {
-                        text: "Height: "
-                        Layout.alignment: Qt.AlignRight
-                    }
-                    TextField {
-                        id: heightField
-                        text: cylinder_height
-                        onEditingFinished: cylinder_height = parseFloat(text)
-                        validator: numberValidator
-                        implicitWidth: textFieldWidth
-                    }
-                    Label {
-                        text: "Radius: "
-                        Layout.alignment: Qt.AlignRight
-                    }
-                    TextField {
-                        id: radiusField
-                        text: cylinder_radius
-                        onEditingFinished: cylinder_radius = parseFloat(text)
-                        validator: numberValidator
-                        implicitWidth: textFieldWidth
-                    }
-                    Label {
-                        text: "Units: "
-                        Layout.alignment: Qt.AlignRight
-                    }
-                    TextField {
-                        id: unitsField
-                        text: cylinder_units
-                        onEditingFinished: cylinder_units = text
-                        validator: UnitValidator {
-                                       id: cylinderUnitValidator
-                                       onValidationFailed: { ValidUnits.validCylinderUnits = false }
-                                       onValidationSuccess: { ValidUnits.validCylinderUnits = true }
-                                   }
-                        implicitWidth: textFieldWidth
-                    }
-                    InvalidInputCross {
-                        id: invalidCylinderUnitsCross
-                        opacity: !ValidUnits.validCylinderUnits
-                        toolTipMessage: ErrorMessages.invalidUnits
-                    }
-                    Label {
-                        text: "Axis Direction:"
-                        Layout.columnSpan: 7
-                    }
-                    Label {
-                        text: "X:"
-                        Layout.alignment: Qt.AlignRight
-                    }
-                    TextField {
-                        id: axisXField
-                        text: axis_x
-                        onEditingFinished: axis_x = parseFloat(text)
-                        validator: numberValidator
-                        implicitWidth: textFieldWidth
-                    }
-                    Label {
-                        text: "Y:"
-                        Layout.alignment: Qt.AlignRight
-                    }
-                    TextField {
-                        id: axisYField
-                        text: axis_y
-                        onEditingFinished: axis_y = parseFloat(text)
-                        validator: numberValidator
-                        implicitWidth: textFieldWidth
-                    }
-                    Label {
-                        text: "Z: "
-                        Layout.alignment: Qt.AlignRight
-                    }
-                    TextField {
-                        id: axisZField
-                        text: axis_z
-                        onEditingFinished: axis_z = parseFloat(text)
-                        validator: numberValidator
-                        implicitWidth: textFieldWidth
-                    }
-                    Item {
-                        // Spacer item to fill the remaining part of the grid
-                        Layout.fillWidth: true
+                    GridLayout {
+                        id: cylinderFieldGrid
+                        columns: 7
+                        rows: 3
+                        anchors.right: parent.right
+                        anchors.left: parent.left
+
+                        Label {
+                            text: "Height: "
+                            Layout.alignment: Qt.AlignRight
+                        }
+                        TextField {
+                            id: heightField
+                            text: cylinder_height
+                            onEditingFinished: cylinder_height = parseFloat(text)
+                            validator: numberValidator
+                            Layout.preferredWidth: textFieldWidth
+                            Layout.fillWidth: true
+                        }
+                        Label {
+                            text: "Radius: "
+                            Layout.alignment: Qt.AlignRight
+                        }
+                        TextField {
+                            id: radiusField
+                            text: cylinder_radius
+                            onEditingFinished: cylinder_radius = parseFloat(text)
+                            validator: numberValidator
+                            Layout.preferredWidth: textFieldWidth
+                            Layout.fillWidth: true
+                        }
+                        Label {
+                            text: "Units: "
+                            Layout.alignment: Qt.AlignRight
+                        }
+                        TextField {
+                            id: unitsField
+                            text: cylinder_units
+                            onEditingFinished: cylinder_units = text
+                            validator: UnitValidator {
+                                           id: cylinderUnitValidator
+                                           onValidationFailed: { ValidUnits.validCylinderUnits = false }
+                                           onValidationSuccess: { ValidUnits.validCylinderUnits = true }
+                                       }
+                            Layout.preferredWidth: textFieldWidth
+                            Layout.fillWidth: true
+                        }
+                        InvalidInputCross {
+                            id: invalidCylinderUnitsCross
+                            opacity: !ValidUnits.validCylinderUnits
+                            toolTipMessage: ErrorMessages.invalidUnits
+                            Layout.fillWidth: false
+                        }
+                        Label {
+                            text: "Axis Direction:"
+                            Layout.columnSpan: 7
+                            Layout.fillWidth: true
+                        }
+                        Label {
+                            text: "X:"
+                            Layout.alignment: Qt.AlignRight
+                        }
+                        TextField {
+                            id: axisXField
+                            text: axis_x
+                            onEditingFinished: axis_x = parseFloat(text)
+                            validator: numberValidator
+                            Layout.preferredWidth: textFieldWidth
+                            Layout.fillWidth: true
+                        }
+                        Label {
+                            text: "Y:"
+                            Layout.alignment: Qt.AlignRight
+                        }
+                        TextField {
+                            id: axisYField
+                            text: axis_y
+                            onEditingFinished: axis_y = parseFloat(text)
+                            validator: numberValidator
+                            Layout.preferredWidth: textFieldWidth
+                            Layout.fillWidth: true
+                        }
+                        Label {
+                            text: "Z: "
+                            Layout.alignment: Qt.AlignRight
+                        }
+                        TextField {
+                            id: axisZField
+                            text: axis_z
+                            onEditingFinished: axis_z = parseFloat(text)
+                            validator: numberValidator
+                            Layout.preferredWidth: textFieldWidth
+                            Layout.fillWidth: true
+                        }
+                        Item {
+                            // Spacer item to fill the remaining part of the grid
+                            Layout.preferredWidth: invalidCylinderUnitsCross.width
+                            Layout.fillWidth: false
+                        }
                     }
                 }
             }
