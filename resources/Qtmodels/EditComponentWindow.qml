@@ -37,15 +37,6 @@ ExpandingWindow {
         id: editorDelegate
         Pane {
             id: detailsPane
-            /*
-            contentWidth: Math.max(transformFrame.implicitWidth, geometryControls.implicitWidth, pixelControls.implicitWidth)
-            contentHeight: nameField.implicitHeight
-                           + descriptionField.implicitHeight
-                           + transformLabel.height
-                           + transformFrame.implicitHeight
-                           + geometryControls.implicitHeight
-                           + pixelControls.implicitHeight
-            */
             contentWidth: editorColumn.implicitWidth
             contentHeight: editorColumn.implicitHeight
             width: view.width
@@ -63,15 +54,28 @@ ExpandingWindow {
                     text: "Name: "
                 }
                 TextField {
+                    id: nameField
                     Layout.fillWidth: true
+                    Layout.preferredWidth: 200
+                    text: name
+                    onEditingFinished: name = text
+                    validator: NameValidator {
+                        model: components
+                        myindex: componentIndex
+                        onValidationFailed: {
+                            nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+                        }
+                    }
                 }
                 Label {
                     text: "Description: "
                 }
                 TextField {
+                    id: descriptionField
                     Layout.fillWidth: true
+                    text: description
+                    onEditingFinished: description = text
                 }
-
                 Label {
                     id: transformLabel
                     text: "Transform:"
@@ -103,7 +107,6 @@ ExpandingWindow {
                         PropertyChanges { target: editComponentWindow; height: minimumHeight}
                     }
                 }
-
                 GeometryControls {
                     id: geometryControls
                     state: geometry_state
@@ -118,7 +121,6 @@ ExpandingWindow {
                     }
                     onCylinderChanged: components.update_mesh(componentIndex)
                 }
-
                 PixelControls {
                     id: pixelControls
                     state: pixel_state
@@ -134,30 +136,6 @@ ExpandingWindow {
                     onLayoutChanged: components.update_mesh(componentIndex)
                 }
             }
-            /*
-            LabeledTextField {
-                    id: nameField
-                    labelText: "Nameddd:"
-                    editorWidth: 200
-                    editorText: name
-                    onEditingFinished: name = editorText
-                    validator: NameValidator {
-                        model: components
-                        myindex: componentIndex
-                        onValidationFailed: {
-                            nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
-                        }
-                    }
-                }
-
-                LabeledTextField {
-                    id: descriptionField
-                    // anchoredEditor: true
-                    labelText: "Description:"
-                    editorText: description
-                    onEditingFinished: description = editorText
-                }
-                */
         }
     }
 }
