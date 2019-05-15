@@ -139,78 +139,91 @@ Pane {
                                             editorButton.implicitWidth + deleteButton.implicitWidth)
                     id: extendedText
 
-                    LabeledTextField {
-                        id: nameField
-                        labelText: "Name:"
-                        editorWidth: 200
-                        editorText: name
-                        onEditingFinished: name = editorText
-                        validator: NameValidator {
-                            model: components
-                            myindex: index
-                            onValidationFailed: {
-                                nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+                    ColumnLayout {
+                        id: extendedGrid
+
+                        RowLayout {
+                            Label {
+                                text: "Name: "
+                            }
+                            TextField {
+                                id: nameField
+                                text: name
+                                onEditingFinished: name = text
+                                validator: NameValidator {
+                                    model: components
+                                    myindex: index
+                                    onValidationFailed: {
+                                        nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+                                    }
+                                }
+                                Layout.fillWidth: true
+                            }
+                            Image {
+                                id: expansionCaret2
+                                Layout.preferredWidth: 20
+                                Layout.preferredHeight: 20
+                                source: "file:resources/images/caret.svg"
+                                transformOrigin: Item.Center
+                                rotation: 180
                             }
                         }
-                    }
+                        TransformControls {
+                            id: transformControls
+                            transformModel: transform_model
+                            componentIndex: index
+                        }
+                        Connections {
+                            target: transform_model
+                            onTransformsUpdated: components.transforms_updated(index)
+                        }
+                        states: State {
+                            name: "hidden"; when: index == 0
+                            PropertyChanges { target: transformControls; height: 0 }
+                            PropertyChanges { target: transformControls; visible: false }
+                        }
 
-                    TransformControls {
-                        id: transformControls
-                        transformModel: transform_model
-                        componentIndex: index
-                        anchors.top: nameField.bottom
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                    }
-                    Connections {
-                        target: transform_model
-                        onTransformsUpdated: components.transforms_updated(index)
-                    }
-                    states: State {
-                        name: "hidden"; when: index == 0
-                        PropertyChanges { target: transformControls; height: 0 }
-                        PropertyChanges { target: transformControls; visible: false }
-                    }
-
-                    PaddedButton {
-                        id: editorButton
-                        anchors.top: transformControls.bottom
-                        anchors.left: parent.left
-                        text: "Full editor"
-                        onClicked: {
-                            if (editorLoader.source == ""){
-                                editorLoader.source = "EditComponentWindow.qml"
-                                editorLoader.item.componentIndex = index
-                                window.positionChildWindow(editorLoader.item)
-                                editorLoader.item.show()
-                            } else {
-                                editorLoader.item.requestActivate()
+                        RowLayout {
+                            PaddedButton {
+                                id: editorButton
+                                text: "Full editor"
+                                onClicked: {
+                                    if (editorLoader.source == ""){
+                                        editorLoader.source = "EditComponentWindow.qml"
+                                        editorLoader.item.componentIndex = index
+                                        window.positionChildWindow(editorLoader.item)
+                                        editorLoader.item.show()
+                                    } else {
+                                        editorLoader.item.requestActivate()
+                                    }
+                                }
+                            }
+                            Loader {
+                                id: editorLoader
+                                Connections {
+                                    target: editorLoader.item
+                                    onClosing: editorLoader.source = ""
+                                }
+                                Connections {
+                                    target: window
+                                    onClosing: editorLoader.source = ""
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                            }
+                            PaddedButton {
+                                id: deleteButton
+                                text: "Delete"
+                                onClicked: components.remove_component(index)
+                                buttonEnabled: removable
+                                // The sample (at index 0) should never be removed. Don't even show it as an option.
+                                visible: index != 0
+                                ToolTip.visible: hovered & !removable
+                                ToolTip.delay: 400
+                                ToolTip.text: "Cannot remove a component that's in use as a transform parent"
                             }
                         }
-                    }
-                    Loader {
-                        id: editorLoader
-                        Connections {
-                            target: editorLoader.item
-                            onClosing: editorLoader.source = ""
-                        }
-                        Connections {
-                            target: window
-                            onClosing: editorLoader.source = ""
-                        }
-                    }
-                    PaddedButton {
-                        id: deleteButton
-                        anchors.top: editorButton.top
-                        anchors.right: parent.right
-                        text: "Delete"
-                        onClicked: components.remove_component(index)
-                        buttonEnabled: removable
-                        // The sample (at index 0) should never be removed. Don't even show it as an option.
-                        visible: index != 0
-                        ToolTip.visible: hovered & !removable
-                        ToolTip.delay: 400
-                        ToolTip.text: "Cannot remove a component that's in use as a transform parent"
                     }
                 }
             }
@@ -226,7 +239,8 @@ Pane {
 
                 PropertyChanges { target: componentBox; contentHeight: extendedContent.height}
 
-                PropertyChanges { target: expansionCaret; rotation: 180 }
+                // PropertyChanges { target: expansionCaret; rotation: 180 }
+                PropertyChanges { target: expansionCaret; visible: false }
             }
         }
     }
