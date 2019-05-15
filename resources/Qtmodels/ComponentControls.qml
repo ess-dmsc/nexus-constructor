@@ -1,80 +1,78 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import MyValidators 1.0
+import QtQuick.Layouts 1.11
 
 Pane {
 
-    contentWidth: Math.max(headingRow.implicitWidth, listContainer.implicitWidth)
-    contentHeight: headingRow.implicitHeight + listContainer.implicitHeight
+    contentWidth: componentControlsColumn.implicitWidth
+    contentHeight: componentControlsColumn.implicitHeight
 
-    Pane {
-        id: headingRow
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        contentHeight: addComponentButton.height
-        contentWidth: componentsLabel.width + addComponentButton.width
-        padding: 1
+    ColumnLayout {
+        id: componentControlsColumn
+        anchors.fill: parent
 
-        Label {
-            id: componentsLabel
-            anchors.left: parent.left
-            anchors.verticalCenter: addComponentButton.verticalCenter
-            text: "Components:"
-        }
-        Button {
-            id: addComponentButton
-            anchors.right: parent.right
+        RowLayout {
+            id: headingRow
 
-            text: "Add component"
-            onClicked: {
-                if (windowLoader.source == ""){
-                    windowLoader.source = "AddComponentWindow.qml"
-                    window.positionChildWindow(windowLoader.item)
-                    windowLoader.item.show()
-                } else {
-                    windowLoader.item.requestActivate()
+            Label {
+                id: componentsLabel
+                text: "Components: "
+            }
+            Item {
+                // Spacer Item to force Components label and Add Component button to opposite ends of pane
+                Layout.fillWidth: true
+            }
+            Button {
+                id: addComponentButton
+                text: "Add Component"
+                onClicked: {
+                    if (windowLoader.source == ""){
+                        windowLoader.source = "AddComponentWindow.qml"
+                        window.positionChildWindow(windowLoader.item)
+                        windowLoader.item.show()
+                    } else {
+                        windowLoader.item.requestActivate()
+                    }
+                }
+                Loader {
+                    id: windowLoader
+                    Connections {
+                        target: windowLoader.item
+                        onClosing: windowLoader.source = ""
+                    }
+                    Connections {
+                        target: window
+                        onClosing: windowLoader.source = ""
+                    }
                 }
             }
-            Loader {
-                id: windowLoader
-                Connections {
-                    target: windowLoader.item
-                    onClosing: windowLoader.source = ""
-                }
-                Connections {
-                    target: window
-                    onClosing: windowLoader.source = ""
-                }
-            }
         }
-    }
 
-    Frame {
-        id: listContainer
-        anchors.left: parent.left
-        anchors.right: parent.right
-        contentWidth: componentListView.implicitWidth
-        contentHeight: 100
-        anchors.top: headingRow.bottom
-        anchors.bottom: parent.bottom
-        padding: 1
-        ListView {
-            id: componentListView
-            model: components
-            delegate: componentDelegate
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: bar
-        }
-        ActiveScrollBar {
-            // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
-            id: bar
-            anchors.left: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+        Frame {
+            id: listContainer
+            contentWidth: componentListView.implicitWidth
+            contentHeight: 100
+            padding: 1
+            Layout.fillHeight: true
+
+            ListView {
+                id: componentListView
+                model: components
+                delegate: componentDelegate
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollBar.vertical: bar
+            }
+            ActiveScrollBar {
+                // Place scrollbar outside of ListView so that it doesn't overlap with ListView contents
+                id: bar
+                anchors.left: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+            }
         }
     }
 
