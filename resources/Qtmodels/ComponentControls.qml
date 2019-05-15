@@ -81,7 +81,7 @@ Pane {
         Frame {
             id: componentBox
             padding: 5
-            contentHeight: Math.max(mainContent.height, expansionCaret.height)
+            contentHeight: expansionCaret.height
             contentWidth: extendedContent.implicitWidth
             width: componentListView.width
 
@@ -97,35 +97,29 @@ Pane {
                 onClicked: componentBox.state = (componentBox.state == "Extended") ? "": "Extended"
             }
 
-            Image {
-                id: expansionCaret
-                width: 20; height: 20;
-                anchors.right: parent.right
-                anchors.top: parent.top
-                source: "file:resources/images/caret.svg"
-                transformOrigin: Item.Center
-                rotation: 0
-            }
+            RowLayout {
+                id: shortenedContent
+                anchors.fill: parent
 
-            Item {
-                id: mainContent
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: mainNameLabel.height
-                implicitWidth: mainNameLabel.width + expansionCaret.width
-                visible: true
                 Label {
                     id: mainNameLabel
-                    anchors.left: parent.left
-                    anchors.top: parent.top
                     text: "Name:" + name
                 }
+                Item {
+                    Layout.fillWidth: true
+                }
+                Image {
+                    id: expansionCaret
+                    Layout.preferredWidth: 20
+                    Layout.preferredHeight: 20
+                    source: "file:resources/images/caret.svg"
+                    transformOrigin: Item.Center
+                    rotation: 0
+                }
             }
-
             ColumnLayout {
                 id: extendedContent
                 implicitWidth: transformControls.implicitWidth
-                anchors.top: mainContent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
                 visible: false
@@ -218,8 +212,8 @@ Pane {
             states: State {
                 name: "Extended"
 
-                PropertyChanges { target: mainContent; height: 0 }
-                PropertyChanges { target: mainContent; visible: false }
+                PropertyChanges { target: shortenedContent; height: 0 }
+                PropertyChanges { target: shortenedContent; visible: false }
 
                 // PropertyChanges { target: extendedContent; height: extendedCon.height }
                 PropertyChanges { target: extendedContent; visible: true }
