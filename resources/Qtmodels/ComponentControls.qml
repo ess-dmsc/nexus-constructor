@@ -98,9 +98,9 @@ Pane {
                     componentDetailsStack.currentIndex = !componentDetailsStack.currentIndex
 
                     if (componentDetailsStack.currentIndex)
-                        componentBox.contentHeight = extendedContent.implicitHeight
+                        componentBox.contentHeight = extendedContent.height
                     else
-                        componentBox.contentHeight = shortenedContent.implicitHeight
+                        componentBox.contentHeight = shortenedContent.height
                 }
             }
 
@@ -167,7 +167,10 @@ Pane {
                     }
                     Connections {
                         target: transform_model
-                        onTransformsUpdated: components.transforms_updated(index)
+                        onTransformsUpdated: {
+                            components.transforms_updated(index)
+                            componentBox.contentHeight = extendedContent.height
+                        }
                     }
                     states: State {
                         name: "hidden"; when: index == 0
