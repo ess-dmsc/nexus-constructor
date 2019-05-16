@@ -7,7 +7,9 @@ Pane {
 
     contentWidth: componentControlsColumn.implicitWidth
     contentHeight: componentControlsColumn.implicitHeight
+
     property var expansionCaretSize: 20
+    property var expansionCaretLocation: "file:resources/images/caret.svg"
 
     ColumnLayout {
         id: componentControlsColumn
@@ -112,7 +114,7 @@ Pane {
                 Image {
                     Layout.preferredWidth: expansionCaretSize
                     Layout.preferredHeight: expansionCaretSize
-                    source: "file:resources/images/caret.svg"
+                    source: expansionCaretLocation
                 }
             }
             ColumnLayout {
@@ -142,7 +144,7 @@ Pane {
                     Image {
                         Layout.preferredWidth: expansionCaretSize
                         Layout.preferredHeight: expansionCaretSize
-                        source: "file:resources/images/caret.svg"
+                        source: expansionCaretLocation
                         transformOrigin: Item.Center
                         rotation: 180
                     }
