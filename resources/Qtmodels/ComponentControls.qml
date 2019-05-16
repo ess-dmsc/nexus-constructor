@@ -81,7 +81,7 @@ Pane {
         Frame {
             id: componentBox
             padding: 5
-            contentHeight: expansionCaret.height
+            contentHeight: nameField.height
             contentWidth: extendedContent.implicitWidth
             width: componentListView.width
 
@@ -103,18 +103,15 @@ Pane {
 
                 Label {
                     id: mainNameLabel
-                    text: "Name:" + name
+                    text: "Name: " + name
                 }
                 Item {
                     Layout.fillWidth: true
                 }
                 Image {
-                    id: expansionCaret
                     Layout.preferredWidth: 20
                     Layout.preferredHeight: 20
                     source: "file:resources/images/caret.svg"
-                    transformOrigin: Item.Center
-                    rotation: 0
                 }
             }
             ColumnLayout {
@@ -123,7 +120,6 @@ Pane {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 visible: false
-                // height: 0
 
                 RowLayout {
                     Label {
@@ -143,7 +139,6 @@ Pane {
                         Layout.fillWidth: true
                     }
                     Image {
-                        id: expansionCaret2
                         Layout.preferredWidth: 20
                         Layout.preferredHeight: 20
                         source: "file:resources/images/caret.svg"
@@ -215,13 +210,9 @@ Pane {
                 PropertyChanges { target: shortenedContent; height: 0 }
                 PropertyChanges { target: shortenedContent; visible: false }
 
-                // PropertyChanges { target: extendedContent; height: extendedCon.height }
                 PropertyChanges { target: extendedContent; visible: true }
 
                 PropertyChanges { target: componentBox; contentHeight: extendedContent.height}
-
-                // PropertyChanges { target: expansionCaret; rotation: 180 }
-                PropertyChanges { target: expansionCaret; visible: false }
             }
         }
     }
