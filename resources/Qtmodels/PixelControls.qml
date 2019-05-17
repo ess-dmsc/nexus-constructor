@@ -99,6 +99,7 @@ Item {
                 }
                 Label {
                     text: "Row Height: "
+                    Layout.fillWidth: false
                 }
                 TextField {
                     id: rowHeightField
@@ -119,6 +120,7 @@ Item {
                 }
                 Label {
                     text: "Column Width: "
+                    Layout.fillWidth: false
                 }
                 TextField {
                     id: columnWidthField
