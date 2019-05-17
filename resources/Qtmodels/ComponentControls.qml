@@ -84,7 +84,7 @@ Pane {
         Frame {
             id: componentBox
             padding: 5
-            contentHeight: nameField.height
+            contentHeight: repeatedNameCross.height
             contentWidth: extendedContent.implicitWidth
             width: componentListView.width
 
