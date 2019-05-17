@@ -136,10 +136,18 @@ Pane {
                             model: components
                             myindex: index
                             onValidationFailed: {
-                                nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+                                repeatedNameCross.opacity = 1
+                            }
+                            onValidationSuccess: {
+                                repeatedNameCross.opacity = 0
                             }
                         }
                         Layout.fillWidth: true
+                    }
+                    InvalidInputCross {
+                        id: repeatedNameCross
+                        toolTipMessage: ErrorMessages.repeatedComponentName
+                        Layout.fillWidth: false
                     }
                     Image {
                         Layout.preferredWidth: expansionCaretSize

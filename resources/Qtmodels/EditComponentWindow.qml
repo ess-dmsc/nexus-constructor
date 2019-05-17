@@ -83,7 +83,6 @@ ExpandingWindow {
                     Layout.fillWidth: true
                     text: description
                     onEditingFinished: description = text
-                    // Layout.columnSpan: 2
                 }
                 Label {
                     id: transformLabel
