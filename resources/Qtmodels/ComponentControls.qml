@@ -8,6 +8,9 @@ Pane {
     contentWidth: componentControlsColumn.implicitWidth
     contentHeight: componentControlsColumn.implicitHeight
 
+    property var expansionCaretSize: 20
+    property var expansionCaretLocation: "file:resources/images/caret.svg"
+
     ColumnLayout {
         id: componentControlsColumn
         anchors.fill: parent
@@ -81,8 +84,8 @@ Pane {
         Frame {
             id: componentBox
             padding: 5
-            contentHeight: Math.max(mainContent.height, expansionCaret.height)
-            contentWidth: Math.max(mainContent.implicitWidth, extendedContent.implicitWidth)
+            contentHeight: nameField.height
+            contentWidth: extendedContent.implicitWidth
             width: componentListView.width
 
             onImplicitWidthChanged: {
@@ -97,54 +100,38 @@ Pane {
                 onClicked: componentBox.state = (componentBox.state == "Extended") ? "": "Extended"
             }
 
-            Image {
-                id: expansionCaret
-                width: 20; height: 20;
-                anchors.right: parent.right
-                anchors.top: parent.top
-                source: "file:resources/images/caret.svg"
-                transformOrigin: Item.Center
-                rotation: 0
-            }
+            RowLayout {
+                id: shortenedContent
+                anchors.fill: parent
 
-            Item {
-                id: mainContent
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: mainNameLabel.height
-                implicitWidth: mainNameLabel.width + expansionCaret.width
-                visible: true
                 Label {
                     id: mainNameLabel
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    text: "Name:" + name
+                    text: "Name: " + name
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                Image {
+                    Layout.preferredWidth: expansionCaretSize
+                    Layout.preferredHeight: expansionCaretSize
+                    source: expansionCaretLocation
                 }
             }
-
-            Item {
+            ColumnLayout {
                 id: extendedContent
-                anchors.top: mainContent.bottom
+                implicitWidth: transformControls.implicitWidth
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: 0
-                implicitWidth: extendedText.implicitWidth
                 visible: false
-                Item {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: nameField.height + transformControls.height + editorButton.height
-                    implicitWidth: Math.max(nameField.implicitWidth,
-                                            transformControls.implicitWidth,
-                                            editorButton.implicitWidth + deleteButton.implicitWidth)
-                    id: extendedText
 
-                    LabeledTextField {
+                RowLayout {
+                    Label {
+                        text: "Name: "
+                    }
+                    TextField {
                         id: nameField
-                        labelText: "Name:"
-                        editorWidth: 200
-                        editorText: name
-                        onEditingFinished: name = editorText
+                        text: name
+                        onEditingFinished: name = text
                         validator: NameValidator {
                             model: components
                             myindex: index
@@ -152,30 +139,34 @@ Pane {
                                 nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
                             }
                         }
+                        Layout.fillWidth: true
                     }
+                    Image {
+                        Layout.preferredWidth: expansionCaretSize
+                        Layout.preferredHeight: expansionCaretSize
+                        source: expansionCaretLocation
+                        transformOrigin: Item.Center
+                        rotation: 180
+                    }
+                }
+                TransformControls {
+                    id: transformControls
+                    transformModel: transform_model
+                    componentIndex: index
+                }
+                Connections {
+                    target: transform_model
+                    onTransformsUpdated: components.transforms_updated(index)
+                }
+                states: State {
+                    name: "hidden"; when: index == 0
+                    PropertyChanges { target: transformControls; height: 0 }
+                    PropertyChanges { target: transformControls; visible: false }
+                }
 
-                    TransformControls {
-                        id: transformControls
-                        transformModel: transform_model
-                        componentIndex: index
-                        anchors.top: nameField.bottom
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                    }
-                    Connections {
-                        target: transform_model
-                        onTransformsUpdated: components.transforms_updated(index)
-                    }
-                    states: State {
-                        name: "hidden"; when: index == 0
-                        PropertyChanges { target: transformControls; height: 0 }
-                        PropertyChanges { target: transformControls; visible: false }
-                    }
-
+                RowLayout {
                     PaddedButton {
                         id: editorButton
-                        anchors.top: transformControls.bottom
-                        anchors.left: parent.left
                         text: "Full editor"
                         onClicked: {
                             if (editorLoader.source == ""){
@@ -199,10 +190,11 @@ Pane {
                             onClosing: editorLoader.source = ""
                         }
                     }
+                    Item {
+                        Layout.fillWidth: true
+                    }
                     PaddedButton {
                         id: deleteButton
-                        anchors.top: editorButton.top
-                        anchors.right: parent.right
                         text: "Delete"
                         onClicked: components.remove_component(index)
                         buttonEnabled: removable
@@ -218,15 +210,12 @@ Pane {
             states: State {
                 name: "Extended"
 
-                PropertyChanges { target: mainContent; height: 0 }
-                PropertyChanges { target: mainContent; visible: false }
+                PropertyChanges { target: shortenedContent; height: 0 }
+                PropertyChanges { target: shortenedContent; visible: false }
 
-                PropertyChanges { target: extendedContent; height: extendedText.height }
                 PropertyChanges { target: extendedContent; visible: true }
 
                 PropertyChanges { target: componentBox; contentHeight: extendedContent.height}
-
-                PropertyChanges { target: expansionCaret; rotation: 180 }
             }
         }
     }
