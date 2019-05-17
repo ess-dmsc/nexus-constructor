@@ -205,4 +205,8 @@ class NameValidator(ValidatorOnListModel):
                 if name_at_index == input:
                     self.validationFailed.emit()
                     return QValidator.Invalid
+
+        self.validationSuccess.emit()
         return QValidator.Acceptable
+
+    validationSuccess = Signal()
