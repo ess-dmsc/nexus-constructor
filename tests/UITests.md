@@ -70,7 +70,7 @@ Reset the sample's name to 'Sample'.
 Press the 'Add component' button.
 - The "Add component" window should appear.
 - It should contain a selector for component type.
-- It should contain a pair of radio buttons for component geometry, 'Mesh', 'Cylinder' and 'None'.
+- It should contain the following radio buttons for component geometry: 'Mesh', 'Cylinder' and 'None'.
 - It should contain a set of radio buttons for pixel layout, 'Single ID', 'Repeatable grid', 'Face
 mapped mesh' and 'None'.
 - It should contain a 'Continue' button at the bottom.
@@ -138,13 +138,21 @@ Click the 'Add component' button.
 Select a Cylinder geometry and leave the other options untouched.  
 Try to name this new component "Sample".
 - The text field will accept the name "Sampl"  
-- Once you try to type in the remaining "e" a red cross will appear
-- Placing your mouse over the cross will show a message saying that component names must be unique
+- Once you try to type in the remaining "e" a red cross will appear.
+- Placing your mouse over the cross will show a message saying that component names must be unique.
 
-Remove focus from the text field by selecting a different field or moving the mouse away
+Remove focus from the text field by selecting a different field or by moving the mouse out of the window.
 - The red cross disappear and the message will no longer be accessible.
-- The component name will still be "Sampl"
+- The component name will still be "Sampl".
 
+Change the name back to its default and click "Add" without changing any of the other options.  
+Expand the component details box in the left-hand-side of the main window.  
+- Repeat the steps above and you should observe the same behaviour.
+
+Change the name back to its default again.  
+Expand the component details box.  
+Click the 'Full editor' button.  
+- Repeat the steps above and you should observe the same behaviour.
 
 ## Validating Units 
 
