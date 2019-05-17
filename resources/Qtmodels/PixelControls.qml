@@ -95,15 +95,18 @@ Item {
                     text: rows
                     onEditingFinished: rows = parseInt(text)
                     validator: integerValidator
+                    Layout.fillWidth: true
                 }
                 Label {
                     text: "Row Height: "
+                    Layout.fillWidth: false
                 }
                 TextField {
                     id: rowHeightField
                     text: row_height
                     onEditingFinished: row_height = parseFloat(editorText)
                     validator: numberValidator
+                    Layout.fillWidth: true
                 }
                 Label {
                     text: "Columns: "
@@ -113,15 +116,18 @@ Item {
                     text: columns
                     onEditingFinished: columns = parseInt(text)
                     validator: integerValidator
+                    Layout.fillWidth: true
                 }
                 Label {
                     text: "Column Width: "
+                    Layout.fillWidth: false
                 }
                 TextField {
                     id: columnWidthField
                     text: column_width
                     onEditingFinished: column_width = parseFloat(text)
                     validator: numberValidator
+                    Layout.fillWidth: true
                 }
                 Label {
                     text: "First ID: "
@@ -131,6 +137,7 @@ Item {
                     text: first_id
                     onEditingFinished: first_id = parseInt(text)
                     validator: integerValidator
+                    Layout.fillWidth: true
                 }
                 Item {
                     Layout.fillWidth: true
