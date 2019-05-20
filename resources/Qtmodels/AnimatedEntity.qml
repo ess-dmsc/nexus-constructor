@@ -145,6 +145,8 @@ Entity {
 
     NodeInstantiator  {
         id: componentRenderList
+        // this is what we need to set up from walking through the nexus file. -
+        // https://doc.qt.io/qt-5/qml-qt3d-core-nodeinstantiator.html#model-prop
         model: instrument
 
         Entity {
