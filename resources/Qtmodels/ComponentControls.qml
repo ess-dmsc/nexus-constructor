@@ -172,22 +172,11 @@ Pane {
                             if (editorLoader.source == ""){
                                 editorLoader.source = "EditComponentWindow.qml"
                                 editorLoader.item.componentIndex = index
-                                window.positionChildWindow(editorLoader.item)
+//                                window.positionChildWindow(editorLoader.item)
                                 editorLoader.item.show()
                             } else {
                                 editorLoader.item.requestActivate()
                             }
-                        }
-                    }
-                    Loader {
-                        id: editorLoader
-                        Connections {
-                            target: editorLoader.item
-                            onClosing: editorLoader.source = ""
-                        }
-                        Connections {
-                            target: window
-                            onClosing: editorLoader.source = ""
                         }
                     }
                     Item {
