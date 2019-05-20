@@ -17,7 +17,7 @@ ApplicationWindow {
     minimumHeight: centralRow.implicitHeight + menuBar.implicitHeight
     property var jsonPaneWidth: 300
 
-    property string jsonMode: "liveFW"
+    property string jsonMode: "hidden"
 
     menuBar: MenuBar {
         Menu {
