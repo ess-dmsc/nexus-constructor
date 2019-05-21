@@ -68,8 +68,8 @@ Entity {
 
     PhongMaterial {
         id: greenMaterial
-        ambient: "green"
-        diffuse: "green"
+        ambient: "grey"
+        diffuse: "grey"
     }
 
     SphereMesh {
