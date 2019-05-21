@@ -153,8 +153,9 @@ Pane {
                             text: "OK"
                             onClicked: {
                                 // Close the box
-                                offModel.file_url = filePicker.fileUrl
+                                // Must set units before the file_url as units are converted when file is loaded
                                 offModel.units = unitInput.editorText
+                                offModel.file_url = filePicker.fileUrl
                                 GeometryFileSelected.geometryFileSelected = true
                                 unitSelection.close()
                             }
