@@ -51,7 +51,7 @@ ExpandingWindow {
                 columns: 3
 
                 Label {
-                    text: "Name: "
+                    text: "Name : "
                 }
                 TextField {
                     id: nameField
@@ -87,12 +87,12 @@ ExpandingWindow {
                 Label {
                     id: transformLabel
                     text: "Transform:"
-                    Layout.columnSpan: 3
+                    Layout.columnSpan: parent.columns
                 }
 
                 Frame {
                     id: transformFrame
-                    Layout.columnSpan: 3
+                    Layout.columnSpan: parent.columns
                     contentHeight: transformControls.implicitHeight
                     contentWidth: transformControls.implicitWidth
                     Layout.fillWidth: true
@@ -118,7 +118,7 @@ ExpandingWindow {
                 GeometryControls {
                     id: geometryControls
                     state: geometry_state
-                    Layout.columnSpan: 3
+                    Layout.columnSpan: parent.columns
                     Layout.fillWidth: true
                     Component.onCompleted: {
                         geometryControls.geometryModel.set_geometry(componentIndex, components)
@@ -133,7 +133,7 @@ ExpandingWindow {
                     id: pixelControls
                     state: pixel_state
                     visible: pixel_state != ""
-                    Layout.columnSpan: 3
+                    Layout.columnSpan: parent.columns
                     Layout.fillWidth: true
 
                     Component.onCompleted:{
