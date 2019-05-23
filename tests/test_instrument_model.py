@@ -78,12 +78,16 @@ def test_GIVEN_component_index_WHEN_calling_remove_component_THEN_component_call
     model = InstrumentModel()
     model.initialise(NexusModel().getEntryGroup())
 
+    # Create a mock component and add this to the InstrumentModel
     mock_component = Mock()
     mock_component.transforms = []
     mock_component.transform_parent = None
     model.append_component_to_list(mock_component)
 
+    # Remove the mock component which will be located at index 1
     model.remove_component(1)
+
+    # Check that this leads to the component's delete_component_group being called with the expected parent argument
     mock_component.delete_component_group.assert_called_once_with(
         model.instrument_group
     )
