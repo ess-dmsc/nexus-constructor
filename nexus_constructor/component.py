@@ -62,5 +62,5 @@ class Component:
     pixel_data = attr.ib(default=None, type=PixelData)
     component_group = attr.ib(default=None)
 
-    def delete_component_group(self):
-        pass
+    def delete_component_group(self, parent):
+        delete_group(self.name, parent)

@@ -275,7 +275,7 @@ class InstrumentModel(QAbstractListModel):
         if self.is_removable(index):
             self.beginRemoveRows(QModelIndex(), index, index)
             component = self.components.pop(index)
-            component.delete_component_group()
+            component.delete_component_group(self.instrument_group)
             self.transform_models.pop(index)
             self.endRemoveRows()
             self.update_removable()

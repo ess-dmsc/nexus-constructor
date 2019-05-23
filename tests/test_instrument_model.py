@@ -84,7 +84,7 @@ def test_GIVEN_component_index_WHEN_calling_remove_component_THEN_component_call
     model.append_component_to_list(mock_component)
 
     model.remove_component(1)
-    mock_component.delete_component_group.assert_called_once()
+    mock_component.delete_component_group.assert_called_once_with(model.instrument_group)
 
 
 def test_GIVEN_nothing_WHEN_calling_create_instrument_group_THEN_instrument_group_is_created_and_added_to_model():
