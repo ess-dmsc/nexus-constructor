@@ -228,7 +228,7 @@ ExpandingWindow {
 
                     GridLayout {
                         rows: 2
-                        columns: 2
+                        columns: 3
                         Layout.fillWidth: true
                         Label {
                             text: "Name: "
@@ -243,11 +243,18 @@ ExpandingWindow {
                                 model: components
                                 myindex: -1
                                 onValidationFailed: {
-                                    nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+                                    repeatedNameCross.opacity = 1
+                                }
+                                onValidationSuccess: {
+                                    repeatedNameCross.opacity = 0
                                 }
                             }
                         }
-
+                        InvalidInputCross {
+                            id: repeatedNameCross
+                            toolTipMessage: ErrorMessages.repeatedComponentName
+                            Layout.fillWidth: false
+                        }
                         Label {
                             text: "Description: "
                         }

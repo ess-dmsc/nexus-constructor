@@ -48,10 +48,10 @@ ExpandingWindow {
                 id: editorColumn
                 anchors.fill: parent
                 rows: 5
-                columns: 2
+                columns: 3
 
                 Label {
-                    text: "Name: "
+                    text: "Name : "
                 }
                 TextField {
                     id: nameField
@@ -63,9 +63,17 @@ ExpandingWindow {
                         model: components
                         myindex: componentIndex
                         onValidationFailed: {
-                            nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+                            repeatedNameCross.opacity = 1
+                        }
+                        onValidationSuccess: {
+                            repeatedNameCross.opacity = 0
                         }
                     }
+                }
+                InvalidInputCross {
+                    id: repeatedNameCross
+                    toolTipMessage: ErrorMessages.repeatedComponentName
+                    Layout.fillWidth: false
                 }
                 Label {
                     text: "Description: "
@@ -79,12 +87,12 @@ ExpandingWindow {
                 Label {
                     id: transformLabel
                     text: "Transform:"
-                    Layout.columnSpan: 2
+                    Layout.columnSpan: parent.columns
                 }
 
                 Frame {
                     id: transformFrame
-                    Layout.columnSpan: 2
+                    Layout.columnSpan: parent.columns
                     contentHeight: transformControls.implicitHeight
                     contentWidth: transformControls.implicitWidth
                     Layout.fillWidth: true
@@ -110,7 +118,7 @@ ExpandingWindow {
                 GeometryControls {
                     id: geometryControls
                     state: geometry_state
-                    Layout.columnSpan: 2
+                    Layout.columnSpan: parent.columns
                     Layout.fillWidth: true
                     Component.onCompleted: {
                         geometryControls.geometryModel.set_geometry(componentIndex, components)
@@ -125,7 +133,7 @@ ExpandingWindow {
                     id: pixelControls
                     state: pixel_state
                     visible: pixel_state != ""
-                    Layout.columnSpan: 2
+                    Layout.columnSpan: parent.columns
                     Layout.fillWidth: true
 
                     Component.onCompleted:{

@@ -84,7 +84,7 @@ Pane {
         Frame {
             id: componentBox
             padding: 5
-            contentHeight: nameField.height
+            contentHeight: repeatedNameCross.height
             contentWidth: extendedContent.implicitWidth
             width: componentListView.width
 
@@ -136,10 +136,18 @@ Pane {
                             model: components
                             myindex: index
                             onValidationFailed: {
-                                nameField.ToolTip.show(ErrorMessages.repeatedComponentName, 3000)
+                                repeatedNameCross.opacity = 1
+                            }
+                            onValidationSuccess: {
+                                repeatedNameCross.opacity = 0
                             }
                         }
                         Layout.fillWidth: true
+                    }
+                    InvalidInputCross {
+                        id: repeatedNameCross
+                        toolTipMessage: ErrorMessages.repeatedComponentName
+                        Layout.fillWidth: false
                     }
                     Image {
                         Layout.preferredWidth: expansionCaretSize
