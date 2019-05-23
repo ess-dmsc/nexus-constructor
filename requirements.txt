@@ -8,6 +8,7 @@ git+https://github.com/ess-dmsc/python-nexus-utilities@6f5d2c7f1ca66063227aad2a1
 numpy-stl
 pre-commit
 pint
+mock
 
 # newer versions of jsonschema don't work with the executables built by cx_Freeze
 jsonschema==2.6.0
