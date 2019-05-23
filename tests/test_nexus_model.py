@@ -70,24 +70,36 @@ def test_GIVEN_nonstandard_nxclass_WHEN_creating_group_THEN_group_is_still_creat
 
 
 def test_GIVEN_recognised_name_WHEN_deleting_group_THEN_group_gets_deleted():
-    name = "test"
+    file_name = "test2"
     nx_class = "NXarbitrary"
-    nexus_file = h5py.File(name, driver="core", backing_store=False)
-    create_group(name, nx_class, nexus_file)
-    delete_group(name, nexus_file)
+    component_name = "MyDetector"
+    nexus_file = h5py.File(file_name, driver="core", backing_store=False)
+    create_group(component_name, nx_class, nexus_file)
+    delete_group(component_name, nexus_file)
 
     with raises(KeyError):
-        pass
+        nexus_file[component_name]
 
 
 def test_GIVEN_unrecognised_name_WHEN_deleting_group_THEN_throws():
-    name = "test"
+    file_name = "test3"
     nx_class = "NXarbitrary"
-    nexus_file = h5py.File(name, driver="core", backing_store=False)
-    create_group(name, nx_class, nexus_file)
+    component_name = "MyDetector"
+    nexus_file = h5py.File(file_name, driver="core", backing_store=False)
+    create_group(component_name, nx_class, nexus_file)
 
     with raises(KeyError):
-        delete_group(name, nexus_file)
+        delete_group(component_name, nexus_file)
+
+
+def test_GIVEN_repeated_name_WHEN_creating_component_that_shares_its_name_with_deleted_component_THEN_name_is_accepted():
+    file_name = "test4"
+    nx_class = "NXarbitrary"
+    component_name = "MyDetector"
+    nexus_file = h5py.File(file_name, driver="core", backing_store=False)
+    create_group(component_name, nx_class, nexus_file)
+    delete_group(component_name, nexus_file)
+    create_group(component_name, nx_class, nexus_file)
 
 
 def test_GIVEN_string_ending_with_nxs_WHEN_appending_nxs_extension_THEN_string_is_not_changed():
