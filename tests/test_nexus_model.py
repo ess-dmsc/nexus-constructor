@@ -2,9 +2,11 @@ from nexus_constructor.nexus_model import (
     NexusModel,
     get_nx_class_for_component,
     create_group,
+    delete_group,
     ComponentType,
     append_nxs_extension,
 )
+from pytest import raises
 import h5py
 
 sample_name = "NXsample"
@@ -65,6 +67,42 @@ def test_GIVEN_nonstandard_nxclass_WHEN_creating_group_THEN_group_is_still_creat
     create_group(name, nx_class, nexus_file)
 
     assert nexus_file[name].attrs["NX_class"] == nx_class
+
+
+def test_GIVEN_recognised_name_WHEN_deleting_group_THEN_group_gets_deleted():
+    file_name = "test2"
+    nx_class = "NXarbitrary"
+    component_name = "MyDetector"
+    nexus_file = h5py.File(file_name, driver="core", backing_store=False)
+    create_group(component_name, nx_class, nexus_file)
+    delete_group(component_name, nexus_file)
+
+    with raises(KeyError):
+        nexus_file[component_name]
+
+
+def test_GIVEN_unrecognised_name_WHEN_deleting_group_THEN_throws():
+    file_name = "test3"
+    nx_class = "NXarbitrary"
+    component_name = "MyDetector"
+    nexus_file = h5py.File(file_name, driver="core", backing_store=False)
+    create_group(component_name, nx_class, nexus_file)
+
+    with raises(KeyError):
+        delete_group("nonexistent_component_name", nexus_file)
+
+
+def test_GIVEN_repeated_name_WHEN_creating_group_that_shares_its_name_with_deleted_group_THEN_group_creation_successful():
+    file_name = "test4"
+    nx_class = "NXarbitrary"
+    component_name = "MyDetector"
+    nexus_file = h5py.File(file_name, driver="core", backing_store=False)
+    create_group(component_name, nx_class, nexus_file)
+    delete_group(component_name, nexus_file)
+
+    assert isinstance(
+        create_group(component_name, nx_class, nexus_file), h5py._hl.group.Group
+    )
 
 
 def test_GIVEN_string_ending_with_nxs_WHEN_appending_nxs_extension_THEN_string_is_not_changed():

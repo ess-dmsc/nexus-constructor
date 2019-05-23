@@ -17,6 +17,7 @@ from nexus_constructor.qml_models.instrument_model import (
 from nexus_constructor.nexus_model import NexusModel, h5py
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, SinglePixelId
 from PySide2.QtGui import QMatrix4x4, QVector3D
+from mock import Mock
 
 
 def test_GIVEN_different_attribute_WHEN_change_value_called_THEN_changes_attribute_to_new_value():
@@ -71,6 +72,25 @@ def test_remove_component():
     model.remove_component(0)
     assert model.rowCount() == 1
     assert model.components[0].component_type == ComponentType.SAMPLE
+
+
+def test_GIVEN_component_index_WHEN_calling_remove_component_THEN_component_calls_delete_component_group():
+    model = InstrumentModel()
+    model.initialise(NexusModel().getEntryGroup())
+
+    # Create a mock component and add this to the InstrumentModel
+    mock_component = Mock()
+    mock_component.transforms = []
+    mock_component.transform_parent = None
+    model.append_component_to_list(mock_component)
+
+    # Remove the mock component which will be located at index 1
+    model.remove_component(1)
+
+    # Check that this leads to the component's delete_component_group method being called with the expected parent argument
+    mock_component.delete_component_group.assert_called_once_with(
+        model.instrument_group
+    )
 
 
 def test_GIVEN_nothing_WHEN_calling_create_instrument_group_THEN_instrument_group_is_created_and_added_to_model():

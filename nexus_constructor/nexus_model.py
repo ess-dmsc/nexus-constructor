@@ -17,6 +17,15 @@ def create_group(name, nx_class, parent):
     return group
 
 
+def delete_group(name, parent):
+    """
+     Delete a HDF group given a name and a parent.
+    :param name: The name of the group to be deleted.
+    :param parent: The parent HDF group to delete the group from.
+    """
+    del parent[name]
+
+
 def get_nx_class_for_component(component_type):
     """
     Returns the NX class for a given component.

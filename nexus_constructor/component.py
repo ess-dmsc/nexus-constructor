@@ -4,7 +4,11 @@ from nexus_constructor.transformations import Transformation
 from nexus_constructor.pixel_data import PixelData
 from nexus_constructor.geometry_types import Geometry
 from typing import List
-from nexus_constructor.nexus_model import create_group, get_nx_class_for_component
+from nexus_constructor.nexus_model import (
+    create_group,
+    delete_group,
+    get_nx_class_for_component,
+)
 
 
 def create_component(
@@ -61,3 +65,10 @@ class Component:
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)
     component_group = attr.ib(default=None)
+
+    def delete_component_group(self, parent):
+        """
+        Delete the group in the HDF5 file that corresponds with this component.
+        :param parent: The parent HDF group that the component belongs to.
+        """
+        delete_group(self.name, parent)
