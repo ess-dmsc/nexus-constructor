@@ -48,6 +48,9 @@ def create_component(
     )
 
 
+def delete_component():
+    pass
+
 @attr.s
 class Component:
     """Components of an instrument"""

@@ -73,6 +73,10 @@ def test_remove_component():
     assert model.components[0].component_type == ComponentType.SAMPLE
 
 
+def test_GIVEN_component_index_WHEN_calling_remove_component_THEN_component_calls_delete_component():
+    pass
+
+
 def test_GIVEN_nothing_WHEN_calling_create_instrument_group_THEN_instrument_group_is_created_and_added_to_model():
     model = InstrumentModel()
     model.initialise(NexusModel().getEntryGroup())
