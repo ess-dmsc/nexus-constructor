@@ -17,6 +17,10 @@ def create_group(name, nx_class, parent):
     return group
 
 
+def delete_group(name, parent):
+    pass
+
+
 def get_nx_class_for_component(component_type):
     """
     Returns the NX class for a given component.
