@@ -19,11 +19,10 @@ def create_group(name, nx_class, parent):
 
 def delete_group(name, parent):
     """
-     Given a name, an nx class and a parent group, create a group under the parent
+     Delete a HDF group given a name and a parent.
     :param name: The name of the group to be deleted.
     :param parent: The parent HDF group to delete the group from.
     """
-
     del parent[name]
 
 

@@ -67,4 +67,8 @@ class Component:
     component_group = attr.ib(default=None)
 
     def delete_component_group(self, parent):
+        """
+        Delete the group in the HDF5 file that corresponds with this component.
+        :param parent: The parent HDF group that the component belongs to.
+        """
         delete_group(self.name, parent)
