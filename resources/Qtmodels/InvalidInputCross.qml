@@ -18,6 +18,6 @@ Text {
     ToolTip {
         id: toolTip
         parent: mouseArea
-        visible: cross.visible && mouseArea.containsMouse
+        visible: cross.visible && cross.opacity && mouseArea.containsMouse
     }
 }

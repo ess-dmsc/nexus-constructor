@@ -70,7 +70,7 @@ Reset the sample's name to 'Sample'.
 Press the 'Add component' button.
 - The "Add component" window should appear.
 - It should contain a selector for component type.
-- It should contain a pair of radio buttons for component geometry, 'Mesh', 'Cylinder' and 'None'.
+- It should contain the following radio buttons for component geometry: 'Mesh', 'Cylinder' and 'None'.
 - It should contain a set of radio buttons for pixel layout, 'Single ID', 'Repeatable grid', 'Face
 mapped mesh' and 'None'.
 - It should contain a 'Continue' button at the bottom.
@@ -132,6 +132,28 @@ the red sample cube, with center in the rear upper corner.
 - The cylinders radius should intersect the upper edges of the cubes front faces, and the rear edges
 of the cubes bottom faces.
 
+## Validating Component Names
+
+Click the 'Add component' button.  
+Select a Cylinder geometry and leave the other options untouched.  
+Try to name this new component "Sample".
+- The text field will accept the name "Sampl"  
+- Once you try to type in the remaining "e" a red cross will appear.
+- Placing your mouse over the cross will show a message saying that component names must be unique.
+
+Remove focus from the text field by selecting a different field or by moving the mouse out of the window.
+- The red cross disappear and the message will no longer be accessible.
+- The component name will still be "Sampl".
+
+Change the name back to its default and click "Add" without changing any of the other options.  
+Expand the component details box in the left-hand-side of the main window.  
+- Repeat the steps above and you should observe the same behaviour.
+
+Change the name back to its default again.  
+Expand the component details box.  
+Click the 'Full editor' button.  
+- Repeat the steps above and you should observe the same behaviour.
+
 ## Validating Units 
 
 Click the 'Add component' button.  
@@ -183,7 +205,7 @@ Rename the transform in 'Cube detector' to just 'translate'.
 - The name change should be reflected in 'Monitor's second transform parent dropdown.
 
 Set the monitors 'transform parent' to 'Sample'.
-- The graphic of the cylinder should allign its right face with the right face of the sample cube.
+- The graphic of the cylinder should align its right face with the right face of the sample cube.
 - The delete buttons of 'Cube detector' and its transform should no longer be greyed out or show
 tooltips on hover.
 
@@ -227,12 +249,6 @@ Click the new rotations delete button in the main window.
 Set the radius of the cylinder to 2.
 - The cylinder's visualisation in the main window should double in radius.
 
-Attempt to set the components name to 'Sample'.
-- It should not be possible to enter the final character.
-- A tooltip should appear saying that names must be unique.
-
-Reset its name to 'Monitor'.
-
 ## Saving to file
 
 Close the editor window.
@@ -268,7 +284,7 @@ Set Monitor's transform parent to 'Cube Detector'.
 - Cube Detector's delete button should grey out, and clicking it result in nothing.
 
 Click Monitor's delete button.
-- Monitor should vanish from the componets list.
+- Monitor should vanish from the components list.
 - The cylinder in the 3D view should vanish too.
 - Cube Detector's delete button should be enabled.
 
