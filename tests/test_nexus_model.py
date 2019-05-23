@@ -89,10 +89,10 @@ def test_GIVEN_unrecognised_name_WHEN_deleting_group_THEN_throws():
     create_group(component_name, nx_class, nexus_file)
 
     with raises(KeyError):
-        delete_group(component_name, nexus_file)
+        delete_group("wrongname", nexus_file)
 
 
-def test_GIVEN_repeated_name_WHEN_creating_component_that_shares_its_name_with_deleted_component_THEN_name_is_accepted():
+def test_GIVEN_repeated_name_WHEN_creating_component_that_shares_its_name_with_deleted_component_THEN_creation_successful():
     file_name = "test4"
     nx_class = "NXarbitrary"
     component_name = "MyDetector"

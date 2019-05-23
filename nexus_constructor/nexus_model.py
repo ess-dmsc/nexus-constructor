@@ -18,7 +18,13 @@ def create_group(name, nx_class, parent):
 
 
 def delete_group(name, parent):
-    pass
+    """
+     Given a name, an nx class and a parent group, create a group under the parent
+    :param name: The name of the group to be deleted.
+    :param parent: The parent HDF group to delete the group from.
+    """
+
+    del parent[name]
 
 
 def get_nx_class_for_component(component_type):
