@@ -100,7 +100,9 @@ def test_GIVEN_repeated_name_WHEN_creating_group_that_shares_its_name_with_group
     create_group(component_name, nx_class, nexus_file)
     delete_group(component_name, nexus_file)
 
-    assert isinstance(create_group(component_name, nx_class, nexus_file), h5py._hl.group.Group)
+    assert isinstance(
+        create_group(component_name, nx_class, nexus_file), h5py._hl.group.Group
+    )
 
 
 def test_GIVEN_string_ending_with_nxs_WHEN_appending_nxs_extension_THEN_string_is_not_changed():
