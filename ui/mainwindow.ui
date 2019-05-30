@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1141</width>
-    <height>599</height>
+    <width>1163</width>
+    <height>712</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,14 +16,20 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QGridLayout" name="gridLayout_3">
       <property name="sizeConstraint">
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
-      <item>
+      <item row="0" column="0" alignment="Qt::AlignLeft">
        <widget class="QTabWidget" name="tabWidget">
+        <property name="minimumSize">
+         <size>
+          <width>400</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">
@@ -58,7 +64,7 @@
         </widget>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1">
        <widget class="QWidget" name="centralWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -83,7 +89,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1141</width>
+     <width>1163</width>
      <height>19</height>
     </rect>
    </property>
@@ -98,16 +104,6 @@
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionShow_Filewriter_JSON">
-   <property name="text">
-    <string>Show Filewriter JSON</string>
-   </property>
-  </action>
-  <action name="actionHide_JSON_Pane">
-   <property name="text">
-    <string>Hide JSON Pane</string>
-   </property>
-  </action>
   <action name="actionOpen_NeXus_file">
    <property name="text">
     <string>Open NeXus file</string>
