@@ -9,6 +9,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtWebEngineWidgets import QWebEngineView
 
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
@@ -27,7 +28,7 @@ class Ui_AddComponentDialog(object):
         self.label_3 = QtWidgets.QLabel(AddComponentDialog)
         self.label_3.setGeometry(QtCore.QRect(1, 133, 87, 16))
         self.label_3.setObjectName("label_3")
-        self.webView = QtWebKit.QWebView(AddComponentDialog)
+        self.webView = QWebEngineView(AddComponentDialog)
         self.webView.setGeometry(QtCore.QRect(660, 10, 491, 831))
         self.webView.setUrl(QtCore.QUrl("about:blank"))
         self.webView.setObjectName("webView")
@@ -121,4 +122,4 @@ class Ui_AddComponentDialog(object):
         self.noGeometryRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No Geometry", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
 
-from PySide2 import QtWebKit
+# from PySide2 import QtWebKit

@@ -8,6 +8,7 @@ import h5py
 from PySide2.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog
 from PySide2 import QtCore
 from ui.mainwindow import Ui_MainWindow
+from ui.addcomponent import Ui_AddComponentDialog
 import silx.gui.hdf5
 
 from nexus_constructor.qml_models import instrument_model
@@ -18,6 +19,14 @@ NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
 
 def set_up_in_memory_nexus_file():
     return h5py.File("nexus-constructor", mode="x", driver="core", backing_store=False)
+
+
+class AddComponentDialog(Ui_AddComponentDialog):
+    def __init__(self, entry_group, instrument_model):
+        super(AddComponentDialog, self).__init__()
+
+    def setupUi(self, AddComponentDialog):
+        super().setupUi(AddComponentDialog)
 
 
 class MainWindow(Ui_MainWindow):
@@ -38,6 +47,10 @@ class MainWindow(Ui_MainWindow):
         super().setupUi(main_window)
 
         self.addWindow = QDialog()
+        self.addWindow.ui = AddComponentDialog(
+            self.entry_group, self.components_list_model
+        )
+        self.addWindow.ui.setupUi(self.addWindow)
 
         self.pushButton.clicked.connect(self.show_add_component_window)
         self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
