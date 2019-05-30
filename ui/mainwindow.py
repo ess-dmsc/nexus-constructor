@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'mainwindow.ui',
 # licensing of 'mainwindow.ui' applies.
 #
-# Created: Thu May 30 09:51:17 2019
+# Created: Thu May 30 10:02:37 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -24,6 +24,17 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
+        self.tab_2 = QtWidgets.QWidget()
+        self.tab_2.setObjectName("tab_2")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.tab_2)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.pushButton = QtWidgets.QPushButton(self.tab_2)
+        self.pushButton.setObjectName("pushButton")
+        self.verticalLayout_2.addWidget(self.pushButton)
+        self.listWidget = QtWidgets.QListWidget(self.tab_2)
+        self.listWidget.setObjectName("listWidget")
+        self.verticalLayout_2.addWidget(self.listWidget)
+        self.tabWidget.addTab(self.tab_2, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.tab)
@@ -32,21 +43,10 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.pushButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.pushButton.setObjectName("pushButton")
-        self.verticalLayout.addWidget(self.pushButton)
         self.widget = QtWidgets.QWidget(self.verticalLayoutWidget)
         self.widget.setObjectName("widget")
         self.verticalLayout.addWidget(self.widget)
         self.tabWidget.addTab(self.tab, "")
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.tab_2)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.listWidget = QtWidgets.QListWidget(self.tab_2)
-        self.listWidget.setObjectName("listWidget")
-        self.verticalLayout_2.addWidget(self.listWidget)
-        self.tabWidget.addTab(self.tab_2, "")
         self.horizontalLayout.addWidget(self.tabWidget)
         self.quickWidget = QQuickWidget(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -59,7 +59,7 @@ class Ui_MainWindow(object):
         self.quickWidget.setSource(QtCore.QUrl("file:./view.qml"))
         self.quickWidget.setObjectName("quickWidget")
         self.horizontalLayout.addWidget(self.quickWidget)
-        self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
+        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1141, 19))
@@ -86,14 +86,14 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "NeXus Constructor", None, -1))
         self.pushButton.setText(QtWidgets.QApplication.translate("MainWindow", "Add component", None, -1))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("MainWindow", "NeXus File Layout", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtWidgets.QApplication.translate("MainWindow", "Components", None, -1))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("MainWindow", "NeXus File Layout", None, -1))
         self.menuFile.setTitle(QtWidgets.QApplication.translate("MainWindow", "File", None, -1))
         self.actionShow_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Show Filewriter JSON", None, -1))
         self.actionHide_JSON_Pane.setText(QtWidgets.QApplication.translate("MainWindow", "Hide JSON Pane", None, -1))
