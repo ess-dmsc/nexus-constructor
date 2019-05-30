@@ -105,12 +105,14 @@ class InstrumentModel(QAbstractListModel):
         """
         sample = create_component(
             component_type=ComponentType.SAMPLE,
-            name="Sample",
+            name="sample",
             geometry=OFFCube,
             parent_group=group,
         )
-
-        self.create_instrument_group(group)
+        try:
+            self.instrument_group = group["instrument"]
+        except KeyError:
+            self.create_instrument_group(group)
 
         self.append_component_to_list(sample)
         self.send_model_updated()
