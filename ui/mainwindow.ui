@@ -38,7 +38,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="listWidget"/>
+           <widget class="QListView" name="listView"/>
           </item>
          </layout>
         </widget>
@@ -65,7 +65,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="centralWidget">
+       <widget class="QWidget" name="centralWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -130,13 +130,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QQuickWidget</class>
-   <extends>QWidget</extends>
-   <header>QtQuickWidgets/QQuickWidget</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

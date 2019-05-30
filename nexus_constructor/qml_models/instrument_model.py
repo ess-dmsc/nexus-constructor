@@ -110,8 +110,6 @@ class InstrumentModel(QAbstractListModel):
             parent_group=group,
         )
 
-        self.create_instrument_group(group)
-
         self.append_component_to_list(sample)
         self.send_model_updated()
 

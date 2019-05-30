@@ -11,6 +11,8 @@ from ui.mainwindow import Ui_MainWindow
 from uuid import uuid4
 import silx.gui.hdf5
 
+from nexus_constructor.qml_models import instrument_model
+
 NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
 
 
@@ -26,6 +28,9 @@ class MainWindow(Ui_MainWindow):
         self.entry_group.attrs["NX_class"] = "NXentry"
         self.instrument_group = self.entry_group.create_group("instrument")
         self.instrument_group.attrs["NX_class"] = "NXinstrument"
+
+        self.components_list_model = instrument_model.InstrumentModel()
+        self.components_list_model.initialise(self.entry_group)
 
     file_dialog_native = QFileDialog.DontUseNativeDialog
 
@@ -49,6 +54,7 @@ class MainWindow(Ui_MainWindow):
         self.treemodel.setDatasetDragEnabled(True)
         self.treemodel.setFileDropEnabled(True)
         self.verticalLayout.addWidget(self.widget)
+        self.listView.setModel(self.components_list_model)
 
         self.widget.setVisible(True)
 

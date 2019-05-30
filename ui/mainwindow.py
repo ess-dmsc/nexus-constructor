@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'mainwindow.ui',
 # licensing of 'mainwindow.ui' applies.
 #
-# Created: Thu May 30 10:46:06 2019
+# Created: Thu May 30 11:03:47 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -30,9 +30,9 @@ class Ui_MainWindow(object):
         self.pushButton = QtWidgets.QPushButton(self.tab_2)
         self.pushButton.setObjectName("pushButton")
         self.verticalLayout_2.addWidget(self.pushButton)
-        self.listWidget = QtWidgets.QListWidget(self.tab_2)
-        self.listWidget.setObjectName("listWidget")
-        self.verticalLayout_2.addWidget(self.listWidget)
+        self.listView = QtWidgets.QListView(self.tab_2)
+        self.listView.setObjectName("listView")
+        self.verticalLayout_2.addWidget(self.listView)
         self.tabWidget.addTab(self.tab_2, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
