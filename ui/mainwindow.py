@@ -9,6 +9,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtQuickWidgets import QQuickWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -100,4 +101,3 @@ class Ui_MainWindow(object):
         self.actionExport_to_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Export to NeXus file", None, -1))
         self.actionExport_to_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to Filewriter JSON", None, -1))
 
-from QtQuickWidgets.QQuickWidget import QQuickWidget
