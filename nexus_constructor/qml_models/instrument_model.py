@@ -105,7 +105,7 @@ class InstrumentModel(QAbstractListModel):
         """
         sample = create_component(
             component_type=ComponentType.SAMPLE,
-            name="Sample",
+            name="sample",
             geometry=OFFCube,
             parent_group=group,
         )
