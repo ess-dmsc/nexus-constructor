@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Thu May 30 16:33:29 2019
+# Created: Thu May 30 16:48:49 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -71,15 +71,15 @@ class Ui_AddComponentDialog(object):
         self.geometryTypeBox.setObjectName("geometryTypeBox")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.geometryTypeBox)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.radioButton = QtWidgets.QRadioButton(self.geometryTypeBox)
-        self.radioButton.setObjectName("radioButton")
-        self.horizontalLayout.addWidget(self.radioButton)
-        self.radioButton_2 = QtWidgets.QRadioButton(self.geometryTypeBox)
-        self.radioButton_2.setObjectName("radioButton_2")
-        self.horizontalLayout.addWidget(self.radioButton_2)
-        self.radioButton_3 = QtWidgets.QRadioButton(self.geometryTypeBox)
-        self.radioButton_3.setObjectName("radioButton_3")
-        self.horizontalLayout.addWidget(self.radioButton_3)
+        self.meshRadioButton = QtWidgets.QRadioButton(self.geometryTypeBox)
+        self.meshRadioButton.setObjectName("meshRadioButton")
+        self.horizontalLayout.addWidget(self.meshRadioButton)
+        self.cylinderRadioButton = QtWidgets.QRadioButton(self.geometryTypeBox)
+        self.cylinderRadioButton.setObjectName("cylinderRadioButton")
+        self.horizontalLayout.addWidget(self.cylinderRadioButton)
+        self.noGeometryRadioButton = QtWidgets.QRadioButton(self.geometryTypeBox)
+        self.noGeometryRadioButton.setObjectName("noGeometryRadioButton")
+        self.horizontalLayout.addWidget(self.noGeometryRadioButton)
         self.fieldsBox = QtWidgets.QGroupBox(AddComponentDialog)
         self.fieldsBox.setGeometry(QtCore.QRect(10, 640, 561, 253))
         self.fieldsBox.setObjectName("fieldsBox")
@@ -116,9 +116,9 @@ class Ui_AddComponentDialog(object):
         self.groupBox_5.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder options", None, -1))
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.geometryTypeBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry type:", None, -1))
-        self.radioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Mesh", None, -1))
-        self.radioButton_2.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1))
-        self.radioButton_3.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No Geometry", None, -1))
+        self.meshRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Mesh", None, -1))
+        self.cylinderRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1))
+        self.noGeometryRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No Geometry", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
 
 from PySide2 import QtWebKit
