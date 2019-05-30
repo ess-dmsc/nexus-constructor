@@ -11,6 +11,7 @@ from ui.mainwindow import Ui_MainWindow
 import silx.gui.hdf5
 
 from nexus_constructor.qml_models import instrument_model
+from nexus_constructor.nexus_filewriter_json import writer
 
 NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
 
@@ -88,7 +89,8 @@ class MainWindow(Ui_MainWindow):
             options=options,
         )
         if fileName:
-            print(fileName)
+            with open(fileName, "w") as file:
+                file.write(writer.generate_json(self.components_list_model))
 
     def open_nexus_file(self):
         options = QFileDialog.Options()
