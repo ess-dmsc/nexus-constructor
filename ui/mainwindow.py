@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'mainwindow.ui',
 # licensing of 'mainwindow.ui' applies.
 #
-# Created: Thu May 30 12:14:26 2019
+# Created: Thu May 30 12:27:57 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1163, 712)
+        MainWindow.resize(1263, 712)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -22,7 +22,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setMinimumSize(QtCore.QSize(400, 0))
+        self.tabWidget.setMinimumSize(QtCore.QSize(500, 0))
         self.tabWidget.setObjectName("tabWidget")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
@@ -49,17 +49,17 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
         self.sceneWidget = QtWidgets.QWidget(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sceneWidget.sizePolicy().hasHeightForWidth())
         self.sceneWidget.setSizePolicy(sizePolicy)
-        self.sceneWidget.setMinimumSize(QtCore.QSize(500, 0))
+        self.sceneWidget.setMinimumSize(QtCore.QSize(745, 0))
         self.sceneWidget.setObjectName("sceneWidget")
-        self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 1)
+        self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
         self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1163, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1263, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
