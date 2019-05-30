@@ -110,7 +110,7 @@ class InstrumentModel(QAbstractListModel):
             parent_group=group,
         )
         try:
-            self.instrument_group = group["/instrument/"]
+            self.instrument_group = group["instrument"]
         except KeyError:
             self.create_instrument_group(group)
 
