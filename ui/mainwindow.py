@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'mainwindow.ui',
 # licensing of 'mainwindow.ui' applies.
 #
-# Created: Thu May 30 12:13:15 2019
+# Created: Thu May 30 12:14:26 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,15 +47,15 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab, "")
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
-        self.centralWidget = QtWidgets.QWidget(self.centralwidget)
+        self.sceneWidget = QtWidgets.QWidget(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.centralWidget.sizePolicy().hasHeightForWidth())
-        self.centralWidget.setSizePolicy(sizePolicy)
-        self.centralWidget.setMinimumSize(QtCore.QSize(500, 0))
-        self.centralWidget.setObjectName("centralWidget")
-        self.gridLayout_3.addWidget(self.centralWidget, 0, 1, 1, 1)
+        sizePolicy.setHeightForWidth(self.sceneWidget.sizePolicy().hasHeightForWidth())
+        self.sceneWidget.setSizePolicy(sizePolicy)
+        self.sceneWidget.setMinimumSize(QtCore.QSize(500, 0))
+        self.sceneWidget.setObjectName("sceneWidget")
+        self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 1)
         self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
