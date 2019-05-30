@@ -109,6 +109,10 @@ class InstrumentModel(QAbstractListModel):
             geometry=OFFCube,
             parent_group=group,
         )
+        try:
+            self.instrument_group = group["/instrument/"]
+        except KeyError:
+            self.create_instrument_group(group)
 
         self.append_component_to_list(sample)
         self.send_model_updated()
