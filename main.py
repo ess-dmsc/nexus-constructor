@@ -8,7 +8,6 @@ import h5py
 from PySide2.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog
 from PySide2 import QtCore
 from ui.mainwindow import Ui_MainWindow
-from uuid import uuid4
 import silx.gui.hdf5
 
 from nexus_constructor.qml_models import instrument_model
@@ -17,7 +16,7 @@ NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
 
 
 def set_up_in_memory_nexus_file():
-    return h5py.File(str(uuid4()), mode="x", driver="core", backing_store=False)
+    return h5py.File("nexus-constructor", mode="x", driver="core", backing_store=False)
 
 
 class MainWindow(Ui_MainWindow):
