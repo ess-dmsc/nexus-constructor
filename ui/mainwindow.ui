@@ -65,7 +65,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QQuickWidget" name="quickWidget">
+       <widget class="QWidget" name="centralWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -77,14 +77,6 @@
           <width>500</width>
           <height>0</height>
          </size>
-        </property>
-        <property name="resizeMode">
-         <enum>QQuickWidget::SizeRootObjectToView</enum>
-        </property>
-        <property name="source">
-         <url>
-          <string>file:./view.qml</string>
-         </url>
         </property>
        </widget>
       </item>

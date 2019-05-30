@@ -3,13 +3,12 @@
 # Form implementation generated from reading ui file 'mainwindow.ui',
 # licensing of 'mainwindow.ui' applies.
 #
-# Created: Thu May 30 10:02:37 2019
+# Created: Thu May 30 10:46:06 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtQuickWidgets import QQuickWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -48,17 +47,15 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.widget)
         self.tabWidget.addTab(self.tab, "")
         self.horizontalLayout.addWidget(self.tabWidget)
-        self.quickWidget = QQuickWidget(self.centralwidget)
+        self.centralWidget = QtWidgets.QWidget(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.quickWidget.sizePolicy().hasHeightForWidth())
-        self.quickWidget.setSizePolicy(sizePolicy)
-        self.quickWidget.setMinimumSize(QtCore.QSize(500, 0))
-        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.quickWidget.setSource(QtCore.QUrl("file:./view.qml"))
-        self.quickWidget.setObjectName("quickWidget")
-        self.horizontalLayout.addWidget(self.quickWidget)
+        sizePolicy.setHeightForWidth(self.centralWidget.sizePolicy().hasHeightForWidth())
+        self.centralWidget.setSizePolicy(sizePolicy)
+        self.centralWidget.setMinimumSize(QtCore.QSize(500, 0))
+        self.centralWidget.setObjectName("centralWidget")
+        self.horizontalLayout.addWidget(self.centralWidget)
         self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
