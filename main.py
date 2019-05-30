@@ -53,6 +53,7 @@ class MainWindow(Ui_MainWindow):
         self.treemodel.insertH5pyObject(self.nexus_file)
         self.treemodel.setDatasetDragEnabled(True)
         self.treemodel.setFileDropEnabled(True)
+        self.treemodel.setFileMoveEnabled(True)
         self.verticalLayout.addWidget(self.widget)
         self.listView.setModel(self.components_list_model)
 
