@@ -3,14 +3,13 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Fri May 31 09:27:05 2019
+# Created: Fri May 31 09:51:20 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView
-
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
         AddComponentDialog.setObjectName("AddComponentDialog")
@@ -154,6 +153,8 @@ class Ui_AddComponentDialog(object):
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
 
         self.retranslateUi(AddComponentDialog)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), AddComponentDialog.close)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), AddComponentDialog.close)
         QtCore.QMetaObject.connectSlotsByName(AddComponentDialog)
 
     def retranslateUi(self, AddComponentDialog):

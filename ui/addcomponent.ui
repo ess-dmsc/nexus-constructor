@@ -235,5 +235,38 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>AddComponentDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>588</x>
+     <y>902</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>588</x>
+     <y>459</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>AddComponentDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>588</x>
+     <y>902</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>588</x>
+     <y>459</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -22,11 +22,21 @@ def set_up_in_memory_nexus_file():
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
-    def __init__(self, entry_group, instrument_model):
+    def __init__(self, entry_group, components_list):
         super(AddComponentDialog, self).__init__()
+        self.entry_group = entry_group
+        self.components_list = components_list
 
     def setupUi(self, AddComponentDialog):
         super().setupUi(AddComponentDialog)
+        self.buttonBox.rejected.connect(self.on_close)
+        self.buttonBox.accepted.connect(self.on_ok)
+
+    def on_close(self):
+        print("closing window")
+
+    def on_ok(self):
+        print("adding component")
 
 
 class MainWindow(Ui_MainWindow):
