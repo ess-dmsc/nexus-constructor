@@ -9,6 +9,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
+from ui.InstrumentView import InstrumentView
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -48,6 +49,7 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab, "")
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
         self.sceneWidget = QtWidgets.QWidget(self.centralwidget)
+        self.instrumentView = InstrumentView(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
@@ -55,7 +57,11 @@ class Ui_MainWindow(object):
         self.sceneWidget.setSizePolicy(sizePolicy)
         self.sceneWidget.setMinimumSize(QtCore.QSize(745, 0))
         self.sceneWidget.setObjectName("sceneWidget")
-        self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
+        self.instrumentView.setSizePolicy(sizePolicy)
+        self.instrumentView.setMinimumSize(QtCore.QSize(745, 0))
+        self.instrumentView.setObjectName("instrumentView")
+        # self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
+        self.gridLayout_3.addWidget(self.instrumentView, 0, 1, 1, 2)
         self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
