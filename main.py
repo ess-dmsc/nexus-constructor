@@ -6,6 +6,7 @@ Requires Python 3.6+
 import sys
 import h5py
 from PySide2.QtCore import QUrl
+from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog
 from PySide2 import QtCore
 from ui.mainwindow import Ui_MainWindow
@@ -189,6 +190,7 @@ class MainWindow(Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+    app.setWindowIcon(QIcon("ui/icon.png"))
     window = QMainWindow()
     ui = MainWindow()
     ui.setupUi(window)
