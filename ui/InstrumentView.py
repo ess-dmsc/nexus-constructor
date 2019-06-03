@@ -23,19 +23,23 @@ class InstrumentView(QWidget):
 
         self.material = Qt3DExtras.QPhongMaterial(self.rootEntity)
 
-        self.add_sphere(20,5,5,5)
+        self.initialise_view()
 
-    def add_sphere(self, radius, x, y, z):
+    def initialise_view(self):
 
-        self.sphereEntity = Qt3DCore.QEntity(self.rootEntity)
-        self.sphereMesh = Qt3DExtras.QSphereMesh()
-        self.sphereMesh.setRadius(radius)
+        self.cubeEntity = Qt3DCore.QEntity(self.rootEntity)
+        self.cubeMesh = Qt3DExtras.QCuboidMesh()
+        self.cubeMesh.setXExtent(5)
+        self.cubeMesh.setYExtent(5)
+        self.cubeMesh.setZExtent(5)
 
+        '''
         self.sphereTransform = Qt3DCore.QTransform()
         self.sphereTransform.setTranslation(QVector3D(x, y, z))
+        '''
 
-        self.sphereEntity.addComponent(self.sphereMesh)
-        self.sphereEntity.addComponent(self.material)
-        self.sphereEntity.addComponent(self.sphereTransform)
+        self.cubeEntity.addComponent(self.cubeMesh)
+        self.cubeEntity.addComponent(self.material)
+        # self.cubeEntity.addComponent(self.sphereTransform)
 
-        print("Created sphere.")
+        print("Created cube.")
