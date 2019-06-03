@@ -12,10 +12,13 @@ from ui.mainwindow import Ui_MainWindow
 from ui.addcomponent import Ui_AddComponentDialog
 import silx.gui.hdf5
 
-from nexus_constructor.qml_models import instrument_model
+
+from nexus_constructor.qml_models import instrument_model, geometry_models
 from nexus_constructor.nexus_filewriter_json import writer
 
 NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
+GEOMETRY_FILE_TYPES = "OFF Files (*.off, *.OFF);; STL Files (*.stl, *.STL)"
+FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog
 
 
 def set_up_in_memory_nexus_file():
@@ -27,6 +30,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         super(AddComponentDialog, self).__init__()
         self.entry_group = entry_group
         self.components_list = components_list
+        self.geometry_model = None
 
     def setupUi(self, AddComponentDialog):
         super().setupUi(AddComponentDialog)
@@ -40,12 +44,28 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
-        self.geometryFileBox.clicked.connect(self.mesh_file_picker)
+        self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
         self.meshRadioButton.setChecked(True)
         self.show_mesh_fields()
 
     def mesh_file_picker(self):
+        options = QFileDialog.Options()
+        options |= FILE_DIALOG_NATIVE
+        fileName, _ = QFileDialog.getOpenFileName(
+            parent=None,
+            caption="QFileDialog.getOpenFileName()",
+            directory="",
+            filter=f"{GEOMETRY_FILE_TYPES};;All Files (*)",
+            options=options,
+        )
+        if fileName:
+            self.fileLineEdit.setText(fileName)
+            with open(fileName) as geometry_file:
+                self.load_geometry_from_file_object(geometry_file)
+
+    def load_geometry_from_file_object(self, file_object):
+        self.geometry_model = geometry_models.OFFModel()
         pass
 
     def show_cylinder_fields(self):
@@ -80,8 +100,6 @@ class MainWindow(Ui_MainWindow):
         self.components_list_model = instrument_model.InstrumentModel()
         self.components_list_model.initialise(self.entry_group)
 
-    file_dialog_native = QFileDialog.DontUseNativeDialog
-
     def setupUi(self, main_window):
         super().setupUi(main_window)
 
@@ -113,7 +131,7 @@ class MainWindow(Ui_MainWindow):
 
     def save_to_nexus_file(self):
         options = QFileDialog.Options()
-        options |= self.file_dialog_native
+        options |= FILE_DIALOG_NATIVE
         fileName, _ = QFileDialog.getSaveFileName(
             parent=None,
             caption="QFileDialog.getSaveFileName()",
@@ -132,7 +150,7 @@ class MainWindow(Ui_MainWindow):
 
     def save_to_filewriter_json(self):
         options = QFileDialog.Options()
-        options |= self.file_dialog_native
+        options |= FILE_DIALOG_NATIVE
         fileName, _ = QFileDialog.getSaveFileName(
             parent=None,
             caption="QFileDialog.getSaveFileName()",
@@ -147,7 +165,7 @@ class MainWindow(Ui_MainWindow):
     def open_nexus_file(self):
         options = QFileDialog.Options()
 
-        options |= self.file_dialog_native
+        options |= FILE_DIALOG_NATIVE
         fileName, _ = QFileDialog.getOpenFileName(
             parent=None,
             caption="QFileDialog.getOpenFileName()",
