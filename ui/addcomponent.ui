@@ -126,13 +126,6 @@
            <string>Geometry options:</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="3" column="0">
-            <widget class="QGroupBox" name="pixelOptionsBox">
-             <property name="title">
-              <string>Pixel options</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="0">
             <widget class="QGroupBox" name="geometryFileBox">
              <property name="title">
@@ -157,6 +150,58 @@
              <property name="title">
               <string>Cylinder options</string>
              </property>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="cylinderXLineEdit"/>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLineEdit" name="cylinderRadiusLineEdit"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>X:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
+               <widget class="QLineEdit" name="cylinderYLineEdit"/>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Radius</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Y:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Height</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="4">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Z:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="cylinderHeightLineEdit"/>
+              </item>
+              <item row="2" column="5">
+               <widget class="QLineEdit" name="cylinderZLineEdit"/>
+              </item>
+             </layout>
             </widget>
            </item>
            <item row="1" column="0">
@@ -179,6 +224,13 @@
                </widget>
               </item>
              </layout>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QGroupBox" name="pixelOptionsBox">
+             <property name="title">
+              <string>Pixel options</string>
+             </property>
             </widget>
            </item>
           </layout>
