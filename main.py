@@ -40,6 +40,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
+        self.geometryFileBox.clicked.connect(self.mesh_file_picker)
+
+        self.meshRadioButton.setChecked(True)
+        self.show_mesh_fields()
+
+    def mesh_file_picker(self):
+        pass
 
     def show_cylinder_fields(self):
         self.geometryOptionsBox.setVisible(True)
@@ -53,7 +60,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
-        print("geometry type updated")
 
     def on_close(self):
         print("closing window")
