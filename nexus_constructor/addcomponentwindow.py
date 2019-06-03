@@ -2,6 +2,12 @@ from PySide2.QtCore import QUrl
 from PySide2.QtWidgets import QFileDialog
 
 from nexus_constructor.qml_models import geometry_models
+from nexus_constructor.qml_models.geometry_models import (
+    CylinderModel,
+    OFFModel,
+    NoShapeModel,
+)
+from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from ui.addcomponent import Ui_AddComponentDialog
 
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
@@ -11,7 +17,7 @@ GEOMETRY_FILE_TYPES = "OFF Files (*.off, *.OFF);; STL Files (*.stl, *.STL)"
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
-    def __init__(self, entry_group, components_list):
+    def __init__(self, entry_group, components_list: InstrumentModel):
         super(AddComponentDialog, self).__init__()
         self.entry_group = entry_group
         self.components_list = components_list
@@ -66,8 +72,33 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
 
+    def generate_geometry_model(self):
+        if self.CylinderRadioButton.isChecked():
+            geometry_model = CylinderModel()
+            geometry_model.cylinder.height = self.cylinderHeightLineEdit.text()
+            geometry_model.cylinder.radius = self.cylinderRadiusLineEdit.text()
+            geometry_model.cylinder.axis_direction.setX(self.cylinderXLineEdit.text())
+            geometry_model.cylinder.axis_direction.setY(self.cylinderYLineEdit.text())
+            geometry_model.cylinder.axis_direction.setZ(self.cylinderZLineEdit.text())
+        if self.meshRadioButton.isChecked():
+            geometry_model = OFFModel()
+            # TODO: set geometry up
+        else:
+            geometry_model = NoShapeModel()
+        return geometry_model
+
     def on_close(self):
         print("closing window")
 
     def on_ok(self):
+        self.components_list.add_component(
+            component_type=self.componentTypeComboBox.currentText(),
+            description=self.descriptionPlainTextEdit.toPlainText(),
+            name=self.nameLineEdit.text().replace(" ", "_"),
+            geometry_model=self.generate_geometry_model(),
+        )
+        # TODO: sort out transforms and pixel data
+
+        # TODO: nexus stuff goes here
+
         print("adding component")
