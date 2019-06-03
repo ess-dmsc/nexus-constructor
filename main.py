@@ -37,6 +37,23 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
             )
         )
+        self.meshRadioButton.clicked.connect(self.show_mesh_fields)
+        self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
+        self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
+
+    def show_cylinder_fields(self):
+        self.geometryOptionsBox.setVisible(True)
+        self.geometryFileBox.setVisible(False)
+        self.cylinderOptionsBox.setVisible(True)
+
+    def show_no_geometry_fields(self):
+        self.geometryOptionsBox.setVisible(False)
+
+    def show_mesh_fields(self):
+        self.geometryOptionsBox.setVisible(True)
+        self.geometryFileBox.setVisible(True)
+        self.cylinderOptionsBox.setVisible(False)
+        print("geometry type updated")
 
     def on_close(self):
         print("closing window")

@@ -3,8 +3,8 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Mon Jun  3 12:53:31 2019
-#      by: pyside2-uic  running on PySide2 5.12.1
+# Created: Mon Jun  3 14:17:29 2019
+#      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -104,9 +104,9 @@ class Ui_AddComponentDialog(object):
         self.fileBrowseButton.setObjectName("fileBrowseButton")
         self.horizontalLayout_2.addWidget(self.fileBrowseButton)
         self.gridLayout_2.addWidget(self.geometryFileBox, 0, 0, 1, 1)
-        self.groupBox_5 = QtWidgets.QGroupBox(self.geometryOptionsBox)
-        self.groupBox_5.setObjectName("groupBox_5")
-        self.gridLayout_2.addWidget(self.groupBox_5, 2, 0, 1, 1)
+        self.cylinderOptionsBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
+        self.cylinderOptionsBox.setObjectName("cylinderOptionsBox")
+        self.gridLayout_2.addWidget(self.cylinderOptionsBox, 2, 0, 1, 1)
         self.unitsbox = QtWidgets.QGroupBox(self.geometryOptionsBox)
         self.unitsbox.setObjectName("unitsbox")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.unitsbox)
@@ -147,7 +147,7 @@ class Ui_AddComponentDialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.webView.sizePolicy().hasHeightForWidth())
         self.webView.setSizePolicy(sizePolicy)
-        self.webView.setUrl(QtCore.QUrl("about:blank"))
+        self.webView.setProperty("url", QtCore.QUrl("about:blank"))
         self.webView.setObjectName("webView")
         self.gridLayout_4.addWidget(self.webView, 0, 1, 1, 1)
         self.gridLayout_4.setColumnStretch(0, 1)
@@ -172,7 +172,7 @@ class Ui_AddComponentDialog(object):
         self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel options", None, -1))
         self.geometryFileBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry file", None, -1))
         self.fileBrowseButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Browse...", None, -1))
-        self.groupBox_5.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder options", None, -1))
+        self.cylinderOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder options", None, -1))
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
 
