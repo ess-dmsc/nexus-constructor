@@ -24,6 +24,14 @@ pipeline_builder = new PipelineBuilder(this, container_build_nodes)
 
 builders = pipeline_builder.createBuilders { container ->
     
+    pipeline_builder.stage("Checkout") {
+        dir(pipeline_builder.project) {
+            scm_vars = checkout scm
+        }
+        // Copy source code to container
+        container.copyTo(pipeline_builder.project, pipeline_builder.project)
+    }  // stage
+    
     pipeline_builder.stage("Create virtualenv") {
         container.sh """
             cd ${project}
