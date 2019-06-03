@@ -1,7 +1,7 @@
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QVector3D, QColor
 
 class InstrumentView(QWidget):
     def __init__(self):
@@ -22,9 +22,25 @@ class InstrumentView(QWidget):
         camController.setCamera(cameraEntity)
         self.view.setRootEntity(self.rootEntity)
 
-        self.material = Qt3DExtras.QPhongMaterial(self.rootEntity)
-
+        self.create_materials()
         self.initialise_view()
+
+    def create_materials(self):
+
+        red = QColor("red")
+        black = QColor("black")
+        grey = QColor("grey")
+        blue = QColor("blue")
+        lightblue = QColor("lightblue")
+        darkred = QColor("#b00")
+
+        self.grey_material = Qt3DExtras.QPhongMaterial()
+        self.grey_material.setAmbient(black)
+        self.grey_material.setDiffuse(grey)
+
+        self.red_material = Qt3DExtras.QPhongMaterial()
+        self.red_material.setAmbient(red)
+        self.red_material.setDiffuse(darkred)
 
     def initialise_view(self):
 
@@ -40,7 +56,7 @@ class InstrumentView(QWidget):
         '''
 
         self.cubeEntity.addComponent(self.cubeMesh)
-        self.cubeEntity.addComponent(self.material)
+        self.cubeEntity.addComponent(self.red_material)
         # self.cubeEntity.addComponent(self.sphereTransform)
 
         print("Created cube.")
