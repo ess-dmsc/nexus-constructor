@@ -55,9 +55,9 @@ class InstrumentView(QWidget):
 
         self.cubeEntity = Qt3DCore.QEntity(self.rootEntity)
         self.cubeMesh = Qt3DExtras.QCuboidMesh()
-        self.cubeMesh.setXExtent(5)
-        self.cubeMesh.setYExtent(5)
-        self.cubeMesh.setZExtent(5)
+        self.cubeMesh.setXExtent(1)
+        self.cubeMesh.setYExtent(1)
+        self.cubeMesh.setZExtent(1)
 
         self.cubeEntity.addComponent(self.cubeMesh)
         self.cubeEntity.addComponent(self.red_material)
