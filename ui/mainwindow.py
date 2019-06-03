@@ -49,7 +49,7 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab, "")
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
         self.sceneWidget = QtWidgets.QWidget(self.centralwidget)
-        self.instrumentView = InstrumentView(MainWindow)
+        self.instrumentView = InstrumentView()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
