@@ -5,6 +5,7 @@ Requires Python 3.6+
 
 import sys
 import h5py
+from PySide2.QtCore import QUrl
 from PySide2.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog
 from PySide2 import QtCore
 from ui.mainwindow import Ui_MainWindow
@@ -31,6 +32,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         super().setupUi(AddComponentDialog)
         self.buttonBox.rejected.connect(self.on_close)
         self.buttonBox.accepted.connect(self.on_ok)
+        self.webView.setUrl(
+            QUrl(
+                "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
+            )
+        )
 
     def on_close(self):
         print("closing window")

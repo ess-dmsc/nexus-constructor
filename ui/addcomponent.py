@@ -3,13 +3,15 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Fri May 31 09:51:20 2019
+# Created: Mon Jun  3 12:53:31 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView
+
+
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
         AddComponentDialog.setObjectName("AddComponentDialog")
@@ -173,3 +175,4 @@ class Ui_AddComponentDialog(object):
         self.groupBox_5.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder options", None, -1))
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
+
