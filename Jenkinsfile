@@ -1,3 +1,7 @@
+@Library('ecdc-pipeline')
+import ecdcpipeline.ContainerBuildNode
+import ecdcpipeline.PipelineBuilder
+
 project = "nexus-constructor"
 
 // Set number of old artefacts to keep.
