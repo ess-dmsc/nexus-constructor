@@ -11,6 +11,7 @@ class InstrumentView(QWidget):
         super().__init__()
         lay = QVBoxLayout(self)
         self.view = Qt3DExtras.Qt3DWindow()
+        self.view.defaultFrameGraph().setClearColor(QColor("lightgrey"))
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
