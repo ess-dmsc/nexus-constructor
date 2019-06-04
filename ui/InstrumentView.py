@@ -1,7 +1,9 @@
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
+from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
+from ui.NeutronAnimationController import NeutronAnimationController
 
 
 class InstrumentView(QWidget):
@@ -81,8 +83,52 @@ class InstrumentView(QWidget):
         self.cylinderEntity.addComponent(self.beam_material)
         self.cylinderEntity.addComponent(self.cylinderTransform)
 
+    def create_neutrons(self):
+
+        self.neutronEntities = []
+        self.neutronMeshes = []
+        self.neutronTransforms = []
+        self.neutronAnimationControllers = []
+        self.neutronAnimations = []
+
+        xOffsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
+        yOffsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
+        timeSpanOffsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
+
+        for i in range(9):
+
+            neutronEntity = Qt3DCore.QEntity(self.rootEntity)
+            neutronMesh = Qt3DExtras.QSphereMesh()
+            neutronMesh.setRadius(3)
+
+            neutronTransform = Qt3DCore.QTransform()
+            neutronAnimationController = NeutronAnimationController(
+                xOffsets[i], yOffsets[i], neutronTransform
+            )
+            neutronAnimationController.setTarget(neutronTransform)
+
+            neutronAnimation = QPropertyAnimation(neutronTransform)
+            neutronAnimation.setTargetObject(neutronAnimationController)
+            neutronAnimation.setPropertyName(b"distance")
+            neutronAnimation.setStartValue(-40)
+            neutronAnimation.setEndValue(0)
+            neutronAnimation.setDuration(500 + timeSpanOffsets[i])
+            neutronAnimation.setLoopCount(-1)
+            neutronAnimation.start()
+
+            self.neutronEntities.append(neutronEntity)
+            self.neutronMeshes.append(neutronMesh)
+            self.neutronTransforms.append(neutronTransform)
+            self.neutronAnimationControllers.append(neutronAnimationController)
+            self.neutronAnimations.append(neutronAnimation)
+
+            neutronEntity.addComponent(neutronMesh)
+            neutronEntity.addComponent(neutronTransform)
+            neutronEntity.addComponent(self.grey_material)
+
     def initialise_view(self):
 
         self.create_materials()
         self.create_sample_cube()
         self.create_beam_cylinder()
+        self.create_neutrons()
