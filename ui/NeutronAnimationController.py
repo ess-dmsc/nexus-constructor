@@ -21,7 +21,6 @@ class NeutronAnimationController(QObject):
         self._distance = distance
         self.updateMatrix()
         self.distanceChanged.emit()
-        print(self._distance)
 
     def getDistance(self):
         return self._distance

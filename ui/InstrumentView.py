@@ -123,12 +123,12 @@ class InstrumentView(QWidget):
             self.neutronAnimations.append(neutronAnimation)
 
             neutronEntity.addComponent(neutronMesh)
-            neutronEntity.addComponent(neutronTransform)
             neutronEntity.addComponent(self.grey_material)
+            neutronEntity.addComponent(neutronTransform)
 
     def initialise_view(self):
 
         self.create_materials()
         self.create_sample_cube()
-        self.create_beam_cylinder()
         self.create_neutrons()
+        self.create_beam_cylinder()
