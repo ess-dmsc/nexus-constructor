@@ -2,7 +2,8 @@ from PySide2.QtWidgets import QWidget, QVBoxLayout
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation
-from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
+from PySide2.QtGui import QVector3D, QColor, QMatrix4x4, QFont
+from PySide2.Qt3DRender import Qt3DRender
 from ui.NeutronAnimationController import NeutronAnimationController
 
 
@@ -15,18 +16,45 @@ class InstrumentView(QWidget):
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
+        '''
         self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.1, 1000)
         self.view.camera().setPosition(QVector3D(6, 8, 30))
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
+        '''
 
         self.rootEntity = Qt3DCore.QEntity()
-        cameraEntity = self.view.camera()
-        camController = Qt3DExtras.QFirstPersonCameraController(self.rootEntity)
-        camController.setLinearSpeed(20)
-        camController.setCamera(cameraEntity)
+
+        self.componentRootEntity = Qt3DCore.QEntity(self.rootEntity)
+        componentCameraEntity = self.view.camera()
+        componentCamController = Qt3DExtras.QFirstPersonCameraController(self.componentRootEntity)
+        componentCamController.setLinearSpeed(20)
+        componentCamController.setCamera(componentCameraEntity)
+
+        self.gnomonRootEntity = Qt3DCore.QEntity(self.rootEntity)
+
         self.view.setRootEntity(self.rootEntity)
 
+        self.create_layers()
         self.initialise_view()
+
+    def create_layers(self):
+
+        self.surSelector = Qt3DRender.QRenderSurfaceSelector()
+        self.surSelector.setSurface(self.view)
+        self.viewport = Qt3DRender.QViewport(self.surSelector)
+        # self.view.setActiveFrameGraph(self.surSelector)
+
+        self.componentLayerFilter = Qt3DRender.QLayerFilter(self.viewport)
+        self.componentLayer = Qt3DRender.QLayer(self.componentRootEntity)
+        self.componentRootEntity.addComponent(self.componentLayer)
+        self.componentLayer.setRecursive(True)
+        self.componentLayerFilter.addLayer(self.componentLayer)
+
+        self.componentCameraSelector = Qt3DRender.QCameraSelector(self.componentLayerFilter)
+        self.componentClearBuffers = Qt3DRender.QClearBuffers(self.componentCameraSelector)
+        self.componentClearBuffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
+
+
 
     def create_materials(self):
 
@@ -56,7 +84,7 @@ class InstrumentView(QWidget):
 
     def create_sample_cube(self):
 
-        self.cubeEntity = Qt3DCore.QEntity(self.rootEntity)
+        self.cubeEntity = Qt3DCore.QEntity(self.componentRootEntity)
         self.cubeMesh = Qt3DExtras.QCuboidMesh()
         self.cubeMesh.setXExtent(1)
         self.cubeMesh.setYExtent(1)
@@ -67,7 +95,7 @@ class InstrumentView(QWidget):
 
     def create_beam_cylinder(self):
 
-        self.cylinderEntity = Qt3DCore.QEntity(self.rootEntity)
+        self.cylinderEntity = Qt3DCore.QEntity(self.componentRootEntity)
         self.cylinderMesh = Qt3DExtras.QCylinderMesh()
         self.cylinderMesh.setRadius(2.5)
         self.cylinderMesh.setLength(40)
@@ -84,6 +112,15 @@ class InstrumentView(QWidget):
         self.cylinderEntity.addComponent(self.beam_material)
         self.cylinderEntity.addComponent(self.cylinderTransform)
 
+    def add_some_next_because(self):
+
+        self.testText = Qt3DExtras.QText2DEntity(self.componentRootEntity)
+        self.testText.setText("Text")
+        self.testText.setHeight(20)
+        self.testText.setWidth(20)
+        self.testText.setColor(QColor("red"))
+        self.testText.setFont(QFont("Courier New", 10))
+
     def create_neutrons(self):
 
         self.neutronEntities = []
@@ -98,7 +135,7 @@ class InstrumentView(QWidget):
 
         for i in range(9):
 
-            neutronEntity = Qt3DCore.QEntity(self.rootEntity)
+            neutronEntity = Qt3DCore.QEntity(self.componentRootEntity)
             neutronMesh = Qt3DExtras.QSphereMesh()
             neutronMesh.setRadius(3)
 
@@ -127,9 +164,21 @@ class InstrumentView(QWidget):
             neutronEntity.addComponent(self.grey_material)
             neutronEntity.addComponent(neutronTransform)
 
+    def create_gnomon(self):
+
+        self.gnomon_layer = Qt3DRender.QLayer()
+        a = Qt3DRender.QDepthTest.Always
+
+
+        print(a)
+
     def initialise_view(self):
 
         self.create_materials()
         self.create_sample_cube()
         self.create_neutrons()
+
+        # The beam must be the last thing placed in the view in order to make the semi-transparency work correctly
         self.create_beam_cylinder()
+
+        # self.create_gnomon()
