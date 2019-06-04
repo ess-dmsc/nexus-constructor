@@ -16,19 +16,19 @@ class InstrumentView(QWidget):
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
-        '''
         self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.1, 1000)
         self.view.camera().setPosition(QVector3D(6, 8, 30))
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
-        '''
 
         self.rootEntity = Qt3DCore.QEntity()
 
         self.componentRootEntity = Qt3DCore.QEntity(self.rootEntity)
+
         componentCameraEntity = self.view.camera()
         componentCamController = Qt3DExtras.QFirstPersonCameraController(self.componentRootEntity)
         componentCamController.setLinearSpeed(20)
         componentCamController.setCamera(componentCameraEntity)
+
 
         self.gnomonRootEntity = Qt3DCore.QEntity(self.rootEntity)
 
@@ -41,10 +41,10 @@ class InstrumentView(QWidget):
 
         self.surSelector = Qt3DRender.QRenderSurfaceSelector()
         self.surSelector.setSurface(self.view)
-        self.viewport = Qt3DRender.QViewport(self.surSelector)
-        # self.view.setActiveFrameGraph(self.surSelector)
+        self.viewportComponent = Qt3DRender.QViewport(self.surSelector)
+        self.view.setActiveFrameGraph(self.surSelector)
 
-        self.componentLayerFilter = Qt3DRender.QLayerFilter(self.viewport)
+        self.componentLayerFilter = Qt3DRender.QLayerFilter(self.viewportComponent)
         self.componentLayer = Qt3DRender.QLayer(self.componentRootEntity)
         self.componentRootEntity.addComponent(self.componentLayer)
         self.componentLayer.setRecursive(True)
@@ -54,6 +54,17 @@ class InstrumentView(QWidget):
         self.componentClearBuffers = Qt3DRender.QClearBuffers(self.componentCameraSelector)
         self.componentClearBuffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
 
+        self.viewportGnomon = Qt3DRender.QViewport(self.surSelector)
+        self.layerFilterGnomon = Qt3DRender.QLayerFilter(self.viewportGnomon)
+        self.gnomonLayer = Qt3DRender.QLayer(self.gnomonRootEntity)
+        self.gnomonRootEntity.addComponent(self.gnomonLayer)
+        self.gnomonLayer.setRecursive(True)
+        self.layerFilterGnomon.addLayer(self.gnomonLayer)
+        self.cameraSelectorGnomon = Qt3DRender.QCameraSelector(self.layerFilterGnomon)
+        self.clearBuffersGnomon = Qt3DRender.QClearBuffers(self.cameraSelectorGnomon)
+        self.cameraSelectorGnomon.setCamera(self.view.camera())
+
+        self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
 
 
     def create_materials(self):
@@ -114,10 +125,10 @@ class InstrumentView(QWidget):
 
     def add_some_next_because(self):
 
-        self.testText = Qt3DExtras.QText2DEntity(self.componentRootEntity)
+        self.testText = Qt3DExtras.QText2DEntity(self.gnomonRootEntity)
         self.testText.setText("Text")
-        self.testText.setHeight(20)
-        self.testText.setWidth(20)
+        self.testText.setHeight(40)
+        self.testText.setWidth(40)
         self.testText.setColor(QColor("red"))
         self.testText.setFont(QFont("Courier New", 10))
 
@@ -165,12 +176,7 @@ class InstrumentView(QWidget):
             neutronEntity.addComponent(neutronTransform)
 
     def create_gnomon(self):
-
-        self.gnomon_layer = Qt3DRender.QLayer()
-        a = Qt3DRender.QDepthTest.Always
-
-
-        print(a)
+        pass
 
     def initialise_view(self):
 
@@ -180,5 +186,7 @@ class InstrumentView(QWidget):
 
         # The beam must be the last thing placed in the view in order to make the semi-transparency work correctly
         self.create_beam_cylinder()
+
+        self.add_some_next_because()
 
         # self.create_gnomon()
