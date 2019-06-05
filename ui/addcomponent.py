@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Wed Jun  5 12:20:14 2019
+# Created: Wed Jun  5 12:27:34 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -169,7 +169,6 @@ class Ui_AddComponentDialog(object):
         self.fieldsListView.setObjectName("fieldsListView")
         self.verticalLayout.addWidget(self.fieldsListView)
         self.verticalLayout_2.addWidget(self.fieldsBox)
-        self.verticalLayout_2.setStretch(1, 1)
         self.verticalLayout_2.setStretch(4, 2)
         self.verticalLayout_2.setStretch(5, 1)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
@@ -193,7 +192,7 @@ class Ui_AddComponentDialog(object):
 
     def retranslateUi(self, AddComponentDialog):
         AddComponentDialog.setWindowTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Add Component", None, -1))
-        self.label.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Name", None, -1))
+        self.label.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Name:", None, -1))
         self.label_2.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Description:", None, -1))
         self.label_3.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Component type:", None, -1))
         self.geometryTypeBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry type:", None, -1))
