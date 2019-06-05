@@ -171,14 +171,10 @@ node("docker") {
         }
     }
     
-    try {
-        // disabled for now as the build isn't setup for Mac OS just yet.
-        // builders['macOS'] = get_macos_pipeline()
+    // disabled for now as the build isn't setup for Mac OS just yet.
+    // builders['macOS'] = get_macos_pipeline()
 
-        // Only build executables on windows if it is a PR build
-        builders['windows10'] = get_win10_pipeline()
-        parallel builders
-    } finally {
-        container.stop()
-    }
+    // Only build executables on windows if it is a PR build
+    builders['windows10'] = get_win10_pipeline()
+    parallel builders
 }
