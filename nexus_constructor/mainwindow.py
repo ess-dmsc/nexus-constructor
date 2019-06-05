@@ -38,6 +38,10 @@ class MainWindow(Ui_MainWindow):
         )
         self.addWindow.ui.setupUi(self.addWindow)
 
+        # reset defaults when closed
+        self.addWindow.ui.buttonBox.rejected.connect(self.reset_component_window)
+        # TODO: get the "x" button to call this function too
+
         self.pushButton.clicked.connect(self.show_add_component_window)
         self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
         self.actionOpen_NeXus_file.triggered.connect(self.open_nexus_file)
@@ -57,6 +61,13 @@ class MainWindow(Ui_MainWindow):
         self.listView.setModel(self.components_list_model)
 
         self.widget.setVisible(True)
+
+    def reset_component_window(self):
+        self.addWindow = QDialog()
+        self.addWindow.ui = AddComponentDialog(
+            self.entry_group, self.components_list_model
+        )
+        self.addWindow.ui.setupUi(self.addWindow)
 
     def save_to_nexus_file(self):
         options = QFileDialog.Options()
