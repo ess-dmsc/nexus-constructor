@@ -73,7 +73,8 @@ class InstrumentView(QWidget):
         self.otherCamera.setFieldOfView(componentCameraEntity.fieldOfView())
         self.otherCamera.setNearPlane(0.1)
         self.otherCamera.setUpVector(componentCameraEntity.upVector())
-        self.otherCamera.setFarPlane(10)
+        self.otherCamera.setViewCenter(QVector3D(0,0,0))
+        # self.otherCamera.setFarPlane(10)
         gnomonCamPosition = componentCameraEntity.position() - componentCameraEntity.viewCenter()
         gnomonCamPosition = gnomonCamPosition.normalized()
         gnomonCamPosition *= 3
@@ -151,22 +152,57 @@ class InstrumentView(QWidget):
     def add_gnomon(self):
 
 
-        self.testText = Qt3DExtras.QText2DEntity(self.gnomonRootEntity)
-        self.testText.setText("Text")
-        self.testText.setHeight(40)
-        self.testText.setWidth(40)
-        self.testText.setColor(QColor("red"))
-        self.testText.setFont(QFont("Courier New", 10))
+        self.xAxisEntity = Qt3DCore.QEntity(self.gnomonRootEntity)
+        self.yAxisEntity = Qt3DCore.QEntity(self.gnomonRootEntity)
+        self.zAxisEntity = Qt3DCore.QEntity(self.gnomonRootEntity)
 
-        self.otherCube = Qt3DCore.QEntity(self.gnomonRootEntity)
-        self.otherCubeMesh = Qt3DExtras.QCuboidMesh()
-        self.otherCubeMesh.setXExtent(5)
-        self.otherCubeMesh.setYExtent(5)
-        self.otherCubeMesh.setZExtent(5)
+        self.xAxisMesh = Qt3DExtras.QCylinderMesh()
+        self.yAxisMesh = Qt3DExtras.QCylinderMesh()
+        self.zAxisMesh = Qt3DExtras.QCylinderMesh()
 
-        self.otherCube.addComponent(self.otherCubeMesh)
-        self.otherCube.addComponent(self.green_material)
+        self.xAxisMesh.setRadius(0.05)
+        self.yAxisMesh.setRadius(0.05)
+        self.zAxisMesh.setRadius(0.05)
 
+        self.xAxisMesh.setLength(1)
+        self.yAxisMesh.setLength(1)
+        self.zAxisMesh.setLength(1)
+
+        self.xAxisMesh.setRings(2)
+        self.yAxisMesh.setRings(2)
+        self.zAxisMesh.setRings(2)
+
+        xAxisMatrix = QMatrix4x4()
+        yAxisMatrix = QMatrix4x4()
+        zAxisMatrix = QMatrix4x4()
+
+        xAxisMatrix.rotate(270, QVector3D(0,0,1))
+        xAxisMatrix.translate(QVector3D(0, 0.5, 0))
+
+        yAxisMatrix.translate(QVector3D(0, 0.5, 0))
+
+        zAxisMatrix.rotate(90, QVector3D(1, 0, 0))
+        zAxisMatrix.translate(QVector3D(0, 0.5, 0))
+
+        self.xAxisTransformation = Qt3DCore.QTransform()
+        self.yAxisTransformation = Qt3DCore.QTransform()
+        self.zAxisTransformation = Qt3DCore.QTransform()
+
+        self.xAxisTransformation.setMatrix(xAxisMatrix)
+        self.yAxisTransformation.setMatrix(yAxisMatrix)
+        self.zAxisTransformation.setMatrix(zAxisMatrix)
+
+        self.xAxisEntity.addComponent(self.xAxisMesh)
+        self.xAxisEntity.addComponent(self.xAxisTransformation)
+        self.xAxisEntity.addComponent(self.red_material)
+
+        self.yAxisEntity.addComponent(self.yAxisMesh)
+        self.yAxisEntity.addComponent(self.yAxisTransformation)
+        self.yAxisEntity.addComponent(self.red_material)
+
+        self.zAxisEntity.addComponent(self.zAxisMesh)
+        self.zAxisEntity.addComponent(self.zAxisTransformation)
+        self.zAxisEntity.addComponent(self.red_material)
 
     def create_neutrons(self):
 
@@ -223,6 +259,6 @@ class InstrumentView(QWidget):
         # The beam must be the last thing placed in the view in order to make the semi-transparency work correctly
         self.create_beam_cylinder()
 
-        self.add_some_next_because()
+        self.add_gnomon()
 
         # self.create_gnomon()
