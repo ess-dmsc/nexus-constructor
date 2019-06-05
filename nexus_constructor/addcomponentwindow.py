@@ -1,6 +1,5 @@
-from PySide2.QtCore import QUrl, QAbstractItemModel
+from PySide2.QtCore import QUrl
 from PySide2.QtWidgets import QFileDialog, QDialogButtonBox
-from nexus_constructor.qml_models import geometry_models
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -120,7 +119,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         component_name = self.nameLineEdit.text().replace(" ", "_")
         self.components_list.add_component(
             component_type=component_type,
-            description=self.descriptionPlainTextEdit.toPlainText(),
+            description=self.descriptionPlainTextEdit.text(),
             name=component_name,
             geometry_model=self.generate_geometry_model(),
         )
