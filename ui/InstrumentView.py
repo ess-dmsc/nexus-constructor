@@ -24,12 +24,6 @@ class InstrumentView(QWidget):
 
         self.componentRootEntity = Qt3DCore.QEntity(self.rootEntity)
 
-        componentCameraEntity = self.view.camera()
-        componentCamController = Qt3DExtras.QFirstPersonCameraController(self.componentRootEntity)
-        componentCamController.setLinearSpeed(20)
-        componentCamController.setCamera(componentCameraEntity)
-
-
         self.gnomonRootEntity = Qt3DCore.QEntity(self.rootEntity)
 
         self.view.setRootEntity(self.rootEntity)
@@ -43,14 +37,19 @@ class InstrumentView(QWidget):
         self.surSelector.setSurface(self.view)
         self.viewportComponent = Qt3DRender.QViewport(self.surSelector)
 
-        # Causes background to become black
         self.view.setActiveFrameGraph(self.surSelector)
+
 
         self.componentLayerFilter = Qt3DRender.QLayerFilter(self.viewportComponent)
         self.componentLayer = Qt3DRender.QLayer(self.componentRootEntity)
         self.componentRootEntity.addComponent(self.componentLayer)
         self.componentLayer.setRecursive(True)
         self.componentLayerFilter.addLayer(self.componentLayer)
+
+        componentCameraEntity = self.view.camera()
+        componentCamController = Qt3DExtras.QFirstPersonCameraController(self.componentRootEntity)
+        componentCamController.setLinearSpeed(20)
+        componentCamController.setCamera(componentCameraEntity)
 
         self.componentCameraSelector = Qt3DRender.QCameraSelector(self.componentLayerFilter)
         self.componentCameraSelector.setCamera(self.view.camera())
@@ -69,8 +68,26 @@ class InstrumentView(QWidget):
         self.clearBuffersGnomon = Qt3DRender.QClearBuffers(self.cameraSelectorGnomon)
 
         self.otherCamera = Qt3DRender.QCamera()
+        self.otherCamera.setParent(componentCameraEntity)
+        self.otherCamera.setProjectionType(componentCameraEntity.projectionType())
+        self.otherCamera.setFieldOfView(componentCameraEntity.fieldOfView())
+        self.otherCamera.setNearPlane(0.1)
+        self.otherCamera.setUpVector(componentCameraEntity.upVector())
+        self.otherCamera.setFarPlane(10)
+        gnomonCamPosition = componentCameraEntity.position() - componentCameraEntity.viewCenter()
+        gnomonCamPosition = gnomonCamPosition.normalized()
+        gnomonCamPosition *= 3
 
-        self.cameraSelectorGnomon.setCamera(self.view.camera())
+        self.otherCamera.setPosition(gnomonCamPosition)
+
+        gnomonCamController = Qt3DExtras.QFirstPersonCameraController(self.gnomonRootEntity)
+        gnomonCamController.setLinearSpeed(0)
+        # gnomonCamController.set
+        gnomonCamController.setCamera(self.otherCamera)
+
+        print(componentCamController.linearSpeed())
+
+        self.cameraSelectorGnomon.setCamera(self.otherCamera)
 
         self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
 
@@ -131,25 +148,25 @@ class InstrumentView(QWidget):
         self.cylinderEntity.addComponent(self.beam_material)
         self.cylinderEntity.addComponent(self.cylinderTransform)
 
-    def add_some_next_because(self):
+    def add_gnomon(self):
 
-        '''
+
         self.testText = Qt3DExtras.QText2DEntity(self.gnomonRootEntity)
         self.testText.setText("Text")
         self.testText.setHeight(40)
         self.testText.setWidth(40)
         self.testText.setColor(QColor("red"))
         self.testText.setFont(QFont("Courier New", 10))
-        '''
 
         self.otherCube = Qt3DCore.QEntity(self.gnomonRootEntity)
         self.otherCubeMesh = Qt3DExtras.QCuboidMesh()
-        self.otherCubeMesh.setXExtent(2)
-        self.otherCubeMesh.setYExtent(2)
-        self.otherCubeMesh.setZExtent(2)
+        self.otherCubeMesh.setXExtent(5)
+        self.otherCubeMesh.setYExtent(5)
+        self.otherCubeMesh.setZExtent(5)
 
         self.otherCube.addComponent(self.otherCubeMesh)
         self.otherCube.addComponent(self.green_material)
+
 
     def create_neutrons(self):
 
