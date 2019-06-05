@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Tue Jun  4 16:50:34 2019
+# Created: Wed Jun  5 12:20:14 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -54,7 +54,7 @@ class Ui_AddComponentDialog(object):
         self.label_2 = QtWidgets.QLabel(self.widget)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_6.addWidget(self.label_2)
-        self.descriptionPlainTextEdit = QtWidgets.QPlainTextEdit(self.widget)
+        self.descriptionPlainTextEdit = QtWidgets.QLineEdit(self.widget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
