@@ -80,7 +80,7 @@ builders = pipeline_builder.createBuilders { container ->
                 build_env/bin/codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
                 """
         }
-        container.copyFrom("${project}test_results.xml", 'test_results.xml')
+        container.copyFrom("${project}/test_results.xml", 'test_results.xml')
         junit "test_results.xml"
     } // stage
     
