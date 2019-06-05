@@ -57,7 +57,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.unitsLineEdit.setValidator(self.units_validator)
         self.unitsLineEdit.validator().validationSuccess.connect(self.tick_check_box)
         self.unitsLineEdit.validator().validationFailed.connect(self.untick_check_box)
-        # TODO: set up this validator with the check box
 
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
