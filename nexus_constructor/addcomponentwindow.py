@@ -52,6 +52,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
+        self.componentTypeComboBox.currentIndexChanged.connect(
+            self.on_component_type_change
+        )
+
         # Set default geometry type to mesh and show the related mesh fields such as geometry file etc.
         self.meshRadioButton.setChecked(True)
         self.show_mesh_fields()
@@ -67,6 +71,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cylinderHeightLineEdit.setValidator(self.intvalidator)
 
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
+
+    def on_component_type_change(self):
+        self.webEngineView.setUrl(
+            QUrl(
+                f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
+            )
+        )
 
     def tick_check_box(self):
         self.ticklabel.setText("✅")
