@@ -42,6 +42,8 @@ class InstrumentView(QWidget):
         self.surSelector = Qt3DRender.QRenderSurfaceSelector()
         self.surSelector.setSurface(self.view)
         self.viewportComponent = Qt3DRender.QViewport(self.surSelector)
+
+        # Causes background to become black
         self.view.setActiveFrameGraph(self.surSelector)
 
         self.componentLayerFilter = Qt3DRender.QLayerFilter(self.viewportComponent)
@@ -51,8 +53,10 @@ class InstrumentView(QWidget):
         self.componentLayerFilter.addLayer(self.componentLayer)
 
         self.componentCameraSelector = Qt3DRender.QCameraSelector(self.componentLayerFilter)
+        self.componentCameraSelector.setCamera(self.view.camera())
         self.componentClearBuffers = Qt3DRender.QClearBuffers(self.componentCameraSelector)
         self.componentClearBuffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
+        self.componentClearBuffers.setClearColor(QColor("lightgrey"))
 
         self.viewportGnomon = Qt3DRender.QViewport(self.surSelector)
         self.layerFilterGnomon = Qt3DRender.QLayerFilter(self.viewportGnomon)
@@ -125,12 +129,23 @@ class InstrumentView(QWidget):
 
     def add_some_next_because(self):
 
+        '''
         self.testText = Qt3DExtras.QText2DEntity(self.gnomonRootEntity)
         self.testText.setText("Text")
         self.testText.setHeight(40)
         self.testText.setWidth(40)
         self.testText.setColor(QColor("red"))
         self.testText.setFont(QFont("Courier New", 10))
+        '''
+
+        self.otherCube = Qt3DCore.QEntity(self.gnomonRootEntity)
+        self.otherCubeMesh = Qt3DExtras.QCuboidMesh()
+        self.otherCubeMesh.setXExtent(0.5)
+        self.otherCubeMesh.setYExtent(0.5)
+        self.otherCubeMesh.setZExtent(0.5)
+
+        self.otherCube.addComponent(self.otherCubeMesh)
+        self.otherCube.addComponent(self.green_material)
 
     def create_neutrons(self):
 
