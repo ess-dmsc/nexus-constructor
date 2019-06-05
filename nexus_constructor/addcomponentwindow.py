@@ -31,7 +31,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         super().setupUi(AddComponentDialog)
 
         # Connect the button calls with functions
-        self.buttonBox.button(QDialogButtonBox.Cancel).clicked.connect(self.on_close)
         self.buttonBox.button(QDialogButtonBox.Ok).clicked.connect(self.on_ok)
 
         # Grey out OK button by default to prevent users from adding components with invalid fields
@@ -110,16 +109,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         else:
             geometry_model = NoShapeModel()
         return geometry_model
-
-    def on_close(self):
-        print("cancel pressed")
-        self.geometry_model = OFFModel()
-        self.show_mesh_fields()
-
-        self.nameLineEdit.setText("")
-        self.descriptionPlainTextEdit.setText("")
-
-        pass
 
     def on_ok(self):
         component_type = self.componentTypeComboBox.currentText()
