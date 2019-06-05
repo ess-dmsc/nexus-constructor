@@ -1,4 +1,5 @@
 from PySide2.QtCore import QUrl
+from PySide2.QtGui import QIntValidator
 from PySide2.QtWidgets import QFileDialog, QDialogButtonBox
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
@@ -10,6 +11,7 @@ from ui.addcomponent import Ui_AddComponentDialog
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.validators import UnitValidator
+
 import os
 
 GEOMETRY_FILE_TYPES = "OFF Files (*.off, *.OFF);; STL Files (*.stl, *.STL)"
@@ -23,6 +25,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.entry_group = entry_group
         self.components_list = components_list
         self.geometry_model = None
+        self.intvalidator = QIntValidator()
         self.component_types = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
@@ -55,6 +58,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.unitsLineEdit.setValidator(self.units_validator)
         self.unitsLineEdit.validator().validationSuccess.connect(self.tick_check_box)
         self.unitsLineEdit.validator().validationFailed.connect(self.untick_check_box)
+
+        self.cylinderXLineEdit.setValidator(self.intvalidator)
+        self.cylinderYLineEdit.setValidator(self.intvalidator)
+        self.cylinderZLineEdit.setValidator(self.intvalidator)
+        self.cylinderRadiusLineEdit.setValidator(self.intvalidator)
+        self.cylinderHeightLineEdit.setValidator(self.intvalidator)
 
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
