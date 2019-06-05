@@ -91,7 +91,7 @@ builders = pipeline_builder.createBuilders { container ->
         
         pipeline_builder.stage('Archive Executable') {
             def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-            container.copyFrom("${project}build/", './build')
+            container.copyFrom("${project}/build/", './build')
             sh "tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
             archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
         } // stage
