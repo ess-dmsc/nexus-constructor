@@ -1,7 +1,7 @@
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtCore import QPropertyAnimation
+from PySide2.QtCore import QPropertyAnimation, QRectF
 from PySide2.QtGui import QVector3D, QColor, QMatrix4x4, QFont
 from PySide2.Qt3DRender import Qt3DRender
 from ui.NeutronAnimationController import NeutronAnimationController
@@ -12,7 +12,7 @@ class InstrumentView(QWidget):
         super().__init__()
         lay = QVBoxLayout(self)
         self.view = Qt3DExtras.Qt3DWindow()
-        self.view.defaultFrameGraph().setClearColor(QColor("lightgrey"))
+        # self.view.defaultFrameGraph().setClearColor(QColor("lightgrey"))
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
@@ -59,6 +59,7 @@ class InstrumentView(QWidget):
         self.componentClearBuffers.setClearColor(QColor("lightgrey"))
 
         self.viewportGnomon = Qt3DRender.QViewport(self.surSelector)
+        self.viewportGnomon.setNormalizedRect(QRectF(0.8,0.8,0.2,0.2))
         self.layerFilterGnomon = Qt3DRender.QLayerFilter(self.viewportGnomon)
         self.gnomonLayer = Qt3DRender.QLayer(self.gnomonRootEntity)
         self.gnomonRootEntity.addComponent(self.gnomonLayer)
@@ -66,6 +67,9 @@ class InstrumentView(QWidget):
         self.layerFilterGnomon.addLayer(self.gnomonLayer)
         self.cameraSelectorGnomon = Qt3DRender.QCameraSelector(self.layerFilterGnomon)
         self.clearBuffersGnomon = Qt3DRender.QClearBuffers(self.cameraSelectorGnomon)
+
+        self.otherCamera = Qt3DRender.QCamera()
+
         self.cameraSelectorGnomon.setCamera(self.view.camera())
 
         self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
@@ -140,9 +144,9 @@ class InstrumentView(QWidget):
 
         self.otherCube = Qt3DCore.QEntity(self.gnomonRootEntity)
         self.otherCubeMesh = Qt3DExtras.QCuboidMesh()
-        self.otherCubeMesh.setXExtent(0.5)
-        self.otherCubeMesh.setYExtent(0.5)
-        self.otherCubeMesh.setZExtent(0.5)
+        self.otherCubeMesh.setXExtent(2)
+        self.otherCubeMesh.setYExtent(2)
+        self.otherCubeMesh.setZExtent(2)
 
         self.otherCube.addComponent(self.otherCubeMesh)
         self.otherCube.addComponent(self.green_material)
