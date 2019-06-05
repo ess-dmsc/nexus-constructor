@@ -27,7 +27,7 @@ build_exe_options = {
         "collections._weakref",
     ],
     "bin_includes": ["libssl.so"],
-    "include_files": ["resources", "Instrument.schema.json"],
+    "include_files": ["ui", "Instrument.schema.json", "definitions"],
 }
 
 unix_removable = [
