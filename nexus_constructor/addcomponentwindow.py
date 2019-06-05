@@ -1,4 +1,6 @@
-from PySide2.QtCore import QUrl
+from typing import List
+
+from PySide2.QtCore import QUrl, QAbstractItemModel
 from PySide2.QtWidgets import QFileDialog
 
 from nexus_constructor.qml_models import geometry_models
@@ -11,7 +13,8 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from ui.addcomponent import Ui_AddComponentDialog
 
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
-
+from nexus_constructor.component_type import make_dictionary_of_class_definitions
+import os
 
 GEOMETRY_FILE_TYPES = "OFF Files (*.off, *.OFF);; STL Files (*.stl, *.STL)"
 
@@ -22,6 +25,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.entry_group = entry_group
         self.components_list = components_list
         self.geometry_model = None
+        self.component_types = make_dictionary_of_class_definitions(
+            os.path.abspath(os.path.join(os.curdir, "definitions"))
+        )
 
     def setupUi(self, AddComponentDialog):
         super().setupUi(AddComponentDialog)
@@ -39,6 +45,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.meshRadioButton.setChecked(True)
         self.show_mesh_fields()
+        self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
     def mesh_file_picker(self):
         options = QFileDialog.Options()

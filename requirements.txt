@@ -10,6 +10,7 @@ pre-commit
 pint
 mock
 silx
+xmltodict
 
 # newer versions of jsonschema don't work with the executables built by cx_Freeze
 jsonschema==2.6.0
