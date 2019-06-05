@@ -1,5 +1,5 @@
 from PySide2.QtCore import QUrl, QAbstractItemModel
-from PySide2.QtWidgets import QFileDialog
+from PySide2.QtWidgets import QFileDialog, QDialogButtonBox
 from nexus_constructor.qml_models import geometry_models
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
@@ -27,20 +27,30 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def setupUi(self, AddComponentDialog):
         super().setupUi(AddComponentDialog)
+
+        # Connect the button calls with functions
         self.buttonBox.rejected.connect(self.on_close)
         self.buttonBox.accepted.connect(self.on_ok)
+
+        # Grey out OK button by default to prevent users from adding components with invalid fields
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+
+        # Set default URL to nexus base classes in web view
         self.webEngineView.setUrl(
             QUrl(
                 "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
             )
         )
+
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
+        # Set default geometry type to mesh and show the related mesh fields such as geometry file etc.
         self.meshRadioButton.setChecked(True)
         self.show_mesh_fields()
+
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
     def mesh_file_picker(self):

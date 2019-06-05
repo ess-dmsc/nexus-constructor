@@ -48,6 +48,6 @@ def make_dictionary_of_class_definitions(
                 except:
                     class_definitions[nx_class_name].append(fields["@name"])
             except KeyError:
-                # No key called "field"
+                # TODO: No key called "field"
                 pass
     return class_definitions
