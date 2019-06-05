@@ -1,8 +1,5 @@
-from typing import List
-
 from PySide2.QtCore import QUrl, QAbstractItemModel
 from PySide2.QtWidgets import QFileDialog
-
 from nexus_constructor.qml_models import geometry_models
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
@@ -11,7 +8,6 @@ from nexus_constructor.qml_models.geometry_models import (
 )
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from ui.addcomponent import Ui_AddComponentDialog
-
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 import os
