@@ -211,15 +211,19 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QLineEdit" name="unitsLineEdit"/>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QLineEdit" name="unitsLineEdit">
                 <property name="text">
+                 <string>m</string>
+                </property>
+                <property name="placeholderText">
                  <string/>
                 </property>
-                <property name="checkable">
-                 <bool>false</bool>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="ticklabel">
+                <property name="text">
+                 <string>✅</string>
                 </property>
                </widget>
               </item>

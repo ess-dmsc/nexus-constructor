@@ -62,10 +62,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
     def tick_check_box(self):
-        self.checkBox.setChecked(True)
+        self.ticklabel.setText("✅")
 
     def untick_check_box(self):
-        self.checkBox.setChecked(False)
+        self.ticklabel.setText("❌")
 
     def mesh_file_picker(self):
         options = QFileDialog.Options()
