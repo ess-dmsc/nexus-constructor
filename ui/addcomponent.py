@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Mon Jun  3 16:27:51 2019
+# Created: Tue Jun  4 16:50:34 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -173,15 +173,15 @@ class Ui_AddComponentDialog(object):
         self.verticalLayout_2.setStretch(4, 2)
         self.verticalLayout_2.setStretch(5, 1)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
-        self.webView = QWebEngineView(self.widget)
+        self.webEngineView = QWebEngineView(self.widget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.webView.sizePolicy().hasHeightForWidth())
-        self.webView.setSizePolicy(sizePolicy)
-        self.webView.setProperty("url", QtCore.QUrl("about:blank"))
-        self.webView.setObjectName("webView")
-        self.gridLayout_4.addWidget(self.webView, 0, 1, 1, 1)
+        sizePolicy.setHeightForWidth(self.webEngineView.sizePolicy().hasHeightForWidth())
+        self.webEngineView.setSizePolicy(sizePolicy)
+        self.webEngineView.setProperty("url", QtCore.QUrl("about:blank"))
+        self.webEngineView.setObjectName("webEngineView")
+        self.gridLayout_4.addWidget(self.webEngineView, 0, 1, 1, 1)
         self.gridLayout_4.setColumnStretch(0, 1)
         self.gridLayout_4.setColumnStretch(1, 1)
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)

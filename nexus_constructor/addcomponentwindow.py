@@ -27,7 +27,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         super().setupUi(AddComponentDialog)
         self.buttonBox.rejected.connect(self.on_close)
         self.buttonBox.accepted.connect(self.on_ok)
-        self.webView.setUrl(
+        self.webEngineView.setUrl(
             QUrl(
                 "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
             )
