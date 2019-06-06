@@ -68,7 +68,7 @@ class InstrumentView(QWidget):
         self.clearBuffersGnomon = Qt3DRender.QClearBuffers(self.cameraSelectorGnomon)
 
         self.otherCamera = Qt3DRender.QCamera()
-        self.otherCamera.setParent(self.view)
+        self.otherCamera.setParent(self.gnomonRootEntity)
         self.otherCamera.setProjectionType(componentCameraEntity.projectionType())
         print(componentCameraEntity.projectionType())
         self.otherCamera.setFieldOfView(componentCameraEntity.fieldOfView())
@@ -89,7 +89,9 @@ class InstrumentView(QWidget):
         # self.otherCamera.setPosition(QVector3D(0,0,0.0001))
 
         gnomonCamController = Qt3DExtras.QOrbitCameraController(self.gnomonRootEntity)
-        gnomonCamController.setLinearSpeed(0)
+        gnomonCamController.setZoomInLimit(2)
+        # gnomonCamController.setLinearSpeed(0)
+        gnomonCamController.setLookSpeed(0)
         # gnomonCamController.set
         gnomonCamController.setCamera(self.otherCamera)
 
@@ -273,10 +275,9 @@ class InstrumentView(QWidget):
         self.create_materials()
         self.create_sample_cube()
         self.create_neutrons()
+        self.add_gnomon()
 
         # The beam must be the last thing placed in the view in order to make the semi-transparency work correctly
         self.create_beam_cylinder()
-
-        self.add_gnomon()
 
         # self.create_gnomon()
