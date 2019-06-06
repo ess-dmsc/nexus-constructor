@@ -1,4 +1,6 @@
-from PySide2.QtCore import QUrl, Signal
+from enum import Enum
+
+from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QDialogButtonBox
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
@@ -48,6 +50,49 @@ class FileValidator(QValidator):
     isValid = Signal(bool)
 
 
+class GeometryType(Enum):
+    NONE = 1
+    CYLINDER = 2
+    MESH = 3
+
+
+class OkValidator(QObject):
+    def __init__(self, no_geometry_button, mesh_button):
+        super().__init__()
+        self.name_is_valid = False
+        self.file_is_valid = False
+        self.units_are_valid = False
+        self.no_geometry_button = no_geometry_button
+        self.mesh_button = mesh_button
+
+    def set_name_valid(self, is_valid):
+        self.name_is_valid = is_valid
+        print("Name: {}".format(self.name_is_valid))
+        self.validate_ok()
+
+    def set_file_valid(self, is_valid):
+        self.file_is_valid = is_valid
+        print("File: {}".format(self.file_is_valid))
+        self.validate_ok()
+
+    def set_units_valid(self, is_valid):
+        self.units_are_valid = is_valid
+        print("Units: {}".format(self.units_are_valid))
+        self.validate_ok()
+
+    def validate_ok(self):
+        unacceptable = [
+            not self.name_is_valid,
+            not self.no_geometry_button.isChecked() and not self.units_are_valid,
+            self.mesh_button.isChecked() and not self.file_is_valid,
+        ]
+
+        print("Is valid {}".format(unacceptable))
+        self.isValid.emit(not any(unacceptable))
+
+    isValid = Signal(bool)
+
+
 class AddComponentDialog(Ui_AddComponentDialog):
     def __init__(self, nexus_wrapper: NexusWrapper):
         super(AddComponentDialog, self).__init__()
@@ -63,10 +108,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Connect the button calls with functions
         self.buttonBox.button(QDialogButtonBox.Ok).clicked.connect(self.on_ok)
 
-        # Grey out OK button by default to prevent users from adding components with invalid fields
-        # TODO: enable this when all fields are valid
-        # self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-
         # Set default URL to nexus base classes in web view
         self.webEngineView.setUrl(
             QUrl(
@@ -74,13 +115,32 @@ class AddComponentDialog(Ui_AddComponentDialog):
             )
         )
 
+        self.ok_validator = OkValidator(
+            self.noGeometryRadioButton, self.meshRadioButton
+        )
+        self.ok_validator.isValid.connect(
+            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled
+        )
+
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
+        [
+            button.clicked.connect(self.ok_validator.validate_ok)
+            for button in [
+                self.meshRadioButton,
+                self.CylinderRadioButton,
+                self.noGeometryRadioButton,
+            ]
+        ]
+
         self.fileLineEdit.setValidator(FileValidator(GEOMETRY_FILE_TYPES))
-        self.fileLineEdit.validator().isValid.connect(partial(self.validate_line_edit, self.fileLineEdit))
+        self.fileLineEdit.validator().isValid.connect(
+            partial(self.validate_line_edit, self.fileLineEdit)
+        )
+        self.fileLineEdit.validator().isValid.connect(self.ok_validator.set_file_valid)
 
         self.componentTypeComboBox.currentIndexChanged.connect(
             self.on_component_type_change
@@ -93,10 +153,16 @@ class AddComponentDialog(Ui_AddComponentDialog):
         name_validator = NameValidator()
         name_validator.list_model = self.nexus_wrapper.get_component_list()
         self.nameLineEdit.setValidator(name_validator)
-        self.nameLineEdit.validator().isValid.connect(partial(self.validate_line_edit, self.nameLineEdit))
+        self.nameLineEdit.validator().isValid.connect(
+            partial(self.validate_line_edit, self.nameLineEdit)
+        )
+        self.nameLineEdit.validator().isValid.connect(self.ok_validator.set_name_valid)
 
         self.unitsLineEdit.setValidator(UnitValidator())
         self.unitsLineEdit.validator().isValid.connect(self.validate_units)
+        self.unitsLineEdit.validator().isValid.connect(
+            self.ok_validator.set_units_valid
+        )
 
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
