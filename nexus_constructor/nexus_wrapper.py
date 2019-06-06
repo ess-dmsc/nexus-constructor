@@ -1,7 +1,7 @@
 import h5py
 
 from nexus_constructor.qml_models import instrument_model
-
+from PySide2.QtCore import Signal, QObject
 
 COMPS_IN_ENTRY = ["NXdetector", "NXsample"]
 
@@ -10,8 +10,11 @@ def set_up_in_memory_nexus_file():
     return h5py.File("nexus-constructor", mode="x", driver="core", backing_store=False)
 
 
-class NexusWrapper(object):
+class NexusWrapper(QObject):
+    file_changed = Signal("QVariant")
+
     def __init__(self):
+        super().__init__()
         self.nexus_file = set_up_in_memory_nexus_file()
         self.entry_group = self.nexus_file.create_group("entry")
         self.entry_group.attrs["NX_class"] = "NXentry"
@@ -20,6 +23,10 @@ class NexusWrapper(object):
 
         self.components_list_model = instrument_model.InstrumentModel()
         self.components_list_model.initialise(self.entry_group)
+        self._emit_file()
+
+    def _emit_file(self):
+        self.file_changed.emit(self.nexus_file)
 
     def get_component_list(self):
         return self.components_list_model
@@ -43,9 +50,10 @@ class NexusWrapper(object):
             self.widget.findHdf5TreeModel().clear()
             self.widget.findHdf5TreeModel().insertH5pyObject(self.nexus_file)
             print("NeXus file loaded")
+            self._emit_file()
 
     def add_component(self, component_type, component_name, description, geometry):
-        self.components_list.add_component(
+        self.components_list_model.add_component(
             component_type=component_type,
             description=description,
             name=component_name,
@@ -60,3 +68,5 @@ class NexusWrapper(object):
 
         component_group = instrument_group.create_group(component_name)
         component_group.attrs["NX_class"] = component_type
+
+        self._emit_file()

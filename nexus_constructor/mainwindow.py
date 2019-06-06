@@ -30,18 +30,19 @@ class MainWindow(Ui_MainWindow):
         self.widget.setAcceptDrops(True)
         self.widget.setDragEnabled(True)
         self.treemodel = self.widget.findHdf5TreeModel()
-        self.treemodel.insertH5pyObject(self.nexus_wrapper.nexus_file)
         self.treemodel.setDatasetDragEnabled(True)
         self.treemodel.setFileDropEnabled(True)
         self.treemodel.setFileMoveEnabled(True)
+        self.treemodel.insertH5pyObject(self.nexus_wrapper.nexus_file)
+        self.nexus_wrapper.file_changed.connect(self.update_nexus_file_structure_view)
         self.verticalLayout.addWidget(self.widget)
         self.listView.setModel(self.nexus_wrapper.get_component_list())
 
         self.widget.setVisible(True)
 
-    def update_nexus_file_structure_view(self):
-        # update the view here
-        pass
+    def update_nexus_file_structure_view(self, nexus_file):
+        self.treemodel.clear()
+        self.treemodel.insertH5pyObject(nexus_file)
 
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
