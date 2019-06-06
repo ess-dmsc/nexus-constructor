@@ -68,20 +68,27 @@ class InstrumentView(QWidget):
         self.clearBuffersGnomon = Qt3DRender.QClearBuffers(self.cameraSelectorGnomon)
 
         self.otherCamera = Qt3DRender.QCamera()
-        self.otherCamera.setParent(componentCameraEntity)
+        self.otherCamera.setParent(self.view)
         self.otherCamera.setProjectionType(componentCameraEntity.projectionType())
+        print(componentCameraEntity.projectionType())
         self.otherCamera.setFieldOfView(componentCameraEntity.fieldOfView())
         self.otherCamera.setNearPlane(0.1)
+        self.otherCamera.setFarPlane(300)
         self.otherCamera.setUpVector(componentCameraEntity.upVector())
         self.otherCamera.setViewCenter(QVector3D(0,0,0))
+        self.otherCamera.setTop(2)
+
         # self.otherCamera.setFarPlane(10)
         gnomonCamPosition = componentCameraEntity.position() - componentCameraEntity.viewCenter()
         gnomonCamPosition = gnomonCamPosition.normalized()
         gnomonCamPosition *= 3
 
+        print(gnomonCamPosition)
         self.otherCamera.setPosition(gnomonCamPosition)
 
-        gnomonCamController = Qt3DExtras.QFirstPersonCameraController(self.gnomonRootEntity)
+        # self.otherCamera.setPosition(QVector3D(0,0,0.0001))
+
+        gnomonCamController = Qt3DExtras.QOrbitCameraController(self.gnomonRootEntity)
         gnomonCamController.setLinearSpeed(0)
         # gnomonCamController.set
         gnomonCamController.setCamera(self.otherCamera)
@@ -148,6 +155,17 @@ class InstrumentView(QWidget):
         self.cylinderEntity.addComponent(self.cylinderMesh)
         self.cylinderEntity.addComponent(self.beam_material)
         self.cylinderEntity.addComponent(self.cylinderTransform)
+
+    def gnomon_cube(self):
+
+        self.gnomonCubeEntity = Qt3DCore.QEntity(self.gnomonRootEntity)
+        self.gnomonCubeMesh = Qt3DExtras.QCuboidMesh()
+        self.gnomonCubeMesh.setXExtent(1)
+        self.gnomonCubeMesh.setYExtent(1)
+        self.gnomonCubeMesh.setZExtent(1)
+
+        self.gnomonCubeEntity.addComponent(self.gnomonCubeMesh)
+        self.gnomonCubeEntity.addComponent(self.red_material)
 
     def add_gnomon(self):
 

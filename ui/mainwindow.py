@@ -48,15 +48,16 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab, "")
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
-        self.sceneWidget = QtWidgets.QWidget(self.centralwidget)
+        # self.sceneWidget = QtWidgets.QWidget(self.centralwidget)
+
         self.instrumentView = InstrumentView()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.sceneWidget.sizePolicy().hasHeightForWidth())
-        self.sceneWidget.setSizePolicy(sizePolicy)
-        self.sceneWidget.setMinimumSize(QtCore.QSize(745, 0))
-        self.sceneWidget.setObjectName("sceneWidget")
+
+        # self.qml_instrument =
+
+        # sizePolicy.setHeightForWidth(self.sceneWidget.sizePolicy().hasHeightForWidth())
         self.instrumentView.setSizePolicy(sizePolicy)
         self.instrumentView.setMinimumSize(QtCore.QSize(745, 0))
         self.instrumentView.setObjectName("instrumentView")
