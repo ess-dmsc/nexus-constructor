@@ -157,12 +157,12 @@
              <property name="title">
               <string>Cylinder options</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout">
+             <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,1,0,1">
               <item row="2" column="1">
-               <widget class="QLineEdit" name="cylinderXLineEdit"/>
+               <widget class="QSpinBox" name="cylinderXLineEdit"/>
               </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="cylinderRadiusLineEdit"/>
+               <widget class="QSpinBox" name="cylinderRadiusLineEdit"/>
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="label_6">
@@ -172,7 +172,7 @@
                </widget>
               </item>
               <item row="2" column="3">
-               <widget class="QLineEdit" name="cylinderYLineEdit"/>
+               <widget class="QSpinBox" name="cylinderYLineEdit"/>
               </item>
               <item row="0" column="2">
                <widget class="QLabel" name="label_5">
@@ -203,10 +203,10 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="cylinderHeightLineEdit"/>
+               <widget class="QSpinBox" name="cylinderHeightLineEdit"/>
               </item>
               <item row="2" column="5">
-               <widget class="QLineEdit" name="cylinderZLineEdit"/>
+               <widget class="QSpinBox" name="cylinderZLineEdit"/>
               </item>
              </layout>
             </widget>
@@ -219,10 +219,10 @@
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
                <widget class="QLineEdit" name="unitsLineEdit">
-                <property name="text">
-                 <string>m</string>
+                <property name="text" stdset="0">
+                 <string>0</string>
                 </property>
-                <property name="placeholderText">
+                <property name="placeholderText" stdset="0">
                  <string/>
                 </property>
                </widget>

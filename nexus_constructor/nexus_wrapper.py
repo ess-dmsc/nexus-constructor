@@ -47,8 +47,6 @@ class NexusWrapper(QObject):
             self.nexus_file = h5py.File(
                 filename, mode="r", backing_store=False, driver="core"
             )
-            self.widget.findHdf5TreeModel().clear()
-            self.widget.findHdf5TreeModel().insertH5pyObject(self.nexus_file)
             print("NeXus file loaded")
             self._emit_file()
 

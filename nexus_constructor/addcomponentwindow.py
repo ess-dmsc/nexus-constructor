@@ -1,15 +1,13 @@
 from PySide2.QtCore import QUrl
 from PySide2.QtCore import Signal
 from PySide2.QtGui import QIntValidator
-from PySide2.QtWidgets import QFileDialog, QDialogButtonBox, QToolTip
+from PySide2.QtWidgets import QDialogButtonBox
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
     NoShapeModel,
 )
-from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from ui.addcomponent import Ui_AddComponentDialog
-from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.validators import UnitValidator
 from nexus_constructor.nexus_wrapper import NexusWrapper
@@ -62,12 +60,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.unitsLineEdit.validator().validationSuccess.connect(self.tick_check_box)
         self.unitsLineEdit.validator().validationFailed.connect(self.untick_check_box)
 
-        self.cylinderXLineEdit.setValidator(QIntValidator())
-        self.cylinderYLineEdit.setValidator(QIntValidator())
-        self.cylinderZLineEdit.setValidator(QIntValidator())
-        self.cylinderRadiusLineEdit.setValidator(QIntValidator())
-        self.cylinderHeightLineEdit.setValidator(QIntValidator())
-
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
     def on_component_type_change(self):
@@ -110,11 +102,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if self.CylinderRadioButton.isChecked():
             geometry_model = CylinderModel()
             geometry_model.set_unit(self.unitsLineEdit.text())
-            geometry_model.cylinder.height = self.cylinderHeightLineEdit.text()
-            geometry_model.cylinder.radius = self.cylinderRadiusLineEdit.text()
-            geometry_model.cylinder.axis_direction.setX(self.cylinderXLineEdit.text())
-            geometry_model.cylinder.axis_direction.setY(self.cylinderYLineEdit.text())
-            geometry_model.cylinder.axis_direction.setZ(self.cylinderZLineEdit.text())
+            geometry_model.cylinder.height = self.cylinderHeightLineEdit.value()
+            geometry_model.cylinder.radius = self.cylinderRadiusLineEdit.value()
+            geometry_model.cylinder.axis_direction.setX(self.cylinderXLineEdit.value())
+            geometry_model.cylinder.axis_direction.setY(self.cylinderYLineEdit.value())
+            geometry_model.cylinder.axis_direction.setZ(self.cylinderZLineEdit.value())
         if self.meshRadioButton.isChecked():
             geometry_model = OFFModel()
             geometry_model.set_units(self.unitsLineEdit.text())
