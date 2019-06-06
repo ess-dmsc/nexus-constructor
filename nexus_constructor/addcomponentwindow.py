@@ -1,6 +1,6 @@
 from PySide2.QtCore import QUrl
 from PySide2.QtGui import QIntValidator
-from PySide2.QtWidgets import QFileDialog, QDialogButtonBox
+from PySide2.QtWidgets import QFileDialog, QDialogButtonBox, QToolTip
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -81,9 +81,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def tick_check_box(self):
         self.ticklabel.setText("✅")
+        self.ticklabel.setToolTip("Unit valid")
 
     def untick_check_box(self):
         self.ticklabel.setText("❌")
+        self.ticklabel.setToolTip("Unit not valid")
 
     def mesh_file_picker(self):
         options = QFileDialog.Options()
