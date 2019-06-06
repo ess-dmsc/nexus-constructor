@@ -1,20 +1,51 @@
-from PySide2.QtCore import QUrl
-from PySide2.QtCore import Signal
-from PySide2.QtGui import QIntValidator
+from PySide2.QtCore import QUrl, Signal
 from PySide2.QtWidgets import QDialogButtonBox
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
     NoShapeModel,
 )
+from PySide2.QtGui import QValidator
 from ui.addcomponent import Ui_AddComponentDialog
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.validators import UnitValidator, NameValidator
 from nexus_constructor.nexus_wrapper import NexusWrapper
 from nexus_constructor.utils import file_dialog
 import os
+from functools import partial
 
-GEOMETRY_FILE_TYPES = "OFF Files (*.off, *.OFF);; STL Files (*.stl, *.STL)"
+GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
+
+
+class FileValidator(QValidator):
+    """
+    Validator to ensure file exists and is the correct file type.
+    """
+
+    def __init__(self, file_types):
+        """
+
+        :param file_types:
+        """
+        super().__init__()
+        self.file_types = file_types
+
+    def validate(self, input: str, pos: int):
+        if not input:
+            self.isValid.emit(False)
+            return QValidator.Intermediate
+        if not os.path.isfile(input):
+            self.isValid.emit(False)
+            return QValidator.Intermediate
+        for suffixes in GEOMETRY_FILE_TYPES.values():
+            for suff in suffixes:
+                if input.endswith(f".{suff}"):
+                    self.isValid.emit(True)
+                    return QValidator.Acceptable
+        self.isValid.emit(False)
+        return QValidator.Invalid
+
+    isValid = Signal(bool)
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
@@ -48,6 +79,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
+        self.fileLineEdit.setValidator(FileValidator(GEOMETRY_FILE_TYPES))
+        self.fileLineEdit.validator().isValid.connect(partial(self.validate_line_edit, self.fileLineEdit))
+
         self.componentTypeComboBox.currentIndexChanged.connect(
             self.on_component_type_change
         )
@@ -59,16 +93,16 @@ class AddComponentDialog(Ui_AddComponentDialog):
         name_validator = NameValidator()
         name_validator.list_model = self.nexus_wrapper.get_component_list()
         self.nameLineEdit.setValidator(name_validator)
-        self.nameLineEdit.validator().isValid.connect(self.validate_name)
+        self.nameLineEdit.validator().isValid.connect(partial(self.validate_line_edit, self.nameLineEdit))
 
         self.unitsLineEdit.setValidator(UnitValidator())
         self.unitsLineEdit.validator().isValid.connect(self.validate_units)
 
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
-    def validate_name(self, is_valid: bool):
+    def validate_line_edit(self, line_edit, is_valid: bool):
         colour = "#FFFFFF" if is_valid else "#f6989d"
-        self.nameLineEdit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
+        line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
 
     def on_component_type_change(self):
         self.webEngineView.setUrl(

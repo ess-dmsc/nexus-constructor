@@ -11,6 +11,11 @@ def set_up_in_memory_nexus_file():
 
 
 class NexusWrapper(QObject):
+    """
+    Contains the NeXus file and functions to add and edit components in the NeXus file structure.
+    Also contains a list of components for use in a listview.
+    """
+
     file_changed = Signal("QVariant")
 
     def __init__(self):
@@ -26,12 +31,25 @@ class NexusWrapper(QObject):
         self._emit_file()
 
     def _emit_file(self):
+        """
+        Calls the file_changed signal with the updated file object when the structure is changed.
+        :return: None
+        """
         self.file_changed.emit(self.nexus_file)
 
     def get_component_list(self):
+        """
+        Returns the component list for use with a listview.
+        :return: List of components in QAbstractListModel form.
+        """
         return self.components_list_model
 
     def save_file(self, filename):
+        """
+        Saves the in-memory NeXus file to a physical file if the filename is valid.
+        :param filename: Absolute file path to the file to save.
+        :return: None
+        """
         if filename:
             print(filename)
             file = h5py.File(filename, mode="x")
@@ -42,6 +60,11 @@ class NexusWrapper(QObject):
                 print(f"File writing failed: {e}")
 
     def open_file(self, filename):
+        """
+        Opens a physical file into memory and sets the model to use it.
+        :param filename: Absolute file path to the file to open.
+        :return:
+        """
         if filename:
             print(filename)
             self.nexus_file = h5py.File(
@@ -51,6 +74,14 @@ class NexusWrapper(QObject):
             self._emit_file()
 
     def add_component(self, component_type, component_name, description, geometry):
+        """
+        Adds a component to the NeXus file and the components list.
+        :param component_type: The NX Component type in string form.
+        :param component_name: The Component name.
+        :param description: The Component Description.
+        :param geometry: Geometry model for the component.
+        :return: None
+        """
         component_name = component_name.replace(" ", "_")
         self.components_list_model.add_component(
             component_type=component_type,

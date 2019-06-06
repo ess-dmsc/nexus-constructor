@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Thu Jun  6 15:07:06 2019
+# Created: Thu Jun  6 15:34:45 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -98,6 +98,7 @@ class Ui_AddComponentDialog(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.geometryFileBox)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.fileLineEdit = QtWidgets.QLineEdit(self.geometryFileBox)
+        self.fileLineEdit.setReadOnly(False)
         self.fileLineEdit.setObjectName("fileLineEdit")
         self.horizontalLayout_2.addWidget(self.fileLineEdit)
         self.fileBrowseButton = QtWidgets.QPushButton(self.geometryFileBox)
@@ -147,7 +148,7 @@ class Ui_AddComponentDialog(object):
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.unitsbox)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.unitsLineEdit = QtWidgets.QLineEdit(self.unitsbox)
-        self.unitsLineEdit.setProperty("placeholderText", "")
+        self.unitsLineEdit.setPlaceholderText("")
         self.unitsLineEdit.setObjectName("unitsLineEdit")
         self.horizontalLayout_3.addWidget(self.unitsLineEdit)
         self.ticklabel = QtWidgets.QLabel(self.unitsbox)
@@ -213,7 +214,7 @@ class Ui_AddComponentDialog(object):
         self.label_4.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Height", None, -1))
         self.label_8.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Z:", None, -1))
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
-        self.unitsLineEdit.setProperty("text", QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
+        self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.ticklabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "✅", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
 

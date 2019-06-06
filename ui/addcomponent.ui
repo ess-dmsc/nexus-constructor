@@ -140,7 +140,11 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QLineEdit" name="fileLineEdit"/>
+               <widget class="QLineEdit" name="fileLineEdit">
+                <property name="readOnly">
+                 <bool>false</bool>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QPushButton" name="fileBrowseButton">
@@ -219,10 +223,10 @@
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
                <widget class="QLineEdit" name="unitsLineEdit">
-                <property name="text" stdset="0">
+                <property name="text">
                  <string>m</string>
                 </property>
-                <property name="placeholderText" stdset="0">
+                <property name="placeholderText">
                  <string/>
                 </property>
                </widget>
