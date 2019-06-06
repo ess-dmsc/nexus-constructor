@@ -70,13 +70,12 @@ class InstrumentView(QWidget):
         self.otherCamera = Qt3DRender.QCamera()
         self.otherCamera.setParent(self.gnomonRootEntity)
         self.otherCamera.setProjectionType(componentCameraEntity.projectionType())
-        print(componentCameraEntity.projectionType())
         self.otherCamera.setFieldOfView(componentCameraEntity.fieldOfView())
         self.otherCamera.setNearPlane(0.1)
-        self.otherCamera.setFarPlane(300)
+        self.otherCamera.setFarPlane(10)
         self.otherCamera.setUpVector(componentCameraEntity.upVector())
         self.otherCamera.setViewCenter(QVector3D(0,0,0))
-        self.otherCamera.setTop(2)
+        # self.otherCamera.setTop(2)
 
         # self.otherCamera.setFarPlane(10)
         gnomonCamPosition = componentCameraEntity.position() - componentCameraEntity.viewCenter()
@@ -89,7 +88,9 @@ class InstrumentView(QWidget):
         # self.otherCamera.setPosition(QVector3D(0,0,0.0001))
 
         gnomonCamController = Qt3DExtras.QOrbitCameraController(self.gnomonRootEntity)
-        gnomonCamController.setZoomInLimit(2)
+        gnomonCamController.setZoomInLimit(1)
+        gnomonCamController.setAcceleration(0)
+        gnomonCamController.setDeceleration(0)
         # gnomonCamController.setLinearSpeed(0)
         gnomonCamController.setLookSpeed(0)
         # gnomonCamController.set
@@ -100,6 +101,7 @@ class InstrumentView(QWidget):
         self.cameraSelectorGnomon.setCamera(self.otherCamera)
 
         self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
+        # self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.LessOr)
 
 
     def create_materials(self):
@@ -180,9 +182,9 @@ class InstrumentView(QWidget):
         self.yAxisMesh = Qt3DExtras.QCylinderMesh()
         self.zAxisMesh = Qt3DExtras.QCylinderMesh()
 
-        self.xAxisMesh.setRadius(0.05)
-        self.yAxisMesh.setRadius(0.05)
-        self.zAxisMesh.setRadius(0.05)
+        self.xAxisMesh.setRadius(0.025)
+        self.yAxisMesh.setRadius(0.025)
+        self.zAxisMesh.setRadius(0.025)
 
         self.xAxisMesh.setLength(1)
         self.yAxisMesh.setLength(1)
@@ -223,6 +225,7 @@ class InstrumentView(QWidget):
         self.zAxisEntity.addComponent(self.zAxisMesh)
         self.zAxisEntity.addComponent(self.zAxisTransformation)
         self.zAxisEntity.addComponent(self.red_material)
+
 
     def create_neutrons(self):
 
