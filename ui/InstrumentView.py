@@ -29,7 +29,9 @@ class InstrumentView(QWidget):
         self.initialise_view()
 
     def create_materials(self):
-
+        """
+        Creates the materials for the the objects that will inhabit the instrument view.
+        """
         red = QColor("red")
         black = QColor("black")
         grey = QColor("grey")
@@ -55,7 +57,9 @@ class InstrumentView(QWidget):
         self.green_material.setDiffuse(grey)
 
     def create_sample_cube(self):
-
+        """
+        Creates the initial sample cube.
+        """
         self.cubeEntity = Qt3DCore.QEntity(self.rootEntity)
         self.cubeMesh = Qt3DExtras.QCuboidMesh()
         self.cubeMesh.setXExtent(1)
@@ -66,7 +70,9 @@ class InstrumentView(QWidget):
         self.cubeEntity.addComponent(self.red_material)
 
     def create_beam_cylinder(self):
-
+        """
+        Creates the initial beam cylinder.
+        """
         self.cylinderEntity = Qt3DCore.QEntity(self.rootEntity)
         self.cylinderMesh = Qt3DExtras.QCylinderMesh()
         self.cylinderMesh.setRadius(2.5)
@@ -85,19 +91,23 @@ class InstrumentView(QWidget):
         self.cylinderEntity.addComponent(self.cylinderTransform)
 
     def create_neutrons(self):
-
+        """
+        Creates the neutron animations.
+        """
         self.neutronEntities = []
         self.neutronMeshes = []
         self.neutronTransforms = []
         self.neutronAnimationControllers = []
         self.neutronAnimations = []
 
+        # Create lists of x, y, and time offsets for the neutron animations
         xOffsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
         yOffsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
         timeSpanOffsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
 
         for i in range(9):
 
+            # Create the neutron mesh and entity
             neutronEntity = Qt3DCore.QEntity(self.rootEntity)
             neutronMesh = Qt3DExtras.QSphereMesh()
             neutronMesh.setRadius(3)
@@ -108,6 +118,7 @@ class InstrumentView(QWidget):
             )
             neutronAnimationController.setTarget(neutronTransform)
 
+            # Instruct the NeutronAnimationController to move the neutron along the z-axis from -40 to 0
             neutronAnimation = QPropertyAnimation(neutronTransform)
             neutronAnimation.setTargetObject(neutronAnimationController)
             neutronAnimation.setPropertyName(b"distance")
