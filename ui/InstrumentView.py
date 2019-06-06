@@ -67,14 +67,14 @@ class InstrumentView(QWidget):
         self.cameraSelectorGnomon = Qt3DRender.QCameraSelector(self.layerFilterGnomon)
         self.clearBuffersGnomon = Qt3DRender.QClearBuffers(self.cameraSelectorGnomon)
 
-        self.otherCamera = Qt3DRender.QCamera()
-        self.otherCamera.setParent(self.gnomonRootEntity)
-        self.otherCamera.setProjectionType(componentCameraEntity.projectionType())
-        self.otherCamera.setFieldOfView(componentCameraEntity.fieldOfView())
-        self.otherCamera.setNearPlane(0.1)
-        self.otherCamera.setFarPlane(10)
-        self.otherCamera.setUpVector(componentCameraEntity.upVector())
-        self.otherCamera.setViewCenter(QVector3D(0,0,0))
+        self.gnomonCameraEntity = Qt3DRender.QCamera()
+        self.gnomonCameraEntity.setParent(self.gnomonRootEntity)
+        self.gnomonCameraEntity.setProjectionType(componentCameraEntity.projectionType())
+        self.gnomonCameraEntity.setFieldOfView(componentCameraEntity.fieldOfView())
+        self.gnomonCameraEntity.setNearPlane(0.1)
+        self.gnomonCameraEntity.setFarPlane(10)
+        self.gnomonCameraEntity.setUpVector(componentCameraEntity.upVector())
+        self.gnomonCameraEntity.setViewCenter(QVector3D(0, 0, 0))
         # self.otherCamera.setTop(2)
 
         # self.otherCamera.setFarPlane(10)
@@ -83,7 +83,7 @@ class InstrumentView(QWidget):
         gnomonCamPosition *= 3
 
         print(gnomonCamPosition)
-        self.otherCamera.setPosition(gnomonCamPosition)
+        self.gnomonCameraEntity.setPosition(gnomonCamPosition)
 
         # self.otherCamera.setPosition(QVector3D(0,0,0.0001))
 
@@ -92,13 +92,13 @@ class InstrumentView(QWidget):
         gnomonCamController.setAcceleration(0)
         gnomonCamController.setDeceleration(0)
         # gnomonCamController.setLinearSpeed(0)
-        gnomonCamController.setLookSpeed(0)
+        # gnomonCamController.setLookSpeed(0)
         # gnomonCamController.set
-        gnomonCamController.setCamera(self.otherCamera)
+        gnomonCamController.setCamera(self.gnomonCameraEntity)
 
         print(componentCamController.linearSpeed())
 
-        self.cameraSelectorGnomon.setCamera(self.otherCamera)
+        self.cameraSelectorGnomon.setCamera(self.gnomonCameraEntity)
 
         self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
         # self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.LessOr)
@@ -107,6 +107,7 @@ class InstrumentView(QWidget):
     def create_materials(self):
 
         red = QColor("red")
+        green = QColor("green")
         black = QColor("black")
         grey = QColor("grey")
         blue = QColor("blue")
