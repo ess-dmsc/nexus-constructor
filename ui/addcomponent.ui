@@ -97,6 +97,13 @@
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
+            <widget class="QRadioButton" name="noGeometryRadioButton">
+             <property name="text">
+              <string>No Geometry</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QRadioButton" name="meshRadioButton">
              <property name="text">
               <string>Mesh</string>
@@ -110,13 +117,6 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QRadioButton" name="noGeometryRadioButton">
-             <property name="text">
-              <string>No Geometry</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -125,8 +125,15 @@
           <property name="title">
            <string>Geometry options:</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,1">
+           <item row="4" column="0">
+            <widget class="QGroupBox" name="pixelOptionsBox">
+             <property name="title">
+              <string>Pixel options</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
             <widget class="QGroupBox" name="geometryFileBox">
              <property name="title">
               <string>Geometry file</string>
@@ -145,7 +152,7 @@
              </layout>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="3" column="0">
             <widget class="QGroupBox" name="cylinderOptionsBox">
              <property name="title">
               <string>Cylinder options</string>
@@ -204,7 +211,7 @@
              </layout>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item row="0" column="0">
             <widget class="QGroupBox" name="unitsbox">
              <property name="title">
               <string>Units</string>
@@ -228,13 +235,6 @@
                </widget>
               </item>
              </layout>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QGroupBox" name="pixelOptionsBox">
-             <property name="title">
-              <string>Pixel options</string>
-             </property>
             </widget>
            </item>
           </layout>
