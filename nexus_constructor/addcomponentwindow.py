@@ -37,8 +37,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.buttonBox.button(QDialogButtonBox.Ok).clicked.connect(self.on_ok)
 
         # Grey out OK button by default to prevent users from adding components with invalid fields
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         # TODO: enable this when all fields are valid
+        # self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
 
         # Set default URL to nexus base classes in web view
         self.webEngineView.setUrl(
