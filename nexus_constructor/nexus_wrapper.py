@@ -51,6 +51,7 @@ class NexusWrapper(QObject):
             self._emit_file()
 
     def add_component(self, component_type, component_name, description, geometry):
+        component_name = component_name.replace(" ", "_")
         self.components_list_model.add_component(
             component_type=component_type,
             description=description,

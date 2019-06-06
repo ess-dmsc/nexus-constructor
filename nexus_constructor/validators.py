@@ -32,27 +32,25 @@ class UnitValidator(QValidator):
             AttributeError,
             pint.compat.tokenize.TokenError,
         ):
-            self.validationFailed.emit()
+            self.isValid.emit(False)
             return QValidator.Intermediate
 
         # Attempt to find 1 metre in terms of the unit. This will ensure that it's a length.
         try:
             self.ureg.metre.from_(unit)
         except (pint.errors.DimensionalityError, ValueError):
-            self.validationFailed.emit()
+            self.isValid.emit(False)
             return QValidator.Intermediate
 
         # Reject input in the form of "2 metres," "40 cm," etc
         if unit.magnitude != 1:
-            self.validationFailed.emit()
+            self.isValid.emit(False)
             return QValidator.Intermediate
 
-        self.validationSuccess.emit()
+        self.isValid.emit(True)
         return QValidator.Acceptable
 
-    # Create signals because the QML LabeledTextField doesn't have "onAccepted"
-    validationSuccess = Signal()
-    validationFailed = Signal()
+    isValid = Signal(bool)
 
 
 class ValidatorOnListModel(QValidator):
@@ -193,6 +191,9 @@ class NameValidator(ValidatorOnListModel):
         super().__init__()
 
     def validate(self, input: str, pos: int):
+        if not input:
+            self.isValid.emit(False)
+            return QValidator.Intermediate
         name_role = Qt.DisplayRole
         for role, name in self.list_model.roleNames().items():
             if name == b"name":
@@ -203,10 +204,10 @@ class NameValidator(ValidatorOnListModel):
                 index = self.list_model.createIndex(i, 0)
                 name_at_index = self.list_model.data(index, name_role)
                 if name_at_index == input:
-                    self.validationFailed.emit()
-                    return QValidator.Invalid
+                    self.isValid.emit(False)
+                    return QValidator.Intermediate
 
-        self.validationSuccess.emit()
+        self.isValid.emit(True)
         return QValidator.Acceptable
 
-    validationSuccess = Signal()
+    isValid = Signal(bool)

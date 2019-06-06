@@ -9,7 +9,7 @@ from nexus_constructor.qml_models.geometry_models import (
 )
 from ui.addcomponent import Ui_AddComponentDialog
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
-from nexus_constructor.validators import UnitValidator
+from nexus_constructor.validators import UnitValidator, NameValidator
 from nexus_constructor.nexus_wrapper import NexusWrapper
 from nexus_constructor.utils import file_dialog
 import os
@@ -56,11 +56,19 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.noGeometryRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
+        name_validator = NameValidator()
+        name_validator.list_model = self.nexus_wrapper.get_component_list()
+        self.nameLineEdit.setValidator(name_validator)
+        self.nameLineEdit.validator().isValid.connect(self.validate_name)
+
         self.unitsLineEdit.setValidator(UnitValidator())
-        self.unitsLineEdit.validator().validationSuccess.connect(self.tick_check_box)
-        self.unitsLineEdit.validator().validationFailed.connect(self.untick_check_box)
+        self.unitsLineEdit.validator().isValid.connect(self.validate_units)
 
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
+
+    def validate_name(self, is_valid: bool):
+        colour = "#FFFFFF" if is_valid else "#f6989d"
+        self.nameLineEdit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
 
     def on_component_type_change(self):
         self.webEngineView.setUrl(
@@ -69,13 +77,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
             )
         )
 
-    def tick_check_box(self):
-        self.ticklabel.setText("✅")
-        self.ticklabel.setToolTip("Unit valid")
-
-    def untick_check_box(self):
-        self.ticklabel.setText("❌")
-        self.ticklabel.setToolTip("Unit not valid")
+    def validate_units(self, is_valid):
+        self.ticklabel.setText("✅" if is_valid else "❌")
+        self.ticklabel.setToolTip("Unit valid" if is_valid else "Unit not valid")
 
     def mesh_file_picker(self):
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
@@ -117,7 +121,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def on_ok(self):
         component_type = self.componentTypeComboBox.currentText()
-        component_name = self.nameLineEdit.text().replace(" ", "_")
+        component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
         self.nexus_wrapper.add_component(
             component_type, component_name, description, self.generate_geometry_model()
