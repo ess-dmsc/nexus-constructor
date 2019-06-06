@@ -1,46 +1,23 @@
-import h5py
-from PySide2.QtWidgets import QDialog, QFileDialog
-
+from PySide2.QtWidgets import QDialog
+from nexus_constructor.nexus_wrapper import NexusWrapper
 from nexus_constructor.addcomponentwindow import AddComponentDialog
-from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
+from nexus_constructor.utils import file_dialog
 from ui.mainwindow import Ui_MainWindow
 import silx.gui.hdf5
 
 
-from nexus_constructor.qml_models import instrument_model
 from nexus_constructor.nexus_filewriter_json import writer
 
 NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
 
 
-def set_up_in_memory_nexus_file():
-    return h5py.File("nexus-constructor", mode="x", driver="core", backing_store=False)
-
-
 class MainWindow(Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, nexus_wrapper: NexusWrapper):
         super().__init__()
-        self.nexus_file = set_up_in_memory_nexus_file()
-        self.entry_group = self.nexus_file.create_group("entry")
-        self.entry_group.attrs["NX_class"] = "NXentry"
-        self.instrument_group = self.entry_group.create_group("instrument")
-        self.instrument_group.attrs["NX_class"] = "NXinstrument"
-
-        self.components_list_model = instrument_model.InstrumentModel()
-        self.components_list_model.initialise(self.entry_group)
+        self.nexus_wrapper = nexus_wrapper
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
-
-        self.addWindow = QDialog()
-        self.addWindow.ui = AddComponentDialog(
-            self.entry_group, self.components_list_model
-        )
-        self.addWindow.ui.setupUi(self.addWindow)
-
-        # reset defaults when closed
-        self.addWindow.ui.buttonBox.rejected.connect(self.reset_component_window)
-        # TODO: get the "x" button to call this function too
 
         self.pushButton.clicked.connect(self.show_add_component_window)
         self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
@@ -53,74 +30,38 @@ class MainWindow(Ui_MainWindow):
         self.widget.setAcceptDrops(True)
         self.widget.setDragEnabled(True)
         self.treemodel = self.widget.findHdf5TreeModel()
-        self.treemodel.insertH5pyObject(self.nexus_file)
+        self.treemodel.insertH5pyObject(self.nexus_wrapper.nexus_file)
         self.treemodel.setDatasetDragEnabled(True)
         self.treemodel.setFileDropEnabled(True)
         self.treemodel.setFileMoveEnabled(True)
         self.verticalLayout.addWidget(self.widget)
-        self.listView.setModel(self.components_list_model)
+        self.listView.setModel(self.nexus_wrapper.get_component_list())
 
         self.widget.setVisible(True)
 
-    def reset_component_window(self):
-        self.addWindow = QDialog()
-        self.addWindow.ui = AddComponentDialog(
-            self.entry_group, self.components_list_model
-        )
-        self.addWindow.ui.setupUi(self.addWindow)
+    def update_nexus_file_structure_view(self):
+        # update the view here
+        pass
 
     def save_to_nexus_file(self):
-        options = QFileDialog.Options()
-        options |= FILE_DIALOG_NATIVE
-        fileName, _ = QFileDialog.getSaveFileName(
-            parent=None,
-            caption="QFileDialog.getSaveFileName()",
-            directory="",
-            filter=f"{NEXUS_FILE_TYPES};;All Files (*)",
-            options=options,
-        )
-        if fileName:
-            print(fileName)
-            file = h5py.File(fileName, mode="x")
-            try:
-                file.copy(source=self.nexus_file["/entry/"], dest="/entry/")
-                print("Saved to NeXus file")
-            except ValueError as e:
-                print(f"File writing failed: {e}")
+        filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
+        self.nexus_wrapper.save_file(filename)
 
     def save_to_filewriter_json(self):
-        options = QFileDialog.Options()
-        options |= FILE_DIALOG_NATIVE
-        fileName, _ = QFileDialog.getSaveFileName(
-            parent=None,
-            caption="QFileDialog.getSaveFileName()",
-            directory="",
-            filter="JSON Files (*.json);;All Files (*)",
-            options=options,
-        )
-        if fileName:
-            with open(fileName, "w") as file:
-                file.write(writer.generate_json(self.components_list_model))
+        filename = file_dialog(True, "Save JSON File", "JSON Files (*.json)")
+        self.nexus_wrapper.save_file(filename)
+        if filename:
+            with open(filename, "w") as file:
+                file.write(
+                    writer.generate_json(self.nexus_wrapper.get_component_list())
+                )
 
     def open_nexus_file(self):
-        options = QFileDialog.Options()
-
-        options |= FILE_DIALOG_NATIVE
-        fileName, _ = QFileDialog.getOpenFileName(
-            parent=None,
-            caption="QFileDialog.getOpenFileName()",
-            directory="",
-            filter=f"{NEXUS_FILE_TYPES};;All Files (*)",
-            options=options,
-        )
-        if fileName:
-            print(fileName)
-            self.nexus_file = h5py.File(
-                fileName, mode="r", backing_store=False, driver="core"
-            )
-            self.widget.findHdf5TreeModel().clear()
-            self.widget.findHdf5TreeModel().insertH5pyObject(self.nexus_file)
-            print("NeXus file loaded")
+        filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
+        self.nexus_wrapper.open_file(filename)
 
     def show_add_component_window(self):
-        self.addWindow.exec()
+        add_window = QDialog()
+        add_window.ui = AddComponentDialog(self.nexus_wrapper)
+        add_window.ui.setupUi(add_window)
+        add_window.exec()
