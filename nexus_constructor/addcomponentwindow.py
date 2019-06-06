@@ -57,8 +57,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
         # Set default geometry type to mesh and show the related mesh fields such as geometry file etc.
-        self.meshRadioButton.setChecked(True)
-        self.show_mesh_fields()
+        self.noGeometryRadioButton.setChecked(True)
+        self.show_no_geometry_fields()
 
         self.unitsLineEdit.setValidator(self.units_validator)
         self.unitsLineEdit.validator().validationSuccess.connect(self.tick_check_box)
