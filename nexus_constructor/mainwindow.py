@@ -8,7 +8,8 @@ import silx.gui.hdf5
 
 from nexus_constructor.nexus_filewriter_json import writer
 
-NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
+NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
+JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
 class MainWindow(Ui_MainWindow):
@@ -49,7 +50,7 @@ class MainWindow(Ui_MainWindow):
         self.nexus_wrapper.save_file(filename)
 
     def save_to_filewriter_json(self):
-        filename = file_dialog(True, "Save JSON File", "JSON Files (*.json)")
+        filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
         self.nexus_wrapper.save_file(filename)
         if filename:
             with open(filename, "w") as file:
