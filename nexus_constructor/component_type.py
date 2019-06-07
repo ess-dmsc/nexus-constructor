@@ -45,7 +45,7 @@ def make_dictionary_of_class_definitions(
                 try:
                     for field in fields:
                         class_definitions[nx_class_name].append(field["@name"])
-                except:
+                except Exception as e:
                     class_definitions[nx_class_name].append(fields["@name"])
             except KeyError:
                 # TODO: No key called "field"
