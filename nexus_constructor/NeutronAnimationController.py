@@ -3,35 +3,37 @@ from PySide2.QtGui import QMatrix4x4, QVector3D
 
 
 class NeutronAnimationController(QObject):
-    def __init__(self, xOffset, yOffset, parent):
+    def __init__(self, x_offset, y_offset, parent):
         super(NeutronAnimationController, self).__init__(parent)
         self._target = None
         self._matrix = QMatrix4x4()
-        self._xOffset = xOffset
-        self._yOffset = yOffset
+        self._x_offset = x_offset
+        self._y_offset = y_offset
         self._distance = 0
 
-    def setTarget(self, t):
+    def set_target(self, t):
         self._target = t
 
-    def getTarget(self):
+    def get_target(self):
         return self._target
 
-    def setDistance(self, distance):
+    def set_distance(self, distance):
         self._distance = distance
-        self.updateMatrix()
+        self.update_matrix()
         self.distanceChanged.emit()
 
-    def getDistance(self):
+    def get_distance(self):
         return self._distance
 
-    def updateMatrix(self):
+    def update_matrix(self):
         self._matrix.setToIdentity()
-        self._matrix.translate(QVector3D(self._xOffset, self._yOffset, self._distance))
+        self._matrix.translate(
+            QVector3D(self._x_offset, self._y_offset, self._distance)
+        )
         self._matrix.scale(0.1)
 
         if self._target is not None:
             self._target.setMatrix(self._matrix)
 
     distanceChanged = Signal()
-    distance = Property(float, getDistance, setDistance, notify=distanceChanged)
+    distance = Property(float, get_distance, set_distance, notify=distanceChanged)
