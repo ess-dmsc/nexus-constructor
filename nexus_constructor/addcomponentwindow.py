@@ -57,9 +57,6 @@ class GeometryType(Enum):
     MESH = 3
 
 
-
-
-
 class OkValidator(QObject):
     """
     Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
