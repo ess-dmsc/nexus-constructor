@@ -12,9 +12,10 @@ from ui.addcomponent import Ui_AddComponentDialog
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.validators import UnitValidator, NameValidator
 from nexus_constructor.nexus_wrapper import NexusWrapper
-from nexus_constructor.utils import file_dialog
+from nexus_constructor.utils import file_dialog, validate_line_edit
 import os
 from functools import partial
+
 
 GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
 
@@ -56,15 +57,7 @@ class GeometryType(Enum):
     MESH = 3
 
 
-def validate_line_edit(line_edit, is_valid: bool):
-    """
-    Sets the line edit colour to red if field is invalid or white if valid
-    :param line_edit: The line edit object to apply the validation to.
-    :param is_valid: Whether the line edit field contains valid text
-    :return: None.
-    """
-    colour = "#FFFFFF" if is_valid else "#f6989d"
-    line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
+
 
 
 class OkValidator(QObject):
@@ -188,7 +181,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.unitsLineEdit.setValidator(UnitValidator())
         self.unitsLineEdit.validator().isValid.connect(
-            partial(validate_line_edit, self.unitsLineEdit)
+            partial(
+                validate_line_edit,
+                self.unitsLineEdit,
+                tooltip_on_reject="Units not valid",
+                tooltip_on_accept="Units Valid",
+            )
         )
         self.unitsLineEdit.validator().isValid.connect(
             self.ok_validator.set_units_valid
