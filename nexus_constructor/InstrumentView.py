@@ -43,13 +43,12 @@ class InstrumentView(QWidget):
         self.neutron_animation_controllers = []
         self.neutron_animations = []
 
-        for i in range(self.num_neutrons):
-            self.neutron_entities.append(Qt3DCore.QEntity())
-            self.neutron_meshes.append()
+        self.num_neutrons = 9
 
         # Initialise beam objects
         self.cylinder_entity = Qt3DCore.QEntity(self.rootEntity)
         self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
+        self.cylinder_transform = Qt3DCore.QTransform()
         self.cylinder_length = 40
 
         self.initialise_view()
@@ -101,31 +100,31 @@ class InstrumentView(QWidget):
         cylinder_matrix.rotate(270, QVector3D(1, 0, 0))
         cylinder_matrix.translate(QVector3D(0, 20, 0))
 
-        self.cylinderTransform = Qt3DCore.QTransform()
-        self.cylinderTransform.setMatrix(cylinder_matrix)
+        self.cylinder_transform.setMatrix(cylinder_matrix)
 
         self.cylinder_entity.addComponent(self.cylinder_mesh)
         self.cylinder_entity.addComponent(self.beam_material)
-        self.cylinder_entity.addComponent(self.cylinderTransform)
+        self.cylinder_entity.addComponent(self.cylinder_transform)
 
     def create_neutrons(self):
         """
         Creates the neutron animations.
         """
         # Create lists of x, y, and time offsets for the neutron animations
-        x_offsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
-        y_offsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
-        time_span_offsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
+        xOffsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
+        yOffsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
+        timeSpanOffsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
 
         for i in range(9):
 
             # Create the neutron mesh and entity
-
+            neutronEntity = Qt3DCore.QEntity(self.rootEntity)
+            neutronMesh = Qt3DExtras.QSphereMesh()
             neutronMesh.setRadius(3)
 
             neutronTransform = Qt3DCore.QTransform()
             neutronAnimationController = NeutronAnimationController(
-                x_offsets[i], y_offsets[i], neutronTransform
+                xOffsets[i], yOffsets[i], neutronTransform
             )
             neutronAnimationController.setTarget(neutronTransform)
 
@@ -133,9 +132,9 @@ class InstrumentView(QWidget):
             neutronAnimation = QPropertyAnimation(neutronTransform)
             neutronAnimation.setTargetObject(neutronAnimationController)
             neutronAnimation.setPropertyName(b"distance")
-            neutronAnimation.setStartValue(-self.cylinder_length)
+            neutronAnimation.setStartValue(-40)
             neutronAnimation.setEndValue(0)
-            neutronAnimation.setDuration(500 + time_span_offsets[i])
+            neutronAnimation.setDuration(500 + timeSpanOffsets[i])
             neutronAnimation.setLoopCount(-1)
             neutronAnimation.start()
 
