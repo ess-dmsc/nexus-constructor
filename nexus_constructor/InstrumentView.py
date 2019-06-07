@@ -7,7 +7,7 @@ from nexus_constructor.NeutronAnimationController import NeutronAnimationControl
 
 
 class InstrumentView(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
         lay = QVBoxLayout(self)
         self.view = Qt3DExtras.Qt3DWindow()

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1263</width>
+    <width>1271</width>
     <height>712</height>
    </rect>
   </property>
@@ -65,7 +65,7 @@
        </widget>
       </item>
       <item row="0" column="1" colspan="2">
-       <widget class="QWidget" name="sceneWidget" native="true">
+       <widget class="InstrumentView" name="sceneWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>1</horstretch>
@@ -89,13 +89,13 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1263</width>
-     <height>19</height>
+     <width>1271</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Fi&amp;le</string>
     </property>
     <addaction name="actionOpen_NeXus_file"/>
     <addaction name="actionExport_to_NeXus_file"/>
@@ -106,20 +106,28 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_NeXus_file">
    <property name="text">
-    <string>Open NeXus file</string>
+    <string>&amp;Open NeXus file</string>
    </property>
   </action>
   <action name="actionExport_to_NeXus_file">
    <property name="text">
-    <string>Export to NeXus file</string>
+    <string>&amp;Export to NeXus file</string>
    </property>
   </action>
   <action name="actionExport_to_Filewriter_JSON">
    <property name="text">
-    <string>Export to Filewriter JSON</string>
+    <string>Export to &amp;Filewriter JSON</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>InstrumentView</class>
+   <extends>QWidget</extends>
+   <header>nexus_constructor/InstrumentView.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
