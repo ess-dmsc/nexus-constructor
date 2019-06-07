@@ -31,20 +31,12 @@ build_exe_options = {
 }
 
 unix_removable = [
-    "lib/PySide2/Qt/lib/libQt5WebEngine.so.5",
-    "lib/PySide2/Qt/lib/libQt5WebEngineCore.so.5",
-    "lib/PySide2/Qt/lib/libQt5WebEngineWidgets.so.5",
-    "lib/PySide2/QtWidgets.abi3.so",
     "lib/PySide2/libclang.so.6",
     "lib/PySide2/Qt/resources/",
     "lib/PySide2/Qt/translations/",
 ]
 
 win_removable = [
-    "lib/PySide2/Qt5WebEngine.dll",
-    "lib/PySide2/Qt5WebEngineCore.dll",
-    "lib/PySide2/Qt5WebEngineWidgets.dll",
-    "lib/PySide2/QtWidgets.pyd",
     "lib/PySide2/libclang.dll",
     "lib/PySide2/resources/",
     "lib/PySide2/translations/",
