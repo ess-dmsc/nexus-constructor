@@ -57,7 +57,6 @@ class MainWindow(Ui_MainWindow):
         self.treemodel.setFileMoveEnabled(True)
         self.verticalLayout.addWidget(self.widget)
         self.listView.setModel(self.components_list_model)
-        self.instrumentView = InstrumentView()
 
         self.widget.setVisible(True)
 
