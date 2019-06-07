@@ -51,7 +51,7 @@ builders = pipeline_builder.createBuilders { container ->
     pipeline_builder.stage("Check formatting") {
         container.sh """
             cd ${project}
-            build_env/bin/python -m black . --check --exclude=build_env/
+            build_env/bin/python -m black . --check 
         """
     } // stage
     
