@@ -20,7 +20,7 @@ class NeutronAnimationController(QObject):
     def set_distance(self, distance):
         self._distance = distance
         self.update_matrix()
-        self.distanceChanged.emit()
+        self.distance_changed.emit()
 
     def get_distance(self):
         return self._distance
@@ -35,5 +35,5 @@ class NeutronAnimationController(QObject):
         if self._target is not None:
             self._target.setMatrix(self._matrix)
 
-    distanceChanged = Signal()
-    distance = Property(float, get_distance, set_distance, notify=distanceChanged)
+    distance_changed = Signal()
+    distance = Property(float, get_distance, set_distance, notify=distance_changed)

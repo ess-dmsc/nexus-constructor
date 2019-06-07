@@ -63,17 +63,17 @@ class InstrumentView(QWidget):
         black = QColor("black")
         grey = QColor("grey")
         blue = QColor("blue")
-        lightblue = QColor("lightblue")
-        darkred = QColor("#b00")
+        light_blue = QColor("lightblue")
+        dark_red = QColor("#b00")
 
         self.grey_material.setAmbient(black)
         self.grey_material.setDiffuse(grey)
 
         self.red_material.setAmbient(red)
-        self.red_material.setDiffuse(darkred)
+        self.red_material.setDiffuse(dark_red)
 
         self.beam_material.setAmbient(blue)
-        self.beam_material.setDiffuse(lightblue)
+        self.beam_material.setDiffuse(light_blue)
         self.beam_material.setAlpha(0.5)
 
         self.green_material.setAmbient(grey)
