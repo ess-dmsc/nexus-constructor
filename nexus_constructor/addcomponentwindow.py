@@ -187,7 +187,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.nameLineEdit.validator().isValid.connect(self.ok_validator.set_name_valid)
 
         self.unitsLineEdit.setValidator(UnitValidator())
-        self.unitsLineEdit.validator().isValid.connect(partial(validate_line_edit, self.unitsLineEdit))
+        self.unitsLineEdit.validator().isValid.connect(
+            partial(validate_line_edit, self.unitsLineEdit)
+        )
         self.unitsLineEdit.validator().isValid.connect(
             self.ok_validator.set_units_valid
         )
