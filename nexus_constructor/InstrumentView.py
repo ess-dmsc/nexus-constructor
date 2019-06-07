@@ -118,19 +118,19 @@ class InstrumentView(QWidget):
         for i in range(9):
 
             # Create the neutron mesh and entity
-            neutronEntity = Qt3DCore.QEntity(self.rootEntity)
-            neutronMesh = Qt3DExtras.QSphereMesh()
-            neutronMesh.setRadius(3)
+            neutron_entity = Qt3DCore.QEntity(self.rootEntity)
+            neutron_mesh = Qt3DExtras.QSphereMesh()
+            neutron_mesh.setRadius(3)
 
-            neutronTransform = Qt3DCore.QTransform()
-            neutronAnimationController = NeutronAnimationController(
-                xOffsets[i], yOffsets[i], neutronTransform
+            neutron_transform = Qt3DCore.QTransform()
+            neutron_animation_controller = NeutronAnimationController(
+                xOffsets[i], yOffsets[i], neutron_transform
             )
-            neutronAnimationController.setTarget(neutronTransform)
+            neutron_animation_controller.setTarget(neutron_transform)
 
             # Instruct the NeutronAnimationController to move the neutron along the z-axis from -40 to 0
-            neutronAnimation = QPropertyAnimation(neutronTransform)
-            neutronAnimation.setTargetObject(neutronAnimationController)
+            neutronAnimation = QPropertyAnimation(neutron_transform)
+            neutronAnimation.setTargetObject(neutron_animation_controller)
             neutronAnimation.setPropertyName(b"distance")
             neutronAnimation.setStartValue(-40)
             neutronAnimation.setEndValue(0)
@@ -138,15 +138,15 @@ class InstrumentView(QWidget):
             neutronAnimation.setLoopCount(-1)
             neutronAnimation.start()
 
-            self.neutron_entities.append(neutronEntity)
-            self.neutron_meshes.append(neutronMesh)
-            self.neutron_transforms.append(neutronTransform)
-            self.neutron_animation_controllers.append(neutronAnimationController)
+            self.neutron_entities.append(neutron_entity)
+            self.neutron_meshes.append(neutron_mesh)
+            self.neutron_transforms.append(neutron_transform)
+            self.neutron_animation_controllers.append(neutron_animation_controller)
             self.neutron_animations.append(neutronAnimation)
 
-            neutronEntity.addComponent(neutronMesh)
-            neutronEntity.addComponent(self.grey_material)
-            neutronEntity.addComponent(neutronTransform)
+            neutron_entity.addComponent(neutron_mesh)
+            neutron_entity.addComponent(self.grey_material)
+            neutron_entity.addComponent(neutron_transform)
 
     def initialise_view(self):
 
