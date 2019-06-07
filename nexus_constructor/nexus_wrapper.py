@@ -3,7 +3,7 @@ import h5py
 from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
 
-COMPS_IN_ENTRY = ["NXdetector", "NXsample"]
+COMPS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
 
 def set_up_in_memory_nexus_file(filename):
