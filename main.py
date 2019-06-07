@@ -12,7 +12,6 @@ import silx.gui.hdf5
 
 from nexus_constructor.qml_models import instrument_model
 from nexus_constructor.nexus_filewriter_json import writer
-from nexus_constructor.InstrumentView import InstrumentView
 
 NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
 

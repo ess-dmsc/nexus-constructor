@@ -20,11 +20,37 @@ class InstrumentView(QWidget):
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
 
         self.rootEntity = Qt3DCore.QEntity()
-        cameraEntity = self.view.camera()
-        camController = Qt3DExtras.QFirstPersonCameraController(self.rootEntity)
-        camController.setLinearSpeed(20)
-        camController.setCamera(cameraEntity)
+        camera_entity = self.view.camera()
+        cam_controller = Qt3DExtras.QFirstPersonCameraController(self.rootEntity)
+        cam_controller.setLinearSpeed(20)
+        cam_controller.setCamera(camera_entity)
         self.view.setRootEntity(self.rootEntity)
+
+        # Initialise materials
+        self.grey_material = Qt3DExtras.QPhongMaterial()
+        self.red_material = Qt3DExtras.QPhongMaterial()
+        self.beam_material = Qt3DExtras.QPhongAlphaMaterial()
+        self.green_material = Qt3DExtras.QPhongMaterial()
+
+        # Initialise cube objects
+        self.cube_entity = Qt3DCore.QEntity(self.rootEntity)
+        self.cube_mesh = Qt3DExtras.QCuboidMesh()
+
+        # Create lists for neutron-related objects
+        self.neutron_entities = []
+        self.neutron_meshes = []
+        self.neutron_transforms = []
+        self.neutron_animation_controllers = []
+        self.neutron_animations = []
+
+        for i in range(self.num_neutrons):
+            self.neutron_entities.append(Qt3DCore.QEntity())
+            self.neutron_meshes.append()
+
+        # Initialise beam objects
+        self.cylinder_entity = Qt3DCore.QEntity(self.rootEntity)
+        self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
+        self.cylinder_length = 40
 
         self.initialise_view()
 
@@ -39,20 +65,16 @@ class InstrumentView(QWidget):
         lightblue = QColor("lightblue")
         darkred = QColor("#b00")
 
-        self.grey_material = Qt3DExtras.QPhongMaterial()
         self.grey_material.setAmbient(black)
         self.grey_material.setDiffuse(grey)
 
-        self.red_material = Qt3DExtras.QPhongMaterial()
         self.red_material.setAmbient(red)
         self.red_material.setDiffuse(darkred)
 
-        self.beam_material = Qt3DExtras.QPhongAlphaMaterial()
         self.beam_material.setAmbient(blue)
         self.beam_material.setDiffuse(lightblue)
         self.beam_material.setAlpha(0.5)
 
-        self.green_material = Qt3DExtras.QPhongMaterial()
         self.green_material.setAmbient(grey)
         self.green_material.setDiffuse(grey)
 
@@ -60,61 +82,50 @@ class InstrumentView(QWidget):
         """
         Creates the initial sample cube.
         """
-        self.cubeEntity = Qt3DCore.QEntity(self.rootEntity)
-        self.cubeMesh = Qt3DExtras.QCuboidMesh()
-        self.cubeMesh.setXExtent(1)
-        self.cubeMesh.setYExtent(1)
-        self.cubeMesh.setZExtent(1)
+        self.cube_mesh.setXExtent(1)
+        self.cube_mesh.setYExtent(1)
+        self.cube_mesh.setZExtent(1)
 
-        self.cubeEntity.addComponent(self.cubeMesh)
-        self.cubeEntity.addComponent(self.red_material)
+        self.cube_entity.addComponent(self.cube_mesh)
+        self.cube_entity.addComponent(self.red_material)
 
     def create_beam_cylinder(self):
         """
         Creates the initial beam cylinder.
         """
-        self.cylinderEntity = Qt3DCore.QEntity(self.rootEntity)
-        self.cylinderMesh = Qt3DExtras.QCylinderMesh()
-        self.cylinderMesh.setRadius(2.5)
-        self.cylinderMesh.setLength(40)
-        self.cylinderMesh.setRings(2)
+        self.cylinder_mesh.setRadius(2.5)
+        self.cylinder_mesh.setLength(self.cylinder_length)
+        self.cylinder_mesh.setRings(2)
 
-        cylinderMatrix = QMatrix4x4()
-        cylinderMatrix.rotate(270, QVector3D(1, 0, 0))
-        cylinderMatrix.translate(QVector3D(0, 20, 0))
+        cylinder_matrix = QMatrix4x4()
+        cylinder_matrix.rotate(270, QVector3D(1, 0, 0))
+        cylinder_matrix.translate(QVector3D(0, 20, 0))
 
         self.cylinderTransform = Qt3DCore.QTransform()
-        self.cylinderTransform.setMatrix(cylinderMatrix)
+        self.cylinderTransform.setMatrix(cylinder_matrix)
 
-        self.cylinderEntity.addComponent(self.cylinderMesh)
-        self.cylinderEntity.addComponent(self.beam_material)
-        self.cylinderEntity.addComponent(self.cylinderTransform)
+        self.cylinder_entity.addComponent(self.cylinder_mesh)
+        self.cylinder_entity.addComponent(self.beam_material)
+        self.cylinder_entity.addComponent(self.cylinderTransform)
 
     def create_neutrons(self):
         """
         Creates the neutron animations.
         """
-        self.neutronEntities = []
-        self.neutronMeshes = []
-        self.neutronTransforms = []
-        self.neutronAnimationControllers = []
-        self.neutronAnimations = []
-
         # Create lists of x, y, and time offsets for the neutron animations
-        xOffsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
-        yOffsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
-        timeSpanOffsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
+        x_offsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
+        y_offsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
+        time_span_offsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
 
         for i in range(9):
 
             # Create the neutron mesh and entity
-            neutronEntity = Qt3DCore.QEntity(self.rootEntity)
-            neutronMesh = Qt3DExtras.QSphereMesh()
+
             neutronMesh.setRadius(3)
 
             neutronTransform = Qt3DCore.QTransform()
             neutronAnimationController = NeutronAnimationController(
-                xOffsets[i], yOffsets[i], neutronTransform
+                x_offsets[i], y_offsets[i], neutronTransform
             )
             neutronAnimationController.setTarget(neutronTransform)
 
@@ -122,17 +133,17 @@ class InstrumentView(QWidget):
             neutronAnimation = QPropertyAnimation(neutronTransform)
             neutronAnimation.setTargetObject(neutronAnimationController)
             neutronAnimation.setPropertyName(b"distance")
-            neutronAnimation.setStartValue(-40)
+            neutronAnimation.setStartValue(-self.cylinder_length)
             neutronAnimation.setEndValue(0)
-            neutronAnimation.setDuration(500 + timeSpanOffsets[i])
+            neutronAnimation.setDuration(500 + time_span_offsets[i])
             neutronAnimation.setLoopCount(-1)
             neutronAnimation.start()
 
-            self.neutronEntities.append(neutronEntity)
-            self.neutronMeshes.append(neutronMesh)
-            self.neutronTransforms.append(neutronTransform)
-            self.neutronAnimationControllers.append(neutronAnimationController)
-            self.neutronAnimations.append(neutronAnimation)
+            self.neutron_entities.append(neutronEntity)
+            self.neutron_meshes.append(neutronMesh)
+            self.neutron_transforms.append(neutronTransform)
+            self.neutron_animation_controllers.append(neutronAnimationController)
+            self.neutron_animations.append(neutronAnimation)
 
             neutronEntity.addComponent(neutronMesh)
             neutronEntity.addComponent(self.grey_material)
