@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'addcomponent.ui',
 # licensing of 'addcomponent.ui' applies.
 #
-# Created: Fri Jun  7 09:25:21 2019
+# Created: Fri Jun  7 15:28:57 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -158,9 +158,6 @@ class Ui_AddComponentDialog(object):
         self.unitsLineEdit.setPlaceholderText("")
         self.unitsLineEdit.setObjectName("unitsLineEdit")
         self.horizontalLayout_3.addWidget(self.unitsLineEdit)
-        self.ticklabel = QtWidgets.QLabel(self.unitsbox)
-        self.ticklabel.setObjectName("ticklabel")
-        self.horizontalLayout_3.addWidget(self.ticklabel)
         self.gridLayout_2.addWidget(self.unitsbox, 0, 0, 1, 1)
         self.gridLayout_2.setRowStretch(4, 1)
         self.verticalLayout_2.addWidget(self.geometryOptionsBox)
@@ -222,6 +219,5 @@ class Ui_AddComponentDialog(object):
         self.label_8.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Z:", None, -1))
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
-        self.ticklabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "✅", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
 

@@ -98,7 +98,7 @@ class OkValidator(QObject):
     def validate_ok(self):
         """
         Validates the fields in order to dictate whether the OK button should be disabled or enabled.
-        :return: None, but emites the isValid signal.
+        :return: None, but emits the isValid signal.
         """
         unacceptable = [
             not self.name_is_valid,
@@ -187,7 +187,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.nameLineEdit.validator().isValid.connect(self.ok_validator.set_name_valid)
 
         self.unitsLineEdit.setValidator(UnitValidator())
-        self.unitsLineEdit.validator().isValid.connect(self.validate_units)
+        self.unitsLineEdit.validator().isValid.connect(partial(validate_line_edit, self.unitsLineEdit))
         self.unitsLineEdit.validator().isValid.connect(
             self.ok_validator.set_units_valid
         )
@@ -200,15 +200,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
             )
         )
-
-    def validate_units(self, is_valid):
-        """
-        Sets the units label to a tick if valid or a cross if not.
-        :param is_valid: Whether the units are valid or not
-        :return: None.
-        """
-        self.ticklabel.setText("✅" if is_valid else "❌")
-        self.ticklabel.setToolTip("Unit valid" if is_valid else "Unit not valid")
 
     def mesh_file_picker(self):
         """
