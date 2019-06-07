@@ -45,6 +45,7 @@ builders = pipeline_builder.createBuilders { container ->
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
             build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
             build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
+            git submodule --init update
             """
     } // stage
     
@@ -110,7 +111,9 @@ return {
               scm_vars = checkout scm
             }  // stage
             stage("Setup") {
-                  bat """python -m pip install --user -r requirements.txt
+                  bat """
+                  git submodule --init update
+                  python -m pip install --user -r requirements.txt
                 """
             } // stage
             stage("Run tests") {
