@@ -6,12 +6,12 @@ from PySide2.QtCore import Signal, QObject
 COMPS_IN_ENTRY = ["NXdetector", "NXsample"]
 
 
-def set_up_in_memory_nexus_file():
+def set_up_in_memory_nexus_file(filename):
     """
     Creates an in-memory nexus-file to store the model data in.
     :return: The file object.
     """
-    return h5py.File("nexus-constructor", mode="x", driver="core", backing_store=False)
+    return h5py.File(filename, mode="x", driver="core", backing_store=False)
 
 
 class NexusWrapper(QObject):
@@ -23,9 +23,9 @@ class NexusWrapper(QObject):
     # Signal that indicates the nexus file has been changed in some way
     file_changed = Signal("QVariant")
 
-    def __init__(self):
+    def __init__(self, filename="nexus-constructor"):
         super().__init__()
-        self.nexus_file = set_up_in_memory_nexus_file()
+        self.nexus_file = set_up_in_memory_nexus_file(filename)
         self.entry_group = self.nexus_file.create_group("entry")
         self.entry_group.attrs["NX_class"] = "NXentry"
         self.instrument_group = self.entry_group.create_group("instrument")

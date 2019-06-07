@@ -63,7 +63,7 @@ class MainWindow(Ui_MainWindow):
         self.nexus_wrapper.open_file(filename)
 
     def show_add_component_window(self):
-        add_window = QDialog()
-        add_window.ui = AddComponentDialog(self.nexus_wrapper)
-        add_window.ui.setupUi(add_window)
-        add_window.exec()
+        self.add_window = QDialog()
+        self.add_window.ui = AddComponentDialog(self.nexus_wrapper)
+        self.add_window.ui.setupUi(self.add_window)
+        self.add_window.show()

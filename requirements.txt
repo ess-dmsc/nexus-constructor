@@ -2,6 +2,7 @@
 attrs
 pytest
 pytest-cov
+pytest-qt
 h5py
 flake8
 git+https://github.com/ess-dmsc/python-nexus-utilities@6f5d2c7f1ca66063227aad2a111a2cc567d573f6#egg=nexusutils
