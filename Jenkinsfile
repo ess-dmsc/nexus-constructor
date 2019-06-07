@@ -117,7 +117,7 @@ return {
                 """
             } // stage
             stage("Run tests") {
-                bat """python -m pytest . -s
+                bat """python -m pytest . -s --ignore=definitions
                 """
             } // stage
             if (env.CHANGE_ID) {
