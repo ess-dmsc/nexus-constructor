@@ -8,8 +8,8 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtGui, QtWidgets
-from ui.InstrumentView import InstrumentView
+from PySide2 import QtCore, QtWidgets
+from nexus_constructor.InstrumentView import InstrumentView
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

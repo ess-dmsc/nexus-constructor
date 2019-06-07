@@ -12,6 +12,7 @@ import silx.gui.hdf5
 
 from nexus_constructor.qml_models import instrument_model
 from nexus_constructor.nexus_filewriter_json import writer
+from nexus_constructor.InstrumentView import InstrumentView
 
 NEXUS_FILE_TYPES = "NeXus Files (*.nxs,*.nex,*.nx5)"
 
@@ -56,6 +57,7 @@ class MainWindow(Ui_MainWindow):
         self.treemodel.setFileMoveEnabled(True)
         self.verticalLayout.addWidget(self.widget)
         self.listView.setModel(self.components_list_model)
+        self.instrumentView = InstrumentView()
 
         self.widget.setVisible(True)
 
