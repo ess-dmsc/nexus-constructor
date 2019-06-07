@@ -8,7 +8,7 @@ def file_dialog(is_save, caption, filter):
     :param is_save: Whether the fial dialog should save or open files.
     :param caption: File dialog title.
     :param filter: A dict with keys being a string of the type of files and the value being a list of file extensions.
-    :return: The file path of the saved or opened file. 
+    :return: The file path of the saved or opened file.
     """
     filter_str = []
     for filetype, suffixes in filter.items():

@@ -3,9 +3,7 @@ from PySide2.QtWidgets import QMainWindow, QDialog
 from nexus_constructor.addcomponentwindow import validate_line_edit, AddComponentDialog
 from nexus_constructor.mainwindow import MainWindow
 from nexus_constructor.nexus_wrapper import NexusWrapper
-import os
 from PySide2.QtCore import Qt
-import pytest
 
 
 class DummyLineEdit:
