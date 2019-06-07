@@ -57,6 +57,10 @@ class GeometryType(Enum):
 
 
 class OkValidator(QObject):
+    """
+    Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
+    """
+
     def __init__(self, no_geometry_button, mesh_button):
         super().__init__()
         self.name_is_valid = False
@@ -81,6 +85,10 @@ class OkValidator(QObject):
         self.validate_ok()
 
     def validate_ok(self):
+        """
+        Validates the fields in order to dictate whether the OK button should be disabled or enabled.
+        :return: None, but emites the isValid signal.
+        """
         unacceptable = [
             not self.name_is_valid,
             not self.no_geometry_button.isChecked() and not self.units_are_valid,
@@ -90,6 +98,7 @@ class OkValidator(QObject):
         print("Is valid {}".format(unacceptable))
         self.isValid.emit(not any(unacceptable))
 
+    # Signal to indicate that the fields are valid or invalid. False: invalid.
     isValid = Signal(bool)
 
 
@@ -103,6 +112,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
     def setupUi(self, parent_dialog):
+        """ Sets up push buttons and validators for the add component window. """
         super().setupUi(parent_dialog)
 
         # Connect the button calls with functions
@@ -167,6 +177,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
     def validate_line_edit(self, line_edit, is_valid: bool):
+        """
+        Sets the line edit colour to red if field is invalid or white if valid
+        :param line_edit: The line edit object to apply the validation to.
+        :param is_valid: Whether the line edit field contains valid text
+        :return: None.
+        """
         colour = "#FFFFFF" if is_valid else "#f6989d"
         line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
 
@@ -178,10 +194,19 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
     def validate_units(self, is_valid):
+        """
+        Sets the units label to a tick if valid or a cross if not.
+        :param is_valid: Whether the units are valid or not
+        :return: None.
+        """
         self.ticklabel.setText("✅" if is_valid else "❌")
         self.ticklabel.setToolTip("Unit valid" if is_valid else "Unit not valid")
 
     def mesh_file_picker(self):
+        """
+        Opens the mesh file picker. Sets the file name line edit to the file path.
+        :return: None
+        """
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
         if filename:
             self.fileLineEdit.setText(filename)
@@ -203,6 +228,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cylinderOptionsBox.setVisible(False)
 
     def generate_geometry_model(self):
+        """
+        Generates a geometry model depending on the type of geometry selected and the current values of the lineedits that apply to the particular geometry type.
+        :return: The generated model.
+        """
         if self.CylinderRadioButton.isChecked():
             geometry_model = CylinderModel()
             geometry_model.set_unit(self.unitsLineEdit.text())

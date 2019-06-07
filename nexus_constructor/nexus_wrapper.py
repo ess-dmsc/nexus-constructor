@@ -7,6 +7,10 @@ COMPS_IN_ENTRY = ["NXdetector", "NXsample"]
 
 
 def set_up_in_memory_nexus_file():
+    """
+    Creates an in-memory nexus-file to store the model data in.
+    :return: The file object.
+    """
     return h5py.File("nexus-constructor", mode="x", driver="core", backing_store=False)
 
 
@@ -16,6 +20,7 @@ class NexusWrapper(QObject):
     Also contains a list of components for use in a listview.
     """
 
+    # Signal that indicates the nexus file has been changed in some way
     file_changed = Signal("QVariant")
 
     def __init__(self):
@@ -93,7 +98,7 @@ class NexusWrapper(QObject):
         instrument_group = self.entry_group["instrument"]
 
         if component_type in COMPS_IN_ENTRY:
-            # If the component should be put in entry rather than instrument
+            # If the component should be put in /entry/ rather than /instrument/
             instrument_group = self.entry_group
 
         component_group = instrument_group.create_group(component_name)
