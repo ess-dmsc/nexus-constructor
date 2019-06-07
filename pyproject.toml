@@ -1,2 +1,2 @@
 [tool.black]
-exclude = '/(build*|ui/|tests/test_ui*)'
+exclude = '/(build*|ui/)'

@@ -51,7 +51,7 @@ builders = pipeline_builder.createBuilders { container ->
     pipeline_builder.stage("Check formatting") {
         container.sh """
             cd ${project}
-            build_env/bin/python -m black . --check 
+            build_env/bin/python -m black . --check
         """
     } // stage
     
@@ -67,7 +67,7 @@ builders = pipeline_builder.createBuilders { container ->
         try {
                 container.sh """
                     cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml -k "not UI"
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml --ignore=tests/ui*
                 """
             }
             catch(err) {
