@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'mainwindow.ui',
 # licensing of 'mainwindow.ui' applies.
 #
-# Created: Fri Jun  7 12:03:05 2019
+# Created: Fri Jun  7 16:02:17 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1271, 712)
+        MainWindow.resize(1263, 712)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -59,7 +59,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1271, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1263, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -87,9 +87,9 @@ class Ui_MainWindow(object):
         self.pushButton.setText(QtWidgets.QApplication.translate("MainWindow", "Add component", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtWidgets.QApplication.translate("MainWindow", "Components", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("MainWindow", "NeXus File Layout", None, -1))
-        self.menuFile.setTitle(QtWidgets.QApplication.translate("MainWindow", "Fi&le", None, -1))
-        self.actionOpen_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "&Open NeXus file", None, -1))
-        self.actionExport_to_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "&Export to NeXus file", None, -1))
-        self.actionExport_to_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to &Filewriter JSON", None, -1))
+        self.menuFile.setTitle(QtWidgets.QApplication.translate("MainWindow", "File", None, -1))
+        self.actionOpen_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Open NeXus file", None, -1))
+        self.actionExport_to_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Export to NeXus file", None, -1))
+        self.actionExport_to_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to Filewriter JSON", None, -1))
 
 from nexus_constructor.InstrumentView import InstrumentView
