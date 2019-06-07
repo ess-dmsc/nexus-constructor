@@ -56,6 +56,17 @@ class GeometryType(Enum):
     MESH = 3
 
 
+def validate_line_edit(line_edit, is_valid: bool):
+    """
+    Sets the line edit colour to red if field is invalid or white if valid
+    :param line_edit: The line edit object to apply the validation to.
+    :param is_valid: Whether the line edit field contains valid text
+    :return: None.
+    """
+    colour = "#FFFFFF" if is_valid else "#f6989d"
+    line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
+
+
 class OkValidator(QObject):
     """
     Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
@@ -148,7 +159,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.fileLineEdit.setValidator(FileValidator(GEOMETRY_FILE_TYPES))
         self.fileLineEdit.validator().isValid.connect(
-            partial(self.validate_line_edit, self.fileLineEdit)
+            partial(validate_line_edit, self.fileLineEdit)
         )
         self.fileLineEdit.validator().isValid.connect(self.ok_validator.set_file_valid)
 
@@ -164,7 +175,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         name_validator.list_model = self.nexus_wrapper.get_component_list()
         self.nameLineEdit.setValidator(name_validator)
         self.nameLineEdit.validator().isValid.connect(
-            partial(self.validate_line_edit, self.nameLineEdit)
+            partial(validate_line_edit, self.nameLineEdit)
         )
         self.nameLineEdit.validator().isValid.connect(self.ok_validator.set_name_valid)
 
@@ -175,16 +186,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
-
-    def validate_line_edit(self, line_edit, is_valid: bool):
-        """
-        Sets the line edit colour to red if field is invalid or white if valid
-        :param line_edit: The line edit object to apply the validation to.
-        :param is_valid: Whether the line edit field contains valid text
-        :return: None.
-        """
-        colour = "#FFFFFF" if is_valid else "#f6989d"
-        line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
 
     def on_component_type_change(self):
         self.webEngineView.setUrl(
