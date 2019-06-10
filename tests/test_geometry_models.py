@@ -1,4 +1,3 @@
-import h5py
 from nexus_constructor.qml_models.geometry_models import (
     NoShapeModel,
     NoShapeGeometry,

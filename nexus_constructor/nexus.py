@@ -167,18 +167,6 @@ def component_class_name(component_type):
 
 class NexusDecoder:
     @staticmethod
-    def component_type_from_classname(class_name: str):
-        """
-        Return a ComponentType enum value that corresponds to the given nexus class name.
-        Reverses the effects of NexusEncoder.component_class_name()
-        """
-        # Remove the leading 'NX'
-        class_name = class_name[2:]
-        for component_type in ComponentType:
-            if component_type.name.lower() == class_name:
-                return component_type
-
-    @staticmethod
     def unwound_off_faces(wound_faces, face_indices):
         """
         Returns a list of face point index lists, to be used as OFFGeometry.faces

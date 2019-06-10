@@ -1,5 +1,3 @@
-import json
-import jsonschema
 from nexus_constructor.pixel_data import (
     PixelMapping,
     PixelGrid,

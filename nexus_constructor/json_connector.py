@@ -1,4 +1,4 @@
-from PySide2.QtCore import QObject, QUrl, Slot, Signal
+from PySide2.QtCore import QObject, QUrl, Slot
 from PySide2.QtGui import QGuiApplication
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from nexus_constructor.nexus_filewriter_json import writer as nf_writer
