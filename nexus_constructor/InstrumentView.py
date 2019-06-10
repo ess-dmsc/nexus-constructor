@@ -7,6 +7,11 @@ from nexus_constructor.NeutronAnimationController import NeutronAnimationControl
 
 
 class InstrumentView(QWidget):
+    """
+    Class for managing the 3D view in the NeXus Constructor.
+    :param parent: The MainWindow in which this widget is created. This isn't used for anything but is accepted as an
+                   argument in order to appease Qt Designer.
+    """
     def __init__(self, parent):
         super().__init__()
         lay = QVBoxLayout(self)
@@ -53,7 +58,17 @@ class InstrumentView(QWidget):
         self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
         self.cylinder_transform = Qt3DCore.QTransform()
 
+        # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.create_beam_cylinder()
+
+    @staticmethod
+    def set_material_properties(material, ambient, diffuse, alpha = None):
+
+        material.setAmbient(ambient)
+        material.setDiffuse(diffuse)
+
+        if alpha is not None:
+            material.setAlpha(alpha)
 
     def create_materials(self):
         """
@@ -66,18 +81,10 @@ class InstrumentView(QWidget):
         light_blue = QColor("lightblue")
         dark_red = QColor("#b00")
 
-        self.grey_material.setAmbient(black)
-        self.grey_material.setDiffuse(grey)
-
-        self.red_material.setAmbient(red)
-        self.red_material.setDiffuse(dark_red)
-
-        self.beam_material.setAmbient(blue)
-        self.beam_material.setDiffuse(light_blue)
-        self.beam_material.setAlpha(0.5)
-
-        self.green_material.setAmbient(grey)
-        self.green_material.setDiffuse(grey)
+        self.set_material_properties(self.grey_material, black, grey)
+        self.set_material_properties(self.red_material, red, dark_red)
+        self.set_material_properties(self.green_material, grey, grey)
+        self.set_material_properties(self.beam_material, blue, light_blue, 0.5)
 
     def create_sample_cube(self):
         """
