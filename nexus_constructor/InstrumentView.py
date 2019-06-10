@@ -183,6 +183,8 @@ class InstrumentView(QWidget):
 
         for i in range(self.num_neutrons):
 
+            self.set_sphere_mesh_radius(self.neutron_meshes[i])
+
             neutron_animation, neutron_animation_controller = self.create_neutron_animation(
                 x_offsets[i],
                 y_offsets[i],
