@@ -151,14 +151,22 @@ class InstrumentView(QWidget):
         sphere_mesh.setRadius(3)
 
     @staticmethod
-    def create_neutron_animation(
-        x_offset, y_offset, neutron_transform, animation_distance, time_span_offset
-    ):
+    def create_neutron_animation_controller(x_offset, y_offset, neutron_transform):
 
         neutron_animation_controller = NeutronAnimationController(
             x_offset, y_offset, neutron_transform
         )
         neutron_animation_controller.set_target(neutron_transform)
+
+        return neutron_animation_controller
+
+    @staticmethod
+    def create_neutron_animation(
+        neutron_transform,
+        neutron_animation_controller,
+        animation_distance,
+        time_span_offset,
+    ):
 
         # Instruct the NeutronAnimationController to move the neutron along the z-axis from -40 to 0
         neutron_animation = QPropertyAnimation(neutron_transform)
@@ -185,10 +193,13 @@ class InstrumentView(QWidget):
 
             self.set_sphere_mesh_radius(self.neutron_meshes[i])
 
-            neutron_animation, neutron_animation_controller = self.create_neutron_animation(
-                x_offsets[i],
-                y_offsets[i],
+            neutron_animation_controller = self.create_neutron_animation_controller(
+                x_offsets[i], y_offsets[i], self.neutron_transforms[i]
+            )
+
+            neutron_animation = self.create_neutron_animation(
                 self.neutron_transforms[i],
+                neutron_animation_controller,
                 -self.cylinder_length,
                 time_span_offsets[i],
             )
