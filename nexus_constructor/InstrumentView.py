@@ -69,14 +69,7 @@ class InstrumentView(QWidget):
         self.cylinder_transform = Qt3DCore.QTransform()
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
-        self.set_cylinder_mesh_properties(
-            self.cylinder_mesh, 2.5, self.cylinder_length, 2
-        )
-        self.set_beam_transform(self.cylinder_transform)
-        self.add_components_to_entity(
-            self.cylinder_entity,
-            [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
-        )
+        self.setup_beam_cylinder()
 
     @staticmethod
     def set_material_properties(material, ambient, diffuse, alpha=None):
@@ -118,6 +111,13 @@ class InstrumentView(QWidget):
         cube_mesh.setYExtent(y)
         cube_mesh.setZExtent(z)
 
+    def setup_sample_cube(self):
+
+        self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
+        self.add_components_to_entity(
+            self.cube_entity, [self.cube_mesh, self.red_material]
+        )
+
     @staticmethod
     def add_components_to_entity(entity, components):
         """
@@ -144,11 +144,22 @@ class InstrumentView(QWidget):
 
         cylinder_transform.setMatrix(cylinder_matrix)
 
+    def setup_beam_cylinder(self):
+
+        self.set_cylinder_mesh_properties(
+            self.cylinder_mesh, 2.5, self.cylinder_length, 2
+        )
+        self.set_beam_transform(self.cylinder_transform)
+        self.add_components_to_entity(
+            self.cylinder_entity,
+            [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
+        )
+
     @staticmethod
-    def set_sphere_mesh_radius(sphere_mesh):
+    def set_sphere_mesh_radius(sphere_mesh, radius):
 
         # Create a neutron mesh with a fixed radius
-        sphere_mesh.setRadius(3)
+        sphere_mesh.setRadius(radius)
 
     @staticmethod
     def create_neutron_animation_controller(x_offset, y_offset, neutron_transform):
@@ -178,9 +189,9 @@ class InstrumentView(QWidget):
         neutron_animation.setLoopCount(-1)
         neutron_animation.start()
 
-        return neutron_animation, neutron_animation_controller
+        return neutron_animation
 
-    def create_neutrons(self):
+    def setup_neutrons(self):
         """
         Creates the neutron animations.
         """
@@ -191,7 +202,7 @@ class InstrumentView(QWidget):
 
         for i in range(self.num_neutrons):
 
-            self.set_sphere_mesh_radius(self.neutron_meshes[i])
+            self.set_sphere_mesh_radius(self.neutron_meshes[i], 3)
 
             neutron_animation_controller = self.create_neutron_animation_controller(
                 x_offsets[i], y_offsets[i], self.neutron_transforms[i]
@@ -219,9 +230,5 @@ class InstrumentView(QWidget):
     def initialise_view(self):
 
         self.give_colours_to_materials()
-
-        self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
-        self.add_components_to_entity(
-            self.cube_entity, [self.cube_mesh, self.red_material]
-        )
-        self.create_neutrons()
+        self.setup_sample_cube()
+        self.setup_neutrons()
