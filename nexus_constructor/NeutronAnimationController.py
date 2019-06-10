@@ -9,7 +9,6 @@ class NeutronAnimationController(QObject):
     :param y_offset: The y-coordinate of the neutron's position as it moves through the beam.
     :param parent: The neutron transform object.
     """
-
     def __init__(self, x_offset, y_offset, parent):
         super(NeutronAnimationController, self).__init__(parent)
         self._target = None
@@ -33,7 +32,7 @@ class NeutronAnimationController(QObject):
 
     def set_distance(self, distance):
         """
-        Sets the current distance of the neutron while its animation is running. Update the transformation matrix and
+        Sets the current distance of the neutron while its animation is running. Updates the transformation matrix and
         emit the `distance_changed` signal.
         :param distance: The new distance of the neutron for the next step of the animation.
         """
@@ -49,8 +48,7 @@ class NeutronAnimationController(QObject):
 
     def update_matrix(self):
         """
-
-        :return:
+        Use the updated distance to construct a new transformation matrix and then apply this matrix to `self._target`.
         """
         self._matrix.setToIdentity()
         self._matrix.translate(
