@@ -8,7 +8,8 @@ from nexus_constructor.NeutronAnimationController import NeutronAnimationControl
 
 class InstrumentView(QWidget):
     """
-    Class for managing the 3D view in the NeXus Constructor.
+    Class for managing the 3D view in the NeXus Constructor. Creates the initial sample, the initial beam, and the
+    neutron animation.
     :param parent: The MainWindow in which this widget is created. This isn't used for anything but is accepted as an
                    argument in order to appease Qt Designer.
     """
@@ -60,10 +61,24 @@ class InstrumentView(QWidget):
         self.cylinder_transform = Qt3DCore.QTransform()
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
-        self.create_beam_cylinder()
+        self.create_beam_cylinder(
+            self.cylinder_mesh,
+            self.cylinder_transform,
+            self.cylinder_entity,
+            self.cylinder_length,
+            self.beam_material,
+        )
 
     @staticmethod
     def set_material_properties(material, ambient, diffuse, alpha=None):
+        """
+        Set the ambient, diffuse, and alpha properties of a material.
+        :param material: The material to be modified.
+        :param ambient: The desired ambient colour of the material.
+        :param diffuse: The desired diffuse colour of the material.
+        :param alpha: The desired alpha value of the material. Optional argument as not all material-types have this
+                         property.
+        """
 
         material.setAmbient(ambient)
         material.setDiffuse(diffuse)
@@ -87,34 +102,38 @@ class InstrumentView(QWidget):
         self.set_material_properties(self.green_material, grey, grey)
         self.set_material_properties(self.beam_material, blue, light_blue, 0.5)
 
-    def create_sample_cube(self):
+    @staticmethod
+    def create_sample_cube(cube_mesh, cube_entity, material):
         """
-        Creates the initial sample cube.
+        Create a 1x1x1 cube given a mesh, an entity, and a material.
         """
-        self.cube_mesh.setXExtent(1)
-        self.cube_mesh.setYExtent(1)
-        self.cube_mesh.setZExtent(1)
+        cube_mesh.setXExtent(1)
+        cube_mesh.setYExtent(1)
+        cube_mesh.setZExtent(1)
 
-        self.cube_entity.addComponent(self.cube_mesh)
-        self.cube_entity.addComponent(self.red_material)
+        cube_entity.addComponent(cube_mesh)
+        cube_entity.addComponent(material)
 
-    def create_beam_cylinder(self):
+    @staticmethod
+    def create_beam_cylinder(
+        cylinder_mesh, cylinder_transform, cylinder_entity, cylinder_length, material
+    ):
         """
         Creates the initial beam cylinder.
         """
-        self.cylinder_mesh.setRadius(2.5)
-        self.cylinder_mesh.setLength(self.cylinder_length)
-        self.cylinder_mesh.setRings(2)
+        cylinder_mesh.setRadius(2.5)
+        cylinder_mesh.setLength(cylinder_length)
+        cylinder_mesh.setRings(2)
 
         cylinder_matrix = QMatrix4x4()
         cylinder_matrix.rotate(270, QVector3D(1, 0, 0))
         cylinder_matrix.translate(QVector3D(0, 20, 0))
 
-        self.cylinder_transform.setMatrix(cylinder_matrix)
+        cylinder_transform.setMatrix(cylinder_matrix)
 
-        self.cylinder_entity.addComponent(self.cylinder_mesh)
-        self.cylinder_entity.addComponent(self.beam_material)
-        self.cylinder_entity.addComponent(self.cylinder_transform)
+        cylinder_entity.addComponent(cylinder_mesh)
+        cylinder_entity.addComponent(material)
+        cylinder_entity.addComponent(cylinder_transform)
 
     def create_neutrons(self):
         """
@@ -161,5 +180,5 @@ class InstrumentView(QWidget):
     def initialise_view(self):
 
         self.create_materials()
-        self.create_sample_cube()
+        self.create_sample_cube(self.cube_mesh, self.cube_entity, self.red_material)
         self.create_neutrons()
