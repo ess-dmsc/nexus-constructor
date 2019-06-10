@@ -12,6 +12,7 @@ class InstrumentView(QWidget):
     :param parent: The MainWindow in which this widget is created. This isn't used for anything but is accepted as an
                    argument in order to appease Qt Designer.
     """
+
     def __init__(self, parent):
         super().__init__()
         lay = QVBoxLayout(self)
@@ -62,7 +63,7 @@ class InstrumentView(QWidget):
         self.create_beam_cylinder()
 
     @staticmethod
-    def set_material_properties(material, ambient, diffuse, alpha = None):
+    def set_material_properties(material, ambient, diffuse, alpha=None):
 
         material.setAmbient(ambient)
         material.setDiffuse(diffuse)
