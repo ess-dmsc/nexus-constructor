@@ -28,6 +28,10 @@ class NexusWrapper(QObject):
         self.nexus_file = set_up_in_memory_nexus_file(filename)
         self.entry_group = self.nexus_file.create_group("entry")
         self.entry_group.attrs["NX_class"] = "NXentry"
+
+        sample = self.entry_group.create_group("sample")
+        sample.attrs["NX_class"] = "NXsample"
+
         self.instrument_group = self.entry_group.create_group("instrument")
         self.instrument_group.attrs["NX_class"] = "NXinstrument"
 
@@ -87,7 +91,7 @@ class NexusWrapper(QObject):
         :param geometry: Geometry model for the component.
         :return: None
         """
-        component_name = component_name.replace(" ", "_")
+        component_name = convert_name_with_spaces(component_name)
         self.components_list_model.add_component(
             component_type=component_type,
             description=description,
@@ -105,3 +109,7 @@ class NexusWrapper(QObject):
         component_group.attrs["NX_class"] = component_type
 
         self._emit_file()
+
+
+def convert_name_with_spaces(component_name):
+    return component_name.replace(" ", "_")

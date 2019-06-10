@@ -104,10 +104,7 @@ class InstrumentModel(QAbstractListModel):
         :param group: The /entry/ group created by the Nexus Model.
         """
         sample = create_component(
-            component_type=ComponentType.SAMPLE,
-            name="sample",
-            geometry=OFFCube,
-            parent_group=group,
+            component_type=ComponentType.SAMPLE, name="sample", geometry=OFFCube
         )
         try:
             self.instrument_group = group["instrument"]
@@ -235,30 +232,24 @@ class InstrumentModel(QAbstractListModel):
         pixel_model=None,
         transform_model=None,
     ):
-        if component_type in ComponentType.values():
-            dependent_transform = None
-            if self.components and transform_index in range(
-                0, len(self.components[parent_index - 1].transforms)
-            ):
-                dependent_transform = self.components[parent_index - 1].transforms[
-                    transform_index
-                ]
-            component = create_component(
-                component_type=ComponentType(component_type),
-                name=name,
-                description=description,
-                transform_parent=self.components[parent_index - 1],
-                dependent_transform=dependent_transform,
-                geometry=geometry_model.get_geometry(),
-                pixel_data=None
-                if pixel_model is None
-                else pixel_model.get_pixel_model(),
-                transforms=[]
-                if transform_model is None
-                else transform_model.transforms,
-                parent_group=self.instrument_group,
-            )
-            self.append_component_to_list(component)
+        dependent_transform = None
+        if self.components and transform_index in range(
+            0, len(self.components[parent_index - 1].transforms)
+        ):
+            dependent_transform = self.components[parent_index - 1].transforms[
+                transform_index
+            ]
+        component = create_component(
+            component_type=component_type,
+            name=name,
+            description=description,
+            transform_parent=self.components[parent_index - 1],
+            dependent_transform=dependent_transform,
+            geometry=geometry_model.get_geometry(),
+            pixel_data=None if pixel_model is None else pixel_model.get_pixel_model(),
+            transforms=[] if transform_model is None else transform_model.transforms,
+        )
+        self.append_component_to_list(component)
 
     def append_component_to_list(self, component):
         """

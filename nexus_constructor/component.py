@@ -14,7 +14,6 @@ from nexus_constructor.nexus_model import (
 def create_component(
     component_type,
     name,
-    parent_group,
     description="",
     transform_parent=None,
     dependent_transform=None,
@@ -46,9 +45,6 @@ def create_component(
         transforms=transforms,
         geometry=geometry,
         pixel_data=pixel_data,
-        component_group=create_group(
-            name, get_nx_class_for_component(component_type), parent_group
-        ),
     )
 
 
@@ -64,7 +60,6 @@ class Component:
     transforms = attr.ib(factory=list, type=List[Transformation])
     geometry = attr.ib(default=None, type=Geometry)
     pixel_data = attr.ib(default=None, type=PixelData)
-    component_group = attr.ib(default=None)
 
     def delete_component_group(self, parent):
         """
