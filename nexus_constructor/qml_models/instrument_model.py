@@ -37,7 +37,7 @@ def change_value(item, attribute_name, value):
 
 
 def generate_mesh(component: Component):
-    if component.component_type == "Detector":
+    if component.nx_class == "Detector":
         return OffMesh(component.geometry.off_geometry, component.pixel_data)
     else:
         return OffMesh(component.geometry.off_geometry)
@@ -45,12 +45,12 @@ def generate_mesh(component: Component):
 
 def determine_pixel_state(component):
     """Returns a string identifying the state a PixelControls editor should be in for the given component"""
-    if component.component_type == "Detector":
+    if component.nx_class == "Detector":
         if isinstance(component.pixel_data, PixelGrid):
             return "Grid"
         elif isinstance(component.pixel_data, PixelMapping):
             return "Mapping"
-    elif component.component_type == "Monitor":
+    elif component.nx_class == "Monitor":
         return "SinglePixel"
     return ""
 
@@ -98,7 +98,7 @@ class InstrumentModel(QAbstractListModel):
         self.transform_models = []
 
         self.append_component_to_list(
-            Component(component_type="Sample", name="sample", geometry=OFFCube)
+            Component(nx_class="NXsample", name="sample", geometry=OFFCube)
         )
         self.dataChanged.connect(self.send_model_updated)
         self.rowsInserted.connect(self.send_model_updated)
@@ -197,7 +197,7 @@ class InstrumentModel(QAbstractListModel):
     @Slot(str, str, str, int, int, "QVariant", "QVariant", "QVariant")
     def add_component(
         self,
-        component_type,
+        nx_class,
         name,
         description="",
         parent_index=0,
@@ -216,7 +216,7 @@ class InstrumentModel(QAbstractListModel):
 
         self.append_component_to_list(
             Component(
-                component_type=component_type,
+                nx_class=nx_class,
                 name=name,
                 description=description,
                 transform_parent=self.components[parent_index - 1],

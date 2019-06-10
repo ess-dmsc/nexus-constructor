@@ -35,7 +35,7 @@ def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_add
     component_in_list = component_list[1]
     assert component_in_list.name == name
     assert component_in_list.description == description
-    assert component_in_list.component_type == component_type
+    assert component_in_list.nx_class == component_type
 
 
 def test_GIVEN_component_WHEN_adding_component_THEN_nexus_file_contains_added_component():

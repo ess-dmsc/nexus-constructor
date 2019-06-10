@@ -92,7 +92,7 @@ class NexusWrapper(QObject):
         """
         component_name = convert_name_with_spaces(component_name)
         self.components_list_model.add_component(
-            component_type=component_type,
+            nx_class=component_type,
             description=description,
             name=component_name,
             geometry_model=geometry,

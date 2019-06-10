@@ -43,14 +43,14 @@ def test_GIVEN_nonexistent_attr_WHEN_change_value_called_THEN_does_nothing():
 def test_GIVEN_nothing_WHEN_initialising_model_THEN_sample_exists_as_first_component():
     model = InstrumentModel()
     assert model.rowCount() == 1
-    assert model.components[0].component_type == "Sample"
+    assert model.components[0].nx_class == "NXsample"
 
 
 def test_add_component():
     model = InstrumentModel()
-    model.add_component("Detector", "MyDetector", geometry_model=NoShapeModel())
+    model.add_component("NXdetector", "MyDetector", geometry_model=NoShapeModel())
     assert model.rowCount() == 2
-    assert model.components[1].component_type == "Detector"
+    assert model.components[1].nx_class == "NXdetector"
     assert model.components[1].name == "MyDetector"
 
 
@@ -59,17 +59,15 @@ def test_remove_component():
     model.add_component("Detector", "My Detector", geometry_model=NoShapeModel())
     model.remove_component(len(model.components) - 1)
     assert model.rowCount() == 1
-    assert not model.components[0].component_type == "Detector"
+    assert not model.components[0].nx_class == "Detector"
 
 
 def test_replace_contents():
     model = InstrumentModel()
     replacement_data = [
-        Component(component_type="Sample", name="Replacement sample"),
+        Component(nx_class="Sample", name="Replacement sample"),
         Component(
-            component_type="Sample",
-            name="Replacement Detector",
-            geometry=CylindricalGeometry,
+            nx_class="Sample", name="Replacement Detector", geometry=CylindricalGeometry
         ),
     ]
     model.replace_contents(replacement_data)
@@ -80,10 +78,10 @@ def test_replace_contents():
 def test_generate_component_name():
     model = InstrumentModel()
     model.components = [
-        Component(component_type="Sample", name="Sample"),
-        Component(component_type="Sample", name="Detector"),
-        Component(component_type="Sample", name="Detector3"),
-        Component(component_type="Sample", name="Magnet2"),
+        Component(nx_class="Sample", name="Sample"),
+        Component(nx_class="Sample", name="Detector"),
+        Component(nx_class="Sample", name="Detector3"),
+        Component(nx_class="Sample", name="Magnet2"),
     ]
     assert model.generate_component_name("Sample") == "Sample1"
     assert model.generate_component_name("Detector") == "Detector4"
@@ -93,9 +91,7 @@ def test_generate_component_name():
 
 def test_is_removable():
     model = InstrumentModel()
-    model.components = [
-        Component(component_type="Sample", name=str(i)) for i in range(4)
-    ]
+    model.components = [Component(nx_class="Sample", name=str(i)) for i in range(4)]
     model.components[0].transform_parent = model.components[0]
     model.components[1].transform_parent = model.components[0]
     model.components[2].transform_parent = model.components[1]
@@ -111,7 +107,7 @@ def build_model_with_sample_transforms():
     instrument = InstrumentModel()
     instrument.components.append(
         Component(
-            component_type="Detector",
+            nx_class="Detector",
             name="detector1",
             transform_parent=instrument.components[0],
             transforms=[
@@ -122,7 +118,7 @@ def build_model_with_sample_transforms():
     )
     instrument.components.append(
         Component(
-            component_type="Detector",
+            nx_class="Detector",
             name="detector2",
             transform_parent=instrument.components[1],
             dependent_transform=instrument.components[1].transforms[0],
@@ -134,7 +130,7 @@ def build_model_with_sample_transforms():
     )
     instrument.components.append(
         Component(
-            component_type="Detector",
+            nx_class="Detector",
             name="detector3",
             transform_parent=instrument.components[1],
             transforms=[

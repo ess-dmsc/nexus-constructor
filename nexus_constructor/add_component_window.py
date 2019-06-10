@@ -19,7 +19,7 @@ from nexus_constructor.utils import file_dialog, validate_line_edit
 import os
 from functools import partial
 
-
+# TODO: stop enter closing the dialog
 GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
 
 

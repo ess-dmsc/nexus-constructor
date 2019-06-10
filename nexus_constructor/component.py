@@ -9,7 +9,7 @@ from typing import List
 class Component:
     """Components of an instrument"""
 
-    component_type = attr.ib(str)
+    nx_class = attr.ib(str)
     name = attr.ib(str)
     description = attr.ib(default="", type=str)
     transform_parent = attr.ib(default=None, type=object)

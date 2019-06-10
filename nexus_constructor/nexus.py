@@ -152,7 +152,7 @@ def geometry_group_name(component: Component):
     """
     # As of writing, Nexus constructor NXcylindrical_geometry's don't contain 'detector_number', simplifying the
     # logic here
-    if component.component_type == "Detector":
+    if component.nx_class == "Detector":
         if isinstance(component.pixel_data, PixelMapping):
             return "detector_shape"
         else:
