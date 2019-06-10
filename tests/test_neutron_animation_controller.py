@@ -3,7 +3,7 @@ from nexus_constructor.NeutronAnimationController import NeutronAnimationControl
 from mock import Mock
 
 
-def test_GIVEN_target_WHEN_setting_target_THEN_target_changed_to_new_value():
+def test_GIVEN_target_WHEN_calling_set_targer_THEN_target_changed_to_new_value():
 
     mock_target = Mock()
 
@@ -66,7 +66,7 @@ def test_GIVEN_nothing_WHEN_calling_get_distance_THEN_distance_returned():
     assert neutron_animation_controller.get_distance() == new_distance
 
 
-def test_GIVEN_offset_and_distance_WHEN_updating_matrix_THEN_correct_matrix_created():
+def test_GIVEN_offset_and_distance_WHEN_calling_update_matrix_THEN_correct_matrix_created():
 
     x_offset = 2
     y_offset = 2
@@ -80,7 +80,7 @@ def test_GIVEN_offset_and_distance_WHEN_updating_matrix_THEN_correct_matrix_crea
     assert neutron_animation_controller._matrix == expected_matrix
 
 
-def test_GIVEN_targer_WHEN_updating_matrix_THEN_set_matrix_called():
+def test_GIVEN_target_WHEN_calling_update_matrix_THEN_set_matrix_called():
 
     mock_target = Mock()
     mock_target.setMatrix = Mock()
