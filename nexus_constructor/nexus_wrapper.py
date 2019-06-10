@@ -36,7 +36,6 @@ class NexusWrapper(QObject):
         self.instrument_group.attrs["NX_class"] = "NXinstrument"
 
         self.components_list_model = instrument_model.InstrumentModel()
-        self.components_list_model.initialise(self.entry_group)
         self._emit_file()
 
     def _emit_file(self):

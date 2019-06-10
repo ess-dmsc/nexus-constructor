@@ -1,6 +1,5 @@
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.component import Component
-from nexus_constructor.component_type import ComponentType
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
 from typing import List, Union
 
@@ -138,7 +137,7 @@ def absolute_transform_path_name(
 
 def external_component_types():
     """Returns a set of component types that should be stored separately to /entry/instrument in a nexus file"""
-    return {ComponentType.SAMPLE, ComponentType.MONITOR}
+    return {"Sample", "Monitor"}
 
 
 def geometry_group_name(component: Component):
@@ -153,7 +152,7 @@ def geometry_group_name(component: Component):
     """
     # As of writing, Nexus constructor NXcylindrical_geometry's don't contain 'detector_number', simplifying the
     # logic here
-    if component.component_type == ComponentType.DETECTOR:
+    if component.component_type == "Detector":
         if isinstance(component.pixel_data, PixelMapping):
             return "detector_shape"
         else:
@@ -162,8 +161,8 @@ def geometry_group_name(component: Component):
         return "shape"
 
 
-def component_class_name(component_type: ComponentType):
-    return "NX{}".format(component_type.name.lower())
+def component_class_name(component_type):
+    return "NX{}".format(component_type.lower())
 
 
 class NexusDecoder:

@@ -1,22 +1,6 @@
-from enum import Enum, unique
 from typing import List
 import os
 import xmltodict
-
-
-@unique
-class ComponentType(Enum):
-    SAMPLE = "Sample"
-    DETECTOR = "Detector"
-    MONITOR = "Monitor"
-    SOURCE = "Source"
-    SLIT = "Slit"
-    MODERATOR = "Moderator"
-    DISK_CHOPPER = "Disk Chopper"
-
-    @classmethod
-    def values(cls):
-        return [item.value for item in cls]
 
 
 PIXEL_COMPONENT_TYPES = ["NXmonitor", "NXdetector", "NXdetector_module"]
