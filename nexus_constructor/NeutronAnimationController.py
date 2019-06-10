@@ -4,10 +4,10 @@ from PySide2.QtGui import QMatrix4x4, QVector3D
 
 class NeutronAnimationController(QObject):
     """
-    A tool for instructing the neutron entities to move through the cylinder.
+    A tool for creating an animation by instructing the neutron entities to move through the cylinder.
     :param x_offset: The x-coordinate of the neutron's position as it moves through the beam.
     :param y_offset: The y-coordinate of the neutron's position as it moves through the beam.
-    :param parent: The neutron transform object.
+    :param parent: The neutron's QTransform object.
     """
     def __init__(self, x_offset, y_offset, parent):
         super(NeutronAnimationController, self).__init__(parent)
@@ -32,8 +32,8 @@ class NeutronAnimationController(QObject):
 
     def set_distance(self, distance):
         """
-        Sets the current distance of the neutron while its animation is running. Updates the transformation matrix and
-        emit the `distance_changed` signal.
+        Updates the current distance of the neutron while its animation is running. Updates the transformation matrix
+        and emits the `distance_changed` signal.
         :param distance: The new distance of the neutron for the next step of the animation.
         """
         self._distance = distance
@@ -42,13 +42,14 @@ class NeutronAnimationController(QObject):
 
     def get_distance(self):
         """
-        :return: The distance of the neutron.
+        :return: The current distance of the neutron.
         """
         return self._distance
 
     def update_matrix(self):
         """
         Use the updated distance to construct a new transformation matrix and then apply this matrix to `self._target`.
+        `set_target` needs to be called before starting the animation otherwise nothing will move.
         """
         self._matrix.setToIdentity()
         self._matrix.translate(
