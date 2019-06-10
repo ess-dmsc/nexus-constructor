@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Mon Jun 10 10:13:51 2019
+# Created: Mon Jun 10 10:36:54 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -144,6 +144,7 @@ class Ui_AddComponentDialog(object):
         self.gridLayout.addWidget(self.cylinderHeightLineEdit, 0, 1, 1, 1)
         self.cylinderZLineEdit = QtWidgets.QSpinBox(self.cylinderOptionsBox)
         self.cylinderZLineEdit.setMaximum(100000)
+        self.cylinderZLineEdit.setProperty("value", 1)
         self.cylinderZLineEdit.setObjectName("cylinderZLineEdit")
         self.gridLayout.addWidget(self.cylinderZLineEdit, 2, 5, 1, 1)
         self.gridLayout.setColumnStretch(1, 1)
@@ -220,3 +221,4 @@ class Ui_AddComponentDialog(object):
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
+
