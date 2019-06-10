@@ -47,15 +47,15 @@ class InstrumentView(QWidget):
         self.num_neutrons = 9
 
         # Create lists for neutron-related objects
-        self.neutron_entities = [
-            Qt3DCore.QEntity(self.root_entity) for _ in range(self.num_neutrons)
-        ]
-        self.neutron_meshes = [
-            Qt3DExtras.QSphereMesh() for _ in range(self.num_neutrons)
-        ]
-        self.neutron_transforms = [
-            Qt3DCore.QTransform() for _ in range(self.num_neutrons)
-        ]
+        self.neutron_entities = []
+        self.neutron_meshes = []
+        self.neutron_transforms = []
+
+        for i in range(self.num_neutrons):
+            self.neutron_entities.append(Qt3DCore.QEntity(self.root_entity))
+            self.neutron_meshes.append(Qt3DExtras.QSphereMesh())
+            self.neutron_transforms.append(Qt3DCore.QTransform())
+
         self.neutron_animation_controllers = []
         self.neutron_animations = []
 
