@@ -9,6 +9,7 @@ class NeutronAnimationController(QObject):
     :param y_offset: The y-coordinate of the neutron's position as it moves through the beam.
     :param parent: The neutron's QTransform object.
     """
+
     def __init__(self, x_offset, y_offset, parent):
         super(NeutronAnimationController, self).__init__(parent)
         self._target = None
