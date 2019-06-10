@@ -1,8 +1,8 @@
 from PySide2.QtWidgets import QDialog
 from nexus_constructor.nexus_wrapper import NexusWrapper
-from nexus_constructor.addcomponentwindow import AddComponentDialog
+from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.utils import file_dialog
-from ui.mainwindow import Ui_MainWindow
+from ui.main_window import Ui_MainWindow
 import silx.gui.hdf5
 
 

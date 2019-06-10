@@ -1,6 +1,6 @@
 from PySide2.QtWidgets import QMainWindow, QDialog
-from nexus_constructor.addcomponentwindow import AddComponentDialog
-from nexus_constructor.mainwindow import MainWindow
+from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus_wrapper import NexusWrapper
 from PySide2.QtCore import Qt
 

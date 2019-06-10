@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui',
-# licensing of 'mainwindow.ui' applies.
+# Form implementation generated from reading ui file 'main_window.ui',
+# licensing of 'main_window.ui' applies.
 #
-# Created: Thu May 30 12:27:57 2019
-#      by: pyside2-uic  running on PySide2 5.12.1
+# Created: Mon Jun 10 10:13:15 2019
+#      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -58,7 +58,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
         self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar = QtWidgets.QMenuBar()
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1263, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)

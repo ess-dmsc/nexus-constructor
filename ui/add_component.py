@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'addcomponent.ui',
-# licensing of 'addcomponent.ui' applies.
+# Form implementation generated from reading ui file 'add_component.ui',
+# licensing of 'add_component.ui' applies.
 #
-# Created: Fri Jun  7 15:28:57 2019
+# Created: Mon Jun 10 10:13:51 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -220,4 +220,3 @@ class Ui_AddComponentDialog(object):
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
-

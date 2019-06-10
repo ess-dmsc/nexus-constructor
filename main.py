@@ -7,7 +7,7 @@ import sys
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QMainWindow
 from PySide2 import QtCore
-from nexus_constructor.mainwindow import MainWindow
+from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus_wrapper import NexusWrapper
 
 if __name__ == "__main__":

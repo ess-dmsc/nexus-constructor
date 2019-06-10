@@ -8,7 +8,7 @@ from nexus_constructor.qml_models.geometry_models import (
     NoShapeModel,
 )
 from PySide2.QtGui import QValidator
-from ui.addcomponent import Ui_AddComponentDialog
+from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.validators import UnitValidator, NameValidator
 from nexus_constructor.nexus_wrapper import NexusWrapper
