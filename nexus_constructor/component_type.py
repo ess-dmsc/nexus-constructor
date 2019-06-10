@@ -19,6 +19,9 @@ class ComponentType(Enum):
         return [item.value for item in cls]
 
 
+PIXEL_COMPONENT_TYPES = ["NXmonitor", "NXdetector", "NXdetector_module"]
+
+
 def __list_base_class_files(repo_directory):
     base_class_dir = os.path.join(repo_directory, "base_classes")
     for file in os.listdir(base_class_dir):

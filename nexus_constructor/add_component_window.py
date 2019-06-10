@@ -9,7 +9,10 @@ from nexus_constructor.qml_models.geometry_models import (
 )
 from PySide2.QtGui import QValidator
 from ui.add_component import Ui_AddComponentDialog
-from nexus_constructor.component_type import make_dictionary_of_class_definitions
+from nexus_constructor.component_type import (
+    make_dictionary_of_class_definitions,
+    PIXEL_COMPONENT_TYPES,
+)
 from nexus_constructor.validators import UnitValidator, NameValidator
 from nexus_constructor.nexus_wrapper import NexusWrapper
 from nexus_constructor.utils import file_dialog, validate_line_edit
@@ -196,6 +199,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
             QUrl(
                 f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
             )
+        )
+        self.pixelOptionsBox.setVisible(
+            self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
 
     def mesh_file_picker(self):
