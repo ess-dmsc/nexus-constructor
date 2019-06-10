@@ -3,7 +3,7 @@ from nexus_constructor.NeutronAnimationController import NeutronAnimationControl
 from mock import Mock
 
 
-def test_GIVEN_target_WHEN_calling_set_targer_THEN_target_changed_to_new_value():
+def test_GIVEN_target_WHEN_calling_set_target_THEN_target_changed_to_new_value():
 
     mock_target = Mock()
 
