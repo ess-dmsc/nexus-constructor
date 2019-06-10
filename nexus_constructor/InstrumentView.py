@@ -53,7 +53,9 @@ class InstrumentView(QWidget):
         self.neutron_meshes = [
             Qt3DExtras.QSphereMesh() for _ in range(self.num_neutrons)
         ]
-        self.neutron_transforms = []
+        self.neutron_transforms = [
+            Qt3DCore.QTransform() for _ in range(self.num_neutrons)
+        ]
         self.neutron_animation_controllers = []
         self.neutron_animations = []
 
@@ -67,10 +69,10 @@ class InstrumentView(QWidget):
         self.cylinder_transform = Qt3DCore.QTransform()
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
-        self.create_beam_cylinder(
-            self.cylinder_mesh, self.cylinder_transform, self.cylinder_length
+        self.set_cylinder_mesh_properties(
+            self.cylinder_mesh, 2.5, self.cylinder_length, 2
         )
-
+        self.set_beam_transform(self.cylinder_transform)
         self.add_components_to_entity(
             self.cylinder_entity,
             [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
@@ -92,9 +94,10 @@ class InstrumentView(QWidget):
         if alpha is not None:
             material.setAlpha(alpha)
 
-    def create_materials(self):
+    def give_colours_to_materials(self):
         """
-        Creates the materials for the the objects that will inhabit the instrument view.
+        Creates several QColours and uses them to configure the different materials that will be used for the objects in
+        the 3D view.
         """
         red = QColor("red")
         black = QColor("black")
@@ -124,14 +127,17 @@ class InstrumentView(QWidget):
             entity.addComponent(component)
 
     @staticmethod
-    def create_beam_cylinder(cylinder_mesh, cylinder_transform, cylinder_length):
+    def set_cylinder_mesh_properties(cylinder_mesh, radius, length, rings):
+
+        cylinder_mesh.setRadius(radius)
+        cylinder_mesh.setLength(length)
+        cylinder_mesh.setRings(rings)
+
+    @staticmethod
+    def set_beam_transform(cylinder_transform):
         """
         Creates the initial beam cylinder.
         """
-        cylinder_mesh.setRadius(2.5)
-        cylinder_mesh.setLength(cylinder_length)
-        cylinder_mesh.setRings(2)
-
         cylinder_matrix = QMatrix4x4()
         cylinder_matrix.rotate(270, QVector3D(1, 0, 0))
         cylinder_matrix.translate(QVector3D(0, 20, 0))
@@ -139,18 +145,10 @@ class InstrumentView(QWidget):
         cylinder_transform.setMatrix(cylinder_matrix)
 
     @staticmethod
-    def create_individual_neutron():
-
-        neutron_entity = Qt3DCore.QEntity(self.rootEntity)
+    def set_sphere_mesh_radius(sphere_mesh):
 
         # Create a neutron mesh with a fixed radius
-        neutron_mesh = Qt3DExtras.QSphereMesh()
-        neutron_mesh.setRadius(3)
-
-        # Create the neutron transform and the controller that will change its matrix in order to make an animation
-        neutron_transform = Qt3DCore.QTransform()
-
-        return neutron_mesh, neutron_transform
+        sphere_mesh.setRadius(3)
 
     @staticmethod
     def create_neutron_animation(
@@ -185,24 +183,32 @@ class InstrumentView(QWidget):
 
         for i in range(self.num_neutrons):
 
-            # neutron_transformation = self.create_individual_neutron(self.neutron_entities[i])
+            neutron_animation, neutron_animation_controller = self.create_neutron_animation(
+                x_offsets[i],
+                y_offsets[i],
+                self.neutron_transforms[i],
+                -self.cylinder_length,
+                time_span_offsets[i],
+            )
 
-            # self.neutron_entities.append(neutron_entity)
-            # self.neutron_meshes.append(neutron_mesh)
-            self.neutron_transforms.append(neutron_transform)
             self.neutron_animation_controllers.append(neutron_animation_controller)
             self.neutron_animations.append(neutron_animation)
 
-            neutron_entity.addComponent(neutron_mesh)
-            neutron_entity.addComponent(self.grey_material)
-            neutron_entity.addComponent(neutron_transform)
+            self.add_components_to_entity(
+                self.neutron_entities[i],
+                [
+                    self.neutron_meshes[i],
+                    self.grey_material,
+                    self.neutron_transforms[i],
+                ],
+            )
 
     def initialise_view(self):
 
-        self.create_materials()
+        self.give_colours_to_materials()
 
         self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
         self.add_components_to_entity(
             self.cube_entity, [self.cube_mesh, self.red_material]
         )
-        # self.create_neutrons()
+        self.create_neutrons()
