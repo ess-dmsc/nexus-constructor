@@ -117,21 +117,6 @@ def test_GIVEN_radius_WHEN_calling_set_sphere_mesh_radius_THEN_radius_set():
     mock_sphere_mesh.setRadius.assert_called_once_with(radius)
 
 
-def test_GIVEN_target_and_offset_WHEN_calling_create_neutron_animation_controller_THEN_properties_set():
-
-    x_offset = 1
-    y_offset = 0
-    mock_neutron_transform = None
-
-    neutron_animation_controller = InstrumentView.create_neutron_animation_controller(
-        x_offset, y_offset, mock_neutron_transform
-    )
-
-    assert neutron_animation_controller._x_offset == x_offset
-    assert neutron_animation_controller._y_offset == y_offset
-    assert neutron_animation_controller._target == mock_neutron_transform
-
-
 def test_GIVEN_animation_parameters_WHEN_calling_set_neutron_animation_properties_THEN_properties_set():
 
     mock_neutron_animation_controller = Mock()

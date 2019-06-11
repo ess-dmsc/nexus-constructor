@@ -187,22 +187,6 @@ class InstrumentView(QWidget):
         sphere_mesh.setRadius(radius)
 
     @staticmethod
-    def create_neutron_animation_controller(x_offset, y_offset, neutron_transform):
-        """
-        Takes an x-offset, y-offset, and a QTransform and uses these to create a NeutronAnimationController.
-        :param x_offset: The desired x-offset.
-        :param y_offset: The desired y-offset.
-        :param neutron_transform: The transform that will be manipulated by the NeutronAnimationController.
-        :return An initialised NeutronAnimationController.
-        """
-        neutron_animation_controller = NeutronAnimationController(
-            x_offset, y_offset, neutron_transform
-        )
-        neutron_animation_controller.set_target(neutron_transform)
-
-        return neutron_animation_controller
-
-    @staticmethod
     def set_neutron_animation_properties(
         neutron_animation,
         neutron_animation_controller,
@@ -239,8 +223,12 @@ class InstrumentView(QWidget):
 
             self.set_sphere_mesh_radius(self.neutron_objects["meshes"][i], 3)
 
-            neutron_animation_controller = self.create_neutron_animation_controller(
+            neutron_animation_controller = NeutronAnimationController(
                 x_offsets[i], y_offsets[i], self.neutron_objects["transforms"][i]
+            )
+
+            neutron_animation_controller.set_target(
+                self.neutron_objects["transforms"][i]
             )
 
             neutron_animation = QPropertyAnimation(
