@@ -106,13 +106,22 @@ class InstrumentView(QWidget):
 
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
-
+        """
+        Takes a cube mesh and sets its x, y, and z extents.
+        :param cube_mesh: The cube mesh to modify.
+        :param x: The x extent.
+        :param y: The y extent.
+        :param z: The z extent.
+        """
         cube_mesh.setXExtent(x)
         cube_mesh.setYExtent(y)
         cube_mesh.setZExtent(z)
 
     def setup_sample_cube(self):
-
+        """
+        Sets up the cube that represents a sample in the 3D view. Creates a cube mesh with a set size and then adds this
+        along with a material to the entity.
+        """
         self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
         self.add_components_to_entity(
             self.cube_entity, [self.cube_mesh, self.red_material]
@@ -127,8 +136,14 @@ class InstrumentView(QWidget):
             entity.addComponent(component)
 
     @staticmethod
-    def set_cylinder_mesh_properties(cylinder_mesh, radius, length, rings):
-
+    def set_cylinder_mesh_dimensions(cylinder_mesh, radius, length, rings):
+        """
+        sets the dimensions of a cylinder mesh.
+        :param cylinder_mesh: The cylinder mesh to modify.
+        :param radius: The radius for the cylinder mesh.
+        :param length: The length for the cylinder mesh.
+        :param rings: The number of rings for the cylinder mesh.
+        """
         cylinder_mesh.setRadius(radius)
         cylinder_mesh.setLength(length)
         cylinder_mesh.setRings(rings)
@@ -136,7 +151,8 @@ class InstrumentView(QWidget):
     @staticmethod
     def set_beam_transform(cylinder_transform):
         """
-        Creates the initial beam cylinder.
+        Sets the transform for the beam cylinder by creating a matrix and setting as the transformation matrix.
+        :param cylinder_transform: A QTransform object.
         """
         cylinder_matrix = QMatrix4x4()
         cylinder_matrix.rotate(270, QVector3D(1, 0, 0))
@@ -146,7 +162,7 @@ class InstrumentView(QWidget):
 
     def setup_beam_cylinder(self):
 
-        self.set_cylinder_mesh_properties(
+        self.set_cylinder_mesh_dimensions(
             self.cylinder_mesh, 2.5, self.cylinder_length, 2
         )
         self.set_beam_transform(self.cylinder_transform)
