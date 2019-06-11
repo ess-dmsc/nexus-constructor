@@ -203,21 +203,19 @@ class InstrumentView(QWidget):
         return neutron_animation_controller
 
     @staticmethod
-    def create_neutron_animation(
-        neutron_transform,
+    def set_neutron_animation_properties(
+        neutron_animation,
         neutron_animation_controller,
         animation_distance,
         time_span_offset,
     ):
         """
-        Creates a QPropertyAnimation for a neutron.
-        :param neutron_transform: The related transform object.
+        Prepares a QPropertyAnimation by giving it a target, a distance, and loop settings.
+        :param neutron_animation: The QPropertyAnimation to be configured.
         :param neutron_animation_controller: The related animation controller object.
         :param animation_distance: The distance that the neutron should move.
         :param time_span_offset: The offset that allows the neutron to move at a different time from other neutrons.
-        :return: An initialised QPropertyAnimation that has been set to run forever.
         """
-        neutron_animation = QPropertyAnimation(neutron_transform)
         neutron_animation.setTargetObject(neutron_animation_controller)
         neutron_animation.setPropertyName(b"distance")
         neutron_animation.setStartValue(animation_distance)
@@ -225,8 +223,6 @@ class InstrumentView(QWidget):
         neutron_animation.setDuration(500 + time_span_offset)
         neutron_animation.setLoopCount(-1)
         neutron_animation.start()
-
-        return neutron_animation
 
     def setup_neutrons(self):
         """
@@ -247,8 +243,12 @@ class InstrumentView(QWidget):
                 x_offsets[i], y_offsets[i], self.neutron_objects["transforms"][i]
             )
 
-            neutron_animation = self.create_neutron_animation(
-                self.neutron_objects["transforms"][i],
+            neutron_animation = QPropertyAnimation(
+                self.neutron_objects["transforms"][i]
+            )
+
+            self.set_neutron_animation_properties(
+                neutron_animation,
                 neutron_animation_controller,
                 -self.cylinder_length,
                 time_span_offsets[i],

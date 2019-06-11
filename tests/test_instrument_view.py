@@ -106,17 +106,37 @@ def test_GIVEN_cylinder_transform_WHEN_calling_set_beam_transform_THEN_matrix_se
     assert mock_cylinder_transform.setMatrix.call_args[0][0] == expected_matrix
 
 
-def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_add_component_called():
-    pass
-
-
 def test_GIVEN_radius_WHEN_calling_set_sphere_mesh_radius_THEN_radius_set():
-    pass
+
+    radius = 2
+    mock_sphere_mesh = Mock()
+    mock_sphere_mesh.setRadius = Mock()
+
+    InstrumentView.set_sphere_mesh_radius(mock_sphere_mesh, radius)
+
+    mock_sphere_mesh.setRadius.assert_called_once_with(radius)
 
 
 def test_GIVEN_target_and_offset_WHEN_calling_create_neutron_animation_controller_THEN_properties_set():
-    pass
+
+    x_offset = 1
+    y_offset = 0
+    mock_neutron_transform = None
+
+    neutron_animation_controller = InstrumentView.create_neutron_animation_controller(
+        x_offset, y_offset, mock_neutron_transform
+    )
+
+    assert neutron_animation_controller._x_offset == x_offset
+    assert neutron_animation_controller._y_offset == y_offset
+    assert neutron_animation_controller._target == mock_neutron_transform
 
 
 def test_GIVEN_animation_parameters_WHEN_calling_create_neutron_animation_THEN_parameters_set():
-    pass
+
+    mock_neutron_transform = None
+    mock_neutron_animation_controller = Mock()
+    animation_distance = 15
+    time_span_offset = 5
+
+    # neutron_animation = InstrumentView.set_neutron_animation_properties(mock_neutron_transform, mock_neutron_animation_controller, animation_distance, time_span_offset)
