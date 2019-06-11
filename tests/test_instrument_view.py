@@ -13,7 +13,10 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
     mock_material.setAmbient = Mock()
     mock_material.setDiffuse = Mock()
 
-    # This method doesn't exist for QPhongMaterial but is mocked all the same to make sure that it isn't called
+    """
+    This method doesn't exist for QPhongMaterial but is mocked all the same to make sure that it isn't called when an
+    alpha argument isn't given
+    """
     mock_material.setAlpha = Mock()
 
     InstrumentView.set_material_properties(mock_material, ambient, diffuse)

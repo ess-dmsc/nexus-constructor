@@ -155,7 +155,7 @@ class InstrumentView(QWidget):
         :param cylinder_transform: A QTransform object.
         """
         """
-        This matrix will turn the cylinder sideways and then move it "backwards" in the z-direction by 20 units so that 
+        This matrix will turn the cylinder sideways and then move it "backwards" in the z-direction by 20 units so that
         it ends at the location of the sample.
         """
         cylinder_matrix = QMatrix4x4()
