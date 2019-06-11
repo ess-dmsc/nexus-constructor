@@ -22,7 +22,10 @@ class InstrumentView(QWidget):
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
-        self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.1, 1000)
+        # Enable the camera to see a large distance by giving it a small nearView and large farView
+        self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.01, 1000)
+
+        # Set the camera view centre as the origin and position the camera so that it looks down at the nuetron beam
         self.view.camera().setPosition(QVector3D(6, 8, 30))
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
 
@@ -46,7 +49,9 @@ class InstrumentView(QWidget):
 
         self.num_neutrons = 9
 
-        # Create lists for neutron-related objects
+        """
+        Create a dictionary for neutron-related objects so that they are always in scope and bot destroyed by C++
+        """
         self.neutron_objects = {
             "entities": [],
             "meshes": [],
