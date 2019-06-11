@@ -22,7 +22,7 @@ class InstrumentView(QWidget):
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
-        # self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.1, 1000)
+        self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.1, 1000)
         self.view.camera().setPosition(QVector3D(6, 8, 30))
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
 
