@@ -250,7 +250,9 @@ class InstrumentView(QWidget):
                 time_span_offsets[i],
             )
 
-            self.neutron_objects["animation_controllers"].append(neutron_animation_controller)
+            self.neutron_objects["animation_controllers"].append(
+                neutron_animation_controller
+            )
             self.neutron_objects["animations"].append(neutron_animation)
 
             self.add_components_to_entity(
