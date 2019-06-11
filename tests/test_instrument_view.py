@@ -1,5 +1,5 @@
 from nexus_constructor.InstrumentView import InstrumentView
-from mock import Mock
+from mock import Mock, call
 
 
 def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_properties_set():
@@ -61,7 +61,15 @@ def test_GIVEN_cube_dimensions_WHEN_calling_set_cube_mesh_dimesions_THEN_dimensi
 
 
 def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_added():
-    pass
+
+    mock_entity = Mock()
+    mock_entity.addComponent = Mock()
+    mock_components = [Mock() for _ in range(4)]
+    calls = [call(mock_component) for mock_component in mock_components]
+
+    InstrumentView.add_components_to_entity(mock_entity, mock_components)
+
+    mock_entity.addComponent.assert_has_calls(calls)
 
 
 def test_GIVEN_cylinder_dimensions_WHEN_calling_set_cylinder_mesh_dimensions_THEN_dimensions_set():
