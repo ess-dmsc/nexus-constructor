@@ -134,9 +134,32 @@ def test_GIVEN_target_and_offset_WHEN_calling_create_neutron_animation_controlle
 
 def test_GIVEN_animation_parameters_WHEN_calling_create_neutron_animation_THEN_parameters_set():
 
-    mock_neutron_transform = None
     mock_neutron_animation_controller = Mock()
     animation_distance = 15
     time_span_offset = 5
 
-    # neutron_animation = InstrumentView.set_neutron_animation_properties(mock_neutron_transform, mock_neutron_animation_controller, animation_distance, time_span_offset)
+    mock_neutron_animation = Mock()
+    mock_neutron_animation.setTargetObject = Mock()
+    mock_neutron_animation.setPropertyName = Mock()
+    mock_neutron_animation.setStartValue = Mock()
+    mock_neutron_animation.setEndValue = Mock()
+    mock_neutron_animation.setDuration = Mock()
+    mock_neutron_animation.setLoopCount = Mock()
+    mock_neutron_animation.start = Mock()
+
+    InstrumentView.set_neutron_animation_properties(
+        mock_neutron_animation,
+        mock_neutron_animation_controller,
+        animation_distance,
+        time_span_offset,
+    )
+
+    mock_neutron_animation.setTargetObject.assert_called_once_with(
+        mock_neutron_animation_controller
+    )
+    mock_neutron_animation.setPropertyName.assert_called_once_with(b"distance")
+    mock_neutron_animation.setStartValue.assert_called_once_with(animation_distance)
+    mock_neutron_animation.setEndValue.assert_called_once_with(0)
+    mock_neutron_animation.setDuration.assert_called_once_with(500 + time_span_offset)
+    mock_neutron_animation.setLoopCount.assert_called_once_with(-1)
+    mock_neutron_animation.start.assert_called_once()
