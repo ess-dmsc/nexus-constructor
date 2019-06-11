@@ -22,7 +22,7 @@ class InstrumentView(QWidget):
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
-        self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.1, 1000)
+        # self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.1, 1000)
         self.view.camera().setPosition(QVector3D(6, 8, 30))
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
 
@@ -153,6 +153,10 @@ class InstrumentView(QWidget):
         """
         Configures the transform for the beam cylinder by giving it a matrix.
         :param cylinder_transform: A QTransform object.
+        """
+        """
+        This matrix will turn the cylinder sideways and then move it "backwards" in the z-direction by 20 units so that 
+        it ends at the location of the sample.
         """
         cylinder_matrix = QMatrix4x4()
         cylinder_matrix.rotate(270, QVector3D(1, 0, 0))
