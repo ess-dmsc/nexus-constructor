@@ -47,17 +47,18 @@ class InstrumentView(QWidget):
         self.num_neutrons = 9
 
         # Create lists for neutron-related objects
-        self.neutron_entities = []
-        self.neutron_meshes = []
-        self.neutron_transforms = []
+        self.neutron_objects = {
+            "entities": [],
+            "meshes": [],
+            "transforms": [],
+            "animation_controllers": [],
+            "animations": [],
+        }
 
         for i in range(self.num_neutrons):
-            self.neutron_entities.append(Qt3DCore.QEntity(self.root_entity))
-            self.neutron_meshes.append(Qt3DExtras.QSphereMesh())
-            self.neutron_transforms.append(Qt3DCore.QTransform())
-
-        self.neutron_animation_controllers = []
-        self.neutron_animations = []
+            self.neutron_objects["entities"].append(Qt3DCore.QEntity(self.root_entity))
+            self.neutron_objects["meshes"].append(Qt3DExtras.QSphereMesh())
+            self.neutron_objects["transforms"].append(Qt3DCore.QTransform())
 
         self.cylinder_length = 40
 
@@ -204,8 +205,14 @@ class InstrumentView(QWidget):
         animation_distance,
         time_span_offset,
     ):
-
-        # Instruct the NeutronAnimationController to move the neutron along the z-axis from -40 to 0
+        """
+        Creates a QPropertyAnimation for a neutron.
+        :param neutron_transform: The related transform object.
+        :param neutron_animation_controller: The related animation controller object.
+        :param animation_distance: The distance that the neutron should move.
+        :param time_span_offset: The offset that allows the neutron to move at a different time from other neutrons.
+        :return: An initialised QPropertyAnimation that has been set to run forever.
+        """
         neutron_animation = QPropertyAnimation(neutron_transform)
         neutron_animation.setTargetObject(neutron_animation_controller)
         neutron_animation.setPropertyName(b"distance")
@@ -219,8 +226,10 @@ class InstrumentView(QWidget):
 
     def setup_neutrons(self):
         """
-        Creates the neutron animations.
+        Sets up the neutrons and their animation by preparing their entities and meshes and then giving offset
+        offset and distance parameters to an animation.
         """
+
         # Create lists of x, y, and time offsets for the neutron animations
         x_offsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
         y_offsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
@@ -228,33 +237,36 @@ class InstrumentView(QWidget):
 
         for i in range(self.num_neutrons):
 
-            self.set_sphere_mesh_radius(self.neutron_meshes[i], 3)
+            self.set_sphere_mesh_radius(self.neutron_objects["meshes"][i], 3)
 
             neutron_animation_controller = self.create_neutron_animation_controller(
-                x_offsets[i], y_offsets[i], self.neutron_transforms[i]
+                x_offsets[i], y_offsets[i], self.neutron_objects["transforms"][i]
             )
 
             neutron_animation = self.create_neutron_animation(
-                self.neutron_transforms[i],
+                self.neutron_objects["transforms"][i],
                 neutron_animation_controller,
                 -self.cylinder_length,
                 time_span_offsets[i],
             )
 
-            self.neutron_animation_controllers.append(neutron_animation_controller)
-            self.neutron_animations.append(neutron_animation)
+            self.neutron_objects["animation_controllers"].append(neutron_animation_controller)
+            self.neutron_objects["animations"].append(neutron_animation)
 
             self.add_components_to_entity(
-                self.neutron_entities[i],
+                self.neutron_objects["entities"][i],
                 [
-                    self.neutron_meshes[i],
+                    self.neutron_objects["meshes"][i],
                     self.grey_material,
-                    self.neutron_transforms[i],
+                    self.neutron_objects["transforms"][i],
                 ],
             )
 
     def initialise_view(self):
-
+        """
+        Calls the methods for defining materials, setting up the same cube and setting up the neutrons. Beam-related
+        functions are called outside of this method to ensure that this is generated last.
+        """
         self.give_colours_to_materials()
         self.setup_sample_cube()
         self.setup_neutrons()
