@@ -107,11 +107,11 @@ class InstrumentView(QWidget):
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
         """
-        Takes a cube mesh and sets its x, y, and z extents.
+        Sets the dimensions of a cube mesh.
         :param cube_mesh: The cube mesh to modify.
-        :param x: The x extent.
-        :param y: The y extent.
-        :param z: The z extent.
+        :param x: The desired x extent.
+        :param y: The desired y extent.
+        :param z: The desired z extent.
         """
         cube_mesh.setXExtent(x)
         cube_mesh.setYExtent(y)
@@ -119,8 +119,7 @@ class InstrumentView(QWidget):
 
     def setup_sample_cube(self):
         """
-        Sets up the cube that represents a sample in the 3D view. Creates a cube mesh with a set size and then adds this
-        along with a material to the entity.
+        Sets up the cube that represents a sample in the 3D view by giving the cube entity a mesh and a material.
         """
         self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
         self.add_components_to_entity(
@@ -138,11 +137,11 @@ class InstrumentView(QWidget):
     @staticmethod
     def set_cylinder_mesh_dimensions(cylinder_mesh, radius, length, rings):
         """
-        sets the dimensions of a cylinder mesh.
+        Sets the dimensions of a cylinder mesh.
         :param cylinder_mesh: The cylinder mesh to modify.
-        :param radius: The radius for the cylinder mesh.
-        :param length: The length for the cylinder mesh.
-        :param rings: The number of rings for the cylinder mesh.
+        :param radius: The desired radius.
+        :param length: The desired length.
+        :param rings: The desired number of rings.
         """
         cylinder_mesh.setRadius(radius)
         cylinder_mesh.setLength(length)
@@ -151,7 +150,7 @@ class InstrumentView(QWidget):
     @staticmethod
     def set_beam_transform(cylinder_transform):
         """
-        Sets the transform for the beam cylinder by creating a matrix and setting as the transformation matrix.
+        Configures the transform for the beam cylinder by giving it a matrix.
         :param cylinder_transform: A QTransform object.
         """
         cylinder_matrix = QMatrix4x4()
@@ -161,7 +160,9 @@ class InstrumentView(QWidget):
         cylinder_transform.setMatrix(cylinder_matrix)
 
     def setup_beam_cylinder(self):
-
+        """
+        Sets up the beam cylinder by giving the cylinder entity a mesh, a material, and a transformation.
+        """
         self.set_cylinder_mesh_dimensions(
             self.cylinder_mesh, 2.5, self.cylinder_length, 2
         )
@@ -173,13 +174,22 @@ class InstrumentView(QWidget):
 
     @staticmethod
     def set_sphere_mesh_radius(sphere_mesh, radius):
-
-        # Create a neutron mesh with a fixed radius
+        """
+        Sets the radius of a sphere mesh.
+        :param sphere_mesh: The sphere mesh to modify.
+        :param radius: The desired radius.
+        """
         sphere_mesh.setRadius(radius)
 
     @staticmethod
     def create_neutron_animation_controller(x_offset, y_offset, neutron_transform):
-
+        """
+        Takes an x-offset, y-offset, and a QTransform and uses these to create a NeutronAnimationController.
+        :param x_offset: The desired x-offset.
+        :param y_offset: The desired y-offset.
+        :param neutron_transform: The transform that will be manipulated by the NeutronAnimationController.
+        :return An initialised NeutronAnimationController.
+        """
         neutron_animation_controller = NeutronAnimationController(
             x_offset, y_offset, neutron_transform
         )
