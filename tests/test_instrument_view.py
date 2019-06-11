@@ -12,12 +12,9 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
     mock_material = Mock()
     mock_material.setAmbient = Mock()
     mock_material.setDiffuse = Mock()
-    mock_material.setAlpha = Mock()
 
-    mock_phong_material = Mock()
-    mock_phong_material.setAmbient = Mock()
-    mock_phong_material.setDiffuse = Mock()
-    mock_phong_material.setAmbient = Mock()
+    # This method doesn't exist for QPhongMaterial but is mocked all the same to make sure that it isn't called
+    mock_material.setAlpha = Mock()
 
     InstrumentView.set_material_properties(mock_material, ambient, diffuse)
 
@@ -26,22 +23,22 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
     mock_material.setAlpha.assert_not_called()
 
 
-def test_GIVEN_phong_material_properties_WHEN_calling_set_material_properties_THEN_properties_set():
+def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_THEN_properties_set():
 
     ambient = Mock()
     diffuse = Mock()
     alpha = 0.5
 
-    mock_phong_material = Mock()
-    mock_phong_material.setAmbient = Mock()
-    mock_phong_material.setDiffuse = Mock()
-    mock_phong_material.setAmbient = Mock()
+    mock_alpha_material = Mock()
+    mock_alpha_material.setAmbient = Mock()
+    mock_alpha_material.setDiffuse = Mock()
+    mock_alpha_material.setAmbient = Mock()
 
-    InstrumentView.set_material_properties(mock_phong_material, ambient, diffuse, alpha)
+    InstrumentView.set_material_properties(mock_alpha_material, ambient, diffuse, alpha)
 
-    mock_phong_material.setAmbient.assert_called_once_with(ambient)
-    mock_phong_material.setDiffuse.assert_called_once_with(diffuse)
-    mock_phong_material.setAlpha.assert_called_once_with(alpha)
+    mock_alpha_material.setAmbient.assert_called_once_with(ambient)
+    mock_alpha_material.setDiffuse.assert_called_once_with(diffuse)
+    mock_alpha_material.setAlpha.assert_called_once_with(alpha)
 
 
 def test_GIVEN_cube_dimensions_WHEN_calling_set_cube_mesh_dimesions_THEN_dimensions_set():
@@ -132,7 +129,7 @@ def test_GIVEN_target_and_offset_WHEN_calling_create_neutron_animation_controlle
     assert neutron_animation_controller._target == mock_neutron_transform
 
 
-def test_GIVEN_animation_parameters_WHEN_calling_create_neutron_animation_THEN_parameters_set():
+def test_GIVEN_animation_parameters_WHEN_calling_set_neutron_animation_properties_THEN_properties_set():
 
     mock_neutron_animation_controller = Mock()
     animation_distance = 15
