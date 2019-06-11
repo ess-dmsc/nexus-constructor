@@ -1,3 +1,5 @@
+from PySide2.QtGui import QMatrix4x4, QVector3D
+
 from nexus_constructor.InstrumentView import InstrumentView
 from mock import Mock, call
 
@@ -73,7 +75,35 @@ def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_
 
 
 def test_GIVEN_cylinder_dimensions_WHEN_calling_set_cylinder_mesh_dimensions_THEN_dimensions_set():
-    pass
+
+    radius = 2
+    length = 10
+    rings = 2
+
+    mock_cylinder = Mock()
+    mock_cylinder.setRadius = Mock()
+    mock_cylinder.setLength = Mock()
+    mock_cylinder.setRings = Mock()
+
+    InstrumentView.set_cylinder_mesh_dimensions(mock_cylinder, radius, length, rings)
+
+    mock_cylinder.setRadius.assert_called_once_with(radius)
+    mock_cylinder.setLength.assert_called_once_with(length)
+    mock_cylinder.setRings.assert_called_once_with(rings)
+
+
+def test_GIVEN_cylinder_transform_WHEN_calling_set_beam_transform_THEN_matrix_set():
+
+    expected_matrix = QMatrix4x4()
+    expected_matrix.rotate(270, QVector3D(1, 0, 0))
+    expected_matrix.translate(QVector3D(0, 20, 0))
+
+    mock_cylinder_transform = Mock()
+    mock_cylinder_transform.setMatrix = Mock()
+
+    InstrumentView.set_beam_transform(mock_cylinder_transform)
+
+    assert mock_cylinder_transform.setMatrix.call_args[0][0] == expected_matrix
 
 
 def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_add_component_called():
