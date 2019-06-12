@@ -37,6 +37,7 @@ unix_removable = [
     "lib/PySide2/libclang.so.6",
     "lib/PySide2/Qt/resources/",
     "lib/PySide2/Qt/translations/",
+    "lib/PySide2/Qt/qml",
 ]
 
 win_removable = [
@@ -46,6 +47,7 @@ win_removable = [
     "lib/PySide2/libclang.dll",
     "lib/PySide2/resources/",
     "lib/PySide2/translations/",
+    "lib/PySide2/qml",
 ]
 
 # GUI applications require a different base on Windows (the default is for a console application).
