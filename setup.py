@@ -76,6 +76,10 @@ unix_removable = [
     "lib/matplotlib",
     "lib/mpl_toolkits",
     "lib/msgpack",
+    "lib/multiprocessing",
+    "lib/nbconvert",
+    "lib/nbformat",
+    "lib/netCDF4",
 ]
 
 win_removable = [
