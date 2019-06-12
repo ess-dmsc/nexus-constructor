@@ -49,8 +49,13 @@ unix_removable = [
     "lib/certifi",
     "lib/chardet",
     "lib/click",
+    "lib/cryptography",
     "lib/curses",
     "lib/cftime",
+    "lib/dask",
+    "lib/dateutil",
+    "lib/distributed",
+    "lib/docutils",
 ]
 
 win_removable = [
