@@ -50,7 +50,7 @@ class InstrumentView(QWidget):
         self.num_neutrons = 9
 
         """
-        Create a dictionary for neutron-related objects so that they are always in scope and bot destroyed by C++
+        Create a dictionary for neutron-related objects so that they are always in scope and not destroyed by C++
         """
         self.neutron_objects = {
             "entities": [],
@@ -199,10 +199,10 @@ class InstrumentView(QWidget):
         time_span_offset,
     ):
         """
-        Prepares a QPropertyAnimation by giving it a target, a distance, and loop settings.
+        Prepares a QPropertyAnimation for a neutron by giving it a target, a distance, and loop settings.
         :param neutron_animation: The QPropertyAnimation to be configured.
         :param neutron_animation_controller: The related animation controller object.
-        :param animation_distance: The distance that the neutron should move.
+        :param animation_distance: The starting distance of the neutron.
         :param time_span_offset: The offset that allows the neutron to move at a different time from other neutrons.
         """
         neutron_animation.setTargetObject(neutron_animation_controller)
@@ -215,8 +215,8 @@ class InstrumentView(QWidget):
 
     def setup_neutrons(self):
         """
-        Sets up the neutrons and their animation by preparing their entities and meshes and then giving offset
-        offset and distance parameters to an animation.
+        Sets up the neutrons and their animations by preparing their meshes and then giving offset and
+        distance parameters to an animation controller.
         """
 
         # Create lists of x, y, and time offsets for the neutron animations
@@ -224,14 +224,15 @@ class InstrumentView(QWidget):
         y_offsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
         time_span_offsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
 
+        neutron_radius = 3
+
         for i in range(self.num_neutrons):
 
-            self.set_sphere_mesh_radius(self.neutron_objects["meshes"][i], 3)
+            self.set_sphere_mesh_radius(self.neutron_objects["meshes"][i], neutron_radius)
 
             neutron_animation_controller = NeutronAnimationController(
                 x_offsets[i], y_offsets[i], self.neutron_objects["transforms"][i]
             )
-
             neutron_animation_controller.set_target(
                 self.neutron_objects["transforms"][i]
             )
@@ -239,7 +240,6 @@ class InstrumentView(QWidget):
             neutron_animation = QPropertyAnimation(
                 self.neutron_objects["transforms"][i]
             )
-
             self.set_neutron_animation_properties(
                 neutron_animation,
                 neutron_animation_controller,
@@ -263,8 +263,8 @@ class InstrumentView(QWidget):
 
     def initialise_view(self):
         """
-        Calls the methods for defining materials, setting up the same cube and setting up the neutrons. Beam-related
-        functions are called outside of this method to ensure that this is generated last.
+        Calls the methods for defining materials, setting up the sample cube, and setting up the neutrons. Beam-related
+        functions are called outside of this method to ensure that those things are generated last.
         """
         self.give_colours_to_materials()
         self.setup_sample_cube()
