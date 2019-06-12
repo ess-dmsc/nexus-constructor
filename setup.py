@@ -56,6 +56,7 @@ unix_removable = [
     "lib/dateutil",
     "lib/distributed",
     "lib/docutils",
+    "lib/fabio",
 ]
 
 win_removable = [
