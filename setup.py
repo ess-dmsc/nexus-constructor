@@ -38,10 +38,12 @@ unix_removable = [
     "lib/PySide2/Qt/resources/",
     "lib/PySide2/Qt/translations/",
     "lib/PySide2/Qt/qml",
+    "lib/apport",
     "lib/notebook",
     "lib/xarray",
     "lib/concurrent",
     "lib/bokeh",
+    "lib/curses",
 ]
 
 win_removable = [
