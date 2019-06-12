@@ -92,6 +92,21 @@ unix_removable = [
     "lib/psutil",
     "lib/ptyprocess",
     "lib/py",
+    "lib/pydoc_data",
+    "lib/pygments",
+    "lib/pytz",
+    "lib/requests",
+    "lib/scipy",
+    "lib/setuptools",
+    "lib/simplejson",
+    "lib/sortedcontainers",
+    "lib/sqlite3",
+    "lib/tables",
+    "lib/tblib",
+    "lib/testpath",
+    "lib/toolz",
+    "lib/tornado",
+    "lib/traitlets",
 ]
 
 win_removable = [
