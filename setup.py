@@ -65,6 +65,12 @@ unix_removable = [
     "lib/ipykernel",
     "lib/IPython",
     "lib/ipython_genutils",
+    "lib/ipywidgets",
+    "lib/jinja2",
+    "lib/jupyter_client",
+    "lib/jupyter_core",
+    "lib/lib2to3",
+    "lib/locket",
 ]
 
 win_removable = [
