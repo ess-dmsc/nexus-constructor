@@ -41,6 +41,7 @@ unix_removable = [
     "lib/notebook",
     "lib/xarray",
     "lib/concurrent",
+    "lib/bokeh",
 ]
 
 win_removable = [
