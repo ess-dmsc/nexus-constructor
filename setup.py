@@ -47,6 +47,8 @@ unix_removable = [
     "lib/bokeh",
     "lib/bs4",
     "lib/certifi",
+    "lib/chardet",
+    "lib/click",
     "lib/curses",
     "lib/cftime",
 ]
