@@ -107,6 +107,13 @@ unix_removable = [
     "lib/toolz",
     "lib/tornado",
     "lib/traitlets",
+    "lib/urllib3",
+    "lib/wcwidth",
+    "lib/webencodings",
+    "lib/xmlrpc",
+    "lib/yaml",
+    "lib/zict",
+    "lib/zmq",
 ]
 
 win_removable = [
