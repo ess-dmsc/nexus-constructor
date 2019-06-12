@@ -39,12 +39,13 @@ unix_removable = [
     "lib/PySide2/Qt/translations/",
     "lib/PySide2/Qt/qml",
     "lib/apt",
-    "lib/apport",
     "lib/asn1crypto",
+    "lib/asyncio",
     "lib/notebook",
     "lib/xarray",
     "lib/concurrent",
     "lib/bokeh",
+    "lib/bs4",
     "lib/curses",
 ]
 
