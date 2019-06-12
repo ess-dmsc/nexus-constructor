@@ -46,7 +46,9 @@ unix_removable = [
     "lib/concurrent",
     "lib/bokeh",
     "lib/bs4",
+    "lib/certifi",
     "lib/curses",
+    "lib/cftime",
 ]
 
 win_removable = [
