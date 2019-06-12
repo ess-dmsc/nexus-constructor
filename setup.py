@@ -71,6 +71,11 @@ unix_removable = [
     "lib/jupyter_core",
     "lib/lib2to3",
     "lib/locket",
+    "lib/lxml",
+    "lib/markupsafe",
+    "lib/matplotlib",
+    "lib/mpl_toolkits",
+    "lib/msgpack",
 ]
 
 win_removable = [
