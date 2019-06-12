@@ -57,6 +57,7 @@ unix_removable = [
     "lib/distributed",
     "lib/docutils",
     "lib/fabio",
+    "lib/gi",
 ]
 
 win_removable = [
