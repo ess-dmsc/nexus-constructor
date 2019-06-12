@@ -80,6 +80,18 @@ unix_removable = [
     "lib/nbconvert",
     "lib/nbformat",
     "lib/netCDF4",
+    "lib/nose",
+    "lib/numexpr",
+    "lib/packaging",
+    "lib/pandas",
+    "lib/partd",
+    "lib/pbr",
+    "lib/pexpect",
+    "lib/PIL",
+    "lib/prompt_toolkit",
+    "lib/psutil",
+    "lib/ptyprocess",
+    "lib/py",
 ]
 
 win_removable = [
