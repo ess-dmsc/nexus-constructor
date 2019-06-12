@@ -58,6 +58,13 @@ unix_removable = [
     "lib/docutils",
     "lib/fabio",
     "lib/gi",
+    "lib/html",
+    "lib/html5lib",
+    "lib/http",
+    "lib/idna",
+    "lib/ipykernel",
+    "lib/IPython",
+    "lib/ipython_genutils",
 ]
 
 win_removable = [
