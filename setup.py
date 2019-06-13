@@ -171,7 +171,23 @@ for f in unused_pyside_files:
     removable_pyside_win.append(f + "dll")
 
 # PySide2 files that appear in a different directory depending on the OS
-pyside_lib_files = ["Qt5WebEngine.", "Qt5WebEngineCore.", "Qt5WebEngineWidgets."]
+pyside_lib_files = [
+    "Qt5WebEngine.",
+    "Qt5WebEngineCore.",
+    "Qt5WebEngineWidgets."
+    "Qt53DAnimation.",
+    "Qt53DInput.",
+    "Qt53DLogic.",
+    "Qt53DQuickAnimation.",
+    "Qt53DQuickExtras.",
+    "Qt53DQuickInput.",
+    "Qt53DQuickRender.",
+    "Qt53DQuickScene2D.",
+    "Qt5Bluetooth.",
+    "Qt5Charts.",
+    "Qt5Concurrent.",
+    "Qt5DataVisualization.",
+]
 
 for f in pyside_lib_files:
     removable_pyside_unix.append("lib/PySide2/Qt/lib/lib" + f + "so.5")
