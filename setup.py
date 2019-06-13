@@ -148,6 +148,9 @@ unix_removable = [
     "lib/_ssl.cpython-36m-x86_64-linux-gnu.so",
     "lib/termios.cpython-36m-x86_64-linux-gnu.so",
     "lib/_yaml.cpython-36m-x86_64-linux-gnu.so",
+    "lib/numpy/f2py",
+    "lib/numpy/disturils",
+    "lib/numpy/doc",
 ]
 
 win_removable = [
