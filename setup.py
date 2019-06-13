@@ -151,6 +151,22 @@ unix_removable = [
     "lib/numpy/f2py",
     "lib/numpy/distutils",
     "lib/PyQt5",
+    "lib/PySide2/QtWebChannel.abi3.so",
+    "lib/PySide2/QtWebChannel.pyi",
+    "lib/PySide2/QtWebEngine.abi3.so",
+    "lib/PySide2/QtWebEngineCore.abi3.so",
+    "lib/PySide2/QtWebEngineCore.pyi",
+    "lib/PySide2/QtWebEngine.pyi",
+    "lib/PySide2/QtWebEngineWidgets.abi3.so",
+    "lib/PySide2/QtWebEngineWidgets.pyi",
+    "lib/PySide2/QtWebSockets.abi3.so",
+    "lib/PySide2/QtWebSockets.pyi",
+    "lib/PySide2/QtMultimedia.abi3.so",
+    "lib/PySide2/QtMultimedia.pyi",
+    "lib/PySide2/QtMultimediaWidgets.abi3.so",
+    "lib/PySide2/QtMultimediaWidgets.pyi",
+    "lib/PySide2/QtTextToSpeech.abi3.so",
+    "lib/PySide2/QtTextToSpeech.pyi",
 ]
 
 win_removable = [
