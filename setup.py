@@ -174,8 +174,7 @@ for f in unused_pyside_files:
 pyside_lib_files = [
     "Qt5WebEngine.",
     "Qt5WebEngineCore.",
-    "Qt5WebEngineWidgets."
-    "Qt53DAnimation.",
+    "Qt5WebEngineWidgets." "Qt53DAnimation.",
     "Qt53DInput.",
     "Qt53DLogic.",
     "Qt53DQuickAnimation.",
