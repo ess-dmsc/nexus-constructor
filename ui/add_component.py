@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Thu Jun 13 13:41:52 2019
+# Created: Thu Jun 13 13:46:11 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -29,7 +29,9 @@ class Ui_AddComponentDialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.buttonBox.sizePolicy().hasHeightForWidth())
         self.buttonBox.setSizePolicy(sizePolicy)
+        self.buttonBox.setMaximumSize(QtCore.QSize(200, 16777215))
         self.buttonBox.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.buttonBox.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.buttonBox.setAutoDefault(False)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout_3.addWidget(self.buttonBox, 1, 0, 1, 1)
