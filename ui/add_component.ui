@@ -274,7 +274,7 @@
               <item>
                <widget class="QLineEdit" name="unitsLineEdit">
                 <property name="text">
-                 <string>m</string>
+                 <string/>
                 </property>
                 <property name="placeholderText">
                  <string/>
