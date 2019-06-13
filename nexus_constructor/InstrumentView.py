@@ -25,7 +25,7 @@ class InstrumentView(QWidget):
         # Enable the camera to see a large distance by giving it a small nearView and large farView
         self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.01, 1000)
 
-        # Set the camera view centre as the origin and position the camera so that it looks down at the nuetron beam
+        # Set the camera view centre as the origin and position the camera so that it looks down at the neutron beam
         self.view.camera().setPosition(QVector3D(6, 8, 30))
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
 
@@ -49,9 +49,7 @@ class InstrumentView(QWidget):
 
         self.num_neutrons = 9
 
-        """
-        Create a dictionary for neutron-related objects so that they are always in scope and not destroyed by C++
-        """
+        # Create a dictionary for neutron-related objects so that they are always in scope and not destroyed by C++
         self.neutron_objects = {
             "entities": [],
             "meshes": [],
@@ -85,7 +83,7 @@ class InstrumentView(QWidget):
         :param ambient: The desired ambient colour of the material.
         :param diffuse: The desired diffuse colour of the material.
         :param alpha: The desired alpha value of the material. Optional argument as not all material-types have this
-                         property.
+                      property.
         """
         material.setAmbient(ambient)
         material.setDiffuse(diffuse)
@@ -156,12 +154,9 @@ class InstrumentView(QWidget):
     @staticmethod
     def set_beam_transform(cylinder_transform):
         """
-        Configures the transform for the beam cylinder by giving it a matrix.
+        Configures the transform for the beam cylinder by giving it a matrix. The matrix will turn the cylinder sideways
+        and then move it "backwards" in the z-direction by 20 units so that it ends at the location of the sample.
         :param cylinder_transform: A QTransform object.
-        """
-        """
-        This matrix will turn the cylinder sideways and then move it "backwards" in the z-direction by 20 units so that
-        it ends at the location of the sample.
         """
         cylinder_matrix = QMatrix4x4()
         cylinder_matrix.rotate(270, QVector3D(1, 0, 0))
