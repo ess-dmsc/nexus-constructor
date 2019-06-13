@@ -224,6 +224,8 @@ pyside_lib_files = [
     "Qt5WebChannel.",
     "Qt5WebSockets.",
     "Qt5WebView.",
+    "Qt5X11Extras.",
+    "Qt5XmlPatterns.",
 ]
 
 for f in pyside_lib_files:
