@@ -196,6 +196,10 @@ unix_removable = [
     "lib/PySide2/QtLocation.pyi",
     "lib/PySide2/QtNetwork.abi3.so",
     "lib/PySide2/QtNetwork.pyi",
+    "lib/PySide2/QtOpenGL.abi3.so",
+    "lib/PySide2/QtOpenGL.pyi",
+    "lib/PySide2/QtPositioning.abi3.so",
+    "lib/PySide2/QtPositioning.pyi",
 ]
 
 win_removable = [
