@@ -7,11 +7,10 @@ PIXEL_COMPONENT_TYPES = ["NXmonitor", "NXdetector", "NXdetector_module"]
 
 
 
-def __list_base_class_files(repo_directory):
-    base_class_dir = os.path.join(repo_directory, "base_classes")
-    for file in os.listdir(base_class_dir):
+def __list_base_class_files(file_list):
+    for file in file_list:
         if file.endswith(".nxdl.xml"):
-            yield os.path.join(base_class_dir, file)
+            yield file
 
 
 def make_dictionary_of_class_definitions(
@@ -20,8 +19,10 @@ def make_dictionary_of_class_definitions(
     if black_list is None:
         black_list = []
 
+    base_class_dir = os.path.join(repo_directory, "base_classes")
+
     class_definitions = {}
-    for base_class_file in __list_base_class_files(repo_directory):
+    for base_class_file in __list_base_class_files(os.listdir(base_class_dir)):
         with open(base_class_file) as def_file:
             xml_definition = xmltodict.parse(def_file.read())["definition"]
             nx_class_name = xml_definition["@name"]
