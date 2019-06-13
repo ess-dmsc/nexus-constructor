@@ -117,7 +117,7 @@ return {
                 """
             } // stage
             stage("Run tests") {
-                bat """python -m pytest . -s --ignore=definitions
+                bat """python -m pytest . -s --ignore=definitions --ignore=tests/test_ui_add_component_window.py
                 """
             } // stage
             if (env.CHANGE_ID) {
