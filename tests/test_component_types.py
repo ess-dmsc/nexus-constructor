@@ -39,7 +39,7 @@ def test_GIVEN_valid_base_class_containing_name_WHEN_creating_base_class_dict_TH
     class_name = "NXtest"
     xml = f"""
     <definition
-    name="{class_name}" 
+    name="{class_name}"
     type="group" extends="NXobject">
     </definition>
     """
@@ -53,8 +53,8 @@ def test_GIVEN_valid_base_class_containing_name_WHEN_creating_base_class_dict_TH
 def test_GIVEN_a_valid_base_class_containing_name_key_and_name_field_WHEN_creating_base_class_dict_THEN_dict_contains_base_class_with_name_as_key_and_name_field():
     class_name = "NXtest"
 
-    xml = f"""<definition 
-    name="{class_name}" 
+    xml = f"""<definition
+    name="{class_name}"
     type="group" extends="NXobject">
         <field name="name">
             <doc>Name of user responsible for this entry</doc>
@@ -72,7 +72,7 @@ def test_GIVEN_a_valid_base_class_with_no_fields_WHEN_creating_base_class_dict_T
     class_name = "NXtest"
     xml = f"""
         <definition
-        name="{class_name}" 
+        name="{class_name}"
         type="group" extends="NXobject">
         </definition>
         """
@@ -87,11 +87,10 @@ def test_GIVEN_a_valid_base_class_that_is_in_blacklist_WHEN_creating_base_class_
     class_name = "NXtest"
     xml = f"""
             <definition
-            name="{class_name}" 
+            name="{class_name}"
             type="group" extends="NXobject">
             </definition>
             """
-
     base_classes = dict()
     _create_base_class_dict(xml, [class_name], base_classes)
 
