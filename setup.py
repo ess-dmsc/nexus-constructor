@@ -187,6 +187,14 @@ pyside_lib_files = [
     "Qt5Charts.",
     "Qt5Concurrent.",
     "Qt5DataVisualization.",
+    "Qt5EglFsKmsSupport.",
+    "Qt5Gamepad.",
+    "Qt5Help.",
+    "Qt5Location.",
+    "Qt5MultimediaGstTools.",
+    "Qt5MultimediaQuick.",
+    "Qt5Multimedia.",
+    "Qt5MultimediaWidgets.",
 ]
 
 for f in pyside_lib_files:
