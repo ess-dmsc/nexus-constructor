@@ -216,6 +216,14 @@ pyside_lib_files = [
     "Qt5SerialPort.",
     "Qt5Scxml.",
     "Qt5Sql.",
+    "Qt5Test.",
+    "Qt5TextToSpeech.",
+    "Qt5VirtualKeyboard.",
+    "Qt5WaylandClient.",
+    "Qt5WaylandCompositor.",
+    "Qt5WebChannel.",
+    "Qt5WebSockets.",
+    "Qt5WebView.",
 ]
 
 for f in pyside_lib_files:
