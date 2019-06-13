@@ -1,7 +1,6 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl, Signal, QObject
-from PySide2.QtWidgets import QDialogButtonBox
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -19,7 +18,6 @@ from nexus_constructor.utils import file_dialog, validate_line_edit
 import os
 from functools import partial
 
-# TODO: stop enter closing the dialog
 GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
 
 

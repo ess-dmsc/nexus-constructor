@@ -5,7 +5,6 @@ import xmltodict
 
 PIXEL_COMPONENT_TYPES = ["NXmonitor", "NXdetector", "NXdetector_module"]
 
-# TODO: unit test this
 
 
 def __list_base_class_files(repo_directory):
