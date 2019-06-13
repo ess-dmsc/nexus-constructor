@@ -65,7 +65,7 @@
        </widget>
       </item>
       <item row="0" column="1" colspan="2">
-       <widget class="QWidget" name="sceneWidget" native="true">
+       <widget class="InstrumentView" name="sceneWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>1</horstretch>
@@ -120,6 +120,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>InstrumentView</class>
+   <extends>QWidget</extends>
+   <header>nexus_constructor/InstrumentView.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

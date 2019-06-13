@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'main_window.ui',
 # licensing of 'main_window.ui' applies.
 #
-# Created: Mon Jun 10 10:13:15 2019
+# Created: Thu Jun 13 13:05:28 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,7 +47,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab, "")
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
-        self.sceneWidget = QtWidgets.QWidget(self.centralwidget)
+        self.sceneWidget = InstrumentView(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
@@ -58,7 +58,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
         self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar()
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1263, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
@@ -92,3 +92,4 @@ class Ui_MainWindow(object):
         self.actionExport_to_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Export to NeXus file", None, -1))
         self.actionExport_to_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to Filewriter JSON", None, -1))
 
+from nexus_constructor.InstrumentView import InstrumentView
