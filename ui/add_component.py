@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Mon Jun 10 10:36:54 2019
+# Created: Thu Jun 13 13:41:52 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -23,8 +23,14 @@ class Ui_AddComponentDialog(object):
         AddComponentDialog.setSizePolicy(sizePolicy)
         self.gridLayout_3 = QtWidgets.QGridLayout(AddComponentDialog)
         self.gridLayout_3.setObjectName("gridLayout_3")
-        self.buttonBox = QtWidgets.QDialogButtonBox(AddComponentDialog)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox = QtWidgets.QPushButton(AddComponentDialog)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.buttonBox.sizePolicy().hasHeightForWidth())
+        self.buttonBox.setSizePolicy(sizePolicy)
+        self.buttonBox.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.buttonBox.setAutoDefault(False)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout_3.addWidget(self.buttonBox, 1, 0, 1, 1)
         self.widget = QtWidgets.QWidget(AddComponentDialog)
@@ -195,12 +201,12 @@ class Ui_AddComponentDialog(object):
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
 
         self.retranslateUi(AddComponentDialog)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), AddComponentDialog.close)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), AddComponentDialog.close)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("clicked()"), AddComponentDialog.close)
         QtCore.QMetaObject.connectSlotsByName(AddComponentDialog)
 
     def retranslateUi(self, AddComponentDialog):
         AddComponentDialog.setWindowTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Add Component", None, -1))
+        self.buttonBox.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Add component", None, -1))
         self.label.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Name:", None, -1))
         self.label_2.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Description:", None, -1))
         self.label_3.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Component type:", None, -1))

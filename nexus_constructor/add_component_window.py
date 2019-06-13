@@ -120,10 +120,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         super().setupUi(parent_dialog)
 
         # Connect the button calls with functions
-        self.buttonBox.button(QDialogButtonBox.Ok).clicked.connect(self.on_ok)
+        self.buttonBox.clicked.connect(self.on_ok)
 
         # Disable by default as component name will be missing at the very least.
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox.setEnabled(False)
 
         # Set default URL to nexus base classes in web view
         self.webEngineView.setUrl(
@@ -135,9 +135,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.ok_validator = OkValidator(
             self.noGeometryRadioButton, self.meshRadioButton
         )
-        self.ok_validator.isValid.connect(
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled
-        )
+        self.ok_validator.isValid.connect(self.buttonBox.setEnabled)
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
@@ -222,7 +220,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def show_no_geometry_fields(self):
         self.geometryOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.buttonBox.setEnabled(True)
 
     def show_mesh_fields(self):
         self.geometryOptionsBox.setVisible(True)
