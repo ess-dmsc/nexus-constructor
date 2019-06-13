@@ -167,6 +167,9 @@ unix_removable = [
     "lib/PySide2/QtMultimediaWidgets.pyi",
     "lib/PySide2/QtTextToSpeech.abi3.so",
     "lib/PySide2/QtTextToSpeech.pyi",
+    "lib/PySide2/examples",
+    "lib/PySide2/glue",
+    "lib/PySide2/include",
 ]
 
 win_removable = [
