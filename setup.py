@@ -119,7 +119,8 @@ removable_folders = [
     "lib/PySide2/Qt/qml",
 ]
 
-pyside_files = [
+# Unused files created by PySide2 that have a different extension depending on the OS
+unused_pyside_files = [
     "lib/PySide2/libclang.",
     "lib/PySide2/libQt5Concurrent.",
     "lib/PySide2/libQt5Network.",
@@ -153,23 +154,31 @@ pyside_files = [
     "lib/PySide2/QtTest.",
     "lib/PySide2/QtX11Extras.",
     "lib/PySide2/QtXmlPatterns.",
+    "lib/PySide2/QtMultimedia.",
+    "lib/PySide2/QtMultimediaWidgets.",
+    "lib/PySide2/QtTextToSpeech.",
 ]
 
 removable_pyside_unix = []
 removable_pyside_win = []
 
-for f in pyside_files:
+# Add all possible extensions to the unix filenames
+for f in unused_pyside_files:
     removable_pyside_unix.append(f + "so.6")
     removable_pyside_unix.append(f + "so.5")
     removable_pyside_unix.append(f + "abi3.so")
     removable_pyside_unix.append(f + "pyi")
     removable_pyside_win.append(f + "dll")
 
+# PySide2 files that appear in a different directory depending on the OS
+pyside_lib_files = ["Qt5WebEngine.", "Qt5WebEngineCore.", "Qt5WebEngineWidgets."]
+
+for f in pyside_lib_files:
+    removable_pyside_unix.append("lib/PySide2/Qt/lib/lib" + f + "so.5")
+    removable_pyside_win.append("lib/PySide2/" + f + "dll")
+
 unix_removable = (
     [
-        "lib/PySide2/Qt/lib/libQt5WebEngine.so.5",
-        "lib/PySide2/Qt/lib/libQt5WebEngineCore.so.5",
-        "lib/PySide2/Qt/lib/libQt5WebEngineWidgets.so.5",
         "lib/apt_pkg.cpython-36m-x86_64-linux-gnu.so",
         "lib/_asyncio.cpython-36m-x86_64-linux-gnu.so",
         "lib/audioop.cpython-36m-x86_64-linux-gnu.so",
@@ -200,12 +209,6 @@ unix_removable = (
         "lib/_ssl.cpython-36m-x86_64-linux-gnu.so",
         "lib/termios.cpython-36m-x86_64-linux-gnu.so",
         "lib/_yaml.cpython-36m-x86_64-linux-gnu.so",
-        "lib/PySide2/QtMultimedia.abi3.so",
-        "lib/PySide2/QtMultimedia.pyi",
-        "lib/PySide2/QtMultimediaWidgets.abi3.so",
-        "lib/PySide2/QtMultimediaWidgets.pyi",
-        "lib/PySide2/QtTextToSpeech.abi3.so",
-        "lib/PySide2/QtTextToSpeech.pyi",
         "lib/PySide2/examples",
         "lib/PySide2/glue",
         "lib/PySide2/include",
@@ -221,15 +224,7 @@ unix_removable = (
     + removable_pyside_unix
 )
 
-win_removable = (
-    [
-        "lib/PySide2/Qt5WebEngine.dll",
-        "lib/PySide2/Qt5WebEngineCore.dll",
-        "lib/PySide2/Qt5WebEngineWidgets.dll",
-    ]
-    + removable_folders
-    + removable_pyside_win
-)
+win_removable = [] + removable_folders + removable_pyside_win
 
 # GUI applications require a different base on Windows (the default is for a console application).
 if sys.platform == "win32":
