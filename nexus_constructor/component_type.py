@@ -15,8 +15,6 @@ def __list_base_class_files(file_list):
 def make_dictionary_of_class_definitions(
     repo_directory="nexus_definitions", black_list: List[str] = None
 ):
-    if black_list is None:
-        black_list = []
 
     base_class_dir = os.path.join(repo_directory, "base_classes")
 
@@ -28,6 +26,9 @@ def make_dictionary_of_class_definitions(
 
 
 def _create_base_class_dict(xml_text, black_list, class_definitions):
+    if black_list is None:
+        black_list = []
+
     xml_definition = xmltodict.parse(xml_text)["definition"]
     nx_class_name = xml_definition["@name"]
     if nx_class_name in black_list:

@@ -45,7 +45,7 @@ def test_GIVEN_valid_base_class_containing_name_WHEN_creating_base_class_dict_TH
     """
 
     base_classes = dict()
-    _create_base_class_dict(xml, [], base_classes)
+    _create_base_class_dict(xml, None, base_classes)
 
     assert class_name in base_classes.keys()
 
@@ -63,7 +63,7 @@ def test_GIVEN_a_valid_base_class_containing_name_key_and_name_field_WHEN_creati
     """
 
     base_classes = dict()
-    _create_base_class_dict(xml, [], base_classes)
+    _create_base_class_dict(xml, None, base_classes)
     assert class_name in base_classes.keys()
     assert "name" in base_classes[class_name]
 
@@ -78,7 +78,7 @@ def test_GIVEN_a_valid_base_class_with_no_fields_WHEN_creating_base_class_dict_T
         """
 
     base_classes = dict()
-    _create_base_class_dict(xml, [], base_classes)
+    _create_base_class_dict(xml, None, base_classes)
 
     assert not base_classes[class_name]
 
