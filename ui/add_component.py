@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Thu Jun 13 13:46:11 2019
+# Created: Thu Jun 13 15:50:27 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -186,7 +186,6 @@ class Ui_AddComponentDialog(object):
         self.fieldsListView.setObjectName("fieldsListView")
         self.verticalLayout.addWidget(self.fieldsListView)
         self.verticalLayout_2.addWidget(self.fieldsBox)
-        self.verticalLayout_2.setStretch(4, 2)
         self.verticalLayout_2.setStretch(5, 1)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
         self.webEngineView = QWebEngineView(self.widget)
