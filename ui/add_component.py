@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Thu Jun 13 16:13:25 2019
+# Created: Thu Jun 13 16:16:47 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -164,7 +164,6 @@ class Ui_AddComponentDialog(object):
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.unitsbox)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.unitsLineEdit = QtWidgets.QLineEdit(self.unitsbox)
-        self.unitsLineEdit.setText("")
         self.unitsLineEdit.setPlaceholderText("")
         self.unitsLineEdit.setObjectName("unitsLineEdit")
         self.horizontalLayout_3.addWidget(self.unitsLineEdit)
@@ -227,4 +226,6 @@ class Ui_AddComponentDialog(object):
         self.label_4.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Height", None, -1))
         self.label_8.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Z:", None, -1))
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
+        self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
+

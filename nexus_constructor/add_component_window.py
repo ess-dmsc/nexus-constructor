@@ -190,6 +190,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.componentTypeComboBox.addItems(list(self.component_types.keys()))
 
+        # Validate the default value set by the UI
+        self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
+
     def on_component_type_change(self):
         self.webEngineView.setUrl(
             QUrl(
