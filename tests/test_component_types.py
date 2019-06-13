@@ -1,6 +1,9 @@
 import pytest
 
-from nexus_constructor.component_type import __list_base_class_files
+from nexus_constructor.component_type import (
+    __list_base_class_files,
+    _create_base_class_dict,
+)
 
 
 def test_GIVEN_list_of_files_all_ending_with_nxdl_WHEN_list_base_class_files_THEN_yields_correct_files():
@@ -32,3 +35,71 @@ def test_GIVEN_list_of_files_some_ending_with_nxdl_WHEN_listing_base_class_files
     with pytest.raises(StopIteration):
         next(gen)
 
+
+def test_GIVEN_valid_base_class_containing_name_WHEN_creating_base_class_dict_THEN_dict_contains_base_class_with_name():
+    class_name = "NXtest"
+    xml = f"""
+    
+    <definition
+	name="{class_name}" 
+    type="group" extends="NXobject">
+    </definition>
+
+    """
+
+    base_classes = dict()
+    _create_base_class_dict(xml, [], base_classes)
+
+    assert class_name in base_classes.keys()
+
+
+def test_GIVEN_a_valid_base_class_containing_name_key_and_name_field_WHEN_creating_base_class_dict_THEN_dict_contains_base_class_with_name_as_key_and_name_field():
+    class_name = "NXtest"
+
+    xml = f"""<definition 
+	name="{class_name}" 
+    type="group" extends="NXobject">
+        <field name="name">
+            <doc>Name of user responsible for this entry</doc>
+        </field>
+    </definition>
+    """
+
+    base_classes = dict()
+    _create_base_class_dict(xml, [], base_classes)
+    assert class_name in base_classes.keys()
+    assert "name" in base_classes[class_name]
+
+
+def test_GIVEN_a_valid_base_class_with_no_fields_WHEN_creating_base_class_dict_THEN_dict_contains_empty_list_for_value():
+    class_name = "NXtest"
+    xml = f"""
+
+        <definition
+    	name="{class_name}" 
+        type="group" extends="NXobject">
+        </definition>
+
+        """
+
+    base_classes = dict()
+    _create_base_class_dict(xml, [], base_classes)
+
+    assert not base_classes[class_name]
+
+
+def test_GIVEN_a_valid_base_class_that_is_in_blacklist_WHEN_creating_base_class_dict_THEN_dict_stays_empty():
+    class_name = "NXtest"
+    xml = f"""
+
+            <definition
+        	name="{class_name}" 
+            type="group" extends="NXobject">
+            </definition>
+
+            """
+
+    base_classes = dict()
+    _create_base_class_dict(xml, [class_name], base_classes)
+
+    assert not base_classes
