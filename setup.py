@@ -149,8 +149,8 @@ unix_removable = [
     "lib/termios.cpython-36m-x86_64-linux-gnu.so",
     "lib/_yaml.cpython-36m-x86_64-linux-gnu.so",
     "lib/numpy/f2py",
-    "lib/numpy/disturils",
-    "lib/numpy/doc",
+    "lib/numpy/distutils",
+    "lib/PyQt5",
 ]
 
 win_removable = [
