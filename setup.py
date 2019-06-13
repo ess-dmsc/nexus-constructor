@@ -170,6 +170,8 @@ unix_removable = [
     "lib/PySide2/examples",
     "lib/PySide2/glue",
     "lib/PySide2/include",
+    "lib/PySide2/libQt5Concurrent.so.5",
+    "lib/PySide2/libQt5Network.so.5",
 ]
 
 win_removable = [
