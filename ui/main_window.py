@@ -92,4 +92,4 @@ class Ui_MainWindow(object):
         self.actionExport_to_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Export to NeXus file", None, -1))
         self.actionExport_to_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to Filewriter JSON", None, -1))
 
-from nexus_constructor.InstrumentView import InstrumentView
+from nexus_constructor.instrument_view import InstrumentView
