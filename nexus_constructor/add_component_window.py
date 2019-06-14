@@ -1,6 +1,6 @@
 from enum import Enum
 
-from PySide2.QtCore import QUrl, Signal, QObject
+from PySide2.QtCore import QUrl
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
