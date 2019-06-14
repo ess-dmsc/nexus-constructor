@@ -42,5 +42,4 @@ def _create_base_class_dict(xml_text, black_list, class_definitions):
         except Exception:
             class_definitions[nx_class_name].append(fields["@name"])
     except KeyError:
-        # TODO: No key called "field"
         pass
