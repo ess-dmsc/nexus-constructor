@@ -35,7 +35,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         super(AddComponentDialog, self).__init__()
         self.nexus_wrapper = nexus_wrapper
         self.geometry_model = None
-        self.component_types = make_dictionary_of_class_definitions(
+        self.nx_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
 
@@ -81,9 +81,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
         self.fileLineEdit.validator().isValid.connect(self.ok_validator.set_file_valid)
 
-        self.componentTypeComboBox.currentIndexChanged.connect(
-            self.on_component_type_change
-        )
+        self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
 
         # Set default geometry type and show the related fields.
         self.noGeometryRadioButton.setChecked(True)
@@ -114,12 +112,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.ok_validator.set_units_valid
         )
 
-        self.componentTypeComboBox.addItems(list(self.component_types.keys()))
+        self.componentTypeComboBox.addItems(list(self.nx_classes.keys()))
 
         # Validate the default value set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
 
-    def on_component_type_change(self):
+    def on_nx_class_changed(self):
         self.webEngineView.setUrl(
             QUrl(
                 f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
@@ -176,9 +174,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         return geometry_model
 
     def on_ok(self):
-        component_type = self.componentTypeComboBox.currentText()
+        nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
         self.nexus_wrapper.add_component(
-            component_type, component_name, description, self.generate_geometry_model()
+            nx_class, component_name, description, self.generate_geometry_model()
         )
