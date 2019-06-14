@@ -6,50 +6,21 @@ from nexus_constructor.qml_models.geometry_models import (
     OFFModel,
     NoShapeModel,
 )
-from PySide2.QtGui import QValidator
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
 )
-from nexus_constructor.validators import UnitValidator, NameValidator
+from nexus_constructor.validators import (
+    UnitValidator,
+    NameValidator,
+    GeometryFileValidator,
+    GEOMETRY_FILE_TYPES,
+)
 from nexus_constructor.nexus_wrapper import NexusWrapper
 from nexus_constructor.utils import file_dialog, validate_line_edit
 import os
 from functools import partial
-
-GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
-
-
-class FileValidator(QValidator):
-    """
-    Validator to ensure file exists and is the correct file type.
-    """
-
-    def __init__(self, file_types):
-        """
-
-        :param file_types:
-        """
-        super().__init__()
-        self.file_types = file_types
-
-    def validate(self, input: str, pos: int):
-        if not input:
-            self.isValid.emit(False)
-            return QValidator.Intermediate
-        if not os.path.isfile(input):
-            self.isValid.emit(False)
-            return QValidator.Intermediate
-        for suffixes in GEOMETRY_FILE_TYPES.values():
-            for suff in suffixes:
-                if input.endswith(f".{suff}"):
-                    self.isValid.emit(True)
-                    return QValidator.Acceptable
-        self.isValid.emit(False)
-        return QValidator.Invalid
-
-    isValid = Signal(bool)
 
 
 class GeometryType(Enum):
@@ -149,7 +120,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             ]
         ]
 
-        self.fileLineEdit.setValidator(FileValidator(GEOMETRY_FILE_TYPES))
+        self.fileLineEdit.setValidator(GeometryFileValidator(GEOMETRY_FILE_TYPES))
         self.fileLineEdit.validator().isValid.connect(
             partial(validate_line_edit, self.fileLineEdit)
         )

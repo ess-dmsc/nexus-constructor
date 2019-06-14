@@ -3,6 +3,7 @@ from nexus_constructor.qml_models.instrument_model import InstrumentModel
 from PySide2.QtCore import Property, Qt, Signal
 from PySide2.QtGui import QValidator, QIntValidator
 import pint
+import os
 
 
 class NullableIntValidator(QIntValidator):
@@ -209,5 +210,39 @@ class NameValidator(ValidatorOnListModel):
 
         self.isValid.emit(True)
         return QValidator.Acceptable
+
+    isValid = Signal(bool)
+
+
+GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
+
+
+class GeometryFileValidator(QValidator):
+    """
+    Validator to ensure file exists and is the correct file type.
+    """
+
+    def __init__(self, file_types):
+        """
+
+        :param file_types:
+        """
+        super().__init__()
+        self.file_types = file_types
+
+    def validate(self, input: str, pos: int):
+        if not input:
+            self.isValid.emit(False)
+            return QValidator.Intermediate
+        if not os.path.isfile(input):
+            self.isValid.emit(False)
+            return QValidator.Intermediate
+        for suffixes in GEOMETRY_FILE_TYPES.values():
+            for suff in suffixes:
+                if input.endswith(f".{suff}"):
+                    self.isValid.emit(True)
+                    return QValidator.Acceptable
+        self.isValid.emit(False)
+        return QValidator.Invalid
 
     isValid = Signal(bool)
