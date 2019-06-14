@@ -16,6 +16,7 @@ from nexus_constructor.validators import (
     NameValidator,
     GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
+    OkValidator,
 )
 from nexus_constructor.nexus_wrapper import NexusWrapper
 from nexus_constructor.utils import file_dialog, validate_line_edit
@@ -27,52 +28,6 @@ class GeometryType(Enum):
     NONE = 1
     CYLINDER = 2
     MESH = 3
-
-
-class OkValidator(QObject):
-    """
-    Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
-    """
-
-    def __init__(self, no_geometry_button, mesh_button):
-        super().__init__()
-        self.name_is_valid = False
-        self.file_is_valid = False
-        self.units_are_valid = False
-        self.no_geometry_button = no_geometry_button
-        self.mesh_button = mesh_button
-
-    def set_name_valid(self, is_valid):
-        self.name_is_valid = is_valid
-        print("Name: {}".format(self.name_is_valid))
-        self.validate_ok()
-
-    def set_file_valid(self, is_valid):
-        self.file_is_valid = is_valid
-        print("File: {}".format(self.file_is_valid))
-        self.validate_ok()
-
-    def set_units_valid(self, is_valid):
-        self.units_are_valid = is_valid
-        print("Units: {}".format(self.units_are_valid))
-        self.validate_ok()
-
-    def validate_ok(self):
-        """
-        Validates the fields in order to dictate whether the OK button should be disabled or enabled.
-        :return: None, but emits the isValid signal.
-        """
-        unacceptable = [
-            not self.name_is_valid,
-            not self.no_geometry_button.isChecked() and not self.units_are_valid,
-            self.mesh_button.isChecked() and not self.file_is_valid,
-        ]
-
-        print("Is valid {}".format(unacceptable))
-        self.isValid.emit(not any(unacceptable))
-
-    # Signal to indicate that the fields are valid or invalid. False: invalid.
-    isValid = Signal(bool)
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
