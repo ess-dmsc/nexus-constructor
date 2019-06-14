@@ -1,6 +1,6 @@
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
-from nexus_constructor.InstrumentView import InstrumentView
+from nexus_constructor.instrument_view import InstrumentView
 from mock import Mock, call
 
 

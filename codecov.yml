@@ -3,6 +3,7 @@ ignore:
   - "**/*__init__.py"
   - "main.py"
   - "setup.py"
+  - "ui/"
 
 comment:
   layout: "header, diff, tree, changes, sunburst"

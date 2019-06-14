@@ -115,15 +115,17 @@ class PixelMappingModel(QAbstractListModel):
     def data(self, index, role=Qt.DisplayRole):
         if role == PixelMappingModel.PixelIdRole:
             row = index.row()
-            return self.pixel_mapping.pixel_ids[row]
+            return self.pixel_mapping.pixel_ids[row - 1]
 
     def setData(self, index, value, role):
         changed = False
         if role == PixelMappingModel.PixelIdRole:
             row = index.row()
-            current_value = self.pixel_mapping.pixel_ids[row]
+            current_value = self.pixel_mapping.pixel_ids[row - 1]
             if current_value != value:
-                self.pixel_mapping.pixel_ids[row] = None if isnan(value) else int(value)
+                self.pixel_mapping.pixel_ids[row - 1] = (
+                    None if isnan(value) else int(value)
+                )
                 self.dataChanged.emit(index, index, role)
                 changed = True
         return changed

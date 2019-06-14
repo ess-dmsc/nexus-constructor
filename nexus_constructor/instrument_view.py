@@ -3,7 +3,7 @@ from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
-from nexus_constructor.NeutronAnimationController import NeutronAnimationController
+from nexus_constructor.neutron_animation_controller import NeutronAnimationController
 
 
 class InstrumentView(QWidget):

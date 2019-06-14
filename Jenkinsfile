@@ -45,6 +45,7 @@ builders = pipeline_builder.createBuilders { container ->
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
             build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
             build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
+            git submodule update --init
             """
     } // stage
     
@@ -67,7 +68,7 @@ builders = pipeline_builder.createBuilders { container ->
         try {
                 container.sh """
                     cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml --ignore=tests/ui_tests/
                 """
             }
             catch(err) {
@@ -110,11 +111,13 @@ return {
               scm_vars = checkout scm
             }  // stage
             stage("Setup") {
-                  bat """python -m pip install --user -r requirements.txt
+                  bat """
+                  git submodule update --init
+                  python -m pip install --user -r requirements.txt
                 """
             } // stage
             stage("Run tests") {
-                bat """python -m pytest . -s
+                bat """python -m pytest . -s --ignore=definitions --ignore=tests/ui_tests/
                 """
             } // stage
             if (env.CHANGE_ID) {
