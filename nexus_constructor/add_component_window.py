@@ -59,7 +59,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.ok_validator = OkValidator(
             self.noGeometryRadioButton, self.meshRadioButton
         )
-        self.ok_validator.isValid.connect(self.buttonBox.setEnabled)
+        self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
@@ -76,10 +76,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         ]
 
         self.fileLineEdit.setValidator(GeometryFileValidator(GEOMETRY_FILE_TYPES))
-        self.fileLineEdit.validator().isValid.connect(
+        self.fileLineEdit.validator().is_valid.connect(
             partial(validate_line_edit, self.fileLineEdit)
         )
-        self.fileLineEdit.validator().isValid.connect(self.ok_validator.set_file_valid)
+        self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
 
@@ -90,17 +90,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
         name_validator = NameValidator()
         name_validator.list_model = self.nexus_wrapper.get_component_list()
         self.nameLineEdit.setValidator(name_validator)
-        self.nameLineEdit.validator().isValid.connect(
+        self.nameLineEdit.validator().is_valid.connect(
             partial(validate_line_edit, self.nameLineEdit)
         )
 
         validate_line_edit(self.nameLineEdit, False)
         validate_line_edit(self.fileLineEdit, False)
 
-        self.nameLineEdit.validator().isValid.connect(self.ok_validator.set_name_valid)
+        self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
 
         self.unitsLineEdit.setValidator(UnitValidator())
-        self.unitsLineEdit.validator().isValid.connect(
+        self.unitsLineEdit.validator().is_valid.connect(
             partial(
                 validate_line_edit,
                 self.unitsLineEdit,
@@ -108,7 +108,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 tooltip_on_accept="Units Valid",
             )
         )
-        self.unitsLineEdit.validator().isValid.connect(
+        self.unitsLineEdit.validator().is_valid.connect(
             self.ok_validator.set_units_valid
         )
 

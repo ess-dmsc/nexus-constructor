@@ -33,25 +33,25 @@ class UnitValidator(QValidator):
             AttributeError,
             pint.compat.tokenize.TokenError,
         ):
-            self.isValid.emit(False)
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
         # Attempt to find 1 metre in terms of the unit. This will ensure that it's a length.
         try:
             self.ureg.metre.from_(unit)
         except (pint.errors.DimensionalityError, ValueError):
-            self.isValid.emit(False)
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
         # Reject input in the form of "2 metres," "40 cm," etc
         if unit.magnitude != 1:
-            self.isValid.emit(False)
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
-        self.isValid.emit(True)
+        self.is_valid.emit(True)
         return QValidator.Acceptable
 
-    isValid = Signal(bool)
+    is_valid = Signal(bool)
 
 
 class ValidatorOnListModel(QValidator):
@@ -95,7 +95,7 @@ class ValidatorOnListModel(QValidator):
 
     model = Property("QVariant", get_model, set_model, notify=model_changed)
 
-    validationFailed = Signal()
+    validation_failed = Signal()
 
 
 class TransformParentValidator(ValidatorOnListModel):
@@ -173,7 +173,7 @@ class TransformParentValidator(ValidatorOnListModel):
                 return True
             if parent_index in visited:
                 # loop found
-                self.validationFailed.emit()
+                self.validation_failed.emit()
                 return False
             visited.add(parent_index)
             index = parent_index
@@ -193,7 +193,7 @@ class NameValidator(ValidatorOnListModel):
 
     def validate(self, input: str, pos: int):
         if not input:
-            self.isValid.emit(False)
+            self.is_valid.emit(False)
             return QValidator.Intermediate
         name_role = Qt.DisplayRole
         for role, name in self.list_model.roleNames().items():
@@ -205,13 +205,13 @@ class NameValidator(ValidatorOnListModel):
                 index = self.list_model.createIndex(i, 0)
                 name_at_index = self.list_model.data(index, name_role)
                 if name_at_index == input:
-                    self.isValid.emit(False)
+                    self.is_valid.emit(False)
                     return QValidator.Intermediate
 
-        self.isValid.emit(True)
+        self.is_valid.emit(True)
         return QValidator.Acceptable
 
-    isValid = Signal(bool)
+    is_valid = Signal(bool)
 
 
 GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
@@ -232,20 +232,20 @@ class GeometryFileValidator(QValidator):
 
     def validate(self, input: str, pos: int):
         if not input:
-            self.isValid.emit(False)
+            self.is_valid.emit(False)
             return QValidator.Intermediate
         if not os.path.isfile(input):
-            self.isValid.emit(False)
+            self.is_valid.emit(False)
             return QValidator.Intermediate
         for suffixes in GEOMETRY_FILE_TYPES.values():
             for suff in suffixes:
                 if input.endswith(f".{suff}"):
-                    self.isValid.emit(True)
+                    self.is_valid.emit(True)
                     return QValidator.Acceptable
-        self.isValid.emit(False)
+        self.is_valid.emit(False)
         return QValidator.Invalid
 
-    isValid = Signal(bool)
+    is_valid = Signal(bool)
 
 
 class OkValidator(QObject):
@@ -288,7 +288,7 @@ class OkValidator(QObject):
         ]
 
         print("Is valid {}".format(unacceptable))
-        self.isValid.emit(not any(unacceptable))
+        self.is_valid.emit(not any(unacceptable))
 
     # Signal to indicate that the fields are valid or invalid. False: invalid.
-    isValid = Signal(bool)
+    is_valid = Signal(bool)
