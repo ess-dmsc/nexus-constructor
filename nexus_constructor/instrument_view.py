@@ -4,8 +4,7 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
-from nexus_constructor.qml_models.geometry_models import CylinderModel, OFFModel
-from nexus_constructor.qml_models.instrument_model import generate_mesh
+from nexus_constructor.off_renderer import OffMesh
 
 
 class InstrumentView(QWidget):
@@ -82,10 +81,10 @@ class InstrumentView(QWidget):
         self.component_meshes = {}
         self.component_entities = {}
 
-    def add_component(self, name, component):
+    def add_component(self, name, geometry):
 
         entity = Qt3DCore.QEntity(self.root_entity)
-        mesh = generate_mesh(component)
+        mesh = OffMesh(geometry.off_geometry)
         material = self.grey_material
 
         entity.addComponent(mesh)
