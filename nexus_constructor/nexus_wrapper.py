@@ -35,8 +35,13 @@ class NexusWrapper(QObject):
         self.instrument_group = self.entry_group.create_group("instrument")
         self.instrument_group.attrs["NX_class"] = "NXinstrument"
 
+        self.instrument_view = None
+
         self.components_list_model = instrument_model.InstrumentModel()
         self._emit_file()
+
+    def set_instrument_view(self, instrument_view):
+        self.instrument_view = instrument_view
 
     def _emit_file(self):
         """
@@ -107,7 +112,12 @@ class NexusWrapper(QObject):
         component_group = instrument_group.create_group(component_name)
         component_group.attrs["NX_class"] = component_type
 
+        self.instrument_view.add_component(component_name, geometry)
+
         self._emit_file()
+
+    def get_component_geometry(self, component_name):
+        pass
 
 
 def convert_name_with_spaces(component_name):
