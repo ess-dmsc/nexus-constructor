@@ -165,7 +165,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             geometry_model.cylinder.axis_direction.setX(self.cylinderXLineEdit.value())
             geometry_model.cylinder.axis_direction.setY(self.cylinderYLineEdit.value())
             geometry_model.cylinder.axis_direction.setZ(self.cylinderZLineEdit.value())
-        if self.meshRadioButton.isChecked():
+        elif self.meshRadioButton.isChecked():
             geometry_model = OFFModel()
             geometry_model.set_units(self.unitsLineEdit.text())
             geometry_model.set_file(self.geometry_file_name)

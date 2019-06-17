@@ -4,6 +4,7 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
+from nexus_constructor.geometry_types import CylindricalGeometry
 
 
 class InstrumentView(QWidget):
@@ -78,6 +79,14 @@ class InstrumentView(QWidget):
         self.setup_beam_cylinder()
 
         self.components = {}
+
+    def add_component(self, name, geometry):
+
+        if type(geometry) is CylindricalGeometry:
+            print("This is a cylinder geometry.")
+        else:
+            print("This is not a cylinder geometry.")
+            print(type(geometry))
 
     @staticmethod
     def set_material_properties(material, ambient, diffuse, alpha=None):
