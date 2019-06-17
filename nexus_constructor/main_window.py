@@ -1,10 +1,10 @@
-from PySide2.QtWidgets import QDialog
+from PySide2.QtWidgets import QDialog, QLabel, QGridLayout
 from nexus_constructor.nexus_wrapper import NexusWrapper
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.utils import file_dialog
 from ui.main_window import Ui_MainWindow
 import silx.gui.hdf5
-
+import os
 
 from nexus_constructor.nexus_filewriter_json import writer
 
@@ -39,7 +39,30 @@ class MainWindow(Ui_MainWindow):
         self.verticalLayout.addWidget(self.widget)
         self.listView.setModel(self.nexus_wrapper.get_component_list())
 
+        self.set_up_warning_window()
+
         self.widget.setVisible(True)
+
+    def set_up_warning_window(self):
+        """
+        Sets up the warning dialog that is shown when the definitions submodule has not been cloned.
+        :return:
+        """
+        definitions_dir = os.path.join(os.curdir, "definitions")
+
+        # Will contain .git even if missing so check that it does not contain just that file.
+        if not os.path.exists(definitions_dir) or len(os.listdir(definitions_dir)) <= 1:
+            self.warning_window = QDialog()
+            self.warning_window.setWindowTitle("NeXus definitions missing")
+            self.warning_window.setLayout(QGridLayout())
+            self.warning_window.layout().addWidget(
+                QLabel(
+                    "Warning: NeXus definitions are missing. Did you forget to clone the submodules?\n run git submodule update --init "
+                )
+            )
+            # Set add component button to disabled, as it wouldn't work without the definitions.
+            self.pushButton.setEnabled(False)
+            self.warning_window.show()
 
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
