@@ -25,6 +25,8 @@ class InstrumentView(QWidget):
         # Enable the camera to see a large distance by giving it a small nearView and large farView
         self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.01, 1000)
 
+        self.nexus_model = None
+
         # Set the camera view centre as the origin and position the camera so that it looks down at the neutron beam
         self.view.camera().setPosition(QVector3D(6, 8, 30))
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
@@ -74,6 +76,8 @@ class InstrumentView(QWidget):
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
+
+        self.components = {}
 
     @staticmethod
     def set_material_properties(material, ambient, diffuse, alpha=None):

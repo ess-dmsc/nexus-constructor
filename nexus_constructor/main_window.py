@@ -39,6 +39,9 @@ class MainWindow(Ui_MainWindow):
         self.verticalLayout.addWidget(self.widget)
         self.listView.setModel(self.nexus_wrapper.get_component_list())
 
+        # self.sceneWidget.setModel(self.nexus_wrapper)
+        self.nexus_wrapper.set_instrument_view(self.sceneWidget)
+
         self.set_up_warning_window()
 
         self.widget.setVisible(True)
