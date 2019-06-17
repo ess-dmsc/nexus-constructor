@@ -114,7 +114,6 @@ class NexusWrapper(QObject):
 
         self.instrument_view.add_component(component_name, geometry.get_geometry())
 
-
         self._emit_file()
 
     def get_component_geometry(self, component_name):

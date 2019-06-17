@@ -4,7 +4,11 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
-from nexus_constructor.geometry_types import CylindricalGeometry
+from nexus_constructor.geometry_types import (
+    CylindricalGeometry,
+    NoShapeGeometry,
+    OFFGeometry,
+)
 
 
 class InstrumentView(QWidget):
@@ -78,15 +82,28 @@ class InstrumentView(QWidget):
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
 
-        self.components = {}
+        self.component_meshes = {}
+        self.component_entities = {}
 
     def add_component(self, name, geometry):
 
-        if type(geometry) is CylindricalGeometry:
-            print("This is a cylinder geometry.")
+        geometry_type = type(geometry)
+
+        if geometry_type is CylindricalGeometry:
+            pass
+        elif geometry_type is OFFGeometry:
+            pass
         else:
-            print("This is not a cylinder geometry.")
-            print(type(geometry))
+            entity = Qt3DCore.QEntity(self.root_entity)
+            mesh = Qt3DExtras.QCuboidMesh()
+            self.set_cube_mesh_dimensions(mesh, 1, 1, 1)
+            material = self.grey_material
+
+        entity.addComponent(mesh)
+        entity.addComponent(material)
+
+        self.component_meshes[name] = mesh
+        self.component_entities[name] = entity
 
     @staticmethod
     def set_material_properties(material, ambient, diffuse, alpha=None):
