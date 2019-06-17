@@ -112,8 +112,6 @@ class NexusWrapper(QObject):
         component_group = instrument_group.create_group(component_name)
         component_group.attrs["NX_class"] = component_type
 
-        self.instrument_view.add_component(component_name, geometry.get_geometry())
-
         self._emit_file()
 
     def get_component_geometry(self, component_name):
