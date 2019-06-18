@@ -40,6 +40,8 @@ class MainWindow(Ui_MainWindow):
         self.listView.setModel(self.nexus_wrapper.get_component_list())
         self.nexus_wrapper.set_instrument_view(self.sceneWidget)
 
+        self.nexus_wrapper.component_added.connect(self.sceneWidget.add_component)
+
         self.set_up_warning_window()
 
         self.widget.setVisible(True)
