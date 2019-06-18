@@ -118,14 +118,20 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
 
     def on_nx_class_changed(self):
+
+        selection = self.componentTypeComboBox.currentText()
+
         self.webEngineView.setUrl(
             QUrl(
-                f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
+                f"http://download.nexusformat.org/sphinx/classes/base_classes/{selection}.html"
             )
         )
         self.pixelOptionsBox.setVisible(
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
+
+        if selection != "NXdetector":
+            self.pixelOptionsBox.setVisible(False)
 
     def mesh_file_picker(self):
         """
@@ -141,9 +147,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
+        self.pixelOptionsBox.setVisible(False)
 
     def show_no_geometry_fields(self):
         self.geometryOptionsBox.setVisible(False)
+        self.pixelOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.buttonBox.setEnabled(True)
 
@@ -153,7 +161,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cylinderOptionsBox.setVisible(False)
 
         if self.componentTypeComboBox.currentText() == "NXdetector":
-            pass
+            self.pixelOptionsBox.setVisible(True)
 
     def generate_geometry_model(self):
         """
