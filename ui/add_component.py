@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'add_component.ui',
-# licensing of 'add_component.ui' applies.
+# Form implementation generated from reading ui file 'ui/add_component.ui',
+# licensing of 'ui/add_component.ui' applies.
 #
-# Created: Thu Jun 13 16:16:47 2019
-#      by: pyside2-uic  running on PySide2 5.12.3
+# Created: Tue Jun 18 15:06:04 2019
+#      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtWebEngineWidgets import QWebEngineView
-
 
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
@@ -100,6 +98,14 @@ class Ui_AddComponentDialog(object):
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.pixelOptionsBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
         self.pixelOptionsBox.setObjectName("pixelOptionsBox")
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.pixelOptionsBox)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.repeatableGridRadioButton = QtWidgets.QRadioButton(self.pixelOptionsBox)
+        self.repeatableGridRadioButton.setObjectName("repeatableGridRadioButton")
+        self.horizontalLayout_7.addWidget(self.repeatableGridRadioButton)
+        self.faceMappedMeshRadioButton = QtWidgets.QRadioButton(self.pixelOptionsBox)
+        self.faceMappedMeshRadioButton.setObjectName("faceMappedMeshRadioButton")
+        self.horizontalLayout_7.addWidget(self.faceMappedMeshRadioButton)
         self.gridLayout_2.addWidget(self.pixelOptionsBox, 4, 0, 1, 1)
         self.geometryFileBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
         self.geometryFileBox.setObjectName("geometryFileBox")
@@ -217,6 +223,8 @@ class Ui_AddComponentDialog(object):
         self.CylinderRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1))
         self.geometryOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry options:", None, -1))
         self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel options", None, -1))
+        self.repeatableGridRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Repeatable Grid", None, -1))
+        self.faceMappedMeshRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Face-Mapped Mesh", None, -1))
         self.geometryFileBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry file", None, -1))
         self.fileBrowseButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Browse...", None, -1))
         self.cylinderOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder options", None, -1))
@@ -229,3 +237,4 @@ class Ui_AddComponentDialog(object):
         self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
 
+from PySide2.QtWebEngineWidgets import QWebEngineView
