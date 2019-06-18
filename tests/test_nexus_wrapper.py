@@ -29,7 +29,6 @@ def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_add
     component_type = "NXcrystal"
     name = "test_crystal"
     description = "shiny"
-    wrapper.instrument_view = Mock()
     wrapper.add_component(component_type, name, description, NoShapeModel())
 
     component_list = wrapper.get_component_list().components
@@ -46,7 +45,6 @@ def test_GIVEN_component_WHEN_adding_component_THEN_nexus_file_contains_added_co
     component_type = "NXcrystal"
     name = "test_crystal"
     description = "shiny"
-    wrapper.instrument_view = Mock()
     wrapper.add_component(component_type, name, description, NoShapeModel())
 
     assert name in wrapper.instrument_group
