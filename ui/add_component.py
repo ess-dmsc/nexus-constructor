@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Tue Jun 18 15:23:16 2019
+# Created: Tue Jun 18 15:39:31 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -174,26 +174,26 @@ class Ui_AddComponentDialog(object):
         self.faceMappedMeshRadioButton.setObjectName("faceMappedMeshRadioButton")
         self.horizontalLayout_7.addWidget(self.faceMappedMeshRadioButton)
         self.gridLayout_2.addWidget(self.pixelOptionsBox, 4, 0, 1, 1)
-        self.groupBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
-        self.groupBox.setObjectName("groupBox")
-        self.horizontalLayout_8 = QtWidgets.QHBoxLayout(self.groupBox)
+        self.pixelDataBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
+        self.pixelDataBox.setObjectName("pixelDataBox")
+        self.horizontalLayout_8 = QtWidgets.QHBoxLayout(self.pixelDataBox)
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_8.addItem(spacerItem)
-        self.label_9 = QtWidgets.QLabel(self.groupBox)
-        self.label_9.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.label_9.setObjectName("label_9")
-        self.horizontalLayout_8.addWidget(self.label_9)
-        self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
+        self.detectorIdLabel = QtWidgets.QLabel(self.pixelDataBox)
+        self.detectorIdLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.detectorIdLabel.setObjectName("detectorIdLabel")
+        self.horizontalLayout_8.addWidget(self.detectorIdLabel)
+        self.detectorIdLineEdit = QtWidgets.QLineEdit(self.pixelDataBox)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lineEdit.sizePolicy().hasHeightForWidth())
-        self.lineEdit.setSizePolicy(sizePolicy)
-        self.lineEdit.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.lineEdit.setObjectName("lineEdit")
-        self.horizontalLayout_8.addWidget(self.lineEdit)
-        self.gridLayout_2.addWidget(self.groupBox, 5, 0, 1, 1)
+        sizePolicy.setHeightForWidth(self.detectorIdLineEdit.sizePolicy().hasHeightForWidth())
+        self.detectorIdLineEdit.setSizePolicy(sizePolicy)
+        self.detectorIdLineEdit.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.detectorIdLineEdit.setObjectName("detectorIdLineEdit")
+        self.horizontalLayout_8.addWidget(self.detectorIdLineEdit)
+        self.gridLayout_2.addWidget(self.pixelDataBox, 5, 0, 1, 1)
         self.gridLayout_2.setRowStretch(4, 1)
         self.verticalLayout_2.addWidget(self.geometryOptionsBox)
         self.fieldsBox = QtWidgets.QGroupBox(self.widget)
@@ -255,8 +255,8 @@ class Ui_AddComponentDialog(object):
         self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel options:", None, -1))
         self.repeatableGridRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Repeatable Grid", None, -1))
         self.faceMappedMeshRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Face-Mapped Mesh", None, -1))
-        self.groupBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel data:", None, -1))
-        self.label_9.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Detector ID:", None, -1))
+        self.pixelDataBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel data:", None, -1))
+        self.detectorIdLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Detector ID:", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
 
 from PySide2.QtWebEngineWidgets import QWebEngineView

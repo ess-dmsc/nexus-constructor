@@ -131,6 +131,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
         self.change_pixel_options_visibility()
+        self.change_pixel_data_visibility()
 
     def mesh_file_picker(self):
         """
@@ -148,16 +149,24 @@ class AddComponentDialog(Ui_AddComponentDialog):
             and self.meshRadioButton.isChecked()
         )
 
+    def change_pixel_data_visibility(self):
+        self.pixelDataBox.setVisible(
+            not self.noGeometryRadioButton.isChecked()
+            and self.componentTypeComboBox.currentText() == "NXmonitor"
+        )
+
     def show_cylinder_fields(self):
         self.geometryOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
         self.change_pixel_options_visibility()
+        self.change_pixel_data_visibility()
 
     def show_no_geometry_fields(self):
         self.geometryOptionsBox.setVisible(False)
         self.pixelOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
+        self.change_pixel_data_visibility()
         if self.nameLineEdit.text():
             self.buttonBox.setEnabled(True)
 
@@ -166,6 +175,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
+        self.change_pixel_data_visibility()
 
     def generate_geometry_model(self):
         """
