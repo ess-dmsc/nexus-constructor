@@ -152,6 +152,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
 
+        if self.componentTypeComboBox.currentText() == "NXdetector":
+            pass
+
     def generate_geometry_model(self):
         """
         Generates a geometry model depending on the type of geometry selected and the current values of the lineedits that apply to the particular geometry type.
