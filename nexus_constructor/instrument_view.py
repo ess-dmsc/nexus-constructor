@@ -111,10 +111,10 @@ class InstrumentView(QWidget):
         except KeyError:
             pass
 
-    def add_translation(self, name):
+    def add_translation(self, component_name, translation_name):
         pass
 
-    def delete_translation(self, name):
+    def delete_translation(self, component_name, translation_name):
         pass
 
     @staticmethod
