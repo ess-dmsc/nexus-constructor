@@ -78,6 +78,7 @@ class InstrumentView(QWidget):
 
         self.component_meshes = {}
         self.component_entities = {}
+        self.component_translations = {}
 
     def add_component(self, name, geometry):
         """
@@ -92,6 +93,24 @@ class InstrumentView(QWidget):
 
         self.component_meshes[name] = mesh
         self.component_entities[name] = entity
+
+    def delete_component(self, name):
+        """
+        Delete a component from the InstrumentView by removing the components and entities from the dictionaries.
+        :param name: The name of the component.
+        """
+        try:
+            del self.component_entities[name]
+            del self.component_meshes[name]
+            del self.component_translations[name]
+        except KeyError:
+            pass
+
+    def add_translation(self, name):
+        pass
+
+    def delete_translation(self, name):
+        pass
 
     @staticmethod
     def set_material_properties(material, ambient, diffuse, alpha=None):

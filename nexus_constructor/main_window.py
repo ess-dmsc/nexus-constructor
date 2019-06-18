@@ -38,7 +38,6 @@ class MainWindow(Ui_MainWindow):
         self.nexus_wrapper.file_changed.connect(self.update_nexus_file_structure_view)
         self.verticalLayout.addWidget(self.widget)
         self.listView.setModel(self.nexus_wrapper.get_component_list())
-        self.nexus_wrapper.set_instrument_view(self.sceneWidget)
 
         self.nexus_wrapper.component_added.connect(self.sceneWidget.add_component)
 
