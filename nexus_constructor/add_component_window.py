@@ -120,6 +120,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.detectorIdLineEdit.setValidator(NullableIntValidator())
 
+        self.repeatableGridRadioButton.clicked.connect(
+            self.change_pixel_grid_visibility
+        )
+        self.faceMappedMeshRadioButton.clicked.connect(
+            self.change_pixel_grid_visibility
+        )
+
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
             QUrl(
@@ -153,6 +160,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelDataBox.setVisible(
             not self.noGeometryRadioButton.isChecked()
             and self.componentTypeComboBox.currentText() == "NXmonitor"
+        )
+
+    def change_pixel_grid_visibility(self):
+        self.pixelGridBox.setVisible(
+            self.repeatableGridRadioButton.isChecked()
+            and self.pixelOptionsBox.isVisible()
         )
 
     def show_cylinder_fields(self):
