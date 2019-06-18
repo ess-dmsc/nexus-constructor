@@ -36,18 +36,8 @@ class NexusWrapper(QObject):
         self.instrument_group = self.entry_group.create_group("instrument")
         self.instrument_group.attrs["NX_class"] = "NXinstrument"
 
-        self.instrument_view = None
-
         self.components_list_model = instrument_model.InstrumentModel()
         self._emit_file()
-
-    def set_instrument_view(self, instrument_view):
-        """
-        Set the instrument view of the NeXus wrapper so that the instrument view can be informed when a component is
-        added/deleted/changed.
-        :param instrument_view: The instrument view for visualising the components.
-        """
-        self.instrument_view = instrument_view
 
     def _emit_file(self):
         """
