@@ -130,8 +130,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
 
-        if selection != "NXdetector":
-            self.pixelOptionsBox.setVisible(False)
+        self.change_pixel_options_visibility()
 
     def mesh_file_picker(self):
         """
@@ -143,15 +142,22 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.fileLineEdit.setText(filename)
             self.geometry_file_name = filename
 
+    def change_pixel_options_visibility(self):
+        self.pixelOptionsBox.setVisible(
+            self.componentTypeComboBox.currentText() == "NXdetector"
+            and self.meshRadioButton.isChecked()
+        )
+
     def show_cylinder_fields(self):
         self.geometryOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
-        self.pixelOptionsBox.setVisible(False)
+        self.change_pixel_options_visibility()
 
     def show_no_geometry_fields(self):
         self.geometryOptionsBox.setVisible(False)
         self.pixelOptionsBox.setVisible(False)
+        self.change_pixel_options_visibility()
         if self.nameLineEdit.text():
             self.buttonBox.setEnabled(True)
 
@@ -159,9 +165,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
-
-        if self.componentTypeComboBox.currentText() == "NXdetector":
-            self.pixelOptionsBox.setVisible(True)
+        self.change_pixel_options_visibility()
 
     def generate_geometry_model(self):
         """
