@@ -116,9 +116,6 @@ class NexusWrapper(QObject):
 
         self._emit_file()
 
-    def get_component_geometry(self, component_name):
-        pass
-
 
 def convert_name_with_spaces(component_name):
     return component_name.replace(" ", "_")

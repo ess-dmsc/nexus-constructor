@@ -85,10 +85,9 @@ class InstrumentView(QWidget):
 
         entity = Qt3DCore.QEntity(self.root_entity)
         mesh = OffMesh(geometry.off_geometry)
-        material = self.grey_material
 
         entity.addComponent(mesh)
-        entity.addComponent(material)
+        entity.addComponent(self.grey_material)
 
         self.component_meshes[name] = mesh
         self.component_entities[name] = entity
