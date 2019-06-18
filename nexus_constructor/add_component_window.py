@@ -118,12 +118,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
 
     def on_nx_class_changed(self):
-
-        selection = self.componentTypeComboBox.currentText()
-
         self.webEngineView.setUrl(
             QUrl(
-                f"http://download.nexusformat.org/sphinx/classes/base_classes/{selection}.html"
+                f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
             )
         )
         self.pixelOptionsBox.setVisible(
