@@ -26,8 +26,6 @@ class InstrumentView(QWidget):
         # Enable the camera to see a large distance by giving it a small nearView and large farView
         self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.01, 1000)
 
-        self.nexus_model = None
-
         # Set the camera view centre as the origin and position the camera so that it looks down at the neutron beam
         self.view.camera().setPosition(QVector3D(6, 8, 30))
         self.view.camera().setViewCenter(QVector3D(0, 0, 0))
@@ -61,7 +59,7 @@ class InstrumentView(QWidget):
             "animations": [],
         }
 
-        for i in range(self.num_neutrons):
+        for _ in range(self.num_neutrons):
             self.neutron_objects["entities"].append(Qt3DCore.QEntity(self.root_entity))
             self.neutron_objects["meshes"].append(Qt3DExtras.QSphereMesh())
             self.neutron_objects["transforms"].append(Qt3DCore.QTransform())
@@ -82,12 +80,15 @@ class InstrumentView(QWidget):
         self.component_entities = {}
 
     def add_component(self, name, geometry):
-
+        """
+        Add a component to the instrument view given a name and its geometry.
+        :param name: The name of the component.
+        :param geometry: The geometry information of the component that is used to create a mesh.
+        """
         entity = Qt3DCore.QEntity(self.root_entity)
         mesh = OffMesh(geometry.off_geometry)
 
-        entity.addComponent(mesh)
-        entity.addComponent(self.grey_material)
+        self.add_components_to_entity(entity, [mesh, self.grey_material])
 
         self.component_meshes[name] = mesh
         self.component_entities[name] = entity
