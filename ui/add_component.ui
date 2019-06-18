@@ -146,34 +146,11 @@
           <property name="title">
            <string>Geometry options:</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,1">
-           <item row="4" column="0">
-            <widget class="QGroupBox" name="pixelOptionsBox">
-             <property name="title">
-              <string>Pixel options</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_7">
-              <item>
-               <widget class="QRadioButton" name="repeatableGridRadioButton">
-                <property name="text">
-                 <string>Repeatable Grid</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="faceMappedMeshRadioButton">
-                <property name="text">
-                 <string>Face-Mapped Mesh</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
+          <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,1,0">
            <item row="1" column="0">
             <widget class="QGroupBox" name="geometryFileBox">
              <property name="title">
-              <string>Geometry file</string>
+              <string>Geometry file:</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
@@ -196,7 +173,7 @@
            <item row="3" column="0">
             <widget class="QGroupBox" name="cylinderOptionsBox">
              <property name="title">
-              <string>Cylinder options</string>
+              <string>Cylinder options:</string>
              </property>
              <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,1,0,1">
               <item row="2" column="1">
@@ -284,7 +261,7 @@
            <item row="0" column="0">
             <widget class="QGroupBox" name="unitsbox">
              <property name="title">
-              <string>Units</string>
+              <string>Units:</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
@@ -294,6 +271,74 @@
                 </property>
                 <property name="placeholderText">
                  <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QGroupBox" name="pixelOptionsBox">
+             <property name="title">
+              <string>Pixel options:</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <item>
+               <widget class="QRadioButton" name="repeatableGridRadioButton">
+                <property name="text">
+                 <string>Repeatable Grid</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="faceMappedMeshRadioButton">
+                <property name="text">
+                 <string>Face-Mapped Mesh</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string>Pixel data:</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Detector ID:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
