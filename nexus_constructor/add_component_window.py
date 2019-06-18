@@ -17,6 +17,7 @@ from nexus_constructor.validators import (
     GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
     OkValidator,
+    NullableIntValidator,
 )
 from nexus_constructor.nexus_wrapper import NexusWrapper
 from nexus_constructor.utils import file_dialog, validate_line_edit
@@ -116,6 +117,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         # Validate the default value set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
+
+        self.detectorIdLineEdit.setValidator(NullableIntValidator())
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
