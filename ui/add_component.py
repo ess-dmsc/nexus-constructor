@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Thu Jun 13 16:16:47 2019
+# Created: Wed Jun 19 10:34:21 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -177,14 +177,17 @@ class Ui_AddComponentDialog(object):
         sizePolicy.setHeightForWidth(self.fieldsBox.sizePolicy().hasHeightForWidth())
         self.fieldsBox.setSizePolicy(sizePolicy)
         self.fieldsBox.setObjectName("fieldsBox")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.fieldsBox)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.gridLayout_5 = QtWidgets.QGridLayout(self.fieldsBox)
+        self.gridLayout_5.setObjectName("gridLayout_5")
         self.fieldsLineEdit = QtWidgets.QLineEdit(self.fieldsBox)
         self.fieldsLineEdit.setObjectName("fieldsLineEdit")
-        self.verticalLayout.addWidget(self.fieldsLineEdit)
+        self.gridLayout_5.addWidget(self.fieldsLineEdit, 0, 0, 1, 1)
+        self.addFieldButton = QtWidgets.QPushButton(self.fieldsBox)
+        self.addFieldButton.setObjectName("addFieldButton")
+        self.gridLayout_5.addWidget(self.addFieldButton, 0, 1, 1, 1)
         self.fieldsListView = QtWidgets.QListView(self.fieldsBox)
         self.fieldsListView.setObjectName("fieldsListView")
-        self.verticalLayout.addWidget(self.fieldsListView)
+        self.gridLayout_5.addWidget(self.fieldsListView, 1, 0, 1, 2)
         self.verticalLayout_2.addWidget(self.fieldsBox)
         self.verticalLayout_2.setStretch(5, 1)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
@@ -228,4 +231,5 @@ class Ui_AddComponentDialog(object):
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
+        self.addFieldButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Add Field", None, -1))
 

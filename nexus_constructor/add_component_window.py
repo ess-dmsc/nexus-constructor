@@ -116,6 +116,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         # Validate the default value set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
+        self.addFieldButton.clicked.connect(self.add_field)
+
+    def add_field(self):
+        print(self.fieldsLineEdit.text())
+        self.fieldsLineEdit.clear()
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
