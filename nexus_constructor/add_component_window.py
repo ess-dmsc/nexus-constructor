@@ -126,7 +126,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.addFieldButton.clicked.connect(self.add_field)
 
-
     def add_field(self):
         self.fieldsLineEdit.clear()
 
