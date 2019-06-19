@@ -1,6 +1,8 @@
 from enum import Enum
 
-from PySide2.QtCore import QUrl
+from PySide2.QtCore import QUrl, QStringListModel
+from PySide2.QtWidgets import QCompleter
+
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -38,6 +40,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.nx_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
+        self.possible_fields = self.nx_classes["NXpinhole"]
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -81,6 +84,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
 
+        self.fieldsLineEdit.setCompleter(
+            QCompleter(QStringListModel(self.possible_fields))
+        )
+
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
 
         # Set default geometry type and show the related fields.
@@ -120,6 +127,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def add_field(self):
         print(self.fieldsLineEdit.text())
+        print(
+            f"possible fields for {self.componentTypeComboBox.currentText()}: {self.possible_fields}"
+        )
         self.fieldsLineEdit.clear()
 
     def on_nx_class_changed(self):
@@ -131,6 +141,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelOptionsBox.setVisible(
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
+        self.possible_fields = self.nx_classes[self.componentTypeComboBox.currentText()]
+        self.fieldsLineEdit.completer().setModel(QStringListModel(self.possible_fields))
 
     def mesh_file_picker(self):
         """
