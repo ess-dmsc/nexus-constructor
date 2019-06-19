@@ -191,5 +191,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
         self.nexus_wrapper.add_component(
-            nx_class, component_name, description, self.generate_geometry_model(), self.listWidget
+            nx_class,
+            component_name,
+            description,
+            self.generate_geometry_model(),
+            self.listWidget,
         )
