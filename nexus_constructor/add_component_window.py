@@ -133,7 +133,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Create a validator that only accepts ints that are 0 or greater
         zero_or_greater_int_validator = QIntValidator()
         zero_or_greater_int_validator.setBottom(0)
-
         # Set the validator of the row, column and first line input boxes in the pixel grid options
         self.rowLineEdit.setValidator(zero_or_greater_int_validator)
         self.columnsLineEdit.setValidator(zero_or_greater_int_validator)
@@ -141,7 +140,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         double_validator = QDoubleValidator()
         double_validator.setNotation(QDoubleValidator.StandardNotation)
-
         self.rowHeightLineEdit.setValidator(double_validator)
         self.columnWidthLineEdit.setValidator(double_validator)
 
