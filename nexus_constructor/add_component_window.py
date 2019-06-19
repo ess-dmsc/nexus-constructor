@@ -3,6 +3,13 @@ from enum import Enum
 from PySide2.QtCore import QUrl
 from PySide2.QtGui import QIntValidator, QDoubleValidator
 
+from nexus_constructor.pixel_data import (
+    PixelGrid,
+    PixelMapping,
+    SinglePixelId,
+    CountDirection,
+    Corner,
+)
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -36,6 +43,16 @@ class GeometryType(Enum):
 class AddComponentDialog(Ui_AddComponentDialog):
     def __init__(self, nexus_wrapper: NexusWrapper):
         super(AddComponentDialog, self).__init__()
+        self.count_direction = {
+            "Row": CountDirection.ROW,
+            "Column": CountDirection.COLUMN,
+        }
+        self.initial_count_corner = {
+            "Bottom left": Corner.BOTTOM_LEFT,
+            "Bottom right": Corner.BOTTOM_RIGHT,
+            "Top left": Corner.TOP_LEFT,
+            "Top right": Corner.TOP_RIGHT,
+        }
         self.nexus_wrapper = nexus_wrapper
         self.geometry_model = None
         self.nx_classes = make_dictionary_of_class_definitions(
@@ -239,7 +256,35 @@ class AddComponentDialog(Ui_AddComponentDialog):
             geometry_model.set_file(self.geometry_file_name)
         else:
             geometry_model = NoShapeModel()
+
         return geometry_model
+
+    def generate_pixel_data(self):
+
+        if self.pixelGridBox.isVisible():
+            pixel_data = PixelGrid()
+            pixel_data.rows = int(self.rowLineEdit.value())
+            pixel_data.columns = int(self.columnsLineEdit.value())
+            pixel_data.row_height = float(self.rowHeightLineEdit.value())
+            pixel_data.col_width = float(self.columnWidthLineEdit.value())
+            pixel_data.first_id = int(self.firstIDLineEdit.value())
+            pixel_data.count_direction = self.count_direction[
+                self.countFirstComboBox.value()
+            ]
+            pixel_data.initial_count_corner = self.initial_count_corner[
+                self.startCountingComboBox.value()
+            ]
+
+        elif self.pixelMappingListView.isVisible():
+            pixel_data = PixelMapping()
+
+        elif self.pixelDataBox.isVisible():
+            pixel_data = SinglePixelId()
+            pixel_data.pixel_id = int(self.detectorIdLineEdit.value())
+        else:
+            return None
+
+        return pixel_data
 
     def on_ok(self):
         nx_class = self.componentTypeComboBox.currentText()
