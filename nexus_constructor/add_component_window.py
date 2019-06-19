@@ -1,7 +1,7 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl
-from PySide2.QtGui import QIntValidator
+from PySide2.QtGui import QIntValidator, QDoubleValidator
 
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
@@ -138,6 +138,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.rowLineEdit.setValidator(zero_or_greater_int_validator)
         self.columnsLineEdit.setValidator(zero_or_greater_int_validator)
         self.firstIDLineEdit.setValidator(zero_or_greater_int_validator)
+
+        double_validator = QDoubleValidator()
+        double_validator.setNotation(QDoubleValidator.StandardNotation)
+
+        self.rowHeightLineEdit.setValidator(double_validator)
+        self.columnWidthLineEdit.setValidator(double_validator)
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
