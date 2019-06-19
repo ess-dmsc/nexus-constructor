@@ -1,6 +1,5 @@
 from nexus_constructor.nexus_wrapper import NexusWrapper, convert_name_with_spaces
 from nexus_constructor.qml_models.geometry_models import NoShapeModel
-from mock import Mock
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_file_contains_entry_group_with_correct_nx_class():
