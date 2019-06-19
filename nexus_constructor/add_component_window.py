@@ -169,7 +169,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def change_pixel_options_visibility(self):
         """
-        Changes the visibilty of the pixel Options
+        Changes the visibility of the pixel-related fields and the box that contains them. First checks if any of the
+        fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
+        and then the fields is set.
         """
         pixel_layout_condition = (
             self.componentTypeComboBox.currentText() == "NXdetector"
@@ -183,8 +185,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_layout_condition and self.repeatableGridRadioButton.isChecked()
         )
 
+        '''
+        Only make the pixel box appear based on layout fields and data fields because the grid and mapping options
+        already depend on pixel layout being visible.
+        '''
         self.pixelOptionsBox.setVisible(pixel_layout_condition or pixel_data_condition)
 
+        # Set visibility for the components of the pixel options box
         self.pixelLayoutBox.setVisible(pixel_layout_condition)
         self.pixelDataBox.setVisible(pixel_data_condition)
         self.pixelGridBox.setVisible(pixel_grid_condition)
