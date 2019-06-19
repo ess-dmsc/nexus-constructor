@@ -1,7 +1,7 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl, QStringListModel
-from PySide2.QtWidgets import QCompleter
+from PySide2.QtWidgets import QCompleter, QListWidgetItem
 
 from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.qml_models.geometry_models import (
@@ -42,7 +42,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
         self.possible_fields = self.nx_classes["NXpinhole"]
-        self.fields = dict()
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -130,9 +129,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def add_field(self):
         self.fieldsLineEdit.clear()
-        self.fields[self.fieldsLineEdit.text()] = FieldWidget(
-            self.possible_fields, parent=self.fieldsListView
-        )
+
+        item = QListWidgetItem()
+        field = FieldWidget(self.possible_fields)
+        item.setSizeHint(field.sizeHint())
+        self.listWidget.addItem(item)
+        self.listWidget.setItemWidget(item, field)
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
