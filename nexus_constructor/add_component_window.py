@@ -124,10 +124,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         # Instruct the pixel grid box to appear or disappear depending on the pixel layout setting
         self.repeatableGridRadioButton.clicked.connect(
-            lambda: self.pixelGridBox.setVisible(True)
+            lambda: self.show_pixel_grid_or_pixel_mapping(True)
         )
         self.faceMappedMeshRadioButton.clicked.connect(
-            lambda: self.pixelGridBox.setVisible(False)
+            lambda: self.show_pixel_grid_or_pixel_mapping(False)
         )
 
         # Create a validator that only accepts ints that are 0 or greater
@@ -145,6 +145,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.rowHeightLineEdit.setValidator(double_validator)
         self.columnWidthLineEdit.setValidator(double_validator)
 
+        self.pixelMappingLabel.setVisible(False)
+        self.pixelMappingListView.setVisible(False)
+
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
             QUrl(
@@ -156,6 +159,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
         self.change_pixel_options_visibility()
+
+    def show_pixel_grid_or_pixel_mapping(self, bool):
+        self.pixelGridBox.setVisible(bool)
+        self.pixelMappingLabel.setVisible(not bool)
+        self.pixelMappingListView.setVisible(not bool)
 
     def mesh_file_picker(self):
         """
