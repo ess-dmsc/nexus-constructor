@@ -298,7 +298,7 @@
               <item>
                <widget class="QRadioButton" name="repeatableGridRadioButton">
                 <property name="text">
-                 <string>Repeatable Grid</string>
+                 <string>Repeatable grid</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -308,52 +308,7 @@
               <item>
                <widget class="QRadioButton" name="faceMappedMeshRadioButton">
                 <property name="text">
-                 <string>Face-Mapped Mesh</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="pixelDataBox">
-             <property name="title">
-              <string>Pixel data:</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
-              <item>
-               <spacer name="pixelDataSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QLabel" name="detectorIdLabel">
-                <property name="text">
-                 <string>Detector ID:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="detectorIdLineEdit">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 <string>Face-mapped mesh</string>
                 </property>
                </widget>
               </item>
@@ -488,6 +443,61 @@
                <widget class="QLabel" name="countingFromLabel">
                 <property name="text">
                  <string>Start counting from:</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="pixelMappingLabel">
+             <property name="text">
+              <string>Pixel mapping:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QListView" name="pixelMappingListView"/>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="pixelDataBox">
+             <property name="title">
+              <string>Pixel data:</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <spacer name="pixelDataSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="detectorIdLabel">
+                <property name="text">
+                 <string>Detector ID:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="detectorIdLineEdit">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
