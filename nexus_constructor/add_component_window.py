@@ -139,6 +139,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.change_pixel_options_visibility()
         self.change_pixel_data_visibility()
+        self.change_pixel_grid_visibility()
 
     def mesh_file_picker(self):
         """
@@ -164,8 +165,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def change_pixel_grid_visibility(self):
         self.pixelGridBox.setVisible(
-            self.repeatableGridRadioButton.isChecked()
-            and self.pixelOptionsBox.isVisible()
+            self.pixelOptionsBox.isVisible()
+            and self.repeatableGridRadioButton.isChecked()
         )
 
     def show_cylinder_fields(self):
@@ -174,12 +175,14 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cylinderOptionsBox.setVisible(True)
         self.change_pixel_options_visibility()
         self.change_pixel_data_visibility()
+        self.change_pixel_grid_visibility()
 
     def show_no_geometry_fields(self):
         self.geometryOptionsBox.setVisible(False)
         self.pixelOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
         self.change_pixel_data_visibility()
+        self.change_pixel_grid_visibility()
         if self.nameLineEdit.text():
             self.buttonBox.setEnabled(True)
 
@@ -189,6 +192,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cylinderOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
         self.change_pixel_data_visibility()
+        self.change_pixel_grid_visibility()
 
     def generate_geometry_model(self):
         """
