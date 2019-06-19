@@ -121,11 +121,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.detectorIdLineEdit.setValidator(NullableIntValidator())
 
         self.repeatableGridRadioButton.clicked.connect(
-            self.change_pixel_grid_visibility
+            lambda: self.pixelGridBox.setVisible(True)
         )
         self.faceMappedMeshRadioButton.clicked.connect(
-            self.change_pixel_grid_visibility
+            lambda: self.pixelGridBox.setVisible(False)
         )
+
+        self.change_pixel_options_visibility()
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
@@ -133,13 +135,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
             )
         )
-        self.pixelOptionsBox.setVisible(
+        self.pixelLayoutBox.setVisible(
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
 
         self.change_pixel_options_visibility()
-        self.change_pixel_data_visibility()
-        self.change_pixel_grid_visibility()
 
     def mesh_file_picker(self):
         """
@@ -152,37 +152,36 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.geometry_file_name = filename
 
     def change_pixel_options_visibility(self):
-        self.pixelOptionsBox.setVisible(
+        """
+        Changes the visibilty of the pixel Options
+        """
+        pixel_layout_condition = (
             self.componentTypeComboBox.currentText() == "NXdetector"
             and self.meshRadioButton.isChecked()
         )
-
-    def change_pixel_data_visibility(self):
-        self.pixelDataBox.setVisible(
+        pixel_data_condition = (
             not self.noGeometryRadioButton.isChecked()
             and self.componentTypeComboBox.currentText() == "NXmonitor"
         )
-
-    def change_pixel_grid_visibility(self):
-        self.pixelGridBox.setVisible(
-            self.pixelOptionsBox.isVisible()
-            and self.repeatableGridRadioButton.isChecked()
+        pixel_grid_condition = (
+            pixel_layout_condition and self.repeatableGridRadioButton.isChecked()
         )
+
+        self.pixelOptionsBox.setVisible(pixel_layout_condition or pixel_data_condition)
+
+        self.pixelLayoutBox.setVisible(pixel_layout_condition)
+        self.pixelDataBox.setVisible(pixel_data_condition)
+        self.pixelGridBox.setVisible(pixel_grid_condition)
 
     def show_cylinder_fields(self):
         self.geometryOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
         self.change_pixel_options_visibility()
-        self.change_pixel_data_visibility()
-        self.change_pixel_grid_visibility()
 
     def show_no_geometry_fields(self):
         self.geometryOptionsBox.setVisible(False)
-        self.pixelOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
-        self.change_pixel_data_visibility()
-        self.change_pixel_grid_visibility()
         if self.nameLineEdit.text():
             self.buttonBox.setEnabled(True)
 
@@ -191,8 +190,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
-        self.change_pixel_data_visibility()
-        self.change_pixel_grid_visibility()
 
     def generate_geometry_model(self):
         """
