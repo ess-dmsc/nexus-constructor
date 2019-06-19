@@ -81,7 +81,7 @@ class NexusWrapper(QObject):
             print("NeXus file loaded")
             self._emit_file()
 
-    def add_component(self, component_type, component_name, description, geometry):
+    def add_component(self, component_type, component_name, description, geometry, fields):
         """
         Adds a component to the NeXus file and the components list.
         :param component_type: The NX Component type in string form.
@@ -106,6 +106,10 @@ class NexusWrapper(QObject):
 
         component_group = instrument_group.create_group(component_name)
         component_group.attrs["NX_class"] = component_type
+
+        for i in range(0, fields.count()):
+            # TODO: do something here with the field widget
+            print(fields.item(i))
 
         self._emit_file()
 

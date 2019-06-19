@@ -85,10 +85,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
 
-        self.fieldsLineEdit.setCompleter(
-            QCompleter(QStringListModel(self.possible_fields))
-        )
-
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
 
         # Set default geometry type and show the related fields.
@@ -127,8 +123,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.addFieldButton.clicked.connect(self.add_field)
 
     def add_field(self):
-        self.fieldsLineEdit.clear()
-
         item = QListWidgetItem()
         field = FieldWidget(self.possible_fields)
         item.setSizeHint(field.sizeHint())
@@ -145,7 +139,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
         self.possible_fields = self.nx_classes[self.componentTypeComboBox.currentText()]
-        self.fieldsLineEdit.completer().setModel(QStringListModel(self.possible_fields))
 
     def mesh_file_picker(self):
         """
@@ -198,5 +191,5 @@ class AddComponentDialog(Ui_AddComponentDialog):
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
         self.nexus_wrapper.add_component(
-            nx_class, component_name, description, self.generate_geometry_model()
+            nx_class, component_name, description, self.generate_geometry_model(), self.listWidget
         )
