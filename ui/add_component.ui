@@ -440,7 +440,18 @@
                </widget>
               </item>
               <item row="4" column="2" colspan="2">
-               <widget class="QComboBox" name="countFirstComboBox"/>
+               <widget class="QComboBox" name="countFirstComboBox">
+                <item>
+                 <property name="text">
+                  <string>Rows</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Columns</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="4" column="0" colspan="2">
                <widget class="QLabel" name="countFirstLabel">
@@ -450,7 +461,28 @@
                </widget>
               </item>
               <item row="3" column="2" colspan="2">
-               <widget class="QComboBox" name="startCountingComboBox"/>
+               <widget class="QComboBox" name="startCountingComboBox">
+                <item>
+                 <property name="text">
+                  <string>Bottom left</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Bottom right</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Top left</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Top right</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="3" column="0" colspan="2">
                <widget class="QLabel" name="countingFromLabel">

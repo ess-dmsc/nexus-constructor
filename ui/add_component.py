@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Wed Jun 19 11:44:27 2019
+# Created: Wed Jun 19 11:47:57 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -239,12 +239,18 @@ class Ui_AddComponentDialog(object):
         self.gridLayout_5.addWidget(self.columnsLabel, 1, 0, 1, 1)
         self.countFirstComboBox = QtWidgets.QComboBox(self.pixelGridBox)
         self.countFirstComboBox.setObjectName("countFirstComboBox")
+        self.countFirstComboBox.addItem("")
+        self.countFirstComboBox.addItem("")
         self.gridLayout_5.addWidget(self.countFirstComboBox, 4, 2, 1, 2)
         self.countFirstLabel = QtWidgets.QLabel(self.pixelGridBox)
         self.countFirstLabel.setObjectName("countFirstLabel")
         self.gridLayout_5.addWidget(self.countFirstLabel, 4, 0, 1, 2)
         self.startCountingComboBox = QtWidgets.QComboBox(self.pixelGridBox)
         self.startCountingComboBox.setObjectName("startCountingComboBox")
+        self.startCountingComboBox.addItem("")
+        self.startCountingComboBox.addItem("")
+        self.startCountingComboBox.addItem("")
+        self.startCountingComboBox.addItem("")
         self.gridLayout_5.addWidget(self.startCountingComboBox, 3, 2, 1, 2)
         self.countingFromLabel = QtWidgets.QLabel(self.pixelGridBox)
         self.countingFromLabel.setObjectName("countingFromLabel")
@@ -324,7 +330,13 @@ class Ui_AddComponentDialog(object):
         self.columnWidthLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
         self.firstIDLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "0", None, -1))
         self.columnsLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Columns:", None, -1))
+        self.countFirstComboBox.setItemText(0, QtWidgets.QApplication.translate("AddComponentDialog", "Rows", None, -1))
+        self.countFirstComboBox.setItemText(1, QtWidgets.QApplication.translate("AddComponentDialog", "Columns", None, -1))
         self.countFirstLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Count first along:", None, -1))
+        self.startCountingComboBox.setItemText(0, QtWidgets.QApplication.translate("AddComponentDialog", "Bottom left", None, -1))
+        self.startCountingComboBox.setItemText(1, QtWidgets.QApplication.translate("AddComponentDialog", "Bottom right", None, -1))
+        self.startCountingComboBox.setItemText(2, QtWidgets.QApplication.translate("AddComponentDialog", "Top left", None, -1))
+        self.startCountingComboBox.setItemText(3, QtWidgets.QApplication.translate("AddComponentDialog", "Top right", None, -1))
         self.countingFromLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Start counting from:", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
 
