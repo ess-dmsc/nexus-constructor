@@ -1,6 +1,8 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl
+from PySide2.QtGui import QIntValidator
+
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -126,6 +128,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.faceMappedMeshRadioButton.clicked.connect(
             lambda: self.pixelGridBox.setVisible(False)
         )
+
+
+
+        self.rowLineEdit.setValidator(QIntValidator())
 
         self.change_pixel_options_visibility()
 
