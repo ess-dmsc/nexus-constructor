@@ -398,19 +398,39 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="rowLineEdit"/>
+               <widget class="QLineEdit" name="rowLineEdit">
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="columnsLineEdit"/>
+               <widget class="QLineEdit" name="columnsLineEdit">
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </widget>
               </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="rowHeightLineEdit"/>
+               <widget class="QLineEdit" name="rowHeightLineEdit">
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </widget>
               </item>
               <item row="1" column="3">
-               <widget class="QLineEdit" name="columnWidthLineEdit"/>
+               <widget class="QLineEdit" name="columnWidthLineEdit">
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="firstIDLineEdit"/>
+               <widget class="QLineEdit" name="firstIDLineEdit">
+                <property name="text">
+                 <string>0</string>
+                </property>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="columnsLabel">

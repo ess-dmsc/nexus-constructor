@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Wed Jun 19 11:01:07 2019
+# Created: Wed Jun 19 11:44:27 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -318,6 +318,11 @@ class Ui_AddComponentDialog(object):
         self.rowHeightLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Row height:", None, -1))
         self.columnWidthLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Column width:", None, -1))
         self.firstIDLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "First ID:", None, -1))
+        self.rowLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
+        self.columnsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
+        self.rowHeightLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
+        self.columnWidthLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
+        self.firstIDLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "0", None, -1))
         self.columnsLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Columns:", None, -1))
         self.countFirstLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Count first along:", None, -1))
         self.countingFromLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Start counting from:", None, -1))

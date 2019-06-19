@@ -122,6 +122,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.detectorIdLineEdit.setValidator(NullableIntValidator())
 
+        # Instruct the pixel grid box to appear or disappear depending on the pixel layout setting
         self.repeatableGridRadioButton.clicked.connect(
             lambda: self.pixelGridBox.setVisible(True)
         )
@@ -129,11 +130,14 @@ class AddComponentDialog(Ui_AddComponentDialog):
             lambda: self.pixelGridBox.setVisible(False)
         )
 
+        # Create a validator that only accepts ints that are 0 or greater
+        zero_or_greater_int_validator = QIntValidator()
+        zero_or_greater_int_validator.setBottom(0)
 
-
-        self.rowLineEdit.setValidator(QIntValidator())
-
-        self.change_pixel_options_visibility()
+        # Set the validator of the row, column and first line input boxes in the pixel grid options
+        self.rowLineEdit.setValidator(zero_or_greater_int_validator)
+        self.columnsLineEdit.setValidator(zero_or_greater_int_validator)
+        self.firstIDLineEdit.setValidator(zero_or_greater_int_validator)
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
