@@ -109,7 +109,7 @@ class NexusWrapper(QObject):
 
         for i in range(0, fields.count()):
             # TODO: do something here with the field widget
-            print(fields.item(i))
+            field_widget = fields.item(i)
 
         self._emit_file()
 

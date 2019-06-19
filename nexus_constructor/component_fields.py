@@ -5,11 +5,13 @@ from PySide2.QtWidgets import (
     QFrame,
     QComboBox,
     QSizePolicy,
+    QDialog,
 )
 from enum import Enum
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt
 from typing import List
+import h5py
 
 _field_types = {}
 
@@ -51,7 +53,6 @@ class FieldWidget(QFrame):
         super(FieldWidget, self).__init__(parent)
 
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
-        # self.field_name_edit.editingFinished.connect(self.new_field_name_entered)
 
         self.field_type_combo = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
@@ -69,10 +70,13 @@ class FieldWidget(QFrame):
         self.edit_button.setMinimumWidth(edit_button_size)
         self.edit_button.setMaximumWidth(edit_button_size)
         self.edit_button.setSizePolicy(fix_horizontal_size)
+        self.edit_button.clicked.connect(self.show_edit_dialog)
 
-        # http://docs.h5py.org/en/stable/faq.html#what-datatypes-are-supported
+        # TODO: add value types http://docs.h5py.org/en/stable/faq.html#what-datatypes-are-supported
+        # TODO: add validator for value types
         self.value_type_combo = QComboBox()
 
+        # TODO: actually remove stuff - use signal to listview?
         self.remove_button = QPushButton("Remove")
 
         self.layout = QHBoxLayout()
@@ -113,3 +117,22 @@ class FieldWidget(QFrame):
         self.nx_class_combo.setVisible(show_nx_class_combo)
         self.edit_button.setVisible(show_edit_button)
         self.value_type_combo.setVisible(show_value_type_combo)
+
+    def show_edit_dialog(self):
+        self.edit_dialog = QDialog()
+        self.edit_dialog.show()
+        if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
+            # TODO: show scalar edit panel
+            pass
+        elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
+            # TODO: show array edit panel
+            pass
+        elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
+            # TODO: show kafka stream panel
+            pass
+        elif self.field_type_combo.currentText() == FieldType.link.value:
+            # TODO: show link panel
+            pass
+        elif self.field_type_combo.currentText() == FieldType.nx_class.value:
+            # TODO: show nx class panels
+            pass
