@@ -185,10 +185,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_layout_condition and self.repeatableGridRadioButton.isChecked()
         )
 
-        '''
+        """
         Only make the pixel box appear based on layout fields and data fields because the grid and mapping options
         already depend on pixel layout being visible.
-        '''
+        """
         self.pixelOptionsBox.setVisible(pixel_layout_condition or pixel_data_condition)
 
         # Set visibility for the components of the pixel options box
