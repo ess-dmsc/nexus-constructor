@@ -123,6 +123,8 @@ removable_folders = [
     "lib/sphinx",
     "platforms",
     "imageformats",
+    "definitions",
+    "mpl-data",
 ]
 
 setup(
