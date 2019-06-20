@@ -67,7 +67,7 @@ larger_folders = [
     os.path.join("definitions", "manual"),
     "imageformats",
     "mpl-data",
-    os.path.join(os.path.join(os.path.join("lib", "PySide2"), "Qt"), "qml"),
+    os.path.join("lib", "PySide2", "Qt", "qml"),
 ]
 
 setup(
