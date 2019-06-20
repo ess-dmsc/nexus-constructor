@@ -203,8 +203,16 @@ class AddComponentDialog(Ui_AddComponentDialog):
         pixel_grid_condition = (
             pixel_layout_condition and self.repeatableGridRadioButton.isChecked()
         )
+        pixel_mapping_condition = (
+            pixel_layout_condition and self.faceMappedMeshRadioButton.isChecked()
+        )
 
-        return pixel_layout_condition, pixel_data_condition, pixel_grid_condition
+        return (
+            pixel_layout_condition,
+            pixel_data_condition,
+            pixel_grid_condition,
+            pixel_mapping_condition,
+        )
 
     def change_pixel_options_visibility(self):
         """
@@ -212,7 +220,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
         and then the fields is set.
         """
-        pixel_layout_condition, pixel_data_condition, pixel_grid_condition = (
+        pixel_layout_condition, pixel_data_condition, pixel_grid_condition, pixel_mapping_condition = (
             self.pixel_options_conditions()
         )
 
@@ -226,11 +234,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelLayoutBox.setVisible(pixel_layout_condition)
         self.pixelDataBox.setVisible(pixel_data_condition)
         self.pixelGridBox.setVisible(pixel_grid_condition)
-
-        if not self.meshRadioButton.isChecked():
-            self.pixelGridBox.setVisible(False)
-            self.pixelMappingLabel.setVisible(False)
-            self.pixelMappingListView.setVisible(False)
+        self.pixelMappingLabel.setVisible(pixel_mapping_condition)
+        self.pixelMappingListView.setVisible(pixel_mapping_condition)
 
     def show_cylinder_fields(self):
         self.geometryOptionsBox.setVisible(True)
@@ -274,7 +279,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def generate_pixel_data(self):
 
-        pixel_layout_condition, pixel_data_condition, pixel_grid_condition = (
+        _, pixel_data_condition, pixel_grid_condition, pixel_mapping_condition = (
             self.pixel_options_conditions()
         )
 
@@ -292,7 +297,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.startCountingComboBox.currentText()
             ]
 
-        elif pixel_layout_condition and self.faceMappedMeshRadioButton.isChecked():
+        elif pixel_mapping_condition:
             pixel_data = PixelMapping()
 
         elif pixel_data_condition:
