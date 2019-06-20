@@ -73,12 +73,13 @@ class InstrumentView(QWidget):
         self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
         self.cylinder_transform = Qt3DCore.QTransform()
 
-        # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
-        self.setup_beam_cylinder()
-
+        # Dictionaries for component-related objects also to prevent them from going out of scope
         self.component_meshes = {}
         self.component_entities = {}
         self.component_translations = {}
+
+        # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
+        self.setup_beam_cylinder()
 
     def add_component(self, name, geometry):
         """
