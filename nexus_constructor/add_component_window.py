@@ -190,12 +190,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.fileLineEdit.setText(filename)
             self.geometry_file_name = filename
 
-    def change_pixel_options_visibility(self):
-        """
-        Changes the visibility of the pixel-related fields and the box that contains them. First checks if any of the
-        fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
-        and then the fields is set.
-        """
+    def pixel_options_conditions(self):
+
         pixel_layout_condition = (
             self.componentTypeComboBox.currentText() == "NXdetector"
             and self.meshRadioButton.isChecked()
@@ -208,6 +204,18 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_layout_condition and self.repeatableGridRadioButton.isChecked()
         )
 
+        return pixel_layout_condition, pixel_data_condition, pixel_grid_condition
+
+    def change_pixel_options_visibility(self):
+        """
+        Changes the visibility of the pixel-related fields and the box that contains them. First checks if any of the
+        fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
+        and then the fields is set.
+        """
+        pixel_layout_condition, pixel_data_condition, pixel_grid_condition = (
+            self.pixel_options_conditions()
+        )
+
         """
         Only make the pixel box appear based on layout fields and data fields because the grid and mapping options
         already depend on pixel layout being visible.
@@ -218,6 +226,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelLayoutBox.setVisible(pixel_layout_condition)
         self.pixelDataBox.setVisible(pixel_data_condition)
         self.pixelGridBox.setVisible(pixel_grid_condition)
+
+        if not self.meshRadioButton.isChecked():
+            self.pixelGridBox.setVisible(False)
+            self.pixelMappingLabel.setVisible(False)
+            self.pixelMappingListView.setVisible(False)
 
     def show_cylinder_fields(self):
         self.geometryOptionsBox.setVisible(True)
@@ -261,7 +274,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def generate_pixel_data(self):
 
-        if self.pixelGridBox.isVisible():
+        pixel_layout_condition, pixel_data_condition, pixel_grid_condition = (
+            self.pixel_options_conditions()
+        )
+
+        if pixel_grid_condition:
             pixel_data = PixelGrid()
             pixel_data.rows = int(self.rowLineEdit.value())
             pixel_data.columns = int(self.columnsLineEdit.value())
@@ -275,10 +292,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.startCountingComboBox.value()
             ]
 
-        elif self.pixelMappingListView.isVisible():
+        elif pixel_layout_condition and self.faceMappedMeshRadioButton.isChecked():
             pixel_data = PixelMapping()
 
-        elif self.pixelDataBox.isVisible():
+        elif pixel_data_condition:
             pixel_data = SinglePixelId()
             pixel_data.pixel_id = int(self.detectorIdLineEdit.value())
         else:
@@ -293,3 +310,4 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.nexus_wrapper.add_component(
             nx_class, component_name, description, self.generate_geometry_model()
         )
+        print("Pixel data is ", self.generate_pixel_data())
