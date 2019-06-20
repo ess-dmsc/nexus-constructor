@@ -1,5 +1,5 @@
 import h5py
-
+from nexus_constructor.field_type import FieldType
 from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
 
@@ -110,8 +110,17 @@ class NexusWrapper(QObject):
         component_group.attrs["NX_class"] = component_type
 
         for i in range(0, fields.count()):
-            # TODO: do something here with the field widget
-            field_widget = fields.item(i)
+            field_widget = fields.itemWidget(fields.item(i))
+            field_type = field_widget.field_type_combo.currentText()
+            if field_type == FieldType.scalar_dataset:
+                # TODO: scalars
+                pass
+            if field_type == FieldType.array_dataset:
+                # TODO: arrays
+                pass
+            if field_type == FieldType.nx_class:
+                # TODO: nx_classes
+                pass
 
         self._emit_file()
 

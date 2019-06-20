@@ -7,11 +7,11 @@ from PySide2.QtWidgets import (
     QSizePolicy,
     QDialog,
 )
-from enum import Enum
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt
 from typing import List
 import h5py
+from nexus_constructor.field_type import DatasetType, FieldType
 
 _field_types = {}
 
@@ -38,28 +38,6 @@ class FieldNameLineEdit(QLineEdit):
             self.completer().complete()
         else:
             super().keyPressEvent(event)
-
-
-class FieldType(Enum):
-    scalar_dataset = "Scalar dataset"
-    array_dataset = "Array dataset"
-    kafka_stream = "Kafka stream"
-    link = "Link"
-    nx_class = "NX class/group"
-
-
-class DatasetType(Enum):
-    byte = "Byte"
-    ubyte = "Unsigned Byte"
-    short = "Short"
-    ushort = "Unsigned Short"
-    int = "Integer"
-    uint = "Unsigned Integer"
-    long = "Long"
-    ulong = "Unsigned Long"
-    float = "Float"
-    double = "Double"
-    string = "String"
 
 
 class FieldWidget(QFrame):
