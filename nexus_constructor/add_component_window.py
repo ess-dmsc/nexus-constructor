@@ -44,8 +44,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def __init__(self, nexus_wrapper: NexusWrapper):
         super(AddComponentDialog, self).__init__()
         self.count_direction = {
-            "Row": CountDirection.ROW,
-            "Column": CountDirection.COLUMN,
+            "Rows": CountDirection.ROW,
+            "Columns": CountDirection.COLUMN,
         }
         self.initial_count_corner = {
             "Bottom left": Corner.BOTTOM_LEFT,
@@ -280,16 +280,16 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         if pixel_grid_condition:
             pixel_data = PixelGrid()
-            pixel_data.rows = int(self.rowLineEdit.value())
-            pixel_data.columns = int(self.columnsLineEdit.value())
-            pixel_data.row_height = float(self.rowHeightLineEdit.value())
-            pixel_data.col_width = float(self.columnWidthLineEdit.value())
-            pixel_data.first_id = int(self.firstIDLineEdit.value())
+            pixel_data.rows = int(self.rowLineEdit.text())
+            pixel_data.columns = int(self.columnsLineEdit.text())
+            pixel_data.row_height = float(self.rowHeightLineEdit.text())
+            pixel_data.col_width = float(self.columnWidthLineEdit.text())
+            pixel_data.first_id = int(self.firstIDLineEdit.text())
             pixel_data.count_direction = self.count_direction[
-                self.countFirstComboBox.value()
+                self.countFirstComboBox.currentText()
             ]
             pixel_data.initial_count_corner = self.initial_count_corner[
-                self.startCountingComboBox.value()
+                self.startCountingComboBox.currentText()
             ]
 
         elif pixel_layout_condition and self.faceMappedMeshRadioButton.isChecked():
@@ -297,7 +297,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         elif pixel_data_condition:
             pixel_data = SinglePixelId()
-            pixel_data.pixel_id = int(self.detectorIdLineEdit.value())
+            pixel_data.pixel_id = int(self.detectorIdLineEdit.text())
         else:
             return None
 
@@ -310,4 +310,4 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.nexus_wrapper.add_component(
             nx_class, component_name, description, self.generate_geometry_model()
         )
-        print("Pixel data is ", self.generate_pixel_data())
+        print("Pixel data is", self.generate_pixel_data())
