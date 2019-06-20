@@ -76,7 +76,7 @@ class InstrumentView(QWidget):
         # Dictionaries for component-related objects also to prevent them from going out of scope
         self.component_meshes = {}
         self.component_entities = {}
-        self.component_translations = {}
+        self.component_transformations = {}
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
@@ -106,22 +106,22 @@ class InstrumentView(QWidget):
         except KeyError:
             print("Unable to delete component " + name + " because it doesn't exist.")
 
-        self._delete_all_translations(name)
+        self._delete_all_transformations(name)
 
-    def _delete_all_translations(self, component_name):
+    def _delete_all_transformations(self, component_name):
         """
-        Deletes all the translations associated with a component. Doesn't print a message in the case of a KeyError
-        because components without translations can exist.
+        Deletes all the transformations associated with a component. Doesn't print a message in the case of a KeyError
+        because components without transformations can exist.
         """
         try:
-            del self.component_translations[component_name]
+            del self.component_transformations[component_name]
         except KeyError:
             pass
 
-    def add_translation(self, component_name, translation_name):
+    def add_transformation(self, component_name, transformation_name):
         pass
 
-    def delete_single_translation(self, component_name, translation_name):
+    def delete_single_transformation(self, component_name, transformation_name):
         pass
 
     @staticmethod
