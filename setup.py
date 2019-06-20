@@ -125,6 +125,7 @@ removable_folders = [
     "imageformats",
     "definitions",
     "mpl-data",
+    "lib/PySide2/Qt/qml",
 ]
 
 setup(
