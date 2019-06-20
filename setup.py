@@ -8,6 +8,7 @@ import sys
 import shutil
 from pathlib import Path
 from cx_Freeze import setup, Executable
+import os
 
 # Dependencies are automatically detected, but it struggles with some parts of numpy.
 build_exe_options = {
@@ -25,7 +26,6 @@ build_exe_options = {
         "Tkinter",
         "collections.sys",
         "collections._weakref",
-        "PySide2/Qt/qml",
         "notebook",
         "scipy",
         "bokeh",
@@ -62,73 +62,13 @@ else:
     removable = []
     extension = ""
 
-removable_folders = [
-    "lib/apt",
-    "lib/asn1crypto",
-    "lib/asyncio",
-    "lib/notebook",
-    "lib/concurrent",
-    "lib/bokeh",
-    "lib/bs4",
-    "lib/certifi",
-    "lib/chardet",
-    "lib/click",
-    "lib/cloudpickle",
-    "lib/curses",
-    "lib/cftime",
-    "lib/dateutil",
-    "lib/gi",
-    "lib/idna",
-    "lib/ipykernel",
-    "lib/ipython_genutils",
-    "lib/ipywidgets",
-    "lib/jinja2",
-    "lib/jupyter_client",
-    "lib/jupyter_core",
-    "lib/lib2to3",
-    "lib/locket",
-    "lib/markupsafe",
-    "lib/msgpack",
-    "lib/multiprocessing",
-    "lib/nbconvert",
-    "lib/nbformat",
-    "lib/nose",
-    "lib/numexpr",
-    "lib/packaging",
-    "lib/pandas",
-    "lib/partd",
-    "lib/pbr",
-    "lib/pexpect",
-    "lib/PIL",
-    "lib/prompt_toolkit",
-    "lib/psutil",
-    "lib/ptyprocess",
-    "lib/py",
-    "lib/pydoc_data",
-    "lib/pygments",
-    "lib/requests",
-    "lib/scipy",
-    "lib/setuptools",
-    "lib/simplejson",
-    "lib/sortedcontainers",
-    "lib/sqlite3",
-    "lib/tblib",
-    "lib/testpath",
-    "lib/toolz",
-    "lib/tornado",
-    "lib/traitlets",
-    "lib/urllib3",
-    "lib/wcwidth",
-    "lib/webencodings",
-    "lib/xmlrpc",
-    "lib/yaml",
-    "lib/zict",
-    "lib/coverage",
-    "lib/distutils",
-    "lib/mock",
+larger_folders = [
+    "platforms",
+    "definitions/manual",
+    "imageformats",
+    "mpl-data",
+    os.path.join(os.path.join(os.path.join("lib", "PySide2"), "Qt"), "qml"),
 ]
-
-larger_folders = ["platforms", "definitions/manual", "imageformats", "mpl-data"]
 
 setup(
     name="Nexus Constructor",
