@@ -106,19 +106,22 @@ class InstrumentView(QWidget):
         except KeyError:
             print("Unable to delete component " + name + " because it doesn't exist.")
 
+        self._delete_all_translations(name)
+
+    def _delete_all_translations(self, component_name):
         """
-        Remove translations separately from error message because a component without translations can exist. The
-        KeyError should only be considered a problem when the entity/mesh don't exist.
+        Deletes all the translations associated with a component. Doesn't print a message in the case of a KeyError
+        because components without translations can exist.
         """
         try:
-            del self.component_translations[name]
+            del self.component_translations[component_name]
         except KeyError:
             pass
 
     def add_translation(self, component_name, translation_name):
         pass
 
-    def delete_translation(self, component_name, translation_name):
+    def delete_single_translation(self, component_name, translation_name):
         pass
 
     @staticmethod
