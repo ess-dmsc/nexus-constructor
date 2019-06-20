@@ -107,7 +107,7 @@ class InstrumentView(QWidget):
 
         """
         Remove translations separately from error message because a component without translations can exist. The
-        KeyError should only appear when the entity/mesh don't exist.
+        KeyError should only be considered a problem when the entity/mesh don't exist.
         """
         try:
             del self.component_translations[name]
