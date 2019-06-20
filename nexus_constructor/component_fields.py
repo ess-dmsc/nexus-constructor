@@ -48,6 +48,20 @@ class FieldType(Enum):
     nx_class = "NX class/group"
 
 
+class DatasetType(Enum):
+    byte = "Byte"
+    ubyte = "Unsigned Byte"
+    short = "Short"
+    ushort = "Unsigned Short"
+    int = "Integer"
+    uint = "Unsigned Integer"
+    long = "Long"
+    ulong = "Unsigned Long"
+    float = "Float"
+    double = "Double"
+    string = "String"
+
+
 class FieldWidget(QFrame):
     def __init__(self, possible_field_names: List[str], parent=None):
         super(FieldWidget, self).__init__(parent)
@@ -72,11 +86,11 @@ class FieldWidget(QFrame):
         self.edit_button.setSizePolicy(fix_horizontal_size)
         self.edit_button.clicked.connect(self.show_edit_dialog)
 
-        # TODO: add value types http://docs.h5py.org/en/stable/faq.html#what-datatypes-are-supported
-        # TODO: add validator for value types
         self.value_type_combo = QComboBox()
+        self.value_type_combo.addItems([item.value for item in DatasetType])
 
         # TODO: actually remove stuff - use signal to listview?
+        # TODO: set up nx classes
         self.remove_button = QPushButton("Remove")
 
         self.layout = QHBoxLayout()
