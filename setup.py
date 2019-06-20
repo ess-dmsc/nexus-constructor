@@ -121,6 +121,8 @@ removable_folders = [
     "lib/PyQt5",
     "lib/babel",
     "lib/sphinx",
+    "platforms",
+    "imageformats",
 ]
 
 setup(
