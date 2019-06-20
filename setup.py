@@ -30,132 +30,14 @@ build_exe_options = {
     "include_files": ["ui", "Instrument.schema.json", "definitions"],
 }
 
-removable_folders = [
-    "lib/apt",
-    "lib/asn1crypto",
-    "lib/asyncio",
-    "lib/notebook",
-    "lib/xarray",
-    "lib/concurrent",
-    "lib/bokeh",
-    "lib/bs4",
-    "lib/certifi",
-    "lib/chardet",
-    "lib/click",
-    "lib/cloudpickle",
-    "lib/cryptography",
-    "lib/curses",
-    "lib/cftime",
-    "lib/dask",
-    "lib/dateutil",
-    "lib/distributed",
-    "lib/docutils",
-    "lib/fabio",
-    "lib/gi",
-    "lib/html",
-    "lib/html5lib",
-    "lib/http",
-    "lib/idna",
-    "lib/ipykernel",
-    "lib/IPython",
-    "lib/ipython_genutils",
-    "lib/ipywidgets",
-    "lib/jinja2",
-    "lib/jupyter_client",
-    "lib/jupyter_core",
-    "lib/lib2to3",
-    "lib/locket",
-    "lib/markupsafe",
-    "lib/matplotlib",
-    "lib/mpl_toolkits",
-    "lib/msgpack",
-    "lib/multiprocessing",
-    "lib/nbconvert",
-    "lib/nbformat",
-    "lib/netCDF4",
-    "lib/nose",
-    "lib/numexpr",
-    "lib/packaging",
-    "lib/pandas",
-    "lib/partd",
-    "lib/pbr",
-    "lib/pexpect",
-    "lib/PIL",
-    "lib/prompt_toolkit",
-    "lib/psutil",
-    "lib/ptyprocess",
-    "lib/py",
-    "lib/pydoc_data",
-    "lib/pygments",
-    "lib/pytz",
-    "lib/requests",
-    "lib/scipy",
-    "lib/setuptools",
-    "lib/simplejson",
-    "lib/sortedcontainers",
-    "lib/sqlite3",
-    "lib/tables",
-    "lib/tblib",
-    "lib/testpath",
-    "lib/toolz",
-    "lib/tornado",
-    "lib/traitlets",
-    "lib/urllib3",
-    "lib/wcwidth",
-    "lib/webencodings",
-    "lib/xmlrpc",
-    "lib/yaml",
-    "lib/zict",
-    "lib/zmq",
-    "lib/coverage",
-    "lib/distutils",
-    "lib/mock",
-]
-
-unix_removable = [
-    "lib/PySide2/libclang.so.6",
-    "lib/PySide2/Qt/resources/",
-    "lib/PySide2/Qt/translations/",
-    "lib/numpy/f2py",
-    "lib/numpy/distutils",
-    "lib/PyQt5",
-    "lib/PySide2/Qt/qml",
-]
-
-win_removable = [
-    "lib/PySide2/libclang.dll",
-    "lib/PySide2/resources/",
-    "lib/PySide2/translations/",
-]
-
-'''
-unix_removable = (
-    [
-        "lib/PySide2/examples",
-        "lib/PySide2/glue",
-        "lib/PySide2/include",
-        "lib/PySide2/pyside2-lupdate",
-        "lib/PySide2/pyside2-rcc",
-        "lib/PySide2/scripts",
-        "lib/PySide2/support",
-        "lib/PySide2/typesystems",
-        "imageformats",
-        "platforms",
-    ]
-    + removable_folders
-)
-'''
-
-win_removable = [] + removable_folders
-
 # GUI applications require a different base on Windows (the default is for a console application).
 if sys.platform == "win32":
     base = "Win32GUI"
-    removable = win_removable
+    removable = []
     extension = ".exe"
 else:
     base = None
-    removable = unix_removable
+    removable = []
     extension = ""
 
 setup(
