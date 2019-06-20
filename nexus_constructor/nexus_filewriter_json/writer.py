@@ -76,7 +76,7 @@ def generate_component_data(component: Component):
         "type": "group",
         "name": component.name,
         "attributes": {
-            "NX_class": component_class_name(component.component_type),
+            "NX_class": component_class_name(component.nx_class),
             "description": component.description,
         },
         "children": [],
@@ -139,7 +139,7 @@ def add_transform_data(json_data: dict, component: Component):
             dependent_on = absolute_transform_path_name(
                 transform,
                 component,
-                component.component_type not in external_component_types(),
+                component.nx_class not in external_component_types(),
             )
         json_data["children"].append(nx_transforms)
 
