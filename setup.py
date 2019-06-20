@@ -64,7 +64,7 @@ else:
 
 larger_folders = [
     "platforms",
-    "definitions/manual",
+    os.path.join("definitions", "qml"),
     "imageformats",
     "mpl-data",
     os.path.join(os.path.join(os.path.join("lib", "PySide2"), "Qt"), "qml"),
