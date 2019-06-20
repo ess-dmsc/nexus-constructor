@@ -30,26 +30,14 @@ build_exe_options = {
     "include_files": ["ui", "Instrument.schema.json", "definitions"],
 }
 
-unix_removable = [
-    "lib/PySide2/libclang.so.6",
-    "lib/PySide2/Qt/resources/",
-    "lib/PySide2/Qt/translations/",
-]
-
-win_removable = [
-    "lib/PySide2/libclang.dll",
-    "lib/PySide2/resources/",
-    "lib/PySide2/translations/",
-]
-
 # GUI applications require a different base on Windows (the default is for a console application).
 if sys.platform == "win32":
     base = "Win32GUI"
-    removable = win_removable
+    removable = []
     extension = ".exe"
 else:
     base = None
-    removable = unix_removable
+    removable = []
     extension = ""
 
 setup(
