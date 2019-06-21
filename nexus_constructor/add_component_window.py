@@ -15,7 +15,11 @@ from nexus_constructor.qml_models.geometry_models import (
     OFFModel,
     NoShapeModel,
 )
-from nexus_constructor.qml_models.pixel_models import SinglePixelModel, PixelMappingModel, PixelGridModel
+from nexus_constructor.qml_models.pixel_models import (
+    SinglePixelModel,
+    PixelMappingModel,
+    PixelGridModel,
+)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
@@ -291,12 +295,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_model.set_row_height(float(self.rowHeightLineEdit.text()))
             pixel_model.set_column_width(float(self.columnWidthLineEdit.text()))
             pixel_model.set_first_id(int(self.firstIDLineEdit.text()))
-            pixel_model.set_count_direction(self.count_direction[
-                self.countFirstComboBox.currentText()
-            ])
-            pixel_model.set_initial_count_corner(self.initial_count_corner[
-                self.startCountingComboBox.currentText()
-            ])
+            pixel_model.set_count_direction(
+                self.count_direction[self.countFirstComboBox.currentText()]
+            )
+            pixel_model.set_initial_count_corner(
+                self.initial_count_corner[self.startCountingComboBox.currentText()]
+            )
 
         elif pixel_mapping_condition:
             pixel_model = PixelMappingModel()
