@@ -112,9 +112,12 @@ class NexusWrapper(QObject):
         component_group = instrument_group.create_group(component_name)
         component_group.attrs["NX_class"] = component_type
 
-        self.component_added.emit(
-            component_name, geometry.get_geometry(), pixel.get_pixel_model()
-        )
+        if pixel is not None:
+            self.component_added.emit(
+                component_name, geometry.get_geometry(), pixel.get_pixel_model()
+            )
+        else:
+            self.component_added.emit(component_name, geometry.get_geometry(), pixel)
 
         self._emit_file()
 
