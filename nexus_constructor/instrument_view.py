@@ -81,14 +81,16 @@ class InstrumentView(QWidget):
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
 
-    def add_component(self, name, geometry):
+    def add_component(self, name, geometry, pixel_data):
         """
         Add a component to the instrument view given a name and its geometry.
         :param name: The name of the component.
         :param geometry: The geometry information of the component that is used to create a mesh.
         """
         entity = Qt3DCore.QEntity(self.root_entity)
-        mesh = OffMesh(geometry.off_geometry)
+        mesh = OffMesh(geometry.off_geometry, pixel_data)
+
+        print("Creating a mesh with pixel data", pixel_data)
 
         self.add_qcomponents_to_entity(entity, [mesh, self.grey_material])
 

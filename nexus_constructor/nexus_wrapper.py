@@ -22,7 +22,7 @@ class NexusWrapper(QObject):
 
     # Signal that indicates the nexus file has been changed in some way
     file_changed = Signal("QVariant")
-    component_added = Signal(str, "QVariant")
+    component_added = Signal(str, "QVariant", "QVariant")
 
     def __init__(self, filename="nexus-constructor"):
         super().__init__()
@@ -112,7 +112,9 @@ class NexusWrapper(QObject):
         component_group = instrument_group.create_group(component_name)
         component_group.attrs["NX_class"] = component_type
 
-        self.component_added.emit(component_name, geometry.get_geometry())
+        self.component_added.emit(
+            component_name, geometry.get_geometry(), pixel.get_pixel_model()
+        )
 
         self._emit_file()
 
