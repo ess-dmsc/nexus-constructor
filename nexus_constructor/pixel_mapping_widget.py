@@ -16,3 +16,10 @@ class PixelMappingWidget(QWidget):
         self.layout.addWidget(self.pixelIDLineEdit)
 
         self.setLayout(self.layout)
+
+    def get_id(self):
+        text = self.pixelIDLineEdit.text()
+        if text:
+            return int(text)
+
+        return None

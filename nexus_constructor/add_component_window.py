@@ -4,7 +4,7 @@ from PySide2.QtCore import QUrl
 from PySide2.QtGui import QIntValidator, QDoubleValidator
 from PySide2.QtWidgets import QListWidgetItem
 
-from nexus_constructor.pixel_data import CountDirection, Corner
+from nexus_constructor.pixel_data import CountDirection, Corner, PixelMapping
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
@@ -164,6 +164,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelMappingLabel.setVisible(False)
         self.pixelMappingListWidget.setVisible(False)
 
+        self.pixel_mapping_widgets = None
+
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
             QUrl(
@@ -191,10 +193,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.fileLineEdit.setText(filename)
             self.geometry_file_name = filename
 
-        _, _, _, pixel_mapping_condition = self.pixel_options_conditions()
-
-        if pixel_mapping_condition:
-            self.populate_pixel_mapping_list()
+        self.populate_pixel_mapping_list()
 
     def pixel_options_conditions(self):
 
@@ -305,6 +304,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         elif pixel_mapping_condition:
             pixel_model = PixelMappingModel()
+            pixel_data = PixelMapping(self.get_pixel_mapping_ids())
+            pixel_model.set_pixel_model(pixel_data)
 
         elif pixel_data_condition:
             pixel_model = SinglePixelModel()
@@ -330,6 +331,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         n_faces = 8
 
+        self.pixel_mapping_widgets = []
+
         for i in range(n_faces):
             pixel_mapping_widget = PixelMappingWidget(self.pixelMappingListWidget, i)
 
@@ -338,3 +341,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
             self.pixelMappingListWidget.addItem(list_item)
             self.pixelMappingListWidget.setItemWidget(list_item, pixel_mapping_widget)
+
+            self.pixel_mapping_widgets.append(pixel_mapping_widget)
+
+    def get_pixel_mapping_ids(self):
+
+        return [
+            pixel_mapping_widget.get_id()
+            for pixel_mapping_widget in self.pixel_mapping_widgets
+        ]
