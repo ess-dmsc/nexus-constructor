@@ -195,6 +195,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.fileLineEdit.setText(filename)
             self.geometry_file_name = filename
 
+        _, _, _, pixel_mapping_condition = self.pixel_options_conditions()
+
+        if pixel_mapping_condition:
+            print("I should populate the list.")
+
     def pixel_options_conditions(self):
 
         pixel_layout_condition = (
