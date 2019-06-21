@@ -90,8 +90,6 @@ class InstrumentView(QWidget):
         entity = Qt3DCore.QEntity(self.root_entity)
         mesh = OffMesh(geometry.off_geometry, pixel_data)
 
-        print("Creating a mesh with pixel data", pixel_data)
-
         self.add_qcomponents_to_entity(entity, [mesh, self.grey_material])
 
         self.component_meshes[name] = mesh
