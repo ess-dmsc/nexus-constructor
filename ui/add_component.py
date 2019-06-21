@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Wed Jun 19 12:52:22 2019
+# Created: Fri Jun 21 14:15:28 2019
 #      by: pyside2-uic  running on PySide2 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
         AddComponentDialog.setObjectName("AddComponentDialog")
-        AddComponentDialog.resize(1177, 919)
+        AddComponentDialog.resize(1177, 1122)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -164,7 +164,6 @@ class Ui_AddComponentDialog(object):
         self.unitsLineEdit.setObjectName("unitsLineEdit")
         self.horizontalLayout_3.addWidget(self.unitsLineEdit)
         self.gridLayout_2.addWidget(self.unitsbox, 0, 0, 1, 1)
-        self.gridLayout_2.setRowStretch(4, 1)
         self.verticalLayout_2.addWidget(self.geometryOptionsBox)
         self.pixelOptionsBox = QtWidgets.QGroupBox(self.widget)
         self.pixelOptionsBox.setObjectName("pixelOptionsBox")
@@ -239,9 +238,9 @@ class Ui_AddComponentDialog(object):
         self.pixelMappingLabel = QtWidgets.QLabel(self.pixelOptionsBox)
         self.pixelMappingLabel.setObjectName("pixelMappingLabel")
         self.verticalLayout_3.addWidget(self.pixelMappingLabel)
-        self.pixelMappingListView = QtWidgets.QListView(self.pixelOptionsBox)
-        self.pixelMappingListView.setObjectName("pixelMappingListView")
-        self.verticalLayout_3.addWidget(self.pixelMappingListView)
+        self.pixelMappingListWidget = QtWidgets.QListWidget(self.pixelOptionsBox)
+        self.pixelMappingListWidget.setObjectName("pixelMappingListWidget")
+        self.verticalLayout_3.addWidget(self.pixelMappingListWidget)
         self.pixelDataBox = QtWidgets.QGroupBox(self.pixelOptionsBox)
         self.pixelDataBox.setObjectName("pixelDataBox")
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout(self.pixelDataBox)

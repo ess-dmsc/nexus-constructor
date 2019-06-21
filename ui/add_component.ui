@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1177</width>
-    <height>919</height>
+    <height>1122</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -146,7 +146,7 @@
           <property name="title">
            <string>Geometry options:</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,1,0,0">
+          <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0">
            <item row="1" column="0">
             <widget class="QGroupBox" name="geometryFileBox">
              <property name="title">
@@ -457,7 +457,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QListView" name="pixelMappingListView"/>
+            <widget class="QListWidget" name="pixelMappingListWidget"/>
            </item>
            <item>
             <widget class="QGroupBox" name="pixelDataBox">

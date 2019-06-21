@@ -2,14 +2,9 @@ from enum import Enum
 
 from PySide2.QtCore import QUrl
 from PySide2.QtGui import QIntValidator, QDoubleValidator
+from PySide2.QtWidgets import QWidget, QListWidgetItem, QLabel, QLineEdit, QHBoxLayout
 
-from nexus_constructor.pixel_data import (
-    PixelGrid,
-    PixelMapping,
-    SinglePixelId,
-    CountDirection,
-    Corner,
-)
+from nexus_constructor.pixel_data import CountDirection, Corner
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -166,7 +161,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.columnWidthLineEdit.setValidator(double_validator)
 
         self.pixelMappingLabel.setVisible(False)
-        self.pixelMappingListView.setVisible(False)
+        self.pixelMappingListWidget.setVisible(False)
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
@@ -183,7 +178,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def show_pixel_grid_or_pixel_mapping(self, bool):
         self.pixelGridBox.setVisible(bool)
         self.pixelMappingLabel.setVisible(not bool)
-        self.pixelMappingListView.setVisible(not bool)
+        self.pixelMappingListWidget.setVisible(not bool)
 
     def mesh_file_picker(self):
         """
@@ -198,7 +193,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         _, _, _, pixel_mapping_condition = self.pixel_options_conditions()
 
         if pixel_mapping_condition:
-            print("I should populate the list.")
+            self.populate_pixel_mapping_list()
 
     def pixel_options_conditions(self):
 
@@ -245,7 +240,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelDataBox.setVisible(pixel_data_condition)
         self.pixelGridBox.setVisible(pixel_grid_condition)
         self.pixelMappingLabel.setVisible(pixel_mapping_condition)
-        self.pixelMappingListView.setVisible(pixel_mapping_condition)
+        self.pixelMappingListWidget.setVisible(pixel_mapping_condition)
 
     def show_cylinder_fields(self):
         self.geometryOptionsBox.setVisible(True)
@@ -329,3 +324,20 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.generate_geometry_model(),
             self.generate_pixel_data(),
         )
+
+    def populate_pixel_mapping_list(self):
+
+        n_faces = 8
+
+        for i in range(n_faces):
+            widget = QWidget()
+            layout = QHBoxLayout()
+            layout.addWidget(QLabel("Pixel ID for face " + str(i) + ":"))
+            layout.addWidget(QLineEdit())
+            widget.setLayout(layout)
+
+            list_item = QListWidgetItem()
+            list_item.setSizeHint(widget.sizeHint())
+
+            self.pixelMappingListWidget.addItem(list_item)
+            self.pixelMappingListWidget.setItemWidget(list_item, widget)
