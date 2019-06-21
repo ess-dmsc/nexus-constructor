@@ -2,9 +2,10 @@ from enum import Enum
 
 from PySide2.QtCore import QUrl
 from PySide2.QtGui import QIntValidator, QDoubleValidator
-from PySide2.QtWidgets import QWidget, QListWidgetItem, QLabel, QLineEdit, QHBoxLayout
+from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.pixel_data import CountDirection, Corner
+from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -330,14 +331,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         n_faces = 8
 
         for i in range(n_faces):
-            widget = QWidget()
-            layout = QHBoxLayout()
-            layout.addWidget(QLabel("Pixel ID for face " + str(i) + ":"))
-            layout.addWidget(QLineEdit())
-            widget.setLayout(layout)
+            pixel_mapping_widget = PixelMappingWidget(self.pixelMappingListWidget, i)
 
             list_item = QListWidgetItem()
-            list_item.setSizeHint(widget.sizeHint())
+            list_item.setSizeHint(pixel_mapping_widget.sizeHint())
 
             self.pixelMappingListWidget.addItem(list_item)
-            self.pixelMappingListWidget.setItemWidget(list_item, widget)
+            self.pixelMappingListWidget.setItemWidget(list_item, pixel_mapping_widget)
