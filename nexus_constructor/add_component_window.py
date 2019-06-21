@@ -332,6 +332,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         n_faces = 8
 
         self.pixel_mapping_widgets = []
+        self.pixelMappingListWidget.clear()
 
         for i in range(n_faces):
             pixel_mapping_widget = PixelMappingWidget(self.pixelMappingListWidget, i)
