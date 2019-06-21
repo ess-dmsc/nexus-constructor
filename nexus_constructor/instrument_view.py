@@ -97,9 +97,12 @@ class InstrumentView(QWidget):
 
     def delete_component(self, name):
         """
-        Delete a component from the InstrumentView by removing the components and entities from the dictionaries.
+        Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
         """
+
+        self.component_entities[name].setParent(None)
+
         try:
             del self.component_entities[name]
             del self.component_meshes[name]
@@ -182,7 +185,7 @@ class InstrumentView(QWidget):
     @staticmethod
     def add_components_to_entity(entity, components):
         """
-        Takes a QEntity and gives it all of the components that are contained in a list.
+        Takes a QEntity and gives it all of the QComponents that are contained in a list.
         """
         for component in components:
             entity.addComponent(component)
