@@ -90,7 +90,7 @@ class InstrumentView(QWidget):
         entity = Qt3DCore.QEntity(self.root_entity)
         mesh = OffMesh(geometry.off_geometry)
 
-        self.add_components_to_entity(entity, [mesh, self.grey_material])
+        self.add_qcomponents_to_entity(entity, [mesh, self.grey_material])
 
         self.component_meshes[name] = mesh
         self.component_entities[name] = entity
@@ -178,12 +178,12 @@ class InstrumentView(QWidget):
         Sets up the cube that represents a sample in the 3D view by giving the cube entity a mesh and a material.
         """
         self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
-        self.add_components_to_entity(
+        self.add_qcomponents_to_entity(
             self.cube_entity, [self.cube_mesh, self.red_material]
         )
 
     @staticmethod
-    def add_components_to_entity(entity, components):
+    def add_qcomponents_to_entity(entity, components):
         """
         Takes a QEntity and gives it all of the QComponents that are contained in a list.
         """
@@ -224,7 +224,7 @@ class InstrumentView(QWidget):
             self.cylinder_mesh, 2.5, self.cylinder_length, 2
         )
         self.set_beam_transform(self.cylinder_transform)
-        self.add_components_to_entity(
+        self.add_qcomponents_to_entity(
             self.cylinder_entity,
             [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
         )
@@ -301,7 +301,7 @@ class InstrumentView(QWidget):
             )
             self.neutron_objects["animations"].append(neutron_animation)
 
-            self.add_components_to_entity(
+            self.add_qcomponents_to_entity(
                 self.neutron_objects["entities"][i],
                 [
                     self.neutron_objects["meshes"][i],
