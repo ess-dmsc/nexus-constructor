@@ -15,6 +15,7 @@ from nexus_constructor.qml_models.geometry_models import (
     OFFModel,
     NoShapeModel,
 )
+from nexus_constructor.qml_models.pixel_models import SinglePixelModel
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
@@ -301,18 +302,21 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_data = PixelMapping()
 
         elif pixel_data_condition:
-            pixel_data = SinglePixelId()
-            pixel_data.pixel_id = int(self.detectorIdLineEdit.text())
+            pixel_model = SinglePixelModel()
+            pixel_model.set_pixel_id(int(self.detectorIdLineEdit.text()))
         else:
             return None
 
-        return pixel_data
+        return pixel_model
 
     def on_ok(self):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
         self.nexus_wrapper.add_component(
-            nx_class, component_name, description, self.generate_geometry_model()
+            nx_class,
+            component_name,
+            description,
+            self.generate_geometry_model(),
+            self.generate_pixel_data(),
         )
-        print("Pixel data is", self.generate_pixel_data())
