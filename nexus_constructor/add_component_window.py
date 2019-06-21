@@ -183,6 +183,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelMappingLabel.setVisible(not bool)
         self.pixelMappingListWidget.setVisible(not bool)
 
+        self.populate_pixel_mapping_list_when_empty(not bool)
+
     def mesh_file_picker(self):
         """
         Opens the mesh file picker. Sets the file name line edit to the file path.
@@ -193,7 +195,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.fileLineEdit.setText(filename)
             self.geometry_file_name = filename
 
-        self.populate_pixel_mapping_list()
+        _, _, _, pixel_mapping_condition = self.pixel_options_conditions()
+
+        if pixel_mapping_condition:
+            self.populate_pixel_mapping_list()
 
     def pixel_options_conditions(self):
 
@@ -241,6 +246,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelGridBox.setVisible(pixel_grid_condition)
         self.pixelMappingLabel.setVisible(pixel_mapping_condition)
         self.pixelMappingListWidget.setVisible(pixel_mapping_condition)
+
+        self.populate_pixel_mapping_list_when_empty(pixel_mapping_condition)
 
     def show_cylinder_fields(self):
         self.geometryOptionsBox.setVisible(True)
@@ -351,3 +358,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_mapping_widget.get_id()
             for pixel_mapping_widget in self.pixel_mapping_widgets
         ]
+
+    def populate_pixel_mapping_list_when_empty(self, pixel_mapping_condition):
+
+        if pixel_mapping_condition and not self.pixel_mapping_widgets:
+            self.populate_pixel_mapping_list()
