@@ -4,6 +4,7 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
+from nexus_constructor.off_renderer import OffMesh
 
 
 class InstrumentView(QWidget):
@@ -58,7 +59,7 @@ class InstrumentView(QWidget):
             "animations": [],
         }
 
-        for i in range(self.num_neutrons):
+        for _ in range(self.num_neutrons):
             self.neutron_objects["entities"].append(Qt3DCore.QEntity(self.root_entity))
             self.neutron_objects["meshes"].append(Qt3DExtras.QSphereMesh())
             self.neutron_objects["transforms"].append(Qt3DCore.QTransform())
@@ -72,8 +73,59 @@ class InstrumentView(QWidget):
         self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
         self.cylinder_transform = Qt3DCore.QTransform()
 
+        # Dictionaries for component-related objects also to prevent them from going out of scope
+        self.component_meshes = {}
+        self.component_entities = {}
+        self.component_transformations = {}
+
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
+
+    def add_component(self, name, geometry):
+        """
+        Add a component to the instrument view given a name and its geometry.
+        :param name: The name of the component.
+        :param geometry: The geometry information of the component that is used to create a mesh.
+        """
+        entity = Qt3DCore.QEntity(self.root_entity)
+        mesh = OffMesh(geometry.off_geometry)
+
+        self.add_qcomponents_to_entity(entity, [mesh, self.grey_material])
+
+        self.component_meshes[name] = mesh
+        self.component_entities[name] = entity
+
+    def delete_component(self, name):
+        """
+        Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
+        :param name: The name of the component.
+        """
+
+        self.component_entities[name].setParent(None)
+
+        try:
+            del self.component_entities[name]
+            del self.component_meshes[name]
+        except KeyError:
+            print("Unable to delete component " + name + " because it doesn't exist.")
+
+        self._delete_all_transformations(name)
+
+    def _delete_all_transformations(self, component_name):
+        """
+        Deletes all the transformations associated with a component. Doesn't print a message in the case of a KeyError
+        because components without transformations can exist.
+        """
+        try:
+            del self.component_transformations[component_name]
+        except KeyError:
+            pass
+
+    def add_transformation(self, component_name, transformation_name):
+        pass
+
+    def delete_single_transformation(self, component_name, transformation_name):
+        pass
 
     @staticmethod
     def set_material_properties(material, ambient, diffuse, alpha=None):
@@ -126,14 +178,14 @@ class InstrumentView(QWidget):
         Sets up the cube that represents a sample in the 3D view by giving the cube entity a mesh and a material.
         """
         self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
-        self.add_components_to_entity(
+        self.add_qcomponents_to_entity(
             self.cube_entity, [self.cube_mesh, self.red_material]
         )
 
     @staticmethod
-    def add_components_to_entity(entity, components):
+    def add_qcomponents_to_entity(entity, components):
         """
-        Takes a QEntity and gives it all of the components that are contained in a list.
+        Takes a QEntity and gives it all of the QComponents that are contained in a list.
         """
         for component in components:
             entity.addComponent(component)
@@ -172,7 +224,7 @@ class InstrumentView(QWidget):
             self.cylinder_mesh, 2.5, self.cylinder_length, 2
         )
         self.set_beam_transform(self.cylinder_transform)
-        self.add_components_to_entity(
+        self.add_qcomponents_to_entity(
             self.cylinder_entity,
             [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
         )
@@ -249,7 +301,7 @@ class InstrumentView(QWidget):
             )
             self.neutron_objects["animations"].append(neutron_animation)
 
-            self.add_components_to_entity(
+            self.add_qcomponents_to_entity(
                 self.neutron_objects["entities"][i],
                 [
                     self.neutron_objects["meshes"][i],
