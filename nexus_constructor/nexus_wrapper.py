@@ -2,8 +2,8 @@ import h5py
 import numpy as np
 from nexus_constructor.field_type import (
     FieldType,
-    get_numpy_dtype_from_dataset_type,
     DatasetType,
+    PYTHON_TO_HDF5,
 )
 from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
@@ -124,7 +124,7 @@ class NexusWrapper(QObject):
             if field_type == FieldType.scalar_dataset.value:
                 component_group.create_dataset(
                     field_name,
-                    dtype=get_numpy_dtype_from_dataset_type(dataset_type),
+                    dtype=PYTHON_TO_HDF5[dataset_type],
                     data=int(field_widget.value_line_edit.text())
                     if dataset_type != DatasetType.string
                     else field_widget.value_line_edit.text(),
@@ -132,10 +132,7 @@ class NexusWrapper(QObject):
             elif field_type == FieldType.array_dataset.value:
                 # TODO: arrays
                 component_group.create_dataset(
-                    field_name,
-                    dtype=np.array(
-                        [], dtype=get_numpy_dtype_from_dataset_type(dataset_type)
-                    ),
+                    field_name, dtype=np.array([], dtype=PYTHON_TO_HDF5[dataset_type])
                 )
             elif field_type == FieldType.nx_class.value:
                 # TODO: nx_classes

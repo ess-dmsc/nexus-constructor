@@ -37,7 +37,3 @@ PYTHON_TO_HDF5 = {
     DatasetType.double.value: np.double,
     DatasetType.string.value: object,
 }
-
-
-def get_numpy_dtype_from_dataset_type(type: str):
-    return PYTHON_TO_HDF5[type]
