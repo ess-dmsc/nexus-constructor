@@ -2,6 +2,11 @@ from nexus_constructor.nexus_wrapper import NexusWrapper, convert_name_with_spac
 from nexus_constructor.qml_models.geometry_models import NoShapeModel
 
 
+class DummyFields:
+    def count(self):
+        return 0
+
+
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_file_contains_entry_group_with_correct_nx_class():
     wrapper = NexusWrapper("contains_entry")
     assert wrapper.entry_group.attrs["NX_class"] == "NXentry"
@@ -28,7 +33,9 @@ def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_add
     component_type = "NXcrystal"
     name = "test_crystal"
     description = "shiny"
-    wrapper.add_component(component_type, name, description, NoShapeModel())
+    wrapper.add_component(
+        component_type, name, description, NoShapeModel(), DummyFields()
+    )
 
     component_list = wrapper.get_component_list().components
     assert len(component_list) == 2
@@ -44,7 +51,9 @@ def test_GIVEN_component_WHEN_adding_component_THEN_nexus_file_contains_added_co
     component_type = "NXcrystal"
     name = "test_crystal"
     description = "shiny"
-    wrapper.add_component(component_type, name, description, NoShapeModel())
+    wrapper.add_component(
+        component_type, name, description, NoShapeModel(), DummyFields()
+    )
 
     assert name in wrapper.instrument_group
     component_in_nexus_file = wrapper.instrument_group[name]
