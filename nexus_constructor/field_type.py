@@ -24,16 +24,20 @@ class DatasetType(Enum):
     string = "String"
 
 
-python_to_hdf5_scalar = {
-    DatasetType.byte: np.byte,
-    DatasetType.ubyte: np.ubyte,
-    DatasetType.short: np.short,
-    DatasetType.ushort: np.ushort,
-    DatasetType.int: np.intc,
-    DatasetType.uint: np.uintc,
-    DatasetType.long: np.int_,
-    DatasetType.ulong: np.uint,
-    DatasetType.float: np.single,
-    DatasetType.double: np.double,
-    DatasetType.string: object,
+PYTHON_TO_HDF5 = {
+    DatasetType.byte.value: np.byte,
+    DatasetType.ubyte.value: np.ubyte,
+    DatasetType.short.value: np.short,
+    DatasetType.ushort.value: np.ushort,
+    DatasetType.int.value: np.intc,
+    DatasetType.uint.value: np.uintc,
+    DatasetType.long.value: np.int_,
+    DatasetType.ulong.value: np.uint,
+    DatasetType.float.value: np.single,
+    DatasetType.double.value: np.double,
+    DatasetType.string.value: object,
 }
+
+
+def get_numpy_dtype_from_dataset_type(type: str):
+    return PYTHON_TO_HDF5[type]

@@ -1,7 +1,13 @@
 import h5py
-from nexus_constructor.field_type import FieldType
+import numpy as np
+from nexus_constructor.field_type import (
+    FieldType,
+    get_numpy_dtype_from_dataset_type,
+    DatasetType,
+)
 from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
+
 
 COMPS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -113,21 +119,32 @@ class NexusWrapper(QObject):
             field_widget = fields.itemWidget(fields.item(i))
             field_type = field_widget.field_type_combo.currentText()
             field_name = field_widget.field_name_edit.text()
-            dataset_type = field_widget.field_type_combo.currentText()
+            dataset_type = field_widget.value_type_combo.currentText()
 
             if field_type == FieldType.scalar_dataset.value:
-                # TODO: convert this to a numpy dtype
-                type = dataset_type
                 component_group.create_dataset(
-                    field_name, dtype=type, data=field_widget.value_line_edit.text()
+                    field_name,
+                    dtype=get_numpy_dtype_from_dataset_type(dataset_type),
+                    data=int(field_widget.value_line_edit.text())
+                    if dataset_type != DatasetType.string
+                    else field_widget.value_line_edit.text(),
                 )
-                pass
             elif field_type == FieldType.array_dataset.value:
                 # TODO: arrays
-                type = dataset_type
-                pass
+                component_group.create_dataset(
+                    field_name,
+                    dtype=np.array(
+                        [], dtype=get_numpy_dtype_from_dataset_type(dataset_type)
+                    ),
+                )
             elif field_type == FieldType.nx_class.value:
                 # TODO: nx_classes
+                pass
+            elif field_type == FieldType.kafka_stream.value:
+                # TODO: streams
+                pass
+            elif field_type == FieldType.link:
+                # TODO: links
                 pass
 
         self._emit_file()
