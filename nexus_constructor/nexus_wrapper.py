@@ -1,10 +1,6 @@
 import h5py
 import numpy as np
-from nexus_constructor.field_type import (
-    FieldType,
-    DatasetType,
-    PYTHON_TO_HDF5,
-)
+from nexus_constructor.field_type import FieldType, DatasetType, PYTHON_TO_HDF5
 from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
 
@@ -28,6 +24,7 @@ class NexusWrapper(QObject):
 
     # Signal that indicates the nexus file has been changed in some way
     file_changed = Signal("QVariant")
+    component_added = Signal(str, "QVariant")
 
     def __init__(self, filename="nexus-constructor"):
         super().__init__()
@@ -143,6 +140,7 @@ class NexusWrapper(QObject):
             elif field_type == FieldType.link:
                 # TODO: links
                 pass
+        self.component_added.emit(component_name, geometry.get_geometry())
 
         self._emit_file()
 

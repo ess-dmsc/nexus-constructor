@@ -8,6 +8,7 @@ import sys
 import shutil
 from pathlib import Path
 from cx_Freeze import setup, Executable
+import os
 
 # Dependencies are automatically detected, but it struggles with some parts of numpy.
 build_exe_options = {
@@ -25,6 +26,27 @@ build_exe_options = {
         "Tkinter",
         "collections.sys",
         "collections._weakref",
+        "notebook",
+        "scipy",
+        "bokeh",
+        "pandas",
+        "netCDF4",
+        "matplotlib",
+        "tables",
+        "lxml",
+        "fabio",
+        "mpl_toolkits",
+        "pytz",
+        "cryptography",
+        "IPython",
+        "dask",
+        "docutils",
+        "distributed",
+        "zmq",
+        "xarray",
+        "PyQt5",
+        "babel",
+        "sphinx",
     ],
     "bin_includes": ["libssl.so"],
     "include_files": ["ui", "Instrument.schema.json", "definitions"],
@@ -40,6 +62,14 @@ else:
     removable = []
     extension = ""
 
+larger_folders = [
+    "platforms",
+    os.path.join("definitions", "manual"),
+    "imageformats",
+    "mpl-data",
+    os.path.join("lib", "PySide2", "Qt", "qml"),
+]
+
 setup(
     name="Nexus Constructor",
     version="2.0-pre",
@@ -50,7 +80,7 @@ setup(
     ],
 )
 
-for file in removable:
+for file in removable + larger_folders:
     for build_dir in Path(".").glob("build/*"):
         full_path = build_dir / file
         if full_path.exists():

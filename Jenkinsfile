@@ -125,11 +125,11 @@ return {
                     bat """
                     python setup.py build_exe"""
                 } // stage
-                stage('Archive Executable') {
-                    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-                    powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
-                    archiveArtifacts 'nexus-constructor*.zip'
-                } // stage
+                // stage('Archive Executable') {
+                    // def git_commit_short = scm_vars.GIT_COMMIT.take(7)
+                    // powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
+                    // archiveArtifacts 'nexus-constructor*.zip'
+                // } // stage
             } // if
           } // dir
       } //ws

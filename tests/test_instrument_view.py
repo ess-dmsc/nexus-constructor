@@ -69,7 +69,7 @@ def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_
     mock_components = [Mock() for _ in range(4)]
     calls = [call(mock_component) for mock_component in mock_components]
 
-    InstrumentView.add_components_to_entity(mock_entity, mock_components)
+    InstrumentView.add_qcomponents_to_entity(mock_entity, mock_components)
 
     mock_entity.addComponent.assert_has_calls(calls)
 
