@@ -1,6 +1,6 @@
 import h5py
 import numpy as np
-from nexus_constructor.field_type import FieldType, DatasetType, PYTHON_TO_HDF5
+from nexus_constructor.field_type import FieldType, PYTHON_TO_HDF5
 from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
 
