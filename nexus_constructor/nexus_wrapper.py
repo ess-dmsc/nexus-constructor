@@ -1,7 +1,11 @@
 import h5py
-
 from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
+from nexus_constructor.qml_models.geometry_models import (
+    NoShapeModel,
+    OFFModel,
+    CylinderModel,
+)
 
 COMPS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -82,13 +86,15 @@ class NexusWrapper(QObject):
             print("NeXus file loaded")
             self._emit_file()
 
-    def add_component(self, component_type, component_name, description, geometry):
+    def add_component(
+        self, component_type, component_name, description, geometry_model
+    ):
         """
         Adds a component to the NeXus file and the components list.
         :param component_type: The NX Component type in string form.
         :param component_name: The Component name.
         :param description: The Component Description.
-        :param geometry: Geometry model for the component.
+        :param geometry_model: Geometry model for the component.
         :return: None
         """
         component_name = convert_name_with_spaces(component_name)
@@ -96,7 +102,7 @@ class NexusWrapper(QObject):
             nx_class=component_type,
             description=description,
             name=component_name,
-            geometry_model=geometry,
+            geometry_model=geometry_model,
         )
 
         instrument_group = self.entry_group["instrument"]
@@ -108,7 +114,28 @@ class NexusWrapper(QObject):
         component_group = instrument_group.create_group(component_name)
         component_group.attrs["NX_class"] = component_type
 
-        self.component_added.emit(component_name, geometry.get_geometry())
+        if not isinstance(geometry_model, NoShapeModel):
+            shape_group = component_group.create_group("shape")
+            if isinstance(geometry_model, OFFModel):
+                shape_group.create_dataset(
+                    "vertices",
+                    data=[item.toTuple() for item in geometry_model.geometry.vertices],
+                )
+                shape_group.create_dataset(
+                    "winding_order", data=geometry_model.geometry.winding_order_indices
+                )
+                shape_group.create_dataset("faces", data=geometry_model.geometry.faces)
+            if isinstance(geometry_model, CylinderModel):
+                shape_group.create_dataset(
+                    "cylinders",
+                    data=[
+                        geometry_model.cylinder.axis_direction.x(),
+                        geometry_model.cylinder.axis_direction.y(),
+                        geometry_model.cylinder.axis_direction.z(),
+                    ],
+                )
+
+        self.component_added.emit(component_name, geometry_model.get_geometry())
 
         self._emit_file()
 
