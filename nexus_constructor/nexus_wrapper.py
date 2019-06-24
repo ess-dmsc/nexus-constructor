@@ -121,10 +121,9 @@ class NexusWrapper(QObject):
             if field_type == FieldType.scalar_dataset.value:
                 component_group.create_dataset(
                     field_name,
-                    dtype=PYTHON_TO_HDF5[dataset_type],
-                    data=int(field_widget.value_line_edit.text())
-                    if dataset_type != DatasetType.string
-                    else field_widget.value_line_edit.text(),
+                    data=PYTHON_TO_HDF5[dataset_type](
+                        field_widget.value_line_edit.text()
+                    ),
                 )
             elif field_type == FieldType.array_dataset.value:
                 # TODO: arrays
