@@ -112,13 +112,21 @@ class NexusWrapper(QObject):
         for i in range(0, fields.count()):
             field_widget = fields.itemWidget(fields.item(i))
             field_type = field_widget.field_type_combo.currentText()
-            if field_type == FieldType.scalar_dataset:
-                # TODO: scalars
+            field_name = field_widget.field_name_edit.text()
+            dataset_type = field_widget.field_type_combo.currentText()
+
+            if field_type == FieldType.scalar_dataset.value:
+                # TODO: convert this to a numpy dtype
+                type = dataset_type
+                component_group.create_dataset(
+                    field_name, dtype=type, data=field_widget.value_line_edit.text()
+                )
                 pass
-            if field_type == FieldType.array_dataset:
+            elif field_type == FieldType.array_dataset.value:
                 # TODO: arrays
+                type = dataset_type
                 pass
-            if field_type == FieldType.nx_class:
+            elif field_type == FieldType.nx_class.value:
                 # TODO: nx_classes
                 pass
 

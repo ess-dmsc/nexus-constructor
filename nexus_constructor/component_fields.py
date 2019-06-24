@@ -86,6 +86,9 @@ class FieldWidget(QFrame):
         self.setFrameShadow(QFrame.Raised)
         self.setFrameShape(QFrame.StyledPanel)
 
+        # Set the layout for the default field type
+        self.field_type_changed()
+
     def field_type_changed(self):
         if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
             self.set_visibility(True, False, False, True)
