@@ -1,7 +1,7 @@
 from enum import Enum
 
-from PySide2.QtCore import QUrl, QStringListModel
-from PySide2.QtWidgets import QCompleter, QListWidgetItem
+from PySide2.QtCore import QUrl
+from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.qml_models.geometry_models import (

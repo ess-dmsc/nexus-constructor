@@ -1,16 +1,7 @@
-from PySide2.QtWidgets import (
-    QLineEdit,
-    QPushButton,
-    QHBoxLayout,
-    QFrame,
-    QComboBox,
-    QSizePolicy,
-    QDialog,
-)
+from PySide2.QtWidgets import QPushButton, QHBoxLayout, QFrame, QComboBox, QDialog
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt
 from typing import List
-import h5py
 from nexus_constructor.field_type import DatasetType, FieldType
 
 _field_types = {}
