@@ -38,8 +38,8 @@ class InstrumentView(QWidget):
         cam_controller.setCamera(camera_entity)
         self.view.setRootEntity(self.root_entity)
 
-        self.componentRootEntity = Qt3DCore.QEntity(self.root_entity)
-        self.gnomonRootEntity = Qt3DCore.QEntity(self.root_entity)
+        self.component_root_entity = Qt3DCore.QEntity(self.root_entity)
+        self.gnomon_root_entity = Qt3DCore.QEntity(self.root_entity)
 
         # Initialise materials
         self.grey_material = Qt3DExtras.QPhongMaterial()
@@ -49,7 +49,7 @@ class InstrumentView(QWidget):
 
         # Initialise cube objects
         self.sample_cube_dimensions = [1, 1, 1]
-        self.cube_entity = Qt3DCore.QEntity(self.componentRootEntity)
+        self.cube_entity = Qt3DCore.QEntity(self.component_root_entity)
         self.cube_mesh = Qt3DExtras.QCuboidMesh()
 
         self.num_neutrons = 9
@@ -65,7 +65,7 @@ class InstrumentView(QWidget):
 
         for _ in range(self.num_neutrons):
             self.neutron_objects["entities"].append(
-                Qt3DCore.QEntity(self.componentRootEntity)
+                Qt3DCore.QEntity(self.component_root_entity)
             )
             self.neutron_objects["meshes"].append(Qt3DExtras.QSphereMesh())
             self.neutron_objects["transforms"].append(Qt3DCore.QTransform())
@@ -76,7 +76,7 @@ class InstrumentView(QWidget):
         self.initialise_view()
 
         # Initialise beam objects
-        self.cylinder_entity = Qt3DCore.QEntity(self.componentRootEntity)
+        self.cylinder_entity = Qt3DCore.QEntity(self.component_root_entity)
         self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
         self.cylinder_transform = Qt3DCore.QTransform()
 
@@ -90,57 +90,57 @@ class InstrumentView(QWidget):
 
     def create_gnomon(self):
 
-        self.xAxisEntity = Qt3DCore.QEntity(self.gnomonRootEntity)
-        self.yAxisEntity = Qt3DCore.QEntity(self.gnomonRootEntity)
-        self.zAxisEntity = Qt3DCore.QEntity(self.gnomonRootEntity)
+        self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.z_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
 
-        self.xAxisMesh = Qt3DExtras.QCylinderMesh()
-        self.yAxisMesh = Qt3DExtras.QCylinderMesh()
-        self.zAxisMesh = Qt3DExtras.QCylinderMesh()
+        self.x_axis_mesh = Qt3DExtras.QCylinderMesh()
+        self.y_axis_mesh = Qt3DExtras.QCylinderMesh()
+        self.z_axis_mesh = Qt3DExtras.QCylinderMesh()
 
-        self.xAxisMesh.setRadius(0.025)
-        self.yAxisMesh.setRadius(0.025)
-        self.zAxisMesh.setRadius(0.025)
+        self.x_axis_mesh.setRadius(0.025)
+        self.y_axis_mesh.setRadius(0.025)
+        self.z_axis_mesh.setRadius(0.025)
 
-        self.xAxisMesh.setLength(1)
-        self.yAxisMesh.setLength(1)
-        self.zAxisMesh.setLength(1)
+        self.x_axis_mesh.setLength(1)
+        self.y_axis_mesh.setLength(1)
+        self.z_axis_mesh.setLength(1)
 
-        self.xAxisMesh.setRings(2)
-        self.yAxisMesh.setRings(2)
-        self.zAxisMesh.setRings(2)
+        self.x_axis_mesh.setRings(2)
+        self.y_axis_mesh.setRings(2)
+        self.z_axis_mesh.setRings(2)
 
-        xAxisMatrix = QMatrix4x4()
-        yAxisMatrix = QMatrix4x4()
-        zAxisMatrix = QMatrix4x4()
+        x_axis_matrix = QMatrix4x4()
+        y_axis_matrix = QMatrix4x4()
+        z_axis_matrix = QMatrix4x4()
 
-        xAxisMatrix.rotate(270, QVector3D(0, 0, 1))
-        xAxisMatrix.translate(QVector3D(0, 0.5, 0))
+        x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
+        x_axis_matrix.translate(QVector3D(0, 0.5, 0))
 
-        yAxisMatrix.translate(QVector3D(0, 0.5, 0))
+        y_axis_matrix.translate(QVector3D(0, 0.5, 0))
 
-        zAxisMatrix.rotate(90, QVector3D(1, 0, 0))
-        zAxisMatrix.translate(QVector3D(0, 0.5, 0))
+        z_axis_matrix.rotate(90, QVector3D(1, 0, 0))
+        z_axis_matrix.translate(QVector3D(0, 0.5, 0))
 
-        self.xAxisTransformation = Qt3DCore.QTransform()
-        self.yAxisTransformation = Qt3DCore.QTransform()
-        self.zAxisTransformation = Qt3DCore.QTransform()
+        self.x_axis_transformation = Qt3DCore.QTransform()
+        self.y_axis_transformation = Qt3DCore.QTransform()
+        self.z_axis_transformation = Qt3DCore.QTransform()
 
-        self.xAxisTransformation.setMatrix(xAxisMatrix)
-        self.yAxisTransformation.setMatrix(yAxisMatrix)
-        self.zAxisTransformation.setMatrix(zAxisMatrix)
+        self.x_axis_transformation.setMatrix(x_axis_matrix)
+        self.y_axis_transformation.setMatrix(y_axis_matrix)
+        self.z_axis_transformation.setMatrix(z_axis_matrix)
 
-        self.xAxisEntity.addComponent(self.xAxisMesh)
-        self.xAxisEntity.addComponent(self.xAxisTransformation)
-        self.xAxisEntity.addComponent(self.red_material)
+        self.x_axis_entity.addComponent(self.x_axis_mesh)
+        self.x_axis_entity.addComponent(self.x_axis_transformation)
+        self.x_axis_entity.addComponent(self.red_material)
 
-        self.yAxisEntity.addComponent(self.yAxisMesh)
-        self.yAxisEntity.addComponent(self.yAxisTransformation)
-        self.yAxisEntity.addComponent(self.red_material)
+        self.y_axis_entity.addComponent(self.y_axis_mesh)
+        self.y_axis_entity.addComponent(self.y_axis_transformation)
+        self.y_axis_entity.addComponent(self.red_material)
 
-        self.zAxisEntity.addComponent(self.zAxisMesh)
-        self.zAxisEntity.addComponent(self.zAxisTransformation)
-        self.zAxisEntity.addComponent(self.red_material)
+        self.z_axis_entity.addComponent(self.z_axis_mesh)
+        self.z_axis_entity.addComponent(self.z_axis_transformation)
+        self.z_axis_entity.addComponent(self.red_material)
 
     def create_layers(self):
 
@@ -151,14 +151,14 @@ class InstrumentView(QWidget):
         self.view.setActiveFrameGraph(self.surSelector)
 
         self.componentLayerFilter = Qt3DRender.QLayerFilter(self.viewportComponent)
-        self.componentLayer = Qt3DRender.QLayer(self.componentRootEntity)
-        self.componentRootEntity.addComponent(self.componentLayer)
+        self.componentLayer = Qt3DRender.QLayer(self.component_root_entity)
+        self.component_root_entity.addComponent(self.componentLayer)
         self.componentLayer.setRecursive(True)
         self.componentLayerFilter.addLayer(self.componentLayer)
 
         componentCameraEntity = self.view.camera()
         componentCamController = Qt3DExtras.QFirstPersonCameraController(
-            self.componentRootEntity
+            self.component_root_entity
         )
         componentCamController.setLinearSpeed(20)
         componentCamController.setCamera(componentCameraEntity)
@@ -176,15 +176,15 @@ class InstrumentView(QWidget):
         self.viewportGnomon = Qt3DRender.QViewport(self.surSelector)
         self.viewportGnomon.setNormalizedRect(QRectF(0.8, 0.8, 0.2, 0.2))
         self.layerFilterGnomon = Qt3DRender.QLayerFilter(self.viewportGnomon)
-        self.gnomonLayer = Qt3DRender.QLayer(self.gnomonRootEntity)
-        self.gnomonRootEntity.addComponent(self.gnomonLayer)
+        self.gnomonLayer = Qt3DRender.QLayer(self.gnomon_root_entity)
+        self.gnomon_root_entity.addComponent(self.gnomonLayer)
         self.gnomonLayer.setRecursive(True)
         self.layerFilterGnomon.addLayer(self.gnomonLayer)
         self.cameraSelectorGnomon = Qt3DRender.QCameraSelector(self.layerFilterGnomon)
         self.clearBuffersGnomon = Qt3DRender.QClearBuffers(self.cameraSelectorGnomon)
 
         self.gnomonCameraEntity = Qt3DRender.QCamera()
-        self.gnomonCameraEntity.setParent(self.gnomonRootEntity)
+        self.gnomonCameraEntity.setParent(self.gnomon_root_entity)
         self.gnomonCameraEntity.setProjectionType(
             componentCameraEntity.projectionType()
         )
@@ -202,7 +202,7 @@ class InstrumentView(QWidget):
 
         self.gnomonCameraEntity.setPosition(gnomonCamPosition)
 
-        gnomonCamController = Qt3DExtras.QOrbitCameraController(self.gnomonRootEntity)
+        gnomonCamController = Qt3DExtras.QOrbitCameraController(self.gnomon_root_entity)
         gnomonCamController.setZoomInLimit(1)
         gnomonCamController.setAcceleration(0)
         gnomonCamController.setDeceleration(0)
@@ -218,7 +218,7 @@ class InstrumentView(QWidget):
         :param name: The name of the component.
         :param geometry: The geometry information of the component that is used to create a mesh.
         """
-        entity = Qt3DCore.QEntity(self.componentRootEntity)
+        entity = Qt3DCore.QEntity(self.component_root_entity)
         mesh = OffMesh(geometry.off_geometry)
 
         self.add_qcomponents_to_entity(entity, [mesh, self.grey_material])
