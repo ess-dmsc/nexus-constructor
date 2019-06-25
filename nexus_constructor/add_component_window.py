@@ -44,6 +44,8 @@ class GeometryType(Enum):
 class AddComponentDialog(Ui_AddComponentDialog):
     def __init__(self, nexus_wrapper: NexusWrapper):
         super(AddComponentDialog, self).__init__()
+
+        # Dictionaries that map user-input to known pixel grid options. Used when created the PixelGridModel.
         self.count_direction = {
             "Rows": CountDirection.ROW,
             "Columns": CountDirection.COLUMN,
@@ -54,12 +56,14 @@ class AddComponentDialog(Ui_AddComponentDialog):
             "Top left": Corner.TOP_LEFT,
             "Top right": Corner.TOP_RIGHT,
         }
+
         self.nexus_wrapper = nexus_wrapper
         self.geometry_model = None
         self.nx_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
         self.geometry_file_name = None
+        self.pixel_mapping_widgets = []
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -177,9 +181,15 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
 
+        # Change which pixel-related fields are visible because this depends on the class that has been selected.
         self.change_pixel_options_visibility()
 
     def show_pixel_grid_or_pixel_mapping(self, bool):
+        """
+        Switches between the pixel grid or pixel mapping boxes being visible. Populates the pixel mapping list if it is
+        visible but empty.
+        :param bool: Boolean indicating whether the pixel grid or pixel mapping box should be visible.
+        """
         self.pixelGridBox.setVisible(bool)
         self.pixelMappingLabel.setVisible(not bool)
         self.pixelMappingListWidget.setVisible(not bool)
@@ -188,7 +198,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def mesh_file_picker(self):
         """
-        Opens the mesh file picker. Sets the file name line edit to the file path.
+        Opens the mesh file picker. Sets the file name line edit to the file path. Creates a pixel mapping list if the
+        pixel mapping box is visible.
         :return: None
         """
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
@@ -202,6 +213,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.populate_pixel_mapping_list()
 
     def pixel_options_conditions(self):
+        """
+        Determine which of the pixel-related fields need to be visible.
+        :return: Booleans indicating whether the pixel layout, pixel data, pixel grid, and pixel mapping options need to
+        be made visible.
+        """
 
         pixel_layout_condition = (
             self.componentTypeComboBox.currentText() == "NXdetector"
@@ -229,15 +245,15 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         Changes the visibility of the pixel-related fields and the box that contains them. First checks if any of the
         fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
-        and then the fields is set.
+        and individual fields is set.
         """
         pixel_layout_condition, pixel_data_condition, pixel_grid_condition, pixel_mapping_condition = (
             self.pixel_options_conditions()
         )
 
         """
-        Only make the pixel box appear based on layout fields and data fields because the grid and mapping options
-        already depend on pixel layout being visible.
+        Only make the pixel box appear based on the pixel layout and pixel data options being visible. The pixel grid
+        and mapping options already depend on pixel layout being visible.
         """
         self.pixelOptionsBox.setVisible(pixel_layout_condition or pixel_data_condition)
 
@@ -248,6 +264,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelMappingLabel.setVisible(pixel_mapping_condition)
         self.pixelMappingListWidget.setVisible(pixel_mapping_condition)
 
+        # Populate the pixel mapping list if it is visible but empty
         self.populate_pixel_mapping_list_when_empty(pixel_mapping_condition)
 
     def show_cylinder_fields(self):
@@ -291,7 +308,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         return geometry_model
 
     def generate_pixel_data(self):
-
+        """
+        Creates the appropriate PixelModel object depending on user selection then gives it the information that the
+        user entered in the relevant fields.
+        :return:
+        """
+        # Determine which type of PixelMapping object ought to be created.
         _, pixel_data_condition, pixel_grid_condition, pixel_mapping_condition = (
             self.pixel_options_conditions()
         )
@@ -336,15 +358,20 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
     def populate_pixel_mapping_list(self):
-
+        """
+        Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
+        """
+        # Don't do this if a file hasn't been selected yet.
         if not self.geometry_file_name:
             return
 
         n_faces = len(self.generate_geometry_model().get_geometry().faces)
 
+        # Clear the list widget in case it contains information from a previous file.
         self.pixel_mapping_widgets = []
         self.pixelMappingListWidget.clear()
 
+        # Use the faces information from the geometry file to add fields to the pixel mapping list
         for i in range(n_faces):
             pixel_mapping_widget = PixelMappingWidget(self.pixelMappingListWidget, i)
 
@@ -354,16 +381,22 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.pixelMappingListWidget.addItem(list_item)
             self.pixelMappingListWidget.setItemWidget(list_item, pixel_mapping_widget)
 
+            # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
 
     def get_pixel_mapping_ids(self):
-
+        """
+        :return: A list of the IDs for the current PixelMappingWidgets.
+        """
         return [
             pixel_mapping_widget.get_id()
             for pixel_mapping_widget in self.pixel_mapping_widgets
         ]
 
     def populate_pixel_mapping_list_when_empty(self, pixel_mapping_condition):
-
+        """
+        Populates the pixel mapping list only if it is visible and empty.
+        :param pixel_mapping_condition: The condition for showing the pixel mapping list.
+        """
         if pixel_mapping_condition and not self.pixel_mapping_widgets:
             self.populate_pixel_mapping_list()
