@@ -14,6 +14,27 @@ def set_up_in_memory_nexus_file(filename):
     return h5py.File(filename, mode="x", driver="core", backing_store=False)
 
 
+def append_nxs_extension(file_name):
+    extension = ".nxs"
+    if file_name.endswith(extension):
+        return file_name
+    else:
+        return file_name + extension
+
+
+def create_nx_group(name, nx_class, parent):
+    """
+    Given a name, an nx class and a parent group, create a group under the parent
+    :param name: The name of the group to be created.
+    :param nx_class: The NX_class attribute to be set.
+    :param parent: The parent HDF group to add the created group to.
+    :return: A reference to the created group in the in-memory NeXus file.
+    """
+    group = parent.create_group(name)
+    group.attrs["NX_class"] = nx_class
+    return group
+
+
 class NexusWrapper(QObject):
     """
     Contains the NeXus file and functions to add and edit components in the NeXus file structure.
@@ -24,17 +45,13 @@ class NexusWrapper(QObject):
     file_changed = Signal("QVariant")
     component_added = Signal(str, "QVariant")
 
-    def __init__(self, filename="nexus-constructor"):
+    def __init__(self, filename="NeXus File"):
         super().__init__()
         self.nexus_file = set_up_in_memory_nexus_file(filename)
-        self.entry_group = self.nexus_file.create_group("entry")
-        self.entry_group.attrs["NX_class"] = "NXentry"
+        self.entry = create_nx_group("entry", "NXentry", self.nexus_file)
 
-        sample = self.entry_group.create_group("sample")
-        sample.attrs["NX_class"] = "NXsample"
-
-        self.instrument_group = self.entry_group.create_group("instrument")
-        self.instrument_group.attrs["NX_class"] = "NXinstrument"
+        create_nx_group("sample", "NXsample", self.entry)
+        create_nx_group("instrument", "NXinstrument", self.entry)
 
         self.components_list_model = instrument_model.InstrumentModel()
         self._emit_file()
@@ -61,7 +78,7 @@ class NexusWrapper(QObject):
         """
         if filename:
             print(filename)
-            file = h5py.File(filename, mode="x")
+            file = h5py.File(append_nxs_extension(filename), mode="x")
             try:
                 file.copy(source=self.nexus_file["/entry/"], dest="/entry/")
                 print("Saved to NeXus file")
