@@ -1,7 +1,7 @@
 from PySide2.QtWidgets import QMainWindow, QDialog
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.main_window import MainWindow
-from nexus_constructor.nexus import NexusFile
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from PySide2.QtCore import Qt
 
 
@@ -9,7 +9,7 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
     qtbot
 ):
     template = QMainWindow()
-    window = MainWindow(NexusFile("test1"))
+    window = MainWindow(NexusWrapper("test1"))
     template.ui = window
     template.ui.setupUi(template)
 
@@ -26,7 +26,7 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     qtbot
 ):
     template = QDialog()
-    dialog = AddComponentDialog(NexusFile("test2"))
+    dialog = AddComponentDialog(NexusWrapper("test2"))
     template.ui = dialog
     template.ui.setupUi(template)
 
@@ -41,7 +41,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     qtbot
 ):
     template = QDialog()
-    dialog = AddComponentDialog(NexusFile("test3"))
+    dialog = AddComponentDialog(NexusWrapper("test3"))
     template.ui = dialog
     template.ui.setupUi(template)
 
