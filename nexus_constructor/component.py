@@ -1,10 +1,10 @@
 import attr
-from nexus_constructor.transformations import Transformation
+import h5py
+from typing import Any, List
 from nexus_constructor.pixel_data import PixelData
 from nexus_constructor.geometry_types import Geometry
 from nexus_constructor.nexus import nexus_wrapper as nx
-import h5py
-from typing import Any, List
+from nexus_constructor.transformations import Transformation, create_transform
 
 
 class ComponentModel:
@@ -25,7 +25,7 @@ class ComponentModel:
         self.file.rename_group(self.group, new_name)
 
     def get_field(self, name: str):
-        self.file.get_field_value(self.group, name)
+        return self.file.get_field_value(self.group, name)
 
     def set_field(self, name: str, value: Any, dtype=None):
         self.file.set_field_value(self.group, name, value, dtype)
@@ -47,10 +47,34 @@ class ComponentModel:
         if description:
             self.file.set_field_value(self.group, "description", description, str)
 
+    @property
+    def transforms(self):
+        transforms = []
+        depends_on = self.get_field("depends_on")
+        self._get_transform(depends_on, transforms)
+        return transforms
+
+    def add_transformation(self):
+        pass
+
+    def remove_transformation(self):
+        pass
+
+    def _get_transform(self, depends_on: str, transforms: List[Transformation]):
+        """
+        Recursive function, appends each transform in depends_on chain to transforms list
+        """
+        if depends_on and depends_on != ".":
+            transform_dataset = self.file.nexus_file[depends_on]
+            transforms.append(
+                create_transform(transform_dataset.attrs["type"], transform_dataset["vector"], transform_dataset[...]))
+            if "depends_on" in transform_dataset.attrs.keys():
+                self._get_transform(transform_dataset.attrs["depends_on"], transforms)
+
 
 @attr.s
 class Component:
-    """Components of an instrument"""
+    """DEPRECATED: Switching to use ComponentModel everywhere"""
 
     nx_class = attr.ib(str)
     name = attr.ib(str)

@@ -1,5 +1,15 @@
 import attr
+import numpy as np
 from PySide2.QtGui import QVector3D
+from typing import Any
+
+
+def create_transform(type: str, vector: np.array, value: Any):
+    if type == "Rotation":
+        return Rotation(type, QVector3D(vector[0], vector[1], vector[2]), value)
+    if type == "Translation":
+        return Translation(type, value * vector)
+    raise ValueError("Unexpected transformation type encountered in create_transform()")
 
 
 @attr.s
