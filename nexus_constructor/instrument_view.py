@@ -88,31 +88,26 @@ class InstrumentView(QWidget):
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
 
+    def create_gnomon_cylinder_resources(self):
+
+        cylinder_mesh = Qt3DExtras.QCylinderMesh()
+        cylinder_mesh.setRadius(0.025)
+        cylinder_mesh.setLength(1)
+        cylinder_mesh.setRings(2)
+
+        return Qt3DCore.QEntity(self.gnomon_root_entity), cylinder_mesh, QMatrix4x4()
+
     def create_gnomon(self):
 
-        self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.z_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-
-        self.x_axis_mesh = Qt3DExtras.QCylinderMesh()
-        self.y_axis_mesh = Qt3DExtras.QCylinderMesh()
-        self.z_axis_mesh = Qt3DExtras.QCylinderMesh()
-
-        self.x_axis_mesh.setRadius(0.025)
-        self.y_axis_mesh.setRadius(0.025)
-        self.z_axis_mesh.setRadius(0.025)
-
-        self.x_axis_mesh.setLength(1)
-        self.y_axis_mesh.setLength(1)
-        self.z_axis_mesh.setLength(1)
-
-        self.x_axis_mesh.setRings(2)
-        self.y_axis_mesh.setRings(2)
-        self.z_axis_mesh.setRings(2)
-
-        x_axis_matrix = QMatrix4x4()
-        y_axis_matrix = QMatrix4x4()
-        z_axis_matrix = QMatrix4x4()
+        self.x_axis_entity, self.x_axis_mesh, x_axis_matrix = (
+            self.create_gnomon_cylinder_resources()
+        )
+        self.y_axis_entity, self.y_axis_mesh, y_axis_matrix = (
+            self.create_gnomon_cylinder_resources()
+        )
+        self.z_axis_entity, self.z_axis_mesh, z_axis_matrix = (
+            self.create_gnomon_cylinder_resources()
+        )
 
         x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
         x_axis_matrix.translate(QVector3D(0, 0.5, 0))
@@ -130,17 +125,18 @@ class InstrumentView(QWidget):
         self.y_axis_transformation.setMatrix(y_axis_matrix)
         self.z_axis_transformation.setMatrix(z_axis_matrix)
 
-        self.x_axis_entity.addComponent(self.x_axis_mesh)
-        self.x_axis_entity.addComponent(self.x_axis_transformation)
-        self.x_axis_entity.addComponent(self.red_material)
-
-        self.y_axis_entity.addComponent(self.y_axis_mesh)
-        self.y_axis_entity.addComponent(self.y_axis_transformation)
-        self.y_axis_entity.addComponent(self.red_material)
-
-        self.z_axis_entity.addComponent(self.z_axis_mesh)
-        self.z_axis_entity.addComponent(self.z_axis_transformation)
-        self.z_axis_entity.addComponent(self.red_material)
+        self.add_qcomponents_to_entity(
+            self.x_axis_entity,
+            [self.x_axis_mesh, self.x_axis_transformation, self.red_material],
+        )
+        self.add_qcomponents_to_entity(
+            self.y_axis_entity,
+            [self.y_axis_mesh, self.y_axis_transformation, self.red_material],
+        )
+        self.add_qcomponents_to_entity(
+            self.z_axis_entity,
+            [self.z_axis_mesh, self.z_axis_transformation, self.red_material],
+        )
 
     def create_layers(self):
 
