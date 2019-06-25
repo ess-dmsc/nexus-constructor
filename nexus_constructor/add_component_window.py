@@ -59,6 +59,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.nx_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
+        self.geometry_file_name = None
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -191,7 +192,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         :return: None
         """
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
-        if filename:
+        if filename != self.geometry_file_name:
             self.fileLineEdit.setText(filename)
             self.geometry_file_name = filename
 
@@ -336,7 +337,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def populate_pixel_mapping_list(self):
 
-        n_faces = 8
+        if not self.geometry_file_name:
+            return
+
+        n_faces = len(self.generate_geometry_model().get_geometry().faces)
 
         self.pixel_mapping_widgets = []
         self.pixelMappingListWidget.clear()
