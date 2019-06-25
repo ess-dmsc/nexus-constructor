@@ -18,7 +18,7 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     OkValidator,
 )
-from nexus_constructor.nexus_wrapper import NexusWrapper
+from nexus_constructor.nexus import NexusWrapper
 from nexus_constructor.utils import file_dialog, validate_line_edit
 import os
 from functools import partial

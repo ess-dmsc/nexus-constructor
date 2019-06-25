@@ -1,4 +1,4 @@
-from nexus_constructor.nexus_wrapper import NexusWrapper, convert_name_with_spaces
+from nexus_constructor.nexus import NexusWrapper, convert_name_with_spaces
 from nexus_constructor.qml_models.geometry_models import NoShapeModel
 
 

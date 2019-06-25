@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout
-from nexus_constructor.nexus_wrapper import NexusWrapper
+from nexus_constructor.nexus import NexusWrapper
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.utils import file_dialog
 from ui.main_window import Ui_MainWindow
