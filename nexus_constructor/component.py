@@ -54,12 +54,6 @@ class ComponentModel:
         self._get_transform(depends_on, transforms)
         return transforms
 
-    def add_transformation(self):
-        pass
-
-    def remove_transformation(self):
-        pass
-
     def _get_transform(self, depends_on: str, transforms: List[Transformation]):
         """
         Recursive function, appends each transform in depends_on chain to transforms list

@@ -4,8 +4,6 @@ from PySide2.QtCore import Signal, QObject
 from typing import Any
 import numpy as np
 
-COMPS_IN_ENTRY = ["NXmonitor", "NXsample"]
-
 
 def set_up_in_memory_nexus_file(filename):
     """
@@ -27,10 +25,6 @@ def get_name_of_group(group: h5py.Group):
     return group.name.split("/")[-1]
 
 
-def convert_name_with_spaces(component_name):
-    return component_name.replace(" ", "_")
-
-
 class NexusWrapper(QObject):
     """
     Contains the NeXus file and functions to add and edit components in the NeXus file structure.
@@ -48,10 +42,6 @@ class NexusWrapper(QObject):
 
         self.create_nx_group("sample", "NXsample", self.entry)
         self.instrument = self.create_nx_group("instrument", "NXinstrument", self.entry)
-
-        self.components = []
-        self.transformations = []  # TODO tree of transformations
-        # Has to be here, not in instrument, to avoid cyclic dependency between Instrument and Component
 
         self._emit_file()
 
@@ -93,36 +83,6 @@ class NexusWrapper(QObject):
 
     def rename_group(self, group: h5py.Group, new_name: str):
         self.nexus_file.move(group.name, f"{self.group.parent.name}/{new_name}")
-
-    def add_component(self, component_type, component_name, description, geometry):
-        """
-        Adds a component to the NeXus file and the components list.
-        :param component_type: The NX Component type in string form.
-        :param component_name: The Component name.
-        :param description: The Component Description.
-        :param geometry: Geometry model for the component.
-        :return: None
-        """
-        component_name = convert_name_with_spaces(component_name)
-        self.components_list_model.add_component(
-            nx_class=component_type,
-            description=description,
-            name=component_name,
-            geometry_model=geometry,
-        )
-
-        instrument_group = self.entry_group["instrument"]
-
-        if component_type in COMPS_IN_ENTRY:
-            # If the component should be put in /entry/ rather than /instrument/
-            instrument_group = self.entry_group
-
-        component_group = instrument_group.create_group(component_name)
-        component_group.attrs["NX_class"] = component_type
-
-        self.component_added.emit(component_name, geometry.get_geometry())
-
-        self._emit_file()
 
     def create_nx_group(self, name, nx_class, parent):
         """
@@ -167,3 +127,9 @@ class NexusWrapper(QObject):
         else:
             group.create_dataset(name, data=value, dtype=dtype)
         self._emit_file()
+
+    def add_transformation(self):
+        raise NotImplementedError
+
+    def remove_transformation(self):
+        raise NotImplementedError

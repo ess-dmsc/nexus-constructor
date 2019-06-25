@@ -4,6 +4,12 @@ from nexus_constructor.component_type import make_dictionary_of_class_definition
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.component import ComponentModel
 
+COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
+
+
+def convert_name_with_spaces(component_name):
+    return component_name.replace(" ", "_")
+
 
 class Instrument:
     def __init__(self, nexus_file: nx.NexusWrapper):
@@ -12,16 +18,16 @@ class Instrument:
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
 
-    def add_component(self, name: str, nx_class: str, description: str, geometry):
+    def add_component(self, name: str, nx_class: str, description: str):
         """
         Creates a component group in a NeXus file
         :param name: Name of the component group to create
         :param nx_class: NX_class of the component group to create
         :param description: Description of the component
-        :param geometry: geometry model
         """
+        name = convert_name_with_spaces(name)
         parent_group = self.nexus.instrument
-        if nx_class == "NXmonitor":
+        if nx_class in COMPONENTS_IN_ENTRY:
             parent_group = self.nexus.entry
         component_group = self.nexus.create_nx_group(name, nx_class, parent_group)
         component = ComponentModel(self.nexus, component_group)
