@@ -44,7 +44,8 @@ class ComponentModel:
 
     @description.setter
     def description(self, description: str):
-        self.file.set_field_value(self.group, "description", description, str)
+        if description:
+            self.file.set_field_value(self.group, "description", description, str)
 
 
 @attr.s

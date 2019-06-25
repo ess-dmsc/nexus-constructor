@@ -12,6 +12,7 @@ pint
 mock
 silx
 xmltodict
+numpy
 
 # newer versions of jsonschema don't work with the executables built by cx_Freeze
 jsonschema==2.6.0
@@ -21,4 +22,3 @@ git+https://github.com/anthony-tuininga/cx_Freeze.git@master
 
 # PySide2 has had some issues with new versions and packaging so we will pin it
 PySide2==5.12.3
-

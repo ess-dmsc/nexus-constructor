@@ -4,6 +4,7 @@ from PySide2.QtCore import Property, Qt, Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator
 import pint
 import os
+from typing import List
 
 
 class NullableIntValidator(QIntValidator):
@@ -181,32 +182,26 @@ class TransformParentValidator(ValidatorOnListModel):
         return False
 
 
-class NameValidator(ValidatorOnListModel):
+class NameValidator(QValidator):
     """
     Validator to ensure item names are unique within a model that has a 'name' property
 
     The validationFailed signal is emitted if an entered name is not unique.
     """
 
-    def __init__(self):
+    def __init__(self, list_model: List):
         super().__init__()
+        self.list_model = list_model
 
     def validate(self, input: str, pos: int):
         if not input:
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        name_role = Qt.DisplayRole
-        for role, name in self.list_model.roleNames().items():
-            if name == b"name":
-                name_role = role
-                break
-        for i in range(self.list_model.rowCount()):
-            if i != self.model_index:
-                index = self.list_model.createIndex(i, 0)
-                name_at_index = self.list_model.data(index, name_role)
-                if name_at_index == input:
-                    self.is_valid.emit(False)
-                    return QValidator.Intermediate
+
+        names_in_list = [item.name for item in self.list_model]
+        if input in names_in_list:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
 
         self.is_valid.emit(True)
         return QValidator.Acceptable

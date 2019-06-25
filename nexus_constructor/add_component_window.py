@@ -18,7 +18,7 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     OkValidator,
 )
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.instrument import Instrument
 from nexus_constructor.utils import file_dialog, validate_line_edit
 import os
 from functools import partial
@@ -31,9 +31,9 @@ class GeometryType(Enum):
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
-    def __init__(self, nexus_wrapper: NexusWrapper):
+    def __init__(self, instrument: Instrument):
         super(AddComponentDialog, self).__init__()
-        self.nexus_wrapper = nexus_wrapper
+        self.instrument = instrument
         self.geometry_model = None
         self.nx_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
@@ -87,8 +87,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.noGeometryRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        name_validator = NameValidator()
-        name_validator.list_model = self.nexus_wrapper.get_component_list()
+        name_validator = NameValidator(self.instrument.get_component_list())
         self.nameLineEdit.setValidator(name_validator)
         self.nameLineEdit.validator().is_valid.connect(
             partial(validate_line_edit, self.nameLineEdit)
@@ -177,6 +176,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        self.nexus_wrapper.add_component(
-            nx_class, component_name, description, self.generate_geometry_model()
+        self.instrument.add_component(
+            component_name, nx_class, description, self.generate_geometry_model()
         )

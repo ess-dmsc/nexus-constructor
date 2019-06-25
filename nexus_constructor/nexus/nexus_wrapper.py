@@ -2,6 +2,7 @@ import h5py
 
 from PySide2.QtCore import Signal, QObject
 from typing import Any
+import numpy as np
 
 COMPS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -153,6 +154,10 @@ class NexusWrapper(QObject):
         return group[name][...]
 
     def set_field_value(self, group: h5py.Group, name: str, value: Any, dtype=None):
+        if dtype is str:
+            dtype = f'|S{len(value)}'
+            value = np.array(value).astype(dtype)
+
         if name in group:
             if dtype is None or group[name].dtype == dtype:
                 group[name][...] = value

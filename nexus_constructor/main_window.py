@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.instrument import Instrument
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.utils import file_dialog
 from ui.main_window import Ui_MainWindow
@@ -13,9 +13,9 @@ JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
 class MainWindow(Ui_MainWindow):
-    def __init__(self, nexus_wrapper: NexusWrapper):
+    def __init__(self, instrument: Instrument):
         super().__init__()
-        self.nexus_wrapper = nexus_wrapper
+        self.instrument = instrument
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
@@ -34,12 +34,12 @@ class MainWindow(Ui_MainWindow):
         self.treemodel.setDatasetDragEnabled(True)
         self.treemodel.setFileDropEnabled(True)
         self.treemodel.setFileMoveEnabled(True)
-        self.treemodel.insertH5pyObject(self.nexus_wrapper.nexus_file)
-        self.nexus_wrapper.file_changed.connect(self.update_nexus_file_structure_view)
+        self.treemodel.insertH5pyObject(self.instrument.nexus.nexus_file)
+        self.instrument.nexus.file_changed.connect(self.update_nexus_file_structure_view)
         self.verticalLayout.addWidget(self.widget)
         #self.listView.setModel(self.nexus_wrapper.get_component_list())
 
-        self.nexus_wrapper.component_added.connect(self.sceneWidget.add_component)
+        self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
 
         self.set_up_warning_window()
 
@@ -72,23 +72,23 @@ class MainWindow(Ui_MainWindow):
 
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
-        self.nexus_wrapper.save_file(filename)
+        self.instrument.nexus.save_file(filename)
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
-        self.nexus_wrapper.save_file(filename)
+        self.instrument.nexus.save_file(filename)
         if filename:
             with open(filename, "w") as file:
                 file.write(
-                    writer.generate_json(self.nexus_wrapper.get_component_list())
+                    writer.generate_json(self.instrument.get_component_list())
                 )
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
-        self.nexus_wrapper.open_file(filename)
+        self.instrument.nexus.open_file(filename)
 
     def show_add_component_window(self):
         self.add_window = QDialog()
-        self.add_window.ui = AddComponentDialog(self.nexus_wrapper)
+        self.add_window.ui = AddComponentDialog(self.instrument)
         self.add_window.ui.setupUi(self.add_window)
         self.add_window.show()
