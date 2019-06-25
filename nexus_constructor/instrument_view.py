@@ -3,7 +3,7 @@ from PySide2.QtWidgets import QWidget, QVBoxLayout
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation, QRectF
-from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
+from PySide2.QtGui import QVector3D, QColor, QMatrix4x4, QFont
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
 from nexus_constructor.off_renderer import OffMesh
 
@@ -91,6 +91,14 @@ class InstrumentView(QWidget):
         self.y_axis_transformation = Qt3DCore.QTransform()
         self.z_axis_transformation = Qt3DCore.QTransform()
 
+        self.x_text_transformation = Qt3DCore.QTransform()
+        self.y_text_transformation = Qt3DCore.QTransform()
+        self.z_text_transformation = Qt3DCore.QTransform()
+
+        self.x_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
+        self.y_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
+        self.z_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
+
         self.create_layers()
         self.initialise_view()
 
@@ -113,8 +121,8 @@ class InstrumentView(QWidget):
     @staticmethod
     def configure_gnomon_cylinder(cylinder_mesh):
 
-        cylinder_mesh.setRadius(0.025)
-        cylinder_mesh.setLength(1)
+        cylinder_mesh.setRadius(0.25 * 0.5)
+        cylinder_mesh.setLength(4)
         cylinder_mesh.setRings(2)
 
     @staticmethod
@@ -125,14 +133,28 @@ class InstrumentView(QWidget):
         z_axis_matrix = QMatrix4x4()
 
         x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
-        x_axis_matrix.translate(QVector3D(0, 0.5, 0))
+        x_axis_matrix.translate(QVector3D(0, 2, 0))
 
-        y_axis_matrix.translate(QVector3D(0, 0.5, 0))
+        y_axis_matrix.translate(QVector3D(0, 2, 0))
 
         z_axis_matrix.rotate(90, QVector3D(1, 0, 0))
-        z_axis_matrix.translate(QVector3D(0, 0.5, 0))
+        z_axis_matrix.translate(QVector3D(0, 2, 0))
 
         return x_axis_matrix, y_axis_matrix, z_axis_matrix
+
+    def create_axis_label_matrices(self):
+
+        x_axis_matrix = QMatrix4x4()
+        y_axis_matrix = QMatrix4x4()
+        z_axis_matrix = QMatrix4x4()
+
+        x_axis_matrix.translate(QVector3D(5, 0, 0))
+        y_axis_matrix.translate(QVector3D(0, 5, 0))
+        z_axis_matrix.translate(QVector3D(0, 0, 5))
+
+        self.x_text_transformation.setMatrix(x_axis_matrix)
+        self.y_text_transformation.setMatrix(y_axis_matrix)
+        self.z_text_transformation.setMatrix(z_axis_matrix)
 
     def create_gnomon(self):
 
@@ -158,6 +180,24 @@ class InstrumentView(QWidget):
             self.z_axis_entity,
             [self.z_axis_mesh, self.z_axis_transformation, self.red_material],
         )
+
+        self.set_axis_label_text(self.x_axis_text, "X")
+        self.set_axis_label_text(self.y_axis_text, "Y")
+        self.set_axis_label_text(self.z_axis_text, "Z")
+
+        self.create_axis_label_matrices()
+
+        self.x_axis_text.addComponent(self.x_text_transformation)
+        self.y_axis_text.addComponent(self.y_text_transformation)
+        self.z_axis_text.addComponent(self.z_text_transformation)
+
+    def set_axis_label_text(self, text_entity, text_label):
+
+        text_entity.setText(text_label)
+        text_entity.setHeight(1.5)
+        text_entity.setWidth(1.5)
+        text_entity.setColor(QColor("green"))
+        text_entity.setFont(QFont("Courier New", 1))
 
     def create_layers(self):
         """
@@ -191,7 +231,7 @@ class InstrumentView(QWidget):
         gnomon_camera.setParent(self.gnomon_root_entity)
         gnomon_camera.setProjectionType(main_camera.projectionType())
         gnomon_camera.lens().setPerspectiveProjection(
-            main_camera.fieldOfView(), 1, 0.1, 10
+            main_camera.fieldOfView(), 1, 0.1, 20
         )
         gnomon_camera.setUpVector(main_camera.upVector())
         gnomon_camera.setViewCenter(QVector3D(0, 0, 0))
@@ -220,7 +260,7 @@ class InstrumentView(QWidget):
 
         gnomon_camera_position = main_camera.position() - main_camera.viewCenter()
         gnomon_camera_position = gnomon_camera_position.normalized()
-        gnomon_camera_position *= 3
+        gnomon_camera_position *= 12
 
         self.gnomon_camera.setPosition(gnomon_camera_position)
 
