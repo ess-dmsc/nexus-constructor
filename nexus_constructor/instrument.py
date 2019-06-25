@@ -15,7 +15,7 @@ class Instrument:
     def __init__(self, nexus_file: nx.NexusWrapper):
         self.nexus = nexus_file
         self.nx_classes = make_dictionary_of_class_definitions(
-            os.path.abspath(os.path.join(os.curdir, "definitions"))
+            os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir, os.pardir, "definitions"))
         )
 
     def add_component(self, name: str, nx_class: str, description: str):
