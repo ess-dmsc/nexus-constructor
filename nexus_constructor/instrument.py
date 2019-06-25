@@ -14,7 +14,7 @@ def convert_name_with_spaces(component_name):
 class Instrument:
     def __init__(self, nexus_file: nx.NexusWrapper):
         self.nexus = nexus_file
-        self.nx_classes = make_dictionary_of_class_definitions(
+        _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir, os.pardir, "definitions"))
         )
 
@@ -42,7 +42,7 @@ class Instrument:
         def find_components(_, node):
             if isinstance(node, h5py.Group):
                 if "NX_class" in node.attrs.keys():
-                    if node.attrs["NX_class"] in self.nx_classes:
+                    if node.attrs["NX_class"] in self.nx_component_classes:
                         component_list.append(ComponentModel(self.nexus, node))
 
         self.nexus.nexus_file.visititems(find_components)

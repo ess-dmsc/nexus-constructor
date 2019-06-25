@@ -35,7 +35,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         super(AddComponentDialog, self).__init__()
         self.instrument = instrument
         self.geometry_model = None
-        self.nx_classes = make_dictionary_of_class_definitions(
+        _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
 
@@ -111,7 +111,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.ok_validator.set_units_valid
         )
 
-        self.componentTypeComboBox.addItems(list(self.nx_classes.keys()))
+        self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
 
         # Validate the default value set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)

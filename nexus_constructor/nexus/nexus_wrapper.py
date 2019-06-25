@@ -99,9 +99,9 @@ class NexusWrapper(QObject):
 
     @staticmethod
     def get_nx_class(group: h5py.Group):
-        if "NX_class" in group.attrs.keys():
+        if "NX_class" not in group.attrs.keys():
             return None
-        return group.attrs["NX_class"][:].decode()
+        return group.attrs["NX_class"]
 
     def set_nx_class(self, group: h5py.Group, nx_class: str):
         group.attrs["NX_class"] = nx_class
@@ -111,7 +111,10 @@ class NexusWrapper(QObject):
     def get_field_value(group: h5py.Group, name: str):
         if name not in group:
             raise NameError(f"Field called {name} not found in {group.name}")
-        return group[name][...]
+        value = group[name][...]
+        if value.dtype.type is np.string_:
+            value = str(value, "utf8")
+        return value
 
     def set_field_value(self, group: h5py.Group, name: str, value: Any, dtype=None):
         if dtype is str:
