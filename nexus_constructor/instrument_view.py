@@ -106,13 +106,15 @@ class InstrumentView(QWidget):
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
 
-    def configure_gnomon_cylinder(self, cylinder_mesh):
+    @staticmethod
+    def configure_gnomon_cylinder(cylinder_mesh):
 
         cylinder_mesh.setRadius(0.025)
         cylinder_mesh.setLength(1)
         cylinder_mesh.setRings(2)
 
-    def create_gnomon_matrices(self):
+    @staticmethod
+    def create_gnomon_matrices():
 
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
