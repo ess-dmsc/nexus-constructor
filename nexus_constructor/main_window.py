@@ -88,7 +88,7 @@ class MainWindow(Ui_MainWindow):
         self.instrument.nexus.open_file(filename)
 
     def show_add_component_window(self):
-        self.add_window = QDialog()
-        self.add_window.ui = AddComponentDialog(self.instrument)
-        self.add_window.ui.setupUi(self.add_window)
-        self.add_window.show()
+        self.add_component_window = QDialog()
+        self.add_component_window.ui = AddComponentDialog(self.instrument)
+        self.add_component_window.ui.setupUi(self.add_component_window)
+        self.add_component_window.show()

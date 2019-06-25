@@ -18,9 +18,9 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 
     qtbot.mouseClick(window.pushButton, Qt.LeftButton)
 
-    assert window.add_window.isVisible()
+    assert window.add_component_window.isVisible()
 
-    window.add_window.close()
+    window.add_component_window.close()
 
 
 def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options_are_hidden(
