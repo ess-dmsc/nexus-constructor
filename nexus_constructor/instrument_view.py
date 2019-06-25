@@ -38,6 +38,7 @@ class InstrumentView(QWidget):
         cam_controller.setCamera(camera_entity)
         self.view.setRootEntity(self.root_entity)
 
+        # Make additional cameras for the gnomon and the instrument components
         self.component_root_entity = Qt3DCore.QEntity(self.root_entity)
         self.gnomon_root_entity = Qt3DCore.QEntity(self.root_entity)
 
@@ -72,6 +73,23 @@ class InstrumentView(QWidget):
 
         self.cylinder_length = 40
 
+        # Gnomon resources
+        self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.z_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+
+        self.x_axis_mesh = Qt3DExtras.QCylinderMesh()
+        self.y_axis_mesh = Qt3DExtras.QCylinderMesh()
+        self.z_axis_mesh = Qt3DExtras.QCylinderMesh()
+
+        self.x_axis_matrix = QMatrix4x4()
+        self.y_axis_matrix = QMatrix4x4()
+        self.z_axis_matrix = QMatrix4x4()
+
+        self.x_axis_transformation = Qt3DCore.QTransform()
+        self.y_axis_transformation = Qt3DCore.QTransform()
+        self.z_axis_transformation = Qt3DCore.QTransform()
+
         self.create_layers()
         self.initialise_view()
 
@@ -88,26 +106,17 @@ class InstrumentView(QWidget):
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
 
-    def create_gnomon_cylinder_resources(self):
+    def configure_gnomon_cylinder(self, cylinder_mesh):
 
-        cylinder_mesh = Qt3DExtras.QCylinderMesh()
         cylinder_mesh.setRadius(0.025)
         cylinder_mesh.setLength(1)
         cylinder_mesh.setRings(2)
 
-        return Qt3DCore.QEntity(self.gnomon_root_entity), cylinder_mesh, QMatrix4x4()
+    def create_gnomon_matrices(self):
 
-    def create_gnomon(self):
-
-        self.x_axis_entity, self.x_axis_mesh, x_axis_matrix = (
-            self.create_gnomon_cylinder_resources()
-        )
-        self.y_axis_entity, self.y_axis_mesh, y_axis_matrix = (
-            self.create_gnomon_cylinder_resources()
-        )
-        self.z_axis_entity, self.z_axis_mesh, z_axis_matrix = (
-            self.create_gnomon_cylinder_resources()
-        )
+        x_axis_matrix = QMatrix4x4()
+        y_axis_matrix = QMatrix4x4()
+        z_axis_matrix = QMatrix4x4()
 
         x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
         x_axis_matrix.translate(QVector3D(0, 0.5, 0))
@@ -117,9 +126,15 @@ class InstrumentView(QWidget):
         z_axis_matrix.rotate(90, QVector3D(1, 0, 0))
         z_axis_matrix.translate(QVector3D(0, 0.5, 0))
 
-        self.x_axis_transformation = Qt3DCore.QTransform()
-        self.y_axis_transformation = Qt3DCore.QTransform()
-        self.z_axis_transformation = Qt3DCore.QTransform()
+        return x_axis_matrix, y_axis_matrix, z_axis_matrix
+
+    def create_gnomon(self):
+
+        self.configure_gnomon_cylinder(self.x_axis_mesh)
+        self.configure_gnomon_cylinder(self.y_axis_mesh)
+        self.configure_gnomon_cylinder(self.z_axis_mesh)
+
+        x_axis_matrix, y_axis_matrix, z_axis_matrix = self.create_gnomon_matrices()
 
         self.x_axis_transformation.setMatrix(x_axis_matrix)
         self.y_axis_transformation.setMatrix(y_axis_matrix)
