@@ -106,6 +106,8 @@ class InstrumentView(QWidget):
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
 
+        self.view.camera().viewVectorChanged.connect(self.update_gnomon_camera)
+
     @staticmethod
     def configure_gnomon_cylinder(cylinder_mesh):
 
@@ -156,7 +158,7 @@ class InstrumentView(QWidget):
         )
 
     def create_layers(self):
-
+        main_camera = self.view.camera()
         self.surSelector = Qt3DRender.QRenderSurfaceSelector()
         self.surSelector.setSurface(self.view)
         self.viewportComponent = Qt3DRender.QViewport(self.surSelector)
@@ -168,13 +170,6 @@ class InstrumentView(QWidget):
         self.component_root_entity.addComponent(self.componentLayer)
         self.componentLayer.setRecursive(True)
         self.componentLayerFilter.addLayer(self.componentLayer)
-
-        componentCameraEntity = self.view.camera()
-        componentCamController = Qt3DExtras.QFirstPersonCameraController(
-            self.component_root_entity
-        )
-        componentCamController.setLinearSpeed(20)
-        componentCamController.setCamera(componentCameraEntity)
 
         self.componentCameraSelector = Qt3DRender.QCameraSelector(
             self.componentLayerFilter
@@ -198,32 +193,27 @@ class InstrumentView(QWidget):
 
         self.gnomonCameraEntity = Qt3DRender.QCamera()
         self.gnomonCameraEntity.setParent(self.gnomon_root_entity)
-        self.gnomonCameraEntity.setProjectionType(
-            componentCameraEntity.projectionType()
+        self.gnomonCameraEntity.setProjectionType(main_camera.projectionType())
+        self.gnomonCameraEntity.lens().setPerspectiveProjection(
+            main_camera.fieldOfView(), 1, 0.1, 10
         )
-        self.gnomonCameraEntity.setFieldOfView(componentCameraEntity.fieldOfView())
-        self.gnomonCameraEntity.setNearPlane(0.1)
-        self.gnomonCameraEntity.setFarPlane(10)
-        self.gnomonCameraEntity.setUpVector(componentCameraEntity.upVector())
+        self.gnomonCameraEntity.setUpVector(main_camera.upVector())
         self.gnomonCameraEntity.setViewCenter(QVector3D(0, 0, 0))
-
-        gnomonCamPosition = (
-            componentCameraEntity.position() - componentCameraEntity.viewCenter()
-        )
-        gnomonCamPosition = gnomonCamPosition.normalized()
-        gnomonCamPosition *= 3
-
-        self.gnomonCameraEntity.setPosition(gnomonCamPosition)
-
-        gnomonCamController = Qt3DExtras.QOrbitCameraController(self.gnomon_root_entity)
-        gnomonCamController.setZoomInLimit(1)
-        gnomonCamController.setAcceleration(0)
-        gnomonCamController.setDeceleration(0)
-        gnomonCamController.setCamera(self.gnomonCameraEntity)
 
         self.cameraSelectorGnomon.setCamera(self.gnomonCameraEntity)
 
+        self.update_gnomon_camera()
+
         self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
+
+    def update_gnomon_camera(self):
+        main_camera = self.view.camera()
+
+        gnomon_camera_position = main_camera.viewVector()
+        gnomon_camera_position = gnomon_camera_position.normalized()
+        gnomon_camera_position *= 3
+
+        self.gnomonCameraEntity.setPosition(gnomon_camera_position)
 
     def add_component(self, name, geometry):
         """
