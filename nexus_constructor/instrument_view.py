@@ -24,6 +24,10 @@ class InstrumentView(QWidget):
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
+        # Set up view surface selector for filtering
+        self.surface_selector = Qt3DRender.QRenderSurfaceSelector()
+        self.surface_selector.setSurface(self.view)
+
         # Enable the camera to see a large distance by giving it a small nearView and large farView
         self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.01, 1000)
 
@@ -41,6 +45,7 @@ class InstrumentView(QWidget):
         # Make additional cameras for the gnomon and the instrument components
         self.component_root_entity = Qt3DCore.QEntity(self.root_entity)
         self.gnomon_root_entity = Qt3DCore.QEntity(self.root_entity)
+        self.gnomon_camera = self.create_gnomon_camera(self.view.camera())
 
         # Initialise materials
         self.grey_material = Qt3DExtras.QPhongMaterial()
@@ -82,10 +87,6 @@ class InstrumentView(QWidget):
         self.y_axis_mesh = Qt3DExtras.QCylinderMesh()
         self.z_axis_mesh = Qt3DExtras.QCylinderMesh()
 
-        self.x_axis_matrix = QMatrix4x4()
-        self.y_axis_matrix = QMatrix4x4()
-        self.z_axis_matrix = QMatrix4x4()
-
         self.x_axis_transformation = Qt3DCore.QTransform()
         self.y_axis_transformation = Qt3DCore.QTransform()
         self.z_axis_transformation = Qt3DCore.QTransform()
@@ -106,6 +107,7 @@ class InstrumentView(QWidget):
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.setup_beam_cylinder()
 
+        # Move the gnomon when the camera view changes
         self.view.camera().viewVectorChanged.connect(self.update_gnomon_camera)
 
     @staticmethod
@@ -158,62 +160,69 @@ class InstrumentView(QWidget):
         )
 
     def create_layers(self):
+        """
+        Assigns the gnomon view and component view to different cameras and viewports.
+        """
         main_camera = self.view.camera()
-        self.surSelector = Qt3DRender.QRenderSurfaceSelector()
-        self.surSelector.setSurface(self.view)
-        self.viewportComponent = Qt3DRender.QViewport(self.surSelector)
+        viewport = Qt3DRender.QViewport(self.surface_selector)
+        self.view.setActiveFrameGraph(self.surface_selector)
 
-        self.view.setActiveFrameGraph(self.surSelector)
-
-        self.componentLayerFilter = Qt3DRender.QLayerFilter(self.viewportComponent)
-        self.componentLayer = Qt3DRender.QLayer(self.component_root_entity)
-        self.component_root_entity.addComponent(self.componentLayer)
-        self.componentLayer.setRecursive(True)
-        self.componentLayerFilter.addLayer(self.componentLayer)
-
-        self.componentCameraSelector = Qt3DRender.QCameraSelector(
-            self.componentLayerFilter
+        # Filters out just the instrument for the main camera to see
+        component_clear_buffers = self.create_camera_filter(
+            viewport, self.component_root_entity, main_camera
         )
-        self.componentCameraSelector.setCamera(self.view.camera())
-        self.componentClearBuffers = Qt3DRender.QClearBuffers(
-            self.componentCameraSelector
+
+        component_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
+        component_clear_buffers.setClearColor(QColor("lightgrey"))
+
+        # Create a viewport for gnomon in small section of the screen
+        gnomon_viewport = Qt3DRender.QViewport(self.surface_selector)
+        gnomon_viewport.setNormalizedRect(QRectF(0.8, 0.8, 0.2, 0.2))
+
+        # Filter out the gnomon for just the gnomon camera to see
+        self.create_camera_filter(
+            gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
         )
-        self.componentClearBuffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
-        self.componentClearBuffers.setClearColor(QColor("lightgrey"))
-
-        self.viewportGnomon = Qt3DRender.QViewport(self.surSelector)
-        self.viewportGnomon.setNormalizedRect(QRectF(0.8, 0.8, 0.2, 0.2))
-        self.layerFilterGnomon = Qt3DRender.QLayerFilter(self.viewportGnomon)
-        self.gnomonLayer = Qt3DRender.QLayer(self.gnomon_root_entity)
-        self.gnomon_root_entity.addComponent(self.gnomonLayer)
-        self.gnomonLayer.setRecursive(True)
-        self.layerFilterGnomon.addLayer(self.gnomonLayer)
-        self.cameraSelectorGnomon = Qt3DRender.QCameraSelector(self.layerFilterGnomon)
-        self.clearBuffersGnomon = Qt3DRender.QClearBuffers(self.cameraSelectorGnomon)
-
-        self.gnomonCameraEntity = Qt3DRender.QCamera()
-        self.gnomonCameraEntity.setParent(self.gnomon_root_entity)
-        self.gnomonCameraEntity.setProjectionType(main_camera.projectionType())
-        self.gnomonCameraEntity.lens().setPerspectiveProjection(
-            main_camera.fieldOfView(), 1, 0.1, 10
-        )
-        self.gnomonCameraEntity.setUpVector(main_camera.upVector())
-        self.gnomonCameraEntity.setViewCenter(QVector3D(0, 0, 0))
-
-        self.cameraSelectorGnomon.setCamera(self.gnomonCameraEntity)
 
         self.update_gnomon_camera()
 
-        self.clearBuffersGnomon.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
+    def create_gnomon_camera(self, main_camera):
+        gnomon_camera = Qt3DRender.QCamera()
+        gnomon_camera.setParent(self.gnomon_root_entity)
+        gnomon_camera.setProjectionType(main_camera.projectionType())
+        gnomon_camera.lens().setPerspectiveProjection(
+            main_camera.fieldOfView(), 1, 0.1, 10
+        )
+        gnomon_camera.setUpVector(main_camera.upVector())
+        gnomon_camera.setViewCenter(QVector3D(0, 0, 0))
+        return gnomon_camera
+
+    def create_camera_filter(self, viewport, visible_entity, camera_to_filter):
+        """
+        Filter the objects that are visible to a camera.
+        :param viewport: The viewport that the camera is using.
+        :param visible_entity: Only children of this entity will be visible to the camera.
+        :param camera_to_filter: The camera to apply the filter to.
+        :return: The clear buffers
+        """
+        layer_filter = Qt3DRender.QLayerFilter(viewport)
+        layer = Qt3DRender.QLayer(visible_entity)
+        visible_entity.addComponent(layer)
+        layer.setRecursive(True)
+        layer_filter.addLayer(layer)
+        camera_selector = Qt3DRender.QCameraSelector(layer_filter)
+        camera_selector.setCamera(camera_to_filter)
+        clear_buffers = Qt3DRender.QClearBuffers(camera_selector)
+        return clear_buffers
 
     def update_gnomon_camera(self):
         main_camera = self.view.camera()
 
-        gnomon_camera_position = main_camera.viewVector()
+        gnomon_camera_position = main_camera.position() - main_camera.viewCenter()
         gnomon_camera_position = gnomon_camera_position.normalized()
         gnomon_camera_position *= 3
 
-        self.gnomonCameraEntity.setPosition(gnomon_camera_position)
+        self.gnomon_camera.setPosition(gnomon_camera_position)
 
     def add_component(self, name, geometry):
         """
