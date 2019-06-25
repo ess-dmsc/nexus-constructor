@@ -2,6 +2,7 @@ import h5py
 
 from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
+from typing import Any
 
 COMPS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -35,7 +36,28 @@ def create_nx_group(name, nx_class, parent):
     return group
 
 
-class NexusWrapper(QObject):
+def get_name_of_group(group: h5py.Group):
+    return group.name.split("/")[-1]
+
+
+def get_field_value(group: h5py.Group, name: str):
+    if name not in group:
+        raise NameError(f"Field called {name} not found in {group.name}")
+    return group[name][...]
+
+
+def set_field_value(group: h5py.Group, name: str, value: Any, dtype=None):
+    if name in group:
+        if dtype is None or group[name].dtype == dtype:
+            group[name][...] = value
+        else:
+            del group[name]
+            group.create_dataset(name, data=value, dtype=dtype)
+    else:
+        group.create_dataset(name, data=value, dtype=dtype)
+
+
+class NexusFile(QObject):
     """
     Contains the NeXus file and functions to add and edit components in the NeXus file structure.
     Also contains a list of components for use in a listview.
@@ -51,7 +73,7 @@ class NexusWrapper(QObject):
         self.entry = create_nx_group("entry", "NXentry", self.nexus_file)
 
         create_nx_group("sample", "NXsample", self.entry)
-        create_nx_group("instrument", "NXinstrument", self.entry)
+        self.instrument = create_nx_group("instrument", "NXinstrument", self.entry)
 
         self.components_list_model = instrument_model.InstrumentModel()
         self._emit_file()
@@ -98,6 +120,9 @@ class NexusWrapper(QObject):
             )
             print("NeXus file loaded")
             self._emit_file()
+
+    def rename_group(self, group: h5py.Group, new_name: str):
+        self.nexus_file.move(group.name, f"{self.group.parent.name}/{new_name}")
 
     def add_component(self, component_type, component_name, description, geometry):
         """

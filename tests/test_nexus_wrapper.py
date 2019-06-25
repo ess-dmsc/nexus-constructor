@@ -1,29 +1,29 @@
-from nexus_constructor.nexus import NexusWrapper, convert_name_with_spaces
+from nexus_constructor.nexus import NexusFile, convert_name_with_spaces
 from nexus_constructor.qml_models.geometry_models import NoShapeModel
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_file_contains_entry_group_with_correct_nx_class():
-    wrapper = NexusWrapper("contains_entry")
+    wrapper = NexusFile("contains_entry")
     assert wrapper.entry_group.attrs["NX_class"] == "NXentry"
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_file_contains_instrument_group_with_correct_nx_class():
-    wrapper = NexusWrapper("contains_instrument")
+    wrapper = NexusFile("contains_instrument")
     assert wrapper.instrument_group.attrs["NX_class"] == "NXinstrument"
 
 
 def test_GIVEN_nothing_WHEN_getting_components_list_THEN_list_contains_sample_and_no_components():
-    wrapper = NexusWrapper("component_list_with_sample")
+    wrapper = NexusFile("component_list_with_sample")
     assert len(wrapper.get_component_list().components) == 1
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_entry_group_contains_sample():
-    wrapper = NexusWrapper("entry_sample")
+    wrapper = NexusFile("entry_sample")
     assert wrapper.entry_group["sample"].attrs["NX_class"] == "NXsample"
 
 
 def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_added_component():
-    wrapper = NexusWrapper("test_components_list")
+    wrapper = NexusFile("test_components_list")
 
     component_type = "NXcrystal"
     name = "test_crystal"
@@ -39,7 +39,7 @@ def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_add
 
 
 def test_GIVEN_component_WHEN_adding_component_THEN_nexus_file_contains_added_component():
-    wrapper = NexusWrapper("test_component")
+    wrapper = NexusFile("test_component")
 
     component_type = "NXcrystal"
     name = "test_crystal"
