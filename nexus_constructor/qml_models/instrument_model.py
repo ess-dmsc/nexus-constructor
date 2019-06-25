@@ -1,5 +1,4 @@
-from nexus_constructor.component import Component, create_component
-from nexus_constructor.component_type import ComponentType
+from nexus_constructor.component import Component
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.qml_models.helpers import generate_unique_name
 from nexus_constructor.transformations import Rotation, Translation
@@ -8,7 +7,6 @@ from nexus_constructor.off_renderer import OffMesh
 from PySide2.QtCore import Qt, QAbstractListModel, QModelIndex, Signal, Slot
 from PySide2.QtGui import QMatrix4x4
 from nexus_constructor.geometry_types import OFFCube
-from nexus_constructor.nexus_model import create_group
 
 
 def change_value(item, attribute_name, value):
@@ -39,7 +37,7 @@ def change_value(item, attribute_name, value):
 
 
 def generate_mesh(component: Component):
-    if component.component_type == ComponentType.DETECTOR:
+    if component.nx_class == "Detector":
         return OffMesh(component.geometry.off_geometry, component.pixel_data)
     else:
         return OffMesh(component.geometry.off_geometry)
@@ -47,12 +45,12 @@ def generate_mesh(component: Component):
 
 def determine_pixel_state(component):
     """Returns a string identifying the state a PixelControls editor should be in for the given component"""
-    if component.component_type == ComponentType.DETECTOR:
+    if component.nx_class == "Detector":
         if isinstance(component.pixel_data, PixelGrid):
             return "Grid"
         elif isinstance(component.pixel_data, PixelMapping):
             return "Mapping"
-    elif component.component_type == ComponentType.MONITOR:
+    elif component.nx_class == "Monitor":
         return "SinglePixel"
     return ""
 
@@ -94,41 +92,14 @@ class InstrumentModel(QAbstractListModel):
     RemovableRole = Qt.UserRole + 9
     TransformModelRole = Qt.UserRole + 10
 
-    @Slot("QVariant")
-    def initialise(self, group):
-        """
-        Called from QML immediately after the constructor and adds the sample to the entry group, then creates the instrument group.
-
-        We cannot pass the group immediately through the constructor because QML looks at slots, signals and properties before
-        creating objects. Therefore this needs to be called by a signal to initialise the instrumentModel with the HDF group
-        :param group: The /entry/ group created by the Nexus Model.
-        """
-        sample = create_component(
-            component_type=ComponentType.SAMPLE,
-            name="sample",
-            geometry=OFFCube,
-            parent_group=group,
-        )
-        try:
-            self.instrument_group = group["instrument"]
-        except KeyError:
-            self.create_instrument_group(group)
-
-        self.append_component_to_list(sample)
-        self.send_model_updated()
-
-    def create_instrument_group(self, group):
-        """
-        Create group for instrument and store a link to it.
-        :param group: The parent group to create instrument under.
-        """
-        self.instrument_group = create_group("instrument", "NXinstrument", group)
-
     def __init__(self):
         super().__init__()
         self.components = []
         self.transform_models = []
-        self.instrument_group = None
+
+        self.append_component_to_list(
+            Component(nx_class="NXsample", name="sample", geometry=OFFCube)
+        )
         self.dataChanged.connect(self.send_model_updated)
         self.rowsInserted.connect(self.send_model_updated)
         self.rowsRemoved.connect(self.send_model_updated)
@@ -226,7 +197,7 @@ class InstrumentModel(QAbstractListModel):
     @Slot(str, str, str, int, int, "QVariant", "QVariant", "QVariant")
     def add_component(
         self,
-        component_type,
+        nx_class,
         name,
         description="",
         parent_index=0,
@@ -235,16 +206,17 @@ class InstrumentModel(QAbstractListModel):
         pixel_model=None,
         transform_model=None,
     ):
-        if component_type in ComponentType.values():
-            dependent_transform = None
-            if self.components and transform_index in range(
-                0, len(self.components[parent_index - 1].transforms)
-            ):
-                dependent_transform = self.components[parent_index - 1].transforms[
-                    transform_index
-                ]
-            component = create_component(
-                component_type=ComponentType(component_type),
+        dependent_transform = None
+        if self.components and transform_index in range(
+            0, len(self.components[parent_index - 1].transforms)
+        ):
+            dependent_transform = self.components[parent_index - 1].transforms[
+                transform_index
+            ]
+
+        self.append_component_to_list(
+            Component(
+                nx_class=nx_class,
                 name=name,
                 description=description,
                 transform_parent=self.components[parent_index - 1],
@@ -256,9 +228,8 @@ class InstrumentModel(QAbstractListModel):
                 transforms=[]
                 if transform_model is None
                 else transform_model.transforms,
-                parent_group=self.instrument_group,
             )
-            self.append_component_to_list(component)
+        )
 
     def append_component_to_list(self, component):
         """
@@ -276,8 +247,7 @@ class InstrumentModel(QAbstractListModel):
     def remove_component(self, index):
         if self.is_removable(index):
             self.beginRemoveRows(QModelIndex(), index, index)
-            component = self.components.pop(index)
-            component.delete_component_group(self.instrument_group)
+            self.components.pop(index)
             self.transform_models.pop(index)
             self.endRemoveRows()
             self.update_removable()

@@ -1,8 +1,9 @@
 """Validators to be used on QML input fields"""
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from PySide2.QtCore import Property, Qt, Signal
+from PySide2.QtCore import Property, Qt, Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator
 import pint
+import os
 
 
 class NullableIntValidator(QIntValidator):
@@ -32,27 +33,25 @@ class UnitValidator(QValidator):
             AttributeError,
             pint.compat.tokenize.TokenError,
         ):
-            self.validationFailed.emit()
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
         # Attempt to find 1 metre in terms of the unit. This will ensure that it's a length.
         try:
             self.ureg.metre.from_(unit)
         except (pint.errors.DimensionalityError, ValueError):
-            self.validationFailed.emit()
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
         # Reject input in the form of "2 metres," "40 cm," etc
         if unit.magnitude != 1:
-            self.validationFailed.emit()
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
-        self.validationSuccess.emit()
+        self.is_valid.emit(True)
         return QValidator.Acceptable
 
-    # Create signals because the QML LabeledTextField doesn't have "onAccepted"
-    validationSuccess = Signal()
-    validationFailed = Signal()
+    is_valid = Signal(bool)
 
 
 class ValidatorOnListModel(QValidator):
@@ -96,7 +95,7 @@ class ValidatorOnListModel(QValidator):
 
     model = Property("QVariant", get_model, set_model, notify=model_changed)
 
-    validationFailed = Signal()
+    validation_failed = Signal()
 
 
 class TransformParentValidator(ValidatorOnListModel):
@@ -174,7 +173,7 @@ class TransformParentValidator(ValidatorOnListModel):
                 return True
             if parent_index in visited:
                 # loop found
-                self.validationFailed.emit()
+                self.validation_failed.emit()
                 return False
             visited.add(parent_index)
             index = parent_index
@@ -193,6 +192,9 @@ class NameValidator(ValidatorOnListModel):
         super().__init__()
 
     def validate(self, input: str, pos: int):
+        if not input:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
         name_role = Qt.DisplayRole
         for role, name in self.list_model.roleNames().items():
             if name == b"name":
@@ -203,10 +205,90 @@ class NameValidator(ValidatorOnListModel):
                 index = self.list_model.createIndex(i, 0)
                 name_at_index = self.list_model.data(index, name_role)
                 if name_at_index == input:
-                    self.validationFailed.emit()
-                    return QValidator.Invalid
+                    self.is_valid.emit(False)
+                    return QValidator.Intermediate
 
-        self.validationSuccess.emit()
+        self.is_valid.emit(True)
         return QValidator.Acceptable
 
-    validationSuccess = Signal()
+    is_valid = Signal(bool)
+
+
+GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
+
+
+class GeometryFileValidator(QValidator):
+    """
+    Validator to ensure file exists and is the correct file type.
+    """
+
+    def __init__(self, file_types):
+        """
+
+        :param file_types:
+        """
+        super().__init__()
+        self.file_types = file_types
+
+    def validate(self, input: str, pos: int):
+        if not input:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        if not os.path.isfile(input):
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        for suffixes in GEOMETRY_FILE_TYPES.values():
+            for suff in suffixes:
+                if input.endswith(f".{suff}"):
+                    self.is_valid.emit(True)
+                    return QValidator.Acceptable
+        self.is_valid.emit(False)
+        return QValidator.Invalid
+
+    is_valid = Signal(bool)
+
+
+class OkValidator(QObject):
+    """
+    Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
+    """
+
+    def __init__(self, no_geometry_button, mesh_button):
+        super().__init__()
+        self.name_is_valid = False
+        self.file_is_valid = False
+        self.units_are_valid = False
+        self.no_geometry_button = no_geometry_button
+        self.mesh_button = mesh_button
+
+    def set_name_valid(self, is_valid):
+        self.name_is_valid = is_valid
+        print("Name: {}".format(self.name_is_valid))
+        self.validate_ok()
+
+    def set_file_valid(self, is_valid):
+        self.file_is_valid = is_valid
+        print("File: {}".format(self.file_is_valid))
+        self.validate_ok()
+
+    def set_units_valid(self, is_valid):
+        self.units_are_valid = is_valid
+        print("Units: {}".format(self.units_are_valid))
+        self.validate_ok()
+
+    def validate_ok(self):
+        """
+        Validates the fields in order to dictate whether the OK button should be disabled or enabled.
+        :return: None, but emits the isValid signal.
+        """
+        unacceptable = [
+            not self.name_is_valid,
+            not self.no_geometry_button.isChecked() and not self.units_are_valid,
+            self.mesh_button.isChecked() and not self.file_is_valid,
+        ]
+
+        print("Is valid {}".format(unacceptable))
+        self.is_valid.emit(not any(unacceptable))
+
+    # Signal to indicate that the fields are valid or invalid. False: invalid.
+    is_valid = Signal(bool)

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui',
-# licensing of 'mainwindow.ui' applies.
+# Form implementation generated from reading ui file 'main_window.ui',
+# licensing of 'main_window.ui' applies.
 #
-# Created: Thu May 30 12:27:57 2019
-#      by: pyside2-uic  running on PySide2 5.12.1
+# Created: Thu Jun 13 13:05:28 2019
+#      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
-from ui.InstrumentView import InstrumentView
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -48,21 +47,15 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab, "")
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
-        # self.sceneWidget = QtWidgets.QWidget(self.centralwidget)
-
-        self.instrumentView = InstrumentView()
+        self.sceneWidget = InstrumentView(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
-
-        # self.qml_instrument =
-
-        # sizePolicy.setHeightForWidth(self.sceneWidget.sizePolicy().hasHeightForWidth())
-        self.instrumentView.setSizePolicy(sizePolicy)
-        self.instrumentView.setMinimumSize(QtCore.QSize(745, 0))
-        self.instrumentView.setObjectName("instrumentView")
-        # self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
-        self.gridLayout_3.addWidget(self.instrumentView, 0, 1, 1, 2)
+        sizePolicy.setHeightForWidth(self.sceneWidget.sizePolicy().hasHeightForWidth())
+        self.sceneWidget.setSizePolicy(sizePolicy)
+        self.sceneWidget.setMinimumSize(QtCore.QSize(745, 0))
+        self.sceneWidget.setObjectName("sceneWidget")
+        self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
         self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -99,3 +92,4 @@ class Ui_MainWindow(object):
         self.actionExport_to_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Export to NeXus file", None, -1))
         self.actionExport_to_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to Filewriter JSON", None, -1))
 
+from nexus_constructor.instrument_view import InstrumentView
