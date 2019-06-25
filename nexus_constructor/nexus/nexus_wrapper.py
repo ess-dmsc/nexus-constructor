@@ -82,7 +82,7 @@ class NexusWrapper(QObject):
             self._emit_file()
 
     def rename_group(self, group: h5py.Group, new_name: str):
-        self.nexus_file.move(group.name, f"{self.group.parent.name}/{new_name}")
+        self.nexus_file.move(group.name, f"{group.parent.name}/{new_name}")
 
     def create_nx_group(self, name, nx_class, parent):
         """

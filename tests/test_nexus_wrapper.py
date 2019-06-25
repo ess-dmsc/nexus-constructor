@@ -1,4 +1,4 @@
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper, convert_name_with_spaces
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.qml_models.geometry_models import NoShapeModel
 
 
@@ -49,13 +49,3 @@ def test_GIVEN_component_WHEN_adding_component_THEN_nexus_file_contains_added_co
     assert name in wrapper.instrument_group
     component_in_nexus_file = wrapper.instrument_group[name]
     assert component_in_nexus_file.attrs["NX_class"] == component_type
-
-
-def test_GIVEN_name_with_spaces_WHEN_converting_name_with_spaces_THEN_converts_spaces_in_name_to_underscores():
-    name = "test name"
-    assert convert_name_with_spaces(name) == name.replace(" ", "_")
-
-
-def test_GIVEN_name_without_spaces_WHEN_converting_name_with_spaces_THEN_name_does_not_change():
-    name = "test_name"
-    assert convert_name_with_spaces(name) == name
