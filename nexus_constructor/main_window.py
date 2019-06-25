@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout
-from nexus_constructor.nexus import NexusFile
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.utils import file_dialog
 from ui.main_window import Ui_MainWindow
@@ -13,7 +13,7 @@ JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
 class MainWindow(Ui_MainWindow):
-    def __init__(self, nexus_wrapper: NexusFile):
+    def __init__(self, nexus_wrapper: NexusWrapper):
         super().__init__()
         self.nexus_wrapper = nexus_wrapper
 
@@ -37,7 +37,7 @@ class MainWindow(Ui_MainWindow):
         self.treemodel.insertH5pyObject(self.nexus_wrapper.nexus_file)
         self.nexus_wrapper.file_changed.connect(self.update_nexus_file_structure_view)
         self.verticalLayout.addWidget(self.widget)
-        self.listView.setModel(self.nexus_wrapper.get_component_list())
+        #self.listView.setModel(self.nexus_wrapper.get_component_list())
 
         self.nexus_wrapper.component_added.connect(self.sceneWidget.add_component)
 

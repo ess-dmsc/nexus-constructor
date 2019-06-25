@@ -18,7 +18,7 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     OkValidator,
 )
-from nexus_constructor.nexus import NexusFile
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.utils import file_dialog, validate_line_edit
 import os
 from functools import partial
@@ -31,7 +31,7 @@ class GeometryType(Enum):
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
-    def __init__(self, nexus_wrapper: NexusFile):
+    def __init__(self, nexus_wrapper: NexusWrapper):
         super(AddComponentDialog, self).__init__()
         self.nexus_wrapper = nexus_wrapper
         self.geometry_model = None

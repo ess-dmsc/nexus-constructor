@@ -1,6 +1,5 @@
 import h5py
 
-from nexus_constructor.qml_models import instrument_model
 from PySide2.QtCore import Signal, QObject
 from typing import Any
 
@@ -23,44 +22,18 @@ def append_nxs_extension(file_name):
         return file_name + extension
 
 
-def create_nx_group(name, nx_class, parent):
-    """
-    Given a name, an nx class and a parent group, create a group under the parent
-    :param name: The name of the group to be created.
-    :param nx_class: The NX_class attribute to be set.
-    :param parent: The parent HDF group to add the created group to.
-    :return: A reference to the created group in the in-memory NeXus file.
-    """
-    group = parent.create_group(name)
-    group.attrs["NX_class"] = nx_class
-    return group
-
-
 def get_name_of_group(group: h5py.Group):
     return group.name.split("/")[-1]
 
 
-def get_field_value(group: h5py.Group, name: str):
-    if name not in group:
-        raise NameError(f"Field called {name} not found in {group.name}")
-    return group[name][...]
+def convert_name_with_spaces(component_name):
+    return component_name.replace(" ", "_")
 
 
-def set_field_value(group: h5py.Group, name: str, value: Any, dtype=None):
-    if name in group:
-        if dtype is None or group[name].dtype == dtype:
-            group[name][...] = value
-        else:
-            del group[name]
-            group.create_dataset(name, data=value, dtype=dtype)
-    else:
-        group.create_dataset(name, data=value, dtype=dtype)
-
-
-class NexusFile(QObject):
+class NexusWrapper(QObject):
     """
     Contains the NeXus file and functions to add and edit components in the NeXus file structure.
-    Also contains a list of components for use in a listview.
+    All changes to the NeXus file should happen via this class. Emits Qt signal whenever anything in the file changes.
     """
 
     # Signal that indicates the nexus file has been changed in some way
@@ -70,12 +43,15 @@ class NexusFile(QObject):
     def __init__(self, filename="NeXus File"):
         super().__init__()
         self.nexus_file = set_up_in_memory_nexus_file(filename)
-        self.entry = create_nx_group("entry", "NXentry", self.nexus_file)
+        self.entry = self.create_nx_group("entry", "NXentry", self.nexus_file)
 
-        create_nx_group("sample", "NXsample", self.entry)
-        self.instrument = create_nx_group("instrument", "NXinstrument", self.entry)
+        self.create_nx_group("sample", "NXsample", self.entry)
+        self.instrument = self.create_nx_group("instrument", "NXinstrument", self.entry)
 
-        self.components_list_model = instrument_model.InstrumentModel()
+        self.components = []
+        self.transformations = []  # TODO tree of transformations
+        # Has to be here, not in instrument, to avoid cyclic dependency between Instrument and Component
+
         self._emit_file()
 
     def _emit_file(self):
@@ -84,13 +60,6 @@ class NexusFile(QObject):
         :return: None
         """
         self.file_changed.emit(self.nexus_file)
-
-    def get_component_list(self):
-        """
-        Returns the component list for use with a listview.
-        :return: List of components in QAbstractListModel form.
-        """
-        return self.components_list_model
 
     def save_file(self, filename):
         """
@@ -154,6 +123,42 @@ class NexusFile(QObject):
 
         self._emit_file()
 
+    def create_nx_group(self, name, nx_class, parent):
+        """
+        Given a name, an nx class and a parent group, create a group under the parent
+        :param name: The name of the group to be created.
+        :param nx_class: The NX_class attribute to be set.
+        :param parent: The parent HDF group to add the created group to.
+        :return: A reference to the created group in the in-memory NeXus file.
+        """
+        group = parent.create_group(name)
+        group.attrs["NX_class"] = nx_class
+        self._emit_file()
+        return group
 
-def convert_name_with_spaces(component_name):
-    return component_name.replace(" ", "_")
+    @staticmethod
+    def get_nx_class(group: h5py.Group):
+        if "NX_class" in group.attrs.keys():
+            return None
+        return group.attrs["NX_class"][:].decode()
+
+    def set_nx_class(self, group: h5py.Group, nx_class: str):
+        group.attrs["NX_class"] = nx_class
+        self._emit_file()
+
+    @staticmethod
+    def get_field_value(group: h5py.Group, name: str):
+        if name not in group:
+            raise NameError(f"Field called {name} not found in {group.name}")
+        return group[name][...]
+
+    def set_field_value(self, group: h5py.Group, name: str, value: Any, dtype=None):
+        if name in group:
+            if dtype is None or group[name].dtype == dtype:
+                group[name][...] = value
+            else:
+                del group[name]
+                group.create_dataset(name, data=value, dtype=dtype)
+        else:
+            group.create_dataset(name, data=value, dtype=dtype)
+        self._emit_file()

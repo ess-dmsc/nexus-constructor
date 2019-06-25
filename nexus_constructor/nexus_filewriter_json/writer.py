@@ -12,7 +12,7 @@ from nexus_constructor.component import Component
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, SinglePixelId
 from nexus_constructor.transformations import Translation, Rotation
 from nexus_constructor.geometry_types import CylindricalGeometry, OFFGeometry
-from nexus_constructor.nexus import (
+from nexus_constructor.nexus.geometry import (
     external_component_types,
     component_class_name,
     ancestral_dependent_transform,
