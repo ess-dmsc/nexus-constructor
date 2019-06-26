@@ -36,8 +36,8 @@ def assess_component_tree(count: int, parent_mappings: dict, results: dict):
         validator.model_index = index
         parent_name = components[index].transform_parent.name
         assert (
-                       validator.validate(parent_name, 0) == QValidator.Acceptable
-               ) == expected_result
+            validator.validate(parent_name, 0) == QValidator.Acceptable
+        ) == expected_result
 
 
 def test_parent_validator_self_loop_terminated_tree():
@@ -91,28 +91,44 @@ def assess_names(names: List[ObjectWithName], new_name, expected_validity):
     """
     validator = NameValidator(names)
     assert (
-                   validator.validate(new_name, 0) == QValidator.Acceptable
-           ) == expected_validity
+        validator.validate(new_name, 0) == QValidator.Acceptable
+    ) == expected_validity
 
 
 def test_name_validator_new_unique_name():
     """A name that's not already in the model, being added at a new index should be valid"""
-    assess_names([ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")], "asdf", True)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "asdf",
+        True,
+    )
 
 
 def test_name_validator_new_existing_name():
     """A name that is already in the model is not valid at a new index"""
-    assess_names([ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")], "foo", False)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "foo",
+        False,
+    )
 
 
 def test_name_validator_set_to_new_name():
     """A name that's not in the model should be valid at an existing index"""
-    assess_names([ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")], "asdf", True)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "asdf",
+        True,
+    )
 
 
 def test_name_validator_set_to_duplicate_name():
     """A name that's already at an index should not be valid at another index"""
-    assess_names([ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")], "foo", False)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "foo",
+        False,
+    )
 
 
 def test_unit_validator():

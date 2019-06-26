@@ -35,9 +35,11 @@ class MainWindow(Ui_MainWindow):
         self.treemodel.setFileDropEnabled(True)
         self.treemodel.setFileMoveEnabled(True)
         self.treemodel.insertH5pyObject(self.instrument.nexus.nexus_file)
-        self.instrument.nexus.file_changed.connect(self.update_nexus_file_structure_view)
+        self.instrument.nexus.file_changed.connect(
+            self.update_nexus_file_structure_view
+        )
         self.verticalLayout.addWidget(self.widget)
-        #self.listView.setModel(self.nexus_wrapper.get_component_list())
+        # self.listView.setModel(self.nexus_wrapper.get_component_list())
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
 
@@ -79,9 +81,7 @@ class MainWindow(Ui_MainWindow):
         self.instrument.nexus.save_file(filename)
         if filename:
             with open(filename, "w") as file:
-                file.write(
-                    writer.generate_json(self.instrument.get_component_list())
-                )
+                file.write(writer.generate_json(self.instrument.get_component_list()))
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)

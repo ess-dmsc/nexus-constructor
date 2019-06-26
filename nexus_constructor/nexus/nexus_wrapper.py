@@ -118,7 +118,7 @@ class NexusWrapper(QObject):
 
     def set_field_value(self, group: h5py.Group, name: str, value: Any, dtype=None):
         if dtype is str:
-            dtype = f'|S{len(value)}'
+            dtype = f"|S{len(value)}"
             value = np.array(value).astype(dtype)
 
         if name in group:

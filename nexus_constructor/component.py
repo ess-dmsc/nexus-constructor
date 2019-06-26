@@ -65,7 +65,12 @@ class ComponentModel:
         if depends_on and depends_on != ".":
             transform_dataset = self.file.nexus_file[depends_on]
             transforms.append(
-                create_transform(transform_dataset.attrs["type"], transform_dataset["vector"], transform_dataset[...]))
+                create_transform(
+                    transform_dataset.attrs["type"],
+                    transform_dataset["vector"],
+                    transform_dataset[...],
+                )
+            )
             if "depends_on" in transform_dataset.attrs.keys():
                 self._get_transform(transform_dataset.attrs["depends_on"], transforms)
 

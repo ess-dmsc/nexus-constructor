@@ -69,10 +69,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         [
             button.clicked.connect(self.ok_validator.validate_ok)
             for button in [
-            self.meshRadioButton,
-            self.CylinderRadioButton,
-            self.noGeometryRadioButton,
-        ]
+                self.meshRadioButton,
+                self.CylinderRadioButton,
+                self.noGeometryRadioButton,
+            ]
         ]
 
         self.fileLineEdit.setValidator(GeometryFileValidator(GEOMETRY_FILE_TYPES))
@@ -176,6 +176,4 @@ class AddComponentDialog(Ui_AddComponentDialog):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        self.instrument.add_component(
-            component_name, nx_class, description
-        )
+        self.instrument.add_component(component_name, nx_class, description)

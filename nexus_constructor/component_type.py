@@ -3,12 +3,41 @@ import os
 import xmltodict
 
 PIXEL_COMPONENT_TYPES = ["NXmonitor", "NXdetector", "NXdetector_module"]
-COMPONENT_TYPES = ["NXmonitor", "NXdetector", "NXdetector_module", "NXsample", "NXsource", "NXdisk_chopper",
-                   "NXaperture", "NXattenuator", "NXbeam_stop", "NXbending_magnet", "NXcapillary", "NXcollimator",
-                   "NXcrystal", "NXdetector_group", "NXdetector_module", "NXfermi_chopper", "NXfilter", "NXflipper",
-                   "NXfresnel_zone_plate", "NXgrating", "NXguide", "NXinsertion_device", "NXmirror", "NXmoderator",
-                   "NXmonochromator", "NXpinhole", "NXpolarizer", "NXpositioner", "NXsample_component", "NXsensor",
-                   "NXSlit", "NXvelocity_selector", "NXxraylens"]
+COMPONENT_TYPES = [
+    "NXmonitor",
+    "NXdetector",
+    "NXdetector_module",
+    "NXsample",
+    "NXsource",
+    "NXdisk_chopper",
+    "NXaperture",
+    "NXattenuator",
+    "NXbeam_stop",
+    "NXbending_magnet",
+    "NXcapillary",
+    "NXcollimator",
+    "NXcrystal",
+    "NXdetector_group",
+    "NXdetector_module",
+    "NXfermi_chopper",
+    "NXfilter",
+    "NXflipper",
+    "NXfresnel_zone_plate",
+    "NXgrating",
+    "NXguide",
+    "NXinsertion_device",
+    "NXmirror",
+    "NXmoderator",
+    "NXmonochromator",
+    "NXpinhole",
+    "NXpolarizer",
+    "NXpositioner",
+    "NXsample_component",
+    "NXsensor",
+    "NXSlit",
+    "NXvelocity_selector",
+    "NXxraylens",
+]
 
 
 def __list_base_class_files(file_list):
@@ -18,7 +47,7 @@ def __list_base_class_files(file_list):
 
 
 def make_dictionary_of_class_definitions(
-        repo_directory="nexus_definitions", black_list: List[str] = None
+    repo_directory="nexus_definitions", black_list: List[str] = None
 ):
     base_class_dir = os.path.join(repo_directory, "base_classes")
 
@@ -26,11 +55,18 @@ def make_dictionary_of_class_definitions(
     all_class_definitions = {}
     for base_class_file in __list_base_class_files(os.listdir(base_class_dir)):
         with open(os.path.join(base_class_dir, base_class_file)) as def_file:
-            _create_base_class_dict(def_file.read(), black_list, all_class_definitions, component_definitions)
+            _create_base_class_dict(
+                def_file.read(),
+                black_list,
+                all_class_definitions,
+                component_definitions,
+            )
     return all_class_definitions, component_definitions
 
 
-def _create_base_class_dict(xml_text, black_list, class_definitions, component_definitions):
+def _create_base_class_dict(
+    xml_text, black_list, class_definitions, component_definitions
+):
     if black_list is None:
         black_list = []
 
