@@ -13,6 +13,11 @@ repository. They can be installed from a terminal by running
 `pip install -r requirements.txt`
 
 The black pre-commit hook (installed by [pre-commit](https://pre-commit.com/)) requires Python 3.6 or above.
+You need to once run
+```
+pre-commit install
+```
+to activate the pre-commit check.
 
 ## Running the application
 
