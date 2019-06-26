@@ -28,6 +28,7 @@ class Instrument:
         :param name: Name of the component group to create
         :param nx_class: NX_class of the component group to create
         :param description: Description of the component
+        :return Wrapper for added component
         """
         name = convert_name_with_spaces(name)
         parent_group = self.nexus.instrument
@@ -36,9 +37,14 @@ class Instrument:
         component_group = self.nexus.create_nx_group(name, nx_class, parent_group)
         component = ComponentModel(self.nexus, component_group)
         component.description = description
+        return component
 
-    def remove_component(self):
-        raise NotImplementedError("Instrument.remove_component() not yet implemented")
+    def remove_component(self, component: ComponentModel):
+        """
+        Removes a component group from the NeXus file
+        :param component: The component to be removed
+        """
+        self.nexus.delete_group(component.group)
 
     def get_component_list(self):
         component_list = []
