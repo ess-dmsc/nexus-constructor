@@ -183,9 +183,11 @@ class InstrumentView(QWidget):
         y_axis_matrix = QMatrix4x4()
         z_axis_matrix = QMatrix4x4()
 
-        x_axis_matrix.translate(QVector3D(self.gnomon_bar_length, 0, 0))
-        y_axis_matrix.translate(QVector3D(0, self.gnomon_bar_length, 0))
-        z_axis_matrix.translate(QVector3D(0, 0, self.gnomon_bar_length))
+        text_translation = self.gnomon_bar_length * 1.3
+
+        x_axis_matrix.translate(QVector3D(text_translation, -0.5, 0))
+        y_axis_matrix.translate(QVector3D(-0.4, text_translation, 0))
+        z_axis_matrix.translate(QVector3D(-0.5, -0.5, text_translation))
 
         self.x_text_transformation.setMatrix(x_axis_matrix)
         self.y_text_transformation.setMatrix(y_axis_matrix)
@@ -264,8 +266,8 @@ class InstrumentView(QWidget):
     def set_axis_label_text(text_entity, text_label, color):
 
         text_entity.setText(text_label)
-        text_entity.setHeight(1.5)
-        text_entity.setWidth(1.5)
+        text_entity.setHeight(1.2)
+        text_entity.setWidth(1)
         text_entity.setColor(QColor(color))
         text_entity.setFont(QFont("Courier New", 1))
 
@@ -331,7 +333,7 @@ class InstrumentView(QWidget):
 
         gnomon_camera_position = main_camera.position() - main_camera.viewCenter()
         gnomon_camera_position = gnomon_camera_position.normalized()
-        gnomon_camera_position *= self.gnomon_bar_length * 3.5
+        gnomon_camera_position *= self.gnomon_bar_length * 4
 
         self.gnomon_camera.setPosition(gnomon_camera_position)
 
