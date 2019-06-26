@@ -1,6 +1,6 @@
 """Validators to be used on QML input fields"""
 from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from PySide2.QtCore import Property, Qt, Signal, QObject
+from PySide2.QtCore import Property, Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator
 import pint
 import os
