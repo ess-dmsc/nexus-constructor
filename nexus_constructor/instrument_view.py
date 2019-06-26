@@ -97,13 +97,25 @@ class InstrumentView(QWidget):
         self.y_axis_transformation = Qt3DCore.QTransform()
         self.z_axis_transformation = Qt3DCore.QTransform()
 
-        self.x_text_transformation = Qt3DCore.QTransform()
-        self.y_text_transformation = Qt3DCore.QTransform()
-        self.z_text_transformation = Qt3DCore.QTransform()
+        self.x_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.y_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.z_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+
+        self.x_cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
+        self.y_cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
+        self.z_cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
+
+        self.x_cone_transformation = Qt3DCore.QTransform()
+        self.y_cone_transformation = Qt3DCore.QTransform()
+        self.z_cone_transformation = Qt3DCore.QTransform()
 
         self.x_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
         self.y_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
         self.z_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
+
+        self.x_text_transformation = Qt3DCore.QTransform()
+        self.y_text_transformation = Qt3DCore.QTransform()
+        self.z_text_transformation = Qt3DCore.QTransform()
 
         self.create_layers()
         self.initialise_view()
@@ -148,6 +160,23 @@ class InstrumentView(QWidget):
 
         return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
+    @staticmethod
+    def create_cone_matrices(length):
+
+        x_axis_matrix = QMatrix4x4()
+        y_axis_matrix = QMatrix4x4()
+        z_axis_matrix = QMatrix4x4()
+
+        x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
+        x_axis_matrix.translate(QVector3D(0, length, 0))
+
+        y_axis_matrix.translate(QVector3D(0, length, 0))
+
+        z_axis_matrix.rotate(90, QVector3D(1, 0, 0))
+        z_axis_matrix.translate(QVector3D(0, length, 0))
+
+        return x_axis_matrix, y_axis_matrix, z_axis_matrix
+
     def create_axis_label_matrices(self):
 
         x_axis_matrix = QMatrix4x4()
@@ -161,6 +190,14 @@ class InstrumentView(QWidget):
         self.x_text_transformation.setMatrix(x_axis_matrix)
         self.y_text_transformation.setMatrix(y_axis_matrix)
         self.z_text_transformation.setMatrix(z_axis_matrix)
+
+    def configure_gnomon_cone(self, cone_mesh, gnomon_cylinder_length):
+
+        cone_mesh.setLength(gnomon_cylinder_length * 0.3)
+        cone_mesh.setRings(2)
+        cone_mesh.setSlices(2)
+        cone_mesh.setBottomRadius(gnomon_cylinder_length * 0.1)
+        cone_mesh.setTopRadius(0)
 
     def create_gnomon(self):
 
@@ -187,6 +224,31 @@ class InstrumentView(QWidget):
         self.add_qcomponents_to_entity(
             self.z_axis_entity,
             [self.z_axis_mesh, self.z_axis_transformation, self.z_material],
+        )
+
+        self.configure_gnomon_cone(self.x_cone_mesh, self.gnomon_bar_length)
+        self.configure_gnomon_cone(self.y_cone_mesh, self.gnomon_bar_length)
+        self.configure_gnomon_cone(self.z_cone_mesh, self.gnomon_bar_length)
+
+        x_cone_matrix, y_cone_matrix, z_cone_matrix = self.create_cone_matrices(
+            self.gnomon_bar_length
+        )
+
+        self.x_cone_transformation.setMatrix(x_cone_matrix)
+        self.y_cone_transformation.setMatrix(y_cone_matrix)
+        self.z_cone_transformation.setMatrix(z_cone_matrix)
+
+        self.add_qcomponents_to_entity(
+            self.x_cone_entity,
+            [self.x_cone_mesh, self.x_cone_transformation, self.x_material],
+        )
+        self.add_qcomponents_to_entity(
+            self.y_cone_entity,
+            [self.y_cone_mesh, self.y_cone_transformation, self.y_material],
+        )
+        self.add_qcomponents_to_entity(
+            self.z_cone_entity,
+            [self.z_cone_mesh, self.z_cone_transformation, self.z_material],
         )
 
         self.set_axis_label_text(self.x_axis_text, "X", "red")
