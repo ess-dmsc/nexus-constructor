@@ -49,6 +49,10 @@ class ComponentModel:
 
     @property
     def transforms(self):
+        """
+        Gets all transforms in the depends_on chain for this component
+        :return: List of transforms
+        """
         transforms = []
         depends_on = self.get_field("depends_on")
         self._get_transform(depends_on, transforms)
