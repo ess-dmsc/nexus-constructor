@@ -52,6 +52,9 @@ class InstrumentView(QWidget):
         self.red_material = Qt3DExtras.QPhongMaterial()
         self.beam_material = Qt3DExtras.QPhongAlphaMaterial()
         self.green_material = Qt3DExtras.QPhongMaterial()
+        self.x_material = Qt3DExtras.QPhongMaterial()
+        self.y_material = Qt3DExtras.QPhongMaterial()
+        self.z_material = Qt3DExtras.QPhongMaterial()
 
         # Initialise cube objects
         self.sample_cube_dimensions = [1, 1, 1]
@@ -175,20 +178,20 @@ class InstrumentView(QWidget):
 
         self.add_qcomponents_to_entity(
             self.x_axis_entity,
-            [self.x_axis_mesh, self.x_axis_transformation, self.red_material],
+            [self.x_axis_mesh, self.x_axis_transformation, self.x_material],
         )
         self.add_qcomponents_to_entity(
             self.y_axis_entity,
-            [self.y_axis_mesh, self.y_axis_transformation, self.red_material],
+            [self.y_axis_mesh, self.y_axis_transformation, self.y_material],
         )
         self.add_qcomponents_to_entity(
             self.z_axis_entity,
-            [self.z_axis_mesh, self.z_axis_transformation, self.red_material],
+            [self.z_axis_mesh, self.z_axis_transformation, self.z_material],
         )
 
-        self.set_axis_label_text(self.x_axis_text, "X")
-        self.set_axis_label_text(self.y_axis_text, "Y")
-        self.set_axis_label_text(self.z_axis_text, "Z")
+        self.set_axis_label_text(self.x_axis_text, "X", "red")
+        self.set_axis_label_text(self.y_axis_text, "Y", "green")
+        self.set_axis_label_text(self.z_axis_text, "Z", "blue")
 
         self.create_axis_label_matrices()
 
@@ -197,12 +200,12 @@ class InstrumentView(QWidget):
         self.z_axis_text.addComponent(self.z_text_transformation)
 
     @staticmethod
-    def set_axis_label_text(text_entity, text_label):
+    def set_axis_label_text(text_entity, text_label, color):
 
         text_entity.setText(text_label)
         text_entity.setHeight(1.5)
         text_entity.setWidth(1.5)
-        text_entity.setColor(QColor("green"))
+        text_entity.setColor(QColor(color))
         text_entity.setFont(QFont("Courier New", 1))
 
     def create_layers(self):
@@ -318,7 +321,7 @@ class InstrumentView(QWidget):
         pass
 
     @staticmethod
-    def set_material_properties(material, ambient, diffuse, alpha=None):
+    def set_material_properties(material, ambient, diffuse, alpha=None, shininess=None):
         """
         Set the ambient, diffuse, and alpha properties of a material.
         :param material: The material to be modified.
@@ -326,12 +329,17 @@ class InstrumentView(QWidget):
         :param diffuse: The desired diffuse colour of the material.
         :param alpha: The desired alpha value of the material. Optional argument as not all material-types have this
                       property.
+        :param shininess: The desired shininess of the material. Optional argument as this is only changes for the
+                           gnomon cylinders.
         """
         material.setAmbient(ambient)
         material.setDiffuse(diffuse)
 
         if alpha is not None:
             material.setAlpha(alpha)
+
+        if shininess is not None:
+            material.setShininess(shininess)
 
     def give_colours_to_materials(self):
         """
@@ -342,13 +350,17 @@ class InstrumentView(QWidget):
         black = QColor("black")
         grey = QColor("grey")
         blue = QColor("blue")
+        green = QColor("green")
         light_blue = QColor("lightblue")
         dark_red = QColor("#b00")
 
         self.set_material_properties(self.grey_material, black, grey)
         self.set_material_properties(self.red_material, red, dark_red)
         self.set_material_properties(self.green_material, grey, grey)
-        self.set_material_properties(self.beam_material, blue, light_blue, 0.5)
+        self.set_material_properties(self.beam_material, blue, light_blue, alpha=0.5)
+        self.set_material_properties(self.x_material, red, red, shininess=0)
+        self.set_material_properties(self.y_material, green, green, shininess=0)
+        self.set_material_properties(self.z_material, blue, blue, shininess=0)
 
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
