@@ -177,7 +177,8 @@ class InstrumentView(QWidget):
 
         return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
-    def create_axis_label_matrices(self, gnomon_cylinder_length, transforms):
+    @staticmethod
+    def create_axis_label_matrices(gnomon_cylinder_length, transforms):
 
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
@@ -202,43 +203,36 @@ class InstrumentView(QWidget):
 
     def create_gnomon(self):
 
-        self.configure_gnomon_cylinder(self.x_axis_mesh, self.gnomon_cylinder_length)
-        self.configure_gnomon_cylinder(self.y_axis_mesh, self.gnomon_cylinder_length)
-        self.configure_gnomon_cylinder(self.z_axis_mesh, self.gnomon_cylinder_length)
+        self.create_gnomon_cylinders()
+        self.create_gnomon_cones()
+        self.create_gnomon_text()
 
-        x_axis_matrix, y_axis_matrix, z_axis_matrix = self.create_gnomon_matrices(
-            self.gnomon_cylinder_length
+    def create_gnomon_text(self):
+        self.set_axis_label_text(self.x_axis_text, "X", "red")
+        self.set_axis_label_text(self.y_axis_text, "Y", "green")
+        self.set_axis_label_text(self.z_axis_text, "Z", "blue")
+        self.create_axis_label_matrices(
+            self.gnomon_cylinder_length,
+            [
+                self.x_text_transformation,
+                self.y_text_transformation,
+                self.z_text_transformation,
+            ],
         )
+        self.x_axis_text.addComponent(self.x_text_transformation)
+        self.y_axis_text.addComponent(self.y_text_transformation)
+        self.z_axis_text.addComponent(self.z_text_transformation)
 
-        self.x_axis_transformation.setMatrix(x_axis_matrix)
-        self.y_axis_transformation.setMatrix(y_axis_matrix)
-        self.z_axis_transformation.setMatrix(z_axis_matrix)
-
-        self.add_qcomponents_to_entity(
-            self.x_axis_entity,
-            [self.x_axis_mesh, self.x_axis_transformation, self.x_material],
-        )
-        self.add_qcomponents_to_entity(
-            self.y_axis_entity,
-            [self.y_axis_mesh, self.y_axis_transformation, self.y_material],
-        )
-        self.add_qcomponents_to_entity(
-            self.z_axis_entity,
-            [self.z_axis_mesh, self.z_axis_transformation, self.z_material],
-        )
-
+    def create_gnomon_cones(self):
         self.configure_gnomon_cone(self.x_cone_mesh, self.gnomon_cylinder_length)
         self.configure_gnomon_cone(self.y_cone_mesh, self.gnomon_cylinder_length)
         self.configure_gnomon_cone(self.z_cone_mesh, self.gnomon_cylinder_length)
-
         x_cone_matrix, y_cone_matrix, z_cone_matrix = self.create_cone_matrices(
             self.gnomon_cylinder_length
         )
-
         self.x_cone_transformation.setMatrix(x_cone_matrix)
         self.y_cone_transformation.setMatrix(y_cone_matrix)
         self.z_cone_transformation.setMatrix(z_cone_matrix)
-
         self.add_qcomponents_to_entity(
             self.x_cone_entity,
             [self.x_cone_mesh, self.x_cone_transformation, self.x_material],
@@ -252,22 +246,29 @@ class InstrumentView(QWidget):
             [self.z_cone_mesh, self.z_cone_transformation, self.z_material],
         )
 
-        self.set_axis_label_text(self.x_axis_text, "X", "red")
-        self.set_axis_label_text(self.y_axis_text, "Y", "green")
-        self.set_axis_label_text(self.z_axis_text, "Z", "blue")
+    def create_gnomon_cylinders(self):
 
-        self.create_axis_label_matrices(
-            self.gnomon_cylinder_length,
-            [
-                self.x_text_transformation,
-                self.y_text_transformation,
-                self.z_text_transformation,
-            ],
+        self.configure_gnomon_cylinder(self.x_axis_mesh, self.gnomon_cylinder_length)
+        self.configure_gnomon_cylinder(self.y_axis_mesh, self.gnomon_cylinder_length)
+        self.configure_gnomon_cylinder(self.z_axis_mesh, self.gnomon_cylinder_length)
+        x_axis_matrix, y_axis_matrix, z_axis_matrix = self.create_gnomon_matrices(
+            self.gnomon_cylinder_length
         )
-
-        self.x_axis_text.addComponent(self.x_text_transformation)
-        self.y_axis_text.addComponent(self.y_text_transformation)
-        self.z_axis_text.addComponent(self.z_text_transformation)
+        self.x_axis_transformation.setMatrix(x_axis_matrix)
+        self.y_axis_transformation.setMatrix(y_axis_matrix)
+        self.z_axis_transformation.setMatrix(z_axis_matrix)
+        self.add_qcomponents_to_entity(
+            self.x_axis_entity,
+            [self.x_axis_mesh, self.x_axis_transformation, self.x_material],
+        )
+        self.add_qcomponents_to_entity(
+            self.y_axis_entity,
+            [self.y_axis_mesh, self.y_axis_transformation, self.y_material],
+        )
+        self.add_qcomponents_to_entity(
+            self.z_axis_entity,
+            [self.z_axis_mesh, self.z_axis_transformation, self.z_material],
+        )
 
     @staticmethod
     def set_axis_label_text(text_entity, text_label, color):
