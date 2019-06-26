@@ -191,11 +191,10 @@ class InstrumentView(QWidget):
         self.y_text_transformation.setMatrix(y_axis_matrix)
         self.z_text_transformation.setMatrix(z_axis_matrix)
 
-    def configure_gnomon_cone(self, cone_mesh, gnomon_cylinder_length):
+    @staticmethod
+    def configure_gnomon_cone(cone_mesh, gnomon_cylinder_length):
 
         cone_mesh.setLength(gnomon_cylinder_length * 0.3)
-        cone_mesh.setRings(2)
-        cone_mesh.setSlices(2)
         cone_mesh.setBottomRadius(gnomon_cylinder_length * 0.1)
         cone_mesh.setTopRadius(0)
 
