@@ -1,4 +1,10 @@
 import pytest
+
+
+pytestmark = pytest.mark.skip(
+    "UI tests SIGABRT currently due to the QWebEngine issues in PySide2"
+)
+
 from PySide2.QtWidgets import QMainWindow, QDialog
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.main_window import MainWindow
@@ -6,12 +12,6 @@ from nexus_constructor.nexus_wrapper import NexusWrapper
 from PySide2.QtCore import Qt
 
 
-pytestmark = pytest.mark.skip(
-    "UI tests SIGABRT currently due to the QWebEngine issues in PySide2"
-)
-
-
-@pytestmark
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot
 ):
@@ -29,7 +29,6 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
     window.add_window.close()
 
 
-@pytestmark
 def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options_are_hidden(
     qtbot
 ):
@@ -45,7 +44,6 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     assert not dialog.geometryOptionsBox.isVisible()
 
 
-@pytestmark
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
