@@ -3,7 +3,7 @@ from PySide2.QtWidgets import QWidget, QVBoxLayout
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation, QRectF
-from PySide2.QtGui import QVector3D, QColor, QMatrix4x4, QFont
+from PySide2.QtGui import QVector3D, QColor, QMatrix4x4, QFont, QQuaternion
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
 from nexus_constructor.off_renderer import OffMesh
 
@@ -83,7 +83,7 @@ class InstrumentView(QWidget):
 
         # Gnomon resources
 
-        self.gnomon_bar_length = 4
+        self.gnomon_cylinder_length = 4
 
         self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
         self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
@@ -177,21 +177,21 @@ class InstrumentView(QWidget):
 
         return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
-    def create_axis_label_matrices(self):
+    def create_axis_label_matrices(self, gnomon_cylinder_length, transforms):
 
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
         z_axis_matrix = QMatrix4x4()
 
-        text_translation = self.gnomon_bar_length * 1.3
+        text_translation = gnomon_cylinder_length * 1.3
 
         x_axis_matrix.translate(QVector3D(text_translation, -0.5, 0))
         y_axis_matrix.translate(QVector3D(-0.4, text_translation, 0))
         z_axis_matrix.translate(QVector3D(-0.5, -0.5, text_translation))
 
-        self.x_text_transformation.setMatrix(x_axis_matrix)
-        self.y_text_transformation.setMatrix(y_axis_matrix)
-        self.z_text_transformation.setMatrix(z_axis_matrix)
+        transforms[0].setMatrix(x_axis_matrix)
+        transforms[1].setMatrix(y_axis_matrix)
+        transforms[2].setMatrix(z_axis_matrix)
 
     @staticmethod
     def configure_gnomon_cone(cone_mesh, gnomon_cylinder_length):
@@ -202,12 +202,12 @@ class InstrumentView(QWidget):
 
     def create_gnomon(self):
 
-        self.configure_gnomon_cylinder(self.x_axis_mesh, self.gnomon_bar_length)
-        self.configure_gnomon_cylinder(self.y_axis_mesh, self.gnomon_bar_length)
-        self.configure_gnomon_cylinder(self.z_axis_mesh, self.gnomon_bar_length)
+        self.configure_gnomon_cylinder(self.x_axis_mesh, self.gnomon_cylinder_length)
+        self.configure_gnomon_cylinder(self.y_axis_mesh, self.gnomon_cylinder_length)
+        self.configure_gnomon_cylinder(self.z_axis_mesh, self.gnomon_cylinder_length)
 
         x_axis_matrix, y_axis_matrix, z_axis_matrix = self.create_gnomon_matrices(
-            self.gnomon_bar_length
+            self.gnomon_cylinder_length
         )
 
         self.x_axis_transformation.setMatrix(x_axis_matrix)
@@ -227,12 +227,12 @@ class InstrumentView(QWidget):
             [self.z_axis_mesh, self.z_axis_transformation, self.z_material],
         )
 
-        self.configure_gnomon_cone(self.x_cone_mesh, self.gnomon_bar_length)
-        self.configure_gnomon_cone(self.y_cone_mesh, self.gnomon_bar_length)
-        self.configure_gnomon_cone(self.z_cone_mesh, self.gnomon_bar_length)
+        self.configure_gnomon_cone(self.x_cone_mesh, self.gnomon_cylinder_length)
+        self.configure_gnomon_cone(self.y_cone_mesh, self.gnomon_cylinder_length)
+        self.configure_gnomon_cone(self.z_cone_mesh, self.gnomon_cylinder_length)
 
         x_cone_matrix, y_cone_matrix, z_cone_matrix = self.create_cone_matrices(
-            self.gnomon_bar_length
+            self.gnomon_cylinder_length
         )
 
         self.x_cone_transformation.setMatrix(x_cone_matrix)
@@ -256,7 +256,14 @@ class InstrumentView(QWidget):
         self.set_axis_label_text(self.y_axis_text, "Y", "green")
         self.set_axis_label_text(self.z_axis_text, "Z", "blue")
 
-        self.create_axis_label_matrices()
+        self.create_axis_label_matrices(
+            self.gnomon_cylinder_length,
+            [
+                self.x_text_transformation,
+                self.y_text_transformation,
+                self.z_text_transformation,
+            ],
+        )
 
         self.x_axis_text.addComponent(self.x_text_transformation)
         self.y_axis_text.addComponent(self.y_text_transformation)
@@ -333,9 +340,61 @@ class InstrumentView(QWidget):
 
         gnomon_camera_position = main_camera.position() - main_camera.viewCenter()
         gnomon_camera_position = gnomon_camera_position.normalized()
-        gnomon_camera_position *= self.gnomon_bar_length * 4
+        gnomon_camera_position *= self.gnomon_cylinder_length * 4
 
         self.gnomon_camera.setPosition(gnomon_camera_position)
+
+        text_translation = self.gnomon_cylinder_length * 1.3
+
+        x_text_matrix = QMatrix4x4()
+        y_text_matrix = QMatrix4x4()
+        z_text_matrix = QMatrix4x4()
+
+        rotation_vector_x = (
+            -self.x_text_transformation.translation() + gnomon_camera_position
+        )
+        rotation_vector_y = (
+            -self.y_text_transformation.translation() + gnomon_camera_position
+        )
+        rotation_vector_z = (
+            -self.z_text_transformation.translation() + gnomon_camera_position
+        )
+
+        self.x_text_transformation.setRotation(
+            QQuaternion().rotationTo(
+                self.x_text_transformation.translation(), rotation_vector_x
+            )
+        )
+        self.y_text_transformation.setRotation(
+            QQuaternion().rotationTo(
+                self.y_text_transformation.translation(), rotation_vector_y
+            )
+        )
+        self.z_text_transformation.setRotation(
+            QQuaternion().rotationTo(
+                self.z_text_transformation.translation(), rotation_vector_z
+            )
+        )
+        #
+        # x_text_matrix.lookAt(
+        #     self.x_text_transformation.translation(),
+        #     gnomon_camera_position,
+        #     self.gnomon_camera.upVector(),
+        # )
+        # y_text_matrix.lookAt(
+        #     self.y_text_transformation.translation(),
+        #     gnomon_camera_position,
+        #     self.gnomon_camera.upVector(),
+        # )
+        # z_text_matrix.lookAt(
+        #     self.y_text_transformation.translation(),
+        #     gnomon_camera_position,
+        #     self.gnomon_camera.upVector(),
+        # )
+        #
+        # self.x_text_transformation.setMatrix(x_text_matrix)
+        # self.y_text_transformation.setMatrix(y_text_matrix)
+        # self.z_text_transformation.setMatrix(z_text_matrix)
 
     def add_component(self, name, geometry):
         """
