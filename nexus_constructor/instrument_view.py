@@ -51,7 +51,6 @@ class InstrumentView(QWidget):
         self.grey_material = Qt3DExtras.QPhongMaterial()
         self.red_material = Qt3DExtras.QPhongMaterial()
         self.beam_material = Qt3DExtras.QPhongAlphaMaterial()
-        self.green_material = Qt3DExtras.QPhongMaterial()
         self.x_material = Qt3DExtras.QPhongMaterial()
         self.y_material = Qt3DExtras.QPhongMaterial()
         self.z_material = Qt3DExtras.QPhongMaterial()
@@ -295,9 +294,14 @@ class InstrumentView(QWidget):
         component_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
         component_clear_buffers.setClearColor(QColor("lightgrey"))
 
+        gnomon_size = 0.5
+        gnomon_start = 1 - gnomon_size
+
         # Create a viewport for gnomon in small section of the screen
         gnomon_viewport = Qt3DRender.QViewport(self.surface_selector)
-        gnomon_viewport.setNormalizedRect(QRectF(0, 0, 1, 1))
+        gnomon_viewport.setNormalizedRect(
+            QRectF(gnomon_start, gnomon_start, gnomon_size, gnomon_size)
+        )
 
         # Filter out the gnomon for just the gnomon camera to see
         self.create_camera_filter(
@@ -344,6 +348,7 @@ class InstrumentView(QWidget):
         gnomon_camera_position *= self.gnomon_cylinder_length * 4
 
         self.gnomon_camera.setPosition(gnomon_camera_position)
+        self.gnomon_camera.setUpVector(self.view.camera().upVector())
 
         text_translation = self.gnomon_cylinder_length * 1.3
 
@@ -473,17 +478,16 @@ class InstrumentView(QWidget):
         black = QColor("black")
         grey = QColor("grey")
         blue = QColor("blue")
-        green = QColor("green")
+        green = QColor("darkgreen")
         light_blue = QColor("lightblue")
         dark_red = QColor("#b00")
 
         self.set_material_properties(self.grey_material, black, grey)
         self.set_material_properties(self.red_material, red, dark_red)
-        self.set_material_properties(self.green_material, grey, grey)
         self.set_material_properties(self.beam_material, blue, light_blue, alpha=0.5)
-        self.set_material_properties(self.x_material, red, red, shininess=0)
+        self.set_material_properties(self.x_material, red, grey, shininess=0)
         self.set_material_properties(self.y_material, green, green, shininess=0)
-        self.set_material_properties(self.z_material, blue, blue, shininess=0)
+        self.set_material_properties(self.z_material, blue, grey, shininess=0)
 
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
