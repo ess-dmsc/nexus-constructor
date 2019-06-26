@@ -2,6 +2,8 @@ import attr
 import numpy as np
 from PySide2.QtGui import QVector3D
 from typing import Any
+import h5py
+from nexus_constructor.nexus import nexus_wrapper as nx
 
 
 def create_transform(type: str, vector: np.array, value: Any):
@@ -10,6 +12,24 @@ def create_transform(type: str, vector: np.array, value: Any):
     if type == "Translation":
         return Translation(type, value * vector)
     raise ValueError("Unexpected transformation type encountered in create_transform()")
+
+
+class TransformationModel:
+    """
+    Provides an interface to an existing transformation dataset in a NeXus file
+    """
+
+    def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
+        self.file = nexus_file
+        self.dataset = dataset
+
+    @property
+    def name(self):
+        return nx.get_name_of_node(self.dataset)
+
+    @name.setter
+    def name(self, new_name: str):
+        self.file.rename_node(self.dataset, new_name)
 
 
 @attr.s

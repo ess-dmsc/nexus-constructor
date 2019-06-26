@@ -1,8 +1,10 @@
 import h5py
 
 from PySide2.QtCore import Signal, QObject
-from typing import Any
+from typing import Any, TypeVar
 import numpy as np
+
+h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
 def set_up_in_memory_nexus_file(filename):
@@ -21,8 +23,8 @@ def append_nxs_extension(file_name):
         return file_name + extension
 
 
-def get_name_of_group(group: h5py.Group):
-    return group.name.split("/")[-1]
+def get_name_of_node(node: h5Node):
+    return node.name.split("/")[-1]
 
 
 class NexusWrapper(QObject):
@@ -81,12 +83,12 @@ class NexusWrapper(QObject):
             print("NeXus file loaded")
             self._emit_file()
 
-    def rename_group(self, group: h5py.Group, new_name: str):
-        self.nexus_file.move(group.name, f"{group.parent.name}/{new_name}")
+    def rename_node(self, node: h5Node, new_name: str):
+        self.nexus_file.move(node.name, f"{node.parent.name}/{new_name}")
         self._emit_file()
 
-    def delete_group(self, group: h5py.Group):
-        del self.nexus_file[group.name]
+    def delete_node(self, node: h5Node):
+        del self.nexus_file[node.name]
         self._emit_file()
 
     def create_nx_group(self, name, nx_class, parent):

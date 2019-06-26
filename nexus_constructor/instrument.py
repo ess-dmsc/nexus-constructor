@@ -44,7 +44,7 @@ class Instrument:
         Removes a component group from the NeXus file
         :param component: The component to be removed
         """
-        self.nexus.delete_group(component.group)
+        self.nexus.delete_node(component.group)
 
     def get_component_list(self):
         component_list = []

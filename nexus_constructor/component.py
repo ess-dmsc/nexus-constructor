@@ -18,11 +18,11 @@ class ComponentModel:
 
     @property
     def name(self):
-        return nx.get_name_of_group(self.group)
+        return nx.get_name_of_node(self.group)
 
     @name.setter
     def name(self, new_name: str):
-        self.file.rename_group(self.group, new_name)
+        self.file.rename_node(self.group, new_name)
 
     def get_field(self, name: str):
         return self.file.get_field_value(self.group, name)
