@@ -144,7 +144,7 @@ class InstrumentView(QWidget):
         cylinder_mesh.setRings(2)
 
     @staticmethod
-    def create_gnomon_matrices(length):
+    def create_cylinder_matrices(length):
 
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
@@ -251,7 +251,7 @@ class InstrumentView(QWidget):
         self.configure_gnomon_cylinder(self.x_axis_mesh, self.gnomon_cylinder_length)
         self.configure_gnomon_cylinder(self.y_axis_mesh, self.gnomon_cylinder_length)
         self.configure_gnomon_cylinder(self.z_axis_mesh, self.gnomon_cylinder_length)
-        x_axis_matrix, y_axis_matrix, z_axis_matrix = self.create_gnomon_matrices(
+        x_axis_matrix, y_axis_matrix, z_axis_matrix = self.create_cylinder_matrices(
             self.gnomon_cylinder_length
         )
         self.x_axis_transformation.setMatrix(x_axis_matrix)
@@ -297,7 +297,7 @@ class InstrumentView(QWidget):
 
         # Create a viewport for gnomon in small section of the screen
         gnomon_viewport = Qt3DRender.QViewport(self.surface_selector)
-        gnomon_viewport.setNormalizedRect(QRectF(0.85, 0.85, 0.15, 0.15))
+        gnomon_viewport.setNormalizedRect(QRectF(0, 0, 1, 1))
 
         # Filter out the gnomon for just the gnomon camera to see
         self.create_camera_filter(
