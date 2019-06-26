@@ -41,7 +41,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.nx_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
-        self.possible_fields = self.nx_classes["NXpinhole"]
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -121,6 +120,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Validate the default value set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.addFieldButton.clicked.connect(self.add_field)
+
+        # Set default possible fields based on default nx_class
+        self.on_nx_class_changed()
 
     def add_field(self):
         item = QListWidgetItem()
