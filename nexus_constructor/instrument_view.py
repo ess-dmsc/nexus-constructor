@@ -158,7 +158,7 @@ class InstrumentView(QWidget):
         """
         Construct the matrices that are used to transform the cylinders so that they form a gnomon.
         :param length: The length of the cylinders.
-        :return: The matrices required to carry out the gnomon transformations.
+        :return: The transformation matrices.
         """
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
@@ -178,7 +178,11 @@ class InstrumentView(QWidget):
 
     @staticmethod
     def create_cone_matrices(length):
-
+        """
+        Creates the matrices used to transform the cones that form the gnomon.
+        :param length: The length of the gnomon cylinders.
+        :return: The transformation matrices.
+        """
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
         z_axis_matrix = QMatrix4x4()
@@ -194,8 +198,12 @@ class InstrumentView(QWidget):
         return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
     @staticmethod
-    def create_axis_label_matrices(transforms, vectors):
-
+    def create_axis_label_matrices(vectors):
+        """
+        Creates the matrices used to transform the labels that form the gnomon.
+        :param vectors: The vectors that describe the location of the text.
+        :return: The transformation matrices.
+        """
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
         z_axis_matrix = QMatrix4x4()
@@ -204,9 +212,7 @@ class InstrumentView(QWidget):
         y_axis_matrix.translate(vectors[1])
         z_axis_matrix.translate(vectors[2])
 
-        transforms[0].setMatrix(x_axis_matrix)
-        transforms[1].setMatrix(y_axis_matrix)
-        transforms[2].setMatrix(z_axis_matrix)
+        return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
     @staticmethod
     def configure_gnomon_cone(cone_mesh, gnomon_cylinder_length):
@@ -225,14 +231,14 @@ class InstrumentView(QWidget):
         self.set_axis_label_text(self.x_axis_text, "X", "red")
         self.set_axis_label_text(self.y_axis_text, "Y", "green")
         self.set_axis_label_text(self.z_axis_text, "Z", "blue")
-        self.create_axis_label_matrices(
-            [
-                self.x_text_transformation,
-                self.y_text_transformation,
-                self.z_text_transformation,
-            ],
-            [self.x_text_vector, self.y_text_vector, self.z_text_vector],
+        x_label_matrix, y_label_matrix, z_label_matrix = self.create_axis_label_matrices(
+            [self.x_text_vector, self.y_text_vector, self.z_text_vector]
         )
+
+        self.x_text_transformation.setMatrix(x_label_matrix)
+        self.y_text_transformation.setMatrix(y_label_matrix)
+        self.z_text_transformation.setMatrix(z_label_matrix)
+
         self.x_axis_text.addComponent(self.x_text_transformation)
         self.y_axis_text.addComponent(self.y_text_transformation)
         self.z_axis_text.addComponent(self.z_text_transformation)

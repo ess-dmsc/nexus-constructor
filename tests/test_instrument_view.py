@@ -207,3 +207,7 @@ def test_GIVEN_cone_length_WHEN_calling_create_cone_matrices_THEN_correct_matric
     assert expected_x == actual_x
     assert expected_y == actual_y
     assert expected_z == actual_z
+
+
+def test_GIVEN_vectors_WHEN_calling_create_axis_label_matrices_THEN_correct_matrices_returned():
+    pass
