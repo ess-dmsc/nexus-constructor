@@ -68,7 +68,7 @@ builders = pipeline_builder.createBuilders { container ->
         try {
                 container.sh """
                     cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml --ignore=tests/ui_tests/
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml
                 """
             }
             catch(err) {
@@ -117,7 +117,7 @@ return {
                 """
             } // stage
             stage("Run tests") {
-                bat """python -m pytest . -s --ignore=definitions --ignore=tests/ui_tests/
+                bat """python -m pytest . -s --ignore=definitions
                 """
             } // stage
             // if (env.CHANGE_ID) {
