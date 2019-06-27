@@ -3,7 +3,7 @@ from PySide2.QtWidgets import QWidget, QVBoxLayout
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtCore import QPropertyAnimation, QRectF
-from PySide2.QtGui import QVector3D, QColor, QMatrix4x4, QFont, QQuaternion
+from PySide2.QtGui import QVector3D, QColor, QMatrix4x4, QFont, QVector4D
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
 from nexus_constructor.off_renderer import OffMesh
 
@@ -116,6 +116,12 @@ class InstrumentView(QWidget):
         self.y_text_transformation = Qt3DCore.QTransform()
         self.z_text_transformation = Qt3DCore.QTransform()
 
+        text_translation = self.gnomon_cylinder_length * 1.3
+
+        self.x_text_vector = QVector3D(text_translation, -0.5, 0)
+        self.y_text_vector = QVector3D(-0.4, text_translation, 0)
+        self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
+
         self.create_layers()
         self.initialise_view()
 
@@ -177,17 +183,15 @@ class InstrumentView(QWidget):
         return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
     @staticmethod
-    def create_axis_label_matrices(gnomon_cylinder_length, transforms):
+    def create_axis_label_matrices(transforms, vectors):
 
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
         z_axis_matrix = QMatrix4x4()
 
-        text_translation = gnomon_cylinder_length * 1.3
-
-        x_axis_matrix.translate(QVector3D(text_translation, -0.5, 0))
-        y_axis_matrix.translate(QVector3D(-0.4, text_translation, 0))
-        z_axis_matrix.translate(QVector3D(-0.5, -0.5, text_translation))
+        x_axis_matrix.translate(vectors[0])
+        y_axis_matrix.translate(vectors[1])
+        z_axis_matrix.translate(vectors[2])
 
         transforms[0].setMatrix(x_axis_matrix)
         transforms[1].setMatrix(y_axis_matrix)
@@ -211,12 +215,12 @@ class InstrumentView(QWidget):
         self.set_axis_label_text(self.y_axis_text, "Y", "green")
         self.set_axis_label_text(self.z_axis_text, "Z", "blue")
         self.create_axis_label_matrices(
-            self.gnomon_cylinder_length,
             [
                 self.x_text_transformation,
                 self.y_text_transformation,
                 self.z_text_transformation,
             ],
+            [self.x_text_vector, self.y_text_vector, self.z_text_vector],
         )
         self.x_axis_text.addComponent(self.x_text_transformation)
         self.y_axis_text.addComponent(self.y_text_transformation)
@@ -294,7 +298,7 @@ class InstrumentView(QWidget):
         component_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
         component_clear_buffers.setClearColor(QColor("lightgrey"))
 
-        gnomon_size = 0.5
+        gnomon_size = 0.15
         gnomon_start = 1 - gnomon_size
 
         # Create a viewport for gnomon in small section of the screen
@@ -350,57 +354,25 @@ class InstrumentView(QWidget):
         self.gnomon_camera.setPosition(gnomon_camera_position)
         self.gnomon_camera.setUpVector(self.view.camera().upVector())
 
-        text_translation = self.gnomon_cylinder_length * 1.3
+        view_matrix = self.gnomon_camera.viewMatrix()
 
-        x_text_matrix = QMatrix4x4()
-        y_text_matrix = QMatrix4x4()
-        z_text_matrix = QMatrix4x4()
-
-        rotation_vector_x = (
-            -self.x_text_transformation.translation() + gnomon_camera_position
+        self.x_text_transformation.setMatrix(
+            self.create_billboard_transformation(view_matrix, self.x_text_vector)
         )
-        rotation_vector_y = (
-            -self.y_text_transformation.translation() + gnomon_camera_position
+        self.y_text_transformation.setMatrix(
+            self.create_billboard_transformation(view_matrix, self.y_text_vector)
         )
-        rotation_vector_z = (
-            -self.z_text_transformation.translation() + gnomon_camera_position
+        self.z_text_transformation.setMatrix(
+            self.create_billboard_transformation(view_matrix, self.z_text_vector)
         )
 
-        self.x_text_transformation.setRotation(
-            QQuaternion().rotationTo(
-                self.x_text_transformation.translation(), rotation_vector_x
-            )
-        )
-        self.y_text_transformation.setRotation(
-            QQuaternion().rotationTo(
-                self.y_text_transformation.translation(), rotation_vector_y
-            )
-        )
-        self.z_text_transformation.setRotation(
-            QQuaternion().rotationTo(
-                self.z_text_transformation.translation(), rotation_vector_z
-            )
-        )
-        #
-        # x_text_matrix.lookAt(
-        #     self.x_text_transformation.translation(),
-        #     gnomon_camera_position,
-        #     self.gnomon_camera.upVector(),
-        # )
-        # y_text_matrix.lookAt(
-        #     self.y_text_transformation.translation(),
-        #     gnomon_camera_position,
-        #     self.gnomon_camera.upVector(),
-        # )
-        # z_text_matrix.lookAt(
-        #     self.y_text_transformation.translation(),
-        #     gnomon_camera_position,
-        #     self.gnomon_camera.upVector(),
-        # )
-        #
-        # self.x_text_transformation.setMatrix(x_text_matrix)
-        # self.y_text_transformation.setMatrix(y_text_matrix)
-        # self.z_text_transformation.setMatrix(z_text_matrix)
+    @staticmethod
+    def create_billboard_transformation(view_matrix, text_vector):
+
+        view_transpose = view_matrix.transposed()
+        view_transpose.setRow(3, QVector4D())
+        view_transpose.setColumn(3, QVector4D(text_vector, 1))
+        return view_transpose
 
     def add_component(self, name, geometry):
         """
