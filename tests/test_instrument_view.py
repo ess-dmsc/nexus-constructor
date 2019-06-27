@@ -148,3 +148,14 @@ def test_GIVEN_animation_parameters_WHEN_calling_set_neutron_animation_propertie
     mock_neutron_animation.setDuration.assert_called_once_with(500 + time_span_offset)
     mock_neutron_animation.setLoopCount.assert_called_once_with(-1)
     mock_neutron_animation.start.assert_called_once()
+
+def test_GIVEN_cylinder_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_properties_set():
+
+    mock_cylinder_mesh = Mock()
+    length = 20
+
+    InstrumentView.configure_gnomon_cylinder(mock_cylinder_mesh, length)
+
+    mock_cylinder_mesh.setRadius.assert_called_once_with(length * 0.05)
+    mock_cylinder_mesh.setLength.assert_called_once_with(length)
+    mock_cylinder_mesh.setRings.assert_called_once_with(2)
