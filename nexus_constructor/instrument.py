@@ -7,7 +7,7 @@ from nexus_constructor.component import ComponentModel
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
 
-def convert_name_with_spaces(component_name):
+def _convert_name_with_spaces(component_name):
     return component_name.replace(" ", "_")
 
 
@@ -30,7 +30,7 @@ class Instrument:
         :param description: Description of the component
         :return Wrapper for added component
         """
-        name = convert_name_with_spaces(name)
+        name = _convert_name_with_spaces(name)
         parent_group = self.nexus.instrument
         if nx_class in COMPONENTS_IN_ENTRY:
             parent_group = self.nexus.entry

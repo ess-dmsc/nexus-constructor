@@ -1,15 +1,15 @@
-from nexus_constructor.instrument import convert_name_with_spaces, Instrument
+from nexus_constructor.instrument import _convert_name_with_spaces, Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 
 def test_GIVEN_name_with_spaces_WHEN_converting_name_with_spaces_THEN_converts_spaces_in_name_to_underscores():
     name = "test name"
-    assert convert_name_with_spaces(name) == name.replace(" ", "_")
+    assert _convert_name_with_spaces(name) == name.replace(" ", "_")
 
 
 def test_GIVEN_name_without_spaces_WHEN_converting_name_with_spaces_THEN_name_does_not_change():
     name = "test_name"
-    assert convert_name_with_spaces(name) == name
+    assert _convert_name_with_spaces(name) == name
 
 
 def test_GIVEN_nothing_WHEN_getting_components_list_THEN_list_contains_sample_and_no_components():

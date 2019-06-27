@@ -117,13 +117,21 @@ class NexusWrapper(QObject):
     @staticmethod
     def get_field_value(group: h5py.Group, name: str):
         if name not in group:
-            raise NameError(f"Field called {name} not found in {group.name}")
+            return None
         value = group[name][...]
         if value.dtype.type is np.string_:
             value = str(value, "utf8")
         return value
 
     def set_field_value(self, group: h5py.Group, name: str, value: Any, dtype=None):
+        """
+        Create or update the value of a field (dataset in hdf terminology)
+        :param group: Parent group of the field
+        :param name: Name of the field
+        :param value: Value fo the field
+        :param dtype: Type of the value (Use numpy types)
+        :return: The dataset
+        """
         if dtype is str:
             dtype = f"|S{len(value)}"
             value = np.array(value).astype(dtype)
@@ -137,9 +145,22 @@ class NexusWrapper(QObject):
         else:
             group.create_dataset(name, data=value, dtype=dtype)
         self._emit_file()
+        return group[name]
 
-    def add_transformation(self):
-        raise NotImplementedError
+    @staticmethod
+    def get_attribute_value(node: h5Node, name: str):
+        if name not in node.attrs.keys():
+            raise NameError(f"Attribute called {name} not found in {node.name}")
+        return node.attrs[name]
 
-    def remove_transformation(self):
-        raise NotImplementedError
+    def set_attribute_value(self, node: h5Node, name: str, value: Any):
+        node.attrs[name] = value
+        self._emit_file()
+
+    def create_transformations_group_if_does_not_exist(self, parent_group: h5Node):
+        for child in parent_group:
+            if "NXtransformations" in parent_group[child].attrs.keys():
+                return parent_group[child]
+        return self.create_nx_group(
+            "transformations", "NXtransformations", parent_group
+        )

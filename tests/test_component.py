@@ -2,6 +2,7 @@ from nexus_constructor.component import ComponentModel
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from cmath import isclose
 from typing import Any
+from PySide2.QtGui import QVector3D
 
 
 def _create_file_containing_test_component(
@@ -108,3 +109,27 @@ def test_type_of_field_can_be_changed():
     assert isclose(
         returned_value, new_value
     ), "Expected to get same value back from field as it was changed to"
+
+
+def test_GIVEN_new_component_WHEN_get_transforms_for_component_THEN_transforms_list_is_empty():
+    nexus_wrapper, component_group = _create_file_containing_test_component(
+        "some_field", 42, "component_name"
+    )
+    component = ComponentModel(nexus_wrapper, component_group)
+    assert (
+        len(component.transforms) == 0
+    ), "expected there to be no transformations in the newly created component"
+
+
+def test_GIVEN_component_with_a_transform_added_WHEN_get_transforms_for_component_THEN_transforms_list_contains_transform():
+    nexus_wrapper, component_group = _create_file_containing_test_component(
+        "some_field", 42, "component_name"
+    )
+    component = ComponentModel(nexus_wrapper, component_group)
+
+    transform = component.add_translation(QVector3D(1.0, 0.0, 0.0))
+    component.depends_on = transform
+
+    assert (
+        len(component.transforms) == 1
+    ), "expected there to be a transformation in the component"
