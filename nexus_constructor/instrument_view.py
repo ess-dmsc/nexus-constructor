@@ -139,7 +139,7 @@ class InstrumentView(QWidget):
         self.setup_beam_cylinder()
 
         # Move the gnomon when the camera view changes
-        self.view.camera().viewVectorChanged.connect(self.update_gnomon_camera)
+        self.view.camera().viewVectorChanged.connect(self.update_gnomon)
 
     @staticmethod
     def configure_gnomon_cylinder(cylinder_mesh, length):
@@ -312,14 +312,14 @@ class InstrumentView(QWidget):
             gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
         )
 
-        self.update_gnomon_camera()
+        self.update_gnomon()
 
     def create_gnomon_camera(self, main_camera):
         gnomon_camera = Qt3DRender.QCamera()
         gnomon_camera.setParent(self.gnomon_root_entity)
         gnomon_camera.setProjectionType(main_camera.projectionType())
         gnomon_camera.lens().setPerspectiveProjection(
-            main_camera.fieldOfView(), 1, 0.1, 20
+            main_camera.fieldOfView(), 1, 0.1, 25
         )
         gnomon_camera.setUpVector(main_camera.upVector())
         gnomon_camera.setViewCenter(QVector3D(0, 0, 0))
@@ -344,18 +344,25 @@ class InstrumentView(QWidget):
         clear_buffers = Qt3DRender.QClearBuffers(camera_selector)
         return clear_buffers
 
+    def update_gnomon(self):
+
+        self.update_gnomon_camera()
+        self.update_gnomon_text()
+
     def update_gnomon_camera(self):
         main_camera = self.view.camera()
 
-        gnomon_camera_position = main_camera.position() - main_camera.viewCenter()
-        gnomon_camera_position = gnomon_camera_position.normalized()
-        gnomon_camera_position *= self.gnomon_cylinder_length * 4
+        updated_gnomon_camera_position = (
+            main_camera.position() - main_camera.viewCenter()
+        )
+        updated_gnomon_camera_position = updated_gnomon_camera_position.normalized()
+        updated_gnomon_camera_position *= self.gnomon_cylinder_length * 4
 
-        self.gnomon_camera.setPosition(gnomon_camera_position)
+        self.gnomon_camera.setPosition(updated_gnomon_camera_position)
         self.gnomon_camera.setUpVector(self.view.camera().upVector())
 
+    def update_gnomon_text(self):
         view_matrix = self.gnomon_camera.viewMatrix()
-
         self.x_text_transformation.setMatrix(
             self.create_billboard_transformation(view_matrix, self.x_text_vector)
         )
