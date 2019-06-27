@@ -62,11 +62,18 @@ class Gnomon:
         self.prepare_gnomon_material(self.z_material, "blue")
 
     def get_gnomon_camera(self):
+        """
+        :return: The camera that observes the gnomon.
+        """
         return self.gnomon_camera
 
     @staticmethod
     def prepare_gnomon_material(material, color):
-
+        """
+        Prepares the material that will be used to color the gnomon cylinders and sets its shininess to zero.
+        :param material: The material to be configured.
+        :param color: The desired ambient color of the material.
+        """
         material.setAmbient(color)
         material.setDiffuse(QColor("grey"))
         material.setShininess(0)

@@ -1,4 +1,4 @@
-from PySide2.QtGui import QMatrix4x4, QVector3D
+from PySide2.QtGui import QMatrix4x4, QVector3D, QColor
 from mock import Mock
 
 from nexus_constructor.gnomon import Gnomon
@@ -63,5 +63,13 @@ def test_GIVEN_cone_length_WHEN_calling_create_cone_matrices_THEN_correct_matric
     assert expected_z == actual_z
 
 
-def test_GIVEN_vectors_WHEN_calling_create_axis_label_matrices_THEN_correct_matrices_returned():
-    pass
+def test_GIVEN_material_and_color_WHEN_calling_prepare_gnomon_material_THEN_properties_set():
+
+    material = Mock()
+    color = "red"
+
+    Gnomon.prepare_gnomon_material(material, color)
+
+    material.setAmbient.assert_called_once_with(QColor(color))
+    material.setDiffuse.assert_called_once_with(QColor("grey"))
+    material.setShininess.assert_called_once_with(0)
