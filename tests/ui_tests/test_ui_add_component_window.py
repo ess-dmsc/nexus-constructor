@@ -1,7 +1,5 @@
 import pytest
 from PySide2.QtWidgets import QMainWindow, QDialog
-from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.instrument import Instrument
 from PySide2.QtCore import Qt
