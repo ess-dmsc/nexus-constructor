@@ -158,6 +158,7 @@ class InstrumentView(QWidget):
         """
         Construct the matrices that are used to transform the cylinders so that they form a gnomon.
         :param length: The length of the cylinders.
+        :return: The matrices required to carry out the gnomon transformations.
         """
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()

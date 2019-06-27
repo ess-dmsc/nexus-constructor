@@ -160,3 +160,27 @@ def test_GIVEN_cylinder_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_p
     mock_cylinder_mesh.setRadius.assert_called_once_with(length * 0.05)
     mock_cylinder_mesh.setLength.assert_called_once_with(length)
     mock_cylinder_mesh.setRings.assert_called_once_with(2)
+
+
+def test_GIVEN_cylinder_length_WHEN_calling_create_cylinder_matrices_THEN_correct_matrices_returned():
+
+    length = 10
+    half_length = length * 0.5
+
+    expected_x = QMatrix4x4()
+    expected_y = QMatrix4x4()
+    expected_z = QMatrix4x4()
+
+    expected_x.rotate(270, QVector3D(0, 0, 1))
+    expected_x.translate(QVector3D(0, half_length, 0))
+
+    expected_y.translate(QVector3D(0, half_length, 0))
+
+    expected_z.rotate(90, QVector3D(1, 0, 0))
+    expected_z.translate(QVector3D(0, half_length, 0))
+
+    actual_x, actual_y, actual_z = InstrumentView.create_cylinder_matrices(length)
+
+    assert expected_x == actual_x
+    assert expected_y == actual_y
+    assert expected_z == actual_z
