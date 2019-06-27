@@ -143,25 +143,35 @@ class InstrumentView(QWidget):
 
     @staticmethod
     def configure_gnomon_cylinder(cylinder_mesh, length):
-
+        """
+        Set the radius, length and ring properties of the cylinders that create the gnomon. The radius is 1/20th of the
+        length and the number of rings is set to the smallest value that still creates the expected shape.
+        :param cylinder_mesh: The mesh to be configured.
+        :param length: The desired length of the cylinder.
+        """
         cylinder_mesh.setRadius(length * 0.05)
         cylinder_mesh.setLength(length)
         cylinder_mesh.setRings(2)
 
     @staticmethod
     def create_cylinder_matrices(length):
-
+        """
+        Construct the matrices that are used to transform the cylinders so that they form a gnomon.
+        :param length: The length of the cylinders.
+        """
         x_axis_matrix = QMatrix4x4()
         y_axis_matrix = QMatrix4x4()
         z_axis_matrix = QMatrix4x4()
 
-        x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
-        x_axis_matrix.translate(QVector3D(0, length * 0.5, 0))
+        half_length = length * 0.5
 
-        y_axis_matrix.translate(QVector3D(0, length * 0.5, 0))
+        x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
+        x_axis_matrix.translate(QVector3D(0, half_length, 0))
+
+        y_axis_matrix.translate(QVector3D(0, half_length, 0))
 
         z_axis_matrix.rotate(90, QVector3D(1, 0, 0))
-        z_axis_matrix.translate(QVector3D(0, length * 0.5, 0))
+        z_axis_matrix.translate(QVector3D(0, half_length, 0))
 
         return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
@@ -298,7 +308,7 @@ class InstrumentView(QWidget):
         component_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
         component_clear_buffers.setClearColor(QColor("lightgrey"))
 
-        gnomon_size = 0.15
+        gnomon_size = 0.2
         gnomon_start = 1 - gnomon_size
 
         # Create a viewport for gnomon in small section of the screen
