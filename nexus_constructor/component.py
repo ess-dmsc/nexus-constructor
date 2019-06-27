@@ -169,7 +169,7 @@ class ComponentModel:
         depends_on_path = self.file.get_field_value(self.group, "depends_on")
         if depends_on_path is None:
             return None
-        return TransformationModel(self.file, self.file[depends_on_path])
+        return TransformationModel(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
     def depends_on(self, transformation: TransformationModel):
