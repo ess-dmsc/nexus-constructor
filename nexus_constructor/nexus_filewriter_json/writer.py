@@ -57,7 +57,7 @@ class NexusToDictConverter:
         }
 
     def _root_to_dict(self, root):
-        if hasattr(root, "entries"):
+        if isinstance(root, h5py.Group):
             root_dict = self._handle_group(root)
         else:
             root_dict = self._handle_dataset(root)
@@ -79,7 +79,7 @@ class NexusToDictConverter:
         :return: the data in the dataset, the datatype and the size of the data in the dataset
         """
         size = 1
-        data = root.value
+        data = root[...]
         dtype = root.dtype
         if isinstance(data, np.ndarray):
             size = data.shape
@@ -99,13 +99,10 @@ class NexusToDictConverter:
         return data, dtype, size
 
     def _handle_attributes(self, root, root_dict):
-        if (
-            root.nxclass
-            and root.nxclass is not "NXfield"
-            and root.nxclass is not "NXgroup"
-        ):
-            root_dict["attributes"] = [{"name": "NX_class", "values": root.nxclass}]
-        if root.attrs:
+        nx_class = root.attrs["NX_class"]
+        if nx_class and nx_class is not "NXfield" and nx_class is not "NXgroup":
+            root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
+        if len(root.attrs) > 1:
             if "attributes" not in root_dict:
                 root_dict["attributes"] = []
             root_dict["attributes"] = []
@@ -123,7 +120,7 @@ class NexusToDictConverter:
         :param root: h5py group to generate dict from.
         :return: generated dict of group and children.
         """
-        root_dict = {"type": "group", "name": root.nxname, "children": []}
+        root_dict = {"type": "group", "name": root.name, "children": []}
         # Add the entries
         entries = root.entries
         if root.nxpath in self._kafka_streams:
@@ -154,7 +151,7 @@ class NexusToDictConverter:
         data, dataset_type, size = self._get_data_and_type(root)
         root_dict = {
             "type": "dataset",
-            "name": root.nxname,
+            "name": root.name,
             "dataset": {"type": dataset_type},
             "values": data,
         }
@@ -185,8 +182,8 @@ def create_writer_commands(
     stop_time=None,
 ):
     """
-    :param nexus_structure:
-    :param output_filename:
+    :param nexus_structure: dictionary? TODO
+    :param output_filename: the nexus file output filename
     :param broker:
     :param job_id:
     :param start_time: ms from unix epoch

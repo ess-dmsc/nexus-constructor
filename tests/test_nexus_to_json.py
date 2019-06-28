@@ -71,3 +71,41 @@ def test_GIVEN_array_WHEN_getting_data_and_dtype_THEN_function_returns_correcte_
     assert size == (len(expected_values),)
     assert data == expected_values
     assert dtype == expected_dtype
+
+
+def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist_in_root_dict():
+    file = create_in_memory_file("test5")
+
+    dataset_name = "test_ds"
+    dataset_value = 1.1
+    dataset_dtype = np.float
+
+    dataset = file.create_dataset(dataset_name, data=dataset_value, dtype=dataset_dtype)
+    dataset.attrs["NX_class"] = "NXpinhole"
+
+    converter = NexusToDictConverter()
+    root_dict = converter._root_to_dict(dataset)
+
+    assert root_dict["name"].lstrip("/") == dataset_name
+    assert root_dict["type"] == "dataset"
+    assert root_dict["values"] == dataset_value
+    assert not root_dict["dataset"]["size"]
+
+
+def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_in_root_dict():
+    file = create_in_memory_file("test6")
+
+    dataset_name = "test_ds"
+    dataset_value = [1.1, 1.2, 1.3]
+    dataset_dtype = np.float
+
+    dataset = file.create_dataset(dataset_name, data=dataset_value, dtype=dataset_dtype)
+    dataset.attrs["NX_class"] = "NXpinhole"
+
+    converter = NexusToDictConverter()
+    root_dict = converter._root_to_dict(dataset)
+
+    assert root_dict["name"].lstrip("/") == dataset_name
+    assert root_dict["type"] == "dataset"
+    assert root_dict["values"] == dataset_value
+    assert root_dict["dataset"]["size"] == (len(dataset_value),)
