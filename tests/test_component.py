@@ -117,7 +117,7 @@ def test_GIVEN_new_component_WHEN_get_transforms_for_component_THEN_transforms_l
     )
     component = ComponentModel(nexus_wrapper, component_group)
     assert (
-        len(component.transforms) == 0
+        len(component.transforms_full_chain) == 0
     ), "expected there to be no transformations in the newly created component"
 
 
@@ -127,11 +127,11 @@ def test_GIVEN_component_with_a_transform_added_WHEN_get_transforms_for_componen
     )
     component = ComponentModel(nexus_wrapper, component_group)
 
-    transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    transform = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = transform
 
     assert (
-        len(component.transforms) == 1
+        len(component.transforms_full_chain) == 1
     ), "expected there to be a transformation in the component"
 
 
@@ -145,6 +145,10 @@ def test_GIVEN_component_with_a_transform_added_WHEN_transform_is_deleted_THEN_t
     component.depends_on = transform
 
     component.remove_transformation(transform)
+
+    assert (
+        len(component.transforms_full_chain) == 0
+    ), "expected there to be no transforms in the component"
 
 
 def test_GIVEN_a_component_with_a_transform_dependency_WHEN_get_depends_on_THEN_transform_dependency_is_returned():

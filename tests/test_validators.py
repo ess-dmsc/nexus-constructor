@@ -1,78 +1,8 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
 import attr
 from typing import List
-from nexus_constructor.component import Component
-from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from nexus_constructor.validators import (
-    NameValidator,
-    TransformParentValidator,
-    UnitValidator,
-)
+from nexus_constructor.validators import NameValidator, UnitValidator
 from PySide2.QtGui import QValidator
-
-
-def assess_component_tree(count: int, parent_mappings: dict, results: dict):
-    """
-    Test the validity of a transform parent network of components
-
-    Builds an InstrumentModel with components connected according to parent_mappings, then for each provided result,
-    checks a components validity if it were to be set to its current parent.
-    :param count: the number of components to create
-    :param parent_mappings: a dictionary of int -> int representing child and parent index numbers
-    :param results: a dictionary of int -> boolean representing the index of components to check validity for, and
-    their expected validity
-    """
-    components = [Component(name=str(i)) for i in range(count)]
-    for child, parent in parent_mappings.items():
-        components[child].transform_parent = components[parent]
-
-    model = InstrumentModel()
-    model.components = components
-
-    validator = TransformParentValidator()
-    validator.list_model = model
-
-    for index, expected_result in results.items():
-        validator.model_index = index
-        parent_name = components[index].transform_parent.name
-        assert (
-            validator.validate(parent_name, 0) == QValidator.Acceptable
-        ) == expected_result
-
-
-def test_parent_validator_self_loop_terminated_tree():
-    """A parent tree where the root item points to itself is valid"""
-    parent_mappings = {0: 0, 1: 0, 2: 1, 3: 1, 4: 0}
-    results = {0: True, 1: True, 2: True, 3: True, 4: True}
-    assess_component_tree(5, parent_mappings, results)
-
-
-def test_parent_validator_none_terminated_tree():
-    """A parent tree where the root item has no parent is valid"""
-    parent_mappings = {1: 0, 2: 1, 3: 1, 4: 0}
-    results = {1: True, 2: True, 3: True, 4: True}
-    assess_component_tree(5, parent_mappings, results)
-
-
-def test_parent_validator_2_item_loop():
-    """A loop between two items is invalid, as would be any item with its parent in that loop"""
-    parent_mappings = {0: 1, 1: 0, 2: 1}
-    results = {0: False, 1: False, 2: False}
-    assess_component_tree(3, parent_mappings, results)
-
-
-def test_parent_validator_3_item_loop():
-    """A loop between three items is invalid, and items with parents in that loop should be too"""
-    parent_mappings = {0: 1, 1: 2, 2: 0, 3: 2}
-    results = {0: False, 1: False, 2: False, 3: False}
-    assess_component_tree(4, parent_mappings, results)
-
-
-def test_parent_validator_chain_beside_loop():
-    """Even if there's a loop, items disconnected from it would still be valid"""
-    parent_mappings = {0: 1, 1: 0, 2: 2, 3: 2}
-    results = {0: False, 1: False, 2: True, 3: True}
-    assess_component_tree(4, parent_mappings, results)
 
 
 @attr.s

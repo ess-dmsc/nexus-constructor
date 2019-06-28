@@ -12,7 +12,6 @@ from nexus_constructor.geometry_types import (
 )
 from nexus_constructor.geometry_loader import load_geometry
 from PySide2.QtCore import QObject, QUrl, Signal, Slot, Property
-from nexus_constructor.qml_models.instrument_model import InstrumentModel
 
 
 class NoShapeModel(QObject):
@@ -90,9 +89,9 @@ class CylinderModel(QObject):
     def get_geometry(self):
         return self.cylinder
 
-    @Slot(int, "QVariant")
-    def set_geometry(self, index, instrument: InstrumentModel):
-        self.cylinder = instrument.components[index].geometry
+    # @Slot(int, "QVariant")
+    # def set_geometry(self, index, instrument: InstrumentModel):
+    #    self.cylinder = instrument.components[index].geometry
 
 
 class OFFModel(QObject):
@@ -136,6 +135,6 @@ class OFFModel(QObject):
     def get_geometry(self):
         return self.geometry
 
-    @Slot(int, "QVariant")
-    def set_geometry(self, index, instrument: InstrumentModel):
-        self.geometry = instrument.components[index].geometry
+    # @Slot(int, "QVariant")
+    # def set_geometry(self, index, instrument: InstrumentModel):
+    #    self.geometry = instrument.components[index].geometry

@@ -77,7 +77,7 @@ class ComponentModel:
             self.file.set_field_value(self.group, "description", description, str)
 
     @property
-    def transforms(self):
+    def transforms_full_chain(self):
         """
         Gets all transforms in the depends_on chain for this component
         :return: List of transforms
@@ -96,6 +96,14 @@ class ComponentModel:
             transforms.append(TransformationModel(self.file, transform_dataset))
             if "depends_on" in transform_dataset.attrs.keys():
                 self._get_transform(transform_dataset.attrs["depends_on"], transforms)
+
+    @property
+    def transforms(self):
+        """
+        Gets transforms in the depends_on chain but only those which are local to this component's group in the NeXus file
+        :return:
+        """
+        pass
 
     def add_translation(
         self,
@@ -157,6 +165,8 @@ class ComponentModel:
         return TransformationModel(self.file, field)
 
     def remove_transformation(self, transformation: TransformationModel):
+        dependency = self.depends_on
+        # if
         # Remove whole transformations group if this is the only transformation in it
         if len(transformation.dataset.parent.keys()) == 1:
             self.file.delete_node(transformation.dataset.parent)
