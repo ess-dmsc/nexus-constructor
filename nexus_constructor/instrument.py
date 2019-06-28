@@ -12,6 +12,14 @@ def _convert_name_with_spaces(component_name):
 
 
 class Instrument:
+    """
+    This is the high level container for all application data,
+    as much as possible lives in the in memory NeXus file which this class holds (via NexusWrapper)
+
+    Existance of this class, rather than putting all this functionality in NexusWrapper avoids circular dependencies,
+    for example between component and NexusWrapper
+    """
+
     def __init__(self, nexus_file: nx.NexusWrapper):
         self.nexus = nexus_file
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
