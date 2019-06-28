@@ -1,6 +1,5 @@
 import attr
 import h5py
-import numpy as np
 from typing import Any, List
 from PySide2.QtGui import QVector3D
 from nexus_constructor.pixel_data import PixelData
@@ -11,6 +10,7 @@ from nexus_constructor.transformations import (
     TransformationModel,
     TransformationsList,
 )
+from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 
 
 class DependencyError(Exception):
@@ -33,12 +33,6 @@ def _normalise(input_vector: QVector3D):
         return QVector3D(0.0, 0.0, 0.0), 0.0
 
     return input_vector.normalized(), magnitude
-
-
-def _qvector3d_to_numpy_array(input_vector: QVector3D):
-    return np.array([input_vector.x(), input_vector.y(), input_vector.z()]).astype(
-        float
-    )
 
 
 def _generate_incremental_name(base_name, group: h5py.Group):
@@ -159,7 +153,7 @@ class ComponentModel:
         field = self.file.set_field_value(transforms_group, name, magnitude, float)
         self.file.set_attribute_value(field, "units", "m")
         self.file.set_attribute_value(
-            field, "vector", _qvector3d_to_numpy_array(unit_vector)
+            field, "vector", qvector3d_to_numpy_array(unit_vector)
         )
         self.file.set_attribute_value(field, "transformation_type", "Translation")
         if depends_on is None:
@@ -189,7 +183,7 @@ class ComponentModel:
             name = _generate_incremental_name("rotation", transforms_group)
         field = self.file.set_field_value(transforms_group, name, angle, float)
         self.file.set_attribute_value(field, "units", "degrees")
-        self.file.set_attribute_value(field, "vector", _qvector3d_to_numpy_array(axis))
+        self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))
         self.file.set_attribute_value(field, "transformation_type", "Rotation")
         if depends_on is None:
             self.file.set_attribute_value(field, "depends_on", ".")

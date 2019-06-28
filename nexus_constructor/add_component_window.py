@@ -19,7 +19,7 @@ from nexus_constructor.validators import (
     OkValidator,
 )
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.utils import file_dialog, validate_line_edit
+from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 import os
 from functools import partial
 

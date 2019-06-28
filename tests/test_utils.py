@@ -1,4 +1,4 @@
-from nexus_constructor.utils import validate_line_edit
+from nexus_constructor.ui_utils import validate_line_edit
 
 
 class DummyLineEdit:
