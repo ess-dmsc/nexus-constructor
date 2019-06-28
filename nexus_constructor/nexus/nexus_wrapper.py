@@ -7,7 +7,7 @@ import numpy as np
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
-def set_up_in_memory_nexus_file(filename):
+def set_up_in_memory_nexus_file(filename: str):
     """
     Creates an in-memory nexus-file to store the model data in.
     :return: The file object.
@@ -15,7 +15,7 @@ def set_up_in_memory_nexus_file(filename):
     return h5py.File(filename, mode="x", driver="core", backing_store=False)
 
 
-def append_nxs_extension(file_name):
+def append_nxs_extension(file_name: str):
     extension = ".nxs"
     if file_name.endswith(extension):
         return file_name
