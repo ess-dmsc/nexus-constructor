@@ -224,3 +224,26 @@ def test_deleting_a_transformation_which_the_component_indirectly_depends_on_is_
         assert component.remove_transformation(
             first_transform
         ), "Expected not to be allowed to delete the transform as the component indirectly depends on it"
+
+
+def test_transforms_contains_only_local_transforms_not_full_depends_on_chain():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    component_group = _add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    first_component = ComponentModel(nexus_wrapper, component_group)
+    component_group = _add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+    second_component = ComponentModel(nexus_wrapper, component_group)
+
+    first_transform = first_component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    second_transform = second_component.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
+    )
+
+    second_component.depends_on = second_transform
+
+    assert len(
+        second_component.transforms
+    ), "Expect transforms to contain only the 1 transform local to this component"
