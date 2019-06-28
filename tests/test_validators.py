@@ -34,6 +34,15 @@ def test_name_validator_new_unique_name():
     )
 
 
+def test_an_empty_name_is_not_valid():
+    empty_name = ""
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        empty_name,
+        False,
+    )
+
+
 def test_name_validator_new_existing_name():
     """A name that is already in the model is not valid at a new index"""
     assess_names(
