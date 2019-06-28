@@ -9,6 +9,14 @@ from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.transformations import Transformation, TransformationModel
 
 
+class DependencyError(Exception):
+    """
+    Raised when trying to carry out an operation which would invalidate the depends_on chain
+    """
+
+    pass
+
+
 def _normalise(input_vector: QVector3D):
     """
     Normalise to unit vector
@@ -34,6 +42,12 @@ def _generate_incremental_name(base_name, group: h5py.Group):
     while f"{base_name}_{number}" in group:
         number += 1
     return f"{base_name}_{number}"
+
+
+def _transforms_are_equivalent(
+    transform_1: TransformationModel, transform_2: TransformationModel
+):
+    return transform_1.dataset.name == transform_2.dataset.name
 
 
 class ComponentModel:
@@ -87,12 +101,23 @@ class ComponentModel:
         self._get_transform(depends_on, transforms)
         return transforms
 
-    def _get_transform(self, depends_on: str, transforms: List[TransformationModel]):
+    def _get_transform(
+        self,
+        depends_on: str,
+        transforms: List[TransformationModel],
+        local_only: bool = False,
+    ):
         """
         Recursive function, appends each transform in depends_on chain to transforms list
+        :param depends_on: The next depends_on string to find the next transformation in the chain
+        :param transforms: The list to populate with transformations
+        :param local_only: If True then only add transformations which are stored within this component
         """
         if depends_on and depends_on != ".":
             transform_dataset = self.file.nexus_file[depends_on]
+            if local_only and transform_dataset.parent.parent.name != self.group.name:
+                # We're done, the next transformation is not stored in this component
+                return
             transforms.append(TransformationModel(self.file, transform_dataset))
             if "depends_on" in transform_dataset.attrs.keys():
                 self._get_transform(transform_dataset.attrs["depends_on"], transforms)
@@ -100,10 +125,14 @@ class ComponentModel:
     @property
     def transforms(self):
         """
-        Gets transforms in the depends_on chain but only those which are local to this component's group in the NeXus file
+        Gets transforms in the depends_on chain but only those which are local to
+        this component's group in the NeXus file
         :return:
         """
-        pass
+        transforms = []
+        depends_on = self.get_field("depends_on")
+        self._get_transform(depends_on, transforms, local_only=True)
+        return transforms
 
     def add_translation(
         self,
@@ -164,15 +193,34 @@ class ComponentModel:
             self.file.set_attribute_value(field, "depends_on", depends_on.dataset.name)
         return TransformationModel(self.file, field)
 
-    def remove_transformation(self, transformation: TransformationModel):
-        dependency = self.depends_on
-        # if
+    def _transform_is_in_this_component(self, transform: TransformationModel):
+        return transform.dataset.parent.parent.name == self.group.name
+
+    def _transform_is_a_dependency_of_this_component(
+        self, transform: TransformationModel
+    ):
+        for transform_dependency in self.transforms_full_chain:
+            if _transforms_are_equivalent(transform, transform_dependency):
+                return True
+        return False
+
+    def remove_transformation(self, transform: TransformationModel):
+        if not self._transform_is_in_this_component(transform):
+            raise PermissionError(
+                "Transform is not in this component, do not have permission to delete"
+            )
+
+        if self._transform_is_a_dependency_of_this_component(transform):
+            raise DependencyError(
+                "Transform is a dependency of the component, cannot delete it"
+            )
+
         # Remove whole transformations group if this is the only transformation in it
-        if len(transformation.dataset.parent.keys()) == 1:
-            self.file.delete_node(transformation.dataset.parent)
+        if len(transform.dataset.parent.keys()) == 1:
+            self.file.delete_node(transform.dataset.parent)
         # Otherwise just remove the transformation from the group
         else:
-            self.file.delete_node(transformation.dataset)
+            self.file.delete_node(transform.dataset)
 
     @property
     def depends_on(self):

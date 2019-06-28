@@ -159,8 +159,9 @@ class NexusWrapper(QObject):
 
     def create_transformations_group_if_does_not_exist(self, parent_group: h5Node):
         for child in parent_group:
-            if "NXtransformations" in parent_group[child].attrs.keys():
-                return parent_group[child]
+            if "NX_class" in parent_group[child].attrs.keys():
+                if parent_group[child].attrs["NX_class"] == "NXtransformations":
+                    return parent_group[child]
         return self.create_nx_group(
             "transformations", "NXtransformations", parent_group
         )
