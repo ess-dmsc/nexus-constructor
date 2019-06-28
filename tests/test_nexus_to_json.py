@@ -20,7 +20,7 @@ def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct
 
     data, dtype, size = converter._get_data_and_type(dataset)
 
-    assert size == 1
+    assert size == expected_size
     assert dtype == expected_dtype
     assert data == expected_value
 
@@ -37,7 +37,7 @@ def test_GIVEN_float64_WHEN_getting_data_and_dtype_THEN_function_returns_correct
 
     data, dtype, size = converter._get_data_and_type(dataset)
 
-    assert size == 1
+    assert size == expected_size
     assert dtype == expected_dtype
     assert data == expected_value
 
@@ -54,7 +54,7 @@ def test_GIVEN_single_string_WHEN_getting_data_and_dtype_THEN_function_returns_c
 
     data, dtype, size = converter._get_data_and_type(dataset)
 
-    assert size == 1
+    assert size == expected_size
     assert dtype == expected_dtype
     assert bytes(data, "ASCII") == expected_value
 
@@ -84,12 +84,14 @@ def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist
     dataset.attrs["NX_class"] = "NXpinhole"
 
     converter = NexusToDictConverter()
-    root_dict = converter._root_to_dict(dataset)
+    root_dict = converter.convert(file, [], [])
 
-    assert root_dict["name"].lstrip("/") == dataset_name
-    assert root_dict["type"] == "dataset"
-    assert root_dict["values"] == dataset_value
-    assert not root_dict["dataset"]["size"]
+    ds = root_dict["children"][0]
+
+    assert ds["name"].lstrip("/") == dataset_name
+    assert ds["type"] == "dataset"
+    assert ds["values"] == dataset_value
+    assert "size" not in ds["dataset"]
 
 
 def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_in_root_dict():
@@ -103,9 +105,10 @@ def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_
     dataset.attrs["NX_class"] = "NXpinhole"
 
     converter = NexusToDictConverter()
-    root_dict = converter._root_to_dict(dataset)
+    root_dict = converter.convert(file, [], [])
+    ds = root_dict["children"][0]
 
-    assert root_dict["name"].lstrip("/") == dataset_name
-    assert root_dict["type"] == "dataset"
-    assert root_dict["values"] == dataset_value
-    assert root_dict["dataset"]["size"] == (len(dataset_value),)
+    assert ds["name"].lstrip("/") == dataset_name
+    assert ds["type"] == "dataset"
+    assert ds["values"] == dataset_value
+    assert ds["dataset"]["size"] == (len(dataset_value),)

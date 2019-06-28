@@ -51,9 +51,7 @@ class NexusToDictConverter:
         self._kafka_streams = streams
         self._links = links
         return {
-            "children": [
-                self._root_to_dict(entry) for _, entry in nexus_root.entries.items()
-            ]
+            "children": [self._root_to_dict(entry) for _, entry in nexus_root.items()]
         }
 
     def _root_to_dict(self, root):
@@ -74,14 +72,14 @@ class NexusToDictConverter:
 
     def _get_data_and_type(self, root: h5py.Dataset):
         """
-        get data type of dataset
+        get the value and data type of dataset
         :param root: h5py dataset
         :return: the data in the dataset, the datatype and the size of the data in the dataset
         """
         size = 1
-        data = root[...]
+        data = root[()]
         dtype = root.dtype
-        if isinstance(data, np.ndarray):
+        if type(data) is np.ndarray:
             size = data.shape
             if self.truncate_large_datasets:
                 self.truncate_if_large(size, data)
