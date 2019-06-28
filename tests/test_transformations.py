@@ -73,10 +73,15 @@ def test_GIVEN_nothing_WHEN_creating_transformation_THEN_transformation_type_is_
 
 
 def _add_transform_to_file(
-    nexus_wrapper: NexusWrapper, name: str, value: Any, vector: QVector3D
+    nexus_wrapper: NexusWrapper,
+    name: str,
+    value: Any,
+    vector: QVector3D,
+    transform_type: str,
 ):
     transform_dataset = nexus_wrapper.nexus_file.create_dataset(name, data=value)
     transform_dataset.attrs["vector"] = qvector3d_to_numpy_array(vector)
+    transform_dataset.attrs["transformation_type"] = transform_type
     return transform_dataset
 
 
@@ -86,9 +91,10 @@ def test_can_get_transform_properties():
     test_name = "slartibartfast"
     test_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
+    test_type = "Translation"
 
     transform_dataset = _add_transform_to_file(
-        nexus_wrapper, test_name, test_value, test_vector
+        nexus_wrapper, test_name, test_value, test_vector, test_type
     )
 
     transform = TransformationModel(nexus_wrapper, transform_dataset)
@@ -102,6 +108,9 @@ def test_can_get_transform_properties():
     assert (
         transform.vector == test_vector
     ), "Expected the transform vector to match what was in the NeXus file"
+    assert (
+        transform.type == test_type
+    ), "Expected the transform type to match what was in the NeXus file"
 
 
 def test_can_set_transform_properties():
@@ -110,9 +119,10 @@ def test_can_set_transform_properties():
     initial_name = "slartibartfast"
     initial_value = 42
     initial_vector = QVector3D(1.0, 0.0, 0.0)
+    initial_type = "Translation"
 
     transform_dataset = _add_transform_to_file(
-        nexus_wrapper, initial_name, initial_value, initial_vector
+        nexus_wrapper, initial_name, initial_value, initial_vector, initial_type
     )
 
     transform = TransformationModel(nexus_wrapper, transform_dataset)
@@ -120,10 +130,12 @@ def test_can_set_transform_properties():
     test_name = "beeblebrox"
     test_value = 34
     test_vector = QVector3D(0.0, 0.0, 1.0)
+    test_type = "Rotation"
 
     transform.name = test_name
     transform.value = test_value
     transform.vector = test_vector
+    transform.type = test_type
 
     assert (
         transform.name == test_name
@@ -134,3 +146,6 @@ def test_can_set_transform_properties():
     assert (
         transform.vector == test_vector
     ), "Expected the transform vector to match what was in the NeXus file"
+    assert (
+        transform.type == test_type
+    ), "Expected the transform type to match what was in the NeXus file"
