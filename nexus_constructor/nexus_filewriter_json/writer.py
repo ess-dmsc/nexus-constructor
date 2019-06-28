@@ -19,7 +19,7 @@ def generate_json(data: Instrument, file):
     nexus_file_name = ""
 
     converter = NexusToDictConverter()
-    tree = converter.convert(data.nexus, streams, links)
+    tree = converter.convert(data.nexus.nexus_file, streams, links)
     write_command, stop_command = create_writer_commands(tree, nexus_file_name)
     object_to_json_file(write_command, file)
 
@@ -115,22 +115,23 @@ class NexusToDictConverter:
     def _handle_group(self, root: h5py.Group):
         """
         Generate JSON dict for a h5py group.
+        TODO: add tests that cover this
         :param root: h5py group to generate dict from.
         :return: generated dict of group and children.
         """
         root_dict = {"type": "group", "name": root.name, "children": []}
         # Add the entries
-        entries = root.entries
-        if root.nxpath in self._kafka_streams:
+        entries = root[...]
+        if root.name in self._kafka_streams:
             root_dict["children"].append(
-                {"type": "stream", "stream": self._kafka_streams[root.nxpath]}
+                {"type": "stream", "stream": self._kafka_streams[root.name]}
             )
-        elif root.nxpath in self._links:
+        elif root.name in self._links:
             root_dict["children"].append(
                 {
                     "type": "link",
-                    "name": self._links[root.nxpath]["name"],
-                    "target": self._links[root.nxpath]["target"],
+                    "name": self._links[root.name]["name"],
+                    "target": self._links[root.name]["target"],
                 }
             )
         elif entries:
@@ -180,13 +181,13 @@ def create_writer_commands(
     stop_time=None,
 ):
     """
-    :param nexus_structure: dictionary? TODO
+    :param nexus_structure: dictionary containing nexus file structure
     :param output_filename: the nexus file output filename
-    :param broker:
-    :param job_id:
+    :param broker: default broker to consume from
+    :param job_id: filewriter job_id
     :param start_time: ms from unix epoch
     :param stop_time: ms from unix epoch
-    :return:
+    :return: A write command and stop command with specified job_id.
     """
     if not job_id:
         job_id = str(uuid.uuid1())
