@@ -78,10 +78,9 @@ class MainWindow(Ui_MainWindow):
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
-        self.instrument.nexus.save_file(filename)
         if filename:
             with open(filename, "w") as file:
-                file.write(writer.generate_json(self.instrument.get_component_list()))
+                writer.generate_json(self.instrument, file)
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
