@@ -5,6 +5,12 @@ import h5py
 from nexus_constructor.nexus import nexus_wrapper as nx
 
 
+class TransformationsList(list):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent_component = parent
+
+
 class TransformationModel:
     """
     Provides an interface to an existing transformation dataset in a NeXus file

@@ -6,7 +6,11 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.pixel_data import PixelData
 from nexus_constructor.geometry_types import Geometry
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.transformations import Transformation, TransformationModel
+from nexus_constructor.transformations import (
+    Transformation,
+    TransformationModel,
+    TransformationsList,
+)
 
 
 class DependencyError(Exception):
@@ -96,7 +100,7 @@ class ComponentModel:
         Gets all transforms in the depends_on chain for this component
         :return: List of transforms
         """
-        transforms = []
+        transforms = TransformationsList(self)
         depends_on = self.get_field("depends_on")
         self._get_transform(depends_on, transforms)
         return transforms
@@ -129,7 +133,7 @@ class ComponentModel:
         this component's group in the NeXus file
         :return:
         """
-        transforms = []
+        transforms = TransformationsList(self)
         depends_on = self.get_field("depends_on")
         self._get_transform(depends_on, transforms, local_only=True)
         return transforms
