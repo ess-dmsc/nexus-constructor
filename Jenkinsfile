@@ -150,7 +150,7 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user -r requirements-dev.txt"
+                    sh "python3 -m pip install --user -r requirements-dev.txt && git submodule update --init"
                 } // stage
                 stage('Run tests') {
                     sh "python3 -m pytest . -s --ignore=definitions/"
