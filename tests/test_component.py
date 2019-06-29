@@ -310,9 +310,8 @@ def test_removing_transformation_which_still_has_one_dependent_transform_is_not_
     component = ComponentModel(nexus_wrapper, component_group)
 
     first_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
-    second_transform = component.add_rotation(
-        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
-    )
+    # second_transform
+    component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform)
     third_transform = component.add_rotation(
         QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
     )

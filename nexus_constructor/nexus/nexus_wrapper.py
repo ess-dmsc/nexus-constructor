@@ -155,8 +155,12 @@ class NexusWrapper(QObject):
     def set_attribute_value(self, node: h5Node, name: str, value: Any):
         # Deal with arrays of strings
         if isinstance(value, np.ndarray):
-            if value.dtype.type is np.string_ and len(value) > 1:
-                node.attrs.create(name, value, (len(value),), h5py.special_dtype(vlen=str))
+            if value.dtype.type is np.str_ and value.size == 1:
+                value = str(value[0])
+            elif value.dtype.type is np.str_ and value.size > 1:
+                node.attrs.create(
+                    name, value, (len(value),), h5py.special_dtype(vlen=str)
+                )
                 for index, item in enumerate(value):
                     node.attrs[name][index] = item.encode("utf-8")
                 self._emit_file()
