@@ -35,12 +35,13 @@ class NexusWrapperNoInit(NexusWrapper):
 
 def test_dependents_list_is_created_on_file_load():
     """
-    The dependents list for transforms is not part of NeXus standard,
-    we therefore cannot rely on it being present and correct in any loaded file.
+    The dependents list for transforms is stored in the "dependent_of" attribute,
+    which is not part of the NeXus standard,
+    we therefore cannot rely on it being present and correct in a file we load.
     This test makes sure that we generate this information on file load.
     """
 
-    # Create minimal test file with some transformations
+    # Create minimal test file with some transformations but no "dependent_of" attributes
     in_memory_test_file = h5py.File(
         "test_file", mode="x", driver="core", backing_store=False
     )
