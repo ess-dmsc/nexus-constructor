@@ -148,7 +148,7 @@ class NexusWrapper(QObject):
         return group[name]
 
     @staticmethod
-    def get_attribute_value(node: h5Node, name: str) -> str:
+    def get_attribute_value(node: h5Node, name: str):
         if name in node.attrs.keys():
             return node.attrs[name]
 
