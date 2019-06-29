@@ -3,6 +3,7 @@ import h5py
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.component import ComponentModel
+from nexus_constructor.transformations import TransformationModel
 
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -29,6 +30,30 @@ class Instrument:
                 )
             )
         )
+        self._generate_transform_dependency_lists()
+
+    def _generate_transform_dependency_lists(self):
+        """
+        We keep track of what transformations a transformation is a dependency of
+        so that we can avoid deleting transformations if anything else still depends on them.
+        There is no attribute for this in the NeXus standard, so we cannot rely on it being in the file we have loaded.
+        This method allows us to generate the attributes.
+        """
+
+        def refresh_depends_on(_, node):
+            """
+            Refresh the depends_on attribute of each transformation, which also results in registering dependents
+            """
+            if isinstance(node, h5py.Group):
+                if "NX_class" in node.attrs.keys():
+                    if node.attrs["NX_class"] == "NXtransformations":
+                        for transformation_name in node:
+                            transform = TransformationModel(
+                                self.nexus, node[transformation_name]
+                            )
+                            transform.depends_on = transform.depends_on
+
+        self.nexus.nexus_file.visititems(refresh_depends_on)
 
     def add_component(self, name: str, nx_class: str, description: str):
         """

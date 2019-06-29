@@ -90,7 +90,7 @@ class TransformationModel:
     def depends_on(self) -> "TransformationModel":
         depends_on_path = self.file.get_attribute_value(self.dataset, "depends_on")
         if depends_on_path is not None:
-            return TransformationModel(self.file, self.file[depends_on_path])
+            return TransformationModel(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
     def depends_on(self, depends_on: "TransformationModel"):
@@ -159,7 +159,10 @@ class TransformationModel:
 
     def get_dependents(self):
         if "dependee_of" in self.dataset.attrs.keys():
-            return self.file.get_attribute_value(self.dataset, "dependee_of")
+            dependents = self.file.get_attribute_value(self.dataset, "dependee_of")
+            if not isinstance(dependents, np.ndarray):
+                return [dependents]
+            return dependents.tolist()
 
 
 @attr.s
