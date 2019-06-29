@@ -122,7 +122,10 @@ class ComponentModel:
         """
         if depends_on is not None and depends_on != ".":
             transform_dataset = self.file.nexus_file[depends_on]
-            if local_only and transform_dataset.parent.parent.name != self.absolute_path:
+            if (
+                local_only
+                and transform_dataset.parent.parent.name != self.absolute_path
+            ):
                 # We're done, the next transformation is not stored in this component
                 return
             transforms.append(TransformationModel(self.file, transform_dataset))
@@ -208,7 +211,9 @@ class ComponentModel:
 
         dependents = transform.get_dependents()
         if dependents:
-            raise DependencyError(f"Cannot delete transformation, it is a dependency of {dependents}")
+            raise DependencyError(
+                f"Cannot delete transformation, it is a dependency of {dependents}"
+            )
 
         # Remove whole transformations group if this is the only transformation in it
         if len(transform.dataset.parent.keys()) == 1:
@@ -228,12 +233,12 @@ class ComponentModel:
     def depends_on(self, transformation: TransformationModel):
         existing_depends_on = self.file.get_attribute_value(self.group, "depends_on")
         if existing_depends_on is not None:
-            TransformationModel(self.file, self.file[existing_depends_on]).deregister_dependent(self)
+            TransformationModel(
+                self.file, self.file[existing_depends_on]
+            ).deregister_dependent(self)
 
         if transformation is None:
-            self.file.set_field_value(
-                self.group, "depends_on", ".", str
-            )
+            self.file.set_field_value(self.group, "depends_on", ".", str)
         else:
             self.file.set_field_value(
                 self.group, "depends_on", transformation.absolute_path, str
