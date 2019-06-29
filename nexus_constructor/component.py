@@ -45,29 +45,7 @@ def _generate_incremental_name(base_name, group: h5py.Group):
 def _transforms_are_equivalent(
     transform_1: TransformationModel, transform_2: TransformationModel
 ):
-    return transform_1.dataset.name == transform_2.dataset.name
-
-
-def _register_in_dependee(dependent: TransformationModel, dependee: TransformationModel):
-    """
-    Register dependent transform in the dependee_of list of the dependee
-    Note, "dependee_of" attribute is not part of the NeXus format
-    :param dependent: transform that depends on the dependee
-    :param dependee: transform that the dependent transform depends on
-    """
-    pass
-    # TODO if dependee does not have dependee_of attribute then create it
-    #  append dependent.dataset.name to dependee_of attribute
-
-
-def _deregister_in_dependee(former_dependent: TransformationModel, former_dependee: TransformationModel):
-    """
-    Remove former dependent transform from the dependee_of list of the former dependee
-    Note, "dependee_of" attribute is not part of the NeXus format
-    :param former_dependent: transform that used to depend on the dependee
-    :param former_dependee: transform that the former dependent transform used to depend on
-    """
-    pass
+    return transform_1.absolute_path == transform_2.absolute_path
 
 
 class ComponentModel:
@@ -86,6 +64,15 @@ class ComponentModel:
     @name.setter
     def name(self, new_name: str):
         self.file.rename_node(self.group, new_name)
+
+    @property
+    def absolute_path(self):
+        """
+        Get absolute path of the component group in the NeXus file,
+        this is guaranteed to be unique so it can be used as an ID for this Component
+        :return: absolute path of the transform dataset in the NeXus file,
+        """
+        return self.group.name
 
     def get_field(self, name: str):
         return self.file.get_field_value(self.group, name)
@@ -133,9 +120,9 @@ class ComponentModel:
         :param transforms: The list to populate with transformations
         :param local_only: If True then only add transformations which are stored within this component
         """
-        if depends_on and depends_on != ".":
+        if depends_on is not None and depends_on != ".":
             transform_dataset = self.file.nexus_file[depends_on]
-            if local_only and transform_dataset.parent.parent.name != self.group.name:
+            if local_only and transform_dataset.parent.parent.name != self.absolute_path:
                 # We're done, the next transformation is not stored in this component
                 return
             transforms.append(TransformationModel(self.file, transform_dataset))
@@ -211,15 +198,7 @@ class ComponentModel:
         return rotation_transform
 
     def _transform_is_in_this_component(self, transform: TransformationModel) -> bool:
-        return transform.dataset.parent.parent.name == self.group.name
-
-    def _transform_is_a_dependency_of_this_component(
-        self, transform: TransformationModel
-    ) -> bool:
-        for transform_dependency in self.transforms_full_chain:
-            if _transforms_are_equivalent(transform, transform_dependency):
-                return True
-        return False
+        return transform.dataset.parent.parent.name == self.absolute_path
 
     def remove_transformation(self, transform: TransformationModel):
         if not self._transform_is_in_this_component(transform):
@@ -227,10 +206,9 @@ class ComponentModel:
                 "Transform is not in this component, do not have permission to delete"
             )
 
-        if self._transform_is_a_dependency_of_this_component(transform):
-            raise DependencyError(
-                "Transform is a dependency of the component, cannot delete it"
-            )
+        dependents = transform.get_dependents()
+        if dependents:
+            raise DependencyError(f"Cannot delete transformation, it is a dependency of {dependents}")
 
         # Remove whole transformations group if this is the only transformation in it
         if len(transform.dataset.parent.keys()) == 1:
@@ -248,14 +226,19 @@ class ComponentModel:
 
     @depends_on.setter
     def depends_on(self, transformation: TransformationModel):
+        existing_depends_on = self.file.get_attribute_value(self.group, "depends_on")
+        if existing_depends_on is not None:
+            TransformationModel(self.file, self.file[existing_depends_on]).deregister_dependent(self)
+
         if transformation is None:
             self.file.set_field_value(
                 self.group, "depends_on", ".", str
             )
         else:
             self.file.set_field_value(
-                self.group, "depends_on", transformation.dataset.name, str
+                self.group, "depends_on", transformation.absolute_path, str
             )
+            transformation.register_dependent(self)
 
 
 @attr.s

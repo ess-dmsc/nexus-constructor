@@ -153,7 +153,21 @@ class NexusWrapper(QObject):
             return node.attrs[name]
 
     def set_attribute_value(self, node: h5Node, name: str, value: Any):
+        # Deal with arrays of strings
+        if isinstance(value, np.ndarray):
+            if value.dtype.type is np.string_ and len(value) > 1:
+                node.attrs.create(name, value, (len(value),), h5py.special_dtype(vlen=str))
+                for index, item in enumerate(value):
+                    node.attrs[name][index] = item.encode("utf-8")
+                self._emit_file()
+                return
+
         node.attrs[name] = value
+        self._emit_file()
+
+    def delete_attribute(self, node: h5Node, name: str):
+        if name in node.attrs.keys():
+            del node.attrs[name]
         self._emit_file()
 
     def create_transformations_group_if_does_not_exist(self, parent_group: h5Node):
