@@ -148,10 +148,9 @@ class NexusWrapper(QObject):
         return group[name]
 
     @staticmethod
-    def get_attribute_value(node: h5Node, name: str):
-        if name not in node.attrs.keys():
-            raise NameError(f"Attribute called {name} not found in {node.name}")
-        return node.attrs[name]
+    def get_attribute_value(node: h5Node, name: str) -> str:
+        if name in node.attrs.keys():
+            return node.attrs[name]
 
     def set_attribute_value(self, node: h5Node, name: str, value: Any):
         node.attrs[name] = value

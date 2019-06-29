@@ -72,6 +72,23 @@ class TransformationModel:
         """
         self.dataset[...] = new_value
 
+    @property
+    def depends_on(self) -> 'TransformationModel':
+        depends_on_path = self.file.get_attribute_value(self.dataset, "depends_on")
+        if depends_on_path is not None:
+            return TransformationModel(self.file, self.file[depends_on_path])
+
+    @depends_on.setter
+    def depends_on(self, depends_on: 'TransformationModel'):
+        """
+        Note, until Python 4.0 (or 3.7 with from __future__ import annotations) have
+        to use string for depends_on type here, because the current class is not defined yet
+        """
+        if depends_on is None:
+            self.file.set_attribute_value(self.dataset, "depends_on", ".")
+        else:
+            self.file.set_attribute_value(self.dataset, "depends_on", depends_on.dataset.name)
+
 
 @attr.s
 class Transformation:
