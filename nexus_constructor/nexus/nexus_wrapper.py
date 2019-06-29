@@ -80,11 +80,11 @@ class NexusWrapper(QObject):
                 filename, mode="r", backing_store=False, driver="core"
             )
             self._load_file(nexus_file)
+            print("NeXus file loaded")
+            self._emit_file()
 
     def _load_file(self, nexus_file: h5py.File):
         self.nexus_file = nexus_file
-        print("NeXus file loaded")
-        self._emit_file()
 
     def rename_node(self, node: h5Node, new_name: str):
         self.nexus_file.move(node.name, f"{node.parent.name}/{new_name}")
