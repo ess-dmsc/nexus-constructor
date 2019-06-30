@@ -1,15 +1,8 @@
-import attr
 import h5py
 from typing import Any, List
 from PySide2.QtGui import QVector3D
-from nexus_constructor.pixel_data import PixelData
-from nexus_constructor.geometry_types import Geometry
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.transformations import (
-    Transformation,
-    TransformationModel,
-    TransformationsList,
-)
+from nexus_constructor.transformations import TransformationModel, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 
 
@@ -48,7 +41,7 @@ def _transforms_are_equivalent(
     return transform_1.absolute_path == transform_2.absolute_path
 
 
-class ComponentModel:
+class Component:
     """
     Provides an interface to an existing component group in a NeXus file
     """
@@ -244,17 +237,3 @@ class ComponentModel:
                 self.group, "depends_on", transformation.absolute_path, str
             )
             transformation.register_dependent(self)
-
-
-@attr.s
-class Component:
-    """DEPRECATED: Switching to use ComponentModel everywhere"""
-
-    nx_class = attr.ib(str)
-    name = attr.ib(str)
-    description = attr.ib(default="", type=str)
-    transform_parent = attr.ib(default=None, type=object)
-    dependent_transform = attr.ib(default=None, type=Transformation)
-    transforms = attr.ib(factory=list, type=List[Transformation])
-    geometry = attr.ib(default=None, type=Geometry)
-    pixel_data = attr.ib(default=None, type=PixelData)
