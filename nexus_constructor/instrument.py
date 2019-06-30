@@ -3,7 +3,7 @@ import h5py
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.component import Component
-from nexus_constructor.transformations import TransformationModel
+from nexus_constructor.transformations import Transformation
 
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -48,7 +48,7 @@ class Instrument:
                 if "NX_class" in node.attrs.keys():
                     if node.attrs["NX_class"] == "NXtransformations":
                         for transformation_name in node:
-                            transform = TransformationModel(
+                            transform = Transformation(
                                 self.nexus, node[transformation_name]
                             )
                             transform.depends_on = transform.depends_on

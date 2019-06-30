@@ -2,7 +2,7 @@ import h5py
 from typing import Any, List
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.transformations import TransformationModel, TransformationsList
+from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 
 
@@ -36,7 +36,7 @@ def _generate_incremental_name(base_name, group: h5py.Group):
 
 
 def _transforms_are_equivalent(
-    transform_1: TransformationModel, transform_2: TransformationModel
+    transform_1: Transformation, transform_2: Transformation
 ):
     return transform_1.absolute_path == transform_2.absolute_path
 
@@ -104,7 +104,7 @@ class Component:
     def _get_transform(
         self,
         depends_on: str,
-        transforms: List[TransformationModel],
+        transforms: List[Transformation],
         local_only: bool = False,
     ):
         """
@@ -121,7 +121,7 @@ class Component:
             ):
                 # We're done, the next transformation is not stored in this component
                 return
-            transforms.append(TransformationModel(self.file, transform_dataset))
+            transforms.append(Transformation(self.file, transform_dataset))
             if "depends_on" in transform_dataset.attrs.keys():
                 self._get_transform(transform_dataset.attrs["depends_on"], transforms)
 
@@ -138,11 +138,8 @@ class Component:
         return transforms
 
     def add_translation(
-        self,
-        vector: QVector3D,
-        name: str = None,
-        depends_on: TransformationModel = None,
-    ) -> TransformationModel:
+        self, vector: QVector3D, name: str = None, depends_on: Transformation = None
+    ) -> Transformation:
         """
         Note, currently assumes translation is in metres
         :param vector: direction and magnitude of translation as a 3D vector
@@ -162,7 +159,7 @@ class Component:
         )
         self.file.set_attribute_value(field, "transformation_type", "Translation")
 
-        translation_transform = TransformationModel(self.file, field)
+        translation_transform = Transformation(self.file, field)
         translation_transform.depends_on = depends_on
         return translation_transform
 
@@ -171,8 +168,8 @@ class Component:
         axis: QVector3D,
         angle: float,
         name: str = None,
-        depends_on: TransformationModel = None,
-    ) -> TransformationModel:
+        depends_on: Transformation = None,
+    ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
         :param axis: axis
@@ -189,14 +186,14 @@ class Component:
         self.file.set_attribute_value(field, "units", "degrees")
         self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))
         self.file.set_attribute_value(field, "transformation_type", "Rotation")
-        rotation_transform = TransformationModel(self.file, field)
+        rotation_transform = Transformation(self.file, field)
         rotation_transform.depends_on = depends_on
         return rotation_transform
 
-    def _transform_is_in_this_component(self, transform: TransformationModel) -> bool:
+    def _transform_is_in_this_component(self, transform: Transformation) -> bool:
         return transform.dataset.parent.parent.name == self.absolute_path
 
-    def remove_transformation(self, transform: TransformationModel):
+    def remove_transformation(self, transform: Transformation):
         if not self._transform_is_in_this_component(transform):
             raise PermissionError(
                 "Transform is not in this component, do not have permission to delete"
@@ -220,13 +217,13 @@ class Component:
         depends_on_path = self.file.get_field_value(self.group, "depends_on")
         if depends_on_path is None:
             return None
-        return TransformationModel(self.file, self.file.nexus_file[depends_on_path])
+        return Transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
-    def depends_on(self, transformation: TransformationModel):
+    def depends_on(self, transformation: Transformation):
         existing_depends_on = self.file.get_attribute_value(self.group, "depends_on")
         if existing_depends_on is not None:
-            TransformationModel(
+            Transformation(
                 self.file, self.file[existing_depends_on]
             ).deregister_dependent(self)
 

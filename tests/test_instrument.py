@@ -1,5 +1,5 @@
 import h5py
-from nexus_constructor.transformations import TransformationModel
+from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import _convert_name_with_spaces, Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
@@ -99,12 +99,12 @@ def test_dependents_list_is_created_by_instrument():
     nexus_wrapper._load_file(in_memory_test_file)
     Instrument(nexus_wrapper)
 
-    transform_1_loaded = TransformationModel(nexus_wrapper, transform_1)
+    transform_1_loaded = Transformation(nexus_wrapper, transform_1)
     assert (
         len(transform_1_loaded.get_dependents()) == 1
     ), "Expected transform 1 to have a registered dependent (transform 2)"
 
-    transform_2_loaded = TransformationModel(nexus_wrapper, transform_2)
+    transform_2_loaded = Transformation(nexus_wrapper, transform_2)
     assert (
         len(transform_2_loaded.get_dependents()) == 2
     ), "Expected transform 2 to have 2 registered dependents (transforms 3 and 4)"
