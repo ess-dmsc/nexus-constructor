@@ -1,3 +1,5 @@
+import numpy as np
+from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QFileDialog
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
 
@@ -45,4 +47,10 @@ def validate_line_edit(
     line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
     line_edit.setToolTip(tooltip_on_accept) if is_valid else line_edit.setToolTip(
         tooltip_on_reject
+    )
+
+
+def qvector3d_to_numpy_array(input_vector: QVector3D):
+    return np.array([input_vector.x(), input_vector.y(), input_vector.z()]).astype(
+        float
     )

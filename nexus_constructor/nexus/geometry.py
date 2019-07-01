@@ -80,7 +80,7 @@ def ancestral_dependent_transform(component: Component):
         ancestor = component.transform_parent
         index = -1
         if component.dependent_transform is not None:
-            index = component.transform_parent.transforms.index(
+            index = component.transform_parent.transforms_full_chain.index(
                 component.dependent_transform
             )
         while not (dependent_found or no_dependent):
@@ -100,7 +100,7 @@ def ancestral_dependent_transform(component: Component):
                 if ancestor.dependent_transform is None:
                     index = -1
                 else:
-                    index = component.transform_parent.transforms.index(
+                    index = component.transform_parent.transforms_full_chain.index(
                         component.dependent_transform
                     )
                 ancestor = ancestor.transform_parent
