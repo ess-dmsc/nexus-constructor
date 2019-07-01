@@ -22,6 +22,7 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 import os
 from functools import partial
+from nexus_constructor.ui_utils import generate_unique_name
 
 
 class GeometryType(Enum):
@@ -90,10 +91,14 @@ class AddComponentDialog(Ui_AddComponentDialog):
         name_validator = NameValidator(self.instrument.get_component_list())
         self.nameLineEdit.setValidator(name_validator)
         self.nameLineEdit.validator().is_valid.connect(
-            partial(validate_line_edit, self.nameLineEdit)
+            partial(
+                validate_line_edit,
+                self.nameLineEdit,
+                tooltip_on_accept="Component name is valid.",
+                tooltip_on_reject=f"Component name is not valid. Suggestion: {self.generate_name_suggestion()}",
+            )
         )
 
-        validate_line_edit(self.nameLineEdit, False)
         validate_line_edit(self.fileLineEdit, False)
 
         self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
@@ -113,8 +118,15 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
 
-        # Validate the default value set by the UI
+        # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
+        self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+
+    def generate_name_suggestion(self):
+        return generate_unique_name(
+            self.componentTypeComboBox.currentText(),
+            self.instrument.get_component_list(),
+        )
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
