@@ -115,13 +115,12 @@ class NexusToDictConverter:
     def _handle_group(self, root: h5py.Group):
         """
         Generate JSON dict for a h5py group.
-        TODO: add tests that cover this
         :param root: h5py group to generate dict from.
         :return: generated dict of group and children.
         """
         root_dict = {"type": "group", "name": root.name, "children": []}
         # Add the entries
-        entries = root[...]
+        entries = list(root.values())
         if root.name in self._kafka_streams:
             root_dict["children"].append(
                 {"type": "stream", "stream": self._kafka_streams[root.name]}
@@ -136,7 +135,7 @@ class NexusToDictConverter:
             )
         elif entries:
             for entry in entries:
-                child_dict = self._root_to_dict(entries[entry])
+                child_dict = self._root_to_dict(entry)
                 root_dict["children"].append(child_dict)
 
         return root_dict
