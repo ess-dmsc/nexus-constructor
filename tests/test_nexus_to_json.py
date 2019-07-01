@@ -112,3 +112,45 @@ def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_
     assert ds["type"] == "dataset"
     assert ds["values"] == dataset_value
     assert ds["dataset"]["size"] == (len(dataset_value),)
+
+
+def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appended_to_children():
+    file = create_in_memory_file("test7")
+    group_name = "test_group"
+    group = file.create_group(group_name)
+    group.attrs["NX_class"] = "NXgroup"
+
+    group_contents = ["test_contents_item"]
+
+    converter = NexusToDictConverter()
+    root_dict = converter.convert(
+        file, streams={f"/{group_name}": group_contents}, links=[]
+    )
+
+    assert group.name == root_dict["children"][0]["name"]
+    assert group_contents == root_dict["children"][0]["children"][0]["stream"]
+
+
+def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children():
+    file = create_in_memory_file("test7")
+    group_name = "test_group"
+    group = file.create_group(group_name)
+    group.attrs["NX_class"] = "NXgroup"
+
+    group_to_be_linked_name = "test_linked_group"
+    group_to_be_linked = file.create_group(group_to_be_linked_name)
+    group_to_be_linked.attrs["NX_class"] = "NXgroup"
+
+    link_name = "testlink"
+
+    group_contents = {"name": link_name, "target": group_to_be_linked.name}
+
+    converter = NexusToDictConverter()
+    root_dict = converter.convert(file, streams={}, links={group.name: group_contents})
+
+    assert group.name == root_dict["children"][0]["name"]
+
+    link_dict = root_dict["children"][0]["children"][0]
+    assert "link" == link_dict["type"]
+    assert link_name == link_dict["name"]
+    assert group_to_be_linked.name == link_dict["target"]
