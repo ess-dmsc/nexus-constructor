@@ -153,18 +153,27 @@ class Gnomon:
 
     @staticmethod
     def configure_gnomon_cone(cone_mesh, gnomon_cylinder_length):
-
+        """
+        Gives a shape to the gnomon cone mesh by settings its length and top/bottom radii.
+        :param cone_mesh: The mesh to be configured.
+        :param gnomon_cylinder_length: The length of the gnomon cylinders. Used to determine the shape of the cones.
+        """
         cone_mesh.setLength(gnomon_cylinder_length * 0.3)
         cone_mesh.setBottomRadius(gnomon_cylinder_length * 0.1)
         cone_mesh.setTopRadius(0)
 
     def create_gnomon(self):
-
+        """
+        Sets up the gnomon by creating the cylinders, cones, and text.
+        """
         self.create_gnomon_cylinders()
         self.create_gnomon_cones()
         self.create_gnomon_text()
 
     def create_gnomon_text(self):
+        """
+        Prepares the gnomon text by creating text entities and then placing them at the ends of the cones.
+        """
         self.set_axis_label_text(self.x_axis_text, "X", "red")
         self.set_axis_label_text(self.y_axis_text, "Y", "green")
         self.set_axis_label_text(self.z_axis_text, "Z", "blue")
@@ -181,6 +190,9 @@ class Gnomon:
         self.z_axis_text.addComponent(self.z_text_transformation)
 
     def create_gnomon_cones(self):
+        """
+        Prepares the gnomon cones by configuring the meshes and then placing them at the ends of the cylinders.
+        """
         self.configure_gnomon_cone(self.x_cone_mesh, self.gnomon_cylinder_length)
         self.configure_gnomon_cone(self.y_cone_mesh, self.gnomon_cylinder_length)
         self.configure_gnomon_cone(self.z_cone_mesh, self.gnomon_cylinder_length)
@@ -204,7 +216,9 @@ class Gnomon:
         )
 
     def create_gnomon_cylinders(self):
-
+        """
+        Configures three cylinder meshes and translates them in order to create a basic gnomon shape.
+        """
         self.configure_gnomon_cylinder(self.x_axis_mesh, self.gnomon_cylinder_length)
         self.configure_gnomon_cylinder(self.y_axis_mesh, self.gnomon_cylinder_length)
         self.configure_gnomon_cylinder(self.z_axis_mesh, self.gnomon_cylinder_length)
@@ -229,7 +243,12 @@ class Gnomon:
 
     @staticmethod
     def set_axis_label_text(text_entity, text_label, text_color):
-
+        """
+        Configures the text used for the axis labels.
+        :param text_entity: The text entity that will be used for the label.
+        :param text_label: The text that the label needs to contain.
+        :param text_color: The desired color of the label.
+        """
         text_entity.setText(text_label)
         text_entity.setHeight(1.2)
         text_entity.setWidth(1)
@@ -237,6 +256,11 @@ class Gnomon:
         text_entity.setFont(QFont("Courier New", 1))
 
     def create_gnomon_camera(self, main_camera):
+        """
+        Creates a camera for observing the gnomon. Borrows some settings from the main camera.
+        :param main_camera: The main camera that views the instrument components.
+        :return: The gnomon camera.
+        """
         gnomon_camera = Qt3DRender.QCamera()
         gnomon_camera.setParent(self.gnomon_root_entity)
         gnomon_camera.setProjectionType(main_camera.projectionType())
@@ -248,12 +272,16 @@ class Gnomon:
         return gnomon_camera
 
     def update_gnomon(self):
-
+        """
+        Updates the gnomon when the main camera has moved by rotating the camera and transforming the axis labels.
+        """
         self.update_gnomon_camera()
         self.update_gnomon_text()
 
     def update_gnomon_camera(self):
-
+        """
+        Rotates the gnomon camera so that it is consistent with the main camera.
+        """
         updated_gnomon_camera_position = (
             self.main_camera.position() - self.main_camera.viewCenter()
         )
@@ -264,6 +292,9 @@ class Gnomon:
         self.gnomon_camera.setUpVector(self.main_camera.upVector())
 
     def update_gnomon_text(self):
+        """
+        Applies a billboard transformation to the axis label text so that it faces the gnomon camera.
+        """
         view_matrix = self.gnomon_camera.viewMatrix()
         self.x_text_transformation.setMatrix(
             self.create_billboard_transformation(view_matrix, self.x_text_vector)
@@ -277,7 +308,12 @@ class Gnomon:
 
     @staticmethod
     def create_billboard_transformation(view_matrix, text_vector):
-
+        """
+        Uses the view matrix of the gnomon camera and the current position of the axis label text in order to create a billboard transformation matrix.
+        :param view_matrix: The view matrix of the gnomon camera.
+        :param text_vector: The vector of the axis label text.
+        :return: A transformation matrix for making the text face the camera.
+        """
         billboard_transformation = view_matrix.transposed()
         billboard_transformation.setRow(3, QVector4D())
         billboard_transformation.setColumn(3, QVector4D(text_vector, 1))
