@@ -1,8 +1,12 @@
+import io
+import json
+
 import numpy as np
 
 from nexus_constructor.nexus_filewriter_json.writer import (
     NexusToDictConverter,
     create_writer_commands,
+    object_to_json_file,
 )
 import h5py
 
@@ -189,3 +193,14 @@ def test_GIVEN_output_file_WHEN_creating_writer_commands_THEN_output_file_is_pre
     start_cmd, _ = create_writer_commands({}, output_filename=filename)
 
     assert start_cmd["file_attributes"]["file_name"] == filename
+
+
+def test_GIVEN_nexus_object_and_fake_fileIO_WHEN_calling_object_to_json_file_THEN_fileIO_contains_nexus_object_attributes():
+    file = io.StringIO(newline=None)
+
+    tree = {"test": ["index1", "index2"]}
+    object_to_json_file(tree, file)
+    file.flush()
+
+    assert json.loads(file.getvalue()) == tree
+
