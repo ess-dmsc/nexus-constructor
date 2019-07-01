@@ -228,12 +228,12 @@ class Gnomon:
         )
 
     @staticmethod
-    def set_axis_label_text(text_entity, text_label, color):
+    def set_axis_label_text(text_entity, text_label, text_color):
 
         text_entity.setText(text_label)
         text_entity.setHeight(1.2)
         text_entity.setWidth(1)
-        text_entity.setColor(QColor(color))
+        text_entity.setColor(QColor(text_color))
         text_entity.setFont(QFont("Courier New", 1))
 
     def create_gnomon_camera(self, main_camera):
@@ -278,7 +278,7 @@ class Gnomon:
     @staticmethod
     def create_billboard_transformation(view_matrix, text_vector):
 
-        view_transpose = view_matrix.transposed()
-        view_transpose.setRow(3, QVector4D())
-        view_transpose.setColumn(3, QVector4D(text_vector, 1))
-        return view_transpose
+        billboard_transformation = view_matrix.transposed()
+        billboard_transformation.setRow(3, QVector4D())
+        billboard_transformation.setColumn(3, QVector4D(text_vector, 1))
+        return billboard_transformation
