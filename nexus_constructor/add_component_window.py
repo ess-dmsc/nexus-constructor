@@ -95,7 +95,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 validate_line_edit,
                 self.nameLineEdit,
                 tooltip_on_accept="Component name is valid.",
-                tooltip_on_reject=f"Component name is not valid. Suggestion: {self.generate_name_suggestion()}",
+                tooltip_on_reject=f"Component name is not valid. Suggestion:",
+                suggestion_callable=self.generate_name_suggestion,
             )
         )
 
