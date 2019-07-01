@@ -1,6 +1,9 @@
 import numpy as np
 
-from nexus_constructor.nexus_filewriter_json.writer import NexusToDictConverter
+from nexus_constructor.nexus_filewriter_json.writer import (
+    NexusToDictConverter,
+    create_writer_commands,
+)
 import h5py
 
 
@@ -154,3 +157,35 @@ def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_
     assert "link" == link_dict["type"]
     assert link_name == link_dict["name"]
     assert group_to_be_linked.name == link_dict["target"]
+
+
+def test_GIVEN_start_time_WHEN_creating_writercommands_THEN_start_time_is_included_in_command():
+    start_time = 123413425
+    start_cmd, _ = create_writer_commands({}, "", start_time=start_time)
+    assert start_cmd["start_time"] == start_time
+
+
+def test_GIVEN_stop_time_WHEN_creating_writer_commands_THEN_stop_time_is_included_in_command():
+    stop_time = 123231412
+    _, stop_cmd = create_writer_commands({}, "", stop_time=stop_time)
+    assert stop_cmd["stop_time"] == stop_time
+
+
+def test_GIVEN_no_job_id_WHEN_creating_writer_commands_THEN_job_id_is_auto_generated():
+    start_cmd, stop_cmd = create_writer_commands({}, "")
+    assert start_cmd["job_id"]
+    assert stop_cmd["job_id"]
+
+
+def test_GIVEN_job_id_WHEN_creating_writer_commands_THEN_job_id_is_present_in_commands():
+    job_id = "something"
+    start_cmd, stop_cmd = create_writer_commands({}, "", job_id=job_id)
+    assert start_cmd["job_id"] == job_id
+    assert stop_cmd["job_id"] == job_id
+
+
+def test_GIVEN_output_file_WHEN_creating_writer_commands_THEN_output_file_is_present_in_write_command():
+    filename = "test.nxs"
+    start_cmd, _ = create_writer_commands({}, output_filename=filename)
+
+    assert start_cmd["file_attributes"]["file_name"] == filename
