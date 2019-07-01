@@ -7,6 +7,8 @@ from ui.main_window import Ui_MainWindow
 import silx.gui.hdf5
 import os
 
+from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.nexus_filewriter_json import writer
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
@@ -21,7 +23,6 @@ class MainWindow(Ui_MainWindow):
     def setupUi(self, main_window):
         super().setupUi(main_window)
 
-        #self.pushButton.clicked.connect(self.show_add_component_window)
         self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
         self.actionOpen_NeXus_file.triggered.connect(self.open_nexus_file)
         self.actionExport_to_Filewriter_JSON.triggered.connect(
@@ -40,7 +41,6 @@ class MainWindow(Ui_MainWindow):
             self.update_nexus_file_structure_view
         )
         self.verticalLayout.addWidget(self.widget)
-        # self.listView.setModel(self.nexus_wrapper.get_component_list())
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
 
@@ -48,20 +48,20 @@ class MainWindow(Ui_MainWindow):
 
         self.widget.setVisible(True)
 
-        # component_list = self.nexus_wrapper.get_component_list()
-        # self.component_model = ComponentTreeModel(component_list.components)
-        #
-        # self.componentTreeView.setDragEnabled(True)
-        # self.componentTreeView.setAcceptDrops(True)
-        # self.componentTreeView.setDropIndicatorShown(True)
-        # self.componentTreeView.header().hide()
-        # self.component_delegate = ComponentEditorDelegate(self.componentTreeView)
-        # self.componentTreeView.setItemDelegate(self.component_delegate)
-        # self.componentTreeView.setModel(self.component_model)
-        # self.componentTreeView.updateEditorGeometries()
-        # self.componentTreeView.updateGeometries()
-        # self.componentTreeView.updateGeometry()
-        # self.componentTreeView.clicked.connect(self.on_clicked)
+        component_list = self.instrument.get_component_list()
+        self.component_model = ComponentTreeModel(component_list)
+
+        self.componentTreeView.setDragEnabled(True)
+        self.componentTreeView.setAcceptDrops(True)
+        self.componentTreeView.setDropIndicatorShown(True)
+        self.componentTreeView.header().hide()
+        self.component_delegate = ComponentEditorDelegate(self.componentTreeView)
+        self.componentTreeView.setItemDelegate(self.component_delegate)
+        self.componentTreeView.setModel(self.component_model)
+        self.componentTreeView.updateEditorGeometries()
+        self.componentTreeView.updateGeometries()
+        self.componentTreeView.updateGeometry()
+        self.componentTreeView.clicked.connect(self.on_clicked)
 
         self.component_tool_bar = QToolBar("Actions", self.tab_2)
         self.new_component_action = QAction(QIcon("ui/new_component.png"), "New component", self.tab_2)
@@ -80,6 +80,19 @@ class MainWindow(Ui_MainWindow):
         self.delete_action.setEnabled(False)
         self.component_tool_bar.addAction(self.delete_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
+
+    def on_clicked(self, index):
+        indices = self.componentTreeView.selectedIndexes()
+        if len(indices) == 0 or len(indices) != 1:
+            self.delete_action.setEnabled(False)
+            self.duplicate_action.setEnabled(False)
+            self.new_rotation_action.setEnabled(False)
+            self.new_translation_action.setEnabled(False)
+        else:
+            self.delete_action.setEnabled(True)
+            self.duplicate_action.setEnabled(True)
+            self.new_rotation_action.setEnabled(True)
+            self.new_translation_action.setEnabled(True)
 
     def set_up_warning_window(self):
         """
