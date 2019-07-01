@@ -98,7 +98,7 @@ class NexusToDictConverter:
 
     def _handle_attributes(self, root, root_dict):
         nx_class = root.attrs["NX_class"]
-        if nx_class and nx_class is not "NXfield" and nx_class is not "NXgroup":
+        if nx_class and nx_class != "NXfield" and nx_class != "NXgroup":
             root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
         if len(root.attrs) > 1:
             if "attributes" not in root_dict:
