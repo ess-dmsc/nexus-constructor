@@ -6,6 +6,12 @@ from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
 
 class Gnomon:
     def __init__(self, root_entity, main_camera, component_adder):
+        """
+        A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon.
+        :param root_entity: The root entity for the gnomon.
+        :param main_camera: The main component view camera.
+        :param component_adder: A function borrowed from the InstrumentView that add QComponents to a QEntity.
+        """
 
         self.gnomon_root_entity = root_entity
         self.gnomon_cylinder_length = 4
