@@ -3,10 +3,13 @@ import json
 
 import numpy as np
 
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.nexus_filewriter_json.writer import (
     NexusToDictConverter,
     create_writer_commands,
     object_to_json_file,
+    generate_json,
 )
 import h5py
 
@@ -203,3 +206,35 @@ def test_GIVEN_nexus_object_and_fake_fileIO_WHEN_calling_object_to_json_file_THE
     file.flush()
 
     assert json.loads(file.getvalue()) == tree
+
+
+def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is_written_containing_components():
+    file = io.StringIO(newline=None)
+    wrapper = NexusWrapper("test.nxs")
+    data = Instrument(wrapper)
+
+    component_name = "pinhole"
+    component_nx_class = "NXpinhole"
+
+    dataset_name = "depends_on"
+    dataset_value = "something_else"
+
+    component = data.add_component(component_name, component_nx_class, "")
+    component.set_field(dataset_name, value=dataset_value, dtype=str)
+
+    nexus_file_name = "test.nxs"
+
+    generate_json(data, file, nexus_file_name=nexus_file_name)
+
+    output_file_dict = json.loads(file.getvalue())
+
+    component = output_file_dict["nexus_structure"]["children"][0]["children"][0]
+
+    assert component["name"].lstrip("/entry/instrument/") == component_name
+    assert (
+        component["children"][0]["name"].lstrip(f"/entry/instrument/{component_name}/")
+        == dataset_name
+    )
+    assert component["children"][0]["type"] == "dataset"
+    assert component["children"][0]["values"] == dataset_value
+    assert component["children"][0]["dataset"]["type"] == "string"

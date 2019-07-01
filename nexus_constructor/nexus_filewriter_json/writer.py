@@ -104,19 +104,20 @@ class NexusToDictConverter:
         return data, dtype, size
 
     def _handle_attributes(self, root, root_dict):
-        nx_class = root.attrs["NX_class"]
-        if nx_class and nx_class != "NXfield" and nx_class != "NXgroup":
-            root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
-        if len(root.attrs) > 1:
-            if "attributes" not in root_dict:
+        if hasattr(root.attrs, "NX_class"):
+            nx_class = root.attrs["NX_class"]
+            if nx_class and nx_class != "NXfield" and nx_class != "NXgroup":
+                root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
+            if len(root.attrs) > 1:
+                if "attributes" not in root_dict:
+                    root_dict["attributes"] = []
                 root_dict["attributes"] = []
-            root_dict["attributes"] = []
-            for attr_name, attr in root.attrs.items():
-                data, dtype, size = self._get_data_and_type(attr)
-                new_attribute = {"name": attr_name, "values": data}
-                if dtype != "object":
-                    new_attribute["type"] = dtype
-                root_dict["attributes"].append(new_attribute)
+                for attr_name, attr in root.attrs.items():
+                    data, dtype, size = self._get_data_and_type(attr)
+                    new_attribute = {"name": attr_name, "values": data}
+                    if dtype != "object":
+                        new_attribute["type"] = dtype
+                    root_dict["attributes"].append(new_attribute)
         return root_dict
 
     def _handle_group(self, root: h5py.Group):
