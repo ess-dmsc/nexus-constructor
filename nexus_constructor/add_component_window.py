@@ -126,7 +126,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def generate_name_suggestion(self):
         """
         Generates a component name suggestion for use in the tooltip when a component is invalid.
-        :return: The component name suggestion, based on the current nx_class. 
+        :return: The component name suggestion, based on the current nx_class.
         """
         return generate_unique_name(
             self.componentTypeComboBox.currentText().lstrip("NX"),
