@@ -95,7 +95,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 validate_line_edit,
                 self.nameLineEdit,
                 tooltip_on_accept="Component name is valid.",
-                tooltip_on_reject=f"Component name is not valid. Suggestion:",
+                tooltip_on_reject=f"Component name is not valid. Suggestion: ",
                 suggestion_callable=self.generate_name_suggestion,
             )
         )
@@ -125,7 +125,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def generate_name_suggestion(self):
         return generate_unique_name(
-            self.componentTypeComboBox.currentText(),
+            self.componentTypeComboBox.currentText().lstrip("NX"),
             self.instrument.get_component_list(),
         )
 
