@@ -246,4 +246,80 @@ def test_transforms_contains_only_local_transforms_not_full_depends_on_chain():
 
     assert len(
         second_component.transforms
-    ), "Expect transforms to contain only the 1 transform local to this component"
+    ), "Expect transforms list to contain only the 1 transform local to this component"
+
+
+def test_removing_transformation_which_has_a_dependent_transform_in_another_component_is_not_allowed():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    component_group = _add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    first_component = ComponentModel(nexus_wrapper, component_group)
+    component_group = _add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+    second_component = ComponentModel(nexus_wrapper, component_group)
+
+    first_transform = first_component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    second_transform = second_component.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
+    )
+
+    second_component.depends_on = second_transform
+
+    with pytest.raises(DependencyError):
+        assert first_component.remove_transformation(
+            first_transform
+        ), "Expected not to be allowed to delete the transform as a transform in another component depends on it"
+
+
+def test_removing_transformation_which_no_longer_has_a_dependent_transform_in_another_component_is_allowed():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    component_group = _add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    first_component = ComponentModel(nexus_wrapper, component_group)
+    component_group = _add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+    second_component = ComponentModel(nexus_wrapper, component_group)
+
+    first_transform = first_component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    second_transform = second_component.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
+    )
+
+    second_component.depends_on = second_transform
+
+    # Make second transform no longer depend on the first
+    second_transform.depends_on = None
+
+    try:
+        first_component.remove_transformation(first_transform)
+    except Exception:
+        pytest.fail(
+            "Expected to be able to remove transformation which is no longer a dependee"
+        )
+
+
+def test_removing_transformation_which_still_has_one_dependent_transform_is_not_allowed():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    component_group = _add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    component = ComponentModel(nexus_wrapper, component_group)
+
+    first_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    # second_transform
+    component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform)
+    third_transform = component.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
+    )
+
+    # Make third transform no longer depend on the first one
+    third_transform.depends_on = None
+
+    with pytest.raises(DependencyError):
+        assert component.remove_transformation(
+            first_transform
+        ), "Expected not to be allowed to delete the transform as the second transform still depends on it"

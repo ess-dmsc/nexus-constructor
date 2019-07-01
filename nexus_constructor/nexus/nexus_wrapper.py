@@ -76,12 +76,15 @@ class NexusWrapper(QObject):
         :return:
         """
         if filename:
-            print(filename)
-            self.nexus_file = h5py.File(
+            nexus_file = h5py.File(
                 filename, mode="r", backing_store=False, driver="core"
             )
+            self._load_file(nexus_file)
             print("NeXus file loaded")
             self._emit_file()
+
+    def _load_file(self, nexus_file: h5py.File):
+        self.nexus_file = nexus_file
 
     def rename_node(self, node: h5Node, new_name: str):
         self.nexus_file.move(node.name, f"{node.parent.name}/{new_name}")
@@ -149,12 +152,29 @@ class NexusWrapper(QObject):
 
     @staticmethod
     def get_attribute_value(node: h5Node, name: str):
-        if name not in node.attrs.keys():
-            raise NameError(f"Attribute called {name} not found in {node.name}")
-        return node.attrs[name]
+        if name in node.attrs.keys():
+            return node.attrs[name]
 
     def set_attribute_value(self, node: h5Node, name: str, value: Any):
+        # Deal with arrays of strings
+        if isinstance(value, np.ndarray):
+            if value.dtype.type is np.str_ and value.size == 1:
+                value = str(value[0])
+            elif value.dtype.type is np.str_ and value.size > 1:
+                node.attrs.create(
+                    name, value, (len(value),), h5py.special_dtype(vlen=str)
+                )
+                for index, item in enumerate(value):
+                    node.attrs[name][index] = item.encode("utf-8")
+                self._emit_file()
+                return
+
         node.attrs[name] = value
+        self._emit_file()
+
+    def delete_attribute(self, node: h5Node, name: str):
+        if name in node.attrs.keys():
+            del node.attrs[name]
         self._emit_file()
 
     def create_transformations_group_if_does_not_exist(self, parent_group: h5Node):

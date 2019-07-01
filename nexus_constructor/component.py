@@ -45,7 +45,7 @@ def _generate_incremental_name(base_name, group: h5py.Group):
 def _transforms_are_equivalent(
     transform_1: TransformationModel, transform_2: TransformationModel
 ):
-    return transform_1.dataset.name == transform_2.dataset.name
+    return transform_1.absolute_path == transform_2.absolute_path
 
 
 class ComponentModel:
@@ -64,6 +64,15 @@ class ComponentModel:
     @name.setter
     def name(self, new_name: str):
         self.file.rename_node(self.group, new_name)
+
+    @property
+    def absolute_path(self):
+        """
+        Get absolute path of the component group in the NeXus file,
+        this is guaranteed to be unique so it can be used as an ID for this Component
+        :return: absolute path of the transform dataset in the NeXus file,
+        """
+        return self.group.name
 
     def get_field(self, name: str):
         return self.file.get_field_value(self.group, name)
@@ -89,7 +98,7 @@ class ComponentModel:
             self.file.set_field_value(self.group, "description", description, str)
 
     @property
-    def transforms_full_chain(self):
+    def transforms_full_chain(self) -> TransformationsList:
         """
         Gets all transforms in the depends_on chain for this component
         :return: List of transforms
@@ -111,9 +120,12 @@ class ComponentModel:
         :param transforms: The list to populate with transformations
         :param local_only: If True then only add transformations which are stored within this component
         """
-        if depends_on and depends_on != ".":
+        if depends_on is not None and depends_on != ".":
             transform_dataset = self.file.nexus_file[depends_on]
-            if local_only and transform_dataset.parent.parent.name != self.group.name:
+            if (
+                local_only
+                and transform_dataset.parent.parent.name != self.absolute_path
+            ):
                 # We're done, the next transformation is not stored in this component
                 return
             transforms.append(TransformationModel(self.file, transform_dataset))
@@ -121,7 +133,7 @@ class ComponentModel:
                 self._get_transform(transform_dataset.attrs["depends_on"], transforms)
 
     @property
-    def transforms(self):
+    def transforms(self) -> TransformationsList:
         """
         Gets transforms in the depends_on chain but only those which are local to
         this component's group in the NeXus file
@@ -137,7 +149,7 @@ class ComponentModel:
         vector: QVector3D,
         name: str = None,
         depends_on: TransformationModel = None,
-    ):
+    ) -> TransformationModel:
         """
         Note, currently assumes translation is in metres
         :param vector: direction and magnitude of translation as a 3D vector
@@ -156,11 +168,10 @@ class ComponentModel:
             field, "vector", qvector3d_to_numpy_array(unit_vector)
         )
         self.file.set_attribute_value(field, "transformation_type", "Translation")
-        if depends_on is None:
-            self.file.set_attribute_value(field, "depends_on", ".")
-        else:
-            self.file.set_attribute_value(field, "depends_on", depends_on.dataset.name)
-        return TransformationModel(self.file, field)
+
+        translation_transform = TransformationModel(self.file, field)
+        translation_transform.depends_on = depends_on
+        return translation_transform
 
     def add_rotation(
         self,
@@ -168,7 +179,7 @@ class ComponentModel:
         angle: float,
         name: str = None,
         depends_on: TransformationModel = None,
-    ):
+    ) -> TransformationModel:
         """
         Note, currently assumes angle is in degrees
         :param axis: axis
@@ -185,22 +196,12 @@ class ComponentModel:
         self.file.set_attribute_value(field, "units", "degrees")
         self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))
         self.file.set_attribute_value(field, "transformation_type", "Rotation")
-        if depends_on is None:
-            self.file.set_attribute_value(field, "depends_on", ".")
-        else:
-            self.file.set_attribute_value(field, "depends_on", depends_on.dataset.name)
-        return TransformationModel(self.file, field)
+        rotation_transform = TransformationModel(self.file, field)
+        rotation_transform.depends_on = depends_on
+        return rotation_transform
 
-    def _transform_is_in_this_component(self, transform: TransformationModel):
-        return transform.dataset.parent.parent.name == self.group.name
-
-    def _transform_is_a_dependency_of_this_component(
-        self, transform: TransformationModel
-    ):
-        for transform_dependency in self.transforms_full_chain:
-            if _transforms_are_equivalent(transform, transform_dependency):
-                return True
-        return False
+    def _transform_is_in_this_component(self, transform: TransformationModel) -> bool:
+        return transform.dataset.parent.parent.name == self.absolute_path
 
     def remove_transformation(self, transform: TransformationModel):
         if not self._transform_is_in_this_component(transform):
@@ -208,9 +209,10 @@ class ComponentModel:
                 "Transform is not in this component, do not have permission to delete"
             )
 
-        if self._transform_is_a_dependency_of_this_component(transform):
+        dependents = transform.get_dependents()
+        if dependents:
             raise DependencyError(
-                "Transform is a dependency of the component, cannot delete it"
+                f"Cannot delete transformation, it is a dependency of {dependents}"
             )
 
         # Remove whole transformations group if this is the only transformation in it
@@ -229,9 +231,19 @@ class ComponentModel:
 
     @depends_on.setter
     def depends_on(self, transformation: TransformationModel):
-        self.file.set_field_value(
-            self.group, "depends_on", transformation.dataset.name, str
-        )
+        existing_depends_on = self.file.get_attribute_value(self.group, "depends_on")
+        if existing_depends_on is not None:
+            TransformationModel(
+                self.file, self.file[existing_depends_on]
+            ).deregister_dependent(self)
+
+        if transformation is None:
+            self.file.set_field_value(self.group, "depends_on", ".", str)
+        else:
+            self.file.set_field_value(
+                self.group, "depends_on", transformation.absolute_path, str
+            )
+            transformation.register_dependent(self)
 
 
 @attr.s

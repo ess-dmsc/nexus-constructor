@@ -1,17 +1,9 @@
 """Validators to be used on QML input fields"""
 from PySide2.QtCore import Signal, QObject
-from PySide2.QtGui import QValidator, QIntValidator
+from PySide2.QtGui import QValidator
 import pint
 import os
 from typing import List
-
-
-class NullableIntValidator(QIntValidator):
-    def validate(self, input: str, pos: int):
-        if input == "":
-            return QValidator.Acceptable
-        else:
-            return super().validate(input, pos)
 
 
 class UnitValidator(QValidator):

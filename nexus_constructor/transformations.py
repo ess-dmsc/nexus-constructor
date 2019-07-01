@@ -3,6 +3,11 @@ import numpy as np
 from PySide2.QtGui import QVector3D
 import h5py
 from nexus_constructor.nexus import nexus_wrapper as nx
+from typing import TypeVar
+
+TransformationOrComponent = TypeVar(
+    "TransformationOrComponent", "TransformationModel", "ComponentModel"
+)
 
 
 class TransformationsList(list):
@@ -27,6 +32,15 @@ class TransformationModel:
     @name.setter
     def name(self, new_name: str):
         self.file.rename_node(self.dataset, new_name)
+
+    @property
+    def absolute_path(self):
+        """
+        Get absolute path of the transform dataset in the NeXus file,
+        this is guarenteed to be unique so it can be used as an ID for this Transformation
+        :return: absolute path of the transform dataset in the NeXus file,
+        """
+        return self.dataset.name
 
     @property
     def type(self):
@@ -71,6 +85,84 @@ class TransformationModel:
         Set the magnitude of the transformation: distance or rotation angle
         """
         self.dataset[...] = new_value
+
+    @property
+    def depends_on(self) -> "TransformationModel":
+        depends_on_path = self.file.get_attribute_value(self.dataset, "depends_on")
+        if depends_on_path is not None:
+            return TransformationModel(self.file, self.file.nexus_file[depends_on_path])
+
+    @depends_on.setter
+    def depends_on(self, depends_on: "TransformationModel"):
+        """
+        Note, until Python 4.0 (or 3.7 with from __future__ import annotations) have
+        to use string for depends_on type here, because the current class is not defined yet
+        """
+        existing_depends_on = self.file.get_attribute_value(self.dataset, "depends_on")
+        if existing_depends_on is not None:
+            TransformationModel(
+                self.file, self.file.nexus_file[existing_depends_on]
+            ).deregister_dependent(self)
+
+        if depends_on is None:
+            self.file.set_attribute_value(self.dataset, "depends_on", ".")
+        else:
+            self.file.set_attribute_value(
+                self.dataset, "depends_on", depends_on.absolute_path
+            )
+            depends_on.register_dependent(self)
+
+    def register_dependent(self, dependent: TransformationOrComponent):
+        """
+        Register dependent transform or component in the dependee_of list of this transform
+        Note, "dependee_of" attribute is not part of the NeXus format
+        :param dependent: transform or component that depends on this one
+        """
+        if "dependee_of" not in self.dataset.attrs.keys():
+            self.file.set_attribute_value(
+                self.dataset, "dependee_of", dependent.absolute_path
+            )
+        else:
+            dependee_of_list = self.file.get_attribute_value(
+                self.dataset, "dependee_of"
+            )
+            if not isinstance(dependee_of_list, np.ndarray):
+                dependee_of_list = np.array([dependee_of_list])
+            dependee_of_list = np.append(
+                dependee_of_list, np.array([dependent.absolute_path])
+            )
+            self.file.set_attribute_value(self.dataset, "dependee_of", dependee_of_list)
+
+    def deregister_dependent(self, former_dependent: TransformationOrComponent):
+        """
+        Remove former dependent from the dependee_of list of this transform
+        Note, "dependee_of" attribute is not part of the NeXus format
+        :param former_dependent: transform or component that used to depend on this one
+        """
+        if "dependee_of" in self.dataset.attrs.keys():
+            dependee_of_list = self.file.get_attribute_value(
+                self.dataset, "dependee_of"
+            )
+            if (
+                not isinstance(dependee_of_list, np.ndarray)
+                and dependee_of_list == former_dependent.absolute_path
+            ):
+                # Must be a single string rather than a list, so simply delete it
+                self.file.delete_attribute(self.dataset, "dependee_of")
+            else:
+                dependee_of_list = dependee_of_list[
+                    dependee_of_list != former_dependent.absolute_path
+                ]
+                self.file.set_attribute_value(
+                    self.dataset, "dependee_of", dependee_of_list
+                )
+
+    def get_dependents(self):
+        if "dependee_of" in self.dataset.attrs.keys():
+            dependents = self.file.get_attribute_value(self.dataset, "dependee_of")
+            if not isinstance(dependents, np.ndarray):
+                return [dependents]
+            return dependents.tolist()
 
 
 @attr.s
