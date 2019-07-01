@@ -52,17 +52,13 @@ class Gnomon:
         self.y_text_transformation = Qt3DCore.QTransform()
         self.z_text_transformation = Qt3DCore.QTransform()
 
-        """
-        Set the text translation value to be the length of the cylinder plus some extra space so that it isn't on top
-        of it or the cones.
-        """
+        # Set the text translation value to be the length of the cylinder plus some extra space so that it isn't on top
+        # of it or the cones.
         text_translation = self.gnomon_cylinder_length * 1.3
 
-        """
-        The text translation value calculated above is used in addition to some "extra" values in order to make the text
-        placement look good and appear centered next to the cone point. This extra values were found via trial and error
-        and will likely have to be figured out again if you decide to change the font/size/height/etc of the text.
-        """
+        # The text translation value calculated above is used in addition to some "extra" values in order to make the text
+        # placement look good and appear centered next to the cone point. This extra values were found via trial and error
+        # and will likely have to be figured out again if you decide to change the font/size/height/etc of the text.
         self.x_text_vector = QVector3D(text_translation, -0.5, 0)
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
@@ -118,10 +114,8 @@ class Gnomon:
         y_axis_matrix = QMatrix4x4()
         z_axis_matrix = QMatrix4x4()
 
-        """
-        When the cylinders are born they are centered on the origin creating a "3D asterisk" shape. A translation of
-        half the length of the cylinders is required to make them form a gnomon.
-        """
+        # When the cylinders are born they are centered on the origin creating a "3D asterisk" shape. A translation of
+        # half the length of the cylinders is required to make them form a gnomon.
         half_length = length * 0.5
 
         x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
@@ -286,10 +280,9 @@ class Gnomon:
         """
         aspect = 1
         near_plane = 0.1
-        """
-        Set far plane so that the camera can see the gnomon even when it is turned "behind" it and the cylinders are
-        facing away from the camera.
-        """
+
+        # Set far plane so that the camera can see the gnomon even when it is turned "behind" it and the cylinders are
+        # facing away from the camera.
         far_plane = 25
 
         gnomon_camera = Qt3DRender.QCamera()
