@@ -73,3 +73,16 @@ def test_GIVEN_material_and_color_WHEN_calling_prepare_gnomon_material_THEN_prop
     material.setAmbient.assert_called_once_with(QColor(color))
     material.setDiffuse.assert_called_once_with(QColor("grey"))
     material.setShininess.assert_called_once_with(0)
+
+
+def test_GIVEN_mesh_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_properties_set():
+
+    cylinder_mesh = Mock()
+    length = 20
+    radius = length * 0.05
+
+    Gnomon.configure_gnomon_cylinder(cylinder_mesh, length)
+
+    cylinder_mesh.setRadius.assert_called_once_with(radius)
+    cylinder_mesh.setLength.assert_called_once_with(length)
+    cylinder_mesh.setRings.assert_called_once_with(2)
