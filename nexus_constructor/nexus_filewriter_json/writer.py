@@ -13,10 +13,11 @@ def generate_json(
     Returns a formatted json string built from a given Instrument
     The json description can be used by the file writer (github.com/ess-dmsc/kafka-to-nexus) to create a NeXus file
 
-    :param nexus_file_name: The NeXus file name in the write command for the filewriter. 
-    :param links: dict of links in nexus file with name and target as value fields.
-    :param streams: dict of streams in nexus file.
     :param data: The full description of the beamline and data
+    :param file: the file object to output the JSON to.
+    :param streams: dict of streams in nexus file.
+    :param links: dict of links in nexus file with name and target as value fields.
+    :param nexus_file_name: The NeXus file name in the write command for the filewriter.
     """
 
     if links is None:
