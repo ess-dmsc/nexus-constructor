@@ -8,7 +8,7 @@ class Gnomon:
     def __init__(self, root_entity, main_camera, component_adder):
         """
         A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon (or axis indicator).
-        The gnomon/axis indicator is the object that appears in the bottom right-hand corner of the instrument view that
+        The gnomon/axis indicator is an object that appears in the bottom right-hand corner of the instrument view that
         shows the direction of the x, y, and z axes.
         :param root_entity: The root entity for the gnomon.
         :param main_camera: The main component view camera.
@@ -120,7 +120,7 @@ class Gnomon:
 
         """
         When the cylinders are born they are centered on the origin creating a "3D asterisk" shape. A translation of
-        half the length of the cylinders is required to make the cylinders form a gnomon.
+        half the length of the cylinders is required to make them form a gnomon.
         """
         half_length = length * 0.5
 
@@ -175,7 +175,7 @@ class Gnomon:
     @staticmethod
     def configure_gnomon_cone(cone_mesh, gnomon_cylinder_length):
         """
-        Gives a shape to the gnomon cone mesh by settings its length and top/bottom radii. The cone length is set to
+        Gives a shape to the gnomon cone mesh by setting its length and top/bottom radii. The cone length is set to
         3/10ths of the cylinder length, the cone bottom radius is 1/10th of the cylinder length (or double the cylinder
         radius), and the top radius is set to zero in order to make a point.
         :param cone_mesh: The mesh to be configured.
@@ -286,7 +286,10 @@ class Gnomon:
         """
         aspect = 1
         near_plane = 0.1
-        # Set far plane so that the camera can see the gnomon even when it is turned "behind" it
+        """
+        Set far plane so that the camera can see the gnomon even when it is turned "behind" it and the cylinders are
+        facing away from the camera.
+        """
         far_plane = 25
 
         gnomon_camera = Qt3DRender.QCamera()
@@ -338,7 +341,7 @@ class Gnomon:
     def create_billboard_transformation(view_matrix, text_vector):
         """
         Uses the view matrix of the gnomon camera and the current position of the axis label text in order to create a
-        matrix that makes the text orthogonal to the camera vector.
+        matrix that makes the text plane orthogonal to the camera vector.
         :param view_matrix: The view matrix of the gnomon camera. This is the inverse of the translation matrix that
             describes the position and rotation of the camera.
         :param text_vector: The vector of the axis label text.
