@@ -179,9 +179,12 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
     field2name = "field2"
     field2value = 3
 
+    arbitrary_field_name = "arbitrary_field"
+    arbitrary_field_value = "something"
+
     field1 = group.create_dataset(field1name, data=field1value)
     field1.attrs["NX_class"] = "NXfield"
-    field1.attrs["arbritrary_field"] = "something"
+    field1.attrs[arbitrary_field_name] = arbitrary_field_value
 
     field2 = group.create_dataset(field2name, data=field2value)
     field2.attrs["NX_class"] = "NXfield"
@@ -193,6 +196,22 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
 
     assert field1.name == root_dict["children"][0]["children"][0]["name"]
     assert field1value == root_dict["children"][0]["children"][0]["values"]
+    assert (
+        "NX_class" == root_dict["children"][0]["children"][0]["attributes"][0]["name"]
+    )
+    assert (
+        field1.attrs["NX_class"]
+        == root_dict["children"][0]["children"][0]["attributes"][0]["values"]
+    )
+
+    assert (
+        arbitrary_field_name
+        == root_dict["children"][0]["children"][0]["attributes"][1]["name"]
+    )
+    assert (
+        field1.attrs[arbitrary_field_name]
+        == root_dict["children"][0]["children"][0]["attributes"][1]["values"]
+    )
 
     assert field2.name == root_dict["children"][0]["children"][1]["name"]
     assert field2value == root_dict["children"][0]["children"][1]["values"]
