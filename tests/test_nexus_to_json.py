@@ -181,6 +181,7 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
 
     field1 = group.create_dataset(field1name, data=field1value)
     field1.attrs["NX_class"] = "NXfield"
+    field1.attrs["arbritrary_field"] = "something"
 
     field2 = group.create_dataset(field2name, data=field2value)
     field2.attrs["NX_class"] = "NXfield"
