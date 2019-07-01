@@ -6,17 +6,23 @@ import json
 import uuid
 
 
-def generate_json(data: Instrument, file):
+def generate_json(
+    data: Instrument, file, streams=None, links=None, nexus_file_name: str = ""
+):
     """
     Returns a formatted json string built from a given Instrument
     The json description can be used by the file writer (github.com/ess-dmsc/kafka-to-nexus) to create a NeXus file
 
+    :param nexus_file_name: The NeXus file name in the write command for the filewriter. 
+    :param links: dict of links in nexus file with name and target as value fields.
+    :param streams: dict of streams in nexus file.
     :param data: The full description of the beamline and data
     """
 
-    streams = []
-    links = []
-    nexus_file_name = ""
+    if links is None:
+        links = {}
+    if streams is None:
+        streams = {}
 
     converter = NexusToDictConverter()
     tree = converter.convert(data.nexus.entry, streams, links)
