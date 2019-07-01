@@ -7,7 +7,9 @@ from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
 class Gnomon:
     def __init__(self, root_entity, main_camera, component_adder):
         """
-        A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon.
+        A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon (or axis indicator).
+        The gnomon/axis indicator is the object that appears in the bottom right-hand corner of the instrument view that
+        shows the direction of the x, y, and z axes.
         :param root_entity: The root entity for the gnomon.
         :param main_camera: The main component view camera.
         :param component_adder: A function borrowed from the InstrumentView that adds QComponents to a QEntity.
@@ -50,8 +52,17 @@ class Gnomon:
         self.y_text_transformation = Qt3DCore.QTransform()
         self.z_text_transformation = Qt3DCore.QTransform()
 
+        """
+        Set the text translation value to be the length of the cylinder plus some extra space so that it isn't on top
+        of it or the cones.
+        """
         text_translation = self.gnomon_cylinder_length * 1.3
 
+        """
+        The text translation value calculated above is used in addition to some "extra" values in order to make the text
+        placement look good and appear centered next to the cone point. This extra values were found via trial and error
+        and will likely have to be figured out again if you decide to change the font/size/height/etc of the text.
+        """
         self.x_text_vector = QVector3D(text_translation, -0.5, 0)
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
@@ -107,6 +118,10 @@ class Gnomon:
         y_axis_matrix = QMatrix4x4()
         z_axis_matrix = QMatrix4x4()
 
+        """
+        When the cylinders are born they are centered on the origin creating a "3D asterisk" shape. A translation of
+        half the length of the cylinders is required to make the cylinders form a gnomon.
+        """
         half_length = length * 0.5
 
         x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
@@ -160,7 +175,9 @@ class Gnomon:
     @staticmethod
     def configure_gnomon_cone(cone_mesh, gnomon_cylinder_length):
         """
-        Gives a shape to the gnomon cone mesh by settings its length and top/bottom radii.
+        Gives a shape to the gnomon cone mesh by settings its length and top/bottom radii. The cone length is set to
+        3/10ths of the cylinder length, the cone bottom radius is 1/10th of the cylinder length (or double the cylinder
+        radius), and the top radius is set to zero in order to make a point.
         :param cone_mesh: The mesh to be configured.
         :param gnomon_cylinder_length: The length of the gnomon cylinders. Used to determine the shape of the cones.
         """
@@ -267,11 +284,16 @@ class Gnomon:
         :param main_camera: The main camera that views the instrument components.
         :return: The gnomon camera.
         """
+        aspect = 1
+        near_plane = 0.1
+        # Set far plane so that the camera can see the gnomon even when it is turned "behind" it
+        far_plane = 25
+
         gnomon_camera = Qt3DRender.QCamera()
         gnomon_camera.setParent(self.gnomon_root_entity)
         gnomon_camera.setProjectionType(main_camera.projectionType())
         gnomon_camera.lens().setPerspectiveProjection(
-            main_camera.fieldOfView(), 1, 0.1, 25
+            main_camera.fieldOfView(), aspect, near_plane, far_plane
         )
         gnomon_camera.setUpVector(main_camera.upVector())
         gnomon_camera.setViewCenter(QVector3D(0, 0, 0))

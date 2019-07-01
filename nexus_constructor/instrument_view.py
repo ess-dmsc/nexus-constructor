@@ -76,7 +76,7 @@ class InstrumentView(QWidget):
             self.neutron_objects["meshes"].append(Qt3DExtras.QSphereMesh())
             self.neutron_objects["transforms"].append(Qt3DCore.QTransform())
 
-        self.cylinder_length = 40
+        self.beam_cylinder_length = 40
 
         # Create the gnomon resources and get its camera
         self.gnomon = Gnomon(
@@ -293,7 +293,7 @@ class InstrumentView(QWidget):
         Sets up the beam cylinder by giving the cylinder entity a mesh, a material, and a transformation.
         """
         self.set_cylinder_mesh_dimensions(
-            self.cylinder_mesh, 2.5, self.cylinder_length, 2
+            self.cylinder_mesh, 2.5, self.beam_cylinder_length, 2
         )
         self.set_beam_transform(self.cylinder_transform)
         self.add_qcomponents_to_entity(
@@ -364,7 +364,7 @@ class InstrumentView(QWidget):
             self.set_neutron_animation_properties(
                 neutron_animation,
                 neutron_animation_controller,
-                -self.cylinder_length,
+                -self.beam_cylinder_length,
                 time_span_offsets[i],
             )
 
