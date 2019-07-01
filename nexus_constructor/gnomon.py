@@ -52,13 +52,14 @@ class Gnomon:
         self.y_text_transformation = Qt3DCore.QTransform()
         self.z_text_transformation = Qt3DCore.QTransform()
 
-        # Set the text translation value to be the length of the cylinder plus some extra space so that it isn't on top
-        # of it or the cones.
+        # Set the text translation value to be the length of the cylinder plus some extra space so that it doesn't
+        # overlap with the cylinder or the cones.
         text_translation = self.gnomon_cylinder_length * 1.3
 
-        # The text translation value calculated above is used in addition to some "extra" values in order to make the text
-        # placement look good and appear centered next to the cone point. This extra values were found via trial and error
-        # and will likely have to be figured out again if you decide to change the font/size/height/etc of the text.
+        # The text translation value calculated above is used in addition to some "extra" values in order to make the
+        # text placement look good and appear centered next to the cone point. This extra values were found via trial
+        # and error and will likely have to be figured out again if you decide to change the font/size/height/etc of
+        # the text.
         self.x_text_vector = QVector3D(text_translation, -0.5, 0)
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
@@ -336,7 +337,7 @@ class Gnomon:
         Uses the view matrix of the gnomon camera and the current position of the axis label text in order to create a
         matrix that makes the text plane orthogonal to the camera vector.
         :param view_matrix: The view matrix of the gnomon camera. This is the inverse of the translation matrix that
-            describes the position and rotation of the camera.
+                            describes the position and rotation of the camera.
         :param text_vector: The vector of the axis label text.
         :return: A transformation matrix for making the text face the camera.
         """
