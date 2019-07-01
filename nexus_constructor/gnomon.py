@@ -10,7 +10,7 @@ class Gnomon:
         A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon.
         :param root_entity: The root entity for the gnomon.
         :param main_camera: The main component view camera.
-        :param component_adder: A function borrowed from the InstrumentView that add QComponents to a QEntity.
+        :param component_adder: A function borrowed from the InstrumentView that adds QComponents to a QEntity.
         """
 
         self.gnomon_root_entity = root_entity
@@ -56,7 +56,7 @@ class Gnomon:
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
 
-        # Borrowing a method from the instrument view?
+        # Borrowing a method from the InstrumentView
         self.add_qcomponents_to_entity = component_adder
 
         self.x_material = Qt3DExtras.QPhongMaterial()
