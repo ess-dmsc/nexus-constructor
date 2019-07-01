@@ -166,6 +166,37 @@ def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_
     assert group_to_be_linked.name == link_dict["target"]
 
 
+def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN_attributes_end_up_in_file():
+    file = create_in_memory_file("test8")
+
+    group_name = "test_group"
+    group = file.create_group(group_name)
+    group.attrs["NX_class"] = "NXgroup"
+
+    field1name = "field1"
+    field1value = "field1val"
+
+    field2name = "field2"
+    field2value = 3
+
+    field1 = group.create_dataset(field1name, data=field1value)
+    field1.attrs["NX_class"] = "NXfield"
+
+    field2 = group.create_dataset(field2name, data=field2value)
+    field2.attrs["NX_class"] = "NXfield"
+
+    converter = NexusToDictConverter()
+    root_dict = converter.convert(file, streams=dict(), links=dict())
+
+    assert group.name == root_dict["children"][0]["name"]
+
+    assert field1.name == root_dict["children"][0]["children"][0]["name"]
+    assert field1value == root_dict["children"][0]["children"][0]["values"]
+
+    assert field2.name == root_dict["children"][0]["children"][1]["name"]
+    assert field2value == root_dict["children"][0]["children"][1]["values"]
+
+
 def test_GIVEN_start_time_WHEN_creating_writercommands_THEN_start_time_is_included_in_command():
     start_time = 123413425
     start_cmd, _ = create_writer_commands({}, "", start_time=start_time)
