@@ -315,8 +315,10 @@ class Gnomon:
     @staticmethod
     def create_billboard_transformation(view_matrix, text_vector):
         """
-        Uses the view matrix of the gnomon camera and the current position of the axis label text in order to create a billboard transformation matrix.
-        :param view_matrix: The view matrix of the gnomon camera.
+        Uses the view matrix of the gnomon camera and the current position of the axis label text in order to create a
+        matrix that makes the text orthogonal to the camera vector.
+        :param view_matrix: The view matrix of the gnomon camera. This is the inverse of the translation matrix that
+            describes the position and rotation of the camera.
         :param text_vector: The vector of the axis label text.
         :return: A transformation matrix for making the text face the camera.
         """
