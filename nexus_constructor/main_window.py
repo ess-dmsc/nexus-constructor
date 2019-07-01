@@ -1,7 +1,7 @@
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.utils import file_dialog
+from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
 import silx.gui.hdf5
 import os

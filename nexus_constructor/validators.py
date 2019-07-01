@@ -1,5 +1,5 @@
 """Validators to be used on QML input fields"""
-from PySide2.QtCore import Property, Signal, QObject
+from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator
 import pint
 import os

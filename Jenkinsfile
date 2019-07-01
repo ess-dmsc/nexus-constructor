@@ -43,8 +43,8 @@ builders = pipeline_builder.createBuilders { container ->
         container.sh """
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
-            build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
-            build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
+            build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
+            build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15
             git submodule update --init
             """
     } // stage
@@ -113,7 +113,7 @@ return {
             stage("Setup") {
                   bat """
                   git submodule update --init
-                  python -m pip install --user -r requirements.txt
+                  python -m pip install --user -r requirements-dev.txt
                 """
             } // stage
             stage("Run tests") {
@@ -150,12 +150,11 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user -r requirements.txt"
+                    sh "python3 -m pip install --user -r requirements-dev.txt && git submodule update --init"
                 } // stage
-                stage('Build Executable') {
-                    sh "python3 setup.py build_exe"
+                stage('Run tests') {
+                    sh "python3 -m pytest . -s --ignore=definitions/"
                 } // stage
-                 // archive as well
             } // dir
         } // node
     } // return
@@ -174,10 +173,7 @@ node("docker") {
         }
     }
     
-    // disabled for now as the build isn't setup for Mac OS just yet.
-    // builders['macOS'] = get_macos_pipeline()
-
-    // Only build executables on windows if it is a PR build
+    builders['macOS'] = get_macos_pipeline()
     builders['windows10'] = get_win10_pipeline()
     parallel builders
 }

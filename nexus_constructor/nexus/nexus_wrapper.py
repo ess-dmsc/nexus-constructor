@@ -7,7 +7,7 @@ import numpy as np
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
-def set_up_in_memory_nexus_file(filename):
+def set_up_in_memory_nexus_file(filename: str):
     """
     Creates an in-memory nexus-file to store the model data in.
     :return: The file object.
@@ -15,7 +15,7 @@ def set_up_in_memory_nexus_file(filename):
     return h5py.File(filename, mode="x", driver="core", backing_store=False)
 
 
-def append_nxs_extension(file_name):
+def append_nxs_extension(file_name: str):
     extension = ".nxs"
     if file_name.endswith(extension):
         return file_name
@@ -159,8 +159,9 @@ class NexusWrapper(QObject):
 
     def create_transformations_group_if_does_not_exist(self, parent_group: h5Node):
         for child in parent_group:
-            if "NXtransformations" in parent_group[child].attrs.keys():
-                return parent_group[child]
+            if "NX_class" in parent_group[child].attrs.keys():
+                if parent_group[child].attrs["NX_class"] == "NXtransformations":
+                    return parent_group[child]
         return self.create_nx_group(
             "transformations", "NXtransformations", parent_group
         )

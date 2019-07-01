@@ -11,7 +11,7 @@ from nexus_constructor.geometry_types import (
     NoShapeGeometry,
 )
 from nexus_constructor.geometry_loader import load_geometry
-from PySide2.QtCore import QObject, QUrl, Signal, Slot, Property
+from PySide2.QtCore import QObject, QUrl, Signal, Property
 
 
 class NoShapeModel(QObject):
