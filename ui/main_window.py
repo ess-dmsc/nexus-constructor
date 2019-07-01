@@ -3,8 +3,8 @@
 # Form implementation generated from reading ui file 'main_window.ui',
 # licensing of 'main_window.ui' applies.
 #
-# Created: Thu Jun 13 13:05:28 2019
-#      by: pyside2-uic  running on PySide2 5.12.3
+# Created: Mon Jul  1 13:25:23 2019
+#      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -13,11 +13,11 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1263, 712)
+        MainWindow.resize(1287, 712)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
-        self.gridLayout.setObjectName("gridLayout")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.gridLayout_3 = QtWidgets.QGridLayout()
         self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.gridLayout_3.setObjectName("gridLayout_3")
@@ -28,12 +28,12 @@ class Ui_MainWindow(object):
         self.tab_2.setObjectName("tab_2")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.tab_2)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.pushButton = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton.setObjectName("pushButton")
-        self.verticalLayout_2.addWidget(self.pushButton)
-        self.listView = QtWidgets.QListView(self.tab_2)
-        self.listView.setObjectName("listView")
-        self.verticalLayout_2.addWidget(self.listView)
+        self.componentsTabLayout = QtWidgets.QVBoxLayout()
+        self.componentsTabLayout.setObjectName("componentsTabLayout")
+        self.componentTreeView = QtWidgets.QTreeView(self.tab_2)
+        self.componentTreeView.setObjectName("componentTreeView")
+        self.componentsTabLayout.addWidget(self.componentTreeView)
+        self.verticalLayout_2.addLayout(self.componentsTabLayout)
         self.tabWidget.addTab(self.tab_2, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -56,10 +56,10 @@ class Ui_MainWindow(object):
         self.sceneWidget.setMinimumSize(QtCore.QSize(745, 0))
         self.sceneWidget.setObjectName("sceneWidget")
         self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
-        self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
+        self.verticalLayout_3.addLayout(self.gridLayout_3)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1263, 19))
+        self.menubar = QtWidgets.QMenuBar()
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1287, 22))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -84,7 +84,6 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "NeXus Constructor", None, -1))
-        self.pushButton.setText(QtWidgets.QApplication.translate("MainWindow", "Add component", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtWidgets.QApplication.translate("MainWindow", "Components", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("MainWindow", "NeXus File Layout", None, -1))
         self.menuFile.setTitle(QtWidgets.QApplication.translate("MainWindow", "File", None, -1))

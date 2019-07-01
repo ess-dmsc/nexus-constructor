@@ -1,4 +1,5 @@
-from PySide2.QtWidgets import QDialog, QLabel, QGridLayout
+from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QAction, QToolBar
+from PySide2.QtGui import QIcon
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.ui_utils import file_dialog
@@ -20,7 +21,7 @@ class MainWindow(Ui_MainWindow):
     def setupUi(self, main_window):
         super().setupUi(main_window)
 
-        self.pushButton.clicked.connect(self.show_add_component_window)
+        #self.pushButton.clicked.connect(self.show_add_component_window)
         self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
         self.actionOpen_NeXus_file.triggered.connect(self.open_nexus_file)
         self.actionExport_to_Filewriter_JSON.triggered.connect(
@@ -46,6 +47,39 @@ class MainWindow(Ui_MainWindow):
         self.set_up_warning_window()
 
         self.widget.setVisible(True)
+
+        # component_list = self.nexus_wrapper.get_component_list()
+        # self.component_model = ComponentTreeModel(component_list.components)
+        #
+        # self.componentTreeView.setDragEnabled(True)
+        # self.componentTreeView.setAcceptDrops(True)
+        # self.componentTreeView.setDropIndicatorShown(True)
+        # self.componentTreeView.header().hide()
+        # self.component_delegate = ComponentEditorDelegate(self.componentTreeView)
+        # self.componentTreeView.setItemDelegate(self.component_delegate)
+        # self.componentTreeView.setModel(self.component_model)
+        # self.componentTreeView.updateEditorGeometries()
+        # self.componentTreeView.updateGeometries()
+        # self.componentTreeView.updateGeometry()
+        # self.componentTreeView.clicked.connect(self.on_clicked)
+
+        self.component_tool_bar = QToolBar("Actions", self.tab_2)
+        self.new_component_action = QAction(QIcon("ui/new_component.png"), "New component", self.tab_2)
+        self.new_component_action.triggered.connect(self.show_add_component_window)
+        self.component_tool_bar.addAction(self.new_component_action)
+        self.new_translation_action = QAction(QIcon("ui/new_translation.png"), "New translation", self.tab_2)
+        self.new_translation_action.setEnabled(False)
+        self.component_tool_bar.addAction(self.new_translation_action)
+        self.new_rotation_action = QAction(QIcon("ui/new_rotation.png"), "New rotation", self.tab_2)
+        self.new_rotation_action.setEnabled(False)
+        self.component_tool_bar.addAction(self.new_rotation_action)
+        self.duplicate_action = QAction(QIcon("ui/duplicate.png"), "Duplicate", self.tab_2)
+        self.component_tool_bar.addAction(self.duplicate_action)
+        self.duplicate_action.setEnabled(False)
+        self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.tab_2)
+        self.delete_action.setEnabled(False)
+        self.component_tool_bar.addAction(self.delete_action)
+        self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
     def set_up_warning_window(self):
         """
