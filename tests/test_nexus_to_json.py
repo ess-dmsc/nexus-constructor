@@ -203,4 +203,3 @@ def test_GIVEN_nexus_object_and_fake_fileIO_WHEN_calling_object_to_json_file_THE
     file.flush()
 
     assert json.loads(file.getvalue()) == tree
-
