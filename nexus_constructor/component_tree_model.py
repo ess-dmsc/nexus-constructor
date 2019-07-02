@@ -91,13 +91,15 @@ class ComponentTreeModel(QAbstractItemModel):
 
         parentItem = parent.internalPointer()
 
-        if type(parentItem) is ComponentModel:
+        if isinstance(parentItem) is ComponentModel:
             if row == 0:
                 if not hasattr(parentItem, "component_info"):
                     parentItem.component_info = ComponentInfo(parentItem)
                 return self.createIndex(0, 0, parentItem.component_info)
             elif row == 1:
-                return self.createIndex(1, 0, parentItem.transforms)
+                if not hasattr(parentItem, "stored_transforms"):
+                    parentItem.stored_transforms = parentItem.transforms
+                return self.createIndex(1, 0, parentItem.stored_transforms)
             else:
                 return QModelIndex()
         elif type(parentItem) is TransformationsList:
@@ -119,20 +121,16 @@ class ComponentTreeModel(QAbstractItemModel):
         if not index.isValid():
             return QModelIndex()
         parentItem = index.internalPointer()
-        if type(parentItem) is TransformationsList:
-            print("TransformationsList!")
         if type(parentItem) is ComponentModel:
             return QModelIndex()
         elif type(parentItem) is TransformationsList:
-            print(type(parentItem))
-            return self.createIndex(self.rootItem.index(parentItem.parent_component), 0, parentItem.parent_component)
+            row = self.rootItem.index(parentItem.parent_component)
+            parent = parentItem.parent_component
+            return self.createIndex(row, 0, parent)
         elif type(parentItem) is ComponentInfo:
             return self.createIndex(self.rootItem.index(parentItem.parent), 0, parentItem.parent)
         elif issubclass(type(parentItem), TransformationModel):
             return self.createIndex(1, 0, parentItem.parent)
-        # if parentItem == self.rootItem:
-        #     return QModelIndex()
-        print(type(parentItem))
         raise RuntimeError("Unknown element type.")
 
     def rowCount(self, parent):

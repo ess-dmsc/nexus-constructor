@@ -127,7 +127,6 @@ def test_GIVEN_new_component_WHEN_get_transforms_for_component_THEN_transforms_l
         len(component.transforms_full_chain) == 0
     ), "expected there to be no transformations in the newly created component"
 
-
 def test_GIVEN_component_with_a_transform_added_WHEN_get_transforms_for_component_THEN_transforms_list_contains_transform():
     nexus_wrapper = NexusWrapper(str(uuid1()))
     component_group = _add_component_to_file(
