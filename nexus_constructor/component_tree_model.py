@@ -72,7 +72,21 @@ class ComponentTreeModel(QAbstractItemModel):
                 return True
         return False
 
-    def updateModel(self):
+    def updateModel(self, new_data: list):
+        new_list = []
+        for current_old_component in self.rootItem:
+            deleted_component = True
+            for current_component in new_data:
+                if current_component.absolute_path == current_old_component.absolute_path:
+                    new_list.append(current_old_component)
+                    new_data.remove(current_component)
+                    deleted_component = False
+                    break
+            if deleted_component:
+                self.removeRow()
+        for new_component in new_data:
+            new_list.append(new_component)
+        self.rootItem = new_list
         self.dataChanged.emit(QModelIndex(), QModelIndex())
         self.layoutChanged.emit()
 
@@ -81,6 +95,13 @@ class ComponentTreeModel(QAbstractItemModel):
 
     def headerData(self, section, orientation, role):
         return None
+
+    def createIndex(self, row, column, parent):
+        if isinstance(parent, TransformationModel) or isinstance(parent, ComponentModel) or isinstance(parent, ComponentInfo) or isinstance(parent, TransformationsList):
+            pass
+        else:
+            print("Not ok")
+        return super().createIndex(row, column, parent)
 
     def index(self, row, column, parent):
         if not self.hasIndex(row, column, parent):
@@ -91,7 +112,7 @@ class ComponentTreeModel(QAbstractItemModel):
 
         parentItem = parent.internalPointer()
 
-        if isinstance(parentItem) is ComponentModel:
+        if isinstance(parentItem, ComponentModel):
             if row == 0:
                 if not hasattr(parentItem, "component_info"):
                     parentItem.component_info = ComponentInfo(parentItem)
@@ -124,9 +145,10 @@ class ComponentTreeModel(QAbstractItemModel):
         if type(parentItem) is ComponentModel:
             return QModelIndex()
         elif type(parentItem) is TransformationsList:
-            row = self.rootItem.index(parentItem.parent_component)
-            parent = parentItem.parent_component
-            return self.createIndex(row, 0, parent)
+            try:
+                return self.createIndex(self.rootItem.index(parentItem.parent_component), 0, parentItem.parent_component)
+            except ValueError as e:
+                print(e)
         elif type(parentItem) is ComponentInfo:
             return self.createIndex(self.rootItem.index(parentItem.parent), 0, parentItem.parent)
         elif issubclass(type(parentItem), TransformationModel):

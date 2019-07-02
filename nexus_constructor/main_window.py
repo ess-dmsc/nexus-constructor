@@ -7,6 +7,8 @@ from ui.main_window import Ui_MainWindow
 import silx.gui.hdf5
 import os
 
+from nexus_constructor.component import ComponentModel
+from nexus_constructor.component import TransformationModel
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.nexus_filewriter_json import writer
@@ -43,6 +45,7 @@ class MainWindow(Ui_MainWindow):
         self.verticalLayout.addWidget(self.widget)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
+        self.instrument.nexus.file_changed.connect(self.update_nexus_file_structure_view)
 
         self.set_up_warning_window()
 
@@ -77,6 +80,7 @@ class MainWindow(Ui_MainWindow):
         self.component_tool_bar.addAction(self.duplicate_action)
         self.duplicate_action.setEnabled(False)
         self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.tab_2)
+        self.delete_action.triggered.connect(self.on_delete_item)
         self.delete_action.setEnabled(False)
         self.component_tool_bar.addAction(self.delete_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
@@ -89,8 +93,13 @@ class MainWindow(Ui_MainWindow):
             self.new_rotation_action.setEnabled(False)
             self.new_translation_action.setEnabled(False)
         else:
-            self.delete_action.setEnabled(True)
-            self.duplicate_action.setEnabled(True)
+            clicked_object = index.internalPointer()
+            if isinstance(clicked_object, ComponentModel) or isinstance(clicked_object, TransformationModel):
+                self.delete_action.setEnabled(True)
+                self.duplicate_action.setEnabled(True)
+            else:
+                self.delete_action.setEnabled(False)
+                self.duplicate_action.setEnabled(False)
             self.new_rotation_action.setEnabled(True)
             self.new_translation_action.setEnabled(True)
 
@@ -118,6 +127,7 @@ class MainWindow(Ui_MainWindow):
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
         self.treemodel.insertH5pyObject(nexus_file)
+        self.component_model.updateModel(self.instrument.get_component_list())
 
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
@@ -139,3 +149,8 @@ class MainWindow(Ui_MainWindow):
         self.add_component_window.ui = AddComponentDialog(self.instrument)
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
+
+    def on_delete_item(self):
+        selected = self.componentTreeView.selectedIndexes()
+        for item in selected:
+            self.instrument.remove_component(item.internalPointer())
