@@ -74,8 +74,8 @@ class NexusToDictConverter:
     def truncate_if_large(size, data):
         for dim_number, dim_size in enumerate(size):
             if dim_size > 10:
-                size[dim_number] = 10
-        data.resize(size)
+                size = (10, dim_size)
+        data.resize(size, refcheck=False)
 
     def _get_data_and_type(self, root: h5py.Dataset):
         """
