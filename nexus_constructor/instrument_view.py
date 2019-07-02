@@ -1,12 +1,11 @@
-from PySide2.Qt3DRender import Qt3DRender
-from PySide2.QtWidgets import QWidget, QVBoxLayout
-from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtCore import QPropertyAnimation, QRectF
-from PySide2.QtGui import QVector3D, QColor, QMatrix4x4
+from PySide2.Qt3DExtras import Qt3DExtras
+from PySide2.Qt3DRender import Qt3DRender
+from PySide2.QtCore import QRectF
+from PySide2.QtGui import QVector3D, QColor
+from PySide2.QtWidgets import QWidget, QVBoxLayout
 
 from nexus_constructor.gnomon import Gnomon
-from nexus_constructor.neutron_animation_controller import NeutronAnimationController
 from nexus_constructor.off_renderer import OffMesh
 
 

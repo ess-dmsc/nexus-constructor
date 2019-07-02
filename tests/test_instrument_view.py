@@ -1,7 +1,6 @@
-from PySide2.QtGui import QMatrix4x4, QVector3D
+from mock import Mock, call
 
 from nexus_constructor.instrument_view import InstrumentView
-from mock import Mock, call
 
 
 def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_properties_set():
