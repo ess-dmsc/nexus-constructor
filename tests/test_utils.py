@@ -103,7 +103,7 @@ def test_GIVEN_name_with_1_in_already_WHEN_generating_unique_name_THEN_number_is
     )
 
 
-def test_GIVEN_name_with_1_as_prefix_and_name_with_11_already_in_list_WHEN_generating_unique_name_THEN_following_number_is_incremented_and_name_is_unique():
+def test_GIVEN_name_with_1_as_suffix_and_name_with_11_already_in_list_WHEN_generating_unique_name_THEN_following_number_is_incremented_and_name_is_unique():
     comp = DummyComponent("something1")
 
     assert (
