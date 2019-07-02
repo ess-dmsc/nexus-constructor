@@ -89,6 +89,8 @@ class Gnomon:
 
         self.num_neutrons = 9
 
+        self.neutron_animation_length = self.gnomon_cylinder_length * 1.5
+
         # Create a dictionary for neutron-related objects so that they are always in scope and not destroyed by C++
         self.neutron_objects = {
             "entities": [],
@@ -390,7 +392,7 @@ class Gnomon:
         cylinder_mesh.setRings(rings)
 
     @staticmethod
-    def set_beam_transform(cylinder_transform, gnomon_cylinder_length):
+    def set_beam_transform(cylinder_transform, neutron_animation_length):
         """
         Configures the transform for the beam cylinder by giving it a matrix. The matrix will turn the cylinder sideways
         and then move it "backwards" in the z-direction by 20 units so that it ends at the location of the sample.
@@ -398,7 +400,7 @@ class Gnomon:
         """
         cylinder_matrix = QMatrix4x4()
         cylinder_matrix.rotate(90, QVector3D(1, 0, 0))
-        cylinder_matrix.translate(QVector3D(0, gnomon_cylinder_length, 0))
+        cylinder_matrix.translate(QVector3D(0, neutron_animation_length * 0.5, 0))
 
         cylinder_transform.setMatrix(cylinder_matrix)
 
@@ -407,9 +409,9 @@ class Gnomon:
         Sets up the beam cylinder by giving the cylinder entity a mesh, a material, and a transformation.
         """
         self.set_cylinder_mesh_dimensions(
-            self.cylinder_mesh, 1.5, self.gnomon_cylinder_length * 2, 2
+            self.cylinder_mesh, 1.5, self.neutron_animation_length, 2
         )
-        self.set_beam_transform(self.cylinder_transform, self.gnomon_cylinder_length)
+        self.set_beam_transform(self.cylinder_transform, self.neutron_animation_length)
         self.add_qcomponents_to_entity(
             self.cylinder_entity,
             [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
@@ -474,16 +476,14 @@ class Gnomon:
                 self.neutron_objects["transforms"][i]
             )
 
-            x_cylinder_length = 8
-
             neutron_animation = QPropertyAnimation(
                 self.neutron_objects["transforms"][i]
             )
             self.set_neutron_animation_properties(
                 neutron_animation,
                 neutron_animation_controller,
-                x_cylinder_length,
-                time_span_offsets[i],
+                self.neutron_animation_length,
+                time_span_offsets[i] * 0.5,
             )
 
             self.neutron_objects["animation_controllers"].append(
