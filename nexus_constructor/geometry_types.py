@@ -1,6 +1,13 @@
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from math import sin, cos, pi, acos, degrees
+import h5py
+from nexus_constructor.nexus import nexus_wrapper as nx
+from nexus_constructor.nexus.validation import (
+    NexusFormatError,
+    ValidateDataset,
+    validate_group,
+)
 from typing import List, TypeVar
 
 
@@ -96,6 +103,46 @@ class CylindricalGeometry:
     """
 
     geometry_str = "Cylinder"
+
+    def __init__(self, nexus_file: nx.NexusWrapper, group: h5py.Group):
+        self.file = nexus_file
+        self.group = group
+        self._verify_in_file()
+
+    def _verify_in_file(self):
+        """
+        Check all the datasets and attributes we require are in the NXcylindrical_geometry group
+        """
+        problems = []
+        if "NX_class" in self.group.attrs.items:
+            if self.group.attrs["NX_class"] != "NXcylindrical_geometry":
+                problems.append(
+                    f"Expected {self.group.name} to have NX_class attribute of NXcylindrical_geometry"
+                )
+        else:
+            problems.append(f"Expected {self.group.name} to have an NX_class attribute")
+        if problems:
+            raise NexusFormatError("\n".join(problems))
+
+        problems = validate_group(
+            self.group,
+            (
+                ValidateDataset(
+                    "vertices", shape=(None, 3), attributes={"units": None}
+                ),
+                ValidateDataset("cylinders", (None, 3)),
+            ),
+        )
+        if problems:
+            raise NexusFormatError("\n".join(problems))
+
+    @property
+    def units(self):
+        return self.group["vertices"].attrs["units"]
+
+    @units.setter
+    def units(self, new_units: str):
+        self.group["vertices"].attrs["units"] = new_units
 
     def __init__(
         self,
