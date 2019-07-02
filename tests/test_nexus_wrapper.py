@@ -94,13 +94,14 @@ def test_GIVEN_multiple_entry_groups_in_file_WHEN_finding_entry_THEN_signal_is_e
     inst_group.attrs["NX_class"] = "NXinstrument"
 
     entry2 = file.create_group("entry2")
-    entry.attrs["NX_class"] = "NXentry"
+    entry2.attrs["NX_class"] = "NXentry"
 
     inst_group2 = entry2.create_group("instrument2")
     inst_group2.attrs["NX_class"] = "NXinstrument"
 
     wrapper = NexusWrapper(filename="test_nw7")
     wrapper.show_entries_dialog = Mock()
+    wrapper.show_entries_dialog.emit = Mock()
 
     wrapper.find_entries_in_file(file)
 
