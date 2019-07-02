@@ -81,20 +81,26 @@ class NexusWrapper(QObject):
                 filename, mode="r", backing_store=False, driver="core"
             )
 
-            entries_in_root = dict()
+            self.find_entries_in_file(nexus_file)
 
-            def append_nx_entries_to_list(name, node):
-                if isinstance(node, h5py.Group):
-                    if "NX_class" in node.attrs.keys():
-                        if node.attrs["NX_class"] == "NXentry":
-                            entries_in_root[name] = node
+    def find_entries_in_file(self, nexus_file):
+        """
+        Find the entry group in the specified nexus file. If there are multiple, emit the signal required to show the multiple entry selection dialog in the UI.
+        :param nexus_file: A reference to the nexus file to check for the entry group.
+        """
+        entries_in_root = dict()
 
-            nexus_file["/"].visititems(append_nx_entries_to_list)
+        def append_nx_entries_to_list(name, node):
+            if isinstance(node, h5py.Group):
+                if "NX_class" in node.attrs.keys():
+                    if node.attrs["NX_class"] == "NXentry":
+                        entries_in_root[name] = node
 
-            if len(entries_in_root.keys()) > 1:
-                self.show_entries_dialog.emit(entries_in_root, nexus_file)
-            else:
-                self.load_file(list(entries_in_root.values())[0], nexus_file)
+        nexus_file["/"].visititems(append_nx_entries_to_list)
+        if len(entries_in_root.keys()) > 1:
+            self.show_entries_dialog.emit(entries_in_root, nexus_file)
+        else:
+            self.load_file(list(entries_in_root.values())[0], nexus_file)
 
     def load_file(self, entry: h5py.Group, nexus_file: h5py.File):
         """
