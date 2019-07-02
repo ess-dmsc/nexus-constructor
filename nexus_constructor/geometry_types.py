@@ -1,31 +1,82 @@
 from PySide2.QtGui import QVector3D, QMatrix4x4
-import attr
-from abc import ABC, abstractmethod
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from math import sin, cos, pi, acos, degrees
-from typing import List
+from typing import List, TypeVar
 
 
 # Temporary method here until the one above is no longer needed
-def validate_nonzero_qvector(instance, attribute, value):
+def validate_nonzero_qvector(value: QVector3D):
     if value.x() == 0 and value.y() == 0 and value.z() == 0:
         raise ValueError("Vector is zero length")
 
 
-@attr.s
-class Geometry(ABC):
-    """Base class for geometry a component can take"""
+class OFFGeometry:
+    """
+    Stores arbitrary 3D geometry as a list of vertices and faces, based on the Object File Format
 
-    geometry_str = None  # A string describing the geometry type to the user
+    vertices:   list of Vector objects used as corners of polygons in the geometry
+    faces:  list of integer lists. Each sublist is a winding path around the corners of a polygon. Each sublist item is
+            an index into the vertices list to identify a specific point in 3D space
+    """
+
+    geometry_str = "OFF"
+
+    def __init__(self, vertices: List[QVector3D] = None, faces: List[List[int]] = None):
+        self.vertices = vertices
+        self.faces = faces
 
     @property
-    @abstractmethod
+    def winding_order(self):
+        return [point for face in self.faces for point in face]
+
+    @property
+    def winding_order_indices(self):
+        face_sizes = [len(face) for face in self.faces]
+        return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
+
+    @property
     def off_geometry(self):
+        return self
+
+
+OFFCube = OFFGeometry(
+    vertices=[
+        QVector3D(-0.5, -0.5, 0.5),
+        QVector3D(0.5, -0.5, 0.5),
+        QVector3D(-0.5, 0.5, 0.5),
+        QVector3D(0.5, 0.5, 0.5),
+        QVector3D(-0.5, 0.5, -0.5),
+        QVector3D(0.5, 0.5, -0.5),
+        QVector3D(-0.5, -0.5, -0.5),
+        QVector3D(0.5, -0.5, -0.5),
+    ],
+    faces=[
+        [0, 1, 3, 2],
+        [2, 3, 5, 4],
+        [4, 5, 7, 6],
+        [6, 7, 1, 0],
+        [1, 7, 5, 3],
+        [6, 0, 2, 4],
+    ],
+)
+
+
+class NoShapeGeometry:
+    """
+    Dummy object for components with no geometry.
+    """
+
+    geometry_str = "None"
+
+    def __init__(self):
         pass
 
+    @property
+    def off_geometry(self):
+        return OFFCube
 
-@attr.s
-class CylindricalGeometry(Geometry):
+
+class CylindricalGeometry:
     """
     Describes the shape of a cylinder in 3D space
 
@@ -34,14 +85,19 @@ class CylindricalGeometry(Geometry):
     """
 
     geometry_str = "Cylinder"
-    units = attr.ib(default="m", type=str)
-    axis_direction = attr.ib(
-        factory=lambda: QVector3D(1, 0, 0),
-        type=QVector3D,
-        validator=validate_nonzero_qvector,
-    )
-    height = attr.ib(default=1, type=float)
-    radius = attr.ib(default=1, type=float)
+
+    def __init__(
+        self,
+        units: str = "m",
+        axis_direction: QVector3D = QVector3D(1, 0, 0),
+        height: float = 1,
+        radius: float = 1,
+    ):
+        validate_nonzero_qvector(axis_direction)
+        self.units = units
+        self.axis_direction = axis_direction
+        self.height = height
+        self.radius = radius
 
     @property
     def base_center_point(self):
@@ -126,64 +182,6 @@ class CylindricalGeometry(Geometry):
         return rotate_matrix
 
 
-@attr.s
-class OFFGeometry(Geometry):
-    """
-    Stores arbitrary 3D geometry as a list of vertices and faces, based on the Object File Format
-
-    vertices:   list of Vector objects used as corners of polygons in the geometry
-    faces:  list of integer lists. Each sublist is a winding path around the corners of a polygon. Each sublist item is
-            an index into the vertices list to identify a specific point in 3D space
-    """
-
-    geometry_str = "OFF"
-    vertices = attr.ib(factory=list, type=List[QVector3D])
-    faces = attr.ib(factory=list, type=List[List[int]])
-
-    @property
-    def winding_order(self):
-        return [point for face in self.faces for point in face]
-
-    @property
-    def winding_order_indices(self):
-        face_sizes = [len(face) for face in self.faces]
-        return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
-
-    @property
-    def off_geometry(self):
-        return self
-
-
-OFFCube = OFFGeometry(
-    vertices=[
-        QVector3D(-0.5, -0.5, 0.5),
-        QVector3D(0.5, -0.5, 0.5),
-        QVector3D(-0.5, 0.5, 0.5),
-        QVector3D(0.5, 0.5, 0.5),
-        QVector3D(-0.5, 0.5, -0.5),
-        QVector3D(0.5, 0.5, -0.5),
-        QVector3D(-0.5, -0.5, -0.5),
-        QVector3D(0.5, -0.5, -0.5),
-    ],
-    faces=[
-        [0, 1, 3, 2],
-        [2, 3, 5, 4],
-        [4, 5, 7, 6],
-        [6, 7, 1, 0],
-        [1, 7, 5, 3],
-        [6, 0, 2, 4],
-    ],
+GeometryType = TypeVar(
+    "GeometryType", CylindricalGeometry, NoShapeGeometry, OFFGeometry
 )
-
-
-@attr.s
-class NoShapeGeometry(Geometry):
-    """
-    Dummy object for components with no geometry.
-    """
-
-    geometry_str = "None"
-
-    @property
-    def off_geometry(self):
-        return OFFCube

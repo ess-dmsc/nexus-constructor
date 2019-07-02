@@ -1,5 +1,4 @@
 from nexus_constructor.geometry_types import (
-    Geometry,
     NoShapeGeometry,
     CylindricalGeometry,
     OFFGeometry,
@@ -9,12 +8,6 @@ from nexus_constructor.geometry_types import (
     acos,
     degrees,
 )
-from pytest import raises
-
-
-def test_GIVEN_nothing_WHEN_constructing_Geometry_THEN_AbstractError():
-    with raises(TypeError):
-        Geometry()
 
 
 def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_off_geometry_returns_offcube():
