@@ -1,8 +1,12 @@
+from functools import partial
+from time import sleep
+
 import h5py
 
 from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar
 import numpy as np
+from PySide2.QtWidgets import QDialog, QComboBox, QGridLayout, QPushButton, QLabel
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
@@ -36,6 +40,7 @@ class NexusWrapper(QObject):
     # Signal that indicates the nexus file has been changed in some way
     file_changed = Signal("QVariant")
     component_added = Signal(str, "QVariant")
+    show_entries_dialog = Signal("QVariant", "QVariant")
 
     def __init__(self, filename="NeXus File"):
         super().__init__()
@@ -79,12 +84,29 @@ class NexusWrapper(QObject):
             nexus_file = h5py.File(
                 filename, mode="r", backing_store=False, driver="core"
             )
-            self._load_file(nexus_file)
-            print("NeXus file loaded")
-            self._emit_file()
 
-    def _load_file(self, nexus_file: h5py.File):
+            entries_in_root = dict()
+
+            def append_nx_entries_to_list(name, node):
+                if isinstance(node, h5py.Group):
+                    if "NX_class" in node.attrs.keys():
+                        if node.attrs["NX_class"] == "NXentry":
+                            entries_in_root[name] = node
+
+            nexus_file["/"].visititems(append_nx_entries_to_list)
+
+            if len(entries_in_root.keys()) > 1:
+                self.show_entries_dialog.emit(entries_in_root, nexus_file)
+            else:
+                self.load_file(list(entries_in_root.values())[0], nexus_file)
+
+    def load_file(self, entry, nexus_file):
+        self.entry = entry
+        self.instrument = self.get_instrument_group_from_entry(self.entry)
         self.nexus_file = nexus_file
+
+        print("NeXus file loaded")
+        self._emit_file()
 
     def rename_node(self, node: h5Node, new_name: str):
         self.nexus_file.move(node.name, f"{node.parent.name}/{new_name}")
@@ -185,3 +207,11 @@ class NexusWrapper(QObject):
         return self.create_nx_group(
             "transformations", "NXtransformations", parent_group
         )
+
+    @staticmethod
+    def get_instrument_group_from_entry(entry):
+        for node in entry:
+            if isinstance(node, h5py.Group):
+                if "NX_class" in node.attrs.keys():
+                    if node.attrs["NX_class"] == "NXinstrument":
+                        return node

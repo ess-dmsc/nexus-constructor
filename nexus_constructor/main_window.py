@@ -1,4 +1,6 @@
-from PySide2.QtWidgets import QDialog, QLabel, QGridLayout
+from functools import partial
+
+from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.ui_utils import file_dialog
@@ -39,13 +41,40 @@ class MainWindow(Ui_MainWindow):
             self.update_nexus_file_structure_view
         )
         self.verticalLayout.addWidget(self.widget)
-        # self.listView.setModel(self.nexus_wrapper.get_component_list())
+        self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
 
         self.set_up_warning_window()
 
         self.widget.setVisible(True)
+
+    def show_entries_dialog(self, map_of_entries: dict, nexus_file):
+        self.entries_dialog = QDialog()
+        self.entries_dialog.setMinimumWidth(400)
+        self.entries_dialog.setWindowTitle(
+            "Multiple Entries found. Please choose the entry name from the list."
+        )
+        combo = QComboBox()
+        [combo.addItem(x) for x in map_of_entries.keys()]
+
+        ok_button = QPushButton()
+        ok_button.setText("OK")
+        ok_button.clicked.connect(self.entries_dialog.close)
+
+        ok_button.clicked.connect(
+            partial(
+                self.instrument.nexus.load_file,
+                map_of_entries[combo.currentText()],
+                nexus_file,
+            )
+        )
+
+        self.entries_dialog.setLayout(QGridLayout())
+        self.entries_dialog.layout().addWidget(QLabel("Entry:"))
+        self.entries_dialog.layout().addWidget(combo)
+        self.entries_dialog.layout().addWidget(ok_button)
+        self.entries_dialog.show()
 
     def set_up_warning_window(self):
         """
