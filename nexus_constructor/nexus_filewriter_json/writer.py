@@ -36,15 +36,9 @@ class NexusToDictConverter:
     Class used to convert nexus format root to python dict
     """
 
-    def __init__(self, truncate_large_datasets=False, large=10):
-        """
-        :param truncate_large_datasets: if True truncates datasets with any dimension larger than large
-        :param large: dimensions larger than this are considered large
-        """
+    def __init__(self):
         self._kafka_streams = dict()
         self._links = dict()
-        self.truncate_large_datasets = truncate_large_datasets
-        self.large = large
 
     def convert(self, nexus_root, streams, links):
         """
@@ -71,13 +65,7 @@ class NexusToDictConverter:
         return root_dict
 
     @staticmethod
-    def truncate_if_large(size, data):
-        for dim_number, dim_size in enumerate(size):
-            if dim_size > 10:
-                size = (10, dim_size)
-        data.resize(size, refcheck=False)
-
-    def _get_data_and_type(self, root: h5py.Dataset):
+    def _get_data_and_type(root: h5py.Dataset):
         """
         get the value and data type of dataset
         :param root: h5py dataset
@@ -88,8 +76,6 @@ class NexusToDictConverter:
         dtype = root.dtype
         if type(data) is np.ndarray:
             size = data.shape
-            if self.truncate_large_datasets:
-                self.truncate_if_large(size, data)
             data = data.tolist()
         if dtype.char == "S":
             if isinstance(data, list):
@@ -103,7 +89,8 @@ class NexusToDictConverter:
             dtype = "float"
         return data, dtype, size
 
-    def _handle_attributes(self, root, root_dict):
+    @staticmethod
+    def _handle_attributes(root, root_dict):
         if "NX_class" in root.attrs:
             nx_class = root.attrs["NX_class"]
             if nx_class and nx_class != "NXfield" and nx_class != "NXgroup":

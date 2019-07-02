@@ -334,28 +334,3 @@ def test_GIVEN_string_list_WHEN_getting_data_and_type_THEN_returns_correct_dtype
 
     assert data == [x.decode("ASCII") for x in list(dataset_value)]
     assert size == (len(dataset_value),)
-
-
-def test_GIVEN_large_list_WHEN_truncating_large_THEN_returns_truncated_list_that_has_been_resized():
-    file = create_in_memory_file("test13")
-
-    ds = file.create_dataset("test_ds", (1000, 1000), chunks=(100, 100))
-    print(ds.size)
-
-    size = (10, 10)
-
-    NexusToDictConverter.truncate_if_large(size, ds)
-
-    assert ds.size.all() == np.array(size).all()
-
-
-def test_GIVEN_large_array_WHEN_getting_data_and_type_and_truncate_is_set_to_true_THEN_dataset_is_truncated():
-    file = create_in_memory_file("test13")
-
-    ds = file.create_dataset("test_ds", (1000, 1000), chunks=(100, 100))
-    ds.attrs["NX_class"] = "NXpinhole"
-
-    converter = NexusToDictConverter(truncate_large_datasets=True, large=(1, 1))
-    root_dict = converter.convert(file, {}, {})
-
-    assert len(root_dict["children"][0]["values"]) == 10
