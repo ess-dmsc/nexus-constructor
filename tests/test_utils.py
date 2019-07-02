@@ -1,6 +1,6 @@
 from mock import Mock
 
-from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.ui_utils import validate_line_edit, generate_unique_name
 
 
 class DummyLineEdit:
@@ -75,3 +75,37 @@ def test_GIVEN_suggestion_callable_WHEN_validating_line_edit_with_valid_line_edi
     )
 
     assert suggestion.not_called()
+
+
+class DummyComponent:
+    def __init__(self, name: str):
+        self.name = name
+
+
+def test_GIVEN_unique_name_WHEN_generating_unique_name_THEN_returns_unchanged_name():
+    name = "something"
+    assert generate_unique_name(name, []) == name
+
+
+def test_GIVEN_name_already_in_list_WHEN_generating_unique_name_THEN_returns_changed_name():
+    comp = DummyComponent("something")
+    assert generate_unique_name(comp.name, [comp]) == comp.name + "1"
+
+
+def test_GIVEN_name_with_1_in_already_WHEN_generating_unique_name_THEN_number_is_appended_to_the_suffix_of_the_name():
+    comp = DummyComponent("something1")
+
+    assert (
+        generate_unique_name(
+            comp.name, [DummyComponent("something1"), DummyComponent("something2")]
+        )
+        == comp.name + "1"
+    )
+
+
+def test_GIVEN_name_with_1_as_prefix_and_name_with_11_already_in_list_WHEN_generating_unique_name_THEN_following_number_is_incremented_and_name_is_unique():
+    comp = DummyComponent("something1")
+
+    assert (
+        generate_unique_name(comp.name, [comp, DummyComponent(comp.name + "1")])
+    ) == "something12"
