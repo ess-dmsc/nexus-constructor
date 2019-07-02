@@ -99,7 +99,7 @@ class InstrumentView(QWidget):
         component_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
         component_clear_buffers.setClearColor(QColor("lightgrey"))
 
-        gnomon_size = 0.15
+        gnomon_size = 0.2
         gnomon_start = 1 - gnomon_size
 
         # Create a viewport for gnomon in small section of the screen

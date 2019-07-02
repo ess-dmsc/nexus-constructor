@@ -343,7 +343,7 @@ class Gnomon:
             self.main_camera.position() - self.main_camera.viewCenter()
         )
         updated_gnomon_camera_position = updated_gnomon_camera_position.normalized()
-        updated_gnomon_camera_position *= self.gnomon_cylinder_length * 4
+        updated_gnomon_camera_position *= self.gnomon_cylinder_length * 4.2
 
         self.gnomon_camera.setPosition(updated_gnomon_camera_position)
         self.gnomon_camera.setUpVector(self.main_camera.upVector())
@@ -483,7 +483,7 @@ class Gnomon:
                 neutron_animation,
                 neutron_animation_controller,
                 self.neutron_animation_length,
-                time_span_offsets[i] * 0.5,
+                time_span_offsets[i],
             )
 
             self.neutron_objects["animation_controllers"].append(
