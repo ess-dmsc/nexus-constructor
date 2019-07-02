@@ -194,3 +194,81 @@ def test_GIVEN_view_matrix_and_vector_WHEN_calling_create_billboard_transformati
     actual_matrix = Gnomon.create_billboard_transformation(view_matrix, text_vector)
 
     assert expected_matrix == actual_matrix
+
+
+def test_GIVEN_animation_parameters_WHEN_calling_set_neutron_animation_properties_THEN_properties_set():
+
+    mock_neutron_animation_controller = Mock()
+    animation_distance = 15
+    time_span_offset = 5
+
+    mock_neutron_animation = Mock()
+    mock_neutron_animation.setTargetObject = Mock()
+    mock_neutron_animation.setPropertyName = Mock()
+    mock_neutron_animation.setStartValue = Mock()
+    mock_neutron_animation.setEndValue = Mock()
+    mock_neutron_animation.setDuration = Mock()
+    mock_neutron_animation.setLoopCount = Mock()
+    mock_neutron_animation.start = Mock()
+
+    Gnomon.set_neutron_animation_properties(
+        mock_neutron_animation,
+        mock_neutron_animation_controller,
+        animation_distance,
+        time_span_offset,
+    )
+
+    mock_neutron_animation.setTargetObject.assert_called_once_with(
+        mock_neutron_animation_controller
+    )
+    mock_neutron_animation.setPropertyName.assert_called_once_with(b"distance")
+    mock_neutron_animation.setStartValue.assert_called_once_with(0)
+    mock_neutron_animation.setEndValue.assert_called_once_with(animation_distance)
+    mock_neutron_animation.setDuration.assert_called_once_with(500 + time_span_offset)
+    mock_neutron_animation.setLoopCount.assert_called_once_with(-1)
+    mock_neutron_animation.start.assert_called_once()
+
+
+def test_GIVEN_cylinder_dimensions_WHEN_calling_set_cylinder_mesh_dimensions_THEN_dimensions_set():
+
+    radius = 2
+    length = 10
+    rings = 2
+
+    mock_cylinder = Mock()
+    mock_cylinder.setRadius = Mock()
+    mock_cylinder.setLength = Mock()
+    mock_cylinder.setRings = Mock()
+
+    Gnomon.set_cylinder_mesh_dimensions(mock_cylinder, radius, length, rings)
+
+    mock_cylinder.setRadius.assert_called_once_with(radius)
+    mock_cylinder.setLength.assert_called_once_with(length)
+    mock_cylinder.setRings.assert_called_once_with(rings)
+
+
+def test_GIVEN_cylinder_transform_WHEN_calling_set_beam_transform_THEN_matrix_set():
+
+    neutron_animation_length = 15
+
+    expected_matrix = QMatrix4x4()
+    expected_matrix.rotate(90, QVector3D(1, 0, 0))
+    expected_matrix.translate(QVector3D(0, neutron_animation_length * 0.5, 0))
+
+    mock_cylinder_transform = Mock()
+    mock_cylinder_transform.setMatrix = Mock()
+
+    Gnomon.set_beam_transform(mock_cylinder_transform, neutron_animation_length)
+
+    assert mock_cylinder_transform.setMatrix.call_args[0][0] == expected_matrix
+
+
+def test_GIVEN_radius_WHEN_calling_set_sphere_mesh_radius_THEN_radius_set():
+
+    radius = 2
+    mock_sphere_mesh = Mock()
+    mock_sphere_mesh.setRadius = Mock()
+
+    Gnomon.set_sphere_mesh_radius(mock_sphere_mesh, radius)
+
+    mock_sphere_mesh.setRadius.assert_called_once_with(radius)
