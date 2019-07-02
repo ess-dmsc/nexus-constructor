@@ -216,7 +216,7 @@ class NexusWrapper(QObject):
         :param entry: The entry group object to search for the instrument group in.
         :return: the instrument group object.
         """
-        for node in entry:
+        for node in entry.values():
             if isinstance(node, h5py.Group):
                 if "NX_class" in node.attrs.keys():
                     if node.attrs["NX_class"] == "NXinstrument":
