@@ -83,9 +83,9 @@ class NexusToDictConverter:
             else:
                 data = data.decode("utf-8")
             dtype = "string"
-        elif dtype is np.float64:
+        elif dtype == np.float64:
             dtype = "double"
-        elif dtype is np.float:
+        elif dtype == np.float32:
             dtype = "float"
         return data, dtype, size
 

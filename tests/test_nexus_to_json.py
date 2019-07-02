@@ -21,10 +21,10 @@ def create_in_memory_file(filename):
 def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
     expected_dtype = "float"
     expected_size = 1
-    expected_value = np.float(23.11585)
+    expected_value = np.float(1.1)
 
     file = create_in_memory_file("test1")
-    dataset = file.create_dataset("test_dataset", dtype=np.float, data=expected_value)
+    dataset = file.create_dataset("test_dataset", dtype="float32", data=expected_value)
 
     converter = NexusToDictConverter()
 
@@ -32,7 +32,7 @@ def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct
 
     assert size == expected_size
     assert dtype == expected_dtype
-    assert data == expected_value
+    assert np.isclose(data, expected_value)
 
 
 def test_GIVEN_float64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
@@ -74,12 +74,12 @@ def test_GIVEN_array_WHEN_getting_data_and_dtype_THEN_function_returns_correcte_
     expected_values = [1.1, 1.2, 1.3]
 
     file = create_in_memory_file("test4")
-    dataset = file.create_dataset("test_dataset", data=expected_values)
+    dataset = file.create_dataset("test_dataset", data=expected_values, dtype="float32")
     converter = NexusToDictConverter()
     data, dtype, size = converter._get_data_and_type(dataset)
 
     assert size == (len(expected_values),)
-    assert data == expected_values
+    assert np.allclose(data, expected_values)
     assert dtype == expected_dtype
 
 
@@ -310,8 +310,8 @@ def test_GIVEN_float_WHEN_getting_data_and_type_THEN_returns_correct_dtype():
     file = create_in_memory_file("test11")
 
     dataset_name = "ds"
-    dataset_type = np.float
-    dataset_value = np.float(2.123)
+    dataset_type = np.float32
+    dataset_value = np.float32(2.123)
 
     dataset = file.create_dataset(dataset_name, dtype=dataset_type, data=dataset_value)
     converter = NexusToDictConverter()
