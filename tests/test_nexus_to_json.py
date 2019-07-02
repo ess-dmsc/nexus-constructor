@@ -289,3 +289,64 @@ def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is
     assert component["children"][0]["type"] == "dataset"
     assert component["children"][0]["values"] == dataset_value
     assert component["children"][0]["dataset"]["type"] == "string"
+
+
+def test_GIVEN_float64_WHEN_getting_data_and_type_THEN_returns_correct_dtype():
+    file = create_in_memory_file("test10")
+    dataset_name = "ds"
+    dataset_type = np.float64
+    dataset_value = np.float64(2.123)
+
+    dataset = file.create_dataset(dataset_name, dtype=dataset_type, data=dataset_value)
+    converter = NexusToDictConverter()
+    data, dtype, size = converter._get_data_and_type(dataset)
+
+    assert data == dataset_value
+    assert dtype == "double"
+    assert size == 1
+
+
+def test_GIVEN_float_WHEN_getting_data_and_type_THEN_returns_correct_dtype():
+    file = create_in_memory_file("test11")
+
+    dataset_name = "ds"
+    dataset_type = np.float
+    dataset_value = np.float(2.123)
+
+    dataset = file.create_dataset(dataset_name, dtype=dataset_type, data=dataset_value)
+    converter = NexusToDictConverter()
+    data, dtype, size = converter._get_data_and_type(dataset)
+
+    assert data == dataset_value
+    assert dtype == "float"
+    assert size == 1
+
+
+def test_GIVEN_string_list_WHEN_getting_data_and_type_THEN_returns_correct_dtype():
+    file = create_in_memory_file("test12")
+    dataset_name = "ds"
+    dataset_value = np.string_(["s", "t", "r"])
+
+    dataset = file.create_dataset(dataset_name, data=dataset_value)
+    converter = NexusToDictConverter()
+
+    data, dtype, size = converter._get_data_and_type(dataset)
+
+    assert data == [x.decode("ASCII") for x in list(dataset_value)]
+    assert size == (len(dataset_value),)
+
+
+# TODO: test truncate_if_large on it's own.
+
+
+def test_GIVEN_large_list_WHEN_truncating_large_THEN_returns_truncated_list_that_has_been_resized():
+    file = create_in_memory_file("test13")
+
+    ds = file.create_dataset("test_ds", (1000, 1000), chunks=(100, 100))
+    print(ds.size)
+
+    size = (10, 10)
+
+    NexusToDictConverter.truncate_if_large(size, ds)
+
+    assert ds.size.all() == np.array(size).all()
