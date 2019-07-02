@@ -1,5 +1,4 @@
 import h5py
-
 from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar
 import numpy as np
