@@ -50,18 +50,26 @@ class MainWindow(Ui_MainWindow):
         self.widget.setVisible(True)
 
     def show_entries_dialog(self, map_of_entries: dict, nexus_file):
+        """
+        Shows the entries dialog when loading a nexus file if there are multiple entries.
+        :param map_of_entries: A map of the entry groups, with the key being the name of the group and value being the actual h5py group object.
+        :param nexus_file: A reference to the nexus file.
+        """
         self.entries_dialog = QDialog()
         self.entries_dialog.setMinimumWidth(400)
         self.entries_dialog.setWindowTitle(
             "Multiple Entries found. Please choose the entry name from the list."
         )
         combo = QComboBox()
+
+        # Populate the combo box with the names of the entry groups.
         [combo.addItem(x) for x in map_of_entries.keys()]
 
         ok_button = QPushButton()
         ok_button.setText("OK")
         ok_button.clicked.connect(self.entries_dialog.close)
 
+        # Connect the clicked signal of the ok_button to instrument.load_file and pass the file and entry group object.
         ok_button.clicked.connect(
             partial(
                 self.instrument.nexus.load_file,

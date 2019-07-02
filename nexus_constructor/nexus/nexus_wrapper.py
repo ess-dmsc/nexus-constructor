@@ -96,7 +96,12 @@ class NexusWrapper(QObject):
             else:
                 self.load_file(list(entries_in_root.values())[0], nexus_file)
 
-    def load_file(self, entry, nexus_file):
+    def load_file(self, entry: h5py.Group, nexus_file: h5py.File):
+        """
+        Sets the entry group, instrument group and reference to the nexus file.
+        :param entry: The entry group.
+        :param nexus_file: The nexus file reference.
+        """
         self.entry = entry
         self.instrument = self.get_instrument_group_from_entry(self.entry)
         self.nexus_file = nexus_file
@@ -205,7 +210,12 @@ class NexusWrapper(QObject):
         )
 
     @staticmethod
-    def get_instrument_group_from_entry(entry):
+    def get_instrument_group_from_entry(entry: h5py.Group) -> h5py.Group:
+        """
+        Get the first NXinstrument object from an entry group.
+        :param entry: The entry group object to search for the instrument group in.
+        :return: the instrument group object.
+        """
         for node in entry:
             if isinstance(node, h5py.Group):
                 if "NX_class" in node.attrs.keys():
