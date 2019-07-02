@@ -1,3 +1,5 @@
+from mock import Mock
+
 from nexus_constructor.ui_utils import validate_line_edit
 
 
@@ -45,3 +47,31 @@ def test_GIVEN_invalid_WHEN_validating_line_edit_with_no_tooltip_THEN_tooltip_is
     line_edit = DummyLineEdit()
     validate_line_edit(line_edit, False)
     assert line_edit.toolTip == ""
+
+
+def test_GIVEN_suggestion_callable_WHEN_validating_line_edit_THEN_callable_is_called():
+    line_edit = DummyLineEdit()
+    suggestion = Mock(side_effect="test")
+
+    validate_line_edit(
+        line_edit,
+        False,
+        tooltip_on_reject="Suggestion: ",
+        suggestion_callable=suggestion,
+    )
+
+    assert suggestion.called_once()
+
+
+def test_GIVEN_suggestion_callable_WHEN_validating_line_edit_with_valid_line_edit_THEN_callable_is_not_called_even_if_suggestion_in_name():
+    line_edit = DummyLineEdit()
+    suggestion = Mock(side_effect="test")
+
+    validate_line_edit(
+        line_edit,
+        True,
+        tooltip_on_reject="Suggestion: ",
+        suggestion_callable=suggestion,
+    )
+
+    assert suggestion.not_called()
