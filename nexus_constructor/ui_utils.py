@@ -3,6 +3,7 @@ import re
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QFileDialog
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
+import re
 
 
 def file_dialog(is_save, caption, filter):
@@ -34,18 +35,25 @@ def file_dialog(is_save, caption, filter):
 
 
 def validate_line_edit(
-    line_edit, is_valid: bool, tooltip_on_reject="", tooltip_on_accept=""
+    line_edit,
+    is_valid: bool,
+    tooltip_on_reject="",
+    tooltip_on_accept="",
+    suggestion_callable=None,
 ):
     """
     Sets the line edit colour to red if field is invalid or white if valid. Also sets the tooltips if provided.
-    :param tooltip_on_accept: Tooltip to display if line edit is valid.
-    :param tooltip_on_reject: Tooltip to display if line edit is invalid.
     :param line_edit: The line edit object to apply the validation to.
     :param is_valid: Whether the line edit field contains valid text
+    :param suggestion_callable: A callable that returns the suggested alternative if not valid.
+    :param tooltip_on_accept: Tooltip to display if line edit is valid.
+    :param tooltip_on_reject: Tooltip to display if line edit is invalid.
     :return: None.
     """
     colour = "#FFFFFF" if is_valid else "#f6989d"
     line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
+    if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):
+        tooltip_on_reject += suggestion_callable()
     line_edit.setToolTip(tooltip_on_accept) if is_valid else line_edit.setToolTip(
         tooltip_on_reject
     )
