@@ -336,9 +336,6 @@ def test_GIVEN_string_list_WHEN_getting_data_and_type_THEN_returns_correct_dtype
     assert size == (len(dataset_value),)
 
 
-# TODO: test truncate_if_large on it's own.
-
-
 def test_GIVEN_large_list_WHEN_truncating_large_THEN_returns_truncated_list_that_has_been_resized():
     file = create_in_memory_file("test13")
 
