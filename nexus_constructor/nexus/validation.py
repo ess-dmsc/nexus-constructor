@@ -61,7 +61,9 @@ class ValidateDataset:
                 )
 
 
-def validate_group(group: h5py.Group, dataset_details: Tuple[ValidateDataset]) -> List:
+def validate_group(
+    group: h5py.Group, dataset_details: Tuple[ValidateDataset, ...]
+) -> List:
     problems = []
     for dataset in dataset_details:
         dataset.check(group, problems)
