@@ -1,10 +1,10 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl
-from nexus_constructor.qml_models.geometry_models import (
-    CylinderModel,
-    OFFModel,
-    NoShapeModel,
+from nexus_constructor.geometry_types import (
+    OFFGeometry,
+    NoShapeGeometry,
+    CylindricalGeometry,
 )
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
@@ -170,23 +170,24 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def generate_geometry_model(self):
         """
-        Generates a geometry model depending on the type of geometry selected and the current values of the lineedits that apply to the particular geometry type.
+        Generates a geometry model depending on the type of geometry selected and the current values
+        of the lineedits that apply to the particular geometry type.
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
-            geometry_model = CylinderModel()
-            geometry_model.set_unit(self.unitsLineEdit.text())
-            geometry_model.cylinder.height = self.cylinderHeightLineEdit.value()
-            geometry_model.cylinder.radius = self.cylinderRadiusLineEdit.value()
-            geometry_model.cylinder.axis_direction.setX(self.cylinderXLineEdit.value())
-            geometry_model.cylinder.axis_direction.setY(self.cylinderYLineEdit.value())
-            geometry_model.cylinder.axis_direction.setZ(self.cylinderZLineEdit.value())
+            geometry_model = CylindricalGeometry()
+            geometry_model.units(self.unitsLineEdit.text())
+            geometry_model.height = self.cylinderHeightLineEdit.value()
+            geometry_model.radius = self.cylinderRadiusLineEdit.value()
+            geometry_model.axis_direction.setX(self.cylinderXLineEdit.value())
+            geometry_model.axis_direction.setY(self.cylinderYLineEdit.value())
+            geometry_model.axis_direction.setZ(self.cylinderZLineEdit.value())
         elif self.meshRadioButton.isChecked():
-            geometry_model = OFFModel()
-            geometry_model.set_units(self.unitsLineEdit.text())
-            geometry_model.set_file(self.geometry_file_name)
+            geometry_model = OFFGeometry()
+            geometry_model.units(self.unitsLineEdit.text())
+            geometry_model.file_path = self.geometry_file_name
         else:
-            geometry_model = NoShapeModel()
+            geometry_model = NoShapeGeometry()
         return geometry_model
 
     def on_ok(self):

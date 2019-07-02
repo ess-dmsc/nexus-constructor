@@ -21,9 +21,20 @@ class OFFGeometry:
 
     geometry_str = "OFF"
 
-    def __init__(self, vertices: List[QVector3D] = None, faces: List[List[int]] = None):
+    def __init__(
+        self,
+        vertices: List[QVector3D] = None,
+        faces: List[List[int]] = None,
+        units: str = "",
+        file_path: str = "",
+    ):
         self.vertices = vertices
         self.faces = faces
+
+        # Source units and file path are retained only for the purpose of populating the edit component window
+        # with the options previously chosen by the user
+        self.units = units
+        self.file_path = file_path
 
     @property
     def winding_order(self):
