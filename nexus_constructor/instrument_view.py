@@ -71,7 +71,7 @@ class InstrumentView(QWidget):
 
         for _ in range(self.num_neutrons):
             self.neutron_objects["entities"].append(
-                Qt3DCore.QEntity(self.component_root_entity)
+                Qt3DCore.QEntity(self.gnomon_root_entity)
             )
             self.neutron_objects["meshes"].append(Qt3DExtras.QSphereMesh())
             self.neutron_objects["transforms"].append(Qt3DCore.QTransform())
@@ -326,8 +326,8 @@ class InstrumentView(QWidget):
         """
         neutron_animation.setTargetObject(neutron_animation_controller)
         neutron_animation.setPropertyName(b"distance")
-        neutron_animation.setStartValue(animation_distance)
-        neutron_animation.setEndValue(0)
+        neutron_animation.setStartValue(0)
+        neutron_animation.setEndValue(animation_distance)
         neutron_animation.setDuration(500 + time_span_offset)
         neutron_animation.setLoopCount(-1)
         neutron_animation.start()
@@ -343,7 +343,7 @@ class InstrumentView(QWidget):
         y_offsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
         time_span_offsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
 
-        neutron_radius = 3
+        neutron_radius = 1.5
 
         for i in range(self.num_neutrons):
 
@@ -352,11 +352,15 @@ class InstrumentView(QWidget):
             )
 
             neutron_animation_controller = NeutronAnimationController(
-                x_offsets[i], y_offsets[i], self.neutron_objects["transforms"][i]
+                x_offsets[i] * 0.5,
+                y_offsets[i] * 0.5,
+                self.neutron_objects["transforms"][i],
             )
             neutron_animation_controller.set_target(
                 self.neutron_objects["transforms"][i]
             )
+
+            x_cylinder_length = 8
 
             neutron_animation = QPropertyAnimation(
                 self.neutron_objects["transforms"][i]
@@ -364,7 +368,7 @@ class InstrumentView(QWidget):
             self.set_neutron_animation_properties(
                 neutron_animation,
                 neutron_animation_controller,
-                -self.beam_cylinder_length,
+                x_cylinder_length,
                 time_span_offsets[i],
             )
 
