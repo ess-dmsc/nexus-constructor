@@ -1,12 +1,8 @@
-from functools import partial
-from time import sleep
-
 import h5py
 
 from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar
 import numpy as np
-from PySide2.QtWidgets import QDialog, QComboBox, QGridLayout, QPushButton, QLabel
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
