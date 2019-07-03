@@ -21,26 +21,17 @@ class Gnomon(Axes):
         :param component_adder: A function borrowed from the InstrumentView that adds QComponents to a QEntity.
         """
 
+        super().__init__(root_entity, component_adder)
+
         self.gnomon_root_entity = root_entity
-        self.gnomon_cylinder_length = 4
+        self.cylinder_length = 4
         self.main_camera = main_camera
         self.gnomon_camera = self.create_gnomon_camera(main_camera)
         self.beam_material = beam_material
         self.grey_material = grey_material
 
-        super().__init__(root_entity, component_adder)
-
-        self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.z_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-
-        self.x_axis_mesh = Qt3DExtras.QCylinderMesh()
-        self.y_axis_mesh = Qt3DExtras.QCylinderMesh()
-        self.z_axis_mesh = Qt3DExtras.QCylinderMesh()
-
-        self.x_axis_transformation = Qt3DCore.QTransform()
-        self.y_axis_transformation = Qt3DCore.QTransform()
-        self.z_axis_transformation = Qt3DCore.QTransform()
+        self.cylinder_length = 4
+        self.cylinder_radius = self.cylinder_length * 0.05
 
         self.x_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
         self.y_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
@@ -64,7 +55,7 @@ class Gnomon(Axes):
 
         # Set the text translation value to be the length of the cylinder plus some extra space so that it doesn't
         # overlap with the cylinder or the cones.
-        text_translation = self.gnomon_cylinder_length * 1.3
+        text_translation = self.cylinder_length * 1.3
 
         # The text translation value calculated above is used in addition to some "extra" values in order to make the
         # text placement look good and appear centered next to the cone point. This extra values were found via trial
@@ -74,17 +65,6 @@ class Gnomon(Axes):
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
 
-        # Borrowing a method from the InstrumentView
-        self.add_qcomponents_to_entity = component_adder
-
-        self.x_material = Qt3DExtras.QPhongMaterial()
-        self.y_material = Qt3DExtras.QPhongMaterial()
-        self.z_material = Qt3DExtras.QPhongMaterial()
-
-        self.prepare_gnomon_material(self.x_material, "red")
-        self.prepare_gnomon_material(self.y_material, "green")
-        self.prepare_gnomon_material(self.z_material, "blue")
-
         # Initialise beam objects
         self.cylinder_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
         self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
@@ -92,7 +72,7 @@ class Gnomon(Axes):
 
         self.num_neutrons = 9
 
-        self.neutron_animation_length = self.gnomon_cylinder_length * 1.5
+        self.neutron_animation_length = self.cylinder_length * 1.5
 
         # Create a dictionary for neutron-related objects so that they are always in scope and not destroyed by C++
         self.neutron_objects = {
@@ -115,54 +95,6 @@ class Gnomon(Axes):
         :return: The camera that observes the gnomon.
         """
         return self.gnomon_camera
-
-    @staticmethod
-    def prepare_gnomon_material(material, color):
-        """
-        Prepares the material that will be used to color the gnomon cylinders and sets its shininess to zero.
-        :param material: The material to be configured.
-        :param color: The desired ambient color of the material.
-        """
-        material.setAmbient(color)
-        material.setDiffuse("grey")
-        material.setShininess(0)
-
-    @staticmethod
-    def configure_gnomon_cylinder(cylinder_mesh, length):
-        """
-        Set the radius, length and ring properties of the cylinders that create the gnomon. The radius is 1/20th of the
-        length and the number of rings is set to the smallest value that still creates the expected shape.
-        :param cylinder_mesh: The mesh to be configured.
-        :param length: The desired length of the cylinder.
-        """
-        cylinder_mesh.setRadius(length * 0.05)
-        cylinder_mesh.setLength(length)
-        cylinder_mesh.setRings(2)
-
-    @staticmethod
-    def create_cylinder_matrices(length):
-        """
-        Construct the matrices that are used to transform the cylinders so that they form a gnomon.
-        :param length: The length of the cylinders.
-        :return: The transformation matrices.
-        """
-        x_axis_matrix = QMatrix4x4()
-        y_axis_matrix = QMatrix4x4()
-        z_axis_matrix = QMatrix4x4()
-
-        # When the cylinders are born they are centered on the origin creating a "3D asterisk" shape. A translation of
-        # half the length of the cylinders is required to make them form a gnomon.
-        half_length = length * 0.5
-
-        x_axis_matrix.rotate(270, QVector3D(0, 0, 1))
-        x_axis_matrix.translate(QVector3D(0, half_length, 0))
-
-        y_axis_matrix.translate(QVector3D(0, half_length, 0))
-
-        z_axis_matrix.rotate(90, QVector3D(1, 0, 0))
-        z_axis_matrix.translate(QVector3D(0, half_length, 0))
-
-        return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
     @staticmethod
     def create_cone_matrices(length):
@@ -219,7 +151,7 @@ class Gnomon(Axes):
         """
         Sets up the gnomon by creating the cylinders, cones, and text.
         """
-        self.create_gnomon_cylinders()
+        self.setup_cylinders()
         self.create_gnomon_cones()
         self.create_gnomon_text()
 
@@ -246,11 +178,11 @@ class Gnomon(Axes):
         """
         Prepares the gnomon cones by configuring the meshes and then placing them at the ends of the cylinders.
         """
-        self.configure_gnomon_cone(self.x_cone_mesh, self.gnomon_cylinder_length)
-        self.configure_gnomon_cone(self.y_cone_mesh, self.gnomon_cylinder_length)
-        self.configure_gnomon_cone(self.z_cone_mesh, self.gnomon_cylinder_length)
+        self.configure_gnomon_cone(self.x_cone_mesh, self.cylinder_length)
+        self.configure_gnomon_cone(self.y_cone_mesh, self.cylinder_length)
+        self.configure_gnomon_cone(self.z_cone_mesh, self.cylinder_length)
         x_cone_matrix, y_cone_matrix, z_cone_matrix = self.create_cone_matrices(
-            self.gnomon_cylinder_length
+            self.cylinder_length
         )
         self.x_cone_transformation.setMatrix(x_cone_matrix)
         self.y_cone_transformation.setMatrix(y_cone_matrix)
@@ -266,32 +198,6 @@ class Gnomon(Axes):
         self.add_qcomponents_to_entity(
             self.z_cone_entity,
             [self.z_cone_mesh, self.z_cone_transformation, self.z_material],
-        )
-
-    def create_gnomon_cylinders(self):
-        """
-        Configures three cylinder meshes and translates them in order to create a basic gnomon shape.
-        """
-        self.configure_gnomon_cylinder(self.x_axis_mesh, self.gnomon_cylinder_length)
-        self.configure_gnomon_cylinder(self.y_axis_mesh, self.gnomon_cylinder_length)
-        self.configure_gnomon_cylinder(self.z_axis_mesh, self.gnomon_cylinder_length)
-        x_axis_matrix, y_axis_matrix, z_axis_matrix = self.create_cylinder_matrices(
-            self.gnomon_cylinder_length
-        )
-        self.x_axis_transformation.setMatrix(x_axis_matrix)
-        self.y_axis_transformation.setMatrix(y_axis_matrix)
-        self.z_axis_transformation.setMatrix(z_axis_matrix)
-        self.add_qcomponents_to_entity(
-            self.x_axis_entity,
-            [self.x_axis_mesh, self.x_axis_transformation, self.x_material],
-        )
-        self.add_qcomponents_to_entity(
-            self.y_axis_entity,
-            [self.y_axis_mesh, self.y_axis_transformation, self.y_material],
-        )
-        self.add_qcomponents_to_entity(
-            self.z_axis_entity,
-            [self.z_axis_mesh, self.z_axis_transformation, self.z_material],
         )
 
     @staticmethod
@@ -346,7 +252,7 @@ class Gnomon(Axes):
             self.main_camera.position() - self.main_camera.viewCenter()
         )
         updated_gnomon_camera_position = updated_gnomon_camera_position.normalized()
-        updated_gnomon_camera_position *= self.gnomon_cylinder_length * 4.2
+        updated_gnomon_camera_position *= self.cylinder_length * 4.2
 
         self.gnomon_camera.setPosition(updated_gnomon_camera_position)
         self.gnomon_camera.setUpVector(self.main_camera.upVector())
