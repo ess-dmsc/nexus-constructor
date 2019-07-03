@@ -2,20 +2,36 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from math import sin, cos, pi, acos, degrees
 import h5py
+import numpy as np
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.validation import (
     NexusFormatError,
     ValidateDataset,
     validate_group,
 )
-from nexus_constructor.ui_utils import numpy_array_to_qvector3d
-from typing import List, TypeVar
+from nexus_constructor.ui_utils import (
+    numpy_array_to_qvector3d,
+    qvector3d_to_numpy_array,
+)
+from typing import List, TypeVar, Tuple
 
 
 # Temporary method here until the one above is no longer needed
 def validate_nonzero_qvector(value: QVector3D):
     if value.x() == 0 and value.y() == 0 and value.z() == 0:
         raise ValueError("Vector is zero length")
+
+
+def _get_an_orthogonal_unit_vector(input_vector: QVector3D):
+    """
+    Return a unit vector which is orthogonal to the input vector
+    There are infinite valid solutions, just one is returned
+    """
+    if np.abs(input_vector.z()) < np.abs(input_vector.x()):
+        vector = QVector3D(input_vector.x(), -input_vector.y(), 0.0)
+        return vector.normalized()
+    vector = QVector3D(0.0, -input_vector.z(), input_vector.y())
+    return vector.normalized()
 
 
 class OFFGeometry:
@@ -136,44 +152,60 @@ class CylindricalGeometry:
 
     @property
     def height(self) -> float:
-        cylinders = self.file.get_field_value(self.group, "cylinders")
-        cylinder = cylinders[0]  # We will only deal with the first cylinder
-        vertices = self.file.get_field_value(self.group, "vertices")
-        base_centre = vertices[cylinder[0], :]
-        top_centre = vertices[cylinder[2], :]
+        base_centre, _, top_centre = self._get_cylinder_vertices()
         cylinder_axis = top_centre - base_centre
-        cylinder_axis_vector = numpy_array_to_qvector3d(cylinder_axis)
-        return cylinder_axis_vector.length()
+        return cylinder_axis.length()
 
     @height.setter
     def height(self, new_height: float):
-        raise NotImplementedError()
+        old_base_centre, old_base_edge, old_top_centre = self._get_cylinder_vertices()
+        cylinder_axis = old_top_centre - old_base_centre
+        old_height = cylinder_axis.length()
+        half_height_change = 0.5 * (new_height - old_height) * self.axis_direction
+        new_base_centre = qvector3d_to_numpy_array(old_base_centre - half_height_change)
+        new_base_edge = qvector3d_to_numpy_array(old_base_edge - half_height_change)
+        new_top_centre = qvector3d_to_numpy_array(old_top_centre + half_height_change)
+        vertices = np.vstack((new_base_centre, new_base_edge, new_top_centre))
+        cylinders = np.array([0, 1, 2])
+        self.file.set_field_value(self.group, "cylinders", cylinders)
+        self.file.set_field_value(self.group, "vertices", vertices)
+
+    def _get_cylinder_vertices(self) -> Tuple[QVector3D, QVector3D, QVector3D]:
+        """
+        Get the three points defining the cylinder
+        We define "base" as the end of the cylinder in the -ve axis direction
+        :return: base centre point, base edge point, top centre point
+        """
+        cylinders = self.file.get_field_value(self.group, "cylinders")
+        cylinder = cylinders[0]  # We will only deal with the first cylinder
+        vertices = self.file.get_field_value(self.group, "vertices")
+        base_centre = numpy_array_to_qvector3d(vertices[cylinder[0], :])
+        base_edge = numpy_array_to_qvector3d(vertices[cylinder[1], :])
+        top_centre = numpy_array_to_qvector3d(vertices[cylinder[2], :])
+        return base_centre, base_edge, top_centre
 
     @property
     def radius(self) -> float:
-        cylinders = self.file.get_field_value(self.group, "cylinders")
-        cylinder = cylinders[0]  # We will only deal with the first cylinder
-        vertices = self.file.get_field_value(self.group, "vertices")
-        base_centre = vertices[cylinder[0], :]
-        base_edge = vertices[cylinder[1], :]
+        base_centre, base_edge, _ = self._get_cylinder_vertices()
         cylinder_radius = base_edge - base_centre
-        cylinder_radius_vector = numpy_array_to_qvector3d(cylinder_radius)
-        return cylinder_radius_vector.length()
+        return cylinder_radius.length()
 
     @radius.setter
     def radius(self, new_radius: float):
-        raise NotImplementedError()
+        base_centre, base_edge, _ = self._get_cylinder_vertices()
+        cylinder_radius = base_edge - base_centre
+        new_cylinder_radius = qvector3d_to_numpy_array(
+            cylinder_radius.normalized() * new_radius
+        )
+        vertices = self.file.get_field_value(self.group, "vertices")
+        vertices[1, :] = new_cylinder_radius
+        self.file.set_field_value(self.group, "vertices", vertices)
 
     @property
     def axis_direction(self) -> QVector3D:
-        cylinders = self.file.get_field_value(self.group, "cylinders")
-        cylinder = cylinders[0]  # We will only deal with the first cylinder
-        vertices = self.file.get_field_value(self.group, "vertices")
-        base_centre = vertices[cylinder[0], :]
-        top_centre = vertices[cylinder[2], :]
+        base_centre, _, top_centre = self._get_cylinder_vertices()
         cylinder_axis = top_centre - base_centre
-        cylinder_axis_vector = numpy_array_to_qvector3d(cylinder_axis)
-        return cylinder_axis_vector.normalized()
+        return cylinder_axis.normalized()
 
     @axis_direction.setter
     def axis_direction(self, new_axis_direction: QVector3D):
@@ -183,26 +215,6 @@ class CylindricalGeometry:
         """
         validate_nonzero_qvector(new_axis_direction)
         raise NotImplementedError()
-
-    # @property
-    # def base_center_point(self):
-    #     return QVector3D(0, 0, 0)
-    #
-    # @property
-    # def base_edge_point(self):
-    #     # rotate a point on the edge of a Z axis aligned cylinder by the rotation matrix
-    #     return (
-    #         QVector3D(self.radius * calculate_unit_conversion_factor(self.units), 0, 0)
-    #         * self.rotation_matrix
-    #     )
-    #
-    # @property
-    # def top_center_point(self):
-    #     return (
-    #         self.axis_direction.normalized()
-    #         * self.height
-    #         * calculate_unit_conversion_factor(self.units)
-    #    )
 
     @property
     def off_geometry(self, steps=20):
@@ -264,8 +276,3 @@ class CylindricalGeometry:
         rotate_matrix = QMatrix4x4()
         rotate_matrix.rotate(degrees(rotate_radians), rotate_axis)
         return rotate_matrix
-
-
-GeometryType = TypeVar(
-    "GeometryType", CylindricalGeometry, NoShapeGeometry, OFFGeometry
-)
