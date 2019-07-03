@@ -121,7 +121,7 @@ class Gnomon:
         :param color: The desired ambient color of the material.
         """
         material.setAmbient(color)
-        material.setDiffuse(QColor("grey"))
+        material.setDiffuse("grey")
         material.setShininess(0)
 
     @staticmethod
