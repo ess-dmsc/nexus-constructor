@@ -4,7 +4,7 @@ from PySide2.QtGui import QMatrix4x4, QVector3D, QColor
 
 
 class Axes(object):
-    def __init__(self, component_root_entity, far_plane, component_adder):
+    def __init__(self, component_root_entity, component_adder):
 
         self.component_root_entity = component_root_entity
 
@@ -26,25 +26,26 @@ class Axes(object):
         self.y_material = Qt3DExtras.QPhongMaterial()
         self.z_material = Qt3DExtras.QPhongMaterial()
 
-        self.prepare_axes_material(self.x_material, "red")
-        self.prepare_axes_material(self.y_material, "green")
-        self.prepare_axes_material(self.z_material, "blue")
+        self.configure_cylinder_materials(self.x_material, "red")
+        self.configure_cylinder_materials(self.y_material, "green")
+        self.configure_cylinder_materials(self.z_material, "blue")
 
-        self.cylinder_length = far_plane
+        self.cylinder_length = 1
+        self.cylinder_radius = 1
 
-    def setup_central_axes(self):
+    def setup_cylinders(self):
 
-        self.configure_central_axes_cylinders(
-            self.x_cylinder_mesh, self.cylinder_length
+        self.configure_cylinder_mesh(
+            self.x_cylinder_mesh, self.cylinder_length, self.cylinder_radius
         )
-        self.configure_central_axes_cylinders(
-            self.y_cylinder_mesh, self.cylinder_length
+        self.configure_cylinder_mesh(
+            self.y_cylinder_mesh, self.cylinder_length, self.cylinder_radius
         )
-        self.configure_central_axes_cylinders(
-            self.z_cylinder_mesh, self.cylinder_length
+        self.configure_cylinder_mesh(
+            self.z_cylinder_mesh, self.cylinder_length, self.cylinder_radius
         )
 
-        x_matrix, y_matrix, z_matrix = self.create_central_axes_matrices(
+        x_matrix, y_matrix, z_matrix = self.create_cylinder_matrices(
             self.cylinder_length
         )
 
@@ -66,16 +67,16 @@ class Axes(object):
         )
 
     @staticmethod
-    def configure_central_axes_cylinders(cylinder_mesh, cylinder_length):
+    def configure_cylinder_mesh(cylinder_mesh, cylinder_length, radius):
 
-        cylinder_mesh.setRadius(0.01)
+        cylinder_mesh.setRadius(radius)
         cylinder_mesh.setLength(cylinder_length)
         cylinder_mesh.setRings(2)
 
     @staticmethod
-    def create_central_axes_matrices(length):
+    def create_cylinder_matrices(length):
         """
-        Construct the matrices that are used to transform the cylinders so that they form a gnomon. Note to self: this is a duplicate method!
+        Construct the matrices that are used to transform the cylinders so that they form a gnomon.
         :param length: The length of the cylinders.
         :return: The transformation matrices.
         """
@@ -98,9 +99,9 @@ class Axes(object):
         return x_axis_matrix, y_axis_matrix, z_axis_matrix
 
     @staticmethod
-    def prepare_axes_material(material, color):
+    def configure_cylinder_materials(material, color):
         """
-        Prepares the material that will be used to color the gnomon cylinders and sets its shininess to zero. Note to self: duplicated method.
+        Prepares the material that will be used to color the gnomon cylinders and sets its shininess to zero.
         :param material: The material to be configured.
         :param color: The desired ambient color of the material.
         """

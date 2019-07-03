@@ -4,10 +4,11 @@ from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
 
+from nexus_constructor.axes import Axes
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
 
 
-class Gnomon:
+class Gnomon(Axes):
     def __init__(
         self, root_entity, main_camera, beam_material, grey_material, component_adder
     ):
@@ -26,6 +27,8 @@ class Gnomon:
         self.gnomon_camera = self.create_gnomon_camera(main_camera)
         self.beam_material = beam_material
         self.grey_material = grey_material
+
+        super().__init__(root_entity, component_adder)
 
         self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
         self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
@@ -396,6 +399,8 @@ class Gnomon:
         """
         Configures the transform for the beam cylinder by giving it a matrix. The matrix will turn the cylinder sideways
         and then move it "backwards" in the z-direction by 20 units so that it ends at the location of the sample.
+        :param neutron_animation_length: The distance that a neutron travels in its animation. This is also the length
+                                         of the cylinder.
         :param cylinder_transform: A QTransform object.
         """
         cylinder_matrix = QMatrix4x4()
