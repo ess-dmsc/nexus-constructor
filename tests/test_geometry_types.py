@@ -2,24 +2,29 @@ from nexus_constructor.geometry import NoShapeGeometry, CylindricalGeometry, OFF
 from nexus_constructor.geometry.no_shape_geometry import OFFCube
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from math import acos, degrees
+from uuid import uuid1
 
 
-def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_off_geometry_returns_offcube():
+def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_off_geometry_returns_an_OFFCube():
     geom = NoShapeGeometry()
     assert geom.off_geometry == OFFCube
 
 
-def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_geometry_str_is_none():
+def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_geometry_str_is_None():
     geom = NoShapeGeometry()
     assert geom.geometry_str == "None"
 
 
-def test_GIVEN_nothing_WHEN_constructing_CylindricalGeometry_THEN_geometry_str_is_correct():
+def test_GIVEN_nothing_WHEN_constructing_CylindricalGeometry_THEN_geometry_str_is_Cylinder():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    component_group = _add_component_to_file(nexus_wrapper, "some_field", 42)
+    component = Component(nexus_wrapper, component_group)
+
     geom = CylindricalGeometry()
     assert geom.geometry_str == "Cylinder"
 
 
-def test_GIVEN_nothing_WHEN_constructing_OFFGeometry_THEN_geometry_str_is_correct():
+def test_GIVEN_nothing_WHEN_constructing_OFFGeometry_THEN_geometry_str_is_OFF():
     geom = OFFGeometry()
     assert geom.geometry_str == "OFF"
 
