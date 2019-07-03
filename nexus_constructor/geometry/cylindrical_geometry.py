@@ -13,9 +13,30 @@ from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
 )
-from nexus_constructor.geometry.utils import validate_nonzero_qvector
+from nexus_constructor.geometry.utils import (
+    validate_nonzero_qvector,
+    get_an_orthogonal_unit_vector,
+)
 from nexus_constructor.geometry.off_geometry import OFFGeometry
 from typing import Tuple
+
+
+def calculate_vertices(
+    axis_direction: QVector3D, height: float, radius: float
+) -> np.ndarray:
+    axis_direction = axis_direction.normalized()
+    top_centre = axis_direction * height / 2.0
+    base_centre = axis_direction * height / -2.0
+    radial_direction = get_an_orthogonal_unit_vector(axis_direction).normalized()
+    base_edge = base_centre + radius * radial_direction
+    vertices = np.vstack(
+        (
+            qvector3d_to_numpy_array(base_centre),
+            qvector3d_to_numpy_array(base_edge),
+            qvector3d_to_numpy_array(top_centre),
+        )
+    )
+    return vertices
 
 
 class CylindricalGeometry:

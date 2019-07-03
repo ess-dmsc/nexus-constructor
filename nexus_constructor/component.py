@@ -4,6 +4,11 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
+from nexus_constructor.geometry.cylindrical_geometry import (
+    CylindricalGeometry,
+    calculate_vertices,
+)
+import numpy as np
 
 
 class DependencyError(Exception):
@@ -234,3 +239,19 @@ class Component:
                 self.group, "depends_on", transformation.absolute_path, str
             )
             transformation.register_dependent(self)
+
+    def add_cylinder(
+        self,
+        axis_direction: QVector3D = QVector3D(0.0, 0.0, 1.0),
+        height: float = 1.0,
+        radius: float = 1.0,
+        units: str = "m",
+    ) -> CylindricalGeometry:
+        shape_group = self.file.create_nx_group(
+            "shape", "NXcylindrical_geometry", self.group
+        )
+        vertices = calculate_vertices(axis_direction, height, radius)
+        vertices_field = self.file.set_field_value(shape_group, "vertices", vertices)
+        self.file.set_field_value(shape_group, "cylinders", np.array([0, 1, 2]))
+        self.file.set_attribute_value(vertices_field, "units", units)
+        return CylindricalGeometry(self.file, shape_group)

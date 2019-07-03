@@ -62,7 +62,7 @@ class ValidateDataset:
 
 
 def _check_nx_class(group: h5py.Group, nx_class: str, problems: List):
-    if "NX_class" in group.attrs.items:
+    if "NX_class" in group.attrs.keys():
         if group.attrs["NX_class"] != nx_class:
             problems.append(
                 f"Expected {group.name} to have NX_class attribute of {nx_class}"
