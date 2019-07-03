@@ -113,19 +113,9 @@ class CylindricalGeometry:
         """
         Check all the datasets and attributes we require are in the NXcylindrical_geometry group
         """
-        problems = []
-        if "NX_class" in self.group.attrs.items:
-            if self.group.attrs["NX_class"] != "NXcylindrical_geometry":
-                problems.append(
-                    f"Expected {self.group.name} to have NX_class attribute of NXcylindrical_geometry"
-                )
-        else:
-            problems.append(f"Expected {self.group.name} to have an NX_class attribute")
-        if problems:
-            raise NexusFormatError("\n".join(problems))
-
         problems = validate_group(
             self.group,
+            "NXcylindrical_geometry",
             (
                 ValidateDataset(
                     "vertices", shape=(None, 3), attributes={"units": None}
