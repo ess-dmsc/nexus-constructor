@@ -88,7 +88,8 @@ def test_GIVEN_multiple_entry_groups_in_file_WHEN_finding_entry_THEN_signal_is_e
     file = create_in_memory_file("test_nw6")
 
     entry = file.create_group("entry")
-    entry.attrs["NX_class"] = "NXentry"
+    # Test with byte string as well as python string.
+    entry.attrs["NX_class"] = b"NXentry"
 
     inst_group = entry.create_group("instrument")
     inst_group.attrs["NX_class"] = "NXinstrument"

@@ -93,7 +93,10 @@ class NexusWrapper(QObject):
         def append_nx_entries_to_list(name, node):
             if isinstance(node, h5py.Group):
                 if "NX_class" in node.attrs.keys():
-                    if node.attrs["NX_class"] == "NXentry":
+                    if (
+                        node.attrs["NX_class"] == b"NXentry"
+                        or node.attrs["NX_class"] == "NXentry"
+                    ):
                         entries_in_root[name] = node
 
         nexus_file["/"].visititems(append_nx_entries_to_list)
