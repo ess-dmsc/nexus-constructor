@@ -9,7 +9,7 @@ def test_can_create_and_read_from_field_in_component():
     field_name = "some_field"
     field_value = 42
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(nexus_wrapper, field_name, field_value)
+    component = add_component_to_file(nexus_wrapper, field_name, field_value)
     returned_value = component.get_field(field_name)
     assert (
         returned_value == field_value
@@ -20,7 +20,7 @@ def test_nameerror_raised_if_requested_field_does_not_exist():
     field_name = "some_field"
     field_value = 42
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(nexus_wrapper, field_name, field_value)
+    component = add_component_to_file(nexus_wrapper, field_name, field_value)
     try:
         component.get_field("nonexistent_field")
     except NameError:
@@ -32,7 +32,7 @@ def test_created_component_has_specified_name():
     field_name = "some_field"
     field_value = 42
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(nexus_wrapper, field_name, field_value, name)
+    component = add_component_to_file(nexus_wrapper, field_name, field_value, name)
     assert component.name == name
 
 
@@ -41,7 +41,7 @@ def test_component_can_be_renamed():
     field_name = "some_field"
     field_value = 42
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(
+    component = add_component_to_file(
         nexus_wrapper, field_name, field_value, initial_name
     )
     assert component.name == initial_name
@@ -55,7 +55,7 @@ def test_value_of_field_can_be_changed():
     field_name = "some_field"
     initial_value = 42
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(nexus_wrapper, field_name, initial_value, name)
+    component = add_component_to_file(nexus_wrapper, field_name, initial_value, name)
     returned_value = component.get_field(field_name)
     assert (
         returned_value == initial_value
@@ -78,7 +78,7 @@ def test_type_of_field_can_be_changed():
     field_name = "some_field"
     initial_value = 42
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(nexus_wrapper, field_name, initial_value, name)
+    component = add_component_to_file(nexus_wrapper, field_name, initial_value, name)
     returned_value = component.get_field(field_name)
     assert (
         returned_value == initial_value
@@ -94,9 +94,7 @@ def test_type_of_field_can_be_changed():
 
 def test_GIVEN_new_component_WHEN_get_transforms_for_component_THEN_transforms_list_is_empty():
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
     assert (
         len(component.transforms_full_chain) == 0
     ), "expected there to be no transformations in the newly created component"
@@ -104,9 +102,7 @@ def test_GIVEN_new_component_WHEN_get_transforms_for_component_THEN_transforms_l
 
 def test_GIVEN_component_with_a_transform_added_WHEN_get_transforms_for_component_THEN_transforms_list_contains_transform():
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
     transform = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = transform
@@ -118,9 +114,7 @@ def test_GIVEN_component_with_a_transform_added_WHEN_get_transforms_for_componen
 
 def test_GIVEN_component_with_a_transform_added_WHEN_transform_is_deleted_THEN_transforms_list_is_empty():
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
     transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
 
@@ -133,9 +127,7 @@ def test_GIVEN_component_with_a_transform_added_WHEN_transform_is_deleted_THEN_t
 
 def test_GIVEN_a_component_with_a_transform_dependency_WHEN_get_depends_on_THEN_transform_dependency_is_returned():
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
     input_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
     component.depends_on = input_transform
@@ -147,10 +139,10 @@ def test_GIVEN_a_component_with_a_transform_dependency_WHEN_get_depends_on_THEN_
 
 def test_deleting_a_transformation_from_a_different_component_is_not_allowed():
     nexus_wrapper = create_nexus_wrapper()
-    _, first_component = add_component_to_file(
+    first_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
     )
-    _, second_component = add_component_to_file(
+    second_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "other_component_name"
     )
 
@@ -164,9 +156,7 @@ def test_deleting_a_transformation_from_a_different_component_is_not_allowed():
 
 def test_deleting_a_transformation_which_the_component_directly_depends_on_is_not_allowed():
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
     transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
     component.depends_on = transform
 
@@ -178,9 +168,7 @@ def test_deleting_a_transformation_which_the_component_directly_depends_on_is_no
 
 def test_deleting_a_transformation_which_the_component_indirectly_depends_on_is_not_allowed():
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
     first_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
     second_transform = component.add_translation(
         QVector3D(1.0, 0.0, 0.0), depends_on=first_transform
@@ -195,10 +183,10 @@ def test_deleting_a_transformation_which_the_component_indirectly_depends_on_is_
 
 def test_transforms_contains_only_local_transforms_not_full_depends_on_chain():
     nexus_wrapper = create_nexus_wrapper()
-    _, first_component = add_component_to_file(
+    first_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
     )
-    _, second_component = add_component_to_file(
+    second_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "other_component_name"
     )
 
@@ -216,10 +204,10 @@ def test_transforms_contains_only_local_transforms_not_full_depends_on_chain():
 
 def test_removing_transformation_which_has_a_dependent_transform_in_another_component_is_not_allowed():
     nexus_wrapper = create_nexus_wrapper()
-    _, first_component = add_component_to_file(
+    first_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
     )
-    _, second_component = add_component_to_file(
+    second_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "other_component_name"
     )
 
@@ -238,10 +226,10 @@ def test_removing_transformation_which_has_a_dependent_transform_in_another_comp
 
 def test_removing_transformation_which_no_longer_has_a_dependent_transform_in_another_component_is_allowed():
     nexus_wrapper = create_nexus_wrapper()
-    _, first_component = add_component_to_file(
+    first_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
     )
-    _, second_component = add_component_to_file(
+    second_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "other_component_name"
     )
 
@@ -265,9 +253,7 @@ def test_removing_transformation_which_no_longer_has_a_dependent_transform_in_an
 
 def test_removing_transformation_which_still_has_one_dependent_transform_is_not_allowed():
     nexus_wrapper = create_nexus_wrapper()
-    _, component = add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
     first_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
     # second_transform
