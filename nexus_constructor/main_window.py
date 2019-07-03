@@ -1,5 +1,6 @@
 from functools import partial
 
+import h5py
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -49,7 +50,7 @@ class MainWindow(Ui_MainWindow):
 
         self.widget.setVisible(True)
 
-    def show_entries_dialog(self, map_of_entries: dict, nexus_file):
+    def show_entries_dialog(self, map_of_entries: dict, nexus_file: h5py.File):
         """
         Shows the entries dialog when loading a nexus file if there are multiple entries.
         :param map_of_entries: A map of the entry groups, with the key being the name of the group and value being the actual h5py group object.

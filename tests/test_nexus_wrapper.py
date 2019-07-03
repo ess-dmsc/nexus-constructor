@@ -84,7 +84,7 @@ def test_GIVEN_single_entry_group_with_instrument_group_WHEN_finding_entry_THEN_
     assert wrapper.instrument == inst_group
 
 
-def test_GIVEN_multiple_entry_groups_in_file_WHEN_finding_entry_THEN_signal_is_emitted_with_correct_arguments():
+def test_GIVEN_multiple_entry_groups_in_file_WHEN_finding_entry_THEN_signal_is_emitted_with_entry_options():
     file = create_in_memory_file("test_nw6")
 
     entry = file.create_group("entry")
