@@ -65,6 +65,10 @@ def qvector3d_to_numpy_array(input_vector: QVector3D):
     )
 
 
+def numpy_array_to_qvector3d(input_array: np.ndarray):
+    return QVector3D(input_array[0], input_array[1], input_array[2])
+
+
 def generate_unique_name(base: str, items: list):
     """
     Generates a unique name for a new item using a common base string
