@@ -2,9 +2,37 @@
 from PySide2.QtCore import QAbstractItemModel, QObject
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, QMimeData
 import PySide2.QtGui
+from PySide2.QtGui import QVector3D
 import typing
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
+import re
+
+def get_duplication_name(prototype_name, list_of_nodes):
+    base_name = prototype_name
+    re_str = "(\((\d+)\))$"
+    if re.search(re_str, prototype_name) != None:
+        suffix_ctr = int(re.search(re_str, prototype_name).group(2))
+        base_name = re.sub(re_str, "", prototype_name)
+    else:
+        suffix_ctr = 2
+    base_in_use = False
+    for node in list_of_nodes:
+        if node.name == prototype_name:
+            base_in_use = True
+            break
+    if not base_in_use:
+        return base_name
+    duplicate_name = True
+    while duplicate_name:
+        duplicate_name = False
+        suffix = "({})".format(suffix_ctr)
+        for node in list_of_nodes:
+            if node.name == base_name + suffix:
+                suffix_ctr += 1
+                duplicate_name = True
+                break
+    return base_name + suffix
 
 class ComponentInfo(object):
     def __init__(self, parent):
@@ -12,9 +40,10 @@ class ComponentInfo(object):
         self.parent = parent
 
 class ComponentTreeModel(QAbstractItemModel):
-    def __init__(self, data, parent=None):
+    def __init__(self, instrument, parent=None):
         super().__init__(parent)
-        self.rootItem = data
+        self.instrument = instrument
+        self.components = self.instrument.get_component_list()
 
     def columnCount(self, parent):
         return 1
@@ -72,23 +101,66 @@ class ComponentTreeModel(QAbstractItemModel):
                 return True
         return False
 
-    def updateModel(self, new_data: list):
-        new_list = []
-        for current_old_component in self.rootItem:
-            deleted_component = True
-            for current_component in new_data:
-                if current_component.absolute_path == current_old_component.absolute_path:
-                    new_list.append(current_old_component)
-                    new_data.remove(current_component)
-                    deleted_component = False
-                    break
-            if deleted_component:
-                self.removeRow()
-        for new_component in new_data:
-            new_list.append(new_component)
-        self.rootItem = new_list
-        self.dataChanged.emit(QModelIndex(), QModelIndex())
-        self.layoutChanged.emit()
+    def add_component(self, new_component):
+        self.beginInsertRows(QModelIndex(), len(self.components), len(self.components))
+        self.components.append(new_component)
+        self.endInsertRows()
+
+    def remove_node(self, node):
+        if isinstance(node.internalPointer(), ComponentModel):
+            remove_index = self.components.index(node.internalPointer())
+            self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
+            self.instrument.remove_component(node.internalPointer())
+            self.components.pop(remove_index)
+            self.endRemoveRows()
+        elif isinstance(node.internalPointer(), TransformationModel):
+            transformation_list = node.internalPointer().parent
+            transformation_list_index = self.parent(node)
+            remove_pos = transformation_list.index(node.internalPointer())
+            component = transformation_list.parent_component
+            self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
+            component.remove_transformation(node.internalPointer())
+            transformation_list.pop(remove_pos)
+            self.endRemoveRows()
+
+    def duplicate_node(self, node):
+        parent = node.internalPointer()
+        if isinstance(parent, ComponentModel):
+            new_name = get_duplication_name(parent.name, self.components)
+
+            self.add_component(self.instrument.add_component(new_name, parent.nx_class, parent.description))
+        elif isinstance(parent, TransformationModel):
+            raise NotImplementedError("Duplication of transformations not implemented")
+
+    def add_translation(self, parent_index):
+        parentItem = parent_index.internalPointer()
+        transformation_list = None
+        parent_component = None
+        target_pos = 0
+        target_index = QModelIndex()
+        if isinstance(parentItem, ComponentModel):
+            transformation_list = parentItem.stored_transforms
+            parent_component = parentItem
+            target_pos = len(transformation_list)
+            target_index = self.index(1, 0, parent_index)
+        elif isinstance(parentItem, TransformationsList):
+            transformation_list = parentItem
+            parent_component = parentItem.parent_component
+            target_pos = len(transformation_list)
+            target_index = parent_index
+        elif isinstance(parentItem, TransformationModel):
+            transformation_list = parentItem.parent
+            parent_component = transformation_list.parent_component
+            target_pos = transformation_list.index(parentItem) + 1
+            target_index = self.parent(parent_index)
+        new_transformation = parent_component.add_translation(name = get_duplication_name("Translation", transformation_list), vector = QVector3D(1.0, 0, 0))
+        new_transformation.parent = transformation_list
+        self.beginInsertRows(target_index, target_pos, target_pos)
+        transformation_list.insert(target_pos, new_transformation)
+        self.endInsertRows()
+
+    def add_rotation(self, parent):
+        pass
 
     def dropEvent(self, event: PySide2.QtGui.QDropEvent):
         print("Done dropping")
@@ -96,19 +168,12 @@ class ComponentTreeModel(QAbstractItemModel):
     def headerData(self, section, orientation, role):
         return None
 
-    def createIndex(self, row, column, parent):
-        if isinstance(parent, TransformationModel) or isinstance(parent, ComponentModel) or isinstance(parent, ComponentInfo) or isinstance(parent, TransformationsList):
-            pass
-        else:
-            print("Not ok")
-        return super().createIndex(row, column, parent)
-
     def index(self, row, column, parent):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
 
         if not parent.isValid():
-            return self.createIndex(row, 0, self.rootItem[row])
+            return self.createIndex(row, 0, self.components[row])
 
         parentItem = parent.internalPointer()
 
@@ -146,18 +211,18 @@ class ComponentTreeModel(QAbstractItemModel):
             return QModelIndex()
         elif type(parentItem) is TransformationsList:
             try:
-                return self.createIndex(self.rootItem.index(parentItem.parent_component), 0, parentItem.parent_component)
+                return self.createIndex(self.components.index(parentItem.parent_component), 0, parentItem.parent_component)
             except ValueError as e:
                 print(e)
         elif type(parentItem) is ComponentInfo:
-            return self.createIndex(self.rootItem.index(parentItem.parent), 0, parentItem.parent)
+            return self.createIndex(self.components.index(parentItem.parent), 0, parentItem.parent)
         elif issubclass(type(parentItem), TransformationModel):
             return self.createIndex(1, 0, parentItem.parent)
         raise RuntimeError("Unknown element type.")
 
     def rowCount(self, parent):
         if not parent.isValid():
-            return len(self.rootItem)
+            return len(self.components)
 
         parentItem = parent.internalPointer()
 

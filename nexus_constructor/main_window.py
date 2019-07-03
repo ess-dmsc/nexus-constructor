@@ -51,8 +51,7 @@ class MainWindow(Ui_MainWindow):
 
         self.widget.setVisible(True)
 
-        component_list = self.instrument.get_component_list()
-        self.component_model = ComponentTreeModel(component_list)
+        self.component_model = ComponentTreeModel(self.instrument)
 
         self.componentTreeView.setDragEnabled(True)
         self.componentTreeView.setAcceptDrops(True)
@@ -71,13 +70,16 @@ class MainWindow(Ui_MainWindow):
         self.new_component_action.triggered.connect(self.show_add_component_window)
         self.component_tool_bar.addAction(self.new_component_action)
         self.new_translation_action = QAction(QIcon("ui/new_translation.png"), "New translation", self.tab_2)
+        self.new_translation_action.triggered.connect(self.on_add_translation)
         self.new_translation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_translation_action)
         self.new_rotation_action = QAction(QIcon("ui/new_rotation.png"), "New rotation", self.tab_2)
+        self.new_rotation_action.triggered.connect(self.on_add_rotation)
         self.new_rotation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_rotation_action)
         self.duplicate_action = QAction(QIcon("ui/duplicate.png"), "Duplicate", self.tab_2)
         self.component_tool_bar.addAction(self.duplicate_action)
+        self.duplicate_action.triggered.connect(self.on_duplicate_node)
         self.duplicate_action.setEnabled(False)
         self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.tab_2)
         self.delete_action.triggered.connect(self.on_delete_item)
@@ -85,7 +87,7 @@ class MainWindow(Ui_MainWindow):
         self.component_tool_bar.addAction(self.delete_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
-    def on_clicked(self, index):
+    def set_button_state(self):
         indices = self.componentTreeView.selectedIndexes()
         if len(indices) == 0 or len(indices) != 1:
             self.delete_action.setEnabled(False)
@@ -93,8 +95,8 @@ class MainWindow(Ui_MainWindow):
             self.new_rotation_action.setEnabled(False)
             self.new_translation_action.setEnabled(False)
         else:
-            clicked_object = index.internalPointer()
-            if isinstance(clicked_object, ComponentModel) or isinstance(clicked_object, TransformationModel):
+            selected_object = indices[0].internalPointer()
+            if isinstance(selected_object, ComponentModel) or isinstance(selected_object, TransformationModel):
                 self.delete_action.setEnabled(True)
                 self.duplicate_action.setEnabled(True)
             else:
@@ -102,6 +104,24 @@ class MainWindow(Ui_MainWindow):
                 self.duplicate_action.setEnabled(False)
             self.new_rotation_action.setEnabled(True)
             self.new_translation_action.setEnabled(True)
+
+    def on_clicked(self, index):
+        self.set_button_state()
+
+    def on_duplicate_node(self):
+        selected = self.componentTreeView.selectedIndexes()
+        if len(selected) > 0:
+            self.component_model.duplicate_node(selected[0])
+
+    def on_add_translation(self):
+        selected = self.componentTreeView.selectedIndexes()
+        if len(selected) > 0:
+            self.component_model.add_translation(selected[0])
+
+    def on_add_rotation(self):
+        selected = self.componentTreeView.selectedIndexes()
+        if len(selected) > 0:
+            self.component_model.add_rotation(selected[0])
 
     def set_up_warning_window(self):
         """
@@ -127,7 +147,6 @@ class MainWindow(Ui_MainWindow):
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
         self.treemodel.insertH5pyObject(nexus_file)
-        self.component_model.updateModel(self.instrument.get_component_list())
 
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
@@ -146,11 +165,12 @@ class MainWindow(Ui_MainWindow):
 
     def show_add_component_window(self):
         self.add_component_window = QDialog()
-        self.add_component_window.ui = AddComponentDialog(self.instrument)
+        self.add_component_window.ui = AddComponentDialog(self.instrument, self.component_model)
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
 
     def on_delete_item(self):
         selected = self.componentTreeView.selectedIndexes()
         for item in selected:
-            self.instrument.remove_component(item.internalPointer())
+            self.component_model.remove_node(item)
+        self.set_button_state()

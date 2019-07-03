@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 from PySide2.QtCore import Qt, QSize, QPoint
-from PySide2.QtWidgets import QApplication, QTreeView, QHBoxLayout, QStyledItemDelegate, QFrame, QPushButton, QVBoxLayout, QSizePolicy, QLabel, QLineEdit
+from PySide2.QtWidgets import QApplication, QTreeView, QHBoxLayout, QStyledItemDelegate, QFrame, QGroupBox, QPushButton, QVBoxLayout, QSizePolicy, QLabel, QLineEdit
 from nexus_constructor.component_tree_model import ComponentInfo
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from PySide2.QtGui import QPixmap, QRegion
 import PySide2.QtGui
-# from ui.transformations import Ui_TransformationFrame
+from ui.translation import Ui_Translation
 
 class ComponentEditorDelegate(QStyledItemDelegate):
     SettingsFrameMap = {} #{Rotation:RotateSettingsFrame, Translation:TranslateSettingsFrame}
@@ -30,21 +30,26 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.layout = QVBoxLayout()
         frame.layout.setContentsMargins(0,0,0,0)
         frame.setLayout(frame.layout)
-        if issubclass(type(value), ComponentModel):
+        if isinstance(value, ComponentModel):
             frame.label = QLabel("{} ({})".format(value.name, value.nx_class), frame)
             frame.layout.addWidget(frame.label)
-        elif type(value) is TransformationsList:
+        elif isinstance(value, TransformationsList):
             frame.label = QLabel("Transformations", frame)
             frame.layout.addWidget(frame.label)
-        elif type(value) is ComponentInfo:
+        elif isinstance(value, ComponentInfo):
             frame.label = QLabel("Component settings", frame)
             frame.layout.addWidget(frame.label)
-        elif issubclass(type(value), TransformationModel):
-            pass
-            # frame.transformation_frame = Ui_TransformationFrame()
-            # temp_frame = QFrame(frame)
-            # frame.transformation_frame.setupUi(temp_frame)
-            # frame.layout.addWidget(temp_frame, Qt.AlignTop)
+        elif isinstance(value, TransformationModel):
+            if value.type == "Translation":
+                pass
+            elif value.type == "Rotation":
+                pass
+            else:
+                raise NotImplementedError("Unknown transformation type.")
+            frame.transformation_frame = Ui_Translation()
+            temp_frame = QGroupBox(frame)
+            frame.transformation_frame.setupUi(temp_frame)
+            frame.layout.addWidget(temp_frame, Qt.AlignTop)
         #     frame.editor_header_layout = QHBoxLayout()
         #     label = QLabel("Name", frame)
         #     label.setSizePolicy(SizePolicy)
