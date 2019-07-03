@@ -1,11 +1,7 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl
-from nexus_constructor.geometry_types import (
-    OFFGeometry,
-    NoShapeGeometry,
-    CylindricalGeometry,
-)
+from nexus_constructor.geometry import OFFGeometry, NoShapeGeometry, CylindricalGeometry
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,

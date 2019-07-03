@@ -1,13 +1,7 @@
-from nexus_constructor.geometry_types import (
-    NoShapeGeometry,
-    CylindricalGeometry,
-    OFFGeometry,
-    OFFCube,
-    QVector3D,
-    QMatrix4x4,
-    acos,
-    degrees,
-)
+from nexus_constructor.geometry import NoShapeGeometry, CylindricalGeometry, OFFGeometry
+from nexus_constructor.geometry.no_shape_geometry import OFFCube
+from PySide2.QtGui import QVector3D, QMatrix4x4
+from math import acos, degrees
 
 
 def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_off_geometry_returns_offcube():

@@ -1,4 +1,4 @@
-from nexus_constructor.geometry_types import OFFGeometry
+from nexus_constructor.geometry import OFFGeometry
 from nexusutils.readwriteoff import parse_off_file
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from stl import mesh

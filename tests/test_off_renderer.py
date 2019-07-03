@@ -4,7 +4,8 @@ from nexus_constructor.off_renderer import (
     create_normal_buffer,
     OffMesh,
 )
-from nexus_constructor.geometry_types import OFFCube, OFFGeometry
+from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.geometry.no_shape_geometry import OFFCube
 import itertools
 from PySide2.QtGui import QVector3D
 
