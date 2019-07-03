@@ -1,11 +1,16 @@
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
+from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
+
+from nexus_constructor.neutron_animation_controller import NeutronAnimationController
 
 
 class Gnomon:
-    def __init__(self, root_entity, main_camera, component_adder):
+    def __init__(
+        self, root_entity, main_camera, beam_material, grey_material, component_adder
+    ):
         """
         A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon (or axis indicator).
         The gnomon/axis indicator is an object that appears in the bottom right-hand corner of the instrument view that
@@ -19,6 +24,8 @@ class Gnomon:
         self.gnomon_cylinder_length = 4
         self.main_camera = main_camera
         self.gnomon_camera = self.create_gnomon_camera(main_camera)
+        self.beam_material = beam_material
+        self.grey_material = grey_material
 
         self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
         self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
@@ -74,6 +81,31 @@ class Gnomon:
         self.prepare_gnomon_material(self.x_material, "red")
         self.prepare_gnomon_material(self.y_material, "green")
         self.prepare_gnomon_material(self.z_material, "blue")
+
+        # Initialise beam objects
+        self.cylinder_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
+        self.cylinder_transform = Qt3DCore.QTransform()
+
+        self.num_neutrons = 9
+
+        self.neutron_animation_length = self.gnomon_cylinder_length * 1.5
+
+        # Create a dictionary for neutron-related objects so that they are always in scope and not destroyed by C++
+        self.neutron_objects = {
+            "entities": [],
+            "meshes": [],
+            "transforms": [],
+            "animation_controllers": [],
+            "animations": [],
+        }
+
+        for _ in range(self.num_neutrons):
+            self.neutron_objects["entities"].append(
+                Qt3DCore.QEntity(self.gnomon_root_entity)
+            )
+            self.neutron_objects["meshes"].append(Qt3DExtras.QSphereMesh())
+            self.neutron_objects["transforms"].append(Qt3DCore.QTransform())
 
     def get_gnomon_camera(self):
         """
@@ -311,7 +343,7 @@ class Gnomon:
             self.main_camera.position() - self.main_camera.viewCenter()
         )
         updated_gnomon_camera_position = updated_gnomon_camera_position.normalized()
-        updated_gnomon_camera_position *= self.gnomon_cylinder_length * 4
+        updated_gnomon_camera_position *= self.gnomon_cylinder_length * 4.2
 
         self.gnomon_camera.setPosition(updated_gnomon_camera_position)
         self.gnomon_camera.setUpVector(self.main_camera.upVector())
@@ -345,3 +377,125 @@ class Gnomon:
         billboard_transformation.setRow(3, QVector4D())
         billboard_transformation.setColumn(3, QVector4D(text_vector, 1))
         return billboard_transformation
+
+    @staticmethod
+    def set_cylinder_mesh_dimensions(cylinder_mesh, radius, length, rings):
+        """
+        Sets the dimensions of a cylinder mesh.
+        :param cylinder_mesh: The cylinder mesh to modify.
+        :param radius: The desired radius.
+        :param length: The desired length.
+        :param rings: The desired number of rings.
+        """
+        cylinder_mesh.setRadius(radius)
+        cylinder_mesh.setLength(length)
+        cylinder_mesh.setRings(rings)
+
+    @staticmethod
+    def set_beam_transform(cylinder_transform, neutron_animation_length):
+        """
+        Configures the transform for the beam cylinder by giving it a matrix. The matrix will turn the cylinder sideways
+        and then move it "backwards" in the z-direction by 20 units so that it ends at the location of the sample.
+        :param cylinder_transform: A QTransform object.
+        """
+        cylinder_matrix = QMatrix4x4()
+        cylinder_matrix.rotate(90, QVector3D(1, 0, 0))
+        cylinder_matrix.translate(QVector3D(0, neutron_animation_length * 0.5, 0))
+
+        cylinder_transform.setMatrix(cylinder_matrix)
+
+    def setup_beam_cylinder(self):
+        """
+        Sets up the beam cylinder by giving the cylinder entity a mesh, a material, and a transformation.
+        """
+        self.set_cylinder_mesh_dimensions(
+            self.cylinder_mesh, 1.5, self.neutron_animation_length, 2
+        )
+        self.set_beam_transform(self.cylinder_transform, self.neutron_animation_length)
+        self.add_qcomponents_to_entity(
+            self.cylinder_entity,
+            [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
+        )
+
+    @staticmethod
+    def set_neutron_animation_properties(
+        neutron_animation,
+        neutron_animation_controller,
+        animation_distance,
+        time_span_offset,
+    ):
+        """
+        Prepares a QPropertyAnimation for a neutron by giving it a target, a distance, and loop settings.
+        :param neutron_animation: The QPropertyAnimation to be configured.
+        :param neutron_animation_controller: The related animation controller object.
+        :param animation_distance: The starting distance of the neutron.
+        :param time_span_offset: The offset that allows the neutron to move at a different time from other neutrons.
+        """
+        neutron_animation.setTargetObject(neutron_animation_controller)
+        neutron_animation.setPropertyName(b"distance")
+        neutron_animation.setStartValue(0)
+        neutron_animation.setEndValue(animation_distance)
+        neutron_animation.setDuration(500 + time_span_offset)
+        neutron_animation.setLoopCount(-1)
+        neutron_animation.start()
+
+    @staticmethod
+    def set_sphere_mesh_radius(sphere_mesh, radius):
+        """
+        Sets the radius of a sphere mesh.
+        :param sphere_mesh: The sphere mesh to modify.
+        :param radius: The desired radius.
+        """
+        sphere_mesh.setRadius(radius)
+
+    def setup_neutrons(self):
+        """
+        Sets up the neutrons and their animations by preparing their meshes and then giving offset and
+        distance parameters to an animation controller.
+        """
+
+        # Create lists of x, y, and time offsets for the neutron animations
+        x_offsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
+        y_offsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
+        time_span_offsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
+
+        neutron_radius = 1.5
+
+        for i in range(self.num_neutrons):
+
+            self.set_sphere_mesh_radius(
+                self.neutron_objects["meshes"][i], neutron_radius
+            )
+
+            neutron_animation_controller = NeutronAnimationController(
+                x_offsets[i] * 0.5,
+                y_offsets[i] * 0.5,
+                self.neutron_objects["transforms"][i],
+            )
+            neutron_animation_controller.set_target(
+                self.neutron_objects["transforms"][i]
+            )
+
+            neutron_animation = QPropertyAnimation(
+                self.neutron_objects["transforms"][i]
+            )
+            self.set_neutron_animation_properties(
+                neutron_animation,
+                neutron_animation_controller,
+                self.neutron_animation_length,
+                time_span_offsets[i],
+            )
+
+            self.neutron_objects["animation_controllers"].append(
+                neutron_animation_controller
+            )
+            self.neutron_objects["animations"].append(neutron_animation)
+
+            self.add_qcomponents_to_entity(
+                self.neutron_objects["entities"][i],
+                [
+                    self.neutron_objects["meshes"][i],
+                    self.grey_material,
+                    self.neutron_objects["transforms"][i],
+                ],
+            )
