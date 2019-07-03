@@ -14,6 +14,7 @@ def test_cylinder_has_property_values_it_was_created_with():
 
     assert cylinder.radius == approx(radius)
     assert cylinder.height == approx(height)
+    assert cylinder.geometry_str == "Cylinder"
 
 
 def test_axis_direction_must_be_non_zero():
