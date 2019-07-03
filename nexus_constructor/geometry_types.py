@@ -143,8 +143,8 @@ class CylindricalGeometry:
             raise NexusFormatError("\n".join(problems))
 
     @property
-    def units(self):
-        return self.group["vertices"].attrs["units"]
+    def units(self) -> str:
+        return str(self.group["vertices"].attrs["units"])
 
     @units.setter
     def units(self, new_units: str):
@@ -214,10 +214,11 @@ class CylindricalGeometry:
         :param new_axis_direction: Vector describing direction of the cylinder's axis
         """
         validate_nonzero_qvector(new_axis_direction)
+        # TODO rotate the vertices by the angle between the new and old axis directions
         raise NotImplementedError()
 
     @property
-    def off_geometry(self, steps=20):
+    def off_geometry(self, steps: int = 20) -> OFFGeometry:
         unit_conversion_factor = calculate_unit_conversion_factor(self.units)
 
         # A list of vertices describing the circle at the bottom of the cylinder
@@ -265,7 +266,7 @@ class CylindricalGeometry:
 
         return OFFGeometry(vertices=vertices, faces=rectangle_faces + top_bottom_faces)
 
-    def _rotation_matrix(self):
+    def _rotation_matrix(self) -> QMatrix4x4:
         """
         :return: A QMatrix4x4 describing the rotation from the Z axis to the cylinder's axis
         """
