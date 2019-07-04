@@ -1,5 +1,3 @@
-
-
 def set_material_properties(
     material, ambient, diffuse, alpha=None, remove_shininess=False
 ):
