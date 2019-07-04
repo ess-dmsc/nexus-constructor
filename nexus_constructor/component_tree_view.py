@@ -46,7 +46,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
                 pass
             else:
                 raise NotImplementedError("Unknown transformation type.")
-            frame.transformation_frame = EditTranslation(frame)
+            frame.transformation_frame = EditTranslation(frame, value)
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
 
         return frame
