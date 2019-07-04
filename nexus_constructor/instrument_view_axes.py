@@ -14,22 +14,23 @@ from nexus_constructor.qentity_utils import (
 
 
 class InstrumentViewAxes(object):
-    def __init__(self, component_root_entity, far_plane):
+    def __init__(self, component_root_entity, line_length):
         """
         Class for housing the objects that create the axes in the instrument view.
         :param component_root_entity: The root entity for the instrument view components.
-        :param far_plane: The far plane of the central camera. Used to determine the length of the lines.
+        :param line_length: The length of the line in the axes.
         """
 
         self.component_root_entity = component_root_entity
-        self.line_length = far_plane
+        self.line_length = line_length
 
-        # The array given to the LineGeometry must be in the form [start_x, start_y, start_z, end_x, end_y, end_z].
-        # All lines start at the origin for the first three elements are the same.
+        # The coordinate array given to the LineGeometry must be in the form
+        # [start_x, start_y, start_z, end_x, end_y, end_z]. All lines start at the origin so the first three elements
+        # in the lists for the three lines will be the same.
         origin = [0, 0, 0]
-        x_line_vertices = origin + [far_plane, 0, 0]
-        y_line_vertices = origin + [0, far_plane, 0]
-        z_line_vertices = origin + [0, 0, far_plane]
+        x_line_vertices = origin + [line_length, 0, 0]
+        y_line_vertices = origin + [0, line_length, 0]
+        z_line_vertices = origin + [0, 0, line_length]
 
         self.x_line_geometry = LineGeometry(
             QtCore.QByteArray(self.create_data_array(x_line_vertices))
