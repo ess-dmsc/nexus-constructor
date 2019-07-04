@@ -139,6 +139,8 @@ class ComponentTreeModel(QAbstractItemModel):
         target_pos = 0
         target_index = QModelIndex()
         if isinstance(parentItem, ComponentModel):
+            if not hasattr(parentItem, "stored_transforms"):
+                parentItem.stored_transforms = parentItem.transforms
             transformation_list = parentItem.stored_transforms
             parent_component = parentItem
             target_pos = len(transformation_list)
@@ -190,20 +192,9 @@ class ComponentTreeModel(QAbstractItemModel):
                 return QModelIndex()
         elif type(parentItem) is TransformationsList:
             return self.createIndex(row, 0, parentItem[row])
-
-        #
-        # if type(parentItem) is list or type(parentItem) is Cp.TransformationList:
-        #     childItem = parentItem[row]
-        # elif issubclass(type(parentItem), Cp.Component):
-        #     childItem = parentItem.transformations
-        # if childItem is not None:
-        #     return self.createIndex(row, column, childItem)
         raise RuntimeError("Unable to find element.")
 
     def parent(self, index):
-        # list.index uses the comparison operator to find an item but we want to find the actual object (pointer)
-        # is there a simple pythonic way to fix this or should we add some attribute to make sure that every
-        # item is unique?
         if not index.isValid():
             return QModelIndex()
         parentItem = index.internalPointer()

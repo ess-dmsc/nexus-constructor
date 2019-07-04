@@ -8,7 +8,7 @@ import silx.gui.hdf5
 import os
 
 from nexus_constructor.component import ComponentModel
-from nexus_constructor.component import TransformationModel
+from nexus_constructor.transformations import TransformationModel, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.nexus_filewriter_json import writer
@@ -116,7 +116,13 @@ class MainWindow(Ui_MainWindow):
     def on_add_translation(self):
         selected = self.componentTreeView.selectedIndexes()
         if len(selected) > 0:
-            self.component_model.add_translation(selected[0])
+            current_index = selected[0]
+            self.component_model.add_translation(current_index)
+            current_pointer = current_index.internalPointer()
+            if not self.componentTreeView.isExpanded(current_index) and (isinstance(current_pointer, TransformationsList) or isinstance(current_pointer,ComponentModel)):
+                self.componentTreeView.expand(current_index)
+                if isinstance(current_pointer,ComponentModel):
+
 
     def on_add_rotation(self):
         selected = self.componentTreeView.selectedIndexes()

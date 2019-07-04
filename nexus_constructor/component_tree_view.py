@@ -7,7 +7,7 @@ from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from PySide2.QtGui import QPixmap, QRegion
 import PySide2.QtGui
-from ui.translation import Ui_Translation
+from nexus_constructor.transformation_view import EditTranslation
 
 class ComponentEditorDelegate(QStyledItemDelegate):
     SettingsFrameMap = {} #{Rotation:RotateSettingsFrame, Translation:TranslateSettingsFrame}
@@ -46,40 +46,8 @@ class ComponentEditorDelegate(QStyledItemDelegate):
                 pass
             else:
                 raise NotImplementedError("Unknown transformation type.")
-            frame.transformation_frame = Ui_Translation()
-            temp_frame = QGroupBox(frame)
-            frame.transformation_frame.setupUi(temp_frame)
-            frame.layout.addWidget(temp_frame, Qt.AlignTop)
-        #     frame.editor_header_layout = QHBoxLayout()
-        #     label = QLabel("Name", frame)
-        #     label.setSizePolicy(SizePolicy)
-        #     frame.editor_header_layout.addWidget(label)
-        #     frame.editor_header_layout.setContentsMargins(0, 0, 0, 0)
-        #     frame.component_name = QLineEdit(value.Name, frame)
-        #     frame.component_name.setSizePolicy(AltSizePolicy)
-        #     line = QFrame(frame)
-        #     line.setFrameShape(QFrame.VLine)
-        #     line.setFrameShadow(QFrame.Sunken)
-        #     frame.editor_header_layout.addWidget(frame.component_name)
-        #     frame.editor_header_layout.addWidget(line)
-        #     frame.edit_btn = QPushButton("Edit", frame)
-        #     frame.edit_btn.setSizePolicy(SizePolicy)
-        #     frame.editor_header_layout.addWidget(frame.edit_btn)
-        #     frame.layout.addLayout(frame.editor_header_layout)
-        #     frame.editor_header_layout.setEnabled(False)
-        #     line2 = QFrame(frame)
-        #     line2.setFrameShape(QFrame.HLine)
-        #     line2.setFrameShadow(QFrame.Sunken)
-        #     line2.setContentsMargins(0, 0, 0, 0)
-        #     frame.setContentsMargins(0, 0, 0, 0)
-        #     frame.layout.setContentsMargins(0, 0, 0, 0)
-        #     frame.layout.addWidget(line2)
-        #     frame.edit_frame = self.SettingsFrameMap[type(value)](value, frame)
-        #     frame.layout.addWidget(frame.edit_frame, Qt.AlignTop)
-        #     frame.edit_frame.setEnabled(False)
-        #     frame.component_name.setEnabled(False)
-        # else:
-        #     raise Exception("Unknown element type in tree view.")
+            frame.transformation_frame = EditTranslation(frame)
+            frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
 
         return frame
 
@@ -104,15 +72,10 @@ class ComponentEditorDelegate(QStyledItemDelegate):
 
     def setEditorData(self, editorWidget, index):
         model = index.model()
-        editorWidget.edit_frame.setEnabled(True)
-        editorWidget.component_name.setEnabled(True)
-        editorWidget.edit_btn.setText("Done")
-        #spinBox.editor.setText(value["data"].Name)
+        editorWidget.setEnabled(True)
 
     def setModelData(self, editorWidget, model, index):
-        editorWidget.edit_frame.setEnabled(False)
-        editorWidget.component_name.setEnabled(False)
-        editorWidget.edit_btn.setText("Edit")
+        editorWidget.setEnabled(False)
 
     def sizeHint(self, option, index):
         model = index.model()
