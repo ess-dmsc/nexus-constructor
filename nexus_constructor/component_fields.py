@@ -10,12 +10,10 @@ from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt
 from typing import List
 from nexus_constructor.component import ComponentModel
-
-_field_types = {}
-
-
 from enum import Enum
 import numpy as np
+
+_field_types = {}
 
 
 class FieldType(Enum):

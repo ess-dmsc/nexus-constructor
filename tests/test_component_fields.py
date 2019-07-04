@@ -65,4 +65,3 @@ def test_GIVEN_single_scalar_field_and_string_WHEN_adding_fields_to_component_TH
 
     assert component.get_field(field_name)
     assert bytes(component.get_field(field_name), encoding="ASCII") == field_value
-    comp = component.get_field(field_name)
