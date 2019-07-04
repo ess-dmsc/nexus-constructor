@@ -6,6 +6,7 @@ from PySide2.QtGui import QVector3D, QColor
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 
 from nexus_constructor.gnomon import Gnomon
+from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.off_renderer import OffMesh
 
 
@@ -68,6 +69,7 @@ class InstrumentView(QWidget):
             self.add_qcomponents_to_entity,
         )
         self.gnomon_camera = self.gnomon.get_gnomon_camera()
+        self.instrument_view_axes = InstrumentViewAxes(self.component_root_entity, 15)
 
         self.create_layers()
         self.initialise_view()
