@@ -7,7 +7,7 @@ from PySide2.QtWidgets import (
     QListWidget,
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
-from PySide2.QtCore import QStringListModel, Qt
+from PySide2.QtCore import QStringListModel, Qt, Signal
 from typing import List
 from nexus_constructor.component import ComponentModel
 from enum import Enum
@@ -64,6 +64,10 @@ class FieldNameLineEdit(QLineEdit):
 
 
 class FieldWidget(QFrame):
+
+    # Used for deletion of field
+    something_clicked = Signal()
+
     def __init__(self, possible_field_names: List[str], parent=None):
         super(FieldWidget, self).__init__(parent)
 
@@ -90,8 +94,6 @@ class FieldWidget(QFrame):
         self.value_type_combo = QComboBox()
         self.value_type_combo.addItems(list(DATASET_TYPE.keys()))
 
-        self.remove_button = QPushButton("Remove")
-
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.field_name_edit)
         self.layout.addWidget(self.field_type_combo)
@@ -99,13 +101,20 @@ class FieldWidget(QFrame):
         self.layout.addWidget(self.nx_class_combo)
         self.layout.addWidget(self.edit_button)
         self.layout.addWidget(self.value_type_combo)
-        self.layout.addWidget(self.remove_button)
 
         self.layout.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout)
 
         self.setFrameShadow(QFrame.Raised)
         self.setFrameShape(QFrame.StyledPanel)
+
+        if parent:
+            # Emit something_clicked so the item in the list view can be deleted when selected.
+            self.field_name_edit.cursorPositionChanged.connect(self.something_clicked)
+            self.value_line_edit.cursorPositionChanged.connect(self.something_clicked)
+            self.value_type_combo.highlighted.connect(self.something_clicked)
+            self.field_type_combo.highlighted.connect(self.something_clicked)
+            self.nx_class_combo.highlighted.connect(self.something_clicked)
 
         # Set the layout for the default field type
         self.field_type_changed()

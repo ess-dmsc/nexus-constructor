@@ -127,16 +127,27 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
         self.addFieldPushButton.clicked.connect(self.add_field)
+        self.removeFieldPushButton.clicked.connect(self.remove_field)
 
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
         self.on_nx_class_changed()
 
+        self.fieldsListWidget.itemClicked.connect(self.select_field)
+
     def add_field(self):
         item = QListWidgetItem()
         field = FieldWidget(self.possible_fields, self.fieldsListWidget)
+        field.something_clicked.connect(partial(self.select_field, item))
         item.setSizeHint(field.sizeHint())
         self.fieldsListWidget.addItem(item)
         self.fieldsListWidget.setItemWidget(item, field)
+
+    def select_field(self, widget):
+        self.selected_widget = widget
+        self.fieldsListWidget.setItemSelected(widget, True)
+
+    def remove_field(self):
+        self.fieldsListWidget.takeItem(self.fieldsListWidget.row(self.selected_widget))
 
     def generate_name_suggestion(self):
         """

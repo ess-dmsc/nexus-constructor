@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Thu Jul  4 09:35:57 2019
+# Created: Thu Jul  4 14:37:40 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -177,14 +177,17 @@ class Ui_AddComponentDialog(object):
         sizePolicy.setHeightForWidth(self.fieldsBox.sizePolicy().hasHeightForWidth())
         self.fieldsBox.setSizePolicy(sizePolicy)
         self.fieldsBox.setObjectName("fieldsBox")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.fieldsBox)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.gridLayout_5 = QtWidgets.QGridLayout(self.fieldsBox)
+        self.gridLayout_5.setObjectName("gridLayout_5")
         self.addFieldPushButton = QtWidgets.QPushButton(self.fieldsBox)
         self.addFieldPushButton.setObjectName("addFieldPushButton")
-        self.verticalLayout.addWidget(self.addFieldPushButton)
+        self.gridLayout_5.addWidget(self.addFieldPushButton, 0, 0, 1, 1)
+        self.removeFieldPushButton = QtWidgets.QPushButton(self.fieldsBox)
+        self.removeFieldPushButton.setObjectName("removeFieldPushButton")
+        self.gridLayout_5.addWidget(self.removeFieldPushButton, 0, 1, 1, 1)
         self.fieldsListWidget = QtWidgets.QListWidget(self.fieldsBox)
         self.fieldsListWidget.setObjectName("fieldsListWidget")
-        self.verticalLayout.addWidget(self.fieldsListWidget)
+        self.gridLayout_5.addWidget(self.fieldsListWidget, 1, 0, 1, 2)
         self.verticalLayout_2.addWidget(self.fieldsBox)
         self.verticalLayout_2.setStretch(5, 1)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
@@ -229,4 +232,5 @@ class Ui_AddComponentDialog(object):
         self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
         self.addFieldPushButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Add field", None, -1))
+        self.removeFieldPushButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Remove field", None, -1))
 
