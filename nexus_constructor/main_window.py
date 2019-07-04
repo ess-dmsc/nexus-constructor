@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QAction, QToolBar
+from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QAction, QToolBar, QPushButton
 from PySide2.QtGui import QIcon
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.add_component_window import AddComponentDialog
