@@ -123,17 +123,6 @@ class Gnomon:
         return self.gnomon_camera
 
     @staticmethod
-    def prepare_gnomon_material(material, color):
-        """
-        Prepares the material that will be used to color the gnomon cylinders and sets its shininess to zero.
-        :param material: The material to be configured.
-        :param color: The desired ambient color of the material.
-        """
-        material.setAmbient(color)
-        material.setDiffuse("grey")
-        material.setShininess(0)
-
-    @staticmethod
     def configure_gnomon_cylinder(cylinder_mesh, length):
         """
         Set the radius, length and ring properties of the cylinders that create the gnomon. The radius is 1/20th of the
