@@ -211,4 +211,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        self.instrument.add_component(component_name, nx_class, description)
+        component = self.instrument.add_component(component_name, nx_class, description)
+
+        for i in range(self.fieldsListWidget.count()):
+            widget = self.fieldsListWidget.itemWidget(self.fieldsListWidget.item(i))
+            component.set_field(widget.name, widget.value, widget.dtype)

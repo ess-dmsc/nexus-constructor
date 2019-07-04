@@ -18,32 +18,18 @@ class FieldType(Enum):
     nx_class = "NX class/group"
 
 
-class DatasetType(Enum):
-    byte = "Byte"
-    ubyte = "Unsigned Byte"
-    short = "Short"
-    ushort = "Unsigned Short"
-    int = "Integer"
-    uint = "Unsigned Integer"
-    long = "Long"
-    ulong = "Unsigned Long"
-    float = "Float"
-    double = "Double"
-    string = "String"
-
-
-PYTHON_TO_HDF5 = {
-    DatasetType.byte.value: np.byte,
-    DatasetType.ubyte.value: np.ubyte,
-    DatasetType.short.value: np.short,
-    DatasetType.ushort.value: np.ushort,
-    DatasetType.int.value: np.intc,
-    DatasetType.uint.value: np.uintc,
-    DatasetType.long.value: np.int_,
-    DatasetType.ulong.value: np.uint,
-    DatasetType.float.value: np.single,
-    DatasetType.double.value: np.double,
-    DatasetType.string.value: object,
+DATASET_TYPE = {
+    "Byte": np.byte,
+    "Unsigned Byte": np.ubyte,
+    "Short": np.short,
+    "Unsigned Short": np.ushort,
+    "Integer": np.intc,
+    "Unsigned Integer": np.uintc,
+    "Long": np.int_,
+    "Unsigned Long": np.uint,
+    "Float": np.single,
+    "Double": np.double,
+    "String": np.string_,
 }
 
 
@@ -96,7 +82,7 @@ class FieldWidget(QFrame):
         self.edit_button.clicked.connect(self.show_edit_dialog)
 
         self.value_type_combo = QComboBox()
-        self.value_type_combo.addItems([item.value for item in DatasetType])
+        self.value_type_combo.addItems(list(DATASET_TYPE.keys()))
 
         self.remove_button = QPushButton("Remove")
 
@@ -117,6 +103,28 @@ class FieldWidget(QFrame):
 
         # Set the layout for the default field type
         self.field_type_changed()
+
+    @property
+    def field_type(self):
+        return FieldType(self.field_type_combo.currentText())
+
+    @property
+    def name(self):
+        return self.field_name_edit.text()
+
+    @property
+    def dtype(self):
+        if self.field_type == FieldType.scalar_dataset:
+            return self.value.dtype
+        if self.field_type == FieldType.array_dataset:
+            return np.array(self.value).dtype
+
+    @property
+    def value(self):
+        if self.field_type == FieldType.scalar_dataset:
+            return DATASET_TYPE[self.value_type_combo.currentText()](
+                self.value_line_edit.text()
+            )
 
     def field_type_changed(self):
         if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
@@ -143,12 +151,7 @@ class FieldWidget(QFrame):
         self.value_type_combo.setVisible(show_value_type_combo)
 
     def show_edit_dialog(self):
-        self.edit_dialog = QDialog()
-        self.edit_dialog.show()
-        if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
-            # TODO: show scalar edit panel
-            pass
-        elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
+        if self.field_type_combo.currentText() == FieldType.array_dataset.value:
             # TODO: show array edit panel
             pass
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
@@ -160,3 +163,5 @@ class FieldWidget(QFrame):
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             # TODO: show nx class panels
             pass
+        self.edit_dialog = QDialog()
+        self.edit_dialog.show()
