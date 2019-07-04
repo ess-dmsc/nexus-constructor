@@ -50,6 +50,7 @@ def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shin
     mock_material.setAlpha.assert_not_called()
     mock_material.setShininess.assert_called_once_with(0)
 
+
 def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_added():
 
     mock_entity = Mock()

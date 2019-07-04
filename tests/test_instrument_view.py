@@ -16,4 +16,3 @@ def test_GIVEN_cube_dimensions_WHEN_calling_set_cube_mesh_dimesions_THEN_dimensi
     mock_cube_mesh.setXExtent.assert_called_once_with(x)
     mock_cube_mesh.setYExtent.assert_called_once_with(y)
     mock_cube_mesh.setZExtent.assert_called_once_with(z)
-

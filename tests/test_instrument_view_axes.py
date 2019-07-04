@@ -3,7 +3,7 @@ import struct
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 
 
-def test_GIVEN_int_list_WHEN_calling_create_data_array_THEN_original_can_be_recovered_by_converting_from_byte_to_int():
+def test_GIVEN_int_list_WHEN_calling_create_data_array_THEN_original_list_can_be_recovered_by_unpacking_byte_array():
 
     list_size = 6
     original_list = [i for i in range(list_size)]
