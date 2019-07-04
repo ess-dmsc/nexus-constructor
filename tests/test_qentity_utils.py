@@ -12,14 +12,6 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
     diffuse = Mock()
 
     mock_material = Mock()
-    mock_material.setAmbient = Mock()
-    mock_material.setDiffuse = Mock()
-
-    # This method doesn't exist for QPhongMaterial but is mocked all the same to make sure that it isn't called when an
-    # alpha argument isn't given
-    mock_material.setAlpha = Mock()
-
-    mock_material.setShininess = Mock()
 
     set_material_properties(mock_material, ambient, diffuse)
 
@@ -36,16 +28,27 @@ def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_TH
     alpha = 0.5
 
     mock_alpha_material = Mock()
-    mock_alpha_material.setAmbient = Mock()
-    mock_alpha_material.setDiffuse = Mock()
-    mock_alpha_material.setAmbient = Mock()
-
     set_material_properties(mock_alpha_material, ambient, diffuse, alpha)
 
     mock_alpha_material.setAmbient.assert_called_once_with(ambient)
     mock_alpha_material.setDiffuse.assert_called_once_with(diffuse)
     mock_alpha_material.setAlpha.assert_called_once_with(alpha)
+    mock_alpha_material.setShininess.assert_not_called()
 
+
+def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shininess_set_to_zero():
+
+    ambient = Mock()
+    diffuse = Mock()
+
+    mock_material = Mock()
+
+    set_material_properties(mock_material, ambient, diffuse, remove_shininess=True)
+
+    mock_material.setAmbient.assert_called_once_with(ambient)
+    mock_material.setDiffuse.assert_called_once_with(diffuse)
+    mock_material.setAlpha.assert_not_called()
+    mock_material.setShininess.assert_called_once_with(0)
 
 def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_added():
 
