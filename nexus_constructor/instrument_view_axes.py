@@ -10,10 +10,14 @@ from nexus_constructor.line_geometry import LineGeometry
 
 
 class InstrumentViewAxes(object):
-    def __init__(self, component_root_entity, far_plane):
+    def __init__(
+        self, component_root_entity, far_plane, component_adder, configure_materials
+    ):
 
         self.component_root_entity = component_root_entity
         self.line_length = far_plane
+        self.add_qcomponents_to_entity = component_adder
+        self.set_material_properties = configure_materials
 
         origin = [0, 0, 0]
         x_line_vertices = origin + [far_plane, 0, 0]
@@ -50,25 +54,25 @@ class InstrumentViewAxes(object):
         self.y_line_material = Qt3DExtras.QPhongMaterial()
         self.z_line_material = Qt3DExtras.QPhongMaterial()
 
-        self.x_line_material.setAmbient(AxisColors.X.value)
-        self.y_line_material.setAmbient(AxisColors.Y.value)
-        self.z_line_material.setAmbient(AxisColors.Z.value)
+        self.set_material_properties(
+            self.x_line_material, AxisColors.X.value, AxisColors.X.value
+        )
+        self.set_material_properties(
+            self.y_line_material, AxisColors.Y.value, AxisColors.Y.value
+        )
+        self.set_material_properties(
+            self.z_line_material, AxisColors.Z.value, AxisColors.Z.value
+        )
 
-        self.x_line_material.setDiffuse(AxisColors.X.value)
-        self.y_line_material.setDiffuse(AxisColors.Y.value)
-        self.z_line_material.setDiffuse(AxisColors.Z.value)
-
-        self.x_line_material.setSpecular(AxisColors.X.value)
-        self.y_line_material.setSpecular(AxisColors.Y.value)
-        self.z_line_material.setSpecular(AxisColors.Z.value)
-
-        self.x_line_entity.addComponent(self.x_line_mesh)
-        self.y_line_entity.addComponent(self.y_line_mesh)
-        self.z_line_entity.addComponent(self.z_line_mesh)
-
-        self.x_line_entity.addComponent(self.x_line_material)
-        self.y_line_entity.addComponent(self.y_line_material)
-        self.z_line_entity.addComponent(self.z_line_material)
+        self.add_qcomponents_to_entity(
+            self.x_line_entity, [self.x_line_mesh, self.x_line_material]
+        )
+        self.add_qcomponents_to_entity(
+            self.y_line_entity, [self.y_line_mesh, self.y_line_material]
+        )
+        self.add_qcomponents_to_entity(
+            self.z_line_entity, [self.z_line_mesh, self.z_line_material]
+        )
 
     @staticmethod
     def create_data_array(line_vertices):

@@ -10,7 +10,13 @@ from nexus_constructor.neutron_animation_controller import NeutronAnimationContr
 
 class Gnomon:
     def __init__(
-        self, root_entity, main_camera, beam_material, grey_material, component_adder
+        self,
+        root_entity,
+        main_camera,
+        beam_material,
+        grey_material,
+        component_adder,
+        configure_materials,
     ):
         """
         A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon (or axis indicator).
@@ -79,9 +85,18 @@ class Gnomon:
         self.y_material = Qt3DExtras.QPhongMaterial()
         self.z_material = Qt3DExtras.QPhongMaterial()
 
-        self.prepare_gnomon_material(self.x_material, AxisColors.X.value)
-        self.prepare_gnomon_material(self.y_material, AxisColors.Y.value)
-        self.prepare_gnomon_material(self.z_material, AxisColors.Z.value)
+        self.set_material_properties = configure_materials
+        diffuse = "grey"
+
+        self.set_material_properties(
+            self.x_material, AxisColors.X.value, diffuse, remove_shininess=True
+        )
+        self.set_material_properties(
+            self.y_material, AxisColors.Y.value, diffuse, remove_shininess=True
+        )
+        self.set_material_properties(
+            self.z_material, AxisColors.Z.value, diffuse, remove_shininess=True
+        )
 
         # Initialise beam objects
         self.cylinder_entity = Qt3DCore.QEntity(self.gnomon_root_entity)

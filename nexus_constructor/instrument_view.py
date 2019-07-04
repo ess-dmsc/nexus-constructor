@@ -67,10 +67,14 @@ class InstrumentView(QWidget):
             self.beam_material,
             self.grey_material,
             self.add_qcomponents_to_entity,
+            self.set_material_properties,
         )
         self.gnomon_camera = self.gnomon.get_gnomon_camera()
         self.instrument_view_axes = InstrumentViewAxes(
-            self.component_root_entity, self.view.camera().farPlane()
+            self.component_root_entity,
+            self.view.camera().farPlane(),
+            self.add_qcomponents_to_entity,
+            self.set_material_properties,
         )
 
         self.create_layers()
@@ -185,7 +189,9 @@ class InstrumentView(QWidget):
         pass
 
     @staticmethod
-    def set_material_properties(material, ambient, diffuse, alpha=None):
+    def set_material_properties(
+        material, ambient, diffuse, alpha=None, remove_shininess=False
+    ):
         """
         Set the ambient, diffuse, and alpha properties of a material.
         :param material: The material to be modified.
@@ -193,12 +199,16 @@ class InstrumentView(QWidget):
         :param diffuse: The desired diffuse colour of the material.
         :param alpha: The desired alpha value of the material. Optional argument as not all material-types have this
                       property.
+        :param remove_shininess: Boolean indicating whether or not to remove shininess. This is used for the gnomon.
         """
         material.setAmbient(ambient)
         material.setDiffuse(diffuse)
 
         if alpha is not None:
             material.setAlpha(alpha)
+
+        if remove_shininess:
+            material.setShininess(0)
 
     def give_colours_to_materials(self):
         """
