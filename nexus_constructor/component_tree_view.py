@@ -7,7 +7,7 @@ from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from PySide2.QtGui import QPixmap, QRegion
 import PySide2.QtGui
-from nexus_constructor.transformation_view import EditTranslation
+from nexus_constructor.transformation_view import EditTranslation, EditRotation
 
 class ComponentEditorDelegate(QStyledItemDelegate):
     SettingsFrameMap = {} #{Rotation:RotateSettingsFrame, Translation:TranslateSettingsFrame}
@@ -37,16 +37,13 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             frame.label = QLabel("Transformations", frame)
             frame.layout.addWidget(frame.label)
         elif isinstance(value, ComponentInfo):
-            frame.label = QLabel("Component settings", frame)
+            frame.label = QLabel("(Place holder)", frame)
             frame.layout.addWidget(frame.label)
         elif isinstance(value, TransformationModel):
             if value.type == "Translation":
-                pass
+                frame.transformation_frame = EditTranslation(frame, value)
             elif value.type == "Rotation":
-                pass
-            else:
-                raise NotImplementedError("Unknown transformation type.")
-            frame.transformation_frame = EditTranslation(frame, value)
+                frame.transformation_frame = EditRotation(frame, value)
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
 
         return frame
@@ -66,16 +63,16 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
         frame = self.getFrame(value)
+        frame.transformation_frame.enable()
         frame.setParent(parent)
         self.frameSize = frame.sizeHint()
         return frame
 
     def setEditorData(self, editorWidget, index):
-        model = index.model()
-        editorWidget.setEnabled(True)
+        pass
 
     def setModelData(self, editorWidget, model, index):
-        editorWidget.setEnabled(False)
+        editorWidget.transformation_frame.saveChanges()
 
     def sizeHint(self, option, index):
         model = index.model()
@@ -86,17 +83,3 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
 
-class ComponentTreeView(QTreeView):
-    def __init__(self, parent = None):
-        super().__init__(parent)
-
-    def dragMoveEvent(self, event):
-        print("dragMoveEvent")
-        event.setDropAction(Qt.MoveAction)
-        event.accept()
-
-    def dragLeaveEvent(self, event: PySide2.QtGui.QDragLeaveEvent):
-        print("dragLeaveEvent")
-
-    def dragEnterEvent(self, event: PySide2.QtGui.QDragEnterEvent):
-        print("dragEnterEvent")

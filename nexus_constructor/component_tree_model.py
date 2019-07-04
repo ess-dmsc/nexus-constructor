@@ -132,7 +132,7 @@ class ComponentTreeModel(QAbstractItemModel):
         elif isinstance(parent, TransformationModel):
             raise NotImplementedError("Duplication of transformations not implemented")
 
-    def add_translation(self, parent_index):
+    def add_transformation(self, parent_index, type):
         parentItem = parent_index.internalPointer()
         transformation_list = None
         parent_component = None
@@ -155,14 +155,24 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_component = transformation_list.parent_component
             target_pos = transformation_list.index(parentItem) + 1
             target_index = self.parent(parent_index)
-        new_transformation = parent_component.add_translation(name = get_duplication_name("Translation", transformation_list), vector = QVector3D(1.0, 0, 0))
+        if type == "translation":
+            new_transformation = parent_component.add_translation(
+                name=get_duplication_name("Translation", transformation_list), vector=QVector3D(1.0, 0, 0))
+        elif type == "rotation":
+            new_transformation = parent_component.add_rotation(
+                name=get_duplication_name("Rotation", transformation_list), axis=QVector3D(1.0, 0, 0), angle = 0.0)
+        else:
+            raise ValueError("Unknown transformation type: {}".format(type))
         new_transformation.parent = transformation_list
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
         self.endInsertRows()
 
-    def add_rotation(self, parent):
-        pass
+    def add_translation(self, parent_index):
+        self.add_transformation(parent_index, "translation")
+
+    def add_rotation(self, parent_index):
+        self.add_transformation(parent_index, "rotation")
 
     def dropEvent(self, event: PySide2.QtGui.QDropEvent):
         print("Done dropping")

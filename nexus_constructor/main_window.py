@@ -154,23 +154,29 @@ class MainWindow(Ui_MainWindow):
         if len(selected) > 0:
             self.component_model.duplicate_node(selected[0])
 
-    def on_add_translation(self):
+    def add_transformation(self, type):
         selected = self.componentTreeView.selectedIndexes()
         if len(selected) > 0:
             current_index = selected[0]
-            self.component_model.add_translation(current_index)
+            if type == "translation":
+                self.component_model.add_translation(current_index)
+            elif type == "rotation":
+                self.component_model.add_rotation(current_index)
+            else:
+                raise ValueError("Unknown transformation type: {}".format(type))
             current_pointer = current_index.internalPointer()
-            if not self.componentTreeView.isExpanded(current_index) and (isinstance(current_pointer, TransformationsList) or isinstance(current_pointer,ComponentModel)):
+            if not self.componentTreeView.isExpanded(current_index) and (
+                    isinstance(current_pointer, TransformationsList) or isinstance(current_pointer, ComponentModel)):
                 self.componentTreeView.expand(current_index)
-                if isinstance(current_pointer,ComponentModel):
+                if isinstance(current_pointer, ComponentModel):
                     trans_list_index = self.component_model.index(1, 0, current_index)
                     self.componentTreeView.expand(trans_list_index)
 
+    def on_add_translation(self):
+        self.add_transformation("translation")
 
     def on_add_rotation(self):
-        selected = self.componentTreeView.selectedIndexes()
-        if len(selected) > 0:
-            self.component_model.add_rotation(selected[0])
+        self.add_transformation("rotation")
 
     def set_up_warning_window(self):
         """
