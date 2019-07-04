@@ -1,7 +1,5 @@
-from functools import partial
-
-import h5py
-from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
+from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QAction, QToolBar
+from PySide2.QtGui import QIcon
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.ui_utils import file_dialog
@@ -9,6 +7,10 @@ from ui.main_window import Ui_MainWindow
 import silx.gui.hdf5
 import os
 
+from nexus_constructor.component import ComponentModel
+from nexus_constructor.transformations import TransformationModel, TransformationsList
+from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.nexus_filewriter_json import writer
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
@@ -23,7 +25,6 @@ class MainWindow(Ui_MainWindow):
     def setupUi(self, main_window):
         super().setupUi(main_window)
 
-        self.pushButton.clicked.connect(self.show_add_component_window)
         self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
         self.actionOpen_NeXus_file.triggered.connect(self.open_nexus_file)
         self.actionExport_to_Filewriter_JSON.triggered.connect(
@@ -42,48 +43,91 @@ class MainWindow(Ui_MainWindow):
             self.update_nexus_file_structure_view
         )
         self.verticalLayout.addWidget(self.widget)
-        self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
+        self.instrument.nexus.file_changed.connect(self.update_nexus_file_structure_view)
 
         self.set_up_warning_window()
 
         self.widget.setVisible(True)
 
-    def show_entries_dialog(self, map_of_entries: dict, nexus_file: h5py.File):
-        """
-        Shows the entries dialog when loading a nexus file if there are multiple entries.
-        :param map_of_entries: A map of the entry groups, with the key being the name of the group and value being the actual h5py group object.
-        :param nexus_file: A reference to the nexus file.
-        """
-        self.entries_dialog = QDialog()
-        self.entries_dialog.setMinimumWidth(400)
-        self.entries_dialog.setWindowTitle(
-            "Multiple Entries found. Please choose the entry name from the list."
-        )
-        combo = QComboBox()
+        self.component_model = ComponentTreeModel(self.instrument)
 
-        # Populate the combo box with the names of the entry groups.
-        [combo.addItem(x) for x in map_of_entries.keys()]
+        self.componentTreeView.setDragEnabled(True)
+        self.componentTreeView.setAcceptDrops(True)
+        self.componentTreeView.setDropIndicatorShown(True)
+        self.componentTreeView.header().hide()
+        self.component_delegate = ComponentEditorDelegate(self.componentTreeView)
+        self.componentTreeView.setItemDelegate(self.component_delegate)
+        self.componentTreeView.setModel(self.component_model)
+        self.componentTreeView.updateEditorGeometries()
+        self.componentTreeView.updateGeometries()
+        self.componentTreeView.updateGeometry()
+        self.componentTreeView.clicked.connect(self.on_clicked)
 
-        ok_button = QPushButton()
-        ok_button.setText("OK")
-        ok_button.clicked.connect(self.entries_dialog.close)
+        self.component_tool_bar = QToolBar("Actions", self.tab_2)
+        self.new_component_action = QAction(QIcon("ui/new_component.png"), "New component", self.tab_2)
+        self.new_component_action.triggered.connect(self.show_add_component_window)
+        self.component_tool_bar.addAction(self.new_component_action)
+        self.new_translation_action = QAction(QIcon("ui/new_translation.png"), "New translation", self.tab_2)
+        self.new_translation_action.triggered.connect(self.on_add_translation)
+        self.new_translation_action.setEnabled(False)
+        self.component_tool_bar.addAction(self.new_translation_action)
+        self.new_rotation_action = QAction(QIcon("ui/new_rotation.png"), "New rotation", self.tab_2)
+        self.new_rotation_action.triggered.connect(self.on_add_rotation)
+        self.new_rotation_action.setEnabled(False)
+        self.component_tool_bar.addAction(self.new_rotation_action)
+        self.duplicate_action = QAction(QIcon("ui/duplicate.png"), "Duplicate", self.tab_2)
+        self.component_tool_bar.addAction(self.duplicate_action)
+        self.duplicate_action.triggered.connect(self.on_duplicate_node)
+        self.duplicate_action.setEnabled(False)
+        self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.tab_2)
+        self.delete_action.triggered.connect(self.on_delete_item)
+        self.delete_action.setEnabled(False)
+        self.component_tool_bar.addAction(self.delete_action)
+        self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
-        # Connect the clicked signal of the ok_button to instrument.load_file and pass the file and entry group object.
-        ok_button.clicked.connect(
-            partial(
-                self.instrument.nexus.load_file,
-                map_of_entries[combo.currentText()],
-                nexus_file,
-            )
-        )
+    def set_button_state(self):
+        indices = self.componentTreeView.selectedIndexes()
+        if len(indices) == 0 or len(indices) != 1:
+            self.delete_action.setEnabled(False)
+            self.duplicate_action.setEnabled(False)
+            self.new_rotation_action.setEnabled(False)
+            self.new_translation_action.setEnabled(False)
+        else:
+            selected_object = indices[0].internalPointer()
+            if isinstance(selected_object, ComponentModel) or isinstance(selected_object, TransformationModel):
+                self.delete_action.setEnabled(True)
+                self.duplicate_action.setEnabled(True)
+            else:
+                self.delete_action.setEnabled(False)
+                self.duplicate_action.setEnabled(False)
+            self.new_rotation_action.setEnabled(True)
+            self.new_translation_action.setEnabled(True)
 
-        self.entries_dialog.setLayout(QGridLayout())
-        self.entries_dialog.layout().addWidget(QLabel("Entry:"))
-        self.entries_dialog.layout().addWidget(combo)
-        self.entries_dialog.layout().addWidget(ok_button)
-        self.entries_dialog.show()
+    def on_clicked(self, index):
+        self.set_button_state()
+
+    def on_duplicate_node(self):
+        selected = self.componentTreeView.selectedIndexes()
+        if len(selected) > 0:
+            self.component_model.duplicate_node(selected[0])
+
+    def on_add_translation(self):
+        selected = self.componentTreeView.selectedIndexes()
+        if len(selected) > 0:
+            current_index = selected[0]
+            self.component_model.add_translation(current_index)
+            current_pointer = current_index.internalPointer()
+            if not self.componentTreeView.isExpanded(current_index) and (isinstance(current_pointer, TransformationsList) or isinstance(current_pointer,ComponentModel)):
+                self.componentTreeView.expand(current_index)
+                if isinstance(current_pointer,ComponentModel):
+
+
+    def on_add_rotation(self):
+        selected = self.componentTreeView.selectedIndexes()
+        if len(selected) > 0:
+            self.component_model.add_rotation(selected[0])
 
     def set_up_warning_window(self):
         """
@@ -116,9 +160,10 @@ class MainWindow(Ui_MainWindow):
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
+        self.instrument.nexus.save_file(filename)
         if filename:
             with open(filename, "w") as file:
-                writer.generate_json(self.instrument, file)
+                file.write(writer.generate_json(self.instrument.get_component_list()))
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
@@ -126,6 +171,12 @@ class MainWindow(Ui_MainWindow):
 
     def show_add_component_window(self):
         self.add_component_window = QDialog()
-        self.add_component_window.ui = AddComponentDialog(self.instrument)
+        self.add_component_window.ui = AddComponentDialog(self.instrument, self.component_model)
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
+
+    def on_delete_item(self):
+        selected = self.componentTreeView.selectedIndexes()
+        for item in selected:
+            self.component_model.remove_node(item)
+        self.set_button_state()
