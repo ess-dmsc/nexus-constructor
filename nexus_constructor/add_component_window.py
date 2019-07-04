@@ -1,6 +1,9 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl
+from PySide2.QtWidgets import QListWidgetItem
+
+from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -39,6 +42,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
+        self.possible_fields = []
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -122,6 +126,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+        self.addFieldPushButton.clicked.connect(self.add_field)
+
+        # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
+        self.on_nx_class_changed()
+
+    def add_field(self):
+        item = QListWidgetItem()
+        field = FieldWidget(self.possible_fields, self.fieldsListWidget)
+        item.setSizeHint(field.sizeHint())
+        self.fieldsListWidget.addItem(item)
+        self.fieldsListWidget.setItemWidget(item, field)
 
     def generate_name_suggestion(self):
         """
@@ -142,6 +157,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelOptionsBox.setVisible(
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
+        self.possible_fields = self.nx_component_classes[
+            self.componentTypeComboBox.currentText()
+        ]
 
     def mesh_file_picker(self):
         """
