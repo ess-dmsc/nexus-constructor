@@ -81,6 +81,12 @@ class MainWindow(Ui_MainWindow):
         self.new_rotation_action.triggered.connect(self.on_add_rotation)
         self.new_rotation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_rotation_action)
+
+        self.create_link_action = QAction(QIcon("ui/create_link.png"), "Create link", self.tab_2)
+        self.create_link_action.triggered.connect(self.on_create_link)
+        self.create_link_action.setEnabled(False)
+        self.component_tool_bar.addAction(self.create_link_action)
+
         self.duplicate_action = QAction(QIcon("ui/duplicate.png"), "Duplicate", self.tab_2)
         self.component_tool_bar.addAction(self.duplicate_action)
         self.duplicate_action.triggered.connect(self.on_duplicate_node)
@@ -135,6 +141,7 @@ class MainWindow(Ui_MainWindow):
             self.duplicate_action.setEnabled(False)
             self.new_rotation_action.setEnabled(False)
             self.new_translation_action.setEnabled(False)
+            self.create_link_action.setEnabled(False)
         else:
             selected_object = indices[0].internalPointer()
             if isinstance(selected_object, ComponentModel) or isinstance(selected_object, TransformationModel):
@@ -146,6 +153,26 @@ class MainWindow(Ui_MainWindow):
             self.new_rotation_action.setEnabled(True)
             self.new_translation_action.setEnabled(True)
 
+            if isinstance(selected_object, ComponentModel):
+                if not hasattr(selected_object, "stored_transforms"):
+                    selected_object.stored_transforms = selected_object.transforms
+                if not selected_object.stored_transforms.has_link:
+                    self.create_link_action.setEnabled(True)
+            elif isinstance(selected_object, TransformationsList):
+                if not selected_object.has_link:
+                    self.create_link_action.setEnabled(True)
+            elif isinstance(selected_object, TransformationModel):
+                if not selected_object.parent.has_link:
+                    self.create_link_action.setEnabled(True)
+            else:
+                self.create_link_action.setEnabled(False)
+
+    def on_create_link(self):
+        selected = self.componentTreeView.selectedIndexes()
+        if len(selected) > 0:
+            self.component_model.add_link(selected[0])
+            self.expand_transformation_list(selected[0])
+
     def on_clicked(self, index):
         self.set_button_state()
 
@@ -153,6 +180,23 @@ class MainWindow(Ui_MainWindow):
         selected = self.componentTreeView.selectedIndexes()
         if len(selected) > 0:
             self.component_model.duplicate_node(selected[0])
+            self.expand_transformation_list(selected[0])
+
+    def expand_transformation_list(self, node):
+        current_pointer = node.internalPointer()
+        if isinstance(current_pointer, TransformationsList) or isinstance(current_pointer, ComponentModel):
+            self.componentTreeView.expand(node)
+            if isinstance(current_pointer, ComponentModel):
+                trans_list_index = self.component_model.index(1, 0, node)
+                self.componentTreeView.expand(trans_list_index)
+            else:
+                component_index = self.component_model.parent(node)
+                self.componentTreeView.expand(component_index)
+        elif isinstance(current_pointer, TransformationModel):
+            trans_list_index = self.component_model.parent(node)
+            self.componentTreeView.expand(trans_list_index)
+            component_index = self.component_model.parent(trans_list_index)
+            self.componentTreeView.expand(component_index)
 
     def add_transformation(self, type):
         selected = self.componentTreeView.selectedIndexes()
@@ -164,13 +208,8 @@ class MainWindow(Ui_MainWindow):
                 self.component_model.add_rotation(current_index)
             else:
                 raise ValueError("Unknown transformation type: {}".format(type))
-            current_pointer = current_index.internalPointer()
-            if not self.componentTreeView.isExpanded(current_index) and (
-                    isinstance(current_pointer, TransformationsList) or isinstance(current_pointer, ComponentModel)):
-                self.componentTreeView.expand(current_index)
-                if isinstance(current_pointer, ComponentModel):
-                    trans_list_index = self.component_model.index(1, 0, current_index)
-                    self.componentTreeView.expand(trans_list_index)
+            self.expand_transformation_list(current_index)
+
 
     def on_add_translation(self):
         self.add_transformation("translation")

@@ -39,6 +39,11 @@ class ComponentInfo(object):
         super().__init__()
         self.parent = parent
 
+class LinkTransformation:
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+
 class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, instrument, parent=None):
         super().__init__(parent)
@@ -100,6 +105,9 @@ class ComponentTreeModel(QAbstractItemModel):
                 self.layoutChanged.emit()
                 return True
         return False
+
+    def add_link(self, node):
+        pass
 
     def add_component(self, new_component):
         self.beginInsertRows(QModelIndex(), len(self.components), len(self.components))
@@ -201,6 +209,8 @@ class ComponentTreeModel(QAbstractItemModel):
             else:
                 return QModelIndex()
         elif type(parentItem) is TransformationsList:
+            if parentItem.has_link and row == len(parentItem) - 1:
+                return self.createIndex(row - 1,  0, parentItem.link)
             return self.createIndex(row, 0, parentItem[row])
         raise RuntimeError("Unable to find element.")
 
@@ -219,6 +229,8 @@ class ComponentTreeModel(QAbstractItemModel):
             return self.createIndex(self.components.index(parentItem.parent), 0, parentItem.parent)
         elif issubclass(type(parentItem), TransformationModel):
             return self.createIndex(1, 0, parentItem.parent)
+        elif isinstance(parentItem, LinkTransformation):
+            return self.createIndex(1, 0, parentItem.parent)
         raise RuntimeError("Unknown element type.")
 
     def rowCount(self, parent):
@@ -230,6 +242,8 @@ class ComponentTreeModel(QAbstractItemModel):
         if type(parentItem) is ComponentModel:
             return 2
         elif type(parentItem) is TransformationsList:
+            if parentItem.has_link:
+                return len(parentItem) + 1
             return len(parentItem)
         elif issubclass(type(parentItem), TransformationModel):
             return 0
