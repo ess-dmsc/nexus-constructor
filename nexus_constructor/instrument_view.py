@@ -8,6 +8,10 @@ from PySide2.QtWidgets import QWidget, QVBoxLayout
 from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.off_renderer import OffMesh
+from nexus_constructor.qentity_utils import (
+    add_qcomponents_to_entity,
+    set_material_properties,
+)
 
 
 class InstrumentView(QWidget):
@@ -66,15 +70,10 @@ class InstrumentView(QWidget):
             self.view.camera(),
             self.beam_material,
             self.grey_material,
-            self.add_qcomponents_to_entity,
-            self.set_material_properties,
         )
         self.gnomon_camera = self.gnomon.get_gnomon_camera()
         self.instrument_view_axes = InstrumentViewAxes(
-            self.component_root_entity,
-            self.view.camera().farPlane(),
-            self.add_qcomponents_to_entity,
-            self.set_material_properties,
+            self.component_root_entity, self.view.camera().farPlane()
         )
 
         self.create_layers()
@@ -151,7 +150,7 @@ class InstrumentView(QWidget):
         entity = Qt3DCore.QEntity(self.component_root_entity)
         mesh = OffMesh(geometry.off_geometry)
 
-        self.add_qcomponents_to_entity(entity, [mesh, self.grey_material])
+        add_qcomponents_to_entity(entity, [mesh, self.grey_material])
 
         self.component_meshes[name] = mesh
         self.component_entities[name] = entity
@@ -188,28 +187,6 @@ class InstrumentView(QWidget):
     def delete_single_transformation(self, component_name, transformation_name):
         pass
 
-    @staticmethod
-    def set_material_properties(
-        material, ambient, diffuse, alpha=None, remove_shininess=False
-    ):
-        """
-        Set the ambient, diffuse, and alpha properties of a material.
-        :param material: The material to be modified.
-        :param ambient: The desired ambient colour of the material.
-        :param diffuse: The desired diffuse colour of the material.
-        :param alpha: The desired alpha value of the material. Optional argument as not all material-types have this
-                      property.
-        :param remove_shininess: Boolean indicating whether or not to remove shininess. This is used for the gnomon.
-        """
-        material.setAmbient(ambient)
-        material.setDiffuse(diffuse)
-
-        if alpha is not None:
-            material.setAlpha(alpha)
-
-        if remove_shininess:
-            material.setShininess(0)
-
     def give_colours_to_materials(self):
         """
         Creates several QColours and uses them to configure the different materials that will be used for the objects in
@@ -222,9 +199,9 @@ class InstrumentView(QWidget):
         light_blue = QColor("lightblue")
         dark_red = QColor("#b00")
 
-        self.set_material_properties(self.grey_material, black, grey)
-        self.set_material_properties(self.red_material, red, dark_red)
-        self.set_material_properties(self.beam_material, blue, light_blue, alpha=0.5)
+        set_material_properties(self.grey_material, black, grey)
+        set_material_properties(self.red_material, red, dark_red)
+        set_material_properties(self.beam_material, blue, light_blue, alpha=0.5)
 
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
@@ -244,17 +221,7 @@ class InstrumentView(QWidget):
         Sets up the cube that represents a sample in the 3D view by giving the cube entity a mesh and a material.
         """
         self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
-        self.add_qcomponents_to_entity(
-            self.cube_entity, [self.cube_mesh, self.red_material]
-        )
-
-    @staticmethod
-    def add_qcomponents_to_entity(entity, components):
-        """
-        Takes a QEntity and gives it all of the QComponents that are contained in a list.
-        """
-        for component in components:
-            entity.addComponent(component)
+        add_qcomponents_to_entity(self.cube_entity, [self.cube_mesh, self.red_material])
 
     def initialise_view(self):
         """
