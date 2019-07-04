@@ -108,6 +108,7 @@ class FieldWidget(QFrame):
         self.setFrameShadow(QFrame.Raised)
         self.setFrameShape(QFrame.StyledPanel)
 
+        # Allow selecting this field widget in a list by clicking on it's contents
         self.field_name_edit.installEventFilter(self)
         self.value_line_edit.installEventFilter(self)
         self.value_type_combo.installEventFilter(self)
