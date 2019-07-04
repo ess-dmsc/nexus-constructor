@@ -75,9 +75,9 @@ class Gnomon:
         # Borrowing a method from the InstrumentView
         self.add_qcomponents_to_entity = component_adder
 
-        self.x_material = Qt3DExtras.QDiffuseSpecularMaterial()
-        self.y_material = Qt3DExtras.QDiffuseSpecularMaterial()
-        self.z_material = Qt3DExtras.QDiffuseSpecularMaterial()
+        self.x_material = Qt3DExtras.QPhongMaterial()
+        self.y_material = Qt3DExtras.QPhongMaterial()
+        self.z_material = Qt3DExtras.QPhongMaterial()
 
         self.prepare_gnomon_material(self.x_material, AxisColors.X.value)
         self.prepare_gnomon_material(self.y_material, AxisColors.Y.value)
@@ -122,7 +122,7 @@ class Gnomon:
         :param color: The desired ambient color of the material.
         """
         material.setAmbient(color)
-        # material.setDiffuse(QColor("grey"))
+        material.setDiffuse("grey")
         material.setShininess(0)
 
     @staticmethod
@@ -225,9 +225,10 @@ class Gnomon:
         """
         Prepares the gnomon text by creating text entities and then placing them at the ends of the cones.
         """
-        self.set_axis_label_text(self.x_axis_text, "X", "red")
+        self.set_axis_label_text(self.x_axis_text, "X", AxisColors.X.value)
+        # Pass "green" rather than the Y axis enum value because otherwise the text is too bright
         self.set_axis_label_text(self.y_axis_text, "Y", "green")
-        self.set_axis_label_text(self.z_axis_text, "Z", "blue")
+        self.set_axis_label_text(self.z_axis_text, "Z", AxisColors.Z.value)
         x_label_matrix, y_label_matrix, z_label_matrix = self.create_axis_label_matrices(
             [self.x_text_vector, self.y_text_vector, self.z_text_vector]
         )

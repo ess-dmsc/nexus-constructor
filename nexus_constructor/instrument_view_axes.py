@@ -30,8 +30,6 @@ class InstrumentViewAxes(object):
             QtCore.QByteArray(self.create_data_array(z_line_vertices))
         )
 
-        print(self.create_data_array(x_line_vertices))
-
         self.x_line_mesh = Qt3DRender.QGeometryRenderer()
         self.y_line_mesh = Qt3DRender.QGeometryRenderer()
         self.z_line_mesh = Qt3DRender.QGeometryRenderer()
@@ -48,13 +46,21 @@ class InstrumentViewAxes(object):
         self.y_line_entity = Qt3DCore.QEntity(self.component_root_entity)
         self.z_line_entity = Qt3DCore.QEntity(self.component_root_entity)
 
-        self.x_line_material = Qt3DExtras.QDiffuseSpecularMaterial()
-        self.y_line_material = Qt3DExtras.QDiffuseSpecularMaterial()
-        self.z_line_material = Qt3DExtras.QDiffuseSpecularMaterial()
+        self.x_line_material = Qt3DExtras.QPhongMaterial()
+        self.y_line_material = Qt3DExtras.QPhongMaterial()
+        self.z_line_material = Qt3DExtras.QPhongMaterial()
 
         self.x_line_material.setAmbient(AxisColors.X.value)
         self.y_line_material.setAmbient(AxisColors.Y.value)
         self.z_line_material.setAmbient(AxisColors.Z.value)
+
+        self.x_line_material.setDiffuse(AxisColors.X.value)
+        self.y_line_material.setDiffuse(AxisColors.Y.value)
+        self.z_line_material.setDiffuse(AxisColors.Z.value)
+
+        self.x_line_material.setSpecular(AxisColors.X.value)
+        self.y_line_material.setSpecular(AxisColors.Y.value)
+        self.z_line_material.setSpecular(AxisColors.Z.value)
 
         self.x_line_entity.addComponent(self.x_line_mesh)
         self.y_line_entity.addComponent(self.y_line_mesh)
