@@ -1,7 +1,15 @@
-from PySide2.QtWidgets import QPushButton, QHBoxLayout, QFrame, QComboBox, QDialog
+from PySide2.QtWidgets import (
+    QPushButton,
+    QHBoxLayout,
+    QFrame,
+    QComboBox,
+    QDialog,
+    QListWidget,
+)
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt
 from typing import List
+from nexus_constructor.component import ComponentModel
 
 _field_types = {}
 
@@ -165,3 +173,15 @@ class FieldWidget(QFrame):
             pass
         self.edit_dialog = QDialog()
         self.edit_dialog.show()
+
+
+def add_fields_to_component(component: ComponentModel, fields_widget: QListWidget):
+    """
+    Adds fields from a list widget to a component.
+    :param component: Component to add the field to.
+    :param fields_widget: The field list widget to extract field information such the name and value of each field.
+    """
+    for i in range(fields_widget.count()):
+        widget = fields_widget.itemWidget(fields_widget.item(i))
+        component.set_field(widget.name, widget.value, widget.dtype)
+

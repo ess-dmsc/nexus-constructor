@@ -3,7 +3,7 @@ from enum import Enum
 from PySide2.QtCore import QUrl
 from PySide2.QtWidgets import QListWidgetItem
 
-from nexus_constructor.component_fields import FieldWidget
+from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -212,7 +212,4 @@ class AddComponentDialog(Ui_AddComponentDialog):
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
         component = self.instrument.add_component(component_name, nx_class, description)
-
-        for i in range(self.fieldsListWidget.count()):
-            widget = self.fieldsListWidget.itemWidget(self.fieldsListWidget.item(i))
-            component.set_field(widget.name, widget.value, widget.dtype)
+        add_fields_to_component(component, self.fieldsListWidget)
