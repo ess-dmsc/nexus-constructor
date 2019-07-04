@@ -28,7 +28,7 @@ def calculate_vertices(
     top_centre = axis_direction * height / 2.0
     base_centre = axis_direction * height / -2.0
     radial_direction = get_an_orthogonal_unit_vector(axis_direction).normalized()
-    base_edge = base_centre + radius * radial_direction
+    base_edge = base_centre + (radius * radial_direction)
     vertices = np.vstack(
         (
             qvector3d_to_numpy_array(base_centre),
@@ -64,7 +64,7 @@ class CylindricalGeometry:
                 ValidateDataset(
                     "vertices", shape=(None, 3), attributes={"units": None}
                 ),
-                ValidateDataset("cylinders", (None, 3)),
+                ValidateDataset("cylinders", (3,)),
             ),
         )
         if problems:

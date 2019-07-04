@@ -21,7 +21,7 @@ def test_non_zero_qvector_does_not_raise_error_when_validated():
 
 
 def test_get_an_orthogonal_unit_vector_gives_a_unit_vector():
-    test_vector = QVector3D(2, 6, 3)
+    test_vector = QVector3D(2, -6, 3)
     result_vector = get_an_orthogonal_unit_vector(test_vector)
     assert result_vector.length() == approx(1)
 

@@ -8,6 +8,7 @@ from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
     calculate_vertices,
 )
+from nexus_constructor.geometry.utils import validate_nonzero_qvector
 import numpy as np
 
 
@@ -247,6 +248,7 @@ class Component:
         radius: float = 1.0,
         units: str = "m",
     ) -> CylindricalGeometry:
+        validate_nonzero_qvector(axis_direction)
         shape_group = self.file.create_nx_group(
             "shape", "NXcylindrical_geometry", self.group
         )

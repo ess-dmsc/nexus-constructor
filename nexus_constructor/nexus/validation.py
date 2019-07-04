@@ -40,6 +40,13 @@ class ValidateDataset:
     def _check_shape(self, dataset: h5py.Dataset, problems: List):
         if self.shape is not None:
             dataset_shape = dataset[...].shape
+            dims_in_dataset = len(dataset_shape)
+            expected_dims = len(self.shape)
+            if dims_in_dataset != expected_dims:
+                problems.append(
+                    f"Expected number of dimensions in {self.name} dataset to be {expected_dims} but it was {dims_in_dataset}"
+                )
+                return
             for index, dimension_length in enumerate(self.shape):
                 if dimension_length is not None:
                     if dataset_shape[index] != dimension_length:
@@ -48,17 +55,19 @@ class ValidateDataset:
                         )
 
     def _check_attributes(self, dataset: h5py.Dataset, problems: List):
-        for attribute, value in self.attributes.items():
-            if attribute in dataset.attrs:
-                if dataset.attrs[attribute] != value:
-                    problems.append(
-                        f"Expected {attribute} attribute in {self.name} to have a value of '{value}', instead"
-                        f" it was '{dataset.attrs[attribute]}'"
-                    )
-            else:
-                problems.append(
-                    f"Expected to find {attribute} attribute in {self.name}"
-                )
+        if self.attributes is not None:
+            for attribute, value in self.attributes.items():
+                if value is not None:
+                    if attribute in dataset.attrs:
+                        if dataset.attrs[attribute] != value:
+                            problems.append(
+                                f"Expected {attribute} attribute in {self.name} to have a value of '{value}', instead"
+                                f" it was '{dataset.attrs[attribute]}'"
+                            )
+                    else:
+                        problems.append(
+                            f"Expected to find {attribute} attribute in {self.name}"
+                        )
 
 
 def _check_nx_class(group: h5py.Group, nx_class: str, problems: List):
