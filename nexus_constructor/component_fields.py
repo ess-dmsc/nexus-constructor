@@ -7,7 +7,7 @@ from PySide2.QtWidgets import (
     QListWidget,
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
-from PySide2.QtCore import QStringListModel, Qt, Signal
+from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
 from nexus_constructor.component import ComponentModel
 from enum import Enum
@@ -108,13 +108,12 @@ class FieldWidget(QFrame):
         self.setFrameShadow(QFrame.Raised)
         self.setFrameShape(QFrame.StyledPanel)
 
-        if parent:
-            # Emit something_clicked so the item in the list view can be deleted when selected.
-            self.field_name_edit.cursorPositionChanged.connect(self.something_clicked)
-            self.value_line_edit.cursorPositionChanged.connect(self.something_clicked)
-            self.value_type_combo.highlighted.connect(self.something_clicked)
-            self.field_type_combo.highlighted.connect(self.something_clicked)
-            self.nx_class_combo.highlighted.connect(self.something_clicked)
+        self.field_name_edit.installEventFilter(self)
+        self.value_line_edit.installEventFilter(self)
+        self.value_type_combo.installEventFilter(self)
+        self.field_type_combo.installEventFilter(self)
+        self.nx_class_combo.installEventFilter(self)
+        self.edit_button.installEventFilter(self)
 
         # Set the layout for the default field type
         self.field_type_changed()
@@ -140,6 +139,13 @@ class FieldWidget(QFrame):
             return DATASET_TYPE[self.value_type_combo.currentText()](
                 self.value_line_edit.text()
             )
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
+        if event.type() == QEvent.MouseButtonPress:
+            self.something_clicked.emit()
+            return True
+        else:
+            return False
 
     def field_type_changed(self):
         if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
