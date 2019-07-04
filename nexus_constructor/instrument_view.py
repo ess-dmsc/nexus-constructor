@@ -5,7 +5,6 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QVector3D, QColor
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 
-from nexus_constructor.InstrumentViewAxes import InstrumentViewAxes
 from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.off_renderer import OffMesh
 
@@ -58,11 +57,7 @@ class InstrumentView(QWidget):
         self.cube_entity = Qt3DCore.QEntity(self.component_root_entity)
         self.cube_mesh = Qt3DExtras.QCuboidMesh()
 
-        self.axes = InstrumentViewAxes(
-            self.component_root_entity,
-            self.view.camera().farPlane(),
-            self.add_qcomponents_to_entity,
-        )
+        self.beam_cylinder_length = 40
 
         # Create the gnomon resources and get its camera
         self.gnomon = Gnomon(
@@ -254,6 +249,5 @@ class InstrumentView(QWidget):
         """
         self.give_colours_to_materials()
         self.setup_sample_cube()
-        self.axes.setup_cylinders()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()
