@@ -191,13 +191,6 @@ def test_GIVEN_animation_parameters_WHEN_calling_set_neutron_animation_propertie
     time_span_offset = 5
 
     mock_neutron_animation = Mock()
-    mock_neutron_animation.setTargetObject = Mock()
-    mock_neutron_animation.setPropertyName = Mock()
-    mock_neutron_animation.setStartValue = Mock()
-    mock_neutron_animation.setEndValue = Mock()
-    mock_neutron_animation.setDuration = Mock()
-    mock_neutron_animation.setLoopCount = Mock()
-    mock_neutron_animation.start = Mock()
 
     Gnomon.set_neutron_animation_properties(
         mock_neutron_animation,
@@ -224,9 +217,6 @@ def test_GIVEN_cylinder_dimensions_WHEN_calling_set_cylinder_mesh_dimensions_THE
     rings = 2
 
     mock_cylinder = Mock()
-    mock_cylinder.setRadius = Mock()
-    mock_cylinder.setLength = Mock()
-    mock_cylinder.setRings = Mock()
 
     Gnomon.set_cylinder_mesh_dimensions(mock_cylinder, radius, length, rings)
 
@@ -255,7 +245,6 @@ def test_GIVEN_radius_WHEN_calling_set_sphere_mesh_radius_THEN_radius_set():
 
     radius = 2
     mock_sphere_mesh = Mock()
-    mock_sphere_mesh.setRadius = Mock()
 
     Gnomon.set_sphere_mesh_radius(mock_sphere_mesh, radius)
 
