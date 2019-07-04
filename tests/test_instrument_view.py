@@ -10,9 +10,6 @@ def test_GIVEN_cube_dimensions_WHEN_calling_set_cube_mesh_dimesions_THEN_dimensi
     z = 1
 
     mock_cube_mesh = Mock()
-    mock_cube_mesh.setXExtent = Mock()
-    mock_cube_mesh.setYExtent = Mock()
-    mock_cube_mesh.setZExtent = Mock()
 
     InstrumentView.set_cube_mesh_dimensions(mock_cube_mesh, x, y, z)
 
