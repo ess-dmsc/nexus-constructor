@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Thu Jun 13 16:16:47 2019
+# Created: Thu Jul  4 09:32:20 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -179,9 +179,9 @@ class Ui_AddComponentDialog(object):
         self.fieldsBox.setObjectName("fieldsBox")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.fieldsBox)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.fieldsLineEdit = QtWidgets.QLineEdit(self.fieldsBox)
-        self.fieldsLineEdit.setObjectName("fieldsLineEdit")
-        self.verticalLayout.addWidget(self.fieldsLineEdit)
+        self.addFieldPushButton = QtWidgets.QPushButton(self.fieldsBox)
+        self.addFieldPushButton.setObjectName("addFieldPushButton")
+        self.verticalLayout.addWidget(self.addFieldPushButton)
         self.fieldsListView = QtWidgets.QListView(self.fieldsBox)
         self.fieldsListView.setObjectName("fieldsListView")
         self.verticalLayout.addWidget(self.fieldsListView)
@@ -228,4 +228,5 @@ class Ui_AddComponentDialog(object):
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
+        self.addFieldPushButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Add field", None, -1))
 

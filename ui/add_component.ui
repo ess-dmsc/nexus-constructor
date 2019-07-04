@@ -300,7 +300,11 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <widget class="QLineEdit" name="fieldsLineEdit"/>
+            <widget class="QPushButton" name="addFieldPushButton">
+             <property name="text">
+              <string>Add field</string>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QListView" name="fieldsListView"/>
