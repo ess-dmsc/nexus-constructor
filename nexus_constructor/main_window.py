@@ -7,6 +7,9 @@ from ui.main_window import Ui_MainWindow
 import silx.gui.hdf5
 import os
 
+from functools import partial
+import h5py
+
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
@@ -43,6 +46,7 @@ class MainWindow(Ui_MainWindow):
             self.update_nexus_file_structure_view
         )
         self.verticalLayout.addWidget(self.widget)
+        self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
         self.instrument.nexus.file_changed.connect(self.update_nexus_file_structure_view)
@@ -87,6 +91,43 @@ class MainWindow(Ui_MainWindow):
         self.component_tool_bar.addAction(self.delete_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
+    def show_entries_dialog(self, map_of_entries: dict, nexus_file: h5py.File):
+        """
+        Shows the entries dialog when loading a nexus file if there are multiple entries.
+        :param map_of_entries: A map of the entry groups, with the key being the name of the group and value being the actual h5py group object.
+        :param nexus_file: A reference to the nexus file.
+        """
+        self.entries_dialog = QDialog()
+        self.entries_dialog.setMinimumWidth(400)
+        self.entries_dialog.setWindowTitle(
+            "Multiple Entries found. Please choose the entry name from the list."
+        )
+        combo = QComboBox()
+
+        # Populate the combo box with the names of the entry groups.
+        [combo.addItem(x) for x in map_of_entries.keys()]
+
+        ok_button = QPushButton()
+
+        ok_button.setText("OK")
+        ok_button.clicked.connect(self.entries_dialog.close)
+
+        # Connect the clicked signal of the ok_button to instrument.load_file and pass the file and entry group object.
+        ok_button.clicked.connect(
+            partial(
+                self.instrument.nexus.load_file,
+                map_of_entries[combo.currentText()],
+                nexus_file,
+            )
+        )
+
+        self.entries_dialog.setLayout(QGridLayout())
+
+        self.entries_dialog.layout().addWidget(QLabel("Entry:"))
+        self.entries_dialog.layout().addWidget(combo)
+        self.entries_dialog.layout().addWidget(ok_button)
+        self.entries_dialog.show()
+
     def set_button_state(self):
         indices = self.componentTreeView.selectedIndexes()
         if len(indices) == 0 or len(indices) != 1:
@@ -122,6 +163,8 @@ class MainWindow(Ui_MainWindow):
             if not self.componentTreeView.isExpanded(current_index) and (isinstance(current_pointer, TransformationsList) or isinstance(current_pointer,ComponentModel)):
                 self.componentTreeView.expand(current_index)
                 if isinstance(current_pointer,ComponentModel):
+                    trans_list_index = self.component_model.index(1, 0, current_index)
+                    self.componentTreeView.expand(trans_list_index)
 
 
     def on_add_rotation(self):
