@@ -4,6 +4,11 @@ from PySide2.Qt3DRender import Qt3DRender
 
 class LineGeometry(Qt3DRender.QGeometry):
     def __init__(self, vertex_data: QtCore.QByteArray, parent=None):
+        """
+        Geometry for depicting a line. Used for axes placed in the origin of the instrument view.
+        :param vertex_data: A byte array containing the coordinates for the start and end points of the line.
+        :param parent: The object parent.
+        """
         Qt3DRender.QGeometry.__init__(self, parent)
         self.m_position_buffer = Qt3DRender.QBuffer(self)
         self.m_position_buffer.setUsage(Qt3DRender.QBuffer.StaticDraw)

@@ -24,6 +24,8 @@ class InstrumentViewAxes(object):
         self.component_root_entity = component_root_entity
         self.line_length = far_plane
 
+        # The array given to the LineGeometry must be in the form [start_x, start_y, start_z, end_x, end_y, end_z].
+        # All lines start at the origin for the first three elements are the same.
         origin = [0, 0, 0]
         x_line_vertices = origin + [far_plane, 0, 0]
         y_line_vertices = origin + [0, far_plane, 0]
