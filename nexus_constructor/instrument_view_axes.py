@@ -4,8 +4,8 @@ from PySide2 import QtCore
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
-from PySide2.QtGui import QColor
 
+from nexus_constructor.axis_colors import AxisColors
 from nexus_constructor.line_geometry import LineGeometry
 
 
@@ -48,16 +48,13 @@ class InstrumentViewAxes(object):
         self.y_line_entity = Qt3DCore.QEntity(self.component_root_entity)
         self.z_line_entity = Qt3DCore.QEntity(self.component_root_entity)
 
-        self.x_line_material = Qt3DExtras.QPhongMaterial()
-        self.y_line_material = Qt3DExtras.QPhongMaterial()
-        self.z_line_material = Qt3DExtras.QPhongMaterial()
+        self.x_line_material = Qt3DExtras.QDiffuseSpecularMaterial()
+        self.y_line_material = Qt3DExtras.QDiffuseSpecularMaterial()
+        self.z_line_material = Qt3DExtras.QDiffuseSpecularMaterial()
 
-        self.x_line_material.setAmbient(QColor("black"))
-        self.y_line_material.setAmbient(QColor("black"))
-        self.z_line_material.setAmbient(QColor("black"))
-        self.x_line_material.setDiffuse(QColor("black"))
-        self.y_line_material.setDiffuse(QColor("black"))
-        self.z_line_material.setDiffuse(QColor("black"))
+        self.x_line_material.setAmbient(AxisColors.X.value)
+        self.y_line_material.setAmbient(AxisColors.Y.value)
+        self.z_line_material.setAmbient(AxisColors.Z.value)
 
         self.x_line_entity.addComponent(self.x_line_mesh)
         self.y_line_entity.addComponent(self.y_line_mesh)

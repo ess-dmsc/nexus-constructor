@@ -4,6 +4,7 @@ from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
 
+from nexus_constructor.axis_colors import AxisColors
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
 
 
@@ -74,13 +75,13 @@ class Gnomon:
         # Borrowing a method from the InstrumentView
         self.add_qcomponents_to_entity = component_adder
 
-        self.x_material = Qt3DExtras.QPhongMaterial()
-        self.y_material = Qt3DExtras.QPhongMaterial()
-        self.z_material = Qt3DExtras.QPhongMaterial()
+        self.x_material = Qt3DExtras.QDiffuseSpecularMaterial()
+        self.y_material = Qt3DExtras.QDiffuseSpecularMaterial()
+        self.z_material = Qt3DExtras.QDiffuseSpecularMaterial()
 
-        self.prepare_gnomon_material(self.x_material, "red")
-        self.prepare_gnomon_material(self.y_material, "green")
-        self.prepare_gnomon_material(self.z_material, "blue")
+        self.prepare_gnomon_material(self.x_material, AxisColors.X.value)
+        self.prepare_gnomon_material(self.y_material, AxisColors.Y.value)
+        self.prepare_gnomon_material(self.z_material, AxisColors.Z.value)
 
         # Initialise beam objects
         self.cylinder_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
@@ -121,7 +122,7 @@ class Gnomon:
         :param color: The desired ambient color of the material.
         """
         material.setAmbient(color)
-        material.setDiffuse(QColor("grey"))
+        # material.setDiffuse(QColor("grey"))
         material.setShininess(0)
 
     @staticmethod
