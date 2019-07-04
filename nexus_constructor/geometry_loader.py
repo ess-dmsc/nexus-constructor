@@ -25,10 +25,8 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
         with open(filename) as file:
             return load_geometry_from_file_object(file, extension, units, geometry)
     except UnicodeDecodeError:
-        """
-        Try again in case the file is in binary. At least one of these should work when a user selects a file because
-        GeometryFileValidator inspects the file beforehand to check that it's valid.
-        """
+        # Try again in case the file is in binary. At least one of these should work when a user selects a file because
+        # GeometryFileValidator inspects the file beforehand to check that it's valid.
         with open(filename, "rb") as file:
             return load_geometry_from_file_object(file, extension, units, geometry)
 

@@ -96,7 +96,7 @@ def test_dependents_list_is_created_by_instrument():
     transform_4.attrs["depends_on"] = transform_2.name
 
     nexus_wrapper = NexusWrapper("test_file_with_transforms")
-    nexus_wrapper._load_file(in_memory_test_file)
+    nexus_wrapper.load_file(entry_group, in_memory_test_file)
     Instrument(nexus_wrapper)
 
     transform_1_loaded = TransformationModel(nexus_wrapper, transform_1)
