@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Thu Jul  4 09:32:20 2019
+# Created: Thu Jul  4 09:35:57 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -182,9 +182,9 @@ class Ui_AddComponentDialog(object):
         self.addFieldPushButton = QtWidgets.QPushButton(self.fieldsBox)
         self.addFieldPushButton.setObjectName("addFieldPushButton")
         self.verticalLayout.addWidget(self.addFieldPushButton)
-        self.fieldsListView = QtWidgets.QListView(self.fieldsBox)
-        self.fieldsListView.setObjectName("fieldsListView")
-        self.verticalLayout.addWidget(self.fieldsListView)
+        self.fieldsListWidget = QtWidgets.QListWidget(self.fieldsBox)
+        self.fieldsListWidget.setObjectName("fieldsListWidget")
+        self.verticalLayout.addWidget(self.fieldsListWidget)
         self.verticalLayout_2.addWidget(self.fieldsBox)
         self.verticalLayout_2.setStretch(5, 1)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)

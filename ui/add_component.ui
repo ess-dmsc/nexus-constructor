@@ -307,7 +307,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QListView" name="fieldsListView"/>
+            <widget class="QListWidget" name="fieldsListWidget"/>
            </item>
           </layout>
          </widget>
