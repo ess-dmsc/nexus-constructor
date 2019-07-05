@@ -11,7 +11,7 @@ def set_material_properties(
     diffuse: QColor,
     alpha: float = None,
     remove_shininess: bool = False,
-) -> None:
+):
     """
     Set the ambient, diffuse, and alpha properties of a material.
     :param material: The material to be modified.
@@ -33,7 +33,7 @@ def set_material_properties(
 
 def add_qcomponents_to_entity(
     entity: Qt3DCore.QEntity, components: List[Qt3DCore.QComponent]
-) -> None:
+):
     """
     Takes a QEntity and gives it all of the QComponents that are contained in a list.
     """
