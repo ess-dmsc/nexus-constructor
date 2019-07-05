@@ -1,6 +1,17 @@
+from typing import List
+
+from PySide2.Qt3DCore import Qt3DCore
+from PySide2.Qt3DRender import Qt3DRender
+from PySide2.QtGui import QColor
+
+
 def set_material_properties(
-    material, ambient, diffuse, alpha=None, remove_shininess=False
-):
+    material: Qt3DRender.QMaterial,
+    ambient: QColor,
+    diffuse: QColor,
+    alpha: float = None,
+    remove_shininess: bool = False,
+) -> None:
     """
     Set the ambient, diffuse, and alpha properties of a material.
     :param material: The material to be modified.
@@ -20,7 +31,9 @@ def set_material_properties(
         material.setShininess(0)
 
 
-def add_qcomponents_to_entity(entity, components):
+def add_qcomponents_to_entity(
+    entity: Qt3DCore.QEntity, components: List[Qt3DCore.QComponent]
+) -> None:
     """
     Takes a QEntity and gives it all of the QComponents that are contained in a list.
     """
