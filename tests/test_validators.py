@@ -1,7 +1,15 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
 import attr
 from typing import List
-from nexus_constructor.validators import NameValidator, UnitValidator
+
+from mock import Mock
+
+from nexus_constructor.validators import (
+    NameValidator,
+    UnitValidator,
+    FieldValueValidator,
+    FieldType,
+)
 from PySide2.QtGui import QValidator
 
 
@@ -96,3 +104,45 @@ def test_unit_validator():
 
     for unit in not_lengths:
         assert validator.validate(unit, 0) == QValidator.Intermediate
+
+
+def test_GIVEN_empty_string_WHEN_validating_field_value_THEN_returns_intermediate_and_emits_signal_with_false():
+    validator = FieldValueValidator(object, object)
+    validator.is_valid = Mock()
+
+    assert validator.validate("", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+class DummyCombo:
+    def __init__(self, current_item):
+        self.current_text = current_item
+
+    def currentText(self):
+        return self.current_text
+
+
+def test_GIVEN_valid_string_value_WHEN_validating_field_value_THEN_returns_acceptable_and_emits_signal_with_true():
+    strvalue = "123a"
+
+    field_type_combo = DummyCombo(FieldType.scalar_dataset.value)
+    dataset_type_combo = DummyCombo("String")
+
+    validator = FieldValueValidator(field_type_combo, dataset_type_combo)
+    validator.is_valid = Mock()
+
+    assert validator.validate(strvalue, 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_invalid_float_value_WHEN_validating_field_value_THEN_returns_intermediate_and_emits_signal_with_false():
+    invalid_value = "sdfn"
+
+    field_type_combo = DummyCombo(FieldType.scalar_dataset.value)
+    dataset_type_combo = DummyCombo("Float")
+
+    validator = FieldValueValidator(field_type_combo, dataset_type_combo)
+    validator.is_valid = Mock()
+
+    assert validator.validate(invalid_value, 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)

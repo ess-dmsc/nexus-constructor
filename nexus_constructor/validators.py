@@ -6,6 +6,8 @@ from typing import List
 import numpy as np
 from enum import Enum
 
+from PySide2.QtWidgets import QComboBox
+
 
 class UnitValidator(QValidator):
     """
@@ -182,12 +184,12 @@ class FieldValueValidator(QValidator):
     Validates the field value line edit to check that the entered string is castable to the selected numpy type. 
     """
 
-    def __init__(self, field_type_combo, dataset_type_combo):
+    def __init__(self, field_type_combo: QComboBox, dataset_type_combo: QComboBox):
         super().__init__()
         self.field_type_combo = field_type_combo
         self.dataset_type_combo = dataset_type_combo
 
-    def validate(self, input: str, pos: int):
+    def validate(self, input: str, pos: int) -> QValidator.State:
         """
         Validates against being blank and the correct numpy type
         :param input: the current string of the field value
@@ -203,7 +205,7 @@ class FieldValueValidator(QValidator):
                 return self._emit_and_return(False)
         return self._emit_and_return(True)
 
-    def _emit_and_return(self, valid: bool):
+    def _emit_and_return(self, valid: bool) -> QValidator.State:
         self.is_valid.emit(valid)
         return QValidator.Acceptable if valid else QValidator.Intermediate
 
