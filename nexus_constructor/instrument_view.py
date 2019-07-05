@@ -62,8 +62,6 @@ class InstrumentView(QWidget):
         self.cube_entity = Qt3DCore.QEntity(self.component_root_entity)
         self.cube_mesh = Qt3DExtras.QCuboidMesh()
 
-        self.beam_cylinder_length = 40
-
         # Create the gnomon resources and get its camera
         self.gnomon = Gnomon(
             self.gnomon_root_entity,
