@@ -12,24 +12,9 @@ from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
 from nexus_constructor.component import ComponentModel
-import numpy as np
 
 from nexus_constructor.ui_utils import validate_line_edit
-from nexus_constructor.validators import FieldValueValidator, FieldType
-
-DATASET_TYPE = {
-    "Byte": np.byte,
-    "Unsigned Byte": np.ubyte,
-    "Short": np.short,
-    "Unsigned Short": np.ushort,
-    "Integer": np.intc,
-    "Unsigned Integer": np.uintc,
-    "Long": np.int_,
-    "Unsigned Long": np.uint,
-    "Float": np.single,
-    "Double": np.double,
-    "String": np.string_,
-}
+from nexus_constructor.validators import FieldValueValidator, FieldType, DATASET_TYPE
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -74,8 +59,13 @@ class FieldWidget(QFrame):
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
+        self.value_type_combo = QComboBox()
+        self.value_type_combo.addItems(list(DATASET_TYPE.keys()))
+
         self.value_line_edit = QLineEdit()
-        self.value_line_edit.setValidator(FieldValueValidator(self.field_type_combo))
+        self.value_line_edit.setValidator(
+            FieldValueValidator(self.field_type_combo, self.value_type_combo)
+        )
         self.value_line_edit.validator().is_valid.connect(
             partial(
                 validate_line_edit,
@@ -94,9 +84,6 @@ class FieldWidget(QFrame):
         self.edit_button.setMaximumWidth(edit_button_size)
         self.edit_button.setSizePolicy(fix_horizontal_size)
         self.edit_button.clicked.connect(self.show_edit_dialog)
-
-        self.value_type_combo = QComboBox()
-        self.value_type_combo.addItems(list(DATASET_TYPE.keys()))
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.field_name_edit)

@@ -1,10 +1,9 @@
-"""Validators to be used on QML input fields"""
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator
 import pint
 import os
 from typing import List
-
+import numpy as np
 from enum import Enum
 
 
@@ -163,14 +162,30 @@ class FieldType(Enum):
     nx_class = "NX class/group"
 
 
+DATASET_TYPE = {
+    "Byte": np.byte,
+    "Unsigned Byte": np.ubyte,
+    "Short": np.short,
+    "Unsigned Short": np.ushort,
+    "Integer": np.intc,
+    "Unsigned Integer": np.uintc,
+    "Long": np.int_,
+    "Unsigned Long": np.uint,
+    "Float": np.single,
+    "Double": np.double,
+    "String": np.string_,
+}
+
+
 class FieldValueValidator(QValidator):
     """
     Validates the field value line edit to check that the entered string is castable to the selected numpy type. 
     """
 
-    def __init__(self, field_type_combo):
+    def __init__(self, field_type_combo, dataset_type_combo):
         super().__init__()
-        self.field_type = field_type_combo
+        self.field_type_combo = field_type_combo
+        self.dataset_type_combo = dataset_type_combo
 
     def validate(self, input: str, pos: int):
         """
@@ -181,11 +196,12 @@ class FieldValueValidator(QValidator):
         """
         if not input:  # More criteria here
             return self._emit_and_return(False)
-        elif self.field_type.currentText() == FieldType.scalar_dataset.value:
-            print("got here")
-            return self._emit_and_return(False)
-        else:
-            return self._emit_and_return(True)
+        elif self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
+            try:
+                DATASET_TYPE[self.dataset_type_combo.currentText()](input)
+            except:
+                return self._emit_and_return(False)
+        return self._emit_and_return(True)
 
     def _emit_and_return(self, valid: bool):
         self.is_valid.emit(valid)
