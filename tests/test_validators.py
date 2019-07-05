@@ -162,7 +162,7 @@ def test_GIVEN_invalid_file_WHEN_validating_geometry_file_THEN_returns_intermedi
     validator = GeometryFileValidator([])
 
     validator.is_valid = Mock()
-    validator.is_file = lambda: False
+    validator.is_file = lambda x: False
 
     assert validator.validate("", 0) == QValidator.Intermediate
     validator.is_valid.emit.assert_called_once_with(False)
