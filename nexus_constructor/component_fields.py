@@ -1,3 +1,6 @@
+from functools import partial
+
+from PySide2.QtGui import QValidator
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
@@ -12,6 +15,9 @@ from typing import List
 from nexus_constructor.component import ComponentModel
 from enum import Enum
 import numpy as np
+
+from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import FieldValueValidator
 
 _field_types = {}
 
@@ -82,6 +88,17 @@ class FieldWidget(QFrame):
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
         self.value_line_edit = QLineEdit()
+        self.value_line_edit.setValidator(FieldValueValidator(self.field_type_combo))
+        self.value_line_edit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.value_line_edit,
+                tooltip_on_accept="Value is cast-able to numpy type.",
+                tooltip_on_reject="Value is not cast-able to selected numpy type.",
+            )
+        )
+
+
         self.nx_class_combo = QComboBox()
 
         self.edit_button = QPushButton("Edit")
