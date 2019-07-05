@@ -1,6 +1,5 @@
 from functools import partial
 
-from PySide2.QtGui import QValidator
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
@@ -13,22 +12,10 @@ from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
 from nexus_constructor.component import ComponentModel
-from enum import Enum
 import numpy as np
 
 from nexus_constructor.ui_utils import validate_line_edit
-from nexus_constructor.validators import FieldValueValidator
-
-_field_types = {}
-
-
-class FieldType(Enum):
-    scalar_dataset = "Scalar dataset"
-    array_dataset = "Array dataset"
-    kafka_stream = "Kafka stream"
-    link = "Link"
-    nx_class = "NX class/group"
-
+from nexus_constructor.validators import FieldValueValidator, FieldType
 
 DATASET_TYPE = {
     "Byte": np.byte,
@@ -97,7 +84,7 @@ class FieldWidget(QFrame):
                 tooltip_on_reject="Value is not cast-able to selected numpy type.",
             )
         )
-
+        self.value_line_edit.validator().validate(self.value_line_edit.text(), 0)
 
         self.nx_class_combo = QComboBox()
 

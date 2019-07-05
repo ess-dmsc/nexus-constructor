@@ -5,6 +5,8 @@ import pint
 import os
 from typing import List
 
+from enum import Enum
+
 
 class UnitValidator(QValidator):
     """
@@ -153,6 +155,14 @@ class OkValidator(QObject):
     is_valid = Signal(bool)
 
 
+class FieldType(Enum):
+    scalar_dataset = "Scalar dataset"
+    array_dataset = "Array dataset"
+    kafka_stream = "Kafka stream"
+    link = "Link"
+    nx_class = "NX class/group"
+
+
 class FieldValueValidator(QValidator):
     """
     Validates the field value line edit to check that the entered string is castable to the selected numpy type. 
@@ -170,10 +180,15 @@ class FieldValueValidator(QValidator):
         :return: QValidator state (Acceptable, Intermediate, Invalid) - returning intermediate because invalid stops the user from typing.
         """
         if not input:  # More criteria here
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
+            return self._emit_and_return(False)
+        elif self.field_type.currentText() == FieldType.scalar_dataset.value:
+            print("got here")
+            return self._emit_and_return(False)
         else:
-            self.is_valid.emit(True)
-            return QValidator.Acceptable
+            return self._emit_and_return(True)
+
+    def _emit_and_return(self, valid: bool):
+        self.is_valid.emit(valid)
+        return QValidator.Acceptable if valid else QValidator.Intermediate
 
     is_valid = Signal(bool)
