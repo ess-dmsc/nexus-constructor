@@ -87,7 +87,7 @@ class GeometryFileValidator(QValidator):
     def __init__(self, file_types):
         """
 
-        :param file_types:
+        :param file_types: dict of file extensions that are valid.
         """
         super().__init__()
         self.file_types = file_types
@@ -96,16 +96,19 @@ class GeometryFileValidator(QValidator):
         if not input:
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        if not os.path.isfile(input):
+        if not self.is_file(input):
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        for suffixes in GEOMETRY_FILE_TYPES.values():
+        for suffixes in self.file_types.values():
             for suff in suffixes:
                 if input.endswith(f".{suff}"):
                     self.is_valid.emit(True)
                     return QValidator.Acceptable
         self.is_valid.emit(False)
         return QValidator.Invalid
+
+    def is_file(self, input):
+        return os.path.isfile(input)
 
     is_valid = Signal(bool)
 
