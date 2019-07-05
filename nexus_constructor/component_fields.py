@@ -1,5 +1,4 @@
 from functools import partial
-
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
@@ -12,7 +11,7 @@ from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
 from nexus_constructor.component import ComponentModel
-
+import numpy as np
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import FieldValueValidator, FieldType, DATASET_TYPE
 
