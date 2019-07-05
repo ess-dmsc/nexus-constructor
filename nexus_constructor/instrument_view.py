@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
@@ -24,6 +26,10 @@ class InstrumentView(QWidget):
         self.view.defaultFrameGraph().setClearColor(QColor("lightgrey"))
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
+
+        # Make sure that the size of the gnomon stays the same when the 3D view is resized
+        self.view.heightChanged.connect(self.update_gnomon_size)
+        self.view.widthChanged.connect(self.update_gnomon_size)
 
         # Set up view surface selector for filtering
         self.surface_selector = Qt3DRender.QRenderSurfaceSelector()
@@ -69,6 +75,12 @@ class InstrumentView(QWidget):
         )
         self.gnomon_camera = self.gnomon.get_gnomon_camera()
 
+        # Keep a reference to the gnomon viewport so that it can be resized to preserve the original size of the gnomon
+        self.gnomon_viewport = None
+
+        # Choose a fixed height and width for the gnomon so that this can be preserved when the 3D view is resized
+        self.gnomon_height = self.gnomon_width = 140
+
         self.create_layers()
         self.initialise_view()
 
@@ -99,21 +111,44 @@ class InstrumentView(QWidget):
         component_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
         component_clear_buffers.setClearColor(QColor("lightgrey"))
 
-        gnomon_size = 0.2
-        gnomon_start = 1 - gnomon_size
-
         # Create a viewport for gnomon in small section of the screen
-        gnomon_viewport = Qt3DRender.QViewport(self.surface_selector)
-        gnomon_viewport.setNormalizedRect(
-            QRectF(gnomon_start, gnomon_start, gnomon_size, gnomon_size)
-        )
+        self.gnomon_viewport = Qt3DRender.QViewport(self.surface_selector)
+        self.update_gnomon_size()
 
         # Filter out the gnomon for just the gnomon camera to see
         self.create_camera_filter(
-            gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
+            self.gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
         )
 
         self.gnomon.update_gnomon()
+
+    def update_gnomon_size(self):
+        """
+        Ensures that the gnomon retains its size when the size of the 3D view has been changed. Calculates the desired
+        gnomon size as a proportion of the current window size and passes these values to the gnomon viewport.
+        """
+        height_ratio, width_ratio = self.calculate_gnomon_rect(
+            self.view.height(), self.view.width(), self.gnomon_height, self.gnomon_width
+        )
+        self.gnomon_viewport.setNormalizedRect(
+            QRectF(1 - width_ratio, 1 - height_ratio, width_ratio, height_ratio)
+        )
+
+    @staticmethod
+    def calculate_gnomon_rect(
+        view_height: float, view_width: float, gnomon_height: float, gnomon_width: float
+    ) -> Tuple[float, float]:
+        """
+        Finds the ratio of the desired gnomon height/width to the current 3D view height/width.
+        :param view_height: The current 3D view height.
+        :param view_width: The current 3D view width.
+        :param gnomon_height: The desired gnomon height.
+        :param gnomon_width: The desired gnomon width.
+        :return: The gnomon height/width ratios that are required to determine the size of the gnomon viewport.
+        """
+        height_ratio = gnomon_height / view_height
+        width_ratio = gnomon_width / view_width
+        return height_ratio, width_ratio
 
     @staticmethod
     def create_camera_filter(viewport, visible_entity, camera_to_filter):
