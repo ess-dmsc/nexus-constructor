@@ -201,7 +201,7 @@ class FieldValueValidator(QValidator):
         elif self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
             try:
                 DATASET_TYPE[self.dataset_type_combo.currentText()](input)
-            except:
+            except ValueError:
                 return self._emit_and_return(False)
         return self._emit_and_return(True)
 
