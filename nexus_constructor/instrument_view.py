@@ -7,7 +7,7 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QVector3D, QColor
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 
-from nexus_constructor.custom_3d_window import Custom3DWindow
+from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.off_renderer import OffMesh
@@ -28,7 +28,7 @@ class InstrumentView(QWidget):
     def __init__(self, parent):
         super().__init__()
         lay = QVBoxLayout(self)
-        self.view = Custom3DWindow()
+        self.view = InstrumentZooming3DWindow()
         self.view.defaultFrameGraph().setClearColor(QColor("lightgrey"))
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
