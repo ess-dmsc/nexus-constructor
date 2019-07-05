@@ -1,15 +1,15 @@
+import os
 from functools import partial
 
 import h5py
+import silx.gui.hdf5
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
-from nexus_constructor.instrument import Instrument
+
 from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.nexus_filewriter_json import writer
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
-import silx.gui.hdf5
-import os
-
-from nexus_constructor.nexus_filewriter_json import writer
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
@@ -24,6 +24,9 @@ class MainWindow(Ui_MainWindow):
         super().setupUi(main_window)
 
         self.pushButton.clicked.connect(self.show_add_component_window)
+        self.pushButton.clicked.connect(
+            self.sceneWidget.make_camera_view_component_entity
+        )
         self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
         self.actionOpen_NeXus_file.triggered.connect(self.open_nexus_file)
         self.actionExport_to_Filewriter_JSON.triggered.connect(

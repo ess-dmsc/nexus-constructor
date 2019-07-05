@@ -55,7 +55,11 @@ class InstrumentView(QWidget):
         self.view.setRootEntity(self.root_entity)
 
         # Make additional cameras for the gnomon and the instrument components
-        self.component_root_entity = Qt3DCore.QEntity(self.root_entity)
+        self.combined_component_axes_entity = Qt3DCore.QEntity(self.root_entity)
+        self.component_root_entity = Qt3DCore.QEntity(
+            self.combined_component_axes_entity
+        )
+        self.axes_root_entity = Qt3DCore.QEntity(self.combined_component_axes_entity)
         self.gnomon_root_entity = Qt3DCore.QEntity(self.root_entity)
 
         # Initialise materials
@@ -77,7 +81,7 @@ class InstrumentView(QWidget):
         )
         self.gnomon_camera = self.gnomon.get_gnomon_camera()
         self.instrument_view_axes = InstrumentViewAxes(
-            self.component_root_entity, self.view.camera().farPlane()
+            self.axes_root_entity, self.view.camera().farPlane()
         )
 
         # Keep a reference to the gnomon viewport so that it can be resized to preserve the original size of the gnomon
@@ -100,6 +104,10 @@ class InstrumentView(QWidget):
         # Move the gnomon when the camera view changes
         self.view.camera().viewVectorChanged.connect(self.gnomon.update_gnomon)
 
+    def make_camera_view_component_entity(self):
+
+        self.view.camera().viewEntity(self.component_root_entity)
+
     def create_layers(self):
         """
         Assigns the gnomon view and component view to different cameras and viewports.
@@ -110,7 +118,7 @@ class InstrumentView(QWidget):
 
         # Filters out just the instrument for the main camera to see
         component_clear_buffers = self.create_camera_filter(
-            viewport, self.component_root_entity, main_camera
+            viewport, self.combined_component_axes_entity, main_camera
         )
 
         component_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
