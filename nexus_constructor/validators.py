@@ -181,7 +181,7 @@ DATASET_TYPE = {
 
 class FieldValueValidator(QValidator):
     """
-    Validates the field value line edit to check that the entered string is castable to the selected numpy type. 
+    Validates the field value line edit to check that the entered string is castable to the selected numpy type.
     """
 
     def __init__(self, field_type_combo: QComboBox, dataset_type_combo: QComboBox):
