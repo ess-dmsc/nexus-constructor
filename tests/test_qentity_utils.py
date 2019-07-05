@@ -54,7 +54,6 @@ def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shin
 def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_added():
 
     mock_entity = Mock()
-    mock_entity.addComponent = Mock()
     mock_components = [Mock() for _ in range(4)]
     calls = [call(mock_component) for mock_component in mock_components]
 
