@@ -167,13 +167,13 @@ class FieldValueValidator(QValidator):
         Validates against being blank and the correct numpy type
         :param input: the current string of the field value
         :param pos: mouse position cursor(ignored, just here to satisfy overriding function)
-        :return: QValidator state (Valid, Intermediate, Invalid) - returning intermediate because invalid stops the user from typing.
+        :return: QValidator state (Acceptable, Intermediate, Invalid) - returning intermediate because invalid stops the user from typing.
         """
         if not input:  # More criteria here
             self.is_valid.emit(False)
             return QValidator.Intermediate
         else:
             self.is_valid.emit(True)
-            return QValidator.Valid
+            return QValidator.Acceptable
 
     is_valid = Signal(bool)
