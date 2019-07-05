@@ -176,4 +176,4 @@ class FieldValueValidator(QValidator):
             self.is_valid.emit(True)
             return QValidator.Valid
 
-    is_valid = Signal()
+    is_valid = Signal(bool)
