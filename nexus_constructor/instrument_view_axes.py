@@ -1,4 +1,5 @@
 import struct
+from typing import List
 
 from PySide2 import QtCore
 from PySide2.Qt3DCore import Qt3DCore
@@ -14,7 +15,7 @@ from nexus_constructor.qentity_utils import (
 
 
 class InstrumentViewAxes(object):
-    def __init__(self, component_root_entity, line_length):
+    def __init__(self, component_root_entity: Qt3DCore.QEntity, line_length: float):
         """
         Class for housing the objects that create the axes in the instrument view.
         :param component_root_entity: The root entity for the instrument view components.
@@ -83,7 +84,7 @@ class InstrumentViewAxes(object):
         )
 
     @staticmethod
-    def create_data_array(line_vertices):
+    def create_data_array(line_vertices: List[float]):
         """
         Takes a list with coordinates of the beginning and end of the line and converts this to a byte array.
         :param line_vertices: A list containing the start and end coordinates.
