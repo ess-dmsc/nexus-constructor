@@ -111,10 +111,10 @@ class FieldWidget(QFrame):
         # Allow selecting this field widget in a list by clicking on it's contents
         self.field_name_edit.installEventFilter(self)
         self.value_line_edit.installEventFilter(self)
-        self.value_type_combo.installEventFilter(self)
-        self.field_type_combo.installEventFilter(self)
-        self.nx_class_combo.installEventFilter(self)
         self.edit_button.installEventFilter(self)
+        self.nx_class_combo.installEventFilter(self)
+        self.value_type_combo.highlighted.connect(self.something_clicked)
+        self.field_type_combo.highlighted.connect(self.something_clicked)
 
         # Set the layout for the default field type
         self.field_type_changed()
