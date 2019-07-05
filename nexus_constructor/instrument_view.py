@@ -7,6 +7,7 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QVector3D, QColor
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 
+from nexus_constructor.custom_3d_window import Custom3DWindow
 from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.off_renderer import OffMesh
@@ -27,7 +28,7 @@ class InstrumentView(QWidget):
     def __init__(self, parent):
         super().__init__()
         lay = QVBoxLayout(self)
-        self.view = Qt3DExtras.Qt3DWindow()
+        self.view = Custom3DWindow()
         self.view.defaultFrameGraph().setClearColor(QColor("lightgrey"))
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
@@ -61,6 +62,8 @@ class InstrumentView(QWidget):
         )
         self.axes_root_entity = Qt3DCore.QEntity(self.combined_component_axes_entity)
         self.gnomon_root_entity = Qt3DCore.QEntity(self.root_entity)
+
+        self.view.set_component_root_entity(self.component_root_entity)
 
         # Initialise materials
         self.grey_material = Qt3DExtras.QPhongMaterial()
@@ -103,10 +106,6 @@ class InstrumentView(QWidget):
 
         # Move the gnomon when the camera view changes
         self.view.camera().viewVectorChanged.connect(self.gnomon.update_gnomon)
-
-    def make_camera_view_component_entity(self):
-
-        self.view.camera().viewEntity(self.component_root_entity)
 
     def create_layers(self):
         """

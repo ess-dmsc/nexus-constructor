@@ -24,9 +24,6 @@ class MainWindow(Ui_MainWindow):
         super().setupUi(main_window)
 
         self.pushButton.clicked.connect(self.show_add_component_window)
-        self.pushButton.clicked.connect(
-            self.sceneWidget.make_camera_view_component_entity
-        )
         self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
         self.actionOpen_NeXus_file.triggered.connect(self.open_nexus_file)
         self.actionExport_to_Filewriter_JSON.triggered.connect(
