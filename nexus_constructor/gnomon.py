@@ -79,16 +79,16 @@ class Gnomon:
         self.y_material = Qt3DExtras.QPhongMaterial()
         self.z_material = Qt3DExtras.QPhongMaterial()
 
-        diffuse = "grey"
+        diffuse_color = QColor("grey")
 
         set_material_properties(
-            self.x_material, AxisColors.X.value, diffuse, remove_shininess=True
+            self.x_material, AxisColors.X.value, diffuse_color, remove_shininess=True
         )
         set_material_properties(
-            self.y_material, AxisColors.Y.value, diffuse, remove_shininess=True
+            self.y_material, AxisColors.Y.value, diffuse_color, remove_shininess=True
         )
         set_material_properties(
-            self.z_material, AxisColors.Z.value, diffuse, remove_shininess=True
+            self.z_material, AxisColors.Z.value, diffuse_color, remove_shininess=True
         )
 
         # Initialise beam objects
@@ -224,7 +224,7 @@ class Gnomon:
         """
         self.set_axis_label_text(self.x_axis_text, "X", AxisColors.X.value)
         # Pass "green" rather than the Y axis enum value because otherwise the text is too bright
-        self.set_axis_label_text(self.y_axis_text, "Y", "green")
+        self.set_axis_label_text(self.y_axis_text, "Y", QColor("green"))
         self.set_axis_label_text(self.z_axis_text, "Z", AxisColors.Z.value)
         x_label_matrix, y_label_matrix, z_label_matrix = self.create_axis_label_matrices(
             [self.x_text_vector, self.y_text_vector, self.z_text_vector]
