@@ -107,7 +107,32 @@ class ComponentTreeModel(QAbstractItemModel):
         return False
 
     def add_link(self, node):
-        pass
+        parentItem = node.internalPointer()
+        transformation_list = None
+        parent_component = None
+        target_index = QModelIndex()
+        if isinstance(parentItem, ComponentModel):
+            if not hasattr(parentItem, "stored_transforms"):
+                parentItem.stored_transforms = parentItem.transforms
+            transformation_list = parentItem.stored_transforms
+            parent_component = parentItem
+            target_index = self.index(1, 0, node)
+        elif isinstance(parentItem, TransformationsList):
+            transformation_list = parentItem
+            parent_component = parentItem.parent_component
+            target_index = node
+        elif isinstance(parentItem, TransformationModel):
+            transformation_list = parentItem.parent
+            parent_component = transformation_list.parent_component
+            target_index = self.parent(node)
+        if transformation_list.has_link:
+            return
+        target_pos = len(transformation_list)
+        self.beginInsertRows(target_index, target_pos, target_pos)
+        transformation_link = LinkTransformation(transformation_list)
+        transformation_list.has_link = True
+        transformation_list.link = transformation_link
+        self.endInsertRows()
 
     def add_component(self, new_component):
         self.beginInsertRows(QModelIndex(), len(self.components), len(self.components))
@@ -129,6 +154,14 @@ class ComponentTreeModel(QAbstractItemModel):
             self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
             component.remove_transformation(node.internalPointer())
             transformation_list.pop(remove_pos)
+            self.endRemoveRows()
+        elif isinstance(node.internalPointer(), LinkTransformation):
+            transformation_list = node.internalPointer().parent
+            transformation_list_index = self.parent(node)
+            remove_pos = len(transformation_list)
+            self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
+            transformation_list.has_link = False
+            transformation_list.link = None
             self.endRemoveRows()
 
     def duplicate_node(self, node):
@@ -209,8 +242,8 @@ class ComponentTreeModel(QAbstractItemModel):
             else:
                 return QModelIndex()
         elif type(parentItem) is TransformationsList:
-            if parentItem.has_link and row == len(parentItem) - 1:
-                return self.createIndex(row - 1,  0, parentItem.link)
+            if parentItem.has_link and row == len(parentItem):
+                return self.createIndex(row,  0, parentItem.link)
             return self.createIndex(row, 0, parentItem[row])
         raise RuntimeError("Unable to find element.")
 
@@ -248,5 +281,7 @@ class ComponentTreeModel(QAbstractItemModel):
         elif issubclass(type(parentItem), TransformationModel):
             return 0
         elif type(parentItem) is ComponentInfo:
+            return 0
+        elif isinstance(parentItem, LinkTransformation):
             return 0
         raise RuntimeError("Unknown element type.")

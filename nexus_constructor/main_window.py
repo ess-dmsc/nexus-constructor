@@ -13,7 +13,7 @@ import h5py
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.component_tree_view import ComponentEditorDelegate
+from nexus_constructor.component_tree_view import ComponentEditorDelegate, LinkTransformation
 from nexus_constructor.nexus_filewriter_json import writer
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
@@ -150,8 +150,13 @@ class MainWindow(Ui_MainWindow):
             else:
                 self.delete_action.setEnabled(False)
                 self.duplicate_action.setEnabled(False)
-            self.new_rotation_action.setEnabled(True)
-            self.new_translation_action.setEnabled(True)
+            if isinstance(selected_object, LinkTransformation):
+                self.new_rotation_action.setEnabled(False)
+                self.new_translation_action.setEnabled(False)
+                self.delete_action.setEnabled(True)
+            else:
+                self.new_rotation_action.setEnabled(True)
+                self.new_translation_action.setEnabled(True)
 
             if isinstance(selected_object, ComponentModel):
                 if not hasattr(selected_object, "stored_transforms"):

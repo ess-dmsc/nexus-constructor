@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'transformation.ui',
 # licensing of 'transformation.ui' applies.
 #
-# Created: Thu Jul  4 11:32:25 2019
+# Created: Thu Jul  4 23:55:45 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,12 +13,15 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_Transformation(object):
     def setupUi(self, Transformation):
         Transformation.setObjectName("Transformation")
-        Transformation.resize(400, 300)
+        Transformation.resize(361, 171)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Transformation)
+        self.verticalLayout_2.setContentsMargins(6, 6, 6, 6)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.mainLayout = QtWidgets.QVBoxLayout()
+        self.mainLayout.setSpacing(7)
         self.mainLayout.setObjectName("mainLayout")
         self.nameLayout = QtWidgets.QHBoxLayout()
+        self.nameLayout.setSpacing(-1)
         self.nameLayout.setObjectName("nameLayout")
         self.nameLabel = QtWidgets.QLabel(Transformation)
         self.nameLabel.setObjectName("nameLabel")
@@ -46,6 +49,7 @@ class Ui_Transformation(object):
         self.vectorLabel.setObjectName("vectorLabel")
         self.mainLayout.addWidget(self.vectorLabel)
         self.vectorLayout = QtWidgets.QHBoxLayout()
+        self.vectorLayout.setSpacing(-1)
         self.vectorLayout.setObjectName("vectorLayout")
         self.xPosLabel = QtWidgets.QLabel(Transformation)
         self.xPosLabel.setObjectName("xPosLabel")
@@ -72,6 +76,7 @@ class Ui_Transformation(object):
         self.line_3.setObjectName("line_3")
         self.mainLayout.addWidget(self.line_3)
         self.lengthLayout = QtWidgets.QHBoxLayout()
+        self.lengthLayout.setSpacing(-1)
         self.lengthLayout.setObjectName("lengthLayout")
         self.valueLabel = QtWidgets.QLabel(Transformation)
         self.valueLabel.setObjectName("valueLabel")

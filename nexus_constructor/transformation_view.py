@@ -1,5 +1,6 @@
 from ui.transformation import Ui_Transformation
-from PySide2.QtWidgets import QGroupBox
+from ui.link import Ui_Link
+from PySide2.QtWidgets import QGroupBox, QFrame
 from PySide2.QtGui import QVector3D
 from nexus_constructor.transformations import TransformationModel
 
@@ -58,3 +59,18 @@ class EditRotation(EditTransformation):
         super().__init__(parent, transformation)
         self.transformation_frame.valueLabel.setText("Rotation (°)")
         self.setTitle("Rotation")
+
+class EditTransformationLink(QFrame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.link_frame = Ui_Link()
+        self.link_frame.setupUi(self)
+
+    def enable(self):
+        pass
+
+    def disable(self):
+        pass
+
+    def saveChanges(self):
+        pass
