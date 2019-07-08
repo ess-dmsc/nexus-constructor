@@ -81,34 +81,43 @@ class ComponentTreeModel(QAbstractItemModel):
         self.components.append(new_component)
         self.endInsertRows()
 
+    def __remove_link(self, index: QModelIndex):
+        transformation_list = index.internalPointer().parent
+        transformation_list_index = self.parent(index)
+        remove_pos = len(transformation_list)
+        self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
+        transformation_list.has_link = False
+        transformation_list.link = None
+        self.endRemoveRows()
+        # Update depends on
+        if len(transformation_list) > 0:
+            parent_transform = transformation_list[len(transformation_list) - 1]
+            parent_transform.depends_on = None
+
+    def __remove_transformation(self, index: QModelIndex):
+        transformation_list = index.internalPointer().parent
+        transformation_list_index = self.parent(index)
+        remove_pos = transformation_list.index(index.internalPointer())
+        component = transformation_list.parent_component
+        self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
+        component.remove_transformation(index.internalPointer())
+        transformation_list.pop(remove_pos)
+        self.endRemoveRows()
+
+    def __remove_component(self, index: QModelIndex):
+        remove_index = self.components.index(index.internalPointer())
+        self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
+        self.instrument.remove_component(index.internalPointer())
+        self.components.pop(remove_index)
+        self.endRemoveRows()
+
     def remove_node(self, node: QModelIndex):
         if isinstance(node.internalPointer(), ComponentModel):
-            remove_index = self.components.index(node.internalPointer())
-            self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
-            self.instrument.remove_component(node.internalPointer())
-            self.components.pop(remove_index)
-            self.endRemoveRows()
+            self.__remove_component(node)
         elif isinstance(node.internalPointer(), TransformationModel):
-            transformation_list = node.internalPointer().parent
-            transformation_list_index = self.parent(node)
-            remove_pos = transformation_list.index(node.internalPointer())
-            component = transformation_list.parent_component
-            self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
-            component.remove_transformation(node.internalPointer())
-            transformation_list.pop(remove_pos)
-            self.endRemoveRows()
+            self.__remove_transformation(node)
         elif isinstance(node.internalPointer(), LinkTransformation):
-            transformation_list = node.internalPointer().parent
-            transformation_list_index = self.parent(node)
-            remove_pos = len(transformation_list)
-            self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
-            transformation_list.has_link = False
-            transformation_list.link = None
-            self.endRemoveRows()
-            # Update depends on
-            if len(transformation_list) > 0:
-                parent_transform = transformation_list[len(transformation_list) - 1]
-                parent_transform.depends_on = None
+            self.__remove_link(node)
 
     def duplicate_node(self, node: QModelIndex):
         parent = node.internalPointer()
