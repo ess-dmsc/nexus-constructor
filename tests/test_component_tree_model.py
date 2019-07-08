@@ -19,6 +19,14 @@ def _add_component_to_file(
     component_group.create_dataset(field_name, data=field_value)
     return component_group
 
+class FakeInstrument(list):
+    def __init__(self, component_list = []):
+        super().__init__()
+        for current in component_list:
+            self.append(current)
+
+    def get_component_list(self):
+        return self
 
 def get_component():
     nexus_wrapper = NexusWrapper(str(uuid1()))
@@ -29,14 +37,14 @@ def get_component():
 
 
 def test_number_of_components_0():
-    data_under_test = []
+    data_under_test = FakeInstrument()
     under_test = ComponentTreeModel(data_under_test)
     test_index = QModelIndex()
     assert under_test.rowCount(test_index) == 0
 
 
 def test_number_of_components_1():
-    data_under_test = [get_component()]
+    data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     test_index = QModelIndex()
@@ -45,7 +53,7 @@ def test_number_of_components_1():
 
 
 def test_number_of_components_2():
-    data_under_test = [get_component(), get_component()]
+    data_under_test = FakeInstrument([get_component(), get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     test_index = QModelIndex()
@@ -54,7 +62,7 @@ def test_number_of_components_2():
 
 
 def test_component_has_2_rows():
-    data_under_test = [get_component()]
+    data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     test_index = under_test.createIndex(0, 0, data_under_test[0])
@@ -63,7 +71,7 @@ def test_component_has_2_rows():
 
 
 def test_transformation_list_has_0_rows():
-    data_under_test = [get_component()]
+    data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     data_under_test[0].stored_transforms = data_under_test[0].transforms
@@ -77,7 +85,7 @@ def test_transformation_list_has_1_rows():
     component = get_component()
     translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = translation
-    data_under_test = [component]
+    data_under_test = FakeInstrument([component])
     component.stored_transforms = component.transforms
     under_test = ComponentTreeModel(data_under_test)
 
@@ -90,7 +98,7 @@ def test_transformation_has_0_rows():
     component = get_component()
     translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = translation
-    data_under_test = [component]
+    data_under_test = FakeInstrument([component])
     component.stored_transforms = component.transforms
     under_test = ComponentTreeModel(data_under_test)
 
@@ -100,7 +108,7 @@ def test_transformation_has_0_rows():
 
 
 def test_rowCount_gets_unknown_type():
-    data_under_test = []
+    data_under_test = FakeInstrument()
     under_test = ComponentTreeModel(data_under_test)
 
     test_index = under_test.createIndex(0, 0, {})
@@ -110,7 +118,7 @@ def test_rowCount_gets_unknown_type():
 
 
 def test_get_default_parent():
-    data_under_test = []
+    data_under_test = FakeInstrument()
     under_test = ComponentTreeModel(data_under_test)
 
     test_index = QModelIndex()
@@ -119,7 +127,7 @@ def test_get_default_parent():
 
 
 def test_get_component_parent():
-    data_under_test = [get_component()]
+    data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     test_index = under_test.createIndex(0, 0, data_under_test[0])
@@ -128,7 +136,7 @@ def test_get_component_parent():
 
 
 def test_get_transform_list_parent():
-    data_under_test = [get_component()]
+    data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     data_under_test[0].stored_transforms = data_under_test[0].transforms
@@ -142,7 +150,7 @@ def test_get_transform_list_parent():
 
 
 def test_get_transform_list_parent_v2():
-    data_under_test = [get_component(), get_component()]
+    data_under_test = FakeInstrument([get_component(), get_component()])
     data_under_test[0].stored_transforms = data_under_test[0].transforms
     data_under_test[1].stored_transforms = data_under_test[1].transforms
     data_under_test[1].name = "Some other name"
@@ -157,7 +165,7 @@ def test_get_transform_list_parent_v2():
 
 
 def test_get_component_info_parent():
-    data_under_test = [get_component()]
+    data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     # Creating ComponentInfo in-line causes a segmentation error
@@ -171,7 +179,7 @@ def test_get_transformation_parent():
     component = get_component()
     translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = translation
-    data_under_test = [component]
+    data_under_test = FakeInstrument([component])
     component.stored_transforms = component.transforms
     translation.parent = component.stored_transforms
 
@@ -185,20 +193,9 @@ def test_get_transformation_parent():
 
 
 def test_get_invalid_index():
-    data_under_test = [get_component()]
+    data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     test_index = QModelIndex()
 
     assert under_test.index(2, 0, test_index) == QModelIndex()
-
-
-# def test_get_component_index():
-#     data_under_test = [get_component(), ]
-#     under_test = ComponentTreeModel(data_under_test)
-#
-#     temp_index = under_test.createIndex(0, 0, None)
-#
-#     a = under_test.index(0, 0, temp_index).internalPointer()
-#     b = data_under_test[0]
-#     assert a is b
