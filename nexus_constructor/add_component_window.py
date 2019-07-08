@@ -195,4 +195,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        self.component_model.add_component(self.instrument.add_component(component_name, nx_class, description))
+        self.component_model.add_component(
+            self.instrument.add_component(component_name, nx_class, description)
+        )
