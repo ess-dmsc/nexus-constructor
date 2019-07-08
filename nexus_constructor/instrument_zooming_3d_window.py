@@ -4,19 +4,11 @@ from PySide2.QtCore import Qt
 
 
 class InstrumentZooming3DWindow(Qt3DExtras.Qt3DWindow):
-    def __init__(self):
+    def __init__(self, component_root_entity):
         """
         A custom 3D window that only zooms in on the instrument components when the escape key is pressed.
         """
         super().__init__()
-        self.component_root_entity = None
-
-    def set_component_root_entity(self, component_root_entity):
-        """
-        Sets the entity which is used when the viewEntity method is called. This is the entity that only contains
-        instrument components.
-        :param component_root_entity: The entity for the instrument components.
-        """
         self.component_root_entity = component_root_entity
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent):

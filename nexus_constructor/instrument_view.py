@@ -7,9 +7,9 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QVector3D, QColor
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 
-from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
+from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.off_renderer import OffMesh
 from nexus_constructor.qentity_utils import (
     add_qcomponents_to_entity,
@@ -26,36 +26,12 @@ class InstrumentView(QWidget):
     """
 
     def __init__(self, parent):
+
         super().__init__()
-        lay = QVBoxLayout(self)
-        self.view = InstrumentZooming3DWindow()
-        self.view.defaultFrameGraph().setClearColor(QColor("lightgrey"))
-        container = QWidget.createWindowContainer(self.view)
-        lay.addWidget(container)
-
-        # Make sure that the size of the gnomon stays the same when the 3D view is resized
-        self.view.heightChanged.connect(self.update_gnomon_size)
-        self.view.widthChanged.connect(self.update_gnomon_size)
-
-        # Set up view surface selector for filtering
-        self.surface_selector = Qt3DRender.QRenderSurfaceSelector()
-        self.surface_selector.setSurface(self.view)
-
-        # Enable the camera to see a large distance by giving it a small nearView and large farView
-        self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.01, 1000)
-
-        # Set the camera view centre as the origin and position the camera so that it looks down at the neutron beam
-        self.view.camera().setPosition(QVector3D(6, 8, 30))
-        self.view.camera().setViewCenter(QVector3D(0, 0, 0))
 
         self.root_entity = Qt3DCore.QEntity()
-        camera_entity = self.view.camera()
-        cam_controller = Qt3DExtras.QFirstPersonCameraController(self.root_entity)
-        cam_controller.setLinearSpeed(20)
-        cam_controller.setCamera(camera_entity)
-        self.view.setRootEntity(self.root_entity)
 
-        # Make additional cameras for the gnomon and the instrument components
+        # Make additional entities for the gnomon and instrument components
         self.combined_component_axes_entity = Qt3DCore.QEntity(self.root_entity)
         self.component_root_entity = Qt3DCore.QEntity(
             self.combined_component_axes_entity
@@ -63,7 +39,40 @@ class InstrumentView(QWidget):
         self.axes_root_entity = Qt3DCore.QEntity(self.combined_component_axes_entity)
         self.gnomon_root_entity = Qt3DCore.QEntity(self.root_entity)
 
-        self.view.set_component_root_entity(self.component_root_entity)
+        # Create the 3DWindow and place it in a widget with a layout
+        lay = QVBoxLayout(self)
+        self.view = InstrumentZooming3DWindow(self.component_root_entity)
+        self.view.defaultFrameGraph().setClearColor(QColor("lightgrey"))
+        self.view.setRootEntity(self.root_entity)
+        container = QWidget.createWindowContainer(self.view)
+        lay.addWidget(container)
+
+        # Set the properties of the instrument camera controller
+        camera_entity = self.view.camera()
+        cam_controller = Qt3DExtras.QFirstPersonCameraController(self.root_entity)
+        cam_controller.setLinearSpeed(20)
+        cam_controller.setCamera(camera_entity)
+
+        # Enable the camera to see a large distance by giving it a small nearView and large farView
+        self.view.camera().lens().setPerspectiveProjection(45, 16 / 9, 0.01, 1000)
+
+        # Set the camera view centre as the origin and position the camera so that it looks down at the initial sample
+        self.view.camera().setPosition(QVector3D(6, 8, 30))
+        self.view.camera().setViewCenter(QVector3D(0, 0, 0))
+
+        # Make sure that the size of the gnomon stays the same when the 3D view is resized
+        self.view.heightChanged.connect(self.update_gnomon_size)
+        self.view.widthChanged.connect(self.update_gnomon_size)
+
+        # Keep a reference to the gnomon viewport so that it can be resized to preserve the original size of the gnomon
+        self.gnomon_viewport = None
+
+        # Choose a fixed height and width for the gnomon so that this can be preserved when the 3D view is resized
+        self.gnomon_height = self.gnomon_width = 140
+
+        # Set up view surface selector for filtering
+        self.surface_selector = Qt3DRender.QRenderSurfaceSelector()
+        self.surface_selector.setSurface(self.view)
 
         # Initialise materials
         self.grey_material = Qt3DExtras.QPhongMaterial()
@@ -83,16 +92,14 @@ class InstrumentView(QWidget):
             self.grey_material,
         )
         self.gnomon_camera = self.gnomon.get_gnomon_camera()
+
+        # Create the axes lines objects
         self.instrument_view_axes = InstrumentViewAxes(
             self.axes_root_entity, self.view.camera().farPlane()
         )
 
-        # Keep a reference to the gnomon viewport so that it can be resized to preserve the original size of the gnomon
-        self.gnomon_viewport = None
-
-        # Choose a fixed height and width for the gnomon so that this can be preserved when the 3D view is resized
-        self.gnomon_height = self.gnomon_width = 140
-
+        # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
+        # components and axis lines
         self.create_layers()
         self.initialise_view()
 
