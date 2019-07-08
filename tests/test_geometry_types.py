@@ -1,4 +1,4 @@
-from nexus_constructor.geometry import NoShapeGeometry, OFFGeometry
+from nexus_constructor.geometry import NoShapeGeometry, OFFGeometryNoNexus
 from nexus_constructor.geometry.no_shape_geometry import OFFCube
 from PySide2.QtGui import QVector3D
 
@@ -14,7 +14,7 @@ def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_geometry_str_is_No
 
 
 def test_GIVEN_nothing_WHEN_constructing_OFFGeometry_THEN_geometry_str_is_OFF():
-    geom = OFFGeometry()
+    geom = OFFGeometryNoNexus()
     assert geom.geometry_str == "OFF"
 
 
@@ -34,7 +34,7 @@ def test_GIVEN_faces_WHEN_calling_winding_order_on_OFF_THEN_order_is_correct():
 
     faces = [[0, 1, 2, 3]]
 
-    geom = OFFGeometry(vertices, faces)
+    geom = OFFGeometryNoNexus(vertices, faces)
     expected = [point for face in faces for point in face]
 
     assert expected == geom.winding_order
@@ -50,7 +50,7 @@ def test_GIVEN_faces_WHEN_calling_winding_order_indices_on_OFF_THEN_order_is_cor
 
     faces = [[0, 1, 2, 3]]
 
-    geom = OFFGeometry(vertices, faces)
+    geom = OFFGeometryNoNexus(vertices, faces)
 
     expected = [0]  # only one face
 
@@ -71,7 +71,7 @@ def test_GIVEN_off_gemetry_WHEN_calling_off_geometry_on_offGeometry_THEN_origina
     ]
 
     faces = [[0, 1, 2, 3]]
-    geom = OFFGeometry(vertices, faces)
+    geom = OFFGeometryNoNexus(vertices, faces)
 
     assert geom.faces == faces
     assert geom.vertices == vertices

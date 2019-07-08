@@ -17,7 +17,7 @@ from nexus_constructor.geometry.utils import (
     validate_nonzero_qvector,
     get_an_orthogonal_unit_vector,
 )
-from nexus_constructor.geometry.off_geometry import OFFGeometry
+from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
 from typing import Tuple
 
 
@@ -191,7 +191,9 @@ class CylindricalGeometry:
             [i for i in range((2 * steps) - 1, steps - 1, -1)],
         ]
 
-        return OFFGeometry(vertices=vertices, faces=rectangle_faces + top_bottom_faces)
+        return OFFGeometryNoNexus(
+            vertices=vertices, faces=rectangle_faces + top_bottom_faces
+        )
 
     def _rotation_matrix(self) -> QMatrix4x4:
         """

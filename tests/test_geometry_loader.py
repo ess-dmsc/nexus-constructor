@@ -1,5 +1,5 @@
 from nexus_constructor.pixel_data import PixelGrid
-from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.off_renderer import QtOFFGeometry
 from PySide2.QtGui import QVector3D
@@ -8,7 +8,7 @@ from io import StringIO
 
 
 def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_vertices_and_faces_loaded_are_the_same_as_the_file():
-    model = OFFGeometry()
+    model = OFFGeometryNoNexus()
     model.units = "m"
 
     off_file = (
@@ -255,7 +255,7 @@ def test_GIVEN_unrecognised_file_extension_WHEN_loading_geometry_THEN_returns_em
 
 def test_generate_off_mesh_without_repeating_grid():
     # A square with a triangle on the side
-    off_geometry = OFFGeometry(
+    off_geometry = OFFGeometryNoNexus(
         vertices=[
             QVector3D(0, 0, 0),
             QVector3D(0, 1, 0),
@@ -292,7 +292,7 @@ def test_generate_off_mesh_with_repeating_grid():
     columns = 5
     column_width = 7
     # A square with a triangle on the side
-    off_geometry = OFFGeometry(
+    off_geometry = OFFGeometryNoNexus(
         vertices=[
             QVector3D(0, 0, 0),
             QVector3D(0, 1, 0),

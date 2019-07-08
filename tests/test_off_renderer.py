@@ -4,7 +4,7 @@ from nexus_constructor.off_renderer import (
     create_normal_buffer,
     OffMesh,
 )
-from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.geometry.no_shape_geometry import OFFCube
 import itertools
 from PySide2.QtGui import QVector3D
@@ -90,7 +90,7 @@ def test_GIVEN_a_square_face_WHEN_creating_normal_buffer_THEN_output_is_correct(
 
 
 def test_GIVEN_a_triangle_WHEN_creating_off_geometry_with_no_pixel_data_THEN_vertex_count_equals_3():
-    off_geometry = OFFGeometry(
+    off_geometry = OFFGeometryNoNexus(
         vertices=[QVector3D(0, 0, 0), QVector3D(0, 1, 0), QVector3D(1, 1, 0)],
         faces=[[0, 1, 2]],
     )
@@ -109,7 +109,7 @@ def test_WHEN_creating_off_mesh_with_cube_THEN_geometry_contains_cube():
 
 
 def test_GIVEN_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_original_geometry():
-    off_output = OFFGeometry(
+    off_output = OFFGeometryNoNexus(
         vertices=[QVector3D(0, 0, 0), QVector3D(0, 1, 0), QVector3D(1, 1, 0)],
         faces=[[0, 1, 2]],
     )

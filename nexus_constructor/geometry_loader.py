@@ -1,4 +1,4 @@
-from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus
 from nexusutils.readwriteoff import parse_off_file
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from stl import mesh
@@ -6,7 +6,9 @@ from PySide2.QtGui import QVector3D
 from io import StringIO
 
 
-def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry()):
+def load_geometry(
+    filename: str, units: str, geometry: OFFGeometry = OFFGeometryNoNexus()
+):
     """
     Loads geometry from a file into an OFFGeometry instance
 
@@ -32,7 +34,10 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
 
 
 def load_geometry_from_file_object(
-    file: StringIO, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
+    file: StringIO,
+    extension: str,
+    units: str,
+    geometry: OFFGeometry = OFFGeometryNoNexus(),
 ):
     """
     Loads geometry from a file object into an OFFGeometry instance
@@ -62,7 +67,7 @@ def load_geometry_from_file_object(
 
 
 def load_off_geometry(
-    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
+    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometryNoNexus()
 ):
     """
     Loads geometry from an OFF file into an OFFGeometry instance.
@@ -85,7 +90,7 @@ def load_off_geometry(
 
 
 def load_stl_geometry(
-    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
+    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometryNoNexus()
 ):
     """
     Loads geometry from an STL file into an OFFGeometry instance.

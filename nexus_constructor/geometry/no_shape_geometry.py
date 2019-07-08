@@ -1,8 +1,8 @@
-from nexus_constructor.geometry.off_geometry import OFFGeometry
+from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
 from PySide2.QtGui import QVector3D
 
 
-OFFCube = OFFGeometry(
+OFFCube = OFFGeometryNoNexus(
     vertices=[
         QVector3D(-0.5, -0.5, 0.5),
         QVector3D(0.5, -0.5, 0.5),
@@ -35,5 +35,5 @@ class NoShapeGeometry:
         pass
 
     @property
-    def off_geometry(self):
+    def off_geometry(self) -> OFFGeometry:
         return OFFCube
