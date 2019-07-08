@@ -1,7 +1,12 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl
-from nexus_constructor.geometry import OFFGeometry, NoShapeGeometry, CylindricalGeometry
+from nexus_constructor.geometry import (
+    OFFGeometry,
+    NoShapeGeometry,
+    CylindricalGeometry,
+    OFFGeometryNexus,
+)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
@@ -164,7 +169,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
 
-    def generate_geometry_model(self):
+    def generate_geometry_model(self) -> OFFGeometry:
         """
         Generates a geometry model depending on the type of geometry selected and the current values
         of the lineedits that apply to the particular geometry type.
@@ -172,14 +177,14 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         if self.CylinderRadioButton.isChecked():
             geometry_model = CylindricalGeometry()
-            geometry_model.units(self.unitsLineEdit.text())
+            geometry_model.units = self.unitsLineEdit.text()
             geometry_model.height = self.cylinderHeightLineEdit.value()
             geometry_model.radius = self.cylinderRadiusLineEdit.value()
             geometry_model.axis_direction.setX(self.cylinderXLineEdit.value())
             geometry_model.axis_direction.setY(self.cylinderYLineEdit.value())
             geometry_model.axis_direction.setZ(self.cylinderZLineEdit.value())
         elif self.meshRadioButton.isChecked():
-            geometry_model = OFFGeometry()
+            geometry_model = OFFGeometryNexus()
             geometry_model.units(self.unitsLineEdit.text())
             geometry_model.file_path = self.geometry_file_name
         else:
