@@ -8,7 +8,11 @@ from nexus_constructor.nexus.validation import (
     ValidateDataset,
     validate_group,
 )
-from nexus_constructor.ui_utils import numpy_array_to_qvector3d
+from nexus_constructor.ui_utils import (
+    numpy_array_to_qvector3d,
+    qvector3d_to_numpy_array,
+)
+import numpy as np
 
 
 class OFFGeometry(ABC):
@@ -151,7 +155,7 @@ class OFFGeometryNexus(OFFGeometry):
 
     @property
     def off_geometry(self) -> OFFGeometry:
-        return OFFGeometry()
+        return OFFGeometryNoNexus(self.vertices, self.faces)
 
     @property
     def vertices(self) -> List[QVector3D]:
@@ -164,7 +168,9 @@ class OFFGeometryNexus(OFFGeometry):
 
     @vertices.setter
     def vertices(self, new_vertices: List[QVector3D]):
-        raise NotImplementedError
+        vertices = [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
+        vertices_node = self.file.set_field_value(self.group, "vertices", vertices)
+        self.file.set_attribute_value(vertices_node, "units", self.units)
 
     @property
     def faces(self) -> List[List[int]]:
@@ -181,4 +187,9 @@ class OFFGeometryNexus(OFFGeometry):
 
     @faces.setter
     def faces(self, new_faces: List[List[int]]):
-        raise NotImplementedError
+        winding_order = [index for new_face in new_faces for index in new_face]
+        self.file.set_field_value(self.group, "winding_order", winding_order)
+        faces_length = [0]
+        faces_length.extend([len(new_face) for new_face in new_faces[:-1]])
+        faces_start_indices = np.cumsum(faces_length)
+        self.file.set_field_value(self.group, "faces", faces_start_indices)
