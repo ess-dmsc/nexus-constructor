@@ -10,7 +10,6 @@ class InstrumentZooming3DWindow(Qt3DExtras.Qt3DWindow):
         """
         super().__init__()
         self.component_root_entity = None
-        self.prev_position = None
 
     def set_component_root_entity(self, component_root_entity):
         """

@@ -22,13 +22,9 @@ class InstrumentViewAxes(object):
         :param line_length: The length of the line in the axes.
         """
 
-        # The coordinate array given to the LineGeometry must be in the form
-        # [start_x, start_y, start_z, end_x, end_y, end_z]. All lines start at the origin so the first three elements
-        # in the lists for the three lines will be the same.
-        origin = [0, 0, 0]
-        x_line_vertices = origin + [line_length, 0, 0]
-        y_line_vertices = origin + [0, line_length, 0]
-        z_line_vertices = origin + [0, 0, line_length]
+        x_line_vertices = [line_length, 0, 0]
+        y_line_vertices = [0, line_length, 0]
+        z_line_vertices = [0, 0, line_length]
 
         self.x_line_geometry = LineGeometry(
             QtCore.QByteArray(self.create_data_array(x_line_vertices))
