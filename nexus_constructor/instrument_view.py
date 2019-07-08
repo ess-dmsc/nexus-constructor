@@ -11,10 +11,7 @@ from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.off_renderer import OffMesh
-from nexus_constructor.qentity_utils import (
-    add_qcomponents_to_entity,
-    set_material_properties,
-)
+from nexus_constructor.qentity_utils import add_qcomponents_to_entity, create_material
 
 
 class InstrumentView(QWidget):
@@ -75,9 +72,10 @@ class InstrumentView(QWidget):
         self.surface_selector.setSurface(self.view)
 
         # Initialise materials
-        self.grey_material = Qt3DExtras.QPhongMaterial()
-        self.red_material = Qt3DExtras.QPhongMaterial()
-        self.beam_material = Qt3DExtras.QPhongAlphaMaterial()
+        self.grey_material = None
+        self.red_material = None
+        self.beam_material = None
+        self.give_colors_to_materials()
 
         # Initialise cube objects
         self.sample_cube_dimensions = [1, 1, 1]
@@ -234,9 +232,9 @@ class InstrumentView(QWidget):
     def delete_single_transformation(self, component_name, transformation_name):
         pass
 
-    def give_colours_to_materials(self):
+    def give_colors_to_materials(self):
         """
-        Creates several QColours and uses them to configure the different materials that will be used for the objects in
+        Creates several QColors and uses them to configure the different materials that will be used for the objects in
         the 3D view.
         """
         red = QColor("red")
@@ -246,9 +244,9 @@ class InstrumentView(QWidget):
         light_blue = QColor("lightblue")
         dark_red = QColor("#b00")
 
-        set_material_properties(self.grey_material, black, grey)
-        set_material_properties(self.red_material, red, dark_red)
-        set_material_properties(self.beam_material, blue, light_blue, alpha=0.5)
+        self.grey_material = create_material(black, grey)
+        self.red_material = create_material(red, dark_red)
+        self.beam_material = create_material(blue, light_blue, alpha=0.5)
 
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
@@ -275,7 +273,7 @@ class InstrumentView(QWidget):
         Calls the methods for defining materials, setting up the sample cube, and setting up the neutrons. Beam-related
         functions are called outside of this method to ensure that those things are generated last.
         """
-        self.give_colours_to_materials()
+
         self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()

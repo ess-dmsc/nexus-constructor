@@ -6,10 +6,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
 
 from nexus_constructor.axis_colors import AxisColors
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
-from nexus_constructor.qentity_utils import (
-    set_material_properties,
-    add_qcomponents_to_entity,
-)
+from nexus_constructor.qentity_utils import create_material, add_qcomponents_to_entity
 
 
 class Gnomon:
@@ -81,14 +78,14 @@ class Gnomon:
 
         diffuse_color = QColor("grey")
 
-        set_material_properties(
-            self.x_material, AxisColors.X.value, diffuse_color, remove_shininess=True
+        self.x_material = create_material(
+            AxisColors.X.value, diffuse_color, remove_shininess=True
         )
-        set_material_properties(
-            self.y_material, AxisColors.Y.value, diffuse_color, remove_shininess=True
+        self.y_material = create_material(
+            AxisColors.Y.value, diffuse_color, remove_shininess=True
         )
-        set_material_properties(
-            self.z_material, AxisColors.Z.value, diffuse_color, remove_shininess=True
+        self.z_material = create_material(
+            AxisColors.Z.value, diffuse_color, remove_shininess=True
         )
 
         # Initialise beam objects

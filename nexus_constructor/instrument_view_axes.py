@@ -3,15 +3,11 @@ from typing import List
 
 from PySide2 import QtCore
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
 
 from nexus_constructor.axis_colors import AxisColors
 from nexus_constructor.line_geometry import LineGeometry
-from nexus_constructor.qentity_utils import (
-    set_material_properties,
-    add_qcomponents_to_entity,
-)
+from nexus_constructor.qentity_utils import create_material, add_qcomponents_to_entity
 
 
 class InstrumentViewAxes(object):
@@ -34,7 +30,6 @@ class InstrumentViewAxes(object):
         ):
             self.line_entities.append(Qt3DCore.QEntity(component_root_entity))
             self.line_meshes.append(Qt3DRender.QGeometryRenderer())
-            self.line_materials.append(Qt3DExtras.QPhongMaterial())
 
             line_vertices = vertices[:]
             line_vertices[i] = line_length
@@ -43,7 +38,7 @@ class InstrumentViewAxes(object):
             )
 
             self.set_mesh_properties(self.line_meshes[i], self.line_geometries[i])
-            set_material_properties(self.line_materials[i], color, color)
+            self.line_materials.append(create_material(color, color))
             add_qcomponents_to_entity(
                 self.line_entities[i], [self.line_meshes[i], self.line_materials[i]]
             )
