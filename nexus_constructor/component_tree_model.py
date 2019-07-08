@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-from PySide2.QtCore import QAbstractItemModel, QObject
-from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, QMimeData
+from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
-import typing
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 import re
@@ -11,8 +9,8 @@ import re
 
 def get_duplication_name(prototype_name, list_of_nodes):
     base_name = prototype_name
-    re_str = "(\((\d+)\))$"
-    if re.search(re_str, prototype_name) != None:
+    re_str = r"(\((\d+)\))$"
+    if re.search(re_str, prototype_name) is not None:
         suffix_ctr = int(re.search(re_str, prototype_name).group(2))
         base_name = re.sub(re_str, "", prototype_name)
     else:

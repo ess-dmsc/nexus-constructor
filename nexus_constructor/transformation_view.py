@@ -43,14 +43,14 @@ class EditTransformation(QGroupBox):
                 float(self.transformation_frame.yLineEdit.text()),
                 float(self.transformation_frame.zLineEdit.text()),
             )
-        except:
-            pass
+        except ValueError as e:
+            print("Unable to convert vectors: " + str(e))
         try:
             self.transformation.value = float(
                 self.transformation_frame.valueLineEdit.text()
             )
-        except:
-            pass
+        except ValueError as e:
+            print("Unable to convert length: " + str(e))
 
 
 class EditTranslation(EditTransformation):

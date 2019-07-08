@@ -2,23 +2,16 @@
 
 from PySide2.QtCore import Qt, QSize, QPoint
 from PySide2.QtWidgets import (
-    QApplication,
-    QTreeView,
-    QHBoxLayout,
     QStyledItemDelegate,
     QFrame,
-    QGroupBox,
-    QPushButton,
     QVBoxLayout,
     QSizePolicy,
     QLabel,
-    QLineEdit,
 )
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from PySide2.QtGui import QPixmap, QRegion
-import PySide2.QtGui
 from nexus_constructor.transformation_view import (
     EditTranslation,
     EditRotation,
