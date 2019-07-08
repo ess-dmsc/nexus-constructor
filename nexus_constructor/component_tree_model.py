@@ -4,35 +4,7 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from nexus_constructor.instrument import Instrument
-import re
-
-
-def get_duplication_name(prototype_name: str, list_of_nodes: list) -> str:
-    base_name = prototype_name
-    re_str = r"(\((\d+)\))$"
-    if re.search(re_str, prototype_name) is not None:
-        suffix_ctr = int(re.search(re_str, prototype_name).group(2))
-        base_name = re.sub(re_str, "", prototype_name)
-    else:
-        suffix_ctr = 2
-    base_in_use = False
-    for node in list_of_nodes:
-        if node.name == prototype_name:
-            base_in_use = True
-            break
-    if not base_in_use:
-        return base_name
-    duplicate_name = True
-    while duplicate_name:
-        duplicate_name = False
-        suffix = "({})".format(suffix_ctr)
-        for node in list_of_nodes:
-            if node.name == base_name + suffix:
-                suffix_ctr += 1
-                duplicate_name = True
-                break
-    return base_name + suffix
-
+from nexus_constructor.ui_utils import generate_unique_name
 
 class ComponentInfo(object):
     def __init__(self, parent: ComponentModel):
@@ -68,12 +40,12 @@ class ComponentTreeModel(QAbstractItemModel):
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         if not index.isValid():
             return Qt.NoItemFlags
-        parentItem = index.internalPointer()
-        if issubclass(type(parentItem), ComponentModel):
+        parent_item = index.internalPointer()
+        if issubclass(type(parent_item), ComponentModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        elif issubclass(type(parentItem), ComponentInfo):
+        elif issubclass(type(parent_item), ComponentInfo):
             return Qt.ItemIsEnabled
-        elif type(parentItem) is TransformationsList:
+        elif type(parent_item) is TransformationsList:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
@@ -81,19 +53,19 @@ class ComponentTreeModel(QAbstractItemModel):
         return Qt.DropAction.MoveAction
 
     def add_link(self, node: QModelIndex):
-        parentItem = node.internalPointer()
+        parent_item = node.internalPointer()
         transformation_list = None
         target_index = QModelIndex()
-        if isinstance(parentItem, ComponentModel):
-            if not hasattr(parentItem, "stored_transforms"):
-                parentItem.stored_transforms = parentItem.transforms
-            transformation_list = parentItem.stored_transforms
+        if isinstance(parent_item, ComponentModel):
+            if not hasattr(parent_item, "stored_transforms"):
+                parent_item.stored_transforms = parent_item.transforms
+            transformation_list = parent_item.stored_transforms
             target_index = self.index(1, 0, node)
-        elif isinstance(parentItem, TransformationsList):
-            transformation_list = parentItem
+        elif isinstance(parent_item, TransformationsList):
+            transformation_list = parent_item
             target_index = node
-        elif isinstance(parentItem, TransformationModel):
-            transformation_list = parentItem.parent
+        elif isinstance(parent_item, TransformationModel):
+            transformation_list = parent_item.parent
             target_index = self.parent(node)
         if transformation_list.has_link:
             return
@@ -141,7 +113,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def duplicate_node(self, node: QModelIndex):
         parent = node.internalPointer()
         if isinstance(parent, ComponentModel):
-            new_name = get_duplication_name(parent.name, self.components)
+            new_name = generate_unique_name(parent.name, self.components)
 
             self.add_component(
                 self.instrument.add_component(
@@ -152,36 +124,36 @@ class ComponentTreeModel(QAbstractItemModel):
             raise NotImplementedError("Duplication of transformations not implemented")
 
     def add_transformation(self, parent_index: QModelIndex, type: str):
-        parentItem = parent_index.internalPointer()
+        parent_item = parent_index.internalPointer()
         transformation_list = None
         parent_component = None
         target_pos = 0
         target_index = QModelIndex()
-        if isinstance(parentItem, ComponentModel):
-            if not hasattr(parentItem, "stored_transforms"):
-                parentItem.stored_transforms = parentItem.transforms
-            transformation_list = parentItem.stored_transforms
-            parent_component = parentItem
+        if isinstance(parent_item, ComponentModel):
+            if not hasattr(parent_item, "stored_transforms"):
+                parent_item.stored_transforms = parent_item.transforms
+            transformation_list = parent_item.stored_transforms
+            parent_component = parent_item
             target_pos = len(transformation_list)
             target_index = self.index(1, 0, parent_index)
-        elif isinstance(parentItem, TransformationsList):
-            transformation_list = parentItem
-            parent_component = parentItem.parent_component
+        elif isinstance(parent_item, TransformationsList):
+            transformation_list = parent_item
+            parent_component = parent_item.parent_component
             target_pos = len(transformation_list)
             target_index = parent_index
-        elif isinstance(parentItem, TransformationModel):
-            transformation_list = parentItem.parent
+        elif isinstance(parent_item, TransformationModel):
+            transformation_list = parent_item.parent
             parent_component = transformation_list.parent_component
-            target_pos = transformation_list.index(parentItem) + 1
+            target_pos = transformation_list.index(parent_item) + 1
             target_index = self.parent(parent_index)
         if type == "translation":
             new_transformation = parent_component.add_translation(
-                name=get_duplication_name("Translation", transformation_list),
+                name=generate_unique_name("Translation", transformation_list),
                 vector=QVector3D(1.0, 0, 0),
             )
         elif type == "rotation":
             new_transformation = parent_component.add_rotation(
-                name=get_duplication_name("Rotation", transformation_list),
+                name=generate_unique_name("Rotation", transformation_list),
                 axis=QVector3D(1.0, 0, 0),
                 angle=0.0,
             )
@@ -219,66 +191,66 @@ class ComponentTreeModel(QAbstractItemModel):
         if not parent.isValid():
             return self.createIndex(row, 0, self.components[row])
 
-        parentItem = parent.internalPointer()
+        parent_item = parent.internalPointer()
 
-        if isinstance(parentItem, ComponentModel):
+        if isinstance(parent_item, ComponentModel):
             if row == 0:
-                if not hasattr(parentItem, "component_info"):
-                    parentItem.component_info = ComponentInfo(parentItem)
-                return self.createIndex(0, 0, parentItem.component_info)
+                if not hasattr(parent_item, "component_info"):
+                    parent_item.component_info = ComponentInfo(parent_item)
+                return self.createIndex(0, 0, parent_item.component_info)
             elif row == 1:
-                if not hasattr(parentItem, "stored_transforms"):
-                    parentItem.stored_transforms = parentItem.transforms
-                return self.createIndex(1, 0, parentItem.stored_transforms)
+                if not hasattr(parent_item, "stored_transforms"):
+                    parent_item.stored_transforms = parent_item.transforms
+                return self.createIndex(1, 0, parent_item.stored_transforms)
             else:
                 return QModelIndex()
-        elif type(parentItem) is TransformationsList:
-            if parentItem.has_link and row == len(parentItem):
-                return self.createIndex(row, 0, parentItem.link)
-            return self.createIndex(row, 0, parentItem[row])
+        elif type(parent_item) is TransformationsList:
+            if parent_item.has_link and row == len(parent_item):
+                return self.createIndex(row, 0, parent_item.link)
+            return self.createIndex(row, 0, parent_item[row])
         raise RuntimeError("Unable to find element.")
 
     def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():
             return QModelIndex()
-        parentItem = index.internalPointer()
-        if type(parentItem) is ComponentModel:
+        parent_item = index.internalPointer()
+        if type(parent_item) is ComponentModel:
             return QModelIndex()
-        elif type(parentItem) is TransformationsList:
+        elif type(parent_item) is TransformationsList:
             try:
                 return self.createIndex(
-                    self.components.index(parentItem.parent_component),
+                    self.components.index(parent_item.parent_component),
                     0,
-                    parentItem.parent_component,
+                    parent_item.parent_component,
                 )
             except ValueError as e:
                 print(e)
-        elif type(parentItem) is ComponentInfo:
+        elif type(parent_item) is ComponentInfo:
             return self.createIndex(
-                self.components.index(parentItem.parent), 0, parentItem.parent
+                self.components.index(parent_item.parent), 0, parent_item.parent
             )
-        elif issubclass(type(parentItem), TransformationModel):
-            return self.createIndex(1, 0, parentItem.parent)
-        elif isinstance(parentItem, LinkTransformation):
-            return self.createIndex(1, 0, parentItem.parent)
+        elif issubclass(type(parent_item), TransformationModel):
+            return self.createIndex(1, 0, parent_item.parent)
+        elif isinstance(parent_item, LinkTransformation):
+            return self.createIndex(1, 0, parent_item.parent)
         raise RuntimeError("Unknown element type.")
 
     def rowCount(self, parent: QModelIndex) -> int:
         if not parent.isValid():
             return len(self.components)
 
-        parentItem = parent.internalPointer()
+        parent_item = parent.internalPointer()
 
-        if type(parentItem) is ComponentModel:
+        if type(parent_item) is ComponentModel:
             return 2
-        elif type(parentItem) is TransformationsList:
-            if parentItem.has_link:
-                return len(parentItem) + 1
-            return len(parentItem)
-        elif issubclass(type(parentItem), TransformationModel):
+        elif type(parent_item) is TransformationsList:
+            if parent_item.has_link:
+                return len(parent_item) + 1
+            return len(parent_item)
+        elif issubclass(type(parent_item), TransformationModel):
             return 0
-        elif type(parentItem) is ComponentInfo:
+        elif type(parent_item) is ComponentInfo:
             return 0
-        elif isinstance(parentItem, LinkTransformation):
+        elif isinstance(parent_item, LinkTransformation):
             return 0
         raise RuntimeError("Unknown element type.")

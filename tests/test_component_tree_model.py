@@ -1,7 +1,7 @@
 from nexus_constructor.component_tree_model import (
     ComponentTreeModel,
     ComponentInfo,
-    get_duplication_name,
+    LinkTransformation
 )
 from nexus_constructor.component import ComponentModel
 import pytest
@@ -111,6 +111,18 @@ def test_transformation_has_0_rows():
 
     assert under_test.rowCount(test_index) == 0
 
+def test_transformation_link_has_0_rows():
+    component = get_component()
+    translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
+    component.depends_on = translation
+    data_under_test = FakeInstrument([component])
+    component.stored_transforms = component.transforms
+    under_test = ComponentTreeModel(data_under_test)
+
+    test_index = under_test.createIndex(0, 0, component.stored_transforms[0])
+
+    assert under_test.rowCount(test_index) == 0
+
 
 def test_rowCount_gets_unknown_type():
     data_under_test = FakeInstrument()
@@ -129,7 +141,6 @@ def test_get_default_parent():
     test_index = QModelIndex()
 
     assert under_test.parent(test_index) == QModelIndex()
-
 
 def test_get_component_parent():
     data_under_test = FakeInstrument([get_component()])
@@ -196,6 +207,22 @@ def test_get_transformation_parent():
     assert found_parent.internalPointer() == data_under_test[0].stored_transforms
     assert found_parent.row() == 1
 
+def test_get_transformation_link_parent():
+    component = get_component()
+    data_under_test = FakeInstrument([component])
+    component.stored_transforms = component.transforms
+    transform_link = LinkTransformation(component.stored_transforms)
+    component.stored_transforms.link = transform_link
+    component.stored_transforms.has_link = True
+
+    under_test = ComponentTreeModel(data_under_test)
+
+    test_index = under_test.createIndex(0, 0, transform_link)
+
+    found_parent = under_test.parent(test_index)
+    assert found_parent.internalPointer() == data_under_test[0].stored_transforms
+    assert found_parent.row() == 1
+
 
 def test_get_invalid_index():
     data_under_test = FakeInstrument([get_component()])
@@ -204,46 +231,3 @@ def test_get_invalid_index():
     test_index = QModelIndex()
 
     assert under_test.index(2, 0, test_index) == QModelIndex()
-
-
-def test_duplicate_name_empty_list():
-    test_name = "some_name"
-    assert test_name == get_duplication_name(test_name, [])
-
-
-class FakeTransformation:
-    def __init__(self, name):
-        self.name = name
-
-
-def test_duplicate_name_one_item_in_list():
-    test_name = "some_name"
-    some_item = FakeTransformation(test_name)
-    assert (test_name + "(2)") == get_duplication_name(test_name, [some_item])
-
-
-def test_duplicate_name_one_item_in_list_two():
-    test_name = "some_name"
-    some_item = FakeTransformation(test_name)
-    assert (test_name + "_two") == get_duplication_name(test_name + "_two", [some_item])
-
-
-def test_duplicate_name_one_item_in_list_three():
-    test_name = "some_name"
-    some_item = FakeTransformation(test_name + "(2)")
-    assert test_name == get_duplication_name(test_name, [some_item])
-
-
-def test_duplicate_name_two_items_in_list():
-    test_name = "some_name"
-    test_list = [FakeTransformation(test_name), FakeTransformation(test_name + "(2)")]
-    assert (test_name + "(3)") == get_duplication_name(test_name, test_list)
-
-
-def test_duplicate_name_two_items_in_list_two():
-    test_name = "some_name"
-    test_list = [
-        FakeTransformation(test_name + "(2)"),
-        FakeTransformation(test_name + "(3)"),
-    ]
-    assert test_name == get_duplication_name(test_name, test_list)
