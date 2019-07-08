@@ -1,19 +1,17 @@
-from mock import Mock, call
+from mock import Mock, call, patch
 
-from nexus_constructor.qentity_utils import (
-    set_material_properties,
-    add_qcomponents_to_entity,
-)
+from nexus_constructor.qentity_utils import create_material, add_qcomponents_to_entity
 
 
-def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_properties_set():
+@patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
+def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_properties_set(
+    mock
+):
 
     ambient = Mock()
     diffuse = Mock()
 
-    mock_material = Mock()
-
-    set_material_properties(mock_material, ambient, diffuse)
+    mock_material = create_material(ambient, diffuse)
 
     mock_material.setAmbient.assert_called_once_with(ambient)
     mock_material.setDiffuse.assert_called_once_with(diffuse)
@@ -21,14 +19,16 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
     mock_material.setShininess.assert_not_called()
 
 
-def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_THEN_properties_set():
+@patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongAlphaMaterial", return_value=Mock())
+def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_THEN_properties_set(
+    mock
+):
 
     ambient = Mock()
     diffuse = Mock()
     alpha = 0.5
 
-    mock_alpha_material = Mock()
-    set_material_properties(mock_alpha_material, ambient, diffuse, alpha)
+    mock_alpha_material = create_material(ambient, diffuse, alpha=alpha)
 
     mock_alpha_material.setAmbient.assert_called_once_with(ambient)
     mock_alpha_material.setDiffuse.assert_called_once_with(diffuse)
@@ -36,14 +36,15 @@ def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_TH
     mock_alpha_material.setShininess.assert_not_called()
 
 
-def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shininess_set_to_zero():
+@patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
+def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shininess_set_to_zero(
+    mock
+):
 
     ambient = Mock()
     diffuse = Mock()
 
-    mock_material = Mock()
-
-    set_material_properties(mock_material, ambient, diffuse, remove_shininess=True)
+    mock_material = create_material(ambient, diffuse, remove_shininess=True)
 
     mock_material.setAmbient.assert_called_once_with(ambient)
     mock_material.setDiffuse.assert_called_once_with(diffuse)
