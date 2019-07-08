@@ -1,6 +1,5 @@
 from nexus_constructor.component_tree_model import ComponentTreeModel, ComponentInfo
 from nexus_constructor.component import ComponentModel
-from nexus_constructor.transformations import TransformationModel
 import pytest
 from PySide2.QtCore import QModelIndex
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
