@@ -22,9 +22,6 @@ class InstrumentViewAxes(object):
         :param line_length: The length of the line in the axes.
         """
 
-        self.component_root_entity = component_root_entity
-        self.line_length = line_length
-
         # The coordinate array given to the LineGeometry must be in the form
         # [start_x, start_y, start_z, end_x, end_y, end_z]. All lines start at the origin so the first three elements
         # in the lists for the three lines will be the same.
@@ -55,9 +52,9 @@ class InstrumentViewAxes(object):
         self.y_line_mesh.setGeometry(self.y_line_geometry)
         self.z_line_mesh.setGeometry(self.z_line_geometry)
 
-        self.x_line_entity = Qt3DCore.QEntity(self.component_root_entity)
-        self.y_line_entity = Qt3DCore.QEntity(self.component_root_entity)
-        self.z_line_entity = Qt3DCore.QEntity(self.component_root_entity)
+        self.x_line_entity = Qt3DCore.QEntity(component_root_entity)
+        self.y_line_entity = Qt3DCore.QEntity(component_root_entity)
+        self.z_line_entity = Qt3DCore.QEntity(component_root_entity)
 
         self.x_line_material = Qt3DExtras.QPhongMaterial()
         self.y_line_material = Qt3DExtras.QPhongMaterial()
