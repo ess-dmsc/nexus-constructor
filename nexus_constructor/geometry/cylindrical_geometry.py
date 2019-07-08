@@ -105,11 +105,10 @@ class CylindricalGeometry:
         :return: base centre point, base edge point, top centre point
         """
         cylinders = self.file.get_field_value(self.group, "cylinders")
-        cylinder = cylinders[0]  # We will only deal with the first cylinder
         vertices = self.file.get_field_value(self.group, "vertices")
-        base_centre = numpy_array_to_qvector3d(vertices[cylinder[0], :])
-        base_edge = numpy_array_to_qvector3d(vertices[cylinder[1], :])
-        top_centre = numpy_array_to_qvector3d(vertices[cylinder[2], :])
+        base_centre = numpy_array_to_qvector3d(vertices[cylinders[0], :])
+        base_edge = numpy_array_to_qvector3d(vertices[cylinders[1], :])
+        top_centre = numpy_array_to_qvector3d(vertices[cylinders[2], :])
         return base_centre, base_edge, top_centre
 
     @property
