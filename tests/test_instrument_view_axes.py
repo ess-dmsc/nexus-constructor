@@ -1,5 +1,8 @@
 import struct
 
+from PySide2.Qt3DRender import Qt3DRender
+from mock import Mock
+
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 
 
@@ -13,3 +16,13 @@ def test_GIVEN_int_list_WHEN_calling_create_data_array_THEN_original_list_can_be
 
     for i in range(list_size):
         assert original_list[i] == int(unpacked_byte_array[i])
+
+def test_GIVEN_mesh_and_geometry_WHEN_calling_set_mesh_properties_THEN_mesh_properties_set():
+
+    mesh = Mock()
+    geometry = Mock()
+
+    InstrumentViewAxes.set_mesh_properties(mesh, geometry)
+
+    mesh.setPrimitiveType.assert_called_once_with(Qt3DRender.QGeometryRenderer.Lines)
+    mesh.setGeometry.assert_called_once_with(geometry)

@@ -22,9 +22,9 @@ class InstrumentViewAxes(object):
         :param line_length: The length of the line in the axes.
         """
 
-        self.line_entities = [Qt3DCore.QEntity(component_root_entity) for _ in range(3)]
-        self.line_meshes = [Qt3DRender.QGeometryRenderer() for _ in range(3)]
-        self.line_materials = [Qt3DExtras.QPhongMaterial() for _ in range(3)]
+        self.line_entities = []
+        self.line_meshes = []
+        self.line_materials = []
         self.line_geometries = []
 
         vertices = [0 for _ in range(3)]
@@ -32,16 +32,17 @@ class InstrumentViewAxes(object):
         for i, color in enumerate(
             [AxisColors.X.value, AxisColors.Y.value, AxisColors.Z.value]
         ):
+            self.line_entities.append(Qt3DCore.QEntity(component_root_entity))
+            self.line_meshes.append(Qt3DRender.QGeometryRenderer())
+            self.line_materials.append(Qt3DExtras.QPhongMaterial())
 
             line_vertices = vertices[:]
             line_vertices[i] = line_length
-            print(line_vertices)
             self.line_geometries.append(
                 LineGeometry(QtCore.QByteArray(self.create_data_array(line_vertices)))
             )
 
-            self.prepare_mesh(self.line_meshes[i], self.line_geometries[i])
-
+            self.set_mesh_properties(self.line_meshes[i], self.line_geometries[i])
             set_material_properties(self.line_materials[i], color, color)
             add_qcomponents_to_entity(
                 self.line_entities[i], [self.line_meshes[i], self.line_materials[i]]
@@ -57,12 +58,11 @@ class InstrumentViewAxes(object):
         return bytearray(struct.pack("%sf" % len(line_vertices), *line_vertices))
 
     @staticmethod
-    def prepare_mesh(mesh: Qt3DRender.QGeometryRenderer, geometry: LineGeometry):
+    def set_mesh_properties(mesh: Qt3DRender.QGeometryRenderer, geometry: LineGeometry):
         """
         Set the primitive type of the mesh and provide it with a line geometry.
         :param mesh: The mesh to be configured.
         :param geometry: A LineGeometry.
         """
-
         mesh.setPrimitiveType(Qt3DRender.QGeometryRenderer.Lines)
         mesh.setGeometry(geometry)
