@@ -19,14 +19,16 @@ def _add_component_to_file(
     component_group.create_dataset(field_name, data=field_value)
     return component_group
 
+
 class FakeInstrument(list):
-    def __init__(self, component_list = []):
+    def __init__(self, component_list=[]):
         super().__init__()
         for current in component_list:
             self.append(current)
 
     def get_component_list(self):
         return self
+
 
 def get_component():
     nexus_wrapper = NexusWrapper(str(uuid1()))
