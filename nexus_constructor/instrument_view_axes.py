@@ -22,59 +22,30 @@ class InstrumentViewAxes(object):
         :param line_length: The length of the line in the axes.
         """
 
-        x_line_vertices = [line_length, 0, 0]
-        y_line_vertices = [0, line_length, 0]
-        z_line_vertices = [0, 0, line_length]
+        self.line_entities = [Qt3DCore.QEntity(component_root_entity) for _ in range(3)]
+        self.line_meshes = [Qt3DRender.QGeometryRenderer() for _ in range(3)]
+        self.line_materials = [Qt3DExtras.QPhongMaterial() for _ in range(3)]
+        self.line_geometries = []
 
-        self.x_line_geometry = LineGeometry(
-            QtCore.QByteArray(self.create_data_array(x_line_vertices))
-        )
-        self.y_line_geometry = LineGeometry(
-            QtCore.QByteArray(self.create_data_array(y_line_vertices))
-        )
-        self.z_line_geometry = LineGeometry(
-            QtCore.QByteArray(self.create_data_array(z_line_vertices))
-        )
+        vertices = [0 for _ in range(3)]
 
-        self.x_line_mesh = Qt3DRender.QGeometryRenderer()
-        self.y_line_mesh = Qt3DRender.QGeometryRenderer()
-        self.z_line_mesh = Qt3DRender.QGeometryRenderer()
+        for i, color in enumerate(
+            [AxisColors.X.value, AxisColors.Y.value, AxisColors.Z.value]
+        ):
 
-        self.x_line_mesh.setPrimitiveType(Qt3DRender.QGeometryRenderer.Lines)
-        self.y_line_mesh.setPrimitiveType(Qt3DRender.QGeometryRenderer.Lines)
-        self.z_line_mesh.setPrimitiveType(Qt3DRender.QGeometryRenderer.Lines)
+            line_vertices = vertices[:]
+            line_vertices[i] = line_length
+            print(line_vertices)
+            self.line_geometries.append(
+                LineGeometry(QtCore.QByteArray(self.create_data_array(line_vertices)))
+            )
 
-        self.x_line_mesh.setGeometry(self.x_line_geometry)
-        self.y_line_mesh.setGeometry(self.y_line_geometry)
-        self.z_line_mesh.setGeometry(self.z_line_geometry)
+            self.prepare_mesh(self.line_meshes[i], self.line_geometries[i])
 
-        self.x_line_entity = Qt3DCore.QEntity(component_root_entity)
-        self.y_line_entity = Qt3DCore.QEntity(component_root_entity)
-        self.z_line_entity = Qt3DCore.QEntity(component_root_entity)
-
-        self.x_line_material = Qt3DExtras.QPhongMaterial()
-        self.y_line_material = Qt3DExtras.QPhongMaterial()
-        self.z_line_material = Qt3DExtras.QPhongMaterial()
-
-        set_material_properties(
-            self.x_line_material, AxisColors.X.value, AxisColors.X.value
-        )
-        set_material_properties(
-            self.y_line_material, AxisColors.Y.value, AxisColors.Y.value
-        )
-        set_material_properties(
-            self.z_line_material, AxisColors.Z.value, AxisColors.Z.value
-        )
-
-        add_qcomponents_to_entity(
-            self.x_line_entity, [self.x_line_mesh, self.x_line_material]
-        )
-        add_qcomponents_to_entity(
-            self.y_line_entity, [self.y_line_mesh, self.y_line_material]
-        )
-        add_qcomponents_to_entity(
-            self.z_line_entity, [self.z_line_mesh, self.z_line_material]
-        )
+            set_material_properties(self.line_materials[i], color, color)
+            add_qcomponents_to_entity(
+                self.line_entities[i], [self.line_meshes[i], self.line_materials[i]]
+            )
 
     @staticmethod
     def create_data_array(line_vertices: List[float]):
@@ -84,3 +55,14 @@ class InstrumentViewAxes(object):
         :return: The coordinates in the form of a bytearray.
         """
         return bytearray(struct.pack("%sf" % len(line_vertices), *line_vertices))
+
+    @staticmethod
+    def prepare_mesh(mesh: Qt3DRender.QGeometryRenderer, geometry: LineGeometry):
+        """
+        Set the primitive type of the mesh and provide it with a line geometry.
+        :param mesh: The mesh to be configured.
+        :param geometry: A LineGeometry.
+        """
+
+        mesh.setPrimitiveType(Qt3DRender.QGeometryRenderer.Lines)
+        mesh.setGeometry(geometry)
