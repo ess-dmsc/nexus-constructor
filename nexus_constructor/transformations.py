@@ -9,6 +9,7 @@ TransformationOrComponent = TypeVar(
     "TransformationOrComponent", "TransformationModel", "ComponentModel"
 )
 
+
 class TransformationsList(list):
     def __init__(self, parent):
         super().__init__()

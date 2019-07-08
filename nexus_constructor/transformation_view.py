@@ -4,6 +4,7 @@ from PySide2.QtWidgets import QGroupBox, QFrame
 from PySide2.QtGui import QVector3D
 from nexus_constructor.transformations import TransformationModel
 
+
 class EditTransformation(QGroupBox):
     def __init__(self, parent, transformation: TransformationModel):
         super().__init__(parent)
@@ -37,16 +38,20 @@ class EditTransformation(QGroupBox):
     def saveChanges(self):
         self.transformation.name = self.transformation_frame.nameLineEdit.text()
         try:
-            self.transformation.vector = QVector3D(float(self.transformation_frame.xLineEdit.text()),
-                                                   float(self.transformation_frame.yLineEdit.text()),
-                                                   float(self.transformation_frame.zLineEdit.text())
-                                                   )
+            self.transformation.vector = QVector3D(
+                float(self.transformation_frame.xLineEdit.text()),
+                float(self.transformation_frame.yLineEdit.text()),
+                float(self.transformation_frame.zLineEdit.text()),
+            )
         except:
             pass
         try:
-            self.transformation.value = float(self.transformation_frame.valueLineEdit.text())
+            self.transformation.value = float(
+                self.transformation_frame.valueLineEdit.text()
+            )
         except:
             pass
+
 
 class EditTranslation(EditTransformation):
     def __init__(self, parent, transformation: TransformationModel):
@@ -54,11 +59,13 @@ class EditTranslation(EditTransformation):
         self.transformation_frame.valueLabel.setText("Position (m)")
         self.setTitle("Translation")
 
+
 class EditRotation(EditTransformation):
     def __init__(self, parent, transformation: TransformationModel):
         super().__init__(parent, transformation)
         self.transformation_frame.valueLabel.setText("Rotation (°)")
         self.setTitle("Rotation")
+
 
 class EditTransformationLink(QFrame):
     def __init__(self, parent, link, instrument):

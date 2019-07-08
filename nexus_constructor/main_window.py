@@ -1,4 +1,12 @@
-from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QAction, QToolBar, QPushButton, QComboBox
+from PySide2.QtWidgets import (
+    QDialog,
+    QLabel,
+    QGridLayout,
+    QAction,
+    QToolBar,
+    QPushButton,
+    QComboBox,
+)
 from PySide2.QtGui import QIcon
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -13,7 +21,10 @@ import h5py
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.component_tree_view import ComponentEditorDelegate, LinkTransformation
+from nexus_constructor.component_tree_view import (
+    ComponentEditorDelegate,
+    LinkTransformation,
+)
 from nexus_constructor.nexus_filewriter_json import writer
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
@@ -49,7 +60,9 @@ class MainWindow(Ui_MainWindow):
         self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
-        self.instrument.nexus.file_changed.connect(self.update_nexus_file_structure_view)
+        self.instrument.nexus.file_changed.connect(
+            self.update_nexus_file_structure_view
+        )
 
         self.set_up_warning_window()
 
@@ -61,7 +74,9 @@ class MainWindow(Ui_MainWindow):
         self.componentTreeView.setAcceptDrops(True)
         self.componentTreeView.setDropIndicatorShown(True)
         self.componentTreeView.header().hide()
-        self.component_delegate = ComponentEditorDelegate(self.componentTreeView, self.instrument)
+        self.component_delegate = ComponentEditorDelegate(
+            self.componentTreeView, self.instrument
+        )
         self.componentTreeView.setItemDelegate(self.component_delegate)
         self.componentTreeView.setModel(self.component_model)
         self.componentTreeView.updateEditorGeometries()
@@ -70,24 +85,34 @@ class MainWindow(Ui_MainWindow):
         self.componentTreeView.clicked.connect(self.on_clicked)
 
         self.component_tool_bar = QToolBar("Actions", self.tab_2)
-        self.new_component_action = QAction(QIcon("ui/new_component.png"), "New component", self.tab_2)
+        self.new_component_action = QAction(
+            QIcon("ui/new_component.png"), "New component", self.tab_2
+        )
         self.new_component_action.triggered.connect(self.show_add_component_window)
         self.component_tool_bar.addAction(self.new_component_action)
-        self.new_translation_action = QAction(QIcon("ui/new_translation.png"), "New translation", self.tab_2)
+        self.new_translation_action = QAction(
+            QIcon("ui/new_translation.png"), "New translation", self.tab_2
+        )
         self.new_translation_action.triggered.connect(self.on_add_translation)
         self.new_translation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_translation_action)
-        self.new_rotation_action = QAction(QIcon("ui/new_rotation.png"), "New rotation", self.tab_2)
+        self.new_rotation_action = QAction(
+            QIcon("ui/new_rotation.png"), "New rotation", self.tab_2
+        )
         self.new_rotation_action.triggered.connect(self.on_add_rotation)
         self.new_rotation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_rotation_action)
 
-        self.create_link_action = QAction(QIcon("ui/create_link.png"), "Create link", self.tab_2)
+        self.create_link_action = QAction(
+            QIcon("ui/create_link.png"), "Create link", self.tab_2
+        )
         self.create_link_action.triggered.connect(self.on_create_link)
         self.create_link_action.setEnabled(False)
         self.component_tool_bar.addAction(self.create_link_action)
 
-        self.duplicate_action = QAction(QIcon("ui/duplicate.png"), "Duplicate", self.tab_2)
+        self.duplicate_action = QAction(
+            QIcon("ui/duplicate.png"), "Duplicate", self.tab_2
+        )
         self.component_tool_bar.addAction(self.duplicate_action)
         self.duplicate_action.triggered.connect(self.on_duplicate_node)
         self.duplicate_action.setEnabled(False)
@@ -144,7 +169,9 @@ class MainWindow(Ui_MainWindow):
             self.create_link_action.setEnabled(False)
         else:
             selected_object = indices[0].internalPointer()
-            if isinstance(selected_object, ComponentModel) or isinstance(selected_object, TransformationModel):
+            if isinstance(selected_object, ComponentModel) or isinstance(
+                selected_object, TransformationModel
+            ):
                 self.delete_action.setEnabled(True)
                 self.duplicate_action.setEnabled(True)
             else:
@@ -196,7 +223,9 @@ class MainWindow(Ui_MainWindow):
 
     def expand_transformation_list(self, node):
         current_pointer = node.internalPointer()
-        if isinstance(current_pointer, TransformationsList) or isinstance(current_pointer, ComponentModel):
+        if isinstance(current_pointer, TransformationsList) or isinstance(
+            current_pointer, ComponentModel
+        ):
             self.componentTreeView.expand(node)
             if isinstance(current_pointer, ComponentModel):
                 trans_list_index = self.component_model.index(1, 0, node)
@@ -221,7 +250,6 @@ class MainWindow(Ui_MainWindow):
             else:
                 raise ValueError("Unknown transformation type: {}".format(type))
             self.expand_transformation_list(current_index)
-
 
     def on_add_translation(self):
         self.add_transformation("translation")
@@ -271,7 +299,9 @@ class MainWindow(Ui_MainWindow):
 
     def show_add_component_window(self):
         self.add_component_window = QDialog()
-        self.add_component_window.ui = AddComponentDialog(self.instrument, self.component_model)
+        self.add_component_window.ui = AddComponentDialog(
+            self.instrument, self.component_model
+        )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
 

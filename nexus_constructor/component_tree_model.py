@@ -8,6 +8,7 @@ from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 import re
 
+
 def get_duplication_name(prototype_name, list_of_nodes):
     base_name = prototype_name
     re_str = "(\((\d+)\))$"
@@ -34,16 +35,19 @@ def get_duplication_name(prototype_name, list_of_nodes):
                 break
     return base_name + suffix
 
+
 class ComponentInfo(object):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+
 
 class LinkTransformation:
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.link_transformation = None
+
 
 class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, instrument, parent=None):
@@ -131,7 +135,7 @@ class ComponentTreeModel(QAbstractItemModel):
             transformation_list.has_link = False
             transformation_list.link = None
             self.endRemoveRows()
-            #Update depends on
+            # Update depends on
             if len(transformation_list) > 0:
                 parent_transform = transformation_list[len(transformation_list) - 1]
                 parent_transform.depends_on = None
@@ -141,7 +145,11 @@ class ComponentTreeModel(QAbstractItemModel):
         if isinstance(parent, ComponentModel):
             new_name = get_duplication_name(parent.name, self.components)
 
-            self.add_component(self.instrument.add_component(new_name, parent.nx_class, parent.description))
+            self.add_component(
+                self.instrument.add_component(
+                    new_name, parent.nx_class, parent.description
+                )
+            )
         elif isinstance(parent, TransformationModel):
             raise NotImplementedError("Duplication of transformations not implemented")
 
@@ -170,10 +178,15 @@ class ComponentTreeModel(QAbstractItemModel):
             target_index = self.parent(parent_index)
         if type == "translation":
             new_transformation = parent_component.add_translation(
-                name=get_duplication_name("Translation", transformation_list), vector=QVector3D(1.0, 0, 0))
+                name=get_duplication_name("Translation", transformation_list),
+                vector=QVector3D(1.0, 0, 0),
+            )
         elif type == "rotation":
             new_transformation = parent_component.add_rotation(
-                name=get_duplication_name("Rotation", transformation_list), axis=QVector3D(1.0, 0, 0), angle = 0.0)
+                name=get_duplication_name("Rotation", transformation_list),
+                axis=QVector3D(1.0, 0, 0),
+                angle=0.0,
+            )
         else:
             raise ValueError("Unknown transformation type: {}".format(type))
         new_transformation.parent = transformation_list
@@ -191,7 +204,7 @@ class ComponentTreeModel(QAbstractItemModel):
             new_transformation.depends_on = child_transform
         if target_pos == len(transformation_list) - 1 and transformation_list.has_link:
             new_transformation.depends_on = transformation_list.link.link_transformation
-    
+
     def add_translation(self, parent_index):
         self.add_transformation(parent_index, "translation")
 
@@ -223,7 +236,7 @@ class ComponentTreeModel(QAbstractItemModel):
                 return QModelIndex()
         elif type(parentItem) is TransformationsList:
             if parentItem.has_link and row == len(parentItem):
-                return self.createIndex(row,  0, parentItem.link)
+                return self.createIndex(row, 0, parentItem.link)
             return self.createIndex(row, 0, parentItem[row])
         raise RuntimeError("Unable to find element.")
 
@@ -235,11 +248,17 @@ class ComponentTreeModel(QAbstractItemModel):
             return QModelIndex()
         elif type(parentItem) is TransformationsList:
             try:
-                return self.createIndex(self.components.index(parentItem.parent_component), 0, parentItem.parent_component)
+                return self.createIndex(
+                    self.components.index(parentItem.parent_component),
+                    0,
+                    parentItem.parent_component,
+                )
             except ValueError as e:
                 print(e)
         elif type(parentItem) is ComponentInfo:
-            return self.createIndex(self.components.index(parentItem.parent), 0, parentItem.parent)
+            return self.createIndex(
+                self.components.index(parentItem.parent), 0, parentItem.parent
+            )
         elif issubclass(type(parentItem), TransformationModel):
             return self.createIndex(1, 0, parentItem.parent)
         elif isinstance(parentItem, LinkTransformation):

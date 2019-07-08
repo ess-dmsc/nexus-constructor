@@ -1,16 +1,35 @@
 #!/usr/bin/env python
 
 from PySide2.QtCore import Qt, QSize, QPoint
-from PySide2.QtWidgets import QApplication, QTreeView, QHBoxLayout, QStyledItemDelegate, QFrame, QGroupBox, QPushButton, QVBoxLayout, QSizePolicy, QLabel, QLineEdit
+from PySide2.QtWidgets import (
+    QApplication,
+    QTreeView,
+    QHBoxLayout,
+    QStyledItemDelegate,
+    QFrame,
+    QGroupBox,
+    QPushButton,
+    QVBoxLayout,
+    QSizePolicy,
+    QLabel,
+    QLineEdit,
+)
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from PySide2.QtGui import QPixmap, QRegion
 import PySide2.QtGui
-from nexus_constructor.transformation_view import EditTranslation, EditRotation, EditTransformationLink
+from nexus_constructor.transformation_view import (
+    EditTranslation,
+    EditRotation,
+    EditTransformationLink,
+)
+
 
 class ComponentEditorDelegate(QStyledItemDelegate):
-    SettingsFrameMap = {} #{Rotation:RotateSettingsFrame, Translation:TranslateSettingsFrame}
+    SettingsFrameMap = (
+        {}
+    )  # {Rotation:RotateSettingsFrame, Translation:TranslateSettingsFrame}
     frameSize = QSize(30, 10)
 
     def __init__(self, parent, instrument):
@@ -29,7 +48,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
 
         frame.setSizePolicy(SizePolicy)
         frame.layout = QVBoxLayout()
-        frame.layout.setContentsMargins(0,0,0,0)
+        frame.layout.setContentsMargins(0, 0, 0, 0)
         frame.setLayout(frame.layout)
         if isinstance(value, ComponentModel):
             frame.label = QLabel("{} ({})".format(value.name, value.nx_class), frame)
@@ -47,7 +66,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
                 frame.transformation_frame = EditRotation(frame, value)
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
         elif isinstance(value, LinkTransformation):
-            frame.transformation_frame = EditTransformationLink(frame, value, self.instrument)
+            frame.transformation_frame = EditTransformationLink(
+                frame, value, self.instrument
+            )
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
         return frame
 
@@ -85,4 +106,3 @@ class ComponentEditorDelegate(QStyledItemDelegate):
 
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
-
