@@ -143,11 +143,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.fieldsListWidget.setItemWidget(item, field)
 
     def select_field(self, widget):
-        self.selected_widget = widget
         self.fieldsListWidget.setItemSelected(widget, True)
 
     def remove_field(self):
-        self.fieldsListWidget.takeItem(self.fieldsListWidget.row(self.selected_widget))
+        for item in self.fieldsListWidget.selectedItems():
+            self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
 
     def generate_name_suggestion(self):
         """
