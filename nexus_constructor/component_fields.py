@@ -101,8 +101,10 @@ class FieldWidget(QFrame):
         # Allow selecting this field widget in a list by clicking on it's contents
         self.field_name_edit.installEventFilter(self)
         self.value_line_edit.installEventFilter(self)
-        self.edit_button.installEventFilter(self)
         self.nx_class_combo.installEventFilter(self)
+
+        # These cause odd double-clicking behaviour when using an event filter so just connecting to the clicked() signals instead.
+        self.edit_button.clicked.connect(self.something_clicked)
         self.value_type_combo.highlighted.connect(self.something_clicked)
         self.field_type_combo.highlighted.connect(self.something_clicked)
 
