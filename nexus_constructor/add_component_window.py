@@ -7,6 +7,7 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
 )
+from PySide2.QtGui import QVector3D
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
@@ -24,6 +25,7 @@ from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 import os
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
+from nexus_constructor.component import Component
 
 
 class GeometryType(Enum):
@@ -169,20 +171,23 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
 
-    def generate_geometry_model(self) -> OFFGeometry:
+    def generate_geometry_model(self, component: Component) -> OFFGeometry:
         """
         Generates a geometry model depending on the type of geometry selected and the current values
         of the lineedits that apply to the particular geometry type.
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
-            geometry_model = CylindricalGeometry()
-            geometry_model.units = self.unitsLineEdit.text()
-            geometry_model.height = self.cylinderHeightLineEdit.value()
-            geometry_model.radius = self.cylinderRadiusLineEdit.value()
-            geometry_model.axis_direction.setX(self.cylinderXLineEdit.value())
-            geometry_model.axis_direction.setY(self.cylinderYLineEdit.value())
-            geometry_model.axis_direction.setZ(self.cylinderZLineEdit.value())
+            geometry_model = component.add_cylinder(
+                QVector3D(
+                    self.cylinderXLineEdit.value(),
+                    self.cylinderYLineEdit.value(),
+                    self.cylinderZLineEdit.value(),
+                ),
+                self.cylinderHeightLineEdit.value(),
+                self.cylinderRadiusLineEdit.value(),
+                self.unitsLineEdit.text(),
+            )
         elif self.meshRadioButton.isChecked():
             geometry_model = OFFGeometryNexus()
             geometry_model.units(self.unitsLineEdit.text())
@@ -195,4 +200,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        self.instrument.add_component(component_name, nx_class, description)
+        component = self.instrument.add_component(component_name, nx_class, description)
+        geometry = self.generate_geometry_model(component)
+        self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)

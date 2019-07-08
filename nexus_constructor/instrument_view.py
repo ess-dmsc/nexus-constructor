@@ -9,6 +9,7 @@ from PySide2.QtWidgets import QWidget, QVBoxLayout
 
 from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.off_renderer import OffMesh
+from nexus_constructor.geometry import OFFGeometry
 
 
 class InstrumentView(QWidget):
@@ -169,7 +170,7 @@ class InstrumentView(QWidget):
         clear_buffers = Qt3DRender.QClearBuffers(camera_selector)
         return clear_buffers
 
-    def add_component(self, name, geometry):
+    def add_component(self, name: str, geometry: OFFGeometry):
         """
         Add a component to the instrument view given a name and its geometry.
         :param name: The name of the component.

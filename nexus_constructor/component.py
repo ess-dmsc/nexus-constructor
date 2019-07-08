@@ -257,3 +257,6 @@ class Component:
         self.file.set_field_value(shape_group, "cylinders", np.array([0, 1, 2]))
         self.file.set_attribute_value(vertices_field, "units", units)
         return CylindricalGeometry(self.file, shape_group)
+
+    def add_off_shape(self):
+        pass
