@@ -1,4 +1,8 @@
-from nexus_constructor.component_tree_model import ComponentTreeModel, ComponentInfo
+from nexus_constructor.component_tree_model import (
+    ComponentTreeModel,
+    ComponentInfo,
+    get_duplication_name,
+)
 from nexus_constructor.component import ComponentModel
 import pytest
 from PySide2.QtCore import QModelIndex
@@ -200,3 +204,46 @@ def test_get_invalid_index():
     test_index = QModelIndex()
 
     assert under_test.index(2, 0, test_index) == QModelIndex()
+
+
+def test_duplicate_name_empty_list():
+    test_name = "some_name"
+    assert test_name == get_duplication_name(test_name, [])
+
+
+class FakeTransformation:
+    def __init__(self, name):
+        self.name = name
+
+
+def test_duplicate_name_one_item_in_list():
+    test_name = "some_name"
+    some_item = FakeTransformation(test_name)
+    assert (test_name + "(2)") == get_duplication_name(test_name, [some_item])
+
+
+def test_duplicate_name_one_item_in_list_two():
+    test_name = "some_name"
+    some_item = FakeTransformation(test_name)
+    assert (test_name + "_two") == get_duplication_name(test_name + "_two", [some_item])
+
+
+def test_duplicate_name_one_item_in_list_three():
+    test_name = "some_name"
+    some_item = FakeTransformation(test_name + "(2)")
+    assert test_name == get_duplication_name(test_name, [some_item])
+
+
+def test_duplicate_name_two_items_in_list():
+    test_name = "some_name"
+    test_list = [FakeTransformation(test_name), FakeTransformation(test_name + "(2)")]
+    assert (test_name + "(3)") == get_duplication_name(test_name, test_list)
+
+
+def test_duplicate_name_two_items_in_list_two():
+    test_name = "some_name"
+    test_list = [
+        FakeTransformation(test_name + "(2)"),
+        FakeTransformation(test_name + "(3)"),
+    ]
+    assert test_name == get_duplication_name(test_name, test_list)

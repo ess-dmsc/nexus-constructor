@@ -1,35 +1,44 @@
-#!/usr/bin/env python
-
-from PySide2.QtCore import Qt, QSize, QPoint
+from PySide2.QtCore import Qt, QSize, QPoint, QModelIndex, QAbstractItemModel, QObject
 from PySide2.QtWidgets import (
     QStyledItemDelegate,
     QFrame,
     QVBoxLayout,
     QSizePolicy,
     QLabel,
+    QStyleOptionViewItem,
+    QWidget,
 )
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
-from PySide2.QtGui import QPixmap, QRegion
+from nexus_constructor.instrument import Instrument
+from PySide2.QtGui import QPixmap, QRegion, QPainter
 from nexus_constructor.transformation_view import (
     EditTranslation,
     EditRotation,
     EditTransformationLink,
 )
 
+from typing import Union
+
 
 class ComponentEditorDelegate(QStyledItemDelegate):
-    SettingsFrameMap = (
-        {}
-    )  # {Rotation:RotateSettingsFrame, Translation:TranslateSettingsFrame}
     frameSize = QSize(30, 10)
 
-    def __init__(self, parent, instrument):
+    def __init__(self, parent: QObject, instrument: Instrument):
         super().__init__(parent)
         self.instrument = instrument
 
-    def getFrame(self, value):
+    def getFrame(
+        self,
+        value: Union[
+            ComponentModel,
+            ComponentInfo,
+            TransformationModel,
+            LinkTransformation,
+            TransformationsList,
+        ],
+    ):
         frame = QFrame()
         frame.setAutoFillBackground(True)
         SizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -65,7 +74,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
         return frame
 
-    def paint(self, painter, option, index):
+    def paint(
+        self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex
+    ):
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
         frame = self.getFrame(value)
@@ -76,7 +87,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.render(pixmap, QPoint(), QRegion())
         painter.drawPixmap(option.rect, pixmap)
 
-    def createEditor(self, parent, option, index):
+    def createEditor(
+        self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
+    ) -> QWidget:
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
         frame = self.getFrame(value)
@@ -85,17 +98,18 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         self.frameSize = frame.sizeHint()
         return frame
 
-    def setEditorData(self, editorWidget, index):
-        pass
-
-    def setModelData(self, editorWidget, model, index):
+    def setModelData(
+        self, editorWidget: QWidget, model: QAbstractItemModel, index: QModelIndex
+    ):
         editorWidget.transformation_frame.saveChanges()
 
-    def sizeHint(self, option, index):
+    def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
         frame = self.getFrame(value)
         return frame.sizeHint()
 
-    def updateEditorGeometry(self, editor, option, index):
+    def updateEditorGeometry(
+        self, editor: QWidget, option: QStyleOptionViewItem, index: QModelIndex
+    ):
         editor.setGeometry(option.rect)

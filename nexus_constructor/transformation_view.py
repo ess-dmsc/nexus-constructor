@@ -1,12 +1,14 @@
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
-from PySide2.QtWidgets import QGroupBox, QFrame
+from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
 from PySide2.QtGui import QVector3D
 from nexus_constructor.transformations import TransformationModel
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.component_tree_model import LinkTransformation
 
 
 class EditTransformation(QGroupBox):
-    def __init__(self, parent, transformation: TransformationModel):
+    def __init__(self, parent: QWidget, transformation: TransformationModel):
         super().__init__(parent)
         self.transformation_frame = Ui_Transformation()
         self.transformation_frame.setupUi(self)
@@ -54,21 +56,23 @@ class EditTransformation(QGroupBox):
 
 
 class EditTranslation(EditTransformation):
-    def __init__(self, parent, transformation: TransformationModel):
+    def __init__(self, parent: QWidget, transformation: TransformationModel):
         super().__init__(parent, transformation)
         self.transformation_frame.valueLabel.setText("Position (m)")
         self.setTitle("Translation")
 
 
 class EditRotation(EditTransformation):
-    def __init__(self, parent, transformation: TransformationModel):
+    def __init__(self, parent: QWidget, transformation: TransformationModel):
         super().__init__(parent, transformation)
         self.transformation_frame.valueLabel.setText("Rotation (°)")
         self.setTitle("Rotation")
 
 
 class EditTransformationLink(QFrame):
-    def __init__(self, parent, link, instrument):
+    def __init__(
+        self, parent: QWidget, link: LinkTransformation, instrument: Instrument
+    ):
         super().__init__(parent)
         self.link = link
         self.instrument = instrument
@@ -81,10 +85,10 @@ class EditTransformationLink(QFrame):
                 self.link_frame.TransformationsComboBox.addItem(transform.name)
 
     def enable(self):
-        pass
+        print("EditTransformationLink.enable not implemented.")
 
     def disable(self):
-        pass
+        print("EditTransformationLink.disable not implemented.")
 
     def saveChanges(self):
-        pass
+        print("EditTransformationLink.saveChanges not implemented.")

@@ -1,13 +1,13 @@
-#!/usr/bin/env python
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
+from nexus_constructor.instrument import Instrument
 import re
 
 
-def get_duplication_name(prototype_name, list_of_nodes):
+def get_duplication_name(prototype_name: str, list_of_nodes: list) -> str:
     base_name = prototype_name
     re_str = r"(\((\d+)\))$"
     if re.search(re_str, prototype_name) is not None:
@@ -35,28 +35,28 @@ def get_duplication_name(prototype_name, list_of_nodes):
 
 
 class ComponentInfo(object):
-    def __init__(self, parent):
+    def __init__(self, parent: ComponentModel):
         super().__init__()
         self.parent = parent
 
 
 class LinkTransformation:
-    def __init__(self, parent):
+    def __init__(self, parent: TransformationsList):
         super().__init__()
         self.parent = parent
         self.link_transformation = None
 
 
 class ComponentTreeModel(QAbstractItemModel):
-    def __init__(self, instrument, parent=None):
+    def __init__(self, instrument: Instrument, parent=None):
         super().__init__(parent)
         self.instrument = instrument
         self.components = self.instrument.get_component_list()
 
-    def columnCount(self, parent):
+    def columnCount(self, parent: QModelIndex) -> int:
         return 1
 
-    def data(self, index, role):
+    def data(self, index: QModelIndex, role: Qt.DisplayRole):
         if not index.isValid():
             return None
         item = index.internalPointer()
@@ -65,7 +65,7 @@ class ComponentTreeModel(QAbstractItemModel):
         elif role == Qt.SizeHintRole:
             return
 
-    def flags(self, index):
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         if not index.isValid():
             return Qt.NoItemFlags
         parentItem = index.internalPointer()
@@ -80,7 +80,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def supportedDropActions(self) -> PySide2.QtCore.Qt.DropActions:
         return Qt.DropAction.MoveAction
 
-    def add_link(self, node):
+    def add_link(self, node: QModelIndex):
         parentItem = node.internalPointer()
         transformation_list = None
         target_index = QModelIndex()
@@ -104,12 +104,12 @@ class ComponentTreeModel(QAbstractItemModel):
         transformation_list.link = transformation_link
         self.endInsertRows()
 
-    def add_component(self, new_component):
+    def add_component(self, new_component: ComponentModel):
         self.beginInsertRows(QModelIndex(), len(self.components), len(self.components))
         self.components.append(new_component)
         self.endInsertRows()
 
-    def remove_node(self, node):
+    def remove_node(self, node: QModelIndex):
         if isinstance(node.internalPointer(), ComponentModel):
             remove_index = self.components.index(node.internalPointer())
             self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
@@ -138,7 +138,7 @@ class ComponentTreeModel(QAbstractItemModel):
                 parent_transform = transformation_list[len(transformation_list) - 1]
                 parent_transform.depends_on = None
 
-    def duplicate_node(self, node):
+    def duplicate_node(self, node: QModelIndex):
         parent = node.internalPointer()
         if isinstance(parent, ComponentModel):
             new_name = get_duplication_name(parent.name, self.components)
@@ -151,7 +151,7 @@ class ComponentTreeModel(QAbstractItemModel):
         elif isinstance(parent, TransformationModel):
             raise NotImplementedError("Duplication of transformations not implemented")
 
-    def add_transformation(self, parent_index, type):
+    def add_transformation(self, parent_index: QModelIndex, type: str):
         parentItem = parent_index.internalPointer()
         transformation_list = None
         parent_component = None
@@ -203,16 +203,16 @@ class ComponentTreeModel(QAbstractItemModel):
         if target_pos == len(transformation_list) - 1 and transformation_list.has_link:
             new_transformation.depends_on = transformation_list.link.link_transformation
 
-    def add_translation(self, parent_index):
+    def add_translation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, "translation")
 
-    def add_rotation(self, parent_index):
+    def add_rotation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, "rotation")
 
     def headerData(self, section, orientation, role):
         return None
 
-    def index(self, row, column, parent):
+    def index(self, row: int, column: int, parent: QModelIndex) -> QModelIndex:
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
 
@@ -238,7 +238,7 @@ class ComponentTreeModel(QAbstractItemModel):
             return self.createIndex(row, 0, parentItem[row])
         raise RuntimeError("Unable to find element.")
 
-    def parent(self, index):
+    def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():
             return QModelIndex()
         parentItem = index.internalPointer()
@@ -263,7 +263,7 @@ class ComponentTreeModel(QAbstractItemModel):
             return self.createIndex(1, 0, parentItem.parent)
         raise RuntimeError("Unknown element type.")
 
-    def rowCount(self, parent):
+    def rowCount(self, parent: QModelIndex) -> int:
         if not parent.isValid():
             return len(self.components)
 
