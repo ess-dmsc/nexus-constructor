@@ -61,10 +61,17 @@ class EditRotation(EditTransformation):
         self.setTitle("Rotation")
 
 class EditTransformationLink(QFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, link, instrument):
         super().__init__(parent)
+        self.link = link
+        self.instrument = instrument
         self.link_frame = Ui_Link()
         self.link_frame.setupUi(self)
+        components = self.instrument.get_component_list()
+        for current_component in components:
+            transformations = current_component.transforms
+            for transform in transformations:
+                self.link_frame.TransformationsComboBox.addItem(transform.name)
 
     def enable(self):
         pass

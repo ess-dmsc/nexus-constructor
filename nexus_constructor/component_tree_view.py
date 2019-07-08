@@ -13,8 +13,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     SettingsFrameMap = {} #{Rotation:RotateSettingsFrame, Translation:TranslateSettingsFrame}
     frameSize = QSize(30, 10)
 
-    def __init__(self, parent):
+    def __init__(self, parent, instrument):
         super().__init__(parent)
+        self.instrument = instrument
 
     def getFrame(self, value):
         frame = QFrame()
@@ -46,7 +47,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
                 frame.transformation_frame = EditRotation(frame, value)
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
         elif isinstance(value, LinkTransformation):
-            frame.transformation_frame = EditTransformationLink(frame)
+            frame.transformation_frame = EditTransformationLink(frame, value, self.instrument)
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
         return frame
 

@@ -43,6 +43,7 @@ class LinkTransformation:
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+        self.link_transformation = None
 
 class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, instrument, parent=None):
@@ -67,63 +68,30 @@ class ComponentTreeModel(QAbstractItemModel):
             return Qt.NoItemFlags
         parentItem = index.internalPointer()
         if issubclass(type(parentItem), ComponentModel):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif issubclass(type(parentItem), ComponentInfo):
             return Qt.ItemIsEnabled
         elif type(parentItem) is TransformationsList:
-            return Qt.ItemIsEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsSelectable
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
-
-
-    def mimeData(self, indexes: typing.List[int]) -> PySide2.QtCore.QMimeData:
-        mimeData = QMimeData()
-        mimeData.setData("test_type", bytearray("no_mime".encode("utf8")))
-        mimeData.data_pointers = []
-        for itm in indexes:
-            mimeData.data_pointers.append(itm.internalPointer())
-        return mimeData
-
-    def mimeTypes(self):
-        return ["test_type"]
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
     def supportedDropActions(self) -> PySide2.QtCore.Qt.DropActions:
         return Qt.DropAction.MoveAction
 
-    def dropMimeData(self, data: PySide2.QtCore.QMimeData, action: PySide2.QtCore.Qt.DropAction, row: int, column: int, parent: PySide2.QtCore.QModelIndex):
-        TgtNode = parent.internalPointer()
-        if type(TgtNode) is list:
-            for i in range(len(data.data_pointers)):
-                cData = data.data_pointers[i]
-                oldDataParent = cData.parentItem
-                oldDataParent.childItems.remove(cData)
-                cData.parentItem = TgtNode
-                if (row >= 0):
-                    TgtNode.childItems.insert(row, cData)
-                else:
-                    TgtNode.childItems.append(cData)
-                self.dataChanged.emit(QModelIndex(), QModelIndex())
-                self.layoutChanged.emit()
-                return True
-        return False
-
     def add_link(self, node):
         parentItem = node.internalPointer()
         transformation_list = None
-        parent_component = None
         target_index = QModelIndex()
         if isinstance(parentItem, ComponentModel):
             if not hasattr(parentItem, "stored_transforms"):
                 parentItem.stored_transforms = parentItem.transforms
             transformation_list = parentItem.stored_transforms
-            parent_component = parentItem
             target_index = self.index(1, 0, node)
         elif isinstance(parentItem, TransformationsList):
             transformation_list = parentItem
-            parent_component = parentItem.parent_component
             target_index = node
         elif isinstance(parentItem, TransformationModel):
             transformation_list = parentItem.parent
-            parent_component = transformation_list.parent_component
             target_index = self.parent(node)
         if transformation_list.has_link:
             return
@@ -163,6 +131,10 @@ class ComponentTreeModel(QAbstractItemModel):
             transformation_list.has_link = False
             transformation_list.link = None
             self.endRemoveRows()
+            #Update depends on
+            if len(transformation_list) > 0:
+                parent_transform = transformation_list[len(transformation_list) - 1]
+                parent_transform.depends_on = None
 
     def duplicate_node(self, node):
         parent = node.internalPointer()
@@ -208,15 +180,23 @@ class ComponentTreeModel(QAbstractItemModel):
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
         self.endInsertRows()
-
+        # Update depends on
+        if target_pos == 0:
+            parent_component.depends_on = new_transformation
+        else:
+            parent_transform = transformation_list[target_pos]
+            parent_transform.depends_on = new_transformation
+        if target_pos < len(transformation_list) - 1:
+            child_transform = transformation_list[target_pos + 1]
+            new_transformation.depends_on = child_transform
+        if target_pos == len(transformation_list) - 1 and transformation_list.has_link:
+            new_transformation.depends_on = transformation_list.link.link_transformation
+    
     def add_translation(self, parent_index):
         self.add_transformation(parent_index, "translation")
 
     def add_rotation(self, parent_index):
         self.add_transformation(parent_index, "rotation")
-
-    def dropEvent(self, event: PySide2.QtGui.QDropEvent):
-        print("Done dropping")
 
     def headerData(self, section, orientation, role):
         return None

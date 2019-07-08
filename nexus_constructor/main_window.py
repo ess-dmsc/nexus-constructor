@@ -61,7 +61,7 @@ class MainWindow(Ui_MainWindow):
         self.componentTreeView.setAcceptDrops(True)
         self.componentTreeView.setDropIndicatorShown(True)
         self.componentTreeView.header().hide()
-        self.component_delegate = ComponentEditorDelegate(self.componentTreeView)
+        self.component_delegate = ComponentEditorDelegate(self.componentTreeView, self.instrument)
         self.componentTreeView.setItemDelegate(self.component_delegate)
         self.componentTreeView.setModel(self.component_model)
         self.componentTreeView.updateEditorGeometries()
@@ -163,12 +163,18 @@ class MainWindow(Ui_MainWindow):
                     selected_object.stored_transforms = selected_object.transforms
                 if not selected_object.stored_transforms.has_link:
                     self.create_link_action.setEnabled(True)
+                else:
+                    self.create_link_action.setEnabled(False)
             elif isinstance(selected_object, TransformationsList):
                 if not selected_object.has_link:
                     self.create_link_action.setEnabled(True)
+                else:
+                    self.create_link_action.setEnabled(False)
             elif isinstance(selected_object, TransformationModel):
                 if not selected_object.parent.has_link:
                     self.create_link_action.setEnabled(True)
+                else:
+                    self.create_link_action.setEnabled(False)
             else:
                 self.create_link_action.setEnabled(False)
 
@@ -177,6 +183,7 @@ class MainWindow(Ui_MainWindow):
         if len(selected) > 0:
             self.component_model.add_link(selected[0])
             self.expand_transformation_list(selected[0])
+            self.set_button_state()
 
     def on_clicked(self, index):
         self.set_button_state()
