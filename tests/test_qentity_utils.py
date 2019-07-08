@@ -63,4 +63,5 @@ def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_
 
     mock_entity = create_qentity(mock_components, mock_parent)
 
+    mock.assert_called_once_with(mock_parent)
     mock_entity.addComponent.assert_has_calls(calls)
