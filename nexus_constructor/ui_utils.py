@@ -1,5 +1,4 @@
 import numpy as np
-import re
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QFileDialog
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
