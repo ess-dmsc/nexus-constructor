@@ -189,7 +189,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.unitsLineEdit.text(),
             )
         elif self.meshRadioButton.isChecked():
-            geometry_model = OFFGeometryNexus()
+            geometry_model = component.add_off_shape()
             geometry_model.units(self.unitsLineEdit.text())
             geometry_model.file_path = self.geometry_file_name
         else:
