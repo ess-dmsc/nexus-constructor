@@ -7,7 +7,7 @@ from PySide2.Qt3DRender import Qt3DRender
 
 from nexus_constructor.axis_colors import AxisColors
 from nexus_constructor.line_geometry import LineGeometry
-from nexus_constructor.qentity_utils import create_material, add_qcomponents_to_entity
+from nexus_constructor.qentity_utils import create_material, create_qentity
 
 
 class InstrumentViewAxes(object):
@@ -28,7 +28,6 @@ class InstrumentViewAxes(object):
         for i, color in enumerate(
             [AxisColors.X.value, AxisColors.Y.value, AxisColors.Z.value]
         ):
-            self.line_entities.append(Qt3DCore.QEntity(component_root_entity))
             self.line_meshes.append(Qt3DRender.QGeometryRenderer())
 
             line_vertices = vertices[:]
@@ -39,8 +38,8 @@ class InstrumentViewAxes(object):
 
             self.set_mesh_properties(self.line_meshes[i], self.line_geometries[i])
             self.line_materials.append(create_material(color, color))
-            add_qcomponents_to_entity(
-                self.line_entities[i], [self.line_meshes[i], self.line_materials[i]]
+            self.line_entities.append(
+                create_qentity([self.line_meshes[i], self.line_materials[i]])
             )
 
     @staticmethod

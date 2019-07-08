@@ -11,7 +11,7 @@ from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.off_renderer import OffMesh
-from nexus_constructor.qentity_utils import add_qcomponents_to_entity, create_material
+from nexus_constructor.qentity_utils import create_qentity, create_material
 
 
 class InstrumentView(QWidget):
@@ -79,7 +79,7 @@ class InstrumentView(QWidget):
 
         # Initialise cube objects
         self.sample_cube_dimensions = [1, 1, 1]
-        self.cube_entity = Qt3DCore.QEntity(self.component_root_entity)
+        self.cube_entity = None
         self.cube_mesh = Qt3DExtras.QCuboidMesh()
 
         # Create the gnomon resources and get its camera
@@ -192,10 +192,9 @@ class InstrumentView(QWidget):
         :param name: The name of the component.
         :param geometry: The geometry information of the component that is used to create a mesh.
         """
-        entity = Qt3DCore.QEntity(self.component_root_entity)
         mesh = OffMesh(geometry.off_geometry)
 
-        add_qcomponents_to_entity(entity, [mesh, self.grey_material])
+        entity = create_qentity([mesh, self.grey_material], self.component_root_entity)
 
         self.component_meshes[name] = mesh
         self.component_entities[name] = entity
@@ -266,7 +265,9 @@ class InstrumentView(QWidget):
         Sets up the cube that represents a sample in the 3D view by giving the cube entity a mesh and a material.
         """
         self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
-        add_qcomponents_to_entity(self.cube_entity, [self.cube_mesh, self.red_material])
+        self.cube_entity = create_qentity(
+            [self.cube_mesh, self.red_material], self.component_root_entity
+        )
 
     def initialise_view(self):
         """

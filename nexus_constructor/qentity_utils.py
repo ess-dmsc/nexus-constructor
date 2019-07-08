@@ -38,11 +38,13 @@ def create_material(
     return material
 
 
-def add_qcomponents_to_entity(
-    entity: Qt3DCore.QEntity, components: List[Qt3DCore.QComponent]
-):
+def create_qentity(
+    components: List[Qt3DCore.QComponent], parent=None
+) -> Qt3DCore.QEntity:
     """
     Takes a QEntity and gives it all of the QComponents that are contained in a list.
     """
+    entity = Qt3DCore.QEntity(parent)
     for component in components:
         entity.addComponent(component)
+    return entity

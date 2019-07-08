@@ -6,7 +6,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
 
 from nexus_constructor.axis_colors import AxisColors
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
-from nexus_constructor.qentity_utils import create_material, add_qcomponents_to_entity
+from nexus_constructor.qentity_utils import create_material, create_qentity
 
 
 class Gnomon:
@@ -28,9 +28,9 @@ class Gnomon:
         self.beam_material = beam_material
         self.grey_material = grey_material
 
-        self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.z_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.x_axis_entity = None
+        self.y_axis_entity = None
+        self.z_axis_entity = None
 
         self.x_axis_mesh = Qt3DExtras.QCylinderMesh()
         self.y_axis_mesh = Qt3DExtras.QCylinderMesh()
@@ -40,9 +40,9 @@ class Gnomon:
         self.y_axis_transformation = Qt3DCore.QTransform()
         self.z_axis_transformation = Qt3DCore.QTransform()
 
-        self.x_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.y_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.z_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.x_cone_entity = None
+        self.y_cone_entity = None
+        self.z_cone_entity = None
 
         self.x_cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
         self.y_cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
@@ -89,7 +89,7 @@ class Gnomon:
         )
 
         # Initialise beam objects
-        self.cylinder_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.cylinder_entity = None
         self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
         self.cylinder_transform = Qt3DCore.QTransform()
 
@@ -248,17 +248,17 @@ class Gnomon:
         self.x_cone_transformation.setMatrix(x_cone_matrix)
         self.y_cone_transformation.setMatrix(y_cone_matrix)
         self.z_cone_transformation.setMatrix(z_cone_matrix)
-        add_qcomponents_to_entity(
-            self.x_cone_entity,
+        self.x_cone_entity = create_qentity(
             [self.x_cone_mesh, self.x_cone_transformation, self.x_material],
+            self.gnomon_root_entity,
         )
-        add_qcomponents_to_entity(
-            self.y_cone_entity,
+        self.y_cone_entity = create_qentity(
             [self.y_cone_mesh, self.y_cone_transformation, self.y_material],
+            self.gnomon_root_entity,
         )
-        add_qcomponents_to_entity(
-            self.z_cone_entity,
+        self.z_cone_entity = create_qentity(
             [self.z_cone_mesh, self.z_cone_transformation, self.z_material],
+            self.gnomon_root_entity,
         )
 
     def create_gnomon_cylinders(self):
@@ -274,17 +274,17 @@ class Gnomon:
         self.x_axis_transformation.setMatrix(x_axis_matrix)
         self.y_axis_transformation.setMatrix(y_axis_matrix)
         self.z_axis_transformation.setMatrix(z_axis_matrix)
-        add_qcomponents_to_entity(
-            self.x_axis_entity,
+        self.x_axis_entity = create_qentity(
             [self.x_axis_mesh, self.x_axis_transformation, self.x_material],
+            self.gnomon_root_entity,
         )
-        add_qcomponents_to_entity(
-            self.y_axis_entity,
+        self.y_axis_entity = create_qentity(
             [self.y_axis_mesh, self.y_axis_transformation, self.y_material],
+            self.gnomon_root_entity,
         )
-        add_qcomponents_to_entity(
-            self.z_axis_entity,
+        self.z_axis_entity = create_qentity(
             [self.z_axis_mesh, self.z_axis_transformation, self.z_material],
+            self.gnomon_root_entity,
         )
 
     @staticmethod
@@ -409,9 +409,9 @@ class Gnomon:
             self.cylinder_mesh, 1.5, self.neutron_animation_length, 2
         )
         self.set_beam_transform(self.cylinder_transform, self.neutron_animation_length)
-        add_qcomponents_to_entity(
-            self.cylinder_entity,
+        self.cylinder_entity = create_qentity(
             [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
+            self.gnomon_root_entity,
         )
 
     @staticmethod
@@ -488,11 +488,11 @@ class Gnomon:
             )
             self.neutron_objects["animations"].append(neutron_animation)
 
-            add_qcomponents_to_entity(
-                self.neutron_objects["entities"][i],
+            self.neutron_objects["entities"][i] = create_qentity(
                 [
                     self.neutron_objects["meshes"][i],
                     self.grey_material,
                     self.neutron_objects["transforms"][i],
                 ],
+                self.gnomon_root_entity,
             )

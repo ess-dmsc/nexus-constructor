@@ -1,6 +1,6 @@
 from mock import Mock, call, patch
 
-from nexus_constructor.qentity_utils import create_material, add_qcomponents_to_entity
+from nexus_constructor.qentity_utils import create_material, create_qentity
 
 
 @patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
@@ -52,12 +52,15 @@ def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shin
     mock_material.setShininess.assert_called_once_with(0)
 
 
-def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_added():
+@patch("PySide2.Qt3DCore.Qt3DCore.QEntity", return_value=Mock())
+def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_added(
+    mock
+):
 
-    mock_entity = Mock()
+    mock_parent = Mock()
     mock_components = [Mock() for _ in range(4)]
     calls = [call(mock_component) for mock_component in mock_components]
 
-    add_qcomponents_to_entity(mock_entity, mock_components)
+    mock_entity = create_qentity(mock_components, mock_parent)
 
     mock_entity.addComponent.assert_has_calls(calls)
