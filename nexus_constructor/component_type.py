@@ -34,7 +34,7 @@ COMPONENT_TYPES = [
     "NXpositioner",
     "NXsample_component",
     "NXsensor",
-    "NXSlit",
+    "NXslit",
     "NXvelocity_selector",
     "NXxraylens",
 ]

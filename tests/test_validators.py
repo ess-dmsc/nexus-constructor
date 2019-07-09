@@ -1,5 +1,4 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
-import attr
 from typing import List
 
 from mock import Mock
@@ -11,7 +10,11 @@ from nexus_constructor.validators import (
     FieldType,
     GeometryFileValidator,
 )
+import attr
 from PySide2.QtGui import QValidator
+from mock import Mock
+
+from nexus_constructor.validators import NameValidator, UnitValidator, OkValidator
 
 
 @attr.s
@@ -188,3 +191,73 @@ def test_GIVEN_valid_file_WHEN_validating_geometry_file_THEN_returns_acceptable_
 
     assert validator.validate("test.OFF", 0) == QValidator.Acceptable
     validator.is_valid.emit.assert_called_once_with(True)
+def create_content_ok_validator():
+    """
+    Create an OkValidator and button mocks that mimic the conditions for valid input.
+    :return: An OkValidator that emits True when `validate_ok` is called and mocks for the no geometry and mesh buttons.
+    """
+    mock_no_geometry_button = Mock()
+    mock_mesh_button = Mock()
+
+    mock_no_geometry_button.isChecked = Mock(return_value=False)
+    mock_mesh_button.isChecked = Mock(return_value=True)
+
+    validator = OkValidator(mock_no_geometry_button, mock_mesh_button)
+    validator.set_units_valid(True)
+    validator.set_name_valid(True)
+    validator.set_file_valid(True)
+
+    return validator, mock_mesh_button, mock_no_geometry_button
+
+
+def inspect_signal(result, expected):
+    """
+    Function for checking that the signal emitted matches an expected value. Used for the OkValidator tests.
+    :param result: The value emitted by the signal.
+    :param expected: The expected value required for the test to pass.
+    """
+    assert result == expected
+
+
+def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.validate_ok()
+
+
+def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_name_valid(False)
+
+
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unchecked_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_units_valid(False)
+
+
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_file_valid(False)
+
+
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_WITH_no_geometry_button_checked_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    mock_no_geometry_button.isChecked = Mock(return_value=True)
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.set_units_valid(False)
+
+
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_WITH_mesh_button_unchecked_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    mock_mesh_button.isChecked = Mock(return_value=False)
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.set_file_valid(False)

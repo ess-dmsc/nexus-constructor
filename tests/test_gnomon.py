@@ -63,18 +63,6 @@ def test_GIVEN_cone_length_WHEN_calling_create_cone_matrices_THEN_correct_matric
     assert expected_z == actual_z
 
 
-def test_GIVEN_material_and_color_WHEN_calling_prepare_gnomon_material_THEN_properties_set():
-
-    material = Mock()
-    color = "red"
-
-    Gnomon.prepare_gnomon_material(material, color)
-
-    material.setAmbient.assert_called_once_with(QColor(color))
-    material.setDiffuse.assert_called_once_with(QColor("grey"))
-    material.setShininess.assert_called_once_with(0)
-
-
 def test_GIVEN_mesh_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_properties_set():
 
     cylinder_mesh = Mock()
@@ -203,13 +191,6 @@ def test_GIVEN_animation_parameters_WHEN_calling_set_neutron_animation_propertie
     time_span_offset = 5
 
     mock_neutron_animation = Mock()
-    mock_neutron_animation.setTargetObject = Mock()
-    mock_neutron_animation.setPropertyName = Mock()
-    mock_neutron_animation.setStartValue = Mock()
-    mock_neutron_animation.setEndValue = Mock()
-    mock_neutron_animation.setDuration = Mock()
-    mock_neutron_animation.setLoopCount = Mock()
-    mock_neutron_animation.start = Mock()
 
     Gnomon.set_neutron_animation_properties(
         mock_neutron_animation,
@@ -236,9 +217,6 @@ def test_GIVEN_cylinder_dimensions_WHEN_calling_set_cylinder_mesh_dimensions_THE
     rings = 2
 
     mock_cylinder = Mock()
-    mock_cylinder.setRadius = Mock()
-    mock_cylinder.setLength = Mock()
-    mock_cylinder.setRings = Mock()
 
     Gnomon.set_cylinder_mesh_dimensions(mock_cylinder, radius, length, rings)
 
@@ -267,7 +245,6 @@ def test_GIVEN_radius_WHEN_calling_set_sphere_mesh_radius_THEN_radius_set():
 
     radius = 2
     mock_sphere_mesh = Mock()
-    mock_sphere_mesh.setRadius = Mock()
 
     Gnomon.set_sphere_mesh_radius(mock_sphere_mesh, radius)
 
