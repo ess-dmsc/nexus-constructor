@@ -30,8 +30,8 @@ def test_GIVEN_3D_view_and_gnomon_sizes_WHEN_calling_calculate_gnomon_rect_THEN_
     gnomon_height = view_height * expected_height_ratio
 
     # Use the ratio values and the width/height values of an imaginary 3D view to determine the width/height of an
-    #  imaginary gnomon (in this case the gnomon is 200x200). These same ratio values should then be returned when
-    #  calling calculate_gnomon_rect
+    # imaginary gnomon (in this case the gnomon is 200x200). These same ratio values should then be returned when
+    # calling calculate_gnomon_rect
     actual_width_ratio, actual_height_ratio = InstrumentView.calculate_gnomon_rect(
         view_width, view_height, gnomon_width, gnomon_height
     )

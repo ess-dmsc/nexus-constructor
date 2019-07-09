@@ -39,7 +39,7 @@ class InstrumentViewAxes(object):
             self.set_mesh_properties(self.line_meshes[i], self.line_geometries[i])
             self.line_materials.append(create_material(color, color))
             self.line_entities.append(
-                create_qentity([self.line_meshes[i], self.line_materials[i]])
+                create_qentity([self.line_meshes[i], self.line_materials[i]], component_root_entity)
             )
 
     @staticmethod
