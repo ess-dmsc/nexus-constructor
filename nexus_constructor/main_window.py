@@ -1,18 +1,16 @@
 from PySide2.QtWidgets import QAction, QToolBar
 from PySide2.QtGui import QIcon
-import silx.gui.hdf5
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
+
+import silx.gui.hdf5
+import os
+from functools import partial
+import h5py
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
-import silx.gui.hdf5
-import os
-
-from functools import partial
-import h5py
-
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.transformations import TransformationModel, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
