@@ -1,5 +1,7 @@
-from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.geometry import OFFGeometryNoNexus, OFFGeometryNexus
 from PySide2.QtGui import QVector3D
+from .helpers import create_nexus_wrapper, add_component_to_file
+from pytest import approx
 
 
 def test_GIVEN_nothing_WHEN_constructing_OFFGeometry_THEN_geometry_str_is_OFF():
@@ -46,7 +48,7 @@ def test_GIVEN_faces_WHEN_calling_winding_order_indices_on_OFF_THEN_order_is_cor
     assert expected == geom.winding_order_indices
 
 
-def test_GIVEN_off_gemetry_WHEN_calling_off_geometry_on_offGeometry_THEN_original_geometry_is_returned():
+def test_GIVEN_off_geometry_WHEN_calling_off_geometry_on_offGeometry_THEN_original_geometry_is_returned():
     vertices = [
         QVector3D(0, 0, 1),
         QVector3D(0, 1, 0),
@@ -60,3 +62,36 @@ def test_GIVEN_off_gemetry_WHEN_calling_off_geometry_on_offGeometry_THEN_origina
     assert geom.faces == faces
     assert geom.vertices == vertices
     assert geom.off_geometry == geom
+
+
+def test_can_get_off_geometry_properties():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper)
+
+    vertex_3_x = 0.0
+    vertex_3_y = 1.0
+    vertex_3_z = 1.0
+
+    vertices = [
+        QVector3D(0, 0, 1),
+        QVector3D(0, 1, 0),
+        QVector3D(0, 0, 0),
+        QVector3D(vertex_3_x, vertex_3_y, vertex_3_z),
+    ]
+
+    faces = [[0, 1, 2, 3]]
+
+    shape = OFFGeometryNoNexus(vertices, faces)
+
+    component.set_off_shape(shape)
+
+    nexus_shape = component.get_shape()
+    assert isinstance(nexus_shape, OFFGeometryNexus)
+    assert nexus_shape.faces == faces
+    assert nexus_shape.vertices[3].x() == approx(vertex_3_x)
+    assert nexus_shape.vertices[3].y() == approx(vertex_3_y)
+    assert nexus_shape.vertices[3].z() == approx(vertex_3_z)
+
+
+def test_can_set_off_geometry_properties():
+    pass

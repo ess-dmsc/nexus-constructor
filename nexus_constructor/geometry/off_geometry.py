@@ -173,7 +173,7 @@ class OFFGeometryNexus(OFFGeometry):
     @property
     def vertices(self) -> List[QVector3D]:
         vertices_from_file = self.group["vertices"]
-        number_of_vertices = vertices_from_file.shape[1]
+        number_of_vertices = vertices_from_file.shape[0]
         return [
             numpy_array_to_qvector3d(vertices_from_file[vertex_number][:])
             for vertex_number in range(number_of_vertices)
