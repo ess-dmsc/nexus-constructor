@@ -124,6 +124,13 @@ def inspect_signal(result, expected):
     assert result == expected
 
 
+def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.validate_ok()
+
+
 def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
 
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
