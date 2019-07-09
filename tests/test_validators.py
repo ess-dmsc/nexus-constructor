@@ -129,3 +129,17 @@ def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
     validator.set_name_valid(False)
+
+
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unchecked_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_units_valid(False)
+
+
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_option_button_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_file_valid(False)
