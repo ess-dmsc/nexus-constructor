@@ -1,6 +1,6 @@
 import h5py
 from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar
+from typing import Any, TypeVar, Optional
 import numpy as np
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
@@ -139,7 +139,7 @@ class NexusWrapper(QObject):
         return group
 
     @staticmethod
-    def get_nx_class(group: h5py.Group):
+    def get_nx_class(group: h5py.Group) -> Optional[str]:
         if "NX_class" not in group.attrs.keys():
             return None
         return group.attrs["NX_class"]

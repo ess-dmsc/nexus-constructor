@@ -1,5 +1,5 @@
 import h5py
-from typing import Any, List
+from typing import Any, List, Optional, Union
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.transformations import Transformation, TransformationsList
@@ -247,13 +247,18 @@ class Component:
             )
             transformation.register_dependent(self)
 
-    def add_cylinder(
+    def set_cylinder_shape(
         self,
         axis_direction: QVector3D = QVector3D(0.0, 0.0, 1.0),
         height: float = 1.0,
         radius: float = 1.0,
         units: str = "m",
     ) -> CylindricalGeometry:
+        """
+        Sets the shape of the component to be a cylinder
+        Overrides any existing shape
+        """
+        self._remove_shape()
         validate_nonzero_qvector(axis_direction)
         shape_group = self.file.create_nx_group(
             "shape", "NXcylindrical_geometry", self.group
@@ -264,8 +269,26 @@ class Component:
         self.file.set_attribute_value(vertices_field, "units", units)
         return CylindricalGeometry(self.file, shape_group)
 
-    def add_off_shape(self, loaded_geometry: OFFGeometry) -> OFFGeometryNexus:
+    def set_off_shape(self, loaded_geometry: OFFGeometry) -> OFFGeometryNexus:
+        """
+        Sets the shape of the component to be a mesh
+        Overrides any existing shape
+        """
+        self._remove_shape()
         shape_group = self.file.create_nx_group("shape", "NXoff_geometry", self.group)
         record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
         record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
         return OFFGeometryNexus(self.file, shape_group)
+
+    def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
+        if "shape" in self.group:
+            shape_group = self.group["shape"]
+            nx_class = self.file.get_nx_class(shape_group)
+            if nx_class == "NXcylindrical_geometry":
+                return CylindricalGeometry(self.file, shape_group)
+            if nx_class == "NXoff_geometry":
+                return OFFGeometryNexus(self.file, shape_group)
+
+    def _remove_shape(self):
+        if "shape" in self.group:
+            del self.group["shape"]

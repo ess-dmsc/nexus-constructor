@@ -8,7 +8,7 @@ def test_cylinder_has_property_values_it_was_created_with():
     component = add_component_to_file(nexus_wrapper)
     height = 3
     radius = 4
-    cylinder = component.add_cylinder(
+    cylinder = component.set_cylinder_shape(
         axis_direction=QVector3D(1, 0, 0), height=height, radius=radius, units="m"
     )
 
@@ -23,6 +23,6 @@ def test_axis_direction_must_be_non_zero():
     height = 3
     radius = 4
     with raises(ValueError):
-        component.add_cylinder(
+        component.set_cylinder_shape(
             axis_direction=QVector3D(0, 0, 0), height=height, radius=radius, units="m"
         )

@@ -2,7 +2,13 @@ from nexus_constructor.component import DependencyError
 from cmath import isclose
 from PySide2.QtGui import QVector3D
 import pytest
+from pytest import approx
 from .helpers import create_nexus_wrapper, add_component_to_file
+from nexus_constructor.geometry import (
+    CylindricalGeometry,
+    OFFGeometryNexus,
+    OFFGeometryNoNexus,
+)
 
 
 def test_can_create_and_read_from_field_in_component():
@@ -269,3 +275,68 @@ def test_removing_transformation_which_still_has_one_dependent_transform_is_not_
         assert component.remove_transformation(
             first_transform
         ), "Expected not to be allowed to delete the transform as the second transform still depends on it"
+
+
+def test_can_add_cylinder_shape_to_and_component_and_get_the_same_shape_back():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    axis_x = 1.0
+    axis_y = 0.0
+    axis_z = 0.0
+    axis = QVector3D(axis_x, axis_y, axis_z)
+    height = 42.0
+    radius = 37.0
+    component.set_cylinder_shape(axis, height, radius)
+
+    cylinder = component.get_shape()
+    assert isinstance(cylinder, CylindricalGeometry)
+    assert cylinder.height == approx(height)
+    assert cylinder.radius == approx(radius)
+    assert cylinder.axis_direction.x() == approx(axis_x)
+    assert cylinder.axis_direction.y() == approx(axis_y)
+    assert cylinder.axis_direction.z() == approx(axis_z)
+
+
+def test_can_add_mesh_shape_to_and_component_and_get_the_same_shape_back():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    # Our test input mesh is a single triangle
+    vertex_2_x = 0.5
+    vertex_2_y = -0.5
+    vertex_2_z = 0
+    vertices = [
+        QVector3D(-0.5, -0.5, 0),
+        QVector3D(0, 0.5, 0),
+        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+    ]
+    triangle = [0, 1, 2]
+    faces = [triangle]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+
+    output_mesh = component.get_shape()
+    assert isinstance(output_mesh, OFFGeometryNexus)
+    assert output_mesh.faces[0] == triangle
+    assert output_mesh.vertices[2].x() == approx(vertex_2_x)
+    assert output_mesh.vertices[2].y() == approx(vertex_2_y)
+    assert output_mesh.vertices[2].z() == approx(vertex_2_z)
+
+
+def test_can_override_existing_shape():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    component.set_cylinder_shape()
+    cylinder = component.get_shape()
+    assert isinstance(
+        cylinder, CylindricalGeometry
+    ), "Expect shape to initially be a cylinder"
+
+    vertices = [QVector3D(-0.5, -0.5, 0), QVector3D(0, 0.5, 0), QVector3D(0.5, -0.5, 0)]
+    faces = [[0, 1, 2]]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+    output_mesh = component.get_shape()
+    assert isinstance(output_mesh, OFFGeometryNexus), "Expect shape to now be a mesh"

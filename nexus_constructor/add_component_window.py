@@ -174,7 +174,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
-            geometry_model = component.add_cylinder(
+            geometry_model = component.set_cylinder_shape(
                 QVector3D(
                     self.cylinderXLineEdit.value(),
                     self.cylinderYLineEdit.value(),
@@ -195,7 +195,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             geometry_model.units = self.unitsLineEdit.text()
             geometry_model.file_path = self.geometry_file_name
 
-            component.add_off_shape(geometry_model)
+            component.set_off_shape(geometry_model)
         else:
             geometry_model = NoShapeGeometry()
         return geometry_model
