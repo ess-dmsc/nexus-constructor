@@ -103,7 +103,7 @@ def test_unit_validator():
 
 def create_content_ok_validator():
     """
-    Create an OkValidator and button mocks that match the conditions for valid input.
+    Create an OkValidator and button mocks that mimic the conditions for valid input.
     :return: An OkValidator that emits True when `validate_ok` is called and mocks for the no geometry and mesh buttons.
     """
     mock_no_geometry_button = Mock()
