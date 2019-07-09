@@ -5,7 +5,6 @@ from nexus_constructor.component_tree_model import (
 )
 from nexus_constructor.component import ComponentModel
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
