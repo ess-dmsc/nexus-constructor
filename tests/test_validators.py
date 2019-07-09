@@ -103,9 +103,9 @@ def test_unit_validator():
 
 def create_content_ok_validator():
     """
-    :return:
+    Create an OkValidator and button mocks that match the conditions for valid input.
+    :return: An OkValidator that emits True when `validate_ok` is called and mocks for the no geometry and mesh buttons.
     """
-
     mock_no_geometry_button = Mock()
     mock_mesh_button = Mock()
 
@@ -121,6 +121,11 @@ def create_content_ok_validator():
 
 
 def inspect_signal(result, expected):
+    """
+    Function for checking that the signal emitted matches an expected value. Used for the OkValidator tests.
+    :param result: The value emitted by the signal.
+    :param expected: The expected value required for the test to pass.
+    """
     assert result == expected
 
 
