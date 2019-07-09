@@ -8,7 +8,7 @@ from io import StringIO
 
 def load_geometry(
     filename: str, units: str, geometry: OFFGeometry = OFFGeometryNoNexus()
-):
+) -> OFFGeometry:
     """
     Loads geometry from a file into an OFFGeometry instance
 
@@ -38,7 +38,7 @@ def load_geometry_from_file_object(
     extension: str,
     units: str,
     geometry: OFFGeometry = OFFGeometryNoNexus(),
-):
+) -> OFFGeometry:
     """
     Loads geometry from a file object into an OFFGeometry instance
 
@@ -55,9 +55,9 @@ def load_geometry_from_file_object(
     mult_factor = calculate_unit_conversion_factor(units)
 
     if extension == ".off":
-        load_off_geometry(file, mult_factor, geometry)
+        _load_off_geometry(file, mult_factor, geometry)
     elif extension == ".stl":
-        load_stl_geometry(file, mult_factor, geometry)
+        _load_stl_geometry(file, mult_factor, geometry)
     else:
         geometry.faces = []
         geometry.vertices = []
@@ -66,9 +66,9 @@ def load_geometry_from_file_object(
     return geometry
 
 
-def load_off_geometry(
+def _load_off_geometry(
     file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometryNoNexus()
-):
+) -> OFFGeometry:
     """
     Loads geometry from an OFF file into an OFFGeometry instance.
 
@@ -89,9 +89,9 @@ def load_off_geometry(
     return geometry
 
 
-def load_stl_geometry(
+def _load_stl_geometry(
     file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometryNoNexus()
-):
+) -> OFFGeometry:
     """
     Loads geometry from an STL file into an OFFGeometry instance.
 
