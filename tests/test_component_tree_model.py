@@ -313,7 +313,11 @@ def test_get_flags_other():
     data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
-    index = under_test.createIndex(0, 0, [])
+    class TestObject:
+        pass
+
+    test_item = TestObject()
+    index = under_test.createIndex(0, 0, test_item)
 
     assert (
         under_test.flags(index)
