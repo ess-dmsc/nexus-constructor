@@ -4,6 +4,8 @@ from nexus_constructor.component_tree_model import (
     LinkTransformation,
 )
 from nexus_constructor.component import ComponentModel
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
@@ -475,3 +477,43 @@ def test_duplicate_transform_fail():
     except NotImplementedError:
         return  # Success
     assert False  # Failure
+
+
+def test_remove_component():
+    wrapper = NexusWrapper("test_remove_component")
+    instrument = Instrument(wrapper)
+    under_test = ComponentTreeModel(instrument)
+    instrument.add_component("Some name", "some class", "desc")
+    component_index = under_test.index(0, 0, QModelIndex())
+    assert under_test.rowCount(QModelIndex()) == 1
+    under_test.remove_node(component_index)
+    assert under_test.rowCount(QModelIndex()) == 0
+
+
+def test_remove_transformation():
+    wrapper = NexusWrapper("test_remove_transformation")
+    instrument = Instrument(wrapper)
+    under_test = ComponentTreeModel(instrument)
+    instrument.add_component("Some name", "some class", "desc")
+    component_index = under_test.index(0, 0, QModelIndex())
+    under_test.add_rotation(component_index)
+    transformation_list_index = under_test.index(1, 0, component_index)
+    transformation_index = under_test.index(0, 0, transformation_list_index)
+    assert under_test.rowCount(transformation_list_index) == 1
+    under_test.remove_node(transformation_index)
+    assert under_test.rowCount(transformation_list_index) == 0
+
+
+def test_remove_link():
+    wrapper = NexusWrapper("test_remove_link")
+    instrument = Instrument(wrapper)
+    under_test = ComponentTreeModel(instrument)
+    instrument.add_component("Some name", "some class", "desc")
+    component_index = under_test.index(0, 0, QModelIndex())
+    under_test.add_link(component_index)
+    transformation_list_index = under_test.index(1, 0, component_index)
+    transformation_index = under_test.index(0, 0, transformation_list_index)
+    assert under_test.rowCount(transformation_list_index) == 1
+    assert len(transformation_list_index.internalPointer()) == 0
+    under_test.remove_node(transformation_index)
+    assert under_test.rowCount(transformation_list_index) == 0
