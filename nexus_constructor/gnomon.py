@@ -4,20 +4,21 @@ from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
 
+from nexus_constructor.axis_colors import AxisColors
 from nexus_constructor.neutron_animation_controller import NeutronAnimationController
+from nexus_constructor.qentity_utils import create_material, create_qentity
 
 
 class Gnomon:
-    def __init__(
-        self, root_entity, main_camera, beam_material, grey_material, component_adder
-    ):
+    def __init__(self, root_entity, main_camera, beam_material, grey_material):
         """
         A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon (or axis indicator).
         The gnomon/axis indicator is an object that appears in the bottom right-hand corner of the instrument view that
         shows the direction of the x, y, and z axes.
         :param root_entity: The root entity for the gnomon.
+        :param beam_material: The semi-transparent material that is used for the beam in the gnomon.
+        :param grey_material: The material that is used to pain the neutrons.
         :param main_camera: The main component view camera.
-        :param component_adder: A function borrowed from the InstrumentView that adds QComponents to a QEntity.
         """
 
         self.gnomon_root_entity = root_entity
@@ -27,9 +28,9 @@ class Gnomon:
         self.beam_material = beam_material
         self.grey_material = grey_material
 
-        self.x_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.y_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.z_axis_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.x_axis_entity = None
+        self.y_axis_entity = None
+        self.z_axis_entity = None
 
         self.x_axis_mesh = Qt3DExtras.QCylinderMesh()
         self.y_axis_mesh = Qt3DExtras.QCylinderMesh()
@@ -39,9 +40,9 @@ class Gnomon:
         self.y_axis_transformation = Qt3DCore.QTransform()
         self.z_axis_transformation = Qt3DCore.QTransform()
 
-        self.x_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.y_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
-        self.z_cone_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.x_cone_entity = None
+        self.y_cone_entity = None
+        self.z_cone_entity = None
 
         self.x_cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
         self.y_cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
@@ -71,19 +72,24 @@ class Gnomon:
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
 
-        # Borrowing a method from the InstrumentView
-        self.add_qcomponents_to_entity = component_adder
-
         self.x_material = Qt3DExtras.QPhongMaterial()
         self.y_material = Qt3DExtras.QPhongMaterial()
         self.z_material = Qt3DExtras.QPhongMaterial()
 
-        self.prepare_gnomon_material(self.x_material, "red")
-        self.prepare_gnomon_material(self.y_material, "green")
-        self.prepare_gnomon_material(self.z_material, "blue")
+        diffuse_color = QColor("grey")
+
+        self.x_material = create_material(
+            AxisColors.X.value, diffuse_color, remove_shininess=True
+        )
+        self.y_material = create_material(
+            AxisColors.Y.value, diffuse_color, remove_shininess=True
+        )
+        self.z_material = create_material(
+            AxisColors.Z.value, diffuse_color, remove_shininess=True
+        )
 
         # Initialise beam objects
-        self.cylinder_entity = Qt3DCore.QEntity(self.gnomon_root_entity)
+        self.cylinder_entity = None
         self.cylinder_mesh = Qt3DExtras.QCylinderMesh()
         self.cylinder_transform = Qt3DCore.QTransform()
 
@@ -112,17 +118,6 @@ class Gnomon:
         :return: The camera that observes the gnomon.
         """
         return self.gnomon_camera
-
-    @staticmethod
-    def prepare_gnomon_material(material, color):
-        """
-        Prepares the material that will be used to color the gnomon cylinders and sets its shininess to zero.
-        :param material: The material to be configured.
-        :param color: The desired ambient color of the material.
-        """
-        material.setAmbient(color)
-        material.setDiffuse(QColor("grey"))
-        material.setShininess(0)
 
     @staticmethod
     def configure_gnomon_cylinder(cylinder_mesh, length):
@@ -224,9 +219,10 @@ class Gnomon:
         """
         Prepares the gnomon text by creating text entities and then placing them at the ends of the cones.
         """
-        self.set_axis_label_text(self.x_axis_text, "X", "red")
-        self.set_axis_label_text(self.y_axis_text, "Y", "green")
-        self.set_axis_label_text(self.z_axis_text, "Z", "blue")
+        self.set_axis_label_text(self.x_axis_text, "X", AxisColors.X.value)
+        # Pass "green" rather than the Y axis enum value because otherwise the text is too bright
+        self.set_axis_label_text(self.y_axis_text, "Y", QColor("green"))
+        self.set_axis_label_text(self.z_axis_text, "Z", AxisColors.Z.value)
         x_label_matrix, y_label_matrix, z_label_matrix = self.create_axis_label_matrices(
             [self.x_text_vector, self.y_text_vector, self.z_text_vector]
         )
@@ -252,17 +248,17 @@ class Gnomon:
         self.x_cone_transformation.setMatrix(x_cone_matrix)
         self.y_cone_transformation.setMatrix(y_cone_matrix)
         self.z_cone_transformation.setMatrix(z_cone_matrix)
-        self.add_qcomponents_to_entity(
-            self.x_cone_entity,
+        self.x_cone_entity = create_qentity(
             [self.x_cone_mesh, self.x_cone_transformation, self.x_material],
+            self.gnomon_root_entity,
         )
-        self.add_qcomponents_to_entity(
-            self.y_cone_entity,
+        self.y_cone_entity = create_qentity(
             [self.y_cone_mesh, self.y_cone_transformation, self.y_material],
+            self.gnomon_root_entity,
         )
-        self.add_qcomponents_to_entity(
-            self.z_cone_entity,
+        self.z_cone_entity = create_qentity(
             [self.z_cone_mesh, self.z_cone_transformation, self.z_material],
+            self.gnomon_root_entity,
         )
 
     def create_gnomon_cylinders(self):
@@ -278,17 +274,17 @@ class Gnomon:
         self.x_axis_transformation.setMatrix(x_axis_matrix)
         self.y_axis_transformation.setMatrix(y_axis_matrix)
         self.z_axis_transformation.setMatrix(z_axis_matrix)
-        self.add_qcomponents_to_entity(
-            self.x_axis_entity,
+        self.x_axis_entity = create_qentity(
             [self.x_axis_mesh, self.x_axis_transformation, self.x_material],
+            self.gnomon_root_entity,
         )
-        self.add_qcomponents_to_entity(
-            self.y_axis_entity,
+        self.y_axis_entity = create_qentity(
             [self.y_axis_mesh, self.y_axis_transformation, self.y_material],
+            self.gnomon_root_entity,
         )
-        self.add_qcomponents_to_entity(
-            self.z_axis_entity,
+        self.z_axis_entity = create_qentity(
             [self.z_axis_mesh, self.z_axis_transformation, self.z_material],
+            self.gnomon_root_entity,
         )
 
     @staticmethod
@@ -392,15 +388,16 @@ class Gnomon:
         cylinder_mesh.setRings(rings)
 
     @staticmethod
-    def set_beam_transform(cylinder_transform, neutron_animation_length):
+    def set_beam_transform(cylinder_transform, neutron_animation_distance):
         """
         Configures the transform for the beam cylinder by giving it a matrix. The matrix will turn the cylinder sideways
         and then move it "backwards" in the z-direction by 20 units so that it ends at the location of the sample.
         :param cylinder_transform: A QTransform object.
+        :param neutron_animation_distance: The distance that the neutron travels during its animation.
         """
         cylinder_matrix = QMatrix4x4()
         cylinder_matrix.rotate(90, QVector3D(1, 0, 0))
-        cylinder_matrix.translate(QVector3D(0, neutron_animation_length * 0.5, 0))
+        cylinder_matrix.translate(QVector3D(0, neutron_animation_distance * 0.5, 0))
 
         cylinder_transform.setMatrix(cylinder_matrix)
 
@@ -412,9 +409,9 @@ class Gnomon:
             self.cylinder_mesh, 1.5, self.neutron_animation_length, 2
         )
         self.set_beam_transform(self.cylinder_transform, self.neutron_animation_length)
-        self.add_qcomponents_to_entity(
-            self.cylinder_entity,
+        self.cylinder_entity = create_qentity(
             [self.cylinder_mesh, self.beam_material, self.cylinder_transform],
+            self.gnomon_root_entity,
         )
 
     @staticmethod
@@ -491,11 +488,11 @@ class Gnomon:
             )
             self.neutron_objects["animations"].append(neutron_animation)
 
-            self.add_qcomponents_to_entity(
-                self.neutron_objects["entities"][i],
+            self.neutron_objects["entities"][i] = create_qentity(
                 [
                     self.neutron_objects["meshes"][i],
                     self.grey_material,
                     self.neutron_objects["transforms"][i],
                 ],
+                self.gnomon_root_entity,
             )
