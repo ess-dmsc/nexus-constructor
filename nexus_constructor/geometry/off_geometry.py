@@ -18,6 +18,14 @@ import numpy as np
 class OFFGeometry(ABC):
     geometry_str = "OFF"
 
+    def __init__(self, units: str = "", filename: str = ""):
+        """
+        :param units: Store units from interface to repopulate field if component is edited
+        :param filename: Store filename from interface to repopulate field if component is edited
+        """
+        self.units = units
+        self.filename = filename
+
     @property
     @abstractmethod
     def winding_order(self):
@@ -74,6 +82,7 @@ class OFFGeometryNoNexus(OFFGeometry):
         :param faces: list of integer lists. Each sublist is a winding path around the corners of a polygon.
             Each sublist item is an index into the vertices list to identify a specific point in 3D space
         """
+        super().__init__()
         self._vertices = vertices
         self._faces = faces
 
@@ -120,6 +129,7 @@ class OFFGeometryNexus(OFFGeometry):
         units: str = "",
         file_path: str = "",
     ):
+        super().__init__(units)
         self.file = nexus_file
         self.group = group
         self._verify_in_file()
@@ -171,9 +181,7 @@ class OFFGeometryNexus(OFFGeometry):
 
     @vertices.setter
     def vertices(self, new_vertices: List[QVector3D]):
-        vertices = [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
-        vertices_node = self.file.set_field_value(self.group, "vertices", vertices)
-        self.file.set_attribute_value(vertices_node, "units", self.units)
+        record_vertices_in_file(self.file, self.group, new_vertices)
 
     @property
     def faces(self) -> List[List[int]]:
@@ -190,9 +198,36 @@ class OFFGeometryNexus(OFFGeometry):
 
     @faces.setter
     def faces(self, new_faces: List[List[int]]):
-        winding_order = [index for new_face in new_faces for index in new_face]
-        self.file.set_field_value(self.group, "winding_order", winding_order)
-        faces_length = [0]
-        faces_length.extend([len(new_face) for new_face in new_faces[:-1]])
-        faces_start_indices = np.cumsum(faces_length)
-        self.file.set_field_value(self.group, "faces", faces_start_indices)
+        record_faces_in_file(self.file, self.group, new_faces)
+
+
+def record_faces_in_file(
+    nexus_wrapper: nx.NexusWrapper, group: h5py.Group, new_faces: List[List[int]]
+):
+    """
+    Record face data in file
+    :param nexus_wrapper: Wrapper for the file the data will be stored in
+    :param group: The shape group node
+    :param new_faces: The new face data, list of list for each face with indices of vertices in face
+    """
+    winding_order = [index for new_face in new_faces for index in new_face]
+    nexus_wrapper.set_field_value(group, "winding_order", winding_order)
+    faces_length = [0]
+    faces_length.extend([len(new_face) for new_face in new_faces[:-1]])
+    faces_start_indices = np.cumsum(faces_length)
+    nexus_wrapper.set_field_value(group, "faces", faces_start_indices)
+
+
+def record_vertices_in_file(
+    nexus_wrapper: nx.NexusWrapper, group: h5py.Group, new_vertices: List[QVector3D]
+):
+    """
+    Record vertex data in file
+    :param nexus_wrapper: Wrapper for the file the data will be stored in
+    :param group: The shape group node
+    :param new_vertices: The new vertices data, list of cartesian coords for each vertex
+    :return:
+    """
+    vertices = [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
+    vertices_node = nexus_wrapper.set_field_value(group, "vertices", vertices)
+    nexus_wrapper.set_attribute_value(vertices_node, "units", "m")

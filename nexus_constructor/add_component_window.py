@@ -1,12 +1,7 @@
 from enum import Enum
 
 from PySide2.QtCore import QUrl
-from nexus_constructor.geometry import (
-    OFFGeometry,
-    NoShapeGeometry,
-    CylindricalGeometry,
-    OFFGeometryNexus,
-)
+from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
 from PySide2.QtGui import QVector3D
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
@@ -26,6 +21,7 @@ import os
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component import Component
+from nexus_constructor.geometry_loader import load_geometry
 
 
 class GeometryType(Enum):
@@ -189,9 +185,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.unitsLineEdit.text(),
             )
         elif self.meshRadioButton.isChecked():
-            geometry_model = component.add_off_shape()
-            geometry_model.units(self.unitsLineEdit.text())
+            mesh_geometry = OFFGeometryNoNexus()
+            geometry_model = load_geometry(
+                self.geometry_file_name, self.unitsLineEdit.text(), mesh_geometry
+            )
+
+            # Units have already been used during loading the file, but we store them and file name
+            # so we can repopulate their fields in the edit component window
+            geometry_model.units = self.unitsLineEdit.text()
             geometry_model.file_path = self.geometry_file_name
+
+            component.add_off_shape(geometry_model)
         else:
             geometry_model = NoShapeGeometry()
         return geometry_model

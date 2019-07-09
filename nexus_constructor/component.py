@@ -8,7 +8,12 @@ from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
     calculate_vertices,
 )
-from nexus_constructor.geometry import OFFGeometryNexus
+from nexus_constructor.geometry import (
+    OFFGeometryNexus,
+    OFFGeometry,
+    record_faces_in_file,
+    record_vertices_in_file,
+)
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 import numpy as np
 
@@ -259,5 +264,8 @@ class Component:
         self.file.set_attribute_value(vertices_field, "units", units)
         return CylindricalGeometry(self.file, shape_group)
 
-    def add_off_shape(self) -> OFFGeometryNexus:
-        pass
+    def add_off_shape(self, loaded_geometry: OFFGeometry) -> OFFGeometryNexus:
+        shape_group = self.file.create_nx_group("shape", "NXoff_geometry", self.group)
+        record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
+        record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
+        return OFFGeometryNexus(self.file, shape_group)
