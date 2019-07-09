@@ -58,7 +58,7 @@ class FieldWidget(QFrame):
         self.field_type_combo = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
-        self.field_type_combo.setMinimumWidth(100)
+
         fix_horizontal_size = QSizePolicy()
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
