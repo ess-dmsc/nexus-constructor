@@ -5,7 +5,7 @@ from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar
 
 TransformationOrComponent = TypeVar(
-    "TransformationOrComponent", "TransformationModel", "ComponentModel"
+    "TransformationOrComponent", "Transformation", "Component"
 )
 
 

@@ -11,8 +11,8 @@ from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
-from nexus_constructor.component import ComponentModel
-from nexus_constructor.transformations import TransformationModel, TransformationsList
+from nexus_constructor.component import Component
+from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import (
     ComponentEditorDelegate,
@@ -162,8 +162,8 @@ class MainWindow(Ui_MainWindow):
             self.create_link_action.setEnabled(False)
         else:
             selected_object = indices[0].internalPointer()
-            if isinstance(selected_object, ComponentModel) or isinstance(
-                selected_object, TransformationModel
+            if isinstance(selected_object, Component) or isinstance(
+                selected_object, Transformation
             ):
                 self.delete_action.setEnabled(True)
                 self.duplicate_action.setEnabled(True)
@@ -178,7 +178,7 @@ class MainWindow(Ui_MainWindow):
                 self.new_rotation_action.setEnabled(True)
                 self.new_translation_action.setEnabled(True)
 
-            if isinstance(selected_object, ComponentModel):
+            if isinstance(selected_object, Component):
                 if not hasattr(selected_object, "stored_transforms"):
                     selected_object.stored_transforms = selected_object.transforms
                 if not selected_object.stored_transforms.has_link:
@@ -190,7 +190,7 @@ class MainWindow(Ui_MainWindow):
                     self.create_link_action.setEnabled(True)
                 else:
                     self.create_link_action.setEnabled(False)
-            elif isinstance(selected_object, TransformationModel):
+            elif isinstance(selected_object, Transformation):
                 if not selected_object.parent.has_link:
                     self.create_link_action.setEnabled(True)
                 else:
@@ -217,16 +217,16 @@ class MainWindow(Ui_MainWindow):
     def expand_transformation_list(self, node):
         current_pointer = node.internalPointer()
         if isinstance(current_pointer, TransformationsList) or isinstance(
-            current_pointer, ComponentModel
+            current_pointer, Component
         ):
             self.componentTreeView.expand(node)
-            if isinstance(current_pointer, ComponentModel):
+            if isinstance(current_pointer, Component):
                 trans_list_index = self.component_model.index(1, 0, node)
                 self.componentTreeView.expand(trans_list_index)
             else:
                 component_index = self.component_model.parent(node)
                 self.componentTreeView.expand(component_index)
-        elif isinstance(current_pointer, TransformationModel):
+        elif isinstance(current_pointer, Transformation):
             trans_list_index = self.component_model.parent(node)
             self.componentTreeView.expand(trans_list_index)
             component_index = self.component_model.parent(trans_list_index)
