@@ -6,6 +6,7 @@ from nexus_constructor.transformations import TransformationModel, Transformatio
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import generate_unique_name
 
+
 class ComponentInfo(object):
     def __init__(self, parent: ComponentModel):
         super().__init__()

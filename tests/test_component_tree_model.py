@@ -1,7 +1,7 @@
 from nexus_constructor.component_tree_model import (
     ComponentTreeModel,
     ComponentInfo,
-    LinkTransformation
+    LinkTransformation,
 )
 from nexus_constructor.component import ComponentModel
 import pytest
@@ -38,6 +38,7 @@ class FakeInstrument(list):
             nexus_wrapper, name, 42, "component_name"
         )
         return ComponentModel(nexus_wrapper, component_group)
+
 
 def get_component():
     nexus_wrapper = NexusWrapper(str(uuid1()))
@@ -117,6 +118,7 @@ def test_transformation_has_0_rows():
 
     assert under_test.rowCount(test_index) == 0
 
+
 def test_transformation_link_has_0_rows():
     component = get_component()
     translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
@@ -147,6 +149,7 @@ def test_get_default_parent():
     test_index = QModelIndex()
 
     assert under_test.parent(test_index) == QModelIndex()
+
 
 def test_get_component_parent():
     data_under_test = FakeInstrument([get_component()])
@@ -213,6 +216,7 @@ def test_get_transformation_parent():
     assert found_parent.internalPointer() == data_under_test[0].stored_transforms
     assert found_parent.row() == 1
 
+
 def test_get_transformation_link_parent():
     component = get_component()
     data_under_test = FakeInstrument([component])
@@ -238,6 +242,7 @@ def test_get_invalid_index():
 
     assert under_test.index(2, 0, test_index) == QModelIndex()
 
+
 def test_get_data_success_1():
     data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
@@ -245,6 +250,7 @@ def test_get_data_success_1():
     test_index = under_test.createIndex(0, 0, data_under_test[0])
 
     assert under_test.data(test_index, Qt.DisplayRole) is data_under_test[0]
+
 
 def test_get_data_success_2():
     data_under_test = FakeInstrument([get_component()])
@@ -254,6 +260,7 @@ def test_get_data_success_2():
 
     assert under_test.data(test_index, Qt.SizeHintRole) is None
 
+
 def test_get_data_fail():
     data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
@@ -261,6 +268,7 @@ def test_get_data_fail():
     under_test.createIndex(0, 0, data_under_test[0])
 
     assert under_test.data(QModelIndex(), Qt.DisplayRole) is None
+
 
 def test_get_flags_fail():
     data_under_test = FakeInstrument([get_component()])
@@ -270,6 +278,7 @@ def test_get_flags_fail():
 
     assert under_test.flags(QModelIndex()) is Qt.NoItemFlags
 
+
 def test_get_flags_component():
     data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
@@ -278,14 +287,16 @@ def test_get_flags_component():
 
     assert under_test.flags(index) == (Qt.ItemIsEnabled | Qt.ItemIsSelectable)
 
+
 def test_get_flags_component_info():
     data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
-    item = ComponentInfo(parent = data_under_test[0])
+    item = ComponentInfo(parent=data_under_test[0])
     index = under_test.createIndex(0, 0, item)
 
     assert under_test.flags(index) == Qt.ItemIsEnabled
+
 
 def test_get_flags_transformation_list():
     data_under_test = FakeInstrument([get_component()])
@@ -297,13 +308,18 @@ def test_get_flags_transformation_list():
 
     assert under_test.flags(index) == Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
+
 def test_get_flags_other():
     data_under_test = FakeInstrument([get_component()])
     under_test = ComponentTreeModel(data_under_test)
 
     index = under_test.createIndex(0, 0, [])
 
-    assert under_test.flags(index) == Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+    assert (
+        under_test.flags(index)
+        == Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+    )
+
 
 def test_add_component():
     data_under_test = FakeInstrument([])
@@ -313,6 +329,7 @@ def test_add_component():
     under_test.add_component(get_component())
 
     assert under_test.rowCount(QModelIndex()) == 1
+
 
 def test_add_rotation():
     data_under_test = FakeInstrument([])
@@ -327,6 +344,7 @@ def test_add_rotation():
     transform_index = under_test.index(0, 0, transformation_list_index)
     assert transform_index.internalPointer().type == "Rotation"
 
+
 def test_add_translation():
     data_under_test = FakeInstrument([])
     under_test = ComponentTreeModel(data_under_test)
@@ -340,6 +358,7 @@ def test_add_translation():
     transform_index = under_test.index(0, 0, transformation_list_index)
     assert transform_index.internalPointer().type == "Translation"
 
+
 def test_add_transformation_alt_1():
     data_under_test = FakeInstrument([])
     under_test = ComponentTreeModel(data_under_test)
@@ -350,6 +369,7 @@ def test_add_transformation_alt_1():
     assert under_test.rowCount(transformation_list_index) == 0
     under_test.add_translation(transformation_list_index)
     assert under_test.rowCount(transformation_list_index) == 1
+
 
 def test_add_transformation_alt_2():
     data_under_test = FakeInstrument([])
@@ -364,6 +384,7 @@ def test_add_transformation_alt_2():
     under_test.add_translation(transform_index)
     assert under_test.rowCount(transformation_list_index) == 2
 
+
 def test_add_link_alt_1():
     data_under_test = FakeInstrument([])
     under_test = ComponentTreeModel(data_under_test)
@@ -374,8 +395,9 @@ def test_add_link_alt_1():
     assert under_test.rowCount(transformation_list_index) == 0
     under_test.add_link(component_index)
     assert under_test.rowCount(transformation_list_index) == 1
-    assert transformation_list_index.internalPointer().has_link == True
+    assert transformation_list_index.internalPointer().has_link
     assert len(transformation_list_index.internalPointer()) == 0
+
 
 def test_add_link_alt_2():
     data_under_test = FakeInstrument([])
@@ -387,8 +409,9 @@ def test_add_link_alt_2():
     assert under_test.rowCount(transformation_list_index) == 0
     under_test.add_link(transformation_list_index)
     assert under_test.rowCount(transformation_list_index) == 1
-    assert transformation_list_index.internalPointer().has_link == True
+    assert transformation_list_index.internalPointer().has_link
     assert len(transformation_list_index.internalPointer()) == 0
+
 
 def test_add_link_alt_3():
     data_under_test = FakeInstrument([])
@@ -402,8 +425,9 @@ def test_add_link_alt_3():
     assert under_test.rowCount(transformation_list_index) == 1
     under_test.add_link(transform_index)
     assert under_test.rowCount(transformation_list_index) == 2
-    assert transformation_list_index.internalPointer().has_link == True
+    assert transformation_list_index.internalPointer().has_link
     assert len(transformation_list_index.internalPointer()) == 1
+
 
 def test_add_link_multiple_times():
     data_under_test = FakeInstrument([])
@@ -417,9 +441,10 @@ def test_add_link_multiple_times():
     first_link = transformation_list_index.internalPointer().link
     under_test.add_link(component_index)
     assert under_test.rowCount(transformation_list_index) == 1
-    assert transformation_list_index.internalPointer().has_link == True
+    assert transformation_list_index.internalPointer().has_link
     assert len(transformation_list_index.internalPointer()) == 0
     assert first_link is transformation_list_index.internalPointer().link
+
 
 def test_duplicate_component():
     data_under_test = FakeInstrument([])
@@ -430,6 +455,7 @@ def test_duplicate_component():
     component_index = under_test.index(0, 0, QModelIndex())
     under_test.duplicate_node(component_index)
     assert under_test.rowCount(QModelIndex()) == 2
+
 
 def test_duplicate_transform_fail():
     data_under_test = FakeInstrument([])
@@ -443,5 +469,5 @@ def test_duplicate_transform_fail():
     try:
         under_test.duplicate_node(transformation_index)
     except NotImplementedError:
-        return #Success
-    assert False #Failure
+        return  # Success
+    assert False  # Failure
