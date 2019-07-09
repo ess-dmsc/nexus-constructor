@@ -133,9 +133,11 @@ class InstrumentView(QWidget):
         self.update_gnomon_size()
 
         # Filter out the gnomon for just the gnomon camera to see
-        self.create_camera_filter(
+        gnomon_clear_buffers = self.create_camera_filter(
             self.gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
         )
+        # Make the gnomon appear in front of everything else
+        gnomon_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
 
         self.gnomon.update_gnomon()
 
