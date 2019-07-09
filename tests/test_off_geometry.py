@@ -1,16 +1,5 @@
-from nexus_constructor.geometry import NoShapeGeometry, OFFGeometryNoNexus
-from nexus_constructor.geometry.no_shape_geometry import OFFCube
+from nexus_constructor.geometry import OFFGeometryNoNexus
 from PySide2.QtGui import QVector3D
-
-
-def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_off_geometry_returns_an_OFFCube():
-    geom = NoShapeGeometry()
-    assert geom.off_geometry == OFFCube
-
-
-def test_GIVEN_nothing_WHEN_constructing_NoShapeGeometry_THEN_geometry_str_is_None():
-    geom = NoShapeGeometry()
-    assert geom.geometry_str == "None"
 
 
 def test_GIVEN_nothing_WHEN_constructing_OFFGeometry_THEN_geometry_str_is_OFF():
@@ -55,11 +44,6 @@ def test_GIVEN_faces_WHEN_calling_winding_order_indices_on_OFF_THEN_order_is_cor
     expected = [0]  # only one face
 
     assert expected == geom.winding_order_indices
-
-
-def test_GIVEN_nothing_WHEN_calling_off_geometry_on_noshapegeometry_THEN_OFFCube_is_returned():
-    geom = NoShapeGeometry()
-    assert geom.off_geometry == OFFCube
 
 
 def test_GIVEN_off_gemetry_WHEN_calling_off_geometry_on_offGeometry_THEN_original_geometry_is_returned():
