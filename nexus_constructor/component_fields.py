@@ -13,7 +13,12 @@ from typing import List
 from nexus_constructor.component import ComponentModel
 import numpy as np
 from nexus_constructor.ui_utils import validate_line_edit
-from nexus_constructor.validators import FieldValueValidator, FieldType, DATASET_TYPE
+from nexus_constructor.validators import (
+    FieldValueValidator,
+    FieldType,
+    DATASET_TYPE,
+    NameValidator,
+)
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -45,7 +50,7 @@ class FieldWidget(QFrame):
     # Used for deletion of field
     something_clicked = Signal()
 
-    def __init__(self, possible_field_names: List[str], parent=None):
+    def __init__(self, possible_field_names: List[str], parent: QListWidget = None):
         super(FieldWidget, self).__init__(parent)
 
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
@@ -100,7 +105,9 @@ class FieldWidget(QFrame):
 
         # Allow selecting this field widget in a list by clicking on it's contents
         self.field_name_edit.installEventFilter(self)
-        # TODO: check for duplicate names
+
+        self.set_up_name_validator(parent)
+        self.field_name_edit.validator().is_valid.emit(False)
 
         self.value_line_edit.installEventFilter(self)
         self.nx_class_combo.installEventFilter(self)
@@ -112,6 +119,20 @@ class FieldWidget(QFrame):
 
         # Set the layout for the default field type
         self.field_type_changed()
+
+    def set_up_name_validator(self, parent):
+        field_widgets = []
+        for i in range(parent.count()):
+            field_widgets.append(parent.itemWidget(parent.item(i)))
+        self.field_name_edit.setValidator(NameValidator(field_widgets))
+        self.field_name_edit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.field_name_edit,
+                tooltip_on_accept="Field name is valid.",
+                tooltip_on_reject=f"Field name is not valid",
+            )
+        )
 
     @property
     def field_type(self):
