@@ -1,6 +1,6 @@
 from enum import Enum
 
-from PySide2.QtCore import QUrl
+from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
@@ -35,7 +35,9 @@ class GeometryType(Enum):
     MESH = 3
 
 
-class AddComponentDialog(Ui_AddComponentDialog):
+class AddComponentDialog(Ui_AddComponentDialog, QObject):
+    nx_class_changed = Signal("QVariant")
+
     def __init__(self, instrument: Instrument, component_model: ComponentTreeModel):
         super(AddComponentDialog, self).__init__()
         self.instrument = instrument
@@ -140,7 +142,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         item = QListWidgetItem()
         field = FieldWidget(self.possible_fields, self.fieldsListWidget)
         field.something_clicked.connect(partial(self.select_field, item))
+        self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
         item.setSizeHint(field.sizeHint())
+
         self.fieldsListWidget.addItem(item)
         self.fieldsListWidget.setItemWidget(item, field)
 
@@ -173,6 +177,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.possible_fields = self.nx_component_classes[
             self.componentTypeComboBox.currentText()
         ]
+        self.nx_class_changed.emit(self.possible_fields)
 
     def mesh_file_picker(self):
         """

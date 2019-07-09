@@ -24,10 +24,7 @@ from nexus_constructor.validators import (
 class FieldNameLineEdit(QLineEdit):
     def __init__(self, possible_field_names: List[str]):
         super().__init__()
-        self.setCompleter(QCompleter())
-        model = QStringListModel()
-        model.setStringList(possible_field_names)
-        self.completer().setModel(model)
+        self.update_possible_fields(possible_field_names)
         self.setPlaceholderText("Enter name of new field")
         self.setMinimumWidth(200)
         fix_horizontal_size = QSizePolicy()
@@ -43,6 +40,12 @@ class FieldNameLineEdit(QLineEdit):
             self.completer().complete()
         else:
             super().keyPressEvent(event)
+
+    def update_possible_fields(self, possible_fields: List[str]):
+        self.setCompleter(QCompleter())
+        model = QStringListModel()
+        model.setStringList(possible_fields)
+        self.completer().setModel(model)
 
 
 class FieldWidget(QFrame):
