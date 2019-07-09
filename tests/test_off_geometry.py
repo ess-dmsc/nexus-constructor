@@ -94,4 +94,38 @@ def test_can_get_off_geometry_properties():
 
 
 def test_can_set_off_geometry_properties():
-    pass
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper)
+
+    vertices = [
+        QVector3D(0.0, 0.0, 1.0),
+        QVector3D(0.0, 1.0, 0.0),
+        QVector3D(0.0, 0.0, 0.0),
+        QVector3D(0.0, 1.0, 1.0),
+    ]
+
+    faces = [[0, 1, 2, 3]]
+
+    shape = OFFGeometryNoNexus(vertices, faces)
+
+    component.set_off_shape(shape)
+
+    nexus_shape = component.get_shape()
+
+    vertex_2_x = 0.5
+    vertex_2_y = -0.5
+    vertex_2_z = 0
+    new_vertices = [
+        QVector3D(-0.5, -0.5, 0),
+        QVector3D(0, 0.5, 0),
+        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+    ]
+    triangle = [0, 1, 2]
+    new_faces = [triangle]
+    nexus_shape.vertices = new_vertices
+    nexus_shape.faces = new_faces
+
+    assert nexus_shape.faces == new_faces
+    assert nexus_shape.vertices[2].x() == approx(vertex_2_x)
+    assert nexus_shape.vertices[2].y() == approx(vertex_2_y)
+    assert nexus_shape.vertices[2].z() == approx(vertex_2_z)

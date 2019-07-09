@@ -157,6 +157,11 @@ class NexusWrapper(QObject):
             value = str(value, "utf8")
         return value
 
+    @staticmethod
+    def _recreate_dataset(parent_group: h5py.Group, name: str, value: Any, dtype=None):
+        del parent_group[name]
+        parent_group.create_dataset(name, data=value, dtype=dtype)
+
     def set_field_value(self, group: h5py.Group, name: str, value: Any, dtype=None):
         """
         Create or update the value of a field (dataset in hdf terminology)
@@ -172,10 +177,12 @@ class NexusWrapper(QObject):
 
         if name in group:
             if dtype is None or group[name].dtype == dtype:
-                group[name][...] = value
+                try:
+                    group[name][...] = value
+                except TypeError:
+                    self._recreate_dataset(group, name, value, dtype)
             else:
-                del group[name]
-                group.create_dataset(name, data=value, dtype=dtype)
+                self._recreate_dataset(group, name, value, dtype)
         else:
             group.create_dataset(name, data=value, dtype=dtype)
         self._emit_file()
