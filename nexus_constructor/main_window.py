@@ -1,15 +1,10 @@
-from PySide2.QtWidgets import (
-    QDialog,
-    QLabel,
-    QGridLayout,
-    QAction,
-    QToolBar,
-    QPushButton,
-    QComboBox,
-)
+from PySide2.QtWidgets import QAction, QToolBar
 from PySide2.QtGui import QIcon
-from nexus_constructor.instrument import Instrument
+import silx.gui.hdf5
+from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
+
 from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
 import silx.gui.hdf5
