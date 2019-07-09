@@ -1,20 +1,16 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
 from typing import List
-
-from mock import Mock
-
 from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
     FieldValueValidator,
     FieldType,
     GeometryFileValidator,
+    OkValidator,
 )
 import attr
 from PySide2.QtGui import QValidator
 from mock import Mock
-
-from nexus_constructor.validators import NameValidator, UnitValidator, OkValidator
 
 
 @attr.s
@@ -191,6 +187,8 @@ def test_GIVEN_valid_file_WHEN_validating_geometry_file_THEN_returns_acceptable_
 
     assert validator.validate("test.OFF", 0) == QValidator.Acceptable
     validator.is_valid.emit.assert_called_once_with(True)
+
+
 def create_content_ok_validator():
     """
     Create an OkValidator and button mocks that mimic the conditions for valid input.

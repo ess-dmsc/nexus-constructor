@@ -100,6 +100,8 @@ class FieldWidget(QFrame):
 
         # Allow selecting this field widget in a list by clicking on it's contents
         self.field_name_edit.installEventFilter(self)
+        #TODO: check for duplicate names
+
         self.value_line_edit.installEventFilter(self)
         self.nx_class_combo.installEventFilter(self)
 
