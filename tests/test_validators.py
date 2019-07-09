@@ -1,8 +1,11 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
-import attr
 from typing import List
-from nexus_constructor.validators import NameValidator, UnitValidator
+
+import attr
 from PySide2.QtGui import QValidator
+from mock import Mock
+
+from nexus_constructor.validators import NameValidator, UnitValidator, OkValidator
 
 
 @attr.s
@@ -96,3 +99,33 @@ def test_unit_validator():
 
     for unit in not_lengths:
         assert validator.validate(unit, 0) == QValidator.Intermediate
+
+
+def create_content_ok_validator():
+    """
+    :return:
+    """
+
+    mock_no_geometry_button = Mock()
+    mock_mesh_button = Mock()
+
+    mock_no_geometry_button.isChecked = Mock(return_value=False)
+    mock_mesh_button.isChecked = Mock(return_value=True)
+
+    validator = OkValidator(mock_no_geometry_button, mock_mesh_button)
+    validator.set_units_valid(True)
+    validator.set_name_valid(True)
+    validator.set_file_valid(True)
+
+    return validator, mock_mesh_button, mock_no_geometry_button
+
+
+def inspect_signal(result, expected):
+    assert result == expected
+
+
+def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_name_valid(False)
