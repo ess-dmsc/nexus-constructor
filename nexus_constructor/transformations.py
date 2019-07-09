@@ -14,6 +14,7 @@ class TransformationsList(list):
     def __init__(self, parent):
         super().__init__()
         self.parent_component = parent
+        self.has_link = False
 
 
 class TransformationModel:

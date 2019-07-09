@@ -23,6 +23,7 @@ from nexus_constructor.validators import (
 )
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
+from nexus_constructor.component_tree_model import ComponentTreeModel
 import os
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
@@ -35,9 +36,10 @@ class GeometryType(Enum):
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
-    def __init__(self, instrument: Instrument):
+    def __init__(self, instrument: Instrument, component_model: ComponentTreeModel):
         super(AddComponentDialog, self).__init__()
         self.instrument = instrument
+        self.component_model = component_model
         self.geometry_model = None
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
@@ -224,3 +226,4 @@ class AddComponentDialog(Ui_AddComponentDialog):
         description = self.descriptionPlainTextEdit.text()
         component = self.instrument.add_component(component_name, nx_class, description)
         add_fields_to_component(component, self.fieldsListWidget)
+        self.component_model.add_component(component)
