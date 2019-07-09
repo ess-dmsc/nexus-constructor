@@ -1,6 +1,6 @@
 from nexus_constructor.pixel_data import PixelGrid
 from nexus_constructor.geometry import OFFGeometryNoNexus
-from nexus_constructor.geometry_loader import load_geometry_from_file_object
+from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.off_renderer import QtOFFGeometry
 from PySide2.QtGui import QVector3D
 import struct

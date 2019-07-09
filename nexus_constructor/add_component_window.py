@@ -21,7 +21,7 @@ import os
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component import Component
-from nexus_constructor.geometry_loader import load_geometry
+from nexus_constructor.geometry.geometry_loader import load_geometry
 
 
 class GeometryType(Enum):
