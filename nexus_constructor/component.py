@@ -271,6 +271,7 @@ class Component:
         )
         vertices = calculate_vertices(axis_direction, height, radius)
         vertices_field = self.file.set_field_value(shape_group, "vertices", vertices)
+        # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
         self.file.set_field_value(shape_group, "cylinders", np.array([0, 1, 2]))
         self.file.set_attribute_value(vertices_field, "units", units)
         return CylindricalGeometry(self.file, shape_group)

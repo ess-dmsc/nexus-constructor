@@ -94,6 +94,7 @@ class CylindricalGeometry:
         new_base_edge = qvector3d_to_numpy_array(old_base_edge - half_height_change)
         new_top_centre = qvector3d_to_numpy_array(old_top_centre + half_height_change)
         vertices = np.vstack((new_base_centre, new_base_edge, new_top_centre))
+        # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
         cylinders = np.array([0, 1, 2])
         self.file.set_field_value(self.group, "cylinders", cylinders)
         self.file.set_field_value(self.group, "vertices", vertices)
