@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'add_component.ui',
 # licensing of 'add_component.ui' applies.
 #
-# Created: Thu Jun 13 16:16:47 2019
+# Created: Wed Jul 10 10:28:16 2019
 #      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -117,11 +117,11 @@ class Ui_AddComponentDialog(object):
         self.cylinderOptionsBox.setObjectName("cylinderOptionsBox")
         self.gridLayout = QtWidgets.QGridLayout(self.cylinderOptionsBox)
         self.gridLayout.setObjectName("gridLayout")
-        self.cylinderXLineEdit = QtWidgets.QSpinBox(self.cylinderOptionsBox)
+        self.cylinderXLineEdit = QtWidgets.QDoubleSpinBox(self.cylinderOptionsBox)
         self.cylinderXLineEdit.setMaximum(100000)
         self.cylinderXLineEdit.setObjectName("cylinderXLineEdit")
         self.gridLayout.addWidget(self.cylinderXLineEdit, 2, 1, 1, 1)
-        self.cylinderRadiusLineEdit = QtWidgets.QSpinBox(self.cylinderOptionsBox)
+        self.cylinderRadiusLineEdit = QtWidgets.QDoubleSpinBox(self.cylinderOptionsBox)
         self.cylinderRadiusLineEdit.setMinimum(1)
         self.cylinderRadiusLineEdit.setMaximum(100000)
         self.cylinderRadiusLineEdit.setObjectName("cylinderRadiusLineEdit")
@@ -129,7 +129,7 @@ class Ui_AddComponentDialog(object):
         self.label_6 = QtWidgets.QLabel(self.cylinderOptionsBox)
         self.label_6.setObjectName("label_6")
         self.gridLayout.addWidget(self.label_6, 2, 0, 1, 1)
-        self.cylinderYLineEdit = QtWidgets.QSpinBox(self.cylinderOptionsBox)
+        self.cylinderYLineEdit = QtWidgets.QDoubleSpinBox(self.cylinderOptionsBox)
         self.cylinderYLineEdit.setMaximum(100000)
         self.cylinderYLineEdit.setObjectName("cylinderYLineEdit")
         self.gridLayout.addWidget(self.cylinderYLineEdit, 2, 3, 1, 1)
@@ -145,12 +145,12 @@ class Ui_AddComponentDialog(object):
         self.label_8 = QtWidgets.QLabel(self.cylinderOptionsBox)
         self.label_8.setObjectName("label_8")
         self.gridLayout.addWidget(self.label_8, 2, 4, 1, 1)
-        self.cylinderHeightLineEdit = QtWidgets.QSpinBox(self.cylinderOptionsBox)
+        self.cylinderHeightLineEdit = QtWidgets.QDoubleSpinBox(self.cylinderOptionsBox)
         self.cylinderHeightLineEdit.setMinimum(1)
         self.cylinderHeightLineEdit.setMaximum(100000)
         self.cylinderHeightLineEdit.setObjectName("cylinderHeightLineEdit")
         self.gridLayout.addWidget(self.cylinderHeightLineEdit, 0, 1, 1, 1)
-        self.cylinderZLineEdit = QtWidgets.QSpinBox(self.cylinderOptionsBox)
+        self.cylinderZLineEdit = QtWidgets.QDoubleSpinBox(self.cylinderOptionsBox)
         self.cylinderZLineEdit.setMaximum(100000)
         self.cylinderZLineEdit.setProperty("value", 1)
         self.cylinderZLineEdit.setObjectName("cylinderZLineEdit")
