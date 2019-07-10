@@ -25,8 +25,8 @@ class FieldNameLineEdit(QLineEdit):
     def __init__(self, possible_field_names: List[str]):
         super().__init__()
         self.update_possible_fields(possible_field_names)
-        self.setPlaceholderText("Enter name of new field")
-        self.setMinimumWidth(200)
+        self.setPlaceholderText("Name of new field")
+        self.setMinimumWidth(160)
         fix_horizontal_size = QSizePolicy()
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
         self.setSizePolicy(fix_horizontal_size)
