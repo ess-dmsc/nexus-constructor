@@ -14,7 +14,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 
 @pytest.mark.skip(
-    reason="Leads to seg faults. Clicking with QActions/QIcons doesn't seem to be possible."
+    reason="Clicking with QActions/QIcons doesn't seem to be possible. This test causes seg faults at the moment."
 )
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot
@@ -86,7 +86,7 @@ def test_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_a
     assert dialog.geometryFileBox.isVisible()
 
 
-def test_GIVEN_correct_class_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
+def test_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
     qtbot
 ):
     template = QDialog()
@@ -112,6 +112,51 @@ def test_GIVEN_correct_class_WHEN_selecting_nxclass_THEN_pixel_options_becomes_v
             template.show()
             qtbot.waitForWindowShown(template)
             assert dialog.pixelOptionsBox.isVisible()
+
+
+def test_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_invisible(
+    qtbot
+):
+
+    template = QDialog()
+    dialog = create_add_component_dialog(5)
+    template.ui = dialog
+    template.ui.setupUi(template)
+
+    classes = list(dialog.nx_component_classes.keys())
+    no_pixel_options_class_indices = []
+
+    for i, nx_class in enumerate(classes):
+        if nx_class not in component_type.PIXEL_COMPONENT_TYPES:
+            no_pixel_options_class_indices.append(i)
+
+    no_pixel_options_class_indices.append(no_pixel_options_class_indices.pop(0))
+
+    all_geometry_buttons = [
+        dialog.noGeometryRadioButton,
+        dialog.meshRadioButton,
+        dialog.CylinderRadioButton,
+    ]
+
+    for geometry_button in all_geometry_buttons:
+
+        qtbot.mouseClick(geometry_button, Qt.LeftButton)
+        template.show()
+        qtbot.waitForWindowShown(template)
+
+        for index in no_pixel_options_class_indices:
+
+            # Check that it starts off invisible
+            assert not dialog.pixelOptionsBox.isVisible()
+
+            # Set the pixel options to visible
+            dialog.pixelOptionsBox.setVisible(True)
+            dialog.geometryOptionsBox.setVisible(True)
+            assert dialog.pixelOptionsBox.isVisible()
+
+            # Change the index and check that the pixel options have become invisible again
+            dialog.componentTypeComboBox.setCurrentIndex(index)
+            assert not dialog.pixelOptionsBox.isVisible()
 
 
 def create_add_component_dialog(test_count):
