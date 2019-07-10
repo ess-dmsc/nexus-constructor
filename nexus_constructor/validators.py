@@ -169,13 +169,13 @@ class FieldType(Enum):
 
 DATASET_TYPE = {
     "Byte": np.byte,
-    "Unsigned Byte": np.ubyte,
+    "UByte": np.ubyte,
     "Short": np.short,
-    "Unsigned Short": np.ushort,
+    "UShort": np.ushort,
     "Integer": np.intc,
-    "Unsigned Integer": np.uintc,
+    "UInteger": np.uintc,
     "Long": np.int_,
-    "Unsigned Long": np.uint,
+    "ULong": np.uint,
     "Float": np.single,
     "Double": np.double,
     "String": np.string_,
