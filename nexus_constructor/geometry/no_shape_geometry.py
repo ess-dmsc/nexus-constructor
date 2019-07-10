@@ -1,17 +1,18 @@
 from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
 from PySide2.QtGui import QVector3D
 
+__half_side_length = 0.5
 
 OFFCube = OFFGeometryNoNexus(
     vertices=[
-        QVector3D(-0.5, -0.5, 0.5),
-        QVector3D(0.5, -0.5, 0.5),
-        QVector3D(-0.5, 0.5, 0.5),
-        QVector3D(0.5, 0.5, 0.5),
-        QVector3D(-0.5, 0.5, -0.5),
-        QVector3D(0.5, 0.5, -0.5),
-        QVector3D(-0.5, -0.5, -0.5),
-        QVector3D(0.5, -0.5, -0.5),
+        QVector3D(-__half_side_length, -__half_side_length, __half_side_length),
+        QVector3D(__half_side_length, -__half_side_length, __half_side_length),
+        QVector3D(-__half_side_length, __half_side_length, __half_side_length),
+        QVector3D(__half_side_length, __half_side_length, __half_side_length),
+        QVector3D(-__half_side_length, __half_side_length, -__half_side_length),
+        QVector3D(__half_side_length, __half_side_length, -__half_side_length),
+        QVector3D(-__half_side_length, -__half_side_length, -__half_side_length),
+        QVector3D(__half_side_length, -__half_side_length, -__half_side_length),
     ],
     faces=[
         [0, 1, 3, 2],
