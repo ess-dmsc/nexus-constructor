@@ -29,7 +29,5 @@ def test_get_an_orthogonal_unit_vector_gives_a_unit_vector():
 def test_get_an_orthogonal_unit_vector_gives_an_orthogonal_vector():
     test_vector = QVector3D(2, 6, 3)
     result_vector = get_an_orthogonal_unit_vector(test_vector)
-    print(test_vector)
-    print(result_vector)
     # Test orthogonal (dot product is zero)
     assert QVector3D.dotProduct(test_vector, result_vector) == approx(0)
