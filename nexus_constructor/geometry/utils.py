@@ -7,7 +7,7 @@ def validate_nonzero_qvector(value: QVector3D):
         raise ValueError("Vector is zero length")
 
 
-def get_an_orthogonal_unit_vector(input_vector: QVector3D):
+def get_an_orthogonal_unit_vector(input_vector: QVector3D) -> QVector3D:
     """
     Return a unit vector which is orthogonal to the input vector
     There are infinite valid solutions, just one is returned

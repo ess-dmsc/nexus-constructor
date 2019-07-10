@@ -18,6 +18,9 @@ from nexus_constructor.geometry.utils import validate_nonzero_qvector
 import numpy as np
 
 
+SHAPE_GROUP_NAME = "shape"
+
+
 class DependencyError(Exception):
     """
     Raised when trying to carry out an operation which would invalidate the depends_on chain
@@ -261,7 +264,7 @@ class Component:
         self._remove_shape()
         validate_nonzero_qvector(axis_direction)
         shape_group = self.file.create_nx_group(
-            "shape", "NXcylindrical_geometry", self.group
+            SHAPE_GROUP_NAME, "NXcylindrical_geometry", self.group
         )
         vertices = calculate_vertices(axis_direction, height, radius)
         vertices_field = self.file.set_field_value(shape_group, "vertices", vertices)
@@ -275,14 +278,16 @@ class Component:
         Overrides any existing shape
         """
         self._remove_shape()
-        shape_group = self.file.create_nx_group("shape", "NXoff_geometry", self.group)
+        shape_group = self.file.create_nx_group(
+            SHAPE_GROUP_NAME, "NXoff_geometry", self.group
+        )
         record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
         record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
         return OFFGeometryNexus(self.file, shape_group)
 
     def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
-        if "shape" in self.group:
-            shape_group = self.group["shape"]
+        if SHAPE_GROUP_NAME in self.group:
+            shape_group = self.group[SHAPE_GROUP_NAME]
             nx_class = self.file.get_nx_class(shape_group)
             if nx_class == "NXcylindrical_geometry":
                 return CylindricalGeometry(self.file, shape_group)
@@ -290,5 +295,5 @@ class Component:
                 return OFFGeometryNexus(self.file, shape_group)
 
     def _remove_shape(self):
-        if "shape" in self.group:
-            del self.group["shape"]
+        if SHAPE_GROUP_NAME in self.group:
+            del self.group[SHAPE_GROUP_NAME]

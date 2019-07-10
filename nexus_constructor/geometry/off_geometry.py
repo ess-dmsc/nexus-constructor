@@ -28,7 +28,7 @@ class OFFGeometry(ABC):
 
     @property
     @abstractmethod
-    def winding_order(self):
+    def winding_order(self) -> List[int]:
         """
         Flattened 1D list of indices in vertices for each face
         winding_order_indices gives the start index for each face in this list
@@ -37,7 +37,7 @@ class OFFGeometry(ABC):
 
     @property
     @abstractmethod
-    def winding_order_indices(self):
+    def winding_order_indices(self) -> List[int]:
         """
         The start index for each face in winding_order
         """
@@ -45,7 +45,7 @@ class OFFGeometry(ABC):
 
     @property
     @abstractmethod
-    def off_geometry(self):
+    def off_geometry(self) -> "OFFGeometry":
         pass
 
     @property
@@ -87,11 +87,11 @@ class OFFGeometryNoNexus(OFFGeometry):
         self._faces = faces
 
     @property
-    def winding_order(self):
+    def winding_order(self) -> List[int]:
         return [point for face in self.faces for point in face]
 
     @property
-    def winding_order_indices(self):
+    def winding_order_indices(self) -> List[int]:
         face_sizes = [len(face) for face in self.faces]
         return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
@@ -158,11 +158,11 @@ class OFFGeometryNexus(OFFGeometry):
             raise NexusFormatError("\n".join(problems))
 
     @property
-    def winding_order(self):
+    def winding_order(self) -> List[int]:
         return [point for face in self.faces for point in face]
 
     @property
-    def winding_order_indices(self):
+    def winding_order_indices(self) -> List[int]:
         face_sizes = [len(face) for face in self.faces]
         return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
