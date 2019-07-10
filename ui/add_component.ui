@@ -184,14 +184,14 @@
              </property>
              <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,1,0,1">
               <item row="2" column="1">
-               <widget class="QSpinBox" name="cylinderXLineEdit">
+               <widget class="QDoubleSpinBox" name="cylinderXLineEdit">
                 <property name="maximum">
                  <number>100000</number>
                 </property>
                </widget>
               </item>
               <item row="0" column="3">
-               <widget class="QSpinBox" name="cylinderRadiusLineEdit">
+               <widget class="QDoubleSpinBox" name="cylinderRadiusLineEdit">
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -208,7 +208,7 @@
                </widget>
               </item>
               <item row="2" column="3">
-               <widget class="QSpinBox" name="cylinderYLineEdit">
+               <widget class="QDoubleSpinBox" name="cylinderYLineEdit">
                 <property name="maximum">
                  <number>100000</number>
                 </property>
@@ -243,7 +243,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QSpinBox" name="cylinderHeightLineEdit">
+               <widget class="QDoubleSpinBox" name="cylinderHeightLineEdit">
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -253,7 +253,7 @@
                </widget>
               </item>
               <item row="2" column="5">
-               <widget class="QSpinBox" name="cylinderZLineEdit">
+               <widget class="QDoubleSpinBox" name="cylinderZLineEdit">
                 <property name="maximum">
                  <number>100000</number>
                 </property>
