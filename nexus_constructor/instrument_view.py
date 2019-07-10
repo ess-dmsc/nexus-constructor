@@ -115,7 +115,8 @@ class InstrumentView(QWidget):
 
     def create_layers(self):
         """
-        Assigns the gnomon view and component view to different cameras and viewports.
+        Assigns the gnomon view and component view to different cameras and viewports. Controls the buffer behaviour of
+        the different viewports so that the depth buffer behaves in such a way that the gnomon is always in front.
         """
         main_camera = self.view.camera()
         viewport = Qt3DRender.QViewport(self.surface_selector)
@@ -126,7 +127,10 @@ class InstrumentView(QWidget):
             viewport, self.combined_component_axes_entity, main_camera
         )
 
+        # Have the component buffer take on the default behaviour
         component_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.AllBuffers)
+
+        # Set the background color of the main scene
         component_clear_buffers.setClearColor(QColor("lightgrey"))
 
         # Create a viewport for gnomon in small section of the screen
@@ -134,9 +138,11 @@ class InstrumentView(QWidget):
         self.update_gnomon_size()
 
         # Filter out the gnomon for just the gnomon camera to see
-        self.create_camera_filter(
+        gnomon_clear_buffers = self.create_camera_filter(
             self.gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
         )
+        # Make the gnomon appear in front of everything else
+        gnomon_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
 
         self.gnomon.update_gnomon()
 
