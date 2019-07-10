@@ -1,20 +1,18 @@
 import pytest
-from PySide2.QtWidgets import QMainWindow, QDialog
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.instrument import Instrument
 from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QMainWindow, QDialog
 
-pytestmark = pytest.mark.skip(
-    "UI tests SIGABRT currently due to the QWebEngine issues in PySide2"
-)
+from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.main_window import MainWindow
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
-# from nexus_constructor.add_component_window import AddComponentDialog
-# from nexus_constructor.main_window import MainWindow
+
 # Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
-AddComponentDialog = object()
-MainWindow = object()
 
 
+@pytest.mark.skip(reason="Leads to seg faults.")
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot
 ):
@@ -25,8 +23,8 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 
     qtbot.addWidget(template)
 
-    qtbot.mouseClick(window.pushButton, Qt.LeftButton)
-
+    # Using trigger rather than clicking on the menu
+    window.new_component_action.trigger()
     assert window.add_component_window.isVisible()
 
     window.add_component_window.close()
@@ -35,8 +33,10 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options_are_hidden(
     qtbot
 ):
+
+    instrument = Instrument(NexusWrapper("test2"))
     template = QDialog()
-    dialog = AddComponentDialog(Instrument(NexusWrapper("test2")))
+    dialog = AddComponentDialog(instrument, ComponentTreeModel(instrument))
     template.ui = dialog
     template.ui.setupUi(template)
 
@@ -50,8 +50,10 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
+    instrument = Instrument(NexusWrapper("test3"))
+    component = ComponentTreeModel(instrument)
     template = QDialog()
-    dialog = AddComponentDialog(Instrument(NexusWrapper("test3")))
+    dialog = AddComponentDialog(instrument, component)
     template.ui = dialog
     template.ui.setupUi(template)
 
@@ -59,5 +61,28 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
 
     qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
 
-    assert dialog.cylinderOptionsBox.isEnabled()
-    assert dialog.unitsbox.isEnabled()
+    template.show()
+    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.cylinderOptionsBox.isVisible()
+    assert dialog.unitsbox.isVisible()
+
+
+def test_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
+    qtbot
+):
+
+    instrument = Instrument(NexusWrapper("test4"))
+    component = ComponentTreeModel(instrument)
+    template = QDialog()
+    dialog = AddComponentDialog(instrument, component)
+    template.ui = dialog
+    template.ui.setupUi(template)
+
+    qtbot.addWidget(template)
+
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    template.show()
+    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.unitsbox.isVisible()
+    assert dialog.geometryFileBox.isVisible()
