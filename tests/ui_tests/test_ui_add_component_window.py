@@ -12,7 +12,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 # Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
 
 
-@pytest.mark.skip(reason="Leads to seg faults.")
+@pytest.mark.skip(reason="Leads to seg faults. Clicking with QActions is not possible.")
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot
 ):
