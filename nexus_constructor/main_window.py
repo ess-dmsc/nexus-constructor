@@ -53,6 +53,9 @@ class MainWindow(Ui_MainWindow):
         self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
+        self.instrument.nexus.component_removed.connect(
+            self.sceneWidget.delete_component
+        )
         self.instrument.nexus.file_changed.connect(
             self.update_nexus_file_structure_view
         )

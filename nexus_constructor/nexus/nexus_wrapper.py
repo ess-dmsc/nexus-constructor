@@ -35,6 +35,7 @@ class NexusWrapper(QObject):
     # Signal that indicates the nexus file has been changed in some way
     file_changed = Signal("QVariant")
     component_added = Signal(str, "QVariant")
+    component_removed = Signal(str)
     show_entries_dialog = Signal("QVariant", "QVariant")
 
     def __init__(self, filename="NeXus File"):
