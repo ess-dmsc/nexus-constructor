@@ -107,10 +107,9 @@ class CylindricalGeometry:
         """
         cylinders = self.file.get_field_value(self.group, "cylinders")
         vertices = self.file.get_field_value(self.group, "vertices")
-        base_centre = numpy_array_to_qvector3d(vertices[cylinders[0], :])
-        base_edge = numpy_array_to_qvector3d(vertices[cylinders[1], :])
-        top_centre = numpy_array_to_qvector3d(vertices[cylinders[2], :])
-        return base_centre, base_edge, top_centre
+        return tuple(
+            numpy_array_to_qvector3d(vertices[cylinders[i], :]) for i in range(3)
+        )
 
     @property
     def radius(self) -> float:
