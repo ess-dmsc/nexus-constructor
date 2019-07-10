@@ -19,6 +19,9 @@ import numpy as np
 
 
 SHAPE_GROUP_NAME = "shape"
+CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
+OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"
+DEPENDS_ON_STR = "depends_on"
 
 
 class DependencyError(Exception):
@@ -112,7 +115,7 @@ class Component:
         :return: List of transforms
         """
         transforms = TransformationsList(self)
-        depends_on = self.get_field("depends_on")
+        depends_on = self.get_field(DEPENDS_ON_STR)
         self._get_transform(depends_on, transforms)
         return transforms
 
@@ -137,8 +140,8 @@ class Component:
                 # We're done, the next transformation is not stored in this component
                 return
             transforms.append(Transformation(self.file, transform_dataset))
-            if "depends_on" in transform_dataset.attrs.keys():
-                self._get_transform(transform_dataset.attrs["depends_on"], transforms)
+            if DEPENDS_ON_STR in transform_dataset.attrs.keys():
+                self._get_transform(transform_dataset.attrs[DEPENDS_ON_STR], transforms)
 
     @property
     def transforms(self) -> TransformationsList:
@@ -148,7 +151,7 @@ class Component:
         :return:
         """
         transforms = TransformationsList(self)
-        depends_on = self.get_field("depends_on")
+        depends_on = self.get_field(DEPENDS_ON_STR)
         self._get_transform(depends_on, transforms, local_only=True)
         return transforms
 
@@ -229,24 +232,24 @@ class Component:
 
     @property
     def depends_on(self):
-        depends_on_path = self.file.get_field_value(self.group, "depends_on")
+        depends_on_path = self.file.get_field_value(self.group, DEPENDS_ON_STR)
         if depends_on_path is None:
             return None
         return Transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
     def depends_on(self, transformation: Transformation):
-        existing_depends_on = self.file.get_attribute_value(self.group, "depends_on")
+        existing_depends_on = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
         if existing_depends_on is not None:
             Transformation(
                 self.file, self.file[existing_depends_on]
             ).deregister_dependent(self)
 
         if transformation is None:
-            self.file.set_field_value(self.group, "depends_on", ".", str)
+            self.file.set_field_value(self.group, DEPENDS_ON_STR, ".", str)
         else:
             self.file.set_field_value(
-                self.group, "depends_on", transformation.absolute_path, str
+                self.group, DEPENDS_ON_STR, transformation.absolute_path, str
             )
             transformation.register_dependent(self)
 
@@ -264,7 +267,7 @@ class Component:
         self._remove_shape()
         validate_nonzero_qvector(axis_direction)
         shape_group = self.file.create_nx_group(
-            SHAPE_GROUP_NAME, "NXcylindrical_geometry", self.group
+            SHAPE_GROUP_NAME, CYLINDRICAL_GEOMETRY_NEXUS_NAME, self.group
         )
         vertices = calculate_vertices(axis_direction, height, radius)
         vertices_field = self.file.set_field_value(shape_group, "vertices", vertices)
@@ -279,7 +282,7 @@ class Component:
         """
         self._remove_shape()
         shape_group = self.file.create_nx_group(
-            SHAPE_GROUP_NAME, "NXoff_geometry", self.group
+            SHAPE_GROUP_NAME, OFF_GEOMETRY_NEXUS_NAME, self.group
         )
         record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
         record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
@@ -289,9 +292,9 @@ class Component:
         if SHAPE_GROUP_NAME in self.group:
             shape_group = self.group[SHAPE_GROUP_NAME]
             nx_class = self.file.get_nx_class(shape_group)
-            if nx_class == "NXcylindrical_geometry":
+            if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
                 return CylindricalGeometry(self.file, shape_group)
-            if nx_class == "NXoff_geometry":
+            if nx_class == OFF_GEOMETRY_NEXUS_NAME:
                 return OFFGeometryNexus(self.file, shape_group)
 
     def _remove_shape(self):
