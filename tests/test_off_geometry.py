@@ -129,3 +129,37 @@ def test_can_set_off_geometry_properties():
     assert nexus_shape.vertices[2].x() == approx(vertex_2_x)
     assert nexus_shape.vertices[2].y() == approx(vertex_2_y)
     assert nexus_shape.vertices[2].z() == approx(vertex_2_z)
+
+
+def test_can_retrieve_list_of_vertices_for_each_face():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper)
+
+    shape = OFFGeometryNoNexus(
+        [QVector3D(0.0, 0.0, 1.0), QVector3D(0.0, 1.0, 0.0), QVector3D(0.0, 0.0, 0.0)],
+        [[0, 1, 2]],
+    )
+
+    component.set_off_shape(shape)
+
+    test_input_flat_list_of_vertex_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    # Define there are three faces, the difference in starting index indicates there are three vertices
+    # in the first face (triangle), four in the second (square), and five in the third face (pentagon)
+    test_input_start_index_of_each_face = [0, 3, 7]
+
+    expected_output_vertex_indices_split_by_face = [
+        [0, 1, 2],
+        [3, 4, 5, 6],
+        [7, 8, 9, 10, 11],
+    ]
+
+    nexus_shape = component.get_shape()
+
+    nexus_wrapper.set_field_value(
+        nexus_shape.group, "winding_order", test_input_flat_list_of_vertex_indices
+    )
+    nexus_wrapper.set_field_value(
+        nexus_shape.group, "faces", test_input_start_index_of_each_face
+    )
+
+    assert nexus_shape.faces == expected_output_vertex_indices_split_by_face

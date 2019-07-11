@@ -190,9 +190,9 @@ class OFFGeometryNexus(OFFGeometry):
         into a list of the vertex indices for each face
         :return: List of vertex indices for each face
         """
-        winding_order_from_file = self.group["winding_order"]
-        face_starting_indices = self.group[
-            "faces"
+        winding_order_from_file = self.group["winding_order"][...]
+        face_starting_indices = self.group["faces"][
+            ...
         ]  # Gives starting index for each face in winding_order
         faces = [
             winding_order_from_file[
