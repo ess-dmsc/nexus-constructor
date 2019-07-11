@@ -15,6 +15,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 nexus_wrapper_count = 0
 RED_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #f6989d }"
 WHITE_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #FFFFFF }"
+UNIQUE_COMPONENT_NAME = "AUniqueName"
 
 
 @pytest.mark.skip(
@@ -206,7 +207,7 @@ def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_become
 
     # Mimic the user entering a name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, "AUniqueName")
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has changed to white
     assert dialog.nameLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
@@ -272,10 +273,71 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_THEN_add_component_window_cl
 
     # Mimic the user entering a non-unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, "AUniqueName")
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
     assert not template.isVisible()
+
+
+def test_UI_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_button_is_disabled(
+    qtbot
+):
+
+    template = QDialog()
+    dialog = create_add_component_dialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+
+    qtbot.addWidget(template)
+
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+    # Mimic the user entering a non-unique name in the text field
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, "sample")
+    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_given_no_input_WHEN_adding_component_THEN_add_component_button_is_disabled(
+    qtbot
+):
+
+    template = QDialog()
+    dialog = create_add_component_dialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+
+    qtbot.addWidget(template)
+
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_given_valid_input_WHEN_adding_component_THEN_add_component_button_is_enabled(
+    qtbot
+):
+
+    template = QDialog()
+    dialog = create_add_component_dialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+
+    qtbot.addWidget(template)
+
+    # Mimic the user entering a non-unique name in the text field
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+    assert dialog.buttonBox.isEnabled()
 
 
 def create_add_component_dialog():
