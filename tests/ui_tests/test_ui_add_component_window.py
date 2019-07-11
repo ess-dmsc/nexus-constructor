@@ -32,7 +32,7 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
     qtbot.addWidget(template)
 
     # Using trigger rather than clicking on the menu
-    template.show()
+    window.new_component_action.trigger()
     assert window.add_component_window.isVisible()
 
     window.add_component_window.close()
@@ -84,7 +84,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     assert dialog.unitsbox.isVisible()
 
 
-def test_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
+def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
 
@@ -111,7 +111,7 @@ def test_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_a
     assert dialog.geometryFileBox.isVisible()
 
 
-def test_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
+def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
     qtbot
 ):
 
@@ -132,6 +132,8 @@ def test_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options
     for geometry_button in pixel_geometry_buttons:
 
         qtbot.mouseClick(geometry_button, Qt.LeftButton)
+        template.show()
+        qtbot.waitForWindowShown(template)
 
         for index in pixel_options_class_indices:
             dialog.componentTypeComboBox.setCurrentIndex(index)
@@ -140,7 +142,7 @@ def test_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options
             assert dialog.pixelOptionsBox.isVisible()
 
 
-def test_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_invisible(
+def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_invisible(
     qtbot
 ):
 
@@ -186,7 +188,7 @@ def test_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
             assert not dialog.pixelOptionsBox.isVisible()
 
 
-def test_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
+def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
     qtbot
 ):
 
@@ -208,7 +210,7 @@ def test_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_w
     assert dialog.nameLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
 
 
-def test_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_remains_red(
+def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_remains_red(
     qtbot
 ):
 
@@ -230,7 +232,7 @@ def test_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_remain
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
-def test_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_window_remains_open(
+def test_UI_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_window_remains_open(
     qtbot
 ):
 
@@ -252,7 +254,7 @@ def test_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_window_rem
     assert template.isVisible()
 
 
-def test_GIVEN_valid_input_WHEN_adding_component_THEN_add_component_window_closes(
+def test_UI_GIVEN_valid_input_WHEN_adding_component_THEN_add_component_window_closes(
     qtbot
 ):
 
