@@ -68,7 +68,7 @@ builders = pipeline_builder.createBuilders { container ->
         try {
                 container.sh """
                     cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --ignore=tests/ui_tests --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml
                 """
             }
             catch(err) {
@@ -153,7 +153,7 @@ def get_macos_pipeline() {
                     sh "python3 -m pip install --user -r requirements-dev.txt && git submodule update --init"
                 } // stage
                 stage('Run tests') {
-                    sh "python3 -m pytest . -s --ignore=definitions/"
+                    sh "python3 -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/"
                 } // stage
             } // dir
         } // node
