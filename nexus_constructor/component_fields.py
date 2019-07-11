@@ -53,6 +53,11 @@ class FieldWidget(QFrame):
     # Used for deletion of field
     something_clicked = Signal()
 
+    def dataset_type_changed(self, _):
+        self.value_line_edit.validator().dataset_type_combo = self.value_type_combo
+        self.value_line_edit.validator().field_type_combo = self.field_type_combo
+        self.value_line_edit.validator().validate(self.value_line_edit.text(), 0)
+
     def __init__(self, possible_field_names: List[str], parent: QListWidget = None):
         super(FieldWidget, self).__init__(parent)
 
@@ -68,6 +73,7 @@ class FieldWidget(QFrame):
 
         self.value_type_combo = QComboBox()
         self.value_type_combo.addItems(list(DATASET_TYPE.keys()))
+        self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit = QLineEdit()
         self.value_line_edit.setValidator(
@@ -81,7 +87,7 @@ class FieldWidget(QFrame):
                 tooltip_on_reject="Value is not cast-able to selected numpy type.",
             )
         )
-        self.value_line_edit.validator().validate(self.value_line_edit.text(), 0)
+        self.dataset_type_changed(0)
 
         self.nx_class_combo = QComboBox()
 
