@@ -88,21 +88,6 @@ class CylindricalGeometry:
         cylinder_axis = top_centre - base_centre
         return cylinder_axis.length()
 
-    @height.setter
-    def height(self, new_height: float):
-        old_base_centre, old_base_edge, old_top_centre = self._get_cylinder_vertices()
-        cylinder_axis = old_top_centre - old_base_centre
-        old_height = cylinder_axis.length()
-        half_height_change = 0.5 * (new_height - old_height) * self.axis_direction
-        new_base_centre = qvector3d_to_numpy_array(old_base_centre - half_height_change)
-        new_base_edge = qvector3d_to_numpy_array(old_base_edge - half_height_change)
-        new_top_centre = qvector3d_to_numpy_array(old_top_centre + half_height_change)
-        vertices = np.vstack((new_base_centre, new_base_edge, new_top_centre))
-        # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
-        cylinders = np.array([0, 1, 2])
-        self.file.set_field_value(self.group, "cylinders", cylinders)
-        self.file.set_field_value(self.group, "vertices", vertices)
-
     def _get_cylinder_vertices(self) -> Tuple[QVector3D, QVector3D, QVector3D]:
         """
         Get the three points defining the cylinder
@@ -120,17 +105,6 @@ class CylindricalGeometry:
         base_centre, base_edge, _ = self._get_cylinder_vertices()
         cylinder_radius = base_edge - base_centre
         return cylinder_radius.length()
-
-    @radius.setter
-    def radius(self, new_radius: float):
-        base_centre, base_edge, _ = self._get_cylinder_vertices()
-        cylinder_radius = base_edge - base_centre
-        new_cylinder_radius = qvector3d_to_numpy_array(
-            cylinder_radius.normalized() * new_radius
-        )
-        vertices = self.file.get_field_value(self.group, "vertices")
-        vertices[1, :] = new_cylinder_radius
-        self.file.set_field_value(self.group, "vertices", vertices)
 
     @property
     def axis_direction(self) -> QVector3D:
