@@ -106,10 +106,14 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     template.show()
     qtbot.waitForWindowShown(template)
 
+    def check_mesh_options_visible():
+        assert dialog.geometryOptionsBox.isVisible()
+        assert dialog.unitsbox.isVisible()
+        assert dialog.geometryFileBox.isVisible()
+
+    qtbot.waitUntil(check_mesh_options_visible)
+
     # Check that this has caused the relevant fields to become visible
-    assert dialog.geometryOptionsBox.isVisible()
-    assert dialog.unitsbox.isVisible()
-    assert dialog.geometryFileBox.isVisible()
 
 
 def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
