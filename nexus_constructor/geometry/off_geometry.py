@@ -185,8 +185,15 @@ class OFFGeometryNexus(OFFGeometry):
 
     @property
     def faces(self) -> List[List[int]]:
+        """
+        Convert winding order dataset, which is a flat list for all faces,
+        into a list of the vertex indices for each face
+        :return: List of vertex indices for each face
+        """
         winding_order_from_file = self.group["winding_order"]
-        face_starting_indices = self.group["faces"]
+        face_starting_indices = self.group[
+            "faces"
+        ]  # Gives starting index for each face in winding_order
         faces = [
             winding_order_from_file[
                 face_start : face_starting_indices[index + 1]
