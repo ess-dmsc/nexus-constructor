@@ -221,4 +221,7 @@ def add_fields_to_component(component: ComponentModel, fields_widget: QListWidge
     """
     for i in range(fields_widget.count()):
         widget = fields_widget.itemWidget(fields_widget.item(i))
-        component.set_field(widget.name, widget.value, widget.dtype)
+        try:
+            component.set_field(widget.name, widget.value, widget.dtype)
+        except ValueError:
+            print(f"Field {widget.name} not added")
