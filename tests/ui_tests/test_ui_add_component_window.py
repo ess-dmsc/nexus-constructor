@@ -1,19 +1,14 @@
 import pytest
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QMainWindow, QDialog
-
-from nexus_constructor import component_type
-from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.instrument import Instrument
-from nexus_constructor.main_window import MainWindow
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-
 # Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
+
 
 nexus_wrapper_count = 0
 RED_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #f6989d }"
 WHITE_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #FFFFFF }"
+
+@pytest.fixture(scope="module")
+def import_modules():
+    pass
 
 
 @pytest.mark.skip(
@@ -22,6 +17,11 @@ WHITE_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #FFFFFF }"
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot
 ):
+    from PySide2.QtWidgets import QMainWindow
+    from nexus_constructor.instrument import Instrument
+    from nexus_constructor.main_window import MainWindow
+    from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+
     template = QMainWindow()
     window = MainWindow(Instrument(NexusWrapper("test")))
     template.ui = window
@@ -39,6 +39,9 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options_are_hidden(
     qtbot
 ):
+    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QDialog
+
     template = QDialog()
     dialog = create_add_component_dialog()
     template.ui = dialog
@@ -54,7 +57,12 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
+    from PySide2.QtWidgets import QDialog
+    from PySide2.QtCore import Qt
+
+
     template = QDialog()
+
     dialog = create_add_component_dialog()
     template.ui = dialog
     template.ui.setupUi(template)
@@ -80,6 +88,9 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
 def test_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
+    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QDialog
+
     template = QDialog()
     dialog = create_add_component_dialog()
     template.ui = dialog
@@ -106,6 +117,11 @@ def test_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_a
 def test_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
     qtbot
 ):
+    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QDialog
+
+    from nexus_constructor import component_type
+
     template = QDialog()
     dialog = create_add_component_dialog()
     template.ui = dialog
@@ -134,6 +150,11 @@ def test_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options
 def test_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_invisible(
     qtbot
 ):
+
+    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QDialog
+
+    from nexus_constructor import component_type
 
     template = QDialog()
     dialog = create_add_component_dialog()
@@ -181,6 +202,9 @@ def test_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_w
     qtbot
 ):
 
+    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QDialog
+
     template = QDialog()
     dialog = create_add_component_dialog()
     template.ui = dialog
@@ -202,6 +226,10 @@ def test_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_w
 def test_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_remains_red(
     qtbot
 ):
+
+    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QDialog
+
 
     template = QDialog()
     dialog = create_add_component_dialog()
@@ -225,6 +253,9 @@ def test_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_window_rem
     qtbot
 ):
 
+    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QDialog
+
     template = QDialog()
     dialog = create_add_component_dialog()
     template.ui = dialog
@@ -247,6 +278,9 @@ def test_GIVEN_valid_input_WHEN_adding_component_THEN_add_component_window_close
     qtbot
 ):
 
+    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QDialog
+
     template = QDialog()
     dialog = create_add_component_dialog()
     template.ui = dialog
@@ -266,6 +300,12 @@ def test_GIVEN_valid_input_WHEN_adding_component_THEN_add_component_window_close
 
 
 def create_add_component_dialog():
+
+    from nexus_constructor.add_component_window import AddComponentDialog
+    from nexus_constructor.component_tree_model import ComponentTreeModel
+    from nexus_constructor.instrument import Instrument
+    from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+
     global nexus_wrapper_count
     nexus_name = "test" + str(nexus_wrapper_count)
     instrument = Instrument(NexusWrapper(nexus_name))
