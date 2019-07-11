@@ -118,7 +118,7 @@ return {
             } // stage
             stage("Run tests") {
                 bat """
-                set PYTEST_QT_API="pyside2"
+                set PYTEST_QT_API=pyside2
                 python -m pytest . -s --ignore=definitions
                 """
             } // stage
