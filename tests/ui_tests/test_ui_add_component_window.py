@@ -1,14 +1,11 @@
 import pytest
+
 # Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
 
 
 nexus_wrapper_count = 0
 RED_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #f6989d }"
 WHITE_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #FFFFFF }"
-
-@pytest.fixture(scope="module")
-def import_modules():
-    pass
 
 
 @pytest.mark.skip(
@@ -59,7 +56,6 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
 ):
     from PySide2.QtWidgets import QDialog
     from PySide2.QtCore import Qt
-
 
     template = QDialog()
 
@@ -229,7 +225,6 @@ def test_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_remain
 
     from PySide2.QtCore import Qt
     from PySide2.QtWidgets import QDialog
-
 
     template = QDialog()
     dialog = create_add_component_dialog()
