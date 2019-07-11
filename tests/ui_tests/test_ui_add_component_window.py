@@ -111,7 +111,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
         assert dialog.unitsbox.isVisible()
         assert dialog.geometryFileBox.isVisible()
 
-    qtbot.waitUntil(check_mesh_options_visible)
+    qtbot.waitUntil(check_mesh_options_visible, 5000)
 
     # Check that this has caused the relevant fields to become visible
 
