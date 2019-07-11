@@ -1,9 +1,9 @@
 ignore:
   - "tests"
-  - "nexus_constructor/application.py"
   - "**/*__init__.py"
   - "main.py"
   - "setup.py"
+  - "ui/"
 
 comment:
   layout: "header, diff, tree, changes, sunburst"

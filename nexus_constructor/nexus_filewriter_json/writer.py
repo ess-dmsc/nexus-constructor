@@ -1,277 +1,201 @@
-"""
-Functions to write data in an InstrumentModel to nexus filewriter json
+import h5py
 
-This module contains all the functions used to format the data.
-It is recommended that instead of importing this module, the root of the package be imported instead, as this exposes
-only the required root function to generate the json
-
-Json format description can be found at https://github.com/ess-dmsc/kafka-to-nexus/
-"""
+from nexus_constructor.instrument import Instrument
+import numpy as np
 import json
-from nexus_constructor.component import Component
-from nexus_constructor.pixel_data import PixelGrid, PixelMapping, SinglePixelId
-from nexus_constructor.transformations import Translation, Rotation
-from nexus_constructor.geometry_types import CylindricalGeometry, OFFGeometry
-from nexus_constructor.nexus import (
-    external_component_types,
-    component_class_name,
-    ancestral_dependent_transform,
-    absolute_transform_path_name,
-    pixel_mapping,
-    geometry_group_name,
-    pixel_grid_x_offsets,
-    pixel_grid_y_offsets,
-    pixel_grid_z_offsets,
-    pixel_grid_detector_ids,
-)
-from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from typing import List
+import uuid
 
 
-def generate_json(model: InstrumentModel):
+def generate_json(
+    data: Instrument, file, streams=None, links=None, nexus_file_name: str = ""
+):
     """
-    Returns a formatted json string built from a given InstrumentModel
+    Returns a formatted json string built from a given Instrument
+    The json description can be used by the file writer (github.com/ess-dmsc/kafka-to-nexus) to create a NeXus file
 
-    :param model: The model to generate a json representation of
-    :return: A string containing a json representation of the model
+    :param data: The full description of the beamline and data
+    :param file: the file object to output the JSON to.
+    :param streams: dict of streams in nexus file.
+    :param links: dict of links in nexus file with name and target as value fields.
+    :param nexus_file_name: The NeXus file name in the write command for the filewriter.
     """
-    internal_components = [
-        component
-        for component in model.components
-        if component.component_type not in external_component_types()
-    ]
-    external_components = [
-        component
-        for component in model.components
-        if component.component_type in external_component_types()
-    ]
 
-    data = {
-        "nexus_structure": {
-            "children": [
-                {
-                    "type": "group",
-                    "name": "instrument",
-                    "attributes": {"NX_class": "NXinstrument"},
-                    "children": generate_component_list(internal_components),
-                }
-            ]
-        }
-    }
-    data["nexus_structure"]["children"].extend(
-        generate_component_list(external_components)
-    )
+    if links is None:
+        links = {}
+    if streams is None:
+        streams = {}
 
-    return json.dumps(data, indent=2)
+    converter = NexusToDictConverter()
+    tree = converter.convert(data.nexus.entry, streams, links)
+    write_command, stop_command = create_writer_commands(tree, nexus_file_name)
+    object_to_json_file(write_command, file)
 
 
-def generate_component_list(components: List[Component]):
-    """Returns a list of dictionaries describing the components provided"""
-    return [generate_component_data(component) for component in components]
+class NexusToDictConverter:
+    """
+    Class used to convert nexus format root to python dict
+    """
 
+    def __init__(self):
+        self._kafka_streams = dict()
+        self._links = dict()
 
-def generate_component_data(component: Component):
-    """Builds and returns a dictionary containing the details of the given component that can be written to json"""
-    data = {
-        "type": "group",
-        "name": component.name,
-        "attributes": {
-            "NX_class": component_class_name(component.component_type),
-            "description": component.description,
-        },
-        "children": [],
-    }
-    add_transform_data(data, component)
-    add_geometry_and_pixel_data(data, component)
-    return data
-
-
-def add_transform_data(json_data: dict, component: Component):
-    """Adds properties to a dictionary describing the transforms in the component"""
-    dependent_on = ancestral_dependent_transform(component)
-
-    if len(component.transforms) > 0:
-
-        nx_transforms = {
-            "type": "group",
-            "name": "transforms",
-            "attributes": {"NX_class": "NXtransformations"},
-            "children": [],
+    def convert(self, nexus_root, streams, links):
+        """
+        Converts the given nexus_root to dict with correct replacement of
+        the streams
+        :param links:
+        :param nexus_root
+        :param streams:
+        :return: dictionary
+        """
+        self._kafka_streams = streams
+        self._links = links
+        return {
+            "children": [self._root_to_dict(entry) for _, entry in nexus_root.items()]
         }
 
-        for transform in component.transforms:
-            if isinstance(transform, Rotation):
-                type_name = "rotation"
-                units = "degrees"
-                vector = (
-                    transform.axis.toTuple()
-                    if transform.axis.length() != 0
-                    else [0, 0, 0]
-                )
-                value = transform.angle
-            elif isinstance(transform, Translation):
-                type_name = "translation"
-                units = "m"
-                vector = (
-                    transform.vector.normalized().toTuple()
-                    if transform.vector.length() != 0
-                    else [0, 0, 0]
-                )
-                value = transform.vector.length()
+    def _root_to_dict(self, root):
+        if isinstance(root, h5py.Group):
+            root_dict = self._handle_group(root)
+        else:
+            root_dict = self._handle_dataset(root)
+
+        root_dict = self._handle_attributes(root, root_dict)
+        return root_dict
+
+    @staticmethod
+    def _get_data_and_type(root: h5py.Dataset):
+        """
+        get the value and data type of dataset
+        :param root: h5py dataset
+        :return: the data in the dataset, the datatype and the size of the data in the dataset
+        """
+        size = 1
+        data = root[()]
+        dtype = root.dtype
+        if type(data) is np.ndarray:
+            size = data.shape
+            data = data.tolist()
+        if dtype.char == "S":
+            if isinstance(data, list):
+                data = [str_item.decode("utf-8") for str_item in data]
             else:
-                continue
+                data = data.decode("utf-8")
+            dtype = "string"
+        elif dtype == np.float64:
+            dtype = "double"
+        elif dtype == np.float32:
+            dtype = "float"
+        return data, dtype, size
 
-            nx_transforms["children"].append(
+    @staticmethod
+    def _handle_attributes(root, root_dict):
+        if "NX_class" in root.attrs:
+            nx_class = root.attrs["NX_class"]
+            if nx_class and nx_class != "NXfield" and nx_class != "NXgroup":
+                root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
+            if len(root.attrs) > 1:
+                if "attributes" not in root_dict:
+                    root_dict["attributes"] = []
+                root_dict["attributes"] = []
+                for attr_name, attr in root.attrs.items():
+                    # data, dtype, size = self._get_data_and_type(attr)
+                    new_attribute = {"name": attr_name, "values": attr}
+                    root_dict["attributes"].append(new_attribute)
+        return root_dict
+
+    def _handle_group(self, root: h5py.Group):
+        """
+        Generate JSON dict for a h5py group.
+        :param root: h5py group to generate dict from.
+        :return: generated dict of group and children.
+        """
+        root_dict = {"type": "group", "name": root.name, "children": []}
+        # Add the entries
+        entries = list(root.values())
+        if root.name in self._kafka_streams:
+            root_dict["children"].append(
+                {"type": "stream", "stream": self._kafka_streams[root.name]}
+            )
+        elif root.name in self._links:
+            root_dict["children"].append(
                 {
-                    "type": "dataset",
-                    "name": transform.name,
-                    "dataset": {"type": "double", "size": [1]},
-                    "attributes": [
-                        {"name": "transformation_type", "values": type_name},
-                        {"name": "depends_on", "values": dependent_on},
-                        {"name": "units", "values": units},
-                        {"name": "offset", "values": [0.0, 0.0, 0.0], "type": "double"},
-                        {"name": "vector", "values": vector, "type": "double"},
-                    ],
-                    "values": value,
+                    "type": "link",
+                    "name": self._links[root.name]["name"],
+                    "target": self._links[root.name]["target"],
                 }
             )
-            dependent_on = absolute_transform_path_name(
-                transform,
-                component,
-                component.component_type not in external_component_types(),
-            )
-        json_data["children"].append(nx_transforms)
+        elif entries:
+            for entry in entries:
+                child_dict = self._root_to_dict(entry)
+                root_dict["children"].append(child_dict)
 
-    json_data["attributes"]["depends_on"] = dependent_on
+        return root_dict
 
-
-def add_geometry_and_pixel_data(json_data: dict, component: Component):
-    """Adds properties describing the geometry and pixel data of the component to its json dictionary"""
-    geometry = component.geometry
-    pixel_data = component.pixel_data
-    geometry_group = geometry_group_name(component)
-
-    if isinstance(geometry, CylindricalGeometry):
-        nexus_geometry = {
-            "type": "group",
-            "name": geometry_group,
-            "attributes": {"NX_class": "NXcylindrical_geometry"},
-            "children": [
-                {
-                    "type": "dataset",
-                    "name": "vertices",
-                    "dataset": {"type": "double", "size": [3, 3]},
-                    "values": [
-                        geometry.base_center_point.toTuple(),
-                        geometry.base_edge_point.toTuple(),
-                        geometry.top_center_point.toTuple(),
-                    ],
-                },
-                {
-                    "type": "dataset",
-                    "name": "cylinders",
-                    "dataset": {"type": "int64", "size": [1, 3]},
-                    "values": [[0, 1, 2]],
-                },
-            ],
+    def _handle_dataset(self, root: h5py.Dataset):
+        """
+        Generate JSON dict for a h5py dataset.
+        :param root: h5py dataset to generate dict from.
+        :return: generated dictionary of dataset values and attrs.
+        """
+        data, dataset_type, size = self._get_data_and_type(root)
+        root_dict = {
+            "type": "dataset",
+            "name": root.name,
+            "dataset": {"type": dataset_type},
+            "values": data,
         }
-    elif isinstance(geometry, OFFGeometry):
-        nexus_geometry = {
-            "type": "group",
-            "name": geometry_group,
-            "attributes": {"NX_class": "NXoff_geometry"},
-            "children": [
-                {
-                    "type": "dataset",
-                    "name": "vertices",
-                    "dataset": {"type": "double", "size": [len(geometry.vertices), 3]},
-                    "values": [vertex.toTuple() for vertex in geometry.vertices],
-                },
-                {
-                    "type": "dataset",
-                    "name": "winding_order",
-                    "dataset": {"type": "int64", "size": [len(geometry.winding_order)]},
-                    "values": geometry.winding_order,
-                },
-                {
-                    "type": "dataset",
-                    "name": "faces",
-                    "dataset": {
-                        "type": "int64",
-                        "size": [len(geometry.winding_order_indices)],
-                    },
-                    "values": geometry.winding_order_indices,
-                },
-            ],
-        }
-        if isinstance(pixel_data, PixelMapping):
-            mapping_list = pixel_mapping(pixel_data)
-            nexus_geometry["children"].append(
-                {
-                    "type": "dataset",
-                    "name": "detector_faces",
-                    "dataset": {"type": "int64", "size": [len(mapping_list), 2]},
-                    "values": mapping_list,
-                }
-            )
-    else:
-        return
+        if size != 1:
+            root_dict["dataset"]["size"] = size
 
-    if isinstance(pixel_data, PixelGrid):
-        json_data["children"].append(
-            {
-                "type": "dataset",
-                "name": "x_pixel_offset",
-                "dataset": {
-                    "type": "double",
-                    "size": [pixel_data.rows, pixel_data.columns],
-                },
-                "values": pixel_grid_x_offsets(pixel_data),
-            }
-        )
-        json_data["children"].append(
-            {
-                "type": "dataset",
-                "name": "y_pixel_offset",
-                "dataset": {
-                    "type": "double",
-                    "size": [pixel_data.rows, pixel_data.columns],
-                },
-                "values": pixel_grid_y_offsets(pixel_data),
-            }
-        )
-        json_data["children"].append(
-            {
-                "type": "dataset",
-                "name": "z_pixel_offset",
-                "dataset": {
-                    "type": "double",
-                    "size": [pixel_data.rows, pixel_data.columns],
-                },
-                "values": pixel_grid_z_offsets(pixel_data),
-            }
-        )
-        json_data["children"].append(
-            {
-                "type": "dataset",
-                "name": "detector_number",
-                "dataset": {
-                    "type": "int64",
-                    "size": [pixel_data.rows, pixel_data.columns],
-                },
-                "values": pixel_grid_detector_ids(pixel_data),
-            }
-        )
-    elif isinstance(pixel_data, SinglePixelId):
-        # TODO: Replace this Mantid compatibility dataset, with the nexus standard's way (once it exists)
-        json_data["children"].append(
-            {
-                "type": "dataset",
-                "name": "detector_id",
-                "dataset": {"type": "int64", "size": [1]},
-                "values": pixel_data.pixel_id,
-            }
-        )
+        return root_dict
 
-    json_data["children"].append(nexus_geometry)
+
+def object_to_json_file(tree_dict, file):
+    """
+    Create a JSON file describing the NeXus file
+    WARNING, output files can easily be 10 times the size of input NeXus file
+
+    :param tree_dict: Root node of the tree.
+    :param file: File object to store the tree in.
+    """
+
+    json.dump(tree_dict, file, indent=2, sort_keys=False)
+
+
+def create_writer_commands(
+    nexus_structure,
+    output_filename,
+    broker="localhost:9092",
+    job_id="",
+    start_time=None,
+    stop_time=None,
+):
+    """
+    :param nexus_structure: dictionary containing nexus file structure
+    :param output_filename: the nexus file output filename
+    :param broker: default broker to consume from
+    :param job_id: filewriter job_id
+    :param start_time: ms from unix epoch
+    :param stop_time: ms from unix epoch
+    :return: A write command and stop command with specified job_id.
+    """
+    if not job_id:
+        job_id = str(uuid.uuid1())
+
+    write_cmd = {
+        "cmd": "FileWriter_new",
+        "broker": broker,
+        "job_id": job_id,
+        "file_attributes": {"file_name": output_filename},
+        "nexus_structure": nexus_structure,
+    }
+    if start_time is not None:
+        write_cmd["start_time"] = start_time
+
+    stop_cmd = {"cmd": "FileWriter_stop", "job_id": job_id}
+    if stop_time is not None:
+        stop_cmd["stop_time"] = stop_time
+
+    return write_cmd, stop_cmd

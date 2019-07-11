@@ -1,4 +1,0 @@
-# qmldir
-singleton ValidUnits ValidUnits.qml
-singleton GeometryFileSelected GeometryFileSelected.qml
-singleton ErrorMessages ErrorMessages.qml

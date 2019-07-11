@@ -1,112 +1,28 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
-from nexus_constructor.component import Component
-from nexus_constructor.transformations import Translation
-from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from nexus_constructor.qml_models.transform_model import TransformationModel
-from nexus_constructor.validators import (
-    NameValidator,
-    TransformParentValidator,
-    UnitValidator,
-)
+from typing import List
+
+import attr
 from PySide2.QtGui import QValidator
+from mock import Mock
+
+from nexus_constructor.validators import NameValidator, UnitValidator, OkValidator
 
 
-def assess_component_tree(count: int, parent_mappings: dict, results: dict):
-    """
-    Test the validity of a transform parent network of components
-
-    Builds an InstrumentModel with components connected according to parent_mappings, then for each provided result,
-    checks a components validity if it were to be set to its current parent.
-    :param count: the number of components to create
-    :param parent_mappings: a dictionary of int -> int representing child and parent index numbers
-    :param results: a dictionary of int -> boolean representing the index of components to check validity for, and
-    their expected validity
-    """
-    components = [Component(name=str(i)) for i in range(count)]
-    for child, parent in parent_mappings.items():
-        components[child].transform_parent = components[parent]
-
-    model = InstrumentModel()
-    model.components = components
-
-    validator = TransformParentValidator()
-    validator.list_model = model
-
-    for index, expected_result in results.items():
-        validator.model_index = index
-        parent_name = components[index].transform_parent.name
-        assert (
-            validator.validate(parent_name, 0) == QValidator.Acceptable
-        ) == expected_result
+@attr.s
+class ObjectWithName:
+    name = attr.ib(str)
 
 
-def test_parent_validator_self_loop_terminated_tree():
-    """A parent tree where the root item points to itself is valid"""
-    parent_mappings = {0: 0, 1: 0, 2: 1, 3: 1, 4: 0}
-    results = {0: True, 1: True, 2: True, 3: True, 4: True}
-    assess_component_tree(5, parent_mappings, results)
-
-
-def test_parent_validator_none_terminated_tree():
-    """A parent tree where the root item has no parent is valid"""
-    parent_mappings = {1: 0, 2: 1, 3: 1, 4: 0}
-    results = {1: True, 2: True, 3: True, 4: True}
-    assess_component_tree(5, parent_mappings, results)
-
-
-def test_parent_validator_2_item_loop():
-    """A loop between two items is invalid, as would be any item with its parent in that loop"""
-    parent_mappings = {0: 1, 1: 0, 2: 1}
-    results = {0: False, 1: False, 2: False}
-    assess_component_tree(3, parent_mappings, results)
-
-
-def test_parent_validator_3_item_loop():
-    """A loop between three items is invalid, and items with parents in that loop should be too"""
-    parent_mappings = {0: 1, 1: 2, 2: 0, 3: 2}
-    results = {0: False, 1: False, 2: False, 3: False}
-    assess_component_tree(4, parent_mappings, results)
-
-
-def test_parent_validator_chain_beside_loop():
-    """Even if there's a loop, items disconnected from it would still be valid"""
-    parent_mappings = {0: 1, 1: 0, 2: 2, 3: 2}
-    results = {0: False, 1: False, 2: True, 3: True}
-    assess_component_tree(4, parent_mappings, results)
-
-
-def assess_names(names: list, index, new_name, expected_validity):
+def assess_names(names: List[ObjectWithName], new_name, expected_validity):
     """
     Tests the validity of a given name at a given index in a TransformationModel and InstrumentModel with an existing
     list of named transforms
 
     :param names: The names to give to items in the model before validating a change
-    :param index: The index to change/insert the new name at in the model
     :param new_name: The name to check the validity of a change/insert into the model
     :param expected_validity: Whether the name change/insert is expected to be valid
     """
-    models = [TransformationModel(), InstrumentModel()]
-    models[0].transforms = [Translation(name=name) for name in names]
-    models[0].deletable = [True for _ in names]
-    models[1].components = [Component(name=name) for name in names]
-
-    for model in models:
-        assess_names_in_model(model, index, new_name, expected_validity)
-
-
-def assess_names_in_model(model, index, new_name, expected_validity):
-    """
-    Tests the validity of a given name at a given index in a model of named items
-
-    :param model: The model of named items to test against
-    :param index: The index to change/insert the new name at in the model
-    :param new_name: The name to check the validity of a change/insert into the model
-    :param expected_validity: Whether the name change/insert is expected to be valid
-    """
-    validator = NameValidator()
-    validator.list_model = model
-    validator.model_index = index
-
+    validator = NameValidator(names)
     assert (
         validator.validate(new_name, 0) == QValidator.Acceptable
     ) == expected_validity
@@ -114,31 +30,50 @@ def assess_names_in_model(model, index, new_name, expected_validity):
 
 def test_name_validator_new_unique_name():
     """A name that's not already in the model, being added at a new index should be valid"""
-    assess_names(["foo", "bar", "baz"], 3, "asdf", True)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "asdf",
+        True,
+    )
+
+
+def test_an_empty_name_is_not_valid():
+    empty_name = ""
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        empty_name,
+        False,
+    )
 
 
 def test_name_validator_new_existing_name():
     """A name that is already in the model is not valid at a new index"""
-    assess_names(["foo", "bar", "baz"], 3, "foo", False)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "foo",
+        False,
+    )
 
 
 def test_name_validator_set_to_new_name():
     """A name that's not in the model should be valid at an existing index"""
-    assess_names(["foo", "bar", "baz"], 1, "asdf", True)
-
-
-def test_name_validator_set_to_current_name():
-    """A name should be valid at an index where it's already present"""
-    assess_names(["foo", "bar", "baz"], 1, "bar", True)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "asdf",
+        True,
+    )
 
 
 def test_name_validator_set_to_duplicate_name():
     """A name that's already at an index should not be valid at another index"""
-    assess_names(["foo", "bar", "baz"], 1, "foo", False)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "foo",
+        False,
+    )
 
 
 def test_unit_validator():
-
     validator = UnitValidator()
 
     lengths = ["mile", "cm", "centimetre", "yard", "km"]
@@ -164,3 +99,75 @@ def test_unit_validator():
 
     for unit in not_lengths:
         assert validator.validate(unit, 0) == QValidator.Intermediate
+
+
+def create_content_ok_validator():
+    """
+    Create an OkValidator and button mocks that mimic the conditions for valid input.
+    :return: An OkValidator that emits True when `validate_ok` is called and mocks for the no geometry and mesh buttons.
+    """
+    mock_no_geometry_button = Mock()
+    mock_mesh_button = Mock()
+
+    mock_no_geometry_button.isChecked = Mock(return_value=False)
+    mock_mesh_button.isChecked = Mock(return_value=True)
+
+    validator = OkValidator(mock_no_geometry_button, mock_mesh_button)
+    validator.set_units_valid(True)
+    validator.set_name_valid(True)
+    validator.set_file_valid(True)
+
+    return validator, mock_mesh_button, mock_no_geometry_button
+
+
+def inspect_signal(result, expected):
+    """
+    Function for checking that the signal emitted matches an expected value. Used for the OkValidator tests.
+    :param result: The value emitted by the signal.
+    :param expected: The expected value required for the test to pass.
+    """
+    assert result == expected
+
+
+def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.validate_ok()
+
+
+def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_name_valid(False)
+
+
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unchecked_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_units_valid(False)
+
+
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_file_valid(False)
+
+
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_WITH_no_geometry_button_checked_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    mock_no_geometry_button.isChecked = Mock(return_value=True)
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.set_units_valid(False)
+
+
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_WITH_mesh_button_unchecked_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    mock_mesh_button.isChecked = Mock(return_value=False)
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.set_file_valid(False)
