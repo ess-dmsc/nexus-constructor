@@ -58,10 +58,17 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
 
     qtbot.addWidget(template)
 
-    qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
+    # Check that the relevant fields start as invisible
+    assert not dialog.geometryOptionsBox.isVisible()
+    assert not dialog.cylinderOptionsBox.isVisible()
+    assert not dialog.unitsbox.isVisible()
 
+    # Click on the cylinder geometry button
+    qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
     template.show()
     qtbot.waitForWindowShown(template)
+
+    # Check that this has caused the relevant fields to become visible
     assert dialog.geometryOptionsBox.isVisible()
     assert dialog.cylinderOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
@@ -77,10 +84,17 @@ def test_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_a
 
     qtbot.addWidget(template)
 
-    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+    # Check that the relevant fields start as invisible
+    assert not dialog.geometryOptionsBox.isVisible()
+    assert not dialog.cylinderOptionsBox.isVisible()
+    assert not dialog.unitsbox.isVisible()
 
+    # Click on the mesh geometry button
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
     template.show()
     qtbot.waitForWindowShown(template)
+
+    # Check that this has caused the relevant fields to become visible
     assert dialog.geometryOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.geometryFileBox.isVisible()
@@ -130,6 +144,7 @@ def test_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
         if nx_class not in component_type.PIXEL_COMPONENT_TYPES:
             no_pixel_options_class_indices.append(i)
 
+    # Put the first index at the end. Otherwise changing from 0 to 0 doesn't trigger the indexChanged signal.
     no_pixel_options_class_indices.append(no_pixel_options_class_indices.pop(0))
 
     all_geometry_buttons = [
@@ -157,6 +172,32 @@ def test_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
             # Change the index and check that the pixel options have become invisible again
             dialog.componentTypeComboBox.setCurrentIndex(index)
             assert not dialog.pixelOptionsBox.isVisible()
+
+
+def test_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
+    qtbot
+):
+
+    template = QDialog()
+    dialog = create_add_component_dialog(6)
+    template.ui = dialog
+    template.ui.setupUi(template)
+
+    qtbot.addWidget(template)
+
+    # Check that the background color of the ext field starts as red
+    assert dialog.nameLineEdit.styleSheet() == "QLineEdit { background-color: #f6989d }"
+    template.show()
+    qtbot.stopForInteraction()
+
+    # Mimic the user entering a name in the text field
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, "AUniqueName")
+    template.show()
+    qtbot.stopForInteraction()
+
+    # Check that the background color of the test field has changed to white
+    assert dialog.nameLineEdit.styleSheet() == "QLineEdit { background-color: #FFFFFF }"
 
 
 def create_add_component_dialog(test_count):
