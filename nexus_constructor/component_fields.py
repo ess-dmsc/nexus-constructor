@@ -6,6 +6,8 @@ from PySide2.QtWidgets import (
     QComboBox,
     QDialog,
     QListWidget,
+    QGridLayout,
+    QLabel,
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
@@ -224,4 +226,9 @@ def add_fields_to_component(component: ComponentModel, fields_widget: QListWidge
         try:
             component.set_field(widget.name, widget.value, widget.dtype)
         except ValueError:
-            print(f"Field {widget.name} not added")
+            dialog = QDialog(fields_widget.parent().parent())
+            dialog.setModal(True)
+            layout = QGridLayout()
+            layout.addWidget(QLabel(f"Warning: field {widget.name} not added"))
+            dialog.setLayout(layout)
+            dialog.show()
