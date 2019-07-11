@@ -159,10 +159,8 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
 
     classes = list(dialog.nx_component_classes.keys())
     no_pixel_options_class_indices = []
-    all_incides = []
 
     for i, nx_class in enumerate(classes):
-        all_incides.append(i)
         if nx_class not in component_type.PIXEL_COMPONENT_TYPES:
             no_pixel_options_class_indices.append(i)
 
@@ -170,7 +168,6 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
     no_pixel_options_class_indices.append(no_pixel_options_class_indices.pop(0))
 
     all_geometry_buttons = [
-        dialog.noGeometryRadioButton,
         dialog.meshRadioButton,
         dialog.CylinderRadioButton,
     ]
@@ -181,22 +178,16 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
         template.show()
         qtbot.waitForWindowShown(template)
 
-        for index in all_incides:
-            if index is no_pixel_options_class_indices:
-                # Check that it starts off invisible
-                dialog.pixelOptionsBox.setVisible(False)
-                assert not dialog.pixelOptionsBox.isVisible()
+        for index in no_pixel_options_class_indices:
 
-                # Set the pixel options to visible
-                dialog.pixelOptionsBox.setVisible(True)
-                dialog.geometryOptionsBox.setVisible(True)
-                assert dialog.pixelOptionsBox.isVisible()
+            # Manually set the pixel options to visible
+            dialog.pixelOptionsBox.setVisible(True)
+            dialog.geometryOptionsBox.setVisible(True)
+            assert dialog.pixelOptionsBox.isVisible()
 
-                # Change the index and check that the pixel options have become invisible again
-                dialog.componentTypeComboBox.setCurrentIndex(index)
-                assert not dialog.pixelOptionsBox.isVisible()
-            else:
-                pass
+            # Change the index and check that the pixel options have become invisible again
+            dialog.componentTypeComboBox.setCurrentIndex(index)
+            assert not dialog.pixelOptionsBox.isVisible()
 
 
 def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
