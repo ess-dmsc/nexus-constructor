@@ -187,17 +187,37 @@ def test_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_w
 
     # Check that the background color of the ext field starts as red
     assert dialog.nameLineEdit.styleSheet() == "QLineEdit { background-color: #f6989d }"
-    template.show()
-    qtbot.stopForInteraction()
 
     # Mimic the user entering a name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, "AUniqueName")
-    template.show()
-    qtbot.stopForInteraction()
 
     # Check that the background color of the test field has changed to white
     assert dialog.nameLineEdit.styleSheet() == "QLineEdit { background-color: #FFFFFF }"
+
+
+def test_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_remains_red(
+    qtbot
+):
+
+    template = QDialog()
+    dialog = create_add_component_dialog(7)
+    template.ui = dialog
+    template.ui.setupUi(template)
+
+    qtbot.addWidget(template)
+
+    red_background_style_sheet = "QLineEdit { background-color: #f6989d }"
+
+    # Check that the background color of the text field starts as red
+    assert dialog.nameLineEdit.styleSheet() == red_background_style_sheet
+
+    # Mimic the user entering a non-unique name in the text field
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, "sample")
+
+    # Check that the background color of the test field has remained red
+    assert dialog.nameLineEdit.styleSheet() == red_background_style_sheet
 
 
 def create_add_component_dialog(test_count):
