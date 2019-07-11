@@ -13,10 +13,7 @@ from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
 )
-from nexus_constructor.geometry.utils import (
-    validate_nonzero_qvector,
-    get_an_orthogonal_unit_vector,
-)
+from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
 from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
 from typing import Tuple
 
