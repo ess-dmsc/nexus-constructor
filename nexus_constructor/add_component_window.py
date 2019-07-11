@@ -1,6 +1,9 @@
 from enum import Enum
 
-from PySide2.QtCore import QUrl
+from PySide2.QtCore import QUrl, Signal, QObject
+from PySide2.QtWidgets import QListWidgetItem
+
+from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from nexus_constructor.qml_models.geometry_models import (
     CylinderModel,
     OFFModel,
@@ -32,7 +35,9 @@ class GeometryType(Enum):
     MESH = 3
 
 
-class AddComponentDialog(Ui_AddComponentDialog):
+class AddComponentDialog(Ui_AddComponentDialog, QObject):
+    nx_class_changed = Signal("QVariant")
+
     def __init__(self, instrument: Instrument, component_model: ComponentTreeModel):
         super(AddComponentDialog, self).__init__()
         self.instrument = instrument
@@ -41,6 +46,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
+        self.possible_fields = []
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -124,6 +130,30 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+        self.addFieldPushButton.clicked.connect(self.add_field)
+        self.removeFieldPushButton.clicked.connect(self.remove_field)
+
+        # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
+        self.on_nx_class_changed()
+
+        self.fieldsListWidget.itemClicked.connect(self.select_field)
+
+    def add_field(self):
+        item = QListWidgetItem()
+        field = FieldWidget(self.possible_fields, self.fieldsListWidget)
+        field.something_clicked.connect(partial(self.select_field, item))
+        self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
+        item.setSizeHint(field.sizeHint())
+
+        self.fieldsListWidget.addItem(item)
+        self.fieldsListWidget.setItemWidget(item, field)
+
+    def select_field(self, widget):
+        self.fieldsListWidget.setItemSelected(widget, True)
+
+    def remove_field(self):
+        for item in self.fieldsListWidget.selectedItems():
+            self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
 
     def generate_name_suggestion(self):
         """
@@ -144,6 +174,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelOptionsBox.setVisible(
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
+        self.possible_fields = self.nx_component_classes[
+            self.componentTypeComboBox.currentText()
+        ]
+        self.nx_class_changed.emit(self.possible_fields)
 
     def mesh_file_picker(self):
         """
@@ -195,6 +229,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        self.component_model.add_component(
-            self.instrument.add_component(component_name, nx_class, description)
-        )
+        component = self.instrument.add_component(component_name, nx_class, description)
+        add_fields_to_component(component, self.fieldsListWidget)
+        self.component_model.add_component(component)
