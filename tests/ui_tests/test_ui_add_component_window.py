@@ -136,9 +136,15 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
         qtbot.waitForWindowShown(template)
 
         for index in pixel_options_class_indices:
+
+            # Change the pixel options to invisible manually
+            dialog.pixelOptionsBox.setVisible(False)
+            assert not dialog.pixelOptionsBox.isVisible()
+
             dialog.componentTypeComboBox.setCurrentIndex(index)
             template.show()
             qtbot.waitForWindowShown(template)
+
             assert dialog.pixelOptionsBox.isVisible()
 
 
