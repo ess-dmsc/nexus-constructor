@@ -134,16 +134,6 @@ class CylindricalGeometry:
         cylinder_axis = top_centre - base_centre
         return cylinder_axis.normalized()
 
-    @axis_direction.setter
-    def axis_direction(self, new_axis_direction: QVector3D):
-        """
-        Not required to be a unit vector, but must be non-zero
-        :param new_axis_direction: Vector describing direction of the cylinder's axis
-        """
-        validate_nonzero_qvector(new_axis_direction)
-        # TODO rotate the vertices by the angle between the new and old axis directions
-        raise NotImplementedError()
-
     @property
     def off_geometry(self, steps: int = 20) -> OFFGeometry:
         unit_conversion_factor = calculate_unit_conversion_factor(self.units)
