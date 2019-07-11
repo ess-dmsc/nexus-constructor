@@ -6,8 +6,6 @@ from PySide2.QtWidgets import (
     QComboBox,
     QDialog,
     QListWidget,
-    QGridLayout,
-    QLabel,
     QMessageBox,
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
