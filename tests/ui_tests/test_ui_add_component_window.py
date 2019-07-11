@@ -102,6 +102,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
 
     # Click on the mesh geometry button
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
     template.show()
     qtbot.waitForWindowShown(template)
 
@@ -167,10 +168,7 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
     # Put the first index at the end. Otherwise changing from 0 to 0 doesn't trigger the indexChanged signal.
     no_pixel_options_class_indices.append(no_pixel_options_class_indices.pop(0))
 
-    all_geometry_buttons = [
-        dialog.meshRadioButton,
-        dialog.CylinderRadioButton,
-    ]
+    all_geometry_buttons = [dialog.meshRadioButton, dialog.CylinderRadioButton]
 
     for geometry_button in all_geometry_buttons:
 
