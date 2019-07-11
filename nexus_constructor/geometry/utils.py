@@ -13,6 +13,6 @@ def get_an_orthogonal_unit_vector(input_vector: QVector3D) -> QVector3D:
     There are infinite valid solutions, just one is returned
     """
     if np.abs(input_vector.z()) < np.abs(input_vector.x()):
-        vector = QVector3D(input_vector.x(), -input_vector.y(), 0.0)
+        vector = QVector3D(input_vector.y(), -input_vector.x(), 0.0)
         return vector.normalized()
     return QVector3D(0.0, -input_vector.z(), input_vector.y()).normalized()
