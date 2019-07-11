@@ -117,7 +117,9 @@ return {
                 """
             } // stage
             stage("Run tests") {
-                bat """python -m pytest . -s --ignore=definitions
+                bat """
+                set PYTEST_QT_API="pyside2"
+                python -m pytest . -s --ignore=definitions
                 """
             } // stage
             // if (env.CHANGE_ID) {
