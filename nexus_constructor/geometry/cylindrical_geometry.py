@@ -21,6 +21,13 @@ from typing import Tuple
 def calculate_vertices(
     axis_direction: QVector3D, height: float, radius: float
 ) -> np.ndarray:
+    """
+    Given cylinder axis, height and radius, calculate the base centre, base edge and top centre vertices
+    :param axis_direction: axis of the cylinder (not required to be unit vector)
+    :param height: height of the cylinder
+    :param radius: radius of the cylinder
+    :return: base centre, base edge and top centre vertices as a numpy array
+    """
     axis_direction = axis_direction.normalized()
     top_centre = axis_direction * height / 2.0
     base_centre = axis_direction * height / -2.0
