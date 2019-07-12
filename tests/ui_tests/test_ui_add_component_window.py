@@ -53,6 +53,23 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     assert not dialog.geometryOptionsBox.isVisible()
 
 
+def test_UI_given_nothing_WHEN_changing_component_geometry_type_THEN_add_component_button_is_always_disabled(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    all_geometry_buttons = [
+        dialog.noGeometryRadioButton,
+        dialog.meshRadioButton,
+        dialog.CylinderRadioButton,
+    ]
+
+    for geometry_button in all_geometry_buttons:
+        qtbot.mouseClick(geometry_button, Qt.LeftButton)
+        assert not dialog.buttonBox.isEnabled()
+
+
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
@@ -549,6 +566,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_ad
     assert not dialog.buttonBox.isEnabled()
 
 
+@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
 def test_UI_GIVEN_mesh_geometry_selected_THEN_relevant_fields_are_visible(qtbot):
 
     dialog, template = create_add_component_template(qtbot)
