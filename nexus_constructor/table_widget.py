@@ -42,7 +42,7 @@ class TableModel(QAbstractTableModel):
         self.array = np.array([[0]], dtype=self.dtype)
 
     def add_row(self):
-        self.beginInsertRows(QModelIndex(), self.array.size - 1, self.array.shape[0])
+        self.beginInsertRows(QModelIndex(), self.array.size, self.array.shape[0])
         self.array = np.concatenate((self.array, np.array([[0]], dtype=self.dtype)))
         self.endInsertRows()
 
@@ -57,7 +57,7 @@ class TableModel(QAbstractTableModel):
 
     def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
         if role == Qt.DisplayRole or role == Qt.EditRole:
-            return self.array[index.row(), index.column()]
+            return self.array[index.row()][index.column()]
         return None
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
