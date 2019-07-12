@@ -1,4 +1,5 @@
 import os
+import sys
 
 import pytest
 from PySide2.QtCore import Qt
@@ -72,7 +73,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     assert dialog.unitsbox.isVisible()
 
 
-@pytest.mark.skip(reason="Fails on Windows. Not sure why.")
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
 def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
@@ -95,7 +96,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     assert dialog.geometryFileBox.isVisible()
 
 
-@pytest.mark.skip(reason="Fails on Windows. Not sure why.")
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
 def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
     qtbot
 ):
@@ -274,6 +275,7 @@ def test_UI_given_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     assert dialog.buttonBox.isEnabled()
 
 
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
 def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
