@@ -128,17 +128,14 @@ class OkValidator(QObject):
 
     def set_name_valid(self, is_valid):
         self.name_is_valid = is_valid
-        print("Name: {}".format(self.name_is_valid))
         self.validate_ok()
 
     def set_file_valid(self, is_valid):
         self.file_is_valid = is_valid
-        print("File: {}".format(self.file_is_valid))
         self.validate_ok()
 
     def set_units_valid(self, is_valid):
         self.units_are_valid = is_valid
-        print("Units: {}".format(self.units_are_valid))
         self.validate_ok()
 
     def validate_ok(self):
@@ -151,8 +148,6 @@ class OkValidator(QObject):
             not self.no_geometry_button.isChecked() and not self.units_are_valid,
             self.mesh_button.isChecked() and not self.file_is_valid,
         ]
-
-        print("Is valid {}".format(unacceptable))
         self.is_valid.emit(not any(unacceptable))
 
     # Signal to indicate that the fields are valid or invalid. False: invalid.
