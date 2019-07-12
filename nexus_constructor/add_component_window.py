@@ -1,11 +1,11 @@
 from enum import Enum
 
-from PySide2.QtCore import QUrl
-from nexus_constructor.qml_models.geometry_models import (
-    CylinderModel,
-    OFFModel,
-    NoShapeModel,
-)
+from PySide2.QtGui import QVector3D
+from PySide2.QtCore import QUrl, Signal, QObject
+from PySide2.QtWidgets import QListWidgetItem
+
+from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
+from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
@@ -24,6 +24,8 @@ from nexus_constructor.component_tree_model import ComponentTreeModel
 import os
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
+from nexus_constructor.component import Component
+from nexus_constructor.geometry.geometry_loader import load_geometry
 
 
 class GeometryType(Enum):
@@ -32,7 +34,9 @@ class GeometryType(Enum):
     MESH = 3
 
 
-class AddComponentDialog(Ui_AddComponentDialog):
+class AddComponentDialog(Ui_AddComponentDialog, QObject):
+    nx_class_changed = Signal("QVariant")
+
     def __init__(self, instrument: Instrument, component_model: ComponentTreeModel):
         super(AddComponentDialog, self).__init__()
         self.instrument = instrument
@@ -41,6 +45,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
+        self.possible_fields = []
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -124,6 +129,30 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+        self.addFieldPushButton.clicked.connect(self.add_field)
+        self.removeFieldPushButton.clicked.connect(self.remove_field)
+
+        # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
+        self.on_nx_class_changed()
+
+        self.fieldsListWidget.itemClicked.connect(self.select_field)
+
+    def add_field(self):
+        item = QListWidgetItem()
+        field = FieldWidget(self.possible_fields, self.fieldsListWidget)
+        field.something_clicked.connect(partial(self.select_field, item))
+        self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
+        item.setSizeHint(field.sizeHint())
+
+        self.fieldsListWidget.addItem(item)
+        self.fieldsListWidget.setItemWidget(item, field)
+
+    def select_field(self, widget):
+        self.fieldsListWidget.setItemSelected(widget, True)
+
+    def remove_field(self):
+        for item in self.fieldsListWidget.selectedItems():
+            self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
 
     def generate_name_suggestion(self):
         """
@@ -144,6 +173,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelOptionsBox.setVisible(
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
+        self.possible_fields = self.nx_component_classes[
+            self.componentTypeComboBox.currentText()
+        ]
+        self.nx_class_changed.emit(self.possible_fields)
 
     def mesh_file_picker(self):
         """
@@ -170,31 +203,45 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
 
-    def generate_geometry_model(self):
+    def generate_geometry_model(self, component: Component) -> OFFGeometry:
         """
-        Generates a geometry model depending on the type of geometry selected and the current values of the lineedits that apply to the particular geometry type.
+        Generates a geometry model depending on the type of geometry selected and the current values
+        of the lineedits that apply to the particular geometry type.
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
-            geometry_model = CylinderModel()
-            geometry_model.set_unit(self.unitsLineEdit.text())
-            geometry_model.cylinder.height = self.cylinderHeightLineEdit.value()
-            geometry_model.cylinder.radius = self.cylinderRadiusLineEdit.value()
-            geometry_model.cylinder.axis_direction.setX(self.cylinderXLineEdit.value())
-            geometry_model.cylinder.axis_direction.setY(self.cylinderYLineEdit.value())
-            geometry_model.cylinder.axis_direction.setZ(self.cylinderZLineEdit.value())
+            geometry_model = component.set_cylinder_shape(
+                QVector3D(
+                    self.cylinderXLineEdit.value(),
+                    self.cylinderYLineEdit.value(),
+                    self.cylinderZLineEdit.value(),
+                ),
+                self.cylinderHeightLineEdit.value(),
+                self.cylinderRadiusLineEdit.value(),
+                self.unitsLineEdit.text(),
+            )
         elif self.meshRadioButton.isChecked():
-            geometry_model = OFFModel()
-            geometry_model.set_units(self.unitsLineEdit.text())
-            geometry_model.set_file(self.geometry_file_name)
+            mesh_geometry = OFFGeometryNoNexus()
+            geometry_model = load_geometry(
+                self.geometry_file_name, self.unitsLineEdit.text(), mesh_geometry
+            )
+
+            # Units have already been used during loading the file, but we store them and file name
+            # so we can repopulate their fields in the edit component window
+            geometry_model.units = self.unitsLineEdit.text()
+            geometry_model.file_path = self.geometry_file_name
+
+            component.set_off_shape(geometry_model)
         else:
-            geometry_model = NoShapeModel()
+            geometry_model = NoShapeGeometry()
         return geometry_model
 
     def on_ok(self):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        self.component_model.add_component(
-            self.instrument.add_component(component_name, nx_class, description)
-        )
+        component = self.instrument.add_component(component_name, nx_class, description)
+        geometry = self.generate_geometry_model(component)
+        add_fields_to_component(component, self.fieldsListWidget)
+        self.component_model.add_component(component)
+        self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)

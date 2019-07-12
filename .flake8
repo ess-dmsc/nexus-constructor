@@ -4,3 +4,4 @@ max-line-length = 80
 max-complexity = 18
 select = B,C,E,F,W,T4,B9
 exclude = ui/,build*,definitions
+per-file-ignores = nexus_constructor/geometry/__init__.py:F401

@@ -58,10 +58,14 @@ def validate_line_edit(
     )
 
 
-def qvector3d_to_numpy_array(input_vector: QVector3D):
+def qvector3d_to_numpy_array(input_vector: QVector3D) -> np.ndarray:
     return np.array([input_vector.x(), input_vector.y(), input_vector.z()]).astype(
         float
     )
+
+
+def numpy_array_to_qvector3d(input_array: np.ndarray) -> QVector3D:
+    return QVector3D(input_array[0], input_array[1], input_array[2])
 
 
 def generate_unique_name(base: str, items: list):
