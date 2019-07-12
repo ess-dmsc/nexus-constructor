@@ -1,7 +1,9 @@
 import os
 import sys
 
+import PySide2
 import pytest
+import pytestqt
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDialog
 
@@ -23,6 +25,7 @@ WHITE_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #FFFFFF }"
 UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
+INVALID_UNITS = "abc"
 
 
 @pytest.mark.skip(
@@ -261,18 +264,12 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_geometry_THEN_add_
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     # Mimic the user entering valid units
-    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
+    enter_units(dialog, qtbot, VALID_UNITS)
 
-    # Manually change the geometry_file_name attribute as this is usally altered by opening a FileDialog
-    dialog.geometry_file_name = VALID_MESH_FILE_PATH
-
-    template.show()
-    qtbot.waitForWindowShown(template)
+    show_and_close_window(qtbot, template)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -293,8 +290,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_geometry_THEN_
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering valid units
-    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
+    enter_units(dialog, qtbot, VALID_UNITS)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -366,8 +362,7 @@ def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometr
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user entering a bad file path
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, NONEXISTENT_FILE_PATH)
+    enter_file_path(dialog, qtbot, NONEXISTENT_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -384,8 +379,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user giving the path for a file that exists but has the wrong extension
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, WRONG_EXTENSION_FILE_PATH)
+    enter_file_path(dialog, qtbot, WRONG_EXTENSION_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -401,8 +395,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user entering a valid file name
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -422,8 +415,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -464,8 +456,7 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a nonexistent file path
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, NONEXISTENT_FILE_PATH)
+    enter_file_path(dialog, qtbot, NONEXISTENT_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -486,8 +477,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a path for a file that exists but has the wrong extension
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, WRONG_EXTENSION_FILE_PATH)
+    enter_file_path(dialog, qtbot, WRONG_EXTENSION_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -504,7 +494,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user clearing the unit input box (it will contain only 'm' by default)
-    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+    enter_units(dialog, qtbot, "")
 
     assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
@@ -519,7 +509,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_un
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user giving invalid units input
-    qtbot.keyClicks(dialog.unitsLineEdit, "111")
+    enter_units(dialog, qtbot, INVALID_UNITS)
 
     assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
@@ -534,8 +524,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_unit
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the replacing the default value with "km"
-    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
+    enter_units(dialog, qtbot, VALID_UNITS)
 
     assert dialog.unitsLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
 
@@ -553,12 +542,10 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     # Mimic the user giving valid units
-    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
+    enter_units(dialog, qtbot, VALID_UNITS)
 
     assert dialog.buttonBox.isEnabled()
 
@@ -577,8 +564,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_com
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     # Mimic the user clearing the units box
     qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
@@ -600,8 +586,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_ad
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     # Mimic the user giving invalid units input
     qtbot.keyClicks(dialog.unitsLineEdit, "111")
@@ -662,7 +647,9 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_irrelevant_fields_are_invisibl
     assert not dialog.geometryFileBox.isVisible()
 
 
-def show_and_close_window(qtbot, template):
+def show_and_close_window(
+    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
+):
     """
     Function for displaying and then closing a window/widget. This appears to be necessary in order to make sure
     some interactions with the UI are recognised. Otherwise the UI can behave as though no clicks/button presses/etc
@@ -674,7 +661,7 @@ def show_and_close_window(qtbot, template):
     qtbot.waitForWindowShown(template)
 
 
-def create_add_component_template(qtbot):
+def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
     """
     Creates a template Add Component Dialog and sets this up for testing.
     :param qtbot: The qtbot testing tool.
@@ -702,13 +689,42 @@ def create_add_component_dialog():
     return AddComponentDialog(instrument, component)
 
 
-def enter_component_name(dialog, qtbot, component_name):
+def enter_component_name(
+    dialog: AddComponentDialog, qtbot: pytestqt.qtbot.QtBot, component_name: str
+):
     """
-    Mimics the user entering a component name in the Add Component window. Clicks on the text field and enters a given
+    Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
     name.
-    :param dialog: An instance of an AddComponentWindow object.
+    :param dialog: An instance of an AddComponentDialog object.
     :param qtbot: The qtbot testing tool.
     :param component_name: The desired component name.
     """
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, component_name)
+
+
+def enter_file_path(
+    dialog: AddComponentDialog, qtbot: pytestqt.qtbot.QtBot, file_path: str
+):
+    """
+    Mimics the user entering a file path. Clicks on the text field and enters a given file path. Also sets the
+    `geometry_file_name` attribute of the AddComponentDialog and this is usually only altered by opening a FileDialog.
+    :param dialog: An instance of an AddComponentDialog object.
+    :param qtbot: The qtbost testing tool.
+    :param file_path: The desired file path.
+    """
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, file_path)
+    dialog.geometry_file_name = file_path
+
+
+def enter_units(dialog: AddComponentDialog, qtbot: pytestqt.qtbot.QtBot, units: str):
+    """
+    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
+    given string.
+    :param dialog: An instance of an AddComponentDialog object.
+    :param qtbot: The qtbot testing tool.
+    :param units: The desired units input.
+    """
+    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.unitsLineEdit, units)
