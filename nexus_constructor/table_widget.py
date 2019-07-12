@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QWidget, QGridLayout, QTableView, QToolBar, QActio
 class TableWidget(QWidget):
     def __init__(self, type: np.dtype = np.byte, parent=None):
         super().__init__(parent)
-        self.model = TableModel(type=type, parent=self)
+        self.model = TableModel(dtype=type, parent=self)
         self.setLayout(QGridLayout())
 
         self.toolbox = QToolBar()
@@ -35,16 +35,17 @@ class TableWidget(QWidget):
 
 
 class TableModel(QAbstractTableModel):
-    def __init__(self, type: np.dtype = np.byte, parent=None):
+    def __init__(self, dtype: np.dtype, parent=None):
         super().__init__()
+        self.dtype = dtype
         self.setParent(parent)
-        self.array = np.array([], dtype=type)
+        self.array = np.array([[0]], dtype=self.dtype)
 
     def add_row(self):
         self.beginInsertRows(QModelIndex(), self.array.size - 1, self.array.size)
-        self.array = np.append(self.array, [0])
+        self.array = np.append(self.array, np.array([[0]], dtype=type))
         self.endInsertRows()
-        self.dataChanged.emit(0, 0)
+        self.dataChanged.emit(QModelIndex(), QModelIndex())
 
     def add_column(self):
         pass
@@ -60,17 +61,17 @@ class TableModel(QAbstractTableModel):
             return self.array[index.row(), index.column()]
         return None
 
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+        if not index.isValid():
+            return Qt.ItemIsEnabled
+        return QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable
+
     def headerData(
         self, section: int, orientation: Qt.Orientation, role: int = ...
     ) -> typing.Any:
         if role == Qt.DisplayRole:
+            if orientation == Qt.Vertical:
+                return f"{section:d}"
             if orientation == Qt.Horizontal:
-                return self.array.columns[section]
-            elif orientation == Qt.Vertical:
-                return orientation
+                return f"{section:d}"
         return None
-
-    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
-        if not index.isValid():
-            return Qt.ItemIsEnabled
-        return QAbstractTableModel.flags(self, index=index) | Qt.ItemIsEditable
