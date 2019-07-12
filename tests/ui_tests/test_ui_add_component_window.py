@@ -288,6 +288,8 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
 
+    show_and_close_window()
+
     # Although the component name is valid, no file path has been given so the button should be disabled
     assert not dialog.buttonBox.isEnabled()
 
