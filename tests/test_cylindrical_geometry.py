@@ -14,12 +14,14 @@ def test_cylinder_has_property_values_it_was_created_with():
     component = add_component_to_file(nexus_wrapper)
     height = 3
     radius = 4
+    units = "cubits"
     cylinder = component.set_cylinder_shape(
-        axis_direction=QVector3D(1, 0, 0), height=height, radius=radius, units="m"
+        axis_direction=QVector3D(1, 0, 0), height=height, radius=radius, units=units
     )
 
     assert cylinder.radius == approx(radius)
     assert cylinder.height == approx(height)
+    assert cylinder.units == units
     assert cylinder.geometry_str == "Cylinder"
 
 
