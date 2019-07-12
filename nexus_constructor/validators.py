@@ -1,9 +1,12 @@
-"""Validators to be used on QML input fields"""
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator
 import pint
 import os
 from typing import List
+import numpy as np
+from enum import Enum
+
+from PySide2.QtWidgets import QComboBox
 
 
 class UnitValidator(QValidator):
@@ -84,7 +87,7 @@ class GeometryFileValidator(QValidator):
     def __init__(self, file_types):
         """
 
-        :param file_types:
+        :param file_types: dict of file extensions that are valid.
         """
         super().__init__()
         self.file_types = file_types
@@ -93,16 +96,19 @@ class GeometryFileValidator(QValidator):
         if not input:
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        if not os.path.isfile(input):
+        if not self.is_file(input):
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        for suffixes in GEOMETRY_FILE_TYPES.values():
+        for suffixes in self.file_types.values():
             for suff in suffixes:
                 if input.endswith(f".{suff}"):
                     self.is_valid.emit(True)
                     return QValidator.Acceptable
         self.is_valid.emit(False)
         return QValidator.Invalid
+
+    def is_file(self, input):
+        return os.path.isfile(input)
 
     is_valid = Signal(bool)
 
@@ -150,4 +156,60 @@ class OkValidator(QObject):
         self.is_valid.emit(not any(unacceptable))
 
     # Signal to indicate that the fields are valid or invalid. False: invalid.
+    is_valid = Signal(bool)
+
+
+class FieldType(Enum):
+    scalar_dataset = "Scalar dataset"
+    array_dataset = "Array dataset"
+    kafka_stream = "Kafka stream"
+    link = "Link"
+    nx_class = "NX class/group"
+
+
+DATASET_TYPE = {
+    "Byte": np.byte,
+    "UByte": np.ubyte,
+    "Short": np.short,
+    "UShort": np.ushort,
+    "Integer": np.intc,
+    "UInteger": np.uintc,
+    "Long": np.int_,
+    "ULong": np.uint,
+    "Float": np.single,
+    "Double": np.double,
+    "String": np.string_,
+}
+
+
+class FieldValueValidator(QValidator):
+    """
+    Validates the field value line edit to check that the entered string is castable to the selected numpy type.
+    """
+
+    def __init__(self, field_type_combo: QComboBox, dataset_type_combo: QComboBox):
+        super().__init__()
+        self.field_type_combo = field_type_combo
+        self.dataset_type_combo = dataset_type_combo
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        """
+        Validates against being blank and the correct numpy type
+        :param input: the current string of the field value
+        :param pos: mouse position cursor(ignored, just here to satisfy overriding function)
+        :return: QValidator state (Acceptable, Intermediate, Invalid) - returning intermediate because invalid stops the user from typing.
+        """
+        if not input:  # More criteria here
+            return self._emit_and_return(False)
+        elif self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
+            try:
+                DATASET_TYPE[self.dataset_type_combo.currentText()](input)
+            except ValueError:
+                return self._emit_and_return(False)
+        return self._emit_and_return(True)
+
+    def _emit_and_return(self, valid: bool) -> QValidator.State:
+        self.is_valid.emit(valid)
+        return QValidator.Acceptable if valid else QValidator.Intermediate
+
     is_valid = Signal(bool)

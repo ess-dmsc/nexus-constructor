@@ -170,11 +170,11 @@ class NexusWrapper(QObject):
     ) -> h5py.Dataset:
         """
         Create or update the value of a field (dataset in hdf terminology)
-        :param group: Parent group of the field
-        :param name: Name of the field
-        :param value: Value fo the field
+        :param group: Parent group of the field.
+        :param name: Name of the field.
+        :param value: Value of the field.
         :param dtype: Type of the value (Use numpy types)
-        :return: The dataset
+        :return: The dataset.
         """
         if dtype is str:
             dtype = f"|S{len(value)}"

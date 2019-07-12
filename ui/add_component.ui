@@ -298,12 +298,23 @@
           <property name="title">
            <string>Fields</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <widget class="QLineEdit" name="fieldsLineEdit"/>
+          <layout class="QGridLayout" name="gridLayout_5">
+           <item row="0" column="0">
+            <widget class="QPushButton" name="addFieldPushButton">
+             <property name="text">
+              <string>Add field</string>
+             </property>
+            </widget>
            </item>
-           <item>
-            <widget class="QListView" name="fieldsListView"/>
+           <item row="0" column="1">
+            <widget class="QPushButton" name="removeFieldPushButton">
+             <property name="text">
+              <string>Remove field</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <widget class="QListWidget" name="fieldsListWidget"/>
            </item>
           </layout>
          </widget>
