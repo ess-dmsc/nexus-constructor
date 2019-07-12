@@ -49,6 +49,12 @@ class TableModel(QAbstractTableModel):
     def add_column(self):
         pass
 
+    def delete_row(self, selected_indexes: QModelIndex):
+        pass
+
+    def delete_column(self, selected_indexes: QModelIndex):
+        pass
+
     def rowCount(self, parent: QModelIndex = ...) -> int:
         return self.array.shape[0]
 
