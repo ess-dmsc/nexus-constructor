@@ -74,3 +74,10 @@ class TableModel(QAbstractTableModel):
             if orientation == Qt.Horizontal:
                 return f"{section:d}"
         return None
+
+    def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
+        if index.isValid() and role == Qt.EditRole:
+            self.array[index.row()][index.column()] = value
+            self.dataChanged.emit(index, index)
+            return True
+        return False
