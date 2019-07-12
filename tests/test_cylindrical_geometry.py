@@ -2,7 +2,10 @@ from pytest import approx, raises
 import pytest
 from PySide2.QtGui import QVector3D
 from .helpers import create_nexus_wrapper, add_component_to_file
-from nexus_constructor.geometry.cylindrical_geometry import calculate_vertices
+from nexus_constructor.geometry.cylindrical_geometry import (
+    calculate_vertices,
+    CylindricalGeometry,
+)
 from nexus_constructor.ui_utils import numpy_array_to_qvector3d
 
 
@@ -29,6 +32,35 @@ def test_axis_direction_must_be_non_zero():
         component.set_cylinder_shape(
             axis_direction=QVector3D(0, 0, 0), height=height, radius=radius, units="m"
         )
+
+
+def test_creating_cylinder_from_file_with_multiple_cylinders_in_single_group_ignores_all_but_the_first_cylinder():
+    nexus_wrapper = create_nexus_wrapper()
+    height_cyl_1 = 4.2
+    radius_cyl_1 = 4.2
+    height_cyl_2 = 3.5
+    radius_cyl_2 = 3.5
+    cylinders_group = nexus_wrapper.create_nx_group(
+        "cylinders", "NXcylindrical_geometry", nexus_wrapper.nexus_file
+    )
+    vertices = [
+        [-0.5 * height_cyl_1, 0, 0],
+        [-0.5 * height_cyl_1, -radius_cyl_1, 0],
+        [0.5 * height_cyl_1, 0, 0],
+        [-0.5 * height_cyl_2, 0, 0],
+        [-0.5 * height_cyl_2, -radius_cyl_2, 0],
+        [0.5 * height_cyl_2, 0, 0],
+    ]
+    vertices_dataset = nexus_wrapper.set_field_value(
+        cylinders_group, "vertices", vertices
+    )
+    nexus_wrapper.set_attribute_value(vertices_dataset, "units", "m")
+    cylinders = [[0, 1, 2], [3, 4, 5]]
+    nexus_wrapper.set_field_value(cylinders_group, "cylinders", cylinders)
+
+    cylinder = CylindricalGeometry(nexus_wrapper, cylinders_group)
+    assert cylinder.radius == approx(radius_cyl_1)
+    assert cylinder.height == approx(height_cyl_1)
 
 
 @pytest.mark.parametrize(

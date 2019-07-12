@@ -68,7 +68,7 @@ class CylindricalGeometry:
                 ValidateDataset(
                     "vertices", shape=(None, 3), attributes={"units": None}
                 ),
-                ValidateDataset("cylinders", (3,)),
+                ValidateDataset("cylinders"),
             ),
         )
         if problems:
@@ -94,7 +94,9 @@ class CylindricalGeometry:
         We define "base" as the end of the cylinder in the -ve axis direction
         :return: base centre point, base edge point, top centre point
         """
-        cylinders = self.file.get_field_value(self.group, "cylinders")
+        # flatten cylinders in case there are multiple cylinders defined, we'll take the first three elements,
+        # so effectively any cylinder after the first one is ignored
+        cylinders = self.file.get_field_value(self.group, "cylinders").flatten()
         vertices = self.file.get_field_value(self.group, "vertices")
         return tuple(
             numpy_array_to_qvector3d(vertices[cylinders[i], :]) for i in range(3)
