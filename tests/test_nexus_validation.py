@@ -1,4 +1,4 @@
-from nexus_constructor.nexus.validation import ValidateDataset
+from nexus_constructor.nexus.validation import validate_group, ValidateDataset
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 import numpy as np
 
@@ -120,3 +120,41 @@ def test_validate_dataset_does_not_report_problem_when_dataset_has_expected_shap
     assert (
         len(problems) == 0
     ), "Expected there to be no reported problem because dataset has expected shape"
+
+
+def test_validate_group_reports_problem_when_group_does_not_have_an_nx_class():
+    nexus_wrapper = NexusWrapper()
+    group = nexus_wrapper.create_nx_group(
+        "test_group", "NXsomething", nexus_wrapper.nexus_file
+    )
+    nexus_wrapper.delete_attribute(group, "NX_class")
+
+    problems = validate_group(group, "NXsomething", ())
+    assert (
+        len(problems) > 0
+    ), "Expected there to be a reported problem because group does not have an nx_class attribute"
+
+
+def test_validate_group_reports_problem_when_group_does_not_have_expected_nx_class():
+    nexus_wrapper = NexusWrapper()
+    group = nexus_wrapper.create_nx_group(
+        "test_group", "NXsomething", nexus_wrapper.nexus_file
+    )
+
+    problems = validate_group(group, "NXtest", ())
+    assert (
+        len(problems) > 0
+    ), "Expected there to be a reported problem because group does not have expected NX_class"
+
+
+def test_validate_group_does_not_report_problem_when_group_has_expected_nx_class():
+    nexus_wrapper = NexusWrapper()
+    nexus_class = "NXtest"
+    group = nexus_wrapper.create_nx_group(
+        "test_group", nexus_class, nexus_wrapper.nexus_file
+    )
+
+    problems = validate_group(group, nexus_class, ())
+    assert (
+        len(problems) == 0
+    ), "Expected there to be no reported problem because group has expected NX_class"
