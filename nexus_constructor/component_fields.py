@@ -7,12 +7,15 @@ from PySide2.QtWidgets import (
     QDialog,
     QListWidget,
     QMessageBox,
+    QGridLayout,
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
 from nexus_constructor.component import ComponentModel
 import numpy as np
+
+from nexus_constructor.table_widget import TableWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
     FieldValueValidator,
@@ -198,19 +201,18 @@ class FieldWidget(QFrame):
         self.value_type_combo.setVisible(show_value_type_combo)
 
     def show_edit_dialog(self):
+        self.edit_dialog = QDialog()
+
         if self.field_type_combo.currentText() == FieldType.array_dataset.value:
-            # TODO: show array edit panel
-            pass
+            self.edit_dialog.setLayout(QGridLayout())
+            table_view = TableWidget()
+            self.edit_dialog.layout().addWidget(table_view)
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             # TODO: show kafka stream panel
-            pass
-        elif self.field_type_combo.currentText() == FieldType.link.value:
-            # TODO: show link panel
             pass
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             # TODO: show nx class panels
             pass
-        self.edit_dialog = QDialog()
         self.edit_dialog.show()
 
 
