@@ -42,10 +42,9 @@ class TableModel(QAbstractTableModel):
         self.array = np.array([[0]], dtype=self.dtype)
 
     def add_row(self):
-        self.beginInsertRows(QModelIndex(), self.array.size - 1, self.array.size)
-        self.array = np.append(self.array, np.array([[0]], dtype=type))
+        self.beginInsertRows(QModelIndex(), self.array.size - 1, self.array.shape[0])
+        self.array = np.concatenate((self.array, np.array([[0]], dtype=self.dtype)))
         self.endInsertRows()
-        self.dataChanged.emit(QModelIndex(), QModelIndex())
 
     def add_column(self):
         pass
