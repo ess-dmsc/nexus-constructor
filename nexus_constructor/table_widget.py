@@ -30,18 +30,21 @@ class TableWidget(QWidget):
 
         self.layout().addWidget(self.toolbox)
         self.view = QTableView()
+        self.view.setModel(self.model)
         self.layout().addWidget(self.view)
 
 
 class TableModel(QAbstractTableModel):
     def __init__(self, type: np.dtype = np.byte, parent=None):
         super().__init__()
+        self.setParent(parent)
         self.array = np.array([], dtype=type)
 
     def add_row(self):
-        self.beginInsertRows(QModelIndex(), 0, 1)
-        np.append(self.array, [1, 2, 3])
+        self.beginInsertRows(QModelIndex(), self.array.size - 1, self.array.size)
+        self.array = np.append(self.array, [0])
         self.endInsertRows()
+        self.dataChanged.emit(0, 0)
 
     def add_column(self):
         pass
@@ -53,7 +56,7 @@ class TableModel(QAbstractTableModel):
         return self.array.shape[1]
 
     def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
-        if role == Qt.DisplayRole:
+        if role == Qt.DisplayRole or role == Qt.EditRole:
             return self.array[index.row(), index.column()]
         return None
 
@@ -66,3 +69,8 @@ class TableModel(QAbstractTableModel):
             elif orientation == Qt.Vertical:
                 return orientation
         return None
+
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+        if not index.isValid():
+            return Qt.ItemIsEnabled
+        return QAbstractTableModel.flags(self, index=index) | Qt.ItemIsEditable
