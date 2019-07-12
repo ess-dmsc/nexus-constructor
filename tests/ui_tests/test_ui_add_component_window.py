@@ -275,27 +275,6 @@ def test_UI_given_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     assert dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
-def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
-    qtbot
-):
-    dialog, template = create_add_component_template(qtbot)
-
-    # Mimic the user selecting a mesh geometry
-    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
-
-    show_and_close_window(qtbot, template)
-
-    # Mimic the user entering a unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
-
-    show_and_close_window(qtbot, template)
-
-    # Although the component name is valid, no file path has been given so the button should be disabled
-    assert not dialog.buttonBox.isEnabled()
-
-
 def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
     qtbot
 ):
@@ -384,6 +363,73 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     show_and_close_window(qtbot, template)
 
     assert dialog.buttonBox.isEnabled()
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
+def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    show_and_close_window(qtbot, template)
+
+    # Mimic the user entering a unique name in the text field
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    show_and_close_window(qtbot, template)
+
+    # Although the component name is valid, no file path has been given so the button should be disabled
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_given_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+
+    # Mimic the user giving a valid component name
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user entering a nonexistent file path
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, NONEXISTENT_FILE_PATH)
+
+    show_and_close_window(qtbot, template)
+
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+
+    # Mimic the user giving a valid component name
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user entering a path for a file that exists but has the wrong extension
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, WRONG_EXTENSION_FILE_PATH)
+
+    show_and_close_window(qtbot, template)
+
+    assert not dialog.buttonBox.isEnabled()
 
 
 def show_and_close_window(qtbot, template):
