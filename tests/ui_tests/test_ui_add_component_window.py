@@ -500,12 +500,50 @@ def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
     assert dialog.buttonBox.isEnabled()
 
 
-def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled():
-    pass
+def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    # Mimic the user giving a valid component name
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user entering a valid file name
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+
+    # Mimic the user clearing the units box
+    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+
+    assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled():
-    pass
+def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    # Mimic the user giving a valid component name
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user entering a valid file name
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+
+    # Mimic the user giving invalid units input
+    qtbot.keyClicks(dialog.unitsLineEdit, "111")
+
+    assert not dialog.buttonBox.isEnabled()
 
 
 def show_and_close_window(qtbot, template):
