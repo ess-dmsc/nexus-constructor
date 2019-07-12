@@ -356,7 +356,7 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, os.path.join(os.getcwd(), "tests", "cube.off"))
+    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -439,17 +439,65 @@ def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
+    # Mimic the user clearing the unit input box (it will contain only 'm' by default)
+    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
 
-def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_red_background():
-    pass
-
-
-def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_white_background():
-    pass
+    assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled():
-    pass
+def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_red_background(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    # Mimic the user giving invalid units input
+    qtbot.keyClicks(dialog.unitsLineEdit, "111")
+
+    assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+
+
+def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_white_background(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    # Mimic the replacing the default value with "km"
+    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.unitsLineEdit, "km")
+
+    assert dialog.unitsLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+
+
+def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    # Mimic the user giving a valid component name
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user entering a valid file name
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+
+    # Mimic the user giving valid units
+    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.unitsLineEdit, "km")
+
+    assert dialog.buttonBox.isEnabled()
 
 
 def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled():
