@@ -373,16 +373,22 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
+    # Mimic the user giving a valid component name
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.fileLineEdit, os.path.join(os.getcwd(), "tests", "cube.off"))
 
     show_and_close_window(qtbot, template)
 
+    assert dialog.buttonBox.isEnabled()
+
 
 def show_and_close_window(qtbot, template):
     """
-    Function for displaying and then closing a window/widget. This appears to be neccessary in order to make sure
+    Function for displaying and then closing a window/widget. This appears to be necessary in order to make sure
     some interactions with the UI are recognised. Otherwise the UI can behave as though no clicks/button presses/etc
     actually took place which then causes tests to fail even though they ought to pass in theory.
     :param qtbot: The qtbot testing tool.
