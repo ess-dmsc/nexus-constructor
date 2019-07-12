@@ -1,5 +1,6 @@
-from nexus_constructor.component_fields import add_fields_to_component, ComponentModel
+from nexus_constructor.component_fields import add_fields_to_component
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.component import Component
 import numpy as np
 
 
@@ -30,7 +31,7 @@ def test_GIVEN_single_scalar_field_and_float_WHEN_adding_fields_to_component_THE
     file = NexusWrapper("test_fields_1")
 
     component_group = file.nexus_file.create_group("test_component")
-    component = ComponentModel(file, component_group)
+    component = Component(file, component_group)
 
     field_name = "test_field"
     field_dtype = np.float32
@@ -52,7 +53,7 @@ def test_GIVEN_single_scalar_field_and_string_WHEN_adding_fields_to_component_TH
     file = NexusWrapper("test_fields_2")
 
     component_group = file.nexus_file.create_group("test_component")
-    component = ComponentModel(file, component_group)
+    component = Component(file, component_group)
 
     field_name = "test_field"
     field_value = np.string_(b"some_value")
