@@ -12,8 +12,9 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 # Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
+RUNNING_ON_WINDOWS = sys.platform.startswith("win")
 WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "tests", "UITests.md")
-NONEXISTENT_FILE_PATH = "fjfkfdhhqkh"
+NONEXISTENT_FILE_PATH = "doesntexist.off"
 VALID_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
 
 nexus_wrapper_count = 0
@@ -73,7 +74,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     assert dialog.unitsbox.isVisible()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
+@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
 def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
@@ -96,7 +97,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     assert dialog.geometryFileBox.isVisible()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
+@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
 def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
     qtbot
 ):
@@ -250,7 +251,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_given_no_input_WHEN_adding_component_with_no_geometry_THEN_add_component_button_is_disabled(
+def test_UI_GIVEN_no_input_WHEN_adding_component_with_no_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
@@ -260,7 +261,7 @@ def test_UI_given_no_input_WHEN_adding_component_with_no_geometry_THEN_add_compo
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_given_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_component_button_is_enabled(
+def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_component_button_is_enabled(
     qtbot
 ):
 
@@ -275,7 +276,7 @@ def test_UI_given_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     assert dialog.buttonBox.isEnabled()
 
 
-def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
+def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
     qtbot
 ):
     dialog, template = create_add_component_template(qtbot)
@@ -289,7 +290,7 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_fil
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_given_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
+def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
     qtbot
 ):
     dialog, template = create_add_component_template(qtbot)
@@ -306,7 +307,7 @@ def test_UI_given_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometr
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
+def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
     qtbot
 ):
 
@@ -324,7 +325,7 @@ def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_white_background(
+def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_white_background(
     qtbot
 ):
     dialog, template = create_add_component_template(qtbot)
@@ -342,7 +343,7 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     assert dialog.fileLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled(
+def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled(
     qtbot
 ):
     dialog, template = create_add_component_template(qtbot)
@@ -363,8 +364,8 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     assert dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
-def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
+def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
     dialog, template = create_add_component_template(qtbot)
@@ -384,8 +385,8 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add
     assert not dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
-def test_UI_given_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
+def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
@@ -407,8 +408,8 @@ def test_UI_given_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry
     assert not dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
-def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
+def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
@@ -430,7 +431,7 @@ def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_red_background(
+def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_red_background(
     qtbot
 ):
 
@@ -445,7 +446,7 @@ def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_red_background(
+def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_red_background(
     qtbot
 ):
 
@@ -460,7 +461,7 @@ def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_un
     assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_white_background(
+def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_white_background(
     qtbot
 ):
 
@@ -476,7 +477,7 @@ def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_unit
     assert dialog.unitsLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled(
+def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled(
     qtbot
 ):
 
@@ -500,8 +501,8 @@ def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
     assert dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
-def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
+def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
@@ -524,8 +525,8 @@ def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_com
     assert not dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
-def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
+def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
@@ -546,6 +547,58 @@ def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_ad
     qtbot.keyClicks(dialog.unitsLineEdit, "111")
 
     assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_GIVEN_mesh_geometry_selected_THEN_relevant_fields_are_visible(qtbot):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    show_and_close_window(qtbot, template)
+
+    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.unitsbox.isVisible()
+    assert dialog.geometryFileBox.isVisible()
+
+
+def test_UI_GIVEN_mesh_geometry_selected_THEN_irrelevant_fields_are_invisible(qtbot):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    show_and_close_window(qtbot, template)
+
+    assert not dialog.cylinderOptionsBox.isVisible()
+
+
+def test_UI_GIVEN_cylinder_geometry_selected_THEN_relevant_fields_are_visible(qtbot):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a cylinder geometry
+    qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
+
+    show_and_close_window(qtbot, template)
+
+    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.unitsbox.isVisible()
+    assert dialog.cylinderOptionsBox.isVisible()
+
+
+def test_UI_GIVEN_cylinder_geometry_selected_THEN_irrelevant_fields_are_invisible(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a cylinder geometry
+    qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
+
+    assert not dialog.geometryFileBox.isVisible()
 
 
 def show_and_close_window(qtbot, template):
