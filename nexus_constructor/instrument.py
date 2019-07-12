@@ -2,8 +2,8 @@ import os
 import h5py
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.component import ComponentModel
-from nexus_constructor.transformations import TransformationModel
+from nexus_constructor.component import Component
+from nexus_constructor.transformations import Transformation
 
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -48,14 +48,14 @@ class Instrument:
                 if "NX_class" in node.attrs.keys():
                     if node.attrs["NX_class"] == "NXtransformations":
                         for transformation_name in node:
-                            transform = TransformationModel(
+                            transform = Transformation(
                                 self.nexus, node[transformation_name]
                             )
                             transform.depends_on = transform.depends_on
 
         self.nexus.nexus_file.visititems(refresh_depends_on)
 
-    def add_component(self, name: str, nx_class: str, description: str):
+    def add_component(self, name: str, nx_class: str, description: str) -> Component:
         """
         Creates a component group in a NeXus file
         :param name: Name of the component group to create
@@ -68,15 +68,16 @@ class Instrument:
         if nx_class in COMPONENTS_IN_ENTRY:
             parent_group = self.nexus.entry
         component_group = self.nexus.create_nx_group(name, nx_class, parent_group)
-        component = ComponentModel(self.nexus, component_group)
+        component = Component(self.nexus, component_group)
         component.description = description
         return component
 
-    def remove_component(self, component: ComponentModel):
+    def remove_component(self, component: Component):
         """
-        Removes a component group from the NeXus file
+        Removes a component group from the NeXus file and instrument view
         :param component: The component to be removed
         """
+        self.nexus.component_removed.emit(component.name)
         self.nexus.delete_node(component.group)
 
     def get_component_list(self):
@@ -86,7 +87,7 @@ class Instrument:
             if isinstance(node, h5py.Group):
                 if "NX_class" in node.attrs.keys():
                     if node.attrs["NX_class"] in self.nx_component_classes:
-                        component_list.append(ComponentModel(self.nexus, node))
+                        component_list.append(Component(self.nexus, node))
 
         self.nexus.nexus_file.visititems(find_components)
         return component_list
