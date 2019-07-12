@@ -193,8 +193,7 @@ def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_become
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
     # Mimic the user entering a name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has changed to white
     assert dialog.nameLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
@@ -210,8 +209,7 @@ def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_rem
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
     # Mimic the user entering a non-unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, NONUNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has remained red
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
@@ -226,8 +224,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
     show_and_close_window(qtbot, template)
 
     # Mimic the user entering a non-unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, NONUNIQUE_COMPONENT_NAME)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -243,8 +240,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user entering a unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -262,8 +258,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_geometry_THEN_add_
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user entering a unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -295,8 +290,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_geometry_THEN_
     qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
 
     # Mimic the user entering a unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering valid units
     qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
@@ -319,8 +313,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
     qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
 
     # Mimic the user entering a non-unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, NONUNIQUE_COMPONENT_NAME)
 
     # The Add Component button is disabled
     assert not dialog.buttonBox.isEnabled()
@@ -343,8 +336,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user entering a unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # The Add Component button is enabled because all the information required to create a no geometry component is
     # there
@@ -427,8 +419,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -451,8 +442,7 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add
     show_and_close_window(qtbot, template)
 
     # Mimic the user entering a unique name in the text field
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     show_and_close_window(qtbot, template)
 
@@ -471,8 +461,7 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a nonexistent file path
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -494,8 +483,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a path for a file that exists but has the wrong extension
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -545,7 +533,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_unit
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
-    # Mimic the replacing the default value with VALID_UNITS
+    # Mimic the replacing the default value with "km"
     qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
     qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
 
@@ -562,8 +550,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -587,8 +574,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_com
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -611,8 +597,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_ad
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -715,3 +700,15 @@ def create_add_component_dialog():
     component = ComponentTreeModel(instrument)
     nexus_wrapper_count += 1
     return AddComponentDialog(instrument, component)
+
+
+def enter_component_name(dialog, qtbot, component_name):
+    """
+    Mimics the user entering a component name in the Add Component window. Clicks on the text field and enters a given
+    name.
+    :param dialog: An instance of an AddComponentWindow object.
+    :param qtbot: The qtbot testing tool.
+    :param component_name: The desired component name.
+    """
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, component_name)
