@@ -26,7 +26,7 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
+    dialog, template = create_add_component_template(qtbot)
 
     qtbot.addWidget(template)
 
@@ -41,9 +41,7 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     qtbot.mouseClick(dialog.noGeometryRadioButton, Qt.LeftButton)
 
@@ -54,9 +52,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Check that the relevant fields start as invisible
     assert not dialog.geometryOptionsBox.isVisible()
@@ -79,9 +75,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Check that the relevant fields start as invisible
     assert not dialog.geometryOptionsBox.isVisible()
@@ -105,7 +99,7 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
+    dialog, template = create_add_component_template(qtbot)
 
     classes = list(dialog.nx_component_classes.keys())
     pixel_options_class_indices = []
@@ -139,7 +133,7 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
+    dialog, template = create_add_component_template(qtbot)
 
     classes = list(dialog.nx_component_classes.keys())
     no_pixel_options_class_indices = []
@@ -175,9 +169,7 @@ def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_become
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Check that the background color of the ext field starts as red
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
@@ -194,9 +186,7 @@ def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_rem
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Check that the background color of the text field starts as red
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
@@ -213,9 +203,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     template.show()
     qtbot.waitForWindowShown(template)
@@ -235,9 +223,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     template.show()
     qtbot.waitForWindowShown(template)
@@ -257,9 +243,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     template.show()
     qtbot.waitForWindowShown(template)
@@ -276,9 +260,7 @@ def test_UI_given_no_input_WHEN_adding_component_with_no_geometry_THEN_add_compo
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     template.show()
     qtbot.waitForWindowShown(template)
@@ -291,9 +273,7 @@ def test_UI_given_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user entering a unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
@@ -310,9 +290,7 @@ def test_UI_given_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
 def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -331,9 +309,7 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add
 def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
     qtbot
 ):
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -348,9 +324,7 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_fil
 def test_UI_given_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
     qtbot
 ):
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -368,9 +342,7 @@ def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     qtbot
 ):
 
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -389,9 +361,7 @@ def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
 def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_white_background(
     qtbot
 ):
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -411,9 +381,7 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled(
     qtbot
 ):
-    dialog, template = create_add_component_template()
-
-    qtbot.addWidget(template)
+    dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -427,11 +395,12 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     qtbot.waitForWindowShown(template)
 
 
-def create_add_component_template():
+def create_add_component_template(qtbot):
     template = QDialog()
     dialog = create_add_component_dialog()
     template.ui = dialog
     template.ui.setupUi(template)
+    qtbot.addWidget(template)
     return dialog, template
 
 
