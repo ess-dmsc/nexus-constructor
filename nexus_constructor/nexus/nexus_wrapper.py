@@ -6,7 +6,7 @@ import numpy as np
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
-def set_up_in_memory_nexus_file(filename: str):
+def set_up_in_memory_nexus_file(filename: str) -> h5py.File:
     """
     Creates an in-memory nexus-file to store the model data in.
     :return: The file object.
@@ -14,7 +14,7 @@ def set_up_in_memory_nexus_file(filename: str):
     return h5py.File(filename, mode="x", driver="core", backing_store=False)
 
 
-def append_nxs_extension(file_name: str):
+def append_nxs_extension(file_name: str) -> str:
     extension = ".nxs"
     if file_name.endswith(extension):
         return file_name
@@ -22,7 +22,7 @@ def append_nxs_extension(file_name: str):
         return file_name + extension
 
 
-def get_name_of_node(node: h5Node):
+def get_name_of_node(node: h5Node) -> str:
     return node.name.split("/")[-1]
 
 
@@ -38,7 +38,7 @@ class NexusWrapper(QObject):
     component_removed = Signal(str)
     show_entries_dialog = Signal("QVariant", "QVariant")
 
-    def __init__(self, filename="NeXus File"):
+    def __init__(self, filename: str = "NeXus File"):
         super().__init__()
         self.nexus_file = set_up_in_memory_nexus_file(filename)
         self.entry = self.create_nx_group("entry", "NXentry", self.nexus_file)
@@ -55,7 +55,7 @@ class NexusWrapper(QObject):
         """
         self.file_changed.emit(self.nexus_file)
 
-    def save_file(self, filename):
+    def save_file(self, filename: str):
         """
         Saves the in-memory NeXus file to a physical file if the filename is valid.
         :param filename: Absolute file path to the file to save.
@@ -70,7 +70,7 @@ class NexusWrapper(QObject):
             except ValueError as e:
                 print(f"File writing failed: {e}")
 
-    def open_file(self, filename):
+    def open_file(self, filename: str):
         """
         Opens a physical file into memory and sets the model to use it.
         :param filename: Absolute file path to the file to open.
@@ -126,7 +126,9 @@ class NexusWrapper(QObject):
         del self.nexus_file[node.name]
         self._emit_file()
 
-    def create_nx_group(self, name, nx_class, parent):
+    def create_nx_group(
+        self, name: str, nx_class: str, parent: h5py.Group
+    ) -> h5py.Group:
         """
         Given a name, an nx class and a parent group, create a group under the parent
         :param name: The name of the group to be created.
@@ -150,7 +152,7 @@ class NexusWrapper(QObject):
         self._emit_file()
 
     @staticmethod
-    def get_field_value(group: h5py.Group, name: str):
+    def get_field_value(group: h5py.Group, name: str) -> Optional[Any]:
         if name not in group:
             return None
         value = group[name][...]
@@ -163,7 +165,9 @@ class NexusWrapper(QObject):
         del parent_group[name]
         parent_group.create_dataset(name, data=value, dtype=dtype)
 
-    def set_field_value(self, group: h5py.Group, name: str, value: Any, dtype=None):
+    def set_field_value(
+        self, group: h5py.Group, name: str, value: Any, dtype=None
+    ) -> h5py.Dataset:
         """
         Create or update the value of a field (dataset in hdf terminology)
         :param group: Parent group of the field
@@ -190,7 +194,7 @@ class NexusWrapper(QObject):
         return group[name]
 
     @staticmethod
-    def get_attribute_value(node: h5Node, name: str):
+    def get_attribute_value(node: h5Node, name: str) -> Optional[Any]:
         if name in node.attrs.keys():
             return node.attrs[name]
 
