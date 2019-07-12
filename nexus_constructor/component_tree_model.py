@@ -1,14 +1,14 @@
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
-from nexus_constructor.component import ComponentModel
-from nexus_constructor.transformations import TransformationModel, TransformationsList
+from nexus_constructor.component import Component
+from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import generate_unique_name
 
 
 class ComponentInfo(object):
-    def __init__(self, parent: ComponentModel):
+    def __init__(self, parent: Component):
         super().__init__()
         self.parent = parent
 
@@ -42,7 +42,7 @@ class ComponentTreeModel(QAbstractItemModel):
         if not index.isValid():
             return Qt.NoItemFlags
         parent_item = index.internalPointer()
-        if issubclass(type(parent_item), ComponentModel):
+        if issubclass(type(parent_item), Component):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif issubclass(type(parent_item), ComponentInfo):
             return Qt.ItemIsEnabled
@@ -57,7 +57,7 @@ class ComponentTreeModel(QAbstractItemModel):
         parent_item = node.internalPointer()
         transformation_list = None
         target_index = QModelIndex()
-        if isinstance(parent_item, ComponentModel):
+        if isinstance(parent_item, Component):
             if not hasattr(parent_item, "stored_transforms"):
                 parent_item.stored_transforms = parent_item.transforms
             transformation_list = parent_item.stored_transforms
@@ -65,7 +65,7 @@ class ComponentTreeModel(QAbstractItemModel):
         elif isinstance(parent_item, TransformationsList):
             transformation_list = parent_item
             target_index = node
-        elif isinstance(parent_item, TransformationModel):
+        elif isinstance(parent_item, Transformation):
             transformation_list = parent_item.parent
             target_index = self.parent(node)
         if transformation_list.has_link:
@@ -77,7 +77,7 @@ class ComponentTreeModel(QAbstractItemModel):
         transformation_list.link = transformation_link
         self.endInsertRows()
 
-    def add_component(self, new_component: ComponentModel):
+    def add_component(self, new_component: Component):
         self.beginInsertRows(QModelIndex(), len(self.components), len(self.components))
         self.components.append(new_component)
         self.endInsertRows()
@@ -114,16 +114,16 @@ class ComponentTreeModel(QAbstractItemModel):
         self.endRemoveRows()
 
     def remove_node(self, node: QModelIndex):
-        if isinstance(node.internalPointer(), ComponentModel):
+        if isinstance(node.internalPointer(), Component):
             self.__remove_component(node)
-        elif isinstance(node.internalPointer(), TransformationModel):
+        elif isinstance(node.internalPointer(), Transformation):
             self.__remove_transformation(node)
         elif isinstance(node.internalPointer(), LinkTransformation):
             self.__remove_link(node)
 
     def duplicate_node(self, node: QModelIndex):
         parent = node.internalPointer()
-        if isinstance(parent, ComponentModel):
+        if isinstance(parent, Component):
             new_name = generate_unique_name(parent.name, self.components)
 
             self.add_component(
@@ -131,7 +131,7 @@ class ComponentTreeModel(QAbstractItemModel):
                     new_name, parent.nx_class, parent.description
                 )
             )
-        elif isinstance(parent, TransformationModel):
+        elif isinstance(parent, Transformation):
             raise NotImplementedError("Duplication of transformations not implemented")
 
     def add_transformation(self, parent_index: QModelIndex, type: str):
@@ -140,7 +140,7 @@ class ComponentTreeModel(QAbstractItemModel):
         parent_component = None
         target_pos = 0
         target_index = QModelIndex()
-        if isinstance(parent_item, ComponentModel):
+        if isinstance(parent_item, Component):
             if not hasattr(parent_item, "stored_transforms"):
                 parent_item.stored_transforms = parent_item.transforms
             transformation_list = parent_item.stored_transforms
@@ -152,7 +152,7 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_component = parent_item.parent_component
             target_pos = len(transformation_list)
             target_index = parent_index
-        elif isinstance(parent_item, TransformationModel):
+        elif isinstance(parent_item, Transformation):
             transformation_list = parent_item.parent
             parent_component = transformation_list.parent_component
             target_pos = transformation_list.index(parent_item) + 1
@@ -204,7 +204,7 @@ class ComponentTreeModel(QAbstractItemModel):
 
         parent_item = parent.internalPointer()
 
-        if isinstance(parent_item, ComponentModel):
+        if isinstance(parent_item, Component):
             if row == 0:
                 if not hasattr(parent_item, "component_info"):
                     parent_item.component_info = ComponentInfo(parent_item)
@@ -225,7 +225,7 @@ class ComponentTreeModel(QAbstractItemModel):
         if not index.isValid():
             return QModelIndex()
         parent_item = index.internalPointer()
-        if type(parent_item) is ComponentModel:
+        if type(parent_item) is Component:
             return QModelIndex()
         elif type(parent_item) is TransformationsList:
             try:
@@ -240,7 +240,7 @@ class ComponentTreeModel(QAbstractItemModel):
             return self.createIndex(
                 self.components.index(parent_item.parent), 0, parent_item.parent
             )
-        elif issubclass(type(parent_item), TransformationModel):
+        elif issubclass(type(parent_item), Transformation):
             return self.createIndex(1, 0, parent_item.parent)
         elif isinstance(parent_item, LinkTransformation):
             return self.createIndex(1, 0, parent_item.parent)
@@ -252,13 +252,13 @@ class ComponentTreeModel(QAbstractItemModel):
 
         parent_item = parent.internalPointer()
 
-        if type(parent_item) is ComponentModel:
+        if type(parent_item) is Component:
             return 2
         elif type(parent_item) is TransformationsList:
             if parent_item.has_link:
                 return len(parent_item) + 1
             return len(parent_item)
-        elif issubclass(type(parent_item), TransformationModel):
+        elif issubclass(type(parent_item), Transformation):
             return 0
         elif type(parent_item) is ComponentInfo:
             return 0

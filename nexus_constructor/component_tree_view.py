@@ -9,8 +9,8 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
-from nexus_constructor.component import ComponentModel
-from nexus_constructor.transformations import TransformationModel, TransformationsList
+from nexus_constructor.component import Component
+from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.instrument import Instrument
 from PySide2.QtGui import QPixmap, QRegion, QPainter
 from nexus_constructor.transformation_view import (
@@ -32,9 +32,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def getFrame(
         self,
         value: Union[
-            ComponentModel,
+            Component,
             ComponentInfo,
-            TransformationModel,
+            Transformation,
             LinkTransformation,
             TransformationsList,
         ],
@@ -52,7 +52,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.layout = QVBoxLayout()
         frame.layout.setContentsMargins(0, 0, 0, 0)
         frame.setLayout(frame.layout)
-        if isinstance(value, ComponentModel):
+        if isinstance(value, Component):
             frame.label = QLabel("{} ({})".format(value.name, value.nx_class), frame)
             frame.layout.addWidget(frame.label)
         elif isinstance(value, TransformationsList):
@@ -61,7 +61,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         elif isinstance(value, ComponentInfo):
             frame.label = QLabel("(Place holder)", frame)
             frame.layout.addWidget(frame.label)
-        elif isinstance(value, TransformationModel):
+        elif isinstance(value, Transformation):
             if value.type == "Translation":
                 frame.transformation_frame = EditTranslation(frame, value)
             elif value.type == "Rotation":

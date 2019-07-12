@@ -1,4 +1,3 @@
-import attr
 import numpy as np
 from PySide2.QtGui import QVector3D
 import h5py
@@ -6,7 +5,7 @@ from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar
 
 TransformationOrComponent = TypeVar(
-    "TransformationOrComponent", "TransformationModel", "ComponentModel"
+    "TransformationOrComponent", "Transformation", "Component"
 )
 
 
@@ -17,7 +16,7 @@ class TransformationsList(list):
         self.has_link = False
 
 
-class TransformationModel:
+class Transformation:
     """
     Provides an interface to an existing transformation dataset in a NeXus file
     """
@@ -88,20 +87,20 @@ class TransformationModel:
         self.dataset[...] = new_value
 
     @property
-    def depends_on(self) -> "TransformationModel":
+    def depends_on(self) -> "Transformation":
         depends_on_path = self.file.get_attribute_value(self.dataset, "depends_on")
         if depends_on_path is not None:
-            return TransformationModel(self.file, self.file.nexus_file[depends_on_path])
+            return Transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
-    def depends_on(self, depends_on: "TransformationModel"):
+    def depends_on(self, depends_on: "Transformation"):
         """
         Note, until Python 4.0 (or 3.7 with from __future__ import annotations) have
         to use string for depends_on type here, because the current class is not defined yet
         """
         existing_depends_on = self.file.get_attribute_value(self.dataset, "depends_on")
         if existing_depends_on is not None:
-            TransformationModel(
+            Transformation(
                 self.file, self.file.nexus_file[existing_depends_on]
             ).deregister_dependent(self)
 
@@ -164,46 +163,3 @@ class TransformationModel:
             if not isinstance(dependents, np.ndarray):
                 return [dependents]
             return dependents.tolist()
-
-
-@attr.s
-class Transformation:
-    """
-    OBSOLETE: Use TransformationModel
-    """
-
-    name = attr.ib(str)
-    type = "Transformation"
-
-
-def validate_nonzero_vector(instance, attribute, vector: QVector3D):
-    """
-    Returns True if the vector does not contain (0,0,0), otherwise returns False
-    """
-    if vector.isNull():
-        raise ValueError
-
-
-@attr.s
-class Rotation(Transformation):
-    """
-    OBSOLETE: Use TransformationModel
-    """
-
-    axis = attr.ib(
-        factory=lambda: QVector3D(0, 0, 1),
-        type=QVector3D,
-        validator=validate_nonzero_vector,
-    )
-    angle = attr.ib(default=0)
-    type = "Rotation"
-
-
-@attr.s
-class Translation(Transformation):
-    """
-    OBSOLETE: Use TransformationModel
-    """
-
-    vector = attr.ib(factory=lambda: QVector3D(0, 0, 0), type=QVector3D)
-    type = "Translation"
