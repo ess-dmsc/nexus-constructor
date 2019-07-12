@@ -1,13 +1,13 @@
+import os
+
 import pytest
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDialog
-from PySide2.QtWidgets import QMainWindow
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 # Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
@@ -16,6 +16,7 @@ nexus_wrapper_count = 0
 RED_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #f6989d }"
 WHITE_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #FFFFFF }"
 UNIQUE_COMPONENT_NAME = "AUniqueName"
+NONUNIQUE_COMPONENT_NAME = "sample"
 
 
 @pytest.mark.skip(
@@ -25,10 +26,7 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
     qtbot
 ):
 
-    template = QMainWindow()
-    window = MainWindow(Instrument(NexusWrapper("test")))
-    template.ui = window
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
@@ -43,10 +41,7 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
@@ -58,14 +53,8 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
-    from PySide2.QtWidgets import QDialog
-    from PySide2.QtCore import Qt
 
-    template = QDialog()
-
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
@@ -90,10 +79,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
@@ -119,10 +105,7 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     classes = list(dialog.nx_component_classes.keys())
     pixel_options_class_indices = []
@@ -156,10 +139,7 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     classes = list(dialog.nx_component_classes.keys())
     no_pixel_options_class_indices = []
@@ -195,10 +175,7 @@ def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_become
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
@@ -217,10 +194,7 @@ def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_rem
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
@@ -229,20 +203,17 @@ def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_rem
 
     # Mimic the user entering a non-unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, "sample")
+    qtbot.keyClicks(dialog.nameLineEdit, NONUNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has remained red
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
-def test_UI_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_window_remains_open(
+def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_component_window_remains_open(
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
@@ -251,42 +222,42 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_window_
 
     # Mimic the user entering a non-unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, "sample")
+    qtbot.keyClicks(dialog.nameLineEdit, NONUNIQUE_COMPONENT_NAME)
+
+    # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
+    # The window won't close because the button is disabled
     assert template.isVisible()
 
 
-def test_UI_GIVEN_valid_input_WHEN_adding_component_THEN_add_component_window_closes(
+def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_component_window_closes(
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
     template.show()
     qtbot.waitForWindowShown(template)
 
-    # Mimic the user entering a non-unique name in the text field
+    # Mimic the user entering a unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
+    # The window will close because the input is valid and the button is enabled
     assert not template.isVisible()
 
 
-def test_UI_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_button_is_disabled(
+def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
@@ -295,49 +266,173 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_THEN_add_component_button_
 
     # Mimic the user entering a non-unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, "sample")
-    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, NONUNIQUE_COMPONENT_NAME)
 
+    # The Add Component button is disabled
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_given_no_input_WHEN_adding_component_THEN_add_component_button_is_disabled(
+def test_UI_given_no_input_WHEN_adding_component_with_no_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
     template.show()
     qtbot.waitForWindowShown(template)
 
+    # The Add Component button is disabled because no input was given
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_given_valid_input_WHEN_adding_component_THEN_add_component_button_is_enabled(
+def test_UI_given_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_component_button_is_enabled(
     qtbot
 ):
 
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
+    dialog, template = create_add_component_template()
 
     qtbot.addWidget(template)
 
-    # Mimic the user entering a non-unique name in the text field
+    # Mimic the user entering a unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
-    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
     template.show()
     qtbot.waitForWindowShown(template)
 
+    # The Add Component button is enabled because all the information required to create a no geometry component is
+    # there
     assert dialog.buttonBox.isEnabled()
+
+
+def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
+    qtbot
+):
+    dialog, template = create_add_component_template()
+
+    qtbot.addWidget(template)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    # Mimic the user entering a unique name in the text field
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+    # Although the component name is valid, no file path has been given so the button should be disabled
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
+    qtbot
+):
+    dialog, template = create_add_component_template()
+
+    qtbot.addWidget(template)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+    # No file name was given so we expect the file input box background to be red
+    assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+
+
+def test_UI_given_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
+    qtbot
+):
+    dialog, template = create_add_component_template()
+
+    qtbot.addWidget(template)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    # Mimic the user entering a bad file path
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, "fjfkfdhhqkh")
+
+    template.show()
+
+    assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+
+
+def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_red_background(
+    qtbot
+):
+
+    dialog, template = create_add_component_template()
+
+    qtbot.addWidget(template)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+    # Mimic the user giving the path for a file that exists but has the wrong extension
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(
+        dialog.fileLineEdit, os.path.join(os.getcwd(), "tests", "UITests.md")
+    )
+
+    template.show()
+
+    assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+
+
+def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_file_path_box_has_white_background(
+    qtbot
+):
+    dialog, template = create_add_component_template()
+
+    qtbot.addWidget(template)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+
+    # Mimic the user entering a valid file name
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, os.path.join(os.getcwd(), "tests", "cube.off"))
+
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+    # The file input box should now have a white background
+    assert dialog.fileLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+
+
+def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled(
+    qtbot
+):
+    dialog, template = create_add_component_template()
+
+    qtbot.addWidget(template)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+
+    # Mimic the user entering a valid file name
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, os.path.join(os.getcwd(), "tests", "cube.off"))
+
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+
+def create_add_component_template():
+    template = QDialog()
+    dialog = create_add_component_dialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    return dialog, template
 
 
 def create_add_component_dialog():
