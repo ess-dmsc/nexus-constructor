@@ -365,11 +365,13 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     assert dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
+# @pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
 def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
     dialog, template = create_add_component_template(qtbot)
+
+    dialog.buttonBox.setEnabled(True)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -386,12 +388,14 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add
     assert not dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
+# @pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
 def test_UI_given_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
     dialog, template = create_add_component_template(qtbot)
+
+    dialog.buttonBox.setEnabled(True)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -410,12 +414,14 @@ def test_UI_given_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry
     assert not dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
+# @pytest.mark.skipif(sys.platform.startswith("win"), reason="Fails on Windows.")
 def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
 
     dialog, template = create_add_component_template(qtbot)
+
+    dialog.buttonBox.setEnabled(True)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
