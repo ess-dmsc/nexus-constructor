@@ -11,6 +11,9 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 # Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
+WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "tests", "UITests.md")
+NONEXISTENT_FILE_PATH = "fjfkfdhhqkh"
+VALID_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
 
 nexus_wrapper_count = 0
 RED_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #f6989d }"
@@ -61,8 +64,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
 
     # Click on the cylinder geometry button
     qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
-    template.show()
-    qtbot.waitForWindowShown(template)
+    show_and_close_window(qtbot, template)
 
     # Check that this has caused the relevant fields to become visible
     assert dialog.geometryOptionsBox.isVisible()
@@ -70,7 +72,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     assert dialog.unitsbox.isVisible()
 
 
-@pytest.mark.skip(reason="Fails on Jenkins.")
+@pytest.mark.skip(reason="Fails on Windows. Not sure why.")
 def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
@@ -85,8 +87,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     # Click on the mesh geometry button
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
-    template.show()
-    qtbot.waitForWindowShown(template)
+    show_and_close_window(qtbot, template)
 
     # Check that this has caused the relevant fields to become visible
     assert dialog.geometryOptionsBox.isVisible()
@@ -94,7 +95,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     assert dialog.geometryFileBox.isVisible()
 
 
-@pytest.mark.skip(reason="Fails on Jenkins.")
+@pytest.mark.skip(reason="Fails on Windows. Not sure why.")
 def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
     qtbot
 ):
@@ -113,8 +114,7 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
     for geometry_button in pixel_geometry_buttons:
 
         qtbot.mouseClick(geometry_button, Qt.LeftButton)
-        template.show()
-        qtbot.waitForWindowShown(template)
+        show_and_close_window(qtbot, template)
 
         for index in pixel_options_class_indices:
 
@@ -123,8 +123,7 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
             assert not dialog.pixelOptionsBox.isVisible()
 
             dialog.componentTypeComboBox.setCurrentIndex(index)
-            template.show()
-            qtbot.waitForWindowShown(template)
+            show_and_close_window(qtbot, template)
 
             assert dialog.pixelOptionsBox.isVisible()
 
@@ -150,8 +149,7 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
     for geometry_button in all_geometry_buttons:
 
         qtbot.mouseClick(geometry_button, Qt.LeftButton)
-        template.show()
-        qtbot.waitForWindowShown(template)
+        show_and_close_window(qtbot, template)
 
         for index in no_pixel_options_class_indices:
 
@@ -205,8 +203,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
 
     dialog, template = create_add_component_template(qtbot)
 
-    template.show()
-    qtbot.waitForWindowShown(template)
+    show_and_close_window(qtbot, template)
 
     # Mimic the user entering a non-unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
@@ -225,8 +222,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
 
     dialog, template = create_add_component_template(qtbot)
 
-    template.show()
-    qtbot.waitForWindowShown(template)
+    show_and_close_window(qtbot, template)
 
     # Mimic the user entering a unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
@@ -245,9 +241,6 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
 
     dialog, template = create_add_component_template(qtbot)
 
-    template.show()
-    qtbot.waitForWindowShown(template)
-
     # Mimic the user entering a non-unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, NONUNIQUE_COMPONENT_NAME)
@@ -261,9 +254,6 @@ def test_UI_given_no_input_WHEN_adding_component_with_no_geometry_THEN_add_compo
 ):
 
     dialog, template = create_add_component_template(qtbot)
-
-    template.show()
-    qtbot.waitForWindowShown(template)
 
     # The Add Component button is disabled because no input was given
     assert not dialog.buttonBox.isEnabled()
@@ -279,8 +269,7 @@ def test_UI_given_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
 
-    template.show()
-    qtbot.waitForWindowShown(template)
+    # show_and_close_window(qtbot, template)
 
     # The Add Component button is enabled because all the information required to create a no geometry component is
     # there
@@ -299,8 +288,7 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
 
-    template.show()
-    qtbot.waitForWindowShown(template)
+    show_and_close_window(qtbot, template)
 
     # Although the component name is valid, no file path has been given so the button should be disabled
     assert not dialog.buttonBox.isEnabled()
@@ -314,8 +302,7 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_fil
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
-    template.show()
-    qtbot.waitForWindowShown(template)
+    show_and_close_window(qtbot, template)
 
     # No file name was given so we expect the file input box background to be red
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
@@ -331,9 +318,9 @@ def test_UI_given_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometr
 
     # Mimic the user entering a bad file path
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, "fjfkfdhhqkh")
+    qtbot.keyClicks(dialog.fileLineEdit, NONEXISTENT_FILE_PATH)
 
-    template.show()
+    show_and_close_window(qtbot, template)
 
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
@@ -349,11 +336,9 @@ def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
 
     # Mimic the user giving the path for a file that exists but has the wrong extension
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(
-        dialog.fileLineEdit, os.path.join(os.getcwd(), "tests", "UITests.md")
-    )
+    qtbot.keyClicks(dialog.fileLineEdit, WRONG_EXTENSION_FILE_PATH)
 
-    template.show()
+    show_and_close_window(qtbot, template)
 
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
@@ -369,10 +354,9 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, os.path.join(os.getcwd(), "tests", "cube.off"))
+    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
 
-    template.show()
-    qtbot.waitForWindowShown(template)
+    show_and_close_window(qtbot, template)
 
     # The file input box should now have a white background
     assert dialog.fileLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
@@ -391,11 +375,27 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.fileLineEdit, os.path.join(os.getcwd(), "tests", "cube.off"))
 
+    show_and_close_window(qtbot, template)
+
+
+def show_and_close_window(qtbot, template):
+    """
+    Function for displaying and then closing a window/widget. This appears to be neccessary in order to make sure
+    some interactions with the UI are recognised. Otherwise the UI can behave as though no clicks/button presses/etc
+    actually took place which then causes tests to fail even though they ought to pass in theory.
+    :param qtbot: The qtbot testing tool.
+    :param template: The window/widget to be opened.
+    """
     template.show()
     qtbot.waitForWindowShown(template)
 
 
 def create_add_component_template(qtbot):
+    """
+    Creates a template Add Component Dialog and sets this up for testing.
+    :param qtbot: The qtbot testing tool.
+    :return: The AddComponentDialog object and the template that contains it.
+    """
     template = QDialog()
     dialog = create_add_component_dialog()
     template.ui = dialog
@@ -405,6 +405,10 @@ def create_add_component_template(qtbot):
 
 
 def create_add_component_dialog():
+    """
+    Creates an AddComponentDialog object for use in a testing template.
+    :return: An instance of an AddComponentDialog object.
+    """
 
     global nexus_wrapper_count
     nexus_name = "test" + str(nexus_wrapper_count)
