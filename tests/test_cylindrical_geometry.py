@@ -63,6 +63,30 @@ def test_creating_cylinder_from_file_with_multiple_cylinders_in_single_group_ign
     assert cylinder.height == approx(height_cyl_1)
 
 
+def test_get_expected_height_and_radius_when_cylinder_vertices_are_out_of_order_in_nexus_file():
+    nexus_wrapper = create_nexus_wrapper()
+    height_cyl = 4.2
+    radius_cyl = 3.7
+    cylinders_group = nexus_wrapper.create_nx_group(
+        "cylinders", "NXcylindrical_geometry", nexus_wrapper.nexus_file
+    )
+    vertices = [
+        [-0.5 * height_cyl, 0, 0],
+        [0.5 * height_cyl, 0, 0],
+        [-0.5 * height_cyl, -radius_cyl, 0],
+    ]
+    vertices_dataset = nexus_wrapper.set_field_value(
+        cylinders_group, "vertices", vertices
+    )
+    nexus_wrapper.set_attribute_value(vertices_dataset, "units", "m")
+    cylinders = [[0, 2, 1]]  # not in 0,1,2 order
+    nexus_wrapper.set_field_value(cylinders_group, "cylinders", cylinders)
+
+    cylinder = CylindricalGeometry(nexus_wrapper, cylinders_group)
+    assert cylinder.radius == approx(radius_cyl)
+    assert cylinder.height == approx(height_cyl)
+
+
 @pytest.mark.parametrize(
     "axis_direction,height,radius",
     [
