@@ -65,6 +65,8 @@ class FieldWidget(QFrame):
     def __init__(self, possible_field_names: List[str], parent: QListWidget = None):
         super(FieldWidget, self).__init__(parent)
 
+        self.edit_dialog = QDialog()
+        self.table_view = TableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
 
         self.field_type_combo = QComboBox()
@@ -160,7 +162,7 @@ class FieldWidget(QFrame):
         if self.field_type == FieldType.scalar_dataset:
             return self.value.dtype
         if self.field_type == FieldType.array_dataset:
-            return np.array(self.value).dtype
+            return self.table_view.model.array.dtype
 
     @property
     def value(self):
@@ -168,6 +170,8 @@ class FieldWidget(QFrame):
             return DATASET_TYPE[self.value_type_combo.currentText()](
                 self.value_line_edit.text()
             )
+        elif self.field_type == FieldType.array_dataset:
+            return self.table_view.model.array
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
@@ -201,12 +205,9 @@ class FieldWidget(QFrame):
         self.value_type_combo.setVisible(show_value_type_combo)
 
     def show_edit_dialog(self):
-        self.edit_dialog = QDialog()
-
         if self.field_type_combo.currentText() == FieldType.array_dataset.value:
             self.edit_dialog.setLayout(QGridLayout())
-            table_view = TableWidget()
-            self.edit_dialog.layout().addWidget(table_view)
+            self.edit_dialog.layout().addWidget(self.table_view)
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             # TODO: show kafka stream panel
             pass
