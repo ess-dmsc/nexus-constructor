@@ -22,6 +22,7 @@ RED_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #f6989d }"
 WHITE_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #FFFFFF }"
 UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
+VALID_UNITS = "km"
 
 
 @pytest.mark.skip(
@@ -241,11 +242,65 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
 
     dialog, template = create_add_component_template(qtbot)
 
-    show_and_close_window(qtbot, template)
+    # Mimic the user entering a unique name in the text field
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user pressing the Add Component button
+    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+
+    # The window will close because the input is valid and the button is enabled
+    assert not template.isVisible()
+
+
+def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_geometry_THEN_add_component_window_closes(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
     # Mimic the user entering a unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user entering a valid file name
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, VALID_MESH_FILE_PATH)
+
+    # Mimic the user entering valid units
+    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
+
+    # Manually change the geometry_file_name attribute as this is usally altered by opening a FileDialog
+    dialog.geometry_file_name = VALID_MESH_FILE_PATH
+
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+    # Mimic the user pressing the Add Component button
+    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
+
+    # The window will close because the input is valid and the button is enabled
+    assert not template.isVisible()
+
+
+def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_geometry_THEN_add_component_window_closes(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
+
+    # Mimic the user entering a unique name in the text field
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user entering valid units
+    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -259,6 +314,9 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
 ):
 
     dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.CylinderRadioButton, Qt.LeftButton)
 
     # Mimic the user entering a non-unique name in the text field
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
@@ -487,9 +545,9 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_unit
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
 
-    # Mimic the replacing the default value with "km"
+    # Mimic the replacing the default value with VALID_UNITS
     qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.unitsLineEdit, "km")
+    qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
 
     assert dialog.unitsLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
 
@@ -513,7 +571,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
 
     # Mimic the user giving valid units
     qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.unitsLineEdit, "km")
+    qtbot.keyClicks(dialog.unitsLineEdit, VALID_UNITS)
 
     assert dialog.buttonBox.isEnabled()
 
