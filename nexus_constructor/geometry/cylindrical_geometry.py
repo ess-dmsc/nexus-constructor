@@ -46,6 +46,7 @@ def calculate_vertices(
 class CylindricalGeometry:
     """
     Describes the shape of a cylinder in 3D space. The cylinder's centre is the origin of the local coordinate system.
+    This wrapper does not have setters, delete cylinder and create a new one if the cylinder needs to change.
 
     Note, the NXcylindrical_geometry group can describe multiple cylinders, but here we are using it only for one.
     """
@@ -77,10 +78,6 @@ class CylindricalGeometry:
     @property
     def units(self) -> str:
         return str(self.group["vertices"].attrs["units"])
-
-    @units.setter
-    def units(self, new_units: str):
-        self.group["vertices"].attrs["units"] = new_units
 
     @property
     def height(self) -> float:
