@@ -51,30 +51,30 @@ class ValidateDataset:
                 if dimension_length is not None:
                     if dataset_shape[index] != dimension_length:
                         problems.append(
-                            f"Expected dimension {index} of {self.name} to have a size of {dimension_length}"
+                            f"Expected dimension {index} of {self.name} to have a size of {dimension_length} but it was {dataset_shape[index]}"
                         )
 
     def _check_attributes(self, dataset: h5py.Dataset, problems: List):
         if self.attributes is not None:
             for attribute, value in self.attributes.items():
-                if value is not None:
-                    if attribute in dataset.attrs:
+                if attribute in dataset.attrs:
+                    if value is not None:
                         if dataset.attrs[attribute] != value:
                             problems.append(
-                                f"Expected {attribute} attribute in {self.name} to have a value of '{value}', instead"
+                                f"Expected {attribute} attribute in {self.name} to have a value of '{value}' but"
                                 f" it was '{dataset.attrs[attribute]}'"
                             )
-                    else:
-                        problems.append(
-                            f"Expected to find {attribute} attribute in {self.name}"
-                        )
+                else:
+                    problems.append(
+                        f"Expected to find {attribute} attribute in {self.name}"
+                    )
 
 
 def _check_nx_class(group: h5py.Group, nx_class: str, problems: List):
     if "NX_class" in group.attrs.keys():
         if group.attrs["NX_class"] != nx_class:
             problems.append(
-                f"Expected {group.name} to have NX_class attribute of {nx_class}"
+                f"Expected {group.name} to have NX_class attribute of {nx_class} but it was {group.attrs['NX_class']}"
             )
     else:
         problems.append(f"Expected {group.name} to have an NX_class attribute")
