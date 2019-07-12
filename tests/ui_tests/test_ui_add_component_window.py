@@ -331,7 +331,6 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
-    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
     # Mimic the user entering a valid file name
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -350,7 +349,6 @@ def test_UI_given_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
-    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
@@ -370,8 +368,6 @@ def test_UI_given_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add
     qtbot
 ):
     dialog, template = create_add_component_template(qtbot)
-
-    dialog.buttonBox.setEnabled(True)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
@@ -395,11 +391,8 @@ def test_UI_given_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry
 
     dialog, template = create_add_component_template(qtbot)
 
-    dialog.buttonBox.setEnabled(True)
-
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
-    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
@@ -421,11 +414,8 @@ def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
 
     dialog, template = create_add_component_template(qtbot)
 
-    dialog.buttonBox.setEnabled(True)
-
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
-    qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
 
     # Mimic the user giving a valid component name
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
@@ -438,6 +428,36 @@ def test_UI_given_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     show_and_close_window(qtbot, template)
 
     assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_red_background(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a mesh geometry
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
+
+
+def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_red_background():
+    pass
+
+
+def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_units_box_has_white_background():
+    pass
+
+
+def test_UI_given_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled():
+    pass
+
+
+def test_UI_given_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled():
+    pass
+
+
+def test_UI_given_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled():
+    pass
 
 
 def show_and_close_window(qtbot, template):
