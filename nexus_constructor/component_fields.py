@@ -12,7 +12,7 @@ from PySide2.QtWidgets import (
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
-from nexus_constructor.component import ComponentModel
+from nexus_constructor.component import Component
 import numpy as np
 
 from nexus_constructor.table_widget import TableWidget
@@ -217,7 +217,7 @@ class FieldWidget(QFrame):
         self.edit_dialog.show()
 
 
-def add_fields_to_component(component: ComponentModel, fields_widget: QListWidget):
+def add_fields_to_component(component: Component, fields_widget: QListWidget):
     """
     Adds fields from a list widget to a component.
     :param component: Component to add the field to.

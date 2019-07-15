@@ -3,7 +3,7 @@ from nexus_constructor.component_tree_model import (
     ComponentInfo,
     LinkTransformation,
 )
-from nexus_constructor.component import ComponentModel
+from nexus_constructor.component import Component
 from nexus_constructor.instrument import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
@@ -38,7 +38,7 @@ class FakeInstrument(list):
         component_group = _add_component_to_file(
             nexus_wrapper, name, 42, "component_name"
         )
-        return ComponentModel(nexus_wrapper, component_group)
+        return Component(nexus_wrapper, component_group)
 
 
 def get_component():
@@ -46,7 +46,7 @@ def get_component():
     component_group = _add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
     )
-    return ComponentModel(nexus_wrapper, component_group)
+    return Component(nexus_wrapper, component_group)
 
 
 def test_number_of_components_0():
