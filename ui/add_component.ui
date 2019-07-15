@@ -120,7 +120,7 @@
            <item>
             <widget class="QRadioButton" name="noGeometryRadioButton">
              <property name="text">
-              <string>No &amp;Geometry</string>
+              <string>No Geometry</string>
              </property>
             </widget>
            </item>
@@ -134,7 +134,7 @@
            <item>
             <widget class="QRadioButton" name="CylinderRadioButton">
              <property name="text">
-              <string>C&amp;ylinder</string>
+              <string>Cylinder</string>
              </property>
             </widget>
            </item>
