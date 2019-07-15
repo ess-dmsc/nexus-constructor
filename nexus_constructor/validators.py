@@ -208,3 +208,24 @@ class FieldValueValidator(QValidator):
         return QValidator.Acceptable if valid else QValidator.Intermediate
 
     is_valid = Signal(bool)
+
+
+class NumpyDTypeValidator(QValidator):
+    def __init__(self, dtype: np.dtype):
+        super().__init__()
+        self.dtype = dtype
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        try:
+            self.dtype(input)
+        except ValueError:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
+
+    is_valid = Signal(bool)

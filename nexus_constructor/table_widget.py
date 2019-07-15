@@ -2,14 +2,7 @@ from functools import partial
 
 import numpy as np
 import typing
-from PySide2.QtCore import (
-    QModelIndex,
-    QAbstractTableModel,
-    Qt,
-    Signal,
-    QAbstractItemModel,
-)
-from PySide2.QtGui import QValidator
+from PySide2.QtCore import QModelIndex, QAbstractTableModel, Qt, QAbstractItemModel
 from PySide2.QtWidgets import (
     QWidget,
     QGridLayout,
@@ -23,6 +16,7 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import NumpyDTypeValidator
 
 
 class TableWidget(QWidget):
@@ -179,24 +173,3 @@ class ValueDelegate(QItemDelegate):
         self, editor: QWidget, option: QStyleOptionViewItem, index: QModelIndex
     ):
         editor.setGeometry(option.rect)
-
-
-class NumpyDTypeValidator(QValidator):
-    def __init__(self, dtype: np.dtype):
-        super().__init__()
-        self.dtype = dtype
-
-    def validate(self, input: str, pos: int) -> QValidator.State:
-        if not input:
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
-        try:
-            self.dtype(input)
-        except ValueError:
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
-
-        self.is_valid.emit(True)
-        return QValidator.Acceptable
-
-    is_valid = Signal(bool)
