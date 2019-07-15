@@ -237,8 +237,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelMappingLabel.setVisible(not bool)
         self.pixelMappingListWidget.setVisible(not bool)
 
-        print("Options changing.")
-
         self.populate_pixel_mapping_list_when_empty(not bool)
 
     def mesh_file_picker(self):
@@ -417,7 +415,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         n_faces = None
 
         with open(self.geometry_file_name) as temp_off_file:
-            _, faces = parse_off_file(temp_off_file)
+            faces = parse_off_file(temp_off_file)[1]
             n_faces = len(faces)
 
         # Clear the list widget in case it contains information from a previous file.
