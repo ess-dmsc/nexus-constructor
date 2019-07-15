@@ -50,7 +50,6 @@ def test_GIVEN_distance_WHEN_calling_set_distance_THEN_distance_changed_signal_e
 
     neutron_animation_controller = NeutronAnimationController(0, 0, None)
     neutron_animation_controller.distance_changed = Mock()
-    neutron_animation_controller.distance_changed.emit = Mock()
     neutron_animation_controller.set_distance(new_distance)
 
     neutron_animation_controller.distance_changed.emit.assert_called_once()

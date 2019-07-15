@@ -1,0 +1,342 @@
+from nexus_constructor.component import DependencyError
+from cmath import isclose
+from PySide2.QtGui import QVector3D
+import pytest
+from pytest import approx
+from .helpers import create_nexus_wrapper, add_component_to_file
+from nexus_constructor.geometry import (
+    CylindricalGeometry,
+    OFFGeometryNexus,
+    OFFGeometryNoNexus,
+)
+
+
+def test_can_create_and_read_from_field_in_component():
+    field_name = "some_field"
+    field_value = 42
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, field_name, field_value)
+    returned_value = component.get_field(field_name)
+    assert (
+        returned_value == field_value
+    ), "Expected to get same value back from field as it was created with"
+
+
+def test_nameerror_raised_if_requested_field_does_not_exist():
+    field_name = "some_field"
+    field_value = 42
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, field_name, field_value)
+    try:
+        component.get_field("nonexistent_field")
+    except NameError:
+        pass  # as expected
+
+
+def test_created_component_has_specified_name():
+    name = "component_name"
+    field_name = "some_field"
+    field_value = 42
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, field_name, field_value, name)
+    assert component.name == name
+
+
+def test_component_can_be_renamed():
+    initial_name = "component_name"
+    field_name = "some_field"
+    field_value = 42
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(
+        nexus_wrapper, field_name, field_value, initial_name
+    )
+    assert component.name == initial_name
+    new_name = "new_name"
+    component.name = new_name
+    assert component.name == new_name
+
+
+def test_value_of_field_can_be_changed():
+    name = "component_name"
+    field_name = "some_field"
+    initial_value = 42
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, field_name, initial_value, name)
+    returned_value = component.get_field(field_name)
+    assert (
+        returned_value == initial_value
+    ), "Expected to get same value back from field as it was created with"
+    new_value = 13
+    component.set_field("some_field", new_value, dtype=int)
+    returned_value = component.get_field(field_name)
+    assert (
+        returned_value == new_value
+    ), "Expected to get same value back from field as it was changed to"
+
+
+def test_type_of_field_can_be_changed():
+    """
+    This is important to test because the implementation is very different to just changing the value.
+    When the type changes the dataset has to be deleted and recreated with the new type
+    """
+
+    name = "component_name"
+    field_name = "some_field"
+    initial_value = 42
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, field_name, initial_value, name)
+    returned_value = component.get_field(field_name)
+    assert (
+        returned_value == initial_value
+    ), "Expected to get same value back from field as it was created with"
+
+    new_value = 17.3
+    component.set_field("some_field", new_value, dtype=float)
+    returned_value = component.get_field(field_name)
+    assert isclose(
+        returned_value, new_value
+    ), "Expected to get same value back from field as it was changed to"
+
+
+def test_GIVEN_new_component_WHEN_get_transforms_for_component_THEN_transforms_list_is_empty():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+    assert (
+        len(component.transforms_full_chain) == 0
+    ), "expected there to be no transformations in the newly created component"
+
+
+def test_GIVEN_component_with_a_transform_added_WHEN_get_transforms_for_component_THEN_transforms_list_contains_transform():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    transform = component.add_translation(QVector3D(1.0, 0.0, 0.0))
+    component.depends_on = transform
+
+    assert (
+        len(component.transforms_full_chain) == 1
+    ), "expected there to be a transformation in the component"
+
+
+def test_GIVEN_component_with_a_transform_added_WHEN_transform_is_deleted_THEN_transforms_list_is_empty():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+
+    component.remove_transformation(transform)
+
+    assert (
+        len(component.transforms_full_chain) == 0
+    ), "expected there to be no transforms in the component"
+
+
+def test_GIVEN_a_component_with_a_transform_dependency_WHEN_get_depends_on_THEN_transform_dependency_is_returned():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    input_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    component.depends_on = input_transform
+
+    returned_transform = component.depends_on
+
+    assert returned_transform.dataset.name == input_transform.dataset.name
+
+
+def test_deleting_a_transformation_from_a_different_component_is_not_allowed():
+    nexus_wrapper = create_nexus_wrapper()
+    first_component = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    second_component = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+
+    transform = first_component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+
+    with pytest.raises(PermissionError):
+        assert second_component.remove_transformation(
+            transform
+        ), "Expected not to be allowed to delete the transform as it belongs to a different component"
+
+
+def test_deleting_a_transformation_which_the_component_directly_depends_on_is_not_allowed():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+    transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    component.depends_on = transform
+
+    with pytest.raises(DependencyError):
+        assert component.remove_transformation(
+            transform
+        ), "Expected not to be allowed to delete the transform as the component directly depends on it"
+
+
+def test_deleting_a_transformation_which_the_component_indirectly_depends_on_is_not_allowed():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+    first_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    second_transform = component.add_translation(
+        QVector3D(1.0, 0.0, 0.0), depends_on=first_transform
+    )
+    component.depends_on = second_transform
+
+    with pytest.raises(DependencyError):
+        assert component.remove_transformation(
+            first_transform
+        ), "Expected not to be allowed to delete the transform as the component indirectly depends on it"
+
+
+def test_transforms_contains_only_local_transforms_not_full_depends_on_chain():
+    nexus_wrapper = create_nexus_wrapper()
+    first_component = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    second_component = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+
+    first_transform = first_component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    second_transform = second_component.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
+    )
+
+    second_component.depends_on = second_transform
+
+    assert len(
+        second_component.transforms
+    ), "Expect transforms list to contain only the 1 transform local to this component"
+
+
+def test_removing_transformation_which_has_a_dependent_transform_in_another_component_is_not_allowed():
+    nexus_wrapper = create_nexus_wrapper()
+    first_component = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    second_component = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+
+    first_transform = first_component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    second_transform = second_component.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
+    )
+
+    second_component.depends_on = second_transform
+
+    with pytest.raises(DependencyError):
+        assert first_component.remove_transformation(
+            first_transform
+        ), "Expected not to be allowed to delete the transform as a transform in another component depends on it"
+
+
+def test_removing_transformation_which_no_longer_has_a_dependent_transform_in_another_component_is_allowed():
+    nexus_wrapper = create_nexus_wrapper()
+    first_component = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    second_component = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+
+    first_transform = first_component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    second_transform = second_component.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
+    )
+
+    second_component.depends_on = second_transform
+
+    # Make second transform no longer depend on the first
+    second_transform.depends_on = None
+
+    try:
+        first_component.remove_transformation(first_transform)
+    except Exception:
+        pytest.fail(
+            "Expected to be able to remove transformation which is no longer a dependee"
+        )
+
+
+def test_removing_transformation_which_still_has_one_dependent_transform_is_not_allowed():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    first_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    # second_transform
+    component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform)
+    third_transform = component.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=first_transform
+    )
+
+    # Make third transform no longer depend on the first one
+    third_transform.depends_on = None
+
+    with pytest.raises(DependencyError):
+        assert component.remove_transformation(
+            first_transform
+        ), "Expected not to be allowed to delete the transform as the second transform still depends on it"
+
+
+def test_can_add_cylinder_shape_to_and_component_and_get_the_same_shape_back():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    axis_x = 1.0
+    axis_y = 0.0
+    axis_z = 0.0
+    axis = QVector3D(axis_x, axis_y, axis_z)
+    height = 42.0
+    radius = 37.0
+    component.set_cylinder_shape(axis, height, radius)
+
+    cylinder = component.get_shape()
+    assert isinstance(cylinder, CylindricalGeometry)
+    assert cylinder.height == approx(height)
+    assert cylinder.radius == approx(radius)
+    assert cylinder.axis_direction.x() == approx(axis_x)
+    assert cylinder.axis_direction.y() == approx(axis_y)
+    assert cylinder.axis_direction.z() == approx(axis_z)
+
+
+def test_can_add_mesh_shape_to_and_component_and_get_the_same_shape_back():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    # Our test input mesh is a single triangle
+    vertex_2_x = 0.5
+    vertex_2_y = -0.5
+    vertex_2_z = 0
+    vertices = [
+        QVector3D(-0.5, -0.5, 0),
+        QVector3D(0, 0.5, 0),
+        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+    ]
+    triangle = [0, 1, 2]
+    faces = [triangle]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+
+    output_mesh = component.get_shape()
+    assert isinstance(output_mesh, OFFGeometryNexus)
+    assert output_mesh.faces[0] == triangle
+    assert output_mesh.vertices[2].x() == approx(vertex_2_x)
+    assert output_mesh.vertices[2].y() == approx(vertex_2_y)
+    assert output_mesh.vertices[2].z() == approx(vertex_2_z)
+
+
+def test_can_override_existing_shape():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    component.set_cylinder_shape()
+    cylinder = component.get_shape()
+    assert isinstance(
+        cylinder, CylindricalGeometry
+    ), "Expect shape to initially be a cylinder"
+
+    vertices = [QVector3D(-0.5, -0.5, 0), QVector3D(0, 0.5, 0), QVector3D(0.5, -0.5, 0)]
+    faces = [[0, 1, 2]]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+    output_mesh = component.get_shape()
+    assert isinstance(output_mesh, OFFGeometryNexus), "Expect shape to now be a mesh"

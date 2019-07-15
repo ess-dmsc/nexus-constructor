@@ -1,16 +1,15 @@
 from nexus_constructor.pixel_data import PixelGrid
-from nexus_constructor.geometry_types import OFFGeometry
-from nexus_constructor.geometry_loader import load_geometry_from_file_object
+from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.off_renderer import QtOFFGeometry
-from nexus_constructor.qml_models.geometry_models import OFFModel
 from PySide2.QtGui import QVector3D
 import struct
 from io import StringIO
 
 
 def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_vertices_and_faces_loaded_are_the_same_as_the_file():
-    model = OFFModel()
-    model.set_units("m")
+    model = OFFGeometryNoNexus()
+    model.units = "m"
 
     off_file = (
         "OFF\n"
@@ -33,13 +32,9 @@ def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_v
         "4 6 0 2 4\n"
     )
 
-    load_geometry_from_file_object(
-        StringIO(off_file), ".off", model.units, model.geometry
-    )
+    load_geometry_from_file_object(StringIO(off_file), ".off", model.units, model)
 
-    off_geometry = model.get_geometry()
-    assert isinstance(off_geometry, OFFGeometry)
-    assert off_geometry.vertices == [
+    assert model.vertices == [
         QVector3D(-0.5, -0.5, 0.5),
         QVector3D(0.5, -0.5, 0.5),
         QVector3D(-0.5, 0.5, 0.5),
@@ -49,7 +44,7 @@ def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_v
         QVector3D(-0.5, -0.5, -0.5),
         QVector3D(0.5, -0.5, -0.5),
     ]
-    assert off_geometry.faces == [
+    assert model.faces == [
         [0, 1, 3, 2],
         [2, 3, 5, 4],
         [4, 5, 7, 6],
@@ -57,7 +52,7 @@ def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_v
         [1, 7, 5, 3],
         [6, 0, 2, 4],
     ]
-    assert off_geometry.winding_order == [
+    assert model.winding_order == [
         0,
         1,
         3,
@@ -83,7 +78,7 @@ def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_v
         2,
         4,
     ]
-    assert off_geometry.winding_order_indices == [0, 4, 8, 12, 16, 20]
+    assert model.winding_order_indices == [0, 4, 8, 12, 16, 20]
 
 
 def test_GIVEN_stl_file_with_cube_geometry_WHEN_loading_geometry_THEN_all_faces_are_present():
@@ -260,7 +255,7 @@ def test_GIVEN_unrecognised_file_extension_WHEN_loading_geometry_THEN_returns_em
 
 def test_generate_off_mesh_without_repeating_grid():
     # A square with a triangle on the side
-    off_geometry = OFFGeometry(
+    off_geometry = OFFGeometryNoNexus(
         vertices=[
             QVector3D(0, 0, 0),
             QVector3D(0, 1, 0),
@@ -297,7 +292,7 @@ def test_generate_off_mesh_with_repeating_grid():
     columns = 5
     column_width = 7
     # A square with a triangle on the side
-    off_geometry = OFFGeometry(
+    off_geometry = OFFGeometryNoNexus(
         vertices=[
             QVector3D(0, 0, 0),
             QVector3D(0, 1, 0),

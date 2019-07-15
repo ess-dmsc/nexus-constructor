@@ -1,38 +1,34 @@
+import os
 from enum import Enum
+from functools import partial
 
-from PySide2.QtCore import QUrl
+from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtGui import QIntValidator, QDoubleValidator
+from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidgetItem
 
-from nexus_constructor.pixel_data import CountDirection, Corner, PixelMapping
-from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
-from nexus_constructor.qml_models.geometry_models import (
-    CylinderModel,
-    OFFModel,
-    NoShapeModel,
-)
-from nexus_constructor.qml_models.pixel_models import (
-    SinglePixelModel,
-    PixelMappingModel,
-    PixelGridModel,
-)
-from ui.add_component import Ui_AddComponentDialog
+from nexus_constructor.component import Component
+from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
+from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
 )
+from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
+from nexus_constructor.geometry.geometry_loader import load_geometry
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.pixel_data import CountDirection, Corner, SinglePixelId, PixelMapping, PixelGrid
+from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
+from nexus_constructor.ui_utils import file_dialog, validate_line_edit
+from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.validators import (
     UnitValidator,
     NameValidator,
     GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
     OkValidator,
-    NullableIntValidator,
 )
-from nexus_constructor.nexus_wrapper import NexusWrapper
-from nexus_constructor.utils import file_dialog, validate_line_edit
-import os
-from functools import partial
+from ui.add_component import Ui_AddComponentDialog
 
 
 class GeometryType(Enum):
@@ -41,8 +37,10 @@ class GeometryType(Enum):
     MESH = 3
 
 
-class AddComponentDialog(Ui_AddComponentDialog):
-    def __init__(self, nexus_wrapper: NexusWrapper):
+class AddComponentDialog(Ui_AddComponentDialog, QObject):
+    nx_class_changed = Signal("QVariant")
+
+    def __init__(self, instrument: Instrument, component_model: ComponentTreeModel):
         super(AddComponentDialog, self).__init__()
 
         # Dictionaries that map user-input to known pixel grid options. Used when created the PixelGridModel.
@@ -57,13 +55,18 @@ class AddComponentDialog(Ui_AddComponentDialog):
             "Top right": Corner.TOP_RIGHT,
         }
 
-        self.nexus_wrapper = nexus_wrapper
+        self.instrument = instrument
+        self.component_model = component_model
+
         self.geometry_model = None
-        self.nx_classes = make_dictionary_of_class_definitions(
+        _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
+
         self.geometry_file_name = None
         self.pixel_mapping_widgets = []
+
+        self.possible_fields = []
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -113,14 +116,18 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.noGeometryRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        name_validator = NameValidator()
-        name_validator.list_model = self.nexus_wrapper.get_component_list()
+        name_validator = NameValidator(self.instrument.get_component_list())
         self.nameLineEdit.setValidator(name_validator)
         self.nameLineEdit.validator().is_valid.connect(
-            partial(validate_line_edit, self.nameLineEdit)
+            partial(
+                validate_line_edit,
+                self.nameLineEdit,
+                tooltip_on_accept="Component name is valid.",
+                tooltip_on_reject=f"Component name is not valid. Suggestion: ",
+                suggestion_callable=self.generate_name_suggestion,
+            )
         )
 
-        validate_line_edit(self.nameLineEdit, False)
         validate_line_edit(self.fileLineEdit, False)
 
         self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
@@ -138,12 +145,47 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.ok_validator.set_units_valid
         )
 
-        self.componentTypeComboBox.addItems(list(self.nx_classes.keys()))
+        self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
 
-        # Validate the default value set by the UI
+        # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
+        self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+        self.addFieldPushButton.clicked.connect(self.add_field)
+        self.removeFieldPushButton.clicked.connect(self.remove_field)
 
-        self.detectorIdLineEdit.setValidator(NullableIntValidator())
+        # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
+        self.on_nx_class_changed()
+
+        self.fieldsListWidget.itemClicked.connect(self.select_field)
+
+    def add_field(self):
+        item = QListWidgetItem()
+        field = FieldWidget(self.possible_fields, self.fieldsListWidget)
+        field.something_clicked.connect(partial(self.select_field, item))
+        self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
+        item.setSizeHint(field.sizeHint())
+
+        self.fieldsListWidget.addItem(item)
+        self.fieldsListWidget.setItemWidget(item, field)
+
+    def select_field(self, widget):
+        self.fieldsListWidget.setItemSelected(widget, True)
+
+    def remove_field(self):
+        for item in self.fieldsListWidget.selectedItems():
+            self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
+
+    def generate_name_suggestion(self):
+        """
+        Generates a component name suggestion for use in the tooltip when a component is invalid.
+        :return: The component name suggestion, based on the current nx_class.
+        """
+        return generate_unique_name(
+            self.componentTypeComboBox.currentText().lstrip("NX"),
+            self.instrument.get_component_list(),
+        )
+
+        self.detectorIdLineEdit.setValidator(QIntValidator())
 
         # Instruct the pixel grid box to appear or disappear depending on the pixel layout setting
         self.repeatableGridRadioButton.clicked.connect(
@@ -180,6 +222,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelLayoutBox.setVisible(
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
+        self.possible_fields = self.nx_component_classes[
+            self.componentTypeComboBox.currentText()
+        ]
+        self.nx_class_changed.emit(self.possible_fields)
 
         # Change which pixel-related fields are visible because this depends on the class that has been selected.
         self.change_pixel_options_visibility()
@@ -251,10 +297,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.pixel_options_conditions()
         )
 
-        """
-        Only make the pixel box appear based on the pixel layout and pixel data options being visible. The pixel grid
-        and mapping options already depend on pixel layout being visible.
-        """
+        # Only make the pixel box appear based on the pixel layout and pixel data options being visible. The pixel grid
+        # and mapping options already depend on pixel layout being visible.
         self.pixelOptionsBox.setVisible(pixel_layout_condition or pixel_data_condition)
 
         # Set visibility for the components of the pixel options box
@@ -285,25 +329,37 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cylinderOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
 
-    def generate_geometry_model(self):
+    def generate_geometry_model(self, component: Component) -> OFFGeometry:
         """
-        Generates a geometry model depending on the type of geometry selected and the current values of the lineedits that apply to the particular geometry type.
+        Generates a geometry model depending on the type of geometry selected and the current values
+        of the lineedits that apply to the particular geometry type.
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
-            geometry_model = CylinderModel()
-            geometry_model.set_unit(self.unitsLineEdit.text())
-            geometry_model.cylinder.height = self.cylinderHeightLineEdit.value()
-            geometry_model.cylinder.radius = self.cylinderRadiusLineEdit.value()
-            geometry_model.cylinder.axis_direction.setX(self.cylinderXLineEdit.value())
-            geometry_model.cylinder.axis_direction.setY(self.cylinderYLineEdit.value())
-            geometry_model.cylinder.axis_direction.setZ(self.cylinderZLineEdit.value())
+            geometry_model = component.set_cylinder_shape(
+                QVector3D(
+                    self.cylinderXLineEdit.value(),
+                    self.cylinderYLineEdit.value(),
+                    self.cylinderZLineEdit.value(),
+                ),
+                self.cylinderHeightLineEdit.value(),
+                self.cylinderRadiusLineEdit.value(),
+                self.unitsLineEdit.text(),
+            )
         elif self.meshRadioButton.isChecked():
-            geometry_model = OFFModel()
-            geometry_model.set_units(self.unitsLineEdit.text())
-            geometry_model.set_file(self.geometry_file_name)
+            mesh_geometry = OFFGeometryNoNexus()
+            geometry_model = load_geometry(
+                self.geometry_file_name, self.unitsLineEdit.text(), mesh_geometry
+            )
+
+            # Units have already been used during loading the file, but we store them and file name
+            # so we can repopulate their fields in the edit component window
+            geometry_model.units = self.unitsLineEdit.text()
+            geometry_model.file_path = self.geometry_file_name
+
+            component.set_off_shape(geometry_model)
         else:
-            geometry_model = NoShapeModel()
+            geometry_model = NoShapeGeometry()
 
         return geometry_model
 
@@ -319,43 +375,50 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
         if pixel_grid_condition:
-            pixel_model = PixelGridModel()
-            pixel_model.set_rows(int(self.rowLineEdit.text()))
-            pixel_model.set_columns(int(self.columnsLineEdit.text()))
-            pixel_model.set_row_height(float(self.rowHeightLineEdit.text()))
-            pixel_model.set_column_width(float(self.columnWidthLineEdit.text()))
-            pixel_model.set_first_id(int(self.firstIDLineEdit.text()))
-            pixel_model.set_count_direction(
-                self.count_direction[self.countFirstComboBox.currentText()]
-            )
-            pixel_model.set_initial_count_corner(
-                self.initial_count_corner[self.startCountingComboBox.currentText()]
-            )
+            pixel_data = PixelGrid()
+            pixel_data.rows = int(self.rowLineEdit.text())
+            pixel_data.columns = int(self.columnsLineEdit.text())
+            pixel_data.row_height = float(self.rowHeightLineEdit.text())
+            pixel_data.column_width = float(self.columnWidthLineEdit.text())
+            pixel_data.first_id = int(self.firstIDLineEdit.text())
+            pixel_data.count_direction = self.count_direction[
+                self.countFirstComboBox.currentText()
+            ]
+
+            pixel_data.initial_count_corner = self.initial_count_corner[
+                self.startCountingComboBox.currentText()
+            ]
 
         elif pixel_mapping_condition:
-            pixel_model = PixelMappingModel()
             pixel_data = PixelMapping(self.get_pixel_mapping_ids())
-            pixel_model.set_pixel_model(pixel_data)
 
         elif pixel_data_condition:
-            pixel_model = SinglePixelModel()
-            pixel_model.set_pixel_id(int(self.detectorIdLineEdit.text()))
+            pixel_data = SinglePixelId()
+            pixel_data.pixel_id = int(self.detectorIdLineEdit.text())
         else:
             return None
 
-        return pixel_model
+        return pixel_data
 
     def on_ok(self):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        self.nexus_wrapper.add_component(
-            nx_class,
-            component_name,
-            description,
-            self.generate_geometry_model(),
-            self.generate_pixel_data(),
-        )
+        component = self.instrument.add_component(component_name, nx_class, description)
+        geometry = self.generate_geometry_model(component)
+        pixel_data = self.generate_pixel_data()
+        add_fields_to_component(component, self.fieldsListWidget)
+        self.component_model.add_component(component)
+        self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
+
+        #
+        # self.nexus_wrapper.add_component(
+        #     nx_class,
+        #     component_name,
+        #     description,
+        #     self.generate_geometry_model(),
+        #     self.generate_pixel_data(),
+        # )
 
     def populate_pixel_mapping_list(self):
         """

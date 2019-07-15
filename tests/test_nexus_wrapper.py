@@ -1,61 +1,111 @@
-from nexus_constructor.nexus_wrapper import NexusWrapper, convert_name_with_spaces
-from nexus_constructor.qml_models.geometry_models import NoShapeModel
+from mock import Mock
+
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper, append_nxs_extension
+from tests.test_nexus_to_json import create_in_memory_file
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_file_contains_entry_group_with_correct_nx_class():
     wrapper = NexusWrapper("contains_entry")
-    assert wrapper.entry_group.attrs["NX_class"] == "NXentry"
+    assert wrapper.nexus_file["entry"].attrs["NX_class"] == "NXentry"
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_file_contains_instrument_group_with_correct_nx_class():
     wrapper = NexusWrapper("contains_instrument")
-    assert wrapper.instrument_group.attrs["NX_class"] == "NXinstrument"
-
-
-def test_GIVEN_nothing_WHEN_getting_components_list_THEN_list_contains_sample_and_no_components():
-    wrapper = NexusWrapper("component_list_with_sample")
-    assert len(wrapper.get_component_list().components) == 1
+    assert wrapper.nexus_file["entry/instrument"].attrs["NX_class"] == "NXinstrument"
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_entry_group_contains_sample():
     wrapper = NexusWrapper("entry_sample")
-    assert wrapper.entry_group["sample"].attrs["NX_class"] == "NXsample"
+    assert wrapper.nexus_file["entry/sample"].attrs["NX_class"] == "NXsample"
 
 
-def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_added_component():
-    wrapper = NexusWrapper("test_components_list")
-
-    component_type = "NXcrystal"
-    name = "test_crystal"
-    description = "shiny"
-    wrapper.add_component(component_type, name, description, NoShapeModel(), None)
-
-    component_list = wrapper.get_component_list().components
-    assert len(component_list) == 2
-    component_in_list = component_list[1]
-    assert component_in_list.name == name
-    assert component_in_list.description == description
-    assert component_in_list.nx_class == component_type
+def test_nxs_is_appended_to_filename():
+    test_filename = "banana"
+    assert append_nxs_extension(test_filename) == f"{test_filename}.nxs"
 
 
-def test_GIVEN_component_WHEN_adding_component_THEN_nexus_file_contains_added_component():
-    wrapper = NexusWrapper("test_component")
-
-    component_type = "NXcrystal"
-    name = "test_crystal"
-    description = "shiny"
-    wrapper.add_component(component_type, name, description, NoShapeModel(), None)
-
-    assert name in wrapper.instrument_group
-    component_in_nexus_file = wrapper.instrument_group[name]
-    assert component_in_nexus_file.attrs["NX_class"] == component_type
+def test_nxs_not_appended_to_filename_if_already_present():
+    test_filename = "banana.nxs"
+    assert append_nxs_extension(test_filename) == f"{test_filename}"
 
 
-def test_GIVEN_name_with_spaces_WHEN_converting_name_with_spaces_THEN_converts_spaces_in_name_to_underscores():
-    name = "test name"
-    assert convert_name_with_spaces(name) == name.replace(" ", "_")
+def test_GIVEN_entry_group_with_one_instrument_group_WHEN_getting_instrument_group_from_entry_THEN_group_is_returned():
+    file = create_in_memory_file("test_nw1")
+
+    entry = file.create_group("entry")
+    entry.attrs["NX_class"] = "NXentry"
+
+    inst_group = entry.create_group("instrument")
+    inst_group.attrs["NX_class"] = "NXinstrument"
+
+    wrapper = NexusWrapper(filename="test_nw")
+    wrapper.load_file(entry, file)
+
+    assert wrapper.instrument == inst_group
+    assert wrapper.entry == entry
+    assert wrapper.nexus_file == file
 
 
-def test_GIVEN_name_without_spaces_WHEN_converting_name_with_spaces_THEN_name_does_not_change():
-    name = "test_name"
-    assert convert_name_with_spaces(name) == name
+def test_GIVEN_multiple_entry_groups_WHEN_getting_instrument_group_from_entry_THEN_first_group_is_returned_and_others_are_ignored():
+    file = create_in_memory_file("test_nw3")
+
+    entry = file.create_group("entry")
+    entry.attrs["NX_class"] = "NXentry"
+
+    inst_group = entry.create_group("instrument")
+    inst_group.attrs["NX_class"] = "NXinstrument"
+
+    inst_group2 = entry.create_group("instrument2")
+    inst_group2.attrs["NX_class"] = "NXinstrument"
+
+    wrapper = NexusWrapper(filename="test_nw2")
+    wrapper.load_file(entry, file)
+
+    assert wrapper.nexus_file == file
+    assert wrapper.entry == entry
+    assert wrapper.instrument == inst_group
+
+
+def test_GIVEN_single_entry_group_with_instrument_group_WHEN_finding_entry_THEN_file_is_loaded_correctly():
+    file = create_in_memory_file("test_nw4")
+
+    entry = file.create_group("entry")
+    entry.attrs["NX_class"] = "NXentry"
+
+    inst_group = entry.create_group("instrument")
+    inst_group.attrs["NX_class"] = "NXinstrument"
+
+    wrapper = NexusWrapper(filename="test_nw5")
+
+    wrapper.find_entries_in_file(file)
+
+    assert wrapper.nexus_file == file
+    assert wrapper.entry == entry
+    assert wrapper.instrument == inst_group
+
+
+def test_GIVEN_multiple_entry_groups_in_file_WHEN_finding_entry_THEN_signal_is_emitted_with_entry_options():
+    file = create_in_memory_file("test_nw6")
+
+    entry = file.create_group("entry")
+    # Test with byte string as well as python string.
+    entry.attrs["NX_class"] = b"NXentry"
+
+    inst_group = entry.create_group("instrument")
+    inst_group.attrs["NX_class"] = "NXinstrument"
+
+    entry2 = file.create_group("entry2")
+    entry2.attrs["NX_class"] = "NXentry"
+
+    inst_group2 = entry2.create_group("instrument2")
+    inst_group2.attrs["NX_class"] = "NXinstrument"
+
+    wrapper = NexusWrapper(filename="test_nw7")
+    wrapper.show_entries_dialog = Mock()
+    wrapper.show_entries_dialog.emit = Mock()
+
+    wrapper.find_entries_in_file(file)
+
+    expected_entry_dict = {entry.name: entry, entry2.name: entry2}
+
+    assert wrapper.show_entries_dialog.emit.called_once_with(expected_entry_dict, file)

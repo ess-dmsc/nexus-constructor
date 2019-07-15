@@ -43,8 +43,8 @@ builders = pipeline_builder.createBuilders { container ->
         container.sh """
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
-            build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
-            build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
+            build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
+            build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15
             git submodule update --init
             """
     } // stage
@@ -68,7 +68,7 @@ builders = pipeline_builder.createBuilders { container ->
         try {
                 container.sh """
                     cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml --ignore=tests/ui_tests/
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml
                 """
             }
             catch(err) {
@@ -113,24 +113,24 @@ return {
             stage("Setup") {
                   bat """
                   git submodule update --init
-                  python -m pip install --user -r requirements.txt
+                  python -m pip install --user -r requirements-dev.txt
                 """
             } // stage
             stage("Run tests") {
-                bat """python -m pytest . -s --ignore=definitions --ignore=tests/ui_tests/
+                bat """python -m pytest . -s --ignore=definitions
                 """
             } // stage
-            if (env.CHANGE_ID) {
-                stage("Build Executable") {
-                    bat """
-                    python setup.py build_exe"""
-                } // stage
+            // if (env.CHANGE_ID) {
+                // stage("Build Executable") {
+                    // bat """
+                    // python setup.py build_exe"""
+                // } // stage
                 // stage('Archive Executable') {
                     // def git_commit_short = scm_vars.GIT_COMMIT.take(7)
                     // powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
                     // archiveArtifacts 'nexus-constructor*.zip'
                 // } // stage
-            } // if
+            // } // if
           } // dir
       } //ws
     } // node
@@ -150,12 +150,11 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user -r requirements.txt"
+                    sh "python3 -m pip install --user -r requirements-dev.txt && git submodule update --init"
                 } // stage
-                stage('Build Executable') {
-                    sh "python3 setup.py build_exe"
+                stage('Run tests') {
+                    sh "python3 -m pytest . -s --ignore=definitions/"
                 } // stage
-                 // archive as well
             } // dir
         } // node
     } // return
@@ -174,10 +173,7 @@ node("docker") {
         }
     }
     
-    // disabled for now as the build isn't setup for Mac OS just yet.
-    // builders['macOS'] = get_macos_pipeline()
-
-    // Only build executables on windows if it is a PR build
+    builders['macOS'] = get_macos_pipeline()
     builders['windows10'] = get_win10_pipeline()
     parallel builders
 }

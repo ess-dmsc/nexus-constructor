@@ -1,4 +1,4 @@
-from nexus_constructor.geometry_types import OFFGeometry
+from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus
 from nexusutils.readwriteoff import parse_off_file
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from stl import mesh
@@ -6,7 +6,9 @@ from PySide2.QtGui import QVector3D
 from io import StringIO
 
 
-def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry()):
+def load_geometry(
+    filename: str, units: str, geometry: OFFGeometry = OFFGeometryNoNexus()
+) -> OFFGeometry:
     """
     Loads geometry from a file into an OFFGeometry instance
 
@@ -25,17 +27,18 @@ def load_geometry(filename: str, units: str, geometry: OFFGeometry = OFFGeometry
         with open(filename) as file:
             return load_geometry_from_file_object(file, extension, units, geometry)
     except UnicodeDecodeError:
-        """
-        Try again in case the file is in binary. At least one of these should work when a user selects a file because
-        GeometryFileValidator inspects the file beforehand to check that it's valid.
-        """
+        # Try again in case the file is in binary. At least one of these should work when a user selects a file because
+        # GeometryFileValidator inspects the file beforehand to check that it's valid.
         with open(filename, "rb") as file:
             return load_geometry_from_file_object(file, extension, units, geometry)
 
 
 def load_geometry_from_file_object(
-    file: StringIO, extension: str, units: str, geometry: OFFGeometry = OFFGeometry()
-):
+    file: StringIO,
+    extension: str,
+    units: str,
+    geometry: OFFGeometry = OFFGeometryNoNexus(),
+) -> OFFGeometry:
     """
     Loads geometry from a file object into an OFFGeometry instance
 
@@ -52,9 +55,9 @@ def load_geometry_from_file_object(
     mult_factor = calculate_unit_conversion_factor(units)
 
     if extension == ".off":
-        load_off_geometry(file, mult_factor, geometry)
+        _load_off_geometry(file, mult_factor, geometry)
     elif extension == ".stl":
-        load_stl_geometry(file, mult_factor, geometry)
+        _load_stl_geometry(file, mult_factor, geometry)
     else:
         geometry.faces = []
         geometry.vertices = []
@@ -63,9 +66,9 @@ def load_geometry_from_file_object(
     return geometry
 
 
-def load_off_geometry(
-    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
-):
+def _load_off_geometry(
+    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometryNoNexus()
+) -> OFFGeometry:
     """
     Loads geometry from an OFF file into an OFFGeometry instance.
 
@@ -86,9 +89,9 @@ def load_off_geometry(
     return geometry
 
 
-def load_stl_geometry(
-    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometry()
-):
+def _load_stl_geometry(
+    file: StringIO, mult_factor: float, geometry: OFFGeometry = OFFGeometryNoNexus()
+) -> OFFGeometry:
     """
     Loads geometry from an STL file into an OFFGeometry instance.
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1263</width>
+    <width>1287</width>
     <height>712</height>
    </rect>
   </property>
@@ -14,8 +14,8 @@
    <string>NeXus Constructor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="sizeConstraint">
        <enum>QLayout::SetDefaultConstraint</enum>
@@ -37,14 +37,11 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QPushButton" name="pushButton">
-            <property name="text">
-             <string>Add component</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListView" name="listView"/>
+           <layout class="QVBoxLayout" name="componentsTabLayout">
+            <item>
+             <widget class="QTreeView" name="componentTreeView"/>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -89,8 +86,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1263</width>
-     <height>19</height>
+     <width>1287</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -124,7 +121,7 @@
   <customwidget>
    <class>InstrumentView</class>
    <extends>QWidget</extends>
-   <header>nexus_constructor/InstrumentView.h</header>
+   <header>nexus_constructor/instrument_view.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
