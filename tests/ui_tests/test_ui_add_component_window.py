@@ -557,7 +557,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
     assert dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
+# @pytest.mark.skipif(RUNNING_ON_WINDOWS, reason="Fails on Windows.")
 def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot
 ):
@@ -573,8 +573,9 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_com
     enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     # Mimic the user clearing the units box
-    # qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-    dialog.unitsLineEdit.textChanged.emit(0)
+    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+
+    # dialog.unitsLineEdit.textChanged.emit(0)
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -656,6 +657,18 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_irrelevant_fields_are_invisibl
     assert not dialog.geometryFileBox.isVisible()
 
 
+def show_window_and_wait_for_interaction(
+    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
+):
+    """
+    Helper method that allows you to examine a window during testing. Just here for convenience.
+    :param qtbot: The qtbot testing tool.
+    :param template: The window/widget to be opened.
+    """
+    template.show()
+    qtbot.stopForInteraction()
+
+
 def show_and_close_window(
     qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
 ):
@@ -735,5 +748,7 @@ def enter_units(dialog: AddComponentDialog, qtbot: pytestqt.qtbot.QtBot, units: 
     :param qtbot: The qtbot testing tool.
     :param units: The desired units input.
     """
-    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+    word_length = len(dialog.unitsLineEdit.text())
+    for _ in range(word_length):
+        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
     qtbot.keyClicks(dialog.unitsLineEdit, units)
