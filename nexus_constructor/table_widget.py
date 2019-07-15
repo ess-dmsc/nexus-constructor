@@ -59,7 +59,7 @@ class TableWidget(QWidget):
 
 
 class TableModel(QAbstractTableModel):
-    def __init__(self, dtype: np.dtype, parent=None):
+    def __init__(self, dtype: np.dtype, parent: TableWidget):
         super().__init__()
         self.setParent(parent)
         self.array = np.array([[0]], dtype=dtype)
@@ -76,6 +76,7 @@ class TableModel(QAbstractTableModel):
             self.array = np.array(self.array.data, dtype=dtype)
         except ValueError:
             self.array = np.array([[0]], dtype=dtype)
+        self.parent().view.itemDelegate().dtype = dtype
         self.endResetModel()
 
     def add_row(self):
@@ -189,10 +190,10 @@ class NumpyDTypeValidator(QValidator):
         if not input:
             self.is_valid.emit(False)
             return QValidator.Intermediate
-
         try:
             self.dtype(input)
         except ValueError:
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
         self.is_valid.emit(True)
