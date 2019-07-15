@@ -14,6 +14,10 @@ from PySide2.QtWidgets import (
 
 
 class TableWidget(QWidget):
+    """
+    Wrapper over a QTableView with buttons to add and delete rows/columns
+    """
+
     def __init__(self, type: np.dtype = np.byte, parent=None):
         super().__init__(parent)
         self.model = TableModel(dtype=type, parent=self)
@@ -43,9 +47,6 @@ class TableWidget(QWidget):
 
 
 class TableModel(QAbstractTableModel):
-
-    dataChanged = Signal(QModelIndex, QModelIndex)
-
     def __init__(self, dtype: np.dtype, parent=None):
         super().__init__()
         self.setParent(parent)
@@ -53,7 +54,9 @@ class TableModel(QAbstractTableModel):
 
     def update_array_dtype(self, dtype: np.dtype):
         """
-        Updates the array dataset type. If there is existing data in the array, it tries to cast the values to the new dtype. If not or if numpy is unable to cast the values, a new array is created.
+        Updates the array dataset type.
+        If there is existing data in the array, it tries to cast the values to the new dtype.
+        If not or if numpy is unable to cast the values, a new array is created.
         :param dtype: The new dataset type to set the array to.
         """
         self.beginResetModel()
@@ -122,10 +125,8 @@ class TableModel(QAbstractTableModel):
 
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
         if index.isValid() and role == Qt.EditRole and value:
-            # self.beginResetModel()
             self.array[index.row()][index.column()] = value
             print(self.array)
             self.dataChanged.emit(index, index)
-            # self.endResetModel()
             return True
         return False
