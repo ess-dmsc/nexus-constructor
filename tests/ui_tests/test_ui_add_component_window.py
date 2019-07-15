@@ -496,8 +496,8 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
-    # qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
-    dialog.meshRadioButton.clicked.emit()
+    qtbot.mouseClick(dialog.meshRadioButton.focusWidget(), Qt.LeftButton)
+    # dialog.meshRadioButton.clicked.emit()
 
     # Mimic the user clearing the unit input box (it will contain only 'm' by default)
     enter_units(dialog, qtbot, "")
