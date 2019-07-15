@@ -52,7 +52,7 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
 
     dialog, template = create_add_component_template(qtbot)
 
-    qtbot.mouseClick(dialog.noGeometryRadioButton, Qt.LeftButton)
+    systematic_radio_button_press(qtbot, dialog.noGeometryRadioButton)
 
     assert not dialog.geometryOptionsBox.isVisible()
 
@@ -70,7 +70,8 @@ def test_UI_given_nothing_WHEN_changing_component_geometry_type_THEN_add_compone
     ]
 
     for geometry_button in all_geometry_buttons:
-        qtbot.mouseClick(geometry_button, Qt.LeftButton)
+        # qtbot.mouseClick(geometry_button, Qt.LeftButton)
+        systematic_radio_button_press(qtbot, geometry_button)
         assert not dialog.buttonBox.isEnabled()
 
 
@@ -111,7 +112,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     qtbot.mouseClick(
         dialog.meshRadioButton,
         Qt.LeftButton,
-        pos=systematic_button_press(dialog.meshRadioButton),
+        pos=find_radio_button_press_position(dialog.meshRadioButton),
     )
 
     show_and_close_window(qtbot, template)
@@ -502,7 +503,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     qtbot.mouseClick(
         dialog.meshRadioButton,
         Qt.LeftButton,
-        pos=systematic_button_press(dialog.meshRadioButton),
+        pos=find_radio_button_press_position(dialog.meshRadioButton),
     )
 
     # Mimic the user clearing the unit input box (it will contain only 'm' by default)
@@ -575,7 +576,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_com
     qtbot.mouseClick(
         dialog.meshRadioButton,
         Qt.LeftButton,
-        pos=systematic_button_press(dialog.meshRadioButton),
+        pos=find_radio_button_press_position(dialog.meshRadioButton),
     )
     # Mimic the user giving a valid component name
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
@@ -625,7 +626,7 @@ def test_UI_GIVEN_mesh_geometry_selected_THEN_relevant_fields_are_visible(qtbot)
     qtbot.mouseClick(
         dialog.meshRadioButton,
         Qt.LeftButton,
-        pos=systematic_button_press(dialog.meshRadioButton),
+        pos=find_radio_button_press_position(dialog.meshRadioButton),
     )
     # q = QStyleOptionButton()
     # dialog.meshRadioButton.clicked.emit()
@@ -728,7 +729,18 @@ def create_add_component_dialog():
     return AddComponentDialog(instrument, component)
 
 
-def systematic_button_press(button: QRadioButton):
+def systematic_radio_button_press(qtbot: pytestqt.qtbot.QtBot, button: QRadioButton):
+    """
+    Left clicks on a radio button after finding the position to click using a systematic search.
+    :param qtbot: The qtbot testing tool.
+    :param button: The button to press.
+    """
+    qtbot.mouseClick(
+        button, Qt.LeftButton, pos=find_radio_button_press_position(button)
+    )
+
+
+def find_radio_button_press_position(button: QRadioButton):
     """
     Systematic way of making sure a button press works. Goes through every point in the widget until it finds one that
     returns True for the `hitButton` method.
