@@ -20,22 +20,18 @@ class TableWidget(QWidget):
         self.view = QTableView()
         self.view.setModel(self.model)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.model.dataChanged.connect(self.view.repaint)
+        self.model.dataChanged.connect(self.view.update)
 
         self.setLayout(QGridLayout())
         self.toolbox = QToolBar()
         self.add_row_button = QAction(text="➕ Add Row")
         self.add_row_button.triggered.connect(self.model.add_row)
         self.remove_row_button = QAction(text="➖ Remove Row")
-        self.remove_row_button.triggered.connect(
-            partial(self.model.delete_row, self.view)
-        )
+        self.remove_row_button.triggered.connect(self.model.delete_row)
         self.add_column_button = QAction(text="➕ Add Column")
         self.add_column_button.triggered.connect(self.model.add_column)
         self.remove_column_button = QAction(text="➖ Remove Column")
-        self.remove_column_button.triggered.connect(
-            partial(self.model.delete_column, self.view)
-        )
+        self.remove_column_button.triggered.connect(self.model.delete_column)
 
         self.toolbox.addAction(self.add_row_button)
         self.toolbox.addAction(self.remove_row_button)
@@ -64,11 +60,11 @@ class TableModel(QAbstractTableModel):
     def add_column(self):
         pass
 
-    def delete_row(self, parent):
-        for index in parent.selectedIndexes():
+    def delete_row(self):
+        for index in self.parent().view().selectedIndexes():
             self.array = np.delete(self.array, index.row())
 
-    def delete_column(self, parent):
+    def delete_column(self):
         pass
 
     def rowCount(self, parent: QModelIndex = ...) -> int:
@@ -95,12 +91,7 @@ class TableModel(QAbstractTableModel):
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         if not index.isValid():
             return Qt.ItemIsEnabled
-        return (
-            QAbstractTableModel.flags(self, index)
-            | Qt.ItemIsEditable
-            | Qt.ItemIsSelectable
-            | Qt.ItemIsEnabled
-        )
+        return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
     def headerData(
         self, section: int, orientation: Qt.Orientation, role: int = ...
