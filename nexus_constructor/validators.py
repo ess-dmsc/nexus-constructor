@@ -119,7 +119,7 @@ class GeometryFileValidator(QValidator):
                     if suff in GEOMETRY_FILE_TYPES["STL Files"]:
                         try:
                             try:
-                                mesh.Mesh(
+                                mesh.Mesh.from_file(
                                     "",
                                     fh=self.open_file(input),
                                     calculate_normals=False,
