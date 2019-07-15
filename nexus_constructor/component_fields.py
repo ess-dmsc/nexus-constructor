@@ -13,7 +13,6 @@ from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
 from nexus_constructor.component import Component
-import numpy as np
 
 from nexus_constructor.table_widget import TableWidget
 from nexus_constructor.ui_utils import validate_line_edit
