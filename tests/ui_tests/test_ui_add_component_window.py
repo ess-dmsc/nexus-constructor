@@ -5,7 +5,7 @@ import PySide2
 import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
-from PySide2.QtWidgets import QDialog
+from PySide2.QtWidgets import QDialog, QRadioButton
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -611,8 +611,11 @@ def test_UI_GIVEN_mesh_geometry_selected_THEN_relevant_fields_are_visible(qtbot)
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
-    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton, pos=QPoint(0, 0))
-    print(dialog.meshRadioButton.hitButton(QPoint(5, 5)))
+    qtbot.mouseClick(
+        dialog.meshRadioButton,
+        Qt.LeftButton,
+        pos=systematic_button_press(dialog.meshRadioButton),
+    )
     # q = QStyleOptionButton()
     # dialog.meshRadioButton.clicked.emit()
     show_and_close_window(qtbot, template)
@@ -712,6 +715,22 @@ def create_add_component_dialog():
     component = ComponentTreeModel(instrument)
     nexus_wrapper_count += 1
     return AddComponentDialog(instrument, component)
+
+
+def systematic_button_press(button: QRadioButton):
+    """
+    Systematic way of making sure a button press works.
+    :param button:  The radio button to click.
+    :return: A QPoint indicating where the button must be clicked in order for its event to be triggered.
+    """
+    coordinates = [i for i in range(1, 16)]
+
+    for x in coordinates:
+        for y in coordinates:
+            click_point = QPoint(x, y)
+            if button.hitButton(click_point):
+                return click_point
+    return None
 
 
 def enter_component_name(
