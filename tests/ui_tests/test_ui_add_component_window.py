@@ -588,8 +588,9 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_ad
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
-    # qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
-    dialog.meshRadioButton.clicked.emit()
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton, pos=QPoint(5, 5))
+    print(dialog.meshRadioButton.hitButton(QPoint(1, 5)))
+    # dialog.meshRadioButton.clicked.emit()
 
     # Mimic the user giving a valid component name
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
