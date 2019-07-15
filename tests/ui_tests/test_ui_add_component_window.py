@@ -192,7 +192,7 @@ def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_become
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
     # Mimic the user entering a name in the text field
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has changed to white
     assert dialog.nameLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
@@ -208,7 +208,7 @@ def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_rem
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
     # Mimic the user entering a non-unique name in the text field
-    enter_component_name(dialog, qtbot, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has remained red
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
@@ -223,7 +223,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
     show_and_close_window(qtbot, template)
 
     # Mimic the user entering a non-unique name in the text field
-    enter_component_name(dialog, qtbot, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -239,7 +239,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -257,13 +257,13 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_geometry_THEN_add_
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     # Mimic the user entering valid units
-    enter_units(dialog, qtbot, VALID_UNITS)
+    enter_units(qtbot, dialog, VALID_UNITS)
 
     show_and_close_window(qtbot, template)
 
@@ -283,10 +283,10 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_geometry_THEN_
     systematic_radio_button_press(qtbot, dialog.CylinderRadioButton)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering valid units
-    enter_units(dialog, qtbot, VALID_UNITS)
+    enter_units(qtbot, dialog, VALID_UNITS)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -305,7 +305,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_geometry_THEN_add_
     systematic_radio_button_press(qtbot, dialog.CylinderRadioButton)
 
     # Mimic the user entering a non-unique name in the text field
-    enter_component_name(dialog, qtbot, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
 
     # The Add Component button is disabled
     assert not dialog.buttonBox.isEnabled()
@@ -328,7 +328,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # The Add Component button is enabled because all the information required to create a no geometry component is
     # there
@@ -358,7 +358,7 @@ def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometr
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user entering a bad file path
-    enter_file_path(dialog, qtbot, NONEXISTENT_FILE_PATH)
+    enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -375,7 +375,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving the path for a file that exists but has the wrong extension
-    enter_file_path(dialog, qtbot, WRONG_EXTENSION_FILE_PATH)
+    enter_file_path(qtbot, dialog, WRONG_EXTENSION_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -391,7 +391,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user entering a valid file name
-    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -408,10 +408,10 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -429,7 +429,7 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add
     show_and_close_window(qtbot, template)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     show_and_close_window(qtbot, template)
 
@@ -447,10 +447,10 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_geometry
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a nonexistent file path
-    enter_file_path(dialog, qtbot, NONEXISTENT_FILE_PATH)
+    enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -467,10 +467,10 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_geom
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a path for a file that exists but has the wrong extension
-    enter_file_path(dialog, qtbot, WRONG_EXTENSION_FILE_PATH)
+    enter_file_path(qtbot, dialog, WRONG_EXTENSION_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -487,7 +487,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user clearing the unit input box (it will contain only 'm' by default)
-    enter_units(dialog, qtbot, "")
+    enter_units(qtbot, dialog, "")
 
     assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
@@ -502,7 +502,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_un
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving invalid units input
-    enter_units(dialog, qtbot, INVALID_UNITS)
+    enter_units(qtbot, dialog, INVALID_UNITS)
 
     assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
@@ -517,7 +517,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_unit
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the replacing the default value with "km"
-    enter_units(dialog, qtbot, VALID_UNITS)
+    enter_units(qtbot, dialog, VALID_UNITS)
 
     assert dialog.unitsLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
 
@@ -532,13 +532,13 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     # Mimic the user giving valid units
-    enter_units(dialog, qtbot, VALID_UNITS)
+    enter_units(qtbot, dialog, VALID_UNITS)
 
     assert dialog.buttonBox.isEnabled()
 
@@ -553,13 +553,13 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_com
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     # Mimic the user clearing the units box
-    enter_units(dialog, qtbot, "")
+    enter_units(qtbot, dialog, "")
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -574,13 +574,13 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_ad
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     # Mimic the user giving invalid units input
-    enter_units(dialog, qtbot, INVALID_UNITS)
+    enter_units(qtbot, dialog, INVALID_UNITS)
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -719,9 +719,7 @@ def find_radio_button_press_position(button: QRadioButton):
     return None
 
 
-def enter_component_name(
-    dialog: AddComponentDialog, qtbot: pytestqt.qtbot.QtBot, component_name: str
-):
+def enter_component_name(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, component_name: str):
     """
     Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
     name.
@@ -733,9 +731,7 @@ def enter_component_name(
     qtbot.keyClicks(dialog.nameLineEdit, component_name)
 
 
-def enter_file_path(
-    dialog: AddComponentDialog, qtbot: pytestqt.qtbot.QtBot, file_path: str
-):
+def enter_file_path(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, file_path: str):
     """
     Mimics the user entering a file path. Clicks on the text field and enters a given file path. Also sets the
     `geometry_file_name` attribute of the AddComponentDialog and this is usually only altered by opening a FileDialog.
@@ -748,7 +744,7 @@ def enter_file_path(
     dialog.geometry_file_name = file_path
 
 
-def enter_units(dialog: AddComponentDialog, qtbot: pytestqt.qtbot.QtBot, units: str):
+def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
     """
     Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
     given string.
