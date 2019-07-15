@@ -621,7 +621,7 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_relevant_fields_are_visible(qt
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a cylinder geometry
-    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
+    systematic_radio_button_press(qtbot, dialog.CylinderRadioButton)
 
     show_and_close_window(qtbot, template)
 
