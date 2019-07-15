@@ -751,4 +751,6 @@ def enter_units(dialog: AddComponentDialog, qtbot: pytestqt.qtbot.QtBot, units: 
     word_length = len(dialog.unitsLineEdit.text())
     for _ in range(word_length):
         qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.unitsLineEdit, units)
+
+    if len(units) > 0:
+        qtbot.keyClicks(dialog.unitsLineEdit, units)
