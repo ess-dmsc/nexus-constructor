@@ -1,5 +1,4 @@
 import os
-import sys
 
 import PySide2
 import pytest
@@ -14,7 +13,6 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 # Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
-RUNNING_ON_WINDOWS = sys.platform.startswith("win")
 WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "tests", "UITests.md")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
 VALID_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
@@ -561,9 +559,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_com
     enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     # Mimic the user clearing the units box
-    qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-
-    # dialog.unitsLineEdit.textChanged.emit(0)
+    enter_units(dialog, qtbot, "")
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -584,8 +580,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_geometry_THEN_ad
     enter_file_path(dialog, qtbot, VALID_MESH_FILE_PATH)
 
     # Mimic the user giving invalid units input
-    qtbot.keyClicks(dialog.unitsLineEdit, "111")
-    dialog.unitsLineEdit.textChanged.emit(0)
+    enter_units(dialog, qtbot, INVALID_UNITS)
 
     assert not dialog.buttonBox.isEnabled()
 
