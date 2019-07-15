@@ -24,7 +24,6 @@ class TableWidget(QWidget):
         self.view = QTableView()
         self.view.setModel(self.model)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.model.dataChanged.connect(self.view.update)
 
         self.setLayout(QGridLayout())
         self.toolbox = QToolBar()
