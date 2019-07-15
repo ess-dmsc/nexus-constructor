@@ -26,9 +26,7 @@ VALID_UNITS = "km"
 INVALID_UNITS = "abc"
 
 
-@pytest.mark.skip(
-    reason="Clicking with QActions/QIcons doesn't seem to be possible. This test causes seg faults at the moment."
-)
+@pytest.mark.skip(reason="This test causes seg faults at the moment.")
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot
 ):
@@ -40,9 +38,16 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 
     qtbot.addWidget(template)
 
-    qtbot.mouseClick(window.pushButton, Qt.LeftButton)
+    show_and_close_window(qtbot, template)
+
+    qtbot.mouseClick(
+        window.component_tool_bar.widgetForAction(window.new_component_action),
+        Qt.LeftButton,
+    )
 
     assert window.add_component_window.isVisible()
+
+    window.add_component_window.close()
 
 
 def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options_are_hidden(
