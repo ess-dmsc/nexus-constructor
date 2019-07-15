@@ -2,7 +2,7 @@ from functools import partial
 
 import numpy as np
 import typing
-from PySide2.QtCore import QModelIndex, QAbstractTableModel, Qt
+from PySide2.QtCore import QModelIndex, QAbstractTableModel, Qt, Signal
 from PySide2.QtWidgets import (
     QWidget,
     QGridLayout,
@@ -20,6 +20,7 @@ class TableWidget(QWidget):
         self.view = QTableView()
         self.view.setModel(self.model)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.model.dataChanged.connect(self.view.repaint)
 
         self.setLayout(QGridLayout())
         self.toolbox = QToolBar()
@@ -46,6 +47,9 @@ class TableWidget(QWidget):
 
 
 class TableModel(QAbstractTableModel):
+
+    dataChanged = Signal(QModelIndex, QModelIndex)
+
     def __init__(self, dtype: np.dtype, parent=None):
         super().__init__()
         self.dtype = dtype
@@ -62,7 +66,7 @@ class TableModel(QAbstractTableModel):
 
     def delete_row(self, parent):
         for index in parent.selectedIndexes():
-            np.delete(self.array, index.row())
+            self.array = np.delete(self.array, index.row())
 
     def delete_column(self, parent):
         pass
