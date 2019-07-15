@@ -7,6 +7,8 @@ import numpy as np
 from enum import Enum
 
 from PySide2.QtWidgets import QComboBox
+from nexusutils.readwriteoff import parse_off_file
+from stl import mesh
 
 
 class UnitValidator(QValidator):
@@ -102,13 +104,48 @@ class GeometryFileValidator(QValidator):
         for suffixes in self.file_types.values():
             for suff in suffixes:
                 if input.endswith(f".{suff}"):
+                    if suff in GEOMETRY_FILE_TYPES["OFF Files"]:
+                        try:
+                            if parse_off_file(self.open_file(input)) is None:
+                                # An invalid file can cause the function to return None
+                                self.is_valid.emit(False)
+                                return QValidator.Intermediate
+                        except (ValueError, TypeError, StopIteration, IndexError):
+                            # File is invalid
+                            self.is_valid.emit(False)
+                            return QValidator.Intermediate
+                        self.is_valid.emit(True)
+                        return QValidator.Acceptable
+                    if suff in GEOMETRY_FILE_TYPES["STL Files"]:
+                        try:
+                            try:
+                                mesh.Mesh(
+                                    "",
+                                    fh=self.open_file(input),
+                                    calculate_normals=False,
+                                )
+                            except UnicodeDecodeError:
+                                # File is in binary format - load it again
+                                mesh.Mesh.from_file(
+                                    "",
+                                    fh=self.open_file(input, mode="rb"),
+                                    calculate_normals=False,
+                                )
+                        except (TypeError, AssertionError, RuntimeError, ValueError):
+                            # File is invalid
+                            self.is_valid.emit(False)
+                            return QValidator.Intermediate
+
                     self.is_valid.emit(True)
                     return QValidator.Acceptable
         self.is_valid.emit(False)
         return QValidator.Invalid
 
-    def is_file(self, input):
+    def is_file(self, input: str) -> bool:
         return os.path.isfile(input)
+
+    def open_file(self, filename: str, mode: str = "r"):
+        return open(filename, mode)
 
     is_valid = Signal(bool)
 
