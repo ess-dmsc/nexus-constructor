@@ -6,6 +6,7 @@ from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtGui import QIntValidator, QDoubleValidator
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidgetItem
+from nexusutils.readwriteoff import parse_off_file
 
 from nexus_constructor.component import Component
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
@@ -413,7 +414,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if not self.geometry_file_name:
             return
 
-        n_faces = len(self.generate_geometry_model().get_geometry().faces)
+        n_faces = None
+
+        with open(self.geometry_file_name) as temp_off_file:
+            _, faces = parse_off_file(temp_off_file)
+            n_faces = len(faces)
 
         # Clear the list widget in case it contains information from a previous file.
         self.pixel_mapping_widgets = []

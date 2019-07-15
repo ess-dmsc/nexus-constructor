@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Mon Jul 15 15:01:35 2019
+# Created: Mon Jul 15 15:16:12 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -172,26 +172,6 @@ class Ui_AddComponentDialog(object):
         self.pixelMappingListWidget = QtWidgets.QListWidget(self.pixelOptionsBox)
         self.pixelMappingListWidget.setObjectName("pixelMappingListWidget")
         self.verticalLayout_3.addWidget(self.pixelMappingListWidget)
-        self.pixelDataBox = QtWidgets.QGroupBox(self.pixelOptionsBox)
-        self.pixelDataBox.setObjectName("pixelDataBox")
-        self.horizontalLayout_8 = QtWidgets.QHBoxLayout(self.pixelDataBox)
-        self.horizontalLayout_8.setObjectName("horizontalLayout_8")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_8.addItem(spacerItem)
-        self.detectorIdLabel = QtWidgets.QLabel(self.pixelDataBox)
-        self.detectorIdLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.detectorIdLabel.setObjectName("detectorIdLabel")
-        self.horizontalLayout_8.addWidget(self.detectorIdLabel)
-        self.detectorIdLineEdit = QtWidgets.QLineEdit(self.pixelDataBox)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.detectorIdLineEdit.sizePolicy().hasHeightForWidth())
-        self.detectorIdLineEdit.setSizePolicy(sizePolicy)
-        self.detectorIdLineEdit.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.detectorIdLineEdit.setObjectName("detectorIdLineEdit")
-        self.horizontalLayout_8.addWidget(self.detectorIdLineEdit)
-        self.verticalLayout_3.addWidget(self.pixelDataBox)
         self.gridLayout_2.addWidget(self.pixelOptionsBox, 4, 0, 1, 1)
         self.geometryFileBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
         self.geometryFileBox.setObjectName("geometryFileBox")
@@ -307,9 +287,9 @@ class Ui_AddComponentDialog(object):
         self.label_2.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Description:", None, -1))
         self.label_3.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Component type:", None, -1))
         self.geometryTypeBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry type:", None, -1))
-        self.noGeometryRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No &Geometry", None, -1))
+        self.noGeometryRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No Geometry", None, -1))
         self.meshRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Mesh", None, -1))
-        self.CylinderRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "C&ylinder", None, -1))
+        self.CylinderRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1))
         self.geometryOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry options:", None, -1))
         self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel options", None, -1))
         self.pixelLayoutBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel layout:", None, -1))
@@ -335,8 +315,6 @@ class Ui_AddComponentDialog(object):
         self.startCountingComboBox.setItemText(5, QtWidgets.QApplication.translate("AddComponentDialog", "Top right", None, -1))
         self.countingFromLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Start counting from:", None, -1))
         self.pixelMappingLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel mapping:", None, -1))
-        self.pixelDataBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel data:", None, -1))
-        self.detectorIdLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Detector ID:", None, -1))
         self.geometryFileBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry file", None, -1))
         self.fileBrowseButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Browse...", None, -1))
         self.cylinderOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder options", None, -1))

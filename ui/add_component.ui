@@ -152,223 +152,178 @@
              <property name="title">
               <string>Pixel options</string>
              </property>
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QGroupBox" name="pixelLayoutBox">
-             <property name="title">
-              <string>Pixel layout:</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <widget class="QRadioButton" name="repeatableGridRadioButton">
-                <property name="text">
-                 <string>Repeatable grid</string>
+               <widget class="QGroupBox" name="pixelLayoutBox">
+                <property name="title">
+                 <string>Pixel layout:</string>
                 </property>
-                <property name="checked">
-                 <bool>true</bool>
+                <layout class="QHBoxLayout" name="horizontalLayout_7">
+                 <item>
+                  <widget class="QRadioButton" name="repeatableGridRadioButton">
+                   <property name="text">
+                    <string>Repeatable grid</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="faceMappedMeshRadioButton">
+                   <property name="text">
+                    <string>Face-mapped mesh</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="pixelGridBox">
+                <property name="title">
+                 <string>Pixel grid:</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0,0,0">
+                 <property name="verticalSpacing">
+                  <number>6</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="rowLabel">
+                   <property name="text">
+                    <string>Row:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="rowHeightLabel">
+                   <property name="text">
+                    <string>Row height:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="columnWidthLabel">
+                   <property name="text">
+                    <string>Column width:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="firstIDLabel">
+                   <property name="text">
+                    <string>First ID:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="rowLineEdit">
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="columnsLineEdit">
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QLineEdit" name="rowHeightLineEdit">
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QLineEdit" name="columnWidthLineEdit">
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLineEdit" name="firstIDLineEdit">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="columnsLabel">
+                   <property name="text">
+                    <string>Columns:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="2" colspan="2">
+                  <widget class="QComboBox" name="countFirstComboBox">
+                   <item>
+                    <property name="text">
+                     <string>Rows</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Columns</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="4" column="0" colspan="2">
+                  <widget class="QLabel" name="countFirstLabel">
+                   <property name="text">
+                    <string>Count first along:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="2" colspan="2">
+                  <widget class="QComboBox" name="startCountingComboBox">
+                   <item>
+                    <property name="text">
+                     <string>Bottom left</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Bottom right</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Top left</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Top right</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="3" column="0" colspan="2">
+                  <widget class="QLabel" name="countingFromLabel">
+                   <property name="text">
+                    <string>Start counting from:</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="pixelMappingLabel">
+                <property name="text">
+                 <string>Pixel mapping:</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="faceMappedMeshRadioButton">
-                <property name="text">
-                 <string>Face-mapped mesh</string>
-                </property>
-               </widget>
+               <widget class="QListWidget" name="pixelMappingListWidget"/>
               </item>
              </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="pixelGridBox">
-             <property name="title">
-              <string>Pixel grid:</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0,0,0">
-              <property name="verticalSpacing">
-               <number>6</number>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="rowLabel">
-                <property name="text">
-                 <string>Row:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QLabel" name="rowHeightLabel">
-                <property name="text">
-                 <string>Row height:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QLabel" name="columnWidthLabel">
-                <property name="text">
-                 <string>Column width:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="firstIDLabel">
-                <property name="text">
-                 <string>First ID:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="rowLineEdit">
-                <property name="text">
-                 <string>1</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="columnsLineEdit">
-                <property name="text">
-                 <string>1</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="3">
-               <widget class="QLineEdit" name="rowHeightLineEdit">
-                <property name="text">
-                 <string>1</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QLineEdit" name="columnWidthLineEdit">
-                <property name="text">
-                 <string>1</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="firstIDLineEdit">
-                <property name="text">
-                 <string>0</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="columnsLabel">
-                <property name="text">
-                 <string>Columns:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="2" colspan="2">
-               <widget class="QComboBox" name="countFirstComboBox">
-                <item>
-                 <property name="text">
-                  <string>Rows</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Columns</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="4" column="0" colspan="2">
-               <widget class="QLabel" name="countFirstLabel">
-                <property name="text">
-                 <string>Count first along:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2" colspan="2">
-               <widget class="QComboBox" name="startCountingComboBox">
-                <item>
-                 <property name="text">
-                  <string>Bottom left</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Bottom right</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Top left</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Top right</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="3" column="0" colspan="2">
-               <widget class="QLabel" name="countingFromLabel">
-                <property name="text">
-                 <string>Start counting from:</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="pixelMappingLabel">
-             <property name="text">
-              <string>Pixel mapping:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QListWidget" name="pixelMappingListWidget"/>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="pixelDataBox">
-             <property name="title">
-              <string>Pixel data:</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
-              <item>
-               <spacer name="pixelDataSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QLabel" name="detectorIdLabel">
-                <property name="text">
-                 <string>Detector ID:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="detectorIdLineEdit">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
             </widget>
            </item>
            <item row="1" column="0">
