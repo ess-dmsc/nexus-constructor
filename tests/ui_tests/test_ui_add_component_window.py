@@ -486,7 +486,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     # Mimic the user selecting a mesh geometry
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
-    # Mimic the user clearing the unit input box (it will contain only 'm' by default)
+    # Mimic the user clearing the unit input box
     enter_units(qtbot, dialog, "")
 
     assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
@@ -719,24 +719,28 @@ def find_radio_button_press_position(button: QRadioButton):
     return None
 
 
-def enter_component_name(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, component_name: str):
+def enter_component_name(
+    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, component_name: str
+):
     """
     Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
     name.
-    :param dialog: An instance of an AddComponentDialog object.
     :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog object.
     :param component_name: The desired component name.
     """
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, component_name)
 
 
-def enter_file_path(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, file_path: str):
+def enter_file_path(
+    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, file_path: str
+):
     """
     Mimics the user entering a file path. Clicks on the text field and enters a given file path. Also sets the
     `geometry_file_name` attribute of the AddComponentDialog and this is usually only altered by opening a FileDialog.
+    :param qtbot: The qtbot testing tool.
     :param dialog: An instance of an AddComponentDialog object.
-    :param qtbot: The qtbost testing tool.
     :param file_path: The desired file path.
     """
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
@@ -748,8 +752,8 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
     """
     Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
     given string.
-    :param dialog: An instance of an AddComponentDialog object.
     :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog object.
     :param units: The desired units input.
     """
     word_length = len(dialog.unitsLineEdit.text())
