@@ -56,7 +56,7 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     assert not dialog.geometryOptionsBox.isVisible()
 
 
-def test_UI_given_nothing_WHEN_changing_component_geometry_type_THEN_add_component_button_is_always_disabled(
+def test_UI_GIVEN_nothing_WHEN_changing_component_geometry_type_THEN_add_component_button_is_always_disabled(
     qtbot
 ):
 
@@ -71,6 +71,21 @@ def test_UI_given_nothing_WHEN_changing_component_geometry_type_THEN_add_compone
     for geometry_button in all_geometry_buttons:
         systematic_radio_button_press(qtbot, geometry_button)
         assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_are_metres(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    units_geometries = [dialog.meshRadioButton, dialog.CylinderRadioButton]
+
+    for geometry_button in units_geometries:
+        systematic_radio_button_press(qtbot, geometry_button)
+        show_and_close_window(qtbot, template)
+        assert dialog.unitsLineEdit.isVisible()
+        assert dialog.unitsLineEdit.text() == "m"
 
 
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
