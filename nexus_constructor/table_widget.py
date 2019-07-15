@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 import typing
 from PySide2.QtCore import QModelIndex, QAbstractTableModel, Qt
@@ -24,21 +26,22 @@ class TableWidget(QWidget):
         self.add_row_button = QAction(text="➕ Add Row")
         self.add_row_button.triggered.connect(self.model.add_row)
         self.remove_row_button = QAction(text="➖ Remove Row")
-        self.remove_row_button.triggered.connect(self.model.delete_row, self)
+        self.remove_row_button.triggered.connect(
+            partial(self.model.delete_row, self.view)
+        )
         self.add_column_button = QAction(text="➕ Add Column")
         self.add_column_button.triggered.connect(self.model.add_column)
         self.remove_column_button = QAction(text="➖ Remove Column")
-        self.remove_column_button.triggered.connect(self.model.delete_column, self)
-        buttons = [
-            self.add_row_button,
-            self.remove_row_button,
-            self.add_column_button,
-            self.remove_column_button,
-        ]
-        [self.toolbox.addAction(button) for button in buttons]
+        self.remove_column_button.triggered.connect(
+            partial(self.model.delete_column, self.view)
+        )
+
+        self.toolbox.addAction(self.add_row_button)
+        self.toolbox.addAction(self.remove_row_button)
+        self.toolbox.addAction(self.add_column_button)
+        self.toolbox.addAction(self.remove_column_button)
 
         self.layout().addWidget(self.toolbox)
-
         self.layout().addWidget(self.view)
 
 
