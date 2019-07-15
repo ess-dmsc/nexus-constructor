@@ -73,21 +73,6 @@ def test_UI_GIVEN_nothing_WHEN_changing_component_geometry_type_THEN_add_compone
         assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_are_metres(
-    qtbot
-):
-
-    dialog, template = create_add_component_template(qtbot)
-
-    units_geometries = [dialog.meshRadioButton, dialog.CylinderRadioButton]
-
-    for geometry_button in units_geometries:
-        systematic_radio_button_press(qtbot, geometry_button)
-        show_and_close_window(qtbot, template)
-        assert dialog.unitsLineEdit.isVisible()
-        assert dialog.unitsLineEdit.text() == "m"
-
-
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
     qtbot
 ):
@@ -129,6 +114,21 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     assert dialog.geometryOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.geometryFileBox.isVisible()
+
+
+def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_are_metres(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    units_geometries = [dialog.meshRadioButton, dialog.CylinderRadioButton]
+
+    for geometry_button in units_geometries:
+        systematic_radio_button_press(qtbot, geometry_button)
+        show_and_close_window(qtbot, template)
+        assert dialog.unitsLineEdit.isVisible()
+        assert dialog.unitsLineEdit.text() == "m"
 
 
 def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
@@ -651,6 +651,22 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_irrelevant_fields_are_invisibl
     systematic_radio_button_press(qtbot, dialog.CylinderRadioButton)
 
     assert not dialog.geometryFileBox.isVisible()
+
+
+def test_UI_GIVEN_cylinder_geometry_selected_THEN_default_values_are_correct(qtbot):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    # Mimic the user selecting a cylinder geometry
+    systematic_radio_button_press(qtbot, dialog.CylinderRadioButton)
+    show_and_close_window(qtbot, template)
+
+    assert dialog.cylinderOptionsBox.isVisible()
+    assert dialog.cylinderHeightLineEdit.value() == 1.0
+    assert dialog.cylinderRadiusLineEdit.value() == 1.0
+    assert dialog.cylinderXLineEdit.value() == 0.0
+    assert dialog.cylinderYLineEdit.value() == 0.0
+    assert dialog.cylinderZLineEdit.value() == 1.0
 
 
 def show_window_and_wait_for_interaction(
