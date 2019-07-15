@@ -108,8 +108,11 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     assert not dialog.unitsbox.isVisible()
 
     # Click on the mesh geometry button
-    # qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton)
-    dialog.meshRadioButton.clicked.emit()
+    qtbot.mouseClick(
+        dialog.meshRadioButton,
+        Qt.LeftButton,
+        pos=systematic_button_press(dialog.meshRadioButton),
+    )
 
     show_and_close_window(qtbot, template)
 
@@ -496,8 +499,11 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
-    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton, pos=QPoint(0, 0))
-    # dialog.meshRadioButton.clicked.emit()
+    qtbot.mouseClick(
+        dialog.meshRadioButton,
+        Qt.LeftButton,
+        pos=systematic_button_press(dialog.meshRadioButton),
+    )
 
     # Mimic the user clearing the unit input box (it will contain only 'm' by default)
     enter_units(dialog, qtbot, "")
@@ -565,7 +571,12 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_add_com
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
-    dialog.meshRadioButton.clicked.emit()
+    # dialog.meshRadioButton.clicked.emit()
+    qtbot.mouseClick(
+        dialog.meshRadioButton,
+        Qt.LeftButton,
+        pos=systematic_button_press(dialog.meshRadioButton),
+    )
     # Mimic the user giving a valid component name
     enter_component_name(dialog, qtbot, UNIQUE_COMPONENT_NAME)
 
@@ -719,14 +730,15 @@ def create_add_component_dialog():
 
 def systematic_button_press(button: QRadioButton):
     """
-    Systematic way of making sure a button press works.
+    Systematic way of making sure a button press works. Goes through every point in the widget until it finds one that
+    returns True for the `hitButton` method.
     :param button:  The radio button to click.
     :return: A QPoint indicating where the button must be clicked in order for its event to be triggered.
     """
-    coordinates = [i for i in range(1, 16)]
+    size = button.size()
 
-    for x in coordinates:
-        for y in coordinates:
+    for x in range(size.width()):
+        for y in range(size.height()):
             click_point = QPoint(x, y)
             if button.hitButton(click_point):
                 return click_point
