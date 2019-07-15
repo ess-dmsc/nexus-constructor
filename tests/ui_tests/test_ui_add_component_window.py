@@ -611,6 +611,8 @@ def test_UI_GIVEN_mesh_geometry_selected_THEN_relevant_fields_are_visible(qtbot)
 
     # Mimic the user selecting a mesh geometry
     qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton, pos=QPoint(0, 0))
+    print(dialog.meshRadioButton.hitButton(QPoint(5, 5)))
+    # q = QStyleOptionButton()
     # dialog.meshRadioButton.clicked.emit()
     show_and_close_window(qtbot, template)
 
