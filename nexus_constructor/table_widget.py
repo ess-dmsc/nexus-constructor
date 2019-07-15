@@ -61,7 +61,7 @@ class TableModel(QAbstractTableModel):
         pass
 
     def delete_row(self):
-        for index in self.parent().view().selectedIndexes():
+        for index in self.parent().view.selectedIndexes():
             self.array = np.delete(self.array, index.row())
 
     def delete_column(self):
@@ -83,15 +83,20 @@ class TableModel(QAbstractTableModel):
         """
         return self.array.shape[1]
 
-    def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
+    def data(self, index: QModelIndex, role: int = ...) -> str:
         if role == Qt.DisplayRole or role == Qt.EditRole:
-            return self.array[index.row()][index.column()]
-        return None
+            value = self.array[index.row()][index.column()]
+            print(value)
+            return str(value)
+        return ""
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
-        if not index.isValid():
-            return Qt.ItemIsEnabled
-        return Qt.ItemIsEnabled | Qt.ItemIsEditable
+        return (
+            super(TableModel, self).flags(index)
+            | Qt.ItemIsEditable
+            | Qt.ItemIsEnabled
+            | Qt.ItemIsSelectable
+        )
 
     def headerData(
         self, section: int, orientation: Qt.Orientation, role: int = ...
@@ -105,7 +110,10 @@ class TableModel(QAbstractTableModel):
 
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
         if index.isValid() and role == Qt.EditRole and value:
+            self.beginResetModel()
             self.array[index.row()][index.column()] = value
+            print(self.array)
             self.dataChanged.emit(index, index)
+            self.endResetModel()
             return True
         return False
