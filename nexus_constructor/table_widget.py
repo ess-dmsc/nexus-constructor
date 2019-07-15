@@ -36,7 +36,6 @@ class TableWidget(QWidget):
         self.view = QTableView()
         self.view.setModel(self.model)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-
         self.view.setItemDelegate(ValueDelegate(type, parent))
 
         self.setLayout(QGridLayout())
@@ -153,7 +152,7 @@ class ValueDelegate(QItemDelegate):
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
     ) -> QWidget:
-        editor = QLineEdit()
+        editor = QLineEdit(parent)
         editor.setValidator(NumpyDTypeValidator(self.dtype))
         editor.validator().is_valid.connect(
             partial(
@@ -172,7 +171,7 @@ class ValueDelegate(QItemDelegate):
     def setModelData(
         self, editor: QWidget, model: QAbstractItemModel, index: QModelIndex
     ):
-        value = editor.curentText()
+        value = editor.text()
         model.setData(index, value, Qt.EditRole)
 
     def updateEditorGeometry(
