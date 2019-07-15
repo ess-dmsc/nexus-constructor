@@ -385,3 +385,16 @@ def test_GIVEN_invalid_stl_file_WHEN_validating_geometry_THEN_valid_sigal_is_emi
 
     assert validator.validate("test.stl", 0) == QValidator.Intermediate
     validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_valid_signal_is_emitted_with_false():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    blank_off_file = ""
+
+    validator.open_file = Mock(return_value=StringIO("".join(blank_off_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.off", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
