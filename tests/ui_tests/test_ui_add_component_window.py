@@ -4,15 +4,15 @@ import PySide2
 import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
-from PySide2.QtWidgets import QDialog, QRadioButton
+from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.instrument import Instrument
+from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
-# Workaround - even when skipping jenkins is not happy importing AddComponentDialog due to a missing lib
 WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "tests", "UITests.md")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
 VALID_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
@@ -33,15 +33,16 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
     qtbot
 ):
 
-    dialog, template = create_add_component_template(qtbot)
+    template = QMainWindow()
+    window = MainWindow(Instrument(NexusWrapper("test")))
+    template.ui = window
+    template.ui.setupUi(template)
 
     qtbot.addWidget(template)
 
-    # Using trigger rather than clicking on the menu
-    # window.new_component_action.trigger()
-    # assert window.add_component_window.isVisible()
-    #
-    # window.add_component_window.close()
+    qtbot.mouseClick(window.pushButton, Qt.LeftButton)
+
+    assert window.add_component_window.isVisible()
 
 
 def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options_are_hidden(
@@ -706,7 +707,7 @@ def find_radio_button_press_position(button: QRadioButton):
     """
     Systematic way of making sure a button press works. Goes through every point in the widget until it finds one that
     returns True for the `hitButton` method.
-    :param button:  The radio button to click.
+    :param button: The radio button to click.
     :return: A QPoint indicating where the button must be clicked in order for its event to be triggered.
     """
     size = button.size()
