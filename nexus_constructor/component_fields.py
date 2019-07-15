@@ -207,6 +207,9 @@ class FieldWidget(QFrame):
     def show_edit_dialog(self):
         if self.field_type_combo.currentText() == FieldType.array_dataset.value:
             self.edit_dialog.setLayout(QGridLayout())
+            self.table_view.model.update_array_dtype(
+                DATASET_TYPE[self.value_type_combo.currentText()]
+            )
             self.edit_dialog.layout().addWidget(self.table_view)
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             # TODO: show kafka stream panel

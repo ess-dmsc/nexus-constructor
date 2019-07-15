@@ -48,13 +48,26 @@ class TableModel(QAbstractTableModel):
 
     def __init__(self, dtype: np.dtype, parent=None):
         super().__init__()
-        self.dtype = dtype
         self.setParent(parent)
-        self.array = np.array([[0]], dtype=self.dtype)
+        self.array = np.array([[0]], dtype=dtype)
+
+    def update_array_dtype(self, dtype: np.dtype):
+        """
+        Updates the array dataset type. If there is existing data in the array, it tries to cast the values to the new dtype. If not or if numpy is unable to cast the values, a new array is created.
+        :param dtype: The new dataset type to set the array to.
+        """
+        self.beginResetModel()
+        try:
+            self.array = np.array(self.array.data, dtype=dtype)
+        except ValueError:
+            self.array = np.array([[0]], dtype=dtype)
+        self.endResetModel()
 
     def add_row(self):
         self.beginInsertRows(QModelIndex(), self.array.size, self.array.shape[0])
-        self.array = np.concatenate((self.array, np.array([[0]], dtype=self.dtype)))
+        self.array = np.concatenate(
+            (self.array, np.array([[0]], dtype=self.array.dtype))
+        )
         self.endInsertRows()
 
     def add_column(self):
@@ -88,7 +101,6 @@ class TableModel(QAbstractTableModel):
             value = self.array[index.row()][index.column()]
             print(value)
             return str(value)
-        return ""
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         return (
@@ -110,10 +122,10 @@ class TableModel(QAbstractTableModel):
 
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
         if index.isValid() and role == Qt.EditRole and value:
-            self.beginResetModel()
+            # self.beginResetModel()
             self.array[index.row()][index.column()] = value
             print(self.array)
             self.dataChanged.emit(index, index)
-            self.endResetModel()
+            # self.endResetModel()
             return True
         return False
