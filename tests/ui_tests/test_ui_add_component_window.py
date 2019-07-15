@@ -4,7 +4,7 @@ import sys
 import PySide2
 import pytest
 import pytestqt
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, QPoint
 from PySide2.QtWidgets import QDialog
 
 from nexus_constructor import component_type
@@ -496,7 +496,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_geometry_THEN_units_b
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
-    qtbot.mouseClick(dialog.meshRadioButton.focusWidget(), Qt.LeftButton)
+    qtbot.mouseClick(dialog.meshRadioButton, Qt.LeftButton, pos=QPoint(0, 0))
     # dialog.meshRadioButton.clicked.emit()
 
     # Mimic the user clearing the unit input box (it will contain only 'm' by default)
