@@ -17,7 +17,7 @@ from nexus_constructor.component_type import (
 from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.pixel_data import CountDirection, Corner, SinglePixelId, PixelMapping, PixelGrid
+from nexus_constructor.pixel_data import CountDirection, Corner, PixelMapping, PixelGrid
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.ui_utils import generate_unique_name
@@ -158,6 +158,30 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
+        # Instruct the pixel grid box to appear or disappear depending on the pixel layout setting
+        self.repeatableGridRadioButton.clicked.connect(
+            lambda: self.show_pixel_grid_or_pixel_mapping(True)
+        )
+        self.faceMappedMeshRadioButton.clicked.connect(
+            lambda: self.show_pixel_grid_or_pixel_mapping(False)
+        )
+
+        # Create a validator that only accepts ints that are 0 or greater
+        zero_or_greater_int_validator = QIntValidator()
+        zero_or_greater_int_validator.setBottom(0)
+        # Set the validator of the row, column and first line input boxes in the pixel grid options
+        self.rowLineEdit.setValidator(zero_or_greater_int_validator)
+        self.columnsLineEdit.setValidator(zero_or_greater_int_validator)
+        self.firstIDLineEdit.setValidator(zero_or_greater_int_validator)
+
+        double_validator = QDoubleValidator()
+        double_validator.setNotation(QDoubleValidator.StandardNotation)
+        self.rowHeightLineEdit.setValidator(double_validator)
+        self.columnWidthLineEdit.setValidator(double_validator)
+
+        self.pixelMappingLabel.setVisible(False)
+        self.pixelMappingListWidget.setVisible(False)
+
     def add_field(self):
         item = QListWidgetItem()
         field = FieldWidget(self.possible_fields, self.fieldsListWidget)
@@ -184,34 +208,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.componentTypeComboBox.currentText().lstrip("NX"),
             self.instrument.get_component_list(),
         )
-
-        self.detectorIdLineEdit.setValidator(QIntValidator())
-
-        # Instruct the pixel grid box to appear or disappear depending on the pixel layout setting
-        self.repeatableGridRadioButton.clicked.connect(
-            lambda: self.show_pixel_grid_or_pixel_mapping(True)
-        )
-        self.faceMappedMeshRadioButton.clicked.connect(
-            lambda: self.show_pixel_grid_or_pixel_mapping(False)
-        )
-
-        # Create a validator that only accepts ints that are 0 or greater
-        zero_or_greater_int_validator = QIntValidator()
-        zero_or_greater_int_validator.setBottom(0)
-        # Set the validator of the row, column and first line input boxes in the pixel grid options
-        self.rowLineEdit.setValidator(zero_or_greater_int_validator)
-        self.columnsLineEdit.setValidator(zero_or_greater_int_validator)
-        self.firstIDLineEdit.setValidator(zero_or_greater_int_validator)
-
-        double_validator = QDoubleValidator()
-        double_validator.setNotation(QDoubleValidator.StandardNotation)
-        self.rowHeightLineEdit.setValidator(double_validator)
-        self.columnWidthLineEdit.setValidator(double_validator)
-
-        self.pixelMappingLabel.setVisible(False)
-        self.pixelMappingListWidget.setVisible(False)
-
-        self.pixel_mapping_widgets = None
 
     def on_nx_class_changed(self):
         self.webEngineView.setUrl(
@@ -240,6 +236,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelMappingLabel.setVisible(not bool)
         self.pixelMappingListWidget.setVisible(not bool)
 
+        print("Options changing.")
+
         self.populate_pixel_mapping_list_when_empty(not bool)
 
     def mesh_file_picker(self):
@@ -253,7 +251,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.fileLineEdit.setText(filename)
             self.geometry_file_name = filename
 
-        _, _, _, pixel_mapping_condition = self.pixel_options_conditions()
+        _, _, pixel_mapping_condition = self.pixel_options_conditions()
 
         if pixel_mapping_condition:
             self.populate_pixel_mapping_list()
@@ -266,12 +264,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
 
         pixel_layout_condition = (
-            self.componentTypeComboBox.currentText() == "NXdetector"
+            self.componentTypeComboBox.currentText().startswith("NXdetector")
             and self.meshRadioButton.isChecked()
-        )
-        pixel_data_condition = (
-            not self.noGeometryRadioButton.isChecked()
-            and self.componentTypeComboBox.currentText() == "NXmonitor"
         )
         pixel_grid_condition = (
             pixel_layout_condition and self.repeatableGridRadioButton.isChecked()
@@ -280,12 +274,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             pixel_layout_condition and self.faceMappedMeshRadioButton.isChecked()
         )
 
-        return (
-            pixel_layout_condition,
-            pixel_data_condition,
-            pixel_grid_condition,
-            pixel_mapping_condition,
-        )
+        return (pixel_layout_condition, pixel_grid_condition, pixel_mapping_condition)
 
     def change_pixel_options_visibility(self):
         """
@@ -293,17 +282,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
         and individual fields is set.
         """
-        pixel_layout_condition, pixel_data_condition, pixel_grid_condition, pixel_mapping_condition = (
+        pixel_layout_condition, pixel_grid_condition, pixel_mapping_condition = (
             self.pixel_options_conditions()
         )
 
         # Only make the pixel box appear based on the pixel layout and pixel data options being visible. The pixel grid
         # and mapping options already depend on pixel layout being visible.
-        self.pixelOptionsBox.setVisible(pixel_layout_condition or pixel_data_condition)
+        self.pixelOptionsBox.setVisible(pixel_layout_condition)
 
         # Set visibility for the components of the pixel options box
         self.pixelLayoutBox.setVisible(pixel_layout_condition)
-        self.pixelDataBox.setVisible(pixel_data_condition)
         self.pixelGridBox.setVisible(pixel_grid_condition)
         self.pixelMappingLabel.setVisible(pixel_mapping_condition)
         self.pixelMappingListWidget.setVisible(pixel_mapping_condition)
@@ -370,7 +358,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return:
         """
         # Determine which type of PixelMapping object ought to be created.
-        _, pixel_data_condition, pixel_grid_condition, pixel_mapping_condition = (
+        _, pixel_grid_condition, pixel_mapping_condition = (
             self.pixel_options_conditions()
         )
 
@@ -392,9 +380,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         elif pixel_mapping_condition:
             pixel_data = PixelMapping(self.get_pixel_mapping_ids())
 
-        elif pixel_data_condition:
-            pixel_data = SinglePixelId()
-            pixel_data.pixel_id = int(self.detectorIdLineEdit.text())
         else:
             return None
 
