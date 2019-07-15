@@ -719,7 +719,6 @@ def create_add_component_dialog():
     Creates an AddComponentDialog object for use in a testing template.
     :return: An instance of an AddComponentDialog object.
     """
-
     global nexus_wrapper_count
     nexus_name = "test" + str(nexus_wrapper_count)
     instrument = Instrument(NexusWrapper(nexus_name))
