@@ -2,7 +2,14 @@ from functools import partial
 
 import numpy as np
 import typing
-from PySide2.QtCore import QModelIndex, QAbstractTableModel, Qt, Signal
+from PySide2.QtCore import (
+    QModelIndex,
+    QAbstractTableModel,
+    Qt,
+    Signal,
+    QAbstractItemModel,
+)
+from PySide2.QtGui import QValidator
 from PySide2.QtWidgets import (
     QWidget,
     QGridLayout,
@@ -10,7 +17,12 @@ from PySide2.QtWidgets import (
     QToolBar,
     QAction,
     QAbstractItemView,
+    QItemDelegate,
+    QStyleOptionViewItem,
+    QLineEdit,
 )
+
+from nexus_constructor.ui_utils import validate_line_edit
 
 
 class TableWidget(QWidget):
@@ -24,6 +36,8 @@ class TableWidget(QWidget):
         self.view = QTableView()
         self.view.setModel(self.model)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        self.view.setItemDelegate(ValueDelegate(type, parent))
 
         self.setLayout(QGridLayout())
         self.toolbox = QToolBar()
@@ -129,3 +143,60 @@ class TableModel(QAbstractTableModel):
             self.dataChanged.emit(index, index)
             return True
         return False
+
+
+class ValueDelegate(QItemDelegate):
+    def __init__(self, dtype, parent):
+        super().__init__(parent)
+        self.dtype = dtype
+
+    def createEditor(
+        self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
+    ) -> QWidget:
+        editor = QLineEdit()
+        editor.setValidator(NumpyDTypeValidator(self.dtype))
+        editor.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                editor,
+                tooltip_on_reject="Not valid for the selected dtype",
+            )
+        )
+        return editor
+
+    def setEditorData(self, editor: QWidget, index: QModelIndex):
+        value = index.model().data(index, Qt.EditRole)
+
+        editor.setText(value)
+
+    def setModelData(
+        self, editor: QWidget, model: QAbstractItemModel, index: QModelIndex
+    ):
+        value = editor.curentText()
+        model.setData(index, value, Qt.EditRole)
+
+    def updateEditorGeometry(
+        self, editor: QWidget, option: QStyleOptionViewItem, index: QModelIndex
+    ):
+        editor.setGeometry(option.rect)
+
+
+class NumpyDTypeValidator(QValidator):
+    def __init__(self, dtype: np.dtype):
+        super().__init__()
+        self.dtype = dtype
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+
+        try:
+            self.dtype(input)
+        except ValueError:
+            return QValidator.Intermediate
+
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
+
+    is_valid = Signal(bool)
