@@ -376,13 +376,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.startCountingComboBox.currentText()
             ]
 
+            return pixel_data
+
         elif pixel_mapping_condition:
-            pixel_data = PixelMapping(self.get_pixel_mapping_ids())
+            return PixelMapping(self.get_pixel_mapping_ids())
 
         else:
             return None
-
-        return pixel_data
 
     def on_ok(self):
         nx_class = self.componentTypeComboBox.currentText()
