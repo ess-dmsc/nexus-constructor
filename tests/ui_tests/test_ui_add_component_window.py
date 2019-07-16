@@ -193,7 +193,6 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
 
         # Change the index and check that the pixel options have become invisible again
         dialog.componentTypeComboBox.setCurrentIndex(index)
-        show_window_and_wait_for_interaction(qtbot, template)
         assert not dialog.pixelOptionsBox.isVisible()
 
 
