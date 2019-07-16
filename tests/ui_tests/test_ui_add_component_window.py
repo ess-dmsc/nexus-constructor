@@ -24,6 +24,9 @@ UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
+ALL_COMPONENT_TYPE_INDICES = [i for i in range(len(component_type.COMPONENT_TYPES))][
+    ::-1
+]
 
 
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
@@ -142,17 +145,12 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_for_component_w
 
     dialog, template = create_add_component_template(qtbot)
 
-    classes = list(dialog.nx_component_classes.keys())
-    pixel_options_class_indices = []
-
-    for i, nx_class in enumerate(classes):
-        if nx_class in component_type.PIXEL_COMPONENT_TYPES:
-            pixel_options_class_indices.append(i)
-
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
     show_and_close_window(qtbot, template)
 
-    for index in pixel_options_class_indices:
+    pixel_options_indices = get_pixel_options_indices(dialog)
+
+    for index in pixel_options_indices:
 
         # Change the pixel options to invisible manually
         dialog.pixelOptionsBox.setVisible(False)
@@ -171,20 +169,12 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
 
     dialog, template = create_add_component_template(qtbot)
 
-    classes = list(dialog.nx_component_classes.keys())
-    no_pixel_options_class_indices = []
-
-    for i, nx_class in enumerate(classes):
-        if nx_class not in component_type.PIXEL_COMPONENT_TYPES:
-            no_pixel_options_class_indices.append(i)
-
-    # Put the first index at the end. Otherwise changing from 0 to 0 doesn't trigger the indexChanged signal.
-    no_pixel_options_class_indices.append(no_pixel_options_class_indices.pop(0))
-
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
     show_and_close_window(qtbot, template)
 
-    for index in no_pixel_options_class_indices:
+    no_pixel_options_indices = get_no_pixel_options_indices(dialog)
+
+    for index in no_pixel_options_indices:
 
         # Manually set the pixel options to visible
         dialog.pixelOptionsBox.setVisible(True)
@@ -196,13 +186,11 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
         assert not dialog.pixelOptionsBox.isVisible()
 
 
+@pytest.mark.parametrize("component_type_index", ALL_COMPONENT_TYPE_INDICES)
 def test_UI_GIVEN_any_class_WHEN_selecting_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible(
-    qtbot
+    qtbot, component_type_index
 ):
     dialog, template = create_add_component_template(qtbot)
-
-    indices = [i for i in range(len(component_type.COMPONENT_TYPES))]
-    indices.append(indices.pop(0))
 
     no_pixel_geometries = [dialog.noGeometryRadioButton, dialog.CylinderRadioButton]
 
@@ -215,15 +203,14 @@ def test_UI_GIVEN_any_class_WHEN_selecting_nxclass_for_component_that_does_not_h
         show_and_close_window(qtbot, template)
 
     for geometry_button in no_pixel_geometries:
-        for index in indices:
 
-            make_pixel_options_appear()
+        make_pixel_options_appear()
 
-            systematic_radio_button_press(qtbot, geometry_button)
-            dialog.componentTypeComboBox.setCurrentIndex(index)
-            show_and_close_window(qtbot, template)
+        systematic_radio_button_press(qtbot, geometry_button)
+        dialog.componentTypeComboBox.setCurrentIndex(component_type_index)
+        show_and_close_window(qtbot, template)
 
-            assert not dialog.pixelOptionsBox.isVisible()
+        assert not dialog.pixelOptionsBox.isVisible()
 
 
 def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_repeatable_grid_is_selected_and_visible_by_default(
@@ -864,3 +851,29 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
 
     if len(units) > 0:
         qtbot.keyClicks(dialog.unitsLineEdit, units)
+
+
+def get_pixel_options_indices(dialog: AddComponentDialog):
+    """
+    Creates a list of the combo box indices for component types that have pixel fields.
+    :param dialog: An instance of a AddComponentDialog containing a component type combo box.
+    :return: An int list.
+    """
+    return [
+        i
+        for i, comp_type in enumerate(dialog.nx_component_classes.keys())
+        if comp_type in component_type.PIXEL_COMPONENT_TYPES
+    ][::-1]
+
+
+def get_no_pixel_options_indices(dialog: AddComponentDialog):
+    """
+    Creates a list of the combo box indices for component types that don't have have pixel fields.
+    :param dialog: An instance of a AddComponentDialog containing a component type combo box.
+    :return: An int list.
+    """
+    return [
+        i
+        for i, comp_type in enumerate(dialog.nx_component_classes.keys())
+        if comp_type not in component_type.PIXEL_COMPONENT_TYPES
+    ][::-1]
