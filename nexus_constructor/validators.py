@@ -213,7 +213,7 @@ DATASET_TYPE = {
     "ULong": np.uint,
     "Float": np.single,
     "Double": np.double,
-    "String": np.object
+    "String": h5py.special_dtype(vlen=str),
 }
 
 
@@ -259,7 +259,7 @@ class NumpyDTypeValidator(QValidator):
         if not input:
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        if self.dtype is not np.object:
+        if not h5py.check_dtype(vlen=self.dtype) == str:
             try:
                 self.dtype(input)
             except ValueError:
