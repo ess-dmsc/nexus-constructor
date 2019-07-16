@@ -3,7 +3,7 @@ from io import StringIO
 from typing import List
 
 import attr
-from PySide2.QtGui import QValidator
+from PySide2.QtGui import QValidator, QIntValidator
 from mock import Mock
 
 from nexus_constructor.validators import (
@@ -256,7 +256,7 @@ def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_T
 
 def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
 
-    validator = NullableIntValidator()
+    validator = QIntValidator()
     assert validator.validate("", 0) == QValidator.Acceptable
 
 
@@ -267,8 +267,8 @@ def test_GIVEN_nonemptry_string_WHEN_using_nullable_int_validator_THEN_returns_i
     validator = NullableIntValidator()
 
     for invalid_input in not_integers:
-        assert validator.validate(invalid_input, 0)[0] == QValidator.State.Invalid
         print(invalid_input, "-", validator.validate(invalid_input, 0)[0])
+        assert validator.validate(invalid_input, 0)[0] == QValidator.State.Invalid
 
 
 def test_GIVEN_integer_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
