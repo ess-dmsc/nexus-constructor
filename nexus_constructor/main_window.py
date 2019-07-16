@@ -113,7 +113,9 @@ class MainWindow(Ui_MainWindow):
         self.duplicate_action.triggered.connect(self.on_duplicate_node)
         self.duplicate_action.setEnabled(False)
 
-        self.edit_component_action = QAction(QIcon("ui/edit_component.png"), "Edit Component", self.tab_2)
+        self.edit_component_action = QAction(
+            QIcon("ui/edit_component.png"), "Edit Component", self.tab_2
+        )
         self.edit_component_action.setEnabled(False)
         self.component_tool_bar.addAction(self.edit_component_action)
 
@@ -175,9 +177,11 @@ class MainWindow(Ui_MainWindow):
             ):
                 self.delete_action.setEnabled(True)
                 self.duplicate_action.setEnabled(True)
+                self.edit_component_action.setEnabled(True)
             else:
                 self.delete_action.setEnabled(False)
                 self.duplicate_action.setEnabled(False)
+                self.edit_component_action.setEnabled(False)
             if isinstance(selected_object, LinkTransformation):
                 self.new_rotation_action.setEnabled(False)
                 self.new_translation_action.setEnabled(False)
