@@ -94,7 +94,7 @@ class GeometryFileValidator(QValidator):
         super().__init__()
         self.file_types = file_types
 
-    def validate(self, input: str, pos: int):
+    def validate(self, input: str, pos: int) -> QValidator.State:
         if not input:
             return self._emit_and_return(False)
         if not self.is_file(input):
@@ -108,7 +108,7 @@ class GeometryFileValidator(QValidator):
                         return self._validate_stl_file(input)
         return self._emit_and_return(False)
 
-    def _validate_stl_file(self, input):
+    def _validate_stl_file(self, input: str) -> QValidator.State:
         try:
             try:
                 mesh.Mesh.from_file(
@@ -131,7 +131,7 @@ class GeometryFileValidator(QValidator):
         else:
             return QValidator.Intermediate
 
-    def _validate_off_file(self, input):
+    def _validate_off_file(self, input: str) -> QValidator.State:
         try:
             if parse_off_file(self.open_file(input)) is None:
                 # An invalid file can cause the function to return None
@@ -141,10 +141,12 @@ class GeometryFileValidator(QValidator):
             return self._emit_and_return(False)
         return self._emit_and_return(True)
 
-    def is_file(self, input: str) -> bool:
+    @staticmethod
+    def is_file(input: str) -> bool:
         return os.path.isfile(input)
 
-    def open_file(self, filename: str, mode: str = "r"):
+    @staticmethod
+    def open_file(filename: str, mode: str = "r"):
         return open(filename, mode)
 
     is_valid = Signal(bool)
