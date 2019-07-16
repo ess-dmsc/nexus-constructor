@@ -82,7 +82,7 @@ builders = pipeline_builder.createBuilders { container ->
                 """
         }
         container.copyFrom("${project}/test_results.xml", 'test_results.xml')
-        junit "test_results.xml"
+
     } // stage
     
     if (env.CHANGE_ID) {
@@ -120,8 +120,9 @@ return {
             stage("Run tests") {
                 bat """
                 set PYTEST_QT_API=pyside2
-                python -m pytest . -s --ignore=definitions
+                python -m pytest . -s --ignore=definitions --assert=plain --cov=nexus_constructor --cov-report=xml --junit-xml=test_results.xml
                 """
+                junit "test_results.xml"
             } // stage
             // if (env.CHANGE_ID) {
                 // stage("Build Executable") {
