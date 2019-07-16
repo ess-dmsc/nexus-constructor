@@ -122,12 +122,15 @@ class GeometryFileValidator(QValidator):
                 mesh.Mesh.from_file(
                     "", fh=self.open_file(input, mode="rb"), calculate_normals=False
                 )
-            self.is_valid.emit(True)
-            return QValidator.Acceptable
+            return self._emit_and_return(True)
         except (TypeError, AssertionError, RuntimeError, ValueError):
             # File is invalid
             self.is_valid.emit(False)
             return QValidator.Intermediate
+
+    def _emit_and_return(self, is_valid: bool) -> QValidator.State:
+        self.is_valid.emit(is_valid)
+        return QValidator.Acceptable if is_valid else QValidator.Intermediate
 
     def _validate_off_file(self, input):
         try:
@@ -139,8 +142,7 @@ class GeometryFileValidator(QValidator):
             # File is invalid
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        self.is_valid.emit(True)
-        return QValidator.Acceptable
+        return self._emit_and_return(True)
 
     def is_file(self, input: str) -> bool:
         return os.path.isfile(input)
