@@ -75,16 +75,12 @@ class TableModel(QAbstractTableModel):
 
     def add_row(self):
         self.beginResetModel()
-        self.array = np.resize(
-            self.array, (self.array.shape[0] + 1, self.array.shape[1])
-        )
+        self.array.resize((self.array.shape[0] + 1, self.array.shape[1]))
         self.endResetModel()
 
     def add_column(self):
         self.beginResetModel()
-        self.array = np.resize(
-            self.array, (self.array.shape[0], self.array.shape[1] + 1)
-        )
+        self.array.resize((self.array.shape[0], self.array.shape[1] + 1))
         self.endResetModel()
 
     def delete_row(self):
@@ -167,7 +163,6 @@ class ValueDelegate(QItemDelegate):
 
     def setEditorData(self, editor: QWidget, index: QModelIndex):
         value = index.model().data(index, Qt.EditRole)
-
         editor.setText(value)
 
     def setModelData(
