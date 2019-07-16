@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QAction, QToolBar
+from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 
@@ -79,6 +79,7 @@ class MainWindow(Ui_MainWindow):
         self.componentTreeView.updateGeometries()
         self.componentTreeView.updateGeometry()
         self.componentTreeView.clicked.connect(self.on_clicked)
+        self.componentTreeView.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.component_tool_bar = QToolBar("Actions", self.tab_2)
         self.new_component_action = QAction(
