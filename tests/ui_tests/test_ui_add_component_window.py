@@ -136,7 +136,7 @@ def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_a
         assert dialog.unitsLineEdit.text() == "m"
 
 
-def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_visible(
+def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_geometry_THEN_pixel_options_becomes_visible(
     qtbot
 ):
 
@@ -149,26 +149,23 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_opti
         if nx_class in component_type.PIXEL_COMPONENT_TYPES:
             pixel_options_class_indices.append(i)
 
-    pixel_geometry_buttons = [dialog.meshRadioButton, dialog.CylinderRadioButton]
+    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
+    show_and_close_window(qtbot, template)
 
-    for geometry_button in pixel_geometry_buttons:
+    for index in pixel_options_class_indices:
 
-        systematic_radio_button_press(qtbot, geometry_button)
+        # Change the pixel options to invisible manually
+        dialog.pixelOptionsBox.setVisible(False)
+        assert not dialog.pixelOptionsBox.isVisible()
+
+        dialog.componentTypeComboBox.setCurrentIndex(index)
+
         show_and_close_window(qtbot, template)
 
-        for index in pixel_options_class_indices:
-
-            # Change the pixel options to invisible manually
-            dialog.pixelOptionsBox.setVisible(False)
-            assert not dialog.pixelOptionsBox.isVisible()
-
-            dialog.componentTypeComboBox.setCurrentIndex(index)
-            show_and_close_window(qtbot, template)
-
-            assert dialog.pixelOptionsBox.isVisible()
+        assert dialog.pixelOptionsBox.isVisible()
 
 
-def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_options_becomes_invisible(
+def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_geometry_THEN_pixel_options_becomes_invisible(
     qtbot
 ):
 
@@ -184,23 +181,52 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
     # Put the first index at the end. Otherwise changing from 0 to 0 doesn't trigger the indexChanged signal.
     no_pixel_options_class_indices.append(no_pixel_options_class_indices.pop(0))
 
-    all_geometry_buttons = [dialog.meshRadioButton, dialog.CylinderRadioButton]
+    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
+    show_and_close_window(qtbot, template)
 
-    for geometry_button in all_geometry_buttons:
+    for index in no_pixel_options_class_indices:
 
-        systematic_radio_button_press(qtbot, geometry_button)
-        show_and_close_window(qtbot, template)
+        # Manually set the pixel options to visible
+        dialog.pixelOptionsBox.setVisible(True)
+        dialog.geometryOptionsBox.setVisible(True)
+        assert dialog.pixelOptionsBox.isVisible()
 
-        for index in no_pixel_options_class_indices:
+        # Change the index and check that the pixel options have become invisible again
+        dialog.componentTypeComboBox.setCurrentIndex(index)
+        show_window_and_wait_for_interaction(qtbot, template)
+        assert not dialog.pixelOptionsBox.isVisible()
 
-            # Manually set the pixel options to visible
-            dialog.pixelOptionsBox.setVisible(True)
-            dialog.geometryOptionsBox.setVisible(True)
-            assert dialog.pixelOptionsBox.isVisible()
 
-            # Change the index and check that the pixel options have become invisible again
-            dialog.componentTypeComboBox.setCurrentIndex(index)
-            assert not dialog.pixelOptionsBox.isVisible()
+def test_UI_GIVEN_any_class_WHEN_selecting_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible():
+    pass
+
+
+def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_repeatable_grid_is_selected_and_visible_by_default():
+    pass
+
+
+def test_UI_GIVEN_user_selects_face_mapped_mesh_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible():
+    pass
+
+
+def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_visible():
+    pass
+
+
+def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_is_populated():
+    pass
+
+
+def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same():
+    pass
+
+
+def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes():
+    pass
+
+
+def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_length_of_list_matches_number_of_faces_in_mesh():
+    pass
 
 
 def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
