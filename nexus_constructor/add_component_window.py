@@ -263,7 +263,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
 
         pixel_layout_condition = (
-            self.componentTypeComboBox.currentText().startswith("NXdetector")
+            self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
             and self.meshRadioButton.isChecked()
         )
         pixel_grid_condition = (
