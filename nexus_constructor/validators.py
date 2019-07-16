@@ -1,16 +1,24 @@
-from PySide2.QtCore import Signal, QObject
-from PySide2.QtGui import QValidator
-import pint
 import os
-from typing import List
-import numpy as np
 from enum import Enum
+from typing import List
 
+import numpy as np
+import pint
+from PySide2.QtCore import Signal, QObject
+from PySide2.QtGui import QValidator, QIntValidator
 from PySide2.QtWidgets import QComboBox
 
 
-class NullableIntValidator(QValidator):
-    pass
+class NullableIntValidator(QIntValidator):
+    """
+    A validator that accepts integers as well as empty input.
+    """
+
+    def validate(self, input: str, pos: int):
+        if input == "":
+            return QValidator.Acceptable
+        else:
+            return super().validate(input, pos)
 
 
 class UnitValidator(QValidator):

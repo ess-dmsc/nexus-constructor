@@ -1,5 +1,10 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
 from typing import List
+
+import attr
+from PySide2.QtGui import QValidator
+from mock import Mock
+
 from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
@@ -7,10 +12,8 @@ from nexus_constructor.validators import (
     FieldType,
     GeometryFileValidator,
     OkValidator,
+    NullableIntValidator,
 )
-import attr
-from PySide2.QtGui import QValidator
-from mock import Mock
 
 
 @attr.s
@@ -245,7 +248,7 @@ def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THE
     validator.set_file_valid(False)
 
 
-def test_GIVEN_invalid_units_WHEN_using_ok_validator_WITH_no_geometry_button_checked_THEN_true_signal_is_emitted():
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_checked_THEN_true_signal_is_emitted():
 
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     mock_no_geometry_button.isChecked = Mock(return_value=True)
@@ -253,9 +256,25 @@ def test_GIVEN_invalid_units_WHEN_using_ok_validator_WITH_no_geometry_button_che
     validator.set_units_valid(False)
 
 
-def test_GIVEN_invalid_file_WHEN_using_ok_validator_WITH_mesh_button_unchecked_THEN_true_signal_is_emitted():
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_THEN_true_signal_is_emitted():
 
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     mock_mesh_button.isChecked = Mock(return_value=False)
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
     validator.set_file_valid(False)
+
+
+def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
+
+    validator = NullableIntValidator()
+    assert validator.validate("", 0) == QValidator.Acceptable
+
+
+def test_GIVEN_nonemptry_string_WHEN_using_nullable_int_validator_THEN_returns_invalid():
+
+    not_integers = ["fff", "1.545424", "!", "       "]
+
+    validator = NullableIntValidator()
+
+    for invalid_input in not_integers:
+        assert validator.validate(invalid_input, 0)[0] == QValidator.State.Invalid
