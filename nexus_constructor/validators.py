@@ -105,17 +105,7 @@ class GeometryFileValidator(QValidator):
             for suff in suffixes:
                 if input.endswith(f".{suff}"):
                     if suff in GEOMETRY_FILE_TYPES["OFF Files"]:
-                        try:
-                            if parse_off_file(self.open_file(input)) is None:
-                                # An invalid file can cause the function to return None
-                                self.is_valid.emit(False)
-                                return QValidator.Intermediate
-                        except (ValueError, TypeError, StopIteration, IndexError):
-                            # File is invalid
-                            self.is_valid.emit(False)
-                            return QValidator.Intermediate
-                        self.is_valid.emit(True)
-                        return QValidator.Acceptable
+                        return self._validate_off_file(input)
                     if suff in GEOMETRY_FILE_TYPES["STL Files"]:
                         try:
                             try:
@@ -131,15 +121,27 @@ class GeometryFileValidator(QValidator):
                                     fh=self.open_file(input, mode="rb"),
                                     calculate_normals=False,
                                 )
+                            self.is_valid.emit(True)
+                            return QValidator.Acceptable
                         except (TypeError, AssertionError, RuntimeError, ValueError):
                             # File is invalid
                             self.is_valid.emit(False)
                             return QValidator.Intermediate
-
-                    self.is_valid.emit(True)
-                    return QValidator.Acceptable
         self.is_valid.emit(False)
         return QValidator.Invalid
+
+    def _validate_off_file(self, input):
+        try:
+            if parse_off_file(self.open_file(input)) is None:
+                # An invalid file can cause the function to return None
+                self.is_valid.emit(False)
+                return QValidator.Intermediate
+        except (ValueError, TypeError, StopIteration, IndexError):
+            # File is invalid
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
 
     def is_file(self, input: str) -> bool:
         return os.path.isfile(input)
