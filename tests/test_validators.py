@@ -169,13 +169,13 @@ def test_GIVEN_invalid_file_WHEN_validating_geometry_file_THEN_returns_intermedi
     validator.is_valid.emit.assert_called_once_with(False)
 
 
-def test_GIVEN_file_not_ending_with_correct_suffix_WHEN_validating_geometry_file_THEN_returns_invalid_and_emits_signal_with_false():
+def test_GIVEN_file_not_ending_with_correct_suffix_WHEN_validating_geometry_file_THEN_emits_signal_with_false():
     file_types = {"OFF files": ["off", ["OFF"]]}
     validator = GeometryFileValidator(file_types)
 
     validator.is_valid = Mock()
     validator.is_file = lambda x: True
-    assert validator.validate("something.json", 0) == QValidator.Invalid
+    assert validator.validate("something.json", 0) == QValidator.Intermediate
     validator.is_valid.emit.assert_called_once_with(False)
 
 
