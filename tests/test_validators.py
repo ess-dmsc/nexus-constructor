@@ -1,4 +1,5 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
+from io import StringIO
 from typing import List
 from nexus_constructor.validators import (
     NameValidator,
@@ -8,6 +9,7 @@ from nexus_constructor.validators import (
     GeometryFileValidator,
     OkValidator,
     NumpyDTypeValidator,
+    GEOMETRY_FILE_TYPES,
 )
 import attr
 from PySide2.QtGui import QValidator
@@ -169,26 +171,14 @@ def test_GIVEN_invalid_file_WHEN_validating_geometry_file_THEN_returns_intermedi
     validator.is_valid.emit.assert_called_once_with(False)
 
 
-def test_GIVEN_file_not_ending_with_correct_suffix_WHEN_validating_geometry_file_THEN_returns_invalid_and_emits_signal_with_false():
+def test_GIVEN_file_not_ending_with_correct_suffix_WHEN_validating_geometry_file_THEN_emits_signal_with_false():
     file_types = {"OFF files": ["off", ["OFF"]]}
     validator = GeometryFileValidator(file_types)
 
     validator.is_valid = Mock()
     validator.is_file = lambda x: True
-    assert validator.validate("something.json", 0) == QValidator.Invalid
+    assert validator.validate("something.json", 0) == QValidator.Intermediate
     validator.is_valid.emit.assert_called_once_with(False)
-
-
-def test_GIVEN_valid_file_WHEN_validating_geometry_file_THEN_returns_acceptable_and_emits_signal_with_true():
-    file_types = {"OFF files": ["off", "OFF"]}
-
-    validator = GeometryFileValidator(file_types)
-
-    validator.is_valid = Mock()
-    validator.is_file = lambda x: True
-
-    assert validator.validate("test.OFF", 0) == QValidator.Acceptable
-    validator.is_valid.emit.assert_called_once_with(True)
 
 
 def create_content_ok_validator():
@@ -292,4 +282,152 @@ def test_GIVEN_alphabetical_chars_WHEN_using_numpy_validator_with_float_as_dtype
     validator.is_valid = Mock()
 
     assert validator.validate("test", 0) == QValidator.Intermediate
+def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    valid_off_file = (
+        "OFF\n"
+        "#  cube.off\n"
+        "#  A cube\n"
+        "8 6 0\n"
+        "-0.500000 -0.500000 0.500000\n"
+        "0.500000 -0.500000 0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "0.500000 0.500000 0.500000\n"
+        "-0.500000 0.500000 -0.500000\n"
+        "0.500000 0.500000 -0.500000\n"
+        "-0.500000 -0.500000 -0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "4 0 1 3 2\n"
+        "4 2 3 5 4\n"
+        "4 4 5 7 6\n"
+        "4 6 7 1 0\n"
+        "4 1 7 5 3\n"
+        "4 6 0 2 4\n"
+    )
+
+    validator.open_file = Mock(return_value=StringIO("".join(valid_off_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.off", 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_invalid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    # File missing a point
+    invalid_off_file = (
+        "OFF\n"
+        "#  cube.off\n"
+        "#  A cube\n"
+        "8 6 0\n"
+        "-0.500000 -0.500000 0.500000\n"
+        "0.500000 -0.500000 0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "0.500000 0.500000 0.500000\n"
+        "-0.500000 0.500000 -0.500000\n"
+        "0.500000 0.500000 -0.500000\n"
+        "-0.500000 -0.500000 -0.500000\n"
+        "4 0 1 3 2\n"
+        "4 2 3 5 4\n"
+        "4 4 5 7 6\n"
+        "4 6 7 1 0\n"
+        "4 1 7 5 3\n"
+        "4 6 0 2 4\n"
+    )
+
+    validator.open_file = Mock(return_value=StringIO("".join(invalid_off_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.off", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_valid_stl_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    valid_stl_file = (
+        "solid dart\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "vertex 1.00000E+000 2.50000E-001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 8.09000E-001 5.87800E-001 0.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 6.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "endsolid dart\n"
+    )
+
+    validator.open_file = Mock(return_value=StringIO("".join(valid_stl_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.stl", 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_invalid_stl_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    # File with missing endloop statement
+    invalid_stl_file = (
+        "solid dart\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "vertex 1.00000E+000 2.50000E-001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 8.09000E-001 5.87800E-001 0.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 6.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "endfacet\n"
+        "endsolid dart\n"
+    )
+
+    validator.open_file = Mock(return_value=StringIO("".join(invalid_stl_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.stl", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    blank_off_file = ""
+
+    validator.open_file = Mock(return_value=StringIO("".join(blank_off_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.off", 0) == QValidator.Intermediate
     validator.is_valid.emit.assert_called_once_with(False)
