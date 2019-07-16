@@ -196,35 +196,74 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
         assert not dialog.pixelOptionsBox.isVisible()
 
 
-def test_UI_GIVEN_any_class_WHEN_selecting_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible():
+def test_UI_GIVEN_any_class_WHEN_selecting_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    indices = [i for i in range(len(component_type.COMPONENT_TYPES))]
+    indices.append(indices.pop(0))
+
+    no_pixel_geometries = [dialog.noGeometryRadioButton, dialog.CylinderRadioButton]
+
+    def make_pixel_options_appear():
+        """
+        Create the conditions for the appearance of the pixel options.
+        """
+        systematic_radio_button_press(qtbot, dialog.meshRadioButton)
+        dialog.componentTypeComboBox.setCurrentIndex(3)
+        show_and_close_window(qtbot, template)
+
+    for geometry_button in no_pixel_geometries:
+        for index in indices:
+
+            make_pixel_options_appear()
+
+            systematic_radio_button_press(qtbot, geometry_button)
+            dialog.componentTypeComboBox.setCurrentIndex(index)
+
+            assert not dialog.pixelOptionsBox.isVisible()
+
+
+def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_repeatable_grid_is_selected_and_visible_by_default(
+    qtbot
+):
     pass
 
 
-def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_repeatable_grid_is_selected_and_visible_by_default():
+def test_UI_GIVEN_user_selects_face_mapped_mesh_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible(
+    qtbot
+):
     pass
 
 
-def test_UI_GIVEN_user_selects_face_mapped_mesh_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible():
+def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_visible(
+    qtbot
+):
     pass
 
 
-def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_visible():
+def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_is_populated(
+    qtbot
+):
     pass
 
 
-def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_is_populated():
+def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same(
+    qtbot
+):
     pass
 
 
-def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same():
+def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
+    qtbot
+):
     pass
 
 
-def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes():
-    pass
-
-
-def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_length_of_list_matches_number_of_faces_in_mesh():
+def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_length_of_list_matches_number_of_faces_in_mesh(
+    qtbot
+):
     pass
 
 
@@ -297,6 +336,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_geometry_THEN_add_co
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_geometry_THEN_add_component_window_closes(
     qtbot
 ):
+
     dialog, template = create_add_component_template(qtbot)
 
     # Mimic the user selecting a mesh geometry
