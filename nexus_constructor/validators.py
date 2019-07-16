@@ -9,6 +9,10 @@ from enum import Enum
 from PySide2.QtWidgets import QComboBox
 
 
+class NullableIntValidator(QValidator):
+    pass
+
+
 class UnitValidator(QValidator):
     """
     Validator to ensure the the text entered is a valid unit of length.
