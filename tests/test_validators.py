@@ -251,7 +251,7 @@ def test_GIVEN_invalid_file_WHEN_using_ok_validator_WITH_mesh_button_unchecked_T
     validator.set_file_valid(False)
 
 
-def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_valid_signal_is_emitted_with_true():
+def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
     validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
     validator.is_valid = Mock()
 
@@ -283,10 +283,11 @@ def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_valid_signal_is_emitted_w
     validator.is_valid.emit.assert_called_once_with(True)
 
 
-def test_GIVEN_invalid_off_WHEN_validating_geometry_THEN_valid_signal_is_emitted_with_false():
+def test_GIVEN_invalid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
     validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
     validator.is_valid = Mock()
 
+    # File missing a point
     invalid_off_file = (
         "OFF\n"
         "#  cube.off\n"
@@ -314,7 +315,7 @@ def test_GIVEN_invalid_off_WHEN_validating_geometry_THEN_valid_signal_is_emitted
     validator.is_valid.emit.assert_called_once_with(False)
 
 
-def test_GIVEN_valid_stl_file_WHEN_validating_geometry_THEN_valid_signal_is_emitted_with_true():
+def test_GIVEN_valid_stl_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
     validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
     validator.is_valid = Mock()
 
@@ -351,10 +352,11 @@ def test_GIVEN_valid_stl_file_WHEN_validating_geometry_THEN_valid_signal_is_emit
     validator.is_valid.emit.assert_called_once_with(True)
 
 
-def test_GIVEN_invalid_stl_file_WHEN_validating_geometry_THEN_valid_sigal_is_emitted_with_false():
+def test_GIVEN_invalid_stl_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
     validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
     validator.is_valid = Mock()
 
+    # File with missing endloop statement
     invalid_stl_file = (
         "solid dart\n"
         "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
@@ -387,7 +389,7 @@ def test_GIVEN_invalid_stl_file_WHEN_validating_geometry_THEN_valid_sigal_is_emi
     validator.is_valid.emit.assert_called_once_with(False)
 
 
-def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_valid_signal_is_emitted_with_false():
+def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
     validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
     validator.is_valid = Mock()
 
