@@ -282,6 +282,8 @@ def test_GIVEN_alphabetical_chars_WHEN_using_numpy_validator_with_float_as_dtype
     validator.is_valid = Mock()
 
     assert validator.validate("test", 0) == QValidator.Intermediate
+
+
 def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
     validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
     validator.is_valid = Mock()
