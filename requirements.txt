@@ -8,6 +8,7 @@ pint
 silx
 xmltodict
 numpy
+pytest-qt
 
 # PySide2 has had some issues with new versions and packaging so we will pin it
-PySide2==5.12.3
+PySide2==5.13.0

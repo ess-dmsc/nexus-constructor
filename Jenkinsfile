@@ -44,7 +44,6 @@ builders = pipeline_builder.createBuilders { container ->
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
             build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
-            build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15
             git submodule update --init
             """
     } // stage
@@ -68,21 +67,14 @@ builders = pipeline_builder.createBuilders { container ->
         try {
                 container.sh """
                     cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --ignore=tests/ui_tests
                 """
             }
             catch(err) {
                 testsError = err
                 currentBuild.result = 'FAILURE'
             }
-        withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
-            container.sh """
-                cd ${project}
-                build_env/bin/codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
-                """
-        }
-        container.copyFrom("${project}/test_results.xml", 'test_results.xml')
-        junit "test_results.xml"
+
     } // stage
     
     if (env.CHANGE_ID) {
@@ -113,12 +105,23 @@ return {
             stage("Setup") {
                   bat """
                   git submodule update --init
+                  python -m pip install --upgrade virtualenv
                   python -m pip install --user -r requirements-dev.txt
+                  python -m pip install codecov==2.0.15
                 """
             } // stage
             stage("Run tests") {
-                bat """python -m pytest . -s --ignore=definitions
+                bat """
+                set PYTEST_QT_API=pyside2
+                python -m pytest . -s --ignore=definitions --assert=plain --cov=nexus_constructor --cov-report=xml --junit-xml=test_results.xml
                 """
+
+        withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
+            bat """
+                codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
+                """
+        }
+                junit "test_results.xml"
             } // stage
             // if (env.CHANGE_ID) {
                 // stage("Build Executable") {
@@ -153,7 +156,7 @@ def get_macos_pipeline() {
                     sh "python3 -m pip install --user -r requirements-dev.txt && git submodule update --init"
                 } // stage
                 stage('Run tests') {
-                    sh "python3 -m pytest . -s --ignore=definitions/"
+                    sh "python3 -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/"
                 } // stage
             } // dir
         } // node
