@@ -1,5 +1,6 @@
-from PySide2.QtGui import QIntValidator
 from PySide2.QtWidgets import QWidget, QLabel, QLineEdit, QHBoxLayout
+
+from nexus_constructor.validators import NullableIntValidator
 
 
 class PixelMappingWidget(QWidget):
@@ -15,7 +16,7 @@ class PixelMappingWidget(QWidget):
 
         # Create the label text based on the face number
         self.pixelIDLabel.setText("Pixel ID for face #" + str(face_no) + ":")
-        self.pixelIDLineEdit.setValidator(QIntValidator())
+        self.pixelIDLineEdit.setValidator(NullableIntValidator())
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.pixelIDLabel)
