@@ -221,6 +221,7 @@ def test_UI_GIVEN_any_class_WHEN_selecting_nxclass_for_component_that_does_not_h
 
             systematic_radio_button_press(qtbot, geometry_button)
             dialog.componentTypeComboBox.setCurrentIndex(index)
+            show_and_close_window(qtbot, template)
 
             assert not dialog.pixelOptionsBox.isVisible()
 
