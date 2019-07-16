@@ -1,3 +1,4 @@
+import h5py
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator
 import pint
@@ -212,7 +213,7 @@ DATASET_TYPE = {
     "ULong": np.uint,
     "Float": np.single,
     "Double": np.double,
-    "String": np.string_,
+    "String": np.object
 }
 
 
@@ -258,11 +259,12 @@ class NumpyDTypeValidator(QValidator):
         if not input:
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        try:
-            self.dtype(input)
-        except ValueError:
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
+        if self.dtype is not np.object:
+            try:
+                self.dtype(input)
+            except ValueError:
+                self.is_valid.emit(False)
+                return QValidator.Intermediate
 
         self.is_valid.emit(True)
         return QValidator.Acceptable
