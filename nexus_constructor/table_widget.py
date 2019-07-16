@@ -74,18 +74,18 @@ class TableModel(QAbstractTableModel):
         self.endResetModel()
 
     def add_row(self):
-        self.beginInsertRows(QModelIndex(), self.array.size, self.array.shape[0])
+        self.beginResetModel()
         self.array = np.resize(
             self.array, (self.array.shape[0] + 1, self.array.shape[1])
         )
-        self.endInsertRows()
+        self.endResetModel()
 
     def add_column(self):
-        self.beginInsertColumns(QModelIndex(), self.array.shape[1], self.array.shape[1])
+        self.beginResetModel()
         self.array = np.resize(
             self.array, (self.array.shape[0], self.array.shape[1] + 1)
         )
-        self.endInsertColumns()
+        self.endResetModel()
 
     def delete_row(self):
         self.beginResetModel()
