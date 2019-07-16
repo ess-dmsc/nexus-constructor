@@ -75,13 +75,17 @@ class TableModel(QAbstractTableModel):
 
     def add_row(self):
         self.beginInsertRows(QModelIndex(), self.array.size, self.array.shape[0])
-        self.array = np.concatenate(
-            (self.array, np.array([[0]], dtype=self.array.dtype))
+        self.array = np.resize(
+            self.array, (self.array.shape[0] + 1, self.array.shape[1])
         )
         self.endInsertRows()
 
     def add_column(self):
-        pass
+        self.beginInsertColumns(QModelIndex(), self.array.shape[1], self.array.shape[1])
+        self.array = np.resize(
+            self.array, (self.array.shape[0], self.array.shape[1] + 1)
+        )
+        self.endInsertColumns()
 
     def delete_row(self):
         self.beginResetModel()
@@ -111,7 +115,6 @@ class TableModel(QAbstractTableModel):
     def data(self, index: QModelIndex, role: int = ...) -> str:
         if role == Qt.DisplayRole or role == Qt.EditRole:
             value = self.array[index.row()][index.column()]
-            print(value)
             return str(value)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
@@ -135,7 +138,6 @@ class TableModel(QAbstractTableModel):
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
         if index.isValid() and role == Qt.EditRole and value:
             self.array[index.row()][index.column()] = value
-            print(self.array)
             self.dataChanged.emit(index, index)
             return True
         return False
