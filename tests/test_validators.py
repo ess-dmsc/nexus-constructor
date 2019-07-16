@@ -268,6 +268,7 @@ def test_GIVEN_nonemptry_string_WHEN_using_nullable_int_validator_THEN_returns_i
 
     for invalid_input in not_integers:
         assert validator.validate(invalid_input, 0)[0] == QValidator.State.Invalid
+        print(invalid_input, "-", validator.validate(invalid_input, 0)[0])
 
 
 def test_GIVEN_integer_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
