@@ -5,6 +5,7 @@ import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
 from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
+from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -32,8 +33,7 @@ ALL_COMPONENT_TYPE_INDICES = [i for i in range(len(component_type.COMPONENT_TYPE
 @pytest.fixture(scope="function")
 def template(qtbot):
     template = QDialog()
-    yield template
-    template.close()
+    return template
 
 
 @pytest.fixture(scope="function")
@@ -78,19 +78,23 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     assert not dialog.geometryOptionsBox.isVisible()
 
 
+@pytest.mark.parametrize(
+    "geometry_button",
+    ["noGeometryRadioButton", "meshRadioButton", "CylinderRadioButton"],
+)
 def test_UI_GIVEN_nothing_WHEN_changing_component_geometry_type_THEN_add_component_button_is_always_disabled(
-    qtbot, template, dialog
+    qtbot, template, dialog, geometry_button
 ):
 
-    all_geometry_buttons = [
-        dialog.noGeometryRadioButton,
-        dialog.meshRadioButton,
-        dialog.CylinderRadioButton,
-    ]
-
-    for geometry_button in all_geometry_buttons:
-        systematic_radio_button_press(qtbot, geometry_button)
-        assert not dialog.buttonBox.isEnabled()
+    # all_geometry_buttons = [
+    #     dialog.noGeometryRadioButton,
+    #     dialog.meshRadioButton,
+    #     dialog.CylinderRadioButton,
+    # ]
+    #
+    # for geometry_button in all_geometry_buttons:
+    systematic_radio_button_press(qtbot, eval("dialog." + geometry_button))
+    assert not dialog.buttonBox.isEnabled()
 
 
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
@@ -679,6 +683,15 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_default_values_are_correct(
     assert dialog.cylinderXLineEdit.value() == 0.0
     assert dialog.cylinderYLineEdit.value() == 0.0
     assert dialog.cylinderZLineEdit.value() == 1.0
+
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup(request):
+    def make_another_qtest():
+        bot = QtBot(request)
+        bot.wait(1)
+
+    request.addfinalizer(make_another_qtest)
 
 
 def show_window_and_wait_for_interaction(
