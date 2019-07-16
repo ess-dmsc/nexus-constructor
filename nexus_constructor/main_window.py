@@ -112,6 +112,11 @@ class MainWindow(Ui_MainWindow):
         self.component_tool_bar.addAction(self.duplicate_action)
         self.duplicate_action.triggered.connect(self.on_duplicate_node)
         self.duplicate_action.setEnabled(False)
+
+        self.edit_component_action = QAction(QIcon("ui/edit_component.png"), "Edit Component", self.tab_2)
+        self.edit_component_action.setEnabled(False)
+        self.component_tool_bar.addAction(self.edit_component_action)
+
         self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.tab_2)
         self.delete_action.triggered.connect(self.on_delete_item)
         self.delete_action.setEnabled(False)
