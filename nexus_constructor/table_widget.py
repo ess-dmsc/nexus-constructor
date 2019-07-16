@@ -84,8 +84,10 @@ class TableModel(QAbstractTableModel):
         pass
 
     def delete_row(self):
+        self.beginResetModel()
         for index in self.parent().view.selectedIndexes():
             self.array = np.delete(self.array, index.row(), axis=0)
+        self.endResetModel()
 
     def delete_column(self):
         pass
