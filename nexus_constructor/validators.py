@@ -107,28 +107,27 @@ class GeometryFileValidator(QValidator):
                     if suff in GEOMETRY_FILE_TYPES["OFF Files"]:
                         return self._validate_off_file(input)
                     if suff in GEOMETRY_FILE_TYPES["STL Files"]:
-                        try:
-                            try:
-                                mesh.Mesh.from_file(
-                                    "",
-                                    fh=self.open_file(input),
-                                    calculate_normals=False,
-                                )
-                            except UnicodeDecodeError:
-                                # File is in binary format - load it again
-                                mesh.Mesh.from_file(
-                                    "",
-                                    fh=self.open_file(input, mode="rb"),
-                                    calculate_normals=False,
-                                )
-                            self.is_valid.emit(True)
-                            return QValidator.Acceptable
-                        except (TypeError, AssertionError, RuntimeError, ValueError):
-                            # File is invalid
-                            self.is_valid.emit(False)
-                            return QValidator.Intermediate
+                        return self._validate_stl_file(input)
         self.is_valid.emit(False)
         return QValidator.Invalid
+
+    def _validate_stl_file(self, input):
+        try:
+            try:
+                mesh.Mesh.from_file(
+                    "", fh=self.open_file(input), calculate_normals=False
+                )
+            except UnicodeDecodeError:
+                # File is in binary format - load it again
+                mesh.Mesh.from_file(
+                    "", fh=self.open_file(input, mode="rb"), calculate_normals=False
+                )
+            self.is_valid.emit(True)
+            return QValidator.Acceptable
+        except (TypeError, AssertionError, RuntimeError, ValueError):
+            # File is invalid
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
 
     def _validate_off_file(self, input):
         try:
