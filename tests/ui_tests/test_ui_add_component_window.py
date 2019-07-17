@@ -25,19 +25,19 @@ UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
-ALL_COMPONENT_TYPE_INDICES = [i for i in range(len(component_type.COMPONENT_TYPES))][
-    ::-1
-]
+ALL_COMPONENT_TYPES = [
+    (comp_type, i) for i, comp_type in enumerate(component_type.COMPONENT_TYPES)
+][::-1]
 instrument = Instrument(NexusWrapper("pixels"))
 component = ComponentTreeModel(instrument)
 add_component_dialog = AddComponentDialog(instrument, component)
-PIXEL_OPTIONS_INDICES = [
-    i
+PIXEL_OPTIONS = [
+    (comp_type, i)
     for i, comp_type in enumerate(add_component_dialog.nx_component_classes.keys())
     if comp_type in component_type.PIXEL_COMPONENT_TYPES
 ][::-1]
-NO_PIXEL_OPTIONS_INDICES = [
-    i
+NO_PIXEL_OPTIONS = [
+    (comp_type, i)
     for i, comp_type in enumerate(add_component_dialog.nx_component_classes.keys())
     if comp_type not in component_type.PIXEL_COMPONENT_TYPES
 ][::-1]
@@ -154,9 +154,9 @@ def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_a
     assert dialog.unitsLineEdit.text() == "m"
 
 
-@pytest.mark.parametrize("pixel_options_index", PIXEL_OPTIONS_INDICES)
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_geometry_THEN_pixel_options_becomes_visible(
-    qtbot, template, dialog, pixel_options_index
+    qtbot, template, dialog, pixel_options
 ):
 
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
@@ -166,44 +166,39 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_for_component_w
     dialog.pixelOptionsBox.setVisible(False)
     assert not dialog.pixelOptionsBox.isVisible()
 
-    dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
+    dialog.componentTypeComboBox.setCurrentIndex(pixel_options[1])
 
     show_and_close_window(qtbot, template)
 
     assert dialog.pixelOptionsBox.isVisible()
 
 
-@pytest.mark.parametrize("no_pixel_options_index", NO_PIXEL_OPTIONS_INDICES)
-@pytest.mark.parametrize("pixel_options_index", PIXEL_OPTIONS_INDICES)
+@pytest.mark.parametrize("no_pixel_options", NO_PIXEL_OPTIONS)
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_geometry_THEN_pixel_options_becomes_invisible(
-    qtbot, template, dialog, no_pixel_options_index, pixel_options_index
+    qtbot, template, dialog, no_pixel_options, pixel_options
 ):
 
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
     show_and_close_window(qtbot, template)
 
     # Make the pixel options become visible
-    make_pixel_options_appear(qtbot, dialog, template, pixel_options_index)
+    make_pixel_options_appear(qtbot, dialog, template, pixel_options[1])
     assert dialog.pixelOptionsBox.isVisible()
 
     # Change the index and check that the pixel options have become invisible again
-    dialog.componentTypeComboBox.setCurrentIndex(no_pixel_options_index)
+    dialog.componentTypeComboBox.setCurrentIndex(no_pixel_options[1])
     assert not dialog.pixelOptionsBox.isVisible()
 
 
 # @pytest.mark.skipif(os.name == "nt", reason="")
-@pytest.mark.parametrize("component_type_index", ALL_COMPONENT_TYPE_INDICES)
-@pytest.mark.parametrize("pixel_options_index", PIXEL_OPTIONS_INDICES)
+@pytest.mark.parametrize("component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 @pytest.mark.parametrize("no_pixel_geometry", ["No Geometry", "Cylinder"])
 def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible(
-    qtbot,
-    template,
-    dialog,
-    component_type_index,
-    pixel_options_index,
-    no_pixel_geometry,
+    qtbot, template, dialog, component_type, pixel_options, no_pixel_geometry
 ):
-    make_pixel_options_appear(qtbot, dialog, template, pixel_options_index)
+    make_pixel_options_appear(qtbot, dialog, template, pixel_options[1])
     assert dialog.pixelOptionsBox.isVisible()
 
     no_pixel_button = get_geometry_button(dialog, no_pixel_geometry)
@@ -211,11 +206,11 @@ def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_n
     systematic_radio_button_press(qtbot, no_pixel_button)
     show_and_close_window(qtbot, template)
 
-    dialog.componentTypeComboBox.setCurrentIndex(component_type_index)
+    dialog.componentTypeComboBox.setCurrentIndex(component_type[1])
     show_and_close_window(qtbot, template)
     assert (
         dialog.componentTypeComboBox.currentText()
-        == list(dialog.nx_component_classes.keys())[component_type_index]
+        == list(dialog.nx_component_classes.keys())[component_type[1]]
     )
 
     assert not dialog.pixelOptionsBox.isVisible()
@@ -475,8 +470,6 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_disabled(
     qtbot, template, dialog
 ):
-    dialog, template = create_add_component_template(qtbot)
-
     # Mimic the user selecting a mesh geometry
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
@@ -718,7 +711,7 @@ def make_pixel_options_appear(
 ):
     """
     Create the conditions to allow the appearance of the pixel options.
-    :param qtbot:  The qtbot testing tool.
+    :param qtbot: The qtbot testing tool.
     :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
     :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
@@ -852,29 +845,3 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
 
     if len(units) > 0:
         qtbot.keyClicks(dialog.unitsLineEdit, units)
-
-
-def get_pixel_options_indices(dialog: AddComponentDialog):
-    """
-    Creates a list of the combo box indices for component types that have pixel fields.
-    :param dialog: An instance of a AddComponentDialog containing a component type combo box.
-    :return: An int list.
-    """
-    return [
-        i
-        for i, comp_type in enumerate(dialog.nx_component_classes.keys())
-        if comp_type in component_type.PIXEL_COMPONENT_TYPES
-    ][::-1]
-
-
-def get_no_pixel_options_indices(dialog: AddComponentDialog):
-    """
-    Creates a list of the combo box indices for component types that don't have have pixel fields.
-    :param dialog: An instance of a AddComponentDialog containing a component type combo box.
-    :return: An int list.
-    """
-    return [
-        i
-        for i, comp_type in enumerate(dialog.nx_component_classes.keys())
-        if comp_type not in component_type.PIXEL_COMPONENT_TYPES
-    ][::-1]
