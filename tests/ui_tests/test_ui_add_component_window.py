@@ -78,23 +78,19 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     assert not dialog.geometryOptionsBox.isVisible()
 
 
-@pytest.mark.parametrize(
-    "geometry_button",
-    ["noGeometryRadioButton", "meshRadioButton", "CylinderRadioButton"],
-)
 def test_UI_GIVEN_nothing_WHEN_changing_component_geometry_type_THEN_add_component_button_is_always_disabled(
-    qtbot, template, dialog, geometry_button
+    qtbot, template, dialog
 ):
 
-    # all_geometry_buttons = [
-    #     dialog.noGeometryRadioButton,
-    #     dialog.meshRadioButton,
-    #     dialog.CylinderRadioButton,
-    # ]
-    #
-    # for geometry_button in all_geometry_buttons:
-    systematic_radio_button_press(qtbot, eval("dialog." + geometry_button))
-    assert not dialog.buttonBox.isEnabled()
+    all_geometry_buttons = [
+        dialog.noGeometryRadioButton,
+        dialog.meshRadioButton,
+        dialog.CylinderRadioButton,
+    ]
+
+    for geometry_button in all_geometry_buttons:
+        systematic_radio_button_press(qtbot, geometry_button)
+        assert not dialog.buttonBox.isEnabled()
 
 
 def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
@@ -193,7 +189,7 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
 
 
 @pytest.mark.parametrize("component_type_index", ALL_COMPONENT_TYPE_INDICES)
-def test_UI_GIVEN_any_class_WHEN_selecting_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible(
+def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible(
     qtbot, component_type_index, template, dialog
 ):
     no_pixel_geometries = [dialog.noGeometryRadioButton, dialog.CylinderRadioButton]
@@ -203,7 +199,9 @@ def test_UI_GIVEN_any_class_WHEN_selecting_nxclass_for_component_that_does_not_h
         Create the conditions for the appearance of the pixel options.
         """
         systematic_radio_button_press(qtbot, dialog.meshRadioButton)
-        dialog.componentTypeComboBox.setCurrentIndex(3)
+        dialog.componentTypeComboBox.setCurrentIndex(
+            get_pixel_options_indices(dialog)[0]
+        )
         show_and_close_window(qtbot, template)
 
     for geometry_button in no_pixel_geometries:
