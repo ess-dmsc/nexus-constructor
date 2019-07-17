@@ -25,22 +25,26 @@ UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
-ALL_COMPONENT_TYPES = [
-    (comp_type, i) for i, comp_type in enumerate(component_type.COMPONENT_TYPES)
-][::-1]
+
 instrument = Instrument(NexusWrapper("pixels"))
 component = ComponentTreeModel(instrument)
 add_component_dialog = AddComponentDialog(instrument, component)
+ALL_COMPONENT_TYPES = [
+    (comp_type, i)
+    for i, comp_type in enumerate(
+        list(add_component_dialog.nx_component_classes.keys())
+    )
+][::-1]
 PIXEL_OPTIONS = [
-    (comp_type, i)
-    for i, comp_type in enumerate(add_component_dialog.nx_component_classes.keys())
-    if comp_type in component_type.PIXEL_COMPONENT_TYPES
-][::-1]
+    comp_with_index
+    for comp_with_index in ALL_COMPONENT_TYPES
+    if comp_with_index[0] in component_type.PIXEL_COMPONENT_TYPES
+]
 NO_PIXEL_OPTIONS = [
-    (comp_type, i)
-    for i, comp_type in enumerate(add_component_dialog.nx_component_classes.keys())
-    if comp_type not in component_type.PIXEL_COMPONENT_TYPES
-][::-1]
+    comp_with_index
+    for comp_with_index in ALL_COMPONENT_TYPES
+    if comp_with_index[0] not in component_type.PIXEL_COMPONENT_TYPES
+]
 GEOMETRY_BUTTONS = ["No Geometry", "Mesh", "Cylinder"]
 
 
