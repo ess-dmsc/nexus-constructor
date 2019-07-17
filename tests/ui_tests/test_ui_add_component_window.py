@@ -212,6 +212,7 @@ def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_n
         show_and_close_window(qtbot, template)
 
         dialog.componentTypeComboBox.setCurrentIndex(component_type_index)
+        show_and_close_window(qtbot, template)
 
         assert not dialog.pixelOptionsBox.isVisible()
 
