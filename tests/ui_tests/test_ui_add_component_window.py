@@ -159,17 +159,22 @@ def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_a
 
 
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
+@pytest.mark.parametrize("component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("no_pixel_geometry", ["No Geometry", "Cylinder"])
 def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_geometry_THEN_pixel_options_becomes_visible(
-    qtbot, template, dialog, pixel_options
+    qtbot, template, dialog, pixel_options, component_type, no_pixel_geometry
 ):
 
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
     show_and_close_window(qtbot, template)
 
-    # Change the pixel options to invisible manually
-    dialog.pixelOptionsBox.setVisible(False)
+    no_pixel_button = get_geometry_button(dialog, no_pixel_geometry)
+
+    # Change the pixel options to invisible
+    make_pixel_options_disappear(qtbot, no_pixel_button, dialog, template, component_type[1])
     assert not dialog.pixelOptionsBox.isVisible()
 
+    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(pixel_options[1])
 
     show_and_close_window(qtbot, template)
@@ -706,6 +711,26 @@ def get_geometry_button(dialog: AddComponentDialog, button_name: str):
     for child in dialog.geometryTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
         if child.text() == button_name:
             return child
+
+
+def make_pixel_options_disappear(
+    qtbot: pytestqt.qtbot.QtBot,
+    button: QRadioButton,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    component_index: int,
+):
+    """
+    Create the conditions to allow the disappearance of the pixel options.
+    :param qtbot: The qtbot testing tool.
+    :param button: The No Geometry or Cylinder button.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param component_index: The index of a component type.
+    """
+    systematic_radio_button_press(qtbot, button)
+    dialog.componentTypeComboBox.setCurrentIndex(component_index)
+    show_and_close_window(qtbot, template)
 
 
 def make_pixel_options_appear(
