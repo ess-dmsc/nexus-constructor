@@ -4,6 +4,7 @@ from nexus_constructor.component_tree_model import (
     LinkTransformation,
 )
 from nexus_constructor.component import Component
+from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
@@ -548,3 +549,50 @@ def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_com
     assert second_shape.axis_direction == axis_direction
     assert second_shape.height == height
     assert second_shape.units == units
+
+
+def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file():
+    wrapper = NexusWrapper("test_duplicate_off_shape")
+    instrument = Instrument(wrapper)
+
+    first_component_name = "component1"
+    first_component_nx_class = "NXdetector"
+    description = "desc"
+    first_component = instrument.add_component(
+        first_component_name, first_component_nx_class, description
+    )
+
+    vertices = [
+        QVector3D(-0.5, -0.5, 0.5),
+        QVector3D(0.5, -0.5, 0.5),
+        QVector3D(-0.5, 0.5, 0.5),
+        QVector3D(0.5, 0.5, 0.5),
+        QVector3D(-0.5, 0.5, -0.5),
+        QVector3D(0.5, 0.5, -0.5),
+        QVector3D(-0.5, -0.5, -0.5),
+        QVector3D(0.5, -0.5, -0.5),
+    ]
+
+    faces = [
+        [0, 1, 3, 2],
+        [2, 3, 5, 4],
+        [4, 5, 7, 6],
+        [6, 7, 1, 0],
+        [1, 7, 5, 3],
+        [6, 0, 2, 4],
+    ]
+
+    first_component.set_off_shape(OFFGeometryNoNexus(vertices=vertices, faces=faces))
+
+    tree_model = ComponentTreeModel(instrument)
+
+    first_component_index = tree_model.index(0, 0, QModelIndex())
+    tree_model.duplicate_node(first_component_index)
+
+    assert tree_model.rowCount(QModelIndex()) == 3
+    second_component_index = tree_model.index(2, 0, QModelIndex())
+    second_component = second_component_index.internalPointer()
+    second_shape = second_component.get_shape()
+
+    assert second_shape.vertices == vertices
+    assert second_shape.faces == faces
