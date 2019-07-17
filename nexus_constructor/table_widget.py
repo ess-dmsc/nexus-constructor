@@ -152,6 +152,11 @@ class ValueDelegate(QItemDelegate):
         self.dtype = dtype
 
     def commit(self, editor, _):
+        """
+        Calls the commitData signal to update the model when text is being edited rather than when it has finished being edited and loses focus.
+        :param editor: The line edit in the item delegate.
+        :param _: Not used, just satisfying the signal parameters
+        """
         self.commitData.emit(editor)
 
     def createEditor(
@@ -167,6 +172,7 @@ class ValueDelegate(QItemDelegate):
             )
         )
 
+        # Update the model when the item is being edited rather than when it has lost focus and finished.
         editor.textEdited.connect(partial(self.commit, editor))
         return editor
 
