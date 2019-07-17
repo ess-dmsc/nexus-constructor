@@ -2,6 +2,11 @@ from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
 from nexus_constructor.component import Component
+from nexus_constructor.geometry import (
+    CylindricalGeometry,
+    OFFGeometry,
+    OFFGeometryNexus,
+)
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import generate_unique_name
@@ -126,13 +131,27 @@ class ComponentTreeModel(QAbstractItemModel):
         if isinstance(parent, Component):
             new_name = generate_unique_name(parent.name, self.components)
 
-            self.add_component(
-                self.instrument.add_component(
-                    new_name, parent.nx_class, parent.description
-                )
+            component = self.instrument.add_component(
+                new_name, parent.nx_class, parent.description
             )
+
+            self._copy_shape(parent, component)
+
+            self.add_component(component)
         elif isinstance(parent, Transformation):
             raise NotImplementedError("Duplication of transformations not implemented")
+
+    def _copy_shape(self, parent, component):
+        parent_shape = parent.get_shape()
+        if isinstance(parent_shape, CylindricalGeometry):
+            component.set_cylinder_shape(
+                parent_shape.axis_direction,
+                parent_shape.height,
+                parent_shape.radius,
+                parent_shape.units,
+            )
+        elif isinstance(parent_shape, OFFGeometryNexus):
+            component.set_off_shape(parent_shape.off_geometry)
 
     def add_transformation(self, parent_index: QModelIndex, type: str):
         parent_item = parent_index.internalPointer()
