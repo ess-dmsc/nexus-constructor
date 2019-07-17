@@ -204,16 +204,14 @@ def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_n
         )
         show_and_close_window(qtbot, template)
 
-    for i, component_type in enumerate(dialog.nx_component_classes.keys()):
-        print(i, "-", component_type)
-
     for geometry_button in no_pixel_geometries:
 
         make_pixel_options_appear()
 
         systematic_radio_button_press(qtbot, geometry_button)
-        dialog.componentTypeComboBox.setCurrentIndex(component_type_index)
         show_and_close_window(qtbot, template)
+
+        dialog.componentTypeComboBox.setCurrentIndex(component_type_index)
 
         assert not dialog.pixelOptionsBox.isVisible()
 
