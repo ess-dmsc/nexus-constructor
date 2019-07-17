@@ -209,8 +209,6 @@ def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_n
 
     systematic_radio_button_press(qtbot, no_pixel_button)
 
-    print(find_radio_button_press_position(no_pixel_button))
-
     show_and_close_window(qtbot, template)
 
     dialog.componentTypeComboBox.setCurrentIndex(component_type[1])
@@ -801,8 +799,8 @@ def find_radio_button_press_position(button: QRadioButton):
     """
     size = button.size()
 
-    for x in range(size.width()):
-        for y in range(size.height()):
+    for x in range(1, size.width()):
+        for y in range(1, size.height()):
             click_point = QPoint(x, y)
             if button.hitButton(click_point):
                 return click_point
