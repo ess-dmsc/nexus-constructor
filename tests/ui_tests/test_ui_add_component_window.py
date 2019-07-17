@@ -207,11 +207,17 @@ def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_n
     for geometry_button in no_pixel_geometries:
 
         make_pixel_options_appear()
+        assert dialog.pixelOptionsBox.isVisible()
 
         systematic_radio_button_press(qtbot, geometry_button)
+        assert geometry_button.isChecked()
         show_and_close_window(qtbot, template)
 
         dialog.componentTypeComboBox.setCurrentIndex(component_type_index)
+        assert (
+            dialog.componentTypeComboBox.currentText()
+            == list(dialog.nx_component_classes.keys())[component_type_index]
+        )
         show_and_close_window(qtbot, template)
 
         assert not dialog.pixelOptionsBox.isVisible()
