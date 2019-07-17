@@ -171,7 +171,9 @@ def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_for_component_w
     no_pixel_button = get_geometry_button(dialog, no_pixel_geometry)
 
     # Change the pixel options to invisible
-    make_pixel_options_disappear(qtbot, no_pixel_button, dialog, template, component_type[1])
+    make_pixel_options_disappear(
+        qtbot, no_pixel_button, dialog, template, component_type[1]
+    )
     assert not dialog.pixelOptionsBox.isVisible()
 
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
