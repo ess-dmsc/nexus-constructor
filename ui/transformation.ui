@@ -91,7 +91,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="xLineEdit"/>
+        <widget class="QDoubleSpinBox" name="xLineEdit"/>
        </item>
        <item>
         <widget class="QLabel" name="yPosLabel">
@@ -101,7 +101,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="yLineEdit"/>
+        <widget class="QDoubleSpinBox" name="yLineEdit"/>
        </item>
        <item>
         <widget class="QLabel" name="zPosLabel">
@@ -111,7 +111,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="zLineEdit"/>
+        <widget class="QDoubleSpinBox" name="zLineEdit"/>
        </item>
       </layout>
      </item>
@@ -135,7 +135,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="valueLineEdit">
+        <widget class="QDoubleSpinBox" name="valueLineEdit">
          <property name="maximumSize">
           <size>
            <width>100</width>

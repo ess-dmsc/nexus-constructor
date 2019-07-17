@@ -3,8 +3,8 @@
 # Form implementation generated from reading ui file 'transformation.ui',
 # licensing of 'transformation.ui' applies.
 #
-# Created: Thu Jul  4 23:55:45 2019
-#      by: pyside2-uic  running on PySide2 5.12.3
+# Created: Wed Jul 17 14:07:33 2019
+#      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -54,19 +54,19 @@ class Ui_Transformation(object):
         self.xPosLabel = QtWidgets.QLabel(Transformation)
         self.xPosLabel.setObjectName("xPosLabel")
         self.vectorLayout.addWidget(self.xPosLabel)
-        self.xLineEdit = QtWidgets.QLineEdit(Transformation)
+        self.xLineEdit = QtWidgets.QDoubleSpinBox(Transformation)
         self.xLineEdit.setObjectName("xLineEdit")
         self.vectorLayout.addWidget(self.xLineEdit)
         self.yPosLabel = QtWidgets.QLabel(Transformation)
         self.yPosLabel.setObjectName("yPosLabel")
         self.vectorLayout.addWidget(self.yPosLabel)
-        self.yLineEdit = QtWidgets.QLineEdit(Transformation)
+        self.yLineEdit = QtWidgets.QDoubleSpinBox(Transformation)
         self.yLineEdit.setObjectName("yLineEdit")
         self.vectorLayout.addWidget(self.yLineEdit)
         self.zPosLabel = QtWidgets.QLabel(Transformation)
         self.zPosLabel.setObjectName("zPosLabel")
         self.vectorLayout.addWidget(self.zPosLabel)
-        self.zLineEdit = QtWidgets.QLineEdit(Transformation)
+        self.zLineEdit = QtWidgets.QDoubleSpinBox(Transformation)
         self.zLineEdit.setObjectName("zLineEdit")
         self.vectorLayout.addWidget(self.zLineEdit)
         self.mainLayout.addLayout(self.vectorLayout)
@@ -81,7 +81,7 @@ class Ui_Transformation(object):
         self.valueLabel = QtWidgets.QLabel(Transformation)
         self.valueLabel.setObjectName("valueLabel")
         self.lengthLayout.addWidget(self.valueLabel)
-        self.valueLineEdit = QtWidgets.QLineEdit(Transformation)
+        self.valueLineEdit = QtWidgets.QDoubleSpinBox(Transformation)
         self.valueLineEdit.setMaximumSize(QtCore.QSize(100, 16777215))
         self.valueLineEdit.setObjectName("valueLineEdit")
         self.lengthLayout.addWidget(self.valueLineEdit)

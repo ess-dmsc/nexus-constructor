@@ -14,11 +14,11 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.setupUi(self)
         self.transformation = transformation
         current_vector = self.transformation.vector
-        self.transformation_frame.xLineEdit.setText(str(current_vector.x()))
-        self.transformation_frame.yLineEdit.setText(str(current_vector.y()))
-        self.transformation_frame.zLineEdit.setText(str(current_vector.z()))
+        self.transformation_frame.xLineEdit.setValue(current_vector.x())
+        self.transformation_frame.yLineEdit.setValue(current_vector.y())
+        self.transformation_frame.zLineEdit.setValue(current_vector.z())
         self.transformation_frame.nameLineEdit.setText(self.transformation.name)
-        self.transformation_frame.valueLineEdit.setText(str(self.transformation.value))
+        self.transformation_frame.valueLineEdit.setValue(self.transformation.value)
         self.disable()
 
     def disable(self):
@@ -39,20 +39,12 @@ class EditTransformation(QGroupBox):
 
     def saveChanges(self):
         self.transformation.name = self.transformation_frame.nameLineEdit.text()
-        try:
-            self.transformation.vector = QVector3D(
-                float(self.transformation_frame.xLineEdit.text()),
-                float(self.transformation_frame.yLineEdit.text()),
-                float(self.transformation_frame.zLineEdit.text()),
-            )
-        except ValueError as e:
-            print("Unable to convert vectors: " + str(e))
-        try:
-            self.transformation.value = float(
-                self.transformation_frame.valueLineEdit.text()
-            )
-        except ValueError as e:
-            print("Unable to convert length: " + str(e))
+        self.transformation.vector = QVector3D(
+            self.transformation_frame.xLineEdit.value(),
+            self.transformation_frame.yLineEdit.value(),
+            self.transformation_frame.zLineEdit.value(),
+        )
+        self.transformation.value = self.transformation_frame.valueLineEdit.value()
 
 
 class EditTranslation(EditTransformation):
