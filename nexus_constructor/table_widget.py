@@ -151,6 +151,9 @@ class ValueDelegate(QItemDelegate):
         super().__init__(parent)
         self.dtype = dtype
 
+    def commit(self, editor, _):
+        self.commitData.emit(editor)
+
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
     ) -> QWidget:
@@ -163,6 +166,8 @@ class ValueDelegate(QItemDelegate):
                 tooltip_on_reject="Not valid for the selected dtype",
             )
         )
+
+        editor.textEdited.connect(partial(self.commit, editor))
         return editor
 
     def setEditorData(self, editor: QWidget, index: QModelIndex):
