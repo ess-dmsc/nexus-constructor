@@ -80,7 +80,9 @@ class TableModel(QAbstractTableModel):
 
     def add_column(self):
         self.beginResetModel()
-        self.array.resize((self.array.shape[0], self.array.shape[1] + 1))
+        self.array = np.column_stack(
+            (self.array, np.zeros(np.shape(self.array)[0], dtype=int))
+        )
         self.endResetModel()
 
     def delete_row(self):
