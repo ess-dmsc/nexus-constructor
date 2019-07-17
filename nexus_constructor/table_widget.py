@@ -81,7 +81,7 @@ class TableModel(QAbstractTableModel):
     def add_column(self):
         self.beginResetModel()
         self.array = np.column_stack(
-            (self.array, np.zeros(np.shape(self.array)[0], dtype=int))
+            (self.array, np.zeros(np.shape(self.array)[0], dtype=self.array.dtype))
         )
         self.endResetModel()
 
