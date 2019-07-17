@@ -159,85 +159,94 @@ def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_a
 
 
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
-@pytest.mark.parametrize("component_type", ALL_COMPONENT_TYPES)
-@pytest.mark.parametrize("no_pixel_geometry", ["No Geometry", "Cylinder"])
-def test_UI_GIVEN_class_with_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_geometry_THEN_pixel_options_becomes_visible(
-    qtbot, template, dialog, pixel_options, component_type, no_pixel_geometry
+@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("pixel_geometry_name", GEOMETRY_BUTTONS[1:])
+def test_UI_GIVEN_class_and_geometry_with_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_invisible_to_visible(
+    qtbot, template, dialog, pixel_options, any_component_type, pixel_geometry_name
 ):
-
-    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
-    show_and_close_window(qtbot, template)
-
-    no_pixel_button = get_geometry_button(dialog, no_pixel_geometry)
+    pixel_geometry_button = get_geometry_button(dialog, pixel_geometry_name)
 
     # Change the pixel options to invisible
-    make_pixel_options_disappear(
-        qtbot, no_pixel_button, dialog, template, component_type[1]
-    )
+    make_pixel_options_disappear(qtbot, dialog, template, any_component_type[1])
     assert not dialog.pixelOptionsBox.isVisible()
 
-    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(pixel_options[1])
-
-    show_and_close_window(qtbot, template)
-
+    # Change the pixel options to visible
+    make_pixel_options_appear(
+        qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
+    )
     assert dialog.pixelOptionsBox.isVisible()
+
+
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
+@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("pixel_geometry_name", GEOMETRY_BUTTONS[1:])
+def test_UI_GIVEN_class_and_geometry_without_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_visible_to_invisible(
+    qtbot, template, dialog, pixel_options, any_component_type, pixel_geometry_name
+):
+    pixel_geometry_button = get_geometry_button(dialog, pixel_geometry_name)
+
+    # Change the pixel options to visible
+    make_pixel_options_appear(
+        qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
+    )
+    assert dialog.pixelOptionsBox.isVisible()
+
+    # Change the pixel options to invisible
+    make_pixel_options_disappear(qtbot, dialog, template, any_component_type[1])
+    assert not dialog.pixelOptionsBox.isVisible()
 
 
 @pytest.mark.parametrize("no_pixel_options", NO_PIXEL_OPTIONS)
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
-def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_geometry_THEN_pixel_options_becomes_invisible(
-    qtbot, template, dialog, no_pixel_options, pixel_options
+@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_or_cylinder_geometry_THEN_pixel_options_becomes_invisible(
+    qtbot, template, dialog, no_pixel_options, pixel_options, geometry_name
 ):
-
-    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
-    show_and_close_window(qtbot, template)
+    geometry_button = get_geometry_button(dialog, geometry_name)
 
     # Make the pixel options become visible
-    make_pixel_options_appear(qtbot, dialog, template, pixel_options[1])
+    make_pixel_options_appear(
+        qtbot, geometry_button, dialog, template, pixel_options[1]
+    )
     assert dialog.pixelOptionsBox.isVisible()
 
-    # Change the index and check that the pixel options have become invisible again
+    # Change the index to an nxclass without pixel fields and check that the pixel options have become invisible again
     dialog.componentTypeComboBox.setCurrentIndex(no_pixel_options[1])
     assert not dialog.pixelOptionsBox.isVisible()
 
 
-# @pytest.mark.skipif(os.name == "nt", reason="")
-@pytest.mark.parametrize("component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
-@pytest.mark.parametrize("no_pixel_geometry", ["No Geometry", "Cylinder"])
-def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible(
-    qtbot, template, dialog, component_type, pixel_options, no_pixel_geometry
+def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_single_pixel_is_selected_and_visible_by_default(
+    qtbot, template, dialog, geometry_name, pixel_options
 ):
-    make_pixel_options_appear(qtbot, dialog, template, pixel_options[1])
-    assert dialog.pixelOptionsBox.isVisible()
-
-    no_pixel_button = get_geometry_button(dialog, no_pixel_geometry)
-
-    systematic_radio_button_press(qtbot, no_pixel_button)
-
-    show_and_close_window(qtbot, template)
-
-    dialog.componentTypeComboBox.setCurrentIndex(component_type[1])
-    show_and_close_window(qtbot, template)
-    assert (
-        dialog.componentTypeComboBox.currentText()
-        == list(dialog.nx_component_classes.keys())[component_type[1]]
+    pixel_geometry_button = get_geometry_button(dialog, geometry_name)
+    make_pixel_options_appear(
+        qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
     )
 
-    assert not dialog.pixelOptionsBox.isVisible()
+    assert dialog.singlePixelRadioButton.isChecked()
+    assert dialog.pixelGridBox.isVisible()
+    assert not dialog.pixelMappingListWidget.isVisible()
+    assert not dialog.pixelMappingLabel.isVisible()
 
 
-def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_repeatable_grid_is_selected_and_visible_by_default(
-    qtbot, template, dialog
+@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
+def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible(
+    qtbot, template, dialog, geometry_name, pixel_options
 ):
-    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
+    pixel_geometry_button = get_geometry_button(dialog, geometry_name)
+    make_pixel_options_appear(
+        qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
+    )
 
+    systematic_radio_button_press(qtbot, dialog.entireShapeRadioButton)
 
-def test_UI_GIVEN_user_selects_face_mapped_mesh_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible(
-    qtbot
-):
-    pass
+    assert dialog.entireShapeRadioButton.isChecked()
+    assert dialog.pixelMappingLabel.isVisible()
+    assert dialog.pixelMappingListWidget.isVisible()
+    assert not dialog.pixelGridBox.isVisible()
 
 
 def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_visible(
@@ -717,7 +726,6 @@ def get_geometry_button(dialog: AddComponentDialog, button_name: str):
 
 def make_pixel_options_disappear(
     qtbot: pytestqt.qtbot.QtBot,
-    button: QRadioButton,
     dialog: AddComponentDialog,
     template: PySide2.QtWidgets.QDialog,
     component_index: int,
@@ -725,18 +733,18 @@ def make_pixel_options_disappear(
     """
     Create the conditions to allow the disappearance of the pixel options.
     :param qtbot: The qtbot testing tool.
-    :param button: The No Geometry or Cylinder button.
     :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
     :param component_index: The index of a component type.
     """
-    systematic_radio_button_press(qtbot, button)
+    systematic_radio_button_press(qtbot, dialog.noGeometryRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(component_index)
     show_and_close_window(qtbot, template)
 
 
 def make_pixel_options_appear(
     qtbot: pytestqt.qtbot.QtBot,
+    button: QRadioButton,
     dialog: AddComponentDialog,
     template: PySide2.QtWidgets.QDialog,
     pixel_options_index: int,
@@ -744,11 +752,12 @@ def make_pixel_options_appear(
     """
     Create the conditions to allow the appearance of the pixel options.
     :param qtbot: The qtbot testing tool.
+    :param button: The Mesh or Cylinder radio button.
     :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
     :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
     """
-    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
+    systematic_radio_button_press(qtbot, button)
     dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
     show_and_close_window(qtbot, template)
 
