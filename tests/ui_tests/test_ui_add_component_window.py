@@ -208,6 +208,9 @@ def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_n
     no_pixel_button = get_geometry_button(dialog, no_pixel_geometry)
 
     systematic_radio_button_press(qtbot, no_pixel_button)
+
+    print(find_radio_button_press_position(no_pixel_button))
+
     show_and_close_window(qtbot, template)
 
     dialog.componentTypeComboBox.setCurrentIndex(component_type[1])
