@@ -88,7 +88,6 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
 ):
 
     systematic_radio_button_press(qtbot, dialog.noGeometryRadioButton)
-
     assert not dialog.geometryOptionsBox.isVisible()
 
 
@@ -142,17 +141,17 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     assert dialog.geometryFileBox.isVisible()
 
 
+@pytest.mark.parametrize("geometry_with_units", GEOMETRY_BUTTONS[1:])
 def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_are_metres(
-    qtbot, template, dialog
+    qtbot, template, dialog, geometry_with_units
 ):
 
-    units_geometries = [dialog.meshRadioButton, dialog.CylinderRadioButton]
-
-    for geometry_button in units_geometries:
-        systematic_radio_button_press(qtbot, geometry_button)
-        show_and_close_window(qtbot, template)
-        assert dialog.unitsLineEdit.isVisible()
-        assert dialog.unitsLineEdit.text() == "m"
+    systematic_radio_button_press(
+        qtbot, get_geometry_button(dialog, geometry_with_units)
+    )
+    show_and_close_window(qtbot, template)
+    assert dialog.unitsLineEdit.isVisible()
+    assert dialog.unitsLineEdit.text() == "m"
 
 
 @pytest.mark.parametrize("pixel_options_index", PIXEL_OPTIONS_INDICES)
@@ -192,40 +191,39 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
     assert not dialog.pixelOptionsBox.isVisible()
 
 
-@pytest.mark.skip
+# @pytest.mark.skipif(os.name == "nt", reason="")
 @pytest.mark.parametrize("component_type_index", ALL_COMPONENT_TYPE_INDICES)
 @pytest.mark.parametrize("pixel_options_index", PIXEL_OPTIONS_INDICES)
+@pytest.mark.parametrize("no_pixel_geometry", ["No Geometry", "Cylinder"])
 def test_UI_GIVEN_any_class_WHEN_selecting_any_nxclass_for_component_that_does_not_have_mesh_geometry_THEN_pixel_options_are_never_visible(
-    qtbot, template, dialog, component_type_index, pixel_options_index
+    qtbot,
+    template,
+    dialog,
+    component_type_index,
+    pixel_options_index,
+    no_pixel_geometry,
 ):
-    no_pixel_geometries = [dialog.noGeometryRadioButton, dialog.CylinderRadioButton]
+    make_pixel_options_appear(qtbot, dialog, template, pixel_options_index)
+    assert dialog.pixelOptionsBox.isVisible()
 
-    for geometry_button in no_pixel_geometries:
+    no_pixel_button = get_geometry_button(dialog, no_pixel_geometry)
 
-        make_pixel_options_appear(qtbot, dialog, template, pixel_options_index)
-        assert dialog.pixelOptionsBox.isVisible()
+    systematic_radio_button_press(qtbot, no_pixel_button)
+    show_and_close_window(qtbot, template)
 
-        def wait_condition():
-            assert geometry_button.isChecked()
+    dialog.componentTypeComboBox.setCurrentIndex(component_type_index)
+    show_and_close_window(qtbot, template)
+    assert (
+        dialog.componentTypeComboBox.currentText()
+        == list(dialog.nx_component_classes.keys())[component_type_index]
+    )
 
-        systematic_radio_button_press(qtbot, geometry_button)
-        show_and_close_window(qtbot, template)
-        qtbot.waitUntil(wait_condition, 3000)
-
-        dialog.componentTypeComboBox.setCurrentIndex(component_type_index)
-        show_and_close_window(qtbot, template)
-        assert (
-            dialog.componentTypeComboBox.currentText()
-            == list(dialog.nx_component_classes.keys())[component_type_index]
-        )
-
-        assert not dialog.pixelOptionsBox.isVisible()
+    assert not dialog.pixelOptionsBox.isVisible()
 
 
 def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_repeatable_grid_is_selected_and_visible_by_default(
     qtbot, template, dialog
 ):
-
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
 
 
@@ -702,12 +700,11 @@ def cleanup(request):
 
 def get_geometry_button(dialog: AddComponentDialog, button_name: str):
     """
-
-    :param dialog:
-    :param button_name:
-    :return:
+    Finds the geometry button that contains the given text.
+    :param dialog: An instance of an AddComponentDialog.
+    :param button_name: The name of the desired button.
+    :return: The QRadioButton for the given geometry type.
     """
-
     for child in dialog.geometryTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
         if child.text() == button_name:
             return child
