@@ -516,3 +516,35 @@ def test_remove_link():
     assert len(transformation_list_index.internalPointer()) == 0
     under_test.remove_node(transformation_index)
     assert under_test.rowCount(transformation_list_index) == 0
+
+
+def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file():
+    wrapper = NexusWrapper("test_duplicate_cyl_shape")
+    instrument = Instrument(wrapper)
+
+    first_component_name = "component1"
+    first_component_nx_class = "NXdetector"
+    description = "desc"
+    first_component = instrument.add_component(
+        first_component_name, first_component_nx_class, description
+    )
+
+    axis_direction = QVector3D(1, 0, 0)
+    height = 2
+    radius = 3
+    units = "cm"
+    first_component.set_cylinder_shape(
+        axis_direction=axis_direction, height=height, radius=radius, units=units
+    )
+    tree_model = ComponentTreeModel(instrument)
+
+    first_component_index = tree_model.index(0, 0, QModelIndex())
+    tree_model.duplicate_node(first_component_index)
+
+    assert tree_model.rowCount(QModelIndex()) == 3
+    second_component_index = tree_model.index(2, 0, QModelIndex())
+    second_component = second_component_index.internalPointer()
+    second_shape = second_component.get_shape()
+    assert second_shape.axis_direction == axis_direction
+    assert second_shape.height == height
+    assert second_shape.units == units
