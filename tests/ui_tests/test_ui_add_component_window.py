@@ -5,6 +5,7 @@ import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
 from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
+from mock import patch
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
@@ -249,16 +250,43 @@ def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixe
     assert not dialog.pixelGridBox.isVisible()
 
 
+@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_visible(
-    qtbot
+    qtbot, template, dialog, geometry_name, pixel_options
 ):
-    pass
+    pixel_geometry_button = get_geometry_button(dialog, geometry_name)
+    make_pixel_options_appear(
+        qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
+    )
+
+    systematic_radio_button_press(qtbot, dialog.entireShapeRadioButton)
+    systematic_radio_button_press(qtbot, dialog.singlePixelRadioButton)
+
+    assert dialog.singlePixelRadioButton.isChecked()
+    assert dialog.pixelGridBox.isVisible()
+    assert not dialog.pixelMappingListWidget.isVisible()
+    assert not dialog.pixelMappingLabel.isVisible()
 
 
+@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_is_populated(
-    qtbot
+    qtbot, template, dialog, geometry_name, pixel_options
 ):
-    pass
+    pixel_geometry_button = get_geometry_button(dialog, geometry_name)
+    make_pixel_options_appear(
+        qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
+    )
+    systematic_radio_button_press(qtbot, dialog.entireShapeRadioButton)
+
+    with patch(
+        "nexus_constructor.add_component_window.file_dialog",
+        return_value=VALID_MESH_FILE_PATH,
+    ):
+        dialog.mesh_file_picker()
+
+    assert dialog.pixelMappingListWidget.count() == 6
 
 
 def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same(
