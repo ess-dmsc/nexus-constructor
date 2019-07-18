@@ -160,10 +160,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
         # Instruct the pixel grid box to appear or disappear depending on the pixel layout setting
-        self.repeatableGridRadioButton.clicked.connect(
+        self.singlePixelRadioButton.clicked.connect(
             lambda: self.show_pixel_grid_or_pixel_mapping(True)
         )
-        self.faceMappedMeshRadioButton.clicked.connect(
+        self.entireShapeRadioButton.clicked.connect(
             lambda: self.show_pixel_grid_or_pixel_mapping(False)
         )
 
@@ -262,15 +262,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         be made visible.
         """
 
-        pixel_layout_condition = (
-            self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
-            and self.meshRadioButton.isChecked()
+        pixel_layout_condition = self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES and (
+            self.meshRadioButton.isChecked() or self.CylinderRadioButton.isChecked()
         )
         pixel_grid_condition = (
-            pixel_layout_condition and self.repeatableGridRadioButton.isChecked()
+            pixel_layout_condition and self.singlePixelRadioButton.isChecked()
         )
         pixel_mapping_condition = (
-            pixel_layout_condition and self.faceMappedMeshRadioButton.isChecked()
+            pixel_layout_condition and self.entireShapeRadioButton.isChecked()
         )
 
         return (pixel_layout_condition, pixel_grid_condition, pixel_mapping_condition)

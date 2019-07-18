@@ -3,17 +3,17 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Mon Jul 15 15:16:12 2019
+# Created: Wed Jul 17 15:46:51 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
         AddComponentDialog.setObjectName("AddComponentDialog")
-        AddComponentDialog.resize(1177, 919)
+        AddComponentDialog.resize(1177, 1051)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -104,13 +104,13 @@ class Ui_AddComponentDialog(object):
         self.pixelLayoutBox.setObjectName("pixelLayoutBox")
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.pixelLayoutBox)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        self.repeatableGridRadioButton = QtWidgets.QRadioButton(self.pixelLayoutBox)
-        self.repeatableGridRadioButton.setChecked(True)
-        self.repeatableGridRadioButton.setObjectName("repeatableGridRadioButton")
-        self.horizontalLayout_7.addWidget(self.repeatableGridRadioButton)
-        self.faceMappedMeshRadioButton = QtWidgets.QRadioButton(self.pixelLayoutBox)
-        self.faceMappedMeshRadioButton.setObjectName("faceMappedMeshRadioButton")
-        self.horizontalLayout_7.addWidget(self.faceMappedMeshRadioButton)
+        self.singlePixelRadioButton = QtWidgets.QRadioButton(self.pixelLayoutBox)
+        self.singlePixelRadioButton.setChecked(True)
+        self.singlePixelRadioButton.setObjectName("singlePixelRadioButton")
+        self.horizontalLayout_7.addWidget(self.singlePixelRadioButton)
+        self.entireShapeRadioButton = QtWidgets.QRadioButton(self.pixelLayoutBox)
+        self.entireShapeRadioButton.setObjectName("entireShapeRadioButton")
+        self.horizontalLayout_7.addWidget(self.entireShapeRadioButton)
         self.verticalLayout_3.addWidget(self.pixelLayoutBox)
         self.pixelGridBox = QtWidgets.QGroupBox(self.pixelOptionsBox)
         self.pixelGridBox.setObjectName("pixelGridBox")
@@ -293,8 +293,8 @@ class Ui_AddComponentDialog(object):
         self.geometryOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry options:", None, -1))
         self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel options", None, -1))
         self.pixelLayoutBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel layout:", None, -1))
-        self.repeatableGridRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Repeatable grid", None, -1))
-        self.faceMappedMeshRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Face-mapped mesh", None, -1))
+        self.singlePixelRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Single Pixel", None, -1))
+        self.entireShapeRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Entire Shape", None, -1))
         self.pixelGridBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel grid:", None, -1))
         self.rowLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Row:", None, -1))
         self.rowHeightLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Row height:", None, -1))

@@ -160,9 +160,9 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                  <item>
-                  <widget class="QRadioButton" name="repeatableGridRadioButton">
+                  <widget class="QRadioButton" name="singlePixelRadioButton">
                    <property name="text">
-                    <string>Repeatable grid</string>
+                    <string>Single Pixel</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -170,9 +170,9 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QRadioButton" name="faceMappedMeshRadioButton">
+                  <widget class="QRadioButton" name="entireShapeRadioButton">
                    <property name="text">
-                    <string>Face-mapped mesh</string>
+                    <string>Entire Shape</string>
                    </property>
                   </widget>
                  </item>
