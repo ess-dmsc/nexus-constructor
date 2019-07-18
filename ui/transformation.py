@@ -3,8 +3,8 @@
 # Form implementation generated from reading ui file 'transformation.ui',
 # licensing of 'transformation.ui' applies.
 #
-# Created: Thu Jul  4 23:55:45 2019
-#      by: pyside2-uic  running on PySide2 5.12.3
+# Created: Wed Jul 17 14:31:45 2019
+#      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -54,21 +54,21 @@ class Ui_Transformation(object):
         self.xPosLabel = QtWidgets.QLabel(Transformation)
         self.xPosLabel.setObjectName("xPosLabel")
         self.vectorLayout.addWidget(self.xPosLabel)
-        self.xLineEdit = QtWidgets.QLineEdit(Transformation)
-        self.xLineEdit.setObjectName("xLineEdit")
-        self.vectorLayout.addWidget(self.xLineEdit)
+        self.xSpinBox = QtWidgets.QDoubleSpinBox(Transformation)
+        self.xSpinBox.setObjectName("xSpinBox")
+        self.vectorLayout.addWidget(self.xSpinBox)
         self.yPosLabel = QtWidgets.QLabel(Transformation)
         self.yPosLabel.setObjectName("yPosLabel")
         self.vectorLayout.addWidget(self.yPosLabel)
-        self.yLineEdit = QtWidgets.QLineEdit(Transformation)
-        self.yLineEdit.setObjectName("yLineEdit")
-        self.vectorLayout.addWidget(self.yLineEdit)
+        self.ySpinBox = QtWidgets.QDoubleSpinBox(Transformation)
+        self.ySpinBox.setObjectName("ySpinBox")
+        self.vectorLayout.addWidget(self.ySpinBox)
         self.zPosLabel = QtWidgets.QLabel(Transformation)
         self.zPosLabel.setObjectName("zPosLabel")
         self.vectorLayout.addWidget(self.zPosLabel)
-        self.zLineEdit = QtWidgets.QLineEdit(Transformation)
-        self.zLineEdit.setObjectName("zLineEdit")
-        self.vectorLayout.addWidget(self.zLineEdit)
+        self.zSpinBox = QtWidgets.QDoubleSpinBox(Transformation)
+        self.zSpinBox.setObjectName("zSpinBox")
+        self.vectorLayout.addWidget(self.zSpinBox)
         self.mainLayout.addLayout(self.vectorLayout)
         self.line_3 = QtWidgets.QFrame(Transformation)
         self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
@@ -81,10 +81,10 @@ class Ui_Transformation(object):
         self.valueLabel = QtWidgets.QLabel(Transformation)
         self.valueLabel.setObjectName("valueLabel")
         self.lengthLayout.addWidget(self.valueLabel)
-        self.valueLineEdit = QtWidgets.QLineEdit(Transformation)
-        self.valueLineEdit.setMaximumSize(QtCore.QSize(100, 16777215))
-        self.valueLineEdit.setObjectName("valueLineEdit")
-        self.lengthLayout.addWidget(self.valueLineEdit)
+        self.valueSpinBox = QtWidgets.QDoubleSpinBox(Transformation)
+        self.valueSpinBox.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.valueSpinBox.setObjectName("valueSpinBox")
+        self.lengthLayout.addWidget(self.valueSpinBox)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.lengthLayout.addItem(spacerItem)
         self.line_2 = QtWidgets.QFrame(Transformation)
