@@ -5,7 +5,7 @@ import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
 from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
-from mock import patch
+from mock import patch, mock_open
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
@@ -47,6 +47,27 @@ NO_PIXEL_OPTIONS = [
     if comp_with_index[0] not in component_type.PIXEL_COMPONENT_TYPES
 ]
 GEOMETRY_BUTTONS = ["No Geometry", "Mesh", "Cylinder"]
+
+VALID_OFF_FILE = (
+    "OFF\n"
+    "#  cube.off\n"
+    "#  A cube\n"
+    "8 6 0\n"
+    "-0.500000 -0.500000 0.500000\n"
+    "0.500000 -0.500000 0.500000\n"
+    "-0.500000 0.500000 0.500000\n"
+    "0.500000 0.500000 0.500000\n"
+    "-0.500000 0.500000 -0.500000\n"
+    "0.500000 0.500000 -0.500000\n"
+    "-0.500000 -0.500000 -0.500000\n"
+    "-0.500000 0.500000 0.500000\n"
+    "4 0 1 3 2\n"
+    "4 2 3 5 4\n"
+    "4 4 5 7 6\n"
+    "4 6 7 1 0\n"
+    "4 1 7 5 3\n"
+    "4 6 0 2 4\n"
+)
 
 
 @pytest.fixture(scope="function")
@@ -284,7 +305,8 @@ def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list
         "nexus_constructor.add_component_window.file_dialog",
         return_value=VALID_MESH_FILE_PATH,
     ):
-        dialog.mesh_file_picker()
+        with patch("builtins.open", mock_open(read_data=VALID_OFF_FILE)):
+            dialog.mesh_file_picker()
 
     assert dialog.pixelMappingListWidget.count() == 6
 
