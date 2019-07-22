@@ -37,11 +37,13 @@ class TableWidget(QWidget):
         self.add_row_button = QAction(text="➕ Add Row")
         self.add_row_button.triggered.connect(self.model.add_row)
         self.remove_row_button = QAction(text="➖ Remove Row")
-        self.remove_row_button.triggered.connect(self.model.delete_row)
+        self.remove_row_button.triggered.connect(partial(self.model.delete_index, True))
         self.add_column_button = QAction(text="➕ Add Column")
         self.add_column_button.triggered.connect(self.model.add_column)
         self.remove_column_button = QAction(text="➖ Remove Column")
-        self.remove_column_button.triggered.connect(self.model.delete_column)
+        self.remove_column_button.triggered.connect(
+            partial(self.model.delete_index, False)
+        )
 
         self.toolbox.addAction(self.add_row_button)
         self.toolbox.addAction(self.remove_row_button)
@@ -85,18 +87,19 @@ class TableModel(QAbstractTableModel):
         )
         self.endResetModel()
 
-    def delete_row(self):
+    def delete_index(self, is_row: bool):
+        """
+        Removes either selected rows or columns depending on is_row
+        :param is_row: bool, if true remove rows, if false remove columns
+        """
         self.beginResetModel()
         for index in self.parent().view.selectedIndexes():
-            if index.row():
-                self.array = np.delete(self.array, (index.row()), axis=0)
-        self.endResetModel()
-
-    def delete_column(self):
-        self.beginResetModel()
-        for index in self.parent().view.selectedIndexes():
-            if index.column():
-                self.array = np.delete(self.array, index.column(), axis=1)
+            if (is_row and index.row()) or (not is_row and index.column()):
+                self.array = np.delete(
+                    self.array,
+                    (index.row() if is_row else index.column()),
+                    axis=int(not is_row),
+                )
         self.endResetModel()
 
     def rowCount(self, parent: QModelIndex = ...) -> int:
