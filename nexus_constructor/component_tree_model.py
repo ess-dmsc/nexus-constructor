@@ -129,18 +129,6 @@ class ComponentTreeModel(QAbstractItemModel):
         )
         self.add_component(component)
 
-    def _copy_shape(self, parent, component):
-        parent_shape = parent.get_shape()
-        if isinstance(parent_shape, CylindricalGeometry):
-            component.set_cylinder_shape(
-                parent_shape.axis_direction,
-                parent_shape.height,
-                parent_shape.radius,
-                parent_shape.units,
-            )
-        elif isinstance(parent_shape, OFFGeometryNexus):
-            component.set_off_shape(parent_shape.off_geometry)
-
     def add_transformation(self, parent_index: QModelIndex, type: str):
         parent_item = parent_index.internalPointer()
         transformation_list = None
