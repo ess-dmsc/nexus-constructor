@@ -3,6 +3,8 @@ from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar, Optional
 import numpy as np
 
+from nexus_constructor.ui_utils import generate_unique_name
+
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
@@ -140,6 +142,10 @@ class NexusWrapper(QObject):
         group.attrs["NX_class"] = nx_class
         self._emit_file()
         return group
+
+    def duplicate_nx_group(self, parent, components_list) -> h5py.Group:
+        new_group_name = generate_unique_name(parent.name, components_list)
+        return parent.group.copy(dest=parent.group.parent, source=parent.group, name=new_group_name)
 
     @staticmethod
     def get_nx_class(group: h5py.Group) -> Optional[str]:

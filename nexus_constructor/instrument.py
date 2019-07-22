@@ -72,6 +72,11 @@ class Instrument:
         component.description = description
         return component
 
+    def duplicate_component(self, parent: Component, components_list) -> Component:
+        return Component(
+            self.nexus, self.nexus.duplicate_nx_group(parent, components_list)
+        )
+
     def remove_component(self, component: Component):
         """
         Removes a component group from the NeXus file and instrument view

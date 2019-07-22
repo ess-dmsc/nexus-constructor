@@ -124,18 +124,10 @@ class ComponentTreeModel(QAbstractItemModel):
 
     def duplicate_node(self, node: QModelIndex):
         parent = node.internalPointer()
-        if isinstance(parent, Component):
-            new_name = generate_unique_name(parent.name, self.components)
-
-            component = self.instrument.add_component(
-                new_name, parent.nx_class, parent.description
-            )
-
-            self._copy_shape(parent, component)
-
-            self.add_component(component)
-        elif isinstance(parent, Transformation):
-            raise NotImplementedError("Duplication of transformations not implemented")
+        component = self.instrument.duplicate_component(
+            parent, self.instrument.get_component_list()
+        )
+        self.add_component(component)
 
     def _copy_shape(self, parent, component):
         parent_shape = parent.get_shape()
