@@ -302,12 +302,7 @@ class Component:
         if SHAPE_GROUP_NAME in self.group:
             del self.group[SHAPE_GROUP_NAME]
 
-    def duplicate(
-        self, components_list
-    ) -> "Component":
+    def duplicate(self, components_list: List["Component"]) -> "Component":
         return Component(
-            self.file,
-            self.file.duplicate_nx_group(
-                self.group, components_list
-            ),
+            self.file, self.file.duplicate_nx_group(self.group, components_list)
         )

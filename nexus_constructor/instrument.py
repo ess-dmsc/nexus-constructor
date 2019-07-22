@@ -1,4 +1,6 @@
 import os
+from typing import List
+
 import h5py
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.nexus import nexus_wrapper as nx
@@ -72,16 +74,6 @@ class Instrument:
         component.description = description
         return component
 
-    def duplicate_component(
-        self, component_to_duplicate: Component, components_list
-    ) -> Component:
-        return Component(
-            self.nexus,
-            self.nexus.duplicate_nx_group(
-                component_to_duplicate.group, components_list
-            ),
-        )
-
     def remove_component(self, component: Component):
         """
         Removes a component group from the NeXus file and instrument view
@@ -90,7 +82,7 @@ class Instrument:
         self.nexus.component_removed.emit(component.name)
         self.nexus.delete_node(component.group)
 
-    def get_component_list(self):
+    def get_component_list(self) -> List[Component]:
         component_list = []
 
         def find_components(_, node):
