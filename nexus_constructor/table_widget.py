@@ -88,16 +88,20 @@ class TableModel(QAbstractTableModel):
     def delete_row(self):
         self.beginResetModel()
         for index in self.parent().view.selectedIndexes():
-            if index.row() > 0:
+            if not self._is_first_index(index):
                 self.array = np.delete(self.array, (index.row()), axis=0)
         self.endResetModel()
 
     def delete_column(self):
         self.beginResetModel()
         for index in self.parent().view.selectedIndexes():
-            if index.column() > 0:
+            if not self._is_first_index(index):
                 self.array = np.delete(self.array, index.column(), axis=1)
         self.endResetModel()
+
+    @staticmethod
+    def _is_first_index(index: QModelIndex()):
+        return index.row() == 0 and index.column() == 0
 
     def rowCount(self, parent: QModelIndex = ...) -> int:
         """
