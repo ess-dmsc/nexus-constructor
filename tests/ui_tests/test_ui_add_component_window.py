@@ -781,7 +781,7 @@ def enter_file_path(
     """
     qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.fileLineEdit, file_path)
-    dialog.geometry_file_name = file_path
+    dialog.cad_file_name = file_path
 
 
 def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):

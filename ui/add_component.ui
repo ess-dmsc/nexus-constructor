@@ -142,7 +142,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="geometryOptionsBox">
+         <widget class="QGroupBox" name="shapeOptionsBox">
           <property name="title">
            <string>Shape options:</string>
           </property>
