@@ -94,7 +94,7 @@ class TableModel(QAbstractTableModel):
         """
         self.beginResetModel()
         for index in self.parent().view.selectedIndexes():
-            if (is_row and index.row()) or (not is_row and index.column()):
+            if self.array.shape != (1, 1):
                 self.array = np.delete(
                     self.array,
                     (index.row() if is_row else index.column()),
