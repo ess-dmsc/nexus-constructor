@@ -1,10 +1,7 @@
 import h5py
 from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar, Optional, List
+from typing import Any, TypeVar, Optional
 import numpy as np
-
-from nexus_constructor.component import Component
-from nexus_constructor.ui_utils import generate_unique_name
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
