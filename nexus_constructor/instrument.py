@@ -86,7 +86,12 @@ class Instrument:
         def find_components(_, node):
             if isinstance(node, h5py.Group):
                 if "NX_class" in node.attrs.keys():
-                    if node.attrs["NX_class"] in self.nx_component_classes:
+                    nx_class = (
+                        node.attrs["NX_class"].decode()
+                        if isinstance(node.attrs["NX_class"], bytes)
+                        else node.attrs["NX_class"]
+                    )
+                    if nx_class in self.nx_component_classes:
                         component_list.append(Component(self.nexus, node))
 
         self.nexus.nexus_file.visititems(find_components)

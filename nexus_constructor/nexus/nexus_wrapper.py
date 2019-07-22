@@ -80,7 +80,6 @@ class NexusWrapper(QObject):
             nexus_file = h5py.File(
                 filename, mode="r", backing_store=False, driver="core"
             )
-
             self.find_entries_in_file(nexus_file)
 
     def find_entries_in_file(self, nexus_file: h5py.File):
@@ -239,5 +238,5 @@ class NexusWrapper(QObject):
         for node in entry.values():
             if isinstance(node, h5py.Group):
                 if "NX_class" in node.attrs.keys():
-                    if node.attrs["NX_class"] == "NXinstrument":
+                    if node.attrs["NX_class"] in ["NXinstrument", b"NXinstrument"]:
                         return node
