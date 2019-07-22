@@ -122,11 +122,11 @@ class ComponentTreeModel(QAbstractItemModel):
             self.__remove_link(node)
 
     def duplicate_node(self, node: QModelIndex):
-        parent = node.internalPointer()
-        component = self.instrument.duplicate_component(
-            parent, self.instrument.get_component_list()
-        )
-        self.add_component(component)
+        node_object = node.internalPointer()
+        if isinstance(node_object, Component):
+            self.add_component(node_object.duplicate(self.instrument.get_component_list()))
+        elif isinstance(node_object, Transformation):
+            raise NotImplementedError("Duplication of transformations not implemented")
 
     def add_transformation(self, parent_index: QModelIndex, type: str):
         parent_item = parent_index.internalPointer()

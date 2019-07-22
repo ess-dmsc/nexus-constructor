@@ -301,3 +301,13 @@ class Component:
     def _remove_shape(self):
         if SHAPE_GROUP_NAME in self.group:
             del self.group[SHAPE_GROUP_NAME]
+
+    def duplicate(
+        self, components_list
+    ) -> "Component":
+        return Component(
+            self.file,
+            self.file.duplicate_nx_group(
+                self.group, components_list
+            ),
+        )
