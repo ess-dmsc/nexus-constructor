@@ -143,8 +143,9 @@ class NexusWrapper(QObject):
         self._emit_file()
         return group
 
+    @staticmethod
     def duplicate_nx_group(
-        self, group_to_duplicate: h5py.Group, components_list
+        group_to_duplicate: h5py.Group, components_list
     ) -> h5py.Group:
         new_group_name = generate_unique_name(
             get_name_of_node(group_to_duplicate), components_list
