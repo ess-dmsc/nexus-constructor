@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Union
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.transformations import Transformation, TransformationsList
-from nexus_constructor.ui_utils import qvector3d_to_numpy_array
+from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
     calculate_vertices,
@@ -304,5 +304,8 @@ class Component:
 
     def duplicate(self, components_list: List["Component"]) -> "Component":
         return Component(
-            self.file, self.file.duplicate_nx_group(self.group, components_list)
+            self.file,
+            self.file.duplicate_nx_group(
+                self.group, generate_unique_name(self.name, components_list)
+            ),
         )
