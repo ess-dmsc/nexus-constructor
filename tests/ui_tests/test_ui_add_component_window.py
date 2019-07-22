@@ -56,9 +56,9 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
 
     dialog, template = create_add_component_template(qtbot)
 
-    systematic_radio_button_press(qtbot, dialog.noGeometryRadioButton)
+    systematic_radio_button_press(qtbot, dialog.noShapeRadioButton)
 
-    assert not dialog.geometryOptionsBox.isVisible()
+    assert not dialog.shapeOptionsBox.isVisible()
 
 
 def test_UI_GIVEN_nothing_WHEN_changing_component_geometry_type_THEN_add_component_button_is_always_disabled(
@@ -68,7 +68,7 @@ def test_UI_GIVEN_nothing_WHEN_changing_component_geometry_type_THEN_add_compone
     dialog, template = create_add_component_template(qtbot)
 
     all_geometry_buttons = [
-        dialog.noGeometryRadioButton,
+        dialog.noShapeRadioButton,
         dialog.meshRadioButton,
         dialog.CylinderRadioButton,
     ]
@@ -85,7 +85,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     dialog, template = create_add_component_template(qtbot)
 
     # Check that the relevant fields start as invisible
-    assert not dialog.geometryOptionsBox.isVisible()
+    assert not dialog.shapeOptionsBox.isVisible()
     assert not dialog.cylinderOptionsBox.isVisible()
     assert not dialog.unitsbox.isVisible()
 
@@ -94,7 +94,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     show_and_close_window(qtbot, template)
 
     # Check that this has caused the relevant fields to become visible
-    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.shapeOptionsBox.isVisible()
     assert dialog.cylinderOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
 
@@ -106,7 +106,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     dialog, template = create_add_component_template(qtbot)
 
     # Check that the relevant fields start as invisible
-    assert not dialog.geometryOptionsBox.isVisible()
+    assert not dialog.shapeOptionsBox.isVisible()
     assert not dialog.cylinderOptionsBox.isVisible()
     assert not dialog.unitsbox.isVisible()
 
@@ -116,7 +116,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     show_and_close_window(qtbot, template)
 
     # Check that this has caused the relevant fields to become visible
-    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.geometryFileBox.isVisible()
 
@@ -195,7 +195,7 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_THEN_pixel_o
 
             # Manually set the pixel options to visible
             dialog.pixelOptionsBox.setVisible(True)
-            dialog.geometryOptionsBox.setVisible(True)
+            dialog.shapeOptionsBox.setVisible(True)
             assert dialog.pixelOptionsBox.isVisible()
 
             # Change the index and check that the pixel options have become invisible again
@@ -615,7 +615,7 @@ def test_UI_GIVEN_mesh_geometry_selected_THEN_relevant_fields_are_visible(qtbot)
 
     show_and_close_window(qtbot, template)
 
-    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.geometryFileBox.isVisible()
 
@@ -641,7 +641,7 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_relevant_fields_are_visible(qt
 
     show_and_close_window(qtbot, template)
 
-    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.cylinderOptionsBox.isVisible()
 
