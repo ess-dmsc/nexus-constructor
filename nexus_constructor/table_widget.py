@@ -94,16 +94,15 @@ class TableModel(QAbstractTableModel):
         """
         self.beginResetModel()
         for index in self.parent().view.selectedIndexes():
-            if self.array.size > 0:
-                if is_row and self.array.shape[0] <= 1:
-                    return
-                elif not is_row and self.array.shape[1] <= 1:
-                    return
-                self.array = np.delete(
-                    self.array,
-                    (index.row() if is_row else index.column()),
-                    axis=int(not is_row),
-                )
+            if is_row and self.array.shape[0] <= 1:
+                return
+            elif not is_row and self.array.shape[1] <= 1:
+                return
+            self.array = np.delete(
+                self.array,
+                (index.row() if is_row else index.column()),
+                axis=int(not is_row),
+            )
         self.endResetModel()
 
     def rowCount(self, parent: QModelIndex = ...) -> int:
