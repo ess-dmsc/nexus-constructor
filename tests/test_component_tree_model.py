@@ -453,18 +453,18 @@ def test_add_link_multiple_times():
 
 
 def test_duplicate_component():
-    data_under_test = FakeInstrument([])
+    data_under_test = Instrument(NexusWrapper("test_component_model_duplicate"))
     under_test = ComponentTreeModel(data_under_test)
 
-    assert under_test.rowCount(QModelIndex()) == 0
+    assert under_test.rowCount(QModelIndex()) == 1  # Sample
     under_test.add_component(get_component())
     component_index = under_test.index(0, 0, QModelIndex())
     under_test.duplicate_node(component_index)
-    assert under_test.rowCount(QModelIndex()) == 2
+    assert under_test.rowCount(QModelIndex()) == 3
 
 
 def test_duplicate_transform_fail():
-    data_under_test = FakeInstrument([])
+    data_under_test = Instrument(NexusWrapper("test_component_model_duplicate_fail"))
     under_test = ComponentTreeModel(data_under_test)
 
     under_test.add_component(get_component())
@@ -474,7 +474,7 @@ def test_duplicate_transform_fail():
     transformation_index = under_test.index(0, 0, transformation_list_index)
     try:
         under_test.duplicate_node(transformation_index)
-    except NotImplementedError:
+    except (NotImplementedError, AttributeError):
         return  # Success
     assert False  # Failure
 
