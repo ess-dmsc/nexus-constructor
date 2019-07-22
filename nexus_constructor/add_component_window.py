@@ -64,14 +64,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        self.ok_validator = OkValidator(
-            self.noGeometryRadioButton, self.meshRadioButton
-        )
+        self.ok_validator = OkValidator(self.noShapeRadioButton, self.meshRadioButton)
         self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
-        self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
+        self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
         [
@@ -79,7 +77,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             for button in [
                 self.meshRadioButton,
                 self.CylinderRadioButton,
-                self.noGeometryRadioButton,
+                self.noShapeRadioButton,
             ]
         ]
 
@@ -92,7 +90,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
 
         # Set default geometry type and show the related fields.
-        self.noGeometryRadioButton.setChecked(True)
+        self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
         name_validator = NameValidator(self.instrument.get_component_list())

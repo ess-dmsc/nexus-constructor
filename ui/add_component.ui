@@ -112,15 +112,15 @@
          </layout>
         </item>
         <item>
-         <widget class="QGroupBox" name="geometryTypeBox">
+         <widget class="QGroupBox" name="ShapeTypeBox">
           <property name="title">
-           <string>Geometry type:</string>
+           <string>Shape type:</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <widget class="QRadioButton" name="noGeometryRadioButton">
+            <widget class="QRadioButton" name="noShapeRadioButton">
              <property name="text">
-              <string>No Geometry</string>
+              <string>No Shape</string>
              </property>
             </widget>
            </item>
@@ -144,7 +144,7 @@
         <item>
          <widget class="QGroupBox" name="geometryOptionsBox">
           <property name="title">
-           <string>Geometry options:</string>
+           <string>Shape options:</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,1">
            <item row="4" column="0">
@@ -157,7 +157,7 @@
            <item row="1" column="0">
             <widget class="QGroupBox" name="geometryFileBox">
              <property name="title">
-              <string>Geometry file</string>
+              <string>CAD file</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
@@ -186,17 +186,17 @@
               <item row="2" column="1">
                <widget class="QDoubleSpinBox" name="cylinderXLineEdit">
                 <property name="maximum">
-                 <number>100000</number>
+                 <double>100000.000000000000000</double>
                 </property>
                </widget>
               </item>
               <item row="0" column="3">
                <widget class="QDoubleSpinBox" name="cylinderRadiusLineEdit">
                 <property name="minimum">
-                 <number>1</number>
+                 <double>1.000000000000000</double>
                 </property>
                 <property name="maximum">
-                 <number>100000</number>
+                 <double>100000.000000000000000</double>
                 </property>
                </widget>
               </item>
@@ -210,7 +210,7 @@
               <item row="2" column="3">
                <widget class="QDoubleSpinBox" name="cylinderYLineEdit">
                 <property name="maximum">
-                 <number>100000</number>
+                 <double>100000.000000000000000</double>
                 </property>
                </widget>
               </item>
@@ -245,20 +245,20 @@
               <item row="0" column="1">
                <widget class="QDoubleSpinBox" name="cylinderHeightLineEdit">
                 <property name="minimum">
-                 <number>1</number>
+                 <double>1.000000000000000</double>
                 </property>
                 <property name="maximum">
-                 <number>100000</number>
+                 <double>100000.000000000000000</double>
                 </property>
                </widget>
               </item>
               <item row="2" column="5">
                <widget class="QDoubleSpinBox" name="cylinderZLineEdit">
                 <property name="maximum">
-                 <number>100000</number>
+                 <double>100000.000000000000000</double>
                 </property>
                 <property name="value">
-                 <number>1</number>
+                 <double>1.000000000000000</double>
                 </property>
                </widget>
               </item>
