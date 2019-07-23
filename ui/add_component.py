@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Tue Jul 23 13:10:14 2019
+# Created: Tue Jul 23 13:21:04 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
         AddComponentDialog.setObjectName("AddComponentDialog")
-        AddComponentDialog.resize(1177, 1051)
+        AddComponentDialog.resize(1177, 919)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

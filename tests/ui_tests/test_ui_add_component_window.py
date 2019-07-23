@@ -1,4 +1,5 @@
 import os
+import sys
 
 import PySide2
 import pytest
@@ -26,6 +27,8 @@ UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
+
+RUNNING_ON_WINDOWS = sys.platform.startswith("win")
 
 instrument = Instrument(NexusWrapper("pixels"))
 component = ComponentTreeModel(instrument)
@@ -643,7 +646,6 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
     # Mimic the user entering a valid file name
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
-
     # Mimic the user giving valid units
     enter_units(qtbot, dialog, VALID_UNITS)
 
@@ -845,9 +847,12 @@ def show_window_and_wait_for_interaction(
 ):
     """
     Helper method that allows you to examine a window during testing. Just here for convenience.
+    Does nothing if the test is running on Windows.
     :param qtbot: The qtbot testing tool.
     :param template: The window/widget to be opened.
     """
+    if RUNNING_ON_WINDOWS:
+        return
     template.show()
     qtbot.stopForInteraction()
 
@@ -941,9 +946,7 @@ def enter_component_name(
 
 
 def enter_file_path(
-    qtbot: pytestqt.qtbot.QtBot,
-    dialog: AddComponentDialog,
-    file_path: str,
+    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, file_path: str
 ):
     """
     Mimics the user entering a file path. Clicks on the text field and enters a given file path. Also sets the
