@@ -4,6 +4,7 @@ from nexus_constructor.component_tree_model import (
     LinkTransformation,
 )
 from nexus_constructor.component import Component
+from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
@@ -452,18 +453,18 @@ def test_add_link_multiple_times():
 
 
 def test_duplicate_component():
-    data_under_test = FakeInstrument([])
+    data_under_test = Instrument(NexusWrapper("test_component_model_duplicate"))
     under_test = ComponentTreeModel(data_under_test)
 
-    assert under_test.rowCount(QModelIndex()) == 0
+    assert under_test.rowCount(QModelIndex()) == 1  # Sample
     under_test.add_component(get_component())
     component_index = under_test.index(0, 0, QModelIndex())
     under_test.duplicate_node(component_index)
-    assert under_test.rowCount(QModelIndex()) == 2
+    assert under_test.rowCount(QModelIndex()) == 3
 
 
 def test_duplicate_transform_fail():
-    data_under_test = FakeInstrument([])
+    data_under_test = Instrument(NexusWrapper("test_component_model_duplicate_fail"))
     under_test = ComponentTreeModel(data_under_test)
 
     under_test.add_component(get_component())
@@ -473,7 +474,7 @@ def test_duplicate_transform_fail():
     transformation_index = under_test.index(0, 0, transformation_list_index)
     try:
         under_test.duplicate_node(transformation_index)
-    except NotImplementedError:
+    except (NotImplementedError, AttributeError):
         return  # Success
     assert False  # Failure
 
@@ -516,3 +517,82 @@ def test_remove_link():
     assert len(transformation_list_index.internalPointer()) == 0
     under_test.remove_node(transformation_index)
     assert under_test.rowCount(transformation_list_index) == 0
+
+
+def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file():
+    wrapper = NexusWrapper("test_duplicate_cyl_shape")
+    instrument = Instrument(wrapper)
+
+    first_component_name = "component1"
+    first_component_nx_class = "NXdetector"
+    description = "desc"
+    first_component = instrument.add_component(
+        first_component_name, first_component_nx_class, description
+    )
+
+    axis_direction = QVector3D(1, 0, 0)
+    height = 2
+    radius = 3
+    units = "cm"
+    first_component.set_cylinder_shape(
+        axis_direction=axis_direction, height=height, radius=radius, units=units
+    )
+    tree_model = ComponentTreeModel(instrument)
+
+    first_component_index = tree_model.index(0, 0, QModelIndex())
+    tree_model.duplicate_node(first_component_index)
+
+    assert tree_model.rowCount(QModelIndex()) == 3
+    second_component_index = tree_model.index(2, 0, QModelIndex())
+    second_component = second_component_index.internalPointer()
+    second_shape = second_component.get_shape()
+    assert second_shape.axis_direction == axis_direction
+    assert second_shape.height == height
+    assert second_shape.units == units
+
+
+def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file():
+    wrapper = NexusWrapper("test_duplicate_off_shape")
+    instrument = Instrument(wrapper)
+
+    first_component_name = "component1"
+    first_component_nx_class = "NXdetector"
+    description = "desc"
+    first_component = instrument.add_component(
+        first_component_name, first_component_nx_class, description
+    )
+
+    vertices = [
+        QVector3D(-0.5, -0.5, 0.5),
+        QVector3D(0.5, -0.5, 0.5),
+        QVector3D(-0.5, 0.5, 0.5),
+        QVector3D(0.5, 0.5, 0.5),
+        QVector3D(-0.5, 0.5, -0.5),
+        QVector3D(0.5, 0.5, -0.5),
+        QVector3D(-0.5, -0.5, -0.5),
+        QVector3D(0.5, -0.5, -0.5),
+    ]
+
+    faces = [
+        [0, 1, 3, 2],
+        [2, 3, 5, 4],
+        [4, 5, 7, 6],
+        [6, 7, 1, 0],
+        [1, 7, 5, 3],
+        [6, 0, 2, 4],
+    ]
+
+    first_component.set_off_shape(OFFGeometryNoNexus(vertices=vertices, faces=faces))
+
+    tree_model = ComponentTreeModel(instrument)
+
+    first_component_index = tree_model.index(0, 0, QModelIndex())
+    tree_model.duplicate_node(first_component_index)
+
+    assert tree_model.rowCount(QModelIndex()) == 3
+    second_component_index = tree_model.index(2, 0, QModelIndex())
+    second_component = second_component_index.internalPointer()
+    second_shape = second_component.get_shape()
+
+    assert second_shape.vertices == vertices
+    assert second_shape.faces == faces
