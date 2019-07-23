@@ -514,6 +514,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH, VALID_OFF_FILE)
 
     show_window_and_wait_for_interaction(qtbot, template)
+    show_window_and_wait_for_interaction(qtbot, template)
 
     show_and_close_window(qtbot, template)
 
