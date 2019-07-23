@@ -26,6 +26,19 @@ def get_name_of_node(node: h5Node) -> str:
     return node.name.split("/")[-1]
 
 
+def get_nx_class(group: h5py.Group) -> Optional[str]:
+    if "NX_class" not in group.attrs.keys():
+        return None
+
+    nx_class = group.attrs["NX_class"]
+
+    try:
+        nx_class = str(nx_class, encoding="utf-8")
+    except TypeError:
+        pass
+    return nx_class
+
+
 class NexusWrapper(QObject):
     """
     Contains the NeXus file and functions to add and edit components in the NeXus file structure.
@@ -141,19 +154,6 @@ class NexusWrapper(QObject):
         group.attrs["NX_class"] = nx_class
         self._emit_file()
         return group
-
-    @staticmethod
-    def get_nx_class(group: h5py.Group) -> Optional[str]:
-        if "NX_class" not in group.attrs.keys():
-            return None
-
-        nx_class = group.attrs["NX_class"]
-
-        try:
-            nx_class = str(nx_class, encoding="utf-8")
-        except TypeError:
-            pass
-        return nx_class
 
     def set_nx_class(self, group: h5py.Group, nx_class: str):
         group.attrs["NX_class"] = nx_class

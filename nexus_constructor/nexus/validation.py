@@ -2,6 +2,8 @@ import attr
 import h5py
 from typing import Tuple, List, Optional
 
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+
 
 class NexusFormatError(Exception):
     pass
@@ -71,13 +73,15 @@ class ValidateDataset:
 
 
 def _check_nx_class(group: h5py.Group, nx_class: str, problems: List):
-    if "NX_class" in group.attrs.keys():
-        if group.attrs["NX_class"] != nx_class:
-            problems.append(
-                f"Expected {group.name} to have NX_class attribute of {nx_class} but it was {group.attrs['NX_class']}"
-            )
-    else:
+
+    group_nx_class = get_nx_class(group)
+
+    if not group_nx_class:
         problems.append(f"Expected {group.name} to have an NX_class attribute")
+    elif group_nx_class != nx_class:
+        problems.append(
+            f"Expected {group.name} to have NX_class attribute of {nx_class} but it was {group.attrs['NX_class']}"
+        )
 
 
 def validate_group(
