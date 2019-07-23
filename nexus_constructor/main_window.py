@@ -294,7 +294,14 @@ class MainWindow(Ui_MainWindow):
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
         self.instrument.nexus.open_file(filename)
+        self.sceneWidget.clear_all_components()
+        self._update_3d_view_with_component_shapes()
         self._set_up_component_model()
+
+    def _update_3d_view_with_component_shapes(self):
+        for component in self.instrument.get_component_list():
+            if component.get_shape():
+                self.sceneWidget.add_component(component.name, component.get_shape())
 
     def show_add_component_window(self):
         self.add_component_window = QDialog()
