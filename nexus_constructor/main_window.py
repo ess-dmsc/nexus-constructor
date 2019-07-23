@@ -56,9 +56,6 @@ class MainWindow(Ui_MainWindow):
         self.instrument.nexus.component_removed.connect(
             self.sceneWidget.delete_component
         )
-        self.instrument.nexus.file_changed.connect(
-            self.update_nexus_file_structure_view
-        )
 
         self.set_up_warning_window()
 
@@ -135,20 +132,20 @@ class MainWindow(Ui_MainWindow):
 
         # Populate the combo box with the names of the entry groups.
         [combo.addItem(x) for x in map_of_entries.keys()]
-
         ok_button = QPushButton()
 
         ok_button.setText("OK")
         ok_button.clicked.connect(self.entries_dialog.close)
 
-        # Connect the clicked signal of the ok_button to instrument.load_file and pass the file and entry group object.
-        ok_button.clicked.connect(
-            partial(
-                self.instrument.nexus.load_file,
-                map_of_entries[combo.currentText()],
-                nexus_file,
+        def _load_current_entry():
+            self.instrument.nexus.load_file(
+                map_of_entries[combo.currentText()], nexus_file
             )
-        )
+            self._set_up_component_model()
+            self._update_views()
+
+        # Connect the clicked signal of the ok_button to instrument.load_file and pass the file and entry group object.
+        ok_button.clicked.connect(_load_current_entry)
 
         self.entries_dialog.setLayout(QGridLayout())
 
@@ -293,7 +290,10 @@ class MainWindow(Ui_MainWindow):
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
-        self.instrument.nexus.open_file(filename)
+        if self.instrument.nexus.open_file(filename):
+            self._update_views()
+
+    def _update_views(self):
         self.sceneWidget.clear_all_components()
         self._update_3d_view_with_component_shapes()
         self._set_up_component_model()

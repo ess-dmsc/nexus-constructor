@@ -94,5 +94,5 @@ class Instrument:
                     if nx_class in self.nx_component_classes:
                         component_list.append(Component(self.nexus, node))
 
-        self.nexus.nexus_file.visititems(find_components)
+        self.nexus.entry.visititems(find_components)
         return component_list
