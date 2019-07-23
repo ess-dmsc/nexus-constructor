@@ -283,8 +283,18 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        component = self.instrument.add_component(component_name, nx_class, description)
-        geometry = self.generate_geometry_model(component)
-        add_fields_to_component(component, self.fieldsListWidget)
-        self.component_model.add_component(component)
+
+        if self.component_to_edit:
+            self.component_to_edit.name = component_name
+            self.component_to_edit.nx_class = nx_class
+            self.component_to_edit.description = description
+            geometry = self.generate_geometry_model(self.component_to_edit)
+        else:
+            component = self.instrument.create_component(
+                component_name, nx_class, description
+            )
+            geometry = self.generate_geometry_model(component)
+            add_fields_to_component(component, self.fieldsListWidget)
+            self.component_model.add_component(component)
+
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
