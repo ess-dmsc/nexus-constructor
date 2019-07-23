@@ -37,7 +37,12 @@ class GeometryType(Enum):
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
     nx_class_changed = Signal("QVariant")
 
-    def __init__(self, instrument: Instrument, component_model: ComponentTreeModel):
+    def __init__(
+        self,
+        instrument: Instrument,
+        component_model: ComponentTreeModel,
+        component_to_edit: Component = None,
+    ):
         super(AddComponentDialog, self).__init__()
         self.instrument = instrument
         self.component_model = component_model
