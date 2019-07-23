@@ -3,16 +3,12 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-<<<<<<< HEAD
-# Created: Thu Jul 18 08:30:03 2019
-=======
-# Created: Mon Jul 22 12:38:26 2019
->>>>>>> switch_to_widgets
+# Created: Tue Jul 23 10:24:26 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
@@ -296,7 +292,6 @@ class Ui_AddComponentDialog(object):
         self.CylinderRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1))
         self.shapeOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Shape options:", None, -1))
         self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel options", None, -1))
-<<<<<<< HEAD
         self.pixelLayoutBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel layout:", None, -1))
         self.singlePixelRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Single Pixel", None, -1))
         self.entireShapeRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Entire Shape", None, -1))
@@ -320,10 +315,7 @@ class Ui_AddComponentDialog(object):
         self.startCountingComboBox.setItemText(5, QtWidgets.QApplication.translate("AddComponentDialog", "Top right", None, -1))
         self.countingFromLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Start counting from:", None, -1))
         self.pixelMappingLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel mapping:", None, -1))
-        self.geometryFileBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry file", None, -1))
-=======
         self.geometryFileBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "CAD file", None, -1))
->>>>>>> switch_to_widgets
         self.fileBrowseButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Browse...", None, -1))
         self.cylinderOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder options", None, -1))
         self.label_6.setText(QtWidgets.QApplication.translate("AddComponentDialog", "X:", None, -1))

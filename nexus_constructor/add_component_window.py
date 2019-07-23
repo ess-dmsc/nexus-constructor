@@ -303,7 +303,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def show_no_geometry_fields(self):
 
-        self.geometryOptionsBox.setVisible(False)
+        self.shapeOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
