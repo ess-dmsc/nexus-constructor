@@ -277,6 +277,7 @@ def test_GIVEN_integer_WHEN_using_nullable_int_validator_THEN_returns_acceptable
     validator = NullableIntValidator()
     assert validator.validate("5", 0)[0] == QValidator.State.Acceptable
 
+
 def test_GIVEN_no_input_WHEN_using_numpy_validator_with_byte_as_dtype_THEN_false_signal_is_emitted():
     validator = NumpyDTypeValidator(np.byte)
     validator.is_valid = Mock()
