@@ -297,11 +297,7 @@ def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list
     )
     systematic_button_press(qtbot, dialog.entireShapeRadioButton)
 
-    show_window_and_wait_for_interaction(qtbot, template)
-
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH, VALID_OFF_FILE)
-
-    show_window_and_wait_for_interaction(qtbot, template)
 
     assert dialog.pixelMappingListWidget.count() == 6
 
@@ -512,7 +508,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     # Mimic the user entering a valid file name
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
-    show_window_and_wait_for_interaction(qtbot, template)
+    # show_window_and_wait_for_interaction(qtbot, template)
 
     show_and_close_window(qtbot, template)
 
