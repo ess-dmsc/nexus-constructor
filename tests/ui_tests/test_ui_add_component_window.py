@@ -505,10 +505,15 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     # Mimic the user selecting a mesh geometry
     systematic_button_press(qtbot, dialog.meshRadioButton)
 
-    # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    # Mimic the user entering a unique name in the text field
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
-    # show_window_and_wait_for_interaction(qtbot, template)
+    show_and_close_window(qtbot, template)
+
+    # Mimic the user entering a valid file name
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH, VALID_OFF_FILE)
+
+    show_window_and_wait_for_interaction(qtbot, template)
 
     show_and_close_window(qtbot, template)
 
