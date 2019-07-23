@@ -262,6 +262,10 @@ class FieldValueValidator(QValidator):
 
 
 class NumpyDTypeValidator(QValidator):
+    """
+    Check given string can be cast to the specified numpy dtype
+    """
+
     def __init__(self, dtype: np.dtype):
         super().__init__()
         self.dtype = dtype
