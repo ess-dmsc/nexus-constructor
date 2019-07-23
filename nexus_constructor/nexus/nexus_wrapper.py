@@ -180,6 +180,9 @@ class NexusWrapper(QObject):
             dtype = f"|S{len(value)}"
             value = np.array(value).astype(dtype)
 
+        if dtype == np.object:
+            dtype = h5py.special_dtype(vlen=str)
+
         if name in group:
             if dtype is None or group[name].dtype == dtype:
                 try:

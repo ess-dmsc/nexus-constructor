@@ -2,6 +2,7 @@ import os
 from enum import Enum
 from typing import List
 
+import h5py
 import numpy as np
 import pint
 from PySide2.QtCore import Signal, QObject
@@ -224,7 +225,7 @@ DATASET_TYPE = {
     "ULong": np.uint,
     "Float": np.single,
     "Double": np.double,
-    "String": np.string_,
+    "String": h5py.special_dtype(vlen=str),
 }
 
 
@@ -249,6 +250,17 @@ class FieldValueValidator(QValidator):
             return self._emit_and_return(False)
         elif self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
             try:
+                if (
+                    h5py.check_dtype(
+                        vlen=DATASET_TYPE[self.dataset_type_combo.currentText()]
+                    )
+                    == str
+                ):
+                    return self._emit_and_return(True)
+            except AttributeError:
+                pass
+
+            try:
                 DATASET_TYPE[self.dataset_type_combo.currentText()](input)
             except ValueError:
                 return self._emit_and_return(False)
@@ -257,5 +269,35 @@ class FieldValueValidator(QValidator):
     def _emit_and_return(self, valid: bool) -> QValidator.State:
         self.is_valid.emit(valid)
         return QValidator.Acceptable if valid else QValidator.Intermediate
+
+    is_valid = Signal(bool)
+
+
+class NumpyDTypeValidator(QValidator):
+    """
+    Check given string can be cast to the specified numpy dtype
+    """
+
+    def __init__(self, dtype: np.dtype):
+        super().__init__()
+        self.dtype = dtype
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        try:
+            if h5py.check_dtype(vlen=self.dtype) == str:
+                self.is_valid.emit(True)
+                return QValidator.Acceptable
+        except AttributeError:
+            try:
+                self.dtype(input)
+            except ValueError:
+                self.is_valid.emit(False)
+                return QValidator.Intermediate
+
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
 
     is_valid = Signal(bool)

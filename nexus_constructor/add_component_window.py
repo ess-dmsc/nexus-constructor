@@ -86,14 +86,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        self.ok_validator = OkValidator(
-            self.noGeometryRadioButton, self.meshRadioButton
-        )
+        self.ok_validator = OkValidator(self.noShapeRadioButton, self.meshRadioButton)
         self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
-        self.noGeometryRadioButton.clicked.connect(self.show_no_geometry_fields)
+        self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
         [
@@ -101,7 +99,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             for button in [
                 self.meshRadioButton,
                 self.CylinderRadioButton,
-                self.noGeometryRadioButton,
+                self.noShapeRadioButton,
             ]
         ]
 
@@ -114,7 +112,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
 
         # Set default geometry type and show the related fields.
-        self.noGeometryRadioButton.setChecked(True)
+        self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
         name_validator = NameValidator(self.instrument.get_component_list())
@@ -248,7 +246,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
         if filename != self.geometry_file_name:
             self.fileLineEdit.setText(filename)
-            self.geometry_file_name = filename
+            self.cad_file_name = filename
 
         _, _, pixel_mapping_condition = self.pixel_options_conditions()
 
@@ -298,19 +296,21 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.populate_pixel_mapping_list_when_empty(pixel_mapping_condition)
 
     def show_cylinder_fields(self):
-        self.geometryOptionsBox.setVisible(True)
+        self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
         self.change_pixel_options_visibility()
 
     def show_no_geometry_fields(self):
+
         self.geometryOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
+        self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.buttonBox.setEnabled(True)
 
     def show_mesh_fields(self):
-        self.geometryOptionsBox.setVisible(True)
+        self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
         self.change_pixel_options_visibility()
@@ -335,13 +335,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         elif self.meshRadioButton.isChecked():
             mesh_geometry = OFFGeometryNoNexus()
             geometry_model = load_geometry(
-                self.geometry_file_name, self.unitsLineEdit.text(), mesh_geometry
+                self.cad_file_name, self.unitsLineEdit.text(), mesh_geometry
             )
 
             # Units have already been used during loading the file, but we store them and file name
             # so we can repopulate their fields in the edit component window
             geometry_model.units = self.unitsLineEdit.text()
-            geometry_model.file_path = self.geometry_file_name
+            geometry_model.file_path = self.cad_file_name
 
             component.set_off_shape(geometry_model)
         else:

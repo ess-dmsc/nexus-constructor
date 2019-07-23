@@ -3,6 +3,7 @@ from io import StringIO
 from typing import List
 
 import attr
+import numpy as np
 import pytest
 from PySide2.QtGui import QValidator
 from mock import Mock
@@ -15,6 +16,7 @@ from nexus_constructor.validators import (
     GeometryFileValidator,
     OkValidator,
     NullableIntValidator,
+    NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
 )
 
@@ -274,6 +276,36 @@ def test_GIVEN_integer_WHEN_using_nullable_int_validator_THEN_returns_acceptable
 
     validator = NullableIntValidator()
     assert validator.validate("5", 0)[0] == QValidator.State.Acceptable
+
+def test_GIVEN_no_input_WHEN_using_numpy_validator_with_byte_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.byte)
+    validator.is_valid = Mock()
+
+    assert validator.validate("", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_valid_input_WHEN_using_numpy_validator_with_integer_as_dtype_THEN_true_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.intc)
+    validator.is_valid = Mock()
+
+    assert validator.validate("1", 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_floating_point_value_WHEN_using_numpy_validator_with_integer_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.intc)
+    validator.is_valid = Mock()
+
+    assert validator.validate("1.2", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_alphabetical_chars_WHEN_using_numpy_validator_with_float_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.float)
+    validator.is_valid = Mock()
+
+    assert validator.validate("test", 0) == QValidator.Intermediate
 
 
 def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():

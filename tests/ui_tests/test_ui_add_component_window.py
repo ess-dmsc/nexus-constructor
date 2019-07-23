@@ -113,8 +113,8 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     qtbot, template, dialog
 ):
 
-    systematic_button_press(qtbot, dialog.noGeometryRadioButton)
-    assert not dialog.geometryOptionsBox.isVisible()
+    systematic_button_press(qtbot, dialog.noShapeRadioButton)
+    assert not dialog.shapeOptionsBox.isVisible()
 
 
 @pytest.mark.parametrize("geometry_button_name", GEOMETRY_BUTTONS)
@@ -131,7 +131,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
 ):
 
     # Check that the relevant fields start as invisible
-    assert not dialog.geometryOptionsBox.isVisible()
+    assert not dialog.shapeOptionsBox.isVisible()
     assert not dialog.cylinderOptionsBox.isVisible()
     assert not dialog.unitsbox.isVisible()
 
@@ -140,7 +140,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     show_and_close_window(qtbot, template)
 
     # Check that this has caused the relevant fields to become visible
-    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.shapeOptionsBox.isVisible()
     assert dialog.cylinderOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
 
@@ -150,7 +150,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
 ):
 
     # Check that the relevant fields start as invisible
-    assert not dialog.geometryOptionsBox.isVisible()
+    assert not dialog.shapeOptionsBox.isVisible()
     assert not dialog.cylinderOptionsBox.isVisible()
     assert not dialog.unitsbox.isVisible()
 
@@ -160,7 +160,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     show_and_close_window(qtbot, template)
 
     # Check that this has caused the relevant fields to become visible
-    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.geometryFileBox.isVisible()
 
@@ -306,7 +306,6 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
     qtbot
 ):
     pass
-
 
 def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
     qtbot
@@ -693,7 +692,7 @@ def test_UI_GIVEN_mesh_geometry_selected_THEN_relevant_fields_are_visible(
 
     show_and_close_window(qtbot, template)
 
-    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.geometryFileBox.isVisible()
 
@@ -719,7 +718,7 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_relevant_fields_are_visible(
 
     show_and_close_window(qtbot, template)
 
-    assert dialog.geometryOptionsBox.isVisible()
+    assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.cylinderOptionsBox.isVisible()
 
@@ -749,9 +748,34 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_default_values_are_correct(
     assert dialog.cylinderYLineEdit.value() == 0.0
     assert dialog.cylinderZLineEdit.value() == 1.0
 
+def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_is_shown(
+    qtbot, template, dialog
+):
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    field.field_type_combo.setCurrentIndex(2)
+    qtbot.addWidget(field)
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+    assert field.edit_dialog.isEnabled()
+
+
+def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_table_is_shown(
+    qtbot, template, dialog
+):
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    field.field_type_combo.setCurrentIndex(2)
+    qtbot.addWidget(field)
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+    assert field.table_view.isEnabled()
+
 
 @pytest.fixture(scope="session", autouse=True)
 def cleanup(request):
+    """
+    Creates a QtBot at the end of all the tests and has it wait. This seems to be necessary in order to prevent
+    the use of fixtures from causing a segmentation fault.
+    """
     def make_another_qtest():
         bot = QtBot(request)
         bot.wait(1)
@@ -807,7 +831,6 @@ def make_pixel_options_appear(
     systematic_button_press(qtbot, button)
     dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
     show_and_close_window(qtbot, template)
-
 
 def show_window_and_wait_for_interaction(
     qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
@@ -923,14 +946,17 @@ def enter_file_path(
     :param file_path: The desired file path.
     :param file_contents: The file contents that are returned by the open mock.
     """
-    with patch(
-        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
-    ):
-        with patch(
-            "nexus_constructor.geometry.geometry_loader.open",
-            mock_open(read_data=file_contents),
-        ):
-            systematic_button_press(qtbot, dialog.fileBrowseButton)
+    # with patch(
+    #     "nexus_constructor.add_component_window.file_dialog", return_value=file_path
+    # ):
+    #     with patch(
+    #         "nexus_constructor.geometry.geometry_loader.open",
+    #         mock_open(read_data=file_contents),
+    #     ):
+    #         systematic_button_press(qtbot, dialog.fileBrowseButton)
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, file_path)
+    dialog.cad_file_name = file_path
 
 
 def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):

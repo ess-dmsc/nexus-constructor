@@ -3,7 +3,11 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
+<<<<<<< HEAD
 # Created: Thu Jul 18 08:30:03 2019
+=======
+# Created: Mon Jul 22 12:38:26 2019
+>>>>>>> switch_to_widgets
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -78,25 +82,25 @@ class Ui_AddComponentDialog(object):
         self.componentTypeComboBox.setObjectName("componentTypeComboBox")
         self.horizontalLayout_4.addWidget(self.componentTypeComboBox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
-        self.geometryTypeBox = QtWidgets.QGroupBox(self.widget)
-        self.geometryTypeBox.setObjectName("geometryTypeBox")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.geometryTypeBox)
+        self.ShapeTypeBox = QtWidgets.QGroupBox(self.widget)
+        self.ShapeTypeBox.setObjectName("ShapeTypeBox")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.ShapeTypeBox)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.noGeometryRadioButton = QtWidgets.QRadioButton(self.geometryTypeBox)
-        self.noGeometryRadioButton.setObjectName("noGeometryRadioButton")
-        self.horizontalLayout.addWidget(self.noGeometryRadioButton)
-        self.meshRadioButton = QtWidgets.QRadioButton(self.geometryTypeBox)
+        self.noShapeRadioButton = QtWidgets.QRadioButton(self.ShapeTypeBox)
+        self.noShapeRadioButton.setObjectName("noShapeRadioButton")
+        self.horizontalLayout.addWidget(self.noShapeRadioButton)
+        self.meshRadioButton = QtWidgets.QRadioButton(self.ShapeTypeBox)
         self.meshRadioButton.setObjectName("meshRadioButton")
         self.horizontalLayout.addWidget(self.meshRadioButton)
-        self.CylinderRadioButton = QtWidgets.QRadioButton(self.geometryTypeBox)
+        self.CylinderRadioButton = QtWidgets.QRadioButton(self.ShapeTypeBox)
         self.CylinderRadioButton.setObjectName("CylinderRadioButton")
         self.horizontalLayout.addWidget(self.CylinderRadioButton)
-        self.verticalLayout_2.addWidget(self.geometryTypeBox)
-        self.geometryOptionsBox = QtWidgets.QGroupBox(self.widget)
-        self.geometryOptionsBox.setObjectName("geometryOptionsBox")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.geometryOptionsBox)
+        self.verticalLayout_2.addWidget(self.ShapeTypeBox)
+        self.shapeOptionsBox = QtWidgets.QGroupBox(self.widget)
+        self.shapeOptionsBox.setObjectName("shapeOptionsBox")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.shapeOptionsBox)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.pixelOptionsBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
+        self.pixelOptionsBox = QtWidgets.QGroupBox(self.shapeOptionsBox)
         self.pixelOptionsBox.setObjectName("pixelOptionsBox")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.pixelOptionsBox)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -173,7 +177,7 @@ class Ui_AddComponentDialog(object):
         self.pixelMappingListWidget.setObjectName("pixelMappingListWidget")
         self.verticalLayout_3.addWidget(self.pixelMappingListWidget)
         self.gridLayout_2.addWidget(self.pixelOptionsBox, 4, 0, 1, 1)
-        self.geometryFileBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
+        self.geometryFileBox = QtWidgets.QGroupBox(self.shapeOptionsBox)
         self.geometryFileBox.setObjectName("geometryFileBox")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.geometryFileBox)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
@@ -185,7 +189,7 @@ class Ui_AddComponentDialog(object):
         self.fileBrowseButton.setObjectName("fileBrowseButton")
         self.horizontalLayout_2.addWidget(self.fileBrowseButton)
         self.gridLayout_2.addWidget(self.geometryFileBox, 1, 0, 1, 1)
-        self.cylinderOptionsBox = QtWidgets.QGroupBox(self.geometryOptionsBox)
+        self.cylinderOptionsBox = QtWidgets.QGroupBox(self.shapeOptionsBox)
         self.cylinderOptionsBox.setObjectName("cylinderOptionsBox")
         self.gridLayout = QtWidgets.QGridLayout(self.cylinderOptionsBox)
         self.gridLayout.setObjectName("gridLayout")
@@ -231,7 +235,7 @@ class Ui_AddComponentDialog(object):
         self.gridLayout.setColumnStretch(3, 1)
         self.gridLayout.setColumnStretch(5, 1)
         self.gridLayout_2.addWidget(self.cylinderOptionsBox, 3, 0, 1, 1)
-        self.unitsbox = QtWidgets.QGroupBox(self.geometryOptionsBox)
+        self.unitsbox = QtWidgets.QGroupBox(self.shapeOptionsBox)
         self.unitsbox.setObjectName("unitsbox")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.unitsbox)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -241,7 +245,7 @@ class Ui_AddComponentDialog(object):
         self.horizontalLayout_3.addWidget(self.unitsLineEdit)
         self.gridLayout_2.addWidget(self.unitsbox, 0, 0, 1, 1)
         self.gridLayout_2.setRowStretch(4, 1)
-        self.verticalLayout_2.addWidget(self.geometryOptionsBox)
+        self.verticalLayout_2.addWidget(self.shapeOptionsBox)
         self.fieldsBox = QtWidgets.QGroupBox(self.widget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(1)
@@ -286,12 +290,13 @@ class Ui_AddComponentDialog(object):
         self.label.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Name:", None, -1))
         self.label_2.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Description:", None, -1))
         self.label_3.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Component type:", None, -1))
-        self.geometryTypeBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry type:", None, -1))
-        self.noGeometryRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No Geometry", None, -1))
+        self.ShapeTypeBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Shape type:", None, -1))
+        self.noShapeRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No Shape", None, -1))
         self.meshRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Mesh", None, -1))
         self.CylinderRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1))
-        self.geometryOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry options:", None, -1))
+        self.shapeOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Shape options:", None, -1))
         self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel options", None, -1))
+<<<<<<< HEAD
         self.pixelLayoutBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel layout:", None, -1))
         self.singlePixelRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Single Pixel", None, -1))
         self.entireShapeRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Entire Shape", None, -1))
@@ -316,6 +321,9 @@ class Ui_AddComponentDialog(object):
         self.countingFromLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Start counting from:", None, -1))
         self.pixelMappingLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel mapping:", None, -1))
         self.geometryFileBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Geometry file", None, -1))
+=======
+        self.geometryFileBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "CAD file", None, -1))
+>>>>>>> switch_to_widgets
         self.fileBrowseButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Browse...", None, -1))
         self.cylinderOptionsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder options", None, -1))
         self.label_6.setText(QtWidgets.QApplication.translate("AddComponentDialog", "X:", None, -1))
