@@ -146,7 +146,14 @@ class NexusWrapper(QObject):
     def get_nx_class(group: h5py.Group) -> Optional[str]:
         if "NX_class" not in group.attrs.keys():
             return None
-        return group.attrs["NX_class"]
+
+        nx_class = group.attrs["NX_class"]
+
+        try:
+            nx_class = str(nx_class, encoding="utf-8")
+        except TypeError:
+            pass
+        return nx_class
 
     def set_nx_class(self, group: h5py.Group, nx_class: str):
         group.attrs["NX_class"] = nx_class

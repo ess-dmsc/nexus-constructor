@@ -4,7 +4,6 @@ from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButt
 
 import silx.gui.hdf5
 import os
-from functools import partial
 import h5py
 
 from nexus_constructor.add_component_window import AddComponentDialog
