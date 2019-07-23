@@ -6,7 +6,7 @@ import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
 from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow, QAbstractButton
-from mock import patch, mock_open
+from mock import patch, mock_open, Mock
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
@@ -18,7 +18,8 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "tests", "UITests.md")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
-VALID_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
+VALID_CUBE_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
+VALID_OCTA_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "octa.off")
 
 nexus_wrapper_count = 0
 RED_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #f6989d }"
@@ -51,7 +52,7 @@ NO_PIXEL_OPTIONS = [
 ]
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
-VALID_OFF_FILE = (
+VALID_CUBE_OFF_FILE = (
     "OFF\n"
     "#  cube.off\n"
     "#  A cube\n"
@@ -71,6 +72,39 @@ VALID_OFF_FILE = (
     "4 1 7 5 3\n"
     "4 6 0 2 4\n"
 )
+
+VALID_OCTA_OFF_FILE = (
+    "OFF\n"
+    "#\n"
+    "#  octa.off\n"
+    "#  An octahedron.\n"
+    "#\n"
+    "6  8  12\n"
+    "  0.0  0.0  1.0\n"
+    "  1.0  0.0  0.0\n"
+    "  0.0  1.0  0.0\n"
+    " -1.0  0.0  0.0\n"
+    "  0.0 -1.0  0.0\n"
+    "  0.0  0.0 -1.0\n"
+    "3  1 0 4  0.7 0 0\n"
+    "3  4 0 3  0.7 0 0\n"
+    "3  3 0 2  0.7 0 0\n"
+    "3  2 0 1  0.7 0 0 \n"
+    "3  1 5 2  0.7 0 0 \n"
+    "3  2 5 3  0.7 0 0\n"
+    "3  3 5 4  0.7 0 0\n"
+    "3  4 5 1  0.7 0 0\n"
+)
+
+
+def get_expected_number_of_faces(off_file):
+    for line in off_file.split("\n")[1:]:
+        if line[0] != "#":
+            return int(line.split()[1])
+
+
+CORRECT_CUBE_FACES = get_expected_number_of_faces(VALID_CUBE_OFF_FILE)
+CORRECT_OCTA_FACES = get_expected_number_of_faces(VALID_OCTA_OFF_FILE)
 
 
 @pytest.fixture(scope="function")
@@ -298,27 +332,48 @@ def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list
     )
     systematic_button_press(qtbot, dialog.entireShapeRadioButton)
 
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
 
-    assert dialog.pixelMappingListWidget.count() == 6
+    assert dialog.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
 
 
+@pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same(
-    qtbot
+    qtbot, template, dialog, shape_name, pixel_options
 ):
-    pass
+    pixel_shape_button = get_shape_type_button(dialog, shape_name)
+    make_pixel_options_appear(
+        qtbot, pixel_shape_button, dialog, template, pixel_options[1]
+    )
+    systematic_button_press(qtbot, dialog.entireShapeRadioButton)
+
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+
+    dialog.pixel_options_conditions = Mock()
+
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+
+    dialog.pixel_options_conditions.assert_not_called()
+
+    assert dialog.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
 
 
+@pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
+@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
-    qtbot
+    qtbot, template, dialog, shape_name, pixel_options
 ):
-    pass
+    pixel_shape_button = get_shape_type_button(dialog, shape_name)
+    make_pixel_options_appear(
+        qtbot, pixel_shape_button, dialog, template, pixel_options[1]
+    )
+    systematic_button_press(qtbot, dialog.entireShapeRadioButton)
 
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(qtbot, dialog, VALID_OCTA_MESH_FILE_PATH, VALID_OCTA_OFF_FILE)
 
-def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_length_of_list_matches_number_of_faces_in_mesh(
-    qtbot
-):
-    pass
+    assert dialog.pixelMappingListWidget.count() == CORRECT_OCTA_FACES
 
 
 def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
@@ -392,7 +447,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_com
     show_and_close_window(qtbot, template)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     # Mimic the user entering valid units
     enter_units(qtbot, dialog, VALID_UNITS)
@@ -480,7 +535,7 @@ def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_shape_T
     enter_component_name(qtbot, dialog, "")
 
     # Mimic the user entering a bad file path
-    enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH)
+    enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     show_and_close_window(qtbot, template)
 
@@ -495,7 +550,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
     systematic_button_press(qtbot, dialog.meshRadioButton)
 
     # Mimic the user giving the path for a file that exists but has the wrong extension
-    enter_file_path(qtbot, dialog, WRONG_EXTENSION_FILE_PATH)
+    enter_file_path(qtbot, dialog, WRONG_EXTENSION_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     show_and_close_window(qtbot, template)
 
@@ -514,7 +569,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_fil
     show_and_close_window(qtbot, template)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     show_and_close_window(qtbot, template)
 
@@ -533,7 +588,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_add
     enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     show_and_close_window(qtbot, template)
 
@@ -568,7 +623,7 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_shape_TH
     enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a nonexistent file path
-    enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH)
+    enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     show_and_close_window(qtbot, template)
 
@@ -586,7 +641,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
     enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a path for a file that exists but has the wrong extension
-    enter_file_path(qtbot, dialog, WRONG_EXTENSION_FILE_PATH)
+    enter_file_path(qtbot, dialog, WRONG_EXTENSION_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     show_and_close_window(qtbot, template)
 
@@ -643,7 +698,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_com
     enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     # Mimic the user giving valid units
     enter_units(qtbot, dialog, VALID_UNITS)
@@ -662,7 +717,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_add_compon
     enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     # Mimic the user clearing the units box
     enter_units(qtbot, dialog, "")
@@ -681,7 +736,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_c
     enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     # Mimic the user giving invalid units input
     enter_units(qtbot, dialog, INVALID_UNITS)
@@ -944,7 +999,10 @@ def enter_component_name(
 
 
 def enter_file_path(
-    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, file_path: str
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    file_path: str,
+    file_contents: str,
 ):
     """
     Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
@@ -959,7 +1017,7 @@ def enter_file_path(
     ):
         with patch(
             "nexus_constructor.geometry.geometry_loader.open",
-            mock_open(read_data=VALID_OFF_FILE),
+            mock_open(read_data=file_contents),
         ):
             systematic_button_press(qtbot, dialog.fileBrowseButton)
 

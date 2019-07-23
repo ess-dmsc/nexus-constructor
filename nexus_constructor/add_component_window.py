@@ -247,6 +247,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if filename != self.cad_file_name:
             self.fileLineEdit.setText(filename)
             self.cad_file_name = filename
+        else:
+            return
 
         _, _, pixel_mapping_condition = self.pixel_options_conditions()
 
