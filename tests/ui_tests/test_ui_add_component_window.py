@@ -46,7 +46,7 @@ NO_PIXEL_OPTIONS = [
     for comp_with_index in ALL_COMPONENT_TYPES
     if comp_with_index[0] not in component_type.PIXEL_COMPONENT_TYPES
 ]
-GEOMETRY_BUTTONS = ["No Geometry", "Mesh", "Cylinder"]
+GEOMETRY_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
 VALID_OFF_FILE = (
     "OFF\n"
@@ -790,7 +790,7 @@ def get_geometry_button(dialog: AddComponentDialog, button_name: str):
     :param button_name: The name of the desired button.
     :return: The QRadioButton for the given geometry type.
     """
-    for child in dialog.geometryTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
+    for child in dialog.ShapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
         if child.text() == button_name:
             return child
 
@@ -808,7 +808,7 @@ def make_pixel_options_disappear(
     :param template: The window/widget that holds the AddComponentDialog.
     :param component_index: The index of a component type.
     """
-    systematic_button_press(qtbot, dialog.noGeometryRadioButton)
+    systematic_button_press(qtbot, dialog.noShapeRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(component_index)
     show_and_close_window(qtbot, template)
 
@@ -914,8 +914,7 @@ def find_button_press_position(button: QAbstractButton):
             click_point = QPoint(x, y)
             if button.hitButton(click_point):
                 return click_point
-    print(width, height)
-    return None
+    return QPoint(5,5)
 
 
 def enter_component_name(
