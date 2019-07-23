@@ -51,6 +51,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
         self.possible_fields = []
+        self.component_to_edit = component_to_edit
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -139,6 +140,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.on_nx_class_changed()
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
+
+        if self.component_to_edit:
+            self.nameLineEdit.setText(self.component_to_edit.name)
+            self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
+            self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
 
     def add_field(self):
         item = QListWidgetItem()

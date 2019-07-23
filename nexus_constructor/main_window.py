@@ -118,6 +118,7 @@ class MainWindow(Ui_MainWindow):
             QIcon("ui/edit_component.png"), "Edit Component", self.tab_2
         )
         self.edit_component_action.setEnabled(False)
+        self.edit_component_action.triggered.connect(self.show_edit_component_dialog)
         self.component_tool_bar.addAction(self.edit_component_action)
 
         self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.tab_2)
@@ -125,6 +126,12 @@ class MainWindow(Ui_MainWindow):
         self.delete_action.setEnabled(False)
         self.component_tool_bar.addAction(self.delete_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
+
+    def show_edit_component_dialog(self):
+        selected_component = self.componentTreeView.selectedIndexes()[
+            0
+        ].internalPointer()
+        self.show_add_component_window(selected_component)
 
     def show_entries_dialog(self, map_of_entries: dict, nexus_file: h5py.File):
         """
@@ -303,10 +310,10 @@ class MainWindow(Ui_MainWindow):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
         self.instrument.nexus.open_file(filename)
 
-    def show_add_component_window(self):
+    def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
         self.add_component_window.ui = AddComponentDialog(
-            self.instrument, self.component_model
+            self.instrument, self.component_model, component
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
