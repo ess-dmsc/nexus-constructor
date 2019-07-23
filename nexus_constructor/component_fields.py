@@ -7,12 +7,14 @@ from PySide2.QtWidgets import (
     QDialog,
     QListWidget,
     QMessageBox,
+    QGridLayout,
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
 from nexus_constructor.component import Component
-import numpy as np
+
+from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
     FieldValueValidator,
@@ -62,6 +64,8 @@ class FieldWidget(QFrame):
     def __init__(self, possible_field_names: List[str], parent: QListWidget = None):
         super(FieldWidget, self).__init__(parent)
 
+        self.edit_dialog = QDialog()
+        self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
 
         self.field_type_combo = QComboBox()
@@ -157,7 +161,7 @@ class FieldWidget(QFrame):
         if self.field_type == FieldType.scalar_dataset:
             return self.value.dtype
         if self.field_type == FieldType.array_dataset:
-            return np.array(self.value).dtype
+            return self.table_view.model.array.dtype
 
     @property
     def value(self):
@@ -165,6 +169,8 @@ class FieldWidget(QFrame):
             return DATASET_TYPE[self.value_type_combo.currentText()](
                 self.value_line_edit.text()
             )
+        elif self.field_type == FieldType.array_dataset:
+            return self.table_view.model.array
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
@@ -199,18 +205,20 @@ class FieldWidget(QFrame):
 
     def show_edit_dialog(self):
         if self.field_type_combo.currentText() == FieldType.array_dataset.value:
-            # TODO: show array edit panel
-            pass
+            self.edit_dialog.setLayout(QGridLayout())
+            self.table_view.model.update_array_dtype(
+                DATASET_TYPE[self.value_type_combo.currentText()]
+            )
+            self.edit_dialog.layout().addWidget(self.table_view)
+            self.edit_dialog.setWindowTitle(
+                f"Edit {self.value_type_combo.currentText()} Array field"
+            )
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             # TODO: show kafka stream panel
-            pass
-        elif self.field_type_combo.currentText() == FieldType.link.value:
-            # TODO: show link panel
             pass
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             # TODO: show nx class panels
             pass
-        self.edit_dialog = QDialog()
         self.edit_dialog.show()
 
 

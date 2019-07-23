@@ -674,6 +674,30 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_default_values_are_correct(qtb
     assert dialog.cylinderZLineEdit.value() == 1.0
 
 
+def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_is_shown(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    field.field_type_combo.setCurrentIndex(2)
+    qtbot.addWidget(field)
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+    assert field.edit_dialog.isEnabled()
+
+
+def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_table_is_shown(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    field.field_type_combo.setCurrentIndex(2)
+    qtbot.addWidget(field)
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+    assert field.table_view.isEnabled()
+
+
 def show_window_and_wait_for_interaction(
     qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
 ):
