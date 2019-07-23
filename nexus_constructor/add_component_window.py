@@ -104,7 +104,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        name_validator = NameValidator(self.instrument.get_component_list())
+        component_list = self.instrument.get_component_list()
+
+        if self.component_to_edit:
+            for item in component_list:
+                if item.name == self.component_to_edit.name:
+                    component_list.remove(item)
+
+        name_validator = NameValidator(component_list)
         self.nameLineEdit.setValidator(name_validator)
         self.nameLineEdit.validator().is_valid.connect(
             partial(
@@ -147,19 +154,30 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
         if self.component_to_edit:
-            self.nameLineEdit.setText(self.component_to_edit.name)
-            self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
-            self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
-            component_shape = self.component_to_edit.get_shape()
-            if not component_shape or isinstance(component_shape, OFFGeometryNoNexus):
-                self.noShapeRadioButton.setChecked(True)
-                self.noShapeRadioButton.clicked.emit()
-            elif isinstance(component_shape, OFFGeometry):
+            self._fill_existing_entries()
+
+    def _fill_existing_entries(self):
+        self.buttonBox.setText("Edit Component")
+        self.nameLineEdit.setText(self.component_to_edit.name)
+        self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
+        self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
+        component_shape = self.component_to_edit.get_shape()
+        if not component_shape or isinstance(component_shape, OFFGeometryNoNexus):
+            self.noShapeRadioButton.setChecked(True)
+            self.noShapeRadioButton.clicked.emit()
+        else:
+            if isinstance(component_shape, OFFGeometry):
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
             elif isinstance(component_shape, CylindricalGeometry):
                 self.CylinderRadioButton.clicked.emit()
                 self.CylinderRadioButton.setChecked(True)
+                self.cylinderHeightLineEdit.setValue(component_shape.height)
+                self.cylinderRadiusLineEdit.setValue(component_shape.radius)
+                self.cylinderXLineEdit.setValue(component_shape.axis_direction.x())
+                self.cylinderYLineEdit.setValue(component_shape.axis_direction.y())
+                self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
+            self.unitsLineEdit.setText(component_shape.units)
 
     def add_field(self):
         item = QListWidgetItem()
