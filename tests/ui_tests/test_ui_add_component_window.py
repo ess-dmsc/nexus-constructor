@@ -1019,7 +1019,11 @@ def enter_file_path(
             "nexus_constructor.geometry.geometry_loader.open",
             mock_open(read_data=file_contents),
         ):
-            systematic_button_press(qtbot, dialog.fileBrowseButton)
+            with patch(
+                "nexus_constructor.add_component_window.open",
+                mock_open(read_data=file_contents),
+            ):
+                systematic_button_press(qtbot, dialog.fileBrowseButton)
 
 
 def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
