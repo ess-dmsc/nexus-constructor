@@ -112,7 +112,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QGroupBox" name="ShapeTypeBox">
+         <widget class="QGroupBox" name="shapeTypeBox">
           <property name="title">
            <string>Shape type:</string>
           </property>
@@ -335,7 +335,7 @@
               <item>
                <widget class="QLineEdit" name="fileLineEdit">
                 <property name="readOnly">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

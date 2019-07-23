@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Tue Jul 23 10:24:26 2019
+# Created: Tue Jul 23 13:10:14 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
         AddComponentDialog.setObjectName("AddComponentDialog")
-        AddComponentDialog.resize(1177, 919)
+        AddComponentDialog.resize(1177, 1051)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -78,20 +78,20 @@ class Ui_AddComponentDialog(object):
         self.componentTypeComboBox.setObjectName("componentTypeComboBox")
         self.horizontalLayout_4.addWidget(self.componentTypeComboBox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
-        self.ShapeTypeBox = QtWidgets.QGroupBox(self.widget)
-        self.ShapeTypeBox.setObjectName("ShapeTypeBox")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.ShapeTypeBox)
+        self.shapeTypeBox = QtWidgets.QGroupBox(self.widget)
+        self.shapeTypeBox.setObjectName("shapeTypeBox")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.shapeTypeBox)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.noShapeRadioButton = QtWidgets.QRadioButton(self.ShapeTypeBox)
+        self.noShapeRadioButton = QtWidgets.QRadioButton(self.shapeTypeBox)
         self.noShapeRadioButton.setObjectName("noShapeRadioButton")
         self.horizontalLayout.addWidget(self.noShapeRadioButton)
-        self.meshRadioButton = QtWidgets.QRadioButton(self.ShapeTypeBox)
+        self.meshRadioButton = QtWidgets.QRadioButton(self.shapeTypeBox)
         self.meshRadioButton.setObjectName("meshRadioButton")
         self.horizontalLayout.addWidget(self.meshRadioButton)
-        self.CylinderRadioButton = QtWidgets.QRadioButton(self.ShapeTypeBox)
+        self.CylinderRadioButton = QtWidgets.QRadioButton(self.shapeTypeBox)
         self.CylinderRadioButton.setObjectName("CylinderRadioButton")
         self.horizontalLayout.addWidget(self.CylinderRadioButton)
-        self.verticalLayout_2.addWidget(self.ShapeTypeBox)
+        self.verticalLayout_2.addWidget(self.shapeTypeBox)
         self.shapeOptionsBox = QtWidgets.QGroupBox(self.widget)
         self.shapeOptionsBox.setObjectName("shapeOptionsBox")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.shapeOptionsBox)
@@ -178,7 +178,7 @@ class Ui_AddComponentDialog(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.geometryFileBox)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.fileLineEdit = QtWidgets.QLineEdit(self.geometryFileBox)
-        self.fileLineEdit.setReadOnly(False)
+        self.fileLineEdit.setReadOnly(True)
         self.fileLineEdit.setObjectName("fileLineEdit")
         self.horizontalLayout_2.addWidget(self.fileLineEdit)
         self.fileBrowseButton = QtWidgets.QPushButton(self.geometryFileBox)
@@ -286,7 +286,7 @@ class Ui_AddComponentDialog(object):
         self.label.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Name:", None, -1))
         self.label_2.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Description:", None, -1))
         self.label_3.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Component type:", None, -1))
-        self.ShapeTypeBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Shape type:", None, -1))
+        self.shapeTypeBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Shape type:", None, -1))
         self.noShapeRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No Shape", None, -1))
         self.meshRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Mesh", None, -1))
         self.CylinderRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1))

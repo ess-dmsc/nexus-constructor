@@ -297,7 +297,7 @@ def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list
     )
     systematic_button_press(qtbot, dialog.entireShapeRadioButton)
 
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH, VALID_OFF_FILE)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     assert dialog.pixelMappingListWidget.count() == 6
 
@@ -391,7 +391,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_geometry_THEN_add_
     show_and_close_window(qtbot, template)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH, VALID_OFF_FILE)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     # Mimic the user entering valid units
     enter_units(qtbot, dialog, VALID_UNITS)
@@ -511,9 +511,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     show_and_close_window(qtbot, template)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH, VALID_OFF_FILE)
-
-    # show_window_and_wait_for_interaction(qtbot, template)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
     show_and_close_window(qtbot, template)
 
@@ -532,6 +530,8 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 
     # Mimic the user entering a valid file name
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+
+    show_window_and_wait_for_interaction(qtbot, template)
 
     show_and_close_window(qtbot, template)
 
@@ -642,6 +642,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_geometry_THEN_add_
 
     # Mimic the user entering a valid file name
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+
 
     # Mimic the user giving valid units
     enter_units(qtbot, dialog, VALID_UNITS)
@@ -796,7 +797,7 @@ def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
     :param button_name: The name of the desired button.
     :return: The QRadioButton for the given shape type.
     """
-    for child in dialog.ShapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
+    for child in dialog.shapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
         if child.text() == button_name:
             return child
 
@@ -921,7 +922,8 @@ def find_button_press_position(button: QAbstractButton):
             click_point = QPoint(x, y)
             if button.hitButton(click_point):
                 return click_point
-    return QPoint(5, 5)
+    # return QPoint(5, 5)
+    return None
 
 
 def enter_component_name(
@@ -942,7 +944,6 @@ def enter_file_path(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
     file_path: str,
-    file_contents: str = "OFF",
 ):
     """
     Mimics the user entering a file path. Clicks on the text field and enters a given file path. Also sets the
@@ -952,14 +953,15 @@ def enter_file_path(
     :param file_path: The desired file path.
     :param file_contents: The file contents that are returned by the open mock.
     """
-    dialog.fileBrowseButton.show()
+    print(find_button_press_position(dialog.fileBrowseButton))
     with patch(
         "nexus_constructor.add_component_window.file_dialog", return_value=file_path
     ):
         with patch(
             "nexus_constructor.geometry.geometry_loader.open",
-            mock_open(read_data=file_contents),
+            mock_open(read_data=VALID_OFF_FILE),
         ):
+            print("Pressing fileBrowseButton")
             systematic_button_press(qtbot, dialog.fileBrowseButton)
 
 
