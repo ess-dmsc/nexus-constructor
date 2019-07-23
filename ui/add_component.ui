@@ -341,6 +341,18 @@
               </item>
               <item>
                <widget class="QPushButton" name="fileBrowseButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>1</width>
+                  <height>1</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Browse...</string>
                 </property>

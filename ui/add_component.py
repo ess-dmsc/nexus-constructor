@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Tue Jul 23 13:21:04 2019
+# Created: Tue Jul 23 16:12:30 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -182,6 +182,12 @@ class Ui_AddComponentDialog(object):
         self.fileLineEdit.setObjectName("fileLineEdit")
         self.horizontalLayout_2.addWidget(self.fileLineEdit)
         self.fileBrowseButton = QtWidgets.QPushButton(self.geometryFileBox)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.fileBrowseButton.sizePolicy().hasHeightForWidth())
+        self.fileBrowseButton.setSizePolicy(sizePolicy)
+        self.fileBrowseButton.setMinimumSize(QtCore.QSize(1, 1))
         self.fileBrowseButton.setObjectName("fileBrowseButton")
         self.horizontalLayout_2.addWidget(self.fileBrowseButton)
         self.gridLayout_2.addWidget(self.geometryFileBox, 1, 0, 1, 1)

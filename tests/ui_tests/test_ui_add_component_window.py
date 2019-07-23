@@ -479,6 +479,8 @@ def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_geometr
     # Mimic the user selecting a mesh geometry
     systematic_button_press(qtbot, dialog.meshRadioButton)
 
+    enter_component_name(qtbot, dialog, "")
+
     # Mimic the user entering a bad file path
     enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH)
 
@@ -525,6 +527,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_add_component_button_is_enabled(
     qtbot, template, dialog
 ):
+
     # Mimic the user selecting a mesh geometry
     systematic_button_press(qtbot, dialog.meshRadioButton)
 
@@ -533,8 +536,6 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
 
     # Mimic the user entering a valid file name
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
-
-    show_window_and_wait_for_interaction(qtbot, template)
 
     show_and_close_window(qtbot, template)
 
@@ -927,7 +928,6 @@ def find_button_press_position(button: QAbstractButton):
             click_point = QPoint(x, y)
             if button.hitButton(click_point):
                 return click_point
-    # return QPoint(5, 5)
     return None
 
 
@@ -956,7 +956,6 @@ def enter_file_path(
     :param file_path: The desired file path.
     :param file_contents: The file contents that are returned by the open mock.
     """
-    print(find_button_press_position(dialog.fileBrowseButton))
     with patch(
         "nexus_constructor.add_component_window.file_dialog", return_value=file_path
     ):
@@ -964,7 +963,6 @@ def enter_file_path(
             "nexus_constructor.geometry.geometry_loader.open",
             mock_open(read_data=VALID_OFF_FILE),
         ):
-            print("Pressing fileBrowseButton")
             systematic_button_press(qtbot, dialog.fileBrowseButton)
 
 

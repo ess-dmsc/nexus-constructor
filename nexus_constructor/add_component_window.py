@@ -243,7 +243,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         pixel mapping box is visible.
         :return: None
         """
-        print("Calling mesh file picker.")
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
         if filename != self.cad_file_name:
             self.fileLineEdit.setText(filename)
