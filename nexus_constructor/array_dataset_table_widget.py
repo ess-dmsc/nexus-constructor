@@ -19,14 +19,14 @@ from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import NumpyDTypeValidator
 
 
-class TableWidget(QWidget):
+class ArrayDatasetTableWidget(QWidget):
     """
     Wrapper over a QTableView with buttons to add and delete rows/columns
     """
 
     def __init__(self, type: np.dtype = np.byte, parent=None):
         super().__init__(parent)
-        self.model = TableModel(dtype=type, parent=self)
+        self.model = ArrayDatasetTableModel(dtype=type, parent=self)
         self.view = QTableView()
         self.view.setModel(self.model)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -54,8 +54,8 @@ class TableWidget(QWidget):
         self.layout().addWidget(self.view)
 
 
-class TableModel(QAbstractTableModel):
-    def __init__(self, dtype: np.dtype, parent: TableWidget):
+class ArrayDatasetTableModel(QAbstractTableModel):
+    def __init__(self, dtype: np.dtype, parent: ArrayDatasetTableWidget):
         super().__init__()
         self.setParent(parent)
         self.array = np.array([[0]], dtype=dtype)
@@ -128,7 +128,7 @@ class TableModel(QAbstractTableModel):
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         return (
-            super(TableModel, self).flags(index)
+            super(ArrayDatasetTableModel, self).flags(index)
             | Qt.ItemIsEditable
             | Qt.ItemIsEnabled
             | Qt.ItemIsSelectable

@@ -14,7 +14,7 @@ from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
 from nexus_constructor.component import Component
 
-from nexus_constructor.table_widget import TableWidget
+from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
     FieldValueValidator,
@@ -65,7 +65,7 @@ class FieldWidget(QFrame):
         super(FieldWidget, self).__init__(parent)
 
         self.edit_dialog = QDialog()
-        self.table_view = TableWidget()
+        self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
 
         self.field_type_combo = QComboBox()
