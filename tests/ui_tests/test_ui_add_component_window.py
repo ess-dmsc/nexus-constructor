@@ -46,7 +46,7 @@ NO_PIXEL_OPTIONS = [
     for comp_with_index in ALL_COMPONENT_TYPES
     if comp_with_index[0] not in component_type.PIXEL_COMPONENT_TYPES
 ]
-GEOMETRY_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
+SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
 VALID_OFF_FILE = (
     "OFF\n"
@@ -109,7 +109,7 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
     window.add_component_window.close()
 
 
-def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options_are_hidden(
+def test_UI_GIVEN_no_shape_WHEN_selecting_shape_type_THEN_shape_options_are_hidden(
     qtbot, template, dialog
 ):
 
@@ -117,16 +117,16 @@ def test_UI_GIVEN_no_geometry_WHEN_selecting_geometry_type_THEN_geometry_options
     assert not dialog.shapeOptionsBox.isVisible()
 
 
-@pytest.mark.parametrize("geometry_button_name", GEOMETRY_BUTTONS)
-def test_UI_GIVEN_nothing_WHEN_changing_component_geometry_type_THEN_add_component_button_is_always_disabled(
-    qtbot, template, dialog, geometry_button_name
+@pytest.mark.parametrize("shape_button_name", SHAPE_TYPE_BUTTONS)
+def test_UI_GIVEN_nothing_WHEN_changing_component_shape_type_THEN_add_component_button_is_always_disabled(
+    qtbot, template, dialog, shape_button_name
 ):
 
-    systematic_button_press(qtbot, get_geometry_button(dialog, geometry_button_name))
+    systematic_button_press(qtbot, get_shape_type_button(dialog, shape_button_name))
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
+def test_UI_GIVEN_cylinder_shape_WHEN_selecting_shape_type_THEN_relevant_fields_are_shown(
     qtbot, template, dialog
 ):
 
@@ -135,7 +135,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     assert not dialog.cylinderOptionsBox.isVisible()
     assert not dialog.unitsbox.isVisible()
 
-    # Click on the cylinder geometry button
+    # Click on the cylinder shape button
     systematic_button_press(qtbot, dialog.CylinderRadioButton)
     show_and_close_window(qtbot, template)
 
@@ -145,7 +145,7 @@ def test_UI_GIVEN_cylinder_geometry_WHEN_selecting_geometry_type_THEN_relevant_f
     assert dialog.unitsbox.isVisible()
 
 
-def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_fields_are_shown(
+def test_UI_GIVEN_mesh_shape_WHEN_selecting_shape_type_THEN_relevant_fields_are_shown(
     qtbot, template, dialog
 ):
 
@@ -154,7 +154,7 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     assert not dialog.cylinderOptionsBox.isVisible()
     assert not dialog.unitsbox.isVisible()
 
-    # Click on the mesh geometry button
+    # Click on the mesh shape button
     systematic_button_press(qtbot, dialog.meshRadioButton)
 
     show_and_close_window(qtbot, template)
@@ -165,12 +165,12 @@ def test_UI_GIVEN_mesh_geometry_WHEN_selecting_geometry_type_THEN_relevant_field
     assert dialog.geometryFileBox.isVisible()
 
 
-@pytest.mark.parametrize("geometry_with_units", GEOMETRY_BUTTONS[1:])
-def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_are_metres(
-    qtbot, template, dialog, geometry_with_units
+@pytest.mark.parametrize("shape_with_units", SHAPE_TYPE_BUTTONS[1:])
+def test_UI_GIVEN_nothing_WHEN_choosing_shape_with_units_THEN_default_units_are_metres(
+    qtbot, template, dialog, shape_with_units
 ):
 
-    systematic_button_press(qtbot, get_geometry_button(dialog, geometry_with_units))
+    systematic_button_press(qtbot, get_shape_type_button(dialog, shape_with_units))
     show_and_close_window(qtbot, template)
     assert dialog.unitsLineEdit.isVisible()
     assert dialog.unitsLineEdit.text() == "m"
@@ -178,11 +178,11 @@ def test_UI_GIVEN_nothing_WHEN_choosing_geometry_with_units_THEN_default_units_a
 
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 @pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
-@pytest.mark.parametrize("pixel_geometry_name", GEOMETRY_BUTTONS[1:])
-def test_UI_GIVEN_class_and_geometry_with_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_invisible_to_visible(
-    qtbot, template, dialog, pixel_options, any_component_type, pixel_geometry_name
+@pytest.mark.parametrize("pixel_shape_name", SHAPE_TYPE_BUTTONS[1:])
+def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_invisible_to_visible(
+    qtbot, template, dialog, pixel_options, any_component_type, pixel_shape_name
 ):
-    pixel_geometry_button = get_geometry_button(dialog, pixel_geometry_name)
+    pixel_shape_button = get_shape_type_button(dialog, pixel_shape_name)
 
     # Change the pixel options to invisible
     make_pixel_options_disappear(qtbot, dialog, template, any_component_type[1])
@@ -190,18 +190,18 @@ def test_UI_GIVEN_class_and_geometry_with_pixel_fields_WHEN_adding_component_THE
 
     # Change the pixel options to visible
     make_pixel_options_appear(
-        qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
+        qtbot, pixel_shape_button, dialog, template, pixel_options[1]
     )
     assert dialog.pixelOptionsBox.isVisible()
 
 
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 @pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
-@pytest.mark.parametrize("pixel_geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("pixel_geometry_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_and_geometry_without_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_visible_to_invisible(
     qtbot, template, dialog, pixel_options, any_component_type, pixel_geometry_name
 ):
-    pixel_geometry_button = get_geometry_button(dialog, pixel_geometry_name)
+    pixel_geometry_button = get_shape_type_button(dialog, pixel_geometry_name)
 
     # Change the pixel options to visible
     make_pixel_options_appear(
@@ -216,11 +216,11 @@ def test_UI_GIVEN_class_and_geometry_without_pixel_fields_WHEN_adding_component_
 
 @pytest.mark.parametrize("no_pixel_options", NO_PIXEL_OPTIONS)
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
-@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("geometry_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_or_cylinder_geometry_THEN_pixel_options_becomes_invisible(
     qtbot, template, dialog, no_pixel_options, pixel_options, geometry_name
 ):
-    geometry_button = get_geometry_button(dialog, geometry_name)
+    geometry_button = get_shape_type_button(dialog, geometry_name)
 
     # Make the pixel options become visible
     make_pixel_options_appear(
@@ -233,12 +233,12 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
     assert not dialog.pixelOptionsBox.isVisible()
 
 
-@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("geometry_name", SHAPE_TYPE_BUTTONS[1:])
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_single_pixel_is_selected_and_visible_by_default(
     qtbot, template, dialog, geometry_name, pixel_options
 ):
-    pixel_geometry_button = get_geometry_button(dialog, geometry_name)
+    pixel_geometry_button = get_shape_type_button(dialog, geometry_name)
     make_pixel_options_appear(
         qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
     )
@@ -249,12 +249,12 @@ def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_si
     assert not dialog.pixelMappingLabel.isVisible()
 
 
-@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("geometry_name", SHAPE_TYPE_BUTTONS[1:])
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible(
     qtbot, template, dialog, geometry_name, pixel_options
 ):
-    pixel_geometry_button = get_geometry_button(dialog, geometry_name)
+    pixel_geometry_button = get_shape_type_button(dialog, geometry_name)
     make_pixel_options_appear(
         qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
     )
@@ -267,12 +267,12 @@ def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixe
     assert not dialog.pixelGridBox.isVisible()
 
 
-@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("geometry_name", SHAPE_TYPE_BUTTONS[1:])
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_visible(
     qtbot, template, dialog, geometry_name, pixel_options
 ):
-    pixel_geometry_button = get_geometry_button(dialog, geometry_name)
+    pixel_geometry_button = get_shape_type_button(dialog, geometry_name)
     make_pixel_options_appear(
         qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
     )
@@ -286,18 +286,22 @@ def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_p
     assert not dialog.pixelMappingLabel.isVisible()
 
 
-@pytest.mark.parametrize("geometry_name", GEOMETRY_BUTTONS[1:])
+@pytest.mark.parametrize("geometry_name", SHAPE_TYPE_BUTTONS[1:])
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_is_populated(
     qtbot, template, dialog, geometry_name, pixel_options
 ):
-    pixel_geometry_button = get_geometry_button(dialog, geometry_name)
+    pixel_geometry_button = get_shape_type_button(dialog, geometry_name)
     make_pixel_options_appear(
         qtbot, pixel_geometry_button, dialog, template, pixel_options[1]
     )
     systematic_button_press(qtbot, dialog.entireShapeRadioButton)
 
+    show_window_and_wait_for_interaction(qtbot, template)
+
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH, VALID_OFF_FILE)
+
+    show_window_and_wait_for_interaction(qtbot, template)
 
     assert dialog.pixelMappingListWidget.count() == 6
 
@@ -306,6 +310,7 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
     qtbot
 ):
     pass
+
 
 def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
     qtbot
@@ -507,9 +512,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_geometry_THEN_
     # Mimic the user entering a valid file name
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
 
-    print(find_button_press_position(dialog.fileBrowseButton))
-
-    # show_window_and_wait_for_interaction(qtbot, template)
+    show_window_and_wait_for_interaction(qtbot, template)
 
     show_and_close_window(qtbot, template)
 
@@ -748,6 +751,7 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_default_values_are_correct(
     assert dialog.cylinderYLineEdit.value() == 0.0
     assert dialog.cylinderZLineEdit.value() == 1.0
 
+
 def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_is_shown(
     qtbot, template, dialog
 ):
@@ -776,6 +780,7 @@ def cleanup(request):
     Creates a QtBot at the end of all the tests and has it wait. This seems to be necessary in order to prevent
     the use of fixtures from causing a segmentation fault.
     """
+
     def make_another_qtest():
         bot = QtBot(request)
         bot.wait(1)
@@ -783,12 +788,12 @@ def cleanup(request):
     request.addfinalizer(make_another_qtest)
 
 
-def get_geometry_button(dialog: AddComponentDialog, button_name: str):
+def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
     """
-    Finds the geometry button that contains the given text.
+    Finds the shape type button that contains the given text.
     :param dialog: An instance of an AddComponentDialog.
     :param button_name: The name of the desired button.
-    :return: The QRadioButton for the given geometry type.
+    :return: The QRadioButton for the given shape type.
     """
     for child in dialog.ShapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
         if child.text() == button_name:
@@ -831,6 +836,7 @@ def make_pixel_options_appear(
     systematic_button_press(qtbot, button)
     dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
     show_and_close_window(qtbot, template)
+
 
 def show_window_and_wait_for_interaction(
     qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
@@ -914,7 +920,7 @@ def find_button_press_position(button: QAbstractButton):
             click_point = QPoint(x, y)
             if button.hitButton(click_point):
                 return click_point
-    return QPoint(5,5)
+    return QPoint(5, 5)
 
 
 def enter_component_name(
@@ -945,17 +951,15 @@ def enter_file_path(
     :param file_path: The desired file path.
     :param file_contents: The file contents that are returned by the open mock.
     """
-    # with patch(
-    #     "nexus_constructor.add_component_window.file_dialog", return_value=file_path
-    # ):
-    #     with patch(
-    #         "nexus_constructor.geometry.geometry_loader.open",
-    #         mock_open(read_data=file_contents),
-    #     ):
-    #         systematic_button_press(qtbot, dialog.fileBrowseButton)
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, file_path)
-    dialog.cad_file_name = file_path
+    dialog.fileBrowseButton.show()
+    with patch(
+        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
+    ):
+        with patch(
+            "nexus_constructor.geometry.geometry_loader.open",
+            mock_open(read_data=file_contents),
+        ):
+            systematic_button_press(qtbot, dialog.fileBrowseButton)
 
 
 def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):

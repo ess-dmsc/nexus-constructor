@@ -64,7 +64,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
 
-        self.geometry_file_name = None
+        self.cad_file_name = None
         self.pixel_mapping_widgets = []
 
         self.possible_fields = []
@@ -243,8 +243,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         pixel mapping box is visible.
         :return: None
         """
+        print("Calling mesh file picker.")
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
-        if filename != self.geometry_file_name:
+        if filename != self.cad_file_name:
             self.fileLineEdit.setText(filename)
             self.cad_file_name = filename
 
@@ -408,12 +409,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
         """
         # Don't do this if a file hasn't been selected yet.
-        if not self.geometry_file_name:
+        if not self.cad_file_name:
             return
 
         n_faces = None
 
-        with open(self.geometry_file_name) as temp_off_file:
+        with open(self.cad_file_name) as temp_off_file:
             faces = parse_off_file(temp_off_file)[1]
             n_faces = len(faces)
 
