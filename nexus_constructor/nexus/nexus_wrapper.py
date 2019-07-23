@@ -155,6 +155,18 @@ class NexusWrapper(QObject):
         self._emit_file()
         return group
 
+    def duplicate_nx_group(
+        self, group_to_duplicate: h5py.Group, new_group_name: str
+    ) -> h5py.Group:
+
+        group_to_duplicate.copy(
+            dest=group_to_duplicate.parent,
+            source=group_to_duplicate,
+            name=new_group_name,
+        )
+        self._emit_file()
+        return group_to_duplicate.parent[new_group_name]
+
     def set_nx_class(self, group: h5py.Group, nx_class: str):
         group.attrs["NX_class"] = nx_class
         self._emit_file()
@@ -187,6 +199,9 @@ class NexusWrapper(QObject):
         if dtype is str:
             dtype = f"|S{len(value)}"
             value = np.array(value).astype(dtype)
+
+        if dtype == np.object:
+            dtype = h5py.special_dtype(vlen=str)
 
         if name in group:
             if dtype is None or group[name].dtype == dtype:

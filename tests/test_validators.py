@@ -8,11 +8,13 @@ from nexus_constructor.validators import (
     FieldType,
     GeometryFileValidator,
     OkValidator,
+    NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
 )
 import attr
 from PySide2.QtGui import QValidator
 from mock import Mock
+import numpy as np
 
 
 @attr.s
@@ -249,6 +251,37 @@ def test_GIVEN_invalid_file_WHEN_using_ok_validator_WITH_mesh_button_unchecked_T
     mock_mesh_button.isChecked = Mock(return_value=False)
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
     validator.set_file_valid(False)
+
+
+def test_GIVEN_no_input_WHEN_using_numpy_validator_with_byte_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.byte)
+    validator.is_valid = Mock()
+
+    assert validator.validate("", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_valid_input_WHEN_using_numpy_validator_with_integer_as_dtype_THEN_true_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.intc)
+    validator.is_valid = Mock()
+
+    assert validator.validate("1", 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_floating_point_value_WHEN_using_numpy_validator_with_integer_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.intc)
+    validator.is_valid = Mock()
+
+    assert validator.validate("1.2", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_alphabetical_chars_WHEN_using_numpy_validator_with_float_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.float)
+    validator.is_valid = Mock()
+
+    assert validator.validate("test", 0) == QValidator.Intermediate
 
 
 def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
