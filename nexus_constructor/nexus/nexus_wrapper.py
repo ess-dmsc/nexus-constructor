@@ -141,9 +141,8 @@ class NexusWrapper(QObject):
         self._emit_file()
         return group
 
-    @staticmethod
     def duplicate_nx_group(
-        group_to_duplicate: h5py.Group, new_group_name: str
+        self, group_to_duplicate: h5py.Group, new_group_name: str
     ) -> h5py.Group:
 
         group_to_duplicate.copy(
@@ -151,6 +150,7 @@ class NexusWrapper(QObject):
             source=group_to_duplicate,
             name=new_group_name,
         )
+        self._emit_file()
         return group_to_duplicate.parent[new_group_name]
 
     @staticmethod
