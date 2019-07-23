@@ -4,7 +4,12 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
-from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
+from nexus_constructor.geometry import (
+    OFFGeometry,
+    OFFGeometryNoNexus,
+    NoShapeGeometry,
+    CylindricalGeometry,
+)
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
@@ -145,6 +150,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.nameLineEdit.setText(self.component_to_edit.name)
             self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
             self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
+            component_shape = self.component_to_edit.get_shape()
+            if not component_shape or isinstance(component_shape, OFFGeometryNoNexus):
+                self.noShapeRadioButton.setChecked(True)
+                self.noShapeRadioButton.clicked.emit()
+            elif isinstance(component_shape, OFFGeometry):
+                self.meshRadioButton.setChecked(True)
+                self.meshRadioButton.clicked.emit()
+            elif isinstance(component_shape, CylindricalGeometry):
+                self.CylinderRadioButton.clicked.emit()
+                self.CylinderRadioButton.setChecked(True)
 
     def add_field(self):
         item = QListWidgetItem()
