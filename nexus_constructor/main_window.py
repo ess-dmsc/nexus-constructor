@@ -1,3 +1,4 @@
+from PySide2.QtCore import QObject
 from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
@@ -24,7 +25,7 @@ NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
-class MainWindow(Ui_MainWindow):
+class MainWindow(Ui_MainWindow, QObject):
     def __init__(self, instrument: Instrument):
         super().__init__()
         self.instrument = instrument
@@ -313,7 +314,7 @@ class MainWindow(Ui_MainWindow):
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
         self.add_component_window.ui = AddComponentDialog(
-            self.instrument, self.component_model, component
+            self.instrument, self.component_model, component, parent=self
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()

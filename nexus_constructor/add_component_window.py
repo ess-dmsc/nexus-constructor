@@ -47,8 +47,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         instrument: Instrument,
         component_model: ComponentTreeModel,
         component_to_edit: Component = None,
+        parent=None,
     ):
         super(AddComponentDialog, self).__init__()
+        if parent:
+            self.setParent(parent)
         self.instrument = instrument
         self.component_model = component_model
         self.geometry_model = None
@@ -180,6 +183,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
             self.unitsLineEdit.setText(component_shape.units)
 
+        # TODO: fields
+
     def add_field(self):
         item = QListWidgetItem()
         field = FieldWidget(self.possible_fields, self.fieldsListWidget)
@@ -277,6 +282,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             component.set_off_shape(geometry_model)
         else:
             geometry_model = NoShapeGeometry()
+            component.remove_shape()
         return geometry_model
 
     def on_ok(self):
@@ -289,10 +295,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.component_to_edit.nx_class = nx_class
             self.component_to_edit.description = description
             # remove the previous shape from the qt3d view
-            self.parent().sceneWidget().remove_component(
-                self.component_to_edit.name,
-                self.component_to_edit.get_shape().off_geometry,
-            )
+            if self.component_to_edit.get_shape():
+                self.parent().sceneWidget.delete_component(self.component_to_edit.name)
             geometry = self.generate_geometry_model(self.component_to_edit)
         else:
             component = self.instrument.create_component(

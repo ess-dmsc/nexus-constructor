@@ -264,7 +264,7 @@ class Component:
         Sets the shape of the component to be a cylinder
         Overrides any existing shape
         """
-        self._remove_shape()
+        self.remove_shape()
         validate_nonzero_qvector(axis_direction)
         shape_group = self.file.create_nx_group(
             SHAPE_GROUP_NAME, CYLINDRICAL_GEOMETRY_NEXUS_NAME, self.group
@@ -281,7 +281,7 @@ class Component:
         Sets the shape of the component to be a mesh
         Overrides any existing shape
         """
-        self._remove_shape()
+        self.remove_shape()
         shape_group = self.file.create_nx_group(
             SHAPE_GROUP_NAME, OFF_GEOMETRY_NEXUS_NAME, self.group
         )
@@ -298,7 +298,7 @@ class Component:
             if nx_class == OFF_GEOMETRY_NEXUS_NAME:
                 return OFFGeometryNexus(self.file, shape_group)
 
-    def _remove_shape(self):
+    def remove_shape(self):
         if SHAPE_GROUP_NAME in self.group:
             del self.group[SHAPE_GROUP_NAME]
 
