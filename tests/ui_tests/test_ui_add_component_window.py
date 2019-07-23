@@ -3,12 +3,15 @@ import os
 import PySide2
 import pytest
 import pytestqt
-from PySide2.QtCore import Qt, QPoint
+from PySide2.QtCore import Qt, QPoint, QObject
+from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
+from mock import Mock
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
@@ -696,6 +699,109 @@ def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_
     qtbot.addWidget(field)
     qtbot.mouseClick(field.edit_button, Qt.LeftButton)
     assert field.table_view.isEnabled()
+
+
+def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_name"))
+
+    component_model = ComponentTreeModel(instrument)
+
+    name = "test"
+    nx_class = "NXmonitor"
+    desc = "description"
+
+    component = instrument.create_component(
+        name=name, nx_class=nx_class, description=desc
+    )
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component, parent=None
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.nameLineEdit.text() == name
+    assert dialog.descriptionPlainTextEdit.text() == desc
+    assert dialog.componentTypeComboBox.currentText() == nx_class
+
+
+def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_radio_is_checked(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_no_shape"))
+    component_model = ComponentTreeModel(instrument)
+
+    component = instrument.create_component("test", "NXpinhole", "")
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component, parent=None
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.noShapeRadioButton.isChecked()
+
+
+def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_cylinder"))
+    component_model = ComponentTreeModel(instrument)
+
+    component_name = "test"
+
+    component = instrument.create_component(component_name, "NXpinhole", "")
+    component.set_cylinder_shape(QVector3D(1, 1, 1), height=3, radius=4)
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.CylinderRadioButton.isChecked()
+    assert dialog.cylinderOptionsBox.isEnabled()
+
+
+def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_off"))
+    component_model = ComponentTreeModel(instrument)
+
+    component_name = "test"
+
+    component = instrument.create_component(component_name, "NXpinhole", "")
+    component.set_off_shape(
+        OFFGeometryNoNexus(
+            [
+                QVector3D(0.0, 0.0, 1.0),
+                QVector3D(0.0, 1.0, 0.0),
+                QVector3D(0.0, 0.0, 0.0),
+            ],
+            [[0, 1, 2]],
+        )
+    )
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.meshRadioButton.isChecked()
+    assert dialog.fileLineEdit.isEnabled()
+    assert dialog.fileBrowseButton.isEnabled()
 
 
 def show_window_and_wait_for_interaction(
