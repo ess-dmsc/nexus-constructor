@@ -14,45 +14,37 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.setupUi(self)
         self.transformation = transformation
         current_vector = self.transformation.vector
-        self.transformation_frame.xLineEdit.setText(str(current_vector.x()))
-        self.transformation_frame.yLineEdit.setText(str(current_vector.y()))
-        self.transformation_frame.zLineEdit.setText(str(current_vector.z()))
+        self.transformation_frame.xSpinBox.setValue(current_vector.x())
+        self.transformation_frame.ySpinBox.setValue(current_vector.y())
+        self.transformation_frame.zSpinBox.setValue(current_vector.z())
         self.transformation_frame.nameLineEdit.setText(self.transformation.name)
-        self.transformation_frame.valueLineEdit.setText(str(self.transformation.value))
+        self.transformation_frame.valueSpinBox.setValue(self.transformation.value)
         self.disable()
 
     def disable(self):
-        self.transformation_frame.xLineEdit.setEnabled(False)
-        self.transformation_frame.yLineEdit.setEnabled(False)
-        self.transformation_frame.zLineEdit.setEnabled(False)
-        self.transformation_frame.valueLineEdit.setEnabled(False)
+        self.transformation_frame.xSpinBox.setEnabled(False)
+        self.transformation_frame.ySpinBox.setEnabled(False)
+        self.transformation_frame.zSpinBox.setEnabled(False)
+        self.transformation_frame.valueSpinBox.setEnabled(False)
         self.transformation_frame.nameLineEdit.setEnabled(False)
         self.transformation_frame.editButton.setText("Edit")
 
     def enable(self):
-        self.transformation_frame.xLineEdit.setEnabled(True)
-        self.transformation_frame.yLineEdit.setEnabled(True)
-        self.transformation_frame.zLineEdit.setEnabled(True)
-        self.transformation_frame.valueLineEdit.setEnabled(True)
+        self.transformation_frame.xSpinBox.setEnabled(True)
+        self.transformation_frame.ySpinBox.setEnabled(True)
+        self.transformation_frame.zSpinBox.setEnabled(True)
+        self.transformation_frame.valueSpinBox.setEnabled(True)
         self.transformation_frame.nameLineEdit.setEnabled(True)
         self.transformation_frame.editButton.setText("Done")
 
     def saveChanges(self):
         self.transformation.name = self.transformation_frame.nameLineEdit.text()
-        try:
-            self.transformation.vector = QVector3D(
-                float(self.transformation_frame.xLineEdit.text()),
-                float(self.transformation_frame.yLineEdit.text()),
-                float(self.transformation_frame.zLineEdit.text()),
-            )
-        except ValueError as e:
-            print("Unable to convert vectors: " + str(e))
-        try:
-            self.transformation.value = float(
-                self.transformation_frame.valueLineEdit.text()
-            )
-        except ValueError as e:
-            print("Unable to convert length: " + str(e))
+        self.transformation.vector = QVector3D(
+            self.transformation_frame.xSpinBox.value(),
+            self.transformation_frame.ySpinBox.value(),
+            self.transformation_frame.zSpinBox.value(),
+        )
+        self.transformation.value = self.transformation_frame.valueSpinBox.value()
 
 
 class EditTranslation(EditTransformation):
