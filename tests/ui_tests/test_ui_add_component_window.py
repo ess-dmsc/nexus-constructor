@@ -766,6 +766,54 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_c
     assert not dialog.buttonBox.isEnabled()
 
 
+def test_UI_GIVEN_nonunique_name_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
+    qtbot, template, dialog
+):
+
+    # Mimic the user selecting a mesh shape
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+
+    # Mimic the user giving an invalid component name
+    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
+
+    # Mimic the user entering a valid file name
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_cylinder_shape_THEN_add_component_button_is_disabled(
+    qtbot, template, dialog
+):
+
+    # Mimic the user selecting a mesh shape
+    systematic_button_press(qtbot, dialog.CylinderRadioButton)
+
+    # Mimic the user giving valid component name
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Mimic the user giving invalid units input
+    enter_units(qtbot, dialog, INVALID_UNITS)
+
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_GIVEN_invalid_name_WHEN_adding_component_with_cylinder_shape_THEN_add_component_button_is_disabled(
+    qtbot, template, dialog
+):
+
+    # Mimic the user selecting a mesh shape
+    systematic_button_press(qtbot, dialog.CylinderRadioButton)
+
+    # Mimic the user giving valid units input
+    enter_units(qtbot, dialog, VALID_UNITS)
+
+    # Mimic the user giving valid component name
+    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
+
+    assert not dialog.buttonBox.isEnabled()
+
+
 def test_UI_GIVEN_mesh_shape_selected_THEN_relevant_fields_are_visible(
     qtbot, template, dialog
 ):
