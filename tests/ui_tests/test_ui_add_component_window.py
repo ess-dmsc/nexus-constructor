@@ -835,7 +835,6 @@ def test_UI_GIVEN_cylinder_shape_selected_THEN_relevant_fields_are_visible(
 
     # Mimic the user selecting a cylinder shape
     systematic_button_press(qtbot, dialog.CylinderRadioButton)
-
     show_and_close_window(qtbot, template)
 
     assert dialog.shapeOptionsBox.isVisible()
