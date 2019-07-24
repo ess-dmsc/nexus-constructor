@@ -307,9 +307,12 @@ def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixe
 def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_visible(
     qtbot, template, dialog, shape_name, pixel_options
 ):
-    pixel_shape_button = get_shape_type_button(dialog, shape_name)
     make_pixel_options_appear(
-        qtbot, pixel_shape_button, dialog, template, pixel_options[1]
+        qtbot,
+        get_shape_type_button(dialog, shape_name),
+        dialog,
+        template,
+        pixel_options[1],
     )
 
     systematic_button_press(qtbot, dialog.entireShapeRadioButton)
@@ -326,9 +329,12 @@ def test_UI_GIVEN_user_selects_repeatable_grid_WHEN_choosing_pixel_layout_THEN_p
 def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_is_populated(
     qtbot, template, dialog, shape_name, pixel_options
 ):
-    pixel_shape_button = get_shape_type_button(dialog, shape_name)
     make_pixel_options_appear(
-        qtbot, pixel_shape_button, dialog, template, pixel_options[1]
+        qtbot,
+        get_shape_type_button(dialog, shape_name),
+        dialog,
+        template,
+        pixel_options[1],
     )
     systematic_button_press(qtbot, dialog.entireShapeRadioButton)
 
