@@ -17,10 +17,28 @@ class PixelGridDoubleValidator(QDoubleValidator):
     Validator for the row height and column width fields in the pixel grid options. Requires that the input is a float
     greater than zero.
     """
+
+    def __init__(self, corresponding_field):
+
+        super().__init__()
+        self.corresponding_field = corresponding_field
+
+    def value_not_needed(self):
+        return self.corresponding_field.text() in ["0", ""]
+
     def validate(self, input: str, pos: int) -> QValidator.State:
+
+        if input == "":
+            if self.value_not_needed():
+                return QValidator.Acceptable
+            else:
+                return QValidator.Intermediate
+
         try:
             if float(input) == 0:
-                return QValidator.Invalid
+                return QValidator.Intermediate
+            elif self.value_not_needed():
+                return QValidator.Intermediate
             else:
                 return super().validate(input, pos)
         except ValueError:
@@ -31,6 +49,7 @@ class NullableIntValidator(QIntValidator):
     """
     A validator that accepts integers as well as empty input.
     """
+
     def __init__(self, bottom=None, top=None):
 
         super().__init__()

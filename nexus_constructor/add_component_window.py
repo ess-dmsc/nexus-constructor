@@ -174,16 +174,22 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.columnsLineEdit.setValidator(zero_or_greater_int_validator)
         self.firstIDLineEdit.setValidator(zero_or_greater_int_validator)
 
-        double_validator = PixelGridDoubleValidator()
-        double_validator.setNotation(QDoubleValidator.StandardNotation)
-        double_validator.setBottom(0)
-        self.rowHeightLineEdit.setValidator(double_validator)
-        self.columnWidthLineEdit.setValidator(double_validator)
+        row_height_validator = PixelGridDoubleValidator(self.rowLineEdit)
+        row_height_validator.setNotation(QDoubleValidator.StandardNotation)
+        row_height_validator.setBottom(0)
+
+        column_width_validator = PixelGridDoubleValidator(self.columnsLineEdit)
+        column_width_validator.setNotation(QDoubleValidator.StandardNotation)
+        column_width_validator.setBottom(0)
+
+        self.rowHeightLineEdit.setValidator(row_height_validator)
+        self.columnWidthLineEdit.setValidator(column_width_validator)
 
         self.pixelMappingLabel.setVisible(False)
         self.pixelMappingListWidget.setVisible(False)
 
         self.countFirstComboBox.addItems(list(self.count_direction.keys()))
+
 
     def add_field(self):
         item = QListWidgetItem()
@@ -262,7 +268,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
     def pixel_options_conditions(self):
         """
         Determine which of the pixel-related fields need to be visible.
-        :return: Booleans indicating whether the pixel layout, pixel data, pixel grid, and pixel mapping options need to
+        :return: Booleans indicating whether the pixel layout, pixel grid, and pixel mapping options need to
         be made visible.
         """
 

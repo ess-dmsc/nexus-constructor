@@ -461,7 +461,40 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
     validator.is_valid.emit.assert_called_once_with(False)
 
 
-def test_GIVEN_zero_WHEN_validating_pixel_grid_floats_THEN_validation_fails():
+def test_GIVEN_zero_WHEN_validating_pixel_grid_floats_THEN_validator_returns_intermediate():
 
-    validator = PixelGridDoubleValidator()
-    assert validator.validate("0.0000", 0) == QValidator.Invalid
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="1")
+
+    validator = PixelGridDoubleValidator(mock_corresponding_field)
+    assert validator.validate("0.0000", 0) == QValidator.Intermediate
+
+
+@pytest.mark.parametrize("corresponding_value", ["0", ""])
+def test_GIVEN_nothing_WHEN_validating_pixel_grid_floats_and_corresponding_value_is_zero_or_empty_THEN_validator_returns_acceptable(
+    corresponding_value
+):
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value=corresponding_value)
+
+    validator = PixelGridDoubleValidator(mock_corresponding_field)
+    assert validator.validate("", 0) == QValidator.Acceptable
+
+
+def test_GIVEN_nothing_WHEN_validating_pixel_grid_floats_and_corresponding_value_is_not_zero_or_empty_THEN_validator_returns_intermediate():
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="12")
+
+    validator = PixelGridDoubleValidator(mock_corresponding_field)
+    assert validator.validate("", 0) == QValidator.Intermediate
+
+@pytest.mark.parametrize("corresponding_value", ["0", ""])
+def test_GIVEN_float_WHEN_validating_pixel_grid_floats_and_correponding_value_is_zero_or_empty_THEN_validator_returns_intermediate(corresponding_value):
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value=corresponding_value)
+
+    validator = PixelGridDoubleValidator(mock_corresponding_field)
+    assert validator.validate("5.2", 0) == QValidator.Intermediate
