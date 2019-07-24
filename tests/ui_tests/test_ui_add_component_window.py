@@ -1,11 +1,18 @@
 import os
 import sys
+from typing import List
 
 import PySide2
 import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
-from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow, QAbstractButton
+from PySide2.QtWidgets import (
+    QDialog,
+    QRadioButton,
+    QMainWindow,
+    QAbstractButton,
+    QLineEdit,
+)
 from mock import patch, mock_open, Mock
 from pytestqt.qtbot import QtBot
 
@@ -844,7 +851,137 @@ def test_UI_GIVEN_cylinder_shape_selected_THEN_relevant_fields_are_visible(
     assert not dialog.geometryFileBox.isVisible()
 
 
-def test_UI_GIVEN_cylinder_shape_selected_THEN_default_values_are_correct(
+@pytest.mark.parametrize("comp_type_without_pixels", NO_PIXEL_OPTIONS)
+def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_mapping_list_remains_empty(
+    qtbot, template, dialog, comp_type_without_pixels
+):
+
+    # Mimic the user selecting a mesh shape
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    show_and_close_window(qtbot, template)
+
+    # Mimic the user selecting a component type that doesn't have pixel fields
+    dialog.componentTypeComboBox.setCurrentIndex(comp_type_without_pixels[1])
+
+    # Mimic the user giving a valid mesh file
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+
+    # Check that the pixel mapping list is still empty
+    assert dialog.pixelMappingListWidget.count() == 0
+
+
+@pytest.mark.parametrize("shape_with_pixels", SHAPE_TYPE_BUTTONS[1:])
+@pytest.mark.parametrize("comp_type_with_pixels", PIXEL_OPTIONS)
+def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_have_expected_default_values(
+    qtbot, template, dialog, shape_with_pixels, comp_type_with_pixels
+):
+
+    # Make the pixel options appear
+    make_pixel_options_appear(
+        qtbot,
+        get_shape_type_button(dialog, shape_with_pixels),
+        dialog,
+        template,
+        comp_type_with_pixels[1],
+    )
+
+    # Check that the pixel-related fields start out with the expected default values
+    assert dialog.rowLineEdit.text() == "1"
+    assert dialog.columnsLineEdit.text() == "1"
+    assert dialog.rowHeightLineEdit.text() == "1"
+    assert dialog.columnsLineEdit.text() == "1"
+    assert dialog.firstIDLineEdit.text() == "0"
+    assert (
+        dialog.startCountingComboBox.currentText()
+        == list(dialog.initial_count_corner.keys())[0]
+    )
+    assert (
+        dialog.countFirstComboBox.currentText()
+        == list(dialog.count_direction.keys())[0]
+    )
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_invalid_values_WHEN_entering_pixel_grid_options_THEN_background_becomes_red(
+    qtbot, template, dialog
+):
+
+    # Mimic the user selecting a mesh shape
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    show_and_close_window(qtbot, template)
+
+    # Mimic the user selecting a component type with pixel fields available
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    for pixel_grid_line_edit in get_pixel_grid_line_edits(dialog):
+        qtbot.keyClick(pixel_grid_line_edit, Qt.Key_Dollar)
+        assert pixel_grid_line_edit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_invalid_values_WHEN_entering_pixel_grid_options_THEN_add_component_button_is_disabled(
+    qtbot, template, dialog
+):
+
+    # Mimic the user selecting a mesh shape
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    show_and_close_window(qtbot, template)
+
+    # Mimic the user selecting a component type with pixel fields available
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Put a non-integer in oen of the pixel grid line edits
+    qtbot.keyClick(dialog.rowLineEdit, Qt.Key_Dollar)
+
+    # Check that this causes the add component button to become disabled
+    assert not dialog.buttonBox.isEnabled()
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_valid_values_WHEN_entering_pixel_grid_options_THEN_background_becomes_white(
+    qtbot, template, dialog
+):
+
+    # Mimic the user selecting a mesh shape
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    show_and_close_window(qtbot, template)
+
+    # Mimic the user selecting a component type with pixel fields available
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter the number seven in the line edits and check that the background is white
+    for pixel_grid_line_edit in get_pixel_grid_line_edits(dialog):
+        qtbot.keyClick(pixel_grid_line_edit, Qt.Key_Backspace)
+        qtbot.keyClick(pixel_grid_line_edit, Qt.Key_7)
+        assert pixel_grid_line_edit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+
+
+def test_UI_GIVEN_valid_values_WHEN_entering_pixel_grid_options_THEN_add_component_button_is_enabled(
+    qtbot, template, dialog
+):
+
+    # Mimic the user selecting a mesh shape
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    show_and_close_window(qtbot, template)
+
+    # Mimic the user selecting a component type with pixel fields available
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Mimic the user giving a valid mesh file
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+
+    # Mimic the user giving a valid component name
+    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter the number seven in the line edits and check that the background is white
+    for pixel_grid_line_edit in get_pixel_grid_line_edits(dialog):
+        qtbot.keyClick(pixel_grid_line_edit, Qt.Key_Backspace)
+        qtbot.keyClick(pixel_grid_line_edit, Qt.Key_7)
+
+    assert dialog.buttonBox.isEnabled()
+
+
+def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(
     qtbot, template, dialog
 ):
 
@@ -1090,3 +1227,7 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
 
     if len(units) > 0:
         qtbot.keyClicks(dialog.unitsLineEdit, units)
+
+
+def get_pixel_grid_line_edits(dialog: AddComponentDialog) -> List[QLineEdit]:
+    return dialog.pixelGridBox.findChildren(QLineEdit)

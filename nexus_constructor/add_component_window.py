@@ -50,10 +50,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             "Columns": CountDirection.COLUMN,
         }
         self.initial_count_corner = {
-            "Bottom left": Corner.BOTTOM_LEFT,
-            "Bottom right": Corner.BOTTOM_RIGHT,
-            "Top left": Corner.TOP_LEFT,
-            "Top right": Corner.TOP_RIGHT,
+            "Bottom Left": Corner.BOTTOM_LEFT,
+            "Bottom Right": Corner.BOTTOM_RIGHT,
+            "Top Left": Corner.TOP_LEFT,
+            "Top Right": Corner.TOP_RIGHT,
         }
 
         self.instrument = instrument
