@@ -181,6 +181,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelMappingLabel.setVisible(False)
         self.pixelMappingListWidget.setVisible(False)
 
+        self.countFirstComboBox.addItems(list(self.count_direction.keys()))
+
     def add_field(self):
         item = QListWidgetItem()
         field = FieldWidget(self.possible_fields, self.fieldsListWidget)

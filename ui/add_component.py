@@ -3,12 +3,12 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Tue Jul 23 16:12:30 2019
+# Created: Wed Jul 24 13:09:05 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
@@ -27,6 +27,7 @@ class Ui_AddComponentDialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.buttonBox.sizePolicy().hasHeightForWidth())
         self.buttonBox.setSizePolicy(sizePolicy)
+        self.buttonBox.setMinimumSize(QtCore.QSize(104, 23))
         self.buttonBox.setMaximumSize(QtCore.QSize(200, 16777215))
         self.buttonBox.setFocusPolicy(QtCore.Qt.NoFocus)
         self.buttonBox.setLayoutDirection(QtCore.Qt.RightToLeft)
@@ -147,24 +148,27 @@ class Ui_AddComponentDialog(object):
         self.columnsLabel = QtWidgets.QLabel(self.pixelGridBox)
         self.columnsLabel.setObjectName("columnsLabel")
         self.gridLayout_5.addWidget(self.columnsLabel, 1, 0, 1, 1)
-        self.countFirstComboBox = QtWidgets.QComboBox(self.pixelGridBox)
-        self.countFirstComboBox.setObjectName("countFirstComboBox")
-        self.countFirstComboBox.addItem("")
-        self.countFirstComboBox.addItem("")
-        self.gridLayout_5.addWidget(self.countFirstComboBox, 4, 2, 1, 2)
         self.countFirstLabel = QtWidgets.QLabel(self.pixelGridBox)
         self.countFirstLabel.setObjectName("countFirstLabel")
         self.gridLayout_5.addWidget(self.countFirstLabel, 4, 0, 1, 2)
+        self.countingFromLabel = QtWidgets.QLabel(self.pixelGridBox)
+        self.countingFromLabel.setObjectName("countingFromLabel")
+        self.gridLayout_5.addWidget(self.countingFromLabel, 3, 0, 1, 2)
         self.startCountingComboBox = QtWidgets.QComboBox(self.pixelGridBox)
+        self.startCountingComboBox.setMaxCount(4)
+        self.startCountingComboBox.setInsertPolicy(QtWidgets.QComboBox.InsertAtCurrent)
         self.startCountingComboBox.setObjectName("startCountingComboBox")
         self.startCountingComboBox.addItem("")
         self.startCountingComboBox.addItem("")
         self.startCountingComboBox.addItem("")
         self.startCountingComboBox.addItem("")
         self.gridLayout_5.addWidget(self.startCountingComboBox, 3, 2, 1, 2)
-        self.countingFromLabel = QtWidgets.QLabel(self.pixelGridBox)
-        self.countingFromLabel.setObjectName("countingFromLabel")
-        self.gridLayout_5.addWidget(self.countingFromLabel, 3, 0, 1, 2)
+        self.countFirstComboBox = QtWidgets.QComboBox(self.pixelGridBox)
+        self.countFirstComboBox.setCurrentText("")
+        self.countFirstComboBox.setMaxCount(2)
+        self.countFirstComboBox.setInsertPolicy(QtWidgets.QComboBox.InsertAtCurrent)
+        self.countFirstComboBox.setObjectName("countFirstComboBox")
+        self.gridLayout_5.addWidget(self.countFirstComboBox, 4, 2, 1, 2)
         self.verticalLayout_3.addWidget(self.pixelGridBox)
         self.pixelMappingLabel = QtWidgets.QLabel(self.pixelOptionsBox)
         self.pixelMappingLabel.setObjectName("pixelMappingLabel")
@@ -187,7 +191,7 @@ class Ui_AddComponentDialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.fileBrowseButton.sizePolicy().hasHeightForWidth())
         self.fileBrowseButton.setSizePolicy(sizePolicy)
-        self.fileBrowseButton.setMinimumSize(QtCore.QSize(1, 1))
+        self.fileBrowseButton.setMinimumSize(QtCore.QSize(80, 23))
         self.fileBrowseButton.setObjectName("fileBrowseButton")
         self.horizontalLayout_2.addWidget(self.fileBrowseButton)
         self.gridLayout_2.addWidget(self.geometryFileBox, 1, 0, 1, 1)
@@ -283,6 +287,7 @@ class Ui_AddComponentDialog(object):
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
 
         self.retranslateUi(AddComponentDialog)
+        self.countFirstComboBox.setCurrentIndex(-1)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("clicked()"), AddComponentDialog.close)
         QtCore.QMetaObject.connectSlotsByName(AddComponentDialog)
 
@@ -312,14 +317,12 @@ class Ui_AddComponentDialog(object):
         self.columnWidthLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
         self.firstIDLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "0", None, -1))
         self.columnsLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Columns:", None, -1))
-        self.countFirstComboBox.setItemText(0, QtWidgets.QApplication.translate("AddComponentDialog", "Rows", None, -1))
-        self.countFirstComboBox.setItemText(1, QtWidgets.QApplication.translate("AddComponentDialog", "Columns", None, -1))
         self.countFirstLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Count first along:", None, -1))
-        self.startCountingComboBox.setItemText(2, QtWidgets.QApplication.translate("AddComponentDialog", "Bottom left", None, -1))
-        self.startCountingComboBox.setItemText(3, QtWidgets.QApplication.translate("AddComponentDialog", "Bottom right", None, -1))
-        self.startCountingComboBox.setItemText(4, QtWidgets.QApplication.translate("AddComponentDialog", "Top left", None, -1))
-        self.startCountingComboBox.setItemText(5, QtWidgets.QApplication.translate("AddComponentDialog", "Top right", None, -1))
         self.countingFromLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Start counting from:", None, -1))
+        self.startCountingComboBox.setItemText(0, QtWidgets.QApplication.translate("AddComponentDialog", "Bottom Left", None, -1))
+        self.startCountingComboBox.setItemText(1, QtWidgets.QApplication.translate("AddComponentDialog", "Bottom Right", None, -1))
+        self.startCountingComboBox.setItemText(2, QtWidgets.QApplication.translate("AddComponentDialog", "Top Left", None, -1))
+        self.startCountingComboBox.setItemText(3, QtWidgets.QApplication.translate("AddComponentDialog", "Top Right", None, -1))
         self.pixelMappingLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel mapping:", None, -1))
         self.geometryFileBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "CAD file", None, -1))
         self.fileBrowseButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Browse...", None, -1))

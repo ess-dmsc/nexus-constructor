@@ -28,6 +28,12 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>104</width>
+       <height>23</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
        <width>200</width>
@@ -258,20 +264,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="2" colspan="2">
-                  <widget class="QComboBox" name="countFirstComboBox">
-                   <item>
-                    <property name="text">
-                     <string>Rows</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Columns</string>
-                    </property>
-                   </item>
-                  </widget>
-                 </item>
                  <item row="4" column="0" colspan="2">
                   <widget class="QLabel" name="countFirstLabel">
                    <property name="text">
@@ -279,34 +271,56 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="2" colspan="2">
-                  <widget class="QComboBox" name="startCountingComboBox">
-                   <item>
-                    <property name="text">
-                     <string>Bottom left</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Bottom right</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Top left</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Top right</string>
-                    </property>
-                   </item>
-                  </widget>
-                 </item>
                  <item row="3" column="0" colspan="2">
                   <widget class="QLabel" name="countingFromLabel">
                    <property name="text">
                     <string>Start counting from:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="2" colspan="2">
+                  <widget class="QComboBox" name="startCountingComboBox">
+                   <property name="maxCount">
+                    <number>4</number>
+                   </property>
+                   <property name="insertPolicy">
+                    <enum>QComboBox::InsertAtCurrent</enum>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>Bottom Left</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Bottom Right</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Top Left</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Top Right</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="4" column="2" colspan="2">
+                  <widget class="QComboBox" name="countFirstComboBox">
+                   <property name="currentText">
+                    <string/>
+                   </property>
+                   <property name="currentIndex">
+                    <number>-1</number>
+                   </property>
+                   <property name="maxCount">
+                    <number>2</number>
+                   </property>
+                   <property name="insertPolicy">
+                    <enum>QComboBox::InsertAtCurrent</enum>
                    </property>
                   </widget>
                  </item>
@@ -349,8 +363,8 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>1</width>
-                  <height>1</height>
+                  <width>80</width>
+                  <height>23</height>
                  </size>
                 </property>
                 <property name="text">
