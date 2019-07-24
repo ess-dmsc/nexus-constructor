@@ -16,7 +16,9 @@ class PixelMappingWidget(QWidget):
 
         # Create the label text based on the face number
         self.pixelIDLabel.setText("Pixel ID for face #" + str(face_no) + ":")
-        self.pixelIDLineEdit.setValidator(NullableIntValidator())
+
+        # Give the line edit a validator that requires values of zero or greater
+        self.pixelIDLineEdit.setValidator(NullableIntValidator(bottom=0))
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.pixelIDLabel)
