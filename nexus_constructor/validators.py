@@ -6,17 +6,31 @@ import h5py
 import numpy as np
 import pint
 from PySide2.QtCore import Signal, QObject
-from PySide2.QtGui import QValidator, QIntValidator
+from PySide2.QtGui import QValidator, QIntValidator, QDoubleValidator
 from PySide2.QtWidgets import QComboBox
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
+
+
+class PixelGridDoubleValidator(QDoubleValidator):
+    """
+    Validator for the row height and column width fields in the pixel grid options. Requires that the input is a float
+    greater than zero.
+    """
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        try:
+            if float(input) == 0:
+                return QValidator.Invalid
+            else:
+                return super().validate(input, pos)
+        except ValueError:
+            return QValidator.Invalid
 
 
 class NullableIntValidator(QIntValidator):
     """
     A validator that accepts integers as well as empty input.
     """
-
     def __init__(self, bottom=None, top=None):
 
         super().__init__()

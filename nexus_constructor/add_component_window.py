@@ -28,6 +28,7 @@ from nexus_constructor.validators import (
     GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
     OkValidator,
+    PixelGridDoubleValidator,
 )
 from ui.add_component import Ui_AddComponentDialog
 
@@ -173,8 +174,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.columnsLineEdit.setValidator(zero_or_greater_int_validator)
         self.firstIDLineEdit.setValidator(zero_or_greater_int_validator)
 
-        double_validator = QDoubleValidator()
+        double_validator = PixelGridDoubleValidator()
         double_validator.setNotation(QDoubleValidator.StandardNotation)
+        double_validator.setBottom(0)
         self.rowHeightLineEdit.setValidator(double_validator)
         self.columnWidthLineEdit.setValidator(double_validator)
 

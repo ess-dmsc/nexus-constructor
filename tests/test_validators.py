@@ -18,6 +18,7 @@ from nexus_constructor.validators import (
     NullableIntValidator,
     NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
+    PixelGridDoubleValidator,
 )
 
 
@@ -458,3 +459,9 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
 
     assert validator.validate("test.off", 0) == QValidator.Intermediate
     validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_zero_WHEN_validating_pixel_grid_floats_THEN_validation_fails():
+
+    validator = PixelGridDoubleValidator()
+    assert validator.validate("0.0000", 0) == QValidator.Invalid
