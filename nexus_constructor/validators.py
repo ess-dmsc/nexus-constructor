@@ -27,7 +27,7 @@ class PixelGridRowColumnSizeValidator(QValidator):
         """
         Checks to see if the input in the rows/columns field is 0 or empty. If this is the case then a value for
         row height/column width isn't needed.
-        :return: Bool indicating whether the corrending field is empty or has the number zero.
+        :return: Bool indicating whether the corresponding field is empty or has the number zero.
         """
         return self.corresponding_field.text() in ["0", ""]
 
@@ -48,15 +48,18 @@ class PixelGridRowColumnSizeValidator(QValidator):
         # Attempt to convert the value to a float
         try:
             val = float(input)
-            # Accept zero and "unneeded" floats as intermediate.
+            # Reject negative values
             if val < 0:
                 return QValidator.Invalid
+            # View zero as intermediate because the user may be trying to enter a value between 1 and zero
             elif val == 0:
                 return QValidator.Intermediate
             else:
                 if value_not_needed:
+                    # Return intermediate if the input is sensible but "unneeded"
                     return QValidator.Intermediate
                 else:
+                    # Otherwise return acceptable
                     return QValidator.Acceptable
         except ValueError:
             # Input that can't be converted to floats is invalid
