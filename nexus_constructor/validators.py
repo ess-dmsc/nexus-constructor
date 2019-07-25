@@ -7,40 +7,104 @@ import numpy as np
 import pint
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator, QDoubleValidator
-from PySide2.QtWidgets import QComboBox
+from PySide2.QtWidgets import QComboBox, QLineEdit
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
 
-class PixelGridDoubleValidator(QDoubleValidator):
-    """
-    Validator for the row height and column width fields in the pixel grid options. Requires that the input is a float
-    greater than zero.
-    """
-
-    def __init__(self, corresponding_field):
-
+class PixelGridRowColumnSizeValidator(QDoubleValidator):
+    def __init__(self, corresponding_field: QLineEdit):
+        """
+        Validator for the row height and column width fields in the pixel grid options. Requires that the input is a
+        float greater than zero.
+        :param corresponding_field: The matching line edit for the number of rows/columns in the pixel grid. The
+        validity of the input also depends on this value.
+        """
         super().__init__()
         self.corresponding_field = corresponding_field
 
     def value_not_needed(self):
+        """
+        Checks to see if the input in the rows/columns field is 0 or empty. If this is the case then a value for
+        row height/column width isn't needed.
+        :return: Bool indicating whether the corrending field is empty or has the number zero.
+        """
         return self.corresponding_field.text() in ["0", ""]
 
     def validate(self, input: str, pos: int) -> QValidator.State:
 
+        value_not_needed = self.value_not_needed()
+
+        # Check if the input is empty
         if input == "":
-            if self.value_not_needed():
+            if value_not_needed:
+                # Accept empty input if the corresponding field contains zero or also empty
                 return QValidator.Acceptable
             else:
+                # The corresponding field has a non-zero value, so an empty string in this field should be regarded as
+                # intermediate
                 return QValidator.Intermediate
 
+        # Attempt to convert the value to a float
         try:
-            if float(input) == 0:
-                return QValidator.Intermediate
-            elif self.value_not_needed():
+            # Accept zero and "unneeded" floats as intermediate.
+            if float(input) == 0 or value_not_needed:
                 return QValidator.Intermediate
             else:
                 return super().validate(input, pos)
+        except ValueError:
+            # Input that can't be converted to floats is invalid
+            return QValidator.Invalid
+
+
+class PixelGridRowColumnCountValidator(QValidator):
+    def __init__(self, corresponding_field: QLineEdit):
+        """
+        Validator for inspecting the number of rows/columns entered in the pixel grid options. Checks the corresponding
+        row height/column width value in order to determine input validity.
+        :param corresponding_field: The line edit for the matching row height/column width field.
+        """
+        super().__init__()
+        self.corresponding_field = corresponding_field
+
+    def value_needed(self):
+        """
+        Checks to see if the corresponding row height/column width field contains a value. If this is the case then
+        setting the number of rows/columns to zero shouldn't be considered valid.
+        :return: A bool indicating that the row height/column width has an actual value.
+        """
+        return len(self.corresponding_field.text()) > 0
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+
+        value_needed = self.value_needed()
+
+        # Check if the input is empty
+        if input == "":
+            if value_needed:
+                # Return intermediate if the value is "needed"
+                return QValidator.Intermediate
+            else:
+                # Otherwise accept an empty field
+                return QValidator.Acceptable
+
+        # Attempt to convert the value to an int
+        try:
+            val = int(input)
+
+            if val < 0:
+                return QValidator.Invalid
+            elif val == 0:
+                if value_needed:
+                    return QValidator.Intermediate
+                else:
+                    return QValidator.Acceptable
+            else:
+                if value_needed:
+                    return QValidator.Acceptable
+                else:
+                    return QValidator.Intermediate
+
         except ValueError:
             return QValidator.Invalid
 

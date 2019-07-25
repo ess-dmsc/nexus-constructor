@@ -18,7 +18,8 @@ from nexus_constructor.validators import (
     NullableIntValidator,
     NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
-    PixelGridDoubleValidator,
+    PixelGridRowColumnSizeValidator,
+    PixelGridRowColumnCountValidator,
 )
 
 
@@ -461,40 +462,94 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
     validator.is_valid.emit.assert_called_once_with(False)
 
 
-def test_GIVEN_zero_WHEN_validating_pixel_grid_floats_THEN_validator_returns_intermediate():
+def test_GIVEN_zero_WHEN_validating_row_or_column_size_THEN_validator_returns_intermediate():
 
     mock_corresponding_field = Mock()
     mock_corresponding_field.text = Mock(return_value="1")
 
-    validator = PixelGridDoubleValidator(mock_corresponding_field)
+    validator = PixelGridRowColumnSizeValidator(mock_corresponding_field)
     assert validator.validate("0.0000", 0) == QValidator.Intermediate
 
 
 @pytest.mark.parametrize("corresponding_value", ["0", ""])
-def test_GIVEN_nothing_WHEN_validating_pixel_grid_floats_and_corresponding_value_is_zero_or_empty_THEN_validator_returns_acceptable(
+def test_GIVEN_nothing_WHEN_validating_row_or_column_size_and_row_or_column_count_is_zero_or_empty_THEN_validator_returns_acceptable(
     corresponding_value
 ):
 
     mock_corresponding_field = Mock()
     mock_corresponding_field.text = Mock(return_value=corresponding_value)
 
-    validator = PixelGridDoubleValidator(mock_corresponding_field)
+    validator = PixelGridRowColumnSizeValidator(mock_corresponding_field)
     assert validator.validate("", 0) == QValidator.Acceptable
 
 
-def test_GIVEN_nothing_WHEN_validating_pixel_grid_floats_and_corresponding_value_is_not_zero_or_empty_THEN_validator_returns_intermediate():
+def test_GIVEN_nothing_WHEN_validating_row_or_column_size_and_row_or_column_count_is_not_zero_or_empty_THEN_validator_returns_intermediate():
 
     mock_corresponding_field = Mock()
     mock_corresponding_field.text = Mock(return_value="12")
 
-    validator = PixelGridDoubleValidator(mock_corresponding_field)
+    validator = PixelGridRowColumnSizeValidator(mock_corresponding_field)
     assert validator.validate("", 0) == QValidator.Intermediate
 
+
 @pytest.mark.parametrize("corresponding_value", ["0", ""])
-def test_GIVEN_float_WHEN_validating_pixel_grid_floats_and_correponding_value_is_zero_or_empty_THEN_validator_returns_intermediate(corresponding_value):
+def test_GIVEN_float_WHEN_validating_row_or_column_size_and_row_or_column_count_is_zero_or_empty_THEN_validator_returns_intermediate(
+    corresponding_value
+):
 
     mock_corresponding_field = Mock()
     mock_corresponding_field.text = Mock(return_value=corresponding_value)
 
-    validator = PixelGridDoubleValidator(mock_corresponding_field)
+    validator = PixelGridRowColumnSizeValidator(mock_corresponding_field)
     assert validator.validate("5.2", 0) == QValidator.Intermediate
+
+
+def test_GIVEN_float_WHEN_validating_row_or_column_size_and_row_or_column_count_is_not_zero_or_empty_THEN_validator_returns_acceptable():
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="5")
+
+    validator = PixelGridRowColumnSizeValidator(mock_corresponding_field)
+    assert validator.validate("3.7", 0)[0] == QValidator.Acceptable
+
+
+@pytest.mark.parametrize("count_value", ["0", ""])
+def test_GIVEN_zero_or_empty_string_WHEN_validating_row_or_column_count_and_row_or_column_size_field_is_empty_THEN_validator_returns_acceptable(
+    count_value
+):
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="")
+
+    validator = PixelGridRowColumnCountValidator(mock_corresponding_field)
+    assert validator.validate(count_value, 0) == QValidator.Acceptable
+
+
+@pytest.mark.parametrize("count_value", ["0", ""])
+def test_GIVEN_zero_or_empty_string_WHEN_validating_row_or_column_count_and_row_or_column_size_field_is_not_empty_THEN_validator_returns_intermediate(
+    count_value
+):
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="3.8")
+
+    validator = PixelGridRowColumnCountValidator(mock_corresponding_field)
+    assert validator.validate(count_value, 0) == QValidator.Intermediate
+
+
+def test_GIVEN_integer_WHEN_validating_row_or_column_count_and_row_or_column_size_is_empty_THEN_validator_returns_intermediate():
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="")
+
+    validator = PixelGridRowColumnCountValidator(mock_corresponding_field)
+    assert validator.validate("6", 0) == QValidator.Intermediate
+
+
+def test_GIVEN_integer_WHEN_validating_row_or_column_count_and_row_or_column_size_is_not_empty_THEN_validator_returns_acceptable():
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="3.8")
+
+    validator = PixelGridRowColumnCountValidator(mock_corresponding_field)
+    assert validator.validate("6", 0) == QValidator.Acceptable
