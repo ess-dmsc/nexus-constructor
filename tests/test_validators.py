@@ -20,6 +20,7 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     PixelGridRowColumnSizeValidator,
     PixelGridRowColumnCountValidator,
+    PixelGridIDValidator,
 )
 
 
@@ -462,6 +463,24 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
     validator.is_valid.emit.assert_called_once_with(False)
 
 
+def test_GIVEN_nonfloat_WHEN_validating_row_or_column_size_THEN_validator_returns_invalid():
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="1")
+
+    validator = PixelGridRowColumnSizeValidator(mock_corresponding_field)
+    assert validator.validate("abc", 0) == QValidator.Invalid
+
+
+def test_GIVEN_negative_value_WHEN_validating_row_or_column_size_THEN_validator_returns_invalid():
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="1")
+
+    validator = PixelGridRowColumnSizeValidator(mock_corresponding_field)
+    assert validator.validate("-3.5", 0) == QValidator.Invalid
+
+
 def test_GIVEN_zero_WHEN_validating_row_or_column_size_THEN_validator_returns_intermediate():
 
     mock_corresponding_field = Mock()
@@ -513,6 +532,27 @@ def test_GIVEN_float_WHEN_validating_row_or_column_size_and_row_or_column_count_
     assert validator.validate("3.7", 0) == QValidator.Acceptable
 
 
+@pytest.mark.parametrize("non_integer", ["abc", "2.5"])
+def test_GIVEN_noninteger_WHEN_validating_row_or_column_count_THEN_validator_returns_invalid(
+    non_integer
+):
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="2.5")
+
+    validator = PixelGridRowColumnCountValidator(mock_corresponding_field)
+    assert validator.validate(non_integer, 0) == QValidator.Invalid
+
+
+def test_GIVEN_negative_number_WHEN_validating_row_or_column_count_THEN_validator_returns_invalid():
+
+    mock_corresponding_field = Mock()
+    mock_corresponding_field.text = Mock(return_value="2.5")
+
+    validator = PixelGridRowColumnCountValidator(mock_corresponding_field)
+    assert validator.validate("-5", 0) == QValidator.Invalid
+
+
 @pytest.mark.parametrize("count_value", ["0", ""])
 def test_GIVEN_zero_or_empty_string_WHEN_validating_row_or_column_count_and_row_or_column_size_field_is_empty_THEN_validator_returns_acceptable(
     count_value
@@ -553,3 +593,86 @@ def test_GIVEN_integer_WHEN_validating_row_or_column_count_and_row_or_column_siz
 
     validator = PixelGridRowColumnCountValidator(mock_corresponding_field)
     assert validator.validate("6", 0) == QValidator.Acceptable
+
+
+def create_mock_pixel_grid_fields(line_edit_text):
+    """
+    Creates mock pixel grid fields for the pixel ID validator.
+    :param line_edit_text: The desired text value for the mock line edit.
+    :return: A list of four mock line edits.
+    """
+    mock_pixel_grid_fields = []
+    for _ in range(4):
+        mock_field = Mock()
+        mock_field.text = Mock(return_value=line_edit_text)
+        mock_pixel_grid_fields.append(mock_field)
+    return mock_pixel_grid_fields
+
+
+@pytest.mark.parametrize("non_integer", ["abc", "2.5"])
+def test_GIVEN_noninteger_WHEN_validating_pixel_id_THEN_validator_returns_invalid(
+    non_integer
+):
+
+    mock_pixel_grid_fields = create_mock_pixel_grid_fields("4")
+
+    validator = PixelGridIDValidator(mock_pixel_grid_fields)
+    assert validator.validate(non_integer, 0) == QValidator.Invalid
+
+
+def test_GIVEN_negative_number_WHEN_validating_pixel_id_THEN_validator_returns_invalid():
+
+    mock_pixel_grid_fields = create_mock_pixel_grid_fields("4")
+
+    validator = PixelGridIDValidator(mock_pixel_grid_fields)
+    assert validator.validate("-3", 0) == QValidator.Invalid
+
+
+def test_GIVEN_nothing_WHEN_validating_pixel_id_and_all_other_fields_are_empty_THEN_validator_returns_acceptable():
+
+    mock_pixel_grid_fields = create_mock_pixel_grid_fields("4")
+
+    validator = PixelGridIDValidator(mock_pixel_grid_fields)
+    assert validator.validate("-3", 0) == QValidator.Invalid
+
+
+def test_GIVEN_nothing_WHEN_validating_pixel_id_and_all_other_fields_are_nonempty_THEN_validator_returns_intermediate():
+
+    mock_pixel_grid_fields = create_mock_pixel_grid_fields("4")
+
+    validator = PixelGridIDValidator(mock_pixel_grid_fields)
+    assert validator.validate("", 0) == QValidator.Intermediate
+
+
+def test_GIVEN_nothing_WHEN_validating_pixel_id_and_some_other_fields_empty_THEN_validator_returns_intermediate():
+
+    mock_pixel_grid_fields = create_mock_pixel_grid_fields("4")
+    mock_pixel_grid_fields[0].text = Mock(return_value="")
+
+    validator = PixelGridIDValidator(mock_pixel_grid_fields)
+    assert validator.validate("", 0) == QValidator.Intermediate
+
+
+def test_GIVEN_valid_id_WHEN_validating_pixel_id_and_all_other_fields_are_empty_THEN_validator_returns_intermediate():
+
+    mock_pixel_grid_fields = create_mock_pixel_grid_fields("")
+
+    validator = PixelGridIDValidator(mock_pixel_grid_fields)
+    assert validator.validate("3", 0) == QValidator.Intermediate
+
+
+def test_GIVEN_valid_id_WHEN_validating_pixel_id_and_some_other_fields_are_empty_THEN_validator_returns_intermediate():
+
+    mock_pixel_grid_fields = create_mock_pixel_grid_fields("4")
+    mock_pixel_grid_fields[0].text = Mock(return_value="")
+
+    validator = PixelGridIDValidator(mock_pixel_grid_fields)
+    assert validator.validate("0", 0) == QValidator.Intermediate
+
+
+def test_GIVEN_valid_id_WHEN_validating_pixel_id_and_all_other_fields_are_nonempty_THEN_validator_returns_accpetable():
+
+    mock_pixel_grid_fields = create_mock_pixel_grid_fields("4")
+
+    validator = PixelGridIDValidator(mock_pixel_grid_fields)
+    assert validator.validate("3", 0) == QValidator.Acceptable

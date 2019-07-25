@@ -12,6 +12,57 @@ from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
 
+class PixelGridIDValidator(QValidator):
+    def __init__(self, fields: List[QLineEdit]):
+
+        self.fields = fields
+        super().__init__()
+
+    def get_content_of_other_fields(self):
+        return [field.text() for field in self.fields]
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+
+        content = self.get_content_of_other_fields()
+        all_other_fields_empty = all(
+            [input_from_other_field == "" for input_from_other_field in content]
+        )
+        all_other_fields_nonempty = all(
+            [input_from_other_field != "" for input_from_other_field in content]
+        )
+
+        if input == "":
+            if all_other_fields_empty:
+                self.is_valid.emit(True)
+                return QValidator.Acceptable
+            else:
+                self.is_valid.emit(False)
+                return QValidator.Intermediate
+
+        try:
+            val = int(input)
+
+            if val < 0:
+                self.is_valid.emit(False)
+                return QValidator.Invalid
+            else:
+                if all_other_fields_empty:
+                    self.is_valid.emit(False)
+                    return QValidator.Intermediate
+                elif all_other_fields_nonempty:
+                    self.is_valid.emit(True)
+                    return QValidator.Acceptable
+                else:
+                    self.is_valid.emit(False)
+                    return QValidator.Intermediate
+
+        except ValueError:
+            self.is_valid.emit(False)
+            return QValidator.Invalid
+
+    is_valid = Signal(bool)
+
+
 class PixelGridRowColumnSizeValidator(QDoubleValidator):
     def __init__(self, corresponding_field: QLineEdit):
         """
