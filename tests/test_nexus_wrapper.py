@@ -118,7 +118,7 @@ def test_GIVEN_multiple_entry_groups_in_file_WHEN_finding_entry_THEN_signal_is_e
 def test_GIVEN_group_without_nx_class_WHEN_getting_nx_class_THEN_returns_none():
     file = create_in_memory_file("test_nw7")
     entry = file.create_group("entry")
-    assert not get_nx_class(entry)
+    assert get_nx_class(entry) is None
 
 
 def test_GIVEN_group_with_nx_class_as_str_WHEN_getting_nx_class_THEN_returns_nx_class_as_str():
