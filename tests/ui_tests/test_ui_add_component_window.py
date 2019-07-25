@@ -966,6 +966,49 @@ def test_GIVEN_mismatching_values_WHEN_giving_pixel_grid_options_THEN_column_wid
     assert dialog.columnWidthLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
+def test_GIVEN_acceptable_value_WHEN_giving_pixel_grid_options_THEN_row_count_background_turns_white(
+    qtbot, template, dialog
+):
+
+    row_count = "2"
+    row_height = "3.5"
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    show_and_close_window(qtbot, template)
+
+    # Enter a value for row height
+    qtbot.keyClick(dialog.rowHeightLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.rowHeightLineEdit, row_height)
+
+    # Enter a value for row count
+    qtbot.keyClick(dialog.rowLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.rowLineEdit, row_count)
+
+    # Check that the background has turned white due to the values being valid
+    assert dialog.rowLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+
+
+def test_GIVEN_acceptable_value_WHEN_giving_pixel_grid_options_THEN_column_width_background_turns_white(
+    qtbot, template, dialog
+):
+
+    column_count = "1"
+    column_width = "0.1"
+
+    # Enter a value for column count
+    qtbot.keyClick(dialog.columnsLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.columnsLineEdit, column_count)
+
+    # Enter a value for column width
+    qtbot.keyClick(dialog.columnWidthLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.columnWidthLineEdit, column_width)
+
+    # Check that the background has turned white due to the values being valid
+    assert dialog.columnWidthLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+
+
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(
     qtbot, template, dialog
 ):
