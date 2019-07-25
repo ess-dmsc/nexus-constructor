@@ -12,7 +12,7 @@ from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.validators import FieldType, DATASET_TYPE
+from nexus_constructor.validators import FieldType
 
 WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "tests", "UITests.md")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
