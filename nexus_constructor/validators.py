@@ -39,10 +39,12 @@ class PixelGridRowColumnSizeValidator(QDoubleValidator):
         if input == "":
             if value_not_needed:
                 # Accept empty input if the corresponding field contains zero or also empty
+                self.is_valid.emit(True)
                 return QValidator.Acceptable
             else:
                 # The corresponding field has a non-zero value, so an empty string in this field should be regarded as
                 # intermediate
+                self.is_valid.emit(False)
                 return QValidator.Intermediate
 
         # Attempt to convert the value to a float
@@ -50,20 +52,27 @@ class PixelGridRowColumnSizeValidator(QDoubleValidator):
             val = float(input)
             # Reject negative values
             if val < 0:
+                self.is_valid.emit(False)
                 return QValidator.Invalid
             # View zero as intermediate because the user may be trying to enter a value between 1 and zero
             elif val == 0:
+                self.is_valid.emit(False)
                 return QValidator.Intermediate
             else:
                 if value_not_needed:
                     # Return intermediate if the input is sensible but "unneeded"
+                    self.is_valid.emit(False)
                     return QValidator.Intermediate
                 else:
                     # Otherwise return acceptable
+                    self.is_valid.emit(True)
                     return QValidator.Acceptable
         except ValueError:
             # Input that can't be converted to floats is invalid
+            self.is_valid.emit(False)
             return QValidator.Invalid
+
+    is_valid = Signal(bool)
 
 
 class PixelGridRowColumnCountValidator(QValidator):
@@ -92,9 +101,11 @@ class PixelGridRowColumnCountValidator(QValidator):
         if input == "":
             if value_needed:
                 # Return intermediate if the value is "needed"
+                self.is_valid.emit(False)
                 return QValidator.Intermediate
             else:
                 # Otherwise accept an empty field
+                self.is_valid.emit(True)
                 return QValidator.Acceptable
 
         # Attempt to convert the value to an int
@@ -103,24 +114,32 @@ class PixelGridRowColumnCountValidator(QValidator):
 
             # Reject negative numbers
             if val < 0:
+                self.is_valid.emit(False)
                 return QValidator.Invalid
             elif val == 0:
                 # Return intermediate if a positive value is "needed"
                 if value_needed:
+                    self.is_valid.emit(False)
                     return QValidator.Intermediate
                 else:
                     # Accept zero if a positive value isn't needed
+                    self.is_valid.emit(True)
                     return QValidator.Acceptable
             else:
                 if value_needed:
                     # Return acceptable if the input in both fields are sensible
+                    self.is_valid.emit(True)
                     return QValidator.Acceptable
                 else:
                     # Return intermediate if the input is sensible but isn't "needed"
+                    self.is_valid.emit(False)
                     return QValidator.Intermediate
 
         except ValueError:
+            self.is_valid.emit(False)
             return QValidator.Invalid
+
+    is_valid = Signal(bool)
 
 
 class NullableIntValidator(QIntValidator):

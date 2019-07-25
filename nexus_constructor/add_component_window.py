@@ -29,7 +29,7 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     OkValidator,
     PixelGridRowColumnSizeValidator,
-)
+    PixelGridRowColumnCountValidator)
 from ui.add_component import Ui_AddComponentDialog
 
 
@@ -167,20 +167,20 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
         # Create a validator that only accepts ints that are 0 or greater
+        row_count_validator = PixelGridRowColumnCountValidator(self.rowHeightLineEdit)
+        column_count_validator = PixelGridRowColumnCountValidator(self.columnWidthLineEdit)
         zero_or_greater_int_validator = QIntValidator()
         zero_or_greater_int_validator.setBottom(0)
         # Set the validator of the row, column and first line input boxes in the pixel grid options
-        self.rowLineEdit.setValidator(zero_or_greater_int_validator)
-        self.columnsLineEdit.setValidator(zero_or_greater_int_validator)
+        self.rowLineEdit.setValidator(row_count_validator)
+        self.columnsLineEdit.setValidator(column_count_validator)
         self.firstIDLineEdit.setValidator(zero_or_greater_int_validator)
 
         row_height_validator = PixelGridRowColumnSizeValidator(self.rowLineEdit)
         row_height_validator.setNotation(QDoubleValidator.StandardNotation)
-        row_height_validator.setBottom(0)
 
         column_width_validator = PixelGridRowColumnSizeValidator(self.columnsLineEdit)
         column_width_validator.setNotation(QDoubleValidator.StandardNotation)
-        column_width_validator.setBottom(0)
 
         self.rowHeightLineEdit.setValidator(row_height_validator)
         self.columnWidthLineEdit.setValidator(column_width_validator)
@@ -189,6 +189,40 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelMappingListWidget.setVisible(False)
 
         self.countFirstComboBox.addItems(list(self.count_direction.keys()))
+
+
+        self.rowLineEdit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.rowLineEdit,
+                tooltip_on_reject="Row count must match value given for row height."
+            )
+        )
+
+        self.rowHeightLineEdit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.rowHeightLineEdit,
+                tooltip_on_reject="Row height must match value given for row count.",
+            )
+        )
+
+        self.columnsLineEdit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.columnsLineEdit,
+                tooltip_on_reject="Column count must match value given for column width."
+            )
+        )
+
+        self.columnWidthLineEdit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.columnWidthLineEdit,
+                tooltip_on_reject="Column width must match value given for column count.",
+            )
+        )
+
 
     def add_field(self):
         item = QListWidgetItem()

@@ -23,7 +23,9 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
-WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "tests", "UITests.md")
+MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("", "5.3"), ("1", "")]
+
+WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "requirements.txt")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
 VALID_CUBE_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
 VALID_OCTA_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "octa.off")
@@ -920,6 +922,50 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
     assert dialog.pixelMappingListWidget.count() == 0
 
 
+@pytest.mark.parametrize("row_count, row_height", MISMATCHING_PIXEL_GRID_VALUES)
+def test_GIVEN_mismatching_values_WHEN_giving_pixel_grid_options_THEN_row_count_background_turns_red(
+    qtbot, template, dialog, row_count, row_height
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    show_and_close_window(qtbot, template)
+
+    # Enter a value for row height
+    qtbot.keyClick(dialog.rowHeightLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.rowHeightLineEdit, row_height)
+
+    # Enter a value for row count
+    qtbot.keyClick(dialog.rowLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.rowLineEdit, row_count)
+
+    # Check that the background has turned red as a result of the values not matching
+    assert dialog.rowLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+
+
+@pytest.mark.parametrize("column_count, column_width", MISMATCHING_PIXEL_GRID_VALUES)
+def test_GIVEN_mismatching_values_WHEN_giving_pixel_grid_options_THEN_column_width_background_turns_red(
+    qtbot, template, dialog, column_count, column_width
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    show_and_close_window(qtbot, template)
+
+    # Enter a value for column count
+    qtbot.keyClick(dialog.columnsLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.columnsLineEdit, column_count)
+
+    # Enter a value for column width
+    qtbot.keyClick(dialog.columnWidthLineEdit, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.columnWidthLineEdit, column_width)
+
+    # Check that the background has become red as a result of the values not matching
+    assert dialog.columnWidthLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+
+
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(
     qtbot, template, dialog
 ):
@@ -1141,15 +1187,6 @@ def enter_file_path(
     with patch(
         "nexus_constructor.add_component_window.file_dialog", return_value=file_path
     ):
-        # with patch(
-        #     "nexus_constructor.geometry.geometry_loader.open",
-        #     mock_open(read_data=file_contents),
-        # ):
-        #     with patch(
-        #         "nexus_constructor.add_component_window.open",
-        #         mock_open(read_data=file_contents),
-        #     ):
-        #         systematic_button_press(qtbot, dialog.fileBrowseButton)
         with patch("builtins.open", mock_open(read_data=file_contents)):
             systematic_button_press(qtbot, dialog.fileBrowseButton)
 
