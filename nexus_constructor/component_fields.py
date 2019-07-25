@@ -1,4 +1,7 @@
+import uuid
 from functools import partial
+
+import h5py
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
@@ -166,9 +169,13 @@ class FieldWidget(QFrame):
     @property
     def value(self):
         if self.field_type == FieldType.scalar_dataset:
-            return DATASET_TYPE[self.value_type_combo.currentText()](
-                self.value_line_edit.text()
-            )
+            dtype = DATASET_TYPE[self.value_type_combo.currentText()]
+            val = self.value_line_edit.text()
+            if dtype == h5py.special_dtype(vlen=str):
+                return h5py.File(
+                    name=str(uuid.uuid4()), driver="core", backing_store=False
+                ).create_dataset(name=self.name, dtype=dtype, data=val)
+            return dtype(val)
         elif self.field_type == FieldType.array_dataset:
             return self.table_view.model.array
 

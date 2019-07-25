@@ -12,6 +12,7 @@ from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.validators import FieldType, DATASET_TYPE
 
 WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "tests", "UITests.md")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
@@ -24,6 +25,132 @@ UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
+
+
+def show_window_and_wait_for_interaction(
+    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
+):
+    """
+    Helper method that allows you to examine a window during testing. Just here for convenience.
+    :param qtbot: The qtbot testing tool.
+    :param template: The window/widget to be opened.
+    """
+    template.show()
+    qtbot.stopForInteraction()
+
+
+def show_and_close_window(
+    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
+):
+    """
+    Function for displaying and then closing a window/widget. This appears to be necessary in order to make sure
+    some interactions with the UI are recognised. Otherwise the UI can behave as though no clicks/button presses/etc
+    actually took place which then causes tests to fail even though they ought to pass in theory.
+    :param qtbot: The qtbot testing tool.
+    :param template: The window/widget to be opened.
+    """
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+
+def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
+    """
+    Creates a template Add Component Dialog and sets this up for testing.
+    :param qtbot: The qtbot testing tool.
+    :return: The AddComponentDialog object and the template that contains it.
+    """
+    template = QDialog()
+    dialog = create_add_component_dialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+    return dialog, template
+
+
+def create_add_component_dialog():
+    """
+    Creates an AddComponentDialog object for use in a testing template.
+    :return: An instance of an AddComponentDialog object.
+    """
+    global nexus_wrapper_count
+    nexus_name = "test" + str(nexus_wrapper_count)
+    instrument = Instrument(NexusWrapper(nexus_name))
+    component = ComponentTreeModel(instrument)
+    nexus_wrapper_count += 1
+    return AddComponentDialog(instrument, component)
+
+
+def systematic_radio_button_press(qtbot: pytestqt.qtbot.QtBot, button: QRadioButton):
+    """
+    Left clicks on a radio button after finding the position to click using a systematic search.
+    :param qtbot: The qtbot testing tool.
+    :param button: The button to press.
+    """
+    qtbot.mouseClick(
+        button, Qt.LeftButton, pos=find_radio_button_press_position(button)
+    )
+
+
+def find_radio_button_press_position(button: QRadioButton):
+    """
+    Systematic way of making sure a button press works. Goes through every point in the widget until it finds one that
+    returns True for the `hitButton` method.
+    :param button: The radio button to click.
+    :return: A QPoint indicating where the button must be clicked in order for its event to be triggered.
+    """
+    size = button.size()
+
+    for x in range(size.width()):
+        for y in range(size.height()):
+            click_point = QPoint(x, y)
+            if button.hitButton(click_point):
+                return click_point
+    return None
+
+
+def enter_component_name(
+    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, component_name: str
+):
+    """
+    Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
+    name.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog object.
+    :param component_name: The desired component name.
+    """
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, component_name)
+
+
+def enter_file_path(
+    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, file_path: str
+):
+    """
+    Mimics the user entering a file path. Clicks on the text field and enters a given file path. Also sets the
+    `geometry_file_name` attribute of the AddComponentDialog and this is usually only altered by opening a FileDialog.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog object.
+    :param file_path: The desired file path.
+    """
+    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.fileLineEdit, file_path)
+    dialog.cad_file_name = file_path
+
+
+def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
+    """
+    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
+    given string.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog object.
+    :param units: The desired units input.
+    """
+    word_length = len(dialog.unitsLineEdit.text())
+    for _ in range(word_length):
+        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+
+    if len(units) > 0:
+        qtbot.keyClicks(dialog.unitsLineEdit, units)
 
 
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
@@ -698,127 +825,28 @@ def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_
     assert field.table_view.isEnabled()
 
 
-def show_window_and_wait_for_interaction(
-    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
-):
-    """
-    Helper method that allows you to examine a window during testing. Just here for convenience.
-    :param qtbot: The qtbot testing tool.
-    :param template: The window/widget to be opened.
-    """
-    template.show()
-    qtbot.stopForInteraction()
+def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(qtbot):
 
+    dialog, template = create_add_component_template(qtbot)
 
-def show_and_close_window(
-    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
-):
-    """
-    Function for displaying and then closing a window/widget. This appears to be necessary in order to make sure
-    some interactions with the UI are recognised. Otherwise the UI can behave as though no clicks/button presses/etc
-    actually took place which then causes tests to fail even though they ought to pass in theory.
-    :param qtbot: The qtbot testing tool.
-    :param template: The window/widget to be opened.
-    """
-    template.show()
-    qtbot.waitForWindowShown(template)
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
+    field.field_type_combo.setCurrentText(FieldType.scalar_dataset.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
 
-def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
-    """
-    Creates a template Add Component Dialog and sets this up for testing.
-    :param qtbot: The qtbot testing tool.
-    :return: The AddComponentDialog object and the template that contains it.
-    """
-    template = QDialog()
-    dialog = create_add_component_dialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
-    qtbot.addWidget(template)
-    return dialog, template
+    field.value_type_combo.setCurrentText("String")
+    field.value_type_combo.currentTextChanged.emit(field.value_type_combo.currentText)
 
+    field_name = "testfield"
+    field_value = "testvalue"
 
-def create_add_component_dialog():
-    """
-    Creates an AddComponentDialog object for use in a testing template.
-    :return: An instance of an AddComponentDialog object.
-    """
-    global nexus_wrapper_count
-    nexus_name = "test" + str(nexus_wrapper_count)
-    instrument = Instrument(NexusWrapper(nexus_name))
-    component = ComponentTreeModel(instrument)
-    nexus_wrapper_count += 1
-    return AddComponentDialog(instrument, component)
+    field.field_name_edit.setText(field_name)
+    field.value_line_edit.setText(field_value)
 
+    import h5py
 
-def systematic_radio_button_press(qtbot: pytestqt.qtbot.QtBot, button: QRadioButton):
-    """
-    Left clicks on a radio button after finding the position to click using a systematic search.
-    :param qtbot: The qtbot testing tool.
-    :param button: The button to press.
-    """
-    qtbot.mouseClick(
-        button, Qt.LeftButton, pos=find_radio_button_press_position(button)
-    )
+    assert field.dtype == h5py.special_dtype(vlen=str)
 
-
-def find_radio_button_press_position(button: QRadioButton):
-    """
-    Systematic way of making sure a button press works. Goes through every point in the widget until it finds one that
-    returns True for the `hitButton` method.
-    :param button: The radio button to click.
-    :return: A QPoint indicating where the button must be clicked in order for its event to be triggered.
-    """
-    size = button.size()
-
-    for x in range(size.width()):
-        for y in range(size.height()):
-            click_point = QPoint(x, y)
-            if button.hitButton(click_point):
-                return click_point
-    return None
-
-
-def enter_component_name(
-    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, component_name: str
-):
-    """
-    Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
-    name.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
-    :param component_name: The desired component name.
-    """
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, component_name)
-
-
-def enter_file_path(
-    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, file_path: str
-):
-    """
-    Mimics the user entering a file path. Clicks on the text field and enters a given file path. Also sets the
-    `geometry_file_name` attribute of the AddComponentDialog and this is usually only altered by opening a FileDialog.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
-    :param file_path: The desired file path.
-    """
-    qtbot.mouseClick(dialog.fileLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.fileLineEdit, file_path)
-    dialog.cad_file_name = file_path
-
-
-def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
-    """
-    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
-    given string.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
-    :param units: The desired units input.
-    """
-    word_length = len(dialog.unitsLineEdit.text())
-    for _ in range(word_length):
-        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-
-    if len(units) > 0:
-        qtbot.keyClicks(dialog.unitsLineEdit, units)
+    assert field.name == field_name
+    assert field.value[...] == field_value
