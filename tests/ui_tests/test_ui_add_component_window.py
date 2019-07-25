@@ -901,6 +901,25 @@ def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_ha
     )
 
 
+def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mapping_widget_isnt_populated(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    show_and_close_window(qtbot, template)
+
+    # Choose the pixel mapping option
+    systematic_button_press(qtbot, dialog.entireShapeRadioButton)
+
+    # Give an invalid file
+    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, "hfhuihfiuhf")
+
+    # Check that the number of items in the pixel mapping list is still zero
+    assert dialog.pixelMappingListWidget.count() == 0
+
+
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(
     qtbot, template, dialog
 ):
@@ -1122,15 +1141,17 @@ def enter_file_path(
     with patch(
         "nexus_constructor.add_component_window.file_dialog", return_value=file_path
     ):
-        with patch(
-            "nexus_constructor.geometry.geometry_loader.open",
-            mock_open(read_data=file_contents),
-        ):
-            with patch(
-                "nexus_constructor.add_component_window.open",
-                mock_open(read_data=file_contents),
-            ):
-                systematic_button_press(qtbot, dialog.fileBrowseButton)
+        # with patch(
+        #     "nexus_constructor.geometry.geometry_loader.open",
+        #     mock_open(read_data=file_contents),
+        # ):
+        #     with patch(
+        #         "nexus_constructor.add_component_window.open",
+        #         mock_open(read_data=file_contents),
+        #     ):
+        #         systematic_button_press(qtbot, dialog.fileBrowseButton)
+        with patch("builtins.open", mock_open(read_data=file_contents)):
+            systematic_button_press(qtbot, dialog.fileBrowseButton)
 
 
 def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):

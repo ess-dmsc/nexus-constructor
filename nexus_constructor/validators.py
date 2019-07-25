@@ -6,13 +6,13 @@ import h5py
 import numpy as np
 import pint
 from PySide2.QtCore import Signal, QObject
-from PySide2.QtGui import QValidator, QIntValidator
+from PySide2.QtGui import QValidator, QIntValidator, QDoubleValidator
 from PySide2.QtWidgets import QComboBox, QLineEdit
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
 
-class PixelGridRowColumnSizeValidator(QValidator):
+class PixelGridRowColumnSizeValidator(QDoubleValidator):
     def __init__(self, corresponding_field: QLineEdit):
         """
         Validator for the row height and column width fields in the pixel grid options. Requires that the input is a
@@ -105,15 +105,18 @@ class PixelGridRowColumnCountValidator(QValidator):
             if val < 0:
                 return QValidator.Invalid
             elif val == 0:
-
+                # Return intermediate if a positive value is "needed"
                 if value_needed:
                     return QValidator.Intermediate
                 else:
+                    # Accept zero if a positive value isn't needed
                     return QValidator.Acceptable
             else:
                 if value_needed:
+                    # Return acceptable if the input in both fields are sensible
                     return QValidator.Acceptable
                 else:
+                    # Return intermediate if the input is sensible but isn't "needed"
                     return QValidator.Intermediate
 
         except ValueError:

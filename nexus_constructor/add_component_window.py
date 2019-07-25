@@ -190,7 +190,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.countFirstComboBox.addItems(list(self.count_direction.keys()))
 
-
     def add_field(self):
         item = QListWidgetItem()
         field = FieldWidget(self.possible_fields, self.fieldsListWidget)
@@ -415,12 +414,22 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         #     self.generate_pixel_data(),
         # )
 
+    def invalid_file_given(self):
+        """
+        Checks if the current mesh file is valid. If it is invalid and pixel mapping has been chosen, then a pixel
+        mapping list won't be generated.
+        :return: A bool indicating whether or not the file line edit has a red background.
+        """
+        return (
+            self.fileLineEdit.styleSheet() == "QLineEdit { background-color: #f6989d }"
+        )
+
     def populate_pixel_mapping_list(self):
         """
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
         """
-        # Don't do this if a file hasn't been selected yet.
-        if not self.cad_file_name:
+        # Don't do this if a file hasn't been selected yet or if the file given is invalid
+        if not self.cad_file_name or self.invalid_file_given():
             return
 
         n_faces = None
