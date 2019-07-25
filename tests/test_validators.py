@@ -510,7 +510,7 @@ def test_GIVEN_float_WHEN_validating_row_or_column_size_and_row_or_column_count_
     mock_corresponding_field.text = Mock(return_value="5")
 
     validator = PixelGridRowColumnSizeValidator(mock_corresponding_field)
-    assert validator.validate("3.7", 0)[0] == QValidator.Acceptable
+    assert validator.validate("3.7", 0) == QValidator.Acceptable
 
 
 @pytest.mark.parametrize("count_value", ["0", ""])
