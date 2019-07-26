@@ -5,7 +5,7 @@ from functools import partial
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtGui import QDoubleValidator
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QListWidgetItem
+from PySide2.QtWidgets import QListWidgetItem, QLineEdit
 from nexusutils.readwriteoff import parse_off_file
 
 from nexus_constructor.component import Component
@@ -20,7 +20,11 @@ from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.pixel_data import CountDirection, Corner, PixelMapping, PixelGrid
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
-from nexus_constructor.ui_utils import file_dialog, validate_line_edit
+from nexus_constructor.ui_utils import (
+    file_dialog,
+    validate_line_edit,
+    validate_multiple_line_edits,
+)
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.validators import (
     UnitValidator,
@@ -168,18 +172,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             lambda: self.show_pixel_grid_or_pixel_mapping(False)
         )
 
+        # Make both the pixel grid and pixel mapping options invisible when the No Pixel button has been pressed
+        self.noPixelsButton.clicked.connect(self.hide_pixel_grid_and_mapping)
+
         # Create a validator that only accepts ints that are 0 or greater
         row_count_validator = PixelGridRowColumnCountValidator(self.rowHeightLineEdit)
         column_count_validator = PixelGridRowColumnCountValidator(
             self.columnWidthLineEdit
         )
         pixel_id_validator = PixelGridIDValidator(
-            [
-                self.rowLineEdit,
-                self.rowHeightLineEdit,
-                self.columnsLineEdit,
-                self.columnWidthLineEdit,
-            ]
+            self.pixelGridBox.findChildren(QLineEdit)
         )
         # Set the validator of the row, column and first line input boxes in the pixel grid options
         self.rowLineEdit.setValidator(row_count_validator)
@@ -202,33 +204,41 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.rowLineEdit.validator().is_valid.connect(
             partial(
-                validate_line_edit,
-                self.rowLineEdit,
+                validate_multiple_line_edits,
+                [self.rowHeightLineEdit, self.rowLineEdit],
                 tooltip_on_reject="Row count must match value given for row height.",
             )
         )
 
         self.rowHeightLineEdit.validator().is_valid.connect(
             partial(
-                validate_line_edit,
-                self.rowHeightLineEdit,
+                validate_multiple_line_edits,
+                [self.rowHeightLineEdit, self.rowLineEdit],
                 tooltip_on_reject="Row height must match value given for row count.",
             )
         )
 
         self.columnsLineEdit.validator().is_valid.connect(
             partial(
-                validate_line_edit,
-                self.columnsLineEdit,
+                validate_multiple_line_edits,
+                [self.columnsLineEdit, self.columnWidthLineEdit],
                 tooltip_on_reject="Column count must match value given for column width.",
             )
         )
 
         self.columnWidthLineEdit.validator().is_valid.connect(
             partial(
-                validate_line_edit,
-                self.columnWidthLineEdit,
+                validate_multiple_line_edits,
+                [self.columnsLineEdit, self.columnWidthLineEdit],
                 tooltip_on_reject="Column width must match value given for column count.",
+            )
+        )
+
+        self.firstIDLineEdit.validator().is_valid.connect(
+            partial(
+                validate_multiple_line_edits,
+                self.firstIDLineEdit,
+                tooltip_on_reject="All pixel grid text fields need to either be filled or left empty.",
             )
         )
 
@@ -275,6 +285,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         # Change which pixel-related fields are visible because this depends on the class that has been selected.
         self.change_pixel_options_visibility()
+
+    def hide_pixel_grid_and_mapping(self):
+        """
+        Hides the pixel grid and pixel mapping options when the No Pixel button has been selected.
+        """
+
+        self.pixelGridBox.setVisible(False)
+        self.pixelMappingLabel.setVisible(False)
+        self.pixelMappingListWidget.setVisible(False)
 
     def show_pixel_grid_or_pixel_mapping(self, bool):
         """

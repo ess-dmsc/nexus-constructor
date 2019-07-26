@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Wed Jul 24 13:09:05 2019
+# Created: Fri Jul 26 09:56:01 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -112,6 +112,9 @@ class Ui_AddComponentDialog(object):
         self.entireShapeRadioButton = QtWidgets.QRadioButton(self.pixelLayoutBox)
         self.entireShapeRadioButton.setObjectName("entireShapeRadioButton")
         self.horizontalLayout_7.addWidget(self.entireShapeRadioButton)
+        self.noPixelsButton = QtWidgets.QRadioButton(self.pixelLayoutBox)
+        self.noPixelsButton.setObjectName("noPixelsButton")
+        self.horizontalLayout_7.addWidget(self.noPixelsButton)
         self.verticalLayout_3.addWidget(self.pixelLayoutBox)
         self.pixelGridBox = QtWidgets.QGroupBox(self.pixelOptionsBox)
         self.pixelGridBox.setObjectName("pixelGridBox")
@@ -306,6 +309,7 @@ class Ui_AddComponentDialog(object):
         self.pixelLayoutBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel layout:", None, -1))
         self.singlePixelRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Single Pixel", None, -1))
         self.entireShapeRadioButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Entire Shape", None, -1))
+        self.noPixelsButton.setText(QtWidgets.QApplication.translate("AddComponentDialog", "No Pixels", None, -1))
         self.pixelGridBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Pixel grid:", None, -1))
         self.rowLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Row:", None, -1))
         self.rowHeightLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Row height:", None, -1))

@@ -512,7 +512,7 @@ def test_GIVEN_nothing_WHEN_validating_row_or_column_size_and_row_or_column_coun
 
 
 @pytest.mark.parametrize("corresponding_value", ["0", ""])
-def test_GIVEN_float_WHEN_validating_row_or_column_size_and_row_or_column_count_is_zero_or_empty_THEN_validator_returns_intermediate(
+def test_GIVEN_valid_size_WHEN_validating_row_or_column_size_and_row_or_column_count_is_zero_or_empty_THEN_validator_returns_intermediate(
     corresponding_value
 ):
 
@@ -523,7 +523,7 @@ def test_GIVEN_float_WHEN_validating_row_or_column_size_and_row_or_column_count_
     assert validator.validate("5.2", 0) == QValidator.Intermediate
 
 
-def test_GIVEN_float_WHEN_validating_row_or_column_size_and_row_or_column_count_is_not_zero_or_empty_THEN_validator_returns_acceptable():
+def test_GIVEN_valid_size_WHEN_validating_row_or_column_size_and_row_or_column_count_is_not_zero_or_empty_THEN_validator_returns_acceptable():
 
     mock_corresponding_field = Mock()
     mock_corresponding_field.text = Mock(return_value="5")
@@ -544,7 +544,7 @@ def test_GIVEN_noninteger_WHEN_validating_row_or_column_count_THEN_validator_ret
     assert validator.validate(non_integer, 0) == QValidator.Invalid
 
 
-def test_GIVEN_negative_number_WHEN_validating_row_or_column_count_THEN_validator_returns_invalid():
+def test_GIVEN_negative_int_WHEN_validating_row_or_column_count_THEN_validator_returns_invalid():
 
     mock_corresponding_field = Mock()
     mock_corresponding_field.text = Mock(return_value="2.5")
@@ -577,7 +577,7 @@ def test_GIVEN_zero_or_empty_string_WHEN_validating_row_or_column_count_and_row_
     assert validator.validate(count_value, 0) == QValidator.Intermediate
 
 
-def test_GIVEN_integer_WHEN_validating_row_or_column_count_and_row_or_column_size_is_empty_THEN_validator_returns_intermediate():
+def test_GIVEN_valid_count_WHEN_validating_row_or_column_count_and_row_or_column_size_is_empty_THEN_validator_returns_intermediate():
 
     mock_corresponding_field = Mock()
     mock_corresponding_field.text = Mock(return_value="")
@@ -586,7 +586,7 @@ def test_GIVEN_integer_WHEN_validating_row_or_column_count_and_row_or_column_siz
     assert validator.validate("6", 0) == QValidator.Intermediate
 
 
-def test_GIVEN_integer_WHEN_validating_row_or_column_count_and_row_or_column_size_is_not_empty_THEN_validator_returns_acceptable():
+def test_GIVEN_valid_count_WHEN_validating_row_or_column_count_and_row_or_column_size_is_not_empty_THEN_validator_returns_acceptable():
 
     mock_corresponding_field = Mock()
     mock_corresponding_field.text = Mock(return_value="3.8")

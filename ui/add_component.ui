@@ -182,6 +182,13 @@
                    </property>
                   </widget>
                  </item>
+                 <item>
+                  <widget class="QRadioButton" name="noPixelsButton">
+                   <property name="text">
+                    <string>No Pixels</string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
               </item>
