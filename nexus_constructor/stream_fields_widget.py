@@ -34,5 +34,5 @@ class StreamFieldsWidget(QDialog):
         self.source_line_edit.setEnabled(source)
         self.type_combo.setEnabled(type)
 
-    def _type_changed(self, type):
-        self.array_size_spinbox.setEnabled(type == "double")
+    def _type_changed(self, dtype):
+        self.array_size_spinbox.setEnabled(dtype == "double")
