@@ -57,7 +57,7 @@ class Instrument:
 
         self.nexus.nexus_file.visititems(refresh_depends_on)
 
-    def add_component(self, name: str, nx_class: str, description: str) -> Component:
+    def create_component(self, name: str, nx_class: str, description: str) -> Component:
         """
         Creates a component group in a NeXus file
         :param name: Name of the component group to create

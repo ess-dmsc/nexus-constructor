@@ -483,7 +483,7 @@ def test_remove_component():
     wrapper = NexusWrapper("test_remove_component")
     instrument = Instrument(wrapper)
     under_test = ComponentTreeModel(instrument)
-    instrument.add_component("Some name", "some class", "desc")
+    instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
     assert under_test.rowCount(QModelIndex()) == 1
     under_test.remove_node(component_index)
@@ -494,7 +494,7 @@ def test_remove_transformation():
     wrapper = NexusWrapper("test_remove_transformation")
     instrument = Instrument(wrapper)
     under_test = ComponentTreeModel(instrument)
-    instrument.add_component("Some name", "some class", "desc")
+    instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
     under_test.add_rotation(component_index)
     transformation_list_index = under_test.index(1, 0, component_index)
@@ -508,7 +508,7 @@ def test_remove_link():
     wrapper = NexusWrapper("test_remove_link")
     instrument = Instrument(wrapper)
     under_test = ComponentTreeModel(instrument)
-    instrument.add_component("Some name", "some class", "desc")
+    instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
     under_test.add_link(component_index)
     transformation_list_index = under_test.index(1, 0, component_index)
@@ -526,7 +526,7 @@ def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_com
     first_component_name = "component1"
     first_component_nx_class = "NXdetector"
     description = "desc"
-    first_component = instrument.add_component(
+    first_component = instrument.create_component(
         first_component_name, first_component_nx_class, description
     )
 
@@ -558,7 +558,7 @@ def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_T
     first_component_name = "component1"
     first_component_nx_class = "NXdetector"
     description = "desc"
-    first_component = instrument.add_component(
+    first_component = instrument.create_component(
         first_component_name, first_component_nx_class, description
     )
 

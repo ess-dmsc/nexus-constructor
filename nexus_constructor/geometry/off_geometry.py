@@ -3,6 +3,7 @@ from PySide2.QtGui import QVector3D
 from abc import ABC, abstractmethod
 from nexus_constructor.nexus import nexus_wrapper as nx
 import h5py
+
 from nexus_constructor.nexus.validation import (
     NexusFormatError,
     ValidateDataset,
@@ -17,14 +18,6 @@ import numpy as np
 
 class OFFGeometry(ABC):
     geometry_str = "OFF"
-
-    def __init__(self, units: str = "", filename: str = ""):
-        """
-        :param units: Store units from interface to repopulate field if component is edited
-        :param filename: Store filename from interface to repopulate field if component is edited
-        """
-        self.units = units
-        self.filename = filename
 
     @property
     @abstractmethod
@@ -129,15 +122,14 @@ class OFFGeometryNexus(OFFGeometry):
         units: str = "",
         file_path: str = "",
     ):
-        super().__init__(units)
+        super().__init__()
         self.file = nexus_file
         self.group = group
         self._verify_in_file()
-
-        # Source units and file path are retained only for the purpose of populating the edit component window
-        # with the options previously chosen by the user
-        self.units = units
-        self.file_path = file_path
+        if units:
+            self.units = units
+        if file_path:
+            self.file_path = file_path
 
     def _verify_in_file(self):
         """
@@ -205,6 +197,32 @@ class OFFGeometryNexus(OFFGeometry):
     @faces.setter
     def faces(self, new_faces: List[List[int]]):
         record_faces_in_file(self.file, self.group, new_faces)
+
+    @property
+    def units(self) -> str:
+        return str(self.group["cad_file_units"][...])
+
+    @units.setter
+    def units(self, units: str):
+        self.file.set_field_value(
+            group=self.group,
+            name="cad_file_units",
+            value=units,
+            dtype=h5py.special_dtype(vlen=str),
+        )
+
+    @property
+    def file_path(self):
+        return str(self.group["cad_file_path"][...])
+
+    @file_path.setter
+    def file_path(self, file_path: str):
+        self.file.set_field_value(
+            group=self.group,
+            name="cad_file_path",
+            value=file_path,
+            dtype=h5py.special_dtype(vlen=str),
+        )
 
 
 def record_faces_in_file(
