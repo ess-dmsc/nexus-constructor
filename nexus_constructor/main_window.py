@@ -1,4 +1,5 @@
-from PySide2.QtWidgets import QAction, QToolBar
+from PySide2.QtCore import QObject
+from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 
@@ -24,7 +25,7 @@ NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
-class MainWindow(Ui_MainWindow):
+class MainWindow(Ui_MainWindow, QObject):
     def __init__(self, instrument: Instrument):
         super().__init__()
         self.instrument = instrument
@@ -79,6 +80,7 @@ class MainWindow(Ui_MainWindow):
         self.componentTreeView.updateGeometries()
         self.componentTreeView.updateGeometry()
         self.componentTreeView.clicked.connect(self.on_clicked)
+        self.componentTreeView.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.component_tool_bar = QToolBar("Actions", self.tab_2)
         self.new_component_action = QAction(
@@ -112,11 +114,25 @@ class MainWindow(Ui_MainWindow):
         self.component_tool_bar.addAction(self.duplicate_action)
         self.duplicate_action.triggered.connect(self.on_duplicate_node)
         self.duplicate_action.setEnabled(False)
+
+        self.edit_component_action = QAction(
+            QIcon("ui/edit_component.png"), "Edit Component", self.tab_2
+        )
+        self.edit_component_action.setEnabled(False)
+        self.edit_component_action.triggered.connect(self.show_edit_component_dialog)
+        self.component_tool_bar.addAction(self.edit_component_action)
+
         self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.tab_2)
         self.delete_action.triggered.connect(self.on_delete_item)
         self.delete_action.setEnabled(False)
         self.component_tool_bar.addAction(self.delete_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
+
+    def show_edit_component_dialog(self):
+        selected_component = self.componentTreeView.selectedIndexes()[
+            0
+        ].internalPointer()
+        self.show_add_component_window(selected_component)
 
     def show_entries_dialog(self, map_of_entries: dict, nexus_file: h5py.File):
         """
@@ -170,9 +186,11 @@ class MainWindow(Ui_MainWindow):
             ):
                 self.delete_action.setEnabled(True)
                 self.duplicate_action.setEnabled(True)
+                self.edit_component_action.setEnabled(True)
             else:
                 self.delete_action.setEnabled(False)
                 self.duplicate_action.setEnabled(False)
+                self.edit_component_action.setEnabled(False)
             if isinstance(selected_object, LinkTransformation):
                 self.new_rotation_action.setEnabled(False)
                 self.new_translation_action.setEnabled(False)
@@ -293,10 +311,10 @@ class MainWindow(Ui_MainWindow):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
         self.instrument.nexus.open_file(filename)
 
-    def show_add_component_window(self):
+    def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
         self.add_component_window.ui = AddComponentDialog(
-            self.instrument, self.component_model
+            self.instrument, self.component_model, component, parent=self
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()

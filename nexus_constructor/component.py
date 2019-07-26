@@ -264,7 +264,7 @@ class Component:
         Sets the shape of the component to be a cylinder
         Overrides any existing shape
         """
-        self._remove_shape()
+        self.remove_shape()
         validate_nonzero_qvector(axis_direction)
         shape_group = self.file.create_nx_group(
             SHAPE_GROUP_NAME, CYLINDRICAL_GEOMETRY_NEXUS_NAME, self.group
@@ -276,18 +276,20 @@ class Component:
         self.file.set_attribute_value(vertices_field, "units", units)
         return CylindricalGeometry(self.file, shape_group)
 
-    def set_off_shape(self, loaded_geometry: OFFGeometry) -> OFFGeometryNexus:
+    def set_off_shape(
+        self, loaded_geometry: OFFGeometry, units: str = "", filename: str = ""
+    ) -> OFFGeometryNexus:
         """
         Sets the shape of the component to be a mesh
         Overrides any existing shape
         """
-        self._remove_shape()
+        self.remove_shape()
         shape_group = self.file.create_nx_group(
             SHAPE_GROUP_NAME, OFF_GEOMETRY_NEXUS_NAME, self.group
         )
         record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
         record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
-        return OFFGeometryNexus(self.file, shape_group)
+        return OFFGeometryNexus(self.file, shape_group, units, filename)
 
     def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
         if SHAPE_GROUP_NAME in self.group:
@@ -298,7 +300,7 @@ class Component:
             if nx_class == OFF_GEOMETRY_NEXUS_NAME:
                 return OFFGeometryNexus(self.file, shape_group)
 
-    def _remove_shape(self):
+    def remove_shape(self):
         if SHAPE_GROUP_NAME in self.group:
             del self.group[SHAPE_GROUP_NAME]
 
