@@ -8,7 +8,8 @@ from PySide2.QtWidgets import (
     QListWidget,
     QMessageBox,
     QGridLayout,
-    QFormLayout)
+    QFormLayout,
+)
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
@@ -216,10 +217,7 @@ class FieldWidget(QFrame):
             )
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             self.edit_dialog.setLayout(QFormLayout())
-            self.edit_dialog.layout().addWidget(StreamFieldsWidget())
-            self.edit_dialog.setWindowTitle("Edit Streamed Field")
-
-            pass
+            self.edit_dialog.layout().addWidget(StreamFieldsWidget(self.edit_dialog))
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             # TODO: show nx class panels
             pass
