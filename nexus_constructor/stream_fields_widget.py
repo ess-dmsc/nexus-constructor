@@ -10,15 +10,18 @@ class StreamFieldsWidget(QDialog):
         self.setParent(parent)
         self.setLayout(QGridLayout())
         self.schema_combo = QComboBox()
-        self.schema_combo.currentTextChanged.connect(self.schema_type_changed)
-        self.schema_combo.addItems(SCHEMAS)
+
         self.topic_line_edit = QLineEdit()
         self.source_line_edit = QLineEdit()
+
+        self.array_size_spinbox = QSpinBox()
 
         self.type_combo = QComboBox()
         self.type_combo.currentTextChanged.connect(self._type_changed)
 
-        self.array_size_spinbox = QSpinBox()
+        self.schema_combo.currentTextChanged.connect(self.schema_type_changed)
+        self.schema_combo.addItems(SCHEMAS)
+
 
         self.layout().addWidget(self.schema_combo)
         self.layout().addWidget(self.topic_line_edit)
@@ -31,17 +34,17 @@ class StreamFieldsWidget(QDialog):
     def schema_type_changed(self, schema):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
         if schema == "f142":
-            self._set_edits_enabled(True, True)
+            self._set_edits_visible(True, True)
         elif schema == "ev42":
-            self._set_edits_enabled(False, False)
+            self._set_edits_visible(False, False)
         elif schema == "hs00":
-            self._set_edits_enabled(False, False)
+            self._set_edits_visible(False, False)
         elif schema == "ns10":
-            self._set_edits_enabled(False, False)
+            self._set_edits_visible(False, False)
 
-    def _set_edits_enabled(self, source: bool, type: bool):
-        self.source_line_edit.setEnabled(source)
-        self.type_combo.setEnabled(type)
+    def _set_edits_visible(self, source: bool, type: bool):
+        self.source_line_edit.setVisible(source)
+        self.type_combo.setVisible(type)
 
     def _type_changed(self, dtype):
         self.array_size_spinbox.setEnabled(dtype == "double")
