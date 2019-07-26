@@ -13,31 +13,15 @@ from stl import mesh
 
 
 class PixelGridIDValidator(QValidator):
-    def __init__(self, fields: List[QLineEdit]):
+    def __init__(self):
 
-        self.fields = fields
         super().__init__()
-
-    def get_content_of_other_fields(self):
-        return [field.text() for field in self.fields]
 
     def validate(self, input: str, pos: int) -> QValidator.State:
 
-        content = self.get_content_of_other_fields()
-        all_other_fields_empty = all(
-            [input_from_other_field == "" for input_from_other_field in content]
-        )
-        all_other_fields_nonempty = all(
-            [input_from_other_field != "" for input_from_other_field in content]
-        )
-
         if input == "":
-            if all_other_fields_empty:
-                self.is_valid.emit(True)
-                return QValidator.Acceptable
-            else:
-                self.is_valid.emit(False)
-                return QValidator.Intermediate
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
 
         try:
             val = int(input)
@@ -46,15 +30,8 @@ class PixelGridIDValidator(QValidator):
                 self.is_valid.emit(False)
                 return QValidator.Invalid
             else:
-                if all_other_fields_empty:
-                    self.is_valid.emit(False)
-                    return QValidator.Intermediate
-                elif all_other_fields_nonempty:
-                    self.is_valid.emit(True)
-                    return QValidator.Acceptable
-                else:
-                    self.is_valid.emit(False)
-                    return QValidator.Intermediate
+                self.is_valid.emit(True)
+                return QValidator.Acceptable
 
         except ValueError:
             self.is_valid.emit(False)
@@ -76,11 +53,11 @@ class PixelGridRowColumnSizeValidator(QDoubleValidator):
 
     def value_not_needed(self):
         """
-        Checks to see if the input in the rows/columns field is 0 or empty. If this is the case then a value for
-        row height/column width isn't needed.
+        Checks to see if the input in the rows/columns field is 0. If this is the case then a value for row
+        height/column width isn't needed.
         :return: Bool indicating whether the corresponding field is empty or has the number zero.
         """
-        return self.corresponding_field.text() in ["0", ""]
+        return self.corresponding_field.text() == "0"
 
     def validate(self, input: str, pos: int) -> QValidator.State:
 
@@ -127,7 +104,7 @@ class PixelGridRowColumnSizeValidator(QDoubleValidator):
 
 
 class PixelGridRowColumnCountValidator(QValidator):
-    def __init__(self, corresponding_field: QLineEdit):
+    def __init__(self, corresponding_field: QLineEdit, other_count_field: QLineEdit):
         """
         Validator for inspecting the number of rows/columns entered in the pixel grid options. Checks the corresponding
         row height/column width value in order to determine input validity.
@@ -135,6 +112,7 @@ class PixelGridRowColumnCountValidator(QValidator):
         """
         super().__init__()
         self.corresponding_field = corresponding_field
+        self.other_count_field = other_count_field
 
     def value_needed(self):
         """
@@ -144,20 +122,18 @@ class PixelGridRowColumnCountValidator(QValidator):
         """
         return len(self.corresponding_field.text()) > 0
 
+    def other_count_is_zero(self):
+
+        return self.other_count_field.text() == "0"
+
     def validate(self, input: str, pos: int) -> QValidator.State:
 
         value_needed = self.value_needed()
 
-        # Check if the input is empty
+        # Return intermediate if the line edit is empty
         if input == "":
-            if value_needed:
-                # Return intermediate if the value is "needed"
-                self.is_valid.emit(False)
-                return QValidator.Intermediate
-            else:
-                # Otherwise accept an empty field
-                self.is_valid.emit(True)
-                return QValidator.Acceptable
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
 
         # Attempt to convert the value to an int
         try:
@@ -171,6 +147,9 @@ class PixelGridRowColumnCountValidator(QValidator):
                 # Return intermediate if a positive value is "needed"
                 if value_needed:
                     self.is_valid.emit(False)
+                    return QValidator.Intermediate
+                elif self.other_count_is_zero():
+                    self.correct_count.emit(False)
                     return QValidator.Intermediate
                 else:
                     # Accept zero if a positive value isn't needed
@@ -191,6 +170,7 @@ class PixelGridRowColumnCountValidator(QValidator):
             return QValidator.Invalid
 
     is_valid = Signal(bool)
+    correct_count = Signal(bool)
 
 
 class NullableIntValidator(QIntValidator):

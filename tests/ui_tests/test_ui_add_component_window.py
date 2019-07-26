@@ -23,7 +23,7 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
-MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("", "5.3"), ("1", "")]
+MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("1", "")]
 
 WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "requirements.txt")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
@@ -164,8 +164,7 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 def test_UI_GIVEN_no_shape_WHEN_selecting_shape_type_THEN_shape_options_are_hidden(
     qtbot, template, dialog
 ):
-
-    systematic_button_press(qtbot, dialog.noShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.noShapeRadioButton)
     assert not dialog.shapeOptionsBox.isVisible()
 
 
@@ -173,99 +172,91 @@ def test_UI_GIVEN_no_shape_WHEN_selecting_shape_type_THEN_shape_options_are_hidd
 def test_UI_GIVEN_nothing_WHEN_changing_component_shape_type_THEN_add_component_button_is_always_disabled(
     qtbot, template, dialog, shape_button_name
 ):
-
-    systematic_button_press(qtbot, get_shape_type_button(dialog, shape_button_name))
+    systematic_button_press(
+        qtbot, template, get_shape_type_button(dialog, shape_button_name)
+    )
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_GIVEN_cylinder_shape_WHEN_selecting_shape_type_THEN_relevant_fields_are_shown(
+def test_UI_GIVEN_nothong_WHEN_selecting_cylinder_type_THEN_relevant_fields_are_shown(
     qtbot, template, dialog
 ):
-
-    # Check that the relevant fields start as invisible
-    assert not dialog.shapeOptionsBox.isVisible()
-    assert not dialog.cylinderOptionsBox.isVisible()
-    assert not dialog.unitsbox.isVisible()
-
     # Click on the cylinder shape button
-    systematic_button_press(qtbot, dialog.CylinderRadioButton)
-    show_and_close_window(qtbot, template)
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
     # Check that this has caused the relevant fields to become visible
     assert dialog.shapeOptionsBox.isVisible()
     assert dialog.cylinderOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
 
+    # Check that the file input isn't visible as this is only available for the mesh
+    assert not dialog.geometryFileBox.isVisible()
+    # Check that the pixel grid options aren't visible as this is only available for certain NXclasses
+    assert not dialog.pixelGridBox.isVisible()
 
-def test_UI_GIVEN_mesh_shape_WHEN_selecting_shape_type_THEN_relevant_fields_are_shown(
+
+def test_UI_GIVEN_nothing_WHEN_selecting_mesh_shape_THEN_relevant_fields_are_shown(
     qtbot, template, dialog
 ):
-
-    # Check that the relevant fields start as invisible
-    assert not dialog.shapeOptionsBox.isVisible()
-    assert not dialog.cylinderOptionsBox.isVisible()
-    assert not dialog.unitsbox.isVisible()
-
     # Click on the mesh shape button
-    systematic_button_press(qtbot, dialog.meshRadioButton)
-    show_and_close_window(qtbot, template)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Check that this has caused the relevant fields to become visible
     assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
     assert dialog.geometryFileBox.isVisible()
 
+    # Check that the cylinder options aren't visible
+    assert not dialog.cylinderOptionsBox.isVisible()
+    # Check that the pixel grid options aren't visible as this is only available for certain NXclasses
+    assert not dialog.pixelGridBox.isVisible()
+
 
 @pytest.mark.parametrize("shape_with_units", SHAPE_TYPE_BUTTONS[1:])
-def test_UI_GIVEN_nothing_WHEN_choosing_shape_with_units_THEN_default_units_are_metres(
+def test_UI_GIVEN_nothing_WHEN_selecting_shape_with_units_THEN_default_units_are_metres(
     qtbot, template, dialog, shape_with_units
 ):
-
     # Click on the button of a shape type with units
-    systematic_button_press(qtbot, get_shape_type_button(dialog, shape_with_units))
-    show_and_close_window(qtbot, template)
+    systematic_button_press(
+        qtbot, template, get_shape_type_button(dialog, shape_with_units)
+    )
 
     # Check that the units line edit is visible and has metres by default
     assert dialog.unitsLineEdit.isVisible()
     assert dialog.unitsLineEdit.text() == "m"
 
 
-@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
+@pytest.mark.parametrize("pixel_class, pixel_index", PIXEL_OPTIONS)
 @pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
 @pytest.mark.parametrize("pixel_shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_invisible_to_visible(
-    qtbot, template, dialog, pixel_options, any_component_type, pixel_shape_name
+    qtbot,
+    template,
+    dialog,
+    pixel_class,
+    pixel_index,
+    any_component_type,
+    pixel_shape_name,
 ):
-    # Change the pixel options to invisible
-    make_pixel_options_disappear(qtbot, dialog, template, any_component_type[1])
-    assert not dialog.pixelOptionsBox.isVisible()
-
-    # Change the pixel options to visible
+    # Change the pixel options to visible by selecting a cylinder/mesh shape and a NXclass with pixel fields
     make_pixel_options_appear(
         qtbot,
         get_shape_type_button(dialog, pixel_shape_name),
         dialog,
         template,
-        pixel_options[1],
+        pixel_index,
     )
+    # Check that this has caused the pixel options to become visible
     assert dialog.pixelOptionsBox.isVisible()
 
 
-@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 @pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
-@pytest.mark.parametrize("pixel_shape_name", SHAPE_TYPE_BUTTONS[1:])
-def test_UI_GIVEN_class_and_shape_without_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_visible_to_invisible(
-    qtbot, template, dialog, pixel_options, any_component_type, pixel_shape_name
+def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_options_go_from_visible_to_invisible(
+    qtbot, template, dialog, any_component_type
 ):
     # Change the pixel options to visible
-    make_pixel_options_appear(
-        qtbot,
-        get_shape_type_button(dialog, pixel_shape_name),
-        dialog,
-        template,
-        pixel_options[1],
-    )
-    assert dialog.pixelOptionsBox.isVisible()
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Change the pixel options to invisible
     make_pixel_options_disappear(qtbot, dialog, template, any_component_type[1])
@@ -299,13 +290,9 @@ def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_si
     qtbot, template, dialog, shape_name, pixel_options
 ):
     # Make the pixel options visible
-    make_pixel_options_appear(
-        qtbot,
-        get_shape_type_button(dialog, shape_name),
-        dialog,
-        template,
-        pixel_options[1],
-    )
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
     # Check that the single grid button is checked and the pixel grid option is visible by default
     assert dialog.singlePixelRadioButton.isChecked()
     assert dialog.pixelGridBox.isVisible()
@@ -315,22 +302,15 @@ def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_si
     assert not dialog.pixelMappingLabel.isVisible()
 
 
-@pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
-@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible(
-    qtbot, template, dialog, shape_name, pixel_options
+    qtbot, template, dialog
 ):
     # Make the pixel options visible
-    make_pixel_options_appear(
-        qtbot,
-        get_shape_type_button(dialog, shape_name),
-        dialog,
-        template,
-        pixel_options[1],
-    )
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape button under pixel layout
-    systematic_button_press(qtbot, dialog.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Check that the pixel mapping items are visible
     assert dialog.pixelMappingLabel.isVisible()
@@ -340,23 +320,16 @@ def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixe
     assert not dialog.pixelGridBox.isVisible()
 
 
-@pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
-@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_options_become_invisible(
-    qtbot, template, dialog, shape_name, pixel_options
+    qtbot, template, dialog
 ):
 
     # Make the pixel options visible
-    make_pixel_options_appear(
-        qtbot,
-        get_shape_type_button(dialog, shape_name),
-        dialog,
-        template,
-        pixel_options[1],
-    )
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape button under pixel layout
-    systematic_button_press(qtbot, dialog.noPixelsButton)
+    systematic_button_press(qtbot, template, dialog.noPixelsButton)
 
     # Check that the pixel mapping items are visible
     assert not dialog.pixelMappingLabel.isVisible()
@@ -366,56 +339,48 @@ def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_optio
     assert not dialog.pixelGridBox.isVisible()
 
 
-@pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
-@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_is_populated(
-    qtbot, template, dialog, shape_name, pixel_options
+    qtbot, template, dialog
 ):
     # Make the pixel options visible
-    make_pixel_options_appear(
-        qtbot,
-        get_shape_type_button(dialog, shape_name),
-        dialog,
-        template,
-        pixel_options[1],
-    )
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape button
-    systematic_button_press(qtbot, dialog.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Provide a valid file path and mesh file
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Check that the number of items in the pixel mapping list matches the number of faces in the mesh file
     assert dialog.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
 
 
-@pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
-@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same(
-    qtbot, template, dialog, shape_name, pixel_options
+    qtbot, template, dialog
 ):
 
     # Make the pixel options visible
-    make_pixel_options_appear(
-        qtbot,
-        get_shape_type_button(dialog, shape_name),
-        dialog,
-        template,
-        pixel_options[1],
-    )
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape radio button
-    systematic_button_press(qtbot, dialog.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Provide a valid file path and mesh file
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Mock the method that is used to create the pixel mapping list
     dialog.populate_pixel_mapping_list = Mock()
 
     # Provide the same file as before
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Check that the method for populating the pixel mapping list was not called
     dialog.populate_pixel_mapping_list.assert_not_called()
@@ -424,28 +389,25 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
     assert dialog.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
 
 
-@pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
-@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
 def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
-    qtbot, template, dialog, shape_name, pixel_options
+    qtbot, template, dialog
 ):
-    # Make the pixel options appear
-    make_pixel_options_appear(
-        qtbot,
-        get_shape_type_button(dialog, shape_name),
-        dialog,
-        template,
-        pixel_options[1],
-    )
+    # Make the pixel options visible
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape button
-    systematic_button_press(qtbot, dialog.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Provide a path and file for a cube mesh
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Provide a path and file for an octahedron mesh
-    enter_file_path(qtbot, dialog, VALID_OCTA_MESH_FILE_PATH, VALID_OCTA_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_OCTA_MESH_FILE_PATH, VALID_OCTA_OFF_FILE
+    )
 
     # Check that the pixel mapping list has updated
     assert dialog.pixelMappingListWidget.count() == CORRECT_OCTA_FACES
@@ -454,12 +416,11 @@ def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_ma
 def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
     qtbot, template, dialog
 ):
-
     # Check that the background color of the ext field starts as red
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
     # Mimic the user entering a name in the text field
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has changed to white
     assert dialog.nameLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
@@ -473,7 +434,7 @@ def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_rem
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
     # Mimic the user entering a non-unique name in the text field
-    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, NONUNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has remained red
     assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
@@ -484,8 +445,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_shape_THEN_add_com
 ):
 
     # Mimic the user entering a non-unique name in the text field
-    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
-    show_and_close_window(qtbot, template)
+    enter_component_name(qtbot, template, dialog, NONUNIQUE_COMPONENT_NAME)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -499,8 +459,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
 ):
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
-    show_and_close_window(qtbot, template)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -514,18 +473,18 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_com
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
-    show_and_close_window(qtbot, template)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Mimic the user entering valid units
     enter_units(qtbot, dialog, VALID_UNITS)
-    show_and_close_window(qtbot, template)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(dialog.buttonBox, Qt.LeftButton)
@@ -538,10 +497,10 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_shape_THEN_add
     qtbot, template, dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.CylinderRadioButton)
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering valid units
     enter_units(qtbot, dialog, VALID_UNITS)
@@ -558,10 +517,10 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_shape_THEN_add_com
 ):
 
     # Mimic the user selecting a no shape
-    systematic_button_press(qtbot, dialog.noShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.noShapeRadioButton)
 
     # Mimic the user entering a non-unique name in the text field
-    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, NONUNIQUE_COMPONENT_NAME)
 
     # The Add Component button is disabled
     assert not dialog.buttonBox.isEnabled()
@@ -580,7 +539,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
 ):
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # The Add Component button is enabled because all the information required to create a no shape component is
     # there
@@ -591,8 +550,7 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_file_p
     qtbot, template, dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
-    show_and_close_window(qtbot, template)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # No file name was given so we expect the file input box background to be red
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
@@ -602,11 +560,10 @@ def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_shape_T
     qtbot, template, dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user entering a bad file path
-    enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH, "OFF")
-    show_and_close_window(qtbot, template)
+    enter_file_path(qtbot, dialog, template, NONEXISTENT_FILE_PATH, "OFF")
 
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
@@ -616,11 +573,10 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving the path for a file that exists but has the wrong extension
-    enter_file_path(qtbot, dialog, WRONG_EXTENSION_FILE_PATH, "OFF")
-    show_and_close_window(qtbot, template)
+    enter_file_path(qtbot, dialog, template, WRONG_EXTENSION_FILE_PATH, "OFF")
 
     assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
@@ -629,11 +585,12 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_fil
     qtbot, template, dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
-    show_and_close_window(qtbot, template)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # The file input box should now have a white background
     assert dialog.fileLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
@@ -644,14 +601,15 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_add
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
-    show_and_close_window(qtbot, template)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     assert dialog.buttonBox.isEnabled()
 
@@ -660,12 +618,10 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_co
     qtbot, template, dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
-    show_and_close_window(qtbot, template)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
-    show_and_close_window(qtbot, template)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Although the component name is valid, no file path has been given so the button should be disabled
     assert not dialog.buttonBox.isEnabled()
@@ -676,14 +632,13 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_shape_TH
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a nonexistent file path
-    enter_file_path(qtbot, dialog, NONEXISTENT_FILE_PATH, VALID_CUBE_OFF_FILE)
-    show_and_close_window(qtbot, template)
+    enter_file_path(qtbot, dialog, template, NONEXISTENT_FILE_PATH, VALID_CUBE_OFF_FILE)
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -693,14 +648,15 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a path for a file that exists but has the wrong extension
-    enter_file_path(qtbot, dialog, WRONG_EXTENSION_FILE_PATH, VALID_CUBE_OFF_FILE)
-    show_and_close_window(qtbot, template)
+    enter_file_path(
+        qtbot, dialog, template, WRONG_EXTENSION_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -710,7 +666,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user clearing the unit input box
     enter_units(qtbot, dialog, "")
@@ -723,7 +679,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_units
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving invalid units input
     enter_units(qtbot, dialog, INVALID_UNITS)
@@ -736,7 +692,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_units_b
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the replacing the default value with "km"
     enter_units(qtbot, dialog, VALID_UNITS)
@@ -749,13 +705,15 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_com
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Mimic the user giving valid units
     enter_units(qtbot, dialog, VALID_UNITS)
@@ -768,13 +726,15 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_add_compon
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Mimic the user clearing the units box
     enter_units(qtbot, dialog, "")
@@ -787,13 +747,15 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_c
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Mimic the user giving invalid units input
     enter_units(qtbot, dialog, INVALID_UNITS)
@@ -806,13 +768,15 @@ def test_UI_GIVEN_nonunique_name_WHEN_adding_component_with_mesh_shape_THEN_add_
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user giving an invalid component name
-    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, NONUNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -822,10 +786,10 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_cylinder_shape_THEN_a
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.CylinderRadioButton)
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
     # Mimic the user giving valid component name
-    enter_component_name(qtbot, dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user giving invalid units input
     enter_units(qtbot, dialog, INVALID_UNITS)
@@ -838,13 +802,13 @@ def test_UI_GIVEN_invalid_name_WHEN_adding_component_with_cylinder_shape_THEN_ad
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.CylinderRadioButton)
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
     # Mimic the user giving valid units input
     enter_units(qtbot, dialog, VALID_UNITS)
 
     # Mimic the user giving valid component name
-    enter_component_name(qtbot, dialog, NONUNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, template, dialog, NONUNIQUE_COMPONENT_NAME)
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -854,8 +818,7 @@ def test_UI_GIVEN_mesh_shape_selected_THEN_relevant_fields_are_visible(
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
-    show_and_close_window(qtbot, template)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
@@ -869,8 +832,7 @@ def test_UI_GIVEN_cylinder_shape_selected_THEN_relevant_fields_are_visible(
 ):
 
     # Mimic the user selecting a cylinder shape
-    systematic_button_press(qtbot, dialog.CylinderRadioButton)
-    show_and_close_window(qtbot, template)
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
     assert dialog.shapeOptionsBox.isVisible()
     assert dialog.unitsbox.isVisible()
@@ -885,33 +847,27 @@ def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, dialog.meshRadioButton)
-    show_and_close_window(qtbot, template)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user selecting a component type that doesn't have pixel fields
     dialog.componentTypeComboBox.setCurrentIndex(comp_type_without_pixels[1])
 
     # Mimic the user giving a valid mesh file
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
 
     # Check that the pixel mapping list is still empty
     assert dialog.pixelMappingListWidget.count() == 0
 
 
-@pytest.mark.parametrize("shape_with_pixels", SHAPE_TYPE_BUTTONS[1:])
-@pytest.mark.parametrize("comp_type_with_pixels", PIXEL_OPTIONS)
 def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_have_expected_default_values(
-    qtbot, template, dialog, shape_with_pixels, comp_type_with_pixels
+    qtbot, template, dialog
 ):
 
     # Make the pixel options appear
-    make_pixel_options_appear(
-        qtbot,
-        get_shape_type_button(dialog, shape_with_pixels),
-        dialog,
-        template,
-        comp_type_with_pixels[1],
-    )
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Check that the pixel-related fields start out with the expected default values
     assert dialog.rowLineEdit.text() == "1"
@@ -934,29 +890,27 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
 ):
 
     # Make the pixel options appear
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-    show_and_close_window(qtbot, template)
 
     # Choose the pixel mapping option
-    systematic_button_press(qtbot, dialog.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Give an invalid file
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH, "hfhuihfiuhf")
+    enter_file_path(qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, "hfhuihfiuhf")
 
     # Check that the number of items in the pixel mapping list is still zero
     assert dialog.pixelMappingListWidget.count() == 0
 
 
 @pytest.mark.parametrize("row_count, row_height", MISMATCHING_PIXEL_GRID_VALUES)
-def test_GIVEN_mismatching_values_WHEN_giving_pixel_grid_options_THEN_row_count_background_turns_red(
+def test_GIVEN_mismatching_row_values_WHEN_giving_pixel_grid_options_THEN_both_backgrounds_turn_red(
     qtbot, template, dialog, row_count, row_height
 ):
 
     # Make the pixel options appear
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-    show_and_close_window(qtbot, template)
 
     # Enter a value for row height
     qtbot.keyClick(dialog.rowHeightLineEdit, Qt.Key_Backspace)
@@ -968,17 +922,17 @@ def test_GIVEN_mismatching_values_WHEN_giving_pixel_grid_options_THEN_row_count_
 
     # Check that the background has turned red as a result of the values not matching
     assert dialog.rowLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.rowHeightLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
 @pytest.mark.parametrize("column_count, column_width", MISMATCHING_PIXEL_GRID_VALUES)
-def test_GIVEN_mismatching_values_WHEN_giving_pixel_grid_options_THEN_column_width_background_turns_red(
+def test_GIVEN_mismatching_column_values_WHEN_giving_pixel_grid_options_THEN_both_backgrounds_turn_red(
     qtbot, template, dialog, column_count, column_width
 ):
 
     # Make the pixel options appear
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-    show_and_close_window(qtbot, template)
 
     # Enter a value for column count
     qtbot.keyClick(dialog.columnsLineEdit, Qt.Key_Backspace)
@@ -989,6 +943,7 @@ def test_GIVEN_mismatching_values_WHEN_giving_pixel_grid_options_THEN_column_wid
     qtbot.keyClicks(dialog.columnWidthLineEdit, column_width)
 
     # Check that the background has become red as a result of the values not matching
+    assert dialog.columnsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
     assert dialog.columnWidthLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
@@ -1000,9 +955,8 @@ def test_GIVEN_acceptable_value_WHEN_giving_pixel_grid_options_THEN_row_count_ba
     row_height = "3.5"
 
     # Make the pixel options appear
-    systematic_button_press(qtbot, dialog.meshRadioButton)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-    show_and_close_window(qtbot, template)
 
     # Enter a value for row height
     qtbot.keyClick(dialog.rowHeightLineEdit, Qt.Key_Backspace)
@@ -1040,8 +994,7 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_val
 ):
 
     # Mimic the user selecting a cylinder shape
-    systematic_button_press(qtbot, dialog.CylinderRadioButton)
-    show_and_close_window(qtbot, template)
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
     assert dialog.cylinderOptionsBox.isVisible()
     assert dialog.cylinderHeightLineEdit.value() == 1.0
@@ -1112,7 +1065,7 @@ def make_pixel_options_disappear(
     :param template: The window/widget that holds the AddComponentDialog.
     :param component_index: The index of a component type.
     """
-    systematic_button_press(qtbot, dialog.noShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.noShapeRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(component_index)
     show_and_close_window(qtbot, template)
 
@@ -1132,7 +1085,7 @@ def make_pixel_options_appear(
     :param template: The window/widget that holds the AddComponentDialog.
     :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
     """
-    systematic_button_press(qtbot, button)
+    systematic_button_press(qtbot, template, button)
     dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
     show_and_close_window(qtbot, template)
 
@@ -1142,7 +1095,7 @@ def show_window_and_wait_for_interaction(
 ):
     """
     Helper method that allows you to examine a window during testing. Just here for convenience.
-    Does nothing if the test is running on Windows.
+    Does nothing if the test is running on Windows because this is bad for Jenkins.
     :param qtbot: The qtbot testing tool.
     :param template: The window/widget to be opened.
     """
@@ -1183,7 +1136,7 @@ def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
 def create_add_component_dialog():
     """
     Creates an AddComponentDialog object for use in a testing template.
-    :return: An instance of an AddComponentDialog object.
+    :return: An instance of an AddComponentDialog.
     """
     global nexus_wrapper_count
     nexus_name = "test" + str(nexus_wrapper_count)
@@ -1193,10 +1146,15 @@ def create_add_component_dialog():
     return AddComponentDialog(instrument, component)
 
 
-def systematic_button_press(qtbot: pytestqt.qtbot.QtBot, button: QAbstractButton):
+def systematic_button_press(
+    qtbot: pytestqt.qtbot.QtBot,
+    template: PySide2.QtWidgets.QDialog,
+    button: QAbstractButton,
+):
     """
     Left clicks on a button after finding the position to click using a systematic search.
     :param qtbot: The qtbot testing tool.
+    :param template: The window/widget that holds an AddComponentDialog.
     :param button: The button to press.
     """
     point = find_button_press_position(button)
@@ -1205,6 +1163,8 @@ def systematic_button_press(qtbot: pytestqt.qtbot.QtBot, button: QAbstractButton
         qtbot.mouseClick(button, Qt.LeftButton, pos=point)
     else:
         qtbot.mouseClick(button, Qt.LeftButton)
+
+    show_and_close_window(qtbot, template)
 
 
 def find_button_press_position(button: QAbstractButton):
@@ -1226,22 +1186,28 @@ def find_button_press_position(button: QAbstractButton):
 
 
 def enter_component_name(
-    qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, component_name: str
+    qtbot: pytestqt.qtbot.QtBot,
+    template: PySide2.QtWidgets.QDialog,
+    dialog: AddComponentDialog,
+    component_name: str,
 ):
     """
     Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
     name.
     :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
     :param component_name: The desired component name.
     """
     qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
     qtbot.keyClicks(dialog.nameLineEdit, component_name)
+    show_and_close_window(qtbot, template)
 
 
 def enter_file_path(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
     file_path: str,
     file_contents: str,
 ):
@@ -1249,7 +1215,8 @@ def enter_file_path(
     Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
     geometry file.
     :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
     :param file_path: The desired file path.
     :param file_contents: The file contents that are returned by the open mock.
     """
@@ -1257,7 +1224,7 @@ def enter_file_path(
         "nexus_constructor.add_component_window.file_dialog", return_value=file_path
     ):
         with patch("builtins.open", mock_open(read_data=file_contents)):
-            systematic_button_press(qtbot, dialog.fileBrowseButton)
+            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
 
 
 def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
@@ -1265,7 +1232,7 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
     Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
     given string.
     :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
+    :param dialog: An instance of an AddComponentDialog.
     :param units: The desired units input.
     """
     word_length = len(dialog.unitsLineEdit.text())

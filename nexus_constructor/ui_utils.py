@@ -60,26 +60,48 @@ def validate_line_edit(
     )
 
 
-def validate_multiple_line_edits(
-    line_edits, is_valid: bool, tooltip_on_reject="", tooltip_on_accept=""
+def validate_rows_and_columns(
+    row_count_line_edit,
+    column_count_line_edit,
+    row_height_line_edit,
+    column_width_line_edit,
 ):
-    """
-    Sets the line edit colours to red if field is invalid or white if valid. Also sets the tooltips if provided.
-    :param line_edit: The line edit object to apply the validation to.
-    :param is_valid: Whether the line edit field contains valid text
-    :param suggestion_callable: A callable that returns the suggested alternative if not valid.
-    :param tooltip_on_accept: Tooltip to display if line edit is valid.
-    :param tooltip_on_reject: Tooltip to display if line edit is invalid.
-    :return: None.
-    """
-    colour = "#FFFFFF" if is_valid else "#f6989d"
+    white = "#FFFFFF"
+    red = "#f6989d"
 
-    for line_edit in line_edits:
-        line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
+    all_line_edits = [
+        row_count_line_edit,
+        column_count_line_edit,
+        row_height_line_edit,
+        column_width_line_edit,
+    ]
 
-    line_edits[0].setToolTip(tooltip_on_accept) if is_valid else line_edits[
-        0
-    ].setToolTip(tooltip_on_reject)
+    for line_edit in all_line_edits:
+        line_edit.setStyleSheet(f"QLineEdit {{ background-color: {white} }}")
+        line_edit.setToolTip("")
+
+    if row_count_line_edit.text() == "0" and column_count_line_edit.text() == "0":
+        row_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+        column_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+        return
+
+    if row_count_line_edit.text() != "0" and row_height_line_edit.text() == "":
+        print(row_count_line_edit.text())
+        row_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+        row_height_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+        row_height_line_edit.setToolTip(f"QLineEdit {{ background-color: {red} }}")
+
+    if row_count_line_edit.text() == "0" and row_height_line_edit.text() != "":
+        row_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+        row_height_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+
+    if column_count_line_edit.text() != "0" and column_width_line_edit.text() == "":
+        column_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+        column_width_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+
+    if column_count_line_edit.text() == "0" and column_width_line_edit.text() != "":
+        column_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+        column_width_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
 
 
 def qvector3d_to_numpy_array(input_vector: QVector3D) -> np.ndarray:

@@ -5,7 +5,7 @@ from functools import partial
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtGui import QDoubleValidator
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QListWidgetItem, QLineEdit
+from PySide2.QtWidgets import QListWidgetItem
 from nexusutils.readwriteoff import parse_off_file
 
 from nexus_constructor.component import Component
@@ -23,7 +23,7 @@ from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.ui_utils import (
     file_dialog,
     validate_line_edit,
-    validate_multiple_line_edits,
+    validate_rows_and_columns,
 )
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.validators import (
@@ -176,13 +176,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noPixelsButton.clicked.connect(self.hide_pixel_grid_and_mapping)
 
         # Create a validator that only accepts ints that are 0 or greater
-        row_count_validator = PixelGridRowColumnCountValidator(self.rowHeightLineEdit)
+        row_count_validator = PixelGridRowColumnCountValidator(
+            self.rowHeightLineEdit, self.columnsLineEdit
+        )
         column_count_validator = PixelGridRowColumnCountValidator(
-            self.columnWidthLineEdit
+            self.columnWidthLineEdit, self.rowLineEdit
         )
-        pixel_id_validator = PixelGridIDValidator(
-            self.pixelGridBox.findChildren(QLineEdit)
-        )
+        pixel_id_validator = PixelGridIDValidator()
         # Set the validator of the row, column and first line input boxes in the pixel grid options
         self.rowLineEdit.setValidator(row_count_validator)
         self.columnsLineEdit.setValidator(column_count_validator)
@@ -202,43 +202,23 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.countFirstComboBox.addItems(list(self.count_direction.keys()))
 
-        self.rowLineEdit.validator().is_valid.connect(
-            partial(
-                validate_multiple_line_edits,
-                [self.rowHeightLineEdit, self.rowLineEdit],
-                tooltip_on_reject="Row count must match value given for row height.",
-            )
+        check_pixel_input = lambda: validate_rows_and_columns(
+            self.rowLineEdit,
+            self.columnsLineEdit,
+            self.rowHeightLineEdit,
+            self.columnWidthLineEdit,
         )
 
-        self.rowHeightLineEdit.validator().is_valid.connect(
-            partial(
-                validate_multiple_line_edits,
-                [self.rowHeightLineEdit, self.rowLineEdit],
-                tooltip_on_reject="Row height must match value given for row count.",
-            )
-        )
-
-        self.columnsLineEdit.validator().is_valid.connect(
-            partial(
-                validate_multiple_line_edits,
-                [self.columnsLineEdit, self.columnWidthLineEdit],
-                tooltip_on_reject="Column count must match value given for column width.",
-            )
-        )
-
-        self.columnWidthLineEdit.validator().is_valid.connect(
-            partial(
-                validate_multiple_line_edits,
-                [self.columnsLineEdit, self.columnWidthLineEdit],
-                tooltip_on_reject="Column width must match value given for column count.",
-            )
-        )
+        self.rowLineEdit.textEdited.connect(check_pixel_input)
+        self.columnsLineEdit.textEdited.connect(check_pixel_input)
+        self.rowHeightLineEdit.textEdited.connect(check_pixel_input)
+        self.columnWidthLineEdit.textEdited.connect(check_pixel_input)
 
         self.firstIDLineEdit.validator().is_valid.connect(
             partial(
-                validate_multiple_line_edits,
+                validate_line_edit,
                 self.firstIDLineEdit,
-                tooltip_on_reject="All pixel grid text fields need to either be filled or left empty.",
+                tooltip_on_reject="A pixel ID value must be given.",
             )
         )
 
