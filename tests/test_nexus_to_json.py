@@ -270,7 +270,7 @@ def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is
     dataset_name = "depends_on"
     dataset_value = "something_else"
 
-    component = data.add_component(component_name, component_nx_class, "")
+    component = data.create_component(component_name, component_nx_class, "")
     component.set_field(dataset_name, value=dataset_value, dtype=str)
 
     nexus_file_name = "test.nxs"

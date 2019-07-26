@@ -15,6 +15,7 @@ from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
 )
+from nexus_constructor.geometry import CylindricalGeometry, OFFGeometryNexus
 from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.instrument import Instrument
@@ -48,8 +49,17 @@ class GeometryType(Enum):
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
     nx_class_changed = Signal("QVariant")
 
-    def __init__(self, instrument: Instrument, component_model: ComponentTreeModel):
+    def __init__(
+        self,
+        instrument: Instrument,
+        component_model: ComponentTreeModel,
+        component_to_edit: Component = None,
+        parent=None,
+    ):
         super(AddComponentDialog, self).__init__()
+
+        if parent:
+            self.setParent(parent)
 
         # Dictionaries that map user-input to known pixel grid options. Used when created the PixelGridModel.
         self.count_direction = {
@@ -75,6 +85,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixel_mapping_widgets = []
 
         self.possible_fields = []
+        self.component_to_edit = component_to_edit
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -122,7 +133,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        name_validator = NameValidator(self.instrument.get_component_list())
+        component_list = self.instrument.get_component_list()
+
+        if self.component_to_edit:
+            for item in component_list:
+                if item.name == self.component_to_edit.name:
+                    component_list.remove(item)
+
+        name_validator = NameValidator(component_list)
         self.nameLineEdit.setValidator(name_validator)
         self.nameLineEdit.validator().is_valid.connect(
             partial(
@@ -202,12 +220,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.countFirstComboBox.addItems(list(self.count_direction.keys()))
 
-        check_pixel_input = lambda: validate_rows_and_columns(
-            self.rowLineEdit,
-            self.columnsLineEdit,
-            self.rowHeightLineEdit,
-            self.columnWidthLineEdit,
-        )
+        def check_pixel_input():
+            validate_rows_and_columns(
+                self.rowLineEdit,
+                self.columnsLineEdit,
+                self.rowHeightLineEdit,
+                self.columnWidthLineEdit,
+            )
 
         self.rowLineEdit.textEdited.connect(check_pixel_input)
         self.columnsLineEdit.textEdited.connect(check_pixel_input)
@@ -221,6 +240,34 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 tooltip_on_reject="A pixel ID value must be given.",
             )
         )
+        if self.component_to_edit:
+            self._fill_existing_entries()
+
+    def _fill_existing_entries(self):
+        self.buttonBox.setText("Edit Component")
+        self.nameLineEdit.setText(self.component_to_edit.name)
+        self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
+        self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
+        component_shape = self.component_to_edit.get_shape()
+        if not component_shape or isinstance(component_shape, OFFGeometryNoNexus):
+            self.noShapeRadioButton.setChecked(True)
+            self.noShapeRadioButton.clicked.emit()
+        else:
+            if isinstance(component_shape, OFFGeometryNexus):
+                self.meshRadioButton.setChecked(True)
+                self.meshRadioButton.clicked.emit()
+                self.fileLineEdit.setText(component_shape.file_path)
+            elif isinstance(component_shape, CylindricalGeometry):
+                self.CylinderRadioButton.clicked.emit()
+                self.CylinderRadioButton.setChecked(True)
+                self.cylinderHeightLineEdit.setValue(component_shape.height)
+                self.cylinderRadiusLineEdit.setValue(component_shape.radius)
+                self.cylinderXLineEdit.setValue(component_shape.axis_direction.x())
+                self.cylinderYLineEdit.setValue(component_shape.axis_direction.y())
+                self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
+            self.unitsLineEdit.setText(component_shape.units)
+
+        # TODO: fields
 
     def add_field(self):
         item = QListWidgetItem()
@@ -395,9 +442,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             geometry_model.units = self.unitsLineEdit.text()
             geometry_model.file_path = self.cad_file_name
 
-            component.set_off_shape(geometry_model)
+            component.set_off_shape(
+                geometry_model,
+                units=self.unitsLineEdit.text(),
+                filename=self.fileLineEdit.text(),
+            )
         else:
             geometry_model = NoShapeGeometry()
+            component.remove_shape()
 
         return geometry_model
 
@@ -439,21 +491,24 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        component = self.instrument.add_component(component_name, nx_class, description)
-        geometry = self.generate_geometry_model(component)
-        # pixel_data = self.generate_pixel_data()
-        add_fields_to_component(component, self.fieldsListWidget)
-        self.component_model.add_component(component)
-        self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
 
-        #
-        # self.nexus_wrapper.add_component(
-        #     nx_class,
-        #     component_name,
-        #     description,
-        #     self.generate_geometry_model(),
-        #     self.generate_pixel_data(),
-        # )
+        if self.component_to_edit:
+            self.component_to_edit.name = component_name
+            self.component_to_edit.nx_class = nx_class
+            self.component_to_edit.description = description
+            # remove the previous shape from the qt3d view
+            if self.component_to_edit.get_shape() and self.parent():
+                self.parent().sceneWidget.delete_component(self.component_to_edit.name)
+            geometry = self.generate_geometry_model(self.component_to_edit)
+        else:
+            component = self.instrument.create_component(
+                component_name, nx_class, description
+            )
+            geometry = self.generate_geometry_model(component)
+            add_fields_to_component(component, self.fieldsListWidget)
+            self.component_model.add_component(component)
+
+        self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
 
     def invalid_file_given(self):
         """

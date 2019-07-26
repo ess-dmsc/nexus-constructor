@@ -40,7 +40,7 @@ def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_add
     component_type = "NXcrystal"
     name = "test_crystal"
     description = "shiny"
-    instrument.add_component(name, component_type, description)
+    instrument.create_component(name, component_type, description)
 
     check_if_component_is_in_component_list(
         component_type, description, instrument, name, expect_component_present=True
@@ -54,7 +54,7 @@ def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_componen
     component_type = "NXcrystal"
     name = "test_crystal"
     description = "shiny"
-    test_component = instrument.add_component(name, component_type, description)
+    test_component = instrument.create_component(name, component_type, description)
 
     # Test component should be in list
     check_if_component_is_in_component_list(

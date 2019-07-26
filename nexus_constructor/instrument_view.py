@@ -206,6 +206,13 @@ class InstrumentView(QWidget):
         self.component_meshes[name] = mesh
         self.component_entities[name] = entity
 
+    def clear_all_components(self):
+        """
+        resets the entities in qt3d so all components are cleared form the 3d view.
+        """
+        self.component_meshes = dict()
+        self.component_entities = dict()
+
     def delete_component(self, name):
         """
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.

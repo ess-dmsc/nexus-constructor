@@ -6,22 +6,20 @@ import PySide2
 import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
-from PySide2.QtWidgets import (
-    QDialog,
-    QRadioButton,
-    QMainWindow,
-    QAbstractButton,
-    QLineEdit,
-)
+from PySide2.QtGui import QVector3D
+from PySide2.QtWidgets import QDialog, QAbstractButton, QLineEdit
+from PySide2.QtWidgets import QRadioButton, QMainWindow
 from mock import patch, mock_open, Mock
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.validators import FieldType
 
 MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("1", "")]
 
@@ -135,6 +133,91 @@ def dialog(qtbot, template):
     template.ui.setupUi(template)
     qtbot.addWidget(template)
     return dialog
+
+
+def show_and_close_window(
+    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
+):
+    """
+    Function for displaying and then closing a window/widget. This appears to be necessary in order to make sure
+    some interactions with the UI are recognised. Otherwise the UI can behave as though no clicks/button presses/etc
+    actually took place which then causes tests to fail even though they ought to pass in theory.
+    :param qtbot: The qtbot testing tool.
+    :param template: The window/widget to be opened.
+    """
+    template.show()
+    qtbot.waitForWindowShown(template)
+
+
+def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
+    """
+    Creates a template Add Component Dialog and sets this up for testing.
+    :param qtbot: The qtbot testing tool.
+    :return: The AddComponentDialog object and the template that contains it.
+    """
+    template = QDialog()
+    dialog = create_add_component_dialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+    return dialog, template
+
+
+def create_add_component_dialog():
+    """
+    Creates an AddComponentDialog object for use in a testing template.
+    :return: An instance of an AddComponentDialog object.
+    """
+    global nexus_wrapper_count
+    nexus_name = "test" + str(nexus_wrapper_count)
+    instrument = Instrument(NexusWrapper(nexus_name))
+    component = ComponentTreeModel(instrument)
+    nexus_wrapper_count += 1
+    return AddComponentDialog(instrument, component)
+
+
+def systematic_radio_button_press(qtbot: pytestqt.qtbot.QtBot, button: QRadioButton):
+    """
+    Left clicks on a radio button after finding the position to click using a systematic search.
+    :param qtbot: The qtbot testing tool.
+    :param button: The button to press.
+    """
+    qtbot.mouseClick(
+        button, Qt.LeftButton, pos=find_radio_button_press_position(button)
+    )
+
+
+def find_radio_button_press_position(button: QRadioButton):
+    """
+    Systematic way of making sure a button press works. Goes through every point in the widget until it finds one that
+    returns True for the `hitButton` method.
+    :param button: The radio button to click.
+    :return: A QPoint indicating where the button must be clicked in order for its event to be triggered.
+    """
+    size = button.size()
+
+    for x in range(size.width()):
+        for y in range(size.height()):
+            click_point = QPoint(x, y)
+            if button.hitButton(click_point):
+                return click_point
+    return None
+
+
+def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
+    """
+    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
+    given string.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog object.
+    :param units: The desired units input.
+    """
+    word_length = len(dialog.unitsLineEdit.text())
+    for _ in range(word_length):
+        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+
+    if len(units) > 0:
+        qtbot.keyClicks(dialog.unitsLineEdit, units)
 
 
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
@@ -1105,45 +1188,229 @@ def show_window_and_wait_for_interaction(
     qtbot.stopForInteraction()
 
 
-def show_and_close_window(
-    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
+def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
+    qtbot
 ):
-    """
-    Function for displaying and then closing a window/widget. This appears to be necessary in order to make sure
-    some interactions with the UI are recognised. Otherwise the UI can behave as though no clicks/button presses/etc
-    actually took place which then causes tests to fail even though they ought to pass in theory.
-    :param qtbot: The qtbot testing tool.
-    :param template: The window/widget to be opened.
-    """
-    template.show()
-    qtbot.waitForWindowShown(template)
+    instrument = Instrument(NexusWrapper("test_component_editing_name"))
 
+    component_model = ComponentTreeModel(instrument)
 
-def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
-    """
-    Creates a template Add Component Dialog and sets this up for testing.
-    :param qtbot: The qtbot testing tool.
-    :return: The AddComponentDialog object and the template that contains it.
-    """
+    name = "test"
+    nx_class = "NXmonitor"
+    desc = "description"
+
+    component = instrument.create_component(
+        name=name, nx_class=nx_class, description=desc
+    )
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component, parent=None
+    )
     template = QDialog()
-    dialog = create_add_component_dialog()
     template.ui = dialog
     template.ui.setupUi(template)
     qtbot.addWidget(template)
-    return dialog, template
+
+    assert dialog.nameLineEdit.text() == name
+    assert dialog.descriptionPlainTextEdit.text() == desc
+    assert dialog.componentTypeComboBox.currentText() == nx_class
 
 
-def create_add_component_dialog():
+def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_radio_is_checked(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_no_shape"))
+    component_model = ComponentTreeModel(instrument)
+
+    component = instrument.create_component("test", "NXpinhole", "")
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component, parent=None
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.noShapeRadioButton.isChecked()
+
+
+def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_cylinder"))
+    component_model = ComponentTreeModel(instrument)
+
+    component_name = "test"
+    component = instrument.create_component(component_name, "NXpinhole", "")
+    component.set_cylinder_shape(QVector3D(1, 1, 1), height=3, radius=4)
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.CylinderRadioButton.isChecked()
+    assert dialog.cylinderOptionsBox.isEnabled()
+
+
+def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_off"))
+    component_model = ComponentTreeModel(instrument)
+
+    component_name = "test"
+
+    component = instrument.create_component(component_name, "NXpinhole", "")
+    component.set_off_shape(
+        OFFGeometryNoNexus(
+            [
+                QVector3D(0.0, 0.0, 1.0),
+                QVector3D(0.0, 1.0, 0.0),
+                QVector3D(0.0, 0.0, 0.0),
+            ],
+            [[0, 1, 2]],
+        ),
+        units="m",
+        filename=os.path.join(os.path.pardir, "cube.off"),
+    )
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.meshRadioButton.isChecked()
+    assert dialog.fileLineEdit.isEnabled()
+    assert dialog.fileBrowseButton.isEnabled()
+
+
+def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data_is_in_line_edits(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_off_filepath"))
+    component_model = ComponentTreeModel(instrument)
+
+    component_name = "test"
+    units = "m"
+    filepath = os.path.join(os.path.pardir, "cube.off")
+
+    component = instrument.create_component(component_name, "NXpinhole", "")
+    component.set_off_shape(
+        OFFGeometryNoNexus(
+            [
+                QVector3D(0.0, 0.0, 1.0),
+                QVector3D(0.0, 1.0, 0.0),
+                QVector3D(0.0, 0.0, 0.0),
+            ],
+            [[0, 1, 2]],
+        ),
+        units=units,
+        filename=filepath,
+    )
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.meshRadioButton.isChecked()
+    assert dialog.fileLineEdit.isEnabled()
+    assert dialog.unitsLineEdit.isEnabled()
+    assert dialog.unitsLineEdit.text() == units
+
+    assert dialog.fileBrowseButton.isEnabled()
+
+    assert dialog.fileLineEdit.isEnabled()
+    assert dialog.fileLineEdit.text() == filepath
+
+
+def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(qtbot):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.scalar_dataset.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    field.value_type_combo.setCurrentText("String")
+    field.value_type_combo.currentTextChanged.emit(field.value_type_combo.currentText)
+
+    field_name = "testfield"
+    field_value = "testvalue"
+
+    field.field_name_edit.setText(field_name)
+    field.value_line_edit.setText(field_value)
+
+    import h5py
+
+    assert field.dtype == h5py.special_dtype(vlen=str)
+
+    assert field.name == field_name
+    assert field.value[...] == field_value
+
+
+def get_pixel_grid_line_edits(dialog: AddComponentDialog) -> List[QLineEdit]:
     """
-    Creates an AddComponentDialog object for use in a testing template.
-    :return: An instance of an AddComponentDialog.
+    Returns a list of the line edits in the Pixel Grid box. These are used to input the row/column size and count.
+    :param dialog: An instance of an AddComponentDialog.
+    :return: A list of the line edits in the Pixel Grid box.
     """
-    global nexus_wrapper_count
-    nexus_name = "test" + str(nexus_wrapper_count)
-    instrument = Instrument(NexusWrapper(nexus_name))
-    component = ComponentTreeModel(instrument)
-    nexus_wrapper_count += 1
-    return AddComponentDialog(instrument, component)
+    return dialog.pixelGridBox.findChildren(QLineEdit)
+
+
+def enter_file_path(
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    file_path: str,
+    file_contents: str,
+):
+    """
+    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
+    geometry file.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param file_path: The desired file path.
+    :param file_contents: The file contents that are returned by the open mock.
+    """
+    with patch(
+        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
+    ):
+        with patch("builtins.open", mock_open(read_data=file_contents)):
+            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
+
+
+def enter_component_name(
+    qtbot: pytestqt.qtbot.QtBot,
+    template: PySide2.QtWidgets.QDialog,
+    dialog: AddComponentDialog,
+    component_name: str,
+):
+    """
+    Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
+    name.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param component_name: The desired component name.
+    """
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, component_name)
+    show_and_close_window(qtbot, template)
 
 
 def systematic_button_press(
@@ -1183,70 +1450,3 @@ def find_button_press_position(button: QAbstractButton):
             if button.hitButton(click_point):
                 return click_point
     return None
-
-
-def enter_component_name(
-    qtbot: pytestqt.qtbot.QtBot,
-    template: PySide2.QtWidgets.QDialog,
-    dialog: AddComponentDialog,
-    component_name: str,
-):
-    """
-    Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
-    name.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param component_name: The desired component name.
-    """
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, component_name)
-    show_and_close_window(qtbot, template)
-
-
-def enter_file_path(
-    qtbot: pytestqt.qtbot.QtBot,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    file_path: str,
-    file_contents: str,
-):
-    """
-    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
-    geometry file.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param file_path: The desired file path.
-    :param file_contents: The file contents that are returned by the open mock.
-    """
-    with patch(
-        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
-    ):
-        with patch("builtins.open", mock_open(read_data=file_contents)):
-            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
-
-
-def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
-    """
-    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
-    given string.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param units: The desired units input.
-    """
-    word_length = len(dialog.unitsLineEdit.text())
-    for _ in range(word_length):
-        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-
-    if len(units) > 0:
-        qtbot.keyClicks(dialog.unitsLineEdit, units)
-
-
-def get_pixel_grid_line_edits(dialog: AddComponentDialog) -> List[QLineEdit]:
-    """
-    Returns a list of the line edits in the Pixel Grid box. These are used to input the row/column size and count.
-    :param dialog: An instance of an AddComponentDialog.
-    :return: A list of the line edits in the Pixel Grid box.
-    """
-    return dialog.pixelGridBox.findChildren(QLineEdit)
