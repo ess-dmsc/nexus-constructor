@@ -9,7 +9,7 @@ from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
     NoShapeGeometry,
     CylindricalGeometry,
-)
+    OFFGeometryNexus)
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
@@ -169,10 +169,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.noShapeRadioButton.setChecked(True)
             self.noShapeRadioButton.clicked.emit()
         else:
-            if isinstance(component_shape, OFFGeometry):
+            if isinstance(component_shape, OFFGeometryNexus):
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
-                self.fileLineEdit.setText(component_shape.filename)
+                self.fileLineEdit.setText(component_shape.file_path)
             elif isinstance(component_shape, CylindricalGeometry):
                 self.CylinderRadioButton.clicked.emit()
                 self.CylinderRadioButton.setChecked(True)
@@ -279,7 +279,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             geometry_model.units = self.unitsLineEdit.text()
             geometry_model.file_path = self.cad_file_name
 
-            component.set_off_shape(geometry_model)
+            component.set_off_shape(geometry_model, units=self.unitsLineEdit.text(), filename=self.fileLineEdit.text())
         else:
             geometry_model = NoShapeGeometry()
             component.remove_shape()

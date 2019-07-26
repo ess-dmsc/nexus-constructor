@@ -276,7 +276,9 @@ class Component:
         self.file.set_attribute_value(vertices_field, "units", units)
         return CylindricalGeometry(self.file, shape_group)
 
-    def set_off_shape(self, loaded_geometry: OFFGeometry) -> OFFGeometryNexus:
+    def set_off_shape(
+        self, loaded_geometry: OFFGeometry, units: str, filename: str
+    ) -> OFFGeometryNexus:
         """
         Sets the shape of the component to be a mesh
         Overrides any existing shape
@@ -287,7 +289,7 @@ class Component:
         )
         record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
         record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
-        return OFFGeometryNexus(self.file, shape_group)
+        return OFFGeometryNexus(self.file, shape_group, units, filename)
 
     def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
         if SHAPE_GROUP_NAME in self.group:
