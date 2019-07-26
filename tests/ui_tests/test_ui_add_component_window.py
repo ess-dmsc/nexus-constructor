@@ -339,9 +339,12 @@ def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixe
     # Check that the pixel grid box is not visible
     assert not dialog.pixelGridBox.isVisible()
 
+
 @pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
 @pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
-def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_options_become_invisible(qtbot, template, dialog, shape_name, pixel_options):
+def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_options_become_invisible(
+    qtbot, template, dialog, shape_name, pixel_options
+):
 
     # Make the pixel options visible
     make_pixel_options_appear(

@@ -77,9 +77,9 @@ def validate_multiple_line_edits(
     for line_edit in line_edits:
         line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
 
-    line_edits[0].setToolTip(tooltip_on_accept) if is_valid else line_edits[0].setToolTip(
-        tooltip_on_reject
-    )
+    line_edits[0].setToolTip(tooltip_on_accept) if is_valid else line_edits[
+        0
+    ].setToolTip(tooltip_on_reject)
 
 
 def qvector3d_to_numpy_array(input_vector: QVector3D) -> np.ndarray:
