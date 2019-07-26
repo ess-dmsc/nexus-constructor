@@ -1,6 +1,6 @@
 from PySide2.QtWidgets import QComboBox, QGridLayout, QLineEdit, QDialog, QSpinBox
 
-SCHEMAS = ["ev42", "f142", "hs00", ""]
+SCHEMAS = ["ev42", "f142", "hs00", "ns10"]
 types = ["double", "int"]
 
 
