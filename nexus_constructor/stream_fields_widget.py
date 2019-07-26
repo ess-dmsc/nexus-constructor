@@ -23,12 +23,21 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.schema_combo)
         self.layout().addWidget(self.topic_line_edit)
 
+        self.layout().addWidget(self.type_combo)
+        self.layout().addWidget(self.array_size_spinbox)
+
         self.schema_type_changed(self.schema_combo.currentText())
 
     def schema_type_changed(self, schema):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
         if schema == "f142":
             self._set_edits_enabled(True, True)
+        elif schema == "ev42":
+            self._set_edits_enabled(False, False)
+        elif schema == "hs00":
+            self._set_edits_enabled(False, False)
+        elif schema == "ns10":
+            self._set_edits_enabled(False, False)
 
     def _set_edits_enabled(self, source: bool, type: bool):
         self.source_line_edit.setEnabled(source)
