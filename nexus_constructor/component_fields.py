@@ -15,6 +15,7 @@ from typing import List
 from nexus_constructor.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
     FieldValueValidator,
@@ -215,7 +216,9 @@ class FieldWidget(QFrame):
             )
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             self.edit_dialog.setLayout(QFormLayout())
-            self.edit_dialog.layout().addWidget()
+            self.edit_dialog.layout().addWidget(StreamFieldsWidget())
+            self.edit_dialog.setWindowTitle("Edit Streamed Field")
+
             pass
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             # TODO: show nx class panels
