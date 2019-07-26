@@ -9,7 +9,8 @@ from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
     NoShapeGeometry,
     CylindricalGeometry,
-    OFFGeometryNexus)
+    OFFGeometryNexus,
+)
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
@@ -279,7 +280,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             geometry_model.units = self.unitsLineEdit.text()
             geometry_model.file_path = self.cad_file_name
 
-            component.set_off_shape(geometry_model, units=self.unitsLineEdit.text(), filename=self.fileLineEdit.text())
+            component.set_off_shape(
+                geometry_model,
+                units=self.unitsLineEdit.text(),
+                filename=self.fileLineEdit.text(),
+            )
         else:
             geometry_model = NoShapeGeometry()
             component.remove_shape()
