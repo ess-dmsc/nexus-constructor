@@ -787,7 +787,9 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
                 QVector3D(0.0, 0.0, 0.0),
             ],
             [[0, 1, 2]],
-        )
+        ),
+        units="m",
+        filename=os.path.join(os.path.pardir, "cube.off"),
     )
 
     dialog = AddComponentDialog(
@@ -801,6 +803,49 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
     assert dialog.meshRadioButton.isChecked()
     assert dialog.fileLineEdit.isEnabled()
     assert dialog.fileBrowseButton.isEnabled()
+
+
+def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data_is_in_line_edits(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_off_filepath"))
+    component_model = ComponentTreeModel(instrument)
+
+    component_name = "test"
+    units = "m"
+    filepath = os.path.join(os.path.pardir, "cube.off")
+
+    component = instrument.create_component(component_name, "NXpinhole", "")
+    component.set_off_shape(
+        OFFGeometryNoNexus(
+            [
+                QVector3D(0.0, 0.0, 1.0),
+                QVector3D(0.0, 1.0, 0.0),
+                QVector3D(0.0, 0.0, 0.0),
+            ],
+            [[0, 1, 2]],
+        ),
+        units=units,
+        filename=filepath,
+    )
+
+    dialog = AddComponentDialog(
+        instrument, component_model, component_to_edit=component
+    )
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.meshRadioButton.isChecked()
+    assert dialog.fileLineEdit.isEnabled()
+    assert dialog.unitsLineEdit.isEnabled()
+    assert dialog.unitsLineEdit.text() == units
+
+    assert dialog.fileBrowseButton.isEnabled()
+
+    assert dialog.fileLineEdit.isEnabled()
+    assert dialog.fileLineEdit.text() == filepath
 
 
 def show_window_and_wait_for_interaction(

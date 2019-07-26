@@ -277,7 +277,7 @@ class Component:
         return CylindricalGeometry(self.file, shape_group)
 
     def set_off_shape(
-        self, loaded_geometry: OFFGeometry, units: str, filename: str
+        self, loaded_geometry: OFFGeometry, units: str = "", filename: str = ""
     ) -> OFFGeometryNexus:
         """
         Sets the shape of the component to be a mesh
