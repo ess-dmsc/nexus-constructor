@@ -2,6 +2,7 @@ import h5py
 from typing import Any, List, Optional, Union
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
@@ -93,7 +94,7 @@ class Component:
 
     @property
     def nx_class(self):
-        return self.file.get_nx_class(self.group)
+        return get_nx_class(self.group)
 
     @nx_class.setter
     def nx_class(self, nx_class: str):
@@ -294,7 +295,7 @@ class Component:
     def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
         if SHAPE_GROUP_NAME in self.group:
             shape_group = self.group[SHAPE_GROUP_NAME]
-            nx_class = self.file.get_nx_class(shape_group)
+            nx_class = get_nx_class(shape_group)
             if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
                 return CylindricalGeometry(self.file, shape_group)
             if nx_class == OFF_GEOMETRY_NEXUS_NAME:
