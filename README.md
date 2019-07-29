@@ -3,7 +3,7 @@
 # NeXus Constructor
 Construct [NeXus files](https://www.nexusformat.org/) with instrument geometry information using a GUI.
 
-[NeXus Constructor](https://raw.githubusercontent.com/ess-dmsc/nexus-constructor/master/nexus-constructor/resources/images/nc_screenshot.png)
+![NeXus Constructor](resources/images/nc_screenshot.png)
 
 ## Installing dependencies
 
