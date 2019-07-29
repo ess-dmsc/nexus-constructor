@@ -29,4 +29,4 @@ Run the python script `main.py` located in the root of the repository.
 
 ## Developer Documentation
 
-See the [Wiki](wiki/Developer-Notes) for developer documentation.
+See the [Wiki](https://github.com/ess-dmsc/nexus-constructor/wiki/Developer-Notes) for developer documentation.
