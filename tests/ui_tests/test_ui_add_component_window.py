@@ -994,23 +994,6 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
     assert dialog.pixelMappingListWidget.count() == 0
 
 
-@pytest.mark.xfail
-def test_GIVEN_zero_WHEN_entering_row_height_in_pixel_grid_options_THEN_background_becomes_red(
-    qtbot, template, dialog
-):
-
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Enter zero in the row height field
-    qtbot.keyClick(dialog.rowHeightSpinBox, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.rowHeightSpinBox, "0")
-
-    # Check that the background has turned red because the input in invalid
-    assert dialog.rowHeightSpinBox.styleSheet() == RED_SPIN_BOX_STYLE_SHEET
-
-
 def test_UI_GIVEN_zero_for_both_row_and_column_count_WHEN_entering_pixel_grid_options_THEN_both_fields_become_red(
     qtbot, template, dialog
 ):
@@ -1025,11 +1008,94 @@ def test_UI_GIVEN_zero_for_both_row_and_column_count_WHEN_entering_pixel_grid_op
     for field in count_fields:
         qtbot.keyClick(field, Qt.Key_Down)
 
-    show_window_and_wait_for_interaction(qtbot, template)
-
     # Check that the background has turned red because the input in invalid
     for field in count_fields:
         assert field.styleSheet() == RED_SPIN_BOX_STYLE_SHEET
+
+
+def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixel_grid_options_THEN_both_fields_become_white(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    count_fields = [dialog.rowCountSpinBox, dialog.columnCountSpinBox]
+
+    # Set both spin boxes to zero
+    for field in count_fields:
+        qtbot.keyClick(field, Qt.Key_Down)
+
+    # Set both spin boxes to one
+    for field in count_fields:
+        qtbot.keyClick(field, Qt.Key_Up)
+
+    # Check that the background has turned white because the input is acceptanle
+    for field in count_fields:
+        assert field.styleSheet() == WHITE_SPIN_BOX_STYLE_SHEET
+
+
+def test_UI_GIVEN_row_count_is_zero_THEN_row_height_becomes_disabled(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter zero in the row count field by pressing the down key
+    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Down)
+
+    # Check that the row height spin box is now disabled
+    assert not dialog.rowHeightSpinBox.isEnabled()
+
+
+def test_UI_GIVEN_row_count_is_not_zero_THEN_row_height_becomes_enabled(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Make the row count go to zero and then back to one again
+    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Up)
+
+    # Check that the row height spin box is now enabled
+    assert dialog.rowHeightSpinBox.isEnabled()
+
+
+def test_UI_GIVEN_column_count_is_zero_THEN_column_width_becomes_disabled(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter zero in the column count field by pressing the down key
+    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Down)
+
+    # Check that the column width spin box is now disabled
+    assert not dialog.columnWidthSpinBox.isEnabled()
+
+
+def test_UI_GIVEN_column_count_is_not_zero_THEN_column_width_becomes_enabled(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Make the column count go to zero and then back to one again
+    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Up)
+
+    # Check that the column width spin box is now enabled
+    assert dialog.columnWidthSpinBox.isEnabled()
 
 
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(
@@ -1067,6 +1133,65 @@ def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_
     qtbot.addWidget(field)
     qtbot.mouseClick(field.edit_button, Qt.LeftButton)
     assert field.table_view.isEnabled()
+
+
+def test_UI_GIVEN_user_selects_shape_without_pixel_fields_THEN_pixel_grid_and_pixel_mapping_are_both_false_in_ok_validator(
+    qtbot, template, dialog
+):
+
+    assert not dialog.ok_validator.pixel_grid
+    assert not dialog.ok_validator.pixel_mapping
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_user_selects_pixel_grid_THEN_pixel_grid_is_set_to_true_in_ok_validator(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Press the pixel grid button
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
+
+    # Check that the pixel grid boolean has become true
+    assert dialog.ok_validator.pixel_grid
+    # Check that the pixel_mapping boolean has become false
+    assert not dialog.ok_validator.pixel_mapping
+
+
+def test_UI_GIVEN_user_selects_pixel_mapping_THEN_pixel_mapping_is_set_to_true_in_ok_validator(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Press the pixel mapping button
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
+
+    # Check that the pixel mapping boolean has become true
+    assert dialog.ok_validator.pixel_mapping
+    # Check that the pixel grid boolean has become false
+    assert not dialog.ok_validator.pixel_grid
+
+
+def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_are_both_false_in_ok_validator(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Press the no pixels button
+    systematic_button_press(qtbot, template, dialog.noPixelsButton)
+
+    # Check that both pixel booleans are false
+    assert not dialog.ok_validator.pixel_grid
+    assert not dialog.ok_validator.pixel_mapping
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -104,6 +104,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
+        self.meshRadioButton.clicked.connect(self.update_pixel_options)
+        self.CylinderRadioButton.clicked.connect(self.update_pixel_options)
+        self.noShapeRadioButton.clicked.connect(self.update_pixel_options)
+
         [
             button.clicked.connect(self.ok_validator.validate_ok)
             for button in [
@@ -120,6 +124,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
+        self.componentTypeComboBox.currentIndexChanged.connect(
+            self.update_pixel_options
+        )
 
         # Set default geometry type and show the related fields.
         self.noShapeRadioButton.setChecked(True)
@@ -178,12 +185,21 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.singlePixelRadioButton.clicked.connect(
             lambda: self.show_pixel_grid_or_pixel_mapping(True)
         )
+        self.singlePixelRadioButton.clicked.connect(
+            lambda: self.change_pixel_bools_in_ok_validator(True, False)
+        )
         self.entireShapeRadioButton.clicked.connect(
             lambda: self.show_pixel_grid_or_pixel_mapping(False)
+        )
+        self.entireShapeRadioButton.clicked.connect(
+            lambda: self.change_pixel_bools_in_ok_validator(False, True)
         )
 
         # Make both the pixel grid and pixel mapping options invisible when the No Pixel button has been pressed
         self.noPixelsButton.clicked.connect(self.hide_pixel_grid_and_mapping)
+        self.noPixelsButton.clicked.connect(
+            lambda: self.change_pixel_bools_in_ok_validator(False, False)
+        )
 
         self.pixelMappingLabel.setVisible(False)
         self.pixelMappingListWidget.setVisible(False)
@@ -290,7 +306,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nx_class_changed.emit(self.possible_fields)
 
         # Change which pixel-related fields are visible because this depends on the class that has been selected.
-        self.change_pixel_options_visibility()
+        self.update_pixel_options()
+
+    def change_ok_validator_pixel_bools(self, grid, mapping):
+
+        self.ok_validator.pixel_grid = grid
+        self.ok_validator.pixel_mapping = mapping
 
     def hide_pixel_grid_and_mapping(self):
         """
@@ -338,34 +359,52 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         be made visible.
         """
 
-        pixel_layout_condition = self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES and (
+        pixel_options_condition = self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES and (
             self.meshRadioButton.isChecked() or self.CylinderRadioButton.isChecked()
         )
         pixel_grid_condition = (
-            pixel_layout_condition and self.singlePixelRadioButton.isChecked()
+            pixel_options_condition and self.singlePixelRadioButton.isChecked()
         )
         pixel_mapping_condition = (
-            pixel_layout_condition and self.entireShapeRadioButton.isChecked()
+            pixel_options_condition and self.entireShapeRadioButton.isChecked()
         )
 
-        return (pixel_layout_condition, pixel_grid_condition, pixel_mapping_condition)
+        return pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
 
-    def change_pixel_options_visibility(self):
+    def update_pixel_options(self):
+
+        pixel_options_condition, pixel_grid_condition, pixel_mapping_condition = (
+            self.pixel_options_conditions()
+        )
+        self.change_pixel_options_visibility(
+            pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
+        )
+        self.change_pixel_bools_in_ok_validator(
+            pixel_grid_condition, pixel_mapping_condition
+        )
+
+    def change_pixel_bools_in_ok_validator(
+        self, pixel_grid_condition, pixel_mapping_condition
+    ):
+
+        self.ok_validator.pixel_grid = pixel_grid_condition
+        self.ok_validator.pixel_mapping = pixel_mapping_condition
+
+    def change_pixel_options_visibility(
+        self, pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
+    ):
         """
         Changes the visibility of the pixel-related fields and the box that contains them. First checks if any of the
         fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
         and individual fields is set.
         """
-        pixel_layout_condition, pixel_grid_condition, pixel_mapping_condition = (
-            self.pixel_options_conditions()
-        )
 
         # Only make the pixel box appear based on the pixel layout and pixel data options being visible. The pixel grid
         # and mapping options already depend on pixel layout being visible.
-        self.pixelOptionsBox.setVisible(pixel_layout_condition)
+        self.pixelOptionsBox.setVisible(pixel_options_condition)
 
         # Set visibility for the components of the pixel options box
-        self.pixelLayoutBox.setVisible(pixel_layout_condition)
+        self.pixelLayoutBox.setVisible(pixel_options_condition)
         self.pixelGridBox.setVisible(pixel_grid_condition)
         self.pixelMappingLabel.setVisible(pixel_mapping_condition)
         self.pixelMappingListWidget.setVisible(pixel_mapping_condition)
@@ -377,12 +416,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
-        self.change_pixel_options_visibility()
 
     def show_no_geometry_fields(self):
 
-        self.shapeOptionsBox.setVisible(False)
-        self.change_pixel_options_visibility()
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.buttonBox.setEnabled(True)
@@ -391,7 +427,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
-        self.change_pixel_options_visibility()
 
     def generate_geometry_model(self, component: Component) -> OFFGeometry:
         """

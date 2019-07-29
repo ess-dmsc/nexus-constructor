@@ -6,143 +6,10 @@ import h5py
 import numpy as np
 import pint
 from PySide2.QtCore import Signal, QObject
-from PySide2.QtGui import QValidator, QIntValidator, QDoubleValidator
-from PySide2.QtWidgets import QComboBox, QLineEdit
+from PySide2.QtGui import QValidator, QIntValidator
+from PySide2.QtWidgets import QComboBox
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
-
-
-class PixelGridRowColumnSizeValidator(QDoubleValidator):
-    def __init__(self, corresponding_field: QLineEdit):
-        """
-        Validator for the row height and column width fields in the pixel grid options. Requires that the input is a
-        float greater than zero.
-        :param corresponding_field: The matching line edit for the number of rows/columns in the pixel grid. The
-        validity of the input also depends on this value.
-        """
-        super().__init__()
-        self.corresponding_field = corresponding_field
-
-    def value_not_needed(self):
-        """
-        Checks to see if the input in the rows/columns field is 0. If this is the case then a value for row
-        height/column width isn't needed.
-        :return: Bool indicating whether the corresponding field is empty or has the number zero.
-        """
-        return self.corresponding_field.text() == "0"
-
-    def validate(self, input: str, pos: int) -> QValidator.State:
-
-        value_not_needed = self.value_not_needed()
-
-        # Check if the input is empty
-        if input == "":
-            if value_not_needed:
-                # Accept empty input if the corresponding field contains zero or also empty
-                self.is_valid.emit(True)
-                return QValidator.Acceptable
-            else:
-                # The corresponding field has a non-zero value, so an empty string in this field should be regarded as
-                # intermediate
-                self.is_valid.emit(False)
-                return QValidator.Intermediate
-
-        # Attempt to convert the value to a float
-        try:
-            val = float(input)
-            # Reject negative values
-            if val < 0:
-                self.is_valid.emit(False)
-                return QValidator.Invalid
-            # View zero as intermediate because the user may be trying to enter a value between 1 and zero
-            elif val == 0:
-                self.is_valid.emit(False)
-                return QValidator.Intermediate
-            else:
-                if value_not_needed:
-                    # Return intermediate if the input is sensible but "unneeded"
-                    self.is_valid.emit(False)
-                    return QValidator.Intermediate
-                else:
-                    # Otherwise return acceptable
-                    self.is_valid.emit(True)
-                    return QValidator.Acceptable
-        except ValueError:
-            # Input that can't be converted to floats is invalid
-            self.is_valid.emit(False)
-            return QValidator.Invalid
-
-    is_valid = Signal(bool)
-
-
-class PixelGridRowColumnCountValidator(QValidator):
-    def __init__(self, corresponding_field: QLineEdit, other_count_field: QLineEdit):
-        """
-        Validator for inspecting the number of rows/columns entered in the pixel grid options. Checks the corresponding
-        row height/column width value in order to determine input validity.
-        :param corresponding_field: The line edit for the matching row height/column width field.
-        """
-        super().__init__()
-        self.corresponding_field = corresponding_field
-        self.other_count_field = other_count_field
-
-    def value_needed(self):
-        """
-        Checks to see if the corresponding row height/column width field contains a value. If this is the case then
-        setting the number of rows/columns to zero shouldn't be considered valid.
-        :return: A bool indicating that the row height/column width has an actual value.
-        """
-        return len(self.corresponding_field.text()) > 0
-
-    def other_count_is_zero(self):
-
-        return self.other_count_field.text() == "0"
-
-    def validate(self, input: str, pos: int) -> QValidator.State:
-
-        value_needed = self.value_needed()
-
-        # Return intermediate if the line edit is empty
-        if input == "":
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
-
-        # Attempt to convert the value to an int
-        try:
-            val = int(input)
-
-            # Reject negative numbers
-            if val < 0:
-                self.is_valid.emit(False)
-                return QValidator.Invalid
-            elif val == 0:
-                # Return intermediate if a positive value is "needed"
-                if value_needed:
-                    self.is_valid.emit(False)
-                    return QValidator.Intermediate
-                elif self.other_count_is_zero():
-                    self.correct_count.emit(False)
-                    return QValidator.Intermediate
-                else:
-                    # Accept zero if a positive value isn't needed
-                    self.is_valid.emit(True)
-                    return QValidator.Acceptable
-            else:
-                if value_needed:
-                    # Return acceptable if the input in both fields are sensible
-                    self.is_valid.emit(True)
-                    return QValidator.Acceptable
-                else:
-                    # Return intermediate if the input is sensible but isn't "needed"
-                    self.is_valid.emit(False)
-                    return QValidator.Intermediate
-
-        except ValueError:
-            self.is_valid.emit(False)
-            return QValidator.Invalid
-
-    is_valid = Signal(bool)
-    correct_count = Signal(bool)
 
 
 class NullableIntValidator(QIntValidator):
@@ -320,6 +187,8 @@ class OkValidator(QObject):
         self.units_are_valid = False
         self.no_geometry_button = no_geometry_button
         self.mesh_button = mesh_button
+        self.pixel_grid = False
+        self.pixel_mapping = False
 
     def set_name_valid(self, is_valid):
         self.name_is_valid = is_valid
@@ -332,6 +201,12 @@ class OkValidator(QObject):
     def set_units_valid(self, is_valid):
         self.units_are_valid = is_valid
         self.validate_ok()
+
+    def pixel_mapping_valid(self):
+        pass
+
+    def pixel_grid_valid(self):
+        pass
 
     def validate_ok(self):
         """
