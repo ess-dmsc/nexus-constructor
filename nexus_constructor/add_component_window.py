@@ -195,21 +195,21 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         # Create a validator that only accepts ints that are 0 or greater
         row_count_validator = PixelGridRowColumnCountValidator(
-            self.rowHeightLineEdit, self.columnsLineEdit
+            self.rowHeightLineEdit, self.columnCountSpinBox
         )
         column_count_validator = PixelGridRowColumnCountValidator(
-            self.columnWidthLineEdit, self.rowLineEdit
+            self.columnWidthLineEdit, self.rowCountSpinBox
         )
-        pixel_id_validator = PixelGridIDValidator()
         # Set the validator of the row, column and first line input boxes in the pixel grid options
-        self.rowLineEdit.setValidator(row_count_validator)
-        self.columnsLineEdit.setValidator(column_count_validator)
-        self.firstIDLineEdit.setValidator(pixel_id_validator)
+        self.rowCountSpinBox.lineEdit().setValidator(row_count_validator)
+        self.columnCountSpinBox.lineEdit().setValidator(column_count_validator)
 
-        row_height_validator = PixelGridRowColumnSizeValidator(self.rowLineEdit)
+        row_height_validator = PixelGridRowColumnSizeValidator(self.rowCountSpinBox)
         row_height_validator.setNotation(QDoubleValidator.StandardNotation)
 
-        column_width_validator = PixelGridRowColumnSizeValidator(self.columnsLineEdit)
+        column_width_validator = PixelGridRowColumnSizeValidator(
+            self.columnCountSpinBox
+        )
         column_width_validator.setNotation(QDoubleValidator.StandardNotation)
 
         self.rowHeightLineEdit.setValidator(row_height_validator)
@@ -220,26 +220,32 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.countFirstComboBox.addItems(list(self.count_direction.keys()))
 
-        def check_pixel_input():
-            validate_rows_and_columns(
-                self.rowLineEdit,
-                self.columnsLineEdit,
-                self.rowHeightLineEdit,
-                self.columnWidthLineEdit,
-            )
+        # def check_pixel_input():
+        #     validate_rows_and_columns(
+        #         self.rowCountSpinBox,
+        #         self.columnCountSpinBox,
+        #         self.rowHeightLineEdit,
+        #         self.columnWidthLineEdit,
+        #     )
 
-        self.rowLineEdit.textEdited.connect(check_pixel_input)
-        self.columnsLineEdit.textEdited.connect(check_pixel_input)
-        self.rowHeightLineEdit.textEdited.connect(check_pixel_input)
-        self.columnWidthLineEdit.textEdited.connect(check_pixel_input)
+        # self.rowCountSpinBox.lineEdit().validator().is_valid.connect(check_pixel_input)
+        # self.columnCountSpinBox.textEdited.connect(check_pixel_input)
+        # self.rowHeightLineEdit.textEdited.connect(check_pixel_input)
+        # self.columnWidthLineEdit.textEdited.connect(check_pixel_input)
 
-        self.firstIDLineEdit.validator().is_valid.connect(
-            partial(
-                validate_line_edit,
-                self.firstIDLineEdit,
-                tooltip_on_reject="A pixel ID value must be given.",
-            )
-        )
+        # self.rowCountSpinBox.validator().connect(check_pixel_input)
+        # self.columnCountSpinBox.validator().connect(check_pixel_input)
+        # self.rowHeightLineEdit.validator().connect(check_pixel_input)
+        # self.columnWidthLineEdit.validator().connect(check_pixel_input)
+
+        # self.firstIDSpinBox.validator().is_valid.connect(
+        #     partial(
+        #         validate_line_edit,
+        #         self.firstIDSpinBox,
+        #         tooltip_on_reject="A pixel ID value must be given.",
+        #     )
+        # )
+
         if self.component_to_edit:
             self._fill_existing_entries()
 
@@ -466,11 +472,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         if pixel_grid_condition:
             pixel_data = PixelGrid()
-            pixel_data.rows = int(self.rowLineEdit.text())
-            pixel_data.columns = int(self.columnsLineEdit.text())
+            pixel_data.rows = self.rowCountSpinBox.value()
+            pixel_data.columns = self.columnCountSpinBox.value()
             pixel_data.row_height = float(self.rowHeightLineEdit.text())
             pixel_data.column_width = float(self.columnWidthLineEdit.text())
-            pixel_data.first_id = int(self.firstIDLineEdit.text())
+            pixel_data.first_id = self.firstIDSpinBox.value()
             pixel_data.count_direction = self.count_direction[
                 self.countFirstComboBox.currentText()
             ]

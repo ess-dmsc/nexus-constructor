@@ -12,34 +12,6 @@ from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
 
-class PixelGridIDValidator(QValidator):
-    def __init__(self):
-
-        super().__init__()
-
-    def validate(self, input: str, pos: int) -> QValidator.State:
-
-        if input == "":
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
-
-        try:
-            val = int(input)
-
-            if val < 0:
-                self.is_valid.emit(False)
-                return QValidator.Invalid
-            else:
-                self.is_valid.emit(True)
-                return QValidator.Acceptable
-
-        except ValueError:
-            self.is_valid.emit(False)
-            return QValidator.Invalid
-
-    is_valid = Signal(bool)
-
-
 class PixelGridRowColumnSizeValidator(QDoubleValidator):
     def __init__(self, corresponding_field: QLineEdit):
         """

@@ -78,18 +78,10 @@ def validate_rows_and_columns(
 
     for line_edit in all_line_edits:
         line_edit.setStyleSheet(f"QLineEdit {{ background-color: {white} }}")
-        line_edit.setToolTip("")
-
-    if row_count_line_edit.text() == "0" and column_count_line_edit.text() == "0":
-        row_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
-        column_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
-        return
 
     if row_count_line_edit.text() != "0" and row_height_line_edit.text() == "":
-        print(row_count_line_edit.text())
         row_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
         row_height_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
-        row_height_line_edit.setToolTip(f"QLineEdit {{ background-color: {red} }}")
 
     if row_count_line_edit.text() == "0" and row_height_line_edit.text() != "":
         row_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
@@ -102,6 +94,10 @@ def validate_rows_and_columns(
     if column_count_line_edit.text() == "0" and column_width_line_edit.text() != "":
         column_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
         column_width_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+
+    if row_count_line_edit.text() == "0" and column_count_line_edit.text() == "0":
+        row_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
+        column_count_line_edit.setStyleSheet(f"QLineEdit {{ background-color: {red} }}")
 
 
 def qvector3d_to_numpy_array(input_vector: QVector3D) -> np.ndarray:

@@ -494,7 +494,7 @@ def test_GIVEN_zero_WHEN_validating_row_or_column_size_THEN_validator_returns_in
     assert validator.validate("0.0000", 0) == QValidator.Intermediate
 
 
-def test_GIVEN_nothing_WHEN_validating_row_or_column_size_and_row_or_column_count_is_zero_THEN_validator_returns_acceptable():
+def test_GIVEN_nothing_WHEN_validating_row_or_column_size_and_row_or_column_count_is_zero_THEN_validator_returns_valid():
 
     mock_corresponding_field = create_mock_line_edit("0")
 
@@ -598,19 +598,6 @@ def test_GIVEN_valid_count_WHEN_validating_row_or_column_count_and_row_or_column
     assert validator.validate("6", 0) == QValidator.Acceptable
 
 
-def create_mock_pixel_grid_fields(line_edit_text):
-    """
-    Creates mock pixel grid fields for the pixel ID validator.
-    :param line_edit_text: The desired text value for the mock line edit.
-    :return: A list of four mock line edits.
-    """
-    mock_pixel_grid_fields = []
-    for _ in range(4):
-        mock_field = create_mock_line_edit(line_edit_text)
-        mock_pixel_grid_fields.append(mock_field)
-    return mock_pixel_grid_fields
-
-
 @pytest.mark.parametrize("non_integer", ["abc", "2.5"])
 def test_GIVEN_noninteger_WHEN_validating_pixel_id_THEN_validator_returns_invalid(
     non_integer
@@ -624,3 +611,23 @@ def test_GIVEN_negative_number_WHEN_validating_pixel_id_THEN_validator_returns_i
 
     validator = PixelGridIDValidator()
     assert validator.validate("-3", 0) == QValidator.Invalid
+
+
+def test_ok_validator_GIVEN_pixel_mapping_and_pixel_grid_are_false_WHEN_validating_add_component_input_THEN_invalid_pixel_input_is_accepted():
+    pass
+
+
+def test_ok_validator_GIVEN_pixel_mapping_is_true_WHEN_validating_add_component_input_THEN_invalid_pixel_input_is_rejected():
+    pass
+
+
+def test_ok_validator_GIVEN_pixel_grid_is_true_WHEN_validating_add_component_input_THEN_invalid_pixel_grid_input_is_rejected():
+    pass
+
+
+def test_ok_validator_GIVEN_pixel_mapping_is_true_WHEN_validating_add_component_input_THEN_valid_pixel_mapping_input_is_accepted():
+    pass
+
+
+def test_ok_validator_GIVEN_pixel_grid_is_true_WHEN_validating_add_component_input_THEN_valid_pixel_grid_input_is_accepted():
+    pass

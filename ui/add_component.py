@@ -3,12 +3,12 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Fri Jul 26 09:56:01 2019
+# Created: Mon Jul 29 10:42:54 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
@@ -133,21 +133,12 @@ class Ui_AddComponentDialog(object):
         self.firstIDLabel = QtWidgets.QLabel(self.pixelGridBox)
         self.firstIDLabel.setObjectName("firstIDLabel")
         self.gridLayout_5.addWidget(self.firstIDLabel, 2, 0, 1, 1)
-        self.rowLineEdit = QtWidgets.QLineEdit(self.pixelGridBox)
-        self.rowLineEdit.setObjectName("rowLineEdit")
-        self.gridLayout_5.addWidget(self.rowLineEdit, 0, 1, 1, 1)
-        self.columnsLineEdit = QtWidgets.QLineEdit(self.pixelGridBox)
-        self.columnsLineEdit.setObjectName("columnsLineEdit")
-        self.gridLayout_5.addWidget(self.columnsLineEdit, 1, 1, 1, 1)
         self.rowHeightLineEdit = QtWidgets.QLineEdit(self.pixelGridBox)
         self.rowHeightLineEdit.setObjectName("rowHeightLineEdit")
         self.gridLayout_5.addWidget(self.rowHeightLineEdit, 0, 3, 1, 1)
         self.columnWidthLineEdit = QtWidgets.QLineEdit(self.pixelGridBox)
         self.columnWidthLineEdit.setObjectName("columnWidthLineEdit")
         self.gridLayout_5.addWidget(self.columnWidthLineEdit, 1, 3, 1, 1)
-        self.firstIDLineEdit = QtWidgets.QLineEdit(self.pixelGridBox)
-        self.firstIDLineEdit.setObjectName("firstIDLineEdit")
-        self.gridLayout_5.addWidget(self.firstIDLineEdit, 2, 1, 1, 1)
         self.columnsLabel = QtWidgets.QLabel(self.pixelGridBox)
         self.columnsLabel.setObjectName("columnsLabel")
         self.gridLayout_5.addWidget(self.columnsLabel, 1, 0, 1, 1)
@@ -172,6 +163,18 @@ class Ui_AddComponentDialog(object):
         self.countFirstComboBox.setInsertPolicy(QtWidgets.QComboBox.InsertAtCurrent)
         self.countFirstComboBox.setObjectName("countFirstComboBox")
         self.gridLayout_5.addWidget(self.countFirstComboBox, 4, 2, 1, 2)
+        self.rowCountSpinBox = QtWidgets.QSpinBox(self.pixelGridBox)
+        self.rowCountSpinBox.setMaximum(1000000)
+        self.rowCountSpinBox.setObjectName("rowCountSpinBox")
+        self.gridLayout_5.addWidget(self.rowCountSpinBox, 0, 1, 1, 1)
+        self.columnCountSpinBox = QtWidgets.QSpinBox(self.pixelGridBox)
+        self.columnCountSpinBox.setMaximum(1000000)
+        self.columnCountSpinBox.setObjectName("columnCountSpinBox")
+        self.gridLayout_5.addWidget(self.columnCountSpinBox, 1, 1, 1, 1)
+        self.firstIDSpinBox = QtWidgets.QSpinBox(self.pixelGridBox)
+        self.firstIDSpinBox.setMaximum(1000000)
+        self.firstIDSpinBox.setObjectName("firstIDSpinBox")
+        self.gridLayout_5.addWidget(self.firstIDSpinBox, 2, 1, 1, 1)
         self.verticalLayout_3.addWidget(self.pixelGridBox)
         self.pixelMappingLabel = QtWidgets.QLabel(self.pixelOptionsBox)
         self.pixelMappingLabel.setObjectName("pixelMappingLabel")
@@ -315,11 +318,8 @@ class Ui_AddComponentDialog(object):
         self.rowHeightLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Row height:", None, -1))
         self.columnWidthLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Column width:", None, -1))
         self.firstIDLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "First ID:", None, -1))
-        self.rowLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
-        self.columnsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
         self.rowHeightLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
         self.columnWidthLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "1", None, -1))
-        self.firstIDLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "0", None, -1))
         self.columnsLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Columns:", None, -1))
         self.countFirstLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Count first along:", None, -1))
         self.countingFromLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Start counting from:", None, -1))
