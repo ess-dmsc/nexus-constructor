@@ -63,9 +63,9 @@ class StreamFieldsWidget(QDialog):
         elif schema == "ev42":
             self._set_edits_visible(False, False)
         elif schema == "hs00":
-            self._set_edits_visible(False, False)
+            self._set_edits_visible(True, False)
         elif schema == "ns10":
-            self._set_edits_visible(False, False)
+            self._set_edits_visible(True, False)
 
     def _set_edits_visible(self, source: bool, type: bool):
         self.source_label.setVisible(source)
