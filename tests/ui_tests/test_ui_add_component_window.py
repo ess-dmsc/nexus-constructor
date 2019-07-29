@@ -29,8 +29,16 @@ VALID_CUBE_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
 VALID_OCTA_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "octa.off")
 
 nexus_wrapper_count = 0
-RED_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #f6989d }"
-WHITE_BACKGROUND_STYLE_SHEET = "QLineEdit { background-color: #FFFFFF }"
+
+RED_BACKGROUND = "{ background-color: #f6989d }"
+WHITE_BACKGROUND = "{ background-color: #FFFFFF }"
+LINE_EDIT = "QLineEdit "
+SPIN_BOX = "QSpinBox "
+RED_LINE_EDIT_STYLE_SHEET = LINE_EDIT + RED_BACKGROUND
+WHITE_LINE_EDIT_STYLE_SHEET = LINE_EDIT + WHITE_BACKGROUND
+RED_SPIN_BOX_STYLE_SHEET = SPIN_BOX + RED_BACKGROUND
+WHITE_SPIN_BOX_STYLE_SHEET = SPIN_BOX + WHITE_BACKGROUND
+
 UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
@@ -500,13 +508,13 @@ def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_become
     qtbot, template, dialog
 ):
     # Check that the background color of the ext field starts as red
-    assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.nameLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
     # Mimic the user entering a name in the text field
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has changed to white
-    assert dialog.nameLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+    assert dialog.nameLineEdit.styleSheet() == WHITE_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_remains_red(
@@ -514,13 +522,13 @@ def test_UI_GIVEN_repeated_name_WHEN_choosing_component_name_THEN_background_rem
 ):
 
     # Check that the background color of the text field starts as red
-    assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.nameLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
     # Mimic the user entering a non-unique name in the text field
     enter_component_name(qtbot, template, dialog, NONUNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has remained red
-    assert dialog.nameLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.nameLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_shape_THEN_add_component_window_remains_open(
@@ -636,7 +644,7 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_file_p
     systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # No file name was given so we expect the file input box background to be red
-    assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.fileLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_shape_THEN_file_path_box_has_red_background(
@@ -648,7 +656,7 @@ def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_shape_T
     # Mimic the user entering a bad file path
     enter_file_path(qtbot, dialog, template, NONEXISTENT_FILE_PATH, "OFF")
 
-    assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.fileLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shape_THEN_file_path_box_has_red_background(
@@ -661,7 +669,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
     # Mimic the user giving the path for a file that exists but has the wrong extension
     enter_file_path(qtbot, dialog, template, WRONG_EXTENSION_FILE_PATH, "OFF")
 
-    assert dialog.fileLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.fileLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_file_path_box_has_white_background(
@@ -676,7 +684,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_fil
     )
 
     # The file input box should now have a white background
-    assert dialog.fileLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+    assert dialog.fileLineEdit.styleSheet() == WHITE_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_enabled(
@@ -754,7 +762,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_
     # Mimic the user clearing the unit input box
     enter_units(qtbot, dialog, "")
 
-    assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.unitsLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_has_red_background(
@@ -767,7 +775,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_units
     # Mimic the user giving invalid units input
     enter_units(qtbot, dialog, INVALID_UNITS)
 
-    assert dialog.unitsLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.unitsLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_has_white_background(
@@ -780,7 +788,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_units_b
     # Mimic the replacing the default value with "km"
     enter_units(qtbot, dialog, VALID_UNITS)
 
-    assert dialog.unitsLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+    assert dialog.unitsLineEdit.styleSheet() == WHITE_LINE_EDIT_STYLE_SHEET
 
 
 def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_enabled(
@@ -955,8 +963,8 @@ def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_ha
     # Check that the pixel-related fields start out with the expected default values
     assert dialog.rowCountSpinBox.value() == 1
     assert dialog.columnCountSpinBox.value() == 1
-    assert dialog.rowHeightSpinBox.value() == 1.0
-    assert dialog.columnWidthSpinBox.value() == 1.0
+    assert dialog.rowHeightSpinBox.value() == 0.01
+    assert dialog.columnWidthSpinBox.value() == 0.01
     assert dialog.firstIDSpinBox.value() == 0
     assert (
         dialog.startCountingComboBox.currentText()
@@ -986,126 +994,6 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
     assert dialog.pixelMappingListWidget.count() == 0
 
 
-@pytest.mark.parametrize("row_count, row_height", MISMATCHING_PIXEL_GRID_VALUES)
-def test_GIVEN_mismatching_row_values_WHEN_giving_pixel_grid_options_THEN_both_backgrounds_turn_red(
-    qtbot, template, dialog, row_count, row_height
-):
-
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Enter a value for row height
-    qtbot.keyClick(dialog.rowHeightSpinBox, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.rowHeightSpinBox, row_height)
-
-    # Enter a value for row count
-    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.rowCountSpinBox, row_count)
-
-    # Check that the background has turned red as a result of the values not matching
-    assert dialog.rowCountSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
-    assert dialog.rowHeightSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
-
-
-@pytest.mark.parametrize("column_count, column_width", MISMATCHING_PIXEL_GRID_VALUES)
-def test_GIVEN_mismatching_column_values_WHEN_giving_pixel_grid_options_THEN_both_backgrounds_turn_red(
-    qtbot, template, dialog, column_count, column_width
-):
-
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Enter a value for column count
-    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.columnCountSpinBox, column_count)
-
-    # Enter a value for column width
-    qtbot.keyClick(dialog.columnWidthLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.columnWidthLineEdit, column_width)
-
-    # Check that the backgrounds have become red as a result of the values not matching
-    assert dialog.columnCountSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
-    assert dialog.columnWidthLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
-
-
-def test_GIVEN_acceptable_values_WHEN_entering_row_pixel_grid_options_THEN_both_backgrounds_turn_white(
-    qtbot, template, dialog
-):
-
-    row_count = "2"
-    row_height = "3.5"
-
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Enter a value for row height
-    qtbot.keyClick(dialog.rowHeightSpinBox, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.rowHeightSpinBox, row_height)
-
-    # Enter a value for row count
-    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.rowCountSpinBox, row_count)
-
-    # Check that the backgrounds have turned white due to the values being valid
-    assert dialog.rowCountSpinBox.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
-    assert dialog.rowHeightSpinBox.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
-
-
-def test_GIVEN_acceptable_values_WHEN_entering_column_pixel_grid_options_THEN_both_backgrounds_turn_white(
-    qtbot, template, dialog
-):
-
-    column_count = "1"
-    column_width = "0.1"
-
-    # Enter a value for column count
-    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.columnCountSpinBox, column_count)
-
-    # Enter a value for column width
-    qtbot.keyClick(dialog.columnWidthLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.columnWidthLineEdit, column_width)
-
-    # Check that the backgrounds have become white due to the values being valid
-    assert dialog.columnWidthLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
-    assert dialog.columnCountSpinBox.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
-
-
-def test_GIVEN_nothing_WHEN_entering_row_count_in_pixel_grid_options_THEN_background_becomes_red(
-    qtbot, template, dialog
-):
-
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Clear the row count field
-    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Backspace)
-
-    # Check that the background has turned red because an empty field can't be accepted
-    assert dialog.rowCountSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
-
-
-def test_GIVEN_nothing_WHEN_entering_column_count_in_pixel_grid_options_THEN_background_becomes_red(
-    qtbot, template, dialog
-):
-
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Clear the row count field
-    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Backspace)
-
-    show_window_and_wait_for_interaction(qtbot, template)
-
-    # Check that the background has turned red because an empty field can't be accepted
-    assert dialog.columnCountSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
-
-
 @pytest.mark.xfail
 def test_GIVEN_zero_WHEN_entering_row_height_in_pixel_grid_options_THEN_background_becomes_red(
     qtbot, template, dialog
@@ -1120,24 +1008,7 @@ def test_GIVEN_zero_WHEN_entering_row_height_in_pixel_grid_options_THEN_backgrou
     qtbot.keyClicks(dialog.rowHeightSpinBox, "0")
 
     # Check that the background has turned red because the input in invalid
-    assert dialog.rowHeightSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
-
-
-@pytest.mark.xfail
-def test_GIVEN_zero_WHEN_entering_column_width_in_pixel_grid_options_THEN_background_becomes_red(
-    qtbot, template, dialog
-):
-
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Enter zero in the row width field
-    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.columnCountSpinBox, "0")
-
-    # Check that the background has turned red because the input in invalid
-    assert dialog.columnCountSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.rowHeightSpinBox.styleSheet() == RED_SPIN_BOX_STYLE_SHEET
 
 
 def test_UI_GIVEN_zero_for_both_row_and_column_count_WHEN_entering_pixel_grid_options_THEN_both_fields_become_red(
@@ -1150,14 +1021,15 @@ def test_UI_GIVEN_zero_for_both_row_and_column_count_WHEN_entering_pixel_grid_op
 
     count_fields = [dialog.rowCountSpinBox, dialog.columnCountSpinBox]
 
-    # Enter zero in the row width field
+    # Enter zero in the count fields by pressing the down key
     for field in count_fields:
-        qtbot.keyClick(field, Qt.Key_Backspace)
-        qtbot.keyClicks(field, "0")
+        qtbot.keyClick(field, Qt.Key_Down)
+
+    show_window_and_wait_for_interaction(qtbot, template)
 
     # Check that the background has turned red because the input in invalid
     for field in count_fields:
-        assert field.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+        assert field.styleSheet() == RED_SPIN_BOX_STYLE_SHEET
 
 
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(

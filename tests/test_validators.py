@@ -20,7 +20,6 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     PixelGridRowColumnSizeValidator,
     PixelGridRowColumnCountValidator,
-    PixelGridIDValidator,
 )
 
 
@@ -596,22 +595,6 @@ def test_GIVEN_valid_count_WHEN_validating_row_or_column_count_and_row_or_column
         mock_corresponding_field, mock_matching_count
     )
     assert validator.validate("6", 0) == QValidator.Acceptable
-
-
-@pytest.mark.parametrize("non_integer", ["abc", "2.5"])
-def test_GIVEN_noninteger_WHEN_validating_pixel_id_THEN_validator_returns_invalid(
-    non_integer
-):
-
-    validator = PixelGridIDValidator()
-    assert validator.validate(non_integer, 0) == QValidator.Invalid
-
-
-def test_GIVEN_negative_number_WHEN_validating_pixel_id_THEN_validator_returns_invalid():
-
-    validator = PixelGridIDValidator()
-    assert validator.validate("-3", 0) == QValidator.Invalid
-
 
 def test_ok_validator_GIVEN_pixel_mapping_and_pixel_grid_are_false_WHEN_validating_add_component_input_THEN_invalid_pixel_input_is_accepted():
     pass
