@@ -3,9 +3,8 @@ from enum import Enum
 from functools import partial
 
 from PySide2.QtCore import QUrl, Signal, QObject
-from PySide2.QtGui import QDoubleValidator
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QListWidgetItem
+from PySide2.QtWidgets import QListWidgetItem, QDoubleSpinBox, QSpinBox
 from nexusutils.readwriteoff import parse_off_file
 
 from nexus_constructor.component import Component
@@ -21,11 +20,7 @@ from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.pixel_data import CountDirection, Corner, PixelMapping, PixelGrid
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
-from nexus_constructor.ui_utils import (
-    file_dialog,
-    validate_line_edit,
-    validate_rows_and_columns,
-)
+from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.validators import (
     UnitValidator,
@@ -33,9 +28,6 @@ from nexus_constructor.validators import (
     GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
     OkValidator,
-    PixelGridRowColumnSizeValidator,
-    PixelGridRowColumnCountValidator,
-    PixelGridIDValidator,
 )
 from ui.add_component import Ui_AddComponentDialog
 
@@ -193,61 +185,42 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Make both the pixel grid and pixel mapping options invisible when the No Pixel button has been pressed
         self.noPixelsButton.clicked.connect(self.hide_pixel_grid_and_mapping)
 
-        # Create a validator that only accepts ints that are 0 or greater
-        row_count_validator = PixelGridRowColumnCountValidator(
-            self.rowHeightLineEdit, self.columnCountSpinBox
-        )
-        column_count_validator = PixelGridRowColumnCountValidator(
-            self.columnWidthLineEdit, self.rowCountSpinBox
-        )
-        # Set the validator of the row, column and first line input boxes in the pixel grid options
-        self.rowCountSpinBox.lineEdit().setValidator(row_count_validator)
-        self.columnCountSpinBox.lineEdit().setValidator(column_count_validator)
-
-        row_height_validator = PixelGridRowColumnSizeValidator(self.rowCountSpinBox)
-        row_height_validator.setNotation(QDoubleValidator.StandardNotation)
-
-        column_width_validator = PixelGridRowColumnSizeValidator(
-            self.columnCountSpinBox
-        )
-        column_width_validator.setNotation(QDoubleValidator.StandardNotation)
-
-        self.rowHeightLineEdit.setValidator(row_height_validator)
-        self.columnWidthLineEdit.setValidator(column_width_validator)
-
         self.pixelMappingLabel.setVisible(False)
         self.pixelMappingListWidget.setVisible(False)
 
         self.countFirstComboBox.addItems(list(self.count_direction.keys()))
 
-        # def check_pixel_input():
-        #     validate_rows_and_columns(
-        #         self.rowCountSpinBox,
-        #         self.columnCountSpinBox,
-        #         self.rowHeightLineEdit,
-        #         self.columnWidthLineEdit,
-        #     )
-
-        # self.rowCountSpinBox.lineEdit().validator().is_valid.connect(check_pixel_input)
-        # self.columnCountSpinBox.textEdited.connect(check_pixel_input)
-        # self.rowHeightLineEdit.textEdited.connect(check_pixel_input)
-        # self.columnWidthLineEdit.textEdited.connect(check_pixel_input)
-
-        # self.rowCountSpinBox.validator().connect(check_pixel_input)
-        # self.columnCountSpinBox.validator().connect(check_pixel_input)
-        # self.rowHeightLineEdit.validator().connect(check_pixel_input)
-        # self.columnWidthLineEdit.validator().connect(check_pixel_input)
-
-        # self.firstIDSpinBox.validator().is_valid.connect(
-        #     partial(
-        #         validate_line_edit,
-        #         self.firstIDSpinBox,
-        #         tooltip_on_reject="A pixel ID value must be given.",
-        #     )
-        # )
+        self.rowCountSpinBox.valueChanged.connect(
+            lambda: self.disable_or_enable_size_field(
+                self.rowCountSpinBox, self.rowHeightSpinBox
+            )
+        )
+        self.columnCountSpinBox.valueChanged.connect(
+            lambda: self.disable_or_enable_size_field(
+                self.columnCountSpinBox, self.columnWidthSpinBox
+            )
+        )
 
         if self.component_to_edit:
             self._fill_existing_entries()
+
+    def disable_or_enable_size_field(
+        self, count_spin_box: QSpinBox, size_spin_box: QDoubleSpinBox
+    ):
+        size_spin_box.setEnabled(count_spin_box.value() != 0)
+        self.forbid_both_row_and_columns_being_zero()
+
+    def forbid_both_row_and_columns_being_zero(self):
+
+        RED_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #f6989d }"
+        WHITE_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #FFFFFF }"
+
+        if self.rowCountSpinBox.value() == 0 and self.columnCountSpinBox.value() == 0:
+            self.rowCountSpinBox.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
+            self.columnCountSpinBox.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
+        else:
+            self.rowCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
+            self.columnCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
@@ -474,8 +447,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             pixel_data = PixelGrid()
             pixel_data.rows = self.rowCountSpinBox.value()
             pixel_data.columns = self.columnCountSpinBox.value()
-            pixel_data.row_height = float(self.rowHeightLineEdit.text())
-            pixel_data.column_width = float(self.columnWidthLineEdit.text())
+            pixel_data.row_height = self.rowHeightSpinBox.value()
+            pixel_data.column_width = self.columnWidthLineEdit.value()
             pixel_data.first_id = self.firstIDSpinBox.value()
             pixel_data.count_direction = self.count_direction[
                 self.countFirstComboBox.currentText()

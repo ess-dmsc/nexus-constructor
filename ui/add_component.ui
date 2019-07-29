@@ -229,20 +229,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="3">
-                  <widget class="QLineEdit" name="rowHeightLineEdit">
-                   <property name="text">
-                    <string>1</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="3">
-                  <widget class="QLineEdit" name="columnWidthLineEdit">
-                   <property name="text">
-                    <string>1</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="1" column="0">
                   <widget class="QLabel" name="columnsLabel">
                    <property name="text">
@@ -315,6 +301,9 @@
                    <property name="maximum">
                     <number>1000000</number>
                    </property>
+                   <property name="value">
+                    <number>1</number>
+                   </property>
                   </widget>
                  </item>
                  <item row="1" column="1">
@@ -322,12 +311,35 @@
                    <property name="maximum">
                     <number>1000000</number>
                    </property>
+                   <property name="value">
+                    <number>1</number>
+                   </property>
                   </widget>
                  </item>
                  <item row="2" column="1">
                   <widget class="QSpinBox" name="firstIDSpinBox">
                    <property name="maximum">
                     <number>1000000</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QDoubleSpinBox" name="rowHeightSpinBox">
+                   <property name="minimum">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.500000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QDoubleSpinBox" name="columnWidthSpinBox">
+                   <property name="minimum">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.500000000000000</double>
                    </property>
                   </widget>
                  </item>

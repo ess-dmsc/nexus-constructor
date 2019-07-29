@@ -954,10 +954,10 @@ def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_ha
 
     # Check that the pixel-related fields start out with the expected default values
     assert dialog.rowCountSpinBox.value() == 1
-    assert dialog.columnCountSpinBox.value() == "1"
-    assert dialog.rowHeightLineEdit.text() == "1"
-    # assert dialog.columnCountSpinBox.text() == "1"
-    assert dialog.firstIDSpinBox.value() == "0"
+    assert dialog.columnCountSpinBox.value() == 1
+    assert dialog.rowHeightSpinBox.value() == 1.0
+    assert dialog.columnWidthSpinBox.value() == 1.0
+    assert dialog.firstIDSpinBox.value() == 0
     assert (
         dialog.startCountingComboBox.currentText()
         == list(dialog.initial_count_corner.keys())[0]
@@ -996,8 +996,8 @@ def test_GIVEN_mismatching_row_values_WHEN_giving_pixel_grid_options_THEN_both_b
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Enter a value for row height
-    qtbot.keyClick(dialog.rowHeightLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.rowHeightLineEdit, row_height)
+    qtbot.keyClick(dialog.rowHeightSpinBox, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.rowHeightSpinBox, row_height)
 
     # Enter a value for row count
     qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Backspace)
@@ -1005,7 +1005,7 @@ def test_GIVEN_mismatching_row_values_WHEN_giving_pixel_grid_options_THEN_both_b
 
     # Check that the background has turned red as a result of the values not matching
     assert dialog.rowCountSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
-    assert dialog.rowHeightLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.rowHeightSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
 @pytest.mark.parametrize("column_count, column_width", MISMATCHING_PIXEL_GRID_VALUES)
@@ -1042,8 +1042,8 @@ def test_GIVEN_acceptable_values_WHEN_entering_row_pixel_grid_options_THEN_both_
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Enter a value for row height
-    qtbot.keyClick(dialog.rowHeightLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.rowHeightLineEdit, row_height)
+    qtbot.keyClick(dialog.rowHeightSpinBox, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.rowHeightSpinBox, row_height)
 
     # Enter a value for row count
     qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Backspace)
@@ -1051,7 +1051,7 @@ def test_GIVEN_acceptable_values_WHEN_entering_row_pixel_grid_options_THEN_both_
 
     # Check that the backgrounds have turned white due to the values being valid
     assert dialog.rowCountSpinBox.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
-    assert dialog.rowHeightLineEdit.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
+    assert dialog.rowHeightSpinBox.styleSheet() == WHITE_BACKGROUND_STYLE_SHEET
 
 
 def test_GIVEN_acceptable_values_WHEN_entering_column_pixel_grid_options_THEN_both_backgrounds_turn_white(
@@ -1116,11 +1116,11 @@ def test_GIVEN_zero_WHEN_entering_row_height_in_pixel_grid_options_THEN_backgrou
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Enter zero in the row height field
-    qtbot.keyClick(dialog.rowHeightLineEdit, Qt.Key_Backspace)
-    qtbot.keyClicks(dialog.rowHeightLineEdit, "0")
+    qtbot.keyClick(dialog.rowHeightSpinBox, Qt.Key_Backspace)
+    qtbot.keyClicks(dialog.rowHeightSpinBox, "0")
 
     # Check that the background has turned red because the input in invalid
-    assert dialog.rowHeightLineEdit.styleSheet() == RED_BACKGROUND_STYLE_SHEET
+    assert dialog.rowHeightSpinBox.styleSheet() == RED_BACKGROUND_STYLE_SHEET
 
 
 @pytest.mark.xfail
