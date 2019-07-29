@@ -3,6 +3,8 @@
 # NeXus Constructor
 Construct [NeXus files](https://www.nexusformat.org/) with instrument geometry information using a GUI.
 
+[NeXus Constructor](https://raw.githubusercontent.com/ess-dmsc/nexus-constructor/master/nexus-constructor/resources/images/nc_screenshot.png)
+
 ## Installing dependencies
 
 This project is developed for Python 3.6, so an install of 3.6 or higher
