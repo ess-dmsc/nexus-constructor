@@ -8,7 +8,19 @@ from PySide2.QtWidgets import (
 )
 
 SCHEMAS = ["ev42", "f142", "hs00", "ns10"]
-types = ["double", "int"]
+F142_TYPES = [
+    "byte",
+    "ubyte",
+    "short",
+    "ushort",
+    "int",
+    "uint",
+    "long",
+    "ulong",
+    "float",
+    "double",
+    "string",
+]
 
 
 class StreamFieldsWidget(QDialog):
@@ -33,6 +45,7 @@ class StreamFieldsWidget(QDialog):
 
         self.type_label = QLabel("Type: ")
         self.type_combo = QComboBox()
+        self.type_combo.addItems(F142_TYPES)
         self.type_combo.currentTextChanged.connect(self._type_changed)
 
         self.schema_combo.currentTextChanged.connect(self.schema_type_changed)
