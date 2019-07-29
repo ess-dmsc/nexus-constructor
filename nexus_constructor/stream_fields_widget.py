@@ -16,6 +16,7 @@ class StreamFieldsWidget(QDialog):
         super().__init__()
         self.setParent(parent)
         self.setLayout(QGridLayout())
+        self.setModal(True)
 
         self.schema_label = QLabel("Schema: ")
         self.schema_combo = QComboBox()
@@ -52,6 +53,7 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.source_line_edit, 4, 1)
 
         self.schema_type_changed(self.schema_combo.currentText())
+        self._type_changed(self.type_combo.currentText())
 
     def schema_type_changed(self, schema):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
@@ -71,6 +73,10 @@ class StreamFieldsWidget(QDialog):
         self.type_combo.setVisible(type)
 
     def _type_changed(self, dtype):
-        is_double = dtype == "double"
-        self.array_size_label.setVisible(is_double)
-        self.array_size_spinbox.setVisible(is_double)
+        if self.type_combo.isVisible():
+            is_double = dtype == "double"
+            self.array_size_label.setVisible(is_double)
+            self.array_size_spinbox.setVisible(is_double)
+        else:
+            self.array_size_label.setVisible(False)
+            self.array_size_spinbox.setVisible(False)
