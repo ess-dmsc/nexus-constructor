@@ -96,7 +96,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        self.ok_validator = OkValidator(self.noShapeRadioButton, self.meshRadioButton)
+        self.ok_validator = OkValidator(
+            self.noShapeRadioButton,
+            self.meshRadioButton,
+            self.pixelOptionsBox,
+            self.singlePixelRadioButton,
+            self.entireShapeRadioButton,
+        )
         self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
@@ -185,21 +191,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.singlePixelRadioButton.clicked.connect(
             lambda: self.show_pixel_grid_or_pixel_mapping(True)
         )
-        self.singlePixelRadioButton.clicked.connect(
-            lambda: self.change_pixel_bools_in_ok_validator(True, False)
-        )
         self.entireShapeRadioButton.clicked.connect(
             lambda: self.show_pixel_grid_or_pixel_mapping(False)
-        )
-        self.entireShapeRadioButton.clicked.connect(
-            lambda: self.change_pixel_bools_in_ok_validator(False, True)
         )
 
         # Make both the pixel grid and pixel mapping options invisible when the No Pixel button has been pressed
         self.noPixelsButton.clicked.connect(self.hide_pixel_grid_and_mapping)
-        self.noPixelsButton.clicked.connect(
-            lambda: self.change_pixel_bools_in_ok_validator(False, False)
-        )
 
         self.pixelMappingLabel.setVisible(False)
         self.pixelMappingListWidget.setVisible(False)
@@ -234,9 +231,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if self.rowCountSpinBox.value() == 0 and self.columnCountSpinBox.value() == 0:
             self.rowCountSpinBox.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
             self.columnCountSpinBox.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
+            self.ok_validator.set_pixel_grid_valid(False)
         else:
             self.rowCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
             self.columnCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
+            self.ok_validator.set_pixel_grid_valid(True)
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
@@ -308,11 +307,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Change which pixel-related fields are visible because this depends on the class that has been selected.
         self.update_pixel_options()
 
-    def change_ok_validator_pixel_bools(self, grid, mapping):
-
-        self.ok_validator.pixel_grid = grid
-        self.ok_validator.pixel_mapping = mapping
-
     def hide_pixel_grid_and_mapping(self):
         """
         Hides the pixel grid and pixel mapping options when the No Pixel button has been selected.
@@ -379,16 +373,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.change_pixel_options_visibility(
             pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
         )
-        self.change_pixel_bools_in_ok_validator(
-            pixel_grid_condition, pixel_mapping_condition
-        )
-
-    def change_pixel_bools_in_ok_validator(
-        self, pixel_grid_condition, pixel_mapping_condition
-    ):
-
-        self.ok_validator.pixel_grid = pixel_grid_condition
-        self.ok_validator.pixel_mapping = pixel_mapping_condition
 
     def change_pixel_options_visibility(
         self, pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
@@ -534,6 +518,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.fileLineEdit.styleSheet() == "QLineEdit { background-color: #f6989d }"
         )
 
+    def check_pixel_mapping(self):
+
+        nonempty_ids = [widget.get_id() != "" for widget in self.pixel_mapping_widgets]
+        self.ok_validator.set_pixel_mapping_valid(any(nonempty_ids))
+
     def populate_pixel_mapping_list(self):
         """
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
@@ -555,6 +544,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Use the faces information from the geometry file to add fields to the pixel mapping list
         for i in range(n_faces):
             pixel_mapping_widget = PixelMappingWidget(self.pixelMappingListWidget, i)
+            pixel_mapping_widget.pixelIDLineEdit.textChanged.connect(
+                self.check_pixel_mapping
+            )
 
             list_item = QListWidgetItem()
             list_item.setSizeHint(pixel_mapping_widget.sizeHint())

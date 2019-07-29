@@ -1,13 +1,12 @@
 import os
 import sys
-from typing import List
 
 import PySide2
 import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QDialog, QAbstractButton, QLineEdit
+from PySide2.QtWidgets import QDialog, QAbstractButton
 from PySide2.QtWidgets import QRadioButton, QMainWindow
 from mock import patch, mock_open, Mock
 from pytestqt.qtbot import QtBot
@@ -1139,8 +1138,8 @@ def test_UI_GIVEN_user_selects_shape_without_pixel_fields_THEN_pixel_grid_and_pi
     qtbot, template, dialog
 ):
 
-    assert not dialog.ok_validator.pixel_grid
-    assert not dialog.ok_validator.pixel_mapping
+    assert not dialog.ok_validator.pixel_grid_button
+    assert not dialog.ok_validator.pixel_mapping_button
 
 
 @pytest.mark.xfail
@@ -1156,9 +1155,9 @@ def test_UI_GIVEN_user_selects_pixel_grid_THEN_pixel_grid_is_set_to_true_in_ok_v
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Check that the pixel grid boolean has become true
-    assert dialog.ok_validator.pixel_grid
+    assert dialog.ok_validator.pixel_grid_button
     # Check that the pixel_mapping boolean has become false
-    assert not dialog.ok_validator.pixel_mapping
+    assert not dialog.ok_validator.pixel_mapping_button
 
 
 def test_UI_GIVEN_user_selects_pixel_mapping_THEN_pixel_mapping_is_set_to_true_in_ok_validator(
@@ -1173,9 +1172,9 @@ def test_UI_GIVEN_user_selects_pixel_mapping_THEN_pixel_mapping_is_set_to_true_i
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Check that the pixel mapping boolean has become true
-    assert dialog.ok_validator.pixel_mapping
+    assert dialog.ok_validator.pixel_mapping_button
     # Check that the pixel grid boolean has become false
-    assert not dialog.ok_validator.pixel_grid
+    assert not dialog.ok_validator.pixel_grid_button
 
 
 def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_are_both_false_in_ok_validator(
@@ -1190,8 +1189,123 @@ def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_are_b
     systematic_button_press(qtbot, template, dialog.noPixelsButton)
 
     # Check that both pixel booleans are false
-    assert not dialog.ok_validator.pixel_grid
-    assert not dialog.ok_validator.pixel_mapping
+    assert not dialog.ok_validator.pixel_grid_button
+    assert not dialog.ok_validator.pixel_mapping_button
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_user_provides_valid_pixel_grid_THEN_clicking_add_component_closes_window(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter a valid name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter a valid file path
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Press the single pixel button
+    systematic_button_press(qtbot, template, dialog.singlePixelRadioButton)
+
+    # Press the add component button
+    systematic_button_press(qtbot, template, dialog.buttonBox)
+
+    # The default pixel grid options are valid so the window should close
+    assert not template.isVisible()
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_clicking_add_component_doesnt_close_window(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter a valid name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter a valid file path
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Press the single pixel button
+    systematic_button_press(qtbot, template, dialog.singlePixelRadioButton)
+
+    # Make both the row count and column count zero
+    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Down)
+
+    # Press the add component button
+    systematic_button_press(qtbot, template, dialog.buttonBox)
+
+    # The pixel grid options are invalid so the window will refuse to close
+    assert template.isVisible()
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_clicking_add_component_closes_window(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter a valid name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter a valid file path
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Press the entire shape button
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
+
+    # Give a single pixel ID
+    qtbot.keyClicks(dialog.pixel_mapping_widgets[0], "32")
+
+    # Press the add component button
+    systematic_button_press(qtbot, template, dialog.buttonBox)
+
+    # Check that the window has closed
+    assert not template.isVisible()
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_clicking_add_component_doesnt_close_window(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter a valid name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter a valid file path
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Press the entire shape button
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
+
+    # Press the add component button
+    systematic_button_press(qtbot, template, dialog.buttonBox)
+
+    # Check that the window has remained open because no pixel mapping information was given
+    assert not template.isVisible()
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -1445,15 +1559,6 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(q
 
     assert field.name == field_name
     assert field.value[...] == field_value
-
-
-def get_pixel_grid_line_edits(dialog: AddComponentDialog) -> List[QLineEdit]:
-    """
-    Returns a list of the line edits in the Pixel Grid box. These are used to input the row/column size and count.
-    :param dialog: An instance of an AddComponentDialog.
-    :return: A list of the line edits in the Pixel Grid box.
-    """
-    return dialog.pixelGridBox.findChildren(QLineEdit)
 
 
 def enter_file_path(

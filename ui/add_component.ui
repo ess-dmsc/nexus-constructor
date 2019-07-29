@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1177</width>
-    <height>919</height>
+    <height>1051</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -126,21 +126,21 @@
            <item>
             <widget class="QRadioButton" name="noShapeRadioButton">
              <property name="text">
-              <string>No Shape</string>
+              <string>&amp;No Shape</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QRadioButton" name="meshRadioButton">
              <property name="text">
-              <string>Mesh</string>
+              <string>&amp;Mesh</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QRadioButton" name="CylinderRadioButton">
              <property name="text">
-              <string>Cylinder</string>
+              <string>C&amp;ylinder</string>
              </property>
             </widget>
            </item>
@@ -168,7 +168,7 @@
                  <item>
                   <widget class="QRadioButton" name="singlePixelRadioButton">
                    <property name="text">
-                    <string>Single Pixel</string>
+                    <string>Sin&amp;gle Pixel</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -178,14 +178,14 @@
                  <item>
                   <widget class="QRadioButton" name="entireShapeRadioButton">
                    <property name="text">
-                    <string>Entire Shape</string>
+                    <string>En&amp;tire Shape</string>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QRadioButton" name="noPixelsButton">
                    <property name="text">
-                    <string>No Pixels</string>
+                    <string>No Pi&amp;xels</string>
                    </property>
                   </widget>
                  </item>
@@ -326,7 +326,7 @@
                  <item row="0" column="3">
                   <widget class="QDoubleSpinBox" name="rowHeightSpinBox">
                    <property name="minimum">
-                    <double>0.010000000000000</double>
+                    <double>0.500000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>0.500000000000000</double>
@@ -336,7 +336,7 @@
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="columnWidthSpinBox">
                    <property name="minimum">
-                    <double>0.010000000000000</double>
+                    <double>0.500000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>0.500000000000000</double>
