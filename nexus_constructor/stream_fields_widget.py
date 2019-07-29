@@ -1,11 +1,14 @@
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QComboBox,
     QGridLayout,
     QLineEdit,
     QDialog,
-    QSpinBox,
     QLabel,
+    QDoubleSpinBox,
+    QSpinBox,
 )
+import numpy as np
 
 SCHEMAS = ["ev42", "f142", "hs00", "ns10"]
 F142_TYPES = [
@@ -28,6 +31,7 @@ class StreamFieldsWidget(QDialog):
         super().__init__()
         self.setParent(parent)
         self.setLayout(QGridLayout())
+        self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
 
         self.schema_label = QLabel("Schema: ")
@@ -42,6 +46,7 @@ class StreamFieldsWidget(QDialog):
 
         self.array_size_label = QLabel("Array size")
         self.array_size_spinbox = QSpinBox()
+        self.array_size_spinbox.setMaximum(np.iinfo(np.int32).max)
 
         self.type_label = QLabel("Type: ")
         self.type_combo = QComboBox()
