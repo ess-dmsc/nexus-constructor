@@ -1,6 +1,10 @@
 from mock import Mock
 
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper, append_nxs_extension
+from nexus_constructor.nexus.nexus_wrapper import (
+    NexusWrapper,
+    append_nxs_extension,
+    get_nx_class,
+)
 from tests.test_nexus_to_json import create_in_memory_file
 
 
@@ -109,3 +113,25 @@ def test_GIVEN_multiple_entry_groups_in_file_WHEN_finding_entry_THEN_signal_is_e
     expected_entry_dict = {entry.name: entry, entry2.name: entry2}
 
     assert wrapper.show_entries_dialog.emit.called_once_with(expected_entry_dict, file)
+
+
+def test_GIVEN_group_without_nx_class_WHEN_getting_nx_class_THEN_returns_none():
+    file = create_in_memory_file("test_nw7")
+    entry = file.create_group("entry")
+    assert get_nx_class(entry) is None
+
+
+def test_GIVEN_group_with_nx_class_as_str_WHEN_getting_nx_class_THEN_returns_nx_class_as_str():
+    file = create_in_memory_file("test_nw8")
+    entry = file.create_group("entry")
+    nx_class = "NXentry"
+    entry.attrs["NX_class"] = nx_class
+    assert get_nx_class(entry) == nx_class
+
+
+def test_GIVEN_group_with_nx_class_as_bytes_WHEN_getting_nx_class_THEN_returns_nx_class_as_str():
+    file = create_in_memory_file("test_nw9")
+    entry = file.create_group("entry")
+    nx_class = b"NXentry"
+    entry.attrs["NX_class"] = nx_class
+    assert get_nx_class(entry) == str(nx_class, encoding="utf-8")
