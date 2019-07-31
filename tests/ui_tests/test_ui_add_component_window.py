@@ -1226,7 +1226,6 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_
     assert not dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.xfail
 def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_add_component_button_is_enabled(
     qtbot, template, dialog
 ):
@@ -1247,7 +1246,7 @@ def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_add_component_button_is
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Give a single pixel ID. This is adequate for making the mapping
-    qtbot.keyClicks(dialog.pixel_mapping_widgets[0], "32")
+    qtbot.keyClicks(dialog.pixel_mapping_widgets[0].pixelIDLineEdit, "32")
 
     # Check that the add component button is enabled
     assert dialog.buttonBox.isEnabled()

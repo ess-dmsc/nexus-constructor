@@ -199,8 +199,8 @@ def create_content_ok_validator():
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
     mock_pixel_options.isVisible = Mock(return_value=True)
-    mock_pixel_grid_button.isVisible = Mock(return_value=False)
-    mock_pixel_mapping_button.isVisible = Mock(return_value=False)
+    mock_pixel_grid_button.isChecked = Mock(return_value=False)
+    mock_pixel_mapping_button.isChecked = Mock(return_value=False)
 
     validator = OkValidator(
         mock_no_geometry_button,
