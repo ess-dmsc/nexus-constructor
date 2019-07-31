@@ -1275,6 +1275,129 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_
     assert not dialog.buttonBox.isEnabled()
 
 
+def test_UI_GIVEN_valid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_pixel_mapping_causes_validity_to_change(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter a valid name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter a valid file path
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Change the first ID
+    qtbot.keyClick(dialog.firstIDSpinBox, Qt.Key_Up)
+    qtbot.keyClick(dialog.firstIDSpinBox, Qt.Key_Up)
+
+    # Switch to pixel mapping
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
+
+    # Check that the add component button is disabled because no pixel mapping info has been entered
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_GIVEN_invalid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_pixel_layout_causes_validity_to_change(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter a valid name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter a valid file path
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Make the pixel grid invalid
+    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Down)
+
+    # Change to the no pixel option
+    systematic_button_press(qtbot, template, dialog.noPixelsButton)
+
+    # Check that the add component button is enabled despite the invalid pixel grid
+    assert dialog.buttonBox.isEnabled()
+
+
+def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_pixel_layout_causes_validity_to_change(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter a valid name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter a valid file path
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Make the pixel grid invalid
+    qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Down)
+
+    # Change to pixel mapping
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
+
+    # Make the pixel mapping valid
+    qtbot.keyClicks(dialog.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
+
+    # Change back to pixel grid
+    systematic_button_press(qtbot, template, dialog.singlePixelRadioButton)
+
+    # Check that the add component button is still disabled
+    assert not dialog.buttonBox.isEnabled()
+
+
+def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_pixel_layout_causes_validity_to_change(
+    qtbot, template, dialog
+):
+
+    # Make the pixel options appear
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    # Enter a valid name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Enter a valid file path
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Change to pixel mapping
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
+
+    # Give input that will be rejected by the validator
+    qtbot.keyClicks(dialog.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
+
+    # Change to pixel grid
+    systematic_button_press(qtbot, template, dialog.singlePixelRadioButton)
+
+    # Check that the add component button is enabled
+    assert dialog.buttonBox.isEnabled()
+
+    # Change to pixel mapping then no pixel
+    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, dialog.noPixelsButton)
+
+    # Check that the add component button is enabled
+    assert dialog.buttonBox.isEnabled()
+
+
 @pytest.fixture(scope="session", autouse=True)
 def cleanup(request):
     """

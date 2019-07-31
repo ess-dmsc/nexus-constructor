@@ -217,7 +217,6 @@ class OkValidator(QObject):
         self.validate_ok()
 
     def set_pixel_grid_valid(self, is_valid):
-        print(is_valid)
         self.pixel_grid_is_valid = is_valid
         self.validate_ok()
 
