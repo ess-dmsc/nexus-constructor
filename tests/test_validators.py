@@ -497,8 +497,6 @@ def test_ok_validator_GIVEN_invalid_pixel_mapping_WHEN_validating_add_component_
         create_content_ok_validator()
     )
 
-    mock_pixel_options.isVisible = Mock(return_value=True)
-
     validator.set_pixel_mapping_valid(False)
     mock_pixel_mapping_button.isChecked = Mock(return_value=True)
 
@@ -511,8 +509,6 @@ def test_ok_validator_GIVEN_valid_pixel_mapping_WHEN_validating_add_component_in
     validator, _, _, mock_pixel_options, _, mock_pixel_mapping_button = (
         create_content_ok_validator()
     )
-
-    mock_pixel_options.isVisible = Mock(return_value=True)
 
     validator.set_pixel_mapping_valid(True)
     mock_pixel_mapping_button.isChecked = Mock(return_value=True)
@@ -527,8 +523,6 @@ def test_ok_validator_GIVEN_invalid_pixel_grid_WHEN_validating_add_component_inp
         create_content_ok_validator()
     )
 
-    mock_pixel_options.isVisible = Mock(return_value=True)
-
     validator.set_pixel_grid_valid(False)
     mock_pixel_grid_button.isChecked = Mock(return_value=True)
 
@@ -541,8 +535,6 @@ def test_ok_validator_GIVEN_invalid_pixel_mapping_WHEN_validating_add_component_
     validator, _, _, mock_pixel_options, mock_pixel_grid_button, _ = (
         create_content_ok_validator()
     )
-
-    mock_pixel_options.isVisible = Mock(return_value=True)
 
     validator.set_pixel_grid_valid(True)
     mock_pixel_grid_button.isChecked = Mock(return_value=True)
