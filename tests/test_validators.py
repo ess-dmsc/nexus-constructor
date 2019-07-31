@@ -530,7 +530,7 @@ def test_ok_validator_GIVEN_invalid_pixel_grid_WHEN_validating_add_component_inp
     validator.validate_ok()
 
 
-def test_ok_validator_GIVEN_invalid_pixel_mapping_WHEN_validating_add_component_input_THEN_validity_signal_is_emitted_with_true():
+def test_ok_validator_GIVEN_valid_pixel_grid_WHEN_validating_add_component_input_THEN_validity_signal_is_emitted_with_true():
 
     validator, _, _, mock_pixel_options, mock_pixel_grid_button, _ = (
         create_content_ok_validator()
