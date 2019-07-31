@@ -1134,15 +1134,6 @@ def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_
     assert field.table_view.isEnabled()
 
 
-def test_UI_GIVEN_user_selects_shape_without_pixel_fields_THEN_pixel_grid_and_pixel_mapping_are_both_false_in_ok_validator(
-    qtbot, template, dialog
-):
-
-    assert not dialog.ok_validator.pixel_grid_button
-    assert not dialog.ok_validator.pixel_mapping_button
-
-
-@pytest.mark.xfail
 def test_UI_GIVEN_user_selects_pixel_grid_THEN_pixel_grid_is_set_to_true_in_ok_validator(
     qtbot, template, dialog
 ):
@@ -1155,29 +1146,12 @@ def test_UI_GIVEN_user_selects_pixel_grid_THEN_pixel_grid_is_set_to_true_in_ok_v
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Check that the pixel grid boolean has become true
-    assert dialog.ok_validator.pixel_grid_button
+    assert dialog.ok_validator.pixel_grid_is_valid
     # Check that the pixel_mapping boolean has become false
-    assert not dialog.ok_validator.pixel_mapping_button
+    assert not dialog.ok_validator.pixel_mapping_is_valid
 
 
-def test_UI_GIVEN_user_selects_pixel_mapping_THEN_pixel_mapping_is_set_to_true_in_ok_validator(
-    qtbot, template, dialog
-):
-
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Press the pixel mapping button
-    systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
-
-    # Check that the pixel mapping boolean has become true
-    assert dialog.ok_validator.pixel_mapping_button
-    # Check that the pixel grid boolean has become false
-    assert not dialog.ok_validator.pixel_grid_button
-
-
-def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_are_both_false_in_ok_validator(
+def test_UI_GIVEN_user_selects_no_pixels_and_gives_valid_input_THEN_add_component_button_is_enabled(
     qtbot, template, dialog
 ):
 
@@ -1188,13 +1162,20 @@ def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_are_b
     # Press the no pixels button
     systematic_button_press(qtbot, template, dialog.noPixelsButton)
 
-    # Check that both pixel booleans are false
-    assert not dialog.ok_validator.pixel_grid_button
-    assert not dialog.ok_validator.pixel_mapping_button
+    # Give a valid component name
+    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
+
+    # Give a valid mesh file
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    # Check that the add component button is enabled
+    assert dialog.buttonBox.isEnabled()
 
 
 @pytest.mark.xfail
-def test_UI_GIVEN_user_provides_valid_pixel_grid_THEN_clicking_add_component_closes_window(
+def test_UI_GIVEN_user_provides_valid_pixel_grid_THEN_add_component_button_is_enabled(
     qtbot, template, dialog
 ):
 
@@ -1213,15 +1194,12 @@ def test_UI_GIVEN_user_provides_valid_pixel_grid_THEN_clicking_add_component_clo
     # Press the single pixel button
     systematic_button_press(qtbot, template, dialog.singlePixelRadioButton)
 
-    # Press the add component button
-    systematic_button_press(qtbot, template, dialog.buttonBox)
-
-    # The default pixel grid options are valid so the window should close
-    assert not template.isVisible()
+    # Check that the add component button is enabled
+    assert dialog.buttonBox.isEnabled()
 
 
 @pytest.mark.xfail
-def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_clicking_add_component_doesnt_close_window(
+def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_disabled(
     qtbot, template, dialog
 ):
 
@@ -1244,15 +1222,12 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_clicking_add_component_d
     qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Down)
     qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Down)
 
-    # Press the add component button
-    systematic_button_press(qtbot, template, dialog.buttonBox)
-
-    # The pixel grid options are invalid so the window will refuse to close
-    assert template.isVisible()
+    # Check that the add component button is disabled
+    assert not dialog.buttonBox.isEnabled()
 
 
 @pytest.mark.xfail
-def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_clicking_add_component_closes_window(
+def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_add_component_button_is_enabled(
     qtbot, template, dialog
 ):
 
@@ -1271,18 +1246,14 @@ def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_clicking_add_component_
     # Press the entire shape button
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
-    # Give a single pixel ID
+    # Give a single pixel ID. This is adequate for making the mapping
     qtbot.keyClicks(dialog.pixel_mapping_widgets[0], "32")
 
-    # Press the add component button
-    systematic_button_press(qtbot, template, dialog.buttonBox)
-
-    # Check that the window has closed
-    assert not template.isVisible()
+    # Check that the add component button is enabled
+    assert dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.xfail
-def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_clicking_add_component_doesnt_close_window(
+def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_is_disabled(
     qtbot, template, dialog
 ):
 
@@ -1301,11 +1272,8 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_clicking_add_componen
     # Press the entire shape button
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
-    # Press the add component button
-    systematic_button_press(qtbot, template, dialog.buttonBox)
-
-    # Check that the window has remained open because no pixel mapping information was given
-    assert not template.isVisible()
+    # Check that the add component button is disabled no pixel mapping information was given
+    assert not dialog.buttonBox.isEnabled()
 
 
 @pytest.fixture(scope="session", autouse=True)

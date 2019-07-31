@@ -192,11 +192,21 @@ def create_content_ok_validator():
     """
     mock_no_geometry_button = Mock()
     mock_mesh_button = Mock()
+    mock_pixel_options = Mock()
+    mock_pixel_grid_button = Mock()
+    mock_pixel_mapping_button = Mock()
 
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
+    mock_pixel_options.isVisible = Mock(return_value=False)
 
-    validator = OkValidator(mock_no_geometry_button, mock_mesh_button)
+    validator = OkValidator(
+        mock_no_geometry_button,
+        mock_mesh_button,
+        mock_pixel_options,
+        mock_pixel_grid_button,
+        mock_pixel_mapping_button,
+    )
     validator.set_units_valid(True)
     validator.set_name_valid(True)
     validator.set_file_valid(True)

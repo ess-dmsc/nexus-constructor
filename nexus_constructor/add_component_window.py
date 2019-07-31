@@ -198,6 +198,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Make both the pixel grid and pixel mapping options invisible when the No Pixel button has been pressed
         self.noPixelsButton.clicked.connect(self.hide_pixel_grid_and_mapping)
 
+        self.singlePixelRadioButton.clicked.connect(self.evaluate_pixel_input_validity)
+        self.entireShapeRadioButton.clicked.connect(self.evaluate_pixel_input_validity)
+        self.noPixelsButton.clicked.connect(self.evaluate_pixel_input_validity)
+
         self.pixelMappingLabel.setVisible(False)
         self.pixelMappingListWidget.setVisible(False)
 
@@ -208,14 +212,25 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.rowCountSpinBox, self.rowHeightSpinBox
             )
         )
+        self.rowCountSpinBox.valueChanged.connect(self.check_pixel_grid_validity)
         self.columnCountSpinBox.valueChanged.connect(
             lambda: self.disable_or_enable_size_field(
                 self.columnCountSpinBox, self.columnWidthSpinBox
             )
         )
+        self.columnCountSpinBox.valueChanged.connect(self.check_pixel_grid_validity)
 
         if self.component_to_edit:
             self._fill_existing_entries()
+
+    def evaluate_pixel_input_validity(self):
+
+        if self.singlePixelRadioButton.isChecked():
+            self.check_pixel_grid_validity()
+        elif self.entireShapeRadioButton.isChecked():
+            self.check_pixel_mapping_validity()
+        else:
+            self.ok_validator.validate_ok()
 
     def disable_or_enable_size_field(
         self, count_spin_box: QSpinBox, size_spin_box: QDoubleSpinBox
@@ -236,6 +251,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.rowCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
             self.columnCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
             self.ok_validator.set_pixel_grid_valid(True)
+
+    def check_pixel_grid_validity(self):
+        self.ok_validator.set_pixel_grid_valid(
+            not (
+                self.rowCountSpinBox.value() == 0
+                and self.columnCountSpinBox.value() == 0
+            )
+        )
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
@@ -373,6 +396,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.change_pixel_options_visibility(
             pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
         )
+
+        self.evaluate_pixel_input_validity()
 
     def change_pixel_options_visibility(
         self, pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
@@ -518,9 +543,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.fileLineEdit.styleSheet() == "QLineEdit { background-color: #f6989d }"
         )
 
-    def check_pixel_mapping(self):
+    def check_pixel_mapping_validity(self):
 
-        nonempty_ids = [widget.get_id() != "" for widget in self.pixel_mapping_widgets]
+        nonempty_ids = [
+            widget.get_id() is not None for widget in self.pixel_mapping_widgets
+        ]
         self.ok_validator.set_pixel_mapping_valid(any(nonempty_ids))
 
     def populate_pixel_mapping_list(self):
@@ -545,7 +572,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         for i in range(n_faces):
             pixel_mapping_widget = PixelMappingWidget(self.pixelMappingListWidget, i)
             pixel_mapping_widget.pixelIDLineEdit.textChanged.connect(
-                self.check_pixel_mapping
+                self.check_pixel_mapping_validity
             )
 
             list_item = QListWidgetItem()
