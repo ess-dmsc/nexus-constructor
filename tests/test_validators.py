@@ -199,6 +199,8 @@ def create_content_ok_validator():
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
     mock_pixel_options.isVisible = Mock(return_value=False)
+    mock_pixel_grid_button.isVisible = Mock(return_value=False)
+    mock_pixel_mapping_button.isVisible = Mock(return_value=False)
 
     validator = OkValidator(
         mock_no_geometry_button,
@@ -211,7 +213,14 @@ def create_content_ok_validator():
     validator.set_name_valid(True)
     validator.set_file_valid(True)
 
-    return validator, mock_mesh_button, mock_no_geometry_button
+    return (
+        validator,
+        mock_mesh_button,
+        mock_no_geometry_button,
+        mock_pixel_options,
+        mock_pixel_grid_button,
+        mock_pixel_mapping_button,
+    )
 
 
 def inspect_signal(result, expected):
@@ -225,35 +234,45 @@ def inspect_signal(result, expected):
 
 def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+        create_content_ok_validator()
+    )
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
     validator.validate_ok()
 
 
 def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+        create_content_ok_validator()
+    )
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
     validator.set_name_valid(False)
 
 
 def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unchecked_THEN_false_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+        create_content_ok_validator()
+    )
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
     validator.set_units_valid(False)
 
 
 def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THEN_false_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+        create_content_ok_validator()
+    )
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
     validator.set_file_valid(False)
 
 
 def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_checked_THEN_true_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+        create_content_ok_validator()
+    )
     mock_no_geometry_button.isChecked = Mock(return_value=True)
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
     validator.set_units_valid(False)
@@ -261,7 +280,9 @@ def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_che
 
 def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_THEN_true_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+        create_content_ok_validator()
+    )
     mock_mesh_button.isChecked = Mock(return_value=False)
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
     validator.set_file_valid(False)
@@ -470,7 +491,7 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
     validator.is_valid.emit.assert_called_once_with(False)
 
 
-def test_ok_validator_GIVEN_pixel_mapping_and_pixel_grid_are_false_WHEN_validating_add_component_input_THEN_invalid_pixel_input_is_accepted():
+def test_ok_validator_GIVEN_invalid_pixel_mapping_WHEN_validating_add_component_input_THEN_validity_signal_is_emited_with_false():
     pass
 
 
