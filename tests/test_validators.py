@@ -198,7 +198,7 @@ def create_content_ok_validator():
 
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
-    mock_pixel_options.isVisible = Mock(return_value=False)
+    mock_pixel_options.isVisible = Mock(return_value=True)
     mock_pixel_grid_button.isVisible = Mock(return_value=False)
     mock_pixel_mapping_button.isVisible = Mock(return_value=False)
 
@@ -492,20 +492,60 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
 
 
 def test_ok_validator_GIVEN_invalid_pixel_mapping_WHEN_validating_add_component_input_THEN_validity_signal_is_emited_with_false():
-    pass
+
+    validator, _, _, mock_pixel_options, _, mock_pixel_mapping_button = (
+        create_content_ok_validator()
+    )
+
+    mock_pixel_options.isVisible = Mock(return_value=True)
+
+    validator.set_pixel_mapping_valid(False)
+    mock_pixel_mapping_button.isChecked = Mock(return_value=True)
+
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.validate_ok()
 
 
-def test_ok_validator_GIVEN_pixel_mapping_is_true_WHEN_validating_add_component_input_THEN_invalid_pixel_input_is_rejected():
-    pass
+def test_ok_validator_GIVEN_valid_pixel_mapping_WHEN_validating_add_component_input_THEN_validity_signal_is_emitted_with_true():
+
+    validator, _, _, mock_pixel_options, _, mock_pixel_mapping_button = (
+        create_content_ok_validator()
+    )
+
+    mock_pixel_options.isVisible = Mock(return_value=True)
+
+    validator.set_pixel_mapping_valid(True)
+    mock_pixel_mapping_button.isChecked = Mock(return_value=True)
+
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.validate_ok()
 
 
-def test_ok_validator_GIVEN_pixel_grid_is_true_WHEN_validating_add_component_input_THEN_invalid_pixel_grid_input_is_rejected():
-    pass
+def test_ok_validator_GIVEN_invalid_pixel_grid_WHEN_validating_add_component_input_THEN_validity_signal_is_emitted_with_false():
+
+    validator, _, _, mock_pixel_options, mock_pixel_grid_button, _ = (
+        create_content_ok_validator()
+    )
+
+    mock_pixel_options.isVisible = Mock(return_value=True)
+
+    validator.set_pixel_grid_valid(False)
+    mock_pixel_grid_button.isChecked = Mock(return_value=True)
+
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.validate_ok()
 
 
-def test_ok_validator_GIVEN_pixel_mapping_is_true_WHEN_validating_add_component_input_THEN_valid_pixel_mapping_input_is_accepted():
-    pass
+def test_ok_validator_GIVEN_invalid_pixel_mapping_WHEN_validating_add_component_input_THEN_validity_signal_is_emitted_with_true():
 
+    validator, _, _, mock_pixel_options, mock_pixel_grid_button, _ = (
+        create_content_ok_validator()
+    )
 
-def test_ok_validator_GIVEN_pixel_grid_is_true_WHEN_validating_add_component_input_THEN_valid_pixel_grid_input_is_accepted():
-    pass
+    mock_pixel_options.isVisible = Mock(return_value=True)
+
+    validator.set_pixel_grid_valid(True)
+    mock_pixel_grid_button.isChecked = Mock(return_value=True)
+
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.validate_ok()
