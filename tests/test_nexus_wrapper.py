@@ -156,3 +156,23 @@ def test_GIVEN_complete_list_of_pixel_ids_WHEN_recording_pixel_data_to_nxdetecto
     pixel_id_array = np.array(pixel_ids)
 
     assert np.array_equal(pixel_id_array, np.array(pixel_id_list))
+
+
+def test_GIVEN_incomplete_list_of_pixel_ids_WHEN_recording_pixel_data_to_nxdetector_THEN_missing_values_are_recorded_as_minus_one():
+
+    file = create_in_memory_file("test_nw12")
+    entry = file.create_group("entry")
+    nx_class = "NXdetector"
+    entry.attrs["NX_class"] = nx_class
+
+    pixel_id_list = [i for i in range(5)]
+    pixel_id_list[0] = None
+    pixel_data = PixelMapping(pixel_id_list)
+
+    nexus_wrapper = NexusWrapper("text_nw13")
+    nexus_wrapper.record_pixel_data(entry, nx_class, pixel_data)
+
+    pixel_ids = entry.get("detector_number")
+    pixel_id_array = np.array(pixel_ids)
+
+    assert np.array_equal(pixel_id_array, np.array([-1] + pixel_id_list[1:]))
