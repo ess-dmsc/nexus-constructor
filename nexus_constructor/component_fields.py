@@ -180,6 +180,8 @@ class FieldWidget(QFrame):
             return dtype(val)
         elif self.field_type == FieldType.array_dataset:
             return self.table_view.model.array
+        elif self.field_type == FieldType.kafka_stream:
+            return self.streams_widget.get_stream_group()
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
@@ -224,7 +226,8 @@ class FieldWidget(QFrame):
             )
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             self.edit_dialog.setLayout(QFormLayout())
-            self.edit_dialog.layout().addWidget(StreamFieldsWidget(self.edit_dialog))
+            self.streams_widget = StreamFieldsWidget(self.edit_dialog)
+            self.edit_dialog.layout().addWidget(self.streams_widget)
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             # TODO: show nx class panels
             pass
