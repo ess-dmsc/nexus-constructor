@@ -1,12 +1,11 @@
 import os
-import sys
 
 import PySide2
 import pytest
 import pytestqt
-from PySide2.QtCore import Qt, QPoint
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QDialog, QAbstractButton
+from PySide2.QtWidgets import QDialog
 from PySide2.QtWidgets import QRadioButton, QMainWindow
 from mock import patch, mock_open, Mock
 from pytestqt.qtbot import QtBot
@@ -19,6 +18,7 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.validators import FieldType
+from tests.ui_tests.ui_test_utils import systematic_button_press, show_and_close_window
 
 MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("1", "")]
 
@@ -43,7 +43,6 @@ NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
 
-RUNNING_ON_WINDOWS = sys.platform.startswith("win")
 
 instrument = Instrument(NexusWrapper("pixels"))
 component = ComponentTreeModel(instrument)
@@ -142,20 +141,6 @@ def dialog(qtbot, template):
     return dialog
 
 
-def show_and_close_window(
-    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
-):
-    """
-    Function for displaying and then closing a window/widget. This appears to be necessary in order to make sure
-    some interactions with the UI are recognised. Otherwise the UI can behave as though no clicks/button presses/etc
-    actually took place which then causes tests to fail even though they ought to pass in theory.
-    :param qtbot: The qtbot testing tool.
-    :param template: The window/widget to be opened.
-    """
-    template.show()
-    qtbot.waitForWindowShown(template)
-
-
 def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
     """
     Creates a template Add Component Dialog and sets this up for testing.
@@ -181,50 +166,6 @@ def create_add_component_dialog():
     component = ComponentTreeModel(instrument)
     nexus_wrapper_count += 1
     return AddComponentDialog(instrument, component)
-
-
-def systematic_radio_button_press(qtbot: pytestqt.qtbot.QtBot, button: QRadioButton):
-    """
-    Left clicks on a radio button after finding the position to click using a systematic search.
-    :param qtbot: The qtbot testing tool.
-    :param button: The button to press.
-    """
-    qtbot.mouseClick(
-        button, Qt.LeftButton, pos=find_radio_button_press_position(button)
-    )
-
-
-def find_radio_button_press_position(button: QRadioButton):
-    """
-    Systematic way of making sure a button press works. Goes through every point in the widget until it finds one that
-    returns True for the `hitButton` method.
-    :param button: The radio button to click.
-    :return: A QPoint indicating where the button must be clicked in order for its event to be triggered.
-    """
-    size = button.size()
-
-    for x in range(size.width()):
-        for y in range(size.height()):
-            click_point = QPoint(x, y)
-            if button.hitButton(click_point):
-                return click_point
-    return None
-
-
-def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
-    """
-    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
-    given string.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
-    :param units: The desired units input.
-    """
-    word_length = len(dialog.unitsLineEdit.text())
-    for _ in range(word_length):
-        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
-
-    if len(units) > 0:
-        qtbot.keyClicks(dialog.unitsLineEdit, units)
 
 
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
@@ -1174,7 +1115,6 @@ def test_UI_GIVEN_user_selects_no_pixels_and_gives_valid_input_THEN_add_componen
     assert dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.xfail
 def test_UI_GIVEN_user_provides_valid_pixel_grid_THEN_add_component_button_is_enabled(
     qtbot, template, dialog
 ):
@@ -1198,7 +1138,6 @@ def test_UI_GIVEN_user_provides_valid_pixel_grid_THEN_add_component_button_is_en
     assert dialog.buttonBox.isEnabled()
 
 
-@pytest.mark.xfail
 def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_disabled(
     qtbot, template, dialog
 ):
@@ -1396,85 +1335,6 @@ def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changin
 
     # Check that the add component button is enabled
     assert dialog.buttonBox.isEnabled()
-
-
-@pytest.fixture(scope="session", autouse=True)
-def cleanup(request):
-    """
-    Creates a QtBot at the end of all the tests and has it wait. This seems to be necessary in order to prevent
-    the use of fixtures from causing a segmentation fault.
-    """
-
-    def make_another_qtest():
-        bot = QtBot(request)
-        bot.wait(1)
-
-    request.addfinalizer(make_another_qtest)
-
-
-def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
-    """
-    Finds the shape type button that contains the given text.
-    :param dialog: An instance of an AddComponentDialog.
-    :param button_name: The name of the desired button.
-    :return: The QRadioButton for the given shape type.
-    """
-    for child in dialog.shapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
-        if child.text() == button_name:
-            return child
-
-
-def make_pixel_options_disappear(
-    qtbot: pytestqt.qtbot.QtBot,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    component_index: int,
-):
-    """
-    Create the conditions to allow the disappearance of the pixel options.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param component_index: The index of a component type.
-    """
-    systematic_button_press(qtbot, template, dialog.noShapeRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(component_index)
-    show_and_close_window(qtbot, template)
-
-
-def make_pixel_options_appear(
-    qtbot: pytestqt.qtbot.QtBot,
-    button: QRadioButton,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    pixel_options_index: int,
-):
-    """
-    Create the conditions to allow the appearance of the pixel options.
-    :param qtbot: The qtbot testing tool.
-    :param button: The Mesh or Cylinder radio button.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
-    """
-    systematic_button_press(qtbot, template, button)
-    dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
-    show_and_close_window(qtbot, template)
-
-
-def show_window_and_wait_for_interaction(
-    qtbot: pytestqt.qtbot.QtBot, template: PySide2.QtWidgets.QDialog
-):
-    """
-    Helper method that allows you to examine a window during testing. Just here for convenience.
-    Does nothing if the test is running on Windows because this is bad for Jenkins.
-    :param qtbot: The qtbot testing tool.
-    :param template: The window/widget to be opened.
-    """
-    if RUNNING_ON_WINDOWS:
-        return
-    template.show()
-    qtbot.stopForInteraction()
 
 
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
@@ -1693,40 +1553,81 @@ def enter_component_name(
     show_and_close_window(qtbot, template)
 
 
-def systematic_button_press(
+@pytest.fixture(scope="session", autouse=True)
+def cleanup(request):
+    """
+    Creates a QtBot at the end of all the tests and has it wait. This seems to be necessary in order to prevent
+    the use of fixtures from causing a segmentation fault.
+    """
+
+    def make_another_qtest():
+        bot = QtBot(request)
+        bot.wait(1)
+
+    request.addfinalizer(make_another_qtest)
+
+
+def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
+    """
+    Finds the shape type button that contains the given text.
+    :param dialog: An instance of an AddComponentDialog.
+    :param button_name: The name of the desired button.
+    :return: The QRadioButton for the given shape type.
+    """
+    for child in dialog.shapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
+        if child.text() == button_name:
+            return child
+
+
+def make_pixel_options_disappear(
     qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
     template: PySide2.QtWidgets.QDialog,
-    button: QAbstractButton,
+    component_index: int,
 ):
     """
-    Left clicks on a button after finding the position to click using a systematic search.
+    Create the conditions to allow the disappearance of the pixel options.
     :param qtbot: The qtbot testing tool.
-    :param template: The window/widget that holds an AddComponentDialog.
-    :param button: The button to press.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param component_index: The index of a component type.
     """
-    point = find_button_press_position(button)
-
-    if point is not None:
-        qtbot.mouseClick(button, Qt.LeftButton, pos=point)
-    else:
-        qtbot.mouseClick(button, Qt.LeftButton)
-
+    systematic_button_press(qtbot, template, dialog.noShapeRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(component_index)
     show_and_close_window(qtbot, template)
 
 
-def find_button_press_position(button: QAbstractButton):
+def make_pixel_options_appear(
+    qtbot: pytestqt.qtbot.QtBot,
+    button: QRadioButton,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    pixel_options_index: int,
+):
     """
-    Systematic way of making sure a button press works. Goes through every point in the widget until it finds one that
-    returns True for the `hitButton` method.
-    :param button: The radio button to click.
-    :return: A QPoint indicating where the button must be clicked in order for its event to be triggered.
+    Create the conditions to allow the appearance of the pixel options.
+    :param qtbot: The qtbot testing tool.
+    :param button: The Mesh or Cylinder radio button.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
     """
-    width = button.geometry().width()
-    height = button.geometry().height()
+    systematic_button_press(qtbot, template, button)
+    dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
+    show_and_close_window(qtbot, template)
 
-    for x in range(1, width):
-        for y in range(1, height):
-            click_point = QPoint(x, y)
-            if button.hitButton(click_point):
-                return click_point
-    return None
+
+def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
+    """
+    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
+    given string.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog object.
+    :param units: The desired units input.
+    """
+    word_length = len(dialog.unitsLineEdit.text())
+    for _ in range(word_length):
+        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+
+    if len(units) > 0:
+        qtbot.keyClicks(dialog.unitsLineEdit, units)
