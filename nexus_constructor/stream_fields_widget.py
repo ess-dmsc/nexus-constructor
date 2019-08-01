@@ -116,4 +116,19 @@ class StreamFieldsWidget(QDialog):
         stream_group.create_dataset(
             name="writer_module", dtype=dtype, data=self.schema_combo.currentText()
         )
+
+        schema = self.schema_combo.currentText()
+
+        if schema == "f142":
+            stream_group.create_dataset(
+                "type", dtype=dtype, data=self.type_combo.currentText()
+            )
+            if self.type_combo.currentText() == "double":
+                stream_group.create_dataset(
+                    "array_size", data=self.array_size_spinbox.value()
+                )
+        if schema != "ev42":
+            stream_group.create_dataset(
+                "source", dtype=dtype, data=self.source_line_edit.text()
+            )
         return stream_group
