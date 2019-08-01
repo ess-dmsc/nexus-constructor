@@ -514,6 +514,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
+        pixel_data = self.generate_pixel_data()
 
         if self.component_to_edit:
             self.component_to_edit.name = component_name
@@ -525,7 +526,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             geometry = self.generate_geometry_model(self.component_to_edit)
         else:
             component = self.instrument.create_component(
-                component_name, nx_class, description
+                component_name, nx_class, description, pixel_data
             )
             geometry = self.generate_geometry_model(component)
             add_fields_to_component(component, self.fieldsListWidget)

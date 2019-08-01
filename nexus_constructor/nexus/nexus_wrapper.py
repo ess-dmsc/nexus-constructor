@@ -1,7 +1,10 @@
+from typing import Any, TypeVar, Optional, List
+
 import h5py
-from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar, Optional
 import numpy as np
+from PySide2.QtCore import Signal, QObject
+
+from nexus_constructor.pixel_data import PixelMapping, PixelData
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
@@ -139,6 +142,40 @@ class NexusWrapper(QObject):
     def delete_node(self, node: h5Node):
         del self.nexus_file[node.name]
         self._emit_file()
+
+    @staticmethod
+    def record_detector_number(component_group: h5py.Group, ids: List[int]):
+        """
+        Stores the pixel IDs in the `detector_number` field of the NeXus file. If a pixel ID is absent then this is
+        recorded as an ID of -1 in the `detector_number` array.
+        :param ids: A list of the pixel IDs.
+        """
+
+        array_shape = len(ids)
+        id_arr = np.full(shape=len(ids), fill_value=-1, dtype="int64")
+
+        # Copy the contents of the list to the numpy array
+        for i in range(array_shape):
+            if ids[i] is not None:
+                id_arr[i] = ids[i]
+
+        # Write the array to the NeXus file
+        component_group.create_dataset(
+            "detector_number", shape=(len(ids),), dtype="int64", data=id_arr
+        )
+
+    def record_pixel_data(
+        self, component_group: h5py.Group, nx_class: str, pixel_data: PixelData
+    ):
+        """
+        Records the pixel data to the NeXus file.
+        :param component_group: The NeXus component group.
+        :param nx_class: The NeXus class of the component.
+        :param pixel_data: The PixelData object. This may be a PixelMapping or a PixelGrid.
+        """
+        if nx_class == "NXdetector":
+            if type(pixel_data) is PixelMapping:
+                self.record_detector_number(component_group, pixel_data.pixel_ids)
 
     def create_nx_group(
         self, name: str, nx_class: str, parent: h5py.Group
