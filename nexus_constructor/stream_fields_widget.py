@@ -103,25 +103,27 @@ class StreamFieldsWidget(QDialog):
             self.array_size_spinbox.setVisible(False)
 
     def get_stream_group(self):
-        dtype = h5py.special_dtype(vlen=str)
+        string_dtype = h5py.special_dtype(vlen=str)
         temp_file = h5py.File(
             name=str(uuid.uuid4()), driver="core", backing_store=False
         )
         group = temp_file.create_group("children")
-        group.create_dataset(name="type", dtype=dtype, data="stream")
+        group.create_dataset(name="type", dtype=string_dtype, data="stream")
         stream_group = group.create_group("stream")
         stream_group.create_dataset(
-            name="topic", dtype=dtype, data=self.topic_line_edit.text()
+            name="topic", dtype=string_dtype, data=self.topic_line_edit.text()
         )
         stream_group.create_dataset(
-            name="writer_module", dtype=dtype, data=self.schema_combo.currentText()
+            name="writer_module",
+            dtype=string_dtype,
+            data=self.schema_combo.currentText(),
         )
 
         schema = self.schema_combo.currentText()
 
         if schema == "f142":
             stream_group.create_dataset(
-                "type", dtype=dtype, data=self.type_combo.currentText()
+                "type", dtype=string_dtype, data=self.type_combo.currentText()
             )
             if self.type_combo.currentText() == "double":
                 stream_group.create_dataset(
@@ -129,6 +131,6 @@ class StreamFieldsWidget(QDialog):
                 )
         if schema != "ev42":
             stream_group.create_dataset(
-                "source", dtype=dtype, data=self.source_line_edit.text()
+                "source", dtype=string_dtype, data=self.source_line_edit.text()
             )
         return stream_group
