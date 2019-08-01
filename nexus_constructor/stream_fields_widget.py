@@ -1,3 +1,6 @@
+import uuid
+
+import h5py
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QComboBox,
@@ -5,7 +8,6 @@ from PySide2.QtWidgets import (
     QLineEdit,
     QDialog,
     QLabel,
-    QDoubleSpinBox,
     QSpinBox,
 )
 import numpy as np
@@ -99,3 +101,16 @@ class StreamFieldsWidget(QDialog):
         else:
             self.array_size_label.setVisible(False)
             self.array_size_spinbox.setVisible(False)
+
+    def get_stream_group(self):
+        dtype = h5py.special_dtype(vlen=str)
+        temp_file = h5py.File(name=uuid.uuid4(), driver="core", backing_store=False)
+        group = temp_file.create_group("children")
+        group.create_dataset(name="type", dtype=dtype, data="stream")
+        stream_group = group.create_group("stream")
+        stream_group.create_dataset(
+            name="topic", dtype=dtype, data=self.topic_line_edit.text()
+        )
+        stream_group.create_dataset(
+            name="writer_module", dtype=dtype, data=self.schema_combo.currentText()
+        )
