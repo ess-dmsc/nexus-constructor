@@ -104,7 +104,9 @@ class StreamFieldsWidget(QDialog):
 
     def get_stream_group(self):
         dtype = h5py.special_dtype(vlen=str)
-        temp_file = h5py.File(name=uuid.uuid4(), driver="core", backing_store=False)
+        temp_file = h5py.File(
+            name=str(uuid.uuid4()), driver="core", backing_store=False
+        )
         group = temp_file.create_group("children")
         group.create_dataset(name="type", dtype=dtype, data="stream")
         stream_group = group.create_group("stream")
@@ -114,3 +116,4 @@ class StreamFieldsWidget(QDialog):
         stream_group.create_dataset(
             name="writer_module", dtype=dtype, data=self.schema_combo.currentText()
         )
+        return stream_group
