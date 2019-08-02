@@ -1,10 +1,12 @@
-from PyQt4.QtGui import QListWidgetItem
-from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox
+from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 from nexusutils.readwriteoff import parse_off_file
 
 from nexus_constructor.component_type import PIXEL_COMPONENT_TYPES
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
+
+RED_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #f6989d }"
+WHITE_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #FFFFFF }"
 
 
 class PixelOptions:
@@ -58,9 +60,6 @@ class PixelOptions:
         )
         self.dialog.noPixelsButton.clicked.connect(self.evaluate_pixel_input_validity)
 
-        self.dialog.pixelMappingLabel.setVisible(False)
-        self.dialog.pixelMappingListWidget.setVisible(False)
-
         self.dialog.countFirstComboBox.addItems(list(self.count_direction.keys()))
 
         self.dialog.columnCountSpinBox.valueChanged.connect(
@@ -77,9 +76,6 @@ class PixelOptions:
         """
         Changes the column and row count spin boxes in the Pixel
         """
-
-        RED_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #f6989d }"
-        WHITE_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #FFFFFF }"
 
         if (
             self.dialog.rowCountSpinBox.value() == 0
@@ -120,7 +116,9 @@ class PixelOptions:
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
         """
 
-        if self.dialog.pixelMappingListWidget.count() != 0 and not file_changed:
+        if (
+            self.dialog.pixelMappingListWidget.count() != 0 and not file_changed
+        ) or self.dialog.cad_file_name is None:
             return
 
         n_faces = None
@@ -139,7 +137,7 @@ class PixelOptions:
                 self.dialog.pixelMappingListWidget, i
             )
             pixel_mapping_widget.pixelIDLineEdit.textChanged.connect(
-                self.dialog.check_pixel_mapping_validity
+                self.check_pixel_mapping_validity
             )
 
             list_item = QListWidgetItem()
@@ -164,14 +162,16 @@ class PixelOptions:
             self.dialog.meshRadioButton.isChecked()
             or self.dialog.CylinderRadioButton.isChecked()
         )
-        pixel_grid_condition = (
-            pixel_options_condition and self.dialog.singlePixelRadioButton.isChecked()
-        )
-        pixel_mapping_condition = (
-            pixel_options_condition and self.dialog.entireShapeRadioButton.isChecked()
-        )
 
-        return pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
+        if not pixel_options_condition:
+            return False, False, False
+
+        else:
+            return (
+                True,
+                self.dialog.singlePixelRadioButton.isChecked(),
+                self.dialog.entireShapeRadioButton.isChecked(),
+            )
 
     def update_visibility(
         self, pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
