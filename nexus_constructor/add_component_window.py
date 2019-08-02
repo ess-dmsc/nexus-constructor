@@ -64,8 +64,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.possible_fields = []
         self.component_to_edit = component_to_edit
 
-        self.pixel_options = PixelOptions(self)
-
         self.valid_file_given = False
 
     def setupUi(self, parent_dialog):
@@ -85,23 +83,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        self.ok_validator = OkValidator(
-            self.noShapeRadioButton,
-            self.meshRadioButton,
-            self.pixelOptionsBox,
-            self.singlePixelRadioButton,
-            self.entireShapeRadioButton,
-        )
+        self.ok_validator = OkValidator(self.noShapeRadioButton, self.meshRadioButton)
         self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
-
-        self.meshRadioButton.clicked.connect(self.pixel_options.update)
-        self.CylinderRadioButton.clicked.connect(self.pixel_options.update)
-        self.noShapeRadioButton.clicked.connect(self.pixel_options.update)
 
         [
             button.clicked.connect(self.ok_validator.validate_ok)
@@ -120,9 +108,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
-        self.componentTypeComboBox.currentIndexChanged.connect(
-            self.pixel_options.update
-        )
 
         # Set default geometry type and show the related fields.
         self.noShapeRadioButton.setChecked(True)
@@ -180,7 +165,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if self.component_to_edit:
             self._fill_existing_entries()
 
-        self.pixel_options.setup_ui()
+        self.pixelOptionsWidget.ui = PixelOptions()
+        self.pixelOptionsWidget.ui.setupUi(self.pixelOptionsWidget)
+        self.pixelOptionsWidget.ui.set_component_combo_box(self.componentTypeComboBox)
+
+        self.meshRadioButton.clicked.connect(self.pixelOptionsWidget.update)
+        self.CylinderRadioButton.clicked.connect(self.pixelOptionsWidget.update)
+        self.noShapeRadioButton.clicked.connect(self.pixelOptionsWidget.update)
+        self.componentTypeComboBox.currentIndexChanged.connect(
+            self.pixelOptionsWidget.update
+        )
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
@@ -241,7 +235,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
             )
         )
-        self.pixelLayoutBox.setVisible(
+        self.pixelOptionsWidget.setVisible(
             self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
         )
         self.possible_fields = self.nx_component_classes[
@@ -250,7 +244,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nx_class_changed.emit(self.possible_fields)
 
         # Change which pixel-related fields are visible because this depends on the class that has been selected.
-        self.pixel_options.update()
+        self.pixelOptionsWidget.update()
 
     def mesh_file_picker(self):
         """
@@ -346,16 +340,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.component_model.add_component(component)
 
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
-
-    def invalid_file_given(self):
-        """
-        Checks if the current mesh file is valid. If it is invalid and pixel mapping has been chosen, then a pixel
-        mapping list won't be generated.
-        :return: A bool indicating whether or not the file line edit has a red background.
-        """
-        return (
-            self.fileLineEdit.styleSheet() == "QLineEdit { background-color: #f6989d }"
-        )
 
     def set_file_valid(self, validity):
         self.valid_file_given = validity

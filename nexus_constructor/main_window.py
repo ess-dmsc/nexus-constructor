@@ -1,24 +1,24 @@
+import os
+
+import h5py
+import silx.gui.hdf5
 from PySide2.QtCore import QObject
-from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView
 from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 
-import silx.gui.hdf5
-import os
-import h5py
-
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.instrument import Instrument
-from nexus_constructor.ui_utils import file_dialog
-from ui.main_window import Ui_MainWindow
 from nexus_constructor.component import Component
-from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import (
     ComponentEditorDelegate,
     LinkTransformation,
 )
+from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus_filewriter_json import writer
+from nexus_constructor.transformations import Transformation, TransformationsList
+from nexus_constructor.ui_utils import file_dialog
+from ui.main_window import Ui_MainWindow
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
@@ -327,6 +327,7 @@ class MainWindow(Ui_MainWindow, QObject):
             self.instrument, self.component_model, component, parent=self
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
+
         self.add_component_window.show()
 
     def on_delete_item(self):

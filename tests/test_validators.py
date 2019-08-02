@@ -192,22 +192,13 @@ def create_content_ok_validator():
     """
     mock_no_geometry_button = Mock()
     mock_mesh_button = Mock()
-    mock_pixel_options = Mock()
-    mock_pixel_grid_button = Mock()
-    mock_pixel_mapping_button = Mock()
 
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
-    mock_pixel_options.isVisible = Mock(return_value=True)
-    mock_pixel_grid_button.isChecked = Mock(return_value=False)
-    mock_pixel_mapping_button.isChecked = Mock(return_value=False)
 
     validator = OkValidator(
         mock_no_geometry_button,
         mock_mesh_button,
-        mock_pixel_options,
-        mock_pixel_grid_button,
-        mock_pixel_mapping_button,
     )
     validator.set_units_valid(True)
     validator.set_name_valid(True)
@@ -217,9 +208,6 @@ def create_content_ok_validator():
         validator,
         mock_mesh_button,
         mock_no_geometry_button,
-        mock_pixel_options,
-        mock_pixel_grid_button,
-        mock_pixel_mapping_button,
     )
 
 
@@ -234,7 +222,7 @@ def inspect_signal(result, expected):
 
 def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+    validator, mock_mesh_button, mock_no_geometry_button = (
         create_content_ok_validator()
     )
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
@@ -243,7 +231,7 @@ def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signa
 
 def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+    validator, mock_mesh_button, mock_no_geometry_button = (
         create_content_ok_validator()
     )
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
@@ -252,7 +240,7 @@ def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted
 
 def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unchecked_THEN_false_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+    validator, mock_mesh_button, mock_no_geometry_button = (
         create_content_ok_validator()
     )
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
@@ -261,7 +249,7 @@ def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unc
 
 def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THEN_false_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+    validator, mock_mesh_button, mock_no_geometry_button = (
         create_content_ok_validator()
     )
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
@@ -270,7 +258,7 @@ def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THE
 
 def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_checked_THEN_true_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+    validator, mock_mesh_button, mock_no_geometry_button = (
         create_content_ok_validator()
     )
     mock_no_geometry_button.isChecked = Mock(return_value=True)
@@ -280,7 +268,7 @@ def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_che
 
 def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_THEN_true_signal_is_emitted():
 
-    validator, mock_mesh_button, mock_no_geometry_button, _, _, _ = (
+    validator, mock_mesh_button, mock_no_geometry_button = (
         create_content_ok_validator()
     )
     mock_mesh_button.isChecked = Mock(return_value=False)
@@ -493,9 +481,9 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
 
 def test_ok_validator_GIVEN_invalid_pixel_mapping_WHEN_validating_add_component_input_THEN_validity_signal_is_emited_with_false():
 
-    validator, _, _, mock_pixel_options, _, mock_pixel_mapping_button = (
-        create_content_ok_validator()
-    )
+    # validator, _, _, mock_pixel_options, _, mock_pixel_mapping_button = (
+    #     create_content_ok_validator()
+    # )
 
     validator.set_pixel_mapping_valid(False)
     mock_pixel_mapping_button.isChecked = Mock(return_value=True)
@@ -506,9 +494,9 @@ def test_ok_validator_GIVEN_invalid_pixel_mapping_WHEN_validating_add_component_
 
 def test_ok_validator_GIVEN_valid_pixel_mapping_WHEN_validating_add_component_input_THEN_validity_signal_is_emitted_with_true():
 
-    validator, _, _, mock_pixel_options, _, mock_pixel_mapping_button = (
-        create_content_ok_validator()
-    )
+    # validator, _, _, mock_pixel_options, _, mock_pixel_mapping_button = (
+    #     create_content_ok_validator()
+    # )
 
     validator.set_pixel_mapping_valid(True)
     mock_pixel_mapping_button.isChecked = Mock(return_value=True)
@@ -519,9 +507,9 @@ def test_ok_validator_GIVEN_valid_pixel_mapping_WHEN_validating_add_component_in
 
 def test_ok_validator_GIVEN_invalid_pixel_grid_WHEN_validating_add_component_input_THEN_validity_signal_is_emitted_with_false():
 
-    validator, _, _, mock_pixel_options, mock_pixel_grid_button, _ = (
-        create_content_ok_validator()
-    )
+    # validator, _, _, mock_pixel_options, mock_pixel_grid_button, _ = (
+    #     create_content_ok_validator()
+    # )
 
     validator.set_pixel_grid_valid(False)
     mock_pixel_grid_button.isChecked = Mock(return_value=True)
@@ -532,9 +520,9 @@ def test_ok_validator_GIVEN_invalid_pixel_grid_WHEN_validating_add_component_inp
 
 def test_ok_validator_GIVEN_valid_pixel_grid_WHEN_validating_add_component_input_THEN_validity_signal_is_emitted_with_true():
 
-    validator, _, _, mock_pixel_options, mock_pixel_grid_button, _ = (
-        create_content_ok_validator()
-    )
+    # validator, _, _, mock_pixel_options, mock_pixel_grid_button, _ = (
+    #     create_content_ok_validator()
+    # )
 
     validator.set_pixel_grid_valid(True)
     mock_pixel_grid_button.isChecked = Mock(return_value=True)
