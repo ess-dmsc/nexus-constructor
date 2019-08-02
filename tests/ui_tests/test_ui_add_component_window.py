@@ -18,10 +18,7 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.validators import FieldType
-from tests.ui_tests.ui_test_utils import (
-    systematic_button_press,
-    show_and_close_window,
-)
+from tests.ui_tests.ui_test_utils import systematic_button_press, show_and_close_window
 
 MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("1", "")]
 
