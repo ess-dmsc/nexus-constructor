@@ -40,15 +40,19 @@ class PixelOptions:
         )
         self.dialog.noPixelsButton.clicked.connect(self.hide_pixel_options_stack)
 
-        self.dialog.rowCountSpinBox.valueChanged.connect(
-            lambda: self.disable_or_enable_size_field(
-                self.dialog.rowCountSpinBox, self.dialog.rowHeightSpinBox
-            )
-        )
         self.dialog.rowCountSpinBox.valueChanged.connect(self.check_pixel_grid_validity)
+        self.dialog.columnCountSpinBox.valueChanged.connect(
+            self.check_pixel_grid_validity
+        )
+
         self.dialog.columnCountSpinBox.valueChanged.connect(
             lambda: self.disable_or_enable_size_field(
                 self.dialog.columnCountSpinBox, self.dialog.columnWidthSpinBox
+            )
+        )
+        self.dialog.rowCountSpinBox.valueChanged.connect(
+            lambda: self.disable_or_enable_size_field(
+                self.dialog.rowCountSpinBox, self.dialog.rowHeightSpinBox
             )
         )
 
@@ -62,9 +66,7 @@ class PixelOptions:
 
         self.dialog.countFirstComboBox.addItems(list(self.count_direction.keys()))
 
-        self.dialog.columnCountSpinBox.valueChanged.connect(
-            self.check_pixel_grid_validity
-        )
+        self.evaluate_pixel_input_validity()
 
     def disable_or_enable_size_field(
         self, count_spin_box: QSpinBox, size_spin_box: QDoubleSpinBox
@@ -189,27 +191,17 @@ class PixelOptions:
         self.dialog.pixelOptionsBox.setVisible(pixel_options_condition)
 
         # Set visibility for the components of the pixel options box
-        self.update_pixel_layout_validity(pixel_grid_condition, pixel_mapping_condition)
-
-    def update_validity(
-        self, pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
-    ):
-        pass
+        if pixel_options_condition:
+            self.update_pixel_layout_validity(
+                pixel_grid_condition, pixel_mapping_condition
+            )
 
     def hide_pixel_options_stack(self):
         self.dialog.pixelOptionsStack.setVisible(False)
 
     def update(self,):
 
-        pixel_options_condition, pixel_grid_condition, pixel_mapping_condition = (
-            self.get_visibility_conditions()
-        )
-        self.update_visibility(
-            pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
-        )
-        self.update_validity(
-            pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
-        )
+        self.update_visibility(*self.get_visibility_conditions())
 
     def get_pixel_mapping_ids(self):
         """
@@ -234,9 +226,12 @@ class PixelOptions:
         :return:
         """
         # Determine which type of PixelMapping object ought to be created.
-        _, pixel_grid_condition, pixel_mapping_condition = (
+        pixel_options_condition, pixel_grid_condition, pixel_mapping_condition = (
             self.get_visibility_conditions()
         )
+
+        if not pixel_options_condition:
+            return None
 
         if pixel_grid_condition:
             pixel_data = PixelGrid()
@@ -255,11 +250,8 @@ class PixelOptions:
 
             return pixel_data
 
-        elif pixel_mapping_condition:
+        if pixel_mapping_condition:
             return PixelMapping(self.get_pixel_mapping_ids())
-
-        else:
-            return None
 
     def evaluate_pixel_input_validity(self):
         """
