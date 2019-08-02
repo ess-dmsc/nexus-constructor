@@ -4,8 +4,7 @@ from functools import partial
 
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QListWidgetItem, QDoubleSpinBox, QSpinBox
-from nexusutils.readwriteoff import parse_off_file
+from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.component import Component
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
@@ -18,8 +17,7 @@ from nexus_constructor.geometry import CylindricalGeometry, OFFGeometryNexus
 from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.pixel_data import CountDirection, Corner, PixelMapping, PixelGrid
-from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
+from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.validators import (
@@ -53,18 +51,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if parent:
             self.setParent(parent)
 
-        # Dictionaries that map user-input to known pixel grid options. Used when created the PixelGridModel.
-        self.count_direction = {
-            "Rows": CountDirection.ROW,
-            "Columns": CountDirection.COLUMN,
-        }
-        self.initial_count_corner = {
-            "Bottom Left": Corner.BOTTOM_LEFT,
-            "Bottom Right": Corner.BOTTOM_RIGHT,
-            "Top Left": Corner.TOP_LEFT,
-            "Top Right": Corner.TOP_RIGHT,
-        }
-
         self.instrument = instrument
         self.component_model = component_model
 
@@ -74,10 +60,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
         self.cad_file_name = None
-        self.pixel_mapping_widgets = []
 
         self.possible_fields = []
         self.component_to_edit = component_to_edit
+
+        self.pixel_options = PixelOptions(self)
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -110,9 +97,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
-        self.meshRadioButton.clicked.connect(self.update_pixel_options)
-        self.CylinderRadioButton.clicked.connect(self.update_pixel_options)
-        self.noShapeRadioButton.clicked.connect(self.update_pixel_options)
+        self.meshRadioButton.clicked.connect(self.pixel_options.update)
+        self.CylinderRadioButton.clicked.connect(self.pixel_options.update)
+        self.noShapeRadioButton.clicked.connect(self.pixel_options.update)
 
         [
             button.clicked.connect(self.ok_validator.validate_ok)
@@ -131,7 +118,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
         self.componentTypeComboBox.currentIndexChanged.connect(
-            self.update_pixel_options
+            self.pixel_options.update
         )
 
         # Set default geometry type and show the related fields.
@@ -187,78 +174,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
-        # Instruct the pixel grid box to appear or disappear depending on the pixel layout setting
-        self.singlePixelRadioButton.clicked.connect(
-            lambda: self.show_pixel_grid_or_pixel_mapping(True)
-        )
-        self.entireShapeRadioButton.clicked.connect(
-            lambda: self.show_pixel_grid_or_pixel_mapping(False)
-        )
-
-        # Make both the pixel grid and pixel mapping options invisible when the No Pixel button has been pressed
-        self.noPixelsButton.clicked.connect(self.hide_pixel_grid_and_mapping)
-
-        self.singlePixelRadioButton.clicked.connect(self.evaluate_pixel_input_validity)
-        self.entireShapeRadioButton.clicked.connect(self.evaluate_pixel_input_validity)
-        self.noPixelsButton.clicked.connect(self.evaluate_pixel_input_validity)
-
-        self.pixelMappingLabel.setVisible(False)
-        self.pixelMappingListWidget.setVisible(False)
-
-        self.countFirstComboBox.addItems(list(self.count_direction.keys()))
-
-        self.rowCountSpinBox.valueChanged.connect(
-            lambda: self.disable_or_enable_size_field(
-                self.rowCountSpinBox, self.rowHeightSpinBox
-            )
-        )
-        self.rowCountSpinBox.valueChanged.connect(self.check_pixel_grid_validity)
-        self.columnCountSpinBox.valueChanged.connect(
-            lambda: self.disable_or_enable_size_field(
-                self.columnCountSpinBox, self.columnWidthSpinBox
-            )
-        )
-        self.columnCountSpinBox.valueChanged.connect(self.check_pixel_grid_validity)
-
         if self.component_to_edit:
             self._fill_existing_entries()
 
-    def evaluate_pixel_input_validity(self):
-
-        if self.singlePixelRadioButton.isChecked():
-            self.check_pixel_grid_validity()
-        elif self.entireShapeRadioButton.isChecked():
-            self.check_pixel_mapping_validity()
-        else:
-            self.ok_validator.validate_ok()
-
-    def disable_or_enable_size_field(
-        self, count_spin_box: QSpinBox, size_spin_box: QDoubleSpinBox
-    ):
-        size_spin_box.setEnabled(count_spin_box.value() != 0)
-        self.forbid_both_row_and_columns_being_zero()
-
-    def forbid_both_row_and_columns_being_zero(self):
-
-        RED_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #f6989d }"
-        WHITE_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #FFFFFF }"
-
-        if self.rowCountSpinBox.value() == 0 and self.columnCountSpinBox.value() == 0:
-            self.rowCountSpinBox.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
-            self.columnCountSpinBox.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
-            self.ok_validator.set_pixel_grid_valid(False)
-        else:
-            self.rowCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
-            self.columnCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
-            self.ok_validator.set_pixel_grid_valid(True)
-
-    def check_pixel_grid_validity(self):
-        self.ok_validator.set_pixel_grid_valid(
-            not (
-                self.rowCountSpinBox.value() == 0
-                and self.columnCountSpinBox.value() == 0
-            )
-        )
+        self.pixel_options.setup_ui()
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
@@ -328,28 +247,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nx_class_changed.emit(self.possible_fields)
 
         # Change which pixel-related fields are visible because this depends on the class that has been selected.
-        self.update_pixel_options()
-
-    def hide_pixel_grid_and_mapping(self):
-        """
-        Hides the pixel grid and pixel mapping options when the No Pixel button has been selected.
-        """
-
-        self.pixelGridBox.setVisible(False)
-        self.pixelMappingLabel.setVisible(False)
-        self.pixelMappingListWidget.setVisible(False)
-
-    def show_pixel_grid_or_pixel_mapping(self, bool):
-        """
-        Switches between the pixel grid or pixel mapping boxes being visible. Populates the pixel mapping list if it is
-        visible but empty.
-        :param bool: Boolean indicating whether the pixel grid or pixel mapping box should be visible.
-        """
-        self.pixelGridBox.setVisible(bool)
-        self.pixelMappingLabel.setVisible(not bool)
-        self.pixelMappingListWidget.setVisible(not bool)
-
-        self.populate_pixel_mapping_list_when_empty(not bool)
+        self.pixel_options.update()
 
     def mesh_file_picker(self):
         """
@@ -363,63 +261,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.cad_file_name = filename
         else:
             return
-
-        _, _, pixel_mapping_condition = self.pixel_options_conditions()
-
-        if pixel_mapping_condition:
-            self.populate_pixel_mapping_list()
-
-    def pixel_options_conditions(self):
-        """
-        Determine which of the pixel-related fields need to be visible.
-        :return: Booleans indicating whether the pixel layout, pixel grid, and pixel mapping options need to
-        be made visible.
-        """
-
-        pixel_options_condition = self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES and (
-            self.meshRadioButton.isChecked() or self.CylinderRadioButton.isChecked()
-        )
-        pixel_grid_condition = (
-            pixel_options_condition and self.singlePixelRadioButton.isChecked()
-        )
-        pixel_mapping_condition = (
-            pixel_options_condition and self.entireShapeRadioButton.isChecked()
-        )
-
-        return pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
-
-    def update_pixel_options(self):
-
-        pixel_options_condition, pixel_grid_condition, pixel_mapping_condition = (
-            self.pixel_options_conditions()
-        )
-        self.change_pixel_options_visibility(
-            pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
-        )
-
-        self.evaluate_pixel_input_validity()
-
-    def change_pixel_options_visibility(
-        self, pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
-    ):
-        """
-        Changes the visibility of the pixel-related fields and the box that contains them. First checks if any of the
-        fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
-        and individual fields is set.
-        """
-
-        # Only make the pixel box appear based on the pixel layout and pixel data options being visible. The pixel grid
-        # and mapping options already depend on pixel layout being visible.
-        self.pixelOptionsBox.setVisible(pixel_options_condition)
-
-        # Set visibility for the components of the pixel options box
-        self.pixelLayoutBox.setVisible(pixel_options_condition)
-        self.pixelGridBox.setVisible(pixel_grid_condition)
-        self.pixelMappingLabel.setVisible(pixel_mapping_condition)
-        self.pixelMappingListWidget.setVisible(pixel_mapping_condition)
-
-        # Populate the pixel mapping list if it is visible but empty
-        self.populate_pixel_mapping_list_when_empty(pixel_mapping_condition)
 
     def show_cylinder_fields(self):
         self.shapeOptionsBox.setVisible(True)
@@ -476,45 +317,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         return geometry_model
 
-    def generate_pixel_data(self):
-        """
-        Creates the appropriate PixelModel object depending on user selection then gives it the information that the
-        user entered in the relevant fields.
-        :return:
-        """
-        # Determine which type of PixelMapping object ought to be created.
-        _, pixel_grid_condition, pixel_mapping_condition = (
-            self.pixel_options_conditions()
-        )
-
-        if pixel_grid_condition:
-            pixel_data = PixelGrid()
-            pixel_data.rows = self.rowCountSpinBox.value()
-            pixel_data.columns = self.columnCountSpinBox.value()
-            pixel_data.row_height = self.rowHeightSpinBox.value()
-            pixel_data.column_width = self.columnWidthLineEdit.value()
-            pixel_data.first_id = self.firstIDSpinBox.value()
-            pixel_data.count_direction = self.count_direction[
-                self.countFirstComboBox.currentText()
-            ]
-
-            pixel_data.initial_count_corner = self.initial_count_corner[
-                self.startCountingComboBox.currentText()
-            ]
-
-            return pixel_data
-
-        elif pixel_mapping_condition:
-            return PixelMapping(self.get_pixel_mapping_ids())
-
-        else:
-            return None
-
     def on_ok(self):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        pixel_data = self.generate_pixel_data()
+        pixel_data = self.pixel_options.generate_pixel_data()
 
         if self.component_to_edit:
             self.component_to_edit.name = component_name
@@ -543,61 +350,3 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         return (
             self.fileLineEdit.styleSheet() == "QLineEdit { background-color: #f6989d }"
         )
-
-    def check_pixel_mapping_validity(self):
-
-        nonempty_ids = [
-            widget.get_id() is not None for widget in self.pixel_mapping_widgets
-        ]
-        self.ok_validator.set_pixel_mapping_valid(any(nonempty_ids))
-
-    def populate_pixel_mapping_list(self):
-        """
-        Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
-        """
-        # Don't do this if a file hasn't been selected yet or if the file given is invalid
-        if not self.cad_file_name or self.invalid_file_given():
-            return
-
-        n_faces = None
-
-        with open(self.cad_file_name) as temp_off_file:
-            faces = parse_off_file(temp_off_file)[1]
-            n_faces = len(faces)
-
-        # Clear the list widget in case it contains information from a previous file.
-        self.pixel_mapping_widgets = []
-        self.pixelMappingListWidget.clear()
-
-        # Use the faces information from the geometry file to add fields to the pixel mapping list
-        for i in range(n_faces):
-            pixel_mapping_widget = PixelMappingWidget(self.pixelMappingListWidget, i)
-            pixel_mapping_widget.pixelIDLineEdit.textChanged.connect(
-                self.check_pixel_mapping_validity
-            )
-
-            list_item = QListWidgetItem()
-            list_item.setSizeHint(pixel_mapping_widget.sizeHint())
-
-            self.pixelMappingListWidget.addItem(list_item)
-            self.pixelMappingListWidget.setItemWidget(list_item, pixel_mapping_widget)
-
-            # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
-            self.pixel_mapping_widgets.append(pixel_mapping_widget)
-
-    def get_pixel_mapping_ids(self):
-        """
-        :return: A list of the IDs for the current PixelMappingWidgets.
-        """
-        return [
-            pixel_mapping_widget.get_id()
-            for pixel_mapping_widget in self.pixel_mapping_widgets
-        ]
-
-    def populate_pixel_mapping_list_when_empty(self, pixel_mapping_condition):
-        """
-        Populates the pixel mapping list only if it is visible and empty.
-        :param pixel_mapping_condition: The condition for showing the pixel mapping list.
-        """
-        if pixel_mapping_condition and not self.pixel_mapping_widgets:
-            self.populate_pixel_mapping_list()

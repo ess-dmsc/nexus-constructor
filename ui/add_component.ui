@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1177</width>
-    <height>1051</height>
+    <height>919</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -126,21 +126,21 @@
            <item>
             <widget class="QRadioButton" name="noShapeRadioButton">
              <property name="text">
-              <string>&amp;No Shape</string>
+              <string>No Shape</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QRadioButton" name="meshRadioButton">
              <property name="text">
-              <string>&amp;Mesh</string>
+              <string>Mesh</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QRadioButton" name="CylinderRadioButton">
              <property name="text">
-              <string>C&amp;ylinder</string>
+              <string>Cylinder</string>
              </property>
             </widget>
            </item>
@@ -168,7 +168,7 @@
                  <item>
                   <widget class="QRadioButton" name="singlePixelRadioButton">
                    <property name="text">
-                    <string>Sin&amp;gle Pixel</string>
+                    <string>Single Pixel</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -178,14 +178,14 @@
                  <item>
                   <widget class="QRadioButton" name="entireShapeRadioButton">
                    <property name="text">
-                    <string>En&amp;tire Shape</string>
+                    <string>Entire Shape</string>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QRadioButton" name="noPixelsButton">
                    <property name="text">
-                    <string>No Pi&amp;xels</string>
+                    <string>No Pixels</string>
                    </property>
                   </widget>
                  </item>
@@ -193,168 +193,189 @@
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="pixelGridBox">
-                <property name="title">
-                 <string>Pixel grid:</string>
+               <widget class="QStackedWidget" name="pixelOptionsStack">
+                <property name="minimumSize">
+                 <size>
+                  <width>518</width>
+                  <height>192</height>
+                 </size>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0,0,0">
-                 <property name="verticalSpacing">
-                  <number>6</number>
-                 </property>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="rowLabel">
-                   <property name="text">
-                    <string>Row:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QLabel" name="rowHeightLabel">
-                   <property name="text">
-                    <string>Row height:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <widget class="QLabel" name="columnWidthLabel">
-                   <property name="text">
-                    <string>Column width:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="firstIDLabel">
-                   <property name="text">
-                    <string>First ID:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="columnsLabel">
-                   <property name="text">
-                    <string>Columns:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0" colspan="2">
-                  <widget class="QLabel" name="countFirstLabel">
-                   <property name="text">
-                    <string>Count first along:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0" colspan="2">
-                  <widget class="QLabel" name="countingFromLabel">
-                   <property name="text">
-                    <string>Start counting from:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="2" colspan="2">
-                  <widget class="QComboBox" name="startCountingComboBox">
-                   <property name="maxCount">
-                    <number>4</number>
-                   </property>
-                   <property name="insertPolicy">
-                    <enum>QComboBox::InsertAtCurrent</enum>
-                   </property>
-                   <item>
-                    <property name="text">
-                     <string>Bottom Left</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Bottom Right</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Top Left</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Top Right</string>
-                    </property>
-                   </item>
-                  </widget>
-                 </item>
-                 <item row="4" column="2" colspan="2">
-                  <widget class="QComboBox" name="countFirstComboBox">
-                   <property name="currentText">
-                    <string/>
-                   </property>
-                   <property name="currentIndex">
-                    <number>-1</number>
-                   </property>
-                   <property name="maxCount">
-                    <number>2</number>
-                   </property>
-                   <property name="insertPolicy">
-                    <enum>QComboBox::InsertAtCurrent</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QSpinBox" name="rowCountSpinBox">
-                   <property name="maximum">
-                    <number>1000000</number>
-                   </property>
-                   <property name="value">
-                    <number>1</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QSpinBox" name="columnCountSpinBox">
-                   <property name="maximum">
-                    <number>1000000</number>
-                   </property>
-                   <property name="value">
-                    <number>1</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QSpinBox" name="firstIDSpinBox">
-                   <property name="maximum">
-                    <number>1000000</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="3">
-                  <widget class="QDoubleSpinBox" name="rowHeightSpinBox">
-                   <property name="minimum">
-                    <double>0.500000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.500000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="3">
-                  <widget class="QDoubleSpinBox" name="columnWidthSpinBox">
-                   <property name="minimum">
-                    <double>0.500000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.500000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="pixelMappingLabel">
-                <property name="text">
-                 <string>Pixel mapping:</string>
+                <property name="currentIndex">
+                 <number>1</number>
                 </property>
+                <widget class="QWidget" name="pixelGridPage">
+                 <layout class="QVBoxLayout" name="verticalLayout">
+                  <item>
+                   <widget class="QGroupBox" name="pixelGridBox">
+                    <property name="title">
+                     <string>Pixel grid:</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0,0,0">
+                     <property name="verticalSpacing">
+                      <number>6</number>
+                     </property>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="rowLabel">
+                       <property name="text">
+                        <string>Row:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QLabel" name="rowHeightLabel">
+                       <property name="text">
+                        <string>Row height:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="2">
+                      <widget class="QLabel" name="columnWidthLabel">
+                       <property name="text">
+                        <string>Column width:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="firstIDLabel">
+                       <property name="text">
+                        <string>First ID:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="columnsLabel">
+                       <property name="text">
+                        <string>Columns:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="0" colspan="2">
+                      <widget class="QLabel" name="countFirstLabel">
+                       <property name="text">
+                        <string>Count first along:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="0" colspan="2">
+                      <widget class="QLabel" name="countingFromLabel">
+                       <property name="text">
+                        <string>Start counting from:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="2" colspan="2">
+                      <widget class="QComboBox" name="startCountingComboBox">
+                       <property name="maxCount">
+                        <number>4</number>
+                       </property>
+                       <property name="insertPolicy">
+                        <enum>QComboBox::InsertAtCurrent</enum>
+                       </property>
+                       <item>
+                        <property name="text">
+                         <string>Bottom Left</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Bottom Right</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Top Left</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Top Right</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item row="4" column="2" colspan="2">
+                      <widget class="QComboBox" name="countFirstComboBox">
+                       <property name="currentText">
+                        <string/>
+                       </property>
+                       <property name="currentIndex">
+                        <number>-1</number>
+                       </property>
+                       <property name="maxCount">
+                        <number>2</number>
+                       </property>
+                       <property name="insertPolicy">
+                        <enum>QComboBox::InsertAtCurrent</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QSpinBox" name="rowCountSpinBox">
+                       <property name="maximum">
+                        <number>1000000</number>
+                       </property>
+                       <property name="value">
+                        <number>1</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QSpinBox" name="columnCountSpinBox">
+                       <property name="maximum">
+                        <number>1000000</number>
+                       </property>
+                       <property name="value">
+                        <number>1</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QSpinBox" name="firstIDSpinBox">
+                       <property name="maximum">
+                        <number>1000000</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="3">
+                      <widget class="QDoubleSpinBox" name="rowHeightSpinBox">
+                       <property name="minimum">
+                        <double>0.500000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.500000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QDoubleSpinBox" name="columnWidthSpinBox">
+                       <property name="minimum">
+                        <double>0.500000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.500000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="pixelMappingPage">
+                 <layout class="QVBoxLayout" name="verticalLayout_4">
+                  <item>
+                   <widget class="QLabel" name="pixelMappingLabel">
+                    <property name="text">
+                     <string>Pixel mapping:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QListWidget" name="pixelMappingListWidget"/>
+                  </item>
+                 </layout>
+                </widget>
                </widget>
-              </item>
-              <item>
-               <widget class="QListWidget" name="pixelMappingListWidget"/>
               </item>
              </layout>
             </widget>

@@ -3,12 +3,12 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Mon Jul 29 11:18:56 2019
+# Created: Fri Aug  2 10:28:22 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
@@ -116,7 +116,14 @@ class Ui_AddComponentDialog(object):
         self.noPixelsButton.setObjectName("noPixelsButton")
         self.horizontalLayout_7.addWidget(self.noPixelsButton)
         self.verticalLayout_3.addWidget(self.pixelLayoutBox)
-        self.pixelGridBox = QtWidgets.QGroupBox(self.pixelOptionsBox)
+        self.pixelOptionsStack = QtWidgets.QStackedWidget(self.pixelOptionsBox)
+        self.pixelOptionsStack.setMinimumSize(QtCore.QSize(518, 192))
+        self.pixelOptionsStack.setObjectName("pixelOptionsStack")
+        self.pixelGridPage = QtWidgets.QWidget()
+        self.pixelGridPage.setObjectName("pixelGridPage")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.pixelGridPage)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.pixelGridBox = QtWidgets.QGroupBox(self.pixelGridPage)
         self.pixelGridBox.setObjectName("pixelGridBox")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.pixelGridBox)
         self.gridLayout_5.setVerticalSpacing(6)
@@ -172,22 +179,29 @@ class Ui_AddComponentDialog(object):
         self.firstIDSpinBox.setObjectName("firstIDSpinBox")
         self.gridLayout_5.addWidget(self.firstIDSpinBox, 2, 1, 1, 1)
         self.rowHeightSpinBox = QtWidgets.QDoubleSpinBox(self.pixelGridBox)
-        self.rowHeightSpinBox.setMinimum(0.01)
+        self.rowHeightSpinBox.setMinimum(0.5)
         self.rowHeightSpinBox.setSingleStep(0.5)
         self.rowHeightSpinBox.setObjectName("rowHeightSpinBox")
         self.gridLayout_5.addWidget(self.rowHeightSpinBox, 0, 3, 1, 1)
         self.columnWidthSpinBox = QtWidgets.QDoubleSpinBox(self.pixelGridBox)
-        self.columnWidthSpinBox.setMinimum(0.01)
+        self.columnWidthSpinBox.setMinimum(0.5)
         self.columnWidthSpinBox.setSingleStep(0.5)
         self.columnWidthSpinBox.setObjectName("columnWidthSpinBox")
         self.gridLayout_5.addWidget(self.columnWidthSpinBox, 1, 3, 1, 1)
-        self.verticalLayout_3.addWidget(self.pixelGridBox)
-        self.pixelMappingLabel = QtWidgets.QLabel(self.pixelOptionsBox)
+        self.verticalLayout.addWidget(self.pixelGridBox)
+        self.pixelOptionsStack.addWidget(self.pixelGridPage)
+        self.pixelMappingPage = QtWidgets.QWidget()
+        self.pixelMappingPage.setObjectName("pixelMappingPage")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.pixelMappingPage)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.pixelMappingLabel = QtWidgets.QLabel(self.pixelMappingPage)
         self.pixelMappingLabel.setObjectName("pixelMappingLabel")
-        self.verticalLayout_3.addWidget(self.pixelMappingLabel)
-        self.pixelMappingListWidget = QtWidgets.QListWidget(self.pixelOptionsBox)
+        self.verticalLayout_4.addWidget(self.pixelMappingLabel)
+        self.pixelMappingListWidget = QtWidgets.QListWidget(self.pixelMappingPage)
         self.pixelMappingListWidget.setObjectName("pixelMappingListWidget")
-        self.verticalLayout_3.addWidget(self.pixelMappingListWidget)
+        self.verticalLayout_4.addWidget(self.pixelMappingListWidget)
+        self.pixelOptionsStack.addWidget(self.pixelMappingPage)
+        self.verticalLayout_3.addWidget(self.pixelOptionsStack)
         self.gridLayout_2.addWidget(self.pixelOptionsBox, 4, 0, 1, 1)
         self.geometryFileBox = QtWidgets.QGroupBox(self.shapeOptionsBox)
         self.geometryFileBox.setObjectName("geometryFileBox")
@@ -299,6 +313,7 @@ class Ui_AddComponentDialog(object):
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
 
         self.retranslateUi(AddComponentDialog)
+        self.pixelOptionsStack.setCurrentIndex(1)
         self.countFirstComboBox.setCurrentIndex(-1)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("clicked()"), AddComponentDialog.close)
         QtCore.QMetaObject.connectSlotsByName(AddComponentDialog)
