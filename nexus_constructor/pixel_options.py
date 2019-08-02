@@ -111,17 +111,19 @@ class PixelOptions:
         if pixel_mapping:
             self.dialog.pixelOptionsStack.setCurrentIndex(1)
 
-    def populate_pixel_mapping_list(self, file_changed=False):
+    def populate_pixel_mapping_list(self):
         """
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
         """
 
-        if (
-            self.dialog.pixelMappingListWidget.count() != 0 and not file_changed
-        ) or self.dialog.cad_file_name is None:
-            return
-
         n_faces = None
+
+        if (
+            self.dialog.cad_file_name is None
+            or not self.dialog.valid_file_given
+            or self.pixel_mapping_not_visible()
+        ):
+            return
 
         with open(self.dialog.cad_file_name) as temp_off_file:
             faces = parse_off_file(temp_off_file)[1]
@@ -271,3 +273,10 @@ class PixelOptions:
             self.check_pixel_mapping_validity()
         else:
             self.dialog.ok_validator.validate_ok()
+
+    def pixel_mapping_not_visible(self):
+
+        return (
+            not self.dialog.pixelOptionsStack.isVisible()
+            or self.dialog.pixelOptionsStack.currentIndex() == 0
+        )

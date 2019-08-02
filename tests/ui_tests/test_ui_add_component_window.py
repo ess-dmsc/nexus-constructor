@@ -18,7 +18,10 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.validators import FieldType
-from tests.ui_tests.ui_test_utils import systematic_button_press, show_and_close_window
+from tests.ui_tests.ui_test_utils import (
+    systematic_button_press,
+    show_and_close_window,
+)
 
 MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("1", "")]
 
@@ -326,11 +329,7 @@ def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_si
 
     # Check that the single grid button is checked and the pixel grid option is visible by default
     assert dialog.singlePixelRadioButton.isChecked()
-    assert dialog.pixelGridBox.isVisible()
-
-    # Check that the pixel mapping items are not visible
-    assert not dialog.pixelMappingListWidget.isVisible()
-    assert not dialog.pixelMappingLabel.isVisible()
+    assert dialog.pixelOptionsStack.currentIndex() == 0
 
 
 def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible(
@@ -344,11 +343,7 @@ def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixe
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Check that the pixel mapping items are visible
-    assert dialog.pixelMappingLabel.isVisible()
-    assert dialog.pixelMappingListWidget.isVisible()
-
-    # Check that the pixel grid box is not visible
-    assert not dialog.pixelGridBox.isVisible()
+    assert dialog.pixelOptionsStack.currentIndex() == 1
 
 
 def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_options_become_invisible(
@@ -363,11 +358,7 @@ def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_optio
     systematic_button_press(qtbot, template, dialog.noPixelsButton)
 
     # Check that the pixel mapping items are visible
-    assert not dialog.pixelMappingLabel.isVisible()
-    assert not dialog.pixelMappingListWidget.isVisible()
-
-    # Check that the pixel grid box is not visible
-    assert not dialog.pixelGridBox.isVisible()
+    assert not dialog.pixelOptionsStack.isVisible()
 
 
 def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_is_populated(
@@ -406,7 +397,7 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
     )
 
     # Mock the method that is used to create the pixel mapping list
-    dialog.populate_pixel_mapping_list = Mock()
+    dialog.pixel_options.populate_pixel_mapping_list = Mock()
 
     # Provide the same file as before
     enter_file_path(
@@ -414,7 +405,7 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
     )
 
     # Check that the method for populating the pixel mapping list was not called
-    dialog.populate_pixel_mapping_list.assert_not_called()
+    dialog.pixel_options.populate_pixel_mapping_list.assert_not_called()
 
     # Check that the list still has the expected number of items
     assert dialog.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
@@ -903,16 +894,16 @@ def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_ha
     # Check that the pixel-related fields start out with the expected default values
     assert dialog.rowCountSpinBox.value() == 1
     assert dialog.columnCountSpinBox.value() == 1
-    assert dialog.rowHeightSpinBox.value() == 0.01
-    assert dialog.columnWidthSpinBox.value() == 0.01
+    assert dialog.rowHeightSpinBox.value() == 0.5
+    assert dialog.columnWidthSpinBox.value() == 0.5
     assert dialog.firstIDSpinBox.value() == 0
     assert (
         dialog.startCountingComboBox.currentText()
-        == list(dialog.initial_count_corner.keys())[0]
+        == list(dialog.pixel_options.initial_count_corner.keys())[0]
     )
     assert (
         dialog.countFirstComboBox.currentText()
-        == list(dialog.count_direction.keys())[0]
+        == list(dialog.pixel_options.count_direction.keys())[0]
     )
 
 
@@ -1185,7 +1176,7 @@ def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_add_component_button_is
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Give a single pixel ID. This is adequate for making the mapping
-    qtbot.keyClicks(dialog.pixel_mapping_widgets[0].pixelIDLineEdit, "32")
+    qtbot.keyClicks(dialog.pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "32")
 
     # Check that the add component button is enabled
     assert dialog.buttonBox.isEnabled()
@@ -1292,7 +1283,7 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Make the pixel mapping valid
-    qtbot.keyClicks(dialog.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
+    qtbot.keyClicks(dialog.pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
 
     # Change back to pixel grid
     systematic_button_press(qtbot, template, dialog.singlePixelRadioButton)
@@ -1321,7 +1312,7 @@ def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changin
     systematic_button_press(qtbot, template, dialog.entireShapeRadioButton)
 
     # Give input that will be rejected by the validator
-    qtbot.keyClicks(dialog.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
+    qtbot.keyClicks(dialog.pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
 
     # Change to pixel grid
     systematic_button_press(qtbot, template, dialog.singlePixelRadioButton)

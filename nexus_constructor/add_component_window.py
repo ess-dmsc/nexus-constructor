@@ -66,6 +66,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.pixel_options = PixelOptions(self)
 
+        self.valid_file_given = False
+
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
         super().setupUi(parent_dialog)
@@ -115,6 +117,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             partial(validate_line_edit, self.fileLineEdit)
         )
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
+        self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
         self.componentTypeComboBox.currentIndexChanged.connect(
@@ -259,6 +262,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if filename != self.cad_file_name:
             self.fileLineEdit.setText(filename)
             self.cad_file_name = filename
+            if self.valid_file_given:
+                self.pixel_options.populate_pixel_mapping_list()
+
         else:
             return
 
@@ -350,3 +356,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         return (
             self.fileLineEdit.styleSheet() == "QLineEdit { background-color: #f6989d }"
         )
+
+    def set_file_valid(self, validity):
+        self.valid_file_given = validity
