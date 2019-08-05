@@ -6,6 +6,15 @@ from pytestqt.qtbot import QtBot
 
 RUNNING_ON_WINDOWS = sys.platform.startswith("win")
 
+RED_BACKGROUND = "{ background-color: #f6989d }"
+WHITE_BACKGROUND = "{ background-color: #FFFFFF }"
+LINE_EDIT = "QLineEdit "
+SPIN_BOX = "QSpinBox "
+RED_LINE_EDIT_STYLE_SHEET = LINE_EDIT + RED_BACKGROUND
+WHITE_LINE_EDIT_STYLE_SHEET = LINE_EDIT + WHITE_BACKGROUND
+RED_SPIN_BOX_STYLE_SHEET = SPIN_BOX + RED_BACKGROUND
+WHITE_SPIN_BOX_STYLE_SHEET = SPIN_BOX + WHITE_BACKGROUND
+
 
 def systematic_button_press(qtbot: QtBot, template: QDialog, button: QAbstractButton):
     """

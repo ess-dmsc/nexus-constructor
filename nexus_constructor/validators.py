@@ -208,10 +208,9 @@ class PixelValidator(QObject):
         ]
 
     def validate_pixels(self):
+        self.reassess_validity.emit()
 
-        self.is_valid.emit(not any(self.unacceptable_pixel_states()))
-
-    is_valid = Signal(bool)
+    reassess_validity = Signal()
 
 
 class OkValidator(QObject):
@@ -232,7 +231,7 @@ class OkValidator(QObject):
         self.no_geometry_button = no_geometry_button
         self.mesh_button = mesh_button
         self.pixel_validator = pixel_validator
-        self.pixel_validator.is_valid.connect(lambda x: self.validate_ok())
+        self.pixel_validator.reassess_validity.connect(self.validate_ok)
 
     def set_name_valid(self, is_valid):
         self.name_is_valid = is_valid
@@ -256,6 +255,7 @@ class OkValidator(QObject):
             not self.no_geometry_button.isChecked() and not self.units_are_valid,
             self.mesh_button.isChecked() and not self.file_is_valid,
         ] + self.pixel_validator.unacceptable_pixel_states()
+        print(unacceptable)
         self.is_valid.emit(not any(unacceptable))
 
     # Signal to indicate that the fields are valid or invalid. False: invalid.

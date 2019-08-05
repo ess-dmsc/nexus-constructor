@@ -66,6 +66,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_to_edit = component_to_edit
 
         self.valid_file_given = False
+        self.new_file_given = False
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -93,6 +94,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fileLineEdit.validator().is_valid.connect(
             partial(validate_line_edit, self.fileLineEdit)
         )
+        self.fileLineEdit.textChanged.connect(self.populate_pixel_mapping_if_necessary)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
         self.componentTypeComboBox.currentIndexChanged.connect(
@@ -179,10 +181,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.change_pixel_options_visibility
         )
 
-        self.pixelOptionsWidget.ui.pixel_mapping_button_pressed.connect(
-            self.populate_pixel_mapping_if_necessary
-        )
-
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
@@ -261,10 +259,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
         if filename != self.cad_file_name:
-            self.fileLineEdit.setText(filename)
             self.cad_file_name = filename
-            if self.valid_file_given:
-                self.pixelOptionsWidget.ui.populate_pixel_mapping_list(filename)
+            self.new_file_given = True
+            self.fileLineEdit.setText(filename)
 
         else:
             return
@@ -367,5 +364,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.valid_file_given = validity
 
     def populate_pixel_mapping_if_necessary(self):
-        if self.cad_file_name is not None and self.valid_file_given:
+        """
+        Tells the pixel options widget to populate the pixel mapping widget provided a valid file has been given and the
+        pixel options widget is visible. The PixelOptions object carries out its own check to see if the Pixel Mapping
+        option has been selected.
+        """
+        if (
+            self.pixelOptionsWidget.isVisible()
+            and self.cad_file_name is not None
+            and self.valid_file_given
+            and self.new_file_given
+        ):
             self.pixelOptionsWidget.ui.populate_pixel_mapping_list(self.cad_file_name)
+            self.new_file_given = False
