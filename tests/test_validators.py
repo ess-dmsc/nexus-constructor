@@ -193,7 +193,7 @@ def create_content_ok_validator():
     mock_no_geometry_button = Mock()
     mock_mesh_button = Mock()
     pixel_validator = Mock()
-    pixel_validator.unacceptable_pixel_states = Mock(return_value = [])
+    pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
 
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
