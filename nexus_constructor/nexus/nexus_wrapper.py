@@ -151,13 +151,14 @@ class NexusWrapper(QObject):
         :param ids: A list of the pixel IDs.
         """
 
+        ids = [id for id in ids if id is not None]
+        print(ids)
         array_shape = len(ids)
         id_arr = np.full(shape=len(ids), fill_value=-1, dtype="int64")
 
         # Copy the contents of the list to the numpy array
         for i in range(array_shape):
-            if ids[i] is not None:
-                id_arr[i] = ids[i]
+            id_arr[i] = ids[i]
 
         # Write the array to the NeXus file
         component_group.create_dataset(

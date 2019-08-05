@@ -9,6 +9,7 @@ from nexus_constructor.nexus.validation import (
     ValidateDataset,
     validate_group,
 )
+from nexus_constructor.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
@@ -121,15 +122,35 @@ class OFFGeometryNexus(OFFGeometry):
         group: h5py.Group,
         units: str = "",
         file_path: str = "",
+        pixel_data: PixelData = None,
     ):
         super().__init__()
         self.file = nexus_file
         self.group = group
         self._verify_in_file()
+
+        if type(pixel_data) is PixelMapping:
+            self.record_detector_faces(pixel_data)
+        if type(pixel_data) is PixelGrid:
+            pass
+
         if units:
             self.units = units
         if file_path:
             self.file_path = file_path
+
+    def record_detector_faces(self, pixel_data: PixelMapping):
+        """
+        Records the detector faces in the NXoff_geometry.
+        :param pixel_data: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
+        """
+        detector_faces = []
+
+        for i in range(len(pixel_data.pixel_ids)):
+            if pixel_data.pixel_ids[i] is not None:
+                detector_faces.append(np.array([i, pixel_data.pixel_ids[i]]))
+
+        self.file.set_field_value(self.group, "detector_faces", detector_faces)
 
     def _verify_in_file(self):
         """

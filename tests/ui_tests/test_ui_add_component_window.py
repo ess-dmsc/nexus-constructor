@@ -337,7 +337,9 @@ def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixe
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape button under pixel layout
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Check that the pixel mapping items are visible
     assert dialog.pixelOptionsWidget.ui.pixelOptionsStack.currentIndex() == 1
@@ -352,7 +354,9 @@ def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_optio
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape button under pixel layout
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.noPixelsButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.noPixelsButton
+    )
 
     # Check that the pixel mapping items are visible
     assert not dialog.pixelOptionsWidget.ui.pixelOptionsStack.isVisible()
@@ -366,7 +370,9 @@ def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Provide a valid file path and mesh file
     enter_file_path(
@@ -374,7 +380,10 @@ def test_UI_GIVEN_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list
     )
 
     # Check that the number of items in the pixel mapping list matches the number of faces in the mesh file
-    assert dialog.pixelOptionsWidget.ui.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
+    assert (
+        dialog.pixelOptionsWidget.ui.pixelMappingListWidget.count()
+        == CORRECT_CUBE_FACES
+    )
 
 
 def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same(
@@ -386,7 +395,9 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape radio button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Provide a valid file path and mesh file
     enter_file_path(
@@ -405,7 +416,10 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
     dialog.populate_pixel_mapping_if_necessary.assert_not_called()
 
     # Check that the list still has the expected number of items
-    assert dialog.pixelOptionsWidget.ui.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
+    assert (
+        dialog.pixelOptionsWidget.ui.pixelMappingListWidget.count()
+        == CORRECT_CUBE_FACES
+    )
 
 
 def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
@@ -416,7 +430,9 @@ def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_ma
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the entire shape button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Provide a path and file for a cube mesh
     enter_file_path(
@@ -429,7 +445,10 @@ def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_ma
     )
 
     # Check that the pixel mapping list has updated
-    assert dialog.pixelOptionsWidget.ui.pixelMappingListWidget.count() == CORRECT_OCTA_FACES
+    assert (
+        dialog.pixelOptionsWidget.ui.pixelMappingListWidget.count()
+        == CORRECT_OCTA_FACES
+    )
 
 
 def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
@@ -914,7 +933,9 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Choose the pixel mapping option
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Give an invalid file
     enter_file_path(qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, "hfhuihfiuhf")
@@ -942,6 +963,7 @@ def test_UI_GIVEN_zero_for_both_row_and_column_count_WHEN_entering_pixel_grid_op
     for field in count_fields:
         assert field.styleSheet() == RED_SPIN_BOX_STYLE_SHEET
 
+
 @pytest.mark.xfail
 def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixel_grid_options_THEN_both_fields_become_white(
     qtbot, template, dialog
@@ -965,6 +987,7 @@ def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixe
     for field in count_fields:
         assert field.styleSheet() == WHITE_SPIN_BOX_STYLE_SHEET
 
+
 @pytest.mark.xfail
 def test_UI_GIVEN_row_count_is_zero_THEN_row_height_becomes_disabled(
     qtbot, template, dialog
@@ -979,6 +1002,7 @@ def test_UI_GIVEN_row_count_is_zero_THEN_row_height_becomes_disabled(
 
     # Check that the row height spin box is now disabled
     assert not dialog.rowHeightSpinBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_row_count_is_not_zero_THEN_row_height_becomes_enabled(
@@ -996,6 +1020,7 @@ def test_UI_GIVEN_row_count_is_not_zero_THEN_row_height_becomes_enabled(
     # Check that the row height spin box is now enabled
     assert dialog.rowHeightSpinBox.isEnabled()
 
+
 @pytest.mark.xfail
 def test_UI_GIVEN_column_count_is_zero_THEN_column_width_becomes_disabled(
     qtbot, template, dialog
@@ -1010,6 +1035,7 @@ def test_UI_GIVEN_column_count_is_zero_THEN_column_width_becomes_disabled(
 
     # Check that the column width spin box is now disabled
     assert not dialog.columnWidthSpinBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_column_count_is_not_zero_THEN_column_width_becomes_enabled(
@@ -1026,6 +1052,7 @@ def test_UI_GIVEN_column_count_is_not_zero_THEN_column_width_becomes_enabled(
 
     # Check that the column width spin box is now enabled
     assert dialog.columnWidthSpinBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(
@@ -1075,7 +1102,9 @@ def test_UI_GIVEN_user_selects_pixel_grid_THEN_pixel_grid_is_set_to_true_in_ok_v
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the pixel grid button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Check that the pixel grid boolean has become true
     assert dialog.ok_validator.pixel_grid_is_valid
@@ -1092,7 +1121,9 @@ def test_UI_GIVEN_user_selects_no_pixels_and_gives_valid_input_THEN_add_componen
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
     # Press the no pixels button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.noPixelsButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.noPixelsButton
+    )
 
     # Give a valid component name
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
@@ -1123,7 +1154,9 @@ def test_UI_GIVEN_user_provides_valid_pixel_grid_THEN_add_component_button_is_en
     )
 
     # Press the single pixel button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.singlePixelRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.singlePixelRadioButton
+    )
 
     # Check that the add component button is enabled
     assert dialog.buttonBox.isEnabled()
@@ -1147,7 +1180,9 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_
     )
 
     # Press the single pixel button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.singlePixelRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.singlePixelRadioButton
+    )
 
     # Make both the row count and column count zero
     qtbot.keyClick(dialog.rowCountSpinBox, Qt.Key_Down)
@@ -1155,6 +1190,7 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_
 
     # Check that the add component button is disabled
     assert not dialog.buttonBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_add_component_button_is_enabled(
@@ -1174,13 +1210,16 @@ def test_UI_GIVEN_user_provides_valid_pixel_mapping_THEN_add_component_button_is
     )
 
     # Press the entire shape button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Give a single pixel ID. This is adequate for making the mapping
     qtbot.keyClicks(dialog.pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "32")
 
     # Check that the add component button is enabled
     assert dialog.buttonBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_is_disabled(
@@ -1200,10 +1239,13 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_
     )
 
     # Press the entire shape button
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Check that the add component button is disabled no pixel mapping information was given
     assert not dialog.buttonBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_valid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_pixel_mapping_causes_validity_to_change(
@@ -1227,10 +1269,13 @@ def test_UI_GIVEN_valid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_
     qtbot.keyClick(dialog.firstIDSpinBox, Qt.Key_Up)
 
     # Switch to pixel mapping
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Check that the add component button is disabled because no pixel mapping info has been entered
     assert not dialog.buttonBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_invalid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_pixel_layout_causes_validity_to_change(
@@ -1254,10 +1299,13 @@ def test_UI_GIVEN_invalid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_p
     qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Down)
 
     # Change to the no pixel option
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.noPixelsButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.noPixelsButton
+    )
 
     # Check that the add component button is enabled despite the invalid pixel grid
     assert dialog.buttonBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_pixel_layout_causes_validity_to_change(
@@ -1281,16 +1329,21 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
     qtbot.keyClick(dialog.columnCountSpinBox, Qt.Key_Down)
 
     # Change to pixel mapping
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Make the pixel mapping valid
     qtbot.keyClicks(dialog.pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
 
     # Change back to pixel grid
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.singlePixelRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.singlePixelRadioButton
+    )
 
     # Check that the add component button is still disabled
     assert not dialog.buttonBox.isEnabled()
+
 
 @pytest.mark.xfail
 def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_pixel_layout_causes_validity_to_change(
@@ -1310,20 +1363,28 @@ def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changin
     )
 
     # Change to pixel mapping
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
 
     # Give input that will be rejected by the validator
     qtbot.keyClicks(dialog.pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
 
     # Change to pixel grid
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.singlePixelRadioButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.singlePixelRadioButton
+    )
 
     # Check that the add component button is enabled
     assert dialog.buttonBox.isEnabled()
 
     # Change to pixel mapping then no pixel
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton)
-    systematic_button_press(qtbot, template, dialog.pixelOptionsWidget.ui.noPixelsButton)
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.entireShapeRadioButton
+    )
+    systematic_button_press(
+        qtbot, template, dialog.pixelOptionsWidget.ui.noPixelsButton
+    )
 
     # Check that the add component button is enabled
     assert dialog.buttonBox.isEnabled()

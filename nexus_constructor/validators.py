@@ -7,7 +7,7 @@ import numpy as np
 import pint
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator
-from PySide2.QtWidgets import QComboBox, QRadioButton, QGroupBox
+from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
@@ -175,51 +175,10 @@ class GeometryFileValidator(QValidator):
     is_valid = Signal(bool)
 
 
-class OkValidator(QObject):
-    """
-    Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
-    """
-
-    def __init__(self, no_geometry_button: QRadioButton, mesh_button: QRadioButton):
-        super().__init__()
-        self.name_is_valid = False
-        self.file_is_valid = False
-        self.units_are_valid = False
-        self.no_geometry_button = no_geometry_button
-        self.mesh_button = mesh_button
-
-    def set_name_valid(self, is_valid):
-        self.name_is_valid = is_valid
-        self.validate_ok()
-
-    def set_file_valid(self, is_valid):
-        self.file_is_valid = is_valid
-        self.validate_ok()
-
-    def set_units_valid(self, is_valid):
-        self.units_are_valid = is_valid
-        self.validate_ok()
-
-    def validate_ok(self):
-        """
-        Validates the fields in order to dictate whether the OK button should be disabled or enabled.
-        :return: None, but emits the isValid signal.
-        """
-        unacceptable = [
-            not self.name_is_valid,
-            not self.no_geometry_button.isChecked() and not self.units_are_valid,
-            self.mesh_button.isChecked() and not self.file_is_valid,
-        ]
-        self.is_valid.emit(not any(unacceptable))
-
-    # Signal to indicate that the fields are valid or invalid. False: invalid.
-    is_valid = Signal(bool)
-
-
 class PixelValidator(QObject):
     def __init__(
         self,
-        pixel_options: QGroupBox,
+        pixel_options: QWidget,
         pixel_grid_button: QRadioButton,
         pixel_mapping_button: QRadioButton,
     ):
@@ -249,8 +208,57 @@ class PixelValidator(QObject):
         ]
 
     def validate_pixels(self):
+
         self.is_valid.emit(not any(self.unacceptable_pixel_states()))
 
+    is_valid = Signal(bool)
+
+
+class OkValidator(QObject):
+    """
+    Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
+    """
+
+    def __init__(
+        self,
+        no_geometry_button: QRadioButton,
+        mesh_button: QRadioButton,
+        pixel_validator: PixelValidator,
+    ):
+        super().__init__()
+        self.name_is_valid = False
+        self.file_is_valid = False
+        self.units_are_valid = False
+        self.no_geometry_button = no_geometry_button
+        self.mesh_button = mesh_button
+        self.pixel_validator = pixel_validator
+        self.pixel_validator.is_valid.connect(lambda x: self.validate_ok())
+
+    def set_name_valid(self, is_valid):
+        self.name_is_valid = is_valid
+        self.validate_ok()
+
+    def set_file_valid(self, is_valid):
+        self.file_is_valid = is_valid
+        self.validate_ok()
+
+    def set_units_valid(self, is_valid):
+        self.units_are_valid = is_valid
+        self.validate_ok()
+
+    def validate_ok(self):
+        """
+        Validates the fields in order to dictate whether the OK button should be disabled or enabled.
+        :return: None, but emits the isValid signal.
+        """
+        unacceptable = [
+            not self.name_is_valid,
+            not self.no_geometry_button.isChecked() and not self.units_are_valid,
+            self.mesh_button.isChecked() and not self.file_is_valid,
+        ] + self.pixel_validator.unacceptable_pixel_states()
+        self.is_valid.emit(not any(unacceptable))
+
+    # Signal to indicate that the fields are valid or invalid. False: invalid.
     is_valid = Signal(bool)
 
 

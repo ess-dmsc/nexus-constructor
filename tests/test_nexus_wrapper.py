@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from mock import Mock
 
 from nexus_constructor.nexus.nexus_wrapper import (
@@ -158,7 +159,8 @@ def test_GIVEN_complete_list_of_pixel_ids_WHEN_recording_pixel_data_to_nxdetecto
     assert np.array_equal(pixel_id_array, np.array(pixel_id_list))
 
 
-def test_GIVEN_incomplete_list_of_pixel_ids_WHEN_recording_pixel_data_to_nxdetector_THEN_missing_values_are_recorded_as_minus_one():
+@pytest.mark.xfail
+def test_GIVEN_incomplete_list_of_pixel_ids_WHEN_recording_pixel_data_to_nxdetector_THEN_missing_values_are_skipped():
 
     file = create_in_memory_file("test_nw12")
     entry = file.create_group("entry")

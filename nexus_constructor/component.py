@@ -3,6 +3,7 @@ from typing import Any, List, Optional, Union
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+from nexus_constructor.pixel_data import PixelData
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
@@ -278,7 +279,11 @@ class Component:
         return CylindricalGeometry(self.file, shape_group)
 
     def set_off_shape(
-        self, loaded_geometry: OFFGeometry, units: str = "", filename: str = ""
+        self,
+        loaded_geometry: OFFGeometry,
+        units: str = "",
+        filename: str = "",
+        pixel_data=None,
     ) -> OFFGeometryNexus:
         """
         Sets the shape of the component to be a mesh
@@ -290,7 +295,7 @@ class Component:
         )
         record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
         record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
-        return OFFGeometryNexus(self.file, shape_group, units, filename)
+        return OFFGeometryNexus(self.file, shape_group, units, filename, pixel_data)
 
     def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
         if SHAPE_GROUP_NAME in self.group:

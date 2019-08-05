@@ -34,6 +34,10 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         super().setupUi(parent_widget)
 
+        self.pixel_validator = PixelValidator(
+            parent_widget, self.singlePixelRadioButton, self.entireShapeRadioButton
+        )
+
         self.singlePixelRadioButton.clicked.connect(
             lambda: self.update_pixel_layout_visibility(True, False)
         )
@@ -67,11 +71,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         self.evaluate_pixel_input_validity()
 
-        self.pixel_validator = PixelValidator(
-            self.pixelOptionsBox,
-            self.singlePixelRadioButton,
-            self.entireShapeRadioButton,
-        )
+    def get_validator(self):
+        return self.pixel_validator
 
     def generate_pixel_mapping_if_empty(self):
         self.pixel_mapping_button_pressed.emit()
@@ -102,13 +103,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         that the rows or columns have a non-zero value. It is invalid if both are zero. The Spin Boxes enforce
         everything else so this is the only check required.
         """
-        pass
-        # self.pixel_validator.set_pixel_grid_valid(
-        #     not (
-        #         self.rowCountSpinBox.value() == 0
-        #         and self.columnCountSpinBox.value() == 0
-        #     )
-        # )
+        self.pixel_validator.set_pixel_grid_valid(
+            not (
+                self.rowCountSpinBox.value() == 0
+                and self.columnCountSpinBox.value() == 0
+            )
+        )
 
     def update_pixel_layout_visibility(self, pixel_grid: bool, pixel_mapping: bool):
 

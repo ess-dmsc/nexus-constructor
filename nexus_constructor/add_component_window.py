@@ -17,6 +17,7 @@ from nexus_constructor.geometry import CylindricalGeometry, OFFGeometryNexus
 from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.instrument import Instrument
+from nexus_constructor.pixel_data import PixelData
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.ui_utils import generate_unique_name
@@ -83,29 +84,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        self.ok_validator = OkValidator(self.noShapeRadioButton, self.meshRadioButton)
-        self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
-
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
-        [
-            button.clicked.connect(self.ok_validator.validate_ok)
-            for button in [
-                self.meshRadioButton,
-                self.CylinderRadioButton,
-                self.noShapeRadioButton,
-            ]
-        ]
-
         self.fileLineEdit.setValidator(GeometryFileValidator(GEOMETRY_FILE_TYPES))
         self.fileLineEdit.validator().is_valid.connect(
             partial(validate_line_edit, self.fileLineEdit)
         )
-        self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
-        self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
         self.componentTypeComboBox.currentIndexChanged.connect(
@@ -137,8 +124,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         validate_line_edit(self.fileLineEdit, False)
 
-        self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
-
         self.unitsLineEdit.setValidator(UnitValidator())
         self.unitsLineEdit.validator().is_valid.connect(
             partial(
@@ -148,17 +133,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 tooltip_on_accept="Units Valid",
             )
         )
-        self.unitsLineEdit.validator().is_valid.connect(
-            self.ok_validator.set_units_valid
-        )
 
         self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
-
-        # Validate the default values set by the UI
-        self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
-        self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
-        self.addFieldPushButton.clicked.connect(self.add_field)
-        self.removeFieldPushButton.clicked.connect(self.remove_field)
 
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
         self.on_nx_class_changed()
@@ -171,6 +147,31 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelOptionsWidget.ui = PixelOptions()
         self.pixelOptionsWidget.ui.setupUi(self.pixelOptionsWidget)
 
+        self.ok_validator = OkValidator(
+            self.noShapeRadioButton,
+            self.meshRadioButton,
+            self.pixelOptionsWidget.ui.get_validator(),
+        )
+        self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
+
+        self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
+
+        [
+            button.clicked.connect(self.ok_validator.validate_ok)
+            for button in [
+                self.meshRadioButton,
+                self.CylinderRadioButton,
+                self.noShapeRadioButton,
+            ]
+        ]
+
+        self.unitsLineEdit.validator().is_valid.connect(
+            self.ok_validator.set_units_valid
+        )
+
+        self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
+        self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
+
         self.meshRadioButton.clicked.connect(self.change_pixel_options_visibility)
         self.CylinderRadioButton.clicked.connect(self.change_pixel_options_visibility)
         self.noShapeRadioButton.clicked.connect(self.change_pixel_options_visibility)
@@ -181,6 +182,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelOptionsWidget.ui.pixel_mapping_button_pressed.connect(
             self.populate_pixel_mapping_if_necessary
         )
+
+        # Validate the default values set by the UI
+        self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
+        self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+        self.addFieldPushButton.clicked.connect(self.add_field)
+        self.removeFieldPushButton.clicked.connect(self.remove_field)
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
@@ -278,7 +285,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
 
-    def generate_geometry_model(self, component: Component) -> OFFGeometry:
+    def generate_geometry_model(
+        self, component: Component, pixel_data: PixelData
+    ) -> OFFGeometry:
         """
         Generates a geometry model depending on the type of geometry selected and the current values
         of the lineedits that apply to the particular geometry type.
@@ -310,6 +319,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 geometry_model,
                 units=self.unitsLineEdit.text(),
                 filename=self.fileLineEdit.text(),
+                pixel_data=pixel_data,
             )
         else:
             geometry_model = NoShapeGeometry()
@@ -339,12 +349,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             # remove the previous shape from the qt3d view
             if self.component_to_edit.get_shape() and self.parent():
                 self.parent().sceneWidget.delete_component(self.component_to_edit.name)
-            geometry = self.generate_geometry_model(self.component_to_edit)
+            geometry = self.generate_geometry_model(self.component_to_edit, pixel_data)
         else:
             component = self.instrument.create_component(
                 component_name, nx_class, description, pixel_data
             )
-            geometry = self.generate_geometry_model(component)
+            geometry = self.generate_geometry_model(component, pixel_data)
             add_fields_to_component(component, self.fieldsListWidget)
             self.component_model.add_component(component)
 
