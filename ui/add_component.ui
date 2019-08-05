@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1177</width>
-    <height>1054</height>
+    <height>919</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -126,21 +126,21 @@
            <item>
             <widget class="QRadioButton" name="noShapeRadioButton">
              <property name="text">
-              <string>&amp;No Shape</string>
+              <string>No Shape</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QRadioButton" name="meshRadioButton">
              <property name="text">
-              <string>&amp;Mesh</string>
+              <string>Mesh</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QRadioButton" name="CylinderRadioButton">
              <property name="text">
-              <string>C&amp;ylinder</string>
+              <string>Cylinder</string>
              </property>
             </widget>
            </item>

@@ -108,6 +108,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
+        self.componentTypeComboBox.currentIndexChanged.connect(
+            self.change_pixel_options_visibility
+        )
 
         # Set default geometry type and show the related fields.
         self.noShapeRadioButton.setChecked(True)
@@ -167,13 +170,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.pixelOptionsWidget.ui = PixelOptions()
         self.pixelOptionsWidget.ui.setupUi(self.pixelOptionsWidget)
-        self.pixelOptionsWidget.ui.set_component_combo_box(self.componentTypeComboBox)
 
-        self.meshRadioButton.clicked.connect(self.pixelOptionsWidget.update)
-        self.CylinderRadioButton.clicked.connect(self.pixelOptionsWidget.update)
-        self.noShapeRadioButton.clicked.connect(self.pixelOptionsWidget.update)
+        self.meshRadioButton.clicked.connect(self.change_pixel_options_visibility)
+        self.CylinderRadioButton.clicked.connect(self.change_pixel_options_visibility)
+        self.noShapeRadioButton.clicked.connect(self.change_pixel_options_visibility)
         self.componentTypeComboBox.currentIndexChanged.connect(
-            self.pixelOptionsWidget.update
+            self.change_pixel_options_visibility
+        )
+
+        self.pixelOptionsWidget.ui.pixel_mapping_button_pressed.connect(
+            self.populate_pixel_mapping_if_necessary
         )
 
     def _fill_existing_entries(self):
@@ -235,16 +241,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
             )
         )
-        self.pixelOptionsWidget.setVisible(
-            self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
-        )
         self.possible_fields = self.nx_component_classes[
             self.componentTypeComboBox.currentText()
         ]
         self.nx_class_changed.emit(self.possible_fields)
-
-        # Change which pixel-related fields are visible because this depends on the class that has been selected.
-        self.pixelOptionsWidget.update()
 
     def mesh_file_picker(self):
         """
@@ -257,7 +257,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.fileLineEdit.setText(filename)
             self.cad_file_name = filename
             if self.valid_file_given:
-                self.pixel_options.populate_pixel_mapping_list()
+                self.pixelOptionsWidget.ui.populate_pixel_mapping_list(filename)
 
         else:
             return
@@ -317,11 +317,20 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         return geometry_model
 
+    def get_pixel_options_condition(self):
+        return self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES and (
+            self.meshRadioButton.isChecked() or self.CylinderRadioButton.isChecked()
+        )
+
     def on_ok(self):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-        pixel_data = self.pixel_options.generate_pixel_data()
+
+        if self.get_pixel_options_condition():
+            pixel_data = self.pixelOptionsWidget.ui.generate_pixel_data()
+        else:
+            pixel_data = None
 
         if self.component_to_edit:
             self.component_to_edit.name = component_name
@@ -341,5 +350,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
 
+    def change_pixel_options_visibility(self):
+        self.pixelOptionsWidget.setVisible(self.get_pixel_options_condition())
+
     def set_file_valid(self, validity):
         self.valid_file_given = validity
+
+    def populate_pixel_mapping_if_necessary(self):
+        if self.cad_file_name is not None and self.valid_file_given:
+            self.pixelOptionsWidget.ui.populate_pixel_mapping_list(self.cad_file_name)

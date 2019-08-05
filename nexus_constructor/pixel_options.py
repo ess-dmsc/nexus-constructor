@@ -1,7 +1,7 @@
+from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 from nexusutils.readwriteoff import parse_off_file
 
-from nexus_constructor.component_type import PIXEL_COMPONENT_TYPES
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.validators import PixelValidator
@@ -11,8 +11,10 @@ RED_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #f6989d }"
 WHITE_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #FFFFFF }"
 
 
-class PixelOptions(Ui_PixelOptionsWidget):
+class PixelOptions(Ui_PixelOptionsWidget, QObject):
     def __init__(self):
+
+        QObject.__init__(self)
 
         self.pixel_mapping_widgets = []
 
@@ -28,11 +30,6 @@ class PixelOptions(Ui_PixelOptionsWidget):
             "Top Right": Corner.TOP_RIGHT,
         }
 
-        self.componentTypeComboBox = None
-        self.meshRadioButton = None
-        self.CylinderRadioButton = None
-        self.cad_file_name = None
-
     def setupUi(self, parent_widget):
 
         super().setupUi(parent_widget)
@@ -43,7 +40,9 @@ class PixelOptions(Ui_PixelOptionsWidget):
         self.entireShapeRadioButton.clicked.connect(
             lambda: self.update_pixel_layout_visibility(False, True)
         )
-        self.entireShapeRadioButton.clicked.connect(self.populate_pixel_mapping_list)
+        self.entireShapeRadioButton.clicked.connect(
+            self.generate_pixel_mapping_if_empty
+        )
         self.noPixelsButton.clicked.connect(self.hide_pixel_options_stack)
 
         self.rowCountSpinBox.valueChanged.connect(self.check_pixel_grid_validity)
@@ -74,9 +73,8 @@ class PixelOptions(Ui_PixelOptionsWidget):
             self.entireShapeRadioButton,
         )
 
-    def set_component_combo_box(self, component_type_combo_box):
-
-        self.componentTypeComboBox = component_type_combo_box
+    def generate_pixel_mapping_if_empty(self):
+        self.pixel_mapping_button_pressed.emit()
 
     def disable_or_enable_size_field(
         self, count_spin_box: QSpinBox, size_spin_box: QDoubleSpinBox
@@ -121,21 +119,17 @@ class PixelOptions(Ui_PixelOptionsWidget):
         if pixel_mapping:
             self.pixelOptionsStack.setCurrentIndex(1)
 
-    def populate_pixel_mapping_list(self):
+    def populate_pixel_mapping_list(self, filename):
         """
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
         """
 
         n_faces = None
 
-        if (
-            self.cad_file_name is None
-            or not self.valid_file_given
-            or self.pixel_mapping_not_visible()
-        ):
+        if self.pixel_mapping_not_visible():
             return
 
-        with open(self.cad_file_name) as temp_off_file:
+        with open(filename) as temp_off_file:
             faces = parse_off_file(temp_off_file)[1]
             n_faces = len(faces)
 
@@ -159,52 +153,8 @@ class PixelOptions(Ui_PixelOptionsWidget):
             # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
 
-    def get_visibility_conditions(self):
-        """
-        Determine which of the pixel-related fields need to be visible.
-        :return: Booleans indicating whether the pixel layout, pixel grid, and pixel mapping options need to
-        be made visible.
-        """
-
-        pixel_options_condition = self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES and (
-            self.meshRadioButton.isChecked() or self.CylinderRadioButton.isChecked()
-        )
-
-        if not pixel_options_condition:
-            return False, False, False
-
-        else:
-            return (
-                True,
-                self.singlePixelRadioButton.isChecked(),
-                self.entireShapeRadioButton.isChecked(),
-            )
-
-    def update_visibility(
-        self, pixel_options_condition, pixel_grid_condition, pixel_mapping_condition
-    ):
-        """
-        Changes the visibility of the pixel-related fields and the box that contains them. First checks if any of the
-        fields need to be shown then uses this to determine if the box is needed. After that the visibility of the box
-        and individual fields is set.
-        """
-
-        # Only make the pixel box appear based on the pixel layout and pixel data options being visible. The pixel grid
-        # and mapping options already depend on pixel layout being visible.
-        self.pixelOptionsBox.setVisible(pixel_options_condition)
-
-        # Set visibility for the components of the pixel options box
-        if pixel_options_condition:
-            self.update_pixel_layout_visibility(
-                pixel_grid_condition, pixel_mapping_condition
-            )
-
     def hide_pixel_options_stack(self):
         self.pixelOptionsStack.setVisible(False)
-
-    def update(self,):
-
-        self.update_visibility(*self.get_visibility_conditions())
 
     def get_pixel_mapping_ids(self):
         """
@@ -228,15 +178,8 @@ class PixelOptions(Ui_PixelOptionsWidget):
         user entered in the relevant fields.
         :return:
         """
-        # Determine which type of PixelMapping object ought to be created.
-        pixel_options_condition, pixel_grid_condition, pixel_mapping_condition = (
-            self.get_visibility_conditions()
-        )
 
-        if not pixel_options_condition:
-            return None
-
-        if pixel_grid_condition:
+        if self.pixelOptionsStack.currentIndex() == 0:
             pixel_data = PixelGrid()
             pixel_data.rows = self.rowCountSpinBox.value()
             pixel_data.columns = self.columnCountSpinBox.value()
@@ -253,7 +196,7 @@ class PixelOptions(Ui_PixelOptionsWidget):
 
             return pixel_data
 
-        if pixel_mapping_condition:
+        else:
             return PixelMapping(self.get_pixel_mapping_ids())
 
     def evaluate_pixel_input_validity(self):
@@ -275,3 +218,5 @@ class PixelOptions(Ui_PixelOptionsWidget):
             not self.pixelOptionsStack.isVisible()
             or self.pixelOptionsStack.currentIndex() == 0
         )
+
+    pixel_mapping_button_pressed = Signal()
