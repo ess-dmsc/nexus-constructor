@@ -11,6 +11,10 @@ from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct
 import itertools
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nexus_constructor.geometry.off_geometry import OFFGeometry
 
 
 def flatten(list_to_flatten):
