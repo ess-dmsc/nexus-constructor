@@ -111,7 +111,7 @@ class CylindricalGeometry:
         return cylinder_axis.normalized()
 
     @property
-    def mesh(self) -> Qt3DExtras.QCylinderGeometry:
+    def mesh(self) -> Qt3DExtras.QCylinderMesh:
         geom = Qt3DExtras.QCylinderMesh()
         geom.setLength(self.height)
         geom.setRadius(self.radius)
