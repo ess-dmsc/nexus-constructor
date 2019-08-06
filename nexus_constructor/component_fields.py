@@ -73,6 +73,8 @@ class FieldWidget(QFrame):
         self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
 
+        self.streams_widget = StreamFieldsWidget(self.edit_dialog)
+
         self.field_type_combo = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
@@ -226,7 +228,6 @@ class FieldWidget(QFrame):
             )
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             self.edit_dialog.setLayout(QFormLayout())
-            self.streams_widget = StreamFieldsWidget(self.edit_dialog)
             self.edit_dialog.layout().addWidget(self.streams_widget)
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             # TODO: show nx class panels
