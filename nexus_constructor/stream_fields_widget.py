@@ -76,7 +76,7 @@ class StreamFieldsWidget(QDialog):
         self.schema_type_changed(self.schema_combo.currentText())
         self._type_changed(self.type_combo.currentText())
 
-    def schema_type_changed(self, schema):
+    def schema_type_changed(self, schema: str):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
         if schema == "f142":
             self._set_edits_visible(True, True)
@@ -93,7 +93,7 @@ class StreamFieldsWidget(QDialog):
         self.type_label.setVisible(type)
         self.type_combo.setVisible(type)
 
-    def _type_changed(self, dtype):
+    def _type_changed(self, dtype: str):
         if self.type_combo.isVisible():
             is_double = dtype == "double"
             self.array_size_label.setVisible(is_double)
@@ -102,7 +102,7 @@ class StreamFieldsWidget(QDialog):
             self.array_size_label.setVisible(False)
             self.array_size_spinbox.setVisible(False)
 
-    def get_stream_group(self):
+    def get_stream_group(self) -> h5py.Group:
         string_dtype = h5py.special_dtype(vlen=str)
         temp_file = h5py.File(
             name=str(uuid.uuid4()), driver="core", backing_store=False
