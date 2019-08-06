@@ -230,6 +230,28 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
     assert pixel_options.pixel_validator.unacceptable_pixel_states() == [True, False]
 
 
+def test_UI_GIVEN_invalid_mapping_and_grid_WHEN_entering_pixel_options_THEN_changing_to_no_pixels_causes_validity_to_change(
+    qtbot, template, pixel_options
+):
+
+    # Make the pixel grid invalid
+    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
+
+    # Change to pixel mapping
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    manually_create_pixel_mapping_list(pixel_options)
+
+    # Give invalid input
+    qtbot.keyClicks(pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "abc")
+
+    # Change to no pixels
+    systematic_button_press(qtbot, template, pixel_options.noPixelsButton)
+
+    # Check that the test for unacceptable pixel states gives false
+    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
+
+
 def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_have_expected_default_values(
     qtbot, template, pixel_options
 ):
