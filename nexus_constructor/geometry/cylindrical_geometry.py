@@ -1,7 +1,6 @@
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DExtras import Qt3DExtras
-from nexus_constructor.unit_converter import calculate_unit_conversion_factor
-from math import sin, cos, pi, acos, degrees
+from math import acos, degrees
 import h5py
 import numpy as np
 from nexus_constructor.nexus import nexus_wrapper as nx
@@ -15,7 +14,6 @@ from nexus_constructor.ui_utils import (
     qvector3d_to_numpy_array,
 )
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
-from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
 from typing import Tuple
 
 
