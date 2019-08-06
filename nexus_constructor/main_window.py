@@ -1,10 +1,5 @@
 from PySide2.QtCore import QObject
-from PySide2.QtWidgets import (
-    QAction,
-    QToolBar,
-    QAbstractItemView,
-    QInputDialog,
-)
+from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView, QInputDialog
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 
