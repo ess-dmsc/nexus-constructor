@@ -1,7 +1,7 @@
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
-from nexusutils.readwriteoff import parse_off_file
 
+from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.validators import PixelValidator
@@ -171,18 +171,14 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         if pixel_mapping:
             self.pixelOptionsStack.setCurrentIndex(1)
 
-    def populate_pixel_mapping_list(self, filename):
+    def populate_pixel_mapping_list(self, filename: str):
         """
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
         """
-        n_faces = None
-
         if self.pixel_mapping_not_visible():
             return
 
-        with open(filename) as temp_off_file:
-            faces = parse_off_file(temp_off_file)[1]
-            n_faces = len(faces)
+        n_faces = self.get_number_of_faces_from_mesh_file(filename)
 
         # Clear the list widget in case it contains information from a previous file.
         self.pixel_mapping_widgets = []
@@ -204,6 +200,16 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
             # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
+
+    @staticmethod
+    def get_number_of_faces_from_mesh_file(filename: str):
+        """
+        Creates a temporary geometry and uses this is order to determine the number of faces in the file.
+        :param filename: The filename for the mesh.
+        :return: The number of faces in the mesh.
+        """
+        temp_geometry = load_geometry(filename, "m")
+        return len(temp_geometry.faces)
 
     def hide_pixel_options_stack(self):
         """

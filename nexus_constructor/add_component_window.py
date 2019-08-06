@@ -97,9 +97,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fileLineEdit.textChanged.connect(self.populate_pixel_mapping_if_necessary)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
-        self.componentTypeComboBox.currentIndexChanged.connect(
-            self.change_pixel_options_visibility
-        )
 
         # Set default geometry type and show the related fields.
         self.noShapeRadioButton.setChecked(True)
@@ -253,8 +250,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def mesh_file_picker(self):
         """
-        Opens the mesh file picker. Sets the file name line edit to the file path. Creates a pixel mapping list if the
-        pixel mapping box is visible.
+        Opens the mesh file picker. Sets the file name line edit to the file path.
         :return: None
         """
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
@@ -324,7 +320,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         return geometry_model
 
-    def get_pixel_options_condition(self):
+    def get_pixel_visibility_condition(self):
+        """
+        Determines if it is necessary to make the pixel options visible.
+        :return: A bool indicating if the current shape and component type allow for pixel-related input.
+        """
         return self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES and (
             self.meshRadioButton.isChecked() or self.CylinderRadioButton.isChecked()
         )
@@ -334,10 +334,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
 
-        if self.get_pixel_options_condition():
-            pixel_data = self.pixelOptionsWidget.ui.generate_pixel_data()
-        else:
-            pixel_data = None
+        pixel_data = self.pixelOptionsWidget.ui.generate_pixel_data()
 
         if self.component_to_edit:
             self.component_to_edit.name = component_name
@@ -358,16 +355,24 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
 
     def change_pixel_options_visibility(self):
-        self.pixelOptionsWidget.setVisible(self.get_pixel_options_condition())
+        """
+        Changes the visibility of the pixel options depending on if the current component/shape type has pixel fields.
+        """
+        self.pixelOptionsWidget.setVisible(self.get_pixel_visibility_condition())
 
     def set_file_valid(self, validity):
+        """
+        Records the current status of the geometry file validity. This is used to determine if a list of pixel mapping
+        widgets can be generated.
+        :param validity: A bool indicating whether the mesh file was opened successfully.
+        """
         self.valid_file_given = validity
 
     def populate_pixel_mapping_if_necessary(self):
         """
-        Tells the pixel options widget to populate the pixel mapping widget provided a valid file has been given and the
-        pixel options widget is visible. The PixelOptions object carries out its own check to see if the Pixel Mapping
-        option has been selected.
+        Tells the pixel options widget to populate the pixel mapping widget provided a new, valid file has been given
+        and the pixel options widget is visible. The PixelOptions object carries out its own check to see if the
+        Pixel Mapping option has been selected and then creates the pixel mapping widgets if this is the case.
         """
         if (
             self.pixelOptionsWidget.isVisible()

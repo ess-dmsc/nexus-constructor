@@ -51,8 +51,15 @@ def pixel_options(qtbot, template):
 
 
 def manually_create_pixel_mapping_list(pixel_options: PixelOptions):
-    with patch("builtins.open", mock_open(read_data=VALID_CUBE_OFF_FILE)):
-        pixel_options.populate_pixel_mapping_list("filename")
+    """
+    Manually creates a pixel mapping list by passing a mesh filename and opening a mesh by mocking open.
+    :param pixel_options: The PixelOptions object that deals with opening the mesh file.
+    """
+    with patch(
+        "nexus_constructor.geometry.geometry_loader.open",
+        mock_open(read_data=VALID_CUBE_OFF_FILE),
+    ):
+        pixel_options.populate_pixel_mapping_list("filename.off")
 
 
 def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_single_pixel_is_selected_and_visible_by_default(
