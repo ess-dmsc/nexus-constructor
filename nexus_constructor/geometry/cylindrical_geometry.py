@@ -1,4 +1,5 @@
 from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.Qt3DExtras import Qt3DExtras
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from math import sin, cos, pi, acos, degrees
 import h5py
@@ -112,55 +113,11 @@ class CylindricalGeometry:
         return cylinder_axis.normalized()
 
     @property
-    def off_geometry(self, steps: int = 20) -> OFFGeometry:
-        unit_conversion_factor = calculate_unit_conversion_factor(self.units)
-
-        # A list of vertices describing the circle at the bottom of the cylinder
-        bottom_circle = [
-            QVector3D(sin(2 * pi * i / steps), cos(2 * pi * i / steps), 0) * self.radius
-            for i in range(steps)
-        ]
-
-        # The top of the cylinder is the bottom shifted upwards
-        top_circle = [vector + QVector3D(0, 0, self.height) for vector in bottom_circle]
-
-        # The true cylinder are all vertices from the unit cylinder multiplied by the conversion factor
-        vertices = [
-            vector * unit_conversion_factor for vector in bottom_circle + top_circle
-        ]
-
-        # rotate each vertex to produce the desired cylinder mesh
-        rotate_matrix = self._rotation_matrix()
-        vertices = [vector * rotate_matrix for vector in vertices]
-
-        def vertex_above(vertex):
-            """
-            Returns the index of the vertex above this one in the cylinder.
-            """
-            return vertex + steps
-
-        def next_vertex(vertex):
-            """
-            Returns the next vertex around in the top or bottom circle of the cylinder.
-            """
-            return (vertex + 1) % steps
-
-        # Rectangular faces joining the top and bottom
-        rectangle_faces = [
-            [i, vertex_above(i), vertex_above(next_vertex(i)), next_vertex(i)]
-            for i in range(steps)
-        ]
-
-        # Step sided shapes describing the top and bottom
-        # The bottom uses steps of -1 to preserve winding order
-        top_bottom_faces = [
-            [i for i in range(steps)],
-            [i for i in range((2 * steps) - 1, steps - 1, -1)],
-        ]
-
-        return OFFGeometryNoNexus(
-            vertices=vertices, faces=rectangle_faces + top_bottom_faces
-        )
+    def mesh(self) -> Qt3DExtras.QCylinderGeometry:
+        geom = Qt3DExtras.QCylinderMesh()
+        geom.setLength(self.height)
+        geom.setRadius(self.radius)
+        return geom
 
     def _rotation_matrix(self) -> QMatrix4x4:
         """

@@ -11,7 +11,7 @@ from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.off_renderer import OffMesh
-from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.geometry import OFFGeometry, CylindricalGeometry
 from nexus_constructor.qentity_utils import create_qentity, create_material
 
 
@@ -199,7 +199,11 @@ class InstrumentView(QWidget):
         :param name: The name of the component.
         :param geometry: The geometry information of the component that is used to create a mesh.
         """
-        mesh = OffMesh(geometry.off_geometry)
+
+        if isinstance(geometry, CylindricalGeometry):
+            mesh = geometry.mesh
+        else:
+            mesh = OffMesh(geometry.off_geometry)
 
         entity = create_qentity([mesh, self.grey_material], self.component_root_entity)
 
