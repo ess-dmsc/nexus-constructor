@@ -13,7 +13,7 @@ import struct
 import itertools
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from nexus_constructor.geometry.off_geometry import OFFGeometry
 
 
