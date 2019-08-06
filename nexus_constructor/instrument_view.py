@@ -200,10 +200,7 @@ class InstrumentView(QWidget):
         :param geometry: The geometry information of the component that is used to create a mesh.
         """
 
-        if isinstance(geometry, CylindricalGeometry):
-            mesh = geometry.mesh
-        else:
-            mesh = OffMesh(geometry.off_geometry)
+        mesh = geometry.mesh
 
         entity = create_qentity([mesh, self.grey_material], self.component_root_entity)
 

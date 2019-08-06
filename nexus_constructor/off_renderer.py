@@ -7,7 +7,6 @@ https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342
 """
 
 from nexus_constructor.pixel_data import PixelData, PixelGrid
-from nexus_constructor.geometry import OFFGeometry
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct
@@ -96,7 +95,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
 
     q_attribute = Qt3DRender.QAttribute
 
-    def __init__(self, model: OFFGeometry, pixel_data: PixelData, parent=None):
+    def __init__(self, model: "OFFGeometry", pixel_data: PixelData, parent=None):
         super().__init__(parent)
 
         if isinstance(pixel_data, PixelGrid):
@@ -137,7 +136,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         attribute.setName(name)
         return attribute
 
-    def repeat_shape_over_grid(self, model: OFFGeometry, grid: PixelGrid):
+    def repeat_shape_over_grid(self, model: "OFFGeometry", grid: PixelGrid):
         faces = []
         vertices = []
         for row in range(grid.rows):
@@ -166,7 +165,7 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
     """
 
-    def __init__(self, geometry: OFFGeometry, pixel_data: PixelData = None):
+    def __init__(self, geometry: "OFFGeometry", pixel_data: PixelData = None):
         super().__init__(None)
 
         self.setInstanceCount(1)

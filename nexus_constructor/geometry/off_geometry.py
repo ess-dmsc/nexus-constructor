@@ -9,6 +9,7 @@ from nexus_constructor.nexus.validation import (
     ValidateDataset,
     validate_group,
 )
+from nexus_constructor.off_renderer import OffMesh
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
@@ -38,7 +39,7 @@ class OFFGeometry(ABC):
 
     @property
     @abstractmethod
-    def off_geometry(self) -> "OFFGeometry":
+    def mesh(self) -> OffMesh:
         pass
 
     @property
@@ -89,8 +90,8 @@ class OFFGeometryNoNexus(OFFGeometry):
         return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
     @property
-    def off_geometry(self) -> OFFGeometry:
-        return self
+    def mesh(self) -> OffMesh:
+        return OffMesh(self)
 
     @property
     def vertices(self) -> List[QVector3D]:
@@ -159,7 +160,7 @@ class OFFGeometryNexus(OFFGeometry):
         return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
     @property
-    def off_geometry(self) -> OFFGeometry:
+    def mesh(self) -> "OFFGeometry":
         return OFFGeometryNoNexus(self.vertices, self.faces)
 
     @property

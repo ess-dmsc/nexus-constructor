@@ -52,7 +52,7 @@ def test_GIVEN_faces_WHEN_calling_winding_order_indices_on_OFF_THEN_order_is_cor
     assert expected == geom.winding_order_indices
 
 
-def test_GIVEN_off_geometry_WHEN_calling_off_geometry_on_offGeometry_THEN_original_geometry_is_returned():
+def test_GIVEN_off_geometry_WHEN_calling_mesh_on_offGeometry_THEN_mesh_is_created():
     vertices = [
         QVector3D(0, 0, 1),
         QVector3D(0, 1, 0),
@@ -65,7 +65,7 @@ def test_GIVEN_off_geometry_WHEN_calling_off_geometry_on_offGeometry_THEN_origin
 
     assert geom.faces == faces
     assert geom.vertices == vertices
-    assert geom.off_geometry == geom
+    assert geom.mesh.vertexCount() == 6
 
 
 def test_can_get_off_geometry_properties():
