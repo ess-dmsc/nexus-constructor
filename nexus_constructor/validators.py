@@ -191,11 +191,11 @@ class PixelValidator(QObject):
 
     def set_pixel_mapping_valid(self, is_valid):
         self.pixel_mapping_is_valid = is_valid
-        self.validate_pixels()
+        self.inform_ok_validator()
 
     def set_pixel_grid_valid(self, is_valid):
         self.pixel_grid_is_valid = is_valid
-        self.validate_pixels()
+        self.inform_ok_validator()
 
     def unacceptable_pixel_states(self):
 
@@ -207,7 +207,7 @@ class PixelValidator(QObject):
             self.pixel_mapping_button.isChecked() and not self.pixel_mapping_is_valid,
         ]
 
-    def validate_pixels(self):
+    def inform_ok_validator(self):
         self.reassess_validity.emit()
 
     reassess_validity = Signal()

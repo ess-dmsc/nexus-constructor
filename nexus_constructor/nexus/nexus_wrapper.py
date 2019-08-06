@@ -152,7 +152,6 @@ class NexusWrapper(QObject):
         """
 
         ids = [id for id in ids if id is not None]
-        print(ids)
         array_shape = len(ids)
         id_arr = np.full(shape=len(ids), fill_value=-1, dtype="int64")
 
