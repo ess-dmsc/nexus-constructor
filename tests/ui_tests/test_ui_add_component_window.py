@@ -132,7 +132,17 @@ def template(qtbot):
 
 @pytest.fixture(scope="function")
 def mock_pixel_options():
+
     pixel_options = Mock(spec=PixelOptions)
+
+    def change_mapping_filename(filename):
+        pixel_options.get_current_mapping_filename = Mock(return_value=filename)
+
+    pixel_options.populate_pixel_mapping_list = Mock(
+        side_effect=change_mapping_filename
+    )
+
+    change_mapping_filename(None)
     return pixel_options
 
 
@@ -141,7 +151,7 @@ def dialog(qtbot, template, mock_pixel_options):
     dialog = create_add_component_dialog()
     template.ui = dialog
     template.ui.setupUi(template)
-    dialog.pixelOptionsWidget.ui = mock_pixel_options
+    dialog.pixel_options = mock_pixel_options
     qtbot.addWidget(template)
     return dialog
 
@@ -329,24 +339,6 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
-def test_UI_GIVEN_mesh_file_WHEN_entering_pixel_data_THEN_mapping_list_is_populate_list_method_is_called(
-    qtbot, template, dialog, mock_pixel_options
-):
-    # Make the pixel options visible
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
-
-    # Provide a valid file path and mesh file
-    enter_file_path(
-        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
-    )
-
-    # Check that the number of items in the pixel mapping list matches the number of faces in the mesh file
-    mock_pixel_options.populate_pixel_mapping_list.assert_called_once_with(
-        VALID_CUBE_MESH_FILE_PATH
-    )
-
-
 def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same(
     qtbot, template, dialog, mock_pixel_options
 ):
@@ -355,7 +347,6 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
     systematic_button_press(qtbot, template, dialog.meshRadioButton)
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
-    # Provide a valid file path and mesh file
     enter_file_path(
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
@@ -365,10 +356,33 @@ def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
-    # Check that the method for populating the pixel mapping was only called once
+    # Check that the method for populating the pixel mapping was only called once even though a file was selected twice
     mock_pixel_options.populate_pixel_mapping_list.assert_called_once_with(
         VALID_CUBE_MESH_FILE_PATH
     )
+
+
+def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_giving_mesh_file_THEN_mapping_list_is_not_generated(
+    qtbot, template, dialog, mock_pixel_options
+):
+
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    mock_pixel_options.populate_pixel_mapping_list.assert_not_called()
+
+
+def test_UI_GIVEN_invalid_file_WHEN_giving_mesh_file_THEN_mapping_list_is_not_generated(
+    qtbot, template, dialog, mock_pixel_options
+):
+
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+    enter_file_path(qtbot, dialog, template, VALID_CUBE_OFF_FILE, "OFF")
+
+    mock_pixel_options.populate_pixel_mapping_list.assert_not_called()
 
 
 def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
@@ -388,6 +402,7 @@ def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_ma
         qtbot, dialog, template, VALID_OCTA_MESH_FILE_PATH, VALID_OCTA_OFF_FILE
     )
 
+    # Check that two different files being given means the method was called twice
     mock_pixel_options.populate_pixel_mapping_list.assert_has_calls(
         [call(VALID_CUBE_MESH_FILE_PATH), call(VALID_OCTA_MESH_FILE_PATH)]
     )
@@ -1052,6 +1067,7 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
     dialog = AddComponentDialog(
         instrument, component_model, component_to_edit=component
     )
+    dialog.pixel_options = Mock()
     template = QDialog()
     template.ui = dialog
     template.ui.setupUi(template)
@@ -1089,6 +1105,7 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data
     dialog = AddComponentDialog(
         instrument, component_model, component_to_edit=component
     )
+    dialog.pixel_options = Mock()
     template = QDialog()
     template.ui = dialog
     template.ui.setupUi(template)

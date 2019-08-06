@@ -66,7 +66,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_to_edit = component_to_edit
 
         self.valid_file_given = False
-        self.new_file_given = False
+
+        self.pixel_options = None
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -143,13 +144,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if self.component_to_edit:
             self._fill_existing_entries()
 
-        self.pixelOptionsWidget.ui = PixelOptions()
-        self.pixelOptionsWidget.ui.setupUi(self.pixelOptionsWidget)
+        self.pixel_options = PixelOptions()
+        self.pixel_options.setupUi(self.pixelOptionsWidget)
+        self.pixelOptionsWidget.ui = self.pixel_options
 
         self.ok_validator = OkValidator(
             self.noShapeRadioButton,
             self.meshRadioButton,
-            self.pixelOptionsWidget.ui.get_validator(),
+            self.pixel_options.get_validator(),
         )
         self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
 
@@ -183,6 +185,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
         self.addFieldPushButton.clicked.connect(self.add_field)
         self.removeFieldPushButton.clicked.connect(self.remove_field)
+
+        self.pixel_options.pixel_mapping_button_pressed.connect(
+            self.populate_pixel_mapping_if_necessary
+        )
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
@@ -254,13 +260,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: None
         """
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
-        if filename != self.cad_file_name:
-            self.cad_file_name = filename
-            self.new_file_given = True
-            self.fileLineEdit.setText(filename)
-
-        else:
-            return
+        self.cad_file_name = filename
+        self.fileLineEdit.setText(filename)
 
     def show_cylinder_fields(self):
         self.shapeOptionsBox.setVisible(True)
@@ -334,7 +335,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
 
-        pixel_data = self.pixelOptionsWidget.ui.generate_pixel_data()
+        pixel_data = self.pixel_options.generate_pixel_data()
 
         if self.component_to_edit:
             self.component_to_edit.name = component_name
@@ -374,11 +375,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         and the pixel options widget is visible. The PixelOptions object carries out its own check to see if the
         Pixel Mapping option has been selected and then creates the pixel mapping widgets if this is the case.
         """
+        print(
+            self.cad_file_name,
+            self.valid_file_given,
+            self.pixel_options.get_current_mapping_filename(),
+        )
         if (
             self.pixelOptionsWidget.isVisible()
             and self.cad_file_name is not None
             and self.valid_file_given
-            and self.new_file_given
+            and self.pixel_options.get_current_mapping_filename() != self.cad_file_name
         ):
-            self.pixelOptionsWidget.ui.populate_pixel_mapping_list(self.cad_file_name)
-            self.new_file_given = False
+            self.pixel_options.populate_pixel_mapping_list(self.cad_file_name)

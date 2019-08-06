@@ -31,6 +31,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         }
 
         self.pixel_validator = None
+        self.current_mapping_filename = None
 
     def setupUi(self, parent_widget):
 
@@ -58,6 +59,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         # Update the validity
         self.evaluate_pixel_input_validity()
+
+    def get_current_mapping_filename(self):
+        return self.current_mapping_filename
 
     def setup_visibility_signals(self):
         """
@@ -119,6 +123,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         then the list will remain empty.
         """
         if self.pixelMappingListWidget.count() == 0:
+            print("Some pixel mapping stuff may be needed.")
             self.pixel_mapping_button_pressed.emit()
 
     @staticmethod
@@ -174,6 +179,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
     def populate_pixel_mapping_list(self, filename: str):
         """
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
+        :return A bool indicating whether or not the pixel mapping widgets have been created.
         """
         if self.pixel_mapping_not_visible():
             return
@@ -200,6 +206,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
             # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
+
+        self.current_mapping_filename = filename
 
     @staticmethod
     def get_number_of_faces_from_mesh_file(filename: str):
