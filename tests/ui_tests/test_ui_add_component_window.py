@@ -7,7 +7,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QDialog
 from PySide2.QtWidgets import QRadioButton, QMainWindow
-from mock import patch, mock_open, create_autospec, call, Mock
+from mock import patch, mock_open, call, Mock
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
@@ -132,7 +132,7 @@ def template(qtbot):
 
 @pytest.fixture(scope="function")
 def mock_pixel_options():
-    pixel_options = create_autospec(PixelOptions)
+    pixel_options = Mock(spec=PixelOptions)
     return pixel_options
 
 
@@ -148,8 +148,9 @@ def dialog(qtbot, template, mock_pixel_options):
 
 @pytest.fixture(scope="function")
 def mock_pixel_validator(dialog, mock_pixel_options):
-    mock_pixel_validator = create_autospec(PixelValidator)
-    mock_pixel_options.get_validator = mock_pixel_validator
+    mock_pixel_validator = Mock(spec=PixelValidator)
+    mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, False])
+    mock_pixel_options.get_validator = Mock(return_value=mock_pixel_validator)
     dialog.ok_validator.pixel_validator = mock_pixel_validator
     return mock_pixel_validator
 

@@ -255,7 +255,6 @@ class OkValidator(QObject):
             not self.no_geometry_button.isChecked() and not self.units_are_valid,
             self.mesh_button.isChecked() and not self.file_is_valid,
         ] + self.pixel_validator.unacceptable_pixel_states()
-        print(unacceptable)
         self.is_valid.emit(not any(unacceptable))
 
     # Signal to indicate that the fields are valid or invalid. False: invalid.
