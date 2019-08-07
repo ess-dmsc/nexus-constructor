@@ -1171,3 +1171,46 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_
 
     assert streams_widget.array_size_label.isVisible()
     assert streams_widget.array_size_spinbox.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_to_double_THEN_stream_dialog_shown_with_array_size_option(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    name = "test"
+
+    field.field_name_edit.setText(name)
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget.schema_combo.setCurrentText("f142")
+    streams_widget.schema_combo.currentTextChanged.emit(
+        streams_widget.schema_combo.currentText()
+    )
+
+    streams_widget.array_radio.setChecked(True)
+    streams_widget.array_radio.clicked.emit()
+
+    array_size = 2
+    streams_widget.array_size_spinbox.setValue(array_size)
+
+    group = streams_widget.get_stream_group()
+
+    assert name in group.name
+
+    assert "array_size" in group
+
+    assert group["array_size"][()] == array_size
