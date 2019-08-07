@@ -143,6 +143,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         if self.component_to_edit:
             self._fill_existing_entries()
+            self.pixel_options.fill_existing_entries()
 
         self.pixel_options = PixelOptions()
         self.pixel_options.setupUi(self.pixelOptionsWidget)
@@ -297,6 +298,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderHeightLineEdit.value(),
                 self.cylinderRadiusLineEdit.value(),
                 self.unitsLineEdit.text(),
+                pixel_data=pixel_data,
             )
         elif self.meshRadioButton.isChecked():
             mesh_geometry = OFFGeometryNoNexus()

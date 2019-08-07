@@ -309,9 +309,7 @@ def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_p
 def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_options_go_from_visible_to_invisible(
     qtbot, template, dialog, any_component_type
 ):
-    # Change the pixel options to visible
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    make_pixel_options_visible(dialog, qtbot, template)
 
     # Change the pixel options to invisible
     make_pixel_options_disappear(qtbot, dialog, template, any_component_type[1])
@@ -339,13 +337,11 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
-def test_UI_GIVEN_same_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_remains_the_same(
+def test_UI_GIVEN_same_mesh_file_twice_WHEN_user_selects_file_THEN_mapping_list_remains_the_same(
     qtbot, template, dialog, mock_pixel_options
 ):
 
-    # Make the pixel options visible
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    make_pixel_options_visible(dialog, qtbot, template)
 
     enter_file_path(
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
@@ -377,20 +373,22 @@ def test_UI_GIVEN_invalid_file_WHEN_giving_mesh_file_THEN_mapping_list_is_not_ge
     qtbot, template, dialog, mock_pixel_options
 ):
 
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    make_pixel_options_visible(dialog, qtbot, template)
 
     enter_file_path(qtbot, dialog, template, VALID_CUBE_OFF_FILE, "OFF")
 
     mock_pixel_options.populate_pixel_mapping_list.assert_not_called()
 
 
+def make_pixel_options_visible(dialog, qtbot, template):
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+
+
 def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
     qtbot, template, dialog, mock_pixel_options
 ):
-    # Make the pixel options visible
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    make_pixel_options_visible(dialog, qtbot, template)
 
     # Provide a path and file for a cube mesh
     enter_file_path(
@@ -860,9 +858,7 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
     qtbot, template, dialog, mock_pixel_options
 ):
 
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    make_pixel_options_visible(dialog, qtbot, template)
 
     # Give an invalid file
     enter_file_path(qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, "hfhuihfiuhf")
@@ -911,9 +907,7 @@ def test_UI_GIVEN_user_provides_valid_pixel_configuration_THEN_add_component_but
     qtbot, template, dialog, mock_pixel_validator
 ):
 
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    make_pixel_options_visible(dialog, qtbot, template)
 
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, False])
 
@@ -933,9 +927,7 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_
     qtbot, template, dialog, mock_pixel_validator
 ):
 
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    make_pixel_options_visible(dialog, qtbot, template)
 
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[True, False])
 
@@ -955,9 +947,7 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_
     qtbot, template, dialog, mock_pixel_validator
 ):
 
-    # Make the pixel options appear
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
+    make_pixel_options_visible(dialog, qtbot, template)
 
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, True])
 
@@ -991,6 +981,7 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
     dialog = AddComponentDialog(
         instrument, component_model, component_to_edit=component, parent=None
     )
+    dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
     template.ui.setupUi(template)
@@ -1012,6 +1003,7 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
     dialog = AddComponentDialog(
         instrument, component_model, component_to_edit=component, parent=None
     )
+    dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
     template.ui.setupUi(template)
@@ -1033,6 +1025,7 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
     dialog = AddComponentDialog(
         instrument, component_model, component_to_edit=component
     )
+    dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
     template.ui.setupUi(template)
@@ -1067,7 +1060,7 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
     dialog = AddComponentDialog(
         instrument, component_model, component_to_edit=component
     )
-    dialog.pixel_options = Mock()
+    dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
     template.ui.setupUi(template)
@@ -1105,7 +1098,7 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data
     dialog = AddComponentDialog(
         instrument, component_model, component_to_edit=component
     )
-    dialog.pixel_options = Mock()
+    dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
     template.ui.setupUi(template)

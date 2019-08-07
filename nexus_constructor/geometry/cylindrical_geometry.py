@@ -1,4 +1,6 @@
 from PySide2.QtGui import QVector3D, QMatrix4x4
+
+from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from math import sin, cos, pi, acos, degrees
 import h5py
@@ -53,10 +55,34 @@ class CylindricalGeometry:
 
     geometry_str = "Cylinder"
 
-    def __init__(self, nexus_file: nx.NexusWrapper, group: h5py.Group):
+    def __init__(
+        self,
+        nexus_file: nx.NexusWrapper,
+        group: h5py.Group,
+        pixel_data: PixelData = None,
+    ):
         self.file = nexus_file
         self.group = group
         self._verify_in_file()
+
+        if pixel_data is not None:
+            if type(pixel_data) is PixelMapping:
+                self.record_detector_number(pixel_data)
+            if type(pixel_data) is PixelGrid:
+                pass
+
+    def record_detector_number(self, pixel_data: PixelMapping):
+        """
+
+        :param pixel_data:
+        :return:
+        """
+        self.file.set_field_value(
+            self.group,
+            "detector_number",
+            np.array([i for i in pixel_data.pixel_ids if i is not None]),
+            dtype="int64",
+        )
 
     def _verify_in_file(self):
         """

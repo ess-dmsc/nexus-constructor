@@ -60,7 +60,15 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # Update the validity
         self.evaluate_pixel_input_validity()
 
+    def fill_existing_entries(self):
+        pass
+
     def get_current_mapping_filename(self):
+        """
+        Retrieves the filename of the mesh that has been used to generate the list of pixel mapping widgets. Used in
+        order to prevent creating the same list twice should the same file be selected twice with the file dialog.
+        :return: The filename of the mesh.
+        """
         return self.current_mapping_filename
 
     def setup_visibility_signals(self):
@@ -123,7 +131,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         then the list will remain empty.
         """
         if self.pixelMappingListWidget.count() == 0:
-            print("Some pixel mapping stuff may be needed.")
             self.pixel_mapping_button_pressed.emit()
 
     @staticmethod

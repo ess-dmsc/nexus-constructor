@@ -130,7 +130,7 @@ class OFFGeometryNexus(OFFGeometry):
         self._verify_in_file()
 
         if type(pixel_data) is PixelMapping:
-            self.record_detector_faces(pixel_data)
+            self.detector_faces = pixel_data.pixel_ids
         if type(pixel_data) is PixelGrid:
             pass
 
@@ -138,19 +138,6 @@ class OFFGeometryNexus(OFFGeometry):
             self.units = units
         if file_path:
             self.file_path = file_path
-
-    def record_detector_faces(self, pixel_data: PixelMapping):
-        """
-        Records the detector faces in the NXoff_geometry.
-        :param pixel_data: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
-        """
-        detector_faces = []
-
-        for i in range(len(pixel_data.pixel_ids)):
-            if pixel_data.pixel_ids[i] is not None:
-                detector_faces.append(np.array([i, pixel_data.pixel_ids[i]]))
-
-        self.file.set_field_value(self.group, "detector_faces", detector_faces)
 
     def _verify_in_file(self):
         """
@@ -169,6 +156,24 @@ class OFFGeometryNexus(OFFGeometry):
         )
         if problems:
             raise NexusFormatError("\n".join(problems))
+
+    @property
+    def detector_faces(self) -> List[int]:
+        return self.file.get_field_value(self.group, "detector_faces")
+
+    @detector_faces.setter
+    def detector_faces(self, pixel_ids: List[int]):
+        """
+        Records the detector faces in the NXoff_geometry.
+        :param pixel_data: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
+        """
+        detector_faces = []
+
+        for i in range(len(pixel_ids)):
+            if pixel_ids[i] is not None:
+                detector_faces.append(np.array([i, pixel_ids[i]]))
+
+        self.file.set_field_value(self.group, "detector_faces", detector_faces)
 
     @property
     def winding_order(self) -> List[int]:
