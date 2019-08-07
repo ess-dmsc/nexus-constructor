@@ -212,6 +212,28 @@ class StreamFieldsWidget(QDialog):
                 stream_group.create_dataset(
                     "array_size", data=self.array_size_spinbox.value()
                 )
+            if self.f142_advanced_group_box.isVisible():
+                # Use strings for names, we don't care if it's byte-encoded as it will output to JSON anyway.
+                stream_group.create_dataset(
+                    self.nexus_indices_index_every_mb_label.text(),
+                    dtype=int,
+                    data=self.nexus_indices_index_every_mb_spinbox.value(),
+                )
+                stream_group.create_dataset(
+                    self.nexus_chunk_mb_label.text(),
+                    dtype=int,
+                    data=self.nexus_chunk_mb_spinbox.value(),
+                )
+                stream_group.create_dataset(
+                    self.nexus_buffer_size_label.text(),
+                    dtype=int,
+                    data=self.nexus_buffer_size_spinbox.value(),
+                )
+                stream_group.create_dataset(
+                    self.nexus_packet_max_kb_label.text(),
+                    dtype=int,
+                    data=self.nexus_packet_max_kb_spinbox.value(),
+                )
         if schema != "ev42":
             stream_group.create_dataset(
                 "source", dtype=string_dtype, data=self.source_line_edit.text()
