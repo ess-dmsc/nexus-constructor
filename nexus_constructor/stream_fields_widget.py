@@ -210,7 +210,7 @@ class StreamFieldsWidget(QDialog):
             stream_group.create_dataset(
                 "type", dtype=string_dtype, data=self.type_combo.currentText()
             )
-            if self.type_combo.currentText() == "double":
+            if self.array_radio.isChecked():
                 stream_group.create_dataset(
                     "array_size", data=self.array_size_spinbox.value()
                 )
