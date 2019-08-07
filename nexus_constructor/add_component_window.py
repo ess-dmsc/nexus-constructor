@@ -191,6 +191,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.populate_pixel_mapping_if_necessary
         )
 
+        self.cylinderCountSpinBox.valueChanged.connect(
+            self.populate_pixel_mapping_if_necessary
+        )
+
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
         self.nameLineEdit.setText(self.component_to_edit.name)
@@ -401,4 +405,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def create_pixel_mapping_list_for_cylinder(self):
 
-        self.pixel_options.populate_pixel_mapping_list_with_cylinder_number()
+        self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
+            self.cylinderCountSpinBox.value()
+        )

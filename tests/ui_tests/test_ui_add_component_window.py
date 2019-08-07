@@ -337,9 +337,8 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.xfail
 def test_UI_GIVEN_cylinder_shape_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_generated(
-    qtbot, template, dialog, pixel_options
+    qtbot, template, dialog, mock_pixel_options
 ):
 
     make_pixel_options_visible(dialog, qtbot, template, dialog.CylinderRadioButton)
@@ -353,7 +352,6 @@ def test_UI_GIVEN_cylinder_shape_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapp
     )
 
 
-@pytest.mark.xfail
 def test_UI_GIVEN_increasing_cylinder_count_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_generated(
     qtbot, template, dialog, mock_pixel_options
 ):
@@ -361,10 +359,10 @@ def test_UI_GIVEN_increasing_cylinder_count_WHEN_user_chooses_pixel_mapping_THEN
     make_pixel_options_visible(dialog, qtbot, template, dialog.CylinderRadioButton)
 
     cylinder_count = 4
-    calls = [call(1)]
+    calls = []
 
     for i in range(2, cylinder_count):
-        qtbot.keyClicks(dialog.cylinderCountSpinBox, Qt.Key_Up)
+        qtbot.keyClick(dialog.cylinderCountSpinBox, Qt.Key_Up)
         calls.append(call(i))
 
     mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assert_has_calls(
@@ -406,16 +404,15 @@ def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_giving_mesh_file_THEN_mappi
     mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_not_called()
 
 
-@pytest.mark.xfail
 def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_changing_cylinder_count_THEN_mapping_list_is_not_generated(
     qtbot, template, dialog, mock_pixel_options
 ):
 
     systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
-    qtbot.keyClicks(dialog.cylinderCountSpinBox, Qt.Key_Up)
+    qtbot.keyClick(dialog.cylinderCountSpinBox, Qt.Key_Up)
 
-    mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assrt_not_called()
+    mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assert_not_called()
 
 
 def test_UI_GIVEN_invalid_file_WHEN_giving_mesh_file_THEN_mapping_list_is_not_generated(

@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Mon Aug  5 10:39:50 2019
+# Created: Wed Aug  7 13:28:33 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -157,6 +157,14 @@ class Ui_AddComponentDialog(object):
         self.cylinderZLineEdit.setProperty("value", 1.0)
         self.cylinderZLineEdit.setObjectName("cylinderZLineEdit")
         self.gridLayout.addWidget(self.cylinderZLineEdit, 2, 5, 1, 1)
+        self.cylinderCountLabel = QtWidgets.QLabel(self.cylinderOptionsBox)
+        self.cylinderCountLabel.setObjectName("cylinderCountLabel")
+        self.gridLayout.addWidget(self.cylinderCountLabel, 3, 0, 1, 1)
+        self.cylinderCountSpinBox = QtWidgets.QSpinBox(self.cylinderOptionsBox)
+        self.cylinderCountSpinBox.setMinimum(1)
+        self.cylinderCountSpinBox.setMaximum(999999999)
+        self.cylinderCountSpinBox.setObjectName("cylinderCountSpinBox")
+        self.gridLayout.addWidget(self.cylinderCountSpinBox, 3, 1, 1, 1)
         self.gridLayout.setColumnStretch(1, 1)
         self.gridLayout.setColumnStretch(3, 1)
         self.gridLayout.setColumnStretch(5, 1)
@@ -231,6 +239,7 @@ class Ui_AddComponentDialog(object):
         self.label_7.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Y:", None, -1))
         self.label_4.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Height", None, -1))
         self.label_8.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Z:", None, -1))
+        self.cylinderCountLabel.setText(QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder Count:", None, -1))
         self.unitsbox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1))
         self.unitsLineEdit.setText(QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1))
         self.fieldsBox.setTitle(QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1))
