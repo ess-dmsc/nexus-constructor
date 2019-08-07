@@ -373,9 +373,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def populate_pixel_mapping_if_necessary(self):
         """
-        Tells the pixel options widget to populate the pixel mapping widget provided a new, valid file has been given
-        and the pixel options widget is visible. The PixelOptions object carries out its own check to see if the
-        Pixel Mapping option has been selected and then creates the pixel mapping widgets if this is the case.
+        Tells the pixel options widget to populate the pixel mapping widget provided certain conditions are met. Checks
+        that the pixel options are visible then performs further checks depending on if the mesh or cylinder button
+        has been selected.
         """
 
         if not self.pixelOptionsWidget.isVisible():
@@ -388,6 +388,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.create_pixel_mapping_list_for_cylinder()
 
     def create_pixel_mapping_list_for_mesh(self):
+        """
+        Instructs the PixelOptions to create a list of Pixel Mapping widgets using a mesh file if the user has given a
+        valid file and has not selected the same file twice in a row.
+        """
         if (
             self.cad_file_name is not None
             and self.valid_file_given

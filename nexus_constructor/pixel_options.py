@@ -315,9 +315,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         pixel mapping list.
         :return: A bool indicating the current index of the PixelOptions stack.
         """
-        return (
-            self.pixelOptionsStack.isVisible()
-            and self.pixelOptionsStack.currentIndex() == 0
-        )
+        return self.pixelOptionsStack.currentIndex() != 1
 
     pixel_mapping_button_pressed = Signal()
