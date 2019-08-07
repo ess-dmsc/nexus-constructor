@@ -128,17 +128,11 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.source_label, 4, 0)
         self.layout().addWidget(self.source_line_edit, 4, 1)
 
-        self.layout().addWidget(
-            self.hs00_unimplemented_label, 5, 0, colspan=1, rowspan=2
-        )
+        self.layout().addWidget(self.hs00_unimplemented_label, 5, 0, 1, 2)
 
         # Spans both rows
-        self.layout().addWidget(
-            self.show_f142_advanced_options_button, 6, 0, colspan=1, rowspan=2
-        )
-        self.layout().addWidget(
-            self.f142_advanced_group_box, 7, 0, colspan=1, rowspan=2
-        )
+        self.layout().addWidget(self.show_f142_advanced_options_button, 6, 0, 1, 2)
+        self.layout().addWidget(self.f142_advanced_group_box, 7, 0, 1, 2)
 
         self.schema_type_changed(self.schema_combo.currentText())
         self._type_changed(self.type_combo.currentText())
