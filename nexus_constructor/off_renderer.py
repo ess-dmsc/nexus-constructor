@@ -5,16 +5,12 @@ Based off of a qml custom mesh example at https://github.com/iLya84a/qt3d/blob/m
 and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
-
+from nexus_constructor.geometry.mesh import Mesh
 from nexus_constructor.pixel_data import PixelData, PixelGrid
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 import struct
 import itertools
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:  # pragma: no cover
-    from nexus_constructor.geometry.off_geometry import OFFGeometry
 
 
 def flatten(list_to_flatten):
@@ -99,7 +95,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
 
     q_attribute = Qt3DRender.QAttribute
 
-    def __init__(self, model: "OFFGeometry", pixel_data: PixelData, parent=None):
+    def __init__(self, model: Mesh, pixel_data: PixelData, parent=None):
         super().__init__(parent)
 
         if isinstance(pixel_data, PixelGrid):
@@ -140,7 +136,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         attribute.setName(name)
         return attribute
 
-    def repeat_shape_over_grid(self, model: "OFFGeometry", grid: PixelGrid):
+    def repeat_shape_over_grid(self, model: Mesh, grid: PixelGrid):
         faces = []
         vertices = []
         for row in range(grid.rows):
@@ -169,7 +165,7 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
     """
 
-    def __init__(self, geometry: "OFFGeometry", pixel_data: PixelData = None):
+    def __init__(self, geometry: Mesh, pixel_data: PixelData = None):
         super().__init__(None)
 
         self.setInstanceCount(1)

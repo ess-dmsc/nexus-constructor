@@ -1,6 +1,8 @@
 from typing import List
 from PySide2.QtGui import QVector3D
 from abc import ABC, abstractmethod
+
+from nexus_constructor.geometry.mesh import Mesh
 from nexus_constructor.nexus import nexus_wrapper as nx
 import h5py
 
@@ -17,7 +19,7 @@ from nexus_constructor.ui_utils import (
 import numpy as np
 
 
-class OFFGeometry(ABC):
+class OFFGeometry(Mesh):
     geometry_str = "OFF"
 
     @property

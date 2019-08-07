@@ -3,6 +3,8 @@ from PySide2.Qt3DExtras import Qt3DExtras
 from math import acos, degrees
 import h5py
 import numpy as np
+
+from nexus_constructor.geometry.mesh import Mesh
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.validation import (
     NexusFormatError,
@@ -42,7 +44,7 @@ def calculate_vertices(
     return vertices
 
 
-class CylindricalGeometry:
+class CylindricalGeometry(Mesh):
     """
     Describes the shape of a cylinder in 3D space. The cylinder's centre is the origin of the local coordinate system.
     This wrapper does not have setters, delete cylinder and create a new one if the cylinder needs to change.
