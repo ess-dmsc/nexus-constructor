@@ -4,7 +4,7 @@ from nexus_constructor.validators import NullableIntValidator
 
 
 class PixelMappingWidget(QWidget):
-    def __init__(self, parent, face_no):
+    def __init__(self, parent, face_no, text):
         """
         A custom widget used for acting as a template in the pixel mapping list. Consists of a label and an input box.
         :param parent: The QListWidget that will contain this list item.
@@ -15,7 +15,7 @@ class PixelMappingWidget(QWidget):
         self.pixelIDLineEdit = QLineEdit()
 
         # Create the label text based on the face number
-        self.pixelIDLabel.setText("Pixel ID for face #" + str(face_no) + ":")
+        self.pixelIDLabel.setText("Pixel ID for " + text + " #" + str(face_no) + ":")
 
         # Give the line edit a validator that requires values of zero or greater
         self.pixelIDLineEdit.setValidator(NullableIntValidator(bottom=0))

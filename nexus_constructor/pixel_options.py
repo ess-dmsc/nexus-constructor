@@ -193,31 +193,18 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         n_faces = self.get_number_of_faces_from_mesh_file(filename)
 
-        # Clear the list widget in case it contains information from a previous file.
-        self.pixel_mapping_widgets = []
-        self.pixelMappingListWidget.clear()
+        self.reset_pixel_mapping_list()
 
         # Use the faces information from the geometry file to add fields to the pixel mapping list
-        for i in range(n_faces):
-            pixel_mapping_widget = PixelMappingWidget(self.pixelMappingListWidget, i)
-            pixel_mapping_widget.pixelIDLineEdit.textChanged.connect(
-                self.update_pixel_mapping_validity
-            )
-
-            # Make sure the list item is as large as the widget
-            list_item = QListWidgetItem()
-            list_item.setSizeHint(pixel_mapping_widget.sizeHint())
-
-            self.pixelMappingListWidget.addItem(list_item)
-            self.pixelMappingListWidget.setItemWidget(list_item, pixel_mapping_widget)
-
-            # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
-            self.pixel_mapping_widgets.append(pixel_mapping_widget)
+        self.create_pixel_mapping_list(n_faces, "faces")
 
         self.current_mapping_filename = filename
 
     def populate_pixel_mapping_list_with_cylinder_number(self, cylinder_number: int):
-        pass
+
+        self.current_mapping_filename = None
+        self.reset_pixel_mapping_list()
+        self.create_pixel_mapping_list(cylinder_number, "cylinder")
 
     @staticmethod
     def get_number_of_faces_from_mesh_file(filename: str):
@@ -316,5 +303,31 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         :return: A bool indicating the current index of the PixelOptions stack.
         """
         return self.pixelOptionsStack.currentIndex() != 1
+
+    def reset_pixel_mapping_list(self):
+
+        # Clear the list widget in case it contains information from a previous file.
+        self.pixel_mapping_widgets = []
+        self.pixelMappingListWidget.clear()
+
+    def create_pixel_mapping_list(self, n_items, text):
+
+        for i in range(n_items):
+            pixel_mapping_widget = PixelMappingWidget(
+                self.pixelMappingListWidget, i, text
+            )
+            pixel_mapping_widget.pixelIDLineEdit.textChanged.connect(
+                self.update_pixel_mapping_validity
+            )
+
+            # Make sure the list item is as large as the widget
+            list_item = QListWidgetItem()
+            list_item.setSizeHint(pixel_mapping_widget.sizeHint())
+
+            self.pixelMappingListWidget.addItem(list_item)
+            self.pixelMappingListWidget.setItemWidget(list_item, pixel_mapping_widget)
+
+            # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
+            self.pixel_mapping_widgets.append(pixel_mapping_widget)
 
     pixel_mapping_button_pressed = Signal()
