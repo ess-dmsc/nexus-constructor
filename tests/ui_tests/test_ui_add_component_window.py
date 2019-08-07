@@ -138,7 +138,7 @@ def mock_pixel_options():
     def change_mapping_filename(filename):
         pixel_options.get_current_mapping_filename = Mock(return_value=filename)
 
-    pixel_options.populate_pixel_mapping_list = Mock(
+    pixel_options.populate_pixel_mapping_list_with_mesh = Mock(
         side_effect=change_mapping_filename
     )
 
@@ -353,7 +353,7 @@ def test_UI_GIVEN_same_mesh_file_twice_WHEN_user_selects_file_THEN_mapping_list_
     )
 
     # Check that the method for populating the pixel mapping was only called once even though a file was selected twice
-    mock_pixel_options.populate_pixel_mapping_list.assert_called_once_with(
+    mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_called_once_with(
         VALID_CUBE_MESH_FILE_PATH
     )
 
@@ -366,7 +366,7 @@ def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_giving_mesh_file_THEN_mappi
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
-    mock_pixel_options.populate_pixel_mapping_list.assert_not_called()
+    mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_not_called()
 
 
 def test_UI_GIVEN_invalid_file_WHEN_giving_mesh_file_THEN_mapping_list_is_not_generated(
@@ -377,7 +377,7 @@ def test_UI_GIVEN_invalid_file_WHEN_giving_mesh_file_THEN_mapping_list_is_not_ge
 
     enter_file_path(qtbot, dialog, template, VALID_CUBE_OFF_FILE, "OFF")
 
-    mock_pixel_options.populate_pixel_mapping_list.assert_not_called()
+    mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_not_called()
 
 
 def make_pixel_options_visible(dialog, qtbot, template):
@@ -401,7 +401,7 @@ def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_ma
     )
 
     # Check that two different files being given means the method was called twice
-    mock_pixel_options.populate_pixel_mapping_list.assert_has_calls(
+    mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_has_calls(
         [call(VALID_CUBE_MESH_FILE_PATH), call(VALID_OCTA_MESH_FILE_PATH)]
     )
 
@@ -851,7 +851,7 @@ def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_
     )
 
     # Check that the pixel mapping list is still empty
-    mock_pixel_options.populate_pixel_mapping_list.assert_not_called()
+    mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_not_called()
 
 
 def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mapping_widget_isnt_populated(
@@ -863,7 +863,7 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
     # Give an invalid file
     enter_file_path(qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, "hfhuihfiuhf")
 
-    mock_pixel_options.populate_pixel_mapping_list.assert_not_called()
+    mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_not_called()
 
 
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(

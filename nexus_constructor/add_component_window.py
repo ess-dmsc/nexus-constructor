@@ -377,15 +377,24 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         and the pixel options widget is visible. The PixelOptions object carries out its own check to see if the
         Pixel Mapping option has been selected and then creates the pixel mapping widgets if this is the case.
         """
-        print(
-            self.cad_file_name,
-            self.valid_file_given,
-            self.pixel_options.get_current_mapping_filename(),
-        )
+
+        if not self.pixelOptionsWidget.isVisible():
+            return
+
+        if self.meshRadioButton.isChecked():
+            self.create_pixel_mapping_list_for_mesh()
+
+        if self.CylinderRadioButton.isChecked():
+            self.create_pixel_mapping_list_for_cylinder()
+
+    def create_pixel_mapping_list_for_mesh(self):
         if (
-            self.pixelOptionsWidget.isVisible()
-            and self.cad_file_name is not None
+            self.cad_file_name is not None
             and self.valid_file_given
             and self.pixel_options.get_current_mapping_filename() != self.cad_file_name
         ):
-            self.pixel_options.populate_pixel_mapping_list(self.cad_file_name)
+            self.pixel_options.populate_pixel_mapping_list_with_mesh(self.cad_file_name)
+
+    def create_pixel_mapping_list_for_cylinder(self):
+
+        self.pixel_options.populate_pixel_mapping_list_with_cylinder_number()

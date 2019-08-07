@@ -59,7 +59,7 @@ def manually_create_pixel_mapping_list(pixel_options: PixelOptions):
         "nexus_constructor.geometry.geometry_loader.open",
         mock_open(read_data=VALID_CUBE_OFF_FILE),
     ):
-        pixel_options.populate_pixel_mapping_list("filename.off")
+        pixel_options.populate_pixel_mapping_list_with_mesh("filename.off")
 
 
 def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_single_pixel_is_selected_and_visible_by_default(

@@ -183,7 +183,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         if pixel_mapping:
             self.pixelOptionsStack.setCurrentIndex(1)
 
-    def populate_pixel_mapping_list(self, filename: str):
+    def populate_pixel_mapping_list_with_mesh(self, filename: str):
         """
         Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
         :return A bool indicating whether or not the pixel mapping widgets have been created.
@@ -215,6 +215,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
 
         self.current_mapping_filename = filename
+
+    def populate_pixel_mapping_list_with_cylinder_number(self, cylinder_number: int):
+        pass
 
     @staticmethod
     def get_number_of_faces_from_mesh_file(filename: str):

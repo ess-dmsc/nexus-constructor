@@ -17,7 +17,7 @@ from nexus_constructor.ui_utils import (
 )
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
 from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
-from typing import Tuple
+from typing import Tuple, List
 
 
 def calculate_vertices(
@@ -67,22 +67,9 @@ class CylindricalGeometry:
 
         if pixel_data is not None:
             if type(pixel_data) is PixelMapping:
-                self.record_detector_number(pixel_data)
+                self.record_detector_number(pixel_data.pixel_ids)
             if type(pixel_data) is PixelGrid:
                 pass
-
-    def record_detector_number(self, pixel_data: PixelMapping):
-        """
-
-        :param pixel_data:
-        :return:
-        """
-        self.file.set_field_value(
-            self.group,
-            "detector_number",
-            np.array([i for i in pixel_data.pixel_ids if i is not None]),
-            dtype="int64",
-        )
 
     def _verify_in_file(self):
         """
@@ -100,6 +87,18 @@ class CylindricalGeometry:
         )
         if problems:
             raise NexusFormatError("\n".join(problems))
+
+    def record_detector_number(self, detector_ids: List[int]):
+        self.file.set_field_value(
+            self.group,
+            "detector_number",
+            np.array([i for i in detector_ids if i is not None]),
+            dtype="int64",
+        )
+
+    @property
+    def detector_number(self) -> List[int]:
+        return self.file.get_field_value(self.group, "detector_number")
 
     @property
     def units(self) -> str:
