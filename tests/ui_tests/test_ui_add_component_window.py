@@ -309,7 +309,7 @@ def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_p
 def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_options_go_from_visible_to_invisible(
     qtbot, template, dialog, any_component_type
 ):
-    make_pixel_options_visible(dialog, qtbot, template)
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     # Change the pixel options to invisible
     make_pixel_options_disappear(qtbot, dialog, template, any_component_type[1])
@@ -337,11 +337,46 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
+@pytest.mark.xfail
+def test_UI_GIVEN_cylinder_shape_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_generated(
+    qtbot, template, dialog, pixel_options
+):
+
+    make_pixel_options_visible(dialog, qtbot, template, dialog.CylinderRadioButton)
+
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assert_called_once_with(
+        1
+    )
+
+
+@pytest.mark.xfail
+def test_UI_GIVEN_increasing_cylinder_count_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_generated(
+    qtbot, template, dialog, mock_pixel_options
+):
+
+    make_pixel_options_visible(dialog, qtbot, template, dialog.CylinderRadioButton)
+
+    cylinder_count = 4
+    calls = [call(1)]
+
+    for i in range(2, cylinder_count):
+        qtbot.keyClicks(dialog.cylinderCountSpinBox, Qt.Key_Up)
+        calls.append(call(i))
+
+    mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assert_has_calls(
+        calls
+    )
+
+
 def test_UI_GIVEN_same_mesh_file_twice_WHEN_user_selects_file_THEN_mapping_list_remains_the_same(
     qtbot, template, dialog, mock_pixel_options
 ):
 
-    make_pixel_options_visible(dialog, qtbot, template)
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     enter_file_path(
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
@@ -362,6 +397,8 @@ def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_giving_mesh_file_THEN_mappi
     qtbot, template, dialog, mock_pixel_options
 ):
 
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+
     enter_file_path(
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
@@ -369,26 +406,38 @@ def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_giving_mesh_file_THEN_mappi
     mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_not_called()
 
 
+@pytest.mark.xfail
+def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_changing_cylinder_count_THEN_mapping_list_is_not_generated(
+    qtbot, template, dialog, mock_pixel_options
+):
+
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
+
+    qtbot.keyClicks(dialog.cylinderCountSpinBox, Qt.Key_Up)
+
+    mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assrt_not_called()
+
+
 def test_UI_GIVEN_invalid_file_WHEN_giving_mesh_file_THEN_mapping_list_is_not_generated(
     qtbot, template, dialog, mock_pixel_options
 ):
 
-    make_pixel_options_visible(dialog, qtbot, template)
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     enter_file_path(qtbot, dialog, template, VALID_CUBE_OFF_FILE, "OFF")
 
     mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_not_called()
 
 
-def make_pixel_options_visible(dialog, qtbot, template):
-    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+def make_pixel_options_visible(dialog, qtbot, template, button):
+    systematic_button_press(qtbot, template, button)
     dialog.componentTypeComboBox.setCurrentIndex(PIXEL_OPTIONS[0][1])
 
 
 def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_mapping_list_changes(
     qtbot, template, dialog, mock_pixel_options
 ):
-    make_pixel_options_visible(dialog, qtbot, template)
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     # Provide a path and file for a cube mesh
     enter_file_path(
@@ -858,7 +907,7 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
     qtbot, template, dialog, mock_pixel_options
 ):
 
-    make_pixel_options_visible(dialog, qtbot, template)
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     # Give an invalid file
     enter_file_path(qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, "hfhuihfiuhf")
@@ -907,7 +956,7 @@ def test_UI_GIVEN_user_provides_valid_pixel_configuration_THEN_add_component_but
     qtbot, template, dialog, mock_pixel_validator
 ):
 
-    make_pixel_options_visible(dialog, qtbot, template)
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, False])
 
@@ -927,7 +976,7 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_
     qtbot, template, dialog, mock_pixel_validator
 ):
 
-    make_pixel_options_visible(dialog, qtbot, template)
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[True, False])
 
@@ -947,7 +996,7 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_
     qtbot, template, dialog, mock_pixel_validator
 ):
 
-    make_pixel_options_visible(dialog, qtbot, template)
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, True])
 
