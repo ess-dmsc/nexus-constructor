@@ -1159,10 +1159,8 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_
         streams_widget.schema_combo.currentText()
     )
 
-    streams_widget.type_combo.setCurrentText("double")
-    streams_widget.type_combo.currentTextChanged.emit(
-        streams_widget.type_combo.currentText()
-    )
+    streams_widget.array_radio.setChecked(True)
+    streams_widget.array_radio.clicked.emit()
 
     assert streams_widget.topic_label.isVisible()
     assert streams_widget.topic_line_edit.isVisible()
