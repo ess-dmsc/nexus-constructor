@@ -1173,7 +1173,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_
     assert streams_widget.array_size_spinbox.isVisible()
 
 
-def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_to_double_THEN_stream_dialog_shown_with_array_size_option(
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_array_size_option_and_correct_value_in_nexus_file(
     qtbot
 ):
 
