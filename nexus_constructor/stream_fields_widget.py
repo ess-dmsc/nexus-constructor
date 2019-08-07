@@ -36,6 +36,10 @@ class StreamFieldsWidget(QDialog):
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
 
+        self.hs00_unimplemented_label = QLabel(
+            "hs00 (Event histograms) has not yet been fully implemented."
+        )
+
         self.schema_label = QLabel("Schema: ")
         self.schema_combo = QComboBox()
 
@@ -73,25 +77,34 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.source_label, 4, 0)
         self.layout().addWidget(self.source_line_edit, 4, 1)
 
+        self.layout().addWidget(self.hs00_unimplemented_label, 5, 0)
+
         self.schema_type_changed(self.schema_combo.currentText())
         self._type_changed(self.type_combo.currentText())
 
     def schema_type_changed(self, schema: str):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
+        self.hs00_unimplemented_label.setVisible(False)
         if schema == "f142":
             self._set_edits_visible(True, True)
         elif schema == "ev42":
             self._set_edits_visible(False, False)
         elif schema == "hs00":
             self._set_edits_visible(True, False)
-        elif schema == "ns10":
-            self._set_edits_visible(True, False)
+            self.hs00_unimplemented_label.setVisible(True)
 
-    def _set_edits_visible(self, source: bool, type: bool):
+        elif schema == "ns10":
+            self._set_edits_visible(True, False, "nicos/<device>/<parameter>")
+
+    def _set_edits_visible(self, source: bool, type: bool, source_hint=None):
         self.source_label.setVisible(source)
         self.source_line_edit.setVisible(source)
         self.type_label.setVisible(type)
         self.type_combo.setVisible(type)
+        if source_hint:
+            self.source_line_edit.setPlaceholderText(source_hint)
+        else:
+            self.source_line_edit.setPlaceholderText("")
 
     def _type_changed(self, dtype: str):
         if self.type_combo.isVisible():
