@@ -1,6 +1,6 @@
 from typing import List
 from PySide2.QtGui import QVector3D
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from nexus_constructor.geometry.mesh import Mesh
 from nexus_constructor.nexus import nexus_wrapper as nx
