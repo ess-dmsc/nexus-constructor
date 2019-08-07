@@ -1037,7 +1037,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     streams_widget = field.streams_widget
     assert streams_widget.isEnabled()
 
-    streams_widget.schema_type_changed("f142")
+    streams_widget._schema_type_changed("f142")
 
     assert streams_widget.topic_label.isEnabled()
     assert streams_widget.topic_line_edit.isEnabled()
@@ -1066,7 +1066,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ev42_THEN_stre
     streams_widget = field.streams_widget
     assert streams_widget.isEnabled()
 
-    streams_widget.schema_type_changed("ev42")
+    streams_widget._schema_type_changed("ev42")
 
     assert streams_widget.topic_label.isEnabled()
     assert streams_widget.topic_line_edit.isEnabled()
@@ -1095,7 +1095,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stre
     streams_widget = field.streams_widget
     assert streams_widget.isEnabled()
 
-    streams_widget.schema_type_changed("ns10")
+    streams_widget._schema_type_changed("ns10")
 
     assert streams_widget.topic_label.isEnabled()
     assert streams_widget.topic_line_edit.isEnabled()
@@ -1124,7 +1124,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_hs00_THEN_stre
     streams_widget = field.streams_widget
     assert streams_widget.isEnabled()
 
-    streams_widget.schema_type_changed("hs00")
+    streams_widget._schema_type_changed("hs00")
 
     assert streams_widget.topic_label.isEnabled()
     assert streams_widget.topic_line_edit.isEnabled()

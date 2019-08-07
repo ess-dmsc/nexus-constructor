@@ -1,4 +1,5 @@
 import uuid
+from functools import partial
 
 import h5py
 from PySide2.QtCore import Qt
@@ -11,6 +12,7 @@ from PySide2.QtWidgets import (
     QSpinBox,
     QPushButton,
     QGroupBox,
+    QRadioButton,
 )
 import numpy as np
 
@@ -59,7 +61,6 @@ class StreamFieldsWidget(QDialog):
         self.type_label = QLabel("Type: ")
         self.type_combo = QComboBox()
         self.type_combo.addItems(F142_TYPES)
-        self.type_combo.currentTextChanged.connect(self._type_changed)
 
         self.show_f142_advanced_options_button = QPushButton(
             text="Show/hide advanced options"
@@ -110,7 +111,15 @@ class StreamFieldsWidget(QDialog):
             self.nexus_packet_max_kb_spinbox, 3, 1
         )
 
-        self.schema_combo.currentTextChanged.connect(self.schema_type_changed)
+        self.scalar_radio = QRadioButton(text="Scalar")
+        self.scalar_radio.clicked.connect(partial(self._show_array_size, False))
+        self.scalar_radio.setChecked(True)
+        self.scalar_radio.clicked.emit()
+
+        self.array_radio = QRadioButton(text="Array")
+        self.array_radio.clicked.connect(partial(self._show_array_size, True))
+
+        self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
         self.schema_combo.addItems(SCHEMAS)
 
         self.layout().addWidget(self.schema_label, 0, 0)
@@ -122,27 +131,33 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.type_label, 2, 0)
         self.layout().addWidget(self.type_combo, 2, 1)
 
-        self.layout().addWidget(self.array_size_label, 3, 0)
-        self.layout().addWidget(self.array_size_spinbox, 3, 1)
+        self.layout().addWidget(self.scalar_radio, 3, 0)
+        self.layout().addWidget(self.array_radio, 3, 1)
 
-        self.layout().addWidget(self.source_label, 4, 0)
-        self.layout().addWidget(self.source_line_edit, 4, 1)
+        self.layout().addWidget(self.array_size_label, 4, 0)
+        self.layout().addWidget(self.array_size_spinbox, 4, 1)
 
-        self.layout().addWidget(self.hs00_unimplemented_label, 5, 0, 1, 2)
+        self.layout().addWidget(self.source_label, 5, 0)
+        self.layout().addWidget(self.source_line_edit, 5, 1)
+
+        self.layout().addWidget(self.hs00_unimplemented_label, 6, 0, 1, 2)
 
         # Spans both rows
-        self.layout().addWidget(self.show_f142_advanced_options_button, 6, 0, 1, 2)
-        self.layout().addWidget(self.f142_advanced_group_box, 7, 0, 1, 2)
+        self.layout().addWidget(self.show_f142_advanced_options_button, 7, 0, 1, 2)
+        self.layout().addWidget(self.f142_advanced_group_box, 8, 0, 1, 2)
 
-        self.schema_type_changed(self.schema_combo.currentText())
-        self._type_changed(self.type_combo.currentText())
+        self._schema_type_changed(self.schema_combo.currentText())
 
     def _show_advanced_options(self):
         self.f142_advanced_group_box.setVisible(
             not self.f142_advanced_group_box.isVisible()
         )
 
-    def schema_type_changed(self, schema: str):
+    def _show_array_size(self, show: bool):
+        self.array_size_spinbox.setVisible(show)
+        self.array_size_label.setVisible(show)
+
+    def _schema_type_changed(self, schema: str):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
         self.hs00_unimplemented_label.setVisible(False)
         self.f142_advanced_group_box.setVisible(False)
@@ -165,19 +180,12 @@ class StreamFieldsWidget(QDialog):
         self.source_line_edit.setVisible(source)
         self.type_label.setVisible(type)
         self.type_combo.setVisible(type)
+        self.array_radio.setVisible(type)
+        self.scalar_radio.setVisible(type)
         if source_hint:
             self.source_line_edit.setPlaceholderText(source_hint)
         else:
             self.source_line_edit.setPlaceholderText("")
-
-    def _type_changed(self, dtype: str):
-        if self.type_combo.isVisible():
-            is_double = dtype == "double"
-            self.array_size_label.setVisible(is_double)
-            self.array_size_spinbox.setVisible(is_double)
-        else:
-            self.array_size_label.setVisible(False)
-            self.array_size_spinbox.setVisible(False)
 
     def get_stream_group(self) -> h5py.Group:
         string_dtype = h5py.special_dtype(vlen=str)
