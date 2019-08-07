@@ -69,7 +69,7 @@ class FieldWidget(QFrame):
     def __init__(self, possible_field_names: List[str], parent: QListWidget = None):
         super(FieldWidget, self).__init__(parent)
 
-        self.edit_dialog = QDialog()
+        self.edit_dialog = QDialog(parent=self)
         self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
 

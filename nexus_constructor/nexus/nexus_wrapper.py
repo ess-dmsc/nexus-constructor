@@ -204,7 +204,7 @@ class NexusWrapper(QObject):
             dtype = h5py.special_dtype(vlen=str)
 
         if isinstance(value, h5py.Group):
-            group.copy(dest=group, source=value)
+            value.copy(dest=group, source=value)
             return group[name]
 
         if name in group:

@@ -192,7 +192,7 @@ class StreamFieldsWidget(QDialog):
         )
         group = temp_file.create_group("children")
         group.create_dataset(name="type", dtype=string_dtype, data="stream")
-        stream_group = group.create_group("stream")
+        stream_group = group.create_group(self.parent().parent().name)
         stream_group.create_dataset(
             name="topic", dtype=string_dtype, data=self.topic_line_edit.text()
         )
