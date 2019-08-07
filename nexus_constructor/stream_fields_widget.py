@@ -9,11 +9,6 @@ from PySide2.QtWidgets import (
     QDialog,
     QLabel,
     QSpinBox,
-    QFrame,
-    QHBoxLayout,
-    QVBoxLayout,
-    QTreeWidget,
-    QFormLayout,
     QPushButton,
     QGroupBox,
 )
@@ -133,7 +128,9 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.source_label, 4, 0)
         self.layout().addWidget(self.source_line_edit, 4, 1)
 
-        self.layout().addWidget(self.hs00_unimplemented_label, 5, 0, colspan=1, rowspan=2)
+        self.layout().addWidget(
+            self.hs00_unimplemented_label, 5, 0, colspan=1, rowspan=2
+        )
 
         # Spans both rows
         self.layout().addWidget(
