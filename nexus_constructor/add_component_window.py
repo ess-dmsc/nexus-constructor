@@ -195,6 +195,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.populate_pixel_mapping_if_necessary
         )
 
+        self.meshRadioButton.clicked.connect(self.populate_pixel_mapping_if_necessary)
+        self.CylinderRadioButton.clicked.connect(
+            self.populate_pixel_mapping_if_necessary
+        )
+
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
         self.nameLineEdit.setText(self.component_to_edit.name)

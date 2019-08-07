@@ -1009,6 +1009,40 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_
     assert not dialog.buttonBox.isEnabled()
 
 
+def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_been_generated_THEN_new_pixel_mapping_list_is_generated(
+    qtbot, template, dialog, mock_pixel_options
+):
+
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
+
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    make_pixel_options_visible(dialog, qtbot, template, dialog.CylinderRadioButton)
+
+    mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assert_called_once_with(
+        1
+    )
+
+
+def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_been_generated_WHEN_new_pixel_mapping_list_is_generated(
+    qtbot, template, dialog, mock_pixel_options
+):
+
+    make_pixel_options_visible(dialog, qtbot, template, dialog.CylinderRadioButton)
+
+    make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
+
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+
+    mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_called_once_with(
+        VALID_CUBE_MESH_FILE_PATH
+    )
+
+
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
     qtbot
 ):
