@@ -304,7 +304,9 @@ class MainWindow(Ui_MainWindow, QObject):
         self.instrument.nexus.save_file(filename)
         if filename:
             name, ok_pressed = QInputDialog.getText(
-                None, "NeXus file output name", "Filename:"
+                None,
+                "NeXus file output name",
+                "Name for output NeXus file to include in JSON command:",
             )
             if ok_pressed:
                 with open(filename, "w") as file:
