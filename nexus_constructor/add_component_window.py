@@ -141,13 +141,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
-        if self.component_to_edit:
-            self._fill_existing_entries()
-            self.pixel_options.fill_existing_entries()
-
         self.pixel_options = PixelOptions()
         self.pixel_options.setupUi(self.pixelOptionsWidget)
         self.pixelOptionsWidget.ui = self.pixel_options
+
+        if self.component_to_edit:
+            self._fill_existing_entries()
+            self.pixel_options.fill_existing_entries()
 
         self.ok_validator = OkValidator(
             self.noShapeRadioButton,
@@ -195,10 +195,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.populate_pixel_mapping_if_necessary
         )
 
+        self.meshRadioButton.clicked.connect(self.clear_previous_mapping_list)
         self.meshRadioButton.clicked.connect(self.populate_pixel_mapping_if_necessary)
+        self.CylinderRadioButton.clicked.connect(self.clear_previous_mapping_list)
         self.CylinderRadioButton.clicked.connect(
             self.populate_pixel_mapping_if_necessary
         )
+
+    def clear_previous_mapping_list(self):
+        self.pixel_options.reset_pixel_mapping_list()
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")

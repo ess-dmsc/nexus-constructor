@@ -7,7 +7,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QDialog
 from PySide2.QtWidgets import QRadioButton, QMainWindow
-from mock import patch, mock_open, call, Mock
+from mock import patch, mock_open, call, Mock, PropertyMock
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
@@ -24,6 +24,7 @@ from tests.ui_tests.ui_test_utils import (
     show_and_close_window,
     RED_LINE_EDIT_STYLE_SHEET,
     WHITE_LINE_EDIT_STYLE_SHEET,
+    show_window_and_wait_for_interaction,
 )
 
 MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("1", "")]
@@ -131,7 +132,7 @@ def template(qtbot):
 
 
 @pytest.fixture(scope="function")
-def mock_pixel_options():
+def mock_pixel_options(dialog):
 
     pixel_options = Mock(spec=PixelOptions)
 
@@ -143,26 +144,33 @@ def mock_pixel_options():
     )
 
     change_mapping_filename(None)
+
+    dialog.pixel_options = PropertyMock(return_value=pixel_options)
+
     return pixel_options
 
 
 @pytest.fixture(scope="function")
-def dialog(qtbot, template, mock_pixel_options):
+def dialog(qtbot, template):
+
     dialog = create_add_component_dialog()
     template.ui = dialog
     template.ui.setupUi(template)
-    dialog.pixel_options = mock_pixel_options
     qtbot.addWidget(template)
+
     return dialog
 
 
 @pytest.fixture(scope="function")
 def mock_pixel_validator(dialog, mock_pixel_options):
-    mock_pixel_validator = Mock(spec=PixelValidator)
-    mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, False])
-    mock_pixel_options.get_validator = Mock(return_value=mock_pixel_validator)
-    dialog.ok_validator.pixel_validator = mock_pixel_validator
-    return mock_pixel_validator
+    pixel_validator = Mock(spec=PixelValidator)
+    pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
+
+    dialog.ok_validator.pixel_validator = PropertyMock(return_value=pixel_validator)
+    mock_pixel_options.pixel_validator = PropertyMock(return_value=pixel_validator)
+    mock_pixel_options.get_validator = Mock(return_value=pixel_validator)
+
+    return pixel_validator
 
 
 def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
@@ -230,6 +238,9 @@ def test_UI_GIVEN_nothing_WHEN_changing_component_shape_type_THEN_add_component_
     systematic_button_press(
         qtbot, template, get_shape_type_button(dialog, shape_button_name)
     )
+
+    show_window_and_wait_for_interaction(qtbot, template)
+
     assert not dialog.buttonBox.isEnabled()
 
 
@@ -560,6 +571,8 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_shape_THEN_add_com
 
     # Mimic the user entering a non-unique name in the text field
     enter_component_name(qtbot, template, dialog, NONUNIQUE_COMPONENT_NAME)
+
+    show_window_and_wait_for_interaction(qtbot, template)
 
     # The Add Component button is disabled
     assert not dialog.buttonBox.isEnabled()
@@ -1015,12 +1028,15 @@ def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_
 
     make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
+    mock_pixel_options.reset_mock()
+
     enter_file_path(
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
     make_pixel_options_visible(dialog, qtbot, template, dialog.CylinderRadioButton)
 
+    mock_pixel_options.reset_pixel_mapping_list.assert_called_once()
     mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assert_called_once_with(
         1
     )
@@ -1032,12 +1048,15 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
 
     make_pixel_options_visible(dialog, qtbot, template, dialog.CylinderRadioButton)
 
+    mock_pixel_options.reset_mock()
+
     make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
 
     enter_file_path(
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
+    mock_pixel_options.reset_pixel_mapping_list.assert_called_once()
     mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_called_once_with(
         VALID_CUBE_MESH_FILE_PATH
     )
@@ -1058,18 +1077,24 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
         name=name, nx_class=nx_class, description=desc
     )
 
-    dialog = AddComponentDialog(
-        instrument, component_model, component_to_edit=component, parent=None
-    )
-    dialog.pixel_options = Mock(spec=PixelOptions)
-    template = QDialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
-    qtbot.addWidget(template)
+    with patch("nexus_constructor.validators.PixelValidator") as mock_pixel_validator:
+        mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
+        with patch(
+            "nexus_constructor.add_component_window.PixelOptions"
+        ) as mock_pixel_options:
+            mock_pixel_options.pixel_validator = mock_pixel_validator
+            dialog = AddComponentDialog(
+                instrument, component_model, component_to_edit=component, parent=None
+            )
+            template = QDialog()
+            template.ui = dialog
+            template.ui.setupUi(template)
 
-    assert dialog.nameLineEdit.text() == name
-    assert dialog.descriptionPlainTextEdit.text() == desc
-    assert dialog.componentTypeComboBox.currentText() == nx_class
+            qtbot.addWidget(template)
+
+            assert dialog.nameLineEdit.text() == name
+            assert dialog.descriptionPlainTextEdit.text() == desc
+            assert dialog.componentTypeComboBox.currentText() == nx_class
 
 
 def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_radio_is_checked(
@@ -1080,16 +1105,21 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
 
     component = instrument.create_component("test", "NXpinhole", "")
 
-    dialog = AddComponentDialog(
-        instrument, component_model, component_to_edit=component, parent=None
-    )
-    dialog.pixel_options = Mock(spec=PixelOptions)
-    template = QDialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
-    qtbot.addWidget(template)
+    with patch("nexus_constructor.validators.PixelValidator") as mock_pixel_validator:
+        mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
+        with patch(
+            "nexus_constructor.add_component_window.PixelOptions"
+        ) as mock_pixel_options:
+            mock_pixel_options.pixel_validator = mock_pixel_validator
+            dialog = AddComponentDialog(
+                instrument, component_model, component_to_edit=component, parent=None
+            )
+            template = QDialog()
+            template.ui = dialog
+            template.ui.setupUi(template)
+            qtbot.addWidget(template)
 
-    assert dialog.noShapeRadioButton.isChecked()
+            assert dialog.noShapeRadioButton.isChecked()
 
 
 def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
@@ -1102,17 +1132,23 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
     component = instrument.create_component(component_name, "NXpinhole", "")
     component.set_cylinder_shape(QVector3D(1, 1, 1), height=3, radius=4)
 
-    dialog = AddComponentDialog(
-        instrument, component_model, component_to_edit=component
-    )
-    dialog.pixel_options = Mock(spec=PixelOptions)
-    template = QDialog()
-    template.ui = dialog
-    template.ui.setupUi(template)
-    qtbot.addWidget(template)
+    with patch("nexus_constructor.validators.PixelValidator") as mock_pixel_validator:
+        mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
+        with patch(
+            "nexus_constructor.add_component_window.PixelOptions"
+        ) as mock_pixel_options:
+            mock_pixel_options.pixel_validator = mock_pixel_validator
+            dialog = AddComponentDialog(
+                instrument, component_model, component_to_edit=component
+            )
+            dialog.pixel_options = Mock(spec=PixelOptions)
+            template = QDialog()
+            template.ui = dialog
+            template.ui.setupUi(template)
+            qtbot.addWidget(template)
 
-    assert dialog.CylinderRadioButton.isChecked()
-    assert dialog.cylinderOptionsBox.isEnabled()
+            assert dialog.CylinderRadioButton.isChecked()
+            assert dialog.cylinderOptionsBox.isEnabled()
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
