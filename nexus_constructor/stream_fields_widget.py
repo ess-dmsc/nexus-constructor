@@ -9,6 +9,13 @@ from PySide2.QtWidgets import (
     QDialog,
     QLabel,
     QSpinBox,
+    QFrame,
+    QHBoxLayout,
+    QVBoxLayout,
+    QTreeWidget,
+    QFormLayout,
+    QPushButton,
+    QGroupBox,
 )
 import numpy as np
 
@@ -59,6 +66,55 @@ class StreamFieldsWidget(QDialog):
         self.type_combo.addItems(F142_TYPES)
         self.type_combo.currentTextChanged.connect(self._type_changed)
 
+        self.show_f142_advanced_options_button = QPushButton(
+            text="Show/hide advanced options"
+        )
+
+        self.f142_advanced_group_box = QGroupBox(title="Advanced options for f142")
+        self.show_f142_advanced_options_button.clicked.connect(
+            self._show_advanced_options
+        )
+        self.f142_advanced_group_box.setLayout(QGridLayout())
+        minimum_value = 0
+        maximum_value = 100000000
+        self.nexus_indices_index_every_mb_label = QLabel("nexus.indices.index_every_mb")
+        self.nexus_indices_index_every_mb_spinbox = QSpinBox()
+        self.nexus_indices_index_every_mb_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_indices_index_every_mb_label, 0, 0
+        )
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_indices_index_every_mb_spinbox, 0, 1
+        )
+
+        self.nexus_chunk_mb_label = QLabel("nexus.indices.index_every_mb")
+        self.nexus_chunk_mb_spinbox = QSpinBox()
+        self.nexus_chunk_mb_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_advanced_group_box.layout().addWidget(self.nexus_chunk_mb_label, 1, 0)
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_chunk_mb_spinbox, 1, 1
+        )
+
+        self.nexus_buffer_size_label = QLabel("nexus.buffer.size_kb")
+        self.nexus_buffer_size_spinbox = QSpinBox()
+        self.nexus_buffer_size_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_buffer_size_label, 2, 0
+        )
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_buffer_size_spinbox, 2, 1
+        )
+
+        self.nexus_packet_max_kb_label = QLabel("nexus.buffer.packet_max_kb")
+        self.nexus_packet_max_kb_spinbox = QSpinBox()
+        self.nexus_packet_max_kb_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_packet_max_kb_label, 3, 0
+        )
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_packet_max_kb_spinbox, 3, 1
+        )
+
         self.schema_combo.currentTextChanged.connect(self.schema_type_changed)
         self.schema_combo.addItems(SCHEMAS)
 
@@ -77,16 +133,33 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.source_label, 4, 0)
         self.layout().addWidget(self.source_line_edit, 4, 1)
 
-        self.layout().addWidget(self.hs00_unimplemented_label, 5, 0)
+        self.layout().addWidget(self.hs00_unimplemented_label, 5, 0, colspan=1, rowspan=2)
+
+        # Spans both rows
+        self.layout().addWidget(
+            self.show_f142_advanced_options_button, 6, 0, colspan=1, rowspan=2
+        )
+        self.layout().addWidget(
+            self.f142_advanced_group_box, 7, 0, colspan=1, rowspan=2
+        )
 
         self.schema_type_changed(self.schema_combo.currentText())
         self._type_changed(self.type_combo.currentText())
 
+    def _show_advanced_options(self):
+        self.f142_advanced_group_box.setVisible(
+            not self.f142_advanced_group_box.isVisible()
+        )
+
     def schema_type_changed(self, schema: str):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
         self.hs00_unimplemented_label.setVisible(False)
+        self.f142_advanced_group_box.setVisible(False)
+        self.show_f142_advanced_options_button.setVisible(False)
         if schema == "f142":
             self._set_edits_visible(True, True)
+            self.show_f142_advanced_options_button.setVisible(True)
+            self.f142_advanced_group_box.setVisible(False)
         elif schema == "ev42":
             self._set_edits_visible(False, False)
         elif schema == "hs00":
