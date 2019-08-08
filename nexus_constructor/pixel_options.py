@@ -61,6 +61,10 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.update_pixel_input_validity()
 
     def fill_existing_entries(self):
+        """
+        Populate the pixel fields based on what is already stored in the NeXus file.
+        :return:
+        """
         pass
 
     def get_current_mapping_filename(self):
@@ -187,8 +191,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     def populate_pixel_mapping_list_with_mesh(self, filename: str):
         """
-        Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file.
-        :return A bool indicating whether or not the pixel mapping widgets have been created.
+        Populates the Pixel Mapping list with widgets depending on the number of faces in the current geometry file for
+        an NXoff_geometry.
         """
         if self.pixel_mapping_not_visible():
             return
@@ -200,13 +204,18 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # Use the faces information from the geometry file to add fields to the pixel mapping list
         self.create_pixel_mapping_list(n_faces, "faces")
 
+        # Record the filename of the current mapping to prevent the widgets from being created twice
         self.current_mapping_filename = filename
 
     def populate_pixel_mapping_list_with_cylinder_number(self, cylinder_number: int):
-
+        """
+        Populates the pixel mapping list based on a number of cylinders for the NXcylindrical_geometry.
+        :param cylinder_number: The number of cylinders.
+        """
         if self.pixel_mapping_not_visible():
             return
 
+        # Set the mapping filename to None as cylinder mappings are not based on a mesh file.
         self.current_mapping_filename = None
         self.reset_pixel_mapping_list()
         self.create_pixel_mapping_list(cylinder_number, "cylinder")
@@ -309,12 +318,20 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         return self.pixelOptionsStack.currentIndex() != 1
 
     def reset_pixel_mapping_list(self):
-
-        # Clear the list widget in case it contains information from a previous file.
+        """
+        Clear the current pixel mapping list and widget. Used when the mesh file changes in the case of NXoff_geometry,
+        when the number of cylinders change in the case of NXcylindrical_geometry, or when the user switches between
+        mesh and cylinder.
+        """
         self.pixel_mapping_widgets = []
         self.pixelMappingListWidget.clear()
 
     def create_pixel_mapping_list(self, n_items, text):
+        """
+        Creates a list of pixel mapping widgets.
+        :param n_items: The number of widgets to create.
+        :param text: The label to be displayed next to the line edit. This is either faces or cylinders.
+        """
 
         for i in range(n_items):
             pixel_mapping_widget = PixelMappingWidget(

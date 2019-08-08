@@ -421,4 +421,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.pixel_options.populate_pixel_mapping_list_with_mesh(self.cad_file_name)
 
     def update_pixel_input_validity(self):
+        """
+
+        :return:
+        """
         self.pixel_options.update_pixel_input_validity()

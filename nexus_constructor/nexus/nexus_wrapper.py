@@ -5,6 +5,12 @@ import numpy as np
 from PySide2.QtCore import Signal, QObject
 
 from nexus_constructor.pixel_data import PixelMapping, PixelData, PixelGrid
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    pixel_grid_x_offsets,
+    pixel_grid_y_offsets,
+    pixel_grid_z_offsets,
+    pixel_grid_detector_ids,
+)
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
@@ -156,6 +162,37 @@ class NexusWrapper(QObject):
             dtype="int64",
         )
 
+    def record_pixel_grid(self, component_group: h5py.Group, pixel_grid: PixelGrid):
+        """
+        Records the pixel grid data to the NeXus file.
+        :param component_group: The NeXus component group.
+        :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
+        """
+        self.set_field_value(
+            component_group,
+            "x_pixel_offset",
+            pixel_grid_x_offsets(pixel_grid),
+            "float64",
+        )
+        self.set_field_value(
+            component_group,
+            "y_pixel_offset",
+            pixel_grid_y_offsets(pixel_grid),
+            "float64",
+        )
+        self.set_field_value(
+            component_group,
+            "z_pixel_offset",
+            pixel_grid_z_offsets(pixel_grid),
+            "float64",
+        )
+        self.set_field_value(
+            component_group,
+            "detector_number",
+            pixel_grid_detector_ids(pixel_grid),
+            "int64",
+        )
+
     def record_pixel_data(
         self, component_group: h5py.Group, nx_class: str, pixel_data: PixelData
     ):
@@ -169,12 +206,9 @@ class NexusWrapper(QObject):
             if type(pixel_data) is PixelMapping:
                 self.record_detector_number(component_group, pixel_data.pixel_ids)
             if type(pixel_data) is PixelGrid:
-                pass
+                self.record_pixel_grid(component_group, pixel_data)
         if nx_class == "NXdetector_module":
-            if type(pixel_data) is PixelMapping:
-                pass
-            if type(pixel_data) is PixelGrid:
-                pass
+            pass
 
     def create_nx_group(
         self, name: str, nx_class: str, parent: h5py.Group
