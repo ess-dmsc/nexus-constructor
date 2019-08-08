@@ -15,6 +15,66 @@ WHITE_LINE_EDIT_STYLE_SHEET = LINE_EDIT + WHITE_BACKGROUND
 RED_SPIN_BOX_STYLE_SHEET = SPIN_BOX + RED_BACKGROUND
 WHITE_SPIN_BOX_STYLE_SHEET = SPIN_BOX + WHITE_BACKGROUND
 
+VALID_CUBE_OFF_FILE = (
+    "OFF\n"
+    "#  cube.off\n"
+    "#  A cube\n"
+    "8 6 0\n"
+    "-0.500000 -0.500000 0.500000\n"
+    "0.500000 -0.500000 0.500000\n"
+    "-0.500000 0.500000 0.500000\n"
+    "0.500000 0.500000 0.500000\n"
+    "-0.500000 0.500000 -0.500000\n"
+    "0.500000 0.500000 -0.500000\n"
+    "-0.500000 -0.500000 -0.500000\n"
+    "-0.500000 0.500000 0.500000\n"
+    "4 0 1 3 2\n"
+    "4 2 3 5 4\n"
+    "4 4 5 7 6\n"
+    "4 6 7 1 0\n"
+    "4 1 7 5 3\n"
+    "4 6 0 2 4\n"
+)
+
+VALID_OCTA_OFF_FILE = (
+    "OFF\n"
+    "#\n"
+    "#  octa.off\n"
+    "#  An octahedron.\n"
+    "#\n"
+    "6  8  12\n"
+    "  0.0  0.0  1.0\n"
+    "  1.0  0.0  0.0\n"
+    "  0.0  1.0  0.0\n"
+    " -1.0  0.0  0.0\n"
+    "  0.0 -1.0  0.0\n"
+    "  0.0  0.0 -1.0\n"
+    "3  1 0 4  0.7 0 0\n"
+    "3  4 0 3  0.7 0 0\n"
+    "3  3 0 2  0.7 0 0\n"
+    "3  2 0 1  0.7 0 0 \n"
+    "3  1 5 2  0.7 0 0 \n"
+    "3  2 5 3  0.7 0 0\n"
+    "3  3 5 4  0.7 0 0\n"
+    "3  4 5 1  0.7 0 0\n"
+)
+
+
+def get_expected_number_of_faces(off_file):
+    """
+    Finds the expected number of faces in an OFF file. Used to check this matches the number of items in a pixel
+    mapping list.
+    :param off_file: The OFF file.
+    :return: The number of faces in the OFF file.
+    """
+    for line in off_file.split("\n")[1:]:
+        if line[0] != "#":
+            return int(line.split()[1])
+
+
+CORRECT_CUBE_FACES = get_expected_number_of_faces(VALID_CUBE_OFF_FILE)
+CORRECT_OCTA_FACES = get_expected_number_of_faces(VALID_OCTA_OFF_FILE)
+
 
 def systematic_button_press(qtbot: QtBot, template: QDialog, button: QAbstractButton):
     """

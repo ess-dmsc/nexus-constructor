@@ -93,6 +93,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # Make the column and row count spin boxes in the Pixel Grid trigger a validity update
         self.rowCountSpinBox.valueChanged.connect(self.update_pixel_grid_validity)
         self.columnCountSpinBox.valueChanged.connect(self.update_pixel_grid_validity)
+
         # Make the row/column count being set to zero cause its matching distance field to become disabled
         self.columnCountSpinBox.valueChanged.connect(
             lambda: self.disable_or_enable_distance_field(
@@ -104,6 +105,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 self.rowCountSpinBox, self.rowHeightSpinBox
             )
         )
+
         # Prevent both the rows and columns in the PixelGrid from being zero
         self.columnCountSpinBox.valueChanged.connect(
             self.forbid_both_row_and_columns_being_zero

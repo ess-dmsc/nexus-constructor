@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ui/add_component.ui',
 # licensing of 'ui/add_component.ui' applies.
 #
-# Created: Wed Aug  7 13:28:33 2019
+# Created: Thu Aug  8 10:10:21 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -161,6 +161,7 @@ class Ui_AddComponentDialog(object):
         self.cylinderCountLabel.setObjectName("cylinderCountLabel")
         self.gridLayout.addWidget(self.cylinderCountLabel, 3, 0, 1, 1)
         self.cylinderCountSpinBox = QtWidgets.QSpinBox(self.cylinderOptionsBox)
+        self.cylinderCountSpinBox.setEnabled(False)
         self.cylinderCountSpinBox.setMinimum(1)
         self.cylinderCountSpinBox.setMaximum(999999999)
         self.cylinderCountSpinBox.setObjectName("cylinderCountSpinBox")

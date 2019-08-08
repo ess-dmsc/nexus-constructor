@@ -11,27 +11,10 @@ from tests.ui_tests.ui_test_utils import (
     show_and_close_window,
     RED_SPIN_BOX_STYLE_SHEET,
     WHITE_SPIN_BOX_STYLE_SHEET,
-)
-
-VALID_CUBE_OFF_FILE = (
-    "OFF\n"
-    "#  cube.off\n"
-    "#  A cube\n"
-    "8 6 0\n"
-    "-0.500000 -0.500000 0.500000\n"
-    "0.500000 -0.500000 0.500000\n"
-    "-0.500000 0.500000 0.500000\n"
-    "0.500000 0.500000 0.500000\n"
-    "-0.500000 0.500000 -0.500000\n"
-    "0.500000 0.500000 -0.500000\n"
-    "-0.500000 -0.500000 -0.500000\n"
-    "-0.500000 0.500000 0.500000\n"
-    "4 0 1 3 2\n"
-    "4 2 3 5 4\n"
-    "4 4 5 7 6\n"
-    "4 6 7 1 0\n"
-    "4 1 7 5 3\n"
-    "4 6 0 2 4\n"
+    VALID_CUBE_OFF_FILE,
+    CORRECT_CUBE_FACES,
+    VALID_OCTA_OFF_FILE,
+    CORRECT_OCTA_FACES,
 )
 
 
@@ -50,14 +33,16 @@ def pixel_options(qtbot, template):
     return pixel_options
 
 
-def manually_create_pixel_mapping_list(pixel_options: PixelOptions):
+def manually_create_pixel_mapping_list(
+    pixel_options: PixelOptions, file_contents: str = VALID_CUBE_OFF_FILE
+):
     """
     Manually creates a pixel mapping list by passing a mesh filename and opening a mesh by mocking open.
     :param pixel_options: The PixelOptions object that deals with opening the mesh file.
     """
     with patch(
         "nexus_constructor.geometry.geometry_loader.open",
-        mock_open(read_data=VALID_CUBE_OFF_FILE),
+        mock_open(read_data=file_contents),
     ):
         pixel_options.populate_pixel_mapping_list_with_mesh("filename.off")
 
@@ -65,22 +50,26 @@ def manually_create_pixel_mapping_list(pixel_options: PixelOptions):
 def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_single_pixel_is_selected_and_visible_by_default(
     qtbot, template, pixel_options
 ):
+    show_and_close_window(qtbot, template)
+
     # Check that the single grid button is checked and the pixel grid option is visible by default
     assert pixel_options.singlePixelRadioButton.isChecked()
+    assert pixel_options.pixelOptionsStack.isVisible()
     assert pixel_options.pixelOptionsStack.currentIndex() == 0
 
 
-def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_grid_box_becomes_invisible(
+def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_mapping_becomes_visisble(
     qtbot, template, pixel_options
 ):
     # Press the entire shape button under pixel layout
     systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
 
     # Check that the pixel mapping items are visible
+    assert pixel_options.pixelOptionsStack.isVisible()
     assert pixel_options.pixelOptionsStack.currentIndex() == 1
 
 
-def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_options_become_invisible(
+def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_options_stack_becomes_invisible(
     qtbot, template, pixel_options
 ):
 
@@ -89,6 +78,18 @@ def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_grid_and_pixel_mapping_optio
 
     # Check that the pixel mapping items are visible
     assert not pixel_options.pixelOptionsStack.isVisible()
+
+
+def test_UI_GIVEN_user_selects_single_pixel_THEN_pixel_grid_becomes_visible(
+    qtbot, template, pixel_options
+):
+
+    # Single pixel is selected by default so switch to entire shape then switch back
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.singlePixelRadioButton)
+
+    assert pixel_options.pixelOptionsStack.isVisible()
+    assert pixel_options.pixelOptionsStack.currentIndex() == 0
 
 
 def test_UI_GIVEN_user_selects_pixel_grid_THEN_pixel_grid_is_set_to_true_in_ok_validator(
@@ -335,3 +336,64 @@ def test_UI_GIVEN_column_count_is_not_zero_THEN_column_width_becomes_enabled(
 
     # Check that the column width spin box is now enabled
     assert pixel_options.columnWidthSpinBox.isEnabled()
+
+
+def test_UI_GIVEN_mesh_file_THEN_pixel_mapping_list_is_populated_with_correct_number_of_widgets(
+    qtbot, template, pixel_options
+):
+
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    manually_create_pixel_mapping_list(pixel_options)
+    assert pixel_options.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
+
+
+def test_UI_GIVEN_mesh_file_changes_THEN_pixel_mapping_list_changes(
+    qtbot, template, pixel_options
+):
+
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    manually_create_pixel_mapping_list(pixel_options)
+    manually_create_pixel_mapping_list(pixel_options, VALID_OCTA_OFF_FILE)
+    assert pixel_options.pixelMappingListWidget.count() == CORRECT_OCTA_FACES
+
+
+def test_UI_GIVEN_cylinder_number_THEN_pixel_mapping_list_is_populated_with_correct_number_of_widgets(
+    qtbot, template, pixel_options
+):
+
+    cylinder_number = 6
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    pixel_options.populate_pixel_mapping_list_with_cylinder_number(cylinder_number)
+    assert pixel_options.pixelMappingListWidget.count() == cylinder_number
+
+
+def test_UI_GIVEN_cylinder_number_changes_THEN_pixel_mapping_list_changes(
+    qtbot, template, pixel_options
+):
+
+    first_cylinder_number = 6
+    second_cylinder_number = first_cylinder_number - 1
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    pixel_options.populate_pixel_mapping_list_with_cylinder_number(
+        first_cylinder_number
+    )
+    pixel_options.populate_pixel_mapping_list_with_cylinder_number(
+        second_cylinder_number
+    )
+    assert pixel_options.pixelMappingListWidget.count() == second_cylinder_number
+
+
+def test_UI_GIVEN_user_switches_to_pixel_mapping_THEN_pixel_mapping_signal_is_emitted(
+    qtbot, template, pixel_options
+):
+
+    global emitted
+    emitted = False
+
+    def check_that_signal_is_emitted():
+        global emitted
+        emitted = not emitted
+
+    pixel_options.pixel_mapping_button_pressed.connect(check_that_signal_is_emitted)
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    assert emitted

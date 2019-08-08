@@ -187,6 +187,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.addFieldPushButton.clicked.connect(self.add_field)
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
+        # Connect the pixel mapping press signal the populate pixel mapping method
         self.pixel_options.pixel_mapping_button_pressed.connect(
             self.populate_pixel_mapping_if_necessary
         )
