@@ -2,6 +2,10 @@ from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, Pixe
 import numpy as np
 
 
+def negative(x):
+    return -x
+
+
 def pixel_mapping(mapping: PixelMapping):
     """
     Returns a list of two-item lists. Each sublist contains a face ID followed by the face's detector ID.
@@ -20,12 +24,16 @@ def pixel_grid_x_offsets(grid: PixelGrid):
     Each entry in the sublists are x positions of pixel instances in the given PixelGrid
     """
     if grid.columns % 2 == 0:
-        return [[x * grid.col_width for x in range(grid.columns)]] * grid.rows
+        distance = grid.col_width / 2
+        second = [i * distance for i in range(1, grid.columns // 2)]
+        first = list(map(negative, reversed(second)))
+        offsets = np.array(first + second)
     else:
         mid_point = grid.columns // 2
         end = grid.col_width * mid_point
         offsets = np.linspace(start=-end, stop=end, num=grid.columns)
-        return np.meshgrid(offsets, offsets)[0]
+
+    return np.meshgrid(offsets, offsets)[0]
 
 
 def pixel_grid_y_offsets(grid: PixelGrid):
@@ -34,12 +42,16 @@ def pixel_grid_y_offsets(grid: PixelGrid):
     Each entry in the sublists are y positions of pixel instances in the given PixelGrid
     """
     if grid.rows % 2 == 0:
-        return [[y * grid.row_height] * grid.columns for y in range(grid.rows)]
+        distance = grid.row_height / 2
+        second = [i * distance for i in range(1, grid.rows // 2)]
+        first = list(map(negative, reversed(second)))
+        offsets = np.array(first + second)
     else:
         mid_point = grid.rows // 2
         end = grid.row_height * mid_point
         offsets = np.linspace(start=-end, stop=end, num=grid.rows)
-        return np.meshgrid(offsets, offsets)[1]
+
+    return np.meshgrid(offsets, offsets)[1]
 
 
 def pixel_grid_z_offsets(grid: PixelGrid):
