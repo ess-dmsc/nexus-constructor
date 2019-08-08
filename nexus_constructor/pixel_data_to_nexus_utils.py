@@ -1,4 +1,5 @@
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
+import numpy as np
 
 
 def pixel_mapping(mapping: PixelMapping):
@@ -18,7 +19,14 @@ def pixel_grid_x_offsets(grid: PixelGrid):
     Returns a list of 'row' lists of 'column' length.
     Each entry in the sublists are x positions of pixel instances in the given PixelGrid
     """
-    return [[x * grid.col_width for x in range(grid.columns)]] * grid.rows
+    if grid.columns % 2 == 0:
+        return [[x * grid.col_width for x in range(grid.columns)]] * grid.rows
+    else:
+        offsets = np.arange(
+            start=0, stop=grid.columns * grid.col_width, step=grid.col_width
+        )
+        offsets -= offsets[grid.columns // 2]
+        return np.meshgrid(offsets, offsets)[0]
 
 
 def pixel_grid_y_offsets(grid: PixelGrid):
@@ -26,7 +34,14 @@ def pixel_grid_y_offsets(grid: PixelGrid):
     Returns a list of 'row' lists of 'column' length.
     Each entry in the sublists are y positions of pixel instances in the given PixelGrid
     """
-    return [[y * grid.row_height] * grid.columns for y in range(grid.rows)]
+    if grid.rows % 2 == 0:
+        return [[y * grid.row_height] * grid.columns for y in range(grid.rows)]
+    else:
+        offsets = np.arange(
+            start=0, stop=grid.rows * grid.row_height, step=grid.row_height
+        )
+        offsets -= offsets[grid.rows // 2]
+        return np.meshgrid(offsets, offsets)[0]
 
 
 def pixel_grid_z_offsets(grid: PixelGrid):
