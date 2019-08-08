@@ -22,10 +22,9 @@ def pixel_grid_x_offsets(grid: PixelGrid):
     if grid.columns % 2 == 0:
         return [[x * grid.col_width for x in range(grid.columns)]] * grid.rows
     else:
-        offsets = np.arange(
-            start=0, stop=grid.columns * grid.col_width, step=grid.col_width
-        )
-        offsets -= offsets[grid.columns // 2]
+        mid_point = grid.columns // 2
+        end = grid.col_width * mid_point
+        offsets = np.linspace(start=-end, stop=end, num=grid.columns)
         return np.meshgrid(offsets, offsets)[0]
 
 
@@ -37,11 +36,10 @@ def pixel_grid_y_offsets(grid: PixelGrid):
     if grid.rows % 2 == 0:
         return [[y * grid.row_height] * grid.columns for y in range(grid.rows)]
     else:
-        offsets = np.arange(
-            start=0, stop=grid.rows * grid.row_height, step=grid.row_height
-        )
-        offsets -= offsets[grid.rows // 2]
-        return np.meshgrid(offsets, offsets)[0]
+        mid_point = grid.rows // 2
+        end = grid.row_height * mid_point
+        offsets = np.linspace(start=-end, stop=end, num=grid.rows)
+        return np.meshgrid(offsets, offsets)[1]
 
 
 def pixel_grid_z_offsets(grid: PixelGrid):
