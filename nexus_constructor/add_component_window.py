@@ -203,6 +203,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.populate_pixel_mapping_if_necessary
         )
 
+        self.meshRadioButton.clicked.connect(self.update_pixel_input_validity)
+        self.CylinderRadioButton.clicked.connect(self.update_pixel_input_validity)
+
     def clear_previous_mapping_list(self):
         self.pixel_options.reset_pixel_mapping_list()
 
@@ -343,8 +346,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         Determines if it is necessary to make the pixel options visible.
         :return: A bool indicating if the current shape and component type allow for pixel-related input.
         """
-        return self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES and (
-            self.meshRadioButton.isChecked() or self.CylinderRadioButton.isChecked()
+        return (
+            self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
+            and not self.noShapeRadioButton.isChecked()
         )
 
     def on_ok(self):
@@ -415,3 +419,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             and self.pixel_options.get_current_mapping_filename() != self.cad_file_name
         ):
             self.pixel_options.populate_pixel_mapping_list_with_mesh(self.cad_file_name)
+
+    def update_pixel_input_validity(self):
+        self.pixel_options.update_pixel_input_validity()

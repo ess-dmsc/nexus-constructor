@@ -18,7 +18,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         self.pixel_mapping_widgets = []
 
-        # Dictionaries that map user-input to known pixel grid options. Used when creatimg the PixelGrid.
+        # Dictionaries that map user-input to known pixel grid options. Used when creating the PixelGrid.
         self.count_direction = {
             "Rows": CountDirection.ROW,
             "Columns": CountDirection.COLUMN,
@@ -53,12 +53,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.setup_pixel_grid_options()
 
         # Cause the overall Pixel Options validity to change when a different type of Pixel Layout has been selected
-        self.singlePixelRadioButton.clicked.connect(self.evaluate_pixel_input_validity)
-        self.entireShapeRadioButton.clicked.connect(self.evaluate_pixel_input_validity)
-        self.noPixelsButton.clicked.connect(self.evaluate_pixel_input_validity)
+        self.singlePixelRadioButton.clicked.connect(self.update_pixel_input_validity)
+        self.entireShapeRadioButton.clicked.connect(self.update_pixel_input_validity)
+        self.noPixelsButton.clicked.connect(self.update_pixel_input_validity)
 
         # Update the validity
-        self.evaluate_pixel_input_validity()
+        self.update_pixel_input_validity()
 
     def fill_existing_entries(self):
         pass
@@ -288,12 +288,11 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         if self.noPixelsButton.isChecked():
             return None
 
-    def evaluate_pixel_input_validity(self):
+    def update_pixel_input_validity(self):
         """
         Changes the state of the OK Validator depending on whether or not the pixel input is valid. If The No Pixel
         option has been selected then there is nothing to do outside of calling `validate_pixels` again.
         """
-
         if self.singlePixelRadioButton.isChecked():
             self.update_pixel_grid_validity()
         elif self.entireShapeRadioButton.isChecked():

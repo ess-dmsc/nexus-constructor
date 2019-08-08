@@ -288,6 +288,18 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
+def test_UI_GIVEN_user_changes_shape_WHEN_adding_component_THEN_validity_is_reassed(
+    qtbot, template, dialog, mock_pixel_options
+):
+
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
+    mock_pixel_options.update_pixel_input_validity.assert_called_once()
+    mock_pixel_options.reset_mock()
+
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    mock_pixel_options.update_pixel_input_validity.assert_called_once()
+
+
 def test_UI_GIVEN_cylinder_shape_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_generated(
     qtbot, template, dialog, mock_pixel_options
 ):
