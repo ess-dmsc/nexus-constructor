@@ -7,7 +7,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QDialog
 from PySide2.QtWidgets import QRadioButton, QMainWindow
-from mock import patch, mock_open, call, Mock, PropertyMock
+from mock import patch, mock_open, call, Mock
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
@@ -145,8 +145,7 @@ def mock_pixel_options(dialog):
 
     change_mapping_filename(None)
 
-    dialog.pixel_options = PropertyMock(return_value=pixel_options)
-
+    dialog.pixel_options = pixel_options
     return pixel_options
 
 
@@ -166,8 +165,8 @@ def mock_pixel_validator(dialog, mock_pixel_options):
     pixel_validator = Mock(spec=PixelValidator)
     pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
 
-    dialog.ok_validator.pixel_validator = PropertyMock(return_value=pixel_validator)
-    mock_pixel_options.pixel_validator = PropertyMock(return_value=pixel_validator)
+    dialog.ok_validator.pixel_validator = pixel_validator
+    mock_pixel_options.pixel_validator = pixel_validator
     mock_pixel_options.get_validator = Mock(return_value=pixel_validator)
 
     return pixel_validator

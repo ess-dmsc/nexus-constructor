@@ -202,6 +202,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     def populate_pixel_mapping_list_with_cylinder_number(self, cylinder_number: int):
 
+        if self.pixel_mapping_not_visible():
+            return
+
         self.current_mapping_filename = None
         self.reset_pixel_mapping_list()
         self.create_pixel_mapping_list(cylinder_number, "cylinder")

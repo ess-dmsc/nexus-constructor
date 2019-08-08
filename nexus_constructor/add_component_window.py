@@ -399,7 +399,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.create_pixel_mapping_list_for_mesh()
 
         if self.CylinderRadioButton.isChecked():
-            self.create_pixel_mapping_list_for_cylinder()
+            self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
+                self.cylinderCountSpinBox.value()
+            )
 
     def create_pixel_mapping_list_for_mesh(self):
         """
@@ -412,9 +414,3 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             and self.pixel_options.get_current_mapping_filename() != self.cad_file_name
         ):
             self.pixel_options.populate_pixel_mapping_list_with_mesh(self.cad_file_name)
-
-    def create_pixel_mapping_list_for_cylinder(self):
-
-        self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
-            self.cylinderCountSpinBox.value()
-        )
