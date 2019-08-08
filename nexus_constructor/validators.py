@@ -17,15 +17,12 @@ class NullableIntValidator(QIntValidator):
     A validator that accepts integers as well as empty input.
     """
 
-    def __init__(self, bottom=None, top=None):
+    def __init__(self, bottom=None):
 
         super().__init__()
 
         if bottom is not None:
             super().setBottom(bottom)
-
-        if top is not None:
-            super().setTop(top)
 
     def validate(self, input: str, pos: int):
         if input == "":
