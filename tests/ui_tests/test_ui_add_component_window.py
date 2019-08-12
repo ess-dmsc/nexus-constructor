@@ -1,6 +1,7 @@
 import os
 
 import PySide2
+import h5py
 import pytest
 import pytestqt
 from PySide2.QtCore import Qt, QPoint
@@ -994,9 +995,28 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(q
     field.field_name_edit.setText(field_name)
     field.value_line_edit.setText(field_value)
 
-    import h5py
-
     assert field.dtype == h5py.special_dtype(vlen=str)
 
     assert field.name == field_name
     assert field.value[...] == field_value
+
+
+def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(qtbot):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.link.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    field_name = "testfield"
+    field_target = "/somewhere/"
+
+    field.field_name_edit.setText(field_name)
+    field.value_line_edit.setText(field_target)
+
+    assert field.dtype == h5py.SoftLink
+
+    assert field.name == field_name
+    assert field.value.path == h5py.SoftLink(field_target).path
