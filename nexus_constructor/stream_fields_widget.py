@@ -66,7 +66,9 @@ class StreamFieldsWidget(QDialog):
             text="Show/hide advanced options"
         )
 
-        self.f142_advanced_group_box = QGroupBox(title="Advanced options for f142")
+        self.f142_advanced_group_box = QGroupBox(
+            parent=self.show_f142_advanced_options_button
+        )
         self.show_f142_advanced_options_button.clicked.connect(
             self._show_advanced_options
         )
