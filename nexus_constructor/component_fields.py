@@ -67,10 +67,6 @@ class FieldWidget(QFrame):
     def __init__(self, possible_field_names: List[str], parent: QListWidget = None):
         super(FieldWidget, self).__init__(parent)
 
-        self.in_mem_file = h5py.File(
-            name=str(uuid.uuid4()), driver="core", backing_store=False
-        )
-
         self.edit_dialog = QDialog()
         self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
@@ -178,9 +174,9 @@ class FieldWidget(QFrame):
             dtype = DATASET_TYPE[self.value_type_combo.currentText()]
             val = self.value_line_edit.text()
             if dtype == h5py.special_dtype(vlen=str):
-                return self.in_mem_file.create_dataset(
-                    name=self.name, dtype=dtype, data=val
-                )
+                return h5py.File(
+                    name=str(uuid.uuid4()), driver="core", backing_store=False
+                ).create_dataset(name=self.name, dtype=dtype, data=val)
             return dtype(val)
         elif self.field_type == FieldType.array_dataset:
             return self.table_view.model.array
