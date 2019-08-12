@@ -1,11 +1,33 @@
+import pytest
+from mock import patch
+
 from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
     OFFGeometryNexus,
     record_faces_in_file,
 )
 from PySide2.QtGui import QVector3D
+
+from nexus_constructor.pixel_data import PixelMapping
 from .helpers import create_nexus_wrapper, add_component_to_file
 from pytest import approx
+
+
+@pytest.fixture(scope="function")
+def nexus_wrapper():
+    return create_nexus_wrapper()
+
+
+@pytest.fixture(scope="function")
+def nexus_file(nexus_wrapper):
+    return nexus_wrapper.nexus_file
+
+
+@pytest.fixture
+def nx_geometry_group(nexus_wrapper):
+    return nexus_wrapper.create_nx_group(
+        "test_geometry", "NXoff_geometry", nexus_wrapper.entry
+    )
 
 
 def test_GIVEN_nothing_WHEN_constructing_OFFGeometry_THEN_geometry_str_is_OFF():
@@ -202,3 +224,23 @@ def test_can_retrieve_list_of_vertices_for_each_face():
     )
 
     assert nexus_shape.faces == expected_output_vertex_indices_split_by_face
+
+
+def test_GIVEN_pixel_mapping_WHEN_writing_pixel_mapping_to_off_geometry_THEN_mapping_is_recorded_correctly(
+    nexus_wrapper, nx_geometry_group
+):
+    num_detectors = 6
+    ids = [i for i in range(num_detectors)] + [None]
+    pixel_mapping = PixelMapping(ids)
+    expected_dataset = [[id, id] for id in ids if id is not None]
+
+    with patch(
+        "nexus_constructor.geometry.off_geometry.OFFGeometryNexus._verify_in_file"
+    ):
+        OFFGeometryNexus(nexus_wrapper, nx_geometry_group, "m", "path", pixel_mapping)
+
+    actual_dataset = nexus_wrapper.get_field_value(nx_geometry_group, "detector_faces")
+
+    for i in range(num_detectors):
+        for j in range(2):
+            assert actual_dataset[i][j] == expected_dataset[i][j]
