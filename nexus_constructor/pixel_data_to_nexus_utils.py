@@ -1,21 +1,14 @@
-from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 import numpy as np
 
-
-def negative(x):
-    return -x
+from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 
 
-def pixel_mapping(mapping: PixelMapping):
+def detector_faces(mapping: PixelMapping):
     """
-    Returns a list of two-item lists. Each sublist contains a face ID followed by the face's detector ID.
+    Returns a list of tuples. Each sublist contains a face ID followed by the face's detector ID.
     Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
     """
-    return [
-        [face_id, mapping.pixel_ids[face_id]]
-        for face_id in range(len(mapping.pixel_ids))
-        if mapping.pixel_ids[face_id] is not None
-    ]
+    return list(enumerate([id for id in mapping.pixel_ids if id is not None]))
 
 
 def pixel_grid_x_offsets(grid: PixelGrid):

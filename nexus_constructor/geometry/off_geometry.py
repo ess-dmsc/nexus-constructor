@@ -1,20 +1,22 @@
-from typing import List
-from PySide2.QtGui import QVector3D
 from abc import ABC, abstractmethod
-from nexus_constructor.nexus import nexus_wrapper as nx
-import h5py
+from typing import List
 
+import h5py
+import numpy as np
+from PySide2.QtGui import QVector3D
+
+from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.validation import (
     NexusFormatError,
     ValidateDataset,
     validate_group,
 )
-from nexus_constructor.pixel_data import PixelData, PixelGrid, PixelMapping
+from nexus_constructor.pixel_data import PixelMapping
+from nexus_constructor.pixel_data_to_nexus_utils import detector_faces
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
 )
-import numpy as np
 
 
 class OFFGeometry(ABC):
@@ -130,7 +132,7 @@ class OFFGeometryNexus(OFFGeometry):
         self._verify_in_file()
 
         if pixel_mapping is not None:
-            self.detector_faces = pixel_mapping.pixel_ids
+            self.detector_faces = pixel_mapping
 
         if units:
             self.units = units
@@ -160,18 +162,12 @@ class OFFGeometryNexus(OFFGeometry):
         return self.file.get_field_value(self.group, "detector_faces")
 
     @detector_faces.setter
-    def detector_faces(self, pixel_ids: List[int]):
+    def detector_faces(self, mapping: PixelMapping):
         """
         Records the detector faces in the NXoff_geometry.
         :param pixel_data: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
-        detector_faces = []
-
-        for i in range(len(pixel_ids)):
-            if pixel_ids[i] is not None:
-                detector_faces.append(np.array([i, pixel_ids[i]]))
-
-        self.file.set_field_value(self.group, "detector_faces", detector_faces)
+        self.file.set_field_value(self.group, "detector_faces", detector_faces(mapping))
 
     @property
     def winding_order(self) -> List[int]:

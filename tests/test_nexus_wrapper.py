@@ -139,7 +139,7 @@ def test_GIVEN_group_with_nx_class_as_bytes_WHEN_getting_nx_class_THEN_returns_n
     assert get_nx_class(entry) == str(nx_class, encoding="utf-8")
 
 
-def test_GIVEN_complete_list_of_pixel_ids_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_ids_are_recorded():
+def test_GIVEN_list_with_all_ids_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_ids_are_recorded():
 
     file = create_in_memory_file("test_nw10")
     entry = file.create_group("entry")
@@ -158,7 +158,7 @@ def test_GIVEN_complete_list_of_pixel_ids_WHEN_recording_pixel_data_to_nxdetecto
     assert np.array_equal(pixel_id_array, np.array(pixel_id_list))
 
 
-def test_GIVEN_incomplete_list_of_pixel_ids_WHEN_recording_pixel_data_to_nxdetector_THEN_missing_values_are_skipped():
+def test_GIVEN_list_where_some_ids_are_none_WHEN_recording_pixel_data_to_nxdetector_THEN_missing_values_are_skipped():
 
     file = create_in_memory_file("test_nw12")
     entry = file.create_group("entry")
