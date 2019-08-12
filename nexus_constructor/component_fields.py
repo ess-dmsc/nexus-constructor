@@ -167,8 +167,10 @@ class FieldWidget(QFrame):
     def dtype(self):
         if self.field_type == FieldType.scalar_dataset:
             return self.value.dtype
-        if self.field_type == FieldType.array_dataset:
+        elif self.field_type == FieldType.array_dataset:
             return self.table_view.model.array.dtype
+        elif self.field_type == FieldType.link:
+            return h5py.SoftLink
 
     @property
     def value(self):

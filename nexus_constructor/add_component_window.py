@@ -184,8 +184,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
             self.unitsLineEdit.setText(component_shape.units)
 
-        # TODO: fields
-
     def add_field(self):
         item = QListWidgetItem()
         field = FieldWidget(self.possible_fields, self.fieldsListWidget)

@@ -197,7 +197,7 @@ class NexusWrapper(QObject):
         :return: The dataset.
         """
 
-        if isinstance(value, h5py.SoftLink):
+        if dtype == h5py.SoftLink:
             group[name] = value
             return value
 
