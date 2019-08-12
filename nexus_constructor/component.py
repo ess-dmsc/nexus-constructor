@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Union
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
-from nexus_constructor.pixel_data import PixelData, PixelMapping
+from nexus_constructor.pixel_data import PixelMapping
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
