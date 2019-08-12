@@ -23,6 +23,12 @@ class InstrumentView(QWidget):
                    argument in order to appease Qt Designer.
     """
 
+    def __del__(self):
+        """Fixes Qt3D segfault"""
+        self.clear_all_components()
+        del self.root_entity
+        del self.view
+
     def __init__(self, parent):
 
         super().__init__()
