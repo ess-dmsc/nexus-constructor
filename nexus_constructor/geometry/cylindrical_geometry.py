@@ -100,7 +100,9 @@ class CylindricalGeometry:
 
     @detector_number.setter
     def detector_number(self, pixel_mapping: PixelMapping):
-        self.file.set_field_value(self.group, "detector_number", pixel_mapping.pixel_ids)
+        self.file.set_field_value(
+            self.group, "detector_number", pixel_mapping.pixel_ids
+        )
 
     @property
     def units(self) -> str:
