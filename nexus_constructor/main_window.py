@@ -301,7 +301,6 @@ class MainWindow(Ui_MainWindow, QObject):
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
-        self.instrument.nexus.save_file(filename)
         if filename:
             name, ok_pressed = QInputDialog.getText(
                 None,
