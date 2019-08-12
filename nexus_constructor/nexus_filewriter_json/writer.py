@@ -77,11 +77,14 @@ class NexusToDictConverter:
         if type(data) is np.ndarray:
             size = data.shape
             data = data.tolist()
-        if dtype.char == "S":
-            if isinstance(data, list):
-                data = [str_item.decode("utf-8") for str_item in data]
-            else:
-                data = data.decode("utf-8")
+        if dtype.char == "S" or dtype == h5py.special_dtype(vlen=str):
+            try:
+                if isinstance(data, list):
+                    data = [str_item.decode("utf-8") for str_item in data]
+                else:
+                    data = data.decode("utf-8")
+            except AttributeError:  # Already a str (decoded)
+                pass
             dtype = "string"
         elif dtype == np.float64:
             dtype = "double"
