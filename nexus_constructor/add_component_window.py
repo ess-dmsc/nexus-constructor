@@ -17,7 +17,7 @@ from nexus_constructor.geometry import CylindricalGeometry, OFFGeometryNexus
 from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.pixel_data import PixelData
+from nexus_constructor.pixel_data import PixelData, PixelMapping
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.ui_utils import generate_unique_name
@@ -299,7 +299,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.cylinderOptionsBox.setVisible(False)
 
     def generate_geometry_model(
-        self, component: Component, pixel_data: PixelData
+        self, component: Component, pixel_mapping: PixelMapping = None
     ) -> OFFGeometry:
         """
         Generates a geometry model depending on the type of geometry selected and the current values
@@ -316,7 +316,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderHeightLineEdit.value(),
                 self.cylinderRadiusLineEdit.value(),
                 self.unitsLineEdit.text(),
-                pixel_data=pixel_data,
+                pixel_mapping=pixel_mapping,
             )
         elif self.meshRadioButton.isChecked():
             mesh_geometry = OFFGeometryNoNexus()
@@ -333,7 +333,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 geometry_model,
                 units=self.unitsLineEdit.text(),
                 filename=self.fileLineEdit.text(),
-                pixel_data=pixel_data,
+                pixel_data=pixel_mapping,
             )
         else:
             geometry_model = NoShapeGeometry()
@@ -357,6 +357,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         description = self.descriptionPlainTextEdit.text()
 
         pixel_data = self.pixel_options.generate_pixel_data()
+        pixel_data_is_mapping = type(PixelData) is PixelMapping
 
         if self.component_to_edit:
             self.component_to_edit.name = component_name
@@ -365,12 +366,22 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             # remove the previous shape from the qt3d view
             if self.component_to_edit.get_shape() and self.parent():
                 self.parent().sceneWidget.delete_component(self.component_to_edit.name)
-            geometry = self.generate_geometry_model(self.component_to_edit, pixel_data)
+
+            if pixel_data_is_mapping:
+                geometry = self.generate_geometry_model(
+                    self.component_to_edit, pixel_data
+                )
+            else:
+                geometry = self.generate_geometry_model(self.component_to_edit)
         else:
             component = self.instrument.create_component(
                 component_name, nx_class, description, pixel_data
             )
-            geometry = self.generate_geometry_model(component, pixel_data)
+            if pixel_data_is_mapping:
+                geometry = self.generate_geometry_model(component, pixel_data)
+            else:
+                geometry = self.generate_geometry_model(component)
+
             add_fields_to_component(component, self.fieldsListWidget)
             self.component_model.add_component(component)
 

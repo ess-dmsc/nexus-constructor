@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Union
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
-from nexus_constructor.pixel_data import PixelData
+from nexus_constructor.pixel_data import PixelData, PixelMapping
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
@@ -261,7 +261,7 @@ class Component:
         height: float = 1.0,
         radius: float = 1.0,
         units: str = "m",
-        pixel_data: PixelData = None,
+        pixel_mapping: PixelMapping = None,
     ) -> CylindricalGeometry:
         """
         Sets the shape of the component to be a cylinder
@@ -277,7 +277,7 @@ class Component:
         # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
         self.file.set_field_value(shape_group, "cylinders", np.array([0, 1, 2]))
         self.file.set_attribute_value(vertices_field, "units", units)
-        return CylindricalGeometry(self.file, shape_group, pixel_data)
+        return CylindricalGeometry(self.file, shape_group, pixel_mapping)
 
     def set_off_shape(
         self,

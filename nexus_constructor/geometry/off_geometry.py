@@ -122,17 +122,15 @@ class OFFGeometryNexus(OFFGeometry):
         group: h5py.Group,
         units: str = "",
         file_path: str = "",
-        pixel_data: PixelData = None,
+        pixel_mapping: PixelMapping = None,
     ):
         super().__init__()
         self.file = nexus_file
         self.group = group
         self._verify_in_file()
 
-        if type(pixel_data) is PixelMapping:
-            self.detector_faces = pixel_data.pixel_ids
-        if type(pixel_data) is PixelGrid:
-            pass
+        if pixel_mapping is not None:
+            self.detector_faces = pixel_mapping.pixel_ids
 
         if units:
             self.units = units

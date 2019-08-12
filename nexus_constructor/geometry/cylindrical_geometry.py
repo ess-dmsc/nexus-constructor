@@ -59,17 +59,14 @@ class CylindricalGeometry:
         self,
         nexus_file: nx.NexusWrapper,
         group: h5py.Group,
-        pixel_data: PixelData = None,
+        pixel_mapping: PixelMapping = None,
     ):
         self.file = nexus_file
         self.group = group
         self._verify_in_file()
 
-        if pixel_data is not None:
-            if type(pixel_data) is PixelMapping:
-                self.record_detector_number(pixel_data.pixel_ids)
-            if type(pixel_data) is PixelGrid:
-                pass
+        if pixel_mapping is not None:
+            self.record_detector_number(pixel_mapping.pixel_ids)
 
     def _verify_in_file(self):
         """

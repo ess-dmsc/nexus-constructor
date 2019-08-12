@@ -226,7 +226,7 @@ def test_can_retrieve_list_of_vertices_for_each_face():
     assert nexus_shape.faces == expected_output_vertex_indices_split_by_face
 
 
-def test_GIVEN_pixel_mapping_WHEN_writing_pixel_mapping_to_off_geometry_THEN_mapping_is_recorded_correctly(
+def test_GIVEN_pixel_mapping_WHEN_writing_pixel_mapping_to_off_geometry_THEN_mapping_in_nexus_file_matches_mapping_in_pixel_data_object(
     nexus_wrapper, nx_geometry_group
 ):
     num_detectors = 6
