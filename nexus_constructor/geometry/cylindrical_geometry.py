@@ -1,23 +1,24 @@
-from PySide2.QtGui import QVector3D, QMatrix4x4
-
-from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
-from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from math import sin, cos, pi, acos, degrees
+from typing import Tuple, List
+
 import h5py
 import numpy as np
+from PySide2.QtGui import QVector3D, QMatrix4x4
+
+from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
+from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.validation import (
     NexusFormatError,
     ValidateDataset,
     validate_group,
 )
+from nexus_constructor.pixel_data import PixelMapping
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
 )
-from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
-from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
-from typing import Tuple, List
+from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 
 
 def calculate_vertices(
@@ -96,6 +97,10 @@ class CylindricalGeometry:
     @property
     def detector_number(self) -> List[int]:
         return self.file.get_field_value(self.group, "detector_number")
+
+    @detector_number.setter
+    def detector_number(self, pixel_mapping: PixelMapping):
+        self.file.set_field_value(self.group, "detector_number", pixel_mapping.pixel_ids)
 
     @property
     def units(self) -> str:
