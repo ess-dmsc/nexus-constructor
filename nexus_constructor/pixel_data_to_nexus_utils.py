@@ -31,8 +31,8 @@ def pixel_grid_y_offsets(grid: PixelGrid):
     half_distance = grid.row_height / 2
     end = half_distance * (grid.rows - 1)
 
-    offsets = np.linspace(start=-end, stop=end, num=grid.rows)
-    return np.tile(np.flip(offsets), (grid.columns, 1)).transpose()
+    offsets = np.linspace(start=end, stop=-end, num=grid.rows)
+    return np.tile(offsets, (grid.columns, 1)).transpose()
 
 
 def pixel_grid_z_offsets(grid: PixelGrid):

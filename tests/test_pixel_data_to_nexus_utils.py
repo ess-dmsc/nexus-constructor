@@ -6,6 +6,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     detector_faces,
     pixel_grid_x_offsets,
     pixel_grid_y_offsets,
+    pixel_grid_detector_ids,
 )
 
 
@@ -18,7 +19,7 @@ def pixel_grid():
         col_width=2.0 / 3,
         first_id=0,
         count_direction=CountDirection.ROW,
-        initial_count_corner=Corner.TOP_RIGHT,
+        initial_count_corner=Corner.BOTTOM_LEFT,
     )
 
 
@@ -53,3 +54,8 @@ def test_GIVEN_pixel_grid_THEN_correct_y_offset_list_is_created(pixel_grid):
         for j in reversed(range(pixel_grid.rows))
     ]
     assert np.allclose(np.array(expected_y_offsets), pixel_grid_y_offsets(pixel_grid))
+
+
+def test_nothing(pixel_grid):
+
+    print(pixel_grid_detector_ids(pixel_grid))
