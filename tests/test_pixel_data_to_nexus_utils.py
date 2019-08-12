@@ -37,12 +37,9 @@ def test_GIVEN_list_of_ids_THEN_correct_detector_faces_list_is_created():
 
 def test_GIVEN_pixel_grid_THEN_correct_x_offset_list_is_created(pixel_grid):
 
+    offset_offset = (pixel_grid.columns - 1) * pixel_grid.col_width / 2
     expected_x_offsets = [
-        [
-            (i * pixel_grid.col_width)
-            - ((pixel_grid.columns - 1) * pixel_grid.col_width / 2)
-            for i in range(pixel_grid.columns)
-        ]
+        [(i * pixel_grid.col_width) - offset_offset for i in range(pixel_grid.columns)]
         for _ in range(pixel_grid.rows)
     ]
     assert np.allclose(np.array(expected_x_offsets), pixel_grid_x_offsets(pixel_grid))
@@ -50,12 +47,9 @@ def test_GIVEN_pixel_grid_THEN_correct_x_offset_list_is_created(pixel_grid):
 
 def test_GIVEN_pixel_grid_THEN_correct_y_offset_list_is_created(pixel_grid):
 
+    offset_offset = (pixel_grid.rows - 1) * pixel_grid.row_height / 2
     expected_y_offsets = [
-        [
-            (j * pixel_grid.row_height)
-            - ((pixel_grid.rows - 1) * pixel_grid.row_height / 2)
-            for _ in range(pixel_grid.columns)
-        ]
+        [(j * pixel_grid.row_height) - offset_offset for _ in range(pixel_grid.columns)]
         for j in reversed(range(pixel_grid.rows))
     ]
     assert np.allclose(np.array(expected_y_offsets), pixel_grid_y_offsets(pixel_grid))
