@@ -23,17 +23,10 @@ def pixel_grid_x_offsets(grid: PixelGrid):
     Returns a list of 'row' lists of 'column' length.
     Each entry in the sublists are x positions of pixel instances in the given PixelGrid
     """
-    if grid.columns % 2 == 0:
-        distance = grid.col_width / 2
-        second = [i * distance for i in range(1, (grid.columns // 2) + 1)]
-        first = list(map(negative, reversed(second)))
-        offsets = np.array(first + second)
-        print(offsets)
-    else:
-        mid_point = grid.columns // 2
-        end = grid.col_width * mid_point
-        offsets = np.linspace(start=-end, stop=end, num=grid.columns)
+    half_distance = grid.col_width / 2
+    end = half_distance * (grid.columns - 1)
 
+    offsets = np.linspace(start=-end, stop=end, num=grid.columns)
     return np.tile(offsets, (grid.rows, 1))
 
 
@@ -42,16 +35,10 @@ def pixel_grid_y_offsets(grid: PixelGrid):
     Returns a list of 'row' lists of 'column' length.
     Each entry in the sublists are y positions of pixel instances in the given PixelGrid
     """
-    if grid.rows % 2 == 0:
-        distance = grid.row_height / 2
-        second = [i * distance for i in range(1, (grid.rows // 2) + 1)]
-        first = list(map(negative, reversed(second)))
-        offsets = np.array(first + second)
-    else:
-        mid_point = grid.rows // 2
-        end = grid.row_height * mid_point
-        offsets = np.linspace(start=-end, stop=end, num=grid.rows)
+    half_distance = grid.row_height / 2
+    end = half_distance * (grid.rows - 1)
 
+    offsets = np.linspace(start=-end, stop=end, num=grid.rows)
     return np.tile(np.flip(offsets), (grid.columns, 1)).transpose()
 
 

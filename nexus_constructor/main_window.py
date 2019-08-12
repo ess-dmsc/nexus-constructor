@@ -3,7 +3,7 @@ import os
 import h5py
 import silx.gui.hdf5
 from PySide2.QtCore import QObject
-from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView, QInputDialog
+from PySide2.QtWidgets import QInputDialog
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton

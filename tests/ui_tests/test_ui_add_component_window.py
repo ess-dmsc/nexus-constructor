@@ -318,7 +318,7 @@ def test_UI_GIVEN_cylinder_shape_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapp
 @pytest.mark.xfail(
     reason="For the time being the number of cylinders is now frozen at one."
 )
-def test_UI_GIVEN_increasing_cylinder_count_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_generated(
+def test_UI_GIVEN_increasing_cylinder_count_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_regenerated(
     qtbot, template, dialog, mock_pixel_options
 ):
 
