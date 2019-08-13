@@ -186,7 +186,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def add_field(self):
         item = QListWidgetItem()
-        field = FieldWidget(self.possible_fields, self.fieldsListWidget)
+        field = FieldWidget(
+            self.possible_fields, self.fieldsListWidget, self.instrument
+        )
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
         item.setSizeHint(field.sizeHint())
