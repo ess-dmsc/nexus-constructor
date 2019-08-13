@@ -130,17 +130,17 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.topic_label, 1, 0)
         self.layout().addWidget(self.topic_line_edit, 1, 1)
 
-        self.layout().addWidget(self.type_label, 2, 0)
-        self.layout().addWidget(self.type_combo, 2, 1)
+        self.layout().addWidget(self.source_label, 2, 0)
+        self.layout().addWidget(self.source_line_edit, 2, 1)
 
-        self.layout().addWidget(self.scalar_radio, 3, 0)
-        self.layout().addWidget(self.array_radio, 3, 1)
+        self.layout().addWidget(self.type_label, 3, 0)
+        self.layout().addWidget(self.type_combo, 3, 1)
 
-        self.layout().addWidget(self.array_size_label, 4, 0)
-        self.layout().addWidget(self.array_size_spinbox, 4, 1)
+        self.layout().addWidget(self.scalar_radio, 4, 0)
+        self.layout().addWidget(self.array_radio, 4, 1)
 
-        self.layout().addWidget(self.source_label, 5, 0)
-        self.layout().addWidget(self.source_line_edit, 5, 1)
+        self.layout().addWidget(self.array_size_label, 5, 0)
+        self.layout().addWidget(self.array_size_spinbox, 5, 1)
 
         self.layout().addWidget(self.hs00_unimplemented_label, 6, 0, 1, 2)
 
