@@ -26,6 +26,8 @@ EXPECTED_DETECTOR_IDS = {
     },
 }
 
+ROW_COL_VALS = [1, 4, 7]
+
 
 @pytest.fixture(scope="function")
 def pixel_grid():
@@ -38,9 +40,6 @@ def pixel_grid():
         count_direction=CountDirection.ROW,
         initial_count_corner=Corner.BOTTOM_LEFT,
     )
-
-
-ROW_COL_VALS = [1, 4, 7]
 
 
 @pytest.fixture(scope="function")
