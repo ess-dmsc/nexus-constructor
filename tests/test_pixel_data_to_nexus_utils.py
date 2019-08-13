@@ -13,16 +13,16 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
 
 EXPECTED_DETECTOR_IDS = {
     CountDirection.ROW: {
-        Corner.TOP_LEFT: [[0, 1], [2, 3]],
-        Corner.TOP_RIGHT: [[1, 0], [3, 2]],
-        Corner.BOTTOM_LEFT: [[2, 3], [0, 1]],
-        Corner.BOTTOM_RIGHT: [[3, 2], [1, 0]],
+        Corner.TOP_LEFT: [[0, 1, 2], [3, 4, 5]],
+        Corner.TOP_RIGHT: [[2, 1, 0], [5, 4, 3]],
+        Corner.BOTTOM_LEFT: [[3, 4, 5], [0, 1, 2]],
+        Corner.BOTTOM_RIGHT: [[5, 4, 3], [2, 1, 0]],
     },
     CountDirection.COLUMN: {
-        Corner.TOP_LEFT: [[0, 2], [1, 3]],
-        Corner.TOP_RIGHT: [[2, 0], [3, 1]],
-        Corner.BOTTOM_LEFT: [[1, 3], [0, 2]],
-        Corner.BOTTOM_RIGHT: [[3, 1], [2, 0]],
+        Corner.TOP_LEFT: [[0, 2, 4], [1, 3, 5]],
+        Corner.TOP_RIGHT: [[4, 2, 0], [5, 3, 1]],
+        Corner.BOTTOM_LEFT: [[1, 3, 5], [0, 2, 4]],
+        Corner.BOTTOM_RIGHT: [[5, 3, 1], [4, 2, 0]],
     },
 }
 
@@ -110,7 +110,8 @@ def test_GIVEN_direction_and_initial_count_corner_WHEN_calling_pixel_grid_detect
     pixel_grid, direction, corner
 ):
 
-    pixel_grid.rows = pixel_grid.columns = 2
+    pixel_grid.rows = 2
+    pixel_grid.columns = 3
     pixel_grid.count_direction = direction
     pixel_grid.initial_count_corner = corner
     pixel_grid.first_id = 2
