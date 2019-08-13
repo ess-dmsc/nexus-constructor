@@ -12,7 +12,10 @@ def detector_faces(mapping: PixelMapping):
 
 
 def detector_number(mapping: PixelMapping):
-
+    """
+    Returns a list of pixel IDs. Used for writing information to the detector_number field in NXdetector and
+    NXcylindrical_geometry.
+    """
     return [id for id in mapping.pixel_ids if id is not None]
 
 
