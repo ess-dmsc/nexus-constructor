@@ -2,7 +2,6 @@ import uuid
 from functools import partial
 
 import h5py
-from PySide2.QtGui import QValidator
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
