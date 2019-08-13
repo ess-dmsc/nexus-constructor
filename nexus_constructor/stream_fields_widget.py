@@ -200,6 +200,7 @@ class StreamFieldsWidget(QDialog):
             name=str(uuid.uuid4()), driver="core", backing_store=False
         )
         group = temp_file.create_group("children")
+        group.attrs["NX_class"] = "NCstream"
         group.create_dataset(name="type", dtype=string_dtype, data="stream")
         stream_group = group.create_group(self.parent().parent().name)
         stream_group.create_dataset(
