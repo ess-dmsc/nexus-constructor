@@ -1,12 +1,28 @@
+from mock import patch
+from numpy import array_equal, array
 from pytest import approx, raises
 import pytest
 from PySide2.QtGui import QVector3D
+
+from nexus_constructor.pixel_data import PixelMapping
 from .helpers import create_nexus_wrapper, add_component_to_file
 from nexus_constructor.geometry.cylindrical_geometry import (
     calculate_vertices,
     CylindricalGeometry,
 )
 from nexus_constructor.ui_utils import numpy_array_to_qvector3d
+
+
+@pytest.fixture(scope="function")
+def nexus_wrapper():
+    return create_nexus_wrapper()
+
+
+@pytest.fixture
+def nx_cylindrical_geometry(nexus_wrapper):
+    return nexus_wrapper.create_nx_group(
+        "test_geometry", "NXcylindrical_geometry", nexus_wrapper.entry
+    )
 
 
 def test_cylinder_has_property_values_it_was_created_with():
@@ -131,3 +147,23 @@ def test_calculate_vertices_gives_vertices_consistent_with_specified_height_and_
 
     assert output_axis.length() == approx(height)
     assert output_radius.length() == approx(radius)
+
+
+def test_GIVEN_pixel_ids_WHEN_initialising_cylindrical_geometry_THEN_ids_in_geometry_match_ids_in_mapping(
+    nexus_wrapper, nx_cylindrical_geometry
+):
+
+    num_detectors = 6
+    expected_dataset = [i for i in range(num_detectors)]
+    pixel_mapping = PixelMapping(expected_dataset)
+
+    with patch(
+        "nexus_constructor.geometry.cylindrical_geometry.CylindricalGeometry._verify_in_file"
+    ):
+        cylindrical_geometry = CylindricalGeometry(
+            nexus_wrapper, nx_cylindrical_geometry, pixel_mapping
+        )
+
+    actual_dataset = cylindrical_geometry.detector_number
+
+    assert array_equal(array(expected_dataset), actual_dataset)

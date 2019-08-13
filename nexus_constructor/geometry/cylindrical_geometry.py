@@ -67,7 +67,7 @@ class CylindricalGeometry:
         self._verify_in_file()
 
         if pixel_mapping is not None:
-            self.record_detector_number(pixel_mapping.pixel_ids)
+            self.detector_number = pixel_mapping.pixel_ids
 
     def _verify_in_file(self):
         """
@@ -86,23 +86,13 @@ class CylindricalGeometry:
         if problems:
             raise NexusFormatError("\n".join(problems))
 
-    def record_detector_number(self, detector_ids: List[int]):
-        self.file.set_field_value(
-            self.group,
-            "detector_number",
-            np.array([i for i in detector_ids if i is not None]),
-            dtype="int64",
-        )
-
     @property
     def detector_number(self) -> List[int]:
         return self.file.get_field_value(self.group, "detector_number")
 
     @detector_number.setter
-    def detector_number(self, pixel_mapping: PixelMapping):
-        self.file.set_field_value(
-            self.group, "detector_number", pixel_mapping.pixel_ids
-        )
+    def detector_number(self, pixel_ids: List[int]):
+        self.file.set_field_value(self.group, "detector_number", pixel_ids)
 
     @property
     def units(self) -> str:

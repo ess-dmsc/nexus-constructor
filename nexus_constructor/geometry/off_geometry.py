@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Tuple
 
 import h5py
 import numpy as np
@@ -132,7 +132,7 @@ class OFFGeometryNexus(OFFGeometry):
         self._verify_in_file()
 
         if pixel_mapping is not None:
-            self.detector_faces = pixel_mapping
+            self.detector_faces = detector_faces(pixel_mapping)
 
         if units:
             self.units = units
@@ -162,12 +162,12 @@ class OFFGeometryNexus(OFFGeometry):
         return self.file.get_field_value(self.group, "detector_faces")
 
     @detector_faces.setter
-    def detector_faces(self, mapping: PixelMapping):
+    def detector_faces(self, detector_faces: List[Tuple[int, int]]):
         """
         Records the detector faces in the NXoff_geometry.
         :param pixel_data: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
-        self.file.set_field_value(self.group, "detector_faces", detector_faces(mapping))
+        self.file.set_field_value(self.group, "detector_faces", detector_faces)
 
     @property
     def winding_order(self) -> List[int]:

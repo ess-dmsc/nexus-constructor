@@ -1,5 +1,6 @@
 import pytest
 from mock import patch
+from numpy import array_equal, array
 
 from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
@@ -16,11 +17,6 @@ from pytest import approx
 @pytest.fixture(scope="function")
 def nexus_wrapper():
     return create_nexus_wrapper()
-
-
-@pytest.fixture(scope="function")
-def nexus_file(nexus_wrapper):
-    return nexus_wrapper.nexus_file
 
 
 @pytest.fixture
@@ -230,17 +226,18 @@ def test_GIVEN_pixel_mapping_WHEN_writing_pixel_mapping_to_off_geometry_THEN_map
     nexus_wrapper, nx_geometry_group
 ):
     num_detectors = 6
-    ids = [i for i in range(num_detectors)] + [None]
+    ids = [i for i in range(num_detectors)]
     pixel_mapping = PixelMapping(ids)
-    expected_dataset = [[id, id] for id in ids if id is not None]
+    expected_dataset = [(id, id) for id in ids]
 
+    # Patch the validation method so that it doesn't mind information being absent fron the NeXus group
     with patch(
         "nexus_constructor.geometry.off_geometry.OFFGeometryNexus._verify_in_file"
     ):
-        OFFGeometryNexus(nexus_wrapper, nx_geometry_group, "m", "path", pixel_mapping)
+        off_geometry = OFFGeometryNexus(
+            nexus_wrapper, nx_geometry_group, "m", "path", pixel_mapping
+        )
 
-    actual_dataset = nexus_wrapper.get_field_value(nx_geometry_group, "detector_faces")
+    actual_dataset = off_geometry.detector_faces
 
-    for i in range(num_detectors):
-        for j in range(2):
-            assert actual_dataset[i][j] == expected_dataset[i][j]
+    assert array_equal(array(expected_dataset), actual_dataset)
