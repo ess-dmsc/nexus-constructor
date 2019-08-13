@@ -57,13 +57,14 @@ def pixel_grid_detector_ids(grid: PixelGrid):
     Each entry in the sublists are detector id's of pixel instances in the given PixelGrid
     """
 
-    ids = (
-        np.arange(grid.rows * grid.columns).reshape(grid.rows, grid.columns)
-        + grid.first_id
-    )
+    ids = np.arange(grid.rows * grid.columns)
 
     if grid.count_direction == CountDirection.COLUMN:
-        ids = ids.transpose()
+        ids = ids.reshape((grid.rows, grid.columns), order="F")
+    else:
+        ids = ids.reshape(grid.rows, grid.columns)
+
+    ids += grid.first_id
 
     if grid.initial_count_corner == Corner.TOP_LEFT:
         return ids
