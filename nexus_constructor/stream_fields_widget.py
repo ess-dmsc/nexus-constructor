@@ -124,6 +124,9 @@ class StreamFieldsWidget(QDialog):
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
         self.schema_combo.addItems(SCHEMAS)
 
+        self.ok_button = QPushButton("OK")
+        self.ok_button.clicked.connect(self.parent().close)
+
         self.layout().addWidget(self.schema_label, 0, 0)
         self.layout().addWidget(self.schema_combo, 0, 1)
 
@@ -147,6 +150,8 @@ class StreamFieldsWidget(QDialog):
         # Spans both rows
         self.layout().addWidget(self.show_f142_advanced_options_button, 7, 0, 1, 2)
         self.layout().addWidget(self.f142_advanced_group_box, 8, 0, 1, 2)
+
+        self.layout().addWidget(self.ok_button, 9, 0, 1, 2)
 
         self._schema_type_changed(self.schema_combo.currentText())
 
