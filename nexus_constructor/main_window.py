@@ -1,14 +1,12 @@
-from PySide2.QtCore import QObject
 from PySide2.QtWidgets import (
     QAction,
     QToolBar,
     QAbstractItemView,
     QInputDialog,
-    QWidget,
     QMainWindow,
     QApplication,
 )
-from PySide2.QtGui import QIcon, QCloseEvent
+from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 
 import silx.gui.hdf5

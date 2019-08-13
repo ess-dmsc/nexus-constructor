@@ -4,7 +4,7 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QRectF
-from PySide2.QtGui import QVector3D, QColor, QCloseEvent
+from PySide2.QtGui import QVector3D, QColor
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 
 from nexus_constructor.gnomon import Gnomon
