@@ -24,7 +24,9 @@ class InstrumentView(QWidget):
     """
 
     def delete(self):
-        """Fixes Qt3D segfault"""
+        """
+        Fixes Qt3D segfault - this needs to be called when the program closes otherwise Qt tries to draw objects as python is cleaning them up.
+        """
         self.clear_all_components()
         del self.root_entity
         del self.view
