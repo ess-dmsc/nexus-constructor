@@ -5,7 +5,7 @@ from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, Pixe
 
 def detector_faces(mapping: PixelMapping):
     """
-    Returns a list of tuples. Each sublist contains a face ID followed by the face's detector ID.
+    Returns a list of tuples. Each tuple contains a face ID followed by the face's detector ID.
     Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
     """
     return list(enumerate([id for id in mapping.pixel_ids if id is not None]))
