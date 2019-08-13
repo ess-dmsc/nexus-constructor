@@ -14,6 +14,7 @@ from nexus_constructor.nexus.validation import (
     validate_group,
 )
 from nexus_constructor.pixel_data import PixelMapping
+from nexus_constructor.pixel_data_to_nexus_utils import detector_number
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
@@ -67,7 +68,7 @@ class CylindricalGeometry:
         self._verify_in_file()
 
         if pixel_mapping is not None:
-            self.detector_number = pixel_mapping.pixel_ids
+            self.detector_number = detector_number(pixel_mapping)
 
     def _verify_in_file(self):
         """

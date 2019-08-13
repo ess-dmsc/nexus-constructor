@@ -139,7 +139,7 @@ def test_GIVEN_group_with_nx_class_as_bytes_WHEN_getting_nx_class_THEN_returns_n
     assert get_nx_class(entry) == str(nx_class, encoding="utf-8")
 
 
-def test_GIVEN_list_with_all_ids_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_ids_are_recorded():
+def test_GIVEN_pixel_mapping_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_ids_in_nexus_file_match_pixel_ids_in_mapping_object():
 
     file = create_in_memory_file("test_nw10")
     entry = file.create_group("entry")
@@ -156,23 +156,3 @@ def test_GIVEN_list_with_all_ids_WHEN_recording_pixel_data_to_nxdetector_THEN_pi
     pixel_id_array = np.array(pixel_ids)
 
     assert np.array_equal(pixel_id_array, np.array(pixel_id_list))
-
-
-def test_GIVEN_list_where_some_ids_are_none_WHEN_recording_pixel_data_to_nxdetector_THEN_missing_values_are_skipped():
-
-    file = create_in_memory_file("test_nw12")
-    entry = file.create_group("entry")
-    nx_class = "NXdetector"
-    entry.attrs["NX_class"] = nx_class
-
-    pixel_id_list = [i for i in range(5)]
-    pixel_id_list[0] = None
-    pixel_data = PixelMapping(pixel_id_list)
-
-    nexus_wrapper = NexusWrapper("text_nw13")
-    nexus_wrapper.record_pixel_data(entry, nx_class, pixel_data)
-
-    nexus_pixel_ids = entry.get("detector_number")
-    pixel_id_array = np.array([i for i in pixel_id_list if i is not None])
-
-    assert np.array_equal(pixel_id_array, nexus_pixel_ids)

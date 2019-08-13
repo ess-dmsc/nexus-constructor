@@ -1,17 +1,16 @@
 import pytest
+from PySide2.QtGui import QVector3D
 from mock import patch
 from numpy import array_equal, array
+from pytest import approx
 
 from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
     OFFGeometryNexus,
     record_faces_in_file,
 )
-from PySide2.QtGui import QVector3D
-
 from nexus_constructor.pixel_data import PixelMapping
 from .helpers import create_nexus_wrapper, add_component_to_file
-from pytest import approx
 
 
 @pytest.fixture(scope="function")
@@ -222,7 +221,7 @@ def test_can_retrieve_list_of_vertices_for_each_face():
     assert nexus_shape.faces == expected_output_vertex_indices_split_by_face
 
 
-def test_GIVEN_pixel_mapping_WHEN_writing_pixel_mapping_to_off_geometry_THEN_mapping_in_nexus_file_matches_mapping_in_pixel_data_object(
+def test_GIVEN_pixel_mapping_WHEN_initialising_off_geometry_THEN_mapping_in_nexus_file_matches_mapping_in_pixel_data_object(
     nexus_wrapper, nx_geometry_group
 ):
     num_detectors = 6
@@ -230,7 +229,7 @@ def test_GIVEN_pixel_mapping_WHEN_writing_pixel_mapping_to_off_geometry_THEN_map
     pixel_mapping = PixelMapping(ids)
     expected_dataset = [(id, id) for id in ids]
 
-    # Patch the validation method so that it doesn't mind information being absent fron the NeXus group
+    # Patch the validation method so that it doesn't mind information being absent from the NeXus group
     with patch(
         "nexus_constructor.geometry.off_geometry.OFFGeometryNexus._verify_in_file"
     ):

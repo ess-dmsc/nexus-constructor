@@ -1,16 +1,16 @@
+import pytest
+from PySide2.QtGui import QVector3D
 from mock import patch
 from numpy import array_equal, array
 from pytest import approx, raises
-import pytest
-from PySide2.QtGui import QVector3D
 
-from nexus_constructor.pixel_data import PixelMapping
-from .helpers import create_nexus_wrapper, add_component_to_file
 from nexus_constructor.geometry.cylindrical_geometry import (
     calculate_vertices,
     CylindricalGeometry,
 )
+from nexus_constructor.pixel_data import PixelMapping
 from nexus_constructor.ui_utils import numpy_array_to_qvector3d
+from .helpers import create_nexus_wrapper, add_component_to_file
 
 
 @pytest.fixture(scope="function")
@@ -157,6 +157,7 @@ def test_GIVEN_pixel_ids_WHEN_initialising_cylindrical_geometry_THEN_ids_in_geom
     expected_dataset = [i for i in range(num_detectors)]
     pixel_mapping = PixelMapping(expected_dataset)
 
+    # Patch the validation method so that it doesn't mind information being absent from the NeXus group
     with patch(
         "nexus_constructor.geometry.cylindrical_geometry.CylindricalGeometry._verify_in_file"
     ):

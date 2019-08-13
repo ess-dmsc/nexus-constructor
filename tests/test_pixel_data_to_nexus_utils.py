@@ -8,6 +8,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     pixel_grid_y_offsets,
     pixel_grid_detector_ids,
     pixel_grid_z_offsets,
+    detector_number,
 )
 
 
@@ -24,20 +25,36 @@ def pixel_grid():
     )
 
 
-def test_GIVEN_list_of_ids_THEN_correct_detector_faces_list_is_created():
-
+@pytest.fixture(scope="function")
+def pixel_mapping():
     ids_with_some_that_are_none = [i if i % 3 != 0 else None for i in range(10)]
-    mapping = PixelMapping(ids_with_some_that_are_none)
+    return PixelMapping(ids_with_some_that_are_none)
 
-    ids_with_none_removed = [id for id in ids_with_some_that_are_none if id is not None]
+
+def test_GIVEN_list_of_ids_WHEN_calling_detector_faces_THEN_correct_detector_faces_list_is_returned(
+    pixel_mapping
+):
+
+    ids_with_none_removed = [id for id in pixel_mapping.pixel_ids if id is not None]
     expected_faces = [
         (i, ids_with_none_removed[i]) for i in range(len(ids_with_none_removed))
     ]
 
-    assert detector_faces(mapping) == expected_faces
+    assert detector_faces(pixel_mapping) == expected_faces
 
 
-def test_GIVEN_pixel_grid_THEN_correct_x_offset_list_is_created(pixel_grid):
+def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_number_list_is_returned(
+    pixel_mapping
+):
+
+    expected_numbers = [id for id in pixel_mapping.pixel_ids if id is not None]
+
+    assert detector_number(pixel_mapping) == expected_numbers
+
+
+def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_x_offsets_THEN_correct_x_offset_list_is_returned(
+    pixel_grid
+):
 
     offset_offset = (pixel_grid.columns - 1) * pixel_grid.col_width / 2
     expected_x_offsets = [
@@ -47,7 +64,9 @@ def test_GIVEN_pixel_grid_THEN_correct_x_offset_list_is_created(pixel_grid):
     assert np.allclose(np.array(expected_x_offsets), pixel_grid_x_offsets(pixel_grid))
 
 
-def test_GIVEN_pixel_grid_THEN_correct_y_offset_list_is_created(pixel_grid):
+def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_y_offsets_THEN_correct_y_offset_list_is_returned(
+    pixel_grid
+):
 
     offset_offset = (pixel_grid.rows - 1) * pixel_grid.row_height / 2
     expected_y_offsets = [
@@ -57,7 +76,9 @@ def test_GIVEN_pixel_grid_THEN_correct_y_offset_list_is_created(pixel_grid):
     assert np.allclose(np.array(expected_y_offsets), pixel_grid_y_offsets(pixel_grid))
 
 
-def test_GIVEN_pixel_grid_THEN_z_offsets_are_all_zero(pixel_grid):
+def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_z_offsets_THEN_z_offsets_are_all_zero(
+    pixel_grid
+):
 
     z_offsets = pixel_grid_z_offsets(pixel_grid)
 
@@ -70,4 +91,15 @@ def test_GIVEN_pixel_grid_THEN_z_offsets_are_all_zero(pixel_grid):
 
 def test_nothing(pixel_grid):
 
-    print(pixel_grid_detector_ids(pixel_grid))
+    for direction in CountDirection:
+        for corner in Corner:
+            print(direction, corner)
+            pixel_grid.count_direction = direction
+            pixel_grid.initial_count_corner = corner
+
+            detector_ids = pixel_grid_detector_ids(pixel_grid)
+
+            for row in detector_ids:
+                print(row)
+
+            print("")

@@ -11,6 +11,11 @@ def detector_faces(mapping: PixelMapping):
     return list(enumerate([id for id in mapping.pixel_ids if id is not None]))
 
 
+def detector_number(mapping: PixelMapping):
+
+    return [id for id in mapping.pixel_ids if id is not None]
+
+
 def pixel_grid_x_offsets(grid: PixelGrid):
     """
     Returns a list of 'row' lists of 'column' length.
