@@ -1,4 +1,4 @@
-from typing import Any, TypeVar, Optional, List
+from typing import Any, TypeVar, Optional
 
 import h5py
 import numpy as np
@@ -10,6 +10,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     pixel_grid_y_offsets,
     pixel_grid_z_offsets,
     pixel_grid_detector_ids,
+    detector_number,
 )
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
@@ -149,17 +150,16 @@ class NexusWrapper(QObject):
         del self.nexus_file[node.name]
         self._emit_file()
 
-    def record_detector_number(self, component_group: h5py.Group, ids: List[int]):
+    def record_detector_number(
+        self, component_group: h5py.Group, mapping: PixelMapping
+    ):
         """
         Stores the pixel IDs in the `detector_number` field of the NeXus file. If a pixel ID is absent then this is
         recorded as an ID of -1 in the `detector_number` array.
         :param ids: A list of the pixel IDs.
         """
         self.set_field_value(
-            component_group,
-            "detector_number",
-            np.array([id for id in ids if id is not None]),
-            dtype="int64",
+            component_group, "detector_number", detector_number(mapping), dtype="int64"
         )
 
     def record_pixel_grid(self, component_group: h5py.Group, pixel_grid: PixelGrid):
@@ -204,7 +204,7 @@ class NexusWrapper(QObject):
         """
         if nx_class == "NXdetector":
             if type(pixel_data) is PixelMapping:
-                self.record_detector_number(component_group, pixel_data.pixel_ids)
+                self.record_detector_number(component_group, pixel_data)
             if type(pixel_data) is PixelGrid:
                 self.record_pixel_grid(component_group, pixel_data)
         if nx_class == "NXdetector_module":
