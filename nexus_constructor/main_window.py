@@ -2,8 +2,11 @@ import os
 
 import h5py
 import silx.gui.hdf5
-from PySide2.QtCore import QObject
-from PySide2.QtWidgets import QInputDialog
+from PySide2.QtWidgets import (
+    QInputDialog,
+    QMainWindow,
+    QApplication,
+)
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QAction, QToolBar, QAbstractItemView
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
@@ -25,7 +28,7 @@ NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
-class MainWindow(Ui_MainWindow, QObject):
+class MainWindow(Ui_MainWindow, QMainWindow):
     def __init__(self, instrument: Instrument):
         super().__init__()
         self.instrument = instrument
@@ -38,6 +41,9 @@ class MainWindow(Ui_MainWindow, QObject):
         self.actionExport_to_Filewriter_JSON.triggered.connect(
             self.save_to_filewriter_json
         )
+
+        # Clear the 3d view when closed
+        QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
 
         self.widget = silx.gui.hdf5.Hdf5TreeView()
         self.widget.setAcceptDrops(True)
