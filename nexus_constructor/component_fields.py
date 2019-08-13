@@ -242,7 +242,9 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
     for i in range(fields_widget.count()):
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
-            component.set_field(widget.name, widget.value, widget.dtype)
+            component.set_field(
+                name=widget.name, value=widget.value, dtype=widget.dtype
+            )
         except ValueError:
             dialog = QMessageBox(
                 icon=QMessageBox.Warning,
