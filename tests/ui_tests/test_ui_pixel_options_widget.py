@@ -34,7 +34,9 @@ def pixel_options(qtbot, template):
 
 
 def manually_create_pixel_mapping_list(
-    pixel_options: PixelOptions, file_contents: str = VALID_CUBE_OFF_FILE
+    pixel_options: PixelOptions,
+    file_contents: str = VALID_CUBE_OFF_FILE,
+    filename: str = "filename.off",
 ):
     """
     Manually creates a pixel mapping list by passing a mesh filename and opening a mesh by mocking open.
@@ -44,7 +46,7 @@ def manually_create_pixel_mapping_list(
         "nexus_constructor.geometry.geometry_loader.open",
         mock_open(read_data=file_contents),
     ):
-        pixel_options.populate_pixel_mapping_list_with_mesh("filename.off")
+        pixel_options.populate_pixel_mapping_list_with_mesh(filename)
 
 
 def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_single_pixel_is_selected_and_visible_by_default(
@@ -397,3 +399,89 @@ def test_UI_GIVEN_user_switches_to_pixel_mapping_THEN_pixel_mapping_signal_is_em
     pixel_options.pixel_mapping_button_pressed.connect(check_that_signal_is_emitted)
     systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
     assert emitted
+
+
+def test_GIVEN_mesh_file_WHEN_generating_mapping_list_THEN_filename_returned_by_pixel_options_matches_filename_of_mesh(
+    qtbot, template, pixel_options
+):
+
+    filename = "a/mesh/file.off"
+
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    manually_create_pixel_mapping_list(pixel_options, filename=filename)
+
+    assert pixel_options.get_current_mapping_filename() == filename
+
+
+def test_GIVEN_user_opens_two_different_files_THEN_filename_stored_by_pixel_options_changes(
+    qtbot, template, pixel_options
+):
+
+    first_filename = "a/mesh/file.off"
+    second_filename = "a/different/mesh/file.off"
+
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    manually_create_pixel_mapping_list(pixel_options, filename=first_filename)
+    manually_create_pixel_mapping_list(pixel_options, filename=second_filename)
+
+    assert pixel_options.get_current_mapping_filename() == second_filename
+
+
+def test_GIVEN_user_switches_from_mesh_to_cylinder_THEN_pixel_mapping_filename_is_changed_to_none(
+    qtbot, template, pixel_options
+):
+
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    manually_create_pixel_mapping_list(pixel_options)
+
+    pixel_options.populate_pixel_mapping_list_with_cylinder_number(12)
+
+    assert pixel_options.get_current_mapping_filename() is None
+
+
+def test_GIVEN_entire_shape_button_is_not_selected_THEN_pixel_mapping_method_returns_without_populating_list(
+    qtbot, template, pixel_options
+):
+
+    manually_create_pixel_mapping_list(pixel_options)
+    assert pixel_options.pixelMappingListWidget.count() == 0
+
+    pixel_options.populate_pixel_mapping_list_with_cylinder_number(4)
+    assert pixel_options.pixelMappingListWidget.count() == 0
+
+
+def test_GIVEN_mapping_list_provided_by_user_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_mapping_with_list_that_matches_user_input(
+    qtbot, template, pixel_options
+):
+
+    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    num_faces = 6
+    expected_id_list = [i if i % 2 != 0 else None for i in range(num_faces)]
+    manually_create_pixel_mapping_list(pixel_options)
+
+    for i in range(num_faces):
+        qtbot.keyClicks(
+            pixel_options.pixel_mapping_widgets[i].pixelIDLineEdit,
+            str(expected_id_list[i]),
+        )
+
+    assert pixel_options.generate_pixel_data().pixel_ids == expected_id_list
+
+
+def test_GIVEN_row_or_column_count_of_zero_WHEN_creating_pixel_grid_THEN_pixel_grid_generated_by_widget_has_none_for_value_of_matching_size_field(
+    qtbot, template, pixel_options
+):
+    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
+    assert pixel_options.generate_pixel_data().row_height == 0
+
+    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Up)
+    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
+    assert pixel_options.generate_pixel_data().col_width == 0
+
+
+def test_GIVEN_no_pixels_button_is_pressed_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_none(
+    qtbot, template, pixel_options
+):
+
+    systematic_button_press(qtbot, template, pixel_options.noPixelsButton)
+    assert pixel_options.generate_pixel_data() is None

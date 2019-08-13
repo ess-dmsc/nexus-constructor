@@ -24,7 +24,6 @@ from tests.ui_tests.ui_test_utils import (
     show_and_close_window,
     RED_LINE_EDIT_STYLE_SHEET,
     WHITE_LINE_EDIT_STYLE_SHEET,
-    show_window_and_wait_for_interaction,
     VALID_CUBE_OFF_FILE,
     VALID_OCTA_OFF_FILE,
 )
@@ -178,8 +177,6 @@ def test_UI_GIVEN_nothing_WHEN_changing_component_shape_type_THEN_add_component_
     systematic_button_press(
         qtbot, template, get_shape_type_button(dialog, shape_button_name)
     )
-
-    show_window_and_wait_for_interaction(qtbot, template)
 
     assert not dialog.buttonBox.isEnabled()
 
@@ -526,8 +523,6 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_shape_THEN_add_com
 
     # Mimic the user entering a non-unique name in the text field
     enter_component_name(qtbot, template, dialog, NONUNIQUE_COMPONENT_NAME)
-
-    show_window_and_wait_for_interaction(qtbot, template)
 
     # The Add Component button is disabled
     assert not dialog.buttonBox.isEnabled()

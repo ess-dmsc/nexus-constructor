@@ -113,8 +113,9 @@ def test_GIVEN_direction_and_initial_count_corner_WHEN_calling_pixel_grid_detect
     pixel_grid.rows = pixel_grid.columns = 2
     pixel_grid.count_direction = direction
     pixel_grid.initial_count_corner = corner
+    pixel_grid.first_id = 2
 
     assert np.array_equal(
-        np.array(EXPECTED_DETECTOR_IDS[direction][corner]),
+        np.array(EXPECTED_DETECTOR_IDS[direction][corner]) + pixel_grid.first_id,
         pixel_grid_detector_ids(pixel_grid),
     )
