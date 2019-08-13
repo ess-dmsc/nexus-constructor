@@ -40,6 +40,9 @@ def pixel_grid():
     )
 
 
+ROW_COL_VALS = [1, 4, 7]
+
+
 @pytest.fixture(scope="function")
 def pixel_mapping():
     ids_with_some_that_are_none = [i if i % 3 != 0 else None for i in range(10)]
@@ -67,33 +70,47 @@ def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_nu
     assert detector_number(pixel_mapping) == expected_numbers
 
 
+@pytest.mark.parametrize("rows", ROW_COL_VALS)
+@pytest.mark.parametrize("columns", ROW_COL_VALS)
 def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_x_offsets_THEN_correct_x_offset_list_is_returned(
-    pixel_grid
+    pixel_grid, rows, columns
 ):
+    pixel_grid.columns = columns
+    pixel_grid.rows = rows
 
     offset_offset = (pixel_grid.columns - 1) * pixel_grid.col_width / 2
     expected_x_offsets = [
         [(i * pixel_grid.col_width) - offset_offset for i in range(pixel_grid.columns)]
         for _ in range(pixel_grid.rows)
     ]
+
     assert np.allclose(np.array(expected_x_offsets), pixel_grid_x_offsets(pixel_grid))
 
 
+@pytest.mark.parametrize("rows", ROW_COL_VALS)
+@pytest.mark.parametrize("columns", ROW_COL_VALS)
 def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_y_offsets_THEN_correct_y_offset_list_is_returned(
-    pixel_grid
+    pixel_grid, rows, columns
 ):
+    pixel_grid.columns = columns
+    pixel_grid.rows = rows
 
     offset_offset = (pixel_grid.rows - 1) * pixel_grid.row_height / 2
     expected_y_offsets = [
         [(j * pixel_grid.row_height) - offset_offset for _ in range(pixel_grid.columns)]
         for j in reversed(range(pixel_grid.rows))
     ]
+
     assert np.allclose(np.array(expected_y_offsets), pixel_grid_y_offsets(pixel_grid))
 
 
+@pytest.mark.parametrize("rows", ROW_COL_VALS)
+@pytest.mark.parametrize("columns", ROW_COL_VALS)
 def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_z_offsets_THEN_z_offsets_are_all_zero(
-    pixel_grid
+    pixel_grid, rows, columns
 ):
+    pixel_grid.rows = rows
+    pixel_grid.columns = columns
 
     z_offsets = pixel_grid_z_offsets(pixel_grid)
 
