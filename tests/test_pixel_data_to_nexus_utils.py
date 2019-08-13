@@ -11,6 +11,21 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     detector_number,
 )
 
+EXPECTED_DETECTOR_IDS = {
+    CountDirection.ROW: {
+        Corner.TOP_LEFT: [[0, 1], [2, 3]],
+        Corner.TOP_RIGHT: [[1, 0], [3, 2]],
+        Corner.BOTTOM_LEFT: [[2, 3], [0, 1]],
+        Corner.BOTTOM_RIGHT: [[3, 2], [1, 0]],
+    },
+    CountDirection.COLUMN: {
+        Corner.TOP_LEFT: [[0, 2], [1, 3]],
+        Corner.TOP_RIGHT: [[2, 0], [3, 1]],
+        Corner.BOTTOM_LEFT: [[1, 3], [0, 2]],
+        Corner.BOTTOM_RIGHT: [[3, 1], [2, 0]],
+    },
+}
+
 
 @pytest.fixture(scope="function")
 def pixel_grid():
@@ -89,17 +104,17 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_z_offsets_THEN_z_offsets_are_a
         assert actual_row == expected_row
 
 
-def test_nothing(pixel_grid):
+@pytest.mark.parametrize("direction", CountDirection)
+@pytest.mark.parametrize("corner", Corner)
+def test_GIVEN_direction_and_initial_count_corner_WHEN_calling_pixel_grid_detector_ids_THEN_correct_grid_is_returned(
+    pixel_grid, direction, corner
+):
 
-    for direction in CountDirection:
-        for corner in Corner:
-            print(direction, corner)
-            pixel_grid.count_direction = direction
-            pixel_grid.initial_count_corner = corner
+    pixel_grid.rows = pixel_grid.columns = 2
+    pixel_grid.count_direction = direction
+    pixel_grid.initial_count_corner = corner
 
-            detector_ids = pixel_grid_detector_ids(pixel_grid)
-
-            for row in detector_ids:
-                print(row)
-
-            print("")
+    assert np.array_equal(
+        np.array(EXPECTED_DETECTOR_IDS[direction][corner]),
+        pixel_grid_detector_ids(pixel_grid),
+    )

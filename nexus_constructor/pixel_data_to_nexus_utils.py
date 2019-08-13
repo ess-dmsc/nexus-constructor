@@ -57,22 +57,21 @@ def pixel_grid_detector_ids(grid: PixelGrid):
     Each entry in the sublists are detector id's of pixel instances in the given PixelGrid
     """
 
-    ids = [[0] * grid.columns for _ in range(grid.rows)]
+    ids = (
+        np.arange(grid.rows * grid.columns).reshape(grid.rows, grid.columns)
+        + grid.first_id
+    )
 
-    for id_offset in range(grid.rows * grid.columns):
-        # Determine a coordinate for the id based on the count direction from (0,0)
-        if grid.count_direction == CountDirection.ROW:
-            col = id_offset % grid.columns
-            row = id_offset // grid.columns
-        else:
-            col = id_offset // grid.rows
-            row = id_offset % grid.rows
-        # Invert axes needed if starting in a different corner
-        if grid.initial_count_corner in (Corner.TOP_LEFT, Corner.TOP_RIGHT):
-            row = grid.rows - (1 + row)
-        if grid.initial_count_corner in (Corner.TOP_RIGHT, Corner.BOTTOM_RIGHT):
-            col = grid.columns - (1 + col)
-        # Set the id at the calculated coordinate
-        ids[row][col] = grid.first_id + id_offset
+    if grid.count_direction == CountDirection.COLUMN:
+        ids = ids.transpose()
 
-    return ids
+    if grid.initial_count_corner == Corner.TOP_LEFT:
+        return ids
+
+    if grid.initial_count_corner == Corner.TOP_RIGHT:
+        return np.fliplr(ids)
+
+    if grid.initial_count_corner == Corner.BOTTOM_LEFT:
+        return np.flipud(ids)
+
+    return np.rot90(ids, 2)
