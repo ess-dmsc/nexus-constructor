@@ -134,6 +134,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
         self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
+        self.componentTypeComboBox.currentIndexChanged.connect(
+            self.change_pixel_options_visibility
+        )
 
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
         self.on_nx_class_changed()
@@ -173,13 +176,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
         self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
-        self.meshRadioButton.clicked.connect(self.change_pixel_options_visibility)
-        self.CylinderRadioButton.clicked.connect(self.change_pixel_options_visibility)
-        self.noShapeRadioButton.clicked.connect(self.change_pixel_options_visibility)
-        self.componentTypeComboBox.currentIndexChanged.connect(
-            self.change_pixel_options_visibility
-        )
-
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
@@ -195,15 +191,18 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.populate_pixel_mapping_if_necessary
         )
 
-        self.meshRadioButton.clicked.connect(self.clear_previous_mapping_list)
-        self.meshRadioButton.clicked.connect(self.populate_pixel_mapping_if_necessary)
-        self.CylinderRadioButton.clicked.connect(self.clear_previous_mapping_list)
-        self.CylinderRadioButton.clicked.connect(
-            self.populate_pixel_mapping_if_necessary
-        )
+        self.meshRadioButton.clicked.connect(self.set_pixel_related_changes)
+        self.CylinderRadioButton.clicked.connect(self.set_pixel_related_changes)
+        self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
 
-        self.meshRadioButton.clicked.connect(self.update_pixel_input_validity)
-        self.CylinderRadioButton.clicked.connect(self.update_pixel_input_validity)
+    def set_pixel_related_changes(self):
+
+        self.change_pixel_options_visibility()
+
+        if not self.noShapeRadioButton.isChecked():
+            self.clear_previous_mapping_list()
+            self.populate_pixel_mapping_if_necessary()
+            self.update_pixel_input_validity()
 
     def clear_previous_mapping_list(self):
         self.pixel_options.reset_pixel_mapping_list()
