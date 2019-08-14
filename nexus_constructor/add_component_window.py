@@ -369,7 +369,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         description = self.descriptionPlainTextEdit.text()
 
         # Check if the Pixel Data is the Pixel Mapping type. If is a mapping then it must be stored in both the
-        # component type and the geometry field. If it is a PixelGrid then this is only stored in the component.
+        # overall component as well as the component's geometry field. If it is a PixelGrid then this is only stored in
+        # the component.
         pixel_data = self.pixel_options.generate_pixel_data()
         pixel_data_is_mapping = type(PixelData) is PixelMapping
 
@@ -392,6 +393,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         pixel_data: PixelData,
         pixel_data_is_mapping: bool,
     ):
+        """
+        Creates a new component.
+        :param component_name: The name of the component.
+        :param description: The component description.
+        :param nx_class: The component class.
+        :param pixel_data: The PixelData for the component. Will be None if it was not given of if the component type
+            doesn't have pixel-related fields.
+        :param pixel_data_is_mapping: Whether or not the PixelData is a mapping.
+        """
         component = self.instrument.create_component(
             component_name, nx_class, description
         )
@@ -414,6 +424,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         pixel_data: PixelData,
         pixel_data_is_mapping: bool,
     ):
+        """
+        Edits an existing component.
+        :param component_name: The component name.
+        :param description: The component description.
+        :param nx_class: The component class.
+        :param pixel_data: The component PixelData. Can be None.
+        :param pixel_data_is_mapping: Whether or not the PixelData is a mapping.
+        :return:
+        """
         self.component_to_edit.name = component_name
         self.component_to_edit.nx_class = nx_class
         self.component_to_edit.description = description
