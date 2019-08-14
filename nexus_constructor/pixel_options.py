@@ -202,7 +202,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.reset_pixel_mapping_list()
 
         # Use the faces information from the geometry file to add fields to the pixel mapping list
-        self.create_pixel_mapping_list(n_faces, "faces")
+        self.create_pixel_mapping_list(n_faces, "face")
 
         # Record the filename of the current mapping to prevent the widgets from being created twice
         self.current_mapping_filename = filename

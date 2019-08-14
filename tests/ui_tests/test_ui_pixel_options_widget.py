@@ -385,7 +385,7 @@ def test_UI_GIVEN_cylinder_number_changes_THEN_pixel_mapping_list_changes(
     assert pixel_options.pixelMappingListWidget.count() == second_cylinder_number
 
 
-def test_UI_GIVEN_user_switches_to_pixel_mapping_THEN_pixel_mapping_signal_is_emitted(
+def test_UI_GIVEN_user_switches_to_pixel_mapping_WHEN_creating_component_THEN_pixel_mapping_signal_is_emitted(
     qtbot, template, pixel_options
 ):
 
@@ -401,7 +401,7 @@ def test_UI_GIVEN_user_switches_to_pixel_mapping_THEN_pixel_mapping_signal_is_em
     assert emitted
 
 
-def test_GIVEN_mesh_file_WHEN_generating_mapping_list_THEN_filename_returned_by_pixel_options_matches_filename_of_mesh(
+def test_UI_GIVEN_mesh_file_WHEN_generating_mapping_list_THEN_filename_returned_by_pixel_options_matches_filename_of_mesh(
     qtbot, template, pixel_options
 ):
 
@@ -413,7 +413,7 @@ def test_GIVEN_mesh_file_WHEN_generating_mapping_list_THEN_filename_returned_by_
     assert pixel_options.get_current_mapping_filename() == filename
 
 
-def test_GIVEN_user_opens_two_different_files_THEN_filename_stored_by_pixel_options_changes(
+def test_UI_GIVEN_user_opens_two_different_files_WHEN_creating_off_geometry_THEN_filename_stored_by_pixel_options_changes(
     qtbot, template, pixel_options
 ):
 
@@ -427,7 +427,7 @@ def test_GIVEN_user_opens_two_different_files_THEN_filename_stored_by_pixel_opti
     assert pixel_options.get_current_mapping_filename() == second_filename
 
 
-def test_GIVEN_user_switches_from_mesh_to_cylinder_THEN_pixel_mapping_filename_is_changed_to_none(
+def test_UI_GIVEN_user_switches_from_mesh_to_cylinder_WHEN_creating_cylindrical_geometry_THEN_pixel_mapping_filename_is_changed_to_none(
     qtbot, template, pixel_options
 ):
 
@@ -439,7 +439,7 @@ def test_GIVEN_user_switches_from_mesh_to_cylinder_THEN_pixel_mapping_filename_i
     assert pixel_options.get_current_mapping_filename() is None
 
 
-def test_GIVEN_entire_shape_button_is_not_selected_THEN_pixel_mapping_method_returns_without_populating_list(
+def test_UI_GIVEN_entire_shape_button_is_not_selected_WHEN_calling_pixel_mapping_method_THEN_pixel_mapping_method_returns_without_populating_list(
     qtbot, template, pixel_options
 ):
 
@@ -450,7 +450,7 @@ def test_GIVEN_entire_shape_button_is_not_selected_THEN_pixel_mapping_method_ret
     assert pixel_options.pixelMappingListWidget.count() == 0
 
 
-def test_GIVEN_mapping_list_provided_by_user_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_mapping_with_list_that_matches_user_input(
+def test_UI_GIVEN_mapping_list_provided_by_user_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_mapping_with_list_that_matches_user_input(
     qtbot, template, pixel_options
 ):
 
@@ -468,7 +468,7 @@ def test_GIVEN_mapping_list_provided_by_user_WHEN_entering_pixel_data_THEN_calli
     assert pixel_options.generate_pixel_data().pixel_ids == expected_id_list
 
 
-def test_GIVEN_row_or_column_count_of_zero_WHEN_creating_pixel_grid_THEN_pixel_grid_generated_by_widget_has_none_for_value_of_matching_size_field(
+def test_UI_GIVEN_row_or_column_count_of_zero_WHEN_creating_pixel_grid_THEN_pixel_grid_generated_by_widget_has_zero_for_value_of_matching_size_field(
     qtbot, template, pixel_options
 ):
     qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
@@ -479,7 +479,7 @@ def test_GIVEN_row_or_column_count_of_zero_WHEN_creating_pixel_grid_THEN_pixel_g
     assert pixel_options.generate_pixel_data().col_width == 0
 
 
-def test_GIVEN_no_pixels_button_is_pressed_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_none(
+def test_UI_GIVEN_no_pixels_button_is_pressed_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_none(
     qtbot, template, pixel_options
 ):
 
