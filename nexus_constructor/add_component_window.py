@@ -1,26 +1,22 @@
-import os
 from enum import Enum
-from functools import partial
 
-from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtGui import QVector3D
+from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
-from nexus_constructor.component import Component
+from nexus_constructor.geometry import (
+    OFFGeometry,
+    OFFGeometryNoNexus,
+    NoShapeGeometry,
+    CylindricalGeometry,
+    OFFGeometryNexus,
+)
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
-from nexus_constructor.component_tree_model import ComponentTreeModel
+from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
 )
-from nexus_constructor.geometry import CylindricalGeometry, OFFGeometryNexus
-from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus, NoShapeGeometry
-from nexus_constructor.geometry.geometry_loader import load_geometry
-from nexus_constructor.instrument import Instrument
-from nexus_constructor.pixel_data import PixelData, PixelMapping
-from nexus_constructor.pixel_options import PixelOptions
-from nexus_constructor.ui_utils import file_dialog, validate_line_edit
-from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.validators import (
     UnitValidator,
     NameValidator,
@@ -28,7 +24,17 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     OkValidator,
 )
-from ui.add_component import Ui_AddComponentDialog
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.ui_utils import file_dialog, validate_line_edit
+from nexus_constructor.component_tree_model import ComponentTreeModel
+import os
+from functools import partial
+from nexus_constructor.ui_utils import generate_unique_name
+from nexus_constructor.component import Component
+from nexus_constructor.geometry.geometry_loader import load_geometry
+
+from nexus_constructor.pixel_data import PixelData, PixelMapping
+from nexus_constructor.pixel_options import PixelOptions
 
 
 class GeometryType(Enum):
@@ -48,25 +54,18 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         parent=None,
     ):
         super(AddComponentDialog, self).__init__()
-
         if parent:
             self.setParent(parent)
-
         self.instrument = instrument
         self.component_model = component_model
-
         self.geometry_model = None
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
-
         self.cad_file_name = None
-
         self.possible_fields = []
         self.component_to_edit = component_to_edit
-
         self.valid_file_given = False
-
         self.pixel_options = None
 
     def setupUi(self, parent_dialog):
