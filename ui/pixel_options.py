@@ -3,12 +3,12 @@
 # Form implementation generated from reading ui file 'ui/pixel_options.ui',
 # licensing of 'ui/pixel_options.ui' applies.
 #
-# Created: Fri Aug  2 15:39:41 2019
+# Created: Wed Aug 14 09:30:56 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 class Ui_PixelOptionsWidget(object):
     def setupUi(self, PixelOptionsWidget):
@@ -111,13 +111,15 @@ class Ui_PixelOptionsWidget(object):
         self.firstIDSpinBox.setObjectName("firstIDSpinBox")
         self.gridLayout_5.addWidget(self.firstIDSpinBox, 2, 1, 1, 1)
         self.rowHeightSpinBox = QtWidgets.QDoubleSpinBox(self.pixelGridBox)
-        self.rowHeightSpinBox.setMinimum(0.5)
-        self.rowHeightSpinBox.setSingleStep(0.5)
+        self.rowHeightSpinBox.setMinimum(0.1)
+        self.rowHeightSpinBox.setSingleStep(0.1)
+        self.rowHeightSpinBox.setProperty("value", 0.5)
         self.rowHeightSpinBox.setObjectName("rowHeightSpinBox")
         self.gridLayout_5.addWidget(self.rowHeightSpinBox, 0, 3, 1, 1)
         self.columnWidthSpinBox = QtWidgets.QDoubleSpinBox(self.pixelGridBox)
-        self.columnWidthSpinBox.setMinimum(0.5)
-        self.columnWidthSpinBox.setSingleStep(0.5)
+        self.columnWidthSpinBox.setMinimum(0.1)
+        self.columnWidthSpinBox.setSingleStep(0.1)
+        self.columnWidthSpinBox.setProperty("value", 0.5)
         self.columnWidthSpinBox.setObjectName("columnWidthSpinBox")
         self.gridLayout_5.addWidget(self.columnWidthSpinBox, 1, 3, 1, 1)
         self.verticalLayout.addWidget(self.pixelGridBox)
@@ -145,9 +147,12 @@ class Ui_PixelOptionsWidget(object):
         PixelOptionsWidget.setWindowTitle(QtWidgets.QApplication.translate("PixelOptionsWidget", "Form", None, -1))
         self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("PixelOptionsWidget", "Pixel options", None, -1))
         self.pixelLayoutBox.setTitle(QtWidgets.QApplication.translate("PixelOptionsWidget", "Pixel layout:", None, -1))
-        self.singlePixelRadioButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Sin&gle Pixel", None, -1))
-        self.entireShapeRadioButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "En&tire Shape", None, -1))
-        self.noPixelsButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "No Pi&xels", None, -1))
+        self.singlePixelRadioButton.setToolTip(QtWidgets.QApplication.translate("PixelOptionsWidget", "The defined cylinder or mesh shape describes each identical pixel in the detector", None, -1))
+        self.singlePixelRadioButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Repeated Single Pixel Shape", None, -1))
+        self.entireShapeRadioButton.setToolTip(QtWidgets.QApplication.translate("PixelOptionsWidget", "The defined cylinder or mesh shape describes the shape of the entire detector", None, -1))
+        self.entireShapeRadioButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Entire Shape", None, -1))
+        self.noPixelsButton.setToolTip(QtWidgets.QApplication.translate("PixelOptionsWidget", "The defined cylinder or mesh shape does not define the shape of the detector pixels", None, -1))
+        self.noPixelsButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "No Pixels", None, -1))
         self.pixelGridBox.setTitle(QtWidgets.QApplication.translate("PixelOptionsWidget", "Pixel grid:", None, -1))
         self.rowLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Row:", None, -1))
         self.rowHeightLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Row height:", None, -1))

@@ -58,8 +58,11 @@
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <widget class="QRadioButton" name="singlePixelRadioButton">
+           <property name="toolTip">
+            <string>The defined cylinder or mesh shape describes each identical pixel in the detector</string>
+           </property>
            <property name="text">
-            <string>Sin&amp;gle Pixel</string>
+            <string>Repeated Single Pixel Shape</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -68,15 +71,21 @@
          </item>
          <item>
           <widget class="QRadioButton" name="entireShapeRadioButton">
+           <property name="toolTip">
+            <string>The defined cylinder or mesh shape describes the shape of the entire detector</string>
+           </property>
            <property name="text">
-            <string>En&amp;tire Shape</string>
+            <string>Entire Shape</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QRadioButton" name="noPixelsButton">
+           <property name="toolTip">
+            <string>The defined cylinder or mesh shape does not define the shape of the detector pixels</string>
+           </property>
            <property name="text">
-            <string>No Pi&amp;xels</string>
+            <string>No Pixels</string>
            </property>
           </widget>
          </item>
@@ -230,9 +239,12 @@
              <item row="0" column="3">
               <widget class="QDoubleSpinBox" name="rowHeightSpinBox">
                <property name="minimum">
-                <double>0.500000000000000</double>
+                <double>0.100000000000000</double>
                </property>
                <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
                 <double>0.500000000000000</double>
                </property>
               </widget>
@@ -240,9 +252,12 @@
              <item row="1" column="3">
               <widget class="QDoubleSpinBox" name="columnWidthSpinBox">
                <property name="minimum">
-                <double>0.500000000000000</double>
+                <double>0.100000000000000</double>
                </property>
                <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
                 <double>0.500000000000000</double>
                </property>
               </widget>
