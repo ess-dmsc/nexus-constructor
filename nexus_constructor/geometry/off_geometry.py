@@ -1,11 +1,9 @@
-from abc import ABC, abstractmethod
 from typing import List, Tuple
-
-import h5py
-import numpy as np
 from PySide2.QtGui import QVector3D
-
+from abc import ABC, abstractmethod
 from nexus_constructor.nexus import nexus_wrapper as nx
+import h5py
+
 from nexus_constructor.nexus.validation import (
     NexusFormatError,
     ValidateDataset,
@@ -17,6 +15,7 @@ from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
 )
+import numpy as np
 
 
 class OFFGeometry(ABC):

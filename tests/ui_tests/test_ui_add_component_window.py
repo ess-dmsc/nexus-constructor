@@ -5,9 +5,8 @@ import pytest
 import pytestqt
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QDialog
-from PySide2.QtWidgets import QRadioButton, QMainWindow
-from mock import patch, mock_open, call, Mock
+from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
+from mock import Mock, call, patch, mock_open
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type

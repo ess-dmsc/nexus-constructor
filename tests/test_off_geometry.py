@@ -1,16 +1,17 @@
 import pytest
-from PySide2.QtGui import QVector3D
 from mock import patch
 from numpy import array_equal, array
-from pytest import approx
 
 from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
     OFFGeometryNexus,
     record_faces_in_file,
 )
+from PySide2.QtGui import QVector3D
+
 from nexus_constructor.pixel_data import PixelMapping
 from .helpers import create_nexus_wrapper, add_component_to_file
+from pytest import approx
 
 
 @pytest.fixture(scope="function")

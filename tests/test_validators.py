@@ -2,11 +2,7 @@
 from io import StringIO
 from typing import List
 
-import attr
-import numpy as np
 import pytest
-from PySide2.QtGui import QValidator
-from mock import Mock
 
 from nexus_constructor.validators import (
     NameValidator,
@@ -19,6 +15,10 @@ from nexus_constructor.validators import (
     NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
 )
+import attr
+from PySide2.QtGui import QValidator
+from mock import Mock
+import numpy as np
 
 
 @attr.s
