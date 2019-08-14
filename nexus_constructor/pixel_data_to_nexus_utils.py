@@ -21,8 +21,8 @@ def detector_number(mapping: PixelMapping):
 
 def pixel_grid_x_offsets(grid: PixelGrid):
     """
-    Returns a list of 'row' lists of 'column' length.
-    Each entry in the sublists are x positions of pixel instances in the given PixelGrid
+    Returns an array of x-offsets. Each value in the array is the x position of a pixel instance defined in the
+    PixelGrid.
     """
     half_distance = grid.col_width / 2
     end = half_distance * (grid.columns - 1)
@@ -33,8 +33,8 @@ def pixel_grid_x_offsets(grid: PixelGrid):
 
 def pixel_grid_y_offsets(grid: PixelGrid):
     """
-    Returns a list of 'row' lists of 'column' length.
-    Each entry in the sublists are y positions of pixel instances in the given PixelGrid
+    Returns an array of y-offsets. Each value in the array is the y position of a pixel instance defined in the
+    PixelGrid.
     """
     half_distance = grid.row_height / 2
     end = half_distance * (grid.rows - 1)
@@ -46,25 +46,23 @@ def pixel_grid_y_offsets(grid: PixelGrid):
 def pixel_grid_z_offsets(grid: PixelGrid):
     """
     Returns a list of 'row' lists of 'column' length.
-    Each entry in the sublists are z positions of pixel instances in the given PixelGrid
+    Each entry in the sublists are z positions of pixel instances in the given PixelGrid.
     """
     return [[0] * grid.columns] * grid.rows
 
 
 def pixel_grid_detector_ids(grid: PixelGrid):
     """
-    Returns a list of 'row' lists of 'column' length.
-    Each entry in the sublists are detector id's of pixel instances in the given PixelGrid
+    Returns an array of detector IDs. Starts with a 1D array of numbers and reorders them depending on the count
+    direction and initial count corner supplied by the user.
     """
 
-    ids = np.arange(grid.rows * grid.columns)
+    ids = np.arange(grid.rows * grid.columns) + grid.first_id
 
     if grid.count_direction == CountDirection.COLUMN:
         ids = ids.reshape((grid.rows, grid.columns), order="F")
     else:
         ids = ids.reshape(grid.rows, grid.columns)
-
-    ids += grid.first_id
 
     if grid.initial_count_corner == Corner.TOP_LEFT:
         return ids
