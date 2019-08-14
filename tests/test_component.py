@@ -1,14 +1,38 @@
-from nexus_constructor.component import DependencyError
+from nexus_constructor.component import DependencyError, Component
 from cmath import isclose
 from PySide2.QtGui import QVector3D
 import pytest
 from pytest import approx
+import numpy as np
+
+from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    pixel_grid_x_offsets,
+    pixel_grid_y_offsets,
+    pixel_grid_z_offsets,
+    pixel_grid_detector_ids,
+)
 from .helpers import create_nexus_wrapper, add_component_to_file
 from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
     OFFGeometryNoNexus,
 )
+
+
+@pytest.fixture(scope="function")
+def nexus_wrapper():
+    return create_nexus_wrapper()
+
+
+@pytest.fixture(scope="function")
+def component_group(nexus_wrapper):
+    return nexus_wrapper.nexus_file.create_group("ComponentName")
+
+
+@pytest.fixture(scope="function")
+def component(nexus_wrapper, component_group):
+    return Component(nexus_wrapper, component_group)
 
 
 def test_can_create_and_read_from_field_in_component():
@@ -340,3 +364,44 @@ def test_can_override_existing_shape():
     component.set_off_shape(input_mesh)
     output_mesh = component.get_shape()
     assert isinstance(output_mesh, OFFGeometryNexus), "Expect shape to now be a mesh"
+
+
+def test_GIVEN_pixel_grid_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_data_in_nexus_file_matches_pixel_data_in_pixel_grid_object(
+    component
+):
+    pixel_grid = PixelGrid(
+        rows=5,
+        columns=6,
+        row_height=0.7,
+        col_width=0.5,
+        first_id=0,
+        count_direction=CountDirection.COLUMN,
+        initial_count_corner=Corner.BOTTOM_RIGHT,
+    )
+
+    component.record_pixel_grid(pixel_grid)
+
+    assert np.array_equal(
+        component.get_field("x_pixel_offset"), pixel_grid_x_offsets(pixel_grid)
+    )
+    assert np.array_equal(
+        component.get_field("y_pixel_offset"), pixel_grid_y_offsets(pixel_grid)
+    )
+    assert np.array_equal(
+        component.get_field("z_pixel_offset"), pixel_grid_z_offsets(pixel_grid)
+    )
+    assert np.array_equal(
+        component.get_field("detector_number"), pixel_grid_detector_ids(pixel_grid)
+    )
+
+
+def test_GIVEN_pixel_mapping_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_ids_in_nexus_file_match_pixel_ids_in_mapping_object(
+    component
+):
+    pixel_id_list = [i for i in range(5)]
+    pixel_mapping = PixelMapping(pixel_id_list)
+    component.record_detector_number(pixel_mapping)
+
+    assert np.array_equal(
+        component.get_field("detector_number"), np.array(pixel_id_list)
+    )

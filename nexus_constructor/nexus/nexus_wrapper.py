@@ -1,17 +1,7 @@
-from typing import Any, TypeVar, Optional
-
 import h5py
-import numpy as np
 from PySide2.QtCore import Signal, QObject
-
-from nexus_constructor.pixel_data import PixelMapping, PixelData, PixelGrid
-from nexus_constructor.pixel_data_to_nexus_utils import (
-    pixel_grid_x_offsets,
-    pixel_grid_y_offsets,
-    pixel_grid_z_offsets,
-    pixel_grid_detector_ids,
-    detector_number,
-)
+from typing import Any, TypeVar, Optional
+import numpy as np
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
@@ -149,66 +139,6 @@ class NexusWrapper(QObject):
     def delete_node(self, node: h5Node):
         del self.nexus_file[node.name]
         self._emit_file()
-
-    def record_detector_number(
-        self, component_group: h5py.Group, mapping: PixelMapping
-    ):
-        """
-        Stores the pixel IDs in the `detector_number` field of the NeXus file. If a pixel ID is absent then this is
-        recorded as an ID of -1 in the `detector_number` array.
-        :param ids: A list of the pixel IDs.
-        """
-        self.set_field_value(
-            component_group, "detector_number", detector_number(mapping), dtype="int64"
-        )
-
-    def record_pixel_grid(self, component_group: h5py.Group, pixel_grid: PixelGrid):
-        """
-        Records the pixel grid data to the NeXus file.
-        :param component_group: The NeXus component group.
-        :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
-        """
-        self.set_field_value(
-            component_group,
-            "x_pixel_offset",
-            pixel_grid_x_offsets(pixel_grid),
-            "float64",
-        )
-        self.set_field_value(
-            component_group,
-            "y_pixel_offset",
-            pixel_grid_y_offsets(pixel_grid),
-            "float64",
-        )
-        self.set_field_value(
-            component_group,
-            "z_pixel_offset",
-            pixel_grid_z_offsets(pixel_grid),
-            "float64",
-        )
-        self.set_field_value(
-            component_group,
-            "detector_number",
-            pixel_grid_detector_ids(pixel_grid),
-            "int64",
-        )
-
-    def record_pixel_data(
-        self, component_group: h5py.Group, nx_class: str, pixel_data: PixelData
-    ):
-        """
-        Records the pixel data to the NeXus file.
-        :param component_group: The NeXus component group.
-        :param nx_class: The NeXus class of the component.
-        :param pixel_data: The PixelData object. This may be a PixelMapping or a PixelGrid.
-        """
-        if nx_class == "NXdetector":
-            if type(pixel_data) is PixelMapping:
-                self.record_detector_number(component_group, pixel_data)
-            if type(pixel_data) is PixelGrid:
-                self.record_pixel_grid(component_group, pixel_data)
-        if nx_class == "NXdetector_module":
-            pass
 
     def create_nx_group(
         self, name: str, nx_class: str, parent: h5py.Group

@@ -196,15 +196,24 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
 
     def set_pixel_related_changes(self):
-
+        """
+        Manages the pixel-related changes that are induced by changing the shape type. This entails changing the
+        visibility of the pixel options widget, clearing the previous pixel mapping widget list (if necessary),
+        generating a new pixel mapping widget list (if necessary), and reassessing the validity of the pixel input.
+        """
         self.change_pixel_options_visibility()
 
         if not self.noShapeRadioButton.isChecked():
             self.clear_previous_mapping_list()
             self.populate_pixel_mapping_if_necessary()
-            self.update_pixel_input_validity()
+
+        self.update_pixel_input_validity()
 
     def clear_previous_mapping_list(self):
+        """
+        Wipes the previous list of pixel mapping widgets. Required if the file has changed, or if the shape type has
+        changed.
+        """
         self.pixel_options.reset_pixel_mapping_list()
 
     def _fill_existing_entries(self):
@@ -350,40 +359,72 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
     def on_ok(self):
+        """
+        Retrieves information from the interface in order to create a component. Sends relevant information to a NeXus
+        file, adds the component to the component list, and draws any new shapes in the InstrumentView. By this point
+        the input should already be valid as the validators control whether or not the Add Component button is enabled.
+        """
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
 
+        # Check if the Pixel Data is the Pixel Mapping type. If is a mapping then it must be stored in both the
+        # component type and the geometry field. If it is a PixelGrid then this is only stored in the component.
         pixel_data = self.pixel_options.generate_pixel_data()
         pixel_data_is_mapping = type(PixelData) is PixelMapping
 
         if self.component_to_edit:
-            self.component_to_edit.name = component_name
-            self.component_to_edit.nx_class = nx_class
-            self.component_to_edit.description = description
-            # remove the previous shape from the qt3d view
-            if self.component_to_edit.get_shape() and self.parent():
-                self.parent().sceneWidget.delete_component(self.component_to_edit.name)
-
-            if pixel_data_is_mapping:
-                geometry = self.generate_geometry_model(
-                    self.component_to_edit, pixel_data
-                )
-            else:
-                geometry = self.generate_geometry_model(self.component_to_edit)
-        else:
-            component = self.instrument.create_component(
-                component_name, nx_class, description, pixel_data
+            geometry = self.edit_existing_component(
+                component_name, description, nx_class, pixel_data, pixel_data_is_mapping
             )
-            if pixel_data_is_mapping:
-                geometry = self.generate_geometry_model(component, pixel_data)
-            else:
-                geometry = self.generate_geometry_model(component)
-
-            add_fields_to_component(component, self.fieldsListWidget)
-            self.component_model.add_component(component)
+        else:
+            geometry = self.create_new_component(
+                component_name, description, nx_class, pixel_data, pixel_data_is_mapping
+            )
 
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
+
+    def create_new_component(
+        self,
+        component_name: str,
+        description: str,
+        nx_class: str,
+        pixel_data: PixelData,
+        pixel_data_is_mapping: bool,
+    ):
+        component = self.instrument.create_component(
+            component_name, nx_class, description
+        )
+        if pixel_data_is_mapping:
+            geometry = self.generate_geometry_model(component, pixel_data)
+            component.record_detector_number(pixel_data)
+        else:
+            geometry = self.generate_geometry_model(component)
+            component.record_pixel_grid(pixel_data)
+
+        add_fields_to_component(component, self.fieldsListWidget)
+        self.component_model.add_component(component)
+        return geometry
+
+    def edit_existing_component(
+        self,
+        component_name: str,
+        description: str,
+        nx_class: str,
+        pixel_data: PixelData,
+        pixel_data_is_mapping: bool,
+    ):
+        self.component_to_edit.name = component_name
+        self.component_to_edit.nx_class = nx_class
+        self.component_to_edit.description = description
+        # remove the previous shape from the qt3d view
+        if self.component_to_edit.get_shape() and self.parent():
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
+        if pixel_data_is_mapping:
+            geometry = self.generate_geometry_model(self.component_to_edit, pixel_data)
+        else:
+            geometry = self.generate_geometry_model(self.component_to_edit)
+        return geometry
 
     def change_pixel_options_visibility(self):
         """
@@ -431,7 +472,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def update_pixel_input_validity(self):
         """
-
         :return:
         """
         self.pixel_options.update_pixel_input_validity()

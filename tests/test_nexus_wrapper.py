@@ -1,5 +1,3 @@
-import numpy as np
-import pytest
 from mock import Mock
 
 from nexus_constructor.nexus.nexus_wrapper import (
@@ -7,29 +5,7 @@ from nexus_constructor.nexus.nexus_wrapper import (
     append_nxs_extension,
     get_nx_class,
 )
-from nexus_constructor.pixel_data import PixelMapping, PixelGrid, CountDirection, Corner
-from nexus_constructor.pixel_data_to_nexus_utils import (
-    pixel_grid_x_offsets,
-    pixel_grid_y_offsets,
-    pixel_grid_z_offsets,
-    pixel_grid_detector_ids,
-)
 from tests.test_nexus_to_json import create_in_memory_file
-
-global file_count
-file_count = 0
-
-
-@pytest.fixture(scope="function")
-def nexus_file():
-    global file_count
-    file_count += 1
-    return create_in_memory_file("test_nw" + str(file_count - 1))
-
-
-@pytest.fixture(scope="function")
-def entry(nexus_file):
-    return nexus_file.create_group("entry")
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_file_contains_entry_group_with_correct_nx_class():
@@ -159,50 +135,3 @@ def test_GIVEN_group_with_nx_class_as_bytes_WHEN_getting_nx_class_THEN_returns_n
     nx_class = b"NXentry"
     entry.attrs["NX_class"] = nx_class
     assert get_nx_class(entry) == str(nx_class, encoding="utf-8")
-
-
-def test_GIVEN_pixel_mapping_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_ids_in_nexus_file_match_pixel_ids_in_mapping_object(
-    nexus_file, entry
-):
-
-    nx_class = "NXdetector"
-    entry.attrs["NX_class"] = nx_class
-
-    pixel_id_list = [i for i in range(5)]
-    pixel_data = PixelMapping(pixel_id_list)
-
-    nexus_wrapper = NexusWrapper("text_nw11")
-    nexus_wrapper.record_pixel_data(entry, nx_class, pixel_data)
-
-    pixel_ids = entry.get("detector_number")
-    pixel_id_array = np.array(pixel_ids)
-
-    assert np.array_equal(pixel_id_array, np.array(pixel_id_list))
-
-
-def test_GIVEN_pixel_grid_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_data_in_nexus_file_matches_pixel_data_in_pixel_grid_object(
-    nexus_file, entry
-):
-
-    nx_class = "NXdetector"
-    entry.attrs["NX_class"] = nx_class
-
-    pixel_grid = PixelGrid(
-        rows=5,
-        columns=6,
-        row_height=0.7,
-        col_width=0.5,
-        first_id=0,
-        count_direction=CountDirection.COLUMN,
-        initial_count_corner=Corner.BOTTOM_RIGHT,
-    )
-
-    nexus_wrapper = NexusWrapper("pixel_grid_test")
-    nexus_wrapper.record_pixel_data(entry, nx_class, pixel_grid)
-
-    assert np.array_equal(entry.get("x_pixel_offset"), pixel_grid_x_offsets(pixel_grid))
-    assert np.array_equal(entry.get("y_pixel_offset"), pixel_grid_y_offsets(pixel_grid))
-    assert np.array_equal(entry.get("z_pixel_offset"), pixel_grid_z_offsets(pixel_grid))
-    assert np.array_equal(
-        entry.get("detector_number"), pixel_grid_detector_ids(pixel_grid)
-    )
