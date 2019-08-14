@@ -71,7 +71,7 @@ def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixe
     assert pixel_options.pixelOptionsStack.currentIndex() == 1
 
 
-def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_options_stack_becomes_invisible(
+def test_UI_GIVEN_user_selects_no_pixels_WHEN_changing_pixel_layout_THEN_pixel_options_stack_becomes_invisible(
     qtbot, template, pixel_options
 ):
 
@@ -82,7 +82,7 @@ def test_UI_GIVEN_user_selects_no_pixels_THEN_pixel_options_stack_becomes_invisi
     assert not pixel_options.pixelOptionsStack.isVisible()
 
 
-def test_UI_GIVEN_user_selects_single_pixel_THEN_pixel_grid_becomes_visible(
+def test_UI_GIVEN_user_selects_single_pixel_WHEN_changing_pixel_layout_THEN_pixel_grid_becomes_visible(
     qtbot, template, pixel_options
 ):
 
@@ -94,7 +94,7 @@ def test_UI_GIVEN_user_selects_single_pixel_THEN_pixel_grid_becomes_visible(
     assert pixel_options.pixelOptionsStack.currentIndex() == 0
 
 
-def test_UI_GIVEN_user_selects_pixel_grid_THEN_pixel_grid_is_set_to_true_in_ok_validator(
+def test_UI_GIVEN_user_selects_pixel_grid_WHEN_changing_pixel_layout_THEN_pixel_grid_is_set_to_true_in_ok_validator(
     qtbot, template, pixel_options
 ):
 
@@ -107,7 +107,7 @@ def test_UI_GIVEN_user_selects_pixel_grid_THEN_pixel_grid_is_set_to_true_in_ok_v
     assert not pixel_options.pixel_validator.pixel_mapping_is_valid
 
 
-def test_UI_GIVEN_user_selects_no_pixels_and_gives_valid_input_THEN_add_component_button_is_enabled(
+def test_UI_GIVEN_user_selects_no_pixels_and_gives_valid_nonpixel_input_WHEN_changing_pixel_layout_THEN_add_component_button_is_enabled(
     qtbot, template, pixel_options
 ):
 
@@ -294,7 +294,7 @@ def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixe
         assert field.styleSheet() == WHITE_SPIN_BOX_STYLE_SHEET
 
 
-def test_UI_GIVEN_row_count_is_zero_THEN_row_height_becomes_disabled(
+def test_UI_GIVEN_row_count_is_zero_WHEN_entering_pixel_grid_THEN_row_height_becomes_disabled(
     qtbot, template, pixel_options
 ):
 
@@ -305,7 +305,7 @@ def test_UI_GIVEN_row_count_is_zero_THEN_row_height_becomes_disabled(
     assert not pixel_options.rowHeightSpinBox.isEnabled()
 
 
-def test_UI_GIVEN_row_count_is_not_zero_THEN_row_height_becomes_enabled(
+def test_UI_GIVEN_row_count_is_not_zero_WHEN_entering_pixel_grid_THEN_row_height_becomes_enabled(
     qtbot, template, pixel_options
 ):
 
@@ -317,7 +317,7 @@ def test_UI_GIVEN_row_count_is_not_zero_THEN_row_height_becomes_enabled(
     assert pixel_options.rowHeightSpinBox.isEnabled()
 
 
-def test_UI_GIVEN_column_count_is_zero_THEN_column_width_becomes_disabled(
+def test_UI_GIVEN_column_count_is_zero_WHEN_entering_pixel_grid_THEN_column_width_becomes_disabled(
     qtbot, template, pixel_options
 ):
 
@@ -328,7 +328,7 @@ def test_UI_GIVEN_column_count_is_zero_THEN_column_width_becomes_disabled(
     assert not pixel_options.columnWidthSpinBox.isEnabled()
 
 
-def test_UI_GIVEN_column_count_is_not_zero_THEN_column_width_becomes_enabled(
+def test_UI_GIVEN_column_count_is_not_zero_WHEN_entering_pixel_grid_THEN_column_width_becomes_enabled(
     qtbot, template, pixel_options
 ):
 
@@ -340,7 +340,7 @@ def test_UI_GIVEN_column_count_is_not_zero_THEN_column_width_becomes_enabled(
     assert pixel_options.columnWidthSpinBox.isEnabled()
 
 
-def test_UI_GIVEN_mesh_file_THEN_pixel_mapping_list_is_populated_with_correct_number_of_widgets(
+def test_UI_GIVEN_user_provides_mesh_file_WHEN_entering_pixel_mapping_THEN_pixel_mapping_list_is_populated_with_correct_number_of_widgets(
     qtbot, template, pixel_options
 ):
 
@@ -349,7 +349,7 @@ def test_UI_GIVEN_mesh_file_THEN_pixel_mapping_list_is_populated_with_correct_nu
     assert pixel_options.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
 
 
-def test_UI_GIVEN_mesh_file_changes_THEN_pixel_mapping_list_changes(
+def test_UI_GIVEN_mesh_file_changes_WHEN_entering_pxixel_mapping_THEN_pixel_mapping_list_changes(
     qtbot, template, pixel_options
 ):
 
@@ -359,7 +359,7 @@ def test_UI_GIVEN_mesh_file_changes_THEN_pixel_mapping_list_changes(
     assert pixel_options.pixelMappingListWidget.count() == CORRECT_OCTA_FACES
 
 
-def test_UI_GIVEN_cylinder_number_THEN_pixel_mapping_list_is_populated_with_correct_number_of_widgets(
+def test_UI_GIVEN_cylinder_number_WHEN_entering_pixel_mapping_THEN_pixel_mapping_list_is_populated_with_correct_number_of_widgets(
     qtbot, template, pixel_options
 ):
 
@@ -369,7 +369,7 @@ def test_UI_GIVEN_cylinder_number_THEN_pixel_mapping_list_is_populated_with_corr
     assert pixel_options.pixelMappingListWidget.count() == cylinder_number
 
 
-def test_UI_GIVEN_cylinder_number_changes_THEN_pixel_mapping_list_changes(
+def test_UI_GIVEN_cylinder_number_changes_WHEN_entering_pixel_mapping_THEN_pixel_mapping_list_changes(
     qtbot, template, pixel_options
 ):
 

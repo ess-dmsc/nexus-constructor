@@ -73,9 +73,15 @@ def template(qtbot):
 
 @pytest.fixture(scope="function")
 def mock_pixel_options(dialog):
+    """
+    Creates a mock of the PixelOptions widget. Used for some basic testing of AddComponentDialog behaviour that requires
+    interaction with the PixelOptions. Testing of the PixelOptions behaviour takes place in a dedicated file.
+    """
 
     pixel_options = Mock(spec=PixelOptions)
 
+    # When the method for creating a pixel mapping is called in PixelOptions, it causes the current mapping filename
+    # stored in PixelOptions to change. This behaviour is going to be mimicked with a side effect mock.
     def change_mapping_filename(filename):
         pixel_options.get_current_mapping_filename = Mock(return_value=filename)
 
@@ -83,6 +89,7 @@ def mock_pixel_options(dialog):
         side_effect=change_mapping_filename
     )
 
+    # Make the filename in PixelOptions start as None as this is what the PixelOptions has after its been initialised.
     change_mapping_filename(None)
 
     dialog.pixel_options = pixel_options
@@ -102,6 +109,10 @@ def dialog(qtbot, template):
 
 @pytest.fixture(scope="function")
 def mock_pixel_validator(dialog, mock_pixel_options):
+    """
+    Create a mock PixelValidator to give to the AddComponentDialog's OKValidator. The OKValidator requires knowledge of
+    the PixelValidator's `unnacceptable_pixel_states` so this will be mocked to mimic valid/invalid Pixel Data input.
+    """
     pixel_validator = Mock(spec=PixelValidator)
     pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
 
@@ -815,7 +826,7 @@ def test_UI_GIVEN_invalid_name_WHEN_adding_component_with_cylinder_shape_THEN_ad
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_GIVEN_mesh_shape_selected_THEN_relevant_fields_are_visible(
+def test_UI_GIVEN_mesh_shape_selected_WHEN_choosing_shape_THEN_relevant_fields_are_visible(
     qtbot, template, dialog
 ):
 
@@ -829,7 +840,7 @@ def test_UI_GIVEN_mesh_shape_selected_THEN_relevant_fields_are_visible(
     assert not dialog.cylinderOptionsBox.isVisible()
 
 
-def test_UI_GIVEN_cylinder_shape_selected_THEN_relevant_fields_are_visible(
+def test_UI_GIVEN_cylinder_shape_selected_WHEN_choosing_shape_THEN_relevant_fields_are_visible(
     qtbot, template, dialog
 ):
 
@@ -912,12 +923,12 @@ def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_
     assert field.table_view.isEnabled()
 
 
-def test_UI_GIVEN_user_provides_valid_pixel_configuration_THEN_add_component_button_is_enabled(
+def test_UI_GIVEN_user_provides_valid_pixel_configuration_WHEN_entering_pixel_data_THEN_add_component_button_is_enabled(
     qtbot, template, dialog, mock_pixel_validator
 ):
 
+    # Deceive the AddComponentDialog into thinking valid pixel info was given
     make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
-
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, False])
 
     # Enter a valid name
@@ -932,12 +943,12 @@ def test_UI_GIVEN_user_provides_valid_pixel_configuration_THEN_add_component_but
     assert dialog.buttonBox.isEnabled()
 
 
-def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_disabled(
+def test_UI_GIVEN_user_provides_invalid_pixel_grid_WHEN_entering_pixel_data_THEN_add_component_button_is_disabled(
     qtbot, template, dialog, mock_pixel_validator
 ):
 
+    # Deceive the AddComponentDialog into thinking an invalid Pixel Grid was given
     make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
-
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[True, False])
 
     # Enter a valid name
@@ -948,16 +959,16 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_THEN_add_component_button_is_
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
-    # Check that the add component button is disabled
+    # Check that the add component button is disabled despite the valid name and file path
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_is_disabled(
+def test_UI_GIVEN_user_provides_invalid_pixel_mapping_WHEN_entering_pixel_data_THEN_add_component_button_is_disabled(
     qtbot, template, dialog, mock_pixel_validator
 ):
 
+    # Deceive the AddComponentDialog into thinking an invalid Pixel Mapping was given
     make_pixel_options_visible(dialog, qtbot, template, dialog.meshRadioButton)
-
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, True])
 
     # Enter a valid name
@@ -968,7 +979,7 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_THEN_add_component_button_
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
-    # Check that the add component button is disabled
+    # Check that the add component button is disabled despite the valid name and file path
     assert not dialog.buttonBox.isEnabled()
 
 
@@ -1283,7 +1294,7 @@ def make_pixel_options_disappear(
     component_index: int,
 ):
     """
-    Create the conditions to allow the disappearance of the pixel options.
+    Create the conditions to allow the disappearance of the pixel options by pressing the NoShape button.
     :param qtbot: The qtbot testing tool.
     :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
@@ -1302,7 +1313,8 @@ def make_pixel_options_appear(
     pixel_options_index: int,
 ):
     """
-    Create the conditions to allow the appearance of the pixel options.
+    Create the conditions to allow the appearance of the pixel options by choosing NXdetector or NXdetector_module as
+    the component type and NXcylindrical_geometry or NXoff_geometry as the shape type.
     :param qtbot: The qtbot testing tool.
     :param button: The Mesh or Cylinder radio button.
     :param dialog: An instance of an AddComponentDialog.
