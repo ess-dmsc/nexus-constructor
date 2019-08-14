@@ -56,21 +56,26 @@ def pixel_grid_detector_ids(grid: PixelGrid):
     Returns an array of detector IDs. Starts with a 1D array of numbers and reorders them depending on the count
     direction and initial count corner supplied by the user.
     """
-
     ids = np.arange(grid.rows * grid.columns) + grid.first_id
 
     if grid.count_direction == CountDirection.COLUMN:
+        # Reshape the the array and set it to column-major order with the F (Fortran-order) argument.
         ids = ids.reshape((grid.rows, grid.columns), order="F")
     else:
+        # Reshape the array. Without an order argument this will be column-major order by default.
         ids = ids.reshape(grid.rows, grid.columns)
 
     if grid.initial_count_corner == Corner.TOP_LEFT:
+        # Return the array as it is in the case of a top-left starting corner.
         return ids
 
     if grid.initial_count_corner == Corner.TOP_RIGHT:
+        # Invert the columns in the case of a top-right starting corner.
         return np.fliplr(ids)
 
     if grid.initial_count_corner == Corner.BOTTOM_LEFT:
+        # Invert the rows in the case of a bottom-left starting corner.
         return np.flipud(ids)
 
+    # Rotate the array 180 degrees clockwise in the case of a bottom-right starting corner.
     return np.rot90(ids, 2)
