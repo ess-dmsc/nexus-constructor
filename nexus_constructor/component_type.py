@@ -3,7 +3,7 @@ from typing import List
 
 import xmltodict
 
-PIXEL_COMPONENT_TYPES = ["NXdetector", "NXdetector_module"]
+PIXEL_COMPONENT_TYPES = {"NXdetector", "NXdetector_module"}
 COMPONENT_TYPES = {
     "NXmonitor",
     "NXdetector",
