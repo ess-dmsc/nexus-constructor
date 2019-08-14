@@ -360,9 +360,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def on_ok(self):
         """
-        Retrieves information from the interface in order to create a component. Sends relevant information to a NeXus
-        file, adds the component to the component list, and draws any new shapes in the InstrumentView. By this point
-        the input should already be valid as the validators control whether or not the Add Component button is enabled.
+        Retrieves information from the interface in order to create a component. By this point the input should already
+        be valid as the validators control whether or not the Add Component button is enabled.
         """
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
