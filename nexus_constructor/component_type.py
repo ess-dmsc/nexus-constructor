@@ -1,6 +1,5 @@
-import os
 from typing import List
-
+import os
 import xmltodict
 
 PIXEL_COMPONENT_TYPES = {"NXdetector", "NXdetector_module"}
