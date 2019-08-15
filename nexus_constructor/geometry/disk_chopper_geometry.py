@@ -41,6 +41,9 @@ def chopper_input_seems_reasonable(fields_widget: QListWidget):
     if fields_dict["slit_height"].dtype not in FLOAT_TYPES:
         return False
 
+    if fields_dict["slit_edges"].dtype not in FLOAT_TYPES:
+        return False
+
     return True
 
 

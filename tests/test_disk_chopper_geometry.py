@@ -38,6 +38,7 @@ def mock_slit_edges_widget(chopper_details):
     mock_slit_edges_widget = Mock(spec=FieldWidget)
     mock_slit_edges_widget.name = "slit_edges"
     mock_slit_edges_widget.value = chopper_details.slit_edges
+    mock_slit_edges_widget.dtype = np.single
 
     return mock_slit_edges_widget
 
@@ -206,7 +207,7 @@ def test_GIVEN_slit_height_field_is_missing_WHEN_checking_if_chopper_input_seems
     assert not chopper_input_seems_reasonable(mock_fields_list_widget)
 
 
-def test_GIVEN_slits_field_is_not_some_type_of_int_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
+def test_GIVEN_slits_field_is_not_int_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
     mock_slits_widget, mock_fields_list_widget
 ):
 
@@ -214,7 +215,7 @@ def test_GIVEN_slits_field_is_not_some_type_of_int_WHEN_checking_if_chopper_inpu
     assert not chopper_input_seems_reasonable(mock_fields_list_widget)
 
 
-def test_GIVEN_radius_field_is_not_some_type_of_float_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
+def test_GIVEN_radius_field_is_not_float_or_double_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
     mock_radius_widget, mock_fields_list_widget
 ):
 
@@ -222,9 +223,17 @@ def test_GIVEN_radius_field_is_not_some_type_of_float_WHEN_checking_if_chopper_i
     assert not chopper_input_seems_reasonable(mock_fields_list_widget)
 
 
-def test_GIVEN_slit_height_field_is_not_some_type_of_float_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
+def test_GIVEN_slit_height_field_is_not_float_or_double_float_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
     mock_slit_height_widget, mock_fields_list_widget
 ):
 
     mock_slit_height_widget.dtype = np.byte
+    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+
+
+def test_GIVEN_slit_edges_field_is_not_float_or_double_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
+    mock_slit_edges_widget, mock_fields_list_widget
+):
+
+    mock_slit_edges_widget.dtype = np.byte
     assert not chopper_input_seems_reasonable(mock_fields_list_widget)
