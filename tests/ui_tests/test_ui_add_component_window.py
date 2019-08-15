@@ -47,22 +47,22 @@ INVALID_UNITS = "abc"
 instrument = Instrument(NexusWrapper("pixels"))
 component = ComponentTreeModel(instrument)
 add_component_dialog = AddComponentDialog(instrument, component)
-ALL_COMPONENT_TYPES = [
-    (comp_type, i)
-    for i, comp_type in enumerate(
-        list(add_component_dialog.nx_component_classes.keys())
-    )
-][::-1]
-PIXEL_OPTIONS = [
-    comp_with_index
-    for comp_with_index in ALL_COMPONENT_TYPES
-    if comp_with_index[0] in component_type.PIXEL_COMPONENT_TYPES
-]
-NO_PIXEL_OPTIONS = [
-    comp_with_index
-    for comp_with_index in ALL_COMPONENT_TYPES
-    if comp_with_index[0] not in component_type.PIXEL_COMPONENT_TYPES
-]
+
+PIXEL_OPTIONS = dict()
+NO_PIXEL_OPTIONS = dict()
+ALL_COMPONENT_TYPES = dict()
+
+for i, component_class in enumerate(
+    list(add_component_dialog.nx_component_classes.keys())
+):
+
+    ALL_COMPONENT_TYPES[component_class] = i
+
+    if component_class in component_type.PIXEL_COMPONENT_TYPES:
+        PIXEL_OPTIONS[component_class] = i
+    else:
+        NO_PIXEL_OPTIONS[component_class] = i
+
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
 
@@ -241,17 +241,11 @@ def test_UI_GIVEN_nothing_WHEN_selecting_shape_with_units_THEN_default_units_are
     assert dialog.unitsLineEdit.text() == "m"
 
 
-@pytest.mark.parametrize("pixel_class, pixel_index", PIXEL_OPTIONS)
+@pytest.mark.parametrize("pixels_class", PIXEL_OPTIONS.keys())
 @pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
 @pytest.mark.parametrize("pixel_shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_invisible_to_visible(
-    qtbot,
-    template,
-    dialog,
-    pixel_class,
-    pixel_index,
-    any_component_type,
-    pixel_shape_name,
+    qtbot, template, dialog, pixels_class, any_component_type, pixel_shape_name
 ):
     # Change the pixel options to visible by selecting a cylinder/mesh shape and a NXclass with pixel fields
     make_pixel_options_appear(
@@ -259,28 +253,30 @@ def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_p
         get_shape_type_button(dialog, pixel_shape_name),
         dialog,
         template,
-        pixel_index,
+        PIXEL_OPTIONS[pixels_class],
     )
     # Check that this has caused the pixel options to become visible
     assert dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES.keys())
 def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_options_go_from_visible_to_invisible(
     qtbot, template, dialog, any_component_type
 ):
     make_pixel_options_appear(qtbot, dialog.meshRadioButton, dialog, template)
 
     # Change the pixel options to invisible
-    make_pixel_options_disappear(qtbot, dialog, template, any_component_type[1])
+    make_pixel_options_disappear(
+        qtbot, dialog, template, ALL_COMPONENT_TYPES[any_component_type]
+    )
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.parametrize("no_pixel_options", NO_PIXEL_OPTIONS)
-@pytest.mark.parametrize("pixel_options", PIXEL_OPTIONS)
+@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS.keys())
+@pytest.mark.parametrize("pixels_class", PIXEL_OPTIONS.keys())
 @pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_or_cylinder_shape_THEN_pixel_options_becomes_invisible(
-    qtbot, template, dialog, no_pixel_options, pixel_options, shape_name
+    qtbot, template, dialog, no_pixels_class, pixels_class, shape_name
 ):
     # Make the pixel options become visible
     make_pixel_options_appear(
@@ -288,16 +284,16 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
         get_shape_type_button(dialog, shape_name),
         dialog,
         template,
-        pixel_options[1],
+        PIXEL_OPTIONS[pixels_class],
     )
     assert dialog.pixelOptionsWidget.isVisible()
 
     # Change nxclass to one without pixel fields and check that the pixel options have become invisible again
-    dialog.componentTypeComboBox.setCurrentIndex(no_pixel_options[1])
+    dialog.componentTypeComboBox.setCurrentIndex(NO_PIXEL_OPTIONS[no_pixels_class])
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
-def test_UI_GIVEN_user_changes_shape_WHEN_adding_component_THEN_validity_is_reassed(
+def test_UI_GIVEN_user_changes_shape_WHEN_adding_component_THEN_validity_is_reassessed(
     qtbot, template, dialog, mock_pixel_options
 ):
 
@@ -850,16 +846,16 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_choosing_shape_THEN_relevant_fiel
     assert not dialog.geometryFileBox.isVisible()
 
 
-@pytest.mark.parametrize("comp_type_without_pixels", NO_PIXEL_OPTIONS)
+@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS.keys())
 def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_mapping_list_remains_empty(
-    qtbot, template, dialog, comp_type_without_pixels, mock_pixel_options
+    qtbot, template, dialog, no_pixels_class, mock_pixel_options
 ):
 
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, dialog.meshRadioButton)
 
     # Mimic the user selecting a component type that doesn't have pixel fields
-    dialog.componentTypeComboBox.setCurrentIndex(comp_type_without_pixels[1])
+    dialog.componentTypeComboBox.setCurrentIndex(NO_PIXEL_OPTIONS[no_pixels_class])
 
     # Mimic the user giving a valid mesh file
     enter_file_path(
@@ -1025,7 +1021,11 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_module_THEN_pixel
 
     # Make the pixel options appear but choose NXdetector_module rather than NXdetector
     make_pixel_options_appear(
-        qtbot, dialog.CylinderRadioButton, dialog, template, "NXdetector_module"
+        qtbot,
+        dialog.CylinderRadioButton,
+        dialog,
+        template,
+        PIXEL_OPTIONS["NXdetector_module"],
     )
 
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
@@ -1052,7 +1052,11 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_module_THEN_pi
 
     # Make the pixel options appear but choose NXdetector_module rather than NXdetector
     make_pixel_options_appear(
-        qtbot, dialog.CylinderRadioButton, dialog, template, "NXdetector_module"
+        qtbot,
+        dialog.CylinderRadioButton,
+        dialog,
+        template,
+        PIXEL_OPTIONS["NXdetector_module"],
     )
 
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
@@ -1077,7 +1081,7 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
 ):
 
     make_pixel_options_appear(
-        qtbot, dialog.meshRadioButton, dialog, template, "NXdetector"
+        qtbot, dialog.meshRadioButton, dialog, template, PIXEL_OPTIONS["NXdetector"]
     )
 
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
@@ -1103,7 +1107,7 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 ):
 
     make_pixel_options_appear(
-        qtbot, dialog.meshRadioButton, dialog, template, "NXdetector"
+        qtbot, dialog.meshRadioButton, dialog, template, PIXEL_OPTIONS["NXdetector"]
     )
 
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
@@ -1411,7 +1415,7 @@ def make_pixel_options_appear(
     button: QRadioButton,
     dialog: AddComponentDialog,
     template: PySide2.QtWidgets.QDialog,
-    pixel_options_index: int = PIXEL_OPTIONS[0][1],
+    pixel_options_index: int = PIXEL_OPTIONS["NXdetector"],
 ):
     """
     Create the conditions to allow the appearance of the pixel options by choosing NXdetector or NXdetector_module as
