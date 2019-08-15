@@ -311,4 +311,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             add_fields_to_component(component, self.fieldsListWidget)
             self.component_model.add_component(component)
 
+        # if nx_class == "NXdisk_chopper" and self.noShapeRadioButton.isChecked():
+        #     chopper_details = self.obtain_chopper_details()
+        #     if valid_chopper_details(*chopper_details):
+        #         geometry = create_disk_chopper_geometry(*chopper_details)
+
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
