@@ -406,8 +406,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
         class_is_nxdetector = nx_class == "NXdetector"
 
-        print("NXclass", nx_class)
-
         if pixel_data_is_mapping:
             geometry = self.generate_geometry_model(component, pixel_data)
 

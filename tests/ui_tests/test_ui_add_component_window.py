@@ -1025,7 +1025,7 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_module_THEN_pixel
 
     # Make the pixel options appear but choose NXdetector_module rather than NXdetector
     make_pixel_options_appear(
-        qtbot, dialog.CylinderRadioButton, dialog, template, PIXEL_OPTIONS[1][1]
+        qtbot, dialog.CylinderRadioButton, dialog, template, "NXdetector_module"
     )
 
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
@@ -1036,6 +1036,8 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_module_THEN_pixel
 
     mock_component = Mock(spec=Component)
     mock_pixel_options.generate_pixel_data = Mock(return_value=PixelGrid())
+
+    show_and_close_window(qtbot, template)
 
     # Call the on_ok method as if the user had pressed Add Component
     with patch("nexus_constructor.instrument.Component") as mock_component_constructor:
@@ -1050,7 +1052,7 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_module_THEN_pi
 
     # Make the pixel options appear but choose NXdetector_module rather than NXdetector
     make_pixel_options_appear(
-        qtbot, dialog.CylinderRadioButton, dialog, template, PIXEL_OPTIONS[1][1]
+        qtbot, dialog.CylinderRadioButton, dialog, template, "NXdetector_module"
     )
 
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
@@ -1062,6 +1064,8 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_module_THEN_pi
     mock_component = Mock(spec=Component)
     mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping())
 
+    show_and_close_window(qtbot, template)
+
     # Call the on_ok method as if the user had pressed Add Component
     with patch("nexus_constructor.instrument.Component", return_value=mock_component):
         dialog.on_ok()
@@ -1072,7 +1076,9 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
     qtbot, template, dialog, mock_pixel_options
 ):
 
-    make_pixel_options_appear(qtbot, dialog.meshRadioButton, dialog, template)
+    make_pixel_options_appear(
+        qtbot, dialog.meshRadioButton, dialog, template, "NXdetector"
+    )
 
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
@@ -1084,6 +1090,8 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
     pixel_grid = PixelGrid()
     mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_grid)
 
+    show_and_close_window(qtbot, template)
+
     # Call the on_ok method as if the user had pressed Add Component
     with patch("nexus_constructor.instrument.Component", return_value=mock_component):
         dialog.on_ok()
@@ -1094,7 +1102,9 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
     qtbot, template, dialog, mock_pixel_options
 ):
 
-    make_pixel_options_appear(qtbot, dialog.meshRadioButton, dialog, template)
+    make_pixel_options_appear(
+        qtbot, dialog.meshRadioButton, dialog, template, "NXdetector"
+    )
 
     enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
 
@@ -1105,6 +1115,8 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
     mock_component = Mock(spec=Component)
     pixel_mapping = PixelMapping()
     mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_mapping)
+
+    show_and_close_window(qtbot, template)
 
     # Call the on_ok method as if the user had pressed Add Component
     with patch("nexus_constructor.instrument.Component", return_value=mock_component):
