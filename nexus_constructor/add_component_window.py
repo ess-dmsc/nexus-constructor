@@ -310,7 +310,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
     ) -> OFFGeometry:
         """
         Generates a geometry model depending on the type of geometry selected and the current values
-        of the lineedits that apply to the particular geometry type.
+        of the line edits that apply to the particular geometry type.
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
@@ -340,7 +340,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 geometry_model,
                 units=self.unitsLineEdit.text(),
                 filename=self.fileLineEdit.text(),
-                pixel_data=pixel_mapping,
+                pixel_mapping=pixel_mapping,
             )
         else:
             geometry_model = NoShapeGeometry()
@@ -368,10 +368,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         description = self.descriptionPlainTextEdit.text()
 
         # Check if the Pixel Data is the Pixel Mapping type. If is a mapping then it must be stored in both the
-        # overall component as well as the component's geometry field. If it is a PixelGrid then this is only stored in
+        # component as well as the NXoff/cylindrical_geometry. If it is a PixelGrid then this is only stored in
         # the component.
         pixel_data = self.pixel_options.generate_pixel_data()
-        pixel_data_is_mapping = type(PixelData) is PixelMapping
+        pixel_data_is_mapping = type(pixel_data) is PixelMapping
 
         if self.component_to_edit:
             geometry = self.edit_existing_component(
@@ -404,12 +404,18 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component = self.instrument.create_component(
             component_name, nx_class, description
         )
+        class_is_nxdetector = nx_class == "NXdetector"
+
         if pixel_data_is_mapping:
             geometry = self.generate_geometry_model(component, pixel_data)
-            component.record_detector_number(pixel_data)
+
+            if class_is_nxdetector:
+                component.record_detector_number(pixel_data)
         else:
             geometry = self.generate_geometry_model(component)
-            component.record_pixel_grid(pixel_data)
+
+            if class_is_nxdetector:
+                component.record_pixel_grid(pixel_data)
 
         add_fields_to_component(component, self.fieldsListWidget)
         self.component_model.add_component(component)
