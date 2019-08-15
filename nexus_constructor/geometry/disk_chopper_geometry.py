@@ -1,7 +1,47 @@
 from math import pi
-from typing import List
 
-from numpy.core.umath import deg2rad
+from PySide2.QtWidgets import QListWidget
+from numpy import diff, unique
+from numpy.core.umath import deg2rad, ndarray
+
+from nexus_constructor.validators import DATASET_TYPE
+
+REQUIRED_CHOPPER_FIELDS = ["slit_edges", "slits", "radius", "slit_height"]
+CONTAINS_INTEGER = [
+    DATASET_TYPE[key] for key in DATASET_TYPE.keys() if "Integer" in key
+]
+CONTAINS_SHORT = [DATASET_TYPE[key] for key in DATASET_TYPE.keys() if "Short" in key]
+CONTAINS_LONG = [DATASET_TYPE[key] for key in DATASET_TYPE.keys() if "Long" in key]
+INT_TYPES = CONTAINS_INTEGER + CONTAINS_SHORT + CONTAINS_LONG
+
+FLOAT_TYPES = [
+    DATASET_TYPE[key] for key in DATASET_TYPE.keys() if key in ["Float", "Double"]
+]
+
+
+def chopper_input_seems_reasonable(fields_widget: QListWidget):
+    """
+    Carries out a preliminary check of the fields input to see if seems like it might be describing a
+    valid disk chopper shape.
+    :param fields_widget:
+    :return:
+    """
+
+    fields_dict = {widget.name: widget for widget in fields_widget.items()}
+
+    if set(fields_dict.keys()) != set(REQUIRED_CHOPPER_FIELDS):
+        return False
+
+    if fields_dict["slits"].dtype not in INT_TYPES:
+        return False
+
+    if fields_dict["radius"].dtype not in FLOAT_TYPES:
+        return False
+
+    if fields_dict["slit_height"].dtype not in FLOAT_TYPES:
+        return False
+
+    return True
 
 
 class ChopperDetails:
@@ -11,7 +51,7 @@ class ChopperDetails:
     def __init__(
         self,
         slits: int,
-        slit_edges: List,
+        slit_edges: ndarray,
         radius: float,
         slit_height: float,
         units: str = "deg",
@@ -50,10 +90,10 @@ class ChopperDetails:
 
     def validate(self):
 
-        # Check that all the elements in the slit edge list are either int or float
-        for edge in self._slit_edges:
-            if type(edge) is not float and type(edge) is not int:
-                return False
+        # Check that all the elements in the slit edge list are float
+        # for edge in self._slit_edges:
+        #     if type(edge) is not float:
+        #         return False
 
         # Check that the number of slit edges is equal to two times the number of slits
         if len(self._slit_edges) != 2 * self._slits:
@@ -64,11 +104,11 @@ class ChopperDetails:
             return False
 
         # Check that the list of slit edges is sorted
-        if self._slit_edges != sorted(self._slit_edges):
+        if not (diff(self._slit_edges) >= 0).all():
             return False
 
         # Check that there are no repeated angles
-        if len(self._slit_edges) != len(set(self._slit_edges)):
+        if len(self._slit_edges) != len(unique(self._slit_edges)):
             return False
 
         # Convert the angles to radians (if necessary) and make sure they are all less then two pi

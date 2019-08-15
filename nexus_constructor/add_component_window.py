@@ -313,7 +313,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         # if nx_class == "NXdisk_chopper" and self.noShapeRadioButton.isChecked():
         #     chopper_details = self.obtain_chopper_details()
-        #     if valid_chopper_details(*chopper_details):
-        #         geometry = create_disk_chopper_geometry(*chopper_details)
+        #     if chopper_details.validate():
+        #         geometry = create_disk_chopper_geometry(chopper_details)
 
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
