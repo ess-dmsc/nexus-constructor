@@ -1020,7 +1020,7 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
 
 
 def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_module_THEN_pixel_data_isnt_stored_in_component(
-    qtbot, template, dialog
+    qtbot, template, dialog, mock_pixel_options
 ):
 
     # Make the pixel options appear but choose NXdetector_module rather than NXdetector
@@ -1035,7 +1035,6 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_module_THEN_pixel
     )
 
     mock_component = Mock(spec=Component)
-
     mock_pixel_options.generate_pixel_data = Mock(return_value=PixelGrid())
 
     # Call the on_ok method as if the user had pressed Add Component
@@ -1061,7 +1060,6 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_module_THEN_pi
     )
 
     mock_component = Mock(spec=Component)
-
     mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping())
 
     # Call the on_ok method as if the user had pressed Add Component
