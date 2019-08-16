@@ -7,18 +7,12 @@ from typing import List
 from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.geometry.disk_chopper_geometry import (
     ChopperDetails,
-    chopper_input_seems_reasonable,
+    ChopperChecker,
+    SLITS,
+    SLIT_HEIGHT,
+    RADIUS,
+    SLIT_EDGES,
 )
-
-
-@pytest.fixture(scope="function")
-def chopper_details():
-    return ChopperDetails(
-        slits=3,
-        slit_edges=np.array([0.0, 43.4, 82.6, 150.1, 220.0, 250.3]),
-        radius=200.3,
-        slit_height=70.1,
-    )
 
 
 @pytest.fixture(scope="function")
@@ -99,6 +93,21 @@ def mock_fields_list_widget(
     return list_widget
 
 
+@pytest.fixture(scope="function")
+def chopper_details():
+    return ChopperDetails(
+        slits=3,
+        slit_edges=np.array([0.0, 43.4, 82.6, 150.1, 220.0, 250.3]),
+        radius=200.3,
+        slit_height=70.1,
+    )
+
+
+@pytest.fixture(scope="function")
+def chopper_checker(mock_fields_list_widget):
+    return ChopperChecker(mock_fields_list_widget)
+
+
 def remove_mock_widget_from_list(
     widget_mock_list: List, widget: Mock, mock_fields_list_widget: Mock
 ):
@@ -109,131 +118,130 @@ def remove_mock_widget_from_list(
     mock_fields_list_widget.items = Mock(return_value=widget_mock_list)
 
 
-def test_GIVEN_valid_values_WHEN_validating_chopper_details_THEN_returns_true(
-    chopper_details
+def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
+    chopper_checker
 ):
 
-    assert chopper_details.validate()
+    assert chopper_checker.validate_chopper()
 
 
-def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopper_details_THEN_returns_false(
-    chopper_details
+def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    chopper_details._slits = 5
-    assert not chopper_details.validate()
+    chopper_checker.fields_dict[SLITS].value = 5
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_details_THEN_returns_false(
-    chopper_details
+def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    chopper_details._slit_height = 201
-    assert not chopper_details.validate()
+    chopper_checker.fields_dict[SLIT_HEIGHT].value = 201
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_details_THEN_returns_false(
-    chopper_details
+def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    chopper_details._slit_height = chopper_details._radius = 20
-    assert not chopper_details.validate()
+    chopper_checker.fields_dict[SLIT_HEIGHT].value = chopper_checker.fields_dict[
+        RADIUS
+    ].value = 20
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_details_THEN_returns_false(
-    chopper_details
+def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    chopper_details.slit_edges[0], chopper_details.slit_edges[1] = (
-        chopper_details.slit_edges[1],
-        chopper_details.slit_edges[0],
+    chopper_checker.fields_dict[SLIT_EDGES].value[0], chopper_checker.fields_dict[
+        SLIT_EDGES
+    ].value[1] = (
+        chopper_checker.fields_dict[SLIT_EDGES].value[1],
+        chopper_checker.fields_dict[SLIT_EDGES].value[0],
     )
-    assert not chopper_details.validate()
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_details_THEN_returns_false(
-    chopper_details
+def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    chopper_details.slit_edges[0] = chopper_details.slit_edges[1]
-    assert not chopper_details.validate()
+    chopper_checker.fields_dict[SLIT_EDGES].value[0] = chopper_checker.fields_dict[
+        SLIT_EDGES
+    ].value[1]
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_details_THEN_returns_false(
-    chopper_details
+def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    chopper_details.slit_edges[-1] = 365
-    assert not chopper_details.validate()
-
-
-def test_GIVEN_slits_field_is_missing_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
-    mock_fields_list_widget, mock_widget_list, mock_slits_widget
-):
-
-    remove_mock_widget_from_list(
-        mock_widget_list, mock_slits_widget, mock_fields_list_widget
+    chopper_checker.fields_dict[SLIT_EDGES].value[-1] = (
+        chopper_checker.fields_dict[SLIT_EDGES].value[0] + 365
     )
-    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_edges_field_is_missing_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
-    mock_fields_list_widget, mock_widget_list, mock_slit_edges_widget
+def test_GIVEN_slits_field_is_missing_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    remove_mock_widget_from_list(
-        mock_widget_list, mock_slit_edges_widget, mock_fields_list_widget
-    )
-    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+    del chopper_checker.fields_dict[SLITS]
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_radius_field_is_missing_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
-    mock_fields_list_widget, mock_widget_list, mock_radius_widget
+def test_GIVEN_slit_edges_field_is_missing_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
+):
+    del chopper_checker.fields_dict[SLIT_EDGES]
+    assert not chopper_checker.validate_chopper()
+
+
+def test_GIVEN_radius_field_is_missing_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    remove_mock_widget_from_list(
-        mock_widget_list, mock_radius_widget, mock_fields_list_widget
-    )
-    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+    del chopper_checker.fields_dict[RADIUS]
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_height_field_is_missing_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
-    mock_fields_list_widget, mock_widget_list, mock_slit_height_widget
+def test_GIVEN_slit_height_field_is_missing_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    remove_mock_widget_from_list(
-        mock_widget_list, mock_slit_height_widget, mock_fields_list_widget
-    )
-    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+    del chopper_checker.fields_dict[SLIT_HEIGHT]
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slits_field_is_not_int_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
-    mock_slits_widget, mock_fields_list_widget
+def test_GIVEN_slits_field_is_not_int_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    mock_slits_widget.dtype = np.byte
-    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+    chopper_checker.fields_dict[SLITS].dtype = np.byte
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_radius_field_is_not_float_or_double_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
-    mock_radius_widget, mock_fields_list_widget
+def test_GIVEN_radius_field_is_not_float_or_double_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    mock_radius_widget.dtype = np.byte
-    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+    chopper_checker.fields_dict[RADIUS].dtype = np.byte
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_height_field_is_not_float_or_double_float_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
-    mock_slit_height_widget, mock_fields_list_widget
+def test_GIVEN_slit_height_field_is_not_float_or_double_float_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    mock_slit_height_widget.dtype = np.byte
-    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+    chopper_checker.fields_dict[SLIT_HEIGHT].dtype = np.byte
+    assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_edges_field_is_not_float_or_double_WHEN_checking_if_chopper_input_seems_reasonable_THEN_returns_false(
-    mock_slit_edges_widget, mock_fields_list_widget
+def test_GIVEN_slit_edges_field_is_not_float_or_double_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
 ):
 
-    mock_slit_edges_widget.dtype = np.byte
-    assert not chopper_input_seems_reasonable(mock_fields_list_widget)
+    chopper_checker.fields_dict[SLIT_EDGES].dtype = np.byte
+    assert not chopper_checker.validate_chopper()
