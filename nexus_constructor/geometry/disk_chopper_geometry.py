@@ -51,8 +51,6 @@ class ChopperChecker:
         """
         Carries out a preliminary check of the fields input to see if seems like it might be describing a
         valid disk chopper shape.
-        :param fields_widget:
-        :return:
         """
         return set(self.fields_dict.keys()) == set(REQUIRED_CHOPPER_FIELDS)
 

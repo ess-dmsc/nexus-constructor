@@ -31,7 +31,7 @@ def mock_slit_edges_widget(chopper_details):
 
     mock_slit_edges_widget = Mock(spec=FieldWidget)
     mock_slit_edges_widget.name = "slit_edges"
-    mock_slit_edges_widget.value = chopper_details.slit_edges
+    mock_slit_edges_widget.value = np.array([0.0, 43.4, 82.6, 150.1, 220.0, 250.3])
     mock_slit_edges_widget.dtype = np.single
 
     return mock_slit_edges_widget
@@ -97,7 +97,16 @@ def mock_fields_list_widget(
 def chopper_details():
     return ChopperDetails(
         slits=3,
-        slit_edges=np.array([0.0, 43.4, 82.6, 150.1, 220.0, 250.3]),
+        slit_edges=np.array(
+            [
+                0.0,
+                0.757472895365539,
+                1.4416419621473162,
+                2.6197392072434886,
+                3.839724354387525,
+                4.368559117741807,
+            ]
+        ),
         radius=200.3,
         slit_height=70.1,
     )
@@ -245,3 +254,26 @@ def test_GIVEN_slit_edges_field_is_not_float_or_double_WHEN_validating_chopper_i
 
     chopper_checker.fields_dict[SLIT_EDGES].dtype = np.byte
     assert not chopper_checker.validate_chopper()
+
+
+def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_matches_fields_widget_input(
+    chopper_checker,
+    mock_slit_edges_widget,
+    mock_slits_widget,
+    mock_radius_widget,
+    mock_slit_height_widget,
+):
+
+    chopper_checker.validate_chopper()
+    details = chopper_checker.get_chopper_details()
+
+    def convert_angle(x):
+        return np.deg2rad(x) % (np.pi * 2)
+
+    vfunc = np.vectorize(convert_angle)
+    radian_slit_edges = vfunc(mock_slit_edges_widget.value)
+
+    assert (details.slit_edges == radian_slit_edges).all()
+    assert details.slits == mock_slits_widget.value
+    assert details.radius == mock_radius_widget.value
+    assert details.slit_height == mock_slit_height_widget.value
