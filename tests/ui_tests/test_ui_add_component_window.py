@@ -825,8 +825,6 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_THEN_chopper_geometry
 
     show_and_close_window(qtbot, template)
 
-    show_window_and_wait_for_interaction(qtbot, template)
-
     qtbot.keyClicks(fields_widgets[0].value_line_edit, "6")
     qtbot.keyClicks(fields_widgets[2].value_line_edit, "200")
     qtbot.keyClicks(fields_widgets[3].value_line_edit, "100")
@@ -835,6 +833,8 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_THEN_chopper_geometry
     fields_widgets[1].table_view.model.array = np.array(
         [[(i * 10.0)] for i in range(12)]
     )
+
+    show_and_close_window(qtbot, template)
 
     with patch(
         "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
