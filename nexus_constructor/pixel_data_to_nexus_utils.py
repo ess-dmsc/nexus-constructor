@@ -59,7 +59,8 @@ def pixel_grid_detector_ids(grid: PixelGrid):
     ids = np.arange(grid.rows * grid.columns) + grid.first_id
 
     if grid.count_direction == CountDirection.COLUMN:
-        # Reshape the the array and set it to column-major order with the F (Fortran-order) argument.
+        # Reshape the array with column-major/Fortran-like index order. This means that first index is changing fastest,
+        # and the last index changing slowest.
         ids = ids.reshape((grid.rows, grid.columns), order="F")
     else:
         # Reshape the array. Without an order argument this will be column-major order by default.
