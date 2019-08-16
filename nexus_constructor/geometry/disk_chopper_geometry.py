@@ -19,32 +19,48 @@ FLOAT_TYPES = [
 ]
 
 
-def chopper_input_seems_reasonable(fields_widget: QListWidget):
-    """
-    Carries out a preliminary check of the fields input to see if seems like it might be describing a
-    valid disk chopper shape.
-    :param fields_widget:
-    :return:
-    """
+class ChopperChecker:
+    def __init__(self, fields_widget: QListWidget):
 
-    fields_dict = {widget.name: widget for widget in fields_widget.items()}
+        self.fields_widget = fields_widget
+        self.fields_dict = {
+            widget.name: widget for widget in self.fields_widget.items()
+        }
 
-    if set(fields_dict.keys()) != set(REQUIRED_CHOPPER_FIELDS):
-        return False
+    def validate_chopper(self):
 
-    if fields_dict["slits"].dtype not in INT_TYPES:
-        return False
+        return (
+            self.required_fields_present() and self.fields_have_correct_type_and_shape()
+        )
 
-    if fields_dict["radius"].dtype not in FLOAT_TYPES:
-        return False
+    def required_fields_present(self):
+        """
+        Carries out a preliminary check of the fields input to see if seems like it might be describing a
+        valid disk chopper shape.
+        :param fields_widget:
+        :return:
+        """
 
-    if fields_dict["slit_height"].dtype not in FLOAT_TYPES:
-        return False
+        if set(self.fields_dict.keys()) != set(REQUIRED_CHOPPER_FIELDS):
+            return False
 
-    if fields_dict["slit_edges"].dtype not in FLOAT_TYPES:
-        return False
+        return True
 
-    return True
+    def fields_have_correct_type_and_shape(self):
+
+        if self.fields_dict["slits"].dtype not in INT_TYPES:
+            return False
+
+        if self.fields_dict["radius"].dtype not in FLOAT_TYPES:
+            return False
+
+        if self.fields_dict["slit_height"].dtype not in FLOAT_TYPES:
+            return False
+
+        if self.fields_dict["slit_edges"].dtype not in FLOAT_TYPES:
+            return False
+
+        return True
 
 
 class ChopperDetails:
