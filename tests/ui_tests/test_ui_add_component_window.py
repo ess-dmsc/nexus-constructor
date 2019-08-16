@@ -6,6 +6,8 @@ import pytestqt
 from PySide2.QtCore import Qt, QPoint
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
+from mock import patch
+import numpy as np
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -785,6 +787,60 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_irrelevant_fields_are_invisibl
     systematic_radio_button_press(qtbot, dialog.CylinderRadioButton)
 
     assert not dialog.geometryFileBox.isVisible()
+
+
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_THEN_chopper_geometry_is_created(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.keyClicks(dialog.nameLineEdit, "ThisIsADiskChopper")
+    dialog.componentTypeComboBox.setCurrentIndex(16)
+
+    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
+    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
+    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
+    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
+
+    fields_widgets = [
+        dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(i))
+        for i in range(4)
+    ]
+
+    qtbot.keyClicks(fields_widgets[0].field_name_edit, "slits")
+    qtbot.keyClicks(fields_widgets[1].field_name_edit, "slit_edges")
+    qtbot.keyClicks(fields_widgets[2].field_name_edit, "radius")
+    qtbot.keyClicks(fields_widgets[3].field_name_edit, "slit_height")
+
+    show_and_close_window(qtbot, template)
+
+    fields_widgets[0].value_type_combo.setCurrentIndex(4)
+    fields_widgets[2].value_type_combo.setCurrentIndex(8)
+    fields_widgets[3].value_type_combo.setCurrentIndex(8)
+
+    show_and_close_window(qtbot, template)
+
+    fields_widgets[1].field_type_combo.setCurrentIndex(1)
+
+    show_and_close_window(qtbot, template)
+
+    show_window_and_wait_for_interaction(qtbot, template)
+
+    qtbot.keyClicks(fields_widgets[0].value_line_edit, "6")
+    qtbot.keyClicks(fields_widgets[2].value_line_edit, "200")
+    qtbot.keyClicks(fields_widgets[3].value_line_edit, "100")
+
+    fields_widgets[1].value_type_combo.setCurrentIndex(8)
+    fields_widgets[1].table_view.model.array = np.array(
+        [[(i * 10.0)] for i in range(12)]
+    )
+
+    with patch(
+        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+    ) as chopper_creator:
+        dialog.on_ok()
+        chopper_creator.assert_called_once()
 
 
 def test_UI_GIVEN_cylinder_geometry_selected_THEN_default_values_are_correct(qtbot):

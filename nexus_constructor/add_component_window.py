@@ -12,6 +12,10 @@ from nexus_constructor.geometry import (
     OFFGeometryNexus,
 )
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
+from nexus_constructor.geometry.disk_chopper_geometry import (
+    ChopperChecker,
+    DiskChopperGeometryCreator,
+)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
@@ -286,8 +290,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 filename=self.fileLineEdit.text(),
             )
         else:
-            geometry_model = NoShapeGeometry()
-            component.remove_shape()
+            chopper_checker = ChopperChecker(self.fieldsListWidget)
+            if (
+                component.nx_class == "NXdisk_chopper"
+                and chopper_checker.validate_chopper()
+            ):
+                geometry_model = DiskChopperGeometryCreator(
+                    chopper_checker.get_chopper_details()
+                ).create_disk_chopper_geometry()
+            else:
+                geometry_model = NoShapeGeometry()
+                component.remove_shape()
         return geometry_model
 
     def on_ok(self):
@@ -310,10 +323,5 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             geometry = self.generate_geometry_model(component)
             add_fields_to_component(component, self.fieldsListWidget)
             self.component_model.add_component(component)
-
-        # if nx_class == "NXdisk_chopper" and self.noShapeRadioButton.isChecked():
-        #     chopper_details = self.obtain_chopper_details()
-        #     if chopper_details.validate():
-        #         geometry = create_disk_chopper_geometry(chopper_details)
 
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)

@@ -2,7 +2,6 @@ import pytest
 from PySide2.QtWidgets import QListWidget
 from mock import Mock
 import numpy as np
-from typing import List
 
 from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.geometry.disk_chopper_geometry import (
@@ -88,7 +87,6 @@ def mock_fields_list_widget(
     list_widget.count = Mock(return_value=4)
 
     list_widget.itemWidget = Mock(side_effect=mock_widget_list)
-    list_widget.items = Mock(return_value=mock_widget_list)
 
     return list_widget
 
@@ -117,20 +115,18 @@ def chopper_checker(mock_fields_list_widget):
     return ChopperChecker(mock_fields_list_widget)
 
 
-def remove_mock_widget_from_list(
-    widget_mock_list: List, widget: Mock, mock_fields_list_widget: Mock
-):
-
-    widget_mock_list.remove(widget)
-
-    mock_fields_list_widget.itemWidget = Mock(side_effect=widget_mock_list)
-    mock_fields_list_widget.items = Mock(return_value=widget_mock_list)
-
-
 def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
     chopper_checker
 ):
 
+    assert chopper_checker.validate_chopper()
+
+
+def test_GIVEN_column_array_WHEN_validating_chopper_input_THEN_returns_true(
+    chopper_checker
+):
+
+    chopper_checker.fields_dict[SLIT_EDGES].value = np.array([[i] for i in range(6)])
     assert chopper_checker.validate_chopper()
 
 
