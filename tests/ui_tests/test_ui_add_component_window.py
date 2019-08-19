@@ -157,6 +157,54 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
         qtbot.keyClicks(dialog.unitsLineEdit, units)
 
 
+def enter_disk_chopper_fields(
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+):
+
+    qtbot.keyClicks(dialog.nameLineEdit, "ThisIsADiskChopper")
+    dialog.componentTypeComboBox.setCurrentIndex(16)
+
+    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
+    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
+    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
+    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
+
+    fields_widgets = [
+        dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(i))
+        for i in range(4)
+    ]
+
+    qtbot.keyClicks(fields_widgets[0].field_name_edit, "slits")
+    qtbot.keyClicks(fields_widgets[1].field_name_edit, "slit_edges")
+    qtbot.keyClicks(fields_widgets[2].field_name_edit, "radius")
+    qtbot.keyClicks(fields_widgets[3].field_name_edit, "slit_height")
+
+    show_and_close_window(qtbot, template)
+
+    fields_widgets[0].value_type_combo.setCurrentIndex(4)
+    fields_widgets[2].value_type_combo.setCurrentIndex(8)
+    fields_widgets[3].value_type_combo.setCurrentIndex(8)
+
+    show_and_close_window(qtbot, template)
+
+    fields_widgets[1].field_type_combo.setCurrentIndex(1)
+
+    show_and_close_window(qtbot, template)
+
+    qtbot.keyClicks(fields_widgets[0].value_line_edit, "6")
+    qtbot.keyClicks(fields_widgets[2].value_line_edit, "200")
+    qtbot.keyClicks(fields_widgets[3].value_line_edit, "100")
+
+    fields_widgets[1].value_type_combo.setCurrentIndex(8)
+    fields_widgets[1].table_view.model.array = np.array(
+        [[(i * 10.0)] for i in range(12)]
+    )
+
+    show_and_close_window(qtbot, template)
+
+
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot
@@ -789,58 +837,52 @@ def test_UI_GIVEN_cylinder_geometry_selected_THEN_irrelevant_fields_are_invisibl
     assert not dialog.geometryFileBox.isVisible()
 
 
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_THEN_chopper_geometry_is_created(
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_geometry_is_created(
     qtbot
 ):
 
     dialog, template = create_add_component_template(qtbot)
 
-    qtbot.keyClicks(dialog.nameLineEdit, "ThisIsADiskChopper")
-    dialog.componentTypeComboBox.setCurrentIndex(16)
-
-    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
-    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
-    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
-    systematic_radio_button_press(qtbot, dialog.addFieldPushButton)
-
-    fields_widgets = [
-        dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(i))
-        for i in range(4)
-    ]
-
-    qtbot.keyClicks(fields_widgets[0].field_name_edit, "slits")
-    qtbot.keyClicks(fields_widgets[1].field_name_edit, "slit_edges")
-    qtbot.keyClicks(fields_widgets[2].field_name_edit, "radius")
-    qtbot.keyClicks(fields_widgets[3].field_name_edit, "slit_height")
-
-    show_and_close_window(qtbot, template)
-
-    fields_widgets[0].value_type_combo.setCurrentIndex(4)
-    fields_widgets[2].value_type_combo.setCurrentIndex(8)
-    fields_widgets[3].value_type_combo.setCurrentIndex(8)
-
-    show_and_close_window(qtbot, template)
-
-    fields_widgets[1].field_type_combo.setCurrentIndex(1)
-
-    show_and_close_window(qtbot, template)
-
-    qtbot.keyClicks(fields_widgets[0].value_line_edit, "6")
-    qtbot.keyClicks(fields_widgets[2].value_line_edit, "200")
-    qtbot.keyClicks(fields_widgets[3].value_line_edit, "100")
-
-    fields_widgets[1].value_type_combo.setCurrentIndex(8)
-    fields_widgets[1].table_view.model.array = np.array(
-        [[(i * 10.0)] for i in range(12)]
-    )
-
-    show_and_close_window(qtbot, template)
+    enter_disk_chopper_fields(qtbot, dialog, template)
 
     with patch(
         "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
     ) as chopper_creator:
         dialog.on_ok()
         chopper_creator.assert_called_once()
+
+
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_chopper_geometry_is_not_created(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+    systematic_radio_button_press(qtbot, dialog.meshRadioButton)
+    enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+
+    enter_disk_chopper_fields(qtbot, dialog, template)
+
+    with patch(
+        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+    ) as chopper_creator:
+        dialog.on_ok()
+        chopper_creator.assert_not_called()
+
+
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_THEN_chopper_geometry_is_not_created(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+    systematic_radio_button_press(qtbot, dialog.CylinderRadioButton)
+
+    enter_disk_chopper_fields(qtbot, dialog, template)
+
+    with patch(
+        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+    ) as chopper_creator:
+        dialog.on_ok()
+        chopper_creator.assert_not_called()
 
 
 def test_UI_GIVEN_cylinder_geometry_selected_THEN_default_values_are_correct(qtbot):
