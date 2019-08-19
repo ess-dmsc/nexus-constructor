@@ -263,7 +263,7 @@ def test_GIVEN_slits_field_is_not_int_WHEN_validating_chopper_input_THEN_returns
     chopper_checker
 ):
 
-    chopper_checker.fields_dict[SLITS].dtype = np.byte
+    chopper_checker.fields_dict[SLITS].dtype = np.float16
 
     assert chopper_checker.required_fields_present()
 

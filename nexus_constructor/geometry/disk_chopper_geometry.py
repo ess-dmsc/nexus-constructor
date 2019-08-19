@@ -14,18 +14,6 @@ SLITS = "slits"
 RADIUS = "radius"
 SLIT_HEIGHT = "slit_height"
 
-REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES, SLITS, RADIUS, SLIT_HEIGHT}
-CONTAINS_INTEGER = [
-    DATASET_TYPE[key] for key in DATASET_TYPE.keys() if "Integer" in key
-]
-CONTAINS_SHORT = [DATASET_TYPE[key] for key in DATASET_TYPE.keys() if "Short" in key]
-CONTAINS_LONG = [DATASET_TYPE[key] for key in DATASET_TYPE.keys() if "Long" in key]
-INT_TYPES = CONTAINS_INTEGER + CONTAINS_SHORT + CONTAINS_LONG
-
-FLOAT_TYPES = [
-    DATASET_TYPE[key] for key in DATASET_TYPE.keys() if key in ["Float", "Double"]
-]
-
 UNABLE = "Unable to create chopper geometry - "
 EXPECTED_TYPE_ERROR_MSG = {
     SLIT_EDGES: "float",
@@ -33,6 +21,10 @@ EXPECTED_TYPE_ERROR_MSG = {
     RADIUS: "float",
     SLIT_HEIGHT: "float",
 }
+
+REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES, SLITS, RADIUS, SLIT_HEIGHT}
+INT_TYPES = [value for value in DATASET_TYPE.values() if "int" in str(value)]
+FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)]
 
 
 class ChopperChecker:
@@ -110,6 +102,11 @@ class ChopperChecker:
         return False
 
     def incorrect_field_type_message(self, field_name: str):
+        """
+        Creates a string explaining to the user that the field input did not have the expected type.
+        :param field_name: The name of the field that failed the check.
+        :return: A string that contains the name of the field, the type it should have, and the type the user entered.
+        """
         return "Wrong {} type. Expected {} but found {}.".format(
             field_name,
             EXPECTED_TYPE_ERROR_MSG[field_name],
@@ -117,10 +114,15 @@ class ChopperChecker:
         )
 
     def edges_array_has_correct_shape(self):
+        """
+        Checks that the edges array consists of either one row or one column.
+        :return: True if the edges array is 1D. False otherwise.
+        """
 
         edges_dim = self.fields_dict[SLIT_EDGES].value.ndim
 
         if edges_dim > 2:
+
             return False
 
         if edges_dim == 2:
