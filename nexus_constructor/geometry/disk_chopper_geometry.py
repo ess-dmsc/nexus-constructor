@@ -1,5 +1,3 @@
-from math import pi
-
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidget
 import numpy as np
@@ -146,8 +144,6 @@ class ChopperChecker:
         return True
 
     def input_describes_valid_chopper(self):
-
-        two_pi = np.pi * 2
 
         self._slit_edges = self.fields_dict[SLIT_EDGES].value
         self._radius = self.fields_dict[RADIUS].value
