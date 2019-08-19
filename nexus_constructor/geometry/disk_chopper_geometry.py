@@ -14,7 +14,7 @@ SLITS = "slits"
 RADIUS = "radius"
 SLIT_HEIGHT = "slit_height"
 
-REQUIRED_CHOPPER_FIELDS = [SLIT_EDGES, SLITS, RADIUS, SLIT_HEIGHT]
+REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES, SLITS, RADIUS, SLIT_HEIGHT}
 CONTAINS_INTEGER = [
     DATASET_TYPE[key] for key in DATASET_TYPE.keys() if "Integer" in key
 ]
@@ -25,6 +25,8 @@ INT_TYPES = CONTAINS_INTEGER + CONTAINS_SHORT + CONTAINS_LONG
 FLOAT_TYPES = [
     DATASET_TYPE[key] for key in DATASET_TYPE.keys() if key in ["Float", "Double"]
 ]
+
+UNABLE = "Unable to create chopper geometry - "
 
 
 class ChopperChecker:
@@ -57,7 +59,15 @@ class ChopperChecker:
         Carries out a preliminary check of the fields input to see if seems like it might be describing a
         valid disk chopper shape.
         """
-        return set(self.fields_dict.keys()) == set(REQUIRED_CHOPPER_FIELDS)
+        missing_fields = list(REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys())
+
+        if len(missing_fields) > 0:
+            print(
+                UNABLE + "Required field(s) missing:", ", ".join(list(missing_fields))
+            )
+            return False
+
+        return True
 
     def fields_have_correct_type(self):
 
