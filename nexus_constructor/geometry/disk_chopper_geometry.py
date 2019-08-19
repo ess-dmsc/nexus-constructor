@@ -107,6 +107,7 @@ class ChopperChecker:
             problems.append(self.incorrect_field_type_message(SLIT_EDGES))
 
         print(UNABLE + "\n".join(problems))
+        return False
 
     def incorrect_field_type_message(self, field_name: str):
         return "Wrong {} type. Expected {} but found {}.".format(
