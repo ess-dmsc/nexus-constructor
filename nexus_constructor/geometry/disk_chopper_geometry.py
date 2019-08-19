@@ -27,6 +27,12 @@ FLOAT_TYPES = [
 ]
 
 UNABLE = "Unable to create chopper geometry - "
+EXPECTED_TYPE_ERROR_MSG = {
+    SLIT_EDGES: "float",
+    SLITS: "int",
+    RADIUS: "float",
+    SLIT_HEIGHT: "float",
+}
 
 
 class ChopperChecker:
@@ -57,6 +63,7 @@ class ChopperChecker:
     def required_fields_present(self):
         """
         Checks that all of the fields required to create the disk chopper are present.
+        :return: True if all the required fields are present. False otherwise.
         """
         missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
 
@@ -67,12 +74,45 @@ class ChopperChecker:
         return True
 
     def fields_have_correct_type(self):
+        """
+        Checks if the fields entered have the correct data types.
+        :return: True if all the fields have the correct data types. False otherwise.
+        """
 
-        return (
-            self.fields_dict[SLITS].dtype in INT_TYPES
-            and self.fields_dict[RADIUS].dtype in FLOAT_TYPES
-            and self.fields_dict[SLIT_HEIGHT].dtype in FLOAT_TYPES
-            and self.fields_dict[SLIT_EDGES].dtype in FLOAT_TYPES
+        correct_slits_type = self.fields_dict[SLITS].dtype in INT_TYPES
+        correct_radius_type = self.fields_dict[RADIUS].dtype in FLOAT_TYPES
+        correct_slit_height_type = self.fields_dict[SLIT_HEIGHT].dtype in FLOAT_TYPES
+        correct_slit_edges_type = self.fields_dict[SLIT_EDGES].dtype in FLOAT_TYPES
+
+        if (
+            correct_slits_type
+            and correct_radius_type
+            and correct_slit_height_type
+            and correct_slit_edges_type
+        ):
+            return True
+
+        problems = []
+
+        if not correct_slits_type:
+            problems.append(self.incorrect_field_type_message(SLITS))
+
+        if not correct_radius_type:
+            problems.append(self.incorrect_field_type_message(RADIUS))
+
+        if not correct_slit_height_type:
+            problems.append(self.incorrect_field_type_message(SLIT_HEIGHT))
+
+        if not correct_slit_edges_type:
+            problems.append(self.incorrect_field_type_message(SLIT_EDGES))
+
+        print(UNABLE + "\n".join(problems))
+
+    def incorrect_field_type_message(self, field_name: str):
+        return "Wrong {} type. Expected {} but found {}.".format(
+            field_name,
+            EXPECTED_TYPE_ERROR_MSG[field_name],
+            str(self.fields_dict[field_name].dtype),
         )
 
     def edges_array_has_correct_shape(self):
