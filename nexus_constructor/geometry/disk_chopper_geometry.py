@@ -56,15 +56,12 @@ class ChopperChecker:
 
     def required_fields_present(self):
         """
-        Carries out a preliminary check of the fields input to see if seems like it might be describing a
-        valid disk chopper shape.
+        Checks that all of the fields required to create the disk chopper are present.
         """
-        missing_fields = list(REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys())
+        missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
 
         if len(missing_fields) > 0:
-            print(
-                UNABLE + "Required field(s) missing:", ", ".join(list(missing_fields))
-            )
+            print(UNABLE + "Required field(s) missing:", ", ".join(missing_fields))
             return False
 
         return True
