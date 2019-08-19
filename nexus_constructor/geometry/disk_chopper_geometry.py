@@ -286,8 +286,8 @@ class DiskChopperGeometryCreator:
 
         self.points = []
         self.faces = []
-        self.z = 20
-        self.arrow_size = 20
+        self.z = 1
+        self.arrow_size = 0.1
         self.resolution = 20
         self.resolution_angles = None
 
