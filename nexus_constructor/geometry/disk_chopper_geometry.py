@@ -122,12 +122,23 @@ class ChopperChecker:
         edges_dim = self.fields_dict[SLIT_EDGES].value.ndim
 
         if edges_dim > 2:
-
+            print(
+                UNABLE
+                + "Expected slit edges array to be 1D but it has {} dimensions.".format(
+                    str(edges_dim)
+                )
+            )
             return False
 
         if edges_dim == 2:
             edges_shape = self.fields_dict[SLIT_EDGES].value.shape
             if edges_shape[0] != 1 and edges_shape[1] != 1:
+                print(
+                    UNABLE
+                    + "Expected slit edges array to be 1D but it has shape {}.".format(
+                        str(edges_shape)
+                    )
+                )
                 return False
 
         return True
