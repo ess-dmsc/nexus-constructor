@@ -162,14 +162,28 @@ class ChopperChecker:
 
         # Check that the slit height is smaller than the radius
         if self._slit_height >= self._radius:
+            print(
+                UNABLE
+                + "Slit height should be smaller than radius. Instead slit height is {} and radius is {}".format(
+                    self._slit_height, self._radius
+                )
+            )
             return False
 
         # Check that the list of slit edges is sorted
         if not (diff(self._slit_edges) >= 0).all():
+            print(
+                UNABLE + "Slit edges array is not sorted. Found values:",
+                self._slit_edges,
+            )
             return False
 
         # Check that there are no repeated angles
         if len(self._slit_edges) != len(unique(self._slit_edges)):
+            print(
+                UNABLE + "Angles in slit edges array should be unique. Found values:",
+                self._slit_edges,
+            )
             return False
 
         # Convert the angles to radians (if necessary) and make sure they are all less then two pi
@@ -182,6 +196,10 @@ class ChopperChecker:
         if (self._slit_edges != sorted(self._slit_edges)) and (
             self._slit_edges[-1] >= self._slit_edges[0]
         ):
+            print(
+                UNABLE + "Slit edges contains overlapping slits. Found values:",
+                self.fields_dict[SLIT_EDGES].value,
+            )
             return False
 
         return True
