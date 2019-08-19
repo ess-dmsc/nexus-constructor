@@ -26,6 +26,8 @@ REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES, SLITS, RADIUS, SLIT_HEIGHT}
 INT_TYPES = [value for value in DATASET_TYPE.values() if "int" in str(value)]
 FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)]
 
+TWO_PI = np.pi * 2
+
 
 class ChopperChecker:
     def __init__(self, fields_widget: QListWidget):
@@ -145,6 +147,8 @@ class ChopperChecker:
 
     def input_describes_valid_chopper(self):
 
+        two_pi = np.pi * 2
+
         self._slit_edges = self.fields_dict[SLIT_EDGES].value
         self._radius = self.fields_dict[RADIUS].value
         self._slit_height = self.fields_dict[SLIT_HEIGHT].value
@@ -152,6 +156,12 @@ class ChopperChecker:
 
         # Check that the number of slit edges is equal to two times the number of slits
         if len(self._slit_edges) != 2 * self._slits:
+            print(
+                UNABLE
+                + "Size of slit edges array should be twice the number of slits. Instead there are {} slits and {} slit edges.".format(
+                    self._slits, len(self._slit_edges)
+                )
+            )
             return False
 
         # Check that the slit height is smaller than the radius
@@ -168,13 +178,9 @@ class ChopperChecker:
 
         # Convert the angles to radians (if necessary) and make sure they are all less then two pi
         if self._units == "deg":
-            self._slit_edges = [
-                deg2rad(edge) % ChopperDetails.TWO_PI for edge in self._slit_edges
-            ]
+            self._slit_edges = [deg2rad(edge) % TWO_PI for edge in self._slit_edges]
         else:
-            self._slit_edges = [
-                edge % ChopperDetails.TWO_PI for edge in self._slit_edges
-            ]
+            self._slit_edges = [edge % TWO_PI for edge in self._slit_edges]
 
         # Check that the first and last edges do not overlap
         if (self._slit_edges != sorted(self._slit_edges)) and (
@@ -191,9 +197,6 @@ class ChopperChecker:
 
 
 class ChopperDetails:
-
-    TWO_PI = pi * 2
-
     def __init__(
         self,
         slits: int,
