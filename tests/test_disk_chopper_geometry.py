@@ -126,8 +126,38 @@ def test_GIVEN_column_array_WHEN_validating_chopper_input_THEN_returns_true(
     chopper_checker
 ):
 
-    chopper_checker.fields_dict[SLIT_EDGES].value = np.array([[i] for i in range(6)])
+    chopper_checker.fields_dict[SLIT_EDGES].value = np.array(
+        [[i * 1.0] for i in range(6)]
+    )
     assert chopper_checker.validate_chopper()
+
+
+def test_GIVEN_slit_edges_array_with_more_than_two_dimensions_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
+):
+
+    chopper_checker.fields_dict[SLIT_EDGES].value = np.array(
+        [[[i * 1.0 for i in range(6)] for _ in range(6)] for _ in range(6)]
+    )
+
+    assert chopper_checker.required_fields_present()
+    assert chopper_checker.fields_have_correct_type()
+    assert not chopper_checker.edges_array_has_correct_shape()
+    assert not chopper_checker.validate_chopper()
+
+
+def test_GIVEN_slit_edges_array_with_two_dimensions_WHEN_validating_chopper_input_THEN_returns_false(
+    chopper_checker
+):
+
+    chopper_checker.fields_dict[SLIT_EDGES].value = np.array(
+        [[i * 1.0 for i in range(6)] for _ in range(6)]
+    )
+
+    assert chopper_checker.required_fields_present()
+    assert chopper_checker.fields_have_correct_type()
+    assert not chopper_checker.edges_array_has_correct_shape()
+    assert not chopper_checker.validate_chopper()
 
 
 def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopper_input_THEN_returns_false(
