@@ -859,6 +859,7 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_
     dialog, template = create_add_component_template(qtbot)
     systematic_radio_button_press(qtbot, dialog.meshRadioButton)
     enter_file_path(qtbot, dialog, VALID_MESH_FILE_PATH)
+    show_and_close_window(qtbot, template)
 
     enter_disk_chopper_fields(qtbot, dialog, template)
 
@@ -875,6 +876,7 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
 
     dialog, template = create_add_component_template(qtbot)
     systematic_radio_button_press(qtbot, dialog.CylinderRadioButton)
+    show_and_close_window(qtbot, template)
 
     enter_disk_chopper_fields(qtbot, dialog, template)
 

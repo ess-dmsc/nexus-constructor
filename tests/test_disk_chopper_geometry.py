@@ -135,6 +135,12 @@ def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopp
 ):
 
     chopper_checker.fields_dict[SLITS].value = 5
+
+    assert chopper_checker.required_fields_present()
+    assert chopper_checker.fields_have_correct_type()
+    assert chopper_checker.edges_array_has_correct_shape()
+
+    assert not chopper_checker.input_describes_valid_chopper()
     assert not chopper_checker.validate_chopper()
 
 
@@ -143,6 +149,11 @@ def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_T
 ):
 
     chopper_checker.fields_dict[SLIT_HEIGHT].value = 201
+    assert chopper_checker.required_fields_present()
+    assert chopper_checker.fields_have_correct_type()
+    assert chopper_checker.edges_array_has_correct_shape()
+
+    assert not chopper_checker.input_describes_valid_chopper()
     assert not chopper_checker.validate_chopper()
 
 
@@ -153,6 +164,11 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
     chopper_checker.fields_dict[SLIT_HEIGHT].value = chopper_checker.fields_dict[
         RADIUS
     ].value = 20
+    assert chopper_checker.required_fields_present()
+    assert chopper_checker.fields_have_correct_type()
+    assert chopper_checker.edges_array_has_correct_shape()
+
+    assert not chopper_checker.input_describes_valid_chopper()
     assert not chopper_checker.validate_chopper()
 
 
@@ -166,6 +182,11 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
         chopper_checker.fields_dict[SLIT_EDGES].value[1],
         chopper_checker.fields_dict[SLIT_EDGES].value[0],
     )
+    assert chopper_checker.required_fields_present()
+    assert chopper_checker.fields_have_correct_type()
+    assert chopper_checker.edges_array_has_correct_shape()
+
+    assert not chopper_checker.input_describes_valid_chopper()
     assert not chopper_checker.validate_chopper()
 
 
@@ -176,6 +197,11 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
     chopper_checker.fields_dict[SLIT_EDGES].value[0] = chopper_checker.fields_dict[
         SLIT_EDGES
     ].value[1]
+    assert chopper_checker.required_fields_present()
+    assert chopper_checker.fields_have_correct_type()
+    assert chopper_checker.edges_array_has_correct_shape()
+
+    assert not chopper_checker.input_describes_valid_chopper()
     assert not chopper_checker.validate_chopper()
 
 
@@ -186,6 +212,11 @@ def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_inp
     chopper_checker.fields_dict[SLIT_EDGES].value[-1] = (
         chopper_checker.fields_dict[SLIT_EDGES].value[0] + 365
     )
+    assert chopper_checker.required_fields_present()
+    assert chopper_checker.fields_have_correct_type()
+    assert chopper_checker.edges_array_has_correct_shape()
+
+    assert not chopper_checker.input_describes_valid_chopper()
     assert not chopper_checker.validate_chopper()
 
 
@@ -194,6 +225,8 @@ def test_GIVEN_slits_field_is_missing_WHEN_validating_chopper_input_THEN_returns
 ):
 
     del chopper_checker.fields_dict[SLITS]
+
+    assert not chopper_checker.required_fields_present()
     assert not chopper_checker.validate_chopper()
 
 
@@ -201,6 +234,8 @@ def test_GIVEN_slit_edges_field_is_missing_WHEN_validating_chopper_input_THEN_re
     chopper_checker
 ):
     del chopper_checker.fields_dict[SLIT_EDGES]
+
+    assert not chopper_checker.required_fields_present()
     assert not chopper_checker.validate_chopper()
 
 
@@ -209,6 +244,8 @@ def test_GIVEN_radius_field_is_missing_WHEN_validating_chopper_input_THEN_return
 ):
 
     del chopper_checker.fields_dict[RADIUS]
+
+    assert not chopper_checker.required_fields_present()
     assert not chopper_checker.validate_chopper()
 
 
@@ -217,6 +254,8 @@ def test_GIVEN_slit_height_field_is_missing_WHEN_validating_chopper_input_THEN_r
 ):
 
     del chopper_checker.fields_dict[SLIT_HEIGHT]
+
+    assert not chopper_checker.required_fields_present()
     assert not chopper_checker.validate_chopper()
 
 
@@ -225,6 +264,10 @@ def test_GIVEN_slits_field_is_not_int_WHEN_validating_chopper_input_THEN_returns
 ):
 
     chopper_checker.fields_dict[SLITS].dtype = np.byte
+
+    assert chopper_checker.required_fields_present()
+
+    assert not chopper_checker.fields_have_correct_type()
     assert not chopper_checker.validate_chopper()
 
 
@@ -233,6 +276,10 @@ def test_GIVEN_radius_field_is_not_float_or_double_WHEN_validating_chopper_input
 ):
 
     chopper_checker.fields_dict[RADIUS].dtype = np.byte
+
+    assert chopper_checker.required_fields_present()
+
+    assert not chopper_checker.fields_have_correct_type()
     assert not chopper_checker.validate_chopper()
 
 
@@ -241,6 +288,10 @@ def test_GIVEN_slit_height_field_is_not_float_or_double_float_WHEN_validating_ch
 ):
 
     chopper_checker.fields_dict[SLIT_HEIGHT].dtype = np.byte
+
+    assert chopper_checker.required_fields_present()
+
+    assert not chopper_checker.fields_have_correct_type()
     assert not chopper_checker.validate_chopper()
 
 
@@ -249,6 +300,10 @@ def test_GIVEN_slit_edges_field_is_not_float_or_double_WHEN_validating_chopper_i
 ):
 
     chopper_checker.fields_dict[SLIT_EDGES].dtype = np.byte
+
+    assert chopper_checker.required_fields_present()
+
+    assert not chopper_checker.fields_have_correct_type()
     assert not chopper_checker.validate_chopper()
 
 
