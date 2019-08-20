@@ -284,10 +284,8 @@ def enter_disk_chopper_fields(
     qtbot.keyClicks(dialog.nameLineEdit, "ThisIsADiskChopper")
     dialog.componentTypeComboBox.setCurrentIndex(16)
 
-    systematic_button_press(qtbot, dialog.addFieldPushButton)
-    systematic_button_press(qtbot, dialog.addFieldPushButton)
-    systematic_button_press(qtbot, dialog.addFieldPushButton)
-    systematic_button_press(qtbot, dialog.addFieldPushButton)
+    for _ in range(4):
+        systematic_button_press(qtbot, template, dialog.addFieldPushButton)
 
     fields_widgets = [
         dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(i))
@@ -1513,8 +1511,10 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_
     qtbot, dialog, template
 ):
 
-    systematic_button_press(qtbot, dialog.meshRadioButton)
-    enter_file_path(qtbot, dialog, VALID_CUBE_MESH_FILE_PATH)
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
     show_and_close_window(qtbot, template)
 
     enter_disk_chopper_fields(qtbot, dialog, template)
@@ -1530,7 +1530,7 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
     qtbot, dialog, template
 ):
 
-    systematic_button_press(qtbot, dialog.CylinderRadioButton)
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
     show_and_close_window(qtbot, template)
 
     enter_disk_chopper_fields(qtbot, dialog, template)
