@@ -67,6 +67,7 @@ for i, component_class in enumerate(
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
 FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(DATASET_TYPE.keys())}
+FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 
 @pytest.fixture(scope="function")
@@ -308,7 +309,9 @@ def enter_disk_chopper_fields(
 
     show_and_close_window(qtbot, template)
 
-    fields_widgets[1].field_type_combo.setCurrentIndex(1)
+    fields_widgets[1].field_type_combo.setCurrentIndex(
+        FIELD_TYPES[FieldType.array_dataset.value]
+    )
 
     show_and_close_window(qtbot, template)
 
