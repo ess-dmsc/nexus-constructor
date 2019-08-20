@@ -29,6 +29,10 @@ TWO_PI = np.pi * 2
 
 class ChopperChecker:
     def __init__(self, fields_widget: QListWidget):
+        """
+        A tool for inspecting chopper input before a chopper mesh can be constructed.
+        :param fields_widget:
+        """
 
         self.fields_widget = fields_widget
         self.fields_dict = dict()
@@ -45,7 +49,12 @@ class ChopperChecker:
         self._chopper_details = None
 
     def validate_chopper(self):
-
+        """
+        Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
+        fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
+        and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
+        :return: True if the chopper is valid. False otherwise.
+        """
         return (
             self.required_fields_present()
             and self.fields_have_correct_type()
@@ -71,7 +80,6 @@ class ChopperChecker:
         Checks if the fields entered have the correct data types.
         :return: True if all the fields have the correct data types. False otherwise.
         """
-
         correct_slits_type = self.fields_dict[SLITS].dtype in INT_TYPES
         correct_radius_type = self.fields_dict[RADIUS].dtype in FLOAT_TYPES
         correct_slit_height_type = self.fields_dict[SLIT_HEIGHT].dtype in FLOAT_TYPES
@@ -119,7 +127,6 @@ class ChopperChecker:
         Checks that the edges array consists of either one row or one column.
         :return: True if the edges array is 1D. False otherwise.
         """
-
         edges_dim = self.fields_dict[SLIT_EDGES].value.ndim
 
         if edges_dim > 2:
@@ -145,7 +152,16 @@ class ChopperChecker:
         return True
 
     def input_describes_valid_chopper(self):
-
+        """
+        A final check that the input has the following properties:
+            - The length of the slit edges array is twice the number of slits
+            - The slit height is smaller than the radius
+            - The slit edges array is sorted.
+            - The slit edges array doesn't contain repeated angles.
+            - The slit edges array doesn't contain overlapping slits.
+        If this is all true then a chopper mesh can be created.
+        :return: True if all the conditions above are met. False otherwise.
+        """
         self._chopper_details = ChopperDetails(
             self.fields_dict[SLITS].value,
             self.fields_dict[SLIT_EDGES].value,
@@ -207,6 +223,10 @@ class ChopperChecker:
         return True
 
     def get_chopper_details(self):
+        """
+        :return: The ChopperDetails object. This will only be created if `validate_chopper` was called and the
+            validation was successful. Otherwise this method just returns None.
+        """
         return self._chopper_details
 
 
@@ -226,8 +246,8 @@ class ChopperDetails:
         :param radius: The radius of the slit chopper.
         :param slit_height: The slit height.
         :param units: The units of the slit edges. At the moment all slit edges provided are assumed to be degrees
-            because the faculty for specifying attributes of fields hasn't yet been implemented in the
-            Add Component Dialog.
+            because the faculty for specifying attributes of fields hasn't yet been implemented in the Add Component
+            Dialog.
         """
         self._slits = slits
         self._radius = radius
@@ -274,16 +294,16 @@ class Point:
         if self.id is None and index is not None:
             self.id = index
 
-    def point_to_qvector(self):
+    def point_to_qvector3d(self):
         """
-        Create a string from the point coordinates to that it can be placed in the OFF file.
+        Create a QVector3D from the point.
         """
         return QVector3D(self.x, self.y, self.z)
 
 
 class DiskChopperGeometryCreator:
     """
-    Tool for creating OFF files in the form of strings from NXdisk_chopper information.
+    Tool for creating OFF Geometry in the form of strings from NXdisk_chopper information.
     """
 
     def __init__(self, chopper_details: ChopperDetails):
@@ -374,7 +394,6 @@ class DiskChopperGeometryCreator:
         """
         Create an OFF file from a given chopper and user-defined thickness and resolution values.
         """
-
         # Find the distance from the disk centre to the bottom of the slit
         centre_to_slit_bottom = self._radius - self._slit_height
 
@@ -574,6 +593,6 @@ class DiskChopperGeometryCreator:
         self.convert_chopper_details_to_off()
 
         # Add the point information to the string
-        vertices = [point.point_to_qvector() for point in self.points]
+        vertices = [point.point_to_qvector3d() for point in self.points]
 
         return OFFGeometryNoNexus(vertices, self.faces)
