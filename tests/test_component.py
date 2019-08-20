@@ -1,3 +1,5 @@
+from mock import patch
+
 from nexus_constructor.component import DependencyError, Component
 from cmath import isclose
 from PySide2.QtGui import QVector3D
@@ -406,3 +408,65 @@ def test_GIVEN_pixel_mapping_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_
     assert np.array_equal(
         component.get_field("detector_number"), np.array(pixel_id_list)
     )
+
+
+def test_GIVEN_pixel_mapping_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_is_called_with_pixel_data(
+    component
+):
+    pixel_mapping = PixelMapping()
+
+    with patch(
+        "nexus_constructor.component.CylindricalGeometry"
+    ) as mock_cylindrical_geometry_constructor:
+        component.set_cylinder_shape(pixel_data=pixel_mapping)
+        mock_cylindrical_geometry_constructor.assert_called_once_with(
+            component.file, component.group["shape"], pixel_mapping
+        )
+
+
+def test_GIVEN_pixel_mapping_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_called_with_pixel_data(
+    component
+):
+    pixel_mapping = PixelMapping()
+    off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
+
+    with patch(
+        "nexus_constructor.component.OFFGeometryNexus"
+    ) as mock_off_geometry_constructor:
+
+        component.set_off_shape(loaded_geometry=off_geometry, pixel_data=pixel_mapping)
+        mock_off_geometry_constructor.assert_called_once_with(
+            component.file, component.group["shape"], "", "", pixel_mapping
+        )
+
+
+def test_GIVEN_pixel_grid_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_is_not_called_with_pixel_data(
+    component
+):
+
+    pixel_grid = PixelGrid()
+
+    with patch(
+        "nexus_constructor.component.CylindricalGeometry"
+    ) as mock_cylindrical_geometry_constructor:
+        component.set_cylinder_shape(pixel_data=pixel_grid)
+        mock_cylindrical_geometry_constructor.assert_called_once_with(
+            component.file, component.group["pixel_shape"], None
+        )
+
+
+def test_GIVEN_pixel_grid_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_not_called_with_pixel_data(
+    component
+):
+
+    pixel_grid = PixelGrid()
+    off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
+
+    with patch(
+        "nexus_constructor.component.OFFGeometryNexus"
+    ) as mock_off_geometry_constructor:
+
+        component.set_off_shape(loaded_geometry=off_geometry, pixel_data=pixel_grid)
+        mock_off_geometry_constructor.assert_called_once_with(
+            component.file, component.group["pixel_shape"], "", "", None
+        )

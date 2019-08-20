@@ -402,6 +402,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
         geometry = self.generate_geometry_model(component, pixel_data)
 
+        # In the future this should check if the class is NXdetector or NXdetector_module
         if nx_class == "NXdetector":
             if type(pixel_data) is PixelMapping:
                 component.record_detector_number(pixel_data)
