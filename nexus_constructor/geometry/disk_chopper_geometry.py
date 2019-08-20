@@ -178,7 +178,7 @@ class ChopperChecker:
         if not (diff(self._chopper_details.slit_edges) >= 0).all():
             print(
                 UNABLE + "Slit edges array is not sorted. Found values:",
-                self._chopper_details.slit_edges,
+                self.fields_dict[SLIT_EDGES].value,
             )
             return False
 
@@ -188,7 +188,7 @@ class ChopperChecker:
         ):
             print(
                 UNABLE + "Angles in slit edges array should be unique. Found values:",
-                self._chopper_details.slit_edges,
+                self.fields_dict[SLIT_EDGES].value,
             )
             return False
 
