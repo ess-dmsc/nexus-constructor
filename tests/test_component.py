@@ -1,6 +1,13 @@
 from mock import patch
 
-from nexus_constructor.component import DependencyError, Component
+from nexus_constructor.component import (
+    DependencyError,
+    Component,
+    SHAPE_GROUP_NAME,
+    PIXEL_SHAPE_GROUP_NAME,
+    CYLINDRICAL_GEOMETRY_NEXUS_NAME,
+    OFF_GEOMETRY_NEXUS_NAME,
+)
 from cmath import isclose
 from PySide2.QtGui import QVector3D
 import pytest
@@ -420,7 +427,7 @@ def test_GIVEN_pixel_mapping_WHEN_setting_cylinder_shape_THEN_cylindrical_geomet
     ) as mock_cylindrical_geometry_constructor:
         component.set_cylinder_shape(pixel_data=pixel_mapping)
         mock_cylindrical_geometry_constructor.assert_called_once_with(
-            component.file, component.group["shape"], pixel_mapping
+            component.file, component.group[SHAPE_GROUP_NAME], pixel_mapping
         )
 
 
@@ -429,14 +436,61 @@ def test_GIVEN_pixel_mapping_WHEN_setting_off_geometry_shape_THEN_off_geometry_i
 ):
     pixel_mapping = PixelMapping()
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
+    units = "m"
+    filename = "somefile.off"
 
     with patch(
         "nexus_constructor.component.OFFGeometryNexus"
     ) as mock_off_geometry_constructor:
 
-        component.set_off_shape(loaded_geometry=off_geometry, pixel_data=pixel_mapping)
+        component.set_off_shape(
+            loaded_geometry=off_geometry,
+            units=units,
+            filename=filename,
+            pixel_data=pixel_mapping,
+        )
         mock_off_geometry_constructor.assert_called_once_with(
-            component.file, component.group["shape"], "", "", pixel_mapping
+            component.file,
+            component.group[SHAPE_GROUP_NAME],
+            units,
+            filename,
+            pixel_mapping,
+        )
+
+
+def test_GIVEN_no_pixel_data_WHEN_setting_cylinder_shape_THEN_shape_group_has_name_shape(
+    component
+):
+
+    with patch(
+        "nexus_constructor.component.CylindricalGeometry"
+    ) as mock_cylindrical_geometry_constructor:
+        component.set_cylinder_shape(pixel_data=None)
+        mock_cylindrical_geometry_constructor.assert_called_once_with(
+            component.file, component.group[SHAPE_GROUP_NAME], None
+        )
+
+
+def test_GIVEN_no_pixel_data_WHEN_setting_off_geometry_shape_THEN_shape_group_has_name_shape(
+    component
+):
+
+    off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
+    units = "m"
+    filename = "somefile.off"
+
+    with patch(
+        "nexus_constructor.component.OFFGeometryNexus"
+    ) as mock_off_geometry_constructor:
+
+        component.set_off_shape(
+            loaded_geometry=off_geometry,
+            units=units,
+            filename=filename,
+            pixel_data=None,
+        )
+        mock_off_geometry_constructor.assert_called_once_with(
+            component.file, component.group[SHAPE_GROUP_NAME], units, filename, None
         )
 
 
@@ -451,7 +505,7 @@ def test_GIVEN_pixel_grid_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_
     ) as mock_cylindrical_geometry_constructor:
         component.set_cylinder_shape(pixel_data=pixel_grid)
         mock_cylindrical_geometry_constructor.assert_called_once_with(
-            component.file, component.group["pixel_shape"], None
+            component.file, component.group[PIXEL_SHAPE_GROUP_NAME], None
         )
 
 
@@ -461,12 +515,48 @@ def test_GIVEN_pixel_grid_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_n
 
     pixel_grid = PixelGrid()
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
+    units = "m"
+    filename = "somefile.off"
 
     with patch(
         "nexus_constructor.component.OFFGeometryNexus"
     ) as mock_off_geometry_constructor:
 
-        component.set_off_shape(loaded_geometry=off_geometry, pixel_data=pixel_grid)
-        mock_off_geometry_constructor.assert_called_once_with(
-            component.file, component.group["pixel_shape"], "", "", None
+        component.set_off_shape(
+            loaded_geometry=off_geometry,
+            units=units,
+            filename=filename,
+            pixel_data=pixel_grid,
         )
+        mock_off_geometry_constructor.assert_called_once_with(
+            component.file,
+            component.group[PIXEL_SHAPE_GROUP_NAME],
+            units,
+            filename,
+            None,
+        )
+
+
+def test_GIVEN_cylinder_properties_WHEN_setting_cylindrical_geometry_shape_THEN_shape_group_has_class_nxcylindrical_geometry(
+    component
+):
+
+    component.set_cylinder_shape()
+    assert (
+        component.group[SHAPE_GROUP_NAME].attrs["NX_class"]
+        == CYLINDRICAL_GEOMETRY_NEXUS_NAME
+    )
+
+
+def test_GIVEN_off_properties_WHEN_setting_off_geometry_shape_THEN_shape_group_has_class_nxoff_geometry(
+    component
+):
+
+    off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
+
+    with patch("nexus_constructor.component.OFFGeometryNexus"):
+        component.set_off_shape(loaded_geometry=off_geometry)
+
+    assert (
+        component.group[SHAPE_GROUP_NAME].attrs["NX_class"] == OFF_GEOMETRY_NEXUS_NAME
+    )
