@@ -2,11 +2,10 @@ from typing import List
 import os
 import xmltodict
 
-PIXEL_COMPONENT_TYPES = ["NXmonitor", "NXdetector", "NXdetector_module"]
-COMPONENT_TYPES = [
+PIXEL_COMPONENT_TYPES = {"NXdetector", "NXdetector_module"}
+COMPONENT_TYPES = {
     "NXmonitor",
     "NXdetector",
-    "NXdetector_module",
     "NXsample",
     "NXsource",
     "NXdisk_chopper",
@@ -37,7 +36,7 @@ COMPONENT_TYPES = [
     "NXslit",
     "NXvelocity_selector",
     "NXxraylens",
-]
+}
 
 
 def __list_base_class_files(file_list):

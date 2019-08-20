@@ -1,4 +1,9 @@
 from PySide2.QtGui import QVector3D, QMatrix4x4
+
+from nexus_constructor.pixel_data import PixelMapping
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    get_detector_number_from_pixel_mapping,
+)
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from math import sin, cos, pi, acos, degrees
 import h5py
@@ -15,7 +20,7 @@ from nexus_constructor.ui_utils import (
 )
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
 from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
-from typing import Tuple
+from typing import Tuple, List
 
 
 def calculate_vertices(
@@ -53,10 +58,18 @@ class CylindricalGeometry:
 
     geometry_str = "Cylinder"
 
-    def __init__(self, nexus_file: nx.NexusWrapper, group: h5py.Group):
+    def __init__(
+        self,
+        nexus_file: nx.NexusWrapper,
+        group: h5py.Group,
+        pixel_mapping: PixelMapping = None,
+    ):
         self.file = nexus_file
         self.group = group
         self._verify_in_file()
+
+        if pixel_mapping is not None:
+            self.detector_number = get_detector_number_from_pixel_mapping(pixel_mapping)
 
     def _verify_in_file(self):
         """
@@ -74,6 +87,14 @@ class CylindricalGeometry:
         )
         if problems:
             raise NexusFormatError("\n".join(problems))
+
+    @property
+    def detector_number(self) -> List[int]:
+        return self.file.get_field_value(self.group, "detector_number")
+
+    @detector_number.setter
+    def detector_number(self, pixel_ids: List[int]):
+        self.file.set_field_value(self.group, "detector_number", pixel_ids)
 
     @property
     def units(self) -> str:
