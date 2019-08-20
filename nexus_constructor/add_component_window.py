@@ -33,7 +33,7 @@ from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
 
-from nexus_constructor.pixel_data import PixelData, PixelMapping
+from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
 
 
@@ -306,7 +306,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.cylinderOptionsBox.setVisible(False)
 
     def generate_geometry_model(
-        self, component: Component, pixel_mapping: PixelMapping = None
+        self, component: Component, pixel_data: PixelData = None
     ) -> OFFGeometry:
         """
         Generates a geometry model depending on the type of geometry selected and the current values
@@ -314,6 +314,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
+
             geometry_model = component.set_cylinder_shape(
                 QVector3D(
                     self.cylinderXLineEdit.value(),
@@ -323,7 +324,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderHeightLineEdit.value(),
                 self.cylinderRadiusLineEdit.value(),
                 self.unitsLineEdit.text(),
-                pixel_mapping=pixel_mapping,
+                pixel_data=pixel_data,
             )
         elif self.meshRadioButton.isChecked():
             mesh_geometry = OFFGeometryNoNexus()
@@ -340,7 +341,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 geometry_model,
                 units=self.unitsLineEdit.text(),
                 filename=self.fileLineEdit.text(),
-                pixel_mapping=pixel_mapping,
+                pixel_data=pixel_data,
             )
         else:
             geometry_model = NoShapeGeometry()
@@ -367,19 +368,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
 
-        # Check if the Pixel Data is the Pixel Mapping type. If is a mapping then it must be stored in both the
-        # component as well as the NXoff/cylindrical_geometry. If it is a PixelGrid then this is only stored in
-        # the component.
         pixel_data = self.pixel_options.generate_pixel_data()
-        pixel_data_is_mapping = type(pixel_data) is PixelMapping
 
         if self.component_to_edit:
             geometry = self.edit_existing_component(
-                component_name, description, nx_class, pixel_data, pixel_data_is_mapping
+                component_name, description, nx_class, pixel_data
             )
         else:
             geometry = self.create_new_component(
-                component_name, description, nx_class, pixel_data, pixel_data_is_mapping
+                component_name, description, nx_class, pixel_data
             )
 
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
@@ -390,7 +387,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         description: str,
         nx_class: str,
         pixel_data: PixelData,
-        pixel_data_is_mapping: bool,
     ):
         """
         Creates a new component.
@@ -399,22 +395,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :param nx_class: The component class.
         :param pixel_data: The PixelData for the component. Will be None if it was not given of if the component type
             doesn't have pixel-related fields.
-        :param pixel_data_is_mapping: Whether or not the PixelData is a mapping.
+        :return: The geometry object.
         """
         component = self.instrument.create_component(
             component_name, nx_class, description
         )
-        class_is_nxdetector = nx_class == "NXdetector"
+        geometry = self.generate_geometry_model(component, pixel_data)
 
-        if pixel_data_is_mapping:
-            geometry = self.generate_geometry_model(component, pixel_data)
-
-            if class_is_nxdetector:
+        if nx_class == "NXdetector":
+            if type(pixel_data) is PixelMapping:
                 component.record_detector_number(pixel_data)
-        else:
-            geometry = self.generate_geometry_model(component)
-
-            if class_is_nxdetector:
+            if type(pixel_data) is PixelGrid:
                 component.record_pixel_grid(pixel_data)
 
         add_fields_to_component(component, self.fieldsListWidget)
@@ -427,7 +418,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         description: str,
         nx_class: str,
         pixel_data: PixelData,
-        pixel_data_is_mapping: bool,
     ):
         """
         Edits an existing component.
@@ -435,8 +425,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :param description: The component description.
         :param nx_class: The component class.
         :param pixel_data: The component PixelData. Can be None.
-        :param pixel_data_is_mapping: Whether or not the PixelData is a mapping.
-        :return:
+        :return: The geometry object.
         """
         self.component_to_edit.name = component_name
         self.component_to_edit.nx_class = nx_class
@@ -444,10 +433,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # remove the previous shape from the qt3d view
         if self.component_to_edit.get_shape() and self.parent():
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
-        if pixel_data_is_mapping:
-            geometry = self.generate_geometry_model(self.component_to_edit, pixel_data)
-        else:
-            geometry = self.generate_geometry_model(self.component_to_edit)
+
+        geometry = self.generate_geometry_model(self.component_to_edit, pixel_data)
         return geometry
 
     def change_pixel_options_visibility(self):
