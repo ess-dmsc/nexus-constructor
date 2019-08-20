@@ -37,6 +37,9 @@ from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
 
+from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
+from nexus_constructor.pixel_options import PixelOptions
+
 
 class GeometryType(Enum):
     NONE = 1
@@ -63,8 +66,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
+        self.cad_file_name = None
         self.possible_fields = []
         self.component_to_edit = component_to_edit
+        self.valid_file_given = False
+        self.pixel_options = None
 
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
@@ -83,28 +89,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        self.ok_validator = OkValidator(self.noShapeRadioButton, self.meshRadioButton)
-        self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
-
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
-        [
-            button.clicked.connect(self.ok_validator.validate_ok)
-            for button in [
-                self.meshRadioButton,
-                self.CylinderRadioButton,
-                self.noShapeRadioButton,
-            ]
-        ]
-
         self.fileLineEdit.setValidator(GeometryFileValidator(GEOMETRY_FILE_TYPES))
         self.fileLineEdit.validator().is_valid.connect(
             partial(validate_line_edit, self.fileLineEdit)
         )
-        self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
+        self.fileLineEdit.textChanged.connect(self.populate_pixel_mapping_if_necessary)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
 
@@ -133,8 +127,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         validate_line_edit(self.fileLineEdit, False)
 
-        self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
-
         self.unitsLineEdit.setValidator(UnitValidator())
         self.unitsLineEdit.validator().is_valid.connect(
             partial(
@@ -144,11 +136,49 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 tooltip_on_accept="Units Valid",
             )
         )
+
+        self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
+        self.componentTypeComboBox.currentIndexChanged.connect(
+            self.change_pixel_options_visibility
+        )
+
+        # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
+        self.on_nx_class_changed()
+
+        self.fieldsListWidget.itemClicked.connect(self.select_field)
+
+        self.pixel_options = PixelOptions()
+        self.pixel_options.setupUi(self.pixelOptionsWidget)
+        self.pixelOptionsWidget.ui = self.pixel_options
+
+        if self.component_to_edit:
+            self._fill_existing_entries()
+            self.pixel_options.fill_existing_entries()
+
+        self.ok_validator = OkValidator(
+            self.noShapeRadioButton,
+            self.meshRadioButton,
+            self.pixel_options.get_validator(),
+        )
+        self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
+
+        self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
+
+        [
+            button.clicked.connect(self.ok_validator.validate_ok)
+            for button in [
+                self.meshRadioButton,
+                self.CylinderRadioButton,
+                self.noShapeRadioButton,
+            ]
+        ]
+
         self.unitsLineEdit.validator().is_valid.connect(
             self.ok_validator.set_units_valid
         )
 
-        self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
+        self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
+        self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
@@ -156,13 +186,39 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.addFieldPushButton.clicked.connect(self.add_field)
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
-        # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
-        self.on_nx_class_changed()
+        # Connect the pixel mapping press signal the populate pixel mapping method
+        self.pixel_options.pixel_mapping_button_pressed.connect(
+            self.populate_pixel_mapping_if_necessary
+        )
 
-        self.fieldsListWidget.itemClicked.connect(self.select_field)
+        self.cylinderCountSpinBox.valueChanged.connect(
+            self.populate_pixel_mapping_if_necessary
+        )
 
-        if self.component_to_edit:
-            self._fill_existing_entries()
+        self.meshRadioButton.clicked.connect(self.set_pixel_related_changes)
+        self.CylinderRadioButton.clicked.connect(self.set_pixel_related_changes)
+        self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
+
+    def set_pixel_related_changes(self):
+        """
+        Manages the pixel-related changes that are induced by changing the shape type. This entails changing the
+        visibility of the pixel options widget, clearing the previous pixel mapping widget list (if necessary),
+        generating a new pixel mapping widget list (if necessary), and reassessing the validity of the pixel input.
+        """
+        self.change_pixel_options_visibility()
+
+        if not self.noShapeRadioButton.isChecked():
+            self.clear_previous_mapping_list()
+            self.populate_pixel_mapping_if_necessary()
+
+        self.update_pixel_input_validity()
+
+    def clear_previous_mapping_list(self):
+        """
+        Wipes the previous list of pixel mapping widgets. Required if the file has changed, or if the shape type has
+        changed.
+        """
+        self.pixel_options.reset_pixel_mapping_list()
 
     def _fill_existing_entries(self):
         self.buttonBox.setText("Edit Component")
@@ -223,9 +279,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
             )
         )
-        self.pixelOptionsBox.setVisible(
-            self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
-        )
         self.possible_fields = self.nx_component_classes[
             self.componentTypeComboBox.currentText()
         ]
@@ -237,9 +290,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: None
         """
         filename = file_dialog(False, "Open Mesh", GEOMETRY_FILE_TYPES)
-        if filename:
-            self.fileLineEdit.setText(filename)
-            self.cad_file_name = filename
+        self.cad_file_name = filename
+        self.fileLineEdit.setText(filename)
 
     def show_cylinder_fields(self):
         self.shapeOptionsBox.setVisible(True)
@@ -247,6 +299,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.cylinderOptionsBox.setVisible(True)
 
     def show_no_geometry_fields(self):
+
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.buttonBox.setEnabled(True)
@@ -256,13 +309,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
 
-    def generate_geometry_model(self, component: Component) -> OFFGeometry:
+    def generate_geometry_model(
+        self, component: Component, pixel_data: PixelData = None
+    ) -> OFFGeometry:
         """
         Generates a geometry model depending on the type of geometry selected and the current values
-        of the lineedits that apply to the particular geometry type.
+        of the line edits that apply to the particular geometry type.
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
+
             geometry_model = component.set_cylinder_shape(
                 QVector3D(
                     self.cylinderXLineEdit.value(),
@@ -272,6 +328,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderHeightLineEdit.value(),
                 self.cylinderRadiusLineEdit.value(),
                 self.unitsLineEdit.text(),
+                pixel_data=pixel_data,
             )
         elif self.meshRadioButton.isChecked():
             mesh_geometry = OFFGeometryNoNexus()
@@ -288,6 +345,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 geometry_model,
                 units=self.unitsLineEdit.text(),
                 filename=self.fileLineEdit.text(),
+                pixel_data=pixel_data,
             )
         else:
             chopper_checker = ChopperChecker(self.fieldsListWidget)
@@ -301,27 +359,144 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             else:
                 geometry_model = NoShapeGeometry()
                 component.remove_shape()
+
         return geometry_model
 
+    def get_pixel_visibility_condition(self):
+        """
+        Determines if it is necessary to make the pixel options visible.
+        :return: A bool indicating if the current shape and component type allow for pixel-related input.
+        """
+        return (
+            self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
+            and not self.noShapeRadioButton.isChecked()
+        )
+
     def on_ok(self):
+        """
+        Retrieves information from the interface in order to create a component. By this point the input should already
+        be valid as the validators control whether or not the Add Component button is enabled.
+        """
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
 
+        pixel_data = self.pixel_options.generate_pixel_data()
+
         if self.component_to_edit:
-            self.component_to_edit.name = component_name
-            self.component_to_edit.nx_class = nx_class
-            self.component_to_edit.description = description
-            # remove the previous shape from the qt3d view
-            if self.component_to_edit.get_shape() and self.parent():
-                self.parent().sceneWidget.delete_component(self.component_to_edit.name)
-            geometry = self.generate_geometry_model(self.component_to_edit)
-        else:
-            component = self.instrument.create_component(
-                component_name, nx_class, description
+            geometry = self.edit_existing_component(
+                component_name, description, nx_class, pixel_data
             )
-            geometry = self.generate_geometry_model(component)
-            add_fields_to_component(component, self.fieldsListWidget)
-            self.component_model.add_component(component)
+        else:
+            geometry = self.create_new_component(
+                component_name, description, nx_class, pixel_data
+            )
 
         self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
+
+    def create_new_component(
+        self,
+        component_name: str,
+        description: str,
+        nx_class: str,
+        pixel_data: PixelData,
+    ):
+        """
+        Creates a new component.
+        :param component_name: The name of the component.
+        :param description: The component description.
+        :param nx_class: The component class.
+        :param pixel_data: The PixelData for the component. Will be None if it was not given of if the component type
+            doesn't have pixel-related fields.
+        :return: The geometry object.
+        """
+        component = self.instrument.create_component(
+            component_name, nx_class, description
+        )
+        geometry = self.generate_geometry_model(component, pixel_data)
+
+        # In the future this should check if the class is NXdetector or NXdetector_module
+        if nx_class == "NXdetector":
+            if type(pixel_data) is PixelMapping:
+                component.record_detector_number(pixel_data)
+            if type(pixel_data) is PixelGrid:
+                component.record_pixel_grid(pixel_data)
+
+        add_fields_to_component(component, self.fieldsListWidget)
+        self.component_model.add_component(component)
+        return geometry
+
+    def edit_existing_component(
+        self,
+        component_name: str,
+        description: str,
+        nx_class: str,
+        pixel_data: PixelData,
+    ):
+        """
+        Edits an existing component.
+        :param component_name: The component name.
+        :param description: The component description.
+        :param nx_class: The component class.
+        :param pixel_data: The component PixelData. Can be None.
+        :return: The geometry object.
+        """
+        self.component_to_edit.name = component_name
+        self.component_to_edit.nx_class = nx_class
+        self.component_to_edit.description = description
+        # remove the previous shape from the qt3d view
+        if self.component_to_edit.get_shape() and self.parent():
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
+
+        geometry = self.generate_geometry_model(self.component_to_edit, pixel_data)
+        return geometry
+
+    def change_pixel_options_visibility(self):
+        """
+        Changes the visibility of the pixel options depending on if the current component/shape type has pixel fields.
+        """
+        self.pixelOptionsWidget.setVisible(self.get_pixel_visibility_condition())
+
+    def set_file_valid(self, validity):
+        """
+        Records the current status of the geometry file validity. This is used to determine if a list of pixel mapping
+        widgets can be generated.
+        :param validity: A bool indicating whether the mesh file was opened successfully.
+        """
+        self.valid_file_given = validity
+
+    def populate_pixel_mapping_if_necessary(self):
+        """
+        Tells the pixel options widget to populate the pixel mapping widget provided certain conditions are met. Checks
+        that the pixel options are visible then performs further checks depending on if the mesh or cylinder button
+        has been selected.
+        """
+
+        if not self.pixelOptionsWidget.isVisible():
+            return
+
+        if self.meshRadioButton.isChecked():
+            self.create_pixel_mapping_list_for_mesh()
+
+        if self.CylinderRadioButton.isChecked():
+            self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
+                self.cylinderCountSpinBox.value()
+            )
+
+    def create_pixel_mapping_list_for_mesh(self):
+        """
+        Instructs the PixelOptions to create a list of Pixel Mapping widgets using a mesh file if the user has given a
+        valid file and has not selected the same file twice in a row.
+        """
+        if (
+            self.cad_file_name is not None
+            and self.valid_file_given
+            and self.pixel_options.get_current_mapping_filename() != self.cad_file_name
+        ):
+            self.pixel_options.populate_pixel_mapping_list_with_mesh(self.cad_file_name)
+
+    def update_pixel_input_validity(self):
+        """
+        :return:
+        """
+        self.pixel_options.update_pixel_input_validity()
