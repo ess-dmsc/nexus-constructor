@@ -3,12 +3,12 @@ import pytest
 
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, CountDirection, Corner
 from nexus_constructor.pixel_data_to_nexus_utils import (
-    detector_faces,
-    pixel_grid_x_offsets,
-    pixel_grid_y_offsets,
-    pixel_grid_detector_ids,
-    pixel_grid_z_offsets,
-    detector_number,
+    get_detector_faces_from_pixel_mapping,
+    get_x_offsets_from_pixel_grid,
+    get_y_offsets_from_pixel_grid,
+    get_detector_ids_from_pixel_grid,
+    get_z_offsets_from_pixel_grid,
+    get_detector_number_from_pixel_mapping,
 )
 
 EXPECTED_DETECTOR_IDS = {
@@ -57,7 +57,7 @@ def test_GIVEN_list_of_ids_WHEN_calling_detector_faces_THEN_correct_detector_fac
         (i, ids_with_none_removed[i]) for i in range(len(ids_with_none_removed))
     ]
 
-    assert detector_faces(pixel_mapping) == expected_faces
+    assert get_detector_faces_from_pixel_mapping(pixel_mapping) == expected_faces
 
 
 def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_number_list_is_returned(
@@ -66,7 +66,7 @@ def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_nu
 
     expected_numbers = [id for id in pixel_mapping.pixel_ids if id is not None]
 
-    assert detector_number(pixel_mapping) == expected_numbers
+    assert get_detector_number_from_pixel_mapping(pixel_mapping) == expected_numbers
 
 
 @pytest.mark.parametrize("rows", ROW_COL_VALS)
@@ -83,7 +83,9 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_x_offsets_THEN_correct_x_offse
         for _ in range(pixel_grid.rows)
     ]
 
-    assert np.allclose(np.array(expected_x_offsets), pixel_grid_x_offsets(pixel_grid))
+    assert np.allclose(
+        np.array(expected_x_offsets), get_x_offsets_from_pixel_grid(pixel_grid)
+    )
 
 
 @pytest.mark.parametrize("rows", ROW_COL_VALS)
@@ -100,7 +102,9 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_y_offsets_THEN_correct_y_offse
         for j in reversed(range(pixel_grid.rows))
     ]
 
-    assert np.allclose(np.array(expected_y_offsets), pixel_grid_y_offsets(pixel_grid))
+    assert np.allclose(
+        np.array(expected_y_offsets), get_y_offsets_from_pixel_grid(pixel_grid)
+    )
 
 
 @pytest.mark.parametrize("rows", ROW_COL_VALS)
@@ -111,7 +115,7 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_z_offsets_THEN_z_offsets_are_a
     pixel_grid.rows = rows
     pixel_grid.columns = columns
 
-    z_offsets = pixel_grid_z_offsets(pixel_grid)
+    z_offsets = get_z_offsets_from_pixel_grid(pixel_grid)
 
     assert len(z_offsets) == pixel_grid.rows
     expected_row = [0 for _ in range(pixel_grid.columns)]
@@ -134,5 +138,5 @@ def test_GIVEN_direction_and_initial_count_corner_WHEN_calling_pixel_grid_detect
 
     assert np.array_equal(
         np.array(EXPECTED_DETECTOR_IDS[direction][corner]) + pixel_grid.first_id,
-        pixel_grid_detector_ids(pixel_grid),
+        get_detector_ids_from_pixel_grid(pixel_grid),
     )

@@ -7,10 +7,10 @@ import numpy as np
 
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
-    pixel_grid_x_offsets,
-    pixel_grid_y_offsets,
-    pixel_grid_z_offsets,
-    pixel_grid_detector_ids,
+    get_x_offsets_from_pixel_grid,
+    get_y_offsets_from_pixel_grid,
+    get_z_offsets_from_pixel_grid,
+    get_detector_ids_from_pixel_grid,
 )
 from .helpers import create_nexus_wrapper, add_component_to_file
 from nexus_constructor.geometry import (
@@ -382,16 +382,17 @@ def test_GIVEN_pixel_grid_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_dat
     component.record_pixel_grid(pixel_grid)
 
     assert np.array_equal(
-        component.get_field("x_pixel_offset"), pixel_grid_x_offsets(pixel_grid)
+        component.get_field("x_pixel_offset"), get_x_offsets_from_pixel_grid(pixel_grid)
     )
     assert np.array_equal(
-        component.get_field("y_pixel_offset"), pixel_grid_y_offsets(pixel_grid)
+        component.get_field("y_pixel_offset"), get_y_offsets_from_pixel_grid(pixel_grid)
     )
     assert np.array_equal(
-        component.get_field("z_pixel_offset"), pixel_grid_z_offsets(pixel_grid)
+        component.get_field("z_pixel_offset"), get_z_offsets_from_pixel_grid(pixel_grid)
     )
     assert np.array_equal(
-        component.get_field("detector_number"), pixel_grid_detector_ids(pixel_grid)
+        component.get_field("detector_number"),
+        get_detector_ids_from_pixel_grid(pixel_grid),
     )
 
 

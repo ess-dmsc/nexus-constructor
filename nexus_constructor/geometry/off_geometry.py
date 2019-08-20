@@ -10,7 +10,9 @@ from nexus_constructor.nexus.validation import (
     validate_group,
 )
 from nexus_constructor.pixel_data import PixelMapping
-from nexus_constructor.pixel_data_to_nexus_utils import detector_faces
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    get_detector_faces_from_pixel_mapping,
+)
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
@@ -131,7 +133,7 @@ class OFFGeometryNexus(OFFGeometry):
         self._verify_in_file()
 
         if pixel_mapping is not None:
-            self.detector_faces = detector_faces(pixel_mapping)
+            self.detector_faces = get_detector_faces_from_pixel_mapping(pixel_mapping)
 
         if units:
             self.units = units

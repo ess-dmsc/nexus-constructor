@@ -5,11 +5,11 @@ from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid
 from nexus_constructor.pixel_data_to_nexus_utils import (
-    pixel_grid_x_offsets,
-    pixel_grid_y_offsets,
-    pixel_grid_z_offsets,
-    pixel_grid_detector_ids,
-    detector_number,
+    get_x_offsets_from_pixel_grid,
+    get_y_offsets_from_pixel_grid,
+    get_z_offsets_from_pixel_grid,
+    get_detector_ids_from_pixel_grid,
+    get_detector_number_from_pixel_mapping,
 )
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
@@ -331,11 +331,23 @@ class Component:
         Records the pixel grid data to the NeXus file.
         :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
         """
-        self.set_field("x_pixel_offset", pixel_grid_x_offsets(pixel_grid), "float64")
-        self.set_field("y_pixel_offset", pixel_grid_y_offsets(pixel_grid), "float64")
-        self.set_field("z_pixel_offset", pixel_grid_z_offsets(pixel_grid), "float64")
-        self.set_field("detector_number", pixel_grid_detector_ids(pixel_grid), "int64")
+        self.set_field(
+            "x_pixel_offset", get_x_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "y_pixel_offset", get_y_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "z_pixel_offset", get_z_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "detector_number", get_detector_ids_from_pixel_grid(pixel_grid), "int64"
+        )
 
     def record_detector_number(self, pixel_mapping: PixelMapping):
 
-        self.set_field("detector_number", detector_number(pixel_mapping), "int64")
+        self.set_field(
+            "detector_number",
+            get_detector_number_from_pixel_mapping(pixel_mapping),
+            "int64",
+        )

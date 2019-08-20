@@ -1,7 +1,9 @@
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
 from nexus_constructor.pixel_data import PixelMapping
-from nexus_constructor.pixel_data_to_nexus_utils import detector_number
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    get_detector_number_from_pixel_mapping,
+)
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from math import sin, cos, pi, acos, degrees
 import h5py
@@ -67,7 +69,7 @@ class CylindricalGeometry:
         self._verify_in_file()
 
         if pixel_mapping is not None:
-            self.detector_number = detector_number(pixel_mapping)
+            self.detector_number = get_detector_number_from_pixel_mapping(pixel_mapping)
 
     def _verify_in_file(self):
         """

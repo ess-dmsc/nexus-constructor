@@ -3,7 +3,7 @@ import numpy as np
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 
 
-def detector_faces(mapping: PixelMapping):
+def get_detector_faces_from_pixel_mapping(mapping: PixelMapping):
     """
     Returns a list of tuples. Each tuple contains a face ID followed by the face's detector ID.
     Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
@@ -11,7 +11,7 @@ def detector_faces(mapping: PixelMapping):
     return list(enumerate([id for id in mapping.pixel_ids if id is not None]))
 
 
-def detector_number(mapping: PixelMapping):
+def get_detector_number_from_pixel_mapping(mapping: PixelMapping):
     """
     Returns a list of pixel IDs. Used for writing information to the detector_number field in NXdetector and
     NXcylindrical_geometry.
@@ -19,7 +19,7 @@ def detector_number(mapping: PixelMapping):
     return [id for id in mapping.pixel_ids if id is not None]
 
 
-def pixel_grid_x_offsets(grid: PixelGrid):
+def get_x_offsets_from_pixel_grid(grid: PixelGrid):
     """
     Returns an array of x-offsets. Each value in the array is the x position of a pixel instance defined in the
     PixelGrid.
@@ -31,7 +31,7 @@ def pixel_grid_x_offsets(grid: PixelGrid):
     return np.tile(offsets, (grid.rows, 1))
 
 
-def pixel_grid_y_offsets(grid: PixelGrid):
+def get_y_offsets_from_pixel_grid(grid: PixelGrid):
     """
     Returns an array of y-offsets. Each value in the array is the y position of a pixel instance defined in the
     PixelGrid.
@@ -43,7 +43,7 @@ def pixel_grid_y_offsets(grid: PixelGrid):
     return np.tile(offsets, (grid.columns, 1)).transpose()
 
 
-def pixel_grid_z_offsets(grid: PixelGrid):
+def get_z_offsets_from_pixel_grid(grid: PixelGrid):
     """
     Returns a list of 'row' lists of 'column' length.
     Each entry in the sublists are z positions of pixel instances in the given PixelGrid.
@@ -51,7 +51,7 @@ def pixel_grid_z_offsets(grid: PixelGrid):
     return [[0] * grid.columns] * grid.rows
 
 
-def pixel_grid_detector_ids(grid: PixelGrid):
+def get_detector_ids_from_pixel_grid(grid: PixelGrid):
     """
     Returns an array of detector IDs. Starts with a 1D array of numbers and reorders them depending on the count
     direction and initial count corner supplied by the user.
