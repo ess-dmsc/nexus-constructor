@@ -42,6 +42,7 @@ class ChopperChecker:
         self._radius = None
         self._slit_height = None
         self._units = "deg"
+        self._chopper_details = None
 
     def validate_chopper(self):
 
@@ -145,56 +146,57 @@ class ChopperChecker:
 
     def input_describes_valid_chopper(self):
 
-        self._slit_edges = self.fields_dict[SLIT_EDGES].value
-        self._radius = self.fields_dict[RADIUS].value
-        self._slit_height = self.fields_dict[SLIT_HEIGHT].value
-        self._slits = self.fields_dict[SLITS].value
+        self._chopper_details = ChopperDetails(
+            self.fields_dict[SLITS].value,
+            self.fields_dict[SLIT_EDGES].value,
+            self.fields_dict[RADIUS].value,
+            self.fields_dict[SLIT_HEIGHT].value,
+            self._units,
+        )
 
         # Check that the number of slit edges is equal to two times the number of slits
-        if len(self._slit_edges) != 2 * self._slits:
+        if len(self._chopper_details.slit_edges) != 2 * self._chopper_details.slits:
             print(
                 UNABLE
                 + "Size of slit edges array should be twice the number of slits. Instead there are {} slits and {} slit edges.".format(
-                    self._slits, len(self._slit_edges)
+                    self._chopper_details.slits, len(self._chopper_details.slit_edges)
                 )
             )
             return False
 
         # Check that the slit height is smaller than the radius
-        if self._slit_height >= self._radius:
+        if self._chopper_details.slit_height >= self._chopper_details.radius:
             print(
                 UNABLE
                 + "Slit height should be smaller than radius. Instead slit height is {} and radius is {}".format(
-                    self._slit_height, self._radius
+                    self._chopper_details.slit_height, self._chopper_details.radius
                 )
             )
             return False
 
         # Check that the list of slit edges is sorted
-        if not (diff(self._slit_edges) >= 0).all():
+        if not (diff(self._chopper_details.slit_edges) >= 0).all():
             print(
                 UNABLE + "Slit edges array is not sorted. Found values:",
-                self._slit_edges,
+                self._chopper_details.slit_edges,
             )
             return False
 
         # Check that there are no repeated angles
-        if len(self._slit_edges) != len(unique(self._slit_edges)):
+        if len(self._chopper_details.slit_edges) != len(
+            unique(self._chopper_details.slit_edges)
+        ):
             print(
                 UNABLE + "Angles in slit edges array should be unique. Found values:",
-                self._slit_edges,
+                self._chopper_details.slit_edges,
             )
             return False
 
-        # Convert the angles to radians (if necessary) and make sure they are all less then two pi
-        if self._units == "deg":
-            self._slit_edges = [deg2rad(edge) % TWO_PI for edge in self._slit_edges]
-        else:
-            self._slit_edges = [edge % TWO_PI for edge in self._slit_edges]
-
         # Check that the first and last edges do not overlap
-        if (self._slit_edges != sorted(self._slit_edges)) and (
-            self._slit_edges[-1] >= self._slit_edges[0]
+        if (
+            self._chopper_details.slit_edges != sorted(self._chopper_details.slit_edges)
+        ) and (
+            self._chopper_details.slit_edges[-1] >= self._chopper_details.slit_edges[0]
         ):
             print(
                 UNABLE + "Slit edges contains overlapping slits. Found values:",
@@ -205,9 +207,7 @@ class ChopperChecker:
         return True
 
     def get_chopper_details(self):
-        return ChopperDetails(
-            self._slits, self._slit_edges, self._radius, self._slit_height
-        )
+        return self._chopper_details
 
 
 class ChopperDetails:
@@ -230,10 +230,14 @@ class ChopperDetails:
             Add Component Dialog.
         """
         self._slits = slits
-        self._slit_edges = slit_edges
         self._radius = radius
         self._slit_height = slit_height
-        self._units = units
+
+        # Convert the angles to radians (if necessary) and make sure they are all less then two pi
+        if units == "deg":
+            self._slit_edges = [deg2rad(edge) % TWO_PI for edge in slit_edges]
+        else:
+            self._slit_edges = [edge % TWO_PI for edge in slit_edges]
 
     @property
     def slits(self):
