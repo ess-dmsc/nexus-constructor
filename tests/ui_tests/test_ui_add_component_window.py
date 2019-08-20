@@ -20,7 +20,7 @@ from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_options import PixelOptions
-from nexus_constructor.validators import FieldType, PixelValidator
+from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -65,6 +65,8 @@ for i, component_class in enumerate(
         NO_PIXEL_OPTIONS[component_class] = i
 
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
+
+FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(DATASET_TYPE.keys())}
 
 
 @pytest.fixture(scope="function")
@@ -282,7 +284,7 @@ def enter_disk_chopper_fields(
 ):
 
     qtbot.keyClicks(dialog.nameLineEdit, "ThisIsADiskChopper")
-    dialog.componentTypeComboBox.setCurrentIndex(16)
+    dialog.componentTypeComboBox.setCurrentIndex(ALL_COMPONENT_TYPES["NXdisk_chopper"])
 
     for _ in range(4):
         systematic_button_press(qtbot, template, dialog.addFieldPushButton)
@@ -299,9 +301,10 @@ def enter_disk_chopper_fields(
 
     show_and_close_window(qtbot, template)
 
-    fields_widgets[0].value_type_combo.setCurrentIndex(4)
-    fields_widgets[2].value_type_combo.setCurrentIndex(8)
-    fields_widgets[3].value_type_combo.setCurrentIndex(8)
+    fields_widgets[0].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Integer"])
+    fields_widgets[1].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[2].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[3].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
 
     show_and_close_window(qtbot, template)
 
@@ -313,7 +316,6 @@ def enter_disk_chopper_fields(
     qtbot.keyClicks(fields_widgets[2].value_line_edit, "200")
     qtbot.keyClicks(fields_widgets[3].value_line_edit, "100")
 
-    fields_widgets[1].value_type_combo.setCurrentIndex(8)
     fields_widgets[1].table_view.model.array = np.array(
         [[(i * 10.0)] for i in range(12)]
     )
