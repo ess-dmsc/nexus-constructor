@@ -119,7 +119,7 @@ class ChopperChecker:
         return "Wrong {} type. Expected {} but found {}.".format(
             field_name,
             EXPECTED_TYPE_ERROR_MSG[field_name],
-            str(self.fields_dict[field_name].dtype),
+            self.fields_dict[field_name].dtype,
         )
 
     def edges_array_has_correct_shape(self):
@@ -133,7 +133,7 @@ class ChopperChecker:
             print(
                 UNABLE
                 + "Expected slit edges array to be 1D but it has {} dimensions.".format(
-                    str(edges_dim)
+                    edges_dim
                 )
             )
             return False
@@ -144,7 +144,7 @@ class ChopperChecker:
                 print(
                     UNABLE
                     + "Expected slit edges array to be 1D but it has shape {}.".format(
-                        str(edges_shape)
+                        edges_shape
                     )
                 )
                 return False
