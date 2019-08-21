@@ -14,7 +14,17 @@ import os
 import h5py
 
 from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.geometry.disk_chopper_geometry import (
+    ChopperDetails,
+    SLITS,
+    SLIT_EDGES,
+    RADIUS,
+    SLIT_HEIGHT,
+    DiskChopperGeometryCreator,
+    ChopperChecker,
+)
 from nexus_constructor.instrument import Instrument
+from nexus_constructor.nexus.nexus_wrapper import decode_bytes_string
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
 from nexus_constructor.component import Component
@@ -58,6 +68,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.file_changed.connect(
             self.update_nexus_file_structure_view
         )
+        self.instrument.nexus.file_changed.connect(self.find_and_draw_disk_choppers)
         self.verticalLayout.addWidget(self.widget)
         self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
@@ -299,6 +310,41 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             # Set add component button to disabled, as it wouldn't work without the definitions.
             self.pushButton.setEnabled(False)
             self.warning_window.show()
+
+    def find_and_draw_disk_choppers(self):
+
+        disk_choppers = self.instrument.nexus.get_disk_choppers()
+
+        if not disk_choppers:
+            print("No choppers found.")
+            return
+
+        print("Found disk choppers in the file. Attempting to construct mesh(es)...")
+
+        for disk_chopper in disk_choppers:
+            print(disk_chopper[SLIT_HEIGHT].attrs["units"])
+            print(type(disk_chopper[SLIT_HEIGHT].attrs["units"]))
+
+            angle_units = decode_bytes_string(disk_chopper[SLIT_EDGES].attrs["units"])
+            length_units = decode_bytes_string(disk_chopper[SLIT_HEIGHT].attrs["units"])
+
+            chopper_details = ChopperDetails(
+                disk_chopper[SLITS][()],
+                disk_chopper[SLIT_EDGES][()],
+                disk_chopper[RADIUS][()],
+                disk_chopper[SLIT_HEIGHT][()],
+                angle_units,
+                length_units,
+            )
+
+            # if not ChopperChecker(chopper_details).validate_chopper():
+            #     print("Unable to construct disk chopper mesh.")
+            self.sceneWidget.add_component(
+                disk_chopper["name"][()],
+                DiskChopperGeometryCreator(
+                    chopper_details
+                ).create_disk_chopper_geometry(),
+            )
 
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()

@@ -5,6 +5,7 @@ from numpy import diff, unique
 from numpy.core.umath import deg2rad, ndarray
 
 from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from nexus_constructor.validators import DATASET_TYPE
 
 SLIT_EDGES = "slit_edges"
@@ -237,7 +238,8 @@ class ChopperDetails:
         slit_edges: ndarray,
         radius: float,
         slit_height: float,
-        units: str = "deg",
+        angle_units: str = "deg",
+        length_units: str = "m",
     ):
         """
         Class for storing the chopper input given by the user.
@@ -245,7 +247,7 @@ class ChopperDetails:
         :param slit_edges: The list of slit edge angles in the disk chopper.
         :param radius: The radius of the slit chopper.
         :param slit_height: The slit height.
-        :param units: The units of the slit edges. At the moment all slit edges provided are assumed to be degrees
+        :param angle_units: The units of the slit edges. At the moment all slit edges provided are assumed to be degrees
             because the faculty for specifying attributes of fields hasn't yet been implemented in the Add Component
             Dialog.
         """
@@ -254,10 +256,19 @@ class ChopperDetails:
         self._slit_height = slit_height
 
         # Convert the angles to radians (if necessary) and make sure they are all less then two pi
-        if units == "deg":
+        if angle_units == "deg":
             self._slit_edges = [deg2rad(edge) % TWO_PI for edge in slit_edges]
         else:
             self._slit_edges = [edge % TWO_PI for edge in slit_edges]
+
+        if length_units != "m":
+
+            factor = calculate_unit_conversion_factor(
+                length_units
+            )  # Something should check that the units a valid before we get to this point
+            print(factor)
+            self._slit_height *= factor
+            self._radius *= factor
 
     @property
     def slits(self):
@@ -594,5 +605,8 @@ class DiskChopperGeometryCreator:
 
         # Add the point information to the string
         vertices = [point.point_to_qvector3d() for point in self.points]
+
+        print(vertices)
+        print(self.faces)
 
         return OFFGeometryNoNexus(vertices, self.faces)

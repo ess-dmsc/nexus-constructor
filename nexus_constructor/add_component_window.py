@@ -20,6 +20,7 @@ from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
+    CHOPPER_CLASS_NAME,
 )
 from nexus_constructor.validators import (
     UnitValidator,
@@ -350,7 +351,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         else:
             chopper_checker = ChopperChecker(self.fieldsListWidget)
             if (
-                component.nx_class == "NXdisk_chopper"
+                component.nx_class == CHOPPER_CLASS_NAME
                 and chopper_checker.validate_chopper()
             ):
                 geometry_model = DiskChopperGeometryCreator(
