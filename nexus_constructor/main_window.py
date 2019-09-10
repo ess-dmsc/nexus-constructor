@@ -21,7 +21,6 @@ from nexus_constructor.geometry.disk_chopper_geometry import (
     RADIUS,
     SLIT_HEIGHT,
     DiskChopperGeometryCreator,
-    ChopperChecker,
 )
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import decode_bytes_string
@@ -314,6 +313,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def find_and_draw_disk_choppers(self):
 
         disk_choppers = self.instrument.nexus.get_disk_choppers()
+
+        print(type(disk_choppers[0]))
 
         if not disk_choppers:
             print("No choppers found.")

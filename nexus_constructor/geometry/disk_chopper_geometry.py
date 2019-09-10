@@ -1,6 +1,7 @@
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidget
 import numpy as np
+from h5py import Group
 from numpy import diff, unique
 from numpy.core.umath import deg2rad, ndarray
 
@@ -29,62 +30,27 @@ TWO_PI = np.pi * 2
 
 
 class ChopperChecker:
-    def __init__(self, fields_widget: QListWidget):
-        """
-        A tool for inspecting chopper input before a chopper mesh can be constructed.
-        :param fields_widget:
-        """
+    def __init__(self):
 
-        self.fields_widget = fields_widget
         self.fields_dict = dict()
-
-        for i in range(fields_widget.count()):
-            widget = fields_widget.itemWidget(fields_widget.item(i))
-            self.fields_dict[widget.name] = widget
 
         self._slits = None
         self._slit_edges = None
         self._radius = None
         self._slit_height = None
-        self._units = "deg"
+        self._angle_units = "deg"
+        self._length_units = None
         self._chopper_details = None
 
-    def validate_chopper(self):
-        """
-        Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
-        fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
-        and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
-        :return: True if the chopper is valid. False otherwise.
-        """
-        return (
-            self.required_fields_present()
-            and self.fields_have_correct_type()
-            and self.edges_array_has_correct_shape()
-            and self.input_describes_valid_chopper()
-        )
-
     def required_fields_present(self):
-        """
-        Checks that all of the fields required to create the disk chopper are present.
-        :return: True if all the required fields are present. False otherwise.
-        """
-        missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
-
-        if len(missing_fields) > 0:
-            print(UNABLE + "Required field(s) missing:", ", ".join(missing_fields))
-            return False
-
-        return True
+        pass
 
     def fields_have_correct_type(self):
-        """
-        Checks if the fields entered have the correct data types.
-        :return: True if all the fields have the correct data types. False otherwise.
-        """
-        correct_slits_type = self.fields_dict[SLITS].dtype in INT_TYPES
-        correct_radius_type = self.fields_dict[RADIUS].dtype in FLOAT_TYPES
-        correct_slit_height_type = self.fields_dict[SLIT_HEIGHT].dtype in FLOAT_TYPES
-        correct_slit_edges_type = self.fields_dict[SLIT_EDGES].dtype in FLOAT_TYPES
+
+        correct_slits_type = self.check_slits_type()
+        correct_radius_type = self.check_radius_type()
+        correct_slit_height_type = self.check_slit_height_type()
+        correct_slit_edges_type = self.check_slit_edges_type()
 
         if (
             correct_slits_type
@@ -111,6 +77,18 @@ class ChopperChecker:
         print(UNABLE + "\n".join(problems))
         return False
 
+    def check_slits_type(self):
+        pass
+
+    def check_radius_type(self):
+        pass
+
+    def check_slit_height_type(self):
+        pass
+
+    def check_slit_edges_type(self):
+        pass
+
     def incorrect_field_type_message(self, field_name: str):
         """
         Creates a string explaining to the user that the field input did not have the expected type.
@@ -128,7 +106,7 @@ class ChopperChecker:
         Checks that the edges array consists of either one row or one column.
         :return: True if the edges array is 1D. False otherwise.
         """
-        edges_dim = self.fields_dict[SLIT_EDGES].value.ndim
+        edges_dim = self.fields_dict[SLIT_EDGES].ndim
 
         if edges_dim > 2:
             print(
@@ -140,7 +118,7 @@ class ChopperChecker:
             return False
 
         if edges_dim == 2:
-            edges_shape = self.fields_dict[SLIT_EDGES].value.shape
+            edges_shape = self.fields_dict[SLIT_EDGES].shape
             if edges_shape[0] != 1 and edges_shape[1] != 1:
                 print(
                     UNABLE
@@ -164,11 +142,12 @@ class ChopperChecker:
         :return: True if all the conditions above are met. False otherwise.
         """
         self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS].value,
-            self.fields_dict[SLIT_EDGES].value,
-            self.fields_dict[RADIUS].value,
-            self.fields_dict[SLIT_HEIGHT].value,
-            self._units,
+            self.fields_dict[SLITS],
+            self.fields_dict[SLIT_EDGES],
+            self.fields_dict[RADIUS],
+            self.fields_dict[SLIT_HEIGHT],
+            self._angle_units,
+            self._length_units,
         )
 
         # Check that the number of slit edges is equal to two times the number of slits
@@ -229,6 +208,90 @@ class ChopperChecker:
             validation was successful. Otherwise this method just returns None.
         """
         return self._chopper_details
+
+    def validate_chopper(self):
+        """
+        Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
+        fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
+        and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
+        :return: True if the chopper is valid. False otherwise.
+        """
+        return (
+            self.required_fields_present()
+            and self.fields_have_correct_type()
+            and self.edges_array_has_correct_shape()
+            and self.input_describes_valid_chopper()
+        )
+
+
+class UserDefinedChopperChecker(ChopperChecker):
+    def __init__(self, fields_widget: QListWidget):
+        """
+        A tool for inspecting chopper input before a chopper mesh can be constructed.
+        :param fields_widget:
+        """
+
+        self.fields_widget = fields_widget
+
+        super().__init__()
+
+        for i in range(fields_widget.count()):
+            widget = fields_widget.itemWidget(fields_widget.item(i))
+            self.fields_dict[widget.name] = widget.value
+
+    def required_fields_present(self):
+        """
+        Checks that all of the fields required to create the disk chopper are present.
+        :return: True if all the required fields are present. False otherwise.
+        """
+        missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
+
+        if len(missing_fields) > 0:
+            print(UNABLE + "Required field(s) missing:", ", ".join(missing_fields))
+            return False
+
+        return True
+
+    def check_slits_type(self):
+        return self.fields_dict[SLITS].dtype in INT_TYPES
+
+    def check_radius_type(self):
+        return self.fields_dict[RADIUS].dtype in FLOAT_TYPES
+
+    def check_slit_height_type(self):
+        return self.fields_dict[SLIT_HEIGHT].dtype in FLOAT_TYPES
+
+    def check_slit_edges_type(self):
+        return self.fields_dict[SLIT_EDGES].dtype in FLOAT_TYPES
+
+
+class NexusDefinedChopperChecker(ChopperChecker):
+    def __init__(self, disk_chopper: Group):
+
+        super().__init__()
+        self._disk_chopper = disk_chopper
+
+    def required_fields_present(self):
+
+        try:
+            self._disk_chopper[SLITS][()]
+            self._disk_chopper[SLIT_EDGES][()]
+            self._disk_chopper[RADIUS][()]
+            self._disk_chopper[SLIT_HEIGHT][()]
+        except KeyError:
+            return False
+
+    def check_slits_type(self):
+        pass
+
+    def check_radius_type(self):
+        pass
+
+    def check_slit_height_type(self):
+        pass
+
+    def check_slit_edges_type(self):
+        pass
 
 
 class ChopperDetails:
@@ -390,7 +453,7 @@ class DiskChopperGeometryCreator:
             self.add_face_connected_to_front_centre([prev_front, current_front])
 
             # Create a three-point face with the two back points and the back centre point
-            self.add_face_connected_to_back_centre([prev_back, current_back])
+            self.add_face_connected_to_back_centre([current_back, prev_back])
             prev_front = current_front
             prev_back = current_back
 

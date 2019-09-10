@@ -6,11 +6,11 @@ import numpy as np
 from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.geometry.disk_chopper_geometry import (
     ChopperDetails,
-    ChopperChecker,
     SLITS,
     SLIT_HEIGHT,
     RADIUS,
     SLIT_EDGES,
+    UserDefinedChopperChecker,
 )
 
 
@@ -112,7 +112,7 @@ def chopper_details():
 
 @pytest.fixture(scope="function")
 def chopper_checker(mock_fields_list_widget):
-    return ChopperChecker(mock_fields_list_widget)
+    return UserDefinedChopperChecker(mock_fields_list_widget)
 
 
 def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
