@@ -29,8 +29,87 @@ FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)
 TWO_PI = np.pi * 2
 
 
-class ChopperChecker:
-    def __init__(self):
+def check_data_type(data_type, expected_types):
+    return str(data_type) in expected_types
+
+
+def incorrect_field_type_message(fields_dict: dict, field_name: str):
+    """
+    Creates a string explaining to the user that the field input did not have the expected type.
+    :param field_name: The name of the field that failed the check.
+    :return: A string that contains the name of the field, the type it should have, and the type the user entered.
+    """
+    return "Wrong {} type. Expected {} but found {}.".format(
+        field_name, EXPECTED_TYPE_ERROR_MSG[field_name], fields_dict[field_name].dtype
+    )
+
+
+def fields_have_correct_type(fields_dict: dict):
+
+    correct_slits_type = check_data_type(fields_dict[SLITS].dtype, INT_TYPES)
+    correct_radius_type = check_data_type(fields_dict[RADIUS].dtype, FLOAT_TYPES)
+    correct_slit_height_type = check_data_type(
+        fields_dict[SLIT_HEIGHT].dtype, FLOAT_TYPES
+    )
+    correct_slit_edges_type = check_data_type(
+        fields_dict[SLIT_EDGES].dtype, FLOAT_TYPES
+    )
+
+    if (
+        correct_slits_type
+        and correct_radius_type
+        and correct_slit_height_type
+        and correct_slit_edges_type
+    ):
+        return True
+
+    problems = []
+
+    if not correct_slits_type:
+        problems.append(incorrect_field_type_message(fields_dict, SLITS))
+
+    if not correct_radius_type:
+        problems.append(incorrect_field_type_message(fields_dict, RADIUS))
+
+    if not correct_slit_height_type:
+        problems.append(incorrect_field_type_message(fields_dict, SLIT_HEIGHT))
+
+    if not correct_slit_edges_type:
+        problems.append(incorrect_field_type_message(fields_dict, SLIT_EDGES))
+
+    print(UNABLE + "\n".join(problems))
+    return False
+
+
+def edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple):
+    """
+    Checks that the edges array consists of either one row or one column.
+    :return: True if the edges array is 1D. False otherwise.
+    """
+    if edges_dim > 2:
+        print(
+            UNABLE
+            + "Expected slit edges array to be 1D but it has {} dimensions.".format(
+                edges_dim
+            )
+        )
+        return False
+
+    if edges_dim == 2:
+        if edges_shape[0] != 1 and edges_shape[1] != 1:
+            print(
+                UNABLE
+                + "Expected slit edges array to be 1D but it has shape {}.".format(
+                    edges_shape
+                )
+            )
+            return False
+
+    return True
+
+
+class UserDefinedChopperChecker:
+    def __init__(self, fields_widget: QListWidget):
 
         self.fields_dict = dict()
 
@@ -42,91 +121,20 @@ class ChopperChecker:
         self._length_units = None
         self._chopper_details = None
 
+        for i in range(fields_widget.count()):
+            widget = fields_widget.itemWidget(fields_widget.item(i))
+            self.fields_dict[widget.name] = widget.value
+
     def required_fields_present(self):
-        pass
-
-    def fields_have_correct_type(self):
-
-        correct_slits_type = self.check_slits_type()
-        correct_radius_type = self.check_radius_type()
-        correct_slit_height_type = self.check_slit_height_type()
-        correct_slit_edges_type = self.check_slit_edges_type()
-
-        if (
-            correct_slits_type
-            and correct_radius_type
-            and correct_slit_height_type
-            and correct_slit_edges_type
-        ):
-            return True
-
-        problems = []
-
-        if not correct_slits_type:
-            problems.append(self.incorrect_field_type_message(SLITS))
-
-        if not correct_radius_type:
-            problems.append(self.incorrect_field_type_message(RADIUS))
-
-        if not correct_slit_height_type:
-            problems.append(self.incorrect_field_type_message(SLIT_HEIGHT))
-
-        if not correct_slit_edges_type:
-            problems.append(self.incorrect_field_type_message(SLIT_EDGES))
-
-        print(UNABLE + "\n".join(problems))
-        return False
-
-    def check_slits_type(self):
-        pass
-
-    def check_radius_type(self):
-        pass
-
-    def check_slit_height_type(self):
-        pass
-
-    def check_slit_edges_type(self):
-        pass
-
-    def incorrect_field_type_message(self, field_name: str):
         """
-        Creates a string explaining to the user that the field input did not have the expected type.
-        :param field_name: The name of the field that failed the check.
-        :return: A string that contains the name of the field, the type it should have, and the type the user entered.
+        Checks that all of the fields required to create the disk chopper are present.
+        :return: True if all the required fields are present. False otherwise.
         """
-        return "Wrong {} type. Expected {} but found {}.".format(
-            field_name,
-            EXPECTED_TYPE_ERROR_MSG[field_name],
-            self.fields_dict[field_name].dtype,
-        )
+        missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
 
-    def edges_array_has_correct_shape(self):
-        """
-        Checks that the edges array consists of either one row or one column.
-        :return: True if the edges array is 1D. False otherwise.
-        """
-        edges_dim = self.fields_dict[SLIT_EDGES].ndim
-
-        if edges_dim > 2:
-            print(
-                UNABLE
-                + "Expected slit edges array to be 1D but it has {} dimensions.".format(
-                    edges_dim
-                )
-            )
+        if len(missing_fields) > 0:
+            print(UNABLE + "Required field(s) missing:", ", ".join(missing_fields))
             return False
-
-        if edges_dim == 2:
-            edges_shape = self.fields_dict[SLIT_EDGES].shape
-            if edges_shape[0] != 1 and edges_shape[1] != 1:
-                print(
-                    UNABLE
-                    + "Expected slit edges array to be 1D but it has shape {}.".format(
-                        edges_shape
-                    )
-                )
-                return False
 
         return True
 
@@ -218,80 +226,77 @@ class ChopperChecker:
         """
         return (
             self.required_fields_present()
-            and self.fields_have_correct_type()
-            and self.edges_array_has_correct_shape()
+            and fields_have_correct_type(self.fields_dict)
+            and edges_array_has_correct_shape(
+                self.fields_dict[SLIT_EDGES].ndim, self.fields_dict[SLIT_EDGES].shape
+            )
             and self.input_describes_valid_chopper()
         )
 
 
-class UserDefinedChopperChecker(ChopperChecker):
-    def __init__(self, fields_widget: QListWidget):
-        """
-        A tool for inspecting chopper input before a chopper mesh can be constructed.
-        :param fields_widget:
-        """
-
-        self.fields_widget = fields_widget
-
-        super().__init__()
-
-        for i in range(fields_widget.count()):
-            widget = fields_widget.itemWidget(fields_widget.item(i))
-            self.fields_dict[widget.name] = widget.value
-
-    def required_fields_present(self):
-        """
-        Checks that all of the fields required to create the disk chopper are present.
-        :return: True if all the required fields are present. False otherwise.
-        """
-        missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
-
-        if len(missing_fields) > 0:
-            print(UNABLE + "Required field(s) missing:", ", ".join(missing_fields))
-            return False
-
-        return True
-
-    def check_slits_type(self):
-        return self.fields_dict[SLITS].dtype in INT_TYPES
-
-    def check_radius_type(self):
-        return self.fields_dict[RADIUS].dtype in FLOAT_TYPES
-
-    def check_slit_height_type(self):
-        return self.fields_dict[SLIT_HEIGHT].dtype in FLOAT_TYPES
-
-    def check_slit_edges_type(self):
-        return self.fields_dict[SLIT_EDGES].dtype in FLOAT_TYPES
-
-
-class NexusDefinedChopperChecker(ChopperChecker):
+class NexusDefinedChopperChecker:
     def __init__(self, disk_chopper: Group):
 
-        super().__init__()
+        self.fields_dict = dict()
+
+        self._slits = None
+        self._slit_edges = None
+        self._radius = None
+        self._slit_height = None
+        self._angle_units = "deg"
+        self._length_units = None
+        self._chopper_details = None
+
         self._disk_chopper = disk_chopper
 
     def required_fields_present(self):
 
         try:
-            self._disk_chopper[SLITS][()]
-            self._disk_chopper[SLIT_EDGES][()]
-            self._disk_chopper[RADIUS][()]
-            self._disk_chopper[SLIT_HEIGHT][()]
+
+            self.fields_dict[SLITS] = self._disk_chopper[SLITS][()]
+            self.fields_dict[SLIT_EDGES] = self._disk_chopper[SLIT_EDGES][()]
+            self.fields_dict[RADIUS] = self._disk_chopper[RADIUS][()]
+            self.fields_dict[SLIT_HEIGHT] = self._disk_chopper[SLIT_HEIGHT][()]
+
         except KeyError:
             return False
 
-    def check_slits_type(self):
-        pass
+        return True
 
-    def check_radius_type(self):
-        pass
+    def fields_have_correct_type(self, fields_dict: dict):
+        correct_slits_type = check_data_type(fields_dict[SLITS].dtype, INT_TYPES)
+        correct_radius_type = check_data_type(fields_dict[RADIUS].dtype, FLOAT_TYPES)
+        correct_slit_height_type = check_data_type(
+            fields_dict[SLIT_HEIGHT].dtype, FLOAT_TYPES
+        )
+        correct_slit_edges_type = check_data_type(
+            fields_dict[SLIT_EDGES].dtype, FLOAT_TYPES
+        )
 
-    def check_slit_height_type(self):
-        pass
+        if (
+            correct_slits_type
+            and correct_radius_type
+            and correct_slit_height_type
+            and correct_slit_edges_type
+        ):
+            return True
 
-    def check_slit_edges_type(self):
-        pass
+        problems = []
+
+        if not correct_slits_type:
+            problems.append(self.incorrect_field_type_message(SLITS))
+
+        if not correct_radius_type:
+            problems.append(self.incorrect_field_type_message(RADIUS))
+
+        if not correct_slit_height_type:
+            problems.append(self.incorrect_field_type_message(SLIT_HEIGHT))
+
+        if not correct_slit_edges_type:
+            problems.append(self.incorrect_field_type_message(SLIT_EDGES))
+
+        print(UNABLE + "\n".join(problems))
+        return False
 
 
 class ChopperDetails:

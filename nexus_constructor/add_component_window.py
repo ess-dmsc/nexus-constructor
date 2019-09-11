@@ -13,9 +13,8 @@ from nexus_constructor.geometry import (
 )
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from nexus_constructor.geometry.disk_chopper_geometry import (
-    ChopperChecker,
     DiskChopperGeometryCreator,
-)
+    UserDefinedChopperChecker)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
@@ -349,7 +348,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 pixel_data=pixel_data,
             )
         else:
-            chopper_checker = ChopperChecker(self.fieldsListWidget)
+            chopper_checker = UserDefinedChopperChecker(self.fieldsListWidget)
             if (
                 component.nx_class == CHOPPER_CLASS_NAME
                 and chopper_checker.validate_chopper()

@@ -329,6 +329,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             angle_units = decode_bytes_string(disk_chopper[SLIT_EDGES].attrs["units"])
             length_units = decode_bytes_string(disk_chopper[SLIT_HEIGHT].attrs["units"])
 
+            print(type(disk_chopper[SLITS][()].dtype))
+            print("Dimensions", disk_chopper[SLIT_EDGES][()].ndim)
+            print(disk_chopper[SLIT_EDGES][()])
+            print(type(disk_chopper[SLIT_EDGES][()].shape))
+
             chopper_details = ChopperDetails(
                 disk_chopper[SLITS][()],
                 disk_chopper[SLIT_EDGES][()],
