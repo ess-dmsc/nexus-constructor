@@ -206,7 +206,7 @@ def input_describes_valid_chopper(
         return False
 
     # Check that there are no repeated angles
-    if len(chopper_details.slit_edges) != len(unique(chopper_details.slit_edges)):
+    if len(slit_edges) != len(unique(slit_edges)):
         print(
             UNABLE + "Angles in slit edges array should be unique. Found values:",
             slit_edges,
@@ -235,7 +235,7 @@ class UserDefinedChopperChecker:
         self._radius = None
         self._slit_height = None
         self._angle_units = "deg"
-        self._length_units = None
+        self._length_units = "m"
         self._chopper_details = None
 
         for i in range(fields_widget.count()):
@@ -280,15 +280,15 @@ class UserDefinedChopperChecker:
 
         self._chopper_details = ChopperDetails(
             self.fields_dict[SLITS],
-            self.fields_dict[SLIT_EDGES].value,
+            self.fields_dict[SLIT_EDGES],
             self.fields_dict[RADIUS],
             self.fields_dict[SLIT_HEIGHT],
-            self.angle_units,
-            self.length_units,
+            self._angle_units,
+            self._length_units,
         )
 
         return input_describes_valid_chopper(
-            self._chopper_details, self.fields_dict, self.fields_dict[SLIT_EDGES].value
+            self._chopper_details, self.fields_dict, self.fields_dict[SLIT_EDGES]
         )
 
 
@@ -301,6 +301,13 @@ class NexusDefinedChopperChecker:
         self._length_units = None
 
         self._disk_chopper = disk_chopper
+
+    def get_chopper_details(self):
+        """
+        :return: The ChopperDetails object. This will only be created if `validate_chopper` was called and the
+            validation was successful. Otherwise this method just returns None.
+        """
+        return self._chopper_details
 
     def required_fields_present(self):
 
@@ -344,7 +351,7 @@ class NexusDefinedChopperChecker:
             self.fields_dict[RADIUS],
             self.fields_dict[SLIT_HEIGHT],
             self._angle_units,
-            self._length_units,
+            "m",
         )
 
         return input_describes_valid_chopper(
@@ -475,7 +482,7 @@ class DiskChopperGeometryCreator:
 
         # Create four points for the first slit in the chopper data
         point_set = self.create_and_add_point_set(
-            self._radius, centre_to_slit_bottom, self._slit_edges[0]
+            self._radius, centre_to_slit_bottom, self._slit_edges[0], False
         )
 
         prev_upper_front = first_upper_front = point_set[0]
@@ -492,7 +499,7 @@ class DiskChopperGeometryCreator:
 
             # Create four points for the current slit edge
             current_upper_front, current_upper_back, current_lower_front, current_lower_back = self.create_and_add_point_set(
-                self._radius, centre_to_slit_bottom, self._slit_edges[i]
+                self._radius, centre_to_slit_bottom, self._slit_edges[i], i % 2
             )
 
             # Create lower intermediate points/faces if the slit angle index is odd
@@ -555,7 +562,9 @@ class DiskChopperGeometryCreator:
 
         return Point(x, y, self.z), Point(x, y, -self.z)
 
-    def create_and_add_point_set(self, radius, centre_to_slit_start, slit_edge):
+    def create_and_add_point_set(
+        self, radius, centre_to_slit_start, slit_edge, right_face
+    ):
         """
         Creates and records the upper and lower points for a slit edge and adds these to the file string. Also adds the
         face made from all four points to the file string.
@@ -580,9 +589,24 @@ class DiskChopperGeometryCreator:
         self._add_point_to_list(lower_back_point)
 
         # Create a face for the slit edge that contains all four points.
-        self.add_face_to_list(
-            [lower_front_point, upper_front_point, upper_back_point, lower_back_point]
-        )
+        if not right_face:
+            self.add_face_to_list(
+                [
+                    lower_front_point,
+                    upper_front_point,
+                    upper_back_point,
+                    lower_back_point,
+                ]
+            )
+        else:
+            self.add_face_to_list(
+                [
+                    lower_back_point,
+                    upper_back_point,
+                    upper_front_point,
+                    lower_front_point,
+                ]
+            )
 
         return [
             upper_front_point,

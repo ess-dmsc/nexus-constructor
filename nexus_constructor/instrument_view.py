@@ -297,6 +297,6 @@ class InstrumentView(QWidget):
         functions are called outside of this method to ensure that those things are generated last.
         """
 
-        # self.setup_sample_cube()
+        self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()

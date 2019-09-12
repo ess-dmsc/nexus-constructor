@@ -321,26 +321,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         print("Found disk choppers in the file. Attempting to construct mesh(es)...")
 
         for disk_chopper in disk_choppers:
-            print(disk_chopper[SLIT_HEIGHT].attrs["units"])
-            print(type(disk_chopper[SLIT_HEIGHT].attrs["units"]))
-
-            print(type(disk_chopper[SLITS][()].dtype))
-            print("Dimensions", disk_chopper[SLIT_EDGES][()].ndim)
-            print(type(disk_chopper[SLIT_EDGES][()].shape))
 
             chopper_checker = NexusDefinedChopperChecker(disk_chopper)
 
             if chopper_checker.validate_chopper():
-                print("Validation...")
-
-            # if not ChopperChecker(chopper_details).validate_chopper():
-            #     print("Unable to construct disk chopper mesh.")
-            self.sceneWidget.add_component(
-                disk_chopper["name"][()],
-                DiskChopperGeometryCreator(
-                    chopper_details
-                ).create_disk_chopper_geometry(),
-            )
+                self.sceneWidget.add_component(
+                    disk_chopper["name"][()],
+                    DiskChopperGeometryCreator(
+                        chopper_checker.get_chopper_details()
+                    ).create_disk_chopper_geometry(),
+                )
 
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
