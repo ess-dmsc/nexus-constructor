@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidget
 import numpy as np
@@ -6,6 +8,7 @@ from numpy import diff, unique
 from numpy.core.umath import deg2rad, ndarray
 
 from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.nexus.nexus_wrapper import decode_bytes_string
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
 from nexus_constructor.validators import DATASET_TYPE
 
@@ -30,7 +33,7 @@ TWO_PI = np.pi * 2
 
 
 def check_data_type(data_type, expected_types):
-    return str(data_type) in expected_types
+    return data_type in expected_types
 
 
 def incorrect_field_type_message(fields_dict: dict, field_name: str):
@@ -108,197 +111,6 @@ def edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple):
     return True
 
 
-class UserDefinedChopperChecker:
-    def __init__(self, fields_widget: QListWidget):
-
-        self.fields_dict = dict()
-
-        self._slits = None
-        self._slit_edges = None
-        self._radius = None
-        self._slit_height = None
-        self._angle_units = "deg"
-        self._length_units = None
-        self._chopper_details = None
-
-        for i in range(fields_widget.count()):
-            widget = fields_widget.itemWidget(fields_widget.item(i))
-            self.fields_dict[widget.name] = widget.value
-
-    def required_fields_present(self):
-        """
-        Checks that all of the fields required to create the disk chopper are present.
-        :return: True if all the required fields are present. False otherwise.
-        """
-        missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
-
-        if len(missing_fields) > 0:
-            print(UNABLE + "Required field(s) missing:", ", ".join(missing_fields))
-            return False
-
-        return True
-
-    def input_describes_valid_chopper(self):
-        """
-        A final check that the input has the following properties:
-            - The length of the slit edges array is twice the number of slits
-            - The slit height is smaller than the radius
-            - The slit edges array is sorted.
-            - The slit edges array doesn't contain repeated angles.
-            - The slit edges array doesn't contain overlapping slits.
-        If this is all true then a chopper mesh can be created.
-        :return: True if all the conditions above are met. False otherwise.
-        """
-        self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS],
-            self.fields_dict[SLIT_EDGES],
-            self.fields_dict[RADIUS],
-            self.fields_dict[SLIT_HEIGHT],
-            self._angle_units,
-            self._length_units,
-        )
-
-        # Check that the number of slit edges is equal to two times the number of slits
-        if len(self._chopper_details.slit_edges) != 2 * self._chopper_details.slits:
-            print(
-                UNABLE
-                + "Size of slit edges array should be twice the number of slits. Instead there are {} slits and {} slit edges.".format(
-                    self._chopper_details.slits, len(self._chopper_details.slit_edges)
-                )
-            )
-            return False
-
-        # Check that the slit height is smaller than the radius
-        if self._chopper_details.slit_height >= self._chopper_details.radius:
-            print(
-                UNABLE
-                + "Slit height should be smaller than radius. Instead slit height is {} and radius is {}".format(
-                    self._chopper_details.slit_height, self._chopper_details.radius
-                )
-            )
-            return False
-
-        # Check that the list of slit edges is sorted
-        if not (diff(self._chopper_details.slit_edges) >= 0).all():
-            print(
-                UNABLE + "Slit edges array is not sorted. Found values:",
-                self.fields_dict[SLIT_EDGES].value,
-            )
-            return False
-
-        # Check that there are no repeated angles
-        if len(self._chopper_details.slit_edges) != len(
-            unique(self._chopper_details.slit_edges)
-        ):
-            print(
-                UNABLE + "Angles in slit edges array should be unique. Found values:",
-                self.fields_dict[SLIT_EDGES].value,
-            )
-            return False
-
-        # Check that the first and last edges do not overlap
-        if (
-            self._chopper_details.slit_edges != sorted(self._chopper_details.slit_edges)
-        ) and (
-            self._chopper_details.slit_edges[-1] >= self._chopper_details.slit_edges[0]
-        ):
-            print(
-                UNABLE + "Slit edges contains overlapping slits. Found values:",
-                self.fields_dict[SLIT_EDGES].value,
-            )
-            return False
-
-        return True
-
-    def get_chopper_details(self):
-        """
-        :return: The ChopperDetails object. This will only be created if `validate_chopper` was called and the
-            validation was successful. Otherwise this method just returns None.
-        """
-        return self._chopper_details
-
-    def validate_chopper(self):
-        """
-        Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
-        fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
-        and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
-        :return: True if the chopper is valid. False otherwise.
-        """
-        return (
-            self.required_fields_present()
-            and fields_have_correct_type(self.fields_dict)
-            and edges_array_has_correct_shape(
-                self.fields_dict[SLIT_EDGES].ndim, self.fields_dict[SLIT_EDGES].shape
-            )
-            and self.input_describes_valid_chopper()
-        )
-
-
-class NexusDefinedChopperChecker:
-    def __init__(self, disk_chopper: Group):
-
-        self.fields_dict = dict()
-
-        self._slits = None
-        self._slit_edges = None
-        self._radius = None
-        self._slit_height = None
-        self._angle_units = "deg"
-        self._length_units = None
-        self._chopper_details = None
-
-        self._disk_chopper = disk_chopper
-
-    def required_fields_present(self):
-
-        try:
-
-            self.fields_dict[SLITS] = self._disk_chopper[SLITS][()]
-            self.fields_dict[SLIT_EDGES] = self._disk_chopper[SLIT_EDGES][()]
-            self.fields_dict[RADIUS] = self._disk_chopper[RADIUS][()]
-            self.fields_dict[SLIT_HEIGHT] = self._disk_chopper[SLIT_HEIGHT][()]
-
-        except KeyError:
-            return False
-
-        return True
-
-    def fields_have_correct_type(self, fields_dict: dict):
-        correct_slits_type = check_data_type(fields_dict[SLITS].dtype, INT_TYPES)
-        correct_radius_type = check_data_type(fields_dict[RADIUS].dtype, FLOAT_TYPES)
-        correct_slit_height_type = check_data_type(
-            fields_dict[SLIT_HEIGHT].dtype, FLOAT_TYPES
-        )
-        correct_slit_edges_type = check_data_type(
-            fields_dict[SLIT_EDGES].dtype, FLOAT_TYPES
-        )
-
-        if (
-            correct_slits_type
-            and correct_radius_type
-            and correct_slit_height_type
-            and correct_slit_edges_type
-        ):
-            return True
-
-        problems = []
-
-        if not correct_slits_type:
-            problems.append(self.incorrect_field_type_message(SLITS))
-
-        if not correct_radius_type:
-            problems.append(self.incorrect_field_type_message(RADIUS))
-
-        if not correct_slit_height_type:
-            problems.append(self.incorrect_field_type_message(SLIT_HEIGHT))
-
-        if not correct_slit_edges_type:
-            problems.append(self.incorrect_field_type_message(SLIT_EDGES))
-
-        print(UNABLE + "\n".join(problems))
-        return False
-
-
 class ChopperDetails:
     def __init__(
         self,
@@ -353,6 +165,191 @@ class ChopperDetails:
     @property
     def slit_height(self):
         return self._slit_height
+
+
+def input_describes_valid_chopper(
+    chopper_details: ChopperDetails, fields_dict: dict, slit_edges: Sequence
+):
+    """
+    A final check that the input has the following properties:
+        - The length of the slit edges array is twice the number of slits
+        - The slit height is smaller than the radius
+        - The slit edges array is sorted.
+        - The slit edges array doesn't contain repeated angles.
+        - The slit edges array doesn't contain overlapping slits.
+    If this is all true then a chopper mesh can be created.
+    :return: True if all the conditions above are met. False otherwise.
+    """
+    # Check that the number of slit edges is equal to two times the number of slits
+    if len(chopper_details.slit_edges) != 2 * chopper_details.slits:
+        print(
+            UNABLE
+            + "Size of slit edges array should be twice the number of slits. Instead there are {} slits and {} slit edges.".format(
+                chopper_details.slits, len(chopper_details.slit_edges)
+            )
+        )
+        return False
+
+    # Check that the slit height is smaller than the radius
+    if chopper_details.slit_height >= chopper_details.radius:
+        print(
+            UNABLE
+            + "Slit height should be smaller than radius. Instead slit height is {} and radius is {}".format(
+                chopper_details.slit_height, chopper_details.radius
+            )
+        )
+        return False
+
+    # Check that the list of slit edges is sorted
+    if not (diff(slit_edges) >= 0).all():
+        print(UNABLE + "Slit edges array is not sorted. Found values:", slit_edges)
+        return False
+
+    # Check that there are no repeated angles
+    if len(chopper_details.slit_edges) != len(unique(chopper_details.slit_edges)):
+        print(
+            UNABLE + "Angles in slit edges array should be unique. Found values:",
+            slit_edges,
+        )
+        return False
+
+    # Check that the first and last edges do not overlap
+    if (chopper_details.slit_edges != sorted(chopper_details.slit_edges)) and (
+        chopper_details.slit_edges[-1] >= chopper_details.slit_edges[0]
+    ):
+        print(
+            UNABLE + "Slit edges contains overlapping slits. Found values:", slit_edges
+        )
+        return False
+
+    return True
+
+
+class UserDefinedChopperChecker:
+    def __init__(self, fields_widget: QListWidget):
+
+        self.fields_dict = dict()
+
+        self._slits = None
+        self._slit_edges = None
+        self._radius = None
+        self._slit_height = None
+        self._angle_units = "deg"
+        self._length_units = None
+        self._chopper_details = None
+
+        for i in range(fields_widget.count()):
+            widget = fields_widget.itemWidget(fields_widget.item(i))
+            self.fields_dict[widget.name] = widget.value
+
+    def required_fields_present(self):
+        """
+        Checks that all of the fields required to create the disk chopper are present.
+        :return: True if all the required fields are present. False otherwise.
+        """
+        missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
+
+        if len(missing_fields) > 0:
+            print(UNABLE + "Required field(s) missing:", ", ".join(missing_fields))
+            return False
+
+        return True
+
+    def get_chopper_details(self):
+        """
+        :return: The ChopperDetails object. This will only be created if `validate_chopper` was called and the
+            validation was successful. Otherwise this method just returns None.
+        """
+        return self._chopper_details
+
+    def validate_chopper(self):
+        """
+        Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
+        fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
+        and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
+        :return: True if the chopper is valid. False otherwise.
+        """
+        if not (
+            self.required_fields_present()
+            and fields_have_correct_type(self.fields_dict)
+            and edges_array_has_correct_shape(
+                self.fields_dict[SLIT_EDGES].ndim, self.fields_dict[SLIT_EDGES].shape
+            )
+        ):
+            return False
+
+        self._chopper_details = ChopperDetails(
+            self.fields_dict[SLITS],
+            self.fields_dict[SLIT_EDGES].value,
+            self.fields_dict[RADIUS],
+            self.fields_dict[SLIT_HEIGHT],
+            self.angle_units,
+            self.length_units,
+        )
+
+        return input_describes_valid_chopper(
+            self._chopper_details, self.fields_dict, self.fields_dict[SLIT_EDGES].value
+        )
+
+
+class NexusDefinedChopperChecker:
+    def __init__(self, disk_chopper: Group):
+
+        self.fields_dict = dict()
+
+        self._angle_units = None
+        self._length_units = None
+
+        self._disk_chopper = disk_chopper
+
+    def required_fields_present(self):
+
+        try:
+
+            self.fields_dict[SLITS] = self._disk_chopper[SLITS][()]
+            self.fields_dict[SLIT_EDGES] = self._disk_chopper[SLIT_EDGES][()]
+            self.fields_dict[RADIUS] = self._disk_chopper[RADIUS][()]
+            self.fields_dict[SLIT_HEIGHT] = self._disk_chopper[SLIT_HEIGHT][()]
+            self._angle_units = decode_bytes_string(
+                self._disk_chopper[SLIT_EDGES].attrs["units"]
+            )
+            self._length_units = decode_bytes_string(
+                self._disk_chopper[SLIT_HEIGHT].attrs["units"]
+            )
+
+        except KeyError:
+            return False
+
+        return True
+
+    def validate_chopper(self):
+        """
+        Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
+        fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
+        and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
+        :return: True if the chopper is valid. False otherwise.
+        """
+        if not (
+            self.required_fields_present()
+            and fields_have_correct_type(self.fields_dict)
+            and edges_array_has_correct_shape(
+                self.fields_dict[SLIT_EDGES].ndim, self.fields_dict[SLIT_EDGES].shape
+            )
+        ):
+            return False
+
+        self._chopper_details = ChopperDetails(
+            self.fields_dict[SLITS],
+            self.fields_dict[SLIT_EDGES],
+            self.fields_dict[RADIUS],
+            self.fields_dict[SLIT_HEIGHT],
+            self._angle_units,
+            self._length_units,
+        )
+
+        return input_describes_valid_chopper(
+            self._chopper_details, self.fields_dict, self.fields_dict[SLIT_EDGES]
+        )
 
 
 class Point:

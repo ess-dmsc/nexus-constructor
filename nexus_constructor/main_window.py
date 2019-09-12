@@ -15,15 +15,13 @@ import h5py
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.geometry.disk_chopper_geometry import (
-    ChopperDetails,
     SLITS,
     SLIT_EDGES,
-    RADIUS,
     SLIT_HEIGHT,
     DiskChopperGeometryCreator,
+    NexusDefinedChopperChecker,
 )
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.nexus.nexus_wrapper import decode_bytes_string
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
 from nexus_constructor.component import Component
@@ -326,22 +324,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             print(disk_chopper[SLIT_HEIGHT].attrs["units"])
             print(type(disk_chopper[SLIT_HEIGHT].attrs["units"]))
 
-            angle_units = decode_bytes_string(disk_chopper[SLIT_EDGES].attrs["units"])
-            length_units = decode_bytes_string(disk_chopper[SLIT_HEIGHT].attrs["units"])
-
             print(type(disk_chopper[SLITS][()].dtype))
             print("Dimensions", disk_chopper[SLIT_EDGES][()].ndim)
-            print(disk_chopper[SLIT_EDGES][()])
             print(type(disk_chopper[SLIT_EDGES][()].shape))
 
-            chopper_details = ChopperDetails(
-                disk_chopper[SLITS][()],
-                disk_chopper[SLIT_EDGES][()],
-                disk_chopper[RADIUS][()],
-                disk_chopper[SLIT_HEIGHT][()],
-                angle_units,
-                length_units,
-            )
+            chopper_checker = NexusDefinedChopperChecker(disk_chopper)
+
+            if chopper_checker.validate_chopper():
+                print("Validation...")
 
             # if not ChopperChecker(chopper_details).validate_chopper():
             #     print("Unable to construct disk chopper mesh.")
