@@ -122,18 +122,57 @@ def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_
     assert not check_data_type(INT_TYPES[0], FLOAT_TYPES)
 
 
+def test_incorrect_field_type_message():
+    pass
+
+
+def test_GIVEN_valid_fields_information_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_true():
+    pass
+
+
+def test_GIVEN_invalid_slits_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false():
+    pass
+
+
+def test_GIVEN_invalid_radius_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false():
+    pass
+
+
+def test_GIVEN_invalid_slit_height_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false():
+    pass
+
+
+def test_GIVEN_invalid_slit_edges_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false():
+    pass
+
+
+def test_GIVEN_edges_array_with_valid_shape_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
+    pass
+
+
+def test_GIVEN_edges_array_with_more_than_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false():
+    pass
+
+
+def test_GIVEN_edges_array_with_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false():
+    pass
+
+
+def test_GIVEN_column_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
+
+    column_array = np.ones(shape=(5, 1))
+    assert edges_array_has_correct_shape(column_array.ndim, column_array.shape)
+
+
+def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
+
+    column_array = np.ones(shape=(1, 5))
+    assert edges_array_has_correct_shape(column_array.ndim, column_array.shape)
+
+
 def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
     chopper_checker
 ):
-    assert chopper_checker.validate_chopper()
-
-
-def test_GIVEN_column_array_WHEN_validating_chopper_input_THEN_returns_true(
-    chopper_checker
-):
-    chopper_checker.fields_dict[SLIT_EDGES].value = np.array(
-        [[i * 1.0] for i in range(6)]
-    )
     assert chopper_checker.validate_chopper()
 
 
