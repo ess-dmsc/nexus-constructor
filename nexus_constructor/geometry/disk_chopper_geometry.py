@@ -230,10 +230,6 @@ class UserDefinedChopperChecker:
 
         self.fields_dict = dict()
 
-        self._slits = None
-        self._slit_edges = None
-        self._radius = None
-        self._slit_height = None
         self._angle_units = "deg"
         self._length_units = "m"
         self._chopper_details = None
@@ -302,6 +298,7 @@ class NexusDefinedChopperChecker:
 
         self._angle_units = None
         self._length_units = None
+        self._chopper_details = None
 
         self._disk_chopper = disk_chopper
 
@@ -326,6 +323,7 @@ class NexusDefinedChopperChecker:
             self._length_units = decode_bytes_string(
                 self._disk_chopper[SLIT_HEIGHT].attrs["units"]
             )
+            self._disk_chopper["name"][()],
 
         except KeyError:
             return False
