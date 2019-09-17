@@ -165,7 +165,7 @@ class ChopperDetails:
 
 
 def input_describes_valid_chopper(
-    chopper_details: ChopperDetails, fields_dict: dict, slit_edges: Sequence
+    chopper_details: ChopperDetails, slit_edges: Sequence
 ):
     """
     A final check that the input has the following properties:
@@ -284,7 +284,7 @@ class UserDefinedChopperChecker:
         )
 
         return input_describes_valid_chopper(
-            self._chopper_details, self.fields_dict, self.fields_dict[SLIT_EDGES].value
+            self._chopper_details, self.fields_dict[SLIT_EDGES].value
         )
 
 
@@ -353,7 +353,7 @@ class NexusDefinedChopperChecker:
         )
 
         return input_describes_valid_chopper(
-            self._chopper_details, self.fields_dict, self.fields_dict[SLIT_EDGES]
+            self._chopper_details, self.fields_dict[SLIT_EDGES]
         )
 
 

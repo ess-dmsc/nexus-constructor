@@ -16,6 +16,7 @@ from nexus_constructor.geometry.disk_chopper_geometry import (
     check_data_type,
     INT_TYPES,
     FLOAT_TYPES,
+    incorrect_field_type_message,
 )
 
 N_SLITS = 3
@@ -151,8 +152,21 @@ def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_
     assert not check_data_type(INT_TYPES[0], FLOAT_TYPES)
 
 
-def test_incorrect_field_type_message():
-    pass
+def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned(
+    fields_dict_mocks
+):
+
+    wrong_data_type_for_radius_field = np.int8
+
+    fields_dict_mocks[RADIUS].dtype = wrong_data_type_for_radius_field
+    error_message = incorrect_field_type_message(fields_dict_mocks, RADIUS)
+
+    assert (
+        error_message
+        == "Wrong radius type. Expected float but found "
+        + str(wrong_data_type_for_radius_field)
+        + "."
+    )
 
 
 def test_GIVEN_valid_fields_information_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_true(
