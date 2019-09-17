@@ -471,7 +471,7 @@ class DiskChopperGeometryCreator:
 
         # Create the final faces connected to the front and back centre points
         self.add_face_connected_to_front_centre([prev_front, second_front])
-        self.add_face_connected_to_back_centre([prev_back, second_back])
+        self.add_face_connected_to_back_centre([second_back, prev_back])
 
     def convert_chopper_details_to_off(self):
         """
@@ -571,6 +571,7 @@ class DiskChopperGeometryCreator:
         :param radius: The radius of the disk chopper.
         :param centre_to_slit_start: The distance between the disk centre and the start of the slit.
         :param slit_edge: The angle of the slit in radians.
+        :param: right_face: Whether or not face on the boundary of the slit edge is facing right or facing left.
         :return: A list containing point objects for the four points in the chopper mesh with an angle of `slit_edge`.
         """
 
@@ -588,25 +589,20 @@ class DiskChopperGeometryCreator:
         self._add_point_to_list(lower_front_point)
         self._add_point_to_list(lower_back_point)
 
-        # Create a face for the slit edge that contains all four points.
-        if not right_face:
-            self.add_face_to_list(
-                [
-                    lower_front_point,
-                    upper_front_point,
-                    upper_back_point,
-                    lower_back_point,
-                ]
-            )
+        # Create a right-facing point list for the boundary of the slit edge.
+        right_face_order = [
+            lower_back_point,
+            upper_back_point,
+            upper_front_point,
+            lower_front_point,
+        ]
+
+        if right_face:
+            # Turn the points into a face if the boundary is right-facing.
+            self.add_face_to_list(right_face_order)
         else:
-            self.add_face_to_list(
-                [
-                    lower_back_point,
-                    upper_back_point,
-                    upper_front_point,
-                    lower_front_point,
-                ]
-            )
+            # Reverse the list otherwise.
+            self.add_face_to_list(reversed(right_face_order))
 
         return [
             upper_front_point,

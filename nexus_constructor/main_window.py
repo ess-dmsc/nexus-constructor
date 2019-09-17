@@ -15,9 +15,6 @@ import h5py
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.geometry.disk_chopper_geometry import (
-    SLITS,
-    SLIT_EDGES,
-    SLIT_HEIGHT,
     DiskChopperGeometryCreator,
     NexusDefinedChopperChecker,
 )
