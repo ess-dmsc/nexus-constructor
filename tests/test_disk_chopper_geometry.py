@@ -436,3 +436,17 @@ def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_a
     assert np.array_equal(
         chopper_details.slit_edges, CONVERT_DEGREES_TO_RADIANS(edges_array)
     )
+
+
+def test_GIVEN_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_and_radius_are_converted_to_cm():
+
+    chopper_details = ChopperDetails(
+        slits=N_SLITS,
+        slit_edges=EDGES_ARR,
+        radius=RADIUS_LENGTH,
+        slit_height=SLIT_HEIGHT_LENGTH,
+        length_units="cm",
+    )
+
+    assert chopper_details.radius * 100 == RADIUS_LENGTH
+    assert chopper_details.slit_height * 100 == SLIT_HEIGHT_LENGTH
