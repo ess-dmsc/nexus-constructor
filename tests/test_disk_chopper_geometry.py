@@ -13,6 +13,9 @@ from nexus_constructor.geometry.disk_chopper_geometry import (
     UserDefinedChopperChecker,
     fields_have_correct_type,
     edges_array_has_correct_shape,
+    check_data_type,
+    INT_TYPES,
+    FLOAT_TYPES,
 )
 
 
@@ -109,6 +112,14 @@ def chopper_details():
 @pytest.fixture(scope="function")
 def chopper_checker(mock_fields_list_widget):
     return UserDefinedChopperChecker(mock_fields_list_widget)
+
+
+def test_GIVEN_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_true():
+    assert check_data_type(FLOAT_TYPES[0], FLOAT_TYPES)
+
+
+def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_false():
+    assert not check_data_type(INT_TYPES[0], FLOAT_TYPES)
 
 
 def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
