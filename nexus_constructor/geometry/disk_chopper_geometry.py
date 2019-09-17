@@ -240,7 +240,9 @@ class UserDefinedChopperChecker:
 
         for i in range(fields_widget.count()):
             widget = fields_widget.itemWidget(fields_widget.item(i))
-            self.fields_dict[widget.name] = widget.value
+            self.fields_dict[widget.name] = widget
+
+        print(self.fields_dict)
 
     def required_fields_present(self):
         """
@@ -273,22 +275,23 @@ class UserDefinedChopperChecker:
             self.required_fields_present()
             and fields_have_correct_type(self.fields_dict)
             and edges_array_has_correct_shape(
-                self.fields_dict[SLIT_EDGES].ndim, self.fields_dict[SLIT_EDGES].shape
+                self.fields_dict[SLIT_EDGES].value.ndim,
+                self.fields_dict[SLIT_EDGES].value.shape,
             )
         ):
             return False
 
         self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS],
-            self.fields_dict[SLIT_EDGES],
-            self.fields_dict[RADIUS],
-            self.fields_dict[SLIT_HEIGHT],
+            self.fields_dict[SLITS].value,
+            self.fields_dict[SLIT_EDGES].value,
+            self.fields_dict[RADIUS].value,
+            self.fields_dict[SLIT_HEIGHT].value,
             self._angle_units,
             self._length_units,
         )
 
         return input_describes_valid_chopper(
-            self._chopper_details, self.fields_dict, self.fields_dict[SLIT_EDGES]
+            self._chopper_details, self.fields_dict, self.fields_dict[SLIT_EDGES].value
         )
 
 
