@@ -235,8 +235,6 @@ class UserDefinedChopperChecker:
             widget = fields_widget.itemWidget(fields_widget.item(i))
             self.fields_dict[widget.name] = widget
 
-        print(self.fields_dict)
-
     def required_fields_present(self):
         """
         Checks that all of the fields required to create the disk chopper are present.

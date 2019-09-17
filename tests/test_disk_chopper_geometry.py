@@ -425,6 +425,19 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
     assert details.slit_height == mock_slit_height_widget.value
 
 
+def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_details_are_returned(
+    chopper_checker
+):
+
+    chopper_checker.validate_chopper()
+    chopper_details = chopper_checker.get_chopper_details()
+
+    assert chopper_details.slits == N_SLITS
+    assert chopper_details.radius == RADIUS_LENGTH
+    assert chopper_details.slit_height == SLIT_HEIGHT_LENGTH
+    assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
+
+
 def test_GIVEN_chopper_information_WHEN_initialising_chopper_details_THEN_chopper_details_object_contains_original_disk_chopper_info(
     chopper_details
 ):
