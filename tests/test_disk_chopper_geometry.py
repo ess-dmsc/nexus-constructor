@@ -33,6 +33,13 @@ RADIUS_LENGTH = 200.3
 SLIT_HEIGHT_LENGTH = 70.1
 
 
+def degree_to_radian(x):
+    return np.deg2rad(x) % (np.pi * 2)
+
+
+CONVERT_DEGREES_TO_RADIANS = np.vectorize(degree_to_radian)
+
+
 @pytest.fixture(scope="function")
 def mock_slits_widget(chopper_details):
 
@@ -111,6 +118,7 @@ def chopper_details():
         slit_edges=EDGES_ARR,
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
+        angle_units="rad",
     )
 
 
@@ -395,13 +403,36 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
     chopper_checker.validate_chopper()
     details = chopper_checker.get_chopper_details()
 
-    def convert_angle(x):
-        return np.deg2rad(x) % (np.pi * 2)
-
-    vfunc = np.vectorize(convert_angle)
-    radian_slit_edges = vfunc(mock_slit_edges_widget.value)
+    radian_slit_edges = CONVERT_DEGREES_TO_RADIANS(mock_slit_edges_widget.value)
 
     assert (details.slit_edges == radian_slit_edges).all()
     assert details.slits == mock_slits_widget.value
     assert details.radius == mock_radius_widget.value
     assert details.slit_height == mock_slit_height_widget.value
+
+
+def test_GIVEN_chopper_information_WHEN_initialising_chopper_details_THEN_chopper_details_object_contains_original_disk_chopper_info(
+    chopper_details
+):
+
+    assert chopper_details.slits == N_SLITS
+    assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
+    assert chopper_details.radius == RADIUS_LENGTH
+    assert chopper_details.slit_height == SLIT_HEIGHT_LENGTH
+
+
+def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_angles_are_converted_to_radians():
+
+    edges_array = np.array([i * 30 for i in range(4)])
+
+    chopper_details = ChopperDetails(
+        slits=N_SLITS,
+        slit_edges=np.array([i * 30 for i in range(4)]),
+        radius=RADIUS_LENGTH,
+        slit_height=SLIT_HEIGHT_LENGTH,
+        angle_units="deg",
+    )
+
+    assert np.array_equal(
+        chopper_details.slit_edges, CONVERT_DEGREES_TO_RADIANS(edges_array)
+    )

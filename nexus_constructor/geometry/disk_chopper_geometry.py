@@ -144,7 +144,6 @@ class ChopperDetails:
             factor = calculate_unit_conversion_factor(
                 length_units
             )  # Something should check that the units a valid before we get to this point
-            print(factor)
             self._slit_height *= factor
             self._radius *= factor
 
