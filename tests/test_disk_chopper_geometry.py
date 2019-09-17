@@ -18,6 +18,20 @@ from nexus_constructor.geometry.disk_chopper_geometry import (
     FLOAT_TYPES,
 )
 
+N_SLITS = 3
+EDGES_ARR = np.array(
+    [
+        0.0,
+        0.757472895365539,
+        1.4416419621473162,
+        2.6197392072434886,
+        3.839724354387525,
+        4.368559117741807,
+    ]
+)
+RADIUS_LENGTH = 200.3
+SLIT_HEIGHT_LENGTH = 70.1
+
 
 @pytest.fixture(scope="function")
 def mock_slits_widget(chopper_details):
@@ -93,20 +107,27 @@ def mock_fields_list_widget(mock_widget_list,):
 @pytest.fixture(scope="function")
 def chopper_details():
     return ChopperDetails(
-        slits=3,
-        slit_edges=np.array(
-            [
-                0.0,
-                0.757472895365539,
-                1.4416419621473162,
-                2.6197392072434886,
-                3.839724354387525,
-                4.368559117741807,
-            ]
-        ),
-        radius=200.3,
-        slit_height=70.1,
+        slits=N_SLITS,
+        slit_edges=EDGES_ARR,
+        radius=RADIUS_LENGTH,
+        slit_height=SLIT_HEIGHT_LENGTH,
     )
+
+
+@pytest.fixture(scope="function")
+def fields_dict_mocks(
+    mock_slits_widget,
+    mock_slit_edges_widget,
+    mock_radius_widget,
+    mock_slit_height_widget,
+):
+
+    return {
+        SLITS: mock_slits_widget,
+        SLIT_EDGES: mock_slit_edges_widget,
+        RADIUS: mock_radius_widget,
+        SLIT_HEIGHT: mock_slit_height_widget,
+    }
 
 
 @pytest.fixture(scope="function")
@@ -126,36 +147,62 @@ def test_incorrect_field_type_message():
     pass
 
 
-def test_GIVEN_valid_fields_information_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_true():
-    pass
+def test_GIVEN_valid_fields_information_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_true(
+    fields_dict_mocks
+):
+    assert fields_have_correct_type(fields_dict_mocks)
 
 
-def test_GIVEN_invalid_slits_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false():
-    pass
+def test_GIVEN_invalid_slits_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
+    fields_dict_mocks
+):
+
+    fields_dict_mocks[SLITS].dtype = FLOAT_TYPES[0]
+    assert not fields_have_correct_type(fields_dict_mocks)
 
 
-def test_GIVEN_invalid_radius_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false():
-    pass
+def test_GIVEN_invalid_radius_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
+    fields_dict_mocks
+):
+
+    fields_dict_mocks[RADIUS].dtype = INT_TYPES[0]
+    assert not fields_have_correct_type(fields_dict_mocks)
 
 
-def test_GIVEN_invalid_slit_height_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false():
-    pass
+def test_GIVEN_invalid_slit_height_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
+    fields_dict_mocks
+):
+
+    fields_dict_mocks[SLIT_HEIGHT].dtype = INT_TYPES[0]
+    assert not fields_have_correct_type(fields_dict_mocks)
 
 
-def test_GIVEN_invalid_slit_edges_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false():
-    pass
+def test_GIVEN_invalid_slit_edges_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
+    fields_dict_mocks
+):
+
+    fields_dict_mocks[SLIT_EDGES].dtype = INT_TYPES[0]
+    assert not fields_have_correct_type(fields_dict_mocks)
 
 
 def test_GIVEN_edges_array_with_valid_shape_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
-    pass
+
+    valid_array = np.array([i for i in range(6)])
+    assert edges_array_has_correct_shape(valid_array.ndim, valid_array.shape)
 
 
 def test_GIVEN_edges_array_with_more_than_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false():
-    pass
+
+    three_dim_array = np.ones(shape=(5, 5, 5))
+    assert not edges_array_has_correct_shape(
+        three_dim_array.ndim, three_dim_array.shape
+    )
 
 
 def test_GIVEN_edges_array_with_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false():
-    pass
+
+    two_dim_array = np.ones(shape=(5, 5))
+    assert not edges_array_has_correct_shape(two_dim_array.ndim, two_dim_array.shape)
 
 
 def test_GIVEN_column_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
@@ -166,8 +213,8 @@ def test_GIVEN_column_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges
 
 def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
 
-    column_array = np.ones(shape=(1, 5))
-    assert edges_array_has_correct_shape(column_array.ndim, column_array.shape)
+    row_array = np.ones(shape=(1, 5))
+    assert edges_array_has_correct_shape(row_array.ndim, row_array.shape)
 
 
 def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
@@ -176,7 +223,7 @@ def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
     assert chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slit_edges_array_with_more_than_two_dimensions_WHEN_validating_chopper_input_THEN_returns_false(
+def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input_THEN_returns_false(
     chopper_checker
 ):
     chopper_checker.fields_dict[SLIT_EDGES].value = np.array(
@@ -185,26 +232,6 @@ def test_GIVEN_slit_edges_array_with_more_than_two_dimensions_WHEN_validating_ch
 
     assert chopper_checker.required_fields_present()
     assert fields_have_correct_type(chopper_checker.fields_dict)
-    assert not edges_array_has_correct_shape(
-        chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
-        chopper_checker.fields_dict[SLIT_EDGES].value.shape,
-    )
-    assert not chopper_checker.validate_chopper()
-
-
-def test_GIVEN_slit_edges_array_with_two_dimensions_WHEN_validating_chopper_input_THEN_returns_false(
-    chopper_checker
-):
-    chopper_checker.fields_dict[SLIT_EDGES].value = np.array(
-        [[i * 1.0 for i in range(6)] for _ in range(6)]
-    )
-
-    assert chopper_checker.required_fields_present()
-    assert fields_have_correct_type(chopper_checker.fields_dict)
-    assert not edges_array_has_correct_shape(
-        chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
-        chopper_checker.fields_dict[SLIT_EDGES].value.shape,
-    )
     assert not chopper_checker.validate_chopper()
 
 
@@ -347,47 +374,13 @@ def test_GIVEN_slit_height_field_is_missing_WHEN_validating_chopper_input_THEN_r
     assert not chopper_checker.validate_chopper()
 
 
-def test_GIVEN_slits_field_is_not_int_WHEN_validating_chopper_input_THEN_returns_false(
-    chopper_checker
-):
-
-    chopper_checker.fields_dict[SLITS].dtype = np.float16
-
-    assert chopper_checker.required_fields_present()
-    assert not fields_have_correct_type(chopper_checker.fields_dict)
-    assert not chopper_checker.validate_chopper()
-
-
-def test_GIVEN_radius_field_is_not_float_or_double_WHEN_validating_chopper_input_THEN_returns_false(
+def test_GIVEN_field_has_wrong_type_WHEN_validating_chopper_input_THEN_valid_chopper_returns_false(
     chopper_checker
 ):
 
     chopper_checker.fields_dict[RADIUS].dtype = np.byte
 
     assert chopper_checker.required_fields_present()
-    assert not fields_have_correct_type(chopper_checker.fields_dict)
-    assert not chopper_checker.validate_chopper()
-
-
-def test_GIVEN_slit_height_field_is_not_float_or_double_float_WHEN_validating_chopper_input_THEN_returns_false(
-    chopper_checker
-):
-
-    chopper_checker.fields_dict[SLIT_HEIGHT].dtype = np.byte
-
-    assert chopper_checker.required_fields_present()
-    assert not fields_have_correct_type(chopper_checker.fields_dict)
-    assert not chopper_checker.validate_chopper()
-
-
-def test_GIVEN_slit_edges_field_is_not_float_or_double_WHEN_validating_chopper_input_THEN_returns_false(
-    chopper_checker
-):
-
-    chopper_checker.fields_dict[SLIT_EDGES].dtype = np.byte
-
-    assert chopper_checker.required_fields_present()
-    assert not fields_have_correct_type(chopper_checker.fields_dict)
     assert not chopper_checker.validate_chopper()
 
 

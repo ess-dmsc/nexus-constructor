@@ -4,8 +4,6 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidget
 import numpy as np
 from h5py import Group
-from numpy import diff, unique
-from numpy.core.umath import deg2rad, ndarray
 
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.nexus.nexus_wrapper import decode_bytes_string
@@ -115,7 +113,7 @@ class ChopperDetails:
     def __init__(
         self,
         slits: int,
-        slit_edges: ndarray,
+        slit_edges: np.ndarray,
         radius: float,
         slit_height: float,
         angle_units: str = "deg",
@@ -137,7 +135,7 @@ class ChopperDetails:
 
         # Convert the angles to radians (if necessary) and make sure they are all less then two pi
         if angle_units == "deg":
-            self._slit_edges = [deg2rad(edge) % TWO_PI for edge in slit_edges]
+            self._slit_edges = [np.deg2rad(edge) % TWO_PI for edge in slit_edges]
         else:
             self._slit_edges = [edge % TWO_PI for edge in slit_edges]
 
@@ -201,12 +199,12 @@ def input_describes_valid_chopper(
         return False
 
     # Check that the list of slit edges is sorted
-    if not (diff(slit_edges) >= 0).all():
+    if not (np.diff(slit_edges) >= 0).all():
         print(UNABLE + "Slit edges array is not sorted. Found values:", slit_edges)
         return False
 
     # Check that there are no repeated angles
-    if len(slit_edges) != len(unique(slit_edges)):
+    if len(slit_edges) != len(np.unique(slit_edges)):
         print(
             UNABLE + "Angles in slit edges array should be unique. Found values:",
             slit_edges,
