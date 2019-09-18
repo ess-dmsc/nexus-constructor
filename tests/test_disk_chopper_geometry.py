@@ -1,4 +1,3 @@
-import h5py
 import pytest
 from PySide2.QtWidgets import QListWidget
 from mock import Mock
@@ -491,18 +490,30 @@ def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_a
     )
 
 
-def test_GIVEN_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_and_radius_are_converted_to_cm():
+def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_is_converted_to_cm():
 
     chopper_details = ChopperDetails(
         slits=N_SLITS,
         slit_edges=EDGES_ARR,
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
-        length_units="cm",
+        slit_height_units="cm",
+    )
+
+    assert chopper_details.slit_height * 100 == SLIT_HEIGHT_LENGTH
+
+
+def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius_is_converted_to_cm():
+
+    chopper_details = ChopperDetails(
+        slits=N_SLITS,
+        slit_edges=EDGES_ARR,
+        radius=RADIUS_LENGTH,
+        slit_height=SLIT_HEIGHT_LENGTH,
+        radius_units="cm",
     )
 
     assert chopper_details.radius * 100 == RADIUS_LENGTH
-    assert chopper_details.slit_height * 100 == SLIT_HEIGHT_LENGTH
 
 
 def test_GIVEN_complete_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_true(
@@ -563,10 +574,12 @@ def test_GIVEN_nexus_disk_chopper_with_no_slit_edge_units_WHEN_validating_disk_c
 def test_GIVEN_nexus_disk_chopper_with_no_slit_height_units_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
     nexus_defined_chopper_checker
 ):
-    pass
+    del nexus_defined_chopper_checker._disk_chopper[SLIT_HEIGHT].attrs["units"]
+    assert not nexus_defined_chopper_checker.required_fields_present()
 
 
 def test_GIVEN_nexus_disk_chopper_with_no_radius_units_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
     nexus_defined_chopper_checker
 ):
-    pass
+    del nexus_defined_chopper_checker._disk_chopper[RADIUS].attrs["units"]
+    assert not nexus_defined_chopper_checker.required_fields_present()

@@ -118,7 +118,8 @@ class ChopperDetails:
         radius: float,
         slit_height: float,
         angle_units: str = "deg",
-        length_units: str = "m",
+        slit_height_units: str = "m",
+        radius_units: str = "m",
     ):
         """
         Class for storing the chopper input given by the user.
@@ -129,6 +130,8 @@ class ChopperDetails:
         :param angle_units: The units of the slit edges. At the moment all slit edges provided are assumed to be degrees
             because the faculty for specifying attributes of fields hasn't yet been implemented in the Add Component
             Dialog.
+        :param slit_height_units: The units for the slit length.
+        :param radius_units: The units for the radius.
         """
         self._slits = slits
         self._radius = radius
@@ -140,12 +143,15 @@ class ChopperDetails:
         else:
             self._slit_edges = [edge % TWO_PI for edge in slit_edges]
 
-        if length_units != "m":
+        # Something should check that the units a valid before we get to this point
+        if slit_height_units != "m":
 
-            factor = calculate_unit_conversion_factor(
-                length_units
-            )  # Something should check that the units a valid before we get to this point
+            factor = calculate_unit_conversion_factor(slit_height_units)
             self._slit_height *= factor
+
+        if radius_units != "m":
+
+            factor = calculate_unit_conversion_factor(radius_units)
             self._radius *= factor
 
     @property
