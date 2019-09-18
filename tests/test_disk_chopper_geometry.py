@@ -611,3 +611,13 @@ def test_GIVEN_nexus_disk_chopper_with_wrong_edges_array_shape_WHEN_validating_d
     )
     assert nexus_defined_chopper_checker.required_fields_present()
     assert not nexus_defined_chopper_checker.validate_chopper()
+
+
+def test_GIVEN_invalid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_true(
+    nexus_defined_chopper_checker
+):
+
+    del nexus_defined_chopper_checker._disk_chopper[SLITS]
+    nexus_defined_chopper_checker._disk_chopper[SLITS] = 200
+    assert nexus_defined_chopper_checker.required_fields_present()
+    assert not nexus_defined_chopper_checker.validate_chopper()
