@@ -169,12 +169,16 @@ def nexus_defined_chopper_checker(nexus_disk_chopper):
     return NexusDefinedChopperChecker(nexus_disk_chopper)
 
 
-def test_GIVEN_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_true():
-    assert check_data_type(FLOAT_TYPES[0], FLOAT_TYPES)
+def test_GIVEN_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_true(
+    mock_radius_widget
+):
+    assert check_data_type(mock_radius_widget, FLOAT_TYPES)
 
 
-def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_false():
-    assert not check_data_type(INT_TYPES[0], FLOAT_TYPES)
+def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_false(
+    mock_slits_widget
+):
+    assert not check_data_type(mock_slits_widget, FLOAT_TYPES)
 
 
 def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned(
@@ -516,10 +520,15 @@ def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius
     assert chopper_details.radius * 100 == RADIUS_LENGTH
 
 
+def test_GIVEN_valid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_true(
+    nexus_defined_chopper_checker
+):
+    assert nexus_defined_chopper_checker.validate_chopper()
+
+
 def test_GIVEN_complete_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_true(
     nexus_defined_chopper_checker
 ):
-
     assert nexus_defined_chopper_checker.required_fields_present()
 
 
@@ -583,3 +592,13 @@ def test_GIVEN_nexus_disk_chopper_with_no_radius_units_WHEN_validating_disk_chop
 ):
     del nexus_defined_chopper_checker._disk_chopper[RADIUS].attrs["units"]
     assert not nexus_defined_chopper_checker.required_fields_present()
+
+
+def test_GIVEN_nexus_disk_chopper_with_wrong_field_type_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_false(
+    nexus_defined_chopper_checker
+):
+
+    del nexus_defined_chopper_checker._disk_chopper[SLITS]
+    nexus_defined_chopper_checker._disk_chopper[SLITS] = "string"
+    assert nexus_defined_chopper_checker.required_fields_present()
+    assert not nexus_defined_chopper_checker.validate_chopper()

@@ -32,7 +32,10 @@ TWO_PI = np.pi * 2
 
 
 def check_data_type(data_type, expected_types):
-    return data_type in expected_types
+    try:
+        return data_type.dtype in expected_types
+    except AttributeError:
+        return False
 
 
 def incorrect_field_type_message(fields_dict: dict, field_name: str):
@@ -42,20 +45,16 @@ def incorrect_field_type_message(fields_dict: dict, field_name: str):
     :return: A string that contains the name of the field, the type it should have, and the type the user entered.
     """
     return "Wrong {} type. Expected {} but found {}.".format(
-        field_name, EXPECTED_TYPE_ERROR_MSG[field_name], fields_dict[field_name].dtype
+        field_name, EXPECTED_TYPE_ERROR_MSG[field_name], type(fields_dict[field_name])
     )
 
 
 def fields_have_correct_type(fields_dict: dict):
 
-    correct_slits_type = check_data_type(fields_dict[SLITS].dtype, INT_TYPES)
-    correct_radius_type = check_data_type(fields_dict[RADIUS].dtype, FLOAT_TYPES)
-    correct_slit_height_type = check_data_type(
-        fields_dict[SLIT_HEIGHT].dtype, FLOAT_TYPES
-    )
-    correct_slit_edges_type = check_data_type(
-        fields_dict[SLIT_EDGES].dtype, FLOAT_TYPES
-    )
+    correct_slits_type = check_data_type(fields_dict[SLITS], INT_TYPES)
+    correct_radius_type = check_data_type(fields_dict[RADIUS], FLOAT_TYPES)
+    correct_slit_height_type = check_data_type(fields_dict[SLIT_HEIGHT], FLOAT_TYPES)
+    correct_slit_edges_type = check_data_type(fields_dict[SLIT_EDGES], FLOAT_TYPES)
 
     if (
         correct_slits_type
