@@ -377,12 +377,14 @@ class Point:
         self.z = z
         self.id = None
 
-    def set_id(self, index):
+    def set_id(self, index: int):
         """
         Give the point an ID. Attempts to make sure this can only be done once.
         """
-        if self.id is None and index is not None:
-            self.id = index
+        if self.id is not None or type(index) is not int:
+            return
+
+        self.id = index
 
     def point_to_qvector3d(self):
         """
