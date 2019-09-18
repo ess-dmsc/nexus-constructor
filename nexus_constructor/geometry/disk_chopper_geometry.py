@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, List
 
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidget
@@ -373,7 +373,7 @@ class Point:
     Basic class for representing a point with an index.
     """
 
-    def __init__(self, x, y, z):
+    def __init__(self, x: float, y: float, z: float):
         self.x = x
         self.y = y
         self.z = z
@@ -424,12 +424,12 @@ class DiskChopperGeometryCreator:
 
     def create_intermediate_points_and_faces(
         self,
-        first_angle,
-        second_angle,
-        first_front,
-        first_back,
-        second_front,
-        second_back,
+        first_angle: float,
+        second_angle: float,
+        first_front: Point,
+        first_back: Point,
+        second_front: Point,
+        second_back: Point,
         r,
     ):
         """
@@ -553,7 +553,7 @@ class DiskChopperGeometryCreator:
         )
 
     @staticmethod
-    def _polar_to_cartesian_2d(r, theta):
+    def _polar_to_cartesian_2d(r, theta: float):
         """
         Converts polar coordinates to cartesian coordinates.
         :param r: The vector magnitude.
@@ -562,7 +562,7 @@ class DiskChopperGeometryCreator:
         """
         return r * np.cos(theta), r * np.sin(theta)
 
-    def _create_mirrored_points(self, r, theta):
+    def _create_mirrored_points(self, r: float, theta: float):
         """
         Creates two points that share the same x and y values and have opposite z values.
         :param r: The distance between the points and the front/back centre of the disk chopper.
@@ -574,7 +574,11 @@ class DiskChopperGeometryCreator:
         return Point(x, y, self.z), Point(x, y, -self.z)
 
     def create_and_add_point_set(
-        self, radius, centre_to_slit_start, slit_edge, right_face
+        self,
+        radius: float,
+        centre_to_slit_start: float,
+        slit_edge: float,
+        right_face: bool,
     ):
         """
         Creates and records the upper and lower points for a slit edge and adds these to the file string. Also adds the
@@ -613,7 +617,7 @@ class DiskChopperGeometryCreator:
             self.add_face_to_list(right_face_order)
         else:
             # Reverse the list otherwise.
-            self.add_face_to_list(reversed(right_face_order))
+            self.add_face_to_list(right_face_order[::-1])
 
         return [
             upper_front_point,
@@ -622,7 +626,7 @@ class DiskChopperGeometryCreator:
             lower_back_point,
         ]
 
-    def create_and_add_mirrored_points(self, r, theta):
+    def create_and_add_mirrored_points(self, r: float, theta: float):
         """
         Creates and records two mirrored points and adds these to the list of points.
         :param r: The distance between the point and front/back centre of the disk chopper.
@@ -636,21 +640,21 @@ class DiskChopperGeometryCreator:
 
         return front, back
 
-    def add_face_connected_to_front_centre(self, points):
+    def add_face_connected_to_front_centre(self, points: float):
         """
         Records a face that is connected to the center point on the front of the disk chopper.
         :param points: A list of points that make up the face minus the centre point.
         """
         self.add_face_to_list([self.front_centre] + points)
 
-    def add_face_connected_to_back_centre(self, points):
+    def add_face_connected_to_back_centre(self, points: List[Point]):
         """
         Records a face that is connected to the center point on the back of the disk chopper.
         :param points: A list of points that make up the face minus the centre point.
         """
         self.add_face_to_list([self.back_centre] + points)
 
-    def _add_point_to_list(self, point):
+    def _add_point_to_list(self, point: Point):
         """
         Records a point and gives it an ID.
         :param point: The point that is added to the list of points.
@@ -658,7 +662,7 @@ class DiskChopperGeometryCreator:
         point.set_id(len(self.points))
         self.points.append(point)
 
-    def add_face_to_list(self, points):
+    def add_face_to_list(self, points: List[Point]):
         """
         Records a face by creating a list of its point IDs and adding this to `self.faces`.
         :param points: A list of the points that compose the face.
@@ -666,7 +670,7 @@ class DiskChopperGeometryCreator:
         ids = [point.id for point in points]
         self.faces.append(ids)
 
-    def add_top_dead_centre_arrow(self, r):
+    def add_top_dead_centre_arrow(self, r: float):
         """
         Adds a 2D arrow to the mesh in order to illustrate the location of the top dead centre.
         :param r: The distance between the disk centre and the top dead centre arrow.
