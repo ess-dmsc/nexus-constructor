@@ -357,7 +357,8 @@ class NexusDefinedChopperChecker:
             self.fields_dict[RADIUS],
             self.fields_dict[SLIT_HEIGHT],
             self._angle_units,
-            "m",
+            self._slit_height_units,
+            self._radius_units,
         )
 
         return input_describes_valid_chopper(

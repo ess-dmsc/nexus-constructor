@@ -157,9 +157,9 @@ def nexus_disk_chopper():
     disk_chopper_group[SLIT_EDGES] = EDGES_ARR
     disk_chopper_group[RADIUS] = RADIUS_LENGTH
     disk_chopper_group[SLIT_HEIGHT] = SLIT_HEIGHT_LENGTH
-    disk_chopper_group[SLIT_EDGES].attrs["units"] = str.encode("m")
-    disk_chopper_group[RADIUS].attrs["units"] = str.encode("m")
-    disk_chopper_group[SLIT_HEIGHT].attrs["units"] = str.encode("rad")
+    disk_chopper_group[SLIT_EDGES].attrs["units"] = str.encode("rad")
+    disk_chopper_group[RADIUS].attrs["units"] = str.encode("mm")
+    disk_chopper_group[SLIT_HEIGHT].attrs["units"] = str.encode("mm")
     yield disk_chopper_group
     nexus_file.close()
 
@@ -181,19 +181,16 @@ def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_
     assert not check_data_type(mock_slits_widget, FLOAT_TYPES)
 
 
-def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned(
-    fields_dict_mocks
-):
+def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned():
 
-    wrong_data_type_for_radius_field = np.int8
+    field_dict = {RADIUS: "string"}
 
-    fields_dict_mocks[RADIUS].dtype = wrong_data_type_for_radius_field
-    error_message = incorrect_field_type_message(fields_dict_mocks, RADIUS)
+    error_message = incorrect_field_type_message(field_dict, RADIUS)
 
     assert (
         error_message
         == "Wrong radius type. Expected float but found "
-        + str(wrong_data_type_for_radius_field)
+        + str(type(field_dict[RADIUS]))
         + "."
     )
 
