@@ -14,6 +14,7 @@ SLIT_EDGES = "slit_edges"
 SLITS = "slits"
 RADIUS = "radius"
 SLIT_HEIGHT = "slit_height"
+NAME = "name"
 
 UNABLE = "Unable to create chopper geometry - "
 EXPECTED_TYPE_ERROR_MSG = {
@@ -292,7 +293,8 @@ class NexusDefinedChopperChecker:
         self.fields_dict = dict()
 
         self._angle_units = None
-        self._length_units = None
+        self._slit_height_units = None
+        self._radius_units = None
         self._chopper_details = None
 
         self._disk_chopper = disk_chopper
@@ -315,10 +317,13 @@ class NexusDefinedChopperChecker:
             self._angle_units = decode_bytes_string(
                 self._disk_chopper[SLIT_EDGES].attrs["units"]
             )
-            self._length_units = decode_bytes_string(
+            self._slit_height_units = decode_bytes_string(
                 self._disk_chopper[SLIT_HEIGHT].attrs["units"]
             )
-            self._disk_chopper["name"][()],
+            self._radius_units = decode_bytes_string(
+                self._disk_chopper[RADIUS].attrs["units"]
+            )
+            self._disk_chopper[NAME][()],
 
         except KeyError:
             return False
