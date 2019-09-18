@@ -234,7 +234,8 @@ class UserDefinedChopperChecker:
         self.fields_dict = dict()
 
         self._angle_units = "deg"
-        self._length_units = "m"
+        self._slit_height_units = "m"
+        self._radius_units = "m"
         self._chopper_details = None
 
         for i in range(fields_widget.count()):
@@ -284,8 +285,8 @@ class UserDefinedChopperChecker:
             self.fields_dict[RADIUS].value,
             self.fields_dict[SLIT_HEIGHT].value,
             self._angle_units,
-            self._length_units,
-            self._length_units,
+            self._slit_height_units,
+            self._radius_units,
         )
 
         return input_describes_valid_chopper(
