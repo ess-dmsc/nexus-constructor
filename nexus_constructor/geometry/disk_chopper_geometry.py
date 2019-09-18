@@ -116,9 +116,9 @@ class ChopperDetails:
         slit_edges: np.ndarray,
         radius: float,
         slit_height: float,
-        angle_units: str = "deg",
-        slit_height_units: str = "m",
-        radius_units: str = "m",
+        angle_units: str,
+        slit_height_units: str,
+        radius_units: str,
     ):
         """
         Class for storing the chopper input given by the user.
@@ -284,6 +284,7 @@ class UserDefinedChopperChecker:
             self.fields_dict[RADIUS].value,
             self.fields_dict[SLIT_HEIGHT].value,
             self._angle_units,
+            self._length_units,
             self._length_units,
         )
 

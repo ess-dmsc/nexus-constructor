@@ -128,6 +128,8 @@ def chopper_details():
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
         angle_units="rad",
+        slit_height_units="m",
+        radius_units="m",
     )
 
 
@@ -163,8 +165,8 @@ def nexus_disk_chopper():
     disk_chopper_group[RADIUS] = RADIUS_LENGTH
     disk_chopper_group[SLIT_HEIGHT] = SLIT_HEIGHT_LENGTH
     disk_chopper_group[SLIT_EDGES].attrs["units"] = str.encode("rad")
-    disk_chopper_group[RADIUS].attrs["units"] = str.encode("mm")
-    disk_chopper_group[SLIT_HEIGHT].attrs["units"] = str.encode("mm")
+    disk_chopper_group[RADIUS].attrs["units"] = str.encode("m")
+    disk_chopper_group[SLIT_HEIGHT].attrs["units"] = str.encode("m")
     yield disk_chopper_group
     nexus_file.close()
 
@@ -493,6 +495,8 @@ def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_a
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
         angle_units="deg",
+        slit_height_units="m",
+        radius_units="m",
     )
 
     assert np.array_equal(
@@ -507,7 +511,9 @@ def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_s
         slit_edges=EDGES_ARR,
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
+        angle_units="deg",
         slit_height_units="cm",
+        radius_units="m",
     )
 
     assert chopper_details.slit_height * 100 == SLIT_HEIGHT_LENGTH
@@ -520,7 +526,9 @@ def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius
         slit_edges=EDGES_ARR,
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
+        angle_units="deg",
         radius_units="cm",
+        slit_height_units="m",
     )
 
     assert chopper_details.radius * 100 == RADIUS_LENGTH
@@ -631,6 +639,19 @@ def test_GIVEN_invalid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_vali
     nexus_defined_chopper_checker._disk_chopper[SLITS] = 200
     assert nexus_defined_chopper_checker.required_fields_present()
     assert not nexus_defined_chopper_checker.validate_chopper()
+
+
+def test_GIVEN_validation_passes_WHEN_validating_nexus_disk_chopper_THEN_chopper_details_has_expected_values(
+    nexus_defined_chopper_checker
+):
+
+    nexus_defined_chopper_checker.validate_chopper()
+    chopper_details = nexus_defined_chopper_checker.get_chopper_details()
+
+    assert chopper_details.slits == N_SLITS
+    assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
+    assert chopper_details.radius == RADIUS_LENGTH
+    assert chopper_details.slit_height == SLIT_HEIGHT_LENGTH
 
 
 def test_GIVEN_three_values_WHEN_creating_point_THEN_point_is_initialised_correctly(
