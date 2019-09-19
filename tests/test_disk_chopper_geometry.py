@@ -665,15 +665,15 @@ def test_GIVEN_three_values_WHEN_creating_point_THEN_point_is_initialised_correc
 
 def test_GIVEN_id_WHEN_point_has_no_id_THEN_id_is_set(point):
 
-    id = 0
+    id = 300
     point.set_id(id)
     assert point.id == id
 
 
 def test_GIVEN_id_WHEN_point_already_has_id_THEN_id_doesnt_change(point):
 
-    old_id = 0
-    new_id = 5
+    old_id = 200
+    new_id = 300
     point.set_id(old_id)
     point.set_id(new_id)
 

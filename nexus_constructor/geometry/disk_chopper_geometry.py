@@ -510,7 +510,7 @@ class DiskChopperGeometryCreator:
 
             # Create four points for the current slit edge
             current_upper_front, current_upper_back, current_lower_front, current_lower_back = self.create_and_add_point_set(
-                self._radius, centre_to_slit_bottom, self._slit_edges[i], i % 2
+                self._radius, centre_to_slit_bottom, self._slit_edges[i], bool(i % 2)
             )
 
             # Create lower intermediate points/faces if the slit angle index is odd
@@ -586,7 +586,7 @@ class DiskChopperGeometryCreator:
         :param radius: The radius of the disk chopper.
         :param centre_to_slit_start: The distance between the disk centre and the start of the slit.
         :param slit_edge: The angle of the slit in radians.
-        :param: right_face: Whether or not face on the boundary of the slit edge is facing right or facing left.
+        :param right_face: Whether or not face on the boundary of the slit edge is facing right or facing left.
         :return: A list containing point objects for the four points in the chopper mesh with an angle of `slit_edge`.
         """
 
@@ -640,7 +640,7 @@ class DiskChopperGeometryCreator:
 
         return front, back
 
-    def add_face_connected_to_front_centre(self, points: float):
+    def add_face_connected_to_front_centre(self, points: List[Point]):
         """
         Records a face that is connected to the center point on the front of the disk chopper.
         :param points: A list of points that make up the face minus the centre point.
