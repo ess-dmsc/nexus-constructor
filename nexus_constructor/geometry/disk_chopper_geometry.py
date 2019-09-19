@@ -31,6 +31,25 @@ FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)
 TWO_PI = np.pi * 2
 
 
+def check_data_type(data_type, expected_types):
+    try:
+        return data_type.dtype in expected_types
+    except AttributeError:
+        return False
+
+
+def incorrect_field_type_message(fields_dict: dict, field_name: str):
+    """
+    Creates a string explaining to the user that the field input did not have the expected type.
+    :param fields_dict: The dictionary containing the different data fields for the disk chopper.
+    :param field_name: The name of the field that failed the check.
+    :return: A string that contains the name of the field, the type it should have, and the type the user entered.
+    """
+    return "Wrong {} type. Expected {} but found {}.".format(
+        field_name, EXPECTED_TYPE_ERROR_MSG[field_name], type(fields_dict[field_name])
+    )
+
+
 class ChopperChecker:
     def __init__(self):
 
@@ -85,50 +104,32 @@ class ChopperChecker:
         print(UNABLE + "\n".join(problems))
         return False
 
-
-def check_data_type(data_type, expected_types):
-    try:
-        return data_type.dtype in expected_types
-    except AttributeError:
-        return False
-
-
-def incorrect_field_type_message(fields_dict: dict, field_name: str):
-    """
-    Creates a string explaining to the user that the field input did not have the expected type.
-    :param field_name: The name of the field that failed the check.
-    :return: A string that contains the name of the field, the type it should have, and the type the user entered.
-    """
-    return "Wrong {} type. Expected {} but found {}.".format(
-        field_name, EXPECTED_TYPE_ERROR_MSG[field_name], type(fields_dict[field_name])
-    )
-
-
-def edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple):
-    """
-    Checks that the edges array consists of either one row or one column.
-    :return: True if the edges array is 1D. False otherwise.
-    """
-    if edges_dim > 2:
-        print(
-            UNABLE
-            + "Expected slit edges array to be 1D but it has {} dimensions.".format(
-                edges_dim
-            )
-        )
-        return False
-
-    if edges_dim == 2:
-        if edges_shape[0] != 1 and edges_shape[1] != 1:
+    @staticmethod
+    def edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple):
+        """
+        Checks that the edges array consists of either one row or one column.
+        :return: True if the edges array is 1D. False otherwise.
+        """
+        if edges_dim > 2:
             print(
                 UNABLE
-                + "Expected slit edges array to be 1D but it has shape {}.".format(
-                    edges_shape
+                + "Expected slit edges array to be 1D but it has {} dimensions.".format(
+                    edges_dim
                 )
             )
             return False
 
-    return True
+        if edges_dim == 2:
+            if edges_shape[0] != 1 and edges_shape[1] != 1:
+                print(
+                    UNABLE
+                    + "Expected slit edges array to be 1D but it has shape {}.".format(
+                        edges_shape
+                    )
+                )
+                return False
+
+        return True
 
 
 class ChopperDetails:
@@ -276,13 +277,6 @@ class UserDefinedChopperChecker(ChopperChecker):
 
         return True
 
-    def get_chopper_details(self):
-        """
-        :return: The ChopperDetails object. This will only be created if `validate_chopper` was called and the
-            validation was successful. Otherwise this method just returns None.
-        """
-        return self._chopper_details
-
     def validate_chopper(self):
         """
         Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
@@ -293,7 +287,7 @@ class UserDefinedChopperChecker(ChopperChecker):
         if not (
             self.required_fields_present()
             and self.fields_have_correct_type(self.fields_dict)
-            and edges_array_has_correct_shape(
+            and self.edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES].value.ndim,
                 self.fields_dict[SLIT_EDGES].value.shape,
             )
@@ -355,7 +349,7 @@ class NexusDefinedChopperChecker(ChopperChecker):
         if not (
             self.required_fields_present()
             and self.fields_have_correct_type(self.fields_dict)
-            and edges_array_has_correct_shape(
+            and self.edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES].ndim, self.fields_dict[SLIT_EDGES].shape
             )
         ):

@@ -11,7 +11,6 @@ from nexus_constructor.geometry.disk_chopper_geometry import (
     RADIUS,
     SLIT_EDGES,
     UserDefinedChopperChecker,
-    edges_array_has_correct_shape,
     check_data_type,
     INT_TYPES,
     FLOAT_TYPES,
@@ -243,36 +242,54 @@ def test_GIVEN_invalid_slit_edges_type_WHEN_validating_disk_chopper_THEN_fields_
     assert not user_defined_chopper_checker.fields_have_correct_type(fields_dict_mocks)
 
 
-def test_GIVEN_edges_array_with_valid_shape_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
+def test_GIVEN_edges_array_with_valid_shape_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true(
+    user_defined_chopper_checker
+):
 
     valid_array = np.array([i for i in range(6)])
-    assert edges_array_has_correct_shape(valid_array.ndim, valid_array.shape)
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
+        valid_array.ndim, valid_array.shape
+    )
 
 
-def test_GIVEN_edges_array_with_more_than_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false():
+def test_GIVEN_edges_array_with_more_than_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false(
+    user_defined_chopper_checker
+):
 
     three_dim_array = np.ones(shape=(5, 5, 5))
-    assert not edges_array_has_correct_shape(
+    assert not user_defined_chopper_checker.edges_array_has_correct_shape(
         three_dim_array.ndim, three_dim_array.shape
     )
 
 
-def test_GIVEN_edges_array_with_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false():
+def test_GIVEN_edges_array_with_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false(
+    user_defined_chopper_checker
+):
 
     two_dim_array = np.ones(shape=(5, 5))
-    assert not edges_array_has_correct_shape(two_dim_array.ndim, two_dim_array.shape)
+    assert not user_defined_chopper_checker.edges_array_has_correct_shape(
+        two_dim_array.ndim, two_dim_array.shape
+    )
 
 
-def test_GIVEN_column_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
+def test_GIVEN_column_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true(
+    user_defined_chopper_checker
+):
 
     column_array = np.ones(shape=(5, 1))
-    assert edges_array_has_correct_shape(column_array.ndim, column_array.shape)
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
+        column_array.ndim, column_array.shape
+    )
 
 
-def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
+def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true(
+    user_defined_chopper_checker
+):
 
     row_array = np.ones(shape=(1, 5))
-    assert edges_array_has_correct_shape(row_array.ndim, row_array.shape)
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
+        row_array.ndim, row_array.shape
+    )
 
 
 def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
@@ -304,7 +321,7 @@ def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopp
     assert user_defined_chopper_checker.fields_have_correct_type(
         user_defined_chopper_checker.fields_dict
     )
-    assert edges_array_has_correct_shape(
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
     )
@@ -321,7 +338,7 @@ def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_T
     assert user_defined_chopper_checker.fields_have_correct_type(
         user_defined_chopper_checker.fields_dict
     )
-    assert edges_array_has_correct_shape(
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
     )
@@ -340,7 +357,7 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
     assert user_defined_chopper_checker.fields_have_correct_type(
         user_defined_chopper_checker.fields_dict
     )
-    assert edges_array_has_correct_shape(
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
     )
@@ -362,7 +379,7 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
     assert user_defined_chopper_checker.fields_have_correct_type(
         user_defined_chopper_checker.fields_dict
     )
-    assert edges_array_has_correct_shape(
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
     )
@@ -381,7 +398,7 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
     assert user_defined_chopper_checker.fields_have_correct_type(
         user_defined_chopper_checker.fields_dict
     )
-    assert edges_array_has_correct_shape(
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
     )
@@ -400,7 +417,7 @@ def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_inp
     assert user_defined_chopper_checker.fields_have_correct_type(
         user_defined_chopper_checker.fields_dict
     )
-    assert edges_array_has_correct_shape(
+    assert user_defined_chopper_checker.edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
     )
