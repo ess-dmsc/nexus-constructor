@@ -197,7 +197,7 @@ class DiskChopperGeometryCreator:
         )
 
     @staticmethod
-    def _polar_to_cartesian_2d(r, theta: float):
+    def _polar_to_cartesian_2d(r: float, theta: float):
         """
         Converts polar coordinates to cartesian coordinates.
         :param r: The vector magnitude.

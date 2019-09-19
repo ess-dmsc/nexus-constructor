@@ -19,6 +19,11 @@ def point():
     return Point(POINT_X, POINT_Y, POINT_Z)
 
 
+@pytest.fixture(scope="function")
+def geometry_creator(chopper_details):
+    return DiskChopperGeometryCreator(chopper_details)
+
+
 def test_GIVEN_three_values_WHEN_creating_point_THEN_point_is_initialised_correctly(
     point
 ):
@@ -63,9 +68,9 @@ def test_GIVEN_point_WHEN_calling_point_to_qvector3d_THEN_expected_vector_is_cre
 
 
 def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_creator_is_initialised_with_expected_values(
-    chopper_details
+    geometry_creator, chopper_details
 ):
-    geometry_creator = DiskChopperGeometryCreator(chopper_details)
+
     expected_z = THICKNESS * 2
 
     assert geometry_creator.faces == []
