@@ -13,6 +13,9 @@ POINT_X = 2.0
 POINT_Y = 3.0
 POINT_Z = 4.0
 
+R = np.sqrt(2)
+THETA = np.deg2rad(45)
+
 
 @pytest.fixture(scope="function")
 def point():
@@ -91,12 +94,23 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
         assert geometry_creator.points[i] == expected_points[i]
 
 
-def test_GIVEN_polar_coordinated_WHEN_converting_polar_to_cartesian_THEN_expected_value_is_returned(
+def test_GIVEN_polar_coordinates_WHEN_converting_polar_to_cartesian_THEN_expected_values_are_returned(
+    geometry_creator
+):
+    x, y = geometry_creator._polar_to_cartesian_2d(R, THETA)
+    assert abs(x - 1) < 1e-05
+    assert abs(y - 1) < 1e-05
+
+
+def test_GIVEN_polar_coordinates_WHEN_creating_mirrored_points_THEN_expected_points_are_returned(
     geometry_creator
 ):
 
-    r = np.sqrt(2)
-    theta = np.deg2rad(45)
-    x, y = geometry_creator._polar_to_cartesian_2d(r, theta)
-    assert abs(x - 1) < 1e-05
-    assert abs(y - 1) < 1e-05
+    expected_first_point = Point(1.0, 1.0, THICKNESS * 2)
+    expected_second_point = Point(1.0, 1.0, -THICKNESS * 2)
+
+    actual_first_point, actual_second_point = geometry_creator._create_mirrored_points(
+        R, THETA
+    )
+    assert actual_first_point == expected_first_point
+    assert actual_second_point == expected_second_point
