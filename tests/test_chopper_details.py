@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from tests.chopper_test_resources import (
@@ -11,7 +10,6 @@ from tests.chopper_test_resources import (
 )
 
 
-@pytest.mark.usefixtures("chopper_details")
 def test_GIVEN_chopper_information_WHEN_initialising_chopper_details_THEN_chopper_details_object_contains_original_disk_chopper_info(
     chopper_details
 ):

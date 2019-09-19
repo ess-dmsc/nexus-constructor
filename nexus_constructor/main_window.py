@@ -311,13 +311,13 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         disk_choppers = self.instrument.nexus.get_disk_choppers()
 
-        print(type(disk_choppers[0]))
-
         if not disk_choppers:
             print("No choppers found.")
             return
 
-        print("Found disk choppers in the file. Attempting to construct mesh(es)...")
+        print(
+            "Found one or more disk choppers in the file. Attempting to construct mesh(es)..."
+        )
 
         for disk_chopper in disk_choppers:
 
@@ -329,6 +329,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     DiskChopperGeometryCreator(
                         chopper_checker.get_chopper_details()
                     ).create_disk_chopper_geometry(),
+                )
+            else:
+                print(
+                    "Validation failed. Unable to create disk chopper mesh. Defaulting to cube..."
                 )
 
     def update_nexus_file_structure_view(self, nexus_file):
