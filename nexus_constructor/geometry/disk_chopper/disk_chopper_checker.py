@@ -62,9 +62,6 @@ class ChopperChecker:
         """
         return self._chopper_details
 
-    def required_fields_present(self):
-        pass
-
     @staticmethod
     def fields_have_correct_type(fields_dict: dict):
 
@@ -185,9 +182,6 @@ class ChopperChecker:
             return False
 
         return True
-
-    def validate_chopper(self):
-        pass
 
 
 class UserDefinedChopperChecker(ChopperChecker):
