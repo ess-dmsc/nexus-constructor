@@ -31,6 +31,67 @@ FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)
 TWO_PI = np.pi * 2
 
 
+class ChopperDetails:
+    def __init__(
+        self,
+        slits: int,
+        slit_edges: np.ndarray,
+        radius: float,
+        slit_height: float,
+        angle_units: str,
+        slit_height_units: str,
+        radius_units: str,
+    ):
+        """
+        Class for storing the chopper input given by the user.
+        :param slits: The number of slits in the disk chopper.
+        :param slit_edges: The list of slit edge angles in the disk chopper.
+        :param radius: The radius of the slit chopper.
+        :param slit_height: The slit height.
+        :param angle_units: The units of the slit edges. At the moment all slit edges provided are assumed to be degrees
+            because the faculty for specifying attributes of fields hasn't yet been implemented in the Add Component
+            Dialog.
+        :param slit_height_units: The units for the slit length.
+        :param radius_units: The units for the radius.
+        """
+        self._slits = slits
+        self._radius = radius
+        self._slit_height = slit_height
+
+        # Convert the angles to radians (if necessary) and make sure they are all less then two pi
+        if angle_units == "deg":
+            self._slit_edges = [np.deg2rad(edge) % TWO_PI for edge in slit_edges]
+        else:
+            self._slit_edges = [edge % TWO_PI for edge in slit_edges]
+
+        # Something should check that the units a valid before we get to this point
+        if slit_height_units != "m":
+
+            factor = calculate_unit_conversion_factor(slit_height_units)
+            self._slit_height *= factor
+
+        if radius_units != "m":
+
+            factor = calculate_unit_conversion_factor(radius_units)
+            self._radius *= factor
+
+    @property
+    def slits(self):
+        return self._slits
+
+    @property
+    def slit_edges(self):
+        return self._slit_edges
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @property
+    def slit_height(self):
+        return self._slit_height
+
+
 def check_data_type(data_type, expected_types):
     try:
         return data_type.dtype in expected_types
@@ -131,124 +192,67 @@ class ChopperChecker:
 
         return True
 
-
-class ChopperDetails:
-    def __init__(
-        self,
-        slits: int,
-        slit_edges: np.ndarray,
-        radius: float,
-        slit_height: float,
-        angle_units: str,
-        slit_height_units: str,
-        radius_units: str,
+    @staticmethod
+    def input_describes_valid_chopper(
+        chopper_details: ChopperDetails, slit_edges: Sequence
     ):
         """
-        Class for storing the chopper input given by the user.
-        :param slits: The number of slits in the disk chopper.
-        :param slit_edges: The list of slit edge angles in the disk chopper.
-        :param radius: The radius of the slit chopper.
-        :param slit_height: The slit height.
-        :param angle_units: The units of the slit edges. At the moment all slit edges provided are assumed to be degrees
-            because the faculty for specifying attributes of fields hasn't yet been implemented in the Add Component
-            Dialog.
-        :param slit_height_units: The units for the slit length.
-        :param radius_units: The units for the radius.
+        A final check that the input has the following properties:
+            - The length of the slit edges array is twice the number of slits
+            - The slit height is smaller than the radius
+            - The slit edges array is sorted.
+            - The slit edges array doesn't contain repeated angles.
+            - The slit edges array doesn't contain overlapping slits.
+        If this is all true then a chopper mesh can be created.
+        :return: True if all the conditions above are met. False otherwise.
         """
-        self._slits = slits
-        self._radius = radius
-        self._slit_height = slit_height
-
-        # Convert the angles to radians (if necessary) and make sure they are all less then two pi
-        if angle_units == "deg":
-            self._slit_edges = [np.deg2rad(edge) % TWO_PI for edge in slit_edges]
-        else:
-            self._slit_edges = [edge % TWO_PI for edge in slit_edges]
-
-        # Something should check that the units a valid before we get to this point
-        if slit_height_units != "m":
-
-            factor = calculate_unit_conversion_factor(slit_height_units)
-            self._slit_height *= factor
-
-        if radius_units != "m":
-
-            factor = calculate_unit_conversion_factor(radius_units)
-            self._radius *= factor
-
-    @property
-    def slits(self):
-        return self._slits
-
-    @property
-    def slit_edges(self):
-        return self._slit_edges
-
-    @property
-    def radius(self):
-        return self._radius
-
-    @property
-    def slit_height(self):
-        return self._slit_height
-
-
-def input_describes_valid_chopper(
-    chopper_details: ChopperDetails, slit_edges: Sequence
-):
-    """
-    A final check that the input has the following properties:
-        - The length of the slit edges array is twice the number of slits
-        - The slit height is smaller than the radius
-        - The slit edges array is sorted.
-        - The slit edges array doesn't contain repeated angles.
-        - The slit edges array doesn't contain overlapping slits.
-    If this is all true then a chopper mesh can be created.
-    :return: True if all the conditions above are met. False otherwise.
-    """
-    # Check that the number of slit edges is equal to two times the number of slits
-    if len(chopper_details.slit_edges) != 2 * chopper_details.slits:
-        print(
-            UNABLE
-            + "Size of slit edges array should be twice the number of slits. Instead there are {} slits and {} slit edges.".format(
-                chopper_details.slits, len(chopper_details.slit_edges)
+        # Check that the number of slit edges is equal to two times the number of slits
+        if len(chopper_details.slit_edges) != 2 * chopper_details.slits:
+            print(
+                UNABLE
+                + "Size of slit edges array should be twice the number of slits. Instead there are {} slits and {} slit edges.".format(
+                    chopper_details.slits, len(chopper_details.slit_edges)
+                )
             )
-        )
-        return False
+            return False
 
-    # Check that the slit height is smaller than the radius
-    if chopper_details.slit_height >= chopper_details.radius:
-        print(
-            UNABLE
-            + "Slit height should be smaller than radius. Instead slit height is {} and radius is {}".format(
-                chopper_details.slit_height, chopper_details.radius
+        # Check that the slit height is smaller than the radius
+        if chopper_details.slit_height >= chopper_details.radius:
+            print(
+                UNABLE
+                + "Slit height should be smaller than radius. Instead slit height is {} and radius is {}".format(
+                    chopper_details.slit_height, chopper_details.radius
+                )
             )
-        )
-        return False
+            return False
 
-    # Check that the list of slit edges is sorted
-    if not (np.diff(slit_edges) >= 0).all():
-        print(UNABLE + "Slit edges array is not sorted. Found values:", slit_edges)
-        return False
+        # Check that the list of slit edges is sorted
+        if not (np.diff(slit_edges) >= 0).all():
+            print(UNABLE + "Slit edges array is not sorted. Found values:", slit_edges)
+            return False
 
-    # Check that there are no repeated angles
-    if len(slit_edges) != len(np.unique(slit_edges)):
-        print(
-            UNABLE + "Angles in slit edges array should be unique. Found values:",
-            slit_edges,
-        )
-        return False
+        # Check that there are no repeated angles
+        if len(slit_edges) != len(np.unique(slit_edges)):
+            print(
+                UNABLE + "Angles in slit edges array should be unique. Found values:",
+                slit_edges,
+            )
+            return False
 
-    # Check that the first and last edges do not overlap
-    if (chopper_details.slit_edges != sorted(chopper_details.slit_edges)) and (
-        chopper_details.slit_edges[-1] >= chopper_details.slit_edges[0]
-    ):
-        print(
-            UNABLE + "Slit edges contains overlapping slits. Found values:", slit_edges
-        )
-        return False
+        # Check that the first and last edges do not overlap
+        if (chopper_details.slit_edges != sorted(chopper_details.slit_edges)) and (
+            chopper_details.slit_edges[-1] >= chopper_details.slit_edges[0]
+        ):
+            print(
+                UNABLE + "Slit edges contains overlapping slits. Found values:",
+                slit_edges,
+            )
+            return False
 
-    return True
+        return True
+
+    def validate_chopper(self):
+        pass
 
 
 class UserDefinedChopperChecker(ChopperChecker):
@@ -304,7 +308,7 @@ class UserDefinedChopperChecker(ChopperChecker):
             self._radius_units,
         )
 
-        return input_describes_valid_chopper(
+        return self.input_describes_valid_chopper(
             self._chopper_details, self.fields_dict[SLIT_EDGES].value
         )
 
@@ -365,7 +369,7 @@ class NexusDefinedChopperChecker(ChopperChecker):
             self._radius_units,
         )
 
-        return input_describes_valid_chopper(
+        return self.input_describes_valid_chopper(
             self._chopper_details, self.fields_dict[SLIT_EDGES]
         )
 
@@ -707,8 +711,5 @@ class DiskChopperGeometryCreator:
 
         # Add the point information to the string
         vertices = [point.point_to_qvector3d() for point in self.points]
-
-        print(vertices)
-        print(self.faces)
 
         return OFFGeometryNoNexus(vertices, self.faces)
