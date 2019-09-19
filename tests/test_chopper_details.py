@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
-from tests.test_disk_chopper_checker import (
+from tests.chopper_test_resources import (
     N_SLITS,
     EDGES_ARR,
     RADIUS_LENGTH,
@@ -11,19 +11,7 @@ from tests.test_disk_chopper_checker import (
 )
 
 
-@pytest.fixture(scope="function")
-def chopper_details():
-    return ChopperDetails(
-        slits=N_SLITS,
-        slit_edges=EDGES_ARR,
-        radius=RADIUS_LENGTH,
-        slit_height=SLIT_HEIGHT_LENGTH,
-        angle_units="rad",
-        slit_height_units="m",
-        radius_units="m",
-    )
-
-
+@pytest.mark.usefixtures("chopper_details")
 def test_GIVEN_chopper_information_WHEN_initialising_chopper_details_THEN_chopper_details_object_contains_original_disk_chopper_info(
     chopper_details
 ):

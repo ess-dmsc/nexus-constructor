@@ -8,21 +8,21 @@ from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetai
 from nexus_constructor.nexus.nexus_wrapper import decode_bytes_string
 from nexus_constructor.validators import DATASET_TYPE
 
-SLIT_EDGES = "slit_edges"
-SLITS = "slits"
-RADIUS = "radius"
-SLIT_HEIGHT = "slit_height"
+SLIT_EDGES_NAME = "slit_edges"
+SLITS_NAME = "slits"
+RADIUS_NAME = "radius"
+SLIT_HEIGHT_NAME = "slit_height"
 NAME = "name"
 
 UNABLE = "Unable to create chopper geometry - "
 EXPECTED_TYPE_ERROR_MSG = {
-    SLIT_EDGES: "float",
-    SLITS: "int",
-    RADIUS: "float",
-    SLIT_HEIGHT: "float",
+    SLIT_EDGES_NAME: "float",
+    SLITS_NAME: "int",
+    RADIUS_NAME: "float",
+    SLIT_HEIGHT_NAME: "float",
 }
 
-REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES, SLITS, RADIUS, SLIT_HEIGHT}
+REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES_NAME, SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME}
 INT_TYPES = [value for value in DATASET_TYPE.values() if "int" in str(value)]
 FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)]
 
@@ -65,12 +65,14 @@ class ChopperChecker:
     @staticmethod
     def fields_have_correct_type(fields_dict: dict):
 
-        correct_slits_type = check_data_type(fields_dict[SLITS], INT_TYPES)
-        correct_radius_type = check_data_type(fields_dict[RADIUS], FLOAT_TYPES)
+        correct_slits_type = check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
+        correct_radius_type = check_data_type(fields_dict[RADIUS_NAME], FLOAT_TYPES)
         correct_slit_height_type = check_data_type(
-            fields_dict[SLIT_HEIGHT], FLOAT_TYPES
+            fields_dict[SLIT_HEIGHT_NAME], FLOAT_TYPES
         )
-        correct_slit_edges_type = check_data_type(fields_dict[SLIT_EDGES], FLOAT_TYPES)
+        correct_slit_edges_type = check_data_type(
+            fields_dict[SLIT_EDGES_NAME], FLOAT_TYPES
+        )
 
         if (
             correct_slits_type
@@ -83,16 +85,16 @@ class ChopperChecker:
         problems = []
 
         if not correct_slits_type:
-            problems.append(incorrect_field_type_message(fields_dict, SLITS))
+            problems.append(incorrect_field_type_message(fields_dict, SLITS_NAME))
 
         if not correct_radius_type:
-            problems.append(incorrect_field_type_message(fields_dict, RADIUS))
+            problems.append(incorrect_field_type_message(fields_dict, RADIUS_NAME))
 
         if not correct_slit_height_type:
-            problems.append(incorrect_field_type_message(fields_dict, SLIT_HEIGHT))
+            problems.append(incorrect_field_type_message(fields_dict, SLIT_HEIGHT_NAME))
 
         if not correct_slit_edges_type:
-            problems.append(incorrect_field_type_message(fields_dict, SLIT_EDGES))
+            problems.append(incorrect_field_type_message(fields_dict, SLIT_EDGES_NAME))
 
         print(UNABLE + "\n".join(problems))
         return False
@@ -221,24 +223,24 @@ class UserDefinedChopperChecker(ChopperChecker):
             self.required_fields_present()
             and self.fields_have_correct_type(self.fields_dict)
             and self.edges_array_has_correct_shape(
-                self.fields_dict[SLIT_EDGES].value.ndim,
-                self.fields_dict[SLIT_EDGES].value.shape,
+                self.fields_dict[SLIT_EDGES_NAME].value.ndim,
+                self.fields_dict[SLIT_EDGES_NAME].value.shape,
             )
         ):
             return False
 
         self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS].value,
-            self.fields_dict[SLIT_EDGES].value,
-            self.fields_dict[RADIUS].value,
-            self.fields_dict[SLIT_HEIGHT].value,
+            self.fields_dict[SLITS_NAME].value,
+            self.fields_dict[SLIT_EDGES_NAME].value,
+            self.fields_dict[RADIUS_NAME].value,
+            self.fields_dict[SLIT_HEIGHT_NAME].value,
             self._angle_units,
             self._slit_height_units,
             self._radius_units,
         )
 
         return self.input_describes_valid_chopper(
-            self._chopper_details, self.fields_dict[SLIT_EDGES].value
+            self._chopper_details, self.fields_dict[SLIT_EDGES_NAME].value
         )
 
 
@@ -252,18 +254,20 @@ class NexusDefinedChopperChecker(ChopperChecker):
 
         try:
 
-            self.fields_dict[SLITS] = self._disk_chopper[SLITS][()]
-            self.fields_dict[SLIT_EDGES] = self._disk_chopper[SLIT_EDGES][()]
-            self.fields_dict[RADIUS] = self._disk_chopper[RADIUS][()]
-            self.fields_dict[SLIT_HEIGHT] = self._disk_chopper[SLIT_HEIGHT][()]
+            self.fields_dict[SLITS_NAME] = self._disk_chopper[SLITS_NAME][()]
+            self.fields_dict[SLIT_EDGES_NAME] = self._disk_chopper[SLIT_EDGES_NAME][()]
+            self.fields_dict[RADIUS_NAME] = self._disk_chopper[RADIUS_NAME][()]
+            self.fields_dict[SLIT_HEIGHT_NAME] = self._disk_chopper[SLIT_HEIGHT_NAME][
+                ()
+            ]
             self._angle_units = decode_bytes_string(
-                self._disk_chopper[SLIT_EDGES].attrs["units"]
+                self._disk_chopper[SLIT_EDGES_NAME].attrs["units"]
             )
             self._slit_height_units = decode_bytes_string(
-                self._disk_chopper[SLIT_HEIGHT].attrs["units"]
+                self._disk_chopper[SLIT_HEIGHT_NAME].attrs["units"]
             )
             self._radius_units = decode_bytes_string(
-                self._disk_chopper[RADIUS].attrs["units"]
+                self._disk_chopper[RADIUS_NAME].attrs["units"]
             )
             self._disk_chopper[NAME][()],
 
@@ -283,21 +287,22 @@ class NexusDefinedChopperChecker(ChopperChecker):
             self.required_fields_present()
             and self.fields_have_correct_type(self.fields_dict)
             and self.edges_array_has_correct_shape(
-                self.fields_dict[SLIT_EDGES].ndim, self.fields_dict[SLIT_EDGES].shape
+                self.fields_dict[SLIT_EDGES_NAME].ndim,
+                self.fields_dict[SLIT_EDGES_NAME].shape,
             )
         ):
             return False
 
         self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS],
-            self.fields_dict[SLIT_EDGES],
-            self.fields_dict[RADIUS],
-            self.fields_dict[SLIT_HEIGHT],
+            self.fields_dict[SLITS_NAME],
+            self.fields_dict[SLIT_EDGES_NAME],
+            self.fields_dict[RADIUS_NAME],
+            self.fields_dict[SLIT_HEIGHT_NAME],
             self._angle_units,
             self._slit_height_units,
             self._radius_units,
         )
 
         return self.input_describes_valid_chopper(
-            self._chopper_details, self.fields_dict[SLIT_EDGES]
+            self._chopper_details, self.fields_dict[SLIT_EDGES_NAME]
         )

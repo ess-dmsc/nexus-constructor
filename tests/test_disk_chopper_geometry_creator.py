@@ -53,3 +53,9 @@ def test_GIVEN_point_WHEN_calling_point_to_qvector3d_THEN_expected_vector_is_cre
     assert vector.x() == POINT_X
     assert vector.y() == POINT_Y
     assert vector.z() == POINT_Z
+
+
+def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_creator_is_initialised_with_expected_values(
+    chopper_details
+):
+    pass
