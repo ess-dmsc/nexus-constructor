@@ -89,3 +89,14 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
 
     for i in range(2):
         assert geometry_creator.points[i] == expected_points[i]
+
+
+def test_GIVEN_polar_coordinated_WHEN_converting_polar_to_cartesian_THEN_expected_value_is_returned(
+    geometry_creator
+):
+
+    r = np.sqrt(2)
+    theta = np.deg2rad(45)
+    x, y = geometry_creator._polar_to_cartesian_2d(r, theta)
+    assert abs(x - 1) < 1e-05
+    assert abs(y - 1) < 1e-05
