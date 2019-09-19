@@ -14,10 +14,10 @@ import os
 import h5py
 
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.geometry.disk_chopper_geometry import (
-    DiskChopperGeometryCreator,
+from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     NexusDefinedChopperChecker,
 )
+from nexus_constructor.geometry.disk_chopper_geometry import DiskChopperGeometryCreator
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
