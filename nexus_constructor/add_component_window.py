@@ -15,7 +15,9 @@ from nexus_constructor.component_fields import FieldWidget, add_fields_to_compon
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     UserDefinedChopperChecker,
 )
-from nexus_constructor.geometry.disk_chopper_geometry import DiskChopperGeometryCreator
+from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
+    DiskChopperGeometryCreator,
+)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
