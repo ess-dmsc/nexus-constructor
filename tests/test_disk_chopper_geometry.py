@@ -11,7 +11,6 @@ from nexus_constructor.geometry.disk_chopper_geometry import (
     RADIUS,
     SLIT_EDGES,
     UserDefinedChopperChecker,
-    fields_have_correct_type,
     edges_array_has_correct_shape,
     check_data_type,
     INT_TYPES,
@@ -207,41 +206,41 @@ def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_ty
 
 
 def test_GIVEN_valid_fields_information_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_true(
-    fields_dict_mocks
+    user_defined_chopper_checker, fields_dict_mocks
 ):
-    assert fields_have_correct_type(fields_dict_mocks)
+    assert user_defined_chopper_checker.fields_have_correct_type(fields_dict_mocks)
 
 
 def test_GIVEN_invalid_slits_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks
+    user_defined_chopper_checker, fields_dict_mocks
 ):
 
     fields_dict_mocks[SLITS].dtype = FLOAT_TYPES[0]
-    assert not fields_have_correct_type(fields_dict_mocks)
+    assert not user_defined_chopper_checker.fields_have_correct_type(fields_dict_mocks)
 
 
 def test_GIVEN_invalid_radius_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks
+    user_defined_chopper_checker, fields_dict_mocks
 ):
 
     fields_dict_mocks[RADIUS].dtype = INT_TYPES[0]
-    assert not fields_have_correct_type(fields_dict_mocks)
+    assert not user_defined_chopper_checker.fields_have_correct_type(fields_dict_mocks)
 
 
 def test_GIVEN_invalid_slit_height_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks
+    user_defined_chopper_checker, fields_dict_mocks
 ):
 
     fields_dict_mocks[SLIT_HEIGHT].dtype = INT_TYPES[0]
-    assert not fields_have_correct_type(fields_dict_mocks)
+    assert not user_defined_chopper_checker.fields_have_correct_type(fields_dict_mocks)
 
 
 def test_GIVEN_invalid_slit_edges_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks
+    user_defined_chopper_checker, fields_dict_mocks
 ):
 
     fields_dict_mocks[SLIT_EDGES].dtype = INT_TYPES[0]
-    assert not fields_have_correct_type(fields_dict_mocks)
+    assert not user_defined_chopper_checker.fields_have_correct_type(fields_dict_mocks)
 
 
 def test_GIVEN_edges_array_with_valid_shape_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
@@ -290,7 +289,9 @@ def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert fields_have_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker.fields_have_correct_type(
+        user_defined_chopper_checker.fields_dict
+    )
     assert not user_defined_chopper_checker.validate_chopper()
 
 
@@ -300,7 +301,9 @@ def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopp
     user_defined_chopper_checker.fields_dict[SLITS].value = 5
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert fields_have_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker.fields_have_correct_type(
+        user_defined_chopper_checker.fields_dict
+    )
     assert edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
@@ -315,7 +318,9 @@ def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_T
     user_defined_chopper_checker.fields_dict[SLIT_HEIGHT].value = 201
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert fields_have_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker.fields_have_correct_type(
+        user_defined_chopper_checker.fields_dict
+    )
     assert edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
@@ -332,7 +337,9 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
     ].value = user_defined_chopper_checker.fields_dict[RADIUS].value = 20
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert fields_have_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker.fields_have_correct_type(
+        user_defined_chopper_checker.fields_dict
+    )
     assert edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
@@ -352,7 +359,9 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert fields_have_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker.fields_have_correct_type(
+        user_defined_chopper_checker.fields_dict
+    )
     assert edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
@@ -369,7 +378,9 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
     ] = user_defined_chopper_checker.fields_dict[SLIT_EDGES].value[1]
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert fields_have_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker.fields_have_correct_type(
+        user_defined_chopper_checker.fields_dict
+    )
     assert edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,
@@ -386,7 +397,9 @@ def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_inp
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert fields_have_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker.fields_have_correct_type(
+        user_defined_chopper_checker.fields_dict
+    )
     assert edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES].value.shape,

@@ -31,6 +31,61 @@ FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)
 TWO_PI = np.pi * 2
 
 
+class ChopperChecker:
+    def __init__(self):
+
+        self.fields_dict = dict()
+        self._chopper_details = None
+        self._angle_units = None
+        self._slit_height_units = None
+        self._radius_units = None
+
+    def get_chopper_details(self):
+        """
+        :return: The ChopperDetails object. This will only be created if `validate_chopper` was called and the
+            validation was successful. Otherwise this method just returns None.
+        """
+        return self._chopper_details
+
+    def required_fields_present(self):
+        pass
+
+    @staticmethod
+    def fields_have_correct_type(fields_dict: dict):
+
+        correct_slits_type = check_data_type(fields_dict[SLITS], INT_TYPES)
+        correct_radius_type = check_data_type(fields_dict[RADIUS], FLOAT_TYPES)
+        correct_slit_height_type = check_data_type(
+            fields_dict[SLIT_HEIGHT], FLOAT_TYPES
+        )
+        correct_slit_edges_type = check_data_type(fields_dict[SLIT_EDGES], FLOAT_TYPES)
+
+        if (
+            correct_slits_type
+            and correct_radius_type
+            and correct_slit_height_type
+            and correct_slit_edges_type
+        ):
+            return True
+
+        problems = []
+
+        if not correct_slits_type:
+            problems.append(incorrect_field_type_message(fields_dict, SLITS))
+
+        if not correct_radius_type:
+            problems.append(incorrect_field_type_message(fields_dict, RADIUS))
+
+        if not correct_slit_height_type:
+            problems.append(incorrect_field_type_message(fields_dict, SLIT_HEIGHT))
+
+        if not correct_slit_edges_type:
+            problems.append(incorrect_field_type_message(fields_dict, SLIT_EDGES))
+
+        print(UNABLE + "\n".join(problems))
+        return False
+
+
 def check_data_type(data_type, expected_types):
     try:
         return data_type.dtype in expected_types
@@ -47,39 +102,6 @@ def incorrect_field_type_message(fields_dict: dict, field_name: str):
     return "Wrong {} type. Expected {} but found {}.".format(
         field_name, EXPECTED_TYPE_ERROR_MSG[field_name], type(fields_dict[field_name])
     )
-
-
-def fields_have_correct_type(fields_dict: dict):
-
-    correct_slits_type = check_data_type(fields_dict[SLITS], INT_TYPES)
-    correct_radius_type = check_data_type(fields_dict[RADIUS], FLOAT_TYPES)
-    correct_slit_height_type = check_data_type(fields_dict[SLIT_HEIGHT], FLOAT_TYPES)
-    correct_slit_edges_type = check_data_type(fields_dict[SLIT_EDGES], FLOAT_TYPES)
-
-    if (
-        correct_slits_type
-        and correct_radius_type
-        and correct_slit_height_type
-        and correct_slit_edges_type
-    ):
-        return True
-
-    problems = []
-
-    if not correct_slits_type:
-        problems.append(incorrect_field_type_message(fields_dict, SLITS))
-
-    if not correct_radius_type:
-        problems.append(incorrect_field_type_message(fields_dict, RADIUS))
-
-    if not correct_slit_height_type:
-        problems.append(incorrect_field_type_message(fields_dict, SLIT_HEIGHT))
-
-    if not correct_slit_edges_type:
-        problems.append(incorrect_field_type_message(fields_dict, SLIT_EDGES))
-
-    print(UNABLE + "\n".join(problems))
-    return False
 
 
 def edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple):
@@ -228,15 +250,14 @@ def input_describes_valid_chopper(
     return True
 
 
-class UserDefinedChopperChecker:
+class UserDefinedChopperChecker(ChopperChecker):
     def __init__(self, fields_widget: QListWidget):
 
-        self.fields_dict = dict()
+        super().__init__()
 
         self._angle_units = "deg"
         self._slit_height_units = "m"
         self._radius_units = "m"
-        self._chopper_details = None
 
         for i in range(fields_widget.count()):
             widget = fields_widget.itemWidget(fields_widget.item(i))
@@ -271,7 +292,7 @@ class UserDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and fields_have_correct_type(self.fields_dict)
+            and self.fields_have_correct_type(self.fields_dict)
             and edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES].value.ndim,
                 self.fields_dict[SLIT_EDGES].value.shape,
@@ -294,24 +315,11 @@ class UserDefinedChopperChecker:
         )
 
 
-class NexusDefinedChopperChecker:
+class NexusDefinedChopperChecker(ChopperChecker):
     def __init__(self, disk_chopper: Group):
 
-        self.fields_dict = dict()
-
-        self._angle_units = None
-        self._slit_height_units = None
-        self._radius_units = None
-        self._chopper_details = None
-
+        super().__init__()
         self._disk_chopper = disk_chopper
-
-    def get_chopper_details(self):
-        """
-        :return: The ChopperDetails object. This will only be created if `validate_chopper` was called and the
-            validation was successful. Otherwise this method just returns None.
-        """
-        return self._chopper_details
 
     def required_fields_present(self):
 
@@ -346,7 +354,7 @@ class NexusDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and fields_have_correct_type(self.fields_dict)
+            and self.fields_have_correct_type(self.fields_dict)
             and edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES].ndim, self.fields_dict[SLIT_EDGES].shape
             )
