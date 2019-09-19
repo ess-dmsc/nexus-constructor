@@ -6,6 +6,10 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 
+THICKNESS = 0.5
+ARROW_SIZE = 0.1
+RESOLUTION = 20
+
 
 class Point:
     """
@@ -33,6 +37,9 @@ class Point:
         """
         return QVector3D(self.x, self.y, self.z)
 
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
 
 class DiskChopperGeometryCreator:
     """
@@ -43,9 +50,9 @@ class DiskChopperGeometryCreator:
 
         self.points = []
         self.faces = []
-        self.z = 1
-        self.arrow_size = 0.1
-        self.resolution = 20
+        self.z = THICKNESS * 2
+        self.arrow_size = ARROW_SIZE
+        self.resolution = RESOLUTION
         self.resolution_angles = None
 
         self._radius = chopper_details.radius

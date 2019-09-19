@@ -1,6 +1,13 @@
 import pytest
+import numpy as np
 
-from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import Point
+from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
+    Point,
+    DiskChopperGeometryCreator,
+    THICKNESS,
+    ARROW_SIZE,
+    RESOLUTION,
+)
 
 POINT_X = 2.0
 POINT_Y = 3.0
@@ -58,4 +65,22 @@ def test_GIVEN_point_WHEN_calling_point_to_qvector3d_THEN_expected_vector_is_cre
 def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_creator_is_initialised_with_expected_values(
     chopper_details
 ):
-    print(chopper_details.slits)
+    geometry_creator = DiskChopperGeometryCreator(chopper_details)
+    expected_z = THICKNESS * 2
+
+    assert geometry_creator.faces == []
+    assert geometry_creator.z == expected_z
+    assert geometry_creator.arrow_size == ARROW_SIZE
+    assert geometry_creator.resolution == RESOLUTION
+
+    assert geometry_creator._radius == chopper_details.radius
+    assert np.array_equal(geometry_creator._slit_edges, chopper_details.slit_edges)
+    assert geometry_creator._slit_height == chopper_details.slit_height
+    assert geometry_creator._slits == chopper_details.slits
+
+    assert len(geometry_creator.points) == 2
+
+    expected_points = [Point(0, 0, expected_z), Point(0, 0, -expected_z)]
+
+    for i in range(2):
+        assert geometry_creator.points[i] == expected_points[i]
