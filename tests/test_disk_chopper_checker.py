@@ -17,7 +17,6 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     NAME,
     check_data_type,
 )
-from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from tests.test_nexus_to_json import create_in_memory_file
 
 N_SLITS = 3
@@ -43,21 +42,21 @@ CONVERT_DEGREES_TO_RADIANS = np.vectorize(degree_to_radian)
 
 
 @pytest.fixture(scope="function")
-def mock_slits_widget(chopper_details):
+def mock_slits_widget():
 
     mock_slits_widget = Mock(spec=FieldWidget)
-    mock_slits_widget.name = "slits"
-    mock_slits_widget.value = chopper_details.slits
+    mock_slits_widget.name = SLITS
+    mock_slits_widget.value = N_SLITS
     mock_slits_widget.dtype = np.intc
 
     return mock_slits_widget
 
 
 @pytest.fixture(scope="function")
-def mock_slit_edges_widget(chopper_details):
+def mock_slit_edges_widget():
 
     mock_slit_edges_widget = Mock(spec=FieldWidget)
-    mock_slit_edges_widget.name = "slit_edges"
+    mock_slit_edges_widget.name = SLIT_EDGES
     mock_slit_edges_widget.value = np.array([0.0, 43.4, 82.6, 150.1, 220.0, 250.3])
     mock_slit_edges_widget.dtype = np.single
 
@@ -65,22 +64,22 @@ def mock_slit_edges_widget(chopper_details):
 
 
 @pytest.fixture(scope="function")
-def mock_radius_widget(chopper_details):
+def mock_radius_widget():
 
     mock_radius_widget = Mock(spec=FieldWidget)
-    mock_radius_widget.name = "radius"
-    mock_radius_widget.value = chopper_details.radius
+    mock_radius_widget.name = RADIUS
+    mock_radius_widget.value = RADIUS_LENGTH
     mock_radius_widget.dtype = np.single
 
     return mock_radius_widget
 
 
 @pytest.fixture(scope="function")
-def mock_slit_height_widget(chopper_details):
+def mock_slit_height_widget():
 
     mock_slit_height_widget = Mock(spec=FieldWidget)
-    mock_slit_height_widget.name = "slit_height"
-    mock_slit_height_widget.value = chopper_details.slit_height
+    mock_slit_height_widget.name = SLIT_HEIGHT
+    mock_slit_height_widget.value = SLIT_HEIGHT_LENGTH
     mock_slit_height_widget.dtype = np.single
 
     return mock_slit_height_widget
@@ -111,19 +110,6 @@ def mock_fields_list_widget(mock_widget_list,):
     list_widget.itemWidget = Mock(side_effect=mock_widget_list)
 
     return list_widget
-
-
-@pytest.fixture(scope="function")
-def chopper_details():
-    return ChopperDetails(
-        slits=N_SLITS,
-        slit_edges=EDGES_ARR,
-        radius=RADIUS_LENGTH,
-        slit_height=SLIT_HEIGHT_LENGTH,
-        angle_units="rad",
-        slit_height_units="m",
-        radius_units="m",
-    )
 
 
 @pytest.fixture(scope="function")
@@ -493,65 +479,6 @@ def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_de
     assert chopper_details.radius == RADIUS_LENGTH
     assert chopper_details.slit_height == SLIT_HEIGHT_LENGTH
     assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
-
-
-def test_GIVEN_chopper_information_WHEN_initialising_chopper_details_THEN_chopper_details_object_contains_original_disk_chopper_info(
-    chopper_details
-):
-
-    assert chopper_details.slits == N_SLITS
-    assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
-    assert chopper_details.radius == RADIUS_LENGTH
-    assert chopper_details.slit_height == SLIT_HEIGHT_LENGTH
-
-
-def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_angles_are_converted_to_radians():
-
-    edges_array = np.array([i * 30 for i in range(4)])
-
-    chopper_details = ChopperDetails(
-        slits=N_SLITS,
-        slit_edges=np.array([i * 30 for i in range(4)]),
-        radius=RADIUS_LENGTH,
-        slit_height=SLIT_HEIGHT_LENGTH,
-        angle_units="deg",
-        slit_height_units="m",
-        radius_units="m",
-    )
-
-    assert np.array_equal(
-        chopper_details.slit_edges, CONVERT_DEGREES_TO_RADIANS(edges_array)
-    )
-
-
-def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_is_converted_to_cm():
-
-    chopper_details = ChopperDetails(
-        slits=N_SLITS,
-        slit_edges=EDGES_ARR,
-        radius=RADIUS_LENGTH,
-        slit_height=SLIT_HEIGHT_LENGTH,
-        angle_units="deg",
-        slit_height_units="cm",
-        radius_units="m",
-    )
-
-    assert chopper_details.slit_height * 100 == SLIT_HEIGHT_LENGTH
-
-
-def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius_is_converted_to_cm():
-
-    chopper_details = ChopperDetails(
-        slits=N_SLITS,
-        slit_edges=EDGES_ARR,
-        radius=RADIUS_LENGTH,
-        slit_height=SLIT_HEIGHT_LENGTH,
-        angle_units="deg",
-        radius_units="cm",
-        slit_height_units="m",
-    )
-
-    assert chopper_details.radius * 100 == RADIUS_LENGTH
 
 
 def test_GIVEN_valid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_true(
