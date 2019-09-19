@@ -4,7 +4,7 @@ import numpy as np
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     Point,
     DiskChopperGeometryCreator,
-    THICKNESS,
+    HALF_THICKNESS,
     ARROW_SIZE,
     RESOLUTION,
 )
@@ -74,7 +74,7 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
     geometry_creator, chopper_details
 ):
 
-    expected_z = THICKNESS * 2
+    expected_z = HALF_THICKNESS * 2
 
     assert geometry_creator.faces == []
     assert geometry_creator.z == expected_z
@@ -106,11 +106,23 @@ def test_GIVEN_polar_coordinates_WHEN_creating_mirrored_points_THEN_expected_poi
     geometry_creator
 ):
 
-    expected_first_point = Point(1.0, 1.0, THICKNESS * 2)
-    expected_second_point = Point(1.0, 1.0, -THICKNESS * 2)
+    expected_first_point = Point(1.0, 1.0, HALF_THICKNESS * 2)
+    expected_second_point = Point(1.0, 1.0, -HALF_THICKNESS * 2)
 
     actual_first_point, actual_second_point = geometry_creator._create_mirrored_points(
         R, THETA
     )
     assert actual_first_point == expected_first_point
     assert actual_second_point == expected_second_point
+
+
+def test_GIVEN_face_should_look_right_WHEN_creating_and_adding_point_set_THEN_face_is_created_with_expected_order(
+    geometry_creator
+):
+    pass
+
+
+def test_GIVEN_face_should_look_left_WHEN_creating_and_adding_point_set_THEN_face_is_created_with_expected_point_order(
+    geometry_creator
+):
+    pass
