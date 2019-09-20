@@ -145,6 +145,7 @@ def test_GIVEN_face_should_look_right_WHEN_creating_and_adding_point_set_THEN_ex
     slit_edge = 0
     right_facing = False
 
+    # Create the expected points
     expected_lower_back, expected_lower_front, expected_upper_back, expected_upper_front = expected_slit_boundary_face_points(
         center_to_slit_start, radius
     )
@@ -176,7 +177,7 @@ def test_GIVEN_face_should_look_right_WHEN_creating_and_adding_point_set_THEN_ex
     assert expected_winding_order == geometry_creator.faces[-1]
 
 
-def test_GIVEN_face_should_look_left_WHEN_creating_and_adding_point_set_THEN_face_is_created_with_expected_point_order(
+def test_GIVEN_face_should_look_left_WHEN_creating_and_adding_point_set_THEN_expected_face_is_created_with_expected_point_order(
     geometry_creator
 ):
     radius = 1
@@ -214,3 +215,24 @@ def test_GIVEN_face_should_look_left_WHEN_creating_and_adding_point_set_THEN_fac
         actual_lower_front.id,
     ]
     assert expected_winding_order == geometry_creator.faces[-1]
+
+
+def test_GIVEN_r_and_theta_WHEN_creating_and_adding_mirrored_points_THEN_expected_points_are_created_and_added_to_list(
+    geometry_creator
+):
+
+    r = 20
+    theta = 0
+
+    expected_front_point = Point(r, 0, HALF_THICKNESS)
+    expected_back_point = Point(r, 0, -HALF_THICKNESS)
+
+    actual_front_point, actual_back_point = geometry_creator.create_and_add_mirrored_points(
+        r, theta
+    )
+
+    assert expected_front_point == actual_front_point
+    assert expected_back_point == actual_back_point
+
+    assert actual_front_point in geometry_creator.points
+    assert actual_back_point in geometry_creator.points
