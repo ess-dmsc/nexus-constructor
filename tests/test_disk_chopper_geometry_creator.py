@@ -67,6 +67,7 @@ def test_GIVEN_three_values_WHEN_creating_point_THEN_point_is_initialised_correc
     assert point.x == POINT_X
     assert point.y == POINT_Y
     assert point.z == POINT_Z
+    assert point.id is None
 
 
 def test_GIVEN_id_WHEN_point_has_no_id_THEN_id_is_set(point):
@@ -270,3 +271,32 @@ def test_GIVEN_points_WHEN_adding_face_connected_to_back_centre_THEN_expected_fa
 
     expected_face = [geometry_creator.back_centre.id, first_point.id, second_point.id]
     assert expected_face == geometry_creator.faces[-1]
+
+
+def test_GIVEN_point_WHEN_adding_point_to_list_THEN_point_is_added_and_assigned_an_id(
+    geometry_creator
+):
+
+    point = Point(1, 2, 3)
+    geometry_creator._add_point_to_list(point)
+
+    assert point in geometry_creator.points
+    assert point.id == len(geometry_creator.points) - 1
+
+
+def test_GIVEN_set_of_points_WHEN_adding_face_to_list_THEN_list_of_ids_is_added_to_list_of_faces(
+    geometry_creator
+):
+
+    num_points = 3
+    points = []
+    ids = []
+
+    for i in range(num_points):
+        ids.append(i + 2)
+        points.append(Point(i, i, i))
+        points[-1].set_id(ids[-1])
+
+    geometry_creator.add_face_to_list(points)
+
+    assert ids in geometry_creator.faces
