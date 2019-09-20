@@ -53,7 +53,7 @@ class DiskChopperGeometryCreator:
 
         self.points = []
         self.faces = []
-        self.z = HALF_THICKNESS * 2
+        self.z = HALF_THICKNESS
         self.arrow_size = ARROW_SIZE
         self.resolution = RESOLUTION
         self.resolution_angles = None
@@ -225,7 +225,7 @@ class DiskChopperGeometryCreator:
         radius: float,
         centre_to_slit_start: float,
         slit_edge: float,
-        right_face: bool,
+        right_facing: bool,
     ):
         """
         Creates and records the upper and lower points for a slit edge and adds these to the file string. Also adds the
@@ -233,7 +233,7 @@ class DiskChopperGeometryCreator:
         :param radius: The radius of the disk chopper.
         :param centre_to_slit_start: The distance between the disk centre and the start of the slit.
         :param slit_edge: The angle of the slit in radians.
-        :param right_face: Whether or not face on the boundary of the slit edge is facing right or facing left.
+        :param right_facing: Whether or not face on the boundary of the slit edge is facing right or facing left.
         :return: A list containing point objects for the four points in the chopper mesh with an angle of `slit_edge`.
         """
 
@@ -259,7 +259,7 @@ class DiskChopperGeometryCreator:
             lower_front_point,
         ]
 
-        if right_face:
+        if right_facing:
             # Turn the points into a face if the boundary is right-facing.
             self.add_face_to_list(right_face_order)
         else:

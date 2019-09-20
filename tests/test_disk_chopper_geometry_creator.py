@@ -74,7 +74,7 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
     geometry_creator, chopper_details
 ):
 
-    expected_z = HALF_THICKNESS * 2
+    expected_z = HALF_THICKNESS
 
     assert geometry_creator.faces == []
     assert geometry_creator.z == expected_z
@@ -106,8 +106,8 @@ def test_GIVEN_polar_coordinates_WHEN_creating_mirrored_points_THEN_expected_poi
     geometry_creator
 ):
 
-    expected_first_point = Point(1.0, 1.0, HALF_THICKNESS * 2)
-    expected_second_point = Point(1.0, 1.0, -HALF_THICKNESS * 2)
+    expected_first_point = Point(1.0, 1.0, HALF_THICKNESS)
+    expected_second_point = Point(1.0, 1.0, -HALF_THICKNESS)
 
     actual_first_point, actual_second_point = geometry_creator._create_mirrored_points(
         R, THETA
@@ -116,10 +116,45 @@ def test_GIVEN_polar_coordinates_WHEN_creating_mirrored_points_THEN_expected_poi
     assert actual_second_point == expected_second_point
 
 
-def test_GIVEN_face_should_look_right_WHEN_creating_and_adding_point_set_THEN_face_is_created_with_expected_order(
+def test_GIVEN_face_should_look_right_WHEN_creating_and_adding_point_set_THEN_expected_face_is_created_with_expected_order(
     geometry_creator
 ):
-    pass
+    radius = 1
+    center_to_slit_start = 0.5
+    slit_edge = 0
+    right_facing = False
+
+    # Create the expected points
+    expected_upper_front = Point(radius, 0, HALF_THICKNESS)
+    expected_lower_front = Point(center_to_slit_start, 0, HALF_THICKNESS)
+    expected_upper_back = Point(radius, 0, -HALF_THICKNESS)
+    expected_lower_back = Point(center_to_slit_start, 0, -HALF_THICKNESS)
+
+    # Call the create and add point set method
+    actual_upper_front, actual_upper_back, actual_lower_front, actual_lower_back = geometry_creator.create_and_add_point_set(
+        radius, center_to_slit_start, slit_edge, right_facing
+    )
+
+    # Check that the return points match the expected points
+    assert expected_upper_front == actual_upper_front
+    assert expected_lower_front == actual_lower_front
+    assert expected_upper_back == actual_upper_back
+    assert expected_lower_back == actual_lower_back
+
+    # Check that the points have been added to the list
+    assert actual_upper_front in geometry_creator.points
+    assert actual_lower_front in geometry_creator.points
+    assert actual_upper_back in geometry_creator.points
+    assert actual_lower_back in geometry_creator.points
+
+    # Check that the face created from the four points has the expected winding order
+    expected_winding_order = [
+        actual_lower_front.id,
+        actual_upper_front.id,
+        actual_upper_back.id,
+        actual_lower_back.id,
+    ]
+    assert expected_winding_order == geometry_creator.faces[-1]
 
 
 def test_GIVEN_face_should_look_left_WHEN_creating_and_adding_point_set_THEN_face_is_created_with_expected_point_order(
