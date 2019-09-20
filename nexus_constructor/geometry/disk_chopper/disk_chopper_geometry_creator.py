@@ -113,8 +113,7 @@ class DiskChopperGeometryCreator:
             self.resolution_angles, first_angle, second_angle
         )
 
-        if first_angle > second_angle:
-            # Add the top dead centre arrow to the file
+        if 0 in intermediate_angles:
             self.add_top_dead_centre_arrow(r)
 
         prev_front = first_front
@@ -160,8 +159,8 @@ class DiskChopperGeometryCreator:
         prev_lower_front = point_set[2]
         prev_lower_back = point_set[3]
 
-        # Remove the first angle to avoid creating duplicate points at angle 0 and angle 360
-        self.resolution_angles = np.linspace(0, np.pi * 2, self.resolution + 1)[1:]
+        # Remove the last angle to avoid creating duplicate points at angle 0 and angle 360
+        self.resolution_angles = np.linspace(0, np.pi * 2, self.resolution + 1)[:-1]
 
         for i in range(1, len(self._slit_edges)):
 
