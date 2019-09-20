@@ -347,4 +347,28 @@ def test_GIVEN_second_angle_greater_than_first_angle_THEN_intermediate_angles_me
 
     assert all(trimmed_array > first_angle)
     assert all(trimmed_array < second_angle)
-    assert np.all(trimmed_array[:-1] <= trimmed_array[1:])
+
+    diff = np.diff(trimmed_array) >= 0
+    assert np.all(diff)
+
+
+def test_GIVEN_first_angle_greater_than_second_angle_THEN_intermediate_angles_method_returns_array_with_values_between_the_two_angles(
+    geometry_creator, resolution_array
+):
+
+    first_angle = 1.5
+    second_angle = 0.5
+
+    trimmed_array = geometry_creator.get_intermediate_angle_values_from_resolution_array(
+        resolution_array, first_angle, second_angle
+    )
+
+    diff = np.diff(trimmed_array)
+    split_index = np.where(diff < 0)[0][0]
+    assert not np.all(diff >= 0)
+
+    first_chunk = trimmed_array[: split_index + 1]
+    second_chunk = trimmed_array[split_index + 1 :]
+
+    assert all(first_chunk > first_angle)
+    assert all(second_chunk < second_angle)
