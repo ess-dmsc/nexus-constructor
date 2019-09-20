@@ -71,6 +71,23 @@ class DiskChopperGeometryCreator:
         self._add_point_to_list(self.front_centre)
         self._add_point_to_list(self.back_centre)
 
+    @staticmethod
+    def get_intermediate_angle_values_from_resolution_array(
+        resolution_angles: np.ndarray, first_angle: float, second_angle: float
+    ):
+
+        # Slice the array to obtain an array of intermediate angles between the two slit edges.
+        if second_angle > first_angle:
+            return resolution_angles[
+                (resolution_angles > first_angle) & (resolution_angles < second_angle)
+            ]
+
+        # Use append rather than an or operator because the larger values need to appear first
+        return np.append(
+            resolution_angles[(resolution_angles > first_angle)],
+            resolution_angles[(resolution_angles < second_angle)],
+        )
+
     def create_intermediate_points_and_faces(
         self,
         first_angle: float,
@@ -92,18 +109,11 @@ class DiskChopperGeometryCreator:
         :param r: The distance between the intermediate points and the back/front centre.
         """
 
-        # Slice the array to obtain an array of intermediate angles between the two slit edges.
-        if second_angle > first_angle:
-            intermediate_angles = self.resolution_angles[
-                (self.resolution_angles > first_angle)
-                & (self.resolution_angles < second_angle)
-            ]
-        else:
-            # Use append rather than an or operator because the larger values need to appear first
-            intermediate_angles = np.append(
-                self.resolution_angles[(self.resolution_angles > first_angle)],
-                self.resolution_angles[(self.resolution_angles < second_angle)],
-            )
+        intermediate_angles = self.get_intermediate_angle_values_from_resolution_array(
+            self.resolution_angles, first_angle, second_angle
+        )
+
+        if first_angle > second_angle:
             # Add the top dead centre arrow to the file
             self.add_top_dead_centre_arrow(r)
 

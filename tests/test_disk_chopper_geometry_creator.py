@@ -27,6 +27,11 @@ def geometry_creator(chopper_details):
     return DiskChopperGeometryCreator(chopper_details)
 
 
+@pytest.fixture(scope="module")
+def resolution_array():
+    return np.linspace(0, 2 * np.pi, 100 + 1)[:-1]
+
+
 def expected_slit_boundary_face_points(center_to_slit_start: float, radius: float):
     """
     Creates for points that match the expected points for the face for the slit boundary. Assumes the slit edge has an
@@ -327,3 +332,19 @@ def test_GIVEN_length_of_arrow_position_WHEN_adding_top_dead_centre_arrow_THEN_e
 
     expected_face = [geometry_creator.points[i].id for i in range(-3, 0)]
     assert expected_face in geometry_creator.faces
+
+
+def test_GIVEN_second_angle_greater_than_first_angle_THEN_intermediate_angles_method_returns_array_with_values_between_the_two_angles(
+    geometry_creator, resolution_array
+):
+
+    first_angle = 0.5
+    second_angle = 1.5
+
+    trimmed_array = geometry_creator.get_intermediate_angle_values_from_resolution_array(
+        resolution_array, first_angle, second_angle
+    )
+
+    assert all(trimmed_array > first_angle)
+    assert all(trimmed_array < second_angle)
+    assert np.all(trimmed_array[:-1] <= trimmed_array[1:])
