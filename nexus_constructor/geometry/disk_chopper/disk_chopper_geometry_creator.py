@@ -327,15 +327,9 @@ class DiskChopperGeometryCreator:
         zero = 0
 
         arrow_points = [
-            Point(*self._polar_to_cartesian_2d(r, zero), self.z),
-            Point(
-                *self._polar_to_cartesian_2d(r + self.arrow_size, zero),
-                self.z + self.arrow_size
-            ),
-            Point(
-                *self._polar_to_cartesian_2d(r - self.arrow_size, zero),
-                self.z + self.arrow_size
-            ),
+            Point(r, zero, self.z),
+            Point(r + self.arrow_size, zero, self.z + self.arrow_size),
+            Point(r - self.arrow_size, zero, self.z + self.arrow_size),
         ]
 
         for point in arrow_points:
