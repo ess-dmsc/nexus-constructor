@@ -48,6 +48,18 @@ def expected_slit_boundary_face_points(center_to_slit_start: float, radius: floa
     )
 
 
+def create_two_points():
+    """
+    Create two points for testing the face connected to front/back centre methods.
+    """
+    first_point = Point(3, 4, 5)
+    first_point.set_id(10)
+    second_point = Point(6, 7, 8)
+    second_point.set_id(11)
+
+    return first_point, second_point
+
+
 def test_GIVEN_three_values_WHEN_creating_point_THEN_point_is_initialised_correctly(
     point
 ):
@@ -236,3 +248,25 @@ def test_GIVEN_r_and_theta_WHEN_creating_and_adding_mirrored_points_THEN_expecte
 
     assert actual_front_point in geometry_creator.points
     assert actual_back_point in geometry_creator.points
+
+
+def test_GIVEN_points_WHEN_adding_face_connected_to_front_centre_THEN_expected_face_is_created(
+    geometry_creator
+):
+
+    first_point, second_point = create_two_points()
+
+    geometry_creator.add_face_connected_to_front_centre([first_point, second_point])
+    expected_face = [geometry_creator.front_centre.id, first_point.id, second_point.id]
+    assert expected_face == geometry_creator.faces[-1]
+
+
+def test_GIVEN_points_WHEN_adding_face_connected_to_back_centre_THEN_expected_face_is_created(
+    geometry_creator
+):
+
+    first_point, second_point = create_two_points()
+    geometry_creator.add_face_connected_to_back_centre([first_point, second_point])
+
+    expected_face = [geometry_creator.back_centre.id, first_point.id, second_point.id]
+    assert expected_face == geometry_creator.faces[-1]
