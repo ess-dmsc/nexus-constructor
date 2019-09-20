@@ -338,9 +338,8 @@ class DiskChopperGeometryCreator:
             ),
         ]
 
-        self._add_point_to_list(arrow_points[0])
-        self._add_point_to_list(arrow_points[1])
-        self._add_point_to_list(arrow_points[2])
+        for point in arrow_points:
+            self._add_point_to_list(point)
 
         # Add the face to the list of faces
         self.add_face_to_list(arrow_points)
