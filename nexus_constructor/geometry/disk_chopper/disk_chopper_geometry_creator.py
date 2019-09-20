@@ -337,6 +337,7 @@ class DiskChopperGeometryCreator:
                 self.z + self.arrow_size
             ),
         ]
+
         self._add_point_to_list(arrow_points[0])
         self._add_point_to_list(arrow_points[1])
         self._add_point_to_list(arrow_points[2])

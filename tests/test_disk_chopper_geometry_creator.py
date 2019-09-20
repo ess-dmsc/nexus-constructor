@@ -298,5 +298,32 @@ def test_GIVEN_set_of_points_WHEN_adding_face_to_list_THEN_list_of_ids_is_added_
         points[-1].set_id(ids[-1])
 
     geometry_creator.add_face_to_list(points)
-
     assert ids in geometry_creator.faces
+
+
+def test_GIVEN_length_of_arrow_position_WHEN_adding_top_dead_centre_arrow_THEN_expected_arrow_is_created(
+    geometry_creator
+):
+
+    length_of_arrow_position = 5
+
+    expected_centre_point = Point(length_of_arrow_position, 0, HALF_THICKNESS)
+    expected_left_point = Point(
+        length_of_arrow_position - geometry_creator.arrow_size,
+        0,
+        HALF_THICKNESS + geometry_creator.arrow_size,
+    )
+    expected_right_point = Point(
+        length_of_arrow_position + geometry_creator.arrow_size,
+        0,
+        HALF_THICKNESS + geometry_creator.arrow_size,
+    )
+
+    geometry_creator.add_top_dead_centre_arrow(length_of_arrow_position)
+
+    assert geometry_creator.points[-3] == expected_centre_point
+    assert geometry_creator.points[-2] == expected_right_point
+    assert geometry_creator.points[-1] == expected_left_point
+
+    expected_face = [geometry_creator.points[i].id for i in range(-3, 0)]
+    assert expected_face in geometry_creator.faces
