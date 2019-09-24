@@ -163,6 +163,11 @@ class DiskChopperGeometryCreator:
 
     @staticmethod
     def create_resolution_angles(resolution: int) -> np.ndarray:
+        """
+        Return an array of angles where the chopper should be broken into wedges based on a resolution value.
+        :param resolution: The number of angles in the array.
+        :return: An array of angles in the range [0, 360).
+        """
 
         return np.linspace(0, np.pi * 2, resolution + 1)[:-1]
 
