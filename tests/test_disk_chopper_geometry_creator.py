@@ -17,6 +17,10 @@ R = np.sqrt(2)
 THETA = np.deg2rad(45)
 
 
+def create_list_of_ids(*points: Point):
+    return [point.id for point in points]
+
+
 @pytest.fixture(scope="function")
 def point():
     return Point(POINT_X, POINT_Y, POINT_Z)
@@ -464,7 +468,33 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
     expected_intermediate_back = Point(0, r, -geometry_creator.z)
 
     # Check that the last two points that were created in the geometry creator match what was expected
-    assert geometry_creator.points[-2] == expected_intermediate_front
-    assert geometry_creator.points[-1] == expected_intermediate_back
+    actual_intermediate_front = geometry_creator.points[-2]
+    actual_intermediate_back = geometry_creator.points[-1]
 
-    # Check that the
+    assert actual_intermediate_front == expected_intermediate_front
+    assert actual_intermediate_back == expected_intermediate_back
+
+    # Check that the expected faces were created
+    assert geometry_creator.faces[-6] == create_list_of_ids(
+        first_front, first_back, actual_intermediate_back, actual_intermediate_front
+    )
+
+    assert geometry_creator.faces[-5] == create_list_of_ids(
+        geometry_creator.front_centre, first_front, actual_intermediate_front
+    )
+
+    assert geometry_creator.faces[-4] == create_list_of_ids(
+        geometry_creator.back_centre, actual_intermediate_back, first_back
+    )
+
+    assert geometry_creator.faces[-3] == create_list_of_ids(
+        actual_intermediate_front, actual_intermediate_back, second_back, second_front
+    )
+
+    assert geometry_creator.faces[-2] == create_list_of_ids(
+        geometry_creator.front_centre, actual_intermediate_front, second_front
+    )
+
+    assert geometry_creator.faces[-1] == create_list_of_ids(
+        geometry_creator.back_centre, second_back, actual_intermediate_back
+    )
