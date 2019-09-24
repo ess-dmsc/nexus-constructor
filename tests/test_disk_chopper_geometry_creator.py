@@ -427,3 +427,44 @@ def test_GIVEN_angle_distance_to_centre_and_two_points_WHEN_creating_wedge_shape
         current_back.id,
         prev_back.id,
     ]
+
+
+def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_expected_points_and_faces_are_created(
+    geometry_creator
+):
+
+    # Choose angles for the boundaries of the slit edge
+    first_angle = np.deg2rad(80)
+    second_angle = np.deg2rad(100)
+
+    # Set the length of the vertices
+    r = 10
+
+    # Create the points for the boundaries of the slit edges
+    first_front, first_back = geometry_creator.create_and_add_mirrored_points(
+        r, first_angle
+    )
+    second_front, second_back = geometry_creator.create_and_add_mirrored_points(
+        r, second_angle
+    )
+
+    # Create a fake set of resolution angles with one value between are first and second angles
+    geometry_creator.resolution_angles = np.array(
+        [first_angle, np.deg2rad(90), second_angle]
+    )
+
+    # Call the method for creating the intermediate points and faces
+    geometry_creator.create_intermediate_points_and_faces(
+        first_angle, second_angle, first_front, first_back, second_front, second_back, r
+    )
+
+    # The expected intermediate points should have a distance from the centres of r, an angle of 90 degrees and be
+    # separated by 2 * z
+    expected_intermediate_front = Point(0, r, geometry_creator.z)
+    expected_intermediate_back = Point(0, r, -geometry_creator.z)
+
+    # Check that the last two points that were created in the geometry creator match what was expected
+    assert geometry_creator.points[-2] == expected_intermediate_front
+    assert geometry_creator.points[-1] == expected_intermediate_back
+
+    # Check that the
