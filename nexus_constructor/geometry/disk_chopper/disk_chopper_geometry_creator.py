@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 from PySide2.QtGui import QVector3D
@@ -33,7 +33,7 @@ class Point:
 
         self.id = index
 
-    def point_to_qvector3d(self):
+    def point_to_qvector3d(self) -> QVector3D:
         """
         Create a QVector3D from the point.
         """
@@ -74,7 +74,7 @@ class DiskChopperGeometryCreator:
     @staticmethod
     def get_intermediate_angle_values_from_resolution_array(
         resolution_angles: np.ndarray, first_angle: float, second_angle: float
-    ):
+    ) -> np.ndarray:
 
         # Slice the array to obtain an array of intermediate angles between the two slit edges.
         if second_angle > first_angle:
@@ -87,6 +87,32 @@ class DiskChopperGeometryCreator:
             resolution_angles[(resolution_angles > first_angle)],
             resolution_angles[(resolution_angles < second_angle)],
         )
+
+    def create_cake_slice(
+        self, angle: float, prev_back: Point, prev_front: Point, r: float
+    ) -> Tuple[Point, Point]:
+        """
+        Creates the 'cake slice' shaped points/faces that make the mesh look smoother.
+        :param angle: The angle of the points to be created.
+        :param prev_back: The previous point that is on the 'back' of the disk chopper.
+        :param prev_front: The previous point that is on the 'front' of the disk chopper.
+        :param r: The length of the 'cake slice' which is either the radius or radius minus slit height.
+        :return: The two new points that have been created.
+        """
+
+        # Create the current front and back points
+        current_front, current_back = self.create_and_add_mirrored_points(r, angle)
+
+        # Create a four-point face with the current points and the previous points
+        self.add_face_to_list([prev_front, prev_back, current_back, current_front])
+
+        # Create a three-point face with the two front points and the front centre point
+        self.add_face_connected_to_front_centre([prev_front, current_front])
+
+        # Create a three-point face with the two back points and the back centre point
+        self.add_face_connected_to_back_centre([current_back, prev_back])
+
+        return current_back, current_front
 
     def create_intermediate_points_and_faces(
         self,
@@ -121,17 +147,9 @@ class DiskChopperGeometryCreator:
 
         for angle in intermediate_angles:
 
-            # Create the front and back points
-            current_front, current_back = self.create_and_add_mirrored_points(r, angle)
-
-            # Create a four-point face with the current points and the previous points
-            self.add_face_to_list([prev_front, prev_back, current_back, current_front])
-
-            # Create a three-point face with the two front points and the front centre point
-            self.add_face_connected_to_front_centre([prev_front, current_front])
-
-            # Create a three-point face with the two back points and the back centre point
-            self.add_face_connected_to_back_centre([current_back, prev_back])
+            current_back, current_front = self.create_cake_slice(
+                angle, prev_back, prev_front, r
+            )
 
             prev_front = current_front
             prev_back = current_back
@@ -142,6 +160,11 @@ class DiskChopperGeometryCreator:
         # Create the final faces connected to the front and back centre points
         self.add_face_connected_to_front_centre([prev_front, second_front])
         self.add_face_connected_to_back_centre([second_back, prev_back])
+
+    @staticmethod
+    def create_resolution_angles(resolution: int) -> np.ndarray:
+
+        return np.linspace(0, np.pi * 2, resolution + 1)[:-1]
 
     def convert_chopper_details_to_off(self):
         """
@@ -159,7 +182,7 @@ class DiskChopperGeometryCreator:
         first_upper_back = prev_upper_back
 
         # Remove the last angle to avoid creating duplicate points at angle 0 and angle 360
-        self.resolution_angles = np.linspace(0, np.pi * 2, self.resolution + 1)[:-1]
+        self.resolution_angles = self.create_resolution_angles(self.resolution)
 
         for i in range(1, len(self._slit_edges)):
 
@@ -208,7 +231,7 @@ class DiskChopperGeometryCreator:
         )
 
     @staticmethod
-    def _polar_to_cartesian_2d(r: float, theta: float):
+    def _polar_to_cartesian_2d(r: float, theta: float) -> Tuple[float, float]:
         """
         Converts polar coordinates to cartesian coordinates.
         :param r: The vector magnitude.
@@ -217,7 +240,7 @@ class DiskChopperGeometryCreator:
         """
         return r * np.cos(theta), r * np.sin(theta)
 
-    def _create_mirrored_points(self, r: float, theta: float):
+    def _create_mirrored_points(self, r: float, theta: float) -> Tuple[Point, Point]:
         """
         Creates two points that share the same x and y values and have opposite z values.
         :param r: The distance between the points and the front/back centre of the disk chopper.
@@ -234,7 +257,7 @@ class DiskChopperGeometryCreator:
         centre_to_slit_start: float,
         slit_edge: float,
         right_facing: bool,
-    ):
+    ) -> List[Point]:
         """
         Creates and records the upper and lower points for a slit edge and adds these to the file string. Also adds the
         face made from all four points to the file string.
@@ -281,7 +304,9 @@ class DiskChopperGeometryCreator:
             lower_back_point,
         ]
 
-    def create_and_add_mirrored_points(self, r: float, theta: float):
+    def create_and_add_mirrored_points(
+        self, r: float, theta: float
+    ) -> Tuple[Point, Point]:
         """
         Creates and records two mirrored points and adds these to the list of points.
         :param r: The distance between the point and front/back centre of the disk chopper.
@@ -346,7 +371,7 @@ class DiskChopperGeometryCreator:
         # Add the face to the list of faces
         self.add_face_to_list(arrow_points)
 
-    def create_disk_chopper_geometry(self):
+    def create_disk_chopper_geometry(self) -> OFFGeometryNoNexus:
         """
         Create the string that stores all the information needed in the OFF file.
         """

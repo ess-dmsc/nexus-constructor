@@ -372,3 +372,12 @@ def test_GIVEN_first_angle_greater_than_second_angle_THEN_intermediate_angles_me
 
     assert all(first_chunk > first_angle)
     assert all(second_chunk < second_angle)
+
+
+def test_GIVEN_resolution_of_one_WHEN_creating_resolution_angles_THEN_array_only_contains_zero(
+    geometry_creator
+):
+
+    resolution = 1
+    resolution_array = geometry_creator.create_resolution_angles(resolution)
+    assert np.array_equal(np.zeros(1), resolution_array)
