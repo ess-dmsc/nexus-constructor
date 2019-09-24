@@ -132,6 +132,7 @@ class DiskChopperGeometryCreator:
 
             # Create a three-point face with the two back points and the back centre point
             self.add_face_connected_to_back_centre([current_back, prev_back])
+
             prev_front = current_front
             prev_back = current_back
 
@@ -150,14 +151,12 @@ class DiskChopperGeometryCreator:
         centre_to_slit_bottom = self._radius - self._slit_height
 
         # Create four points for the first slit in the chopper data
-        point_set = self.create_and_add_point_set(
+        prev_upper_front, prev_upper_back, prev_lower_front, prev_lower_back = self.create_and_add_point_set(
             self._radius, centre_to_slit_bottom, self._slit_edges[0], False
         )
 
-        prev_upper_front = first_upper_front = point_set[0]
-        prev_upper_back = first_upper_back = point_set[1]
-        prev_lower_front = point_set[2]
-        prev_lower_back = point_set[3]
+        first_upper_front = prev_upper_front
+        first_upper_back = prev_upper_back
 
         # Remove the last angle to avoid creating duplicate points at angle 0 and angle 360
         self.resolution_angles = np.linspace(0, np.pi * 2, self.resolution + 1)[:-1]
