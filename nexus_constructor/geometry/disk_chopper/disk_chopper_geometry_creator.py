@@ -89,11 +89,11 @@ class DiskChopperGeometryCreator:
         )
 
     def create_cake_slice(
-        self, angle: float, prev_back: Point, prev_front: Point, r: float
+        self, theta: float, prev_back: Point, prev_front: Point, r: float
     ) -> Tuple[Point, Point]:
         """
         Creates the 'cake slice' shaped points/faces that make the mesh look smoother.
-        :param angle: The angle of the points to be created.
+        :param theta: The angle of the points to be created.
         :param prev_back: The previous point that is on the 'back' of the disk chopper.
         :param prev_front: The previous point that is on the 'front' of the disk chopper.
         :param r: The length of the 'cake slice' which is either the radius or radius minus slit height.
@@ -101,7 +101,7 @@ class DiskChopperGeometryCreator:
         """
 
         # Create the current front and back points
-        current_front, current_back = self.create_and_add_mirrored_points(r, angle)
+        current_front, current_back = self.create_and_add_mirrored_points(r, theta)
 
         # Create a four-point face with the current points and the previous points
         self.add_face_to_list([prev_front, prev_back, current_back, current_front])

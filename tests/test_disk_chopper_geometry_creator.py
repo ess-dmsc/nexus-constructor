@@ -393,3 +393,26 @@ def test_GIVEN_resolution_greater_than_one_WHEN_creating_resolution_angles_THEN_
 
     assert len(resolution_array) == resolution
     assert np.array_equal(expected, resolution_array)
+
+
+def test_GIVEN_angle_distance_to_centre_and_two_points_WHEN_creating_wedge_shape_THEN_expected_faces_and_points_are_created(
+    geometry_creator
+):
+
+    theta = np.pi
+    r = 10
+    prev_back, prev_front = geometry_creator.create_and_add_mirrored_points(r, theta)
+    current_back, current_front = geometry_creator.create_cake_slice(
+        theta, prev_back, prev_front, r
+    )
+
+    assert geometry_creator.faces[-1] == [
+        geometry_creator.back_centre.id,
+        current_back.id,
+        prev_back.id,
+    ]
+    assert geometry_creator.faces[-2] == [
+        geometry_creator.front_centre.id,
+        prev_front.id,
+        current_front.id,
+    ]
