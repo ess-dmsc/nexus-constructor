@@ -381,3 +381,15 @@ def test_GIVEN_resolution_of_one_WHEN_creating_resolution_angles_THEN_array_only
     resolution = 1
     resolution_array = geometry_creator.create_resolution_angles(resolution)
     assert np.array_equal(np.zeros(1), resolution_array)
+
+
+def test_GIVEN_resolution_greater_than_one_WHEN_creating_resolution_angles_THEN_array_contains_expected_values(
+    geometry_creator
+):
+
+    resolution = 5
+    resolution_array = geometry_creator.create_resolution_angles(resolution)
+    expected = np.array([i * ((np.pi * 2) / resolution) for i in range(resolution)])
+
+    assert len(resolution_array) == resolution
+    assert np.array_equal(expected, resolution_array)
