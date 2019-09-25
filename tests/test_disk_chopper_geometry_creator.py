@@ -190,12 +190,9 @@ def test_GIVEN_face_should_look_right_WHEN_creating_and_adding_point_set_THEN_ex
     assert actual_lower_back in geometry_creator.points
 
     # Check that the face created from the four points has the expected winding order
-    expected_winding_order = [
-        actual_lower_front.id,
-        actual_upper_front.id,
-        actual_upper_back.id,
-        actual_lower_back.id,
-    ]
+    expected_winding_order = create_list_of_ids(
+        actual_lower_front, actual_upper_front, actual_upper_back, actual_lower_back
+    )
     assert expected_winding_order == geometry_creator.faces[-1]
 
 
@@ -417,24 +414,17 @@ def test_GIVEN_angle_distance_to_centre_and_two_points_WHEN_creating_wedge_shape
     assert current_front == Point(-r, 0, geometry_creator.z)
     assert current_back == Point(-r, 0, -geometry_creator.z)
 
-    assert geometry_creator.faces[-3] == [
-        prev_front.id,
-        prev_back.id,
-        current_back.id,
-        current_front.id,
-    ]
+    assert geometry_creator.faces[-3] == create_list_of_ids(
+        prev_front, prev_back, current_back, current_front
+    )
 
-    assert geometry_creator.faces[-2] == [
-        geometry_creator.front_centre.id,
-        prev_front.id,
-        current_front.id,
-    ]
+    assert geometry_creator.faces[-2] == create_list_of_ids(
+        geometry_creator.front_centre, prev_front, current_front
+    )
 
-    assert geometry_creator.faces[-1] == [
-        geometry_creator.back_centre.id,
-        current_back.id,
-        prev_back.id,
-    ]
+    assert geometry_creator.faces[-1] == create_list_of_ids(
+        geometry_creator.back_centre, current_back, prev_back
+    )
 
 
 def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_expected_points_and_faces_are_created(
