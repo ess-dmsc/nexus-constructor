@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from PySide2.QtGui import QVector3D
 from abc import ABC, abstractmethod
 from nexus_constructor.nexus import nexus_wrapper as nx
@@ -8,6 +8,10 @@ from nexus_constructor.nexus.validation import (
     NexusFormatError,
     ValidateDataset,
     validate_group,
+)
+from nexus_constructor.pixel_data import PixelMapping
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    get_detector_faces_from_pixel_mapping,
 )
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
@@ -121,11 +125,16 @@ class OFFGeometryNexus(OFFGeometry):
         group: h5py.Group,
         units: str = "",
         file_path: str = "",
+        pixel_mapping: PixelMapping = None,
     ):
         super().__init__()
         self.file = nexus_file
         self.group = group
         self._verify_in_file()
+
+        if pixel_mapping is not None:
+            self.detector_faces = get_detector_faces_from_pixel_mapping(pixel_mapping)
+
         if units:
             self.units = units
         if file_path:
@@ -148,6 +157,18 @@ class OFFGeometryNexus(OFFGeometry):
         )
         if problems:
             raise NexusFormatError("\n".join(problems))
+
+    @property
+    def detector_faces(self) -> List[int]:
+        return self.file.get_field_value(self.group, "detector_faces")
+
+    @detector_faces.setter
+    def detector_faces(self, detector_faces: List[Tuple[int, int]]):
+        """
+        Records the detector faces in the NXoff_geometry.
+        :param pixel_data: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
+        """
+        self.file.set_field_value(self.group, "detector_faces", detector_faces)
 
     @property
     def winding_order(self) -> List[int]:

@@ -38,7 +38,7 @@ def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct
 def test_GIVEN_float64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
     expected_dtype = "double"
     expected_size = 1
-    expected_value = np.float64(324.12323141351522341235213534)
+    expected_value = np.float64(324.123_231_413_515_223_412_352_135_34)
 
     file = create_in_memory_file("test2")
     dataset = file.create_dataset("test_dataset", dtype=np.float64, data=expected_value)
@@ -214,13 +214,13 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
 
 
 def test_GIVEN_start_time_WHEN_creating_writercommands_THEN_start_time_is_included_in_command():
-    start_time = 123413425
+    start_time = 123_413_425
     start_cmd, _ = create_writer_commands({}, "", start_time=start_time)
     assert start_cmd["start_time"] == start_time
 
 
 def test_GIVEN_stop_time_WHEN_creating_writer_commands_THEN_stop_time_is_included_in_command():
-    stop_time = 123231412
+    stop_time = 123_231_412
     _, stop_cmd = create_writer_commands({}, "", stop_time=stop_time)
     assert stop_cmd["stop_time"] == stop_time
 

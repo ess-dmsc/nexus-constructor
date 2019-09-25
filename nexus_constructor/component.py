@@ -3,6 +3,14 @@ from typing import Any, List, Optional, Union
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    get_x_offsets_from_pixel_grid,
+    get_y_offsets_from_pixel_grid,
+    get_z_offsets_from_pixel_grid,
+    get_detector_ids_from_pixel_grid,
+    get_detector_number_from_pixel_mapping,
+)
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
@@ -20,6 +28,7 @@ import numpy as np
 
 
 SHAPE_GROUP_NAME = "shape"
+PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
 CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
 OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"
 DEPENDS_ON_STR = "depends_on"
@@ -260,6 +269,7 @@ class Component:
         height: float = 1.0,
         radius: float = 1.0,
         units: str = "m",
+        pixel_data: PixelData = None,
     ) -> CylindricalGeometry:
         """
         Sets the shape of the component to be a cylinder
@@ -267,30 +277,67 @@ class Component:
         """
         self.remove_shape()
         validate_nonzero_qvector(axis_direction)
-        shape_group = self.file.create_nx_group(
-            SHAPE_GROUP_NAME, CYLINDRICAL_GEOMETRY_NEXUS_NAME, self.group
+
+        shape_group = self.create_shape_nx_group(
+            CYLINDRICAL_GEOMETRY_NEXUS_NAME, type(pixel_data) is PixelGrid
         )
+
+        pixel_mapping = None
+        if type(pixel_data) is PixelMapping:
+            pixel_mapping = pixel_data
+
         vertices = calculate_vertices(axis_direction, height, radius)
         vertices_field = self.file.set_field_value(shape_group, "vertices", vertices)
         # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
         self.file.set_field_value(shape_group, "cylinders", np.array([0, 1, 2]))
         self.file.set_attribute_value(vertices_field, "units", units)
-        return CylindricalGeometry(self.file, shape_group)
+        return CylindricalGeometry(self.file, shape_group, pixel_mapping)
 
     def set_off_shape(
-        self, loaded_geometry: OFFGeometry, units: str = "", filename: str = ""
+        self,
+        loaded_geometry: OFFGeometry,
+        units: str = "",
+        filename: str = "",
+        pixel_data: PixelData = None,
     ) -> OFFGeometryNexus:
         """
         Sets the shape of the component to be a mesh
         Overrides any existing shape
         """
         self.remove_shape()
-        shape_group = self.file.create_nx_group(
-            SHAPE_GROUP_NAME, OFF_GEOMETRY_NEXUS_NAME, self.group
+
+        shape_group = self.create_shape_nx_group(
+            OFF_GEOMETRY_NEXUS_NAME, type(pixel_data) is PixelGrid
         )
+
+        pixel_mapping = None
+        if type(pixel_data) is PixelMapping:
+            pixel_mapping = pixel_data
+
         record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
         record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
-        return OFFGeometryNexus(self.file, shape_group, units, filename)
+        return OFFGeometryNexus(self.file, shape_group, units, filename, pixel_mapping)
+
+    def create_shape_nx_group(
+        self, nexus_name: str, shape_is_single_pixel: bool = False
+    ):
+        """
+        Creates an NXGroup for the shape information. If the shape is a Pixel Grid/Single Pixel then this is stored
+        with the name `pixel_shape`, otherwise it is stored as `shape`.
+        :param nexus_name: The Nexus name for the shape. This will either be (NXcylindrical/NXoff)_geometry
+        :param shape_is_single_pixel: Whether or not the shape is a single pixel.
+        :return: The shape group.
+        """
+
+        if shape_is_single_pixel:
+            shape_group = self.file.create_nx_group(
+                PIXEL_SHAPE_GROUP_NAME, nexus_name, self.group
+            )
+        else:
+            shape_group = self.file.create_nx_group(
+                SHAPE_GROUP_NAME, nexus_name, self.group
+            )
+        return shape_group
 
     def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
         if SHAPE_GROUP_NAME in self.group:
@@ -311,4 +358,30 @@ class Component:
             self.file.duplicate_nx_group(
                 self.group, generate_unique_name(self.name, components_list)
             ),
+        )
+
+    def record_pixel_grid(self, pixel_grid: PixelGrid):
+        """
+        Records the pixel grid data to the NeXus file.
+        :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
+        """
+        self.set_field(
+            "x_pixel_offset", get_x_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "y_pixel_offset", get_y_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "z_pixel_offset", get_z_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "detector_number", get_detector_ids_from_pixel_grid(pixel_grid), "int64"
+        )
+
+    def record_detector_number(self, pixel_mapping: PixelMapping):
+
+        self.set_field(
+            "detector_number",
+            get_detector_number_from_pixel_mapping(pixel_mapping),
+            "int64",
         )

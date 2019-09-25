@@ -1,15 +1,34 @@
 import h5py
 from PySide2.QtCore import Signal, QObject
-from PySide2.QtGui import QValidator
+from PySide2.QtGui import QValidator, QIntValidator
 import pint
 import os
 from typing import List
 import numpy as np
 from enum import Enum
 
-from PySide2.QtWidgets import QComboBox
+from PySide2.QtWidgets import QComboBox, QWidget, QRadioButton
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
+
+
+class NullableIntValidator(QIntValidator):
+    """
+    A validator that accepts integers as well as empty input.
+    """
+
+    def __init__(self, bottom=None):
+
+        super().__init__()
+
+        if bottom is not None:
+            super().setBottom(bottom)
+
+    def validate(self, input: str, pos: int):
+        if input == "":
+            return QValidator.Acceptable
+        else:
+            return super().validate(input, pos)
 
 
 class UnitValidator(QValidator):
@@ -153,18 +172,88 @@ class GeometryFileValidator(QValidator):
     is_valid = Signal(bool)
 
 
+class PixelValidator(QObject):
+    def __init__(
+        self,
+        pixel_options: QWidget,
+        pixel_grid_button: QRadioButton,
+        pixel_mapping_button: QRadioButton,
+    ):
+        """
+        Validates the pixel-related input and informs the OKValidator for the Add Component Window of any changes.
+        :param pixel_options: The PixelOptions object that holds pixel-related UI elements.
+        :param pixel_grid_button: The pixel grid radio button.
+        :param pixel_mapping_button: The pixel mapping radio button.
+        """
+        super().__init__()
+        self.pixel_options = pixel_options
+        self.pixel_grid_button = pixel_grid_button
+        self.pixel_grid_is_valid = True
+        self.pixel_mapping_button = pixel_mapping_button
+        self.pixel_mapping_is_valid = False
+
+    def set_pixel_mapping_valid(self, is_valid: bool):
+        """
+        Set the validity of the pixel mapping and inform the OKValidator of the change.
+        :param is_valid: Whether or not the pixel mapping is valid.
+        """
+        self.pixel_mapping_is_valid = is_valid
+        self.inform_ok_validator()
+
+    def set_pixel_grid_valid(self, is_valid: bool):
+        """
+        Set the validity of the pixel grid and inform the OKValidator of the change.
+        :param is_valid: Whether or not the pixel grid is valid.
+        """
+        self.pixel_grid_is_valid = is_valid
+        self.inform_ok_validator()
+
+    def unacceptable_pixel_states(self):
+        """
+        Determines if the current input in the pixel options is valid.
+        """
+
+        # Return nothing if the PixelOptions widget isn't presently visible. This will cause the OKValidator to not take
+        # the contents of the pixel-related fields into account when assessing the overall validity of the Add Component
+        # input.
+        if not self.pixel_options.isVisible():
+            return []
+
+        # If the PixelOptions widget is visible then return the state of the radio buttons and their related inputs.
+        return [
+            self.pixel_grid_button.isChecked() and not self.pixel_grid_is_valid,
+            self.pixel_mapping_button.isChecked() and not self.pixel_mapping_is_valid,
+        ]
+
+    def inform_ok_validator(self):
+        """
+        Sends a signal to the OKValidator that tells it to perform another validity check.
+        :return:
+        """
+        self.reassess_validity.emit()
+
+    reassess_validity = Signal()
+
+
 class OkValidator(QObject):
     """
     Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
     """
 
-    def __init__(self, no_geometry_button, mesh_button):
+    def __init__(
+        self,
+        no_geometry_button: QRadioButton,
+        mesh_button: QRadioButton,
+        pixel_validator: PixelValidator,
+    ):
         super().__init__()
         self.name_is_valid = False
         self.file_is_valid = False
         self.units_are_valid = False
         self.no_geometry_button = no_geometry_button
         self.mesh_button = mesh_button
+        self.pixel_validator = pixel_validator
+        self.pixel_validator.reassess_validity.connect(self.validate_ok)
 
     def set_name_valid(self, is_valid):
         self.name_is_valid = is_valid
@@ -187,7 +276,7 @@ class OkValidator(QObject):
             not self.name_is_valid,
             not self.no_geometry_button.isChecked() and not self.units_are_valid,
             self.mesh_button.isChecked() and not self.file_is_valid,
-        ]
+        ] + self.pixel_validator.unacceptable_pixel_states()
         self.is_valid.emit(not any(unacceptable))
 
     # Signal to indicate that the fields are valid or invalid. False: invalid.

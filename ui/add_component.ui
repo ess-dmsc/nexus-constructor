@@ -28,6 +28,12 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>104</width>
+       <height>23</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
        <width>200</width>
@@ -112,7 +118,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QGroupBox" name="ShapeTypeBox">
+         <widget class="QGroupBox" name="shapeTypeBox">
           <property name="title">
            <string>Shape type:</string>
           </property>
@@ -146,14 +152,7 @@
           <property name="title">
            <string>Shape options:</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,1">
-           <item row="4" column="0">
-            <widget class="QGroupBox" name="pixelOptionsBox">
-             <property name="title">
-              <string>Pixel options</string>
-             </property>
-            </widget>
-           </item>
+          <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0">
            <item row="1" column="0">
             <widget class="QGroupBox" name="geometryFileBox">
              <property name="title">
@@ -163,12 +162,24 @@
               <item>
                <widget class="QLineEdit" name="fileLineEdit">
                 <property name="readOnly">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="fileBrowseButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>23</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Browse...</string>
                 </property>
@@ -262,6 +273,26 @@
                 </property>
                </widget>
               </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="cylinderCountLabel">
+                <property name="text">
+                 <string>Cylinder Count:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="cylinderCountSpinBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>999999999</number>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -283,6 +314,9 @@
               </item>
              </layout>
             </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QWidget" name="pixelOptionsWidget" native="true"/>
            </item>
           </layout>
          </widget>
@@ -345,7 +379,7 @@
   <customwidget>
    <class>QWebEngineView</class>
    <extends>QWidget</extends>
-   <header location="global">QtWebEngineWidgets/QWebEngineView</header>
+   <header location="global">PySide2/QtWebEngineWidgets</header>
   </customwidget>
  </customwidgets>
  <resources/>

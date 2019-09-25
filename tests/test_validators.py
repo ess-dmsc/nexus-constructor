@@ -1,6 +1,9 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
 from io import StringIO
 from typing import List
+
+import pytest
+
 from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
@@ -8,6 +11,7 @@ from nexus_constructor.validators import (
     FieldType,
     GeometryFileValidator,
     OkValidator,
+    NullableIntValidator,
     NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
 )
@@ -189,15 +193,18 @@ def create_content_ok_validator():
     mock_no_geometry_button = Mock()
     mock_mesh_button = Mock()
 
+    pixel_validator = Mock()
+    pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
+
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
 
-    validator = OkValidator(mock_no_geometry_button, mock_mesh_button)
+    validator = OkValidator(mock_no_geometry_button, mock_mesh_button, pixel_validator)
     validator.set_units_valid(True)
     validator.set_name_valid(True)
     validator.set_file_valid(True)
 
-    return validator, mock_mesh_button, mock_no_geometry_button
+    return (validator, mock_mesh_button, mock_no_geometry_button)
 
 
 def inspect_signal(result, expected):
@@ -237,7 +244,7 @@ def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THE
     validator.set_file_valid(False)
 
 
-def test_GIVEN_invalid_units_WHEN_using_ok_validator_WITH_no_geometry_button_checked_THEN_true_signal_is_emitted():
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_checked_THEN_true_signal_is_emitted():
 
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     mock_no_geometry_button.isChecked = Mock(return_value=True)
@@ -245,12 +252,33 @@ def test_GIVEN_invalid_units_WHEN_using_ok_validator_WITH_no_geometry_button_che
     validator.set_units_valid(False)
 
 
-def test_GIVEN_invalid_file_WHEN_using_ok_validator_WITH_mesh_button_unchecked_THEN_true_signal_is_emitted():
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_THEN_true_signal_is_emitted():
 
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     mock_mesh_button.isChecked = Mock(return_value=False)
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
     validator.set_file_valid(False)
+
+
+def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
+
+    validator = NullableIntValidator()
+    assert validator.validate("", 0) == QValidator.Acceptable
+
+
+@pytest.mark.parametrize("invalid_input", ["fff", "!", "       "])
+def test_GIVEN_nonemptry_string_WHEN_using_nullable_int_validator_THEN_returns_invalid(
+    invalid_input
+):
+
+    validator = NullableIntValidator()
+    assert validator.validate(invalid_input, 0)[0] == QValidator.State.Invalid
+
+
+def test_GIVEN_integer_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
+
+    validator = NullableIntValidator()
+    assert validator.validate("5", 0)[0] == QValidator.State.Acceptable
 
 
 def test_GIVEN_no_input_WHEN_using_numpy_validator_with_byte_as_dtype_THEN_false_signal_is_emitted():
