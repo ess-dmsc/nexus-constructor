@@ -230,12 +230,10 @@ def test_GIVEN_face_should_look_left_WHEN_creating_and_adding_point_set_THEN_exp
     assert actual_lower_back in geometry_creator.points
 
     # Check that the face created from the four points has the expected winding order
-    expected_winding_order = [
-        actual_lower_back.id,
-        actual_upper_back.id,
-        actual_upper_front.id,
-        actual_lower_front.id,
-    ]
+    expected_winding_order = create_list_of_ids(
+        actual_lower_back, actual_upper_back, actual_upper_front, actual_lower_front
+    )
+
     assert expected_winding_order == geometry_creator.faces[-1]
 
 
@@ -265,9 +263,11 @@ def test_GIVEN_points_WHEN_adding_face_connected_to_front_centre_THEN_expected_f
 ):
 
     first_point, second_point = create_two_points()
-
     geometry_creator.add_face_connected_to_front_centre([first_point, second_point])
-    expected_face = [geometry_creator.front_centre.id, first_point.id, second_point.id]
+
+    expected_face = create_list_of_ids(
+        geometry_creator.front_centre, first_point, second_point
+    )
     assert expected_face == geometry_creator.faces[-1]
 
 
@@ -278,7 +278,9 @@ def test_GIVEN_points_WHEN_adding_face_connected_to_back_centre_THEN_expected_fa
     first_point, second_point = create_two_points()
     geometry_creator.add_face_connected_to_back_centre([first_point, second_point])
 
-    expected_face = [geometry_creator.back_centre.id, first_point.id, second_point.id]
+    expected_face = create_list_of_ids(
+        geometry_creator.back_centre, first_point, second_point
+    )
     assert expected_face == geometry_creator.faces[-1]
 
 
@@ -334,7 +336,9 @@ def test_GIVEN_length_of_arrow_position_WHEN_adding_top_dead_centre_arrow_THEN_e
     assert geometry_creator.points[-2] == expected_right_point
     assert geometry_creator.points[-1] == expected_left_point
 
-    expected_face = [geometry_creator.points[i].id for i in range(-3, 0)]
+    expected_face = create_list_of_ids(
+        *[geometry_creator.points[i] for i in range(-3, 0)]
+    )
     assert expected_face in geometry_creator.faces
 
 
