@@ -101,7 +101,9 @@ class Instrument:
 
         def find_streams(_, node):
             if isinstance(node, h5py.Group):
-                if hasattr(node, "NX_class") and node.attrs["NX_class"] == "NCstream":
-                    streams_dict[node.name] = node
+                if "NX_class" in node.attrs:
+                    if node.attrs["NX_class"] == "NCstream":
+                        streams_dict[node.name] = node
+
         self.nexus.entry.visititems(find_streams)
         return streams_dict
