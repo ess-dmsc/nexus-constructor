@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Dict
 
 import h5py
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
@@ -96,7 +96,7 @@ class Instrument:
         self.nexus.entry.visititems(find_components)
         return component_list
 
-    def get_streams(self):
+    def get_streams(self) -> Dict[str, h5py.Group]:
         streams_dict = dict()
 
         def find_streams(_, node):
