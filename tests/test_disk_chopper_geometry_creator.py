@@ -128,7 +128,6 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
     assert geometry_creator._radius == chopper_details.radius
     assert np.array_equal(geometry_creator._slit_edges, chopper_details.slit_edges)
     assert geometry_creator._slit_height == chopper_details.slit_height
-    assert geometry_creator._slits == chopper_details.slits
 
     assert len(geometry_creator.points) == 2
 
@@ -535,3 +534,10 @@ def test_GIVEN_range_of_resolution_angles_contains_zero_WHEN_creating_intermedia
 
     # Check that the top dead centre method was called with the expected argument
     geometry_creator.add_top_dead_centre_arrow.assert_called_once_with(r)
+
+
+def test_GIVEN_single_slit_WHEN_converting_shopper_details_to_OFF_THEN_expected_list_of_points_and_faces_is_created(
+    geometry_creator
+):
+
+    geometry_creator._slit_edges = np.array([np.deg2rad(30), np.deg2rad(50)])

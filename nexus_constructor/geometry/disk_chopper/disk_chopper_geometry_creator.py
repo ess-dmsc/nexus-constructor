@@ -61,7 +61,6 @@ class DiskChopperGeometryCreator:
         self._radius = chopper_details.radius
         self._slit_edges = chopper_details.slit_edges
         self._slit_height = chopper_details.slit_height
-        self._slits = chopper_details.slits
 
         # Create points for the front and back centres of the disk
         self.front_centre = Point(0, 0, self.z)
