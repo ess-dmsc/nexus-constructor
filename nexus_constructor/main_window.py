@@ -318,7 +318,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             )
             if ok_pressed:
                 with open(filename, "w") as file:
-                    writer.generate_json(self.instrument, file, nexus_file_name=name)
+                    writer.generate_json(
+                        self.instrument,
+                        file,
+                        nexus_file_name=name,
+                        streams=self.instrument.get_streams(),
+                    )
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
