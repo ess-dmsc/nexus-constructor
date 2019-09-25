@@ -525,8 +525,6 @@ def test_GIVEN_range_of_resolution_angles_contains_zero_WHEN_creating_intermedia
         [first_angle, middle_angle, second_angle]
     )
 
-    print(geometry_creator.resolution_angles)
-
     # Mock the top dead centre arrow method
     geometry_creator.add_top_dead_centre_arrow = Mock()
 
