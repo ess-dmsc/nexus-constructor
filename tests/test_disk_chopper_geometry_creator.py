@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from mock import Mock
 
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     Point,
@@ -435,6 +436,9 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
     first_angle = np.deg2rad(80)
     second_angle = np.deg2rad(100)
 
+    # Set a middle angle
+    middle_angle = np.deg2rad(90)
+
     # Set the length of the vertices
     r = 10
 
@@ -446,9 +450,9 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
         r, second_angle
     )
 
-    # Create a fake set of resolution angles with one value between are first and second angles
+    # Create a fake set of resolution angles with zero between the first and second angle
     geometry_creator.resolution_angles = np.array(
-        [first_angle, np.deg2rad(90), second_angle]
+        [first_angle, middle_angle, second_angle]
     )
 
     # Call the method for creating the intermediate points and faces
@@ -492,3 +496,44 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
     assert geometry_creator.faces[-1] == create_list_of_ids(
         geometry_creator.back_centre, second_back, actual_intermediate_back
     )
+
+
+def test_GIVEN_range_of_resolution_angles_contains_zero_WHEN_creating_intermediate_points_and_faces_THEN_top_dead_centre_arrow_is_created(
+    geometry_creator
+):
+
+    # Choose the angles for the boundaries of the slit edge
+    first_angle = np.deg2rad(350)
+    second_angle = np.deg2rad(10)
+
+    # Choose a middle angle of 0
+    middle_angle = 0
+
+    # Set the length of the vertices
+    r = 10
+
+    # Create the points for the boundaries of the slit edges
+    first_front, first_back = geometry_creator.create_and_add_mirrored_points(
+        r, first_angle
+    )
+    second_front, second_back = geometry_creator.create_and_add_mirrored_points(
+        r, second_angle
+    )
+
+    # Create a fake set of resolution angles with zero between the first and second angle
+    geometry_creator.resolution_angles = np.array(
+        [first_angle, middle_angle, second_angle]
+    )
+
+    print(geometry_creator.resolution_angles)
+
+    # Mock the top dead centre arrow method
+    geometry_creator.add_top_dead_centre_arrow = Mock()
+
+    # Call the method for creating the intermediate points and faces
+    geometry_creator.create_intermediate_points_and_faces(
+        first_angle, second_angle, first_front, first_back, second_front, second_back, r
+    )
+
+    # Check that the top dead centre method was called with the expected argument
+    geometry_creator.add_top_dead_centre_arrow.assert_called_once_with(r)
