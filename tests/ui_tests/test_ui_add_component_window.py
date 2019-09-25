@@ -1537,6 +1537,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
 
     assert group["array_size"][()] == array_size
 
+
 def enter_file_path(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
