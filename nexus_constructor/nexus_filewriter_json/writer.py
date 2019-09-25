@@ -81,8 +81,10 @@ class NexusToDictConverter:
             if isinstance(data, list):
                 data = [str_item.decode("utf-8") for str_item in data]
             else:
-                if type(data) == bytes:
+                try:
                     data = data.decode("utf-8")
+                except AttributeError:
+                    pass
             dtype = "string"
         elif dtype == np.float64:
             dtype = "double"
