@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from mock import Mock
+from mock import Mock, call
 
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     Point,
@@ -536,8 +536,27 @@ def test_GIVEN_range_of_resolution_angles_contains_zero_WHEN_creating_intermedia
     geometry_creator.add_top_dead_centre_arrow.assert_called_once_with(r)
 
 
-def test_GIVEN_single_slit_WHEN_converting_shopper_details_to_OFF_THEN_expected_list_of_points_and_faces_is_created(
-    geometry_creator
+def test_GIVEN_single_slit_WHEN_converting_chopper_details_to_OFF_THEN_first_set_of_points_are_created_correctly(
+    geometry_creator, point
 ):
 
-    geometry_creator._slit_edges = np.array([np.deg2rad(30), np.deg2rad(50)])
+    first_angle = np.deg2rad(30)
+    second_angle = np.deg2rad(50)
+    geometry_creator._slit_edges = np.array([first_angle, second_angle])
+
+    centre_to_slit_bottom = geometry_creator._radius - geometry_creator._slit_height
+
+    mock_create_and_add_point_set = Mock(return_value=(point, point, point, point))
+    geometry_creator.create_and_add_point_set = mock_create_and_add_point_set
+    geometry_creator.create_intermediate_points_and_faces = Mock()
+
+    geometry_creator.convert_chopper_details_to_off()
+
+    first_call = call(
+        geometry_creator._radius, centre_to_slit_bottom, first_angle, False
+    )
+    second_call = call(
+        geometry_creator._radius, centre_to_slit_bottom, second_angle, True
+    )
+
+    mock_create_and_add_point_set.assert_has_calls([first_call, second_call])
