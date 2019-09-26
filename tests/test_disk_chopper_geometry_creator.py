@@ -540,23 +540,23 @@ def test_GIVEN_single_slit_WHEN_converting_chopper_details_to_OFF_THEN_first_set
     geometry_creator, point
 ):
 
-    first_angle = np.deg2rad(30)
-    second_angle = np.deg2rad(50)
-    geometry_creator._slit_edges = np.array([first_angle, second_angle])
+    # Create a slit edges array
+    angles = [np.deg2rad(30 + i * 20) for i in range(4)]
+    geometry_creator._slit_edges = np.array(angles)
 
+    # Calculate distance between centre and bottom of the slit
     centre_to_slit_bottom = geometry_creator._radius - geometry_creator._slit_height
 
+    # Create a mock for the create and add point set method
     mock_create_and_add_point_set = Mock(return_value=(point, point, point, point))
     geometry_creator.create_and_add_point_set = mock_create_and_add_point_set
     geometry_creator.create_intermediate_points_and_faces = Mock()
 
     geometry_creator.convert_chopper_details_to_off()
 
-    first_call = call(
-        geometry_creator._radius, centre_to_slit_bottom, first_angle, False
-    )
-    second_call = call(
-        geometry_creator._radius, centre_to_slit_bottom, second_angle, True
-    )
-
-    mock_create_and_add_point_set.assert_has_calls([first_call, second_call])
+    # Check that the calls to create and add point set match what is expected
+    expected_calls = [
+        call(geometry_creator._radius, centre_to_slit_bottom, angles[i], bool(i % 2))
+        for i in range(4)
+    ]
+    mock_create_and_add_point_set.assert_has_calls(expected_calls)
