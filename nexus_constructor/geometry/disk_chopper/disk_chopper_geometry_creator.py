@@ -38,6 +38,11 @@ class Point:
         return QVector3D(self.x, self.y, self.z)
 
     def __eq__(self, other):
+        """
+        Check if two points are equal. This is only used for testing.
+        :param other: The other point.
+        :return: If the x, y, and z values of the points are close to each other.
+        """
         diffs = [
             np.isclose(self.x, other.x),
             np.isclose(self.y, other.y),

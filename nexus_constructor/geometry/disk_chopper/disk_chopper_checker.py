@@ -195,6 +195,9 @@ class UserDefinedChopperChecker:
         self._generic_chopper_checker = GenericChopperChecker()
 
     def get_chopper_details(self):
+        """
+        :return: The ChopperDetails object of the user-defined disk chopper.
+        """
         return self._chopper_details
 
     def required_fields_present(self):
@@ -255,6 +258,9 @@ class NexusDefinedChopperChecker:
         self._disk_chopper = disk_chopper
 
     def get_chopper_details(self):
+        """
+        :return: The ChopperDetails object of the NeXus-defined disk chopper.
+        """
         return self._chopper_details
 
     def required_fields_present(self):
