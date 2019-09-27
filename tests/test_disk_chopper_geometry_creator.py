@@ -1,6 +1,5 @@
 import pytest
 import numpy as np
-from mock import Mock, call
 
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     Point,
@@ -495,69 +494,3 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
     assert geometry_creator.faces[-1] == create_list_of_ids(
         geometry_creator.back_centre, second_back, actual_intermediate_back
     )
-
-
-def test_GIVEN_range_of_resolution_angles_contains_zero_WHEN_creating_intermediate_points_and_faces_THEN_top_dead_centre_arrow_is_created(
-    geometry_creator
-):
-
-    # Choose the angles for the boundaries of the slit edge
-    first_angle = np.deg2rad(350)
-    second_angle = np.deg2rad(10)
-
-    # Choose a middle angle of 0
-    middle_angle = 0
-
-    # Set the length of the vertices
-    r = 10
-
-    # Create the points for the boundaries of the slit edges
-    first_front, first_back = geometry_creator.create_and_add_mirrored_points(
-        r, first_angle
-    )
-    second_front, second_back = geometry_creator.create_and_add_mirrored_points(
-        r, second_angle
-    )
-
-    # Create a fake set of resolution angles with zero between the first and second angle
-    geometry_creator.resolution_angles = np.array(
-        [first_angle, middle_angle, second_angle]
-    )
-
-    # Mock the top dead centre arrow method
-    geometry_creator.add_top_dead_centre_arrow = Mock()
-
-    # Call the method for creating the intermediate points and faces
-    geometry_creator.create_intermediate_points_and_faces(
-        first_angle, second_angle, first_front, first_back, second_front, second_back, r
-    )
-
-    # Check that the top dead centre method was called with the expected argument
-    geometry_creator.add_top_dead_centre_arrow.assert_called_once_with(r)
-
-
-def test_GIVEN_single_slit_WHEN_converting_chopper_details_to_OFF_THEN_first_set_of_points_are_created_correctly(
-    geometry_creator, point
-):
-
-    # Create a slit edges array
-    angles = [np.deg2rad(30 + i * 20) for i in range(4)]
-    geometry_creator._slit_edges = np.array(angles)
-
-    # Calculate distance between centre and bottom of the slit
-    centre_to_slit_bottom = geometry_creator._radius - geometry_creator._slit_height
-
-    # Create a mock for the create and add point set method
-    mock_create_and_add_point_set = Mock(return_value=(point, point, point, point))
-    geometry_creator.create_and_add_point_set = mock_create_and_add_point_set
-    geometry_creator.create_intermediate_points_and_faces = Mock()
-
-    geometry_creator.convert_chopper_details_to_off()
-
-    # Check that the calls to create the points for the faces that make up the slit boundaries have been made in the
-    # expected order
-    expected_calls = [
-        call(geometry_creator._radius, centre_to_slit_bottom, angles[i], bool(i % 2))
-        for i in range(4)
-    ]
-    mock_create_and_add_point_set.assert_has_calls(expected_calls)

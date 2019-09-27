@@ -39,7 +39,7 @@ class Point:
 
     def __eq__(self, other):
         """
-        Check if two points are equal. This is only used for testing.
+        Check if two points are equal. This is only used for testing.1
         :param other: The other point.
         :return: If the x, y, and z values of the points are close to each other.
         """
