@@ -10,8 +10,6 @@ HALF_THICKNESS = 0.5
 ARROW_SIZE = 0.1
 RESOLUTION = 20
 
-POINT_TOLERANCE = 1e-05
-
 
 class Point:
     """
@@ -40,8 +38,12 @@ class Point:
         return QVector3D(self.x, self.y, self.z)
 
     def __eq__(self, other):
-        diffs = [self.x - other.x, self.y - other.y, self.z - other.z]
-        return all([abs(diff) < POINT_TOLERANCE for diff in diffs])
+        diffs = [
+            np.isclose(self.x, other.x),
+            np.isclose(self.y, other.y),
+            np.isclose(self.z, other.z),
+        ]
+        return all(diffs)
 
 
 class DiskChopperGeometryCreator:
