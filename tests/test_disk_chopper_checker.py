@@ -143,7 +143,7 @@ def nexus_defined_chopper_checker(nexus_disk_chopper):
 
 
 @pytest.fixture(scope="function")
-def generic_chopper_checker(fields_dict_mocks):
+def generic_chopper_checker():
     return GenericChopperChecker()
 
 
