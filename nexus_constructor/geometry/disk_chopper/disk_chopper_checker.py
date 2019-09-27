@@ -46,21 +46,13 @@ def check_data_type(data_type, expected_types):
         return False
 
 
-class ChopperChecker:
+class GenericChopperChecker:
     def __init__(self):
 
-        self.fields_dict = dict()
         self._chopper_details = None
         self._angle_units = None
         self._slit_height_units = None
         self._radius_units = None
-
-    def get_chopper_details(self):
-        """
-        :return: The ChopperDetails object. This will only be created if `validate_chopper` was called and the
-            validation was successful. Otherwise this method just returns None.
-        """
-        return self._chopper_details
 
     @staticmethod
     def fields_have_correct_type(fields_dict: dict):
@@ -186,10 +178,11 @@ class ChopperChecker:
         return True
 
 
-class UserDefinedChopperChecker(ChopperChecker):
+class UserDefinedChopperChecker:
     def __init__(self, fields_widget: QListWidget):
 
-        super().__init__()
+        self.fields_dict = dict()
+        self._chopper_details = None
 
         self._angle_units = "deg"
         self._slit_height_units = "m"
@@ -198,6 +191,11 @@ class UserDefinedChopperChecker(ChopperChecker):
         for i in range(fields_widget.count()):
             widget = fields_widget.itemWidget(fields_widget.item(i))
             self.fields_dict[widget.name] = widget
+
+        self._generic_chopper_checker = GenericChopperChecker()
+
+    def get_chopper_details(self):
+        return self._chopper_details
 
     def required_fields_present(self):
         """
@@ -221,8 +219,8 @@ class UserDefinedChopperChecker(ChopperChecker):
         """
         if not (
             self.required_fields_present()
-            and self.fields_have_correct_type(self.fields_dict)
-            and self.edges_array_has_correct_shape(
+            and self._generic_chopper_checker.fields_have_correct_type(self.fields_dict)
+            and self._generic_chopper_checker.edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].value.ndim,
                 self.fields_dict[SLIT_EDGES_NAME].value.shape,
             )
@@ -239,16 +237,25 @@ class UserDefinedChopperChecker(ChopperChecker):
             self._radius_units,
         )
 
-        return self.input_describes_valid_chopper(
+        return self._generic_chopper_checker.input_describes_valid_chopper(
             self._chopper_details, self.fields_dict[SLIT_EDGES_NAME].value
         )
 
 
-class NexusDefinedChopperChecker(ChopperChecker):
+class NexusDefinedChopperChecker:
     def __init__(self, disk_chopper: Group):
 
-        super().__init__()
+        self.fields_dict = dict()
+        self._chopper_details = None
+        self._angle_units = None
+        self._slit_height_units = None
+        self._radius_units = None
+
+        self._generic_chopper_checker = GenericChopperChecker()
         self._disk_chopper = disk_chopper
+
+    def get_chopper_details(self):
+        return self._chopper_details
 
     def required_fields_present(self):
 
@@ -285,8 +292,8 @@ class NexusDefinedChopperChecker(ChopperChecker):
         """
         if not (
             self.required_fields_present()
-            and self.fields_have_correct_type(self.fields_dict)
-            and self.edges_array_has_correct_shape(
+            and self._generic_chopper_checker.fields_have_correct_type(self.fields_dict)
+            and self._generic_chopper_checker.edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].ndim,
                 self.fields_dict[SLIT_EDGES_NAME].shape,
             )
@@ -303,6 +310,6 @@ class NexusDefinedChopperChecker(ChopperChecker):
             self._radius_units,
         )
 
-        return self.input_describes_valid_chopper(
+        return self._generic_chopper_checker.input_describes_valid_chopper(
             self._chopper_details, self.fields_dict[SLIT_EDGES_NAME]
         )

@@ -554,7 +554,8 @@ def test_GIVEN_single_slit_WHEN_converting_chopper_details_to_OFF_THEN_first_set
 
     geometry_creator.convert_chopper_details_to_off()
 
-    # Check that the calls to create and add point set match what is expected
+    # Check that the calls to create the points for the faces that make up the slit boundaries have been made in the
+    # expected order
     expected_calls = [
         call(geometry_creator._radius, centre_to_slit_bottom, angles[i], bool(i % 2))
         for i in range(4)
