@@ -77,11 +77,14 @@ class NexusToDictConverter:
         if type(data) is np.ndarray:
             size = data.shape
             data = data.tolist()
-        if dtype.char == "S":
+        if dtype.char == "S" or dtype == h5py.special_dtype(vlen=str):
             if isinstance(data, list):
                 data = [str_item.decode("utf-8") for str_item in data]
             else:
-                data = data.decode("utf-8")
+                try:
+                    data = data.decode("utf-8")
+                except AttributeError:
+                    pass
             dtype = "string"
         elif dtype == np.float64:
             dtype = "double"
@@ -118,12 +121,14 @@ class NexusToDictConverter:
             root_dict["children"].append(
                 {"type": "stream", "stream": self._kafka_streams[root.name]}
             )
-        elif root.name in self._links:
+        elif root.name in self._links.keys():
             root_dict["children"].append(
                 {
                     "type": "link",
-                    "name": self._links[root.name]["name"],
-                    "target": self._links[root.name]["target"],
+                    "name": root.name,
+                    "target": self._links[root.name]
+                    .file.get(root.name, getlink=True)
+                    .path,
                 }
             )
         elif entries:

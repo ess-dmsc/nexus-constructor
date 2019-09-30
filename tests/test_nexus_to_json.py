@@ -143,27 +143,23 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
 
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children():
     file = create_in_memory_file("test7")
-    group_name = "test_group"
-    group = file.create_group(group_name)
-    group.attrs["NX_class"] = "NXgroup"
 
     group_to_be_linked_name = "test_linked_group"
     group_to_be_linked = file.create_group(group_to_be_linked_name)
     group_to_be_linked.attrs["NX_class"] = "NXgroup"
 
-    link_name = "testlink"
-
-    group_contents = {"name": link_name, "target": group_to_be_linked.name}
+    group_name = "test_group_with_link"
+    file[group_name] = h5py.SoftLink(group_to_be_linked.name)
+    file[group_name].attrs["NX_class"] = "NXgroup"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, streams={}, links={group.name: group_contents})
+    root_dict = converter.convert(
+        file, streams={}, links={file[group_name].name: group_to_be_linked}
+    )
 
-    assert group.name == root_dict["children"][0]["name"]
-
-    link_dict = root_dict["children"][0]["children"][0]
-    assert "link" == link_dict["type"]
-    assert link_name == link_dict["name"]
-    assert group_to_be_linked.name == link_dict["target"]
+    assert file[group_name].name == root_dict["children"][0]["name"]
+    assert file[group_name].name == root_dict["children"][0]["children"][0]["name"]
+    assert group_to_be_linked.name == root_dict["children"][0]["children"][0]["target"]
 
 
 def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN_attributes_end_up_in_file():
