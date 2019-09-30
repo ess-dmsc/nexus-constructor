@@ -199,7 +199,7 @@ class NexusWrapper(QObject):
 
         if isinstance(value, h5py.SoftLink):
             group[name] = value
-            return value
+            return group[name]
 
         if dtype is str:
             dtype = f"|S{len(value)}"
