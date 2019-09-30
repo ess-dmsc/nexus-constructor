@@ -96,14 +96,21 @@ class Instrument:
         self.nexus.entry.visititems(find_components)
         return component_list
 
-    def get_streams(self) -> Dict[str, h5py.Group]:
+    def get_streams(self) -> Dict[str, Dict[str, str]]:
+        """
+        Find all streams and return them in the expected format for JSON serialisiation.
+        :return: A dictionary of stream groups, with their respective field names and values.
+        """
         streams_dict = dict()
 
         def find_streams(_, node):
             if isinstance(node, h5py.Group):
                 if "NX_class" in node.attrs:
                     if node.attrs["NX_class"] == "NCstream":
-                        streams_dict[node.name] = node
+                        item_dict = dict()
+                        for item in node.items():
+                            item_dict[item[0]] = str(item[1][...])
+                        streams_dict[node.name] = item_dict
 
         self.nexus.entry.visititems(find_streams)
         return streams_dict

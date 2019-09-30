@@ -119,10 +119,7 @@ class NexusToDictConverter:
         entries = list(root.values())
         if root.name in self._kafka_streams:
             root_dict["children"].append(
-                {
-                    "type": "stream",
-                    "stream": self._kafka_streams[root.name],
-                }  # TODO: actually handle the groups here
+                {"type": "stream", "stream": self._kafka_streams[root.name]}
             )
         elif root.name in self._links:
             root_dict["children"].append(
