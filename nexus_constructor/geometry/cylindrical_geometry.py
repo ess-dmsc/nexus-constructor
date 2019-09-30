@@ -98,7 +98,7 @@ class CylindricalGeometry:
 
     @property
     def units(self) -> str:
-        return str(self.group["vertices"].attrs["units"])
+        return self.file.get_attribute_value(self.group["vertices"], "units")
 
     @property
     def height(self) -> float:
