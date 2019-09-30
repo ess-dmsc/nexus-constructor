@@ -268,7 +268,7 @@ class Component:
         axis_direction: QVector3D = QVector3D(0.0, 0.0, 1.0),
         height: float = 1.0,
         radius: float = 1.0,
-        units: str = "m",
+        units: Union[str, bytes] = "m",
         pixel_data: PixelData = None,
     ) -> CylindricalGeometry:
         """
