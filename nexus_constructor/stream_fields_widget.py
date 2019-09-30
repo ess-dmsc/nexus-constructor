@@ -16,7 +16,7 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
-SCHEMAS = ["ev42", "f142", "hs00", "ns10"]
+SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime"]
 F142_TYPES = [
     "byte",
     "ubyte",
@@ -178,9 +178,10 @@ class StreamFieldsWidget(QDialog):
         elif schema == "hs00":
             self._set_edits_visible(True, False)
             self.hs00_unimplemented_label.setVisible(True)
-
         elif schema == "ns10":
             self._set_edits_visible(True, False, "nicos/<device>/<parameter>")
+        elif schema == "TdcTime":
+            self._set_edits_visible(True, False)
 
     def _set_edits_visible(self, source: bool, type: bool, source_hint=None):
         self.source_label.setVisible(source)
