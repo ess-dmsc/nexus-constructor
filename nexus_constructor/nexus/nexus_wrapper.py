@@ -196,6 +196,11 @@ class NexusWrapper(QObject):
         :param dtype: Type of the value (Use numpy types)
         :return: The dataset.
         """
+
+        if isinstance(value, h5py.SoftLink):
+            group[name] = value
+            return group[name]
+
         if dtype is str:
             dtype = f"|S{len(value)}"
             value = np.array(value).astype(dtype)

@@ -378,3 +378,29 @@ class NumpyDTypeValidator(QValidator):
         return QValidator.Acceptable
 
     is_valid = Signal(bool)
+
+
+class HDFLocationExistsValidator(QValidator):
+    """
+    For checking that a location exists in a given HDF file
+    """
+
+    def __init__(self, file: h5py.File, field_type):
+        super(HDFLocationExistsValidator, self).__init__()
+        self.file = file
+        self.field_combo = field_type
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input:
+            self._emit_and_return(False)
+        if not self.field_combo.currentText == FieldType.link.value:
+            self._emit_and_return(True)
+
+        in_file = input in self.file
+        return self._emit_and_return(in_file)
+
+    def _emit_and_return(self, valid: bool) -> QValidator.State:
+        self.is_valid.emit(valid)
+        return QValidator.Acceptable if valid else QValidator.Intermediate
+
+    is_valid = Signal(bool)

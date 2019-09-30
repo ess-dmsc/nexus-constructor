@@ -323,6 +323,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                         file,
                         nexus_file_name=name,
                         streams=self.instrument.get_streams(),
+                        links=self.instrument.get_links(),
                     )
 
     def open_nexus_file(self):

@@ -121,12 +121,14 @@ class NexusToDictConverter:
             root_dict["children"].append(
                 {"type": "stream", "stream": self._kafka_streams[root.name]}
             )
-        elif root.name in self._links:
+        elif root.name in self._links.keys():
             root_dict["children"].append(
                 {
                     "type": "link",
-                    "name": self._links[root.name]["name"],
-                    "target": self._links[root.name]["target"],
+                    "name": root.name,
+                    "target": self._links[root.name]
+                    .file.get(root.name, getlink=True)
+                    .path,
                 }
             )
         elif entries:

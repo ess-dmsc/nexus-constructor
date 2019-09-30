@@ -114,3 +114,16 @@ class Instrument:
 
         self.nexus.entry.visititems(find_streams)
         return streams_dict
+
+    def get_links(self) -> Dict[str, h5py.Group]:
+        links_dict = dict()
+
+        def find_links(_, node):
+            if isinstance(node, h5py.Group):
+                # visititems does not visit softlinks so we need to do this manually
+                for item in node:
+                    if isinstance(node.get(item, getlink=True), h5py.SoftLink):
+                        links_dict[node[item].name] = node[item]
+
+        self.nexus.entry.visititems(find_links)
+        return links_dict

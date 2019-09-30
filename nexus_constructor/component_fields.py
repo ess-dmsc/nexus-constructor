@@ -20,12 +20,14 @@ from nexus_constructor.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
+from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
     FieldValueValidator,
     FieldType,
     DATASET_TYPE,
     NameValidator,
+    HDFLocationExistsValidator,
 )
 
 
@@ -66,10 +68,17 @@ class FieldWidget(QFrame):
         self.value_line_edit.validator().field_type_combo = self.field_type_combo
         self.value_line_edit.validator().validate(self.value_line_edit.text(), 0)
 
-    def __init__(self, possible_field_names: List[str], parent: QListWidget = None):
+    def __init__(
+        self,
+        possible_field_names: List[str],
+        parent: QListWidget = None,
+        instrument: Instrument = None,
+    ):
         super(FieldWidget, self).__init__(parent)
 
         self.edit_dialog = QDialog(parent=self)
+        self.instrument = instrument
+
         self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
 
@@ -88,17 +97,8 @@ class FieldWidget(QFrame):
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit = QLineEdit()
-        self.value_line_edit.setValidator(
-            FieldValueValidator(self.field_type_combo, self.value_type_combo)
-        )
-        self.value_line_edit.validator().is_valid.connect(
-            partial(
-                validate_line_edit,
-                self.value_line_edit,
-                tooltip_on_accept="Value is cast-able to numpy type.",
-                tooltip_on_reject="Value is not cast-able to selected numpy type.",
-            )
-        )
+
+        self._set_up_value_validator(False)
         self.dataset_type_changed(0)
 
         self.nx_class_combo = QComboBox()
@@ -169,6 +169,8 @@ class FieldWidget(QFrame):
             return self.value.dtype
         if self.field_type == FieldType.array_dataset:
             return self.table_view.model.array.dtype
+        if self.field_type == FieldType.link:
+            return h5py.SoftLink
 
     @property
     def value(self):
@@ -180,10 +182,12 @@ class FieldWidget(QFrame):
                     name=str(uuid.uuid4()), driver="core", backing_store=False
                 ).create_dataset(name=self.name, dtype=dtype, data=val)
             return dtype(val)
-        elif self.field_type == FieldType.array_dataset:
+        if self.field_type == FieldType.array_dataset:
             return self.table_view.model.array
-        elif self.field_type == FieldType.kafka_stream:
+        if self.field_type == FieldType.kafka_stream:
             return self.streams_widget.get_stream_group()
+        if self.field_type == FieldType.link:
+            return h5py.SoftLink(self.value_line_edit.text())
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
@@ -193,6 +197,7 @@ class FieldWidget(QFrame):
             return False
 
     def field_type_changed(self):
+        self._set_up_value_validator(False)
         if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
             self.set_visibility(True, False, False, True)
         elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
@@ -201,8 +206,36 @@ class FieldWidget(QFrame):
             self.set_visibility(False, False, True, False)
         elif self.field_type_combo.currentText() == FieldType.link.value:
             self.set_visibility(True, False, False, False)
+            self._set_up_value_validator(True)
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             self.set_visibility(False, True, False, False)
+
+    def _set_up_value_validator(self, is_link: bool):
+        self.value_line_edit.setValidator(None)
+        if is_link:
+            self.value_line_edit.setValidator(
+                HDFLocationExistsValidator(
+                    self.instrument.nexus.nexus_file, self.field_type_combo
+                )
+            )
+
+            tooltip_on_accept = "Valid HDF path"
+            tooltip_on_reject = "HDF Path is not valid"
+        else:
+            self.value_line_edit.setValidator(
+                FieldValueValidator(self.field_type_combo, self.value_type_combo)
+            )
+            tooltip_on_accept = "Value is cast-able to numpy type."
+            tooltip_on_reject = "Value is not cast-able to selected numpy type."
+
+        self.value_line_edit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.value_line_edit,
+                tooltip_on_accept=tooltip_on_accept,
+                tooltip_on_reject=tooltip_on_reject,
+            )
+        )
 
     def set_visibility(
         self,
@@ -244,7 +277,9 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
     for i in range(fields_widget.count()):
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
-            component.set_field(widget.name, widget.value, widget.dtype)
+            component.set_field(
+                name=widget.name, value=widget.value, dtype=widget.dtype
+            )
         except ValueError:
             dialog = QMessageBox(
                 icon=QMessageBox.Warning,
