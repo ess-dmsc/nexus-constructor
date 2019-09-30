@@ -64,7 +64,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.file_changed.connect(
             self.update_nexus_file_structure_view
         )
-        self.instrument.nexus.file_changed.connect(self.find_and_draw_disk_choppers)
+        self.instrument.nexus.file_opened.connect(self.find_and_draw_disk_choppers)
         self.verticalLayout.addWidget(self.widget)
         self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
@@ -324,7 +324,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             chopper_checker = NexusDefinedChopperChecker(disk_chopper)
 
             if chopper_checker.validate_chopper():
-                self.sceneWidget.add_component(
+                self.sceneWidget.component(
                     disk_chopper["name"][()],
                     DiskChopperGeometryCreator(
                         chopper_checker.get_chopper_details()

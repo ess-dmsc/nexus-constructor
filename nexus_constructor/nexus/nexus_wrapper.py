@@ -51,6 +51,7 @@ class NexusWrapper(QObject):
 
     # Signal that indicates the nexus file has been changed in some way
     file_changed = Signal("QVariant")
+    file_opened = Signal("QVariant")
     component_added = Signal(str, "QVariant")
     component_removed = Signal(str)
     show_entries_dialog = Signal("QVariant", "QVariant")
@@ -97,7 +98,9 @@ class NexusWrapper(QObject):
             nexus_file = h5py.File(
                 filename, mode="r", backing_store=False, driver="core"
             )
-            return self.find_entries_in_file(nexus_file)
+            entries = self.find_entries_in_file(nexus_file)
+            self.file_opened.emit(nexus_file)
+            return entries
 
     def find_entries_in_file(self, nexus_file: h5py.File):
         """
