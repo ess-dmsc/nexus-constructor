@@ -157,7 +157,7 @@ class ValueDelegate(QItemDelegate):
         super().__init__(parent)
         self.dtype = dtype
 
-    def commit(self, editor, _):
+    def commit(self, editor):
         """
         Calls the commitData signal to update the model when text is being edited rather than when it has finished being edited and loses focus.
         :param editor: The line edit in the item delegate.
@@ -179,7 +179,7 @@ class ValueDelegate(QItemDelegate):
         )
 
         # Update the model when the item is being edited rather than when it has lost focus and finished.
-        editor.textEdited.connect(partial(self.commit, editor))
+        editor.editingFinished.connect(partial(self.commit, editor))
         return editor
 
     def setEditorData(self, editor: QWidget, index: QModelIndex):
