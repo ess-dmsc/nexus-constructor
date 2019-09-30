@@ -9,6 +9,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtWidgets import QSplitter
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -16,9 +18,12 @@ class Ui_MainWindow(object):
         MainWindow.resize(1287, 712)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+        self.splitter = QSplitter(self.centralwidget)
+        self.splitter.setChildrenCollapsible(False)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.gridLayout_3 = QtWidgets.QGridLayout()
+        self.gridLayout_3.addWidget(self.splitter)
         self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -46,8 +51,8 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.widget)
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab, "")
-        self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
-        self.sceneWidget = InstrumentView(self.centralwidget)
+        self.splitter.addWidget(self.tabWidget)
+        self.sceneWidget = InstrumentView(self.splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
@@ -55,7 +60,7 @@ class Ui_MainWindow(object):
         self.sceneWidget.setSizePolicy(sizePolicy)
         self.sceneWidget.setMinimumSize(QtCore.QSize(745, 0))
         self.sceneWidget.setObjectName("sceneWidget")
-        self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
+        self.splitter.addWidget(self.sceneWidget)
         self.verticalLayout_3.addLayout(self.gridLayout_3)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar()
