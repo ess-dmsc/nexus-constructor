@@ -886,8 +886,8 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_val
     systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
     assert dialog.cylinderOptionsBox.isVisible()
-    assert dialog.cylinderHeightLineEdit.value() == 1.0
-    assert dialog.cylinderRadiusLineEdit.value() == 1.0
+    assert dialog.cylinderHeightLineEdit.value() == 0.0
+    assert dialog.cylinderRadiusLineEdit.value() == 0.0
     assert dialog.cylinderXLineEdit.value() == 0.0
     assert dialog.cylinderYLineEdit.value() == 0.0
     assert dialog.cylinderZLineEdit.value() == 1.0
