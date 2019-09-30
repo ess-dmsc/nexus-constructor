@@ -25,7 +25,7 @@ from nexus_constructor.validators import (
     FieldType,
     DATASET_TYPE,
     NameValidator,
-    HDFValidator,
+    HDFLocationExistsValidator,
 )
 
 
@@ -161,9 +161,9 @@ class FieldWidget(QFrame):
     def dtype(self):
         if self.field_type == FieldType.scalar_dataset:
             return self.value.dtype
-        elif self.field_type == FieldType.array_dataset:
+        if self.field_type == FieldType.array_dataset:
             return self.table_view.model.array.dtype
-        elif self.field_type == FieldType.link:
+        if self.field_type == FieldType.link:
             return h5py.SoftLink
 
     @property
@@ -206,7 +206,9 @@ class FieldWidget(QFrame):
         self.value_line_edit.setValidator(None)
         if is_link:
             self.value_line_edit.setValidator(
-                HDFValidator(self.instrument.nexus.nexus_file, self.field_type_combo)
+                HDFLocationExistsValidator(
+                    self.instrument.nexus.nexus_file, self.field_type_combo
+                )
             )
 
             tooltip_on_accept = "Valid HDF path"
