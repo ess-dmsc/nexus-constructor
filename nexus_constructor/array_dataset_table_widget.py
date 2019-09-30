@@ -161,7 +161,6 @@ class ValueDelegate(QItemDelegate):
         """
         Calls the commitData signal to update the model when text is being edited rather than when it has finished being edited and loses focus.
         :param editor: The line edit in the item delegate.
-        :param _: Not used, just satisfying the signal parameters
         """
         self.commitData.emit(editor)
 
