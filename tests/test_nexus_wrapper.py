@@ -135,3 +135,15 @@ def test_GIVEN_group_with_nx_class_as_bytes_WHEN_getting_nx_class_THEN_returns_n
     nx_class = b"NXentry"
     entry.attrs["NX_class"] = nx_class
     assert get_nx_class(entry) == str(nx_class, encoding="utf-8")
+
+
+def test_GIVEN_group_with_bytes_attribute_WHEN_getting_attribute_value_THEN_returns_value_as_str():
+    wrapper = NexusWrapper(filename="test_attr_as_str")
+    test_group = wrapper.nexus_file.create_group("test_group")
+    attr_value = b"test_attr_value"
+    attr_name = "test_attr"
+    test_group.attrs[attr_name] = attr_value
+
+    attr_value_as_str = attr_value.decode("utf-8")
+
+    assert wrapper.get_attribute_value(test_group, attr_name) == attr_value_as_str

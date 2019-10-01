@@ -49,7 +49,7 @@ build_exe_options = {
         "sphinx",
     ],
     "bin_includes": ["libssl.so"],
-    "include_files": ["ui", "Instrument.schema.json", "definitions"],
+    "include_files": ["ui", "definitions"],
 }
 
 # GUI applications require a different base on Windows (the default is for a console application).

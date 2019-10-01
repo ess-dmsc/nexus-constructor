@@ -345,7 +345,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
-        self.instrument.nexus.save_file(filename)
         if filename:
             name, ok_pressed = QInputDialog.getText(
                 None,
@@ -354,7 +353,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             )
             if ok_pressed:
                 with open(filename, "w") as file:
-                    writer.generate_json(self.instrument, file, nexus_file_name=name)
+                    writer.generate_json(
+                        self.instrument,
+                        file,
+                        nexus_file_name=name,
+                        links=self.instrument.get_links(),
+                    )
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)

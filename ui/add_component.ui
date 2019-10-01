@@ -203,9 +203,6 @@
               </item>
               <item row="0" column="3">
                <widget class="QDoubleSpinBox" name="cylinderRadiusLineEdit">
-                <property name="minimum">
-                 <double>1.000000000000000</double>
-                </property>
                 <property name="maximum">
                  <double>100000.000000000000000</double>
                 </property>
@@ -255,9 +252,6 @@
               </item>
               <item row="0" column="1">
                <widget class="QDoubleSpinBox" name="cylinderHeightLineEdit">
-                <property name="minimum">
-                 <double>1.000000000000000</double>
-                </property>
                 <property name="maximum">
                  <double>100000.000000000000000</double>
                 </property>

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/add_component.ui',
-# licensing of 'ui/add_component.ui' applies.
+# Form implementation generated from reading ui file 'add_component.ui',
+# licensing of 'add_component.ui' applies.
 #
-# Created: Thu Aug  8 10:10:21 2019
+# Created: Mon Sep 30 11:55:40 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -124,7 +124,6 @@ class Ui_AddComponentDialog(object):
         self.cylinderXLineEdit.setObjectName("cylinderXLineEdit")
         self.gridLayout.addWidget(self.cylinderXLineEdit, 2, 1, 1, 1)
         self.cylinderRadiusLineEdit = QtWidgets.QDoubleSpinBox(self.cylinderOptionsBox)
-        self.cylinderRadiusLineEdit.setMinimum(1.0)
         self.cylinderRadiusLineEdit.setMaximum(100000.0)
         self.cylinderRadiusLineEdit.setObjectName("cylinderRadiusLineEdit")
         self.gridLayout.addWidget(self.cylinderRadiusLineEdit, 0, 3, 1, 1)
@@ -148,7 +147,6 @@ class Ui_AddComponentDialog(object):
         self.label_8.setObjectName("label_8")
         self.gridLayout.addWidget(self.label_8, 2, 4, 1, 1)
         self.cylinderHeightLineEdit = QtWidgets.QDoubleSpinBox(self.cylinderOptionsBox)
-        self.cylinderHeightLineEdit.setMinimum(1.0)
         self.cylinderHeightLineEdit.setMaximum(100000.0)
         self.cylinderHeightLineEdit.setObjectName("cylinderHeightLineEdit")
         self.gridLayout.addWidget(self.cylinderHeightLineEdit, 0, 1, 1, 1)

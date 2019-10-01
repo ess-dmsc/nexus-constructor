@@ -41,6 +41,18 @@ def test_cylinder_has_property_values_it_was_created_with():
     assert cylinder.geometry_str == "Cylinder"
 
 
+def test_cylinder_units_returns_str_if_bytes_in_file():
+    nexus_wrapper = create_nexus_wrapper()
+    component = add_component_to_file(nexus_wrapper)
+    units_bytes = b"cubits"
+    cylinder = component.set_cylinder_shape(
+        axis_direction=QVector3D(1, 0, 0), height=3, radius=4, units=units_bytes
+    )
+    units_str = units_bytes.decode("utf-8")
+
+    assert cylinder.units == units_str
+
+
 def test_axis_direction_must_be_non_zero():
     nexus_wrapper = create_nexus_wrapper()
     component = add_component_to_file(nexus_wrapper)

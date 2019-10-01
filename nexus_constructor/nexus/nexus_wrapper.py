@@ -203,6 +203,11 @@ class NexusWrapper(QObject):
         :param dtype: Type of the value (Use numpy types)
         :return: The dataset.
         """
+
+        if isinstance(value, h5py.SoftLink):
+            group[name] = value
+            return group[name]
+
         if dtype is str:
             dtype = f"|S{len(value)}"
             value = np.array(value).astype(dtype)
@@ -226,7 +231,10 @@ class NexusWrapper(QObject):
     @staticmethod
     def get_attribute_value(node: h5Node, name: str) -> Optional[Any]:
         if name in node.attrs.keys():
-            return node.attrs[name]
+            value = node.attrs[name]
+            if isinstance(value, bytes):
+                return value.decode("utf-8")
+            return value
 
     def set_attribute_value(self, node: h5Node, name: str, value: Any):
         # Deal with arrays of strings

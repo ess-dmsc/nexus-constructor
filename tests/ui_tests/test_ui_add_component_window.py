@@ -1,6 +1,7 @@
 import os
 
 import PySide2
+import h5py
 import pytest
 import pytestqt
 from PySide2.QtCore import Qt
@@ -1061,8 +1062,8 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_val
     systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
 
     assert dialog.cylinderOptionsBox.isVisible()
-    assert dialog.cylinderHeightLineEdit.value() == 1.0
-    assert dialog.cylinderRadiusLineEdit.value() == 1.0
+    assert dialog.cylinderHeightLineEdit.value() == 0.0
+    assert dialog.cylinderRadiusLineEdit.value() == 0.0
     assert dialog.cylinderXLineEdit.value() == 0.0
     assert dialog.cylinderYLineEdit.value() == 0.0
     assert dialog.cylinderZLineEdit.value() == 1.0
@@ -1491,8 +1492,6 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     field.field_name_edit.setText(field_name)
     field.value_line_edit.setText(field_value)
 
-    import h5py
-
     assert field.dtype == h5py.special_dtype(vlen=str)
 
     assert field.name == field_name
@@ -1545,3 +1544,23 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
     ) as chopper_creator:
         dialog.on_ok()
         chopper_creator.assert_not_called()
+
+
+def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(qtbot, dialog, template):
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.link.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    field_name = "testfield"
+    field_target = "/somewhere/"
+
+    field.field_name_edit.setText(field_name)
+    field.value_line_edit.setText(field_target)
+
+    assert field.dtype == h5py.SoftLink
+
+    assert field.name == field_name
+    assert field.value.path == h5py.SoftLink(field_target).path

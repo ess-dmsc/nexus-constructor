@@ -5,6 +5,8 @@ Construct [NeXus files](https://www.nexusformat.org/) with instrument geometry i
 
 ![NeXus Constructor](resources/images/nc_screenshot.png)
 
+Currently tested on Windows 10 and CentOS 7, it should also work on other Linux distributions. Currently it does not work on Mac due to a bug in Qt, but we hope to resolve this soon.
+
 ## Installing dependencies
 
 This project is developed for Python 3.6, so an install of 3.6 or higher
