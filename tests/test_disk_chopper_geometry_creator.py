@@ -493,3 +493,19 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
     assert geometry_creator.faces[-1] == create_list_of_ids(
         geometry_creator.back_centre, second_back, actual_intermediate_back
     )
+
+
+def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_all_points_have_expected_distance_from_centre(
+    geometry_creator, chopper_details
+):
+
+    geometry_creator.resolution = 5
+    geometry_creator.create_disk_chopper_geometry()
+
+    centre_to_slit = chopper_details.radius - chopper_details.slit_height
+
+    for point in geometry_creator.points[2:]:
+        distance_from_centre = np.sqrt(point.x ** 2 + point.y ** 2)
+        assert np.isclose(distance_from_centre, geometry_creator._radius) or np.isclose(
+            distance_from_centre, centre_to_slit
+        )
