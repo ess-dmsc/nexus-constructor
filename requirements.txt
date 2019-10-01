@@ -10,8 +10,5 @@ xmltodict
 numpy
 pytest-qt
 
-# Pin to 0.8.3 as currently a bug in 0.8.4
-tabulate==0.8.3
-
 # PySide2 has had some issues with new versions and packaging so we will pin it
 PySide2==5.13.0
