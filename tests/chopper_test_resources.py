@@ -15,6 +15,7 @@ EDGES_ARR = np.array(
 )
 RADIUS_LENGTH = 200.3
 SLIT_HEIGHT_LENGTH = 70.1
+EXPECTED_Z = RADIUS_LENGTH * 0.025
 
 
 def degree_to_radian(x):

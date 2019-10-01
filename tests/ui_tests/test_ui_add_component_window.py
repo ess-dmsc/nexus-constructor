@@ -1546,7 +1546,9 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
         chopper_creator.assert_not_called()
 
 
-def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(qtbot, dialog, template):
+def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
+    qtbot, dialog, template
+):
 
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))

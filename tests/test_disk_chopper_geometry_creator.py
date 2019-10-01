@@ -4,10 +4,10 @@ import numpy as np
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     Point,
     DiskChopperGeometryCreator,
-    HALF_THICKNESS,
     ARROW_SIZE,
     RESOLUTION,
 )
+from tests.chopper_test_resources import EXPECTED_Z
 
 POINT_X = 2.0
 POINT_Y = 3.0
@@ -44,10 +44,11 @@ def expected_slit_boundary_face_points(center_to_slit_start: float, radius: floa
     :param radius: The radius of the disk chopper.
     :return: Four points that should be roughly equal to the points for slit boundary face.
     """
-    expected_upper_front = Point(radius, 0, HALF_THICKNESS)
-    expected_lower_front = Point(center_to_slit_start, 0, HALF_THICKNESS)
-    expected_upper_back = Point(radius, 0, -HALF_THICKNESS)
-    expected_lower_back = Point(center_to_slit_start, 0, -HALF_THICKNESS)
+
+    expected_upper_front = Point(radius, 0, EXPECTED_Z)
+    expected_lower_front = Point(center_to_slit_start, 0, EXPECTED_Z)
+    expected_upper_back = Point(radius, 0, -EXPECTED_Z)
+    expected_lower_back = Point(center_to_slit_start, 0, -EXPECTED_Z)
 
     return (
         expected_lower_back,
@@ -117,10 +118,8 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
     geometry_creator, chopper_details
 ):
 
-    expected_z = HALF_THICKNESS
-
     assert geometry_creator.faces == []
-    assert geometry_creator.z == expected_z
+    assert geometry_creator.z == EXPECTED_Z
     assert geometry_creator.arrow_size == ARROW_SIZE
     assert geometry_creator.resolution == RESOLUTION
 
@@ -130,7 +129,7 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
 
     assert len(geometry_creator.points) == 2
 
-    expected_points = [Point(0, 0, expected_z), Point(0, 0, -expected_z)]
+    expected_points = [Point(0, 0, EXPECTED_Z), Point(0, 0, -EXPECTED_Z)]
 
     for i in range(2):
         assert geometry_creator.points[i] == expected_points[i]
@@ -145,11 +144,11 @@ def test_GIVEN_polar_coordinates_WHEN_converting_polar_to_cartesian_THEN_expecte
 
 
 def test_GIVEN_polar_coordinates_WHEN_creating_mirrored_points_THEN_expected_points_are_returned(
-    geometry_creator
+    geometry_creator, chopper_details
 ):
 
-    expected_first_point = Point(1.0, 1.0, HALF_THICKNESS)
-    expected_second_point = Point(1.0, 1.0, -HALF_THICKNESS)
+    expected_first_point = Point(1.0, 1.0, EXPECTED_Z)
+    expected_second_point = Point(1.0, 1.0, -EXPECTED_Z)
 
     actual_first_point, actual_second_point = geometry_creator._create_mirrored_points(
         R, THETA
@@ -234,14 +233,14 @@ def test_GIVEN_face_should_look_left_WHEN_creating_and_adding_point_set_THEN_exp
 
 
 def test_GIVEN_r_and_theta_WHEN_creating_and_adding_mirrored_points_THEN_expected_points_are_created_and_added_to_list(
-    geometry_creator
+    geometry_creator, chopper_details
 ):
 
     r = 20
     theta = 0
 
-    expected_front_point = Point(r, 0, HALF_THICKNESS)
-    expected_back_point = Point(r, 0, -HALF_THICKNESS)
+    expected_front_point = Point(r, 0, EXPECTED_Z)
+    expected_back_point = Point(r, 0, -EXPECTED_Z)
 
     actual_front_point, actual_back_point = geometry_creator.create_and_add_mirrored_points(
         r, theta
@@ -314,16 +313,16 @@ def test_GIVEN_length_of_arrow_position_WHEN_adding_top_dead_centre_arrow_THEN_e
 
     length_of_arrow_position = 5
 
-    expected_centre_point = Point(length_of_arrow_position, 0, HALF_THICKNESS)
+    expected_centre_point = Point(length_of_arrow_position, 0, EXPECTED_Z)
     expected_left_point = Point(
         length_of_arrow_position - geometry_creator.arrow_size,
         0,
-        HALF_THICKNESS + geometry_creator.arrow_size,
+        EXPECTED_Z + geometry_creator.arrow_size,
     )
     expected_right_point = Point(
         length_of_arrow_position + geometry_creator.arrow_size,
         0,
-        HALF_THICKNESS + geometry_creator.arrow_size,
+        EXPECTED_Z + geometry_creator.arrow_size,
     )
 
     geometry_creator.add_top_dead_centre_arrow(length_of_arrow_position)
