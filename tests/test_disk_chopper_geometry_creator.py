@@ -533,3 +533,30 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_t
     for face in geometry_creator.faces:
         if len(face) == 3:
             assert front_centre_point_index in face or back_centre_point_index in face
+
+
+def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_connected_to_front_or_back_centre_all_have_expected_z_value(
+    geometry_creator
+):
+
+    geometry_creator.convert_chopper_details_to_off()
+
+    front_centre_point_index = 0
+    back_centre_point_index = 1
+
+    for face in geometry_creator.faces:
+        if len(face) == 3:
+
+            first_point = geometry_creator.points[face[1]]
+            second_point = geometry_creator.points[face[2]]
+
+            expected_z = 0
+
+            if front_centre_point_index in face:
+                expected_z = geometry_creator.z
+            if back_centre_point_index in face:
+                expected_z = -geometry_creator.z
+
+            assert np.isclose(first_point.z, expected_z) and np.isclose(
+                second_point.z, expected_z
+            )
