@@ -499,7 +499,7 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_all_points_h
     geometry_creator, chopper_details
 ):
 
-    geometry_creator.create_disk_chopper_geometry()
+    geometry_creator.convert_chopper_details_to_off()
 
     centre_to_bottom_of_slit = chopper_details.radius - chopper_details.slit_height
 
@@ -510,11 +510,22 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_all_points_h
         )
 
 
+def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_THEN_all_faces_contain_three_or_four_points(
+    geometry_creator
+):
+
+    geometry_creator.convert_chopper_details_to_off()
+    expected_face_sizes = [3, 4]
+
+    for face in geometry_creator.faces:
+        assert len(face) in expected_face_sizes
+
+
 def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_three_points_all_contain_front_or_back_centre_point(
     geometry_creator, chopper_details
 ):
 
-    geometry_creator.create_disk_chopper_geometry()
+    geometry_creator.convert_chopper_details_to_off()
 
     front_centre_point_index = 0
     back_centre_point_index = 1
