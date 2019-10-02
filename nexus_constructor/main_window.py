@@ -324,7 +324,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             chopper_checker = NexusDefinedChopperChecker(disk_chopper)
 
             if chopper_checker.validate_chopper():
-                self.sceneWidget.component(
+                self.sceneWidget.add_component(
                     disk_chopper["name"][()],
                     DiskChopperGeometryCreator(
                         chopper_checker.get_chopper_details()
