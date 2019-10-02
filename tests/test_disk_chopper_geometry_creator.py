@@ -499,13 +499,26 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_all_points_h
     geometry_creator, chopper_details
 ):
 
-    geometry_creator.resolution = 5
     geometry_creator.create_disk_chopper_geometry()
 
-    centre_to_slit = chopper_details.radius - chopper_details.slit_height
+    centre_to_bottom_of_slit = chopper_details.radius - chopper_details.slit_height
 
     for point in geometry_creator.points[2:]:
         distance_from_centre = np.sqrt(point.x ** 2 + point.y ** 2)
-        assert np.isclose(distance_from_centre, geometry_creator._radius) or np.isclose(
-            distance_from_centre, centre_to_slit
+        assert np.isclose(distance_from_centre, chopper_details.radius) or np.isclose(
+            distance_from_centre, centre_to_bottom_of_slit
         )
+
+
+def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_three_points_all_contain_front_or_back_centre_point(
+    geometry_creator, chopper_details
+):
+
+    geometry_creator.create_disk_chopper_geometry()
+
+    front_centre_point_index = 0
+    back_centre_point_index = 1
+
+    for face in geometry_creator.faces:
+        if len(face) == 3:
+            assert front_centre_point_index in face or back_centre_point_index in face
