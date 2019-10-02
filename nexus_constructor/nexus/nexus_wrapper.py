@@ -3,8 +3,6 @@ from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar, Optional
 import numpy as np
 
-from nexus_constructor.component_type import CHOPPER_CLASS_NAME
-
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
@@ -279,32 +277,3 @@ class NexusWrapper(QObject):
                 if "NX_class" in node.attrs.keys():
                     if node.attrs["NX_class"] in ["NXinstrument", b"NXinstrument"]:
                         return node
-
-    def get_disk_choppers(self):
-
-        return _NXDiskChopperFinder().get_NXdisk_chopper(self.nexus_file, "entry")
-
-
-class _NXDiskChopperFinder(object):
-    """
-    Finds disk chopper information in a NeXus file.
-    """
-
-    def __init__(self):
-        self.hits = []
-
-    def _visit_NXdisk_chopper(self, name, obj):
-        if "NX_class" in obj.attrs.keys():
-            try:
-                if str(obj.attrs["NX_class"], "utf8") == CHOPPER_CLASS_NAME:
-                    self.hits.append(obj)
-            except TypeError:
-                # If the file was created with the NeXus Constructor then its class doesn't require decoding
-                if obj.attrs["NX_class"] == CHOPPER_CLASS_NAME:
-                    self.hits.append(obj)
-
-    def get_NXdisk_chopper(self, nx_file, entry):
-        self.hits = []
-        nx_file[entry].visititems(self._visit_NXdisk_chopper)
-
-        return self.hits

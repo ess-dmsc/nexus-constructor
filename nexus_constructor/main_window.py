@@ -14,12 +14,6 @@ import os
 import h5py
 
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
-    NexusDefinedChopperChecker,
-)
-from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
-    DiskChopperGeometryCreator,
-)
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
@@ -64,7 +58,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.file_changed.connect(
             self.update_nexus_file_structure_view
         )
-        self.instrument.nexus.file_opened.connect(self.find_and_draw_disk_choppers)
         self.verticalLayout.addWidget(self.widget)
         self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
@@ -306,34 +299,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             # Set add component button to disabled, as it wouldn't work without the definitions.
             self.pushButton.setEnabled(False)
             self.warning_window.show()
-
-    def find_and_draw_disk_choppers(self):
-
-        disk_choppers = self.instrument.nexus.get_disk_choppers()
-
-        if not disk_choppers:
-            print("No choppers found.")
-            return
-
-        print(
-            "Found one or more disk choppers in the file. Attempting to construct mesh(es)..."
-        )
-
-        for disk_chopper in disk_choppers:
-
-            chopper_checker = NexusDefinedChopperChecker(disk_chopper)
-
-            if chopper_checker.validate_chopper():
-                self.sceneWidget.add_component(
-                    disk_chopper["name"][()],
-                    DiskChopperGeometryCreator(
-                        chopper_checker.get_chopper_details()
-                    ).create_disk_chopper_geometry(),
-                )
-            else:
-                print(
-                    "Validation failed. Unable to create disk chopper mesh. Defaulting to cube..."
-                )
 
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
