@@ -285,6 +285,7 @@ class NexusDefinedChopperChecker:
             self._disk_chopper[NAME][()],
 
         except KeyError:
+            print(self._radius_units)
             return False
 
         return True

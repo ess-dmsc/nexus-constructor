@@ -545,6 +545,7 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_connec
     back_centre_point_index = 1
 
     for face in geometry_creator.faces:
+
         if len(face) == 3:
 
             first_point = geometry_creator.points[face[1]]
@@ -560,3 +561,29 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_connec
             assert np.isclose(first_point.z, expected_z) and np.isclose(
                 second_point.z, expected_z
             )
+
+
+def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_four_points_have_two_on_front_and_two_on_back(
+    geometry_creator
+):
+
+    geometry_creator.convert_chopper_details_to_off()
+
+    front_z = geometry_creator.z
+    back_z = -geometry_creator.z
+
+    for face in geometry_creator.faces:
+
+        num_points_on_front = 0
+        num_points_on_back = 0
+
+        if len(face) == 4:
+
+            for point_index in face:
+
+                if np.isclose(geometry_creator.points[point_index].z, front_z):
+                    num_points_on_front += 1
+                if np.isclose(geometry_creator.points[point_index].z, back_z):
+                    num_points_on_back += 1
+
+            assert num_points_on_front == 2 and num_points_on_back == 2
