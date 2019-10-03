@@ -414,7 +414,7 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
 ):
 
     user_defined_chopper_checker.validate_chopper()
-    details = user_defined_chopper_checker.get_chopper_details()
+    details = user_defined_chopper_checker.chopper_details
 
     radian_slit_edges = CONVERT_DEGREES_TO_RADIANS(mock_slit_edges_widget.value)
 
@@ -429,7 +429,7 @@ def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_de
 ):
 
     user_defined_chopper_checker.validate_chopper()
-    chopper_details = user_defined_chopper_checker.get_chopper_details()
+    chopper_details = user_defined_chopper_checker.chopper_details
 
     assert chopper_details.slits == N_SLITS
     assert chopper_details.radius == RADIUS_LENGTH
@@ -549,7 +549,7 @@ def test_GIVEN_validation_passes_WHEN_validating_nexus_disk_chopper_THEN_chopper
 ):
 
     nexus_defined_chopper_checker.validate_chopper()
-    chopper_details = nexus_defined_chopper_checker.get_chopper_details()
+    chopper_details = nexus_defined_chopper_checker.chopper_details
 
     assert chopper_details.slits == N_SLITS
     assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
