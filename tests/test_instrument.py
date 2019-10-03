@@ -146,7 +146,7 @@ def test_dependents_list_is_created_by_instrument():
 
 
 def test_GIVEN_dot_separated_field_name_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
-    wrapper = NexusWrapper("test_sterams_dict")
+    wrapper = NexusWrapper("test_streams_dict")
     inst = Instrument(wrapper)
 
     streams_group = wrapper.entry.create_group("streams")
@@ -165,7 +165,7 @@ def test_GIVEN_dot_separated_field_name_WHEN_getting_streams_THEN_dict_is_return
 
 
 def test_GIVEN_several_dot_separated_field_names_with_similar_prefixes_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
-    wrapper = NexusWrapper("test_sterams_dict")
+    wrapper = NexusWrapper("test_streams_dict_multiple")
     inst = Instrument(wrapper)
 
     streams_group = wrapper.entry.create_group("streams")
