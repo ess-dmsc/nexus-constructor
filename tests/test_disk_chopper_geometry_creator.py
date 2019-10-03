@@ -683,3 +683,8 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     assert geometry_creator.faces[5] == [10, 11, 9, 8]
     assert geometry_creator.faces[6] == [0, 10, 8]
     assert geometry_creator.faces[7] == [1, 9, 11]
+
+    # Test for the next pair of points
+    x, y = find_x(radius, angles[2]), find_y(radius, angles[2])
+    assert geometry_creator.points[12] == Point(x, y, z)
+    assert geometry_creator.points[13] == Point(x, y, -z)
