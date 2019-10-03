@@ -721,3 +721,12 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
 
     # Test for the top dead centre arrow face
     assert [18, 19, 20] in geometry_creator.faces
+
+
+def test_GIVEN_completed_mesh_WHEN_creating_off_geometry_THEN_off_geometry_has_expected_values(
+    geometry_creator
+):
+
+    off_geometry = geometry_creator.create_disk_chopper_geometry()
+
+    assert geometry_creator.faces == off_geometry.faces
