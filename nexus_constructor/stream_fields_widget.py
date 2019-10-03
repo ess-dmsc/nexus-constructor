@@ -35,7 +35,12 @@ F142_TYPES = [
 
 STRING_DTYPE = h5py.special_dtype(vlen=str)
 
+
 class StreamFieldsWidget(QDialog):
+    """
+    A stream widget containing schema-specific properties. 
+    """
+
     def __init__(self, parent):
         super().__init__()
         self.setParent(parent)
@@ -332,9 +337,18 @@ class StreamFieldsWidget(QDialog):
         return stream_group
 
     def _create_ev42_fields(self, stream_group: h5py.Group):
-        pass
+        """
+        Create ev42 fields in the given group if advanced options are specified.
+        :param stream_group: The group to apply fields to.
+        """
+        if self.ev42_advanced_group_box.isVisible():
+            pass
 
     def _create_f142_fields(self, stream_group: h5py.Group):
+        """
+        Create f142 fields in the given group if advanced options are specified.
+        :param stream_group: The group to apply fields to.
+        """
         stream_group.create_dataset(
             "type", dtype=STRING_DTYPE, data=self.type_combo.currentText()
         )
