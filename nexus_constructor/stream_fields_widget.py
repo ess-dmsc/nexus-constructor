@@ -33,6 +33,7 @@ F142_TYPES = [
     "string",
 ]
 
+STRING_DTYPE = h5py.special_dtype(vlen=str)
 
 class StreamFieldsWidget(QDialog):
     def __init__(self, parent):
@@ -301,36 +302,41 @@ class StreamFieldsWidget(QDialog):
         Create the stream group with a temporary in-memory HDF5 file.
         :return: The created HDF group.
         """
-        string_dtype = h5py.special_dtype(vlen=str)
+
         temp_file = h5py.File(
             name=str(uuid.uuid4()), driver="core", backing_store=False
         )
         group = temp_file.create_group("children")
-        group.create_dataset(name="type", dtype=string_dtype, data="stream")
+        group.create_dataset(name="type", dtype=STRING_DTYPE, data="stream")
         stream_group = group.create_group(self.parent().parent().name)
         stream_group.attrs["NX_class"] = "NCstream"
         stream_group.create_dataset(
-            name="topic", dtype=string_dtype, data=self.topic_line_edit.text()
+            name="topic", dtype=STRING_DTYPE, data=self.topic_line_edit.text()
         )
         stream_group.create_dataset(
             name="writer_module",
-            dtype=string_dtype,
+            dtype=STRING_DTYPE,
             data=self.schema_combo.currentText(),
         )
 
         schema = self.schema_combo.currentText()
 
         if schema == "f142":
-            self.create_f142_fields(stream_group, string_dtype)
+            self._create_f142_fields(stream_group)
         if schema != "ev42":
             stream_group.create_dataset(
-                "source", dtype=string_dtype, data=self.source_line_edit.text()
+                "source", dtype=STRING_DTYPE, data=self.source_line_edit.text()
             )
+        elif schema == "ev42":
+            self._create_ev42_fields(stream_group)
         return stream_group
 
-    def create_f142_fields(self, stream_group, string_dtype):
+    def _create_ev42_fields(self, stream_group: h5py.Group):
+        pass
+
+    def _create_f142_fields(self, stream_group: h5py.Group):
         stream_group.create_dataset(
-            "type", dtype=string_dtype, data=self.type_combo.currentText()
+            "type", dtype=STRING_DTYPE, data=self.type_combo.currentText()
         )
         if self.array_radio.isChecked():
             stream_group.create_dataset(
