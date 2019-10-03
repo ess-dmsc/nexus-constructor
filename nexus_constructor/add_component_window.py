@@ -357,7 +357,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 and chopper_checker.validate_chopper()
             ):
                 geometry_model = DiskChopperGeometryCreator(
-                    chopper_checker.get_chopper_details()
+                    chopper_checker.chopper_details
                 ).create_disk_chopper_geometry()
             else:
                 geometry_model = NoShapeGeometry()

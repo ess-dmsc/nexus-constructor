@@ -21,7 +21,7 @@ class ChopperComponent(Component):
         chopper_checker = NexusDefinedChopperChecker(self.group)
         if chopper_checker.validate_chopper():
             return DiskChopperGeometryCreator(
-                chopper_checker.get_chopper_details()
+                chopper_checker.chopper_details
             ).create_disk_chopper_geometry()
         else:
             print("Validation failed. Unable to create disk chopper mesh.")
