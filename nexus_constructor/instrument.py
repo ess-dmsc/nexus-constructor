@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict
+from typing import List, Dict, Any, Tuple
 
 import h5py
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
@@ -13,6 +13,20 @@ COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
 def _convert_name_with_spaces(component_name):
     return component_name.replace(" ", "_")
+
+
+def _separate_dot_field_group_hierarchy(
+    item_dict: Dict[Any], dots_in_field_name: List[str], item: Tuple[str, h5py.Group]
+):
+    previous_group = item_dict
+    for subgroup in dots_in_field_name:
+        # do not overwrite a group unless it doesn't yet exist
+        if subgroup not in previous_group:
+            previous_group[subgroup] = dict()
+        if subgroup == dots_in_field_name[-1]:
+            # set the value of the field to the last item in the list
+            previous_group[subgroup] = str(item[1][...])
+        previous_group = previous_group[subgroup]
 
 
 class Instrument:
@@ -111,15 +125,9 @@ class Instrument:
                         for item in node.items():
                             dots_in_field_name = item[0].split(".")
                             if len(dots_in_field_name) > 1:
-                                previous_group = item_dict
-                                for subgroup in dots_in_field_name:
-                                    # do not overwrite a group unless it doesn't yet exist
-                                    if subgroup not in previous_group:
-                                        previous_group[subgroup] = dict()
-                                    if subgroup == dots_in_field_name[-1]:
-                                        # set the value of the field to the last item in the list
-                                        previous_group[subgroup] = str(item[1][...])
-                                    previous_group = previous_group[subgroup]
+                                _separate_dot_field_group_hierarchy(
+                                    item_dict, dots_in_field_name, item
+                                )
                             else:
                                 item_dict[item[0]] = str(item[1][...])
                         streams_dict[node.name] = item_dict
