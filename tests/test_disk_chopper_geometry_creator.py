@@ -730,3 +730,6 @@ def test_GIVEN_completed_mesh_WHEN_creating_off_geometry_THEN_off_geometry_has_e
     off_geometry = geometry_creator.create_disk_chopper_geometry()
 
     assert geometry_creator.faces == off_geometry.faces
+
+    for point, qvector in zip(geometry_creator.points, off_geometry.vertices):
+        assert point.point_to_qvector3d() == qvector
