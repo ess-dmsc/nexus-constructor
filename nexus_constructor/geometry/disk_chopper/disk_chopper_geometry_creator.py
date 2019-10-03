@@ -6,7 +6,6 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 
-ARROW_SIZE = 0.1
 RESOLUTION = 20
 
 
