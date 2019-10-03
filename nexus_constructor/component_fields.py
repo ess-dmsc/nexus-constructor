@@ -27,6 +27,7 @@ from nexus_constructor.validators import (
     NameValidator,
     HDFLocationExistsValidator,
 )
+import numpy as np
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -177,7 +178,8 @@ class FieldWidget(QFrame):
                 ).create_dataset(name=self.name, dtype=dtype, data=val)
             return dtype(val)
         elif self.field_type == FieldType.array_dataset:
-            return self.table_view.model.array
+            # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
+            return np.squeeze(self.table_view.model.array)
         elif self.field_type == FieldType.link:
             return h5py.SoftLink(self.value_line_edit.text())
 
