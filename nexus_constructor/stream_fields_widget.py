@@ -14,6 +14,7 @@ from PySide2.QtWidgets import (
     QGroupBox,
     QRadioButton,
     QCheckBox,
+    QFormLayout,
 )
 import numpy as np
 
@@ -124,10 +125,10 @@ class StreamFieldsWidget(QDialog):
         self.ev42_advanced_group_box = QGroupBox(
             parent=self.show_advanced_options_button
         )
-        self.ev42_advanced_group_box.setLayout(QGridLayout())
+        self.ev42_advanced_group_box.setLayout(QFormLayout())
 
-        self.adc_pulse_debug_label = QLabel("adc_pulse_debug")
-        self.adc_pulse_debug_checkbox = QCheckBox()
+        self.ev42_adc_pulse_debug_label = QLabel("adc_pulse_debug")
+        self.ev42_adc_pulse_debug_checkbox = QCheckBox()
 
         minimum_value = 0
         maximum_value = 100000000
@@ -172,21 +173,34 @@ class StreamFieldsWidget(QDialog):
             minimum_value, maximum_value
         )
 
-        self.ev42_advanced_group_box.layout().addWidget(
-            self.ev42_nexus_indices_index_every_mb_label, 0, 0
+        self.ev42_advanced_group_box.layout().addRow(
+            self.ev42_adc_pulse_debug_label, self.ev42_adc_pulse_debug_checkbox
         )
-        self.ev42_advanced_group_box.layout().addWidget(
-            self.ev42_nexus_indices_index_every_mb_spinbox, 0, 1
+        self.ev42_advanced_group_box.layout().addRow(
+            self.ev42_nexus_indices_index_every_mb_label,
+            self.ev42_nexus_indices_index_every_mb_spinbox,
+        )
+        self.ev42_advanced_group_box.layout().addRow(
+            self.ev42_nexus_indices_index_every_kb_label,
+            self.ev42_nexus_indices_index_every_kb_spinbox,
+        )
+        self.ev42_advanced_group_box.layout().addRow(
+            self.ev42_nexus_chunk_chunk_mb_label, self.ev42_nexus_chunk_chunk_mb_spinbox
+        )
+        self.ev42_advanced_group_box.layout().addRow(
+            self.ev42_nexus_chunk_chunk_kb_label, self.ev42_nexus_chunk_chunk_kb_spinbox
+        )
+        self.ev42_advanced_group_box.layout().addRow(
+            self.ev42_nexus_buffer_size_mb_label, self.ev42_nexus_buffer_size_mb_spinbox
+        )
+        self.ev42_advanced_group_box.layout().addRow(
+            self.ev42_nexus_buffer_size_kb_label, self.ev42_nexus_buffer_size_kb_spinbox
+        )
+        self.ev42_advanced_group_box.layout().addRow(
+            self.ev42_nexus_buffer_packet_max_kb_label,
+            self.ev42_nexus_buffer_packet_max_kb_spinbox,
         )
 
-        self.ev42_advanced_group_box.layout().addWidget(
-            self.ev42_nexus_indices_index_every_kb_label, 1, 0
-        )
-        self.ev42_advanced_group_box.layout().addWidget(
-            self.ev42_nexus_indices_index_every_kb_spinbox, 1, 1
-        )
-
-        # TODO: add the rest
         # TODO: add these to stream group
 
     def _set_up_f142_group_box(self):
