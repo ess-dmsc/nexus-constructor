@@ -415,11 +415,6 @@ class StreamFieldsWidget(QDialog):
                 data=self.f142_nexus_indices_index_every_mb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.nexus_chunk_mb_label.text(),
-                dtype=int,
-                data=self.nexus_chunk_mb_spinbox.value(),
-            )
-            stream_group.create_dataset(
                 self.f142_nexus_indices_index_every_kb_label.text(),
                 dtype=int,
                 data=self.f142_nexus_indices_index_every_kb_spinbox.value(),
