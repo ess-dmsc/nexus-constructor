@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 import numpy as np
 
@@ -19,6 +21,17 @@ THETA = np.deg2rad(45)
 
 def create_list_of_ids(*points: Point):
     return [point.id for point in points]
+
+
+def print_off_details(points: List[Point], faces: List[List[int]]):
+
+    print("")
+
+    for count, point in enumerate(points):
+        print(count, "-", point.x, point.y, point.z)
+
+    for count, face in enumerate(faces):
+        print(count, "-", len(face), " ".join([str(index) for index in face]))
 
 
 @pytest.fixture(scope="function")
@@ -598,7 +611,7 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     geometry_creator.resolution = 5
     geometry_creator._radius = radius = 1
     geometry_creator._slit_height = slit_height = 0.5
-    geometry_creator._slit_edges = np.array([0.0, 90.0])
+    geometry_creator._slit_edges = np.array([0.0, np.deg2rad(90)])
     geometry_creator.convert_chopper_details_to_off()
 
     z = geometry_creator.z
@@ -614,3 +627,11 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     assert geometry_creator.points[5] == Point(slit_height, 0, -z)
 
     assert geometry_creator.faces[0] == [4, 2, 3, 5]
+
+    # Check the next four points that make form the "left" slit boundary
+    assert geometry_creator.points[6] == Point(0, radius, z)
+    assert geometry_creator.points[7] == Point(0, radius, -z)
+    assert geometry_creator.points[8] == Point(0, slit_height, z)
+    assert geometry_creator.points[9] == Point(0, slit_height, -z)
+
+    assert geometry_creator.faces[1] == [9, 7, 6, 8]
