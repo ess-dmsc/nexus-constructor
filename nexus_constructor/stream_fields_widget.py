@@ -62,6 +62,12 @@ class StreamFieldsWidget(QDialog):
         self.type_combo = QComboBox()
         self.type_combo.addItems(F142_TYPES)
 
+        self.show_advanced_options_button = QPushButton(
+            text="Show/hide advanced options"
+        )
+        self.show_advanced_options_button.setCheckable(True)
+        self.show_advanced_options_button.clicked.connect(self._show_advanced_options)
+
         self._set_up_f142_group_box()
         self._set_up_ev42_group_box()
 
@@ -100,13 +106,12 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.hs00_unimplemented_label, 6, 0, 1, 2)
 
         # Spans both rows
-        self.layout().addWidget(self.show_f142_advanced_options_button, 7, 0, 1, 2)
+        self.layout().addWidget(self.show_advanced_options_button, 7, 0, 1, 2)
         self.layout().addWidget(self.f142_advanced_group_box, 8, 0, 1, 2)
 
-        self.layout().addWidget(self.show_ev42_advanced_options_button, 9, 0, 1, 2)
-        self.layout().addWidget(self.ev42_advanced_group_box, 10, 0, 1, 2)
+        self.layout().addWidget(self.ev42_advanced_group_box, 9, 0, 1, 2)
 
-        self.layout().addWidget(self.ok_button, 11, 0, 1, 2)
+        self.layout().addWidget(self.ok_button, 10, 0, 1, 2)
 
         self._schema_type_changed(self.schema_combo.currentText())
 
@@ -114,18 +119,9 @@ class StreamFieldsWidget(QDialog):
         """
         Sets up the UI for ev42 advanced options.
         """
-        self.show_ev42_advanced_options_button = QPushButton(
-            text="Show/hide ev42 advanced options"
-        )
-        self.show_ev42_advanced_options_button.setCheckable(True)
+
         self.ev42_advanced_group_box = QGroupBox(
-            parent=self.show_ev42_advanced_options_button
-        )
-        self.show_ev42_advanced_options_button.clicked.connect(
-            self._show_advanced_options
-        )
-        self.ev42_advanced_group_box = QGroupBox(
-            parent=self.show_ev42_advanced_options_button
+            parent=self.show_advanced_options_button
         )
         self.ev42_advanced_group_box.setLayout(QGridLayout())
 
@@ -133,16 +129,10 @@ class StreamFieldsWidget(QDialog):
         """
         Sets up the UI for the f142 advanced options.
         """
-        self.show_f142_advanced_options_button = QPushButton(
-            text="Show/hide f142 advanced options"
-        )
-        self.show_f142_advanced_options_button.setCheckable(True)
         self.f142_advanced_group_box = QGroupBox(
-            parent=self.show_f142_advanced_options_button
+            parent=self.show_advanced_options_button
         )
-        self.show_f142_advanced_options_button.clicked.connect(
-            self._show_advanced_options
-        )
+
         self.f142_advanced_group_box.setLayout(QGridLayout())
         minimum_value = 0
         maximum_value = 100000000
@@ -194,16 +184,15 @@ class StreamFieldsWidget(QDialog):
         self.hs00_unimplemented_label.setVisible(False)
         self.f142_advanced_group_box.setVisible(False)
         self.ev42_advanced_group_box.setVisible(False)
-        self.show_f142_advanced_options_button.setVisible(False)
-        self.show_ev42_advanced_options_button.setVisible(False)
+        self.show_advanced_options_button.setVisible(False)
         if schema == "f142":
             self._set_edits_visible(True, True)
-            self.show_f142_advanced_options_button.setVisible(True)
+            self.show_advanced_options_button.setVisible(True)
             self.f142_advanced_group_box.setVisible(False)
         elif schema == "ev42":
             self._set_edits_visible(False, False)
-            self.show_ev42_advanced_options_button.setVisible(True)
-            self.ev42_advanced_group_box.setVisible(True)
+            self.show_advanced_options_button.setVisible(True)
+            self.ev42_advanced_group_box.setVisible(False)
         elif schema == "hs00":
             self._set_edits_visible(True, False)
             self.hs00_unimplemented_label.setVisible(True)
