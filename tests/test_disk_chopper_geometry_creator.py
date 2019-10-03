@@ -637,15 +637,15 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
         radius_units="m",
     )
     geometry_creator = DiskChopperGeometryCreator(chopper_details)
-
     geometry_creator.resolution = 5
 
-    z = radius * 0.025
-    geometry_creator.z = z
+    z = geometry_creator.z
 
     geometry_creator.convert_chopper_details_to_off()
 
-    print_off_details(geometry_creator.points, geometry_creator.faces)
+    # Check the centre points
+    assert geometry_creator.points[0] == Point(0, 0, z)
+    assert geometry_creator.points[1] == Point(0, 0, -z)
 
     # Check the next four points that make form the "right" slit boundary
     assert geometry_creator.points[2] == Point(radius, 0, z)
