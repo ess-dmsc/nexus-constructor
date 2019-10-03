@@ -29,6 +29,7 @@ from nexus_constructor.validators import (
     NameValidator,
     HDFLocationExistsValidator,
 )
+import numpy as np
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -183,7 +184,8 @@ class FieldWidget(QFrame):
                 ).create_dataset(name=self.name, dtype=dtype, data=val)
             return dtype(val)
         if self.field_type == FieldType.array_dataset:
-            return self.table_view.model.array
+            # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
+            return np.squeeze(self.table_view.model.array)
         if self.field_type == FieldType.kafka_stream:
             return self.streams_widget.get_stream_group()
         if self.field_type == FieldType.link:
