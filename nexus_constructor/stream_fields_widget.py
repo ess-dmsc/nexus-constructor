@@ -342,7 +342,46 @@ class StreamFieldsWidget(QDialog):
         :param stream_group: The group to apply fields to.
         """
         if self.ev42_advanced_group_box.isVisible():
-            pass
+            stream_group.create_dataset(
+                self.ev42_adc_pulse_debug_label.text(),
+                dtype=bool,
+                data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
+            )
+            stream_group.create_dataset(
+                self.ev42_nexus_indices_index_every_mb_label.text(),
+                dtype=int,
+                data=self.ev42_nexus_indices_index_every_mb_spinbox.value(),
+            )
+            stream_group.create_dataset(
+                self.ev42_nexus_indices_index_every_kb_label.text(),
+                dtype=int,
+                data=self.ev42_nexus_indices_index_every_kb_spinbox.value(),
+            )
+            stream_group.create_dataset(
+                self.ev42_nexus_chunk_chunk_mb_label.text(),
+                dtype=int,
+                data=self.ev42_nexus_chunk_chunk_mb_spinbox.value(),
+            )
+            stream_group.create_dataset(
+                self.ev42_nexus_chunk_chunk_kb_label.text(),
+                dtype=int,
+                data=self.ev42_nexus_chunk_chunk_kb_spinbox.value(),
+            )
+            stream_group.create_dataset(
+                self.ev42_nexus_buffer_size_mb_label.text(),
+                dtype=int,
+                data=self.ev42_nexus_buffer_size_mb_spinbox.value(),
+            )
+            stream_group.create_dataset(
+                self.ev42_nexus_buffer_size_kb_label.text(),
+                dtype=int,
+                data=self.ev42_nexus_buffer_size_kb_spinbox.value(),
+            )
+            stream_group.create_dataset(
+                self.ev42_nexus_buffer_packet_max_kb_label.text(),
+                dtype=int,
+                data=self.ev42_nexus_buffer_packet_max_kb_spinbox.value(),
+            )
 
     def _create_f142_fields(self, stream_group: h5py.Group):
         """
