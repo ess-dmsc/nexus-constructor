@@ -325,7 +325,9 @@ def test_GIVEN_length_of_arrow_position_WHEN_adding_top_dead_centre_arrow_THEN_e
         EXPECTED_Z + geometry_creator.arrow_size,
     )
 
-    geometry_creator.add_top_dead_centre_arrow(length_of_arrow_position)
+    geometry_creator.add_top_dead_centre_arrow(
+        length_of_arrow_position, expected_centre_point
+    )
 
     assert geometry_creator.points[-3] == expected_centre_point
     assert geometry_creator.points[-2] == expected_right_point
@@ -587,3 +589,28 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_f
                     num_points_on_back += 1
 
             assert num_points_on_front == 2 and num_points_on_back == 2
+
+
+def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_mesh_has_expected_shape(
+    geometry_creator
+):
+
+    geometry_creator.resolution = 5
+    geometry_creator._radius = radius = 1
+    geometry_creator._slit_height = slit_height = 0.5
+    geometry_creator._slit_edges = np.array([0.0, 90.0])
+    geometry_creator.convert_chopper_details_to_off()
+
+    z = geometry_creator.z
+
+    # Check the first two centre points
+    assert geometry_creator.points[0] == Point(0, 0, z)
+    assert geometry_creator.points[1] == Point(0, 0, -z)
+
+    # Check the next four points that make form the "right" slit boundary
+    assert geometry_creator.points[2] == Point(radius, 0, z)
+    assert geometry_creator.points[3] == Point(radius, 0, -z)
+    assert geometry_creator.points[4] == Point(slit_height, 0, z)
+    assert geometry_creator.points[5] == Point(slit_height, 0, -z)
+
+    assert geometry_creator.faces[0] == [4, 2, 3, 5]

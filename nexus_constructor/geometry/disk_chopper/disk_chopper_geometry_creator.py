@@ -145,17 +145,19 @@ class DiskChopperGeometryCreator:
             self.resolution_angles, first_angle, second_angle
         )
 
-        if 0 in intermediate_angles:
-            self.add_top_dead_centre_arrow(r)
-
         prev_front = first_front
         prev_back = first_back
+
+        zero_point = None
 
         for angle in intermediate_angles:
 
             current_back, current_front = self.create_cake_slice(
                 angle, prev_back, prev_front, r
             )
+
+            if angle == 0:
+                zero_point = current_front
 
             prev_front = current_front
             prev_back = current_back
@@ -166,6 +168,9 @@ class DiskChopperGeometryCreator:
         # Create the final faces connected to the front and back centre points
         self.add_face_connected_to_front_centre([prev_front, second_front])
         self.add_face_connected_to_back_centre([second_back, prev_back])
+
+        if 0 in intermediate_angles:
+            self.add_top_dead_centre_arrow(r, zero_point)
 
     @staticmethod
     def create_resolution_angles(resolution: int) -> np.ndarray:
@@ -361,7 +366,7 @@ class DiskChopperGeometryCreator:
         ids = [point.id for point in points]
         self.faces.append(ids)
 
-    def add_top_dead_centre_arrow(self, r: float):
+    def add_top_dead_centre_arrow(self, r: float, zero_point: Point):
         """
         Adds a 2D arrow to the mesh in order to illustrate the location of the top dead centre.
         :param r: The distance between the disk centre and the top dead centre arrow.
@@ -371,7 +376,7 @@ class DiskChopperGeometryCreator:
         zero = 0
 
         arrow_points = [
-            Point(r, zero, self.z),
+            zero_point,
             Point(r + self.arrow_size, zero, self.z + self.arrow_size),
             Point(r - self.arrow_size, zero, self.z + self.arrow_size),
         ]
