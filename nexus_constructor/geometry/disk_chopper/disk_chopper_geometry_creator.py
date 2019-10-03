@@ -128,7 +128,7 @@ class DiskChopperGeometryCreator:
         first_back: Point,
         second_front: Point,
         second_back: Point,
-        r,
+        r: float,
     ):
         """
         Create additional points and faces between the slit edges to make the mesh look smoother.
