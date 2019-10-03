@@ -3,6 +3,7 @@ from typing import List
 import pytest
 import numpy as np
 
+from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     Point,
     DiskChopperGeometryCreator,
@@ -622,21 +623,29 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_f
             assert num_points_on_front == 2 and num_points_on_back == 2
 
 
-def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_mesh_has_expected_shape(
-    geometry_creator
-):
+def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_mesh_has_expected_shape():
+
+    radius = 1
+    slit_height = 0.5
+    chopper_details = ChopperDetails(
+        slits=1,
+        slit_edges=np.array([0.0, np.deg2rad(90)]),
+        radius=radius,
+        slit_height=slit_height,
+        angle_units="rad",
+        slit_height_units="m",
+        radius_units="m",
+    )
+    geometry_creator = DiskChopperGeometryCreator(chopper_details)
 
     geometry_creator.resolution = 5
-    geometry_creator._radius = radius = 1
-    geometry_creator._slit_height = slit_height = 0.5
-    geometry_creator._slit_edges = np.array([0.0, np.deg2rad(90)])
 
     z = radius * 0.025
     geometry_creator.z = z
 
     geometry_creator.convert_chopper_details_to_off()
 
-    # print_off_details(geometry_creator.points, geometry_creator.faces)
+    print_off_details(geometry_creator.points, geometry_creator.faces)
 
     # Check the next four points that make form the "right" slit boundary
     assert geometry_creator.points[2] == Point(radius, 0, z)
