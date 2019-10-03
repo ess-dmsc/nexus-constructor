@@ -513,8 +513,7 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
     )
 
 
-@pytest.mark.xfail
-def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_all_points_have_expected_distance_from_centre(
+def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_points_not_in_top_dead_centre_arrow_have_expected_distance_from_centres(
     geometry_creator, chopper_details
 ):
 
@@ -522,7 +521,7 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_all_points_h
 
     centre_to_bottom_of_slit = chopper_details.radius - chopper_details.slit_height
 
-    for point in geometry_creator.points[2:]:
+    for point in geometry_creator.points[2:-2]:
         distance_from_centre = np.sqrt(point.x ** 2 + point.y ** 2)
         assert np.isclose(distance_from_centre, chopper_details.radius) or np.isclose(
             distance_from_centre, centre_to_bottom_of_slit
@@ -710,3 +709,15 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
 
     # Test for the remaining connection in the chopper
     check_cake_slice_faces([16, 17, 3, 2])
+
+    # Test for the points in the top dead centre arrow
+    assert geometry_creator.points[18] == Point(radius, 0, z)
+    assert geometry_creator.points[19] == Point(
+        radius + geometry_creator.arrow_size, 0, z + geometry_creator.arrow_size
+    )
+    assert geometry_creator.points[20] == Point(
+        radius - geometry_creator.arrow_size, 0, z + geometry_creator.arrow_size
+    )
+
+    # Test for the top dead centre arrow face
+    assert [18, 19, 20] in geometry_creator.faces
