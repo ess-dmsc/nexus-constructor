@@ -38,7 +38,7 @@ STRING_DTYPE = h5py.special_dtype(vlen=str)
 
 class StreamFieldsWidget(QDialog):
     """
-    A stream widget containing schema-specific properties. 
+    A stream widget containing schema-specific properties.
     """
 
     def __init__(self, parent):
