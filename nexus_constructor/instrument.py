@@ -16,7 +16,7 @@ def _convert_name_with_spaces(component_name):
 
 
 def _separate_dot_field_group_hierarchy(
-    item_dict: Dict[Any], dots_in_field_name: List[str], item: Tuple[str, h5py.Group]
+    item_dict: Dict[Any, Any], dots_in_field_name: List[str], item: Tuple[str, h5py.Group]
 ):
     previous_group = item_dict
     for subgroup in dots_in_field_name:

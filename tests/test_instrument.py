@@ -143,3 +143,47 @@ def test_dependents_list_is_created_by_instrument():
     assert (
         len(transform_2_loaded.get_dependents()) == 2
     ), "Expected transform 2 to have 2 registered dependents (transforms 3 and 4)"
+
+
+def test_GIVEN_dot_separated_field_name_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
+    wrapper = NexusWrapper("test_sterams_dict")
+    inst = Instrument(wrapper)
+
+    streams_group = wrapper.entry.create_group("streams")
+    streams_group.attrs["NX_class"] = "NCstream"
+
+    name = "nexus.indices.index_every_mb"
+    val = 1000
+
+    streams_group.create_dataset(name=name, dtype=int, data=val)
+
+    streams = inst.get_streams()
+
+    assert "nexus" in streams["/entry/streams"]
+    assert "indices" in streams["/entry/streams"]["nexus"]
+    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_mb"] == str(val)
+
+
+def test_GIVEN_several_dot_separated_field_names_with_similar_prefixes_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
+    wrapper = NexusWrapper("test_sterams_dict")
+    inst = Instrument(wrapper)
+
+    streams_group = wrapper.entry.create_group("streams")
+    streams_group.attrs["NX_class"] = "NCstream"
+
+    name = "nexus.indices.index_every_mb"
+    val = 1000
+
+    streams_group.create_dataset(name=name, dtype=int, data=val)
+
+    name2 = "nexus.indices.index_every_kb"
+    val2 = 2000
+
+    streams_group.create_dataset(name=name2, dtype=int, data=val2)
+
+    streams = inst.get_streams()
+
+    assert "nexus" in streams["/entry/streams"]
+    assert "indices" in streams["/entry/streams"]["nexus"]
+    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_mb"] == str(val)
+    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_kb"] == str(val2)
