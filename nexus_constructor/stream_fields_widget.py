@@ -62,49 +62,7 @@ class StreamFieldsWidget(QDialog):
         self.type_combo = QComboBox()
         self.type_combo.addItems(F142_TYPES)
 
-        self.show_f142_advanced_options_button = QPushButton(
-            text="Show/hide advanced options"
-        )
-        self.show_f142_advanced_options_button.setCheckable(True)
-
-        self.f142_advanced_group_box = QGroupBox(
-            parent=self.show_f142_advanced_options_button
-        )
-        self.show_f142_advanced_options_button.clicked.connect(
-            self._show_advanced_options
-        )
-        self.f142_advanced_group_box.setLayout(QGridLayout())
-        minimum_value = 0
-        maximum_value = 100000000
-        self.nexus_indices_index_every_mb_label = QLabel("nexus.indices.index_every_mb")
-        self.nexus_indices_index_every_mb_spinbox = QSpinBox()
-        self.nexus_indices_index_every_mb_spinbox.setRange(minimum_value, maximum_value)
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_indices_index_every_mb_label, 0, 0
-        )
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_indices_index_every_mb_spinbox, 0, 1
-        )
-
-        self.nexus_indices_index_every_kb_label = QLabel("nexus.indices.index_every_kb")
-        self.nexus_indices_index_every_kb_spinbox = QSpinBox()
-        self.nexus_indices_index_every_kb_spinbox.setRange(minimum_value, maximum_value)
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_indices_index_every_kb_label, 2, 0
-        )
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_indices_index_every_kb_spinbox, 2, 1
-        )
-
-        self.nexus_store_latest_into_label = QLabel("store_latest_into")
-        self.nexus_store_latest_into_spinbox = QSpinBox()
-        self.nexus_store_latest_into_spinbox.setRange(minimum_value, maximum_value)
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_store_latest_into_label, 3, 0
-        )
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_store_latest_into_spinbox, 3, 1
-        )
+        self._set_up_f142_group_box()
 
         self.scalar_radio = QRadioButton(text="Scalar")
         self.scalar_radio.clicked.connect(partial(self._show_array_size, False))
@@ -148,6 +106,48 @@ class StreamFieldsWidget(QDialog):
 
         self._schema_type_changed(self.schema_combo.currentText())
 
+    def _set_up_f142_group_box(self):
+        self.show_f142_advanced_options_button = QPushButton(
+            text="Show/hide advanced options"
+        )
+        self.show_f142_advanced_options_button.setCheckable(True)
+        self.f142_advanced_group_box = QGroupBox(
+            parent=self.show_f142_advanced_options_button
+        )
+        self.show_f142_advanced_options_button.clicked.connect(
+            self._show_advanced_options
+        )
+        self.f142_advanced_group_box.setLayout(QGridLayout())
+        minimum_value = 0
+        maximum_value = 100000000
+        self.nexus_indices_index_every_mb_label = QLabel("nexus.indices.index_every_mb")
+        self.nexus_indices_index_every_mb_spinbox = QSpinBox()
+        self.nexus_indices_index_every_mb_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_indices_index_every_mb_label, 0, 0
+        )
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_indices_index_every_mb_spinbox, 0, 1
+        )
+        self.nexus_indices_index_every_kb_label = QLabel("nexus.indices.index_every_kb")
+        self.nexus_indices_index_every_kb_spinbox = QSpinBox()
+        self.nexus_indices_index_every_kb_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_indices_index_every_kb_label, 2, 0
+        )
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_indices_index_every_kb_spinbox, 2, 1
+        )
+        self.nexus_store_latest_into_label = QLabel("store_latest_into")
+        self.nexus_store_latest_into_spinbox = QSpinBox()
+        self.nexus_store_latest_into_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_store_latest_into_label, 3, 0
+        )
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_store_latest_into_spinbox, 3, 1
+        )
+
     def _show_advanced_options(self):
         self.f142_advanced_group_box.setVisible(
             not self.f142_advanced_group_box.isVisible()
@@ -161,6 +161,7 @@ class StreamFieldsWidget(QDialog):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
         self.hs00_unimplemented_label.setVisible(False)
         self.f142_advanced_group_box.setVisible(False)
+        # self.ev42_advanced_group_box.setVisible(False)
         self.show_f142_advanced_options_button.setVisible(False)
         if schema == "f142":
             self._set_edits_visible(True, True)
