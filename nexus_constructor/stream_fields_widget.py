@@ -210,8 +210,8 @@ class StreamFieldsWidget(QDialog):
         self.f142_advanced_group_box = QGroupBox(
             parent=self.show_advanced_options_button
         )
+        self.f142_advanced_group_box.setLayout(QFormLayout())
 
-        self.f142_advanced_group_box.setLayout(QGridLayout())
         minimum_value = 0
         maximum_value = 100000000
         self.f142_nexus_indices_index_every_mb_label = QLabel(
@@ -221,12 +221,7 @@ class StreamFieldsWidget(QDialog):
         self.f142_nexus_indices_index_every_mb_spinbox.setRange(
             minimum_value, maximum_value
         )
-        self.f142_advanced_group_box.layout().addWidget(
-            self.f142_nexus_indices_index_every_mb_label, 0, 0
-        )
-        self.f142_advanced_group_box.layout().addWidget(
-            self.f142_nexus_indices_index_every_mb_spinbox, 0, 1
-        )
+
         self.f142_nexus_indices_index_every_kb_label = QLabel(
             "nexus.indices.index_every_kb"
         )
@@ -235,21 +230,21 @@ class StreamFieldsWidget(QDialog):
             minimum_value, maximum_value
         )
 
-        self.f142_advanced_group_box.layout().addWidget(
-            self.f142_nexus_indices_index_every_kb_label, 2, 0
-        )
-        self.f142_advanced_group_box.layout().addWidget(
-            self.f142_nexus_indices_index_every_kb_spinbox, 2, 1
-        )
-
         self.f142_nexus_store_latest_into_label = QLabel("store_latest_into")
         self.f142_nexus_store_latest_into_spinbox = QSpinBox()
         self.f142_nexus_store_latest_into_spinbox.setRange(minimum_value, maximum_value)
-        self.f142_advanced_group_box.layout().addWidget(
-            self.f142_nexus_store_latest_into_label, 3, 0
+
+        self.f142_advanced_group_box.layout().addRow(
+            self.f142_nexus_indices_index_every_mb_label,
+            self.f142_nexus_indices_index_every_mb_spinbox,
         )
-        self.f142_advanced_group_box.layout().addWidget(
-            self.f142_nexus_store_latest_into_spinbox, 3, 1
+        self.f142_advanced_group_box.layout().addRow(
+            self.f142_nexus_indices_index_every_kb_label,
+            self.f142_nexus_indices_index_every_kb_spinbox,
+        )
+        self.f142_advanced_group_box.layout().addRow(
+            self.f142_nexus_store_latest_into_label,
+            self.f142_nexus_store_latest_into_spinbox,
         )
 
     def _show_advanced_options(self):
