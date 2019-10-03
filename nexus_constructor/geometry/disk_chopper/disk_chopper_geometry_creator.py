@@ -59,7 +59,6 @@ class DiskChopperGeometryCreator:
 
         self.points = []
         self.faces = []
-        self.arrow_size = ARROW_SIZE
         self.resolution = RESOLUTION
         self.resolution_angles = None
 
@@ -68,6 +67,7 @@ class DiskChopperGeometryCreator:
         self._slit_height = chopper_details.slit_height
 
         self.z = self._radius * 0.025
+        self.arrow_size = self.z
 
         # Create points for the front and back centres of the disk
         self.front_centre = Point(0, 0, self.z)

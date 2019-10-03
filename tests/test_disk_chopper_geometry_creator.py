@@ -7,7 +7,6 @@ from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetai
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     Point,
     DiskChopperGeometryCreator,
-    ARROW_SIZE,
     RESOLUTION,
 )
 from tests.chopper_test_resources import EXPECTED_Z
@@ -137,7 +136,7 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
 
     assert geometry_creator.faces == []
     assert geometry_creator.z == EXPECTED_Z
-    assert geometry_creator.arrow_size == ARROW_SIZE
+    assert geometry_creator.arrow_size == EXPECTED_Z
     assert geometry_creator.resolution == RESOLUTION
 
     assert geometry_creator._radius == chopper_details.radius
