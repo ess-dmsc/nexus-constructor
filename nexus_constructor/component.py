@@ -340,8 +340,12 @@ class Component:
         return shape_group
 
     def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
-        if SHAPE_GROUP_NAME in self.group:
-            shape_group = self.group[SHAPE_GROUP_NAME]
+        if SHAPE_GROUP_NAME in self.group or PIXEL_SHAPE_GROUP_NAME in self.group:
+            shape_group = self.group[
+                SHAPE_GROUP_NAME
+                if SHAPE_GROUP_NAME in self.group
+                else PIXEL_SHAPE_GROUP_NAME
+            ]
             nx_class = get_nx_class(shape_group)
             if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
                 return CylindricalGeometry(self.file, shape_group)
