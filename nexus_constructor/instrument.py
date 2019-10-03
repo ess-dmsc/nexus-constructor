@@ -109,7 +109,17 @@ class Instrument:
                     if node.attrs["NX_class"] == "NCstream":
                         item_dict = dict()
                         for item in node.items():
-                            item_dict[item[0]] = str(item[1][...])
+                            if len(item[0].split(".")) > 1:
+                                previous = item_dict
+                                for sub in item[0].split("."):
+                                    if sub not in previous:
+                                        previous[sub] = dict()
+                                    if sub == item[0].split(".")[-1]:
+                                        previous[sub] = str(item[1][...])
+                                    previous = previous[sub]
+
+                            else:
+                                item_dict[item[0]] = str(item[1][...])
                         streams_dict[node.name] = item_dict
 
         self.nexus.entry.visititems(find_streams)
