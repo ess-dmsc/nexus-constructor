@@ -13,6 +13,7 @@ from PySide2.QtWidgets import (
     QPushButton,
     QGroupBox,
     QRadioButton,
+    QCheckBox,
 )
 import numpy as np
 
@@ -125,6 +126,69 @@ class StreamFieldsWidget(QDialog):
         )
         self.ev42_advanced_group_box.setLayout(QGridLayout())
 
+        self.adc_pulse_debug_label = QLabel("adc_pulse_debug")
+        self.adc_pulse_debug_checkbox = QCheckBox()
+
+        minimum_value = 0
+        maximum_value = 100000000
+
+        self.ev42_nexus_indices_index_every_mb_label = QLabel(
+            "nexus.indices.index_every_mb"
+        )
+        self.ev42_nexus_indices_index_every_mb_spinbox = QSpinBox()
+        self.ev42_nexus_indices_index_every_mb_spinbox.setRange(
+            minimum_value, maximum_value
+        )
+
+        self.ev42_nexus_indices_index_every_kb_label = QLabel(
+            "nexus.indices.index_every_kb"
+        )
+        self.ev42_nexus_indices_index_every_kb_spinbox = QSpinBox()
+        self.ev42_nexus_indices_index_every_kb_spinbox.setRange(
+            minimum_value, maximum_value
+        )
+
+        self.ev42_nexus_chunk_chunk_mb_label = QLabel("nexus.chunk.chunk_mb")
+        self.ev42_nexus_chunk_chunk_mb_spinbox = QSpinBox()
+        self.ev42_nexus_chunk_chunk_mb_spinbox.setRange(minimum_value, maximum_value)
+
+        self.ev42_nexus_chunk_chunk_kb_label = QLabel("nexus.chunk.chunk_kb")
+        self.ev42_nexus_chunk_chunk_kb_spinbox = QSpinBox()
+        self.ev42_nexus_chunk_chunk_kb_spinbox.setRange(minimum_value, maximum_value)
+
+        self.ev42_nexus_buffer_size_mb_label = QLabel("nexus.buffer.size_mb")
+        self.ev42_nexus_buffer_size_mb_spinbox = QSpinBox()
+        self.ev42_nexus_buffer_size_mb_spinbox.setRange(minimum_value, maximum_value)
+
+        self.ev42_nexus_buffer_size_kb_label = QLabel("nexus.buffer.size_kb")
+        self.ev42_nexus_buffer_size_kb_spinbox = QSpinBox()
+        self.ev42_nexus_buffer_size_kb_spinbox.setRange(minimum_value, maximum_value)
+
+        self.ev42_nexus_buffer_packet_max_kb_label = QLabel(
+            "nexus.buffer.packet_max_kb"
+        )
+        self.ev42_nexus_buffer_packet_max_kb_spinbox = QSpinBox()
+        self.ev42_nexus_buffer_packet_max_kb_spinbox.setRange(
+            minimum_value, maximum_value
+        )
+
+        self.ev42_advanced_group_box.layout().addWidget(
+            self.ev42_nexus_indices_index_every_mb_label, 0, 0
+        )
+        self.ev42_advanced_group_box.layout().addWidget(
+            self.ev42_nexus_indices_index_every_mb_spinbox, 0, 1
+        )
+
+        self.ev42_advanced_group_box.layout().addWidget(
+            self.ev42_nexus_indices_index_every_kb_label, 1, 0
+        )
+        self.ev42_advanced_group_box.layout().addWidget(
+            self.ev42_nexus_indices_index_every_kb_spinbox, 1, 1
+        )
+
+        # TODO: add the rest
+        # TODO: add these to stream group
+
     def _set_up_f142_group_box(self):
         """
         Sets up the UI for the f142 advanced options.
@@ -136,32 +200,42 @@ class StreamFieldsWidget(QDialog):
         self.f142_advanced_group_box.setLayout(QGridLayout())
         minimum_value = 0
         maximum_value = 100000000
-        self.nexus_indices_index_every_mb_label = QLabel("nexus.indices.index_every_mb")
-        self.nexus_indices_index_every_mb_spinbox = QSpinBox()
-        self.nexus_indices_index_every_mb_spinbox.setRange(minimum_value, maximum_value)
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_indices_index_every_mb_label, 0, 0
+        self.f142_nexus_indices_index_every_mb_label = QLabel(
+            "nexus.indices.index_every_mb"
+        )
+        self.f142_nexus_indices_index_every_mb_spinbox = QSpinBox()
+        self.f142_nexus_indices_index_every_mb_spinbox.setRange(
+            minimum_value, maximum_value
         )
         self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_indices_index_every_mb_spinbox, 0, 1
-        )
-        self.nexus_indices_index_every_kb_label = QLabel("nexus.indices.index_every_kb")
-        self.nexus_indices_index_every_kb_spinbox = QSpinBox()
-        self.nexus_indices_index_every_kb_spinbox.setRange(minimum_value, maximum_value)
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_indices_index_every_kb_label, 2, 0
+            self.f142_nexus_indices_index_every_mb_label, 0, 0
         )
         self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_indices_index_every_kb_spinbox, 2, 1
+            self.f142_nexus_indices_index_every_mb_spinbox, 0, 1
         )
-        self.nexus_store_latest_into_label = QLabel("store_latest_into")
-        self.nexus_store_latest_into_spinbox = QSpinBox()
-        self.nexus_store_latest_into_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_nexus_indices_index_every_kb_label = QLabel(
+            "nexus.indices.index_every_kb"
+        )
+        self.f142_nexus_indices_index_every_kb_spinbox = QSpinBox()
+        self.f142_nexus_indices_index_every_kb_spinbox.setRange(
+            minimum_value, maximum_value
+        )
+
         self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_store_latest_into_label, 3, 0
+            self.f142_nexus_indices_index_every_kb_label, 2, 0
         )
         self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_store_latest_into_spinbox, 3, 1
+            self.f142_nexus_indices_index_every_kb_spinbox, 2, 1
+        )
+
+        self.f142_nexus_store_latest_into_label = QLabel("store_latest_into")
+        self.f142_nexus_store_latest_into_spinbox = QSpinBox()
+        self.f142_nexus_store_latest_into_spinbox.setRange(minimum_value, maximum_value)
+        self.f142_advanced_group_box.layout().addWidget(
+            self.f142_nexus_store_latest_into_label, 3, 0
+        )
+        self.f142_advanced_group_box.layout().addWidget(
+            self.f142_nexus_store_latest_into_spinbox, 3, 1
         )
 
     def _show_advanced_options(self):
@@ -256,9 +330,9 @@ class StreamFieldsWidget(QDialog):
         if self.f142_advanced_group_box.isVisible():
             # Use strings for names, we don't care if it's byte-encoded as it will output to JSON anyway.
             stream_group.create_dataset(
-                self.nexus_indices_index_every_mb_label.text(),
+                self.f142_nexus_indices_index_every_mb_label.text(),
                 dtype=int,
-                data=self.nexus_indices_index_every_mb_spinbox.value(),
+                data=self.f142_nexus_indices_index_every_mb_spinbox.value(),
             )
             stream_group.create_dataset(
                 self.nexus_chunk_mb_label.text(),
@@ -266,12 +340,12 @@ class StreamFieldsWidget(QDialog):
                 data=self.nexus_chunk_mb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.nexus_indices_index_every_kb_label.text(),
+                self.f142_nexus_indices_index_every_kb_label.text(),
                 dtype=int,
-                data=self.nexus_indices_index_every_kb_spinbox.value(),
+                data=self.f142_nexus_indices_index_every_kb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.nexus_store_latest_into_label.text(),
+                self.f142_nexus_store_latest_into_label.text(),
                 dtype=int,
-                data=self.nexus_store_latest_into_spinbox.value(),
+                data=self.f142_nexus_store_latest_into_spinbox.value(),
             )
