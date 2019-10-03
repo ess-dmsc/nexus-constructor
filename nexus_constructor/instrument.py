@@ -109,15 +109,17 @@ class Instrument:
                     if node.attrs["NX_class"] == "NCstream":
                         item_dict = dict()
                         for item in node.items():
-                            if len(item[0].split(".")) > 1:
-                                previous = item_dict
-                                for sub in item[0].split("."):
-                                    if sub not in previous:
-                                        previous[sub] = dict()
-                                    if sub == item[0].split(".")[-1]:
-                                        previous[sub] = str(item[1][...])
-                                    previous = previous[sub]
-
+                            dots_in_field_name = item[0].split(".")
+                            if len(dots_in_field_name) > 1:
+                                previous_group = item_dict
+                                for subgroup in dots_in_field_name:
+                                    # do not overwrite a group unless it doesn't yet exist
+                                    if subgroup not in previous_group:
+                                        previous_group[subgroup] = dict()
+                                    if subgroup == dots_in_field_name[-1]:
+                                        # set the value of the field to the last item in the list
+                                        previous_group[subgroup] = str(item[1][...])
+                                    previous_group = previous_group[subgroup]
                             else:
                                 item_dict[item[0]] = str(item[1][...])
                         streams_dict[node.name] = item_dict
