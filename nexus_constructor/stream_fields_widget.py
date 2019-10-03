@@ -93,6 +93,8 @@ class StreamFieldsWidget(QDialog):
         self.ok_button = QPushButton("OK")
         self.ok_button.clicked.connect(self.parent().close)
 
+        self.set_advanced_options_state()
+
         self.layout().addWidget(self.schema_label, 0, 0)
         self.layout().addWidget(self.schema_combo, 0, 1)
 
@@ -207,8 +209,6 @@ class StreamFieldsWidget(QDialog):
             self.ev42_nexus_buffer_packet_max_kb_spinbox,
         )
 
-        # TODO: add these to stream group
-
     def _set_up_f142_group_box(self):
         """
         Sets up the UI for the f142 advanced options.
@@ -264,6 +264,17 @@ class StreamFieldsWidget(QDialog):
                 not self.ev42_advanced_group_box.isVisible()
             )
 
+        self.set_advanced_options_state()
+
+    def set_advanced_options_state(self):
+        """Used for getting the stream options when the dialog is closed."""
+        self.advanced_options_enabled = (
+            True
+            if self.ev42_advanced_group_box.isVisible()
+            or self.f142_advanced_group_box.isVisible()
+            else False
+        )
+
     def _show_array_size(self, show: bool):
         self.array_size_spinbox.setVisible(show)
         self.array_size_label.setVisible(show)
@@ -274,6 +285,7 @@ class StreamFieldsWidget(QDialog):
         self.f142_advanced_group_box.setVisible(False)
         self.ev42_advanced_group_box.setVisible(False)
         self.show_advanced_options_button.setVisible(False)
+        self.set_advanced_options_state()
         if schema == "f142":
             self._set_edits_visible(True, True)
             self.show_advanced_options_button.setVisible(True)
@@ -341,7 +353,7 @@ class StreamFieldsWidget(QDialog):
         Create ev42 fields in the given group if advanced options are specified.
         :param stream_group: The group to apply fields to.
         """
-        if self.ev42_advanced_group_box.isVisible():
+        if self.advanced_options_enabled:
             stream_group.create_dataset(
                 self.ev42_adc_pulse_debug_label.text(),
                 dtype=bool,
@@ -395,7 +407,7 @@ class StreamFieldsWidget(QDialog):
             stream_group.create_dataset(
                 "array_size", data=self.array_size_spinbox.value()
             )
-        if self.f142_advanced_group_box.isVisible():
+        if self.advanced_options_enabled:
             # Use strings for names, we don't care if it's byte-encoded as it will output to JSON anyway.
             stream_group.create_dataset(
                 self.f142_nexus_indices_index_every_mb_label.text(),
