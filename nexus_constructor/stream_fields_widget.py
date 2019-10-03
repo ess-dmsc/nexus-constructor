@@ -285,6 +285,7 @@ class StreamFieldsWidget(QDialog):
         self.f142_advanced_group_box.setVisible(False)
         self.ev42_advanced_group_box.setVisible(False)
         self.show_advanced_options_button.setVisible(False)
+        self.show_advanced_options_button.setChecked(False)
         self.set_advanced_options_state()
         if schema == "f142":
             self._set_edits_visible(True, True)
