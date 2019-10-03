@@ -86,32 +86,24 @@ class StreamFieldsWidget(QDialog):
             self.nexus_indices_index_every_mb_spinbox, 0, 1
         )
 
-        self.nexus_chunk_mb_label = QLabel("nexus.indices.index_every_mb")
-        self.nexus_chunk_mb_spinbox = QSpinBox()
-        self.nexus_chunk_mb_spinbox.setRange(minimum_value, maximum_value)
-        self.f142_advanced_group_box.layout().addWidget(self.nexus_chunk_mb_label, 1, 0)
+        self.nexus_indices_index_every_kb_label = QLabel("nexus.indices.index_every_kb")
+        self.nexus_indices_index_every_kb_spinbox = QSpinBox()
+        self.nexus_indices_index_every_kb_spinbox.setRange(minimum_value, maximum_value)
         self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_chunk_mb_spinbox, 1, 1
+            self.nexus_indices_index_every_kb_label, 2, 0
+        )
+        self.f142_advanced_group_box.layout().addWidget(
+            self.nexus_indices_index_every_kb_spinbox, 2, 1
         )
 
-        self.nexus_buffer_size_label = QLabel("nexus.buffer.size_kb")
-        self.nexus_buffer_size_spinbox = QSpinBox()
-        self.nexus_buffer_size_spinbox.setRange(minimum_value, maximum_value)
+        self.nexus_store_latest_into_label = QLabel("store_latest_into")
+        self.nexus_store_latest_into_spinbox = QSpinBox()
+        self.nexus_store_latest_into_spinbox.setRange(minimum_value, maximum_value)
         self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_buffer_size_label, 2, 0
+            self.nexus_store_latest_into_label, 3, 0
         )
         self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_buffer_size_spinbox, 2, 1
-        )
-
-        self.nexus_packet_max_kb_label = QLabel("nexus.buffer.packet_max_kb")
-        self.nexus_packet_max_kb_spinbox = QSpinBox()
-        self.nexus_packet_max_kb_spinbox.setRange(minimum_value, maximum_value)
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_packet_max_kb_label, 3, 0
-        )
-        self.f142_advanced_group_box.layout().addWidget(
-            self.nexus_packet_max_kb_spinbox, 3, 1
+            self.nexus_store_latest_into_spinbox, 3, 1
         )
 
         self.scalar_radio = QRadioButton(text="Scalar")
@@ -245,12 +237,12 @@ class StreamFieldsWidget(QDialog):
                 data=self.nexus_chunk_mb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.nexus_buffer_size_label.text(),
+                self.nexus_indices_index_every_kb_label.text(),
                 dtype=int,
-                data=self.nexus_buffer_size_spinbox.value(),
+                data=self.nexus_indices_index_every_kb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.nexus_packet_max_kb_label.text(),
+                self.nexus_store_latest_into_label.text(),
                 dtype=int,
-                data=self.nexus_packet_max_kb_spinbox.value(),
+                data=self.nexus_store_latest_into_spinbox.value(),
             )
