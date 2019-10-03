@@ -627,6 +627,7 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
 
     radius = 1
     slit_height = 0.5
+    resolution = 5
     chopper_details = ChopperDetails(
         slits=1,
         slit_edges=np.array([0.0, np.deg2rad(90)]),
@@ -637,9 +638,16 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
         radius_units="m",
     )
     geometry_creator = DiskChopperGeometryCreator(chopper_details)
-    geometry_creator.resolution = 5
-
+    geometry_creator.resolution = resolution
     z = geometry_creator.z
+
+    angles = np.linspace(0, np.pi * 2, resolution + 1)[:-1]
+
+    def find_x(r, theta):
+        return r * np.cos(theta)
+
+    def find_y(r, theta):
+        return r * np.sin(theta)
 
     geometry_creator.convert_chopper_details_to_off()
 
@@ -662,3 +670,17 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     assert geometry_creator.points[9] == Point(0, slit_height, -z)
 
     assert geometry_creator.faces[1] == [9, 7, 6, 8]
+
+    # Test the intermediate points in the slit
+    x, y = find_x(slit_height, angles[1]), find_y(slit_height, angles[1])
+    assert geometry_creator.points[10] == Point(x, y, z)
+    assert geometry_creator.points[11] == Point(x, y, -z)
+
+    # Test for the faces connected to the intermediate points
+    assert geometry_creator.faces[2] == [4, 5, 11, 10]
+    assert geometry_creator.faces[3] == [0, 4, 10]
+    assert geometry_creator.faces[4] == [1, 11, 5]
+
+    assert geometry_creator.faces[5] == [10, 11, 9, 8]
+    assert geometry_creator.faces[6] == [0, 10, 8]
+    assert geometry_creator.faces[7] == [1, 9, 11]
