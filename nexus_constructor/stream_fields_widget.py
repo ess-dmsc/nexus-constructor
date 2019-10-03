@@ -63,6 +63,7 @@ class StreamFieldsWidget(QDialog):
         self.type_combo.addItems(F142_TYPES)
 
         self._set_up_f142_group_box()
+        self._set_up_ev42_group_box()
 
         self.scalar_radio = QRadioButton(text="Scalar")
         self.scalar_radio.clicked.connect(partial(self._show_array_size, False))
@@ -102,13 +103,38 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.show_f142_advanced_options_button, 7, 0, 1, 2)
         self.layout().addWidget(self.f142_advanced_group_box, 8, 0, 1, 2)
 
-        self.layout().addWidget(self.ok_button, 9, 0, 1, 2)
+        self.layout().addWidget(self.show_ev42_advanced_options_button, 9, 0, 1, 2)
+        self.layout().addWidget(self.ev42_advanced_group_box, 10, 0, 1, 2)
+
+        self.layout().addWidget(self.ok_button, 11, 0, 1, 2)
 
         self._schema_type_changed(self.schema_combo.currentText())
 
+    def _set_up_ev42_group_box(self):
+        """
+        Sets up the UI for ev42 advanced options.
+        """
+        self.show_ev42_advanced_options_button = QPushButton(
+            text="Show/hide ev42 advanced options"
+        )
+        self.show_ev42_advanced_options_button.setCheckable(True)
+        self.ev42_advanced_group_box = QGroupBox(
+            parent=self.show_ev42_advanced_options_button
+        )
+        self.show_ev42_advanced_options_button.clicked.connect(
+            self._show_advanced_options
+        )
+        self.ev42_advanced_group_box = QGroupBox(
+            parent=self.show_ev42_advanced_options_button
+        )
+        self.ev42_advanced_group_box.setLayout(QGridLayout())
+
     def _set_up_f142_group_box(self):
+        """
+        Sets up the UI for the f142 advanced options.
+        """
         self.show_f142_advanced_options_button = QPushButton(
-            text="Show/hide advanced options"
+            text="Show/hide f142 advanced options"
         )
         self.show_f142_advanced_options_button.setCheckable(True)
         self.f142_advanced_group_box = QGroupBox(
@@ -149,9 +175,15 @@ class StreamFieldsWidget(QDialog):
         )
 
     def _show_advanced_options(self):
-        self.f142_advanced_group_box.setVisible(
-            not self.f142_advanced_group_box.isVisible()
-        )
+        schema = self.schema_combo.currentText()
+        if schema == "f142":
+            self.f142_advanced_group_box.setVisible(
+                not self.f142_advanced_group_box.isVisible()
+            )
+        elif schema == "ev42":
+            self.ev42_advanced_group_box.setVisible(
+                not self.ev42_advanced_group_box.isVisible()
+            )
 
     def _show_array_size(self, show: bool):
         self.array_size_spinbox.setVisible(show)
@@ -161,14 +193,17 @@ class StreamFieldsWidget(QDialog):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
         self.hs00_unimplemented_label.setVisible(False)
         self.f142_advanced_group_box.setVisible(False)
-        # self.ev42_advanced_group_box.setVisible(False)
+        self.ev42_advanced_group_box.setVisible(False)
         self.show_f142_advanced_options_button.setVisible(False)
+        self.show_ev42_advanced_options_button.setVisible(False)
         if schema == "f142":
             self._set_edits_visible(True, True)
             self.show_f142_advanced_options_button.setVisible(True)
             self.f142_advanced_group_box.setVisible(False)
         elif schema == "ev42":
             self._set_edits_visible(False, False)
+            self.show_ev42_advanced_options_button.setVisible(True)
+            self.ev42_advanced_group_box.setVisible(True)
         elif schema == "hs00":
             self._set_edits_visible(True, False)
             self.hs00_unimplemented_label.setVisible(True)
@@ -190,6 +225,10 @@ class StreamFieldsWidget(QDialog):
             self.source_line_edit.setPlaceholderText("")
 
     def get_stream_group(self) -> h5py.Group:
+        """
+        Create the stream group with a temporary in-memory HDF5 file.
+        :return: The created HDF group.
+        """
         string_dtype = h5py.special_dtype(vlen=str)
         temp_file = h5py.File(
             name=str(uuid.uuid4()), driver="core", backing_store=False
