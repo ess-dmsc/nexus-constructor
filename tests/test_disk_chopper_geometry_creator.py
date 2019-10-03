@@ -648,6 +648,11 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     def find_y(r, theta):
         return r * np.sin(theta)
 
+    def check_cake_slice_faces(indices):
+        assert indices in geometry_creator.faces
+        assert [0, indices[0], indices[-1]] in geometry_creator.faces
+        assert [1, indices[-2], indices[1]] in geometry_creator.faces
+
     geometry_creator.convert_chopper_details_to_off()
 
     # Check the centre points
@@ -660,7 +665,7 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     assert geometry_creator.points[4] == Point(slit_height, 0, z)
     assert geometry_creator.points[5] == Point(slit_height, 0, -z)
 
-    assert geometry_creator.faces[0] == [4, 2, 3, 5]
+    assert [4, 2, 3, 5] in geometry_creator.faces
 
     # Check the next four points that make form the "left" slit boundary
     assert geometry_creator.points[6] == Point(0, radius, z)
@@ -668,23 +673,40 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     assert geometry_creator.points[8] == Point(0, slit_height, z)
     assert geometry_creator.points[9] == Point(0, slit_height, -z)
 
-    assert geometry_creator.faces[1] == [9, 7, 6, 8]
+    assert [9, 7, 6, 8] in geometry_creator.faces
 
     # Test the intermediate points in the slit
     x, y = find_x(slit_height, angles[1]), find_y(slit_height, angles[1])
     assert geometry_creator.points[10] == Point(x, y, z)
     assert geometry_creator.points[11] == Point(x, y, -z)
 
-    # Test for the faces connected to the intermediate points
-    assert geometry_creator.faces[2] == [4, 5, 11, 10]
-    assert geometry_creator.faces[3] == [0, 4, 10]
-    assert geometry_creator.faces[4] == [1, 11, 5]
-
-    assert geometry_creator.faces[5] == [10, 11, 9, 8]
-    assert geometry_creator.faces[6] == [0, 10, 8]
-    assert geometry_creator.faces[7] == [1, 9, 11]
+    # Test for the faces connected to the points 10 and 11
+    check_cake_slice_faces([4, 5, 11, 10])
+    check_cake_slice_faces([10, 11, 9, 8])
 
     # Test for the next pair of points
     x, y = find_x(radius, angles[2]), find_y(radius, angles[2])
     assert geometry_creator.points[12] == Point(x, y, z)
     assert geometry_creator.points[13] == Point(x, y, -z)
+
+    # Test for the faces connected to points 12 and 13
+    check_cake_slice_faces([6, 7, 13, 12])
+
+    # Test for the next pair of points
+    x, y = find_x(radius, angles[3]), find_y(radius, angles[3])
+    assert geometry_creator.points[14] == Point(x, y, z)
+    assert geometry_creator.points[15] == Point(x, y, -z)
+
+    # Test for the faces connected to points 14 and 15
+    check_cake_slice_faces([12, 13, 15, 14])
+
+    # Test for the next pair of points
+    x, y = find_x(radius, angles[4]), find_y(radius, angles[4])
+    assert geometry_creator.points[16] == Point(x, y, z)
+    assert geometry_creator.points[17] == Point(x, y, -z)
+
+    # Test for the faces connected to points 14 and 15
+    check_cake_slice_faces([14, 15, 17, 16])
+
+    # Test for the remaining connection in the chopper
+    check_cake_slice_faces([16, 17, 3, 2])
