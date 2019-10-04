@@ -353,8 +353,7 @@ class Component:
     def get_shape(
         self
     ) -> Tuple[
-        Optional[Union[OFFGeometry, CylindricalGeometry]],
-        Optional[List[Transformation]],
+        Optional[Union[OFFGeometry, CylindricalGeometry]], Optional[List[QVector3D]]
     ]:
         """
         Get the shape of the component if there is one defined, and optionally a

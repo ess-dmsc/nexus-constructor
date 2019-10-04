@@ -33,7 +33,7 @@ def test_GIVEN_a_PixelShapeComponent_WHEN_calling_get_shape_THEN_shape_and_trans
     y_offsets = np.array([[-0.05, -0.05], [0.05, 0.05]])
 
     wrapper.set_field_value(detector_group, "x_pixel_offset", x_offsets)
-    wrapper.set_field_value(detector_group, "x_pixel_offset", y_offsets)
+    wrapper.set_field_value(detector_group, "y_pixel_offset", y_offsets)
 
     pixel_component = PixelShapeComponent(wrapper, detector_group)
     assert isinstance(pixel_component, PixelShapeComponent)
@@ -44,5 +44,11 @@ def test_GIVEN_a_PixelShapeComponent_WHEN_calling_get_shape_THEN_shape_and_trans
     assert np.allclose(shape.faces, [winding_order])
 
     assert (
-        len(transformations) == x_offsets.size()
+        len(transformations) == x_offsets.size
     ), "Expected one transformation per pixel offset"
+    assert np.allclose(
+        qvector3d_to_numpy_array(transformations[0]), np.array([-0.05, -0.05, 0.0])
+    )
+    assert np.allclose(
+        qvector3d_to_numpy_array(transformations[3]), np.array([0.05, 0.05, 0.0])
+    )

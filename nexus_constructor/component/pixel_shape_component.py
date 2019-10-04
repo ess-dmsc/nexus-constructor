@@ -5,17 +5,45 @@ from nexus_constructor.component.component import (
 )
 from nexus_constructor.geometry.cylindrical_geometry import CylindricalGeometry
 from nexus_constructor.geometry import OFFGeometry
-from nexus_constructor.transformations import Transformation
+from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import Optional, Union, List, Tuple
+from PySide2.QtGui import QVector3D
+import h5py
+import numpy as np
+
+
+def _create_transformation_vectors_for_pixel_offsets(
+    detector_group: h5py.Group, wrapper: nx.NexusWrapper
+) -> List[QVector3D]:
+    """
+    Construct a transformation (as a QVector3D) for each pixel offset
+    """
+    x_offsets = wrapper.get_field_value(detector_group, "x_pixel_offset")
+    y_offsets = wrapper.get_field_value(detector_group, "y_pixel_offset")
+    z_offsets = wrapper.get_field_value(detector_group, "z_pixel_offset")
+    if x_offsets is None or y_offsets is None:
+        raise Exception(
+            "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
+        )
+    if z_offsets is None:
+        z_offsets = np.zeros_like(x_offsets)
+    # offsets datasets can be 2D to match dimensionality of detector, so flatten to 1D
+    return [
+        QVector3D(x, y, z)
+        for x, y, z in zip(
+            x_offsets.flatten(), y_offsets.flatten(), z_offsets.flatten()
+        )
+    ]
 
 
 class PixelShapeComponent(Component):
     def get_shape(
         self
     ) -> Tuple[
-        Optional[Union[OFFGeometry, CylindricalGeometry]],
-        Optional[List[Transformation]],
+        Optional[Union[OFFGeometry, CylindricalGeometry]], Optional[List[QVector3D]]
     ]:
         shape = get_shape_from_component(self.group, self.file, PIXEL_SHAPE_GROUP_NAME)
-        # TODO construct a transformation for each pixel offset
-        return shape, None
+        return (
+            shape,
+            _create_transformation_vectors_for_pixel_offsets(self.group, self.file),
+        )

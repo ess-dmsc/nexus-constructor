@@ -7,16 +7,15 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     DiskChopperGeometryCreator,
 )
-from nexus_constructor.transformations import Transformation
 from typing import Optional, Union, List, Tuple
+from PySide2.QtGui import QVector3D
 
 
 class ChopperComponent(Component):
     def get_shape(
         self
     ) -> Tuple[
-        Optional[Union[OFFGeometry, CylindricalGeometry]],
-        Optional[List[Transformation]],
+        Optional[Union[OFFGeometry, CylindricalGeometry]], Optional[List[QVector3D]]
     ]:
         # If there is a shape group then use that
         shape, _ = super().get_shape()

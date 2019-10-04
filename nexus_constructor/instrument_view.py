@@ -4,7 +4,7 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QRectF
-from PySide2.QtGui import QVector3D, QColor
+from PySide2.QtGui import QVector3D, QColor, QQuaternion
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 
 from nexus_constructor.gnomon import Gnomon
@@ -32,7 +32,6 @@ class InstrumentView(QWidget):
         del self.view
 
     def __init__(self, parent):
-
         super().__init__()
 
         self.root_entity = Qt3DCore.QEntity()
@@ -266,7 +265,7 @@ class InstrumentView(QWidget):
         dark_red = QColor("#b00")
 
         self.grey_material = create_material(black, grey)
-        self.red_material = create_material(red, dark_red)
+        self.red_material = create_material(red, dark_red, alpha=0.5)
         self.beam_material = create_material(blue, light_blue, alpha=0.5)
 
     @staticmethod
@@ -296,7 +295,6 @@ class InstrumentView(QWidget):
         Calls the methods for defining materials, setting up the sample cube, and setting up the neutrons. Beam-related
         functions are called outside of this method to ensure that those things are generated last.
         """
-
         self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()
