@@ -1,5 +1,5 @@
 import numpy as np
-
+import pytest
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from tests.chopper_test_helpers import (
     N_SLITS,
@@ -10,18 +10,17 @@ from tests.chopper_test_helpers import (
 )
 
 
-def test_GIVEN_chopper_information_WHEN_initialising_chopper_details_THEN_chopper_details_object_contains_original_disk_chopper_info(
+def test_GIVEN_initialised_chopper_details_WHEN_getting_properties_THEN_values_returned_match_original_constructor_input(
     chopper_details
 ):
-
+    # ChopperDetails is constructed in the test fixture
     assert chopper_details.slits == N_SLITS
     assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
     assert chopper_details.radius == RADIUS_LENGTH
-    assert chopper_details.slit_height == SLIT_HEIGHT_LENGTH
+    assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
 
 
 def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_angles_are_converted_to_radians():
-
     edges_array = np.array([i * 30 for i in range(4)])
 
     chopper_details = ChopperDetails(
@@ -40,7 +39,6 @@ def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_a
 
 
 def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_is_converted_to_cm():
-
     chopper_details = ChopperDetails(
         slits=N_SLITS,
         slit_edges=EDGES_ARR,
@@ -51,11 +49,10 @@ def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_s
         radius_units="m",
     )
 
-    assert chopper_details.slit_height * 100 == SLIT_HEIGHT_LENGTH
+    assert chopper_details.slit_height * 100 == pytest.approx(SLIT_HEIGHT_LENGTH)
 
 
 def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius_is_converted_to_cm():
-
     chopper_details = ChopperDetails(
         slits=N_SLITS,
         slit_edges=EDGES_ARR,
@@ -66,4 +63,4 @@ def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius
         slit_height_units="m",
     )
 
-    assert chopper_details.radius * 100 == RADIUS_LENGTH
+    assert chopper_details.radius * 100 == pytest.approx(RADIUS_LENGTH)

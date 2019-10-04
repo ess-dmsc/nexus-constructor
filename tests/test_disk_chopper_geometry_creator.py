@@ -90,9 +90,9 @@ def test_GIVEN_three_values_WHEN_creating_point_THEN_point_is_initialised_correc
     point
 ):
 
-    assert point.x == POINT_X
-    assert point.y == POINT_Y
-    assert point.z == POINT_Z
+    assert point.x == pytest.approx(POINT_X)
+    assert point.y == pytest.approx(POINT_Y)
+    assert point.z == pytest.approx(POINT_Z)
     assert point.id is None
 
 
@@ -125,9 +125,9 @@ def test_GIVEN_point_WHEN_calling_point_to_qvector3d_THEN_expected_vector_is_cre
 ):
 
     vector = point.point_to_qvector3d()
-    assert vector.x() == POINT_X
-    assert vector.y() == POINT_Y
-    assert vector.z() == POINT_Z
+    assert vector.x() == pytest.approx(POINT_X)
+    assert vector.y() == pytest.approx(POINT_Y)
+    assert vector.z() == pytest.approx(POINT_Z)
 
 
 def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_creator_is_initialised_with_expected_values(
@@ -135,13 +135,13 @@ def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_
 ):
 
     assert geometry_creator.faces == []
-    assert geometry_creator.z == EXPECTED_Z
-    assert geometry_creator.arrow_size == EXPECTED_Z
+    assert geometry_creator.z == pytest.approx(EXPECTED_Z)
+    assert geometry_creator.arrow_size == pytest.approx(EXPECTED_Z)
     assert geometry_creator.resolution == RESOLUTION
 
-    assert geometry_creator._radius == chopper_details.radius
+    assert geometry_creator._radius == pytest.approx(chopper_details.radius)
     assert np.array_equal(geometry_creator._slit_edges, chopper_details.slit_edges)
-    assert geometry_creator._slit_height == chopper_details.slit_height
+    assert geometry_creator._slit_height == pytest.approx(chopper_details.slit_height)
 
     assert len(geometry_creator.points) == 2
 

@@ -418,10 +418,10 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
 
     radian_slit_edges = CONVERT_DEGREES_TO_RADIANS(mock_slit_edges_widget.value)
 
-    assert (details.slit_edges == radian_slit_edges).all()
+    assert np.array_equal(details.slit_edges, radian_slit_edges)
     assert details.slits == mock_slits_widget.value
-    assert details.radius == mock_radius_widget.value
-    assert details.slit_height == mock_slit_height_widget.value
+    assert details.radius == pytest.approx(mock_radius_widget.value)
+    assert details.slit_height == pytest.approx(mock_slit_height_widget.value)
 
 
 def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_details_are_returned(
@@ -432,8 +432,8 @@ def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_de
     chopper_details = user_defined_chopper_checker.chopper_details
 
     assert chopper_details.slits == N_SLITS
-    assert chopper_details.radius == RADIUS_LENGTH
-    assert chopper_details.slit_height == SLIT_HEIGHT_LENGTH
+    assert chopper_details.radius == pytest.approx(RADIUS_LENGTH)
+    assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
     assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
 
 
@@ -553,5 +553,5 @@ def test_GIVEN_validation_passes_WHEN_validating_nexus_disk_chopper_THEN_chopper
 
     assert chopper_details.slits == N_SLITS
     assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
-    assert chopper_details.radius == RADIUS_LENGTH
-    assert chopper_details.slit_height == SLIT_HEIGHT_LENGTH
+    assert chopper_details.radius == pytest.approx(RADIUS_LENGTH)
+    assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
