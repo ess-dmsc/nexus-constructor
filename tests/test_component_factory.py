@@ -4,6 +4,10 @@ from nexus_constructor.component.component import Component
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.nexus import nexus_wrapper as nx
 
+"""
+Tests here document the conditions under which the factory creates components of different types
+"""
+
 
 def test_GIVEN_an_NXdisk_chopper_group_WHEN_calling_create_component_THEN_a_ChopperComponent_is_created():
     wrapper = nx.NexusWrapper("file_with_chopper")
