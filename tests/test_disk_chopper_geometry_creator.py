@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 import numpy as np
 
@@ -21,20 +19,6 @@ THETA = np.deg2rad(45)
 
 def create_list_of_ids(*points: Point):
     return [point.id for point in points]
-
-
-def print_off_details(points: List[Point], faces: List[List[int]]):
-
-    print("")
-
-    print("OFF")
-    print(len(points), len(faces), 0)
-
-    for count, point in enumerate(points):
-        print(point.x, point.y, point.z)
-
-    for count, face in enumerate(faces):
-        print(len(face), " ".join([str(index) for index in face]))
 
 
 @pytest.fixture(scope="function")
@@ -97,14 +81,12 @@ def test_GIVEN_three_values_WHEN_creating_point_THEN_point_is_initialised_correc
 
 
 def test_GIVEN_id_WHEN_point_has_no_id_THEN_id_is_set(point):
-
     id = 300
     point.set_id(id)
     assert point.id == id
 
 
 def test_GIVEN_id_WHEN_point_already_has_id_THEN_id_doesnt_change(point):
-
     old_id = 200
     new_id = 300
     point.set_id(old_id)
@@ -114,7 +96,6 @@ def test_GIVEN_id_WHEN_point_already_has_id_THEN_id_doesnt_change(point):
 
 
 def test_GIVEN_non_integer_id_WHEN_setting_id_THEN_id_is_rejected(point):
-
     bad_id = "abc"
     point.set_id(bad_id)
     assert point.id is None
@@ -123,7 +104,6 @@ def test_GIVEN_non_integer_id_WHEN_setting_id_THEN_id_is_rejected(point):
 def test_GIVEN_point_WHEN_calling_point_to_qvector3d_THEN_expected_vector_is_created(
     point
 ):
-
     vector = point.point_to_qvector3d()
     assert vector.x() == pytest.approx(POINT_X)
     assert vector.y() == pytest.approx(POINT_Y)
@@ -133,7 +113,6 @@ def test_GIVEN_point_WHEN_calling_point_to_qvector3d_THEN_expected_vector_is_cre
 def test_GIVEN_chopper_details_WHEN_initialising_geometry_creator_THEN_geometry_creator_is_initialised_with_expected_values(
     geometry_creator, chopper_details
 ):
-
     assert geometry_creator.faces == []
     assert geometry_creator.z == pytest.approx(EXPECTED_Z)
     assert geometry_creator.arrow_size == pytest.approx(EXPECTED_Z)
@@ -162,7 +141,6 @@ def test_GIVEN_polar_coordinates_WHEN_converting_polar_to_cartesian_THEN_expecte
 def test_GIVEN_polar_coordinates_WHEN_creating_mirrored_points_THEN_expected_points_are_returned(
     geometry_creator, chopper_details
 ):
-
     expected_first_point = Point(1.0, 1.0, EXPECTED_Z)
     expected_second_point = Point(1.0, 1.0, -EXPECTED_Z)
 
@@ -251,7 +229,6 @@ def test_GIVEN_face_should_look_left_WHEN_creating_and_adding_point_set_THEN_exp
 def test_GIVEN_r_and_theta_WHEN_creating_and_adding_mirrored_points_THEN_expected_points_are_created_and_added_to_list(
     geometry_creator, chopper_details
 ):
-
     r = 20
     theta = 0
 
@@ -272,7 +249,6 @@ def test_GIVEN_r_and_theta_WHEN_creating_and_adding_mirrored_points_THEN_expecte
 def test_GIVEN_points_WHEN_adding_face_connected_to_front_centre_THEN_expected_face_is_created(
     geometry_creator
 ):
-
     first_point, second_point = create_two_points()
     geometry_creator.add_face_connected_to_front_centre([first_point, second_point])
 
@@ -285,7 +261,6 @@ def test_GIVEN_points_WHEN_adding_face_connected_to_front_centre_THEN_expected_f
 def test_GIVEN_points_WHEN_adding_face_connected_to_back_centre_THEN_expected_face_is_created(
     geometry_creator
 ):
-
     first_point, second_point = create_two_points()
     geometry_creator.add_face_connected_to_back_centre([first_point, second_point])
 
@@ -298,7 +273,6 @@ def test_GIVEN_points_WHEN_adding_face_connected_to_back_centre_THEN_expected_fa
 def test_GIVEN_point_WHEN_adding_point_to_list_THEN_point_is_added_and_assigned_an_id(
     geometry_creator
 ):
-
     point = Point(1, 2, 3)
     geometry_creator._add_point_to_list(point)
 
@@ -309,7 +283,6 @@ def test_GIVEN_point_WHEN_adding_point_to_list_THEN_point_is_added_and_assigned_
 def test_GIVEN_set_of_points_WHEN_adding_face_to_list_THEN_list_of_ids_is_added_to_list_of_faces(
     geometry_creator
 ):
-
     num_points = 3
     points = []
     ids = []
@@ -326,7 +299,6 @@ def test_GIVEN_set_of_points_WHEN_adding_face_to_list_THEN_list_of_ids_is_added_
 def test_GIVEN_length_of_arrow_position_WHEN_adding_top_dead_centre_arrow_THEN_expected_arrow_is_created(
     geometry_creator
 ):
-
     length_of_arrow_position = 5
 
     expected_centre_point = Point(length_of_arrow_position, 0, EXPECTED_Z)
@@ -358,7 +330,6 @@ def test_GIVEN_length_of_arrow_position_WHEN_adding_top_dead_centre_arrow_THEN_e
 def test_GIVEN_second_angle_greater_than_first_angle_THEN_intermediate_angles_method_returns_array_with_values_between_the_two_angles(
     geometry_creator, resolution_array
 ):
-
     first_angle = 0.5
     second_angle = 1.5
 
@@ -376,7 +347,6 @@ def test_GIVEN_second_angle_greater_than_first_angle_THEN_intermediate_angles_me
 def test_GIVEN_first_angle_greater_than_second_angle_THEN_intermediate_angles_method_returns_array_with_values_between_the_two_angles(
     geometry_creator, resolution_array
 ):
-
     first_angle = 1.5
     second_angle = 0.5
 
@@ -398,7 +368,6 @@ def test_GIVEN_first_angle_greater_than_second_angle_THEN_intermediate_angles_me
 def test_GIVEN_resolution_of_one_WHEN_creating_resolution_angles_THEN_array_only_contains_zero(
     geometry_creator
 ):
-
     resolution = 1
     resolution_array = geometry_creator.create_resolution_angles(resolution)
     assert np.array_equal(np.zeros(1), resolution_array)
@@ -407,7 +376,6 @@ def test_GIVEN_resolution_of_one_WHEN_creating_resolution_angles_THEN_array_only
 def test_GIVEN_resolution_greater_than_one_WHEN_creating_resolution_angles_THEN_array_contains_expected_values(
     geometry_creator
 ):
-
     resolution = 5
     resolution_array = geometry_creator.create_resolution_angles(resolution)
     expected = np.array([i * ((np.pi * 2) / resolution) for i in range(resolution)])
@@ -419,7 +387,6 @@ def test_GIVEN_resolution_greater_than_one_WHEN_creating_resolution_angles_THEN_
 def test_GIVEN_angle_distance_to_centre_and_two_points_WHEN_creating_wedge_shape_THEN_expected_faces_and_points_are_created(
     geometry_creator
 ):
-
     theta = np.pi
     r = 10
     prev_back, prev_front = geometry_creator.create_and_add_mirrored_points(r, theta)
@@ -446,7 +413,6 @@ def test_GIVEN_angle_distance_to_centre_and_two_points_WHEN_creating_wedge_shape
 def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_expected_points_and_faces_are_created(
     geometry_creator
 ):
-
     # Choose angles for the boundaries of the slit edge
     first_angle = np.deg2rad(80)
     second_angle = np.deg2rad(100)
@@ -516,7 +482,6 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
 def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_points_not_in_top_dead_centre_arrow_have_expected_distance_from_centres(
     geometry_creator, chopper_details
 ):
-
     geometry_creator.convert_chopper_details_to_off()
 
     centre_to_bottom_of_slit = chopper_details.radius - chopper_details.slit_height
@@ -531,7 +496,6 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_points_not_i
 def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_THEN_all_faces_contain_three_or_four_points(
     geometry_creator
 ):
-
     geometry_creator.convert_chopper_details_to_off()
     expected_face_sizes = [3, 4]
 
@@ -542,7 +506,6 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_THEN_all_faces_contain
 def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_three_points_all_contain_front_or_back_centre_point(
     geometry_creator, chopper_details
 ):
-
     geometry_creator.convert_chopper_details_to_off()
 
     front_centre_point_index = 0
@@ -564,7 +527,6 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_t
 def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_connected_to_front_or_back_centre_all_have_expected_z_value(
     geometry_creator
 ):
-
     geometry_creator.convert_chopper_details_to_off()
 
     front_centre_point_index = 0
@@ -598,7 +560,6 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_connec
 def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_four_points_have_two_on_front_and_two_on_back(
     geometry_creator
 ):
-
     geometry_creator.convert_chopper_details_to_off()
 
     front_z = geometry_creator.z
@@ -622,7 +583,6 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_f
 
 
 def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_mesh_has_expected_shape():
-
     radius = 1
     slit_height = 0.5
     resolution = 5
@@ -726,7 +686,6 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
 def test_GIVEN_completed_mesh_WHEN_creating_off_geometry_THEN_off_geometry_has_expected_values(
     geometry_creator
 ):
-
     off_geometry = geometry_creator.create_disk_chopper_geometry()
 
     assert geometry_creator.faces == off_geometry.faces
