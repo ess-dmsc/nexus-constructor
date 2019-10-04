@@ -461,7 +461,6 @@ def test_GIVEN_pixel_mapping_WHEN_setting_off_geometry_shape_THEN_off_geometry_i
 def test_GIVEN_no_pixel_data_WHEN_setting_cylinder_shape_THEN_shape_group_has_name_shape(
     component
 ):
-
     with patch(
         "nexus_constructor.component.CylindricalGeometry"
     ) as mock_cylindrical_geometry_constructor:
@@ -474,7 +473,6 @@ def test_GIVEN_no_pixel_data_WHEN_setting_cylinder_shape_THEN_shape_group_has_na
 def test_GIVEN_no_pixel_data_WHEN_setting_off_geometry_shape_THEN_shape_group_has_name_shape(
     component
 ):
-
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
     units = "m"
     filename = "somefile.off"
@@ -497,7 +495,6 @@ def test_GIVEN_no_pixel_data_WHEN_setting_off_geometry_shape_THEN_shape_group_ha
 def test_GIVEN_pixel_grid_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_is_not_called_with_pixel_data(
     component
 ):
-
     pixel_grid = PixelGrid()
 
     with patch(
@@ -512,7 +509,6 @@ def test_GIVEN_pixel_grid_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_
 def test_GIVEN_pixel_grid_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_not_called_with_pixel_data(
     component
 ):
-
     pixel_grid = PixelGrid()
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
     units = "m"
@@ -540,7 +536,6 @@ def test_GIVEN_pixel_grid_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_n
 def test_GIVEN_cylinder_properties_WHEN_setting_cylindrical_geometry_shape_THEN_shape_group_has_class_nxcylindrical_geometry(
     component
 ):
-
     component.set_cylinder_shape()
     assert (
         component.group[SHAPE_GROUP_NAME].attrs["NX_class"]
@@ -551,7 +546,6 @@ def test_GIVEN_cylinder_properties_WHEN_setting_cylindrical_geometry_shape_THEN_
 def test_GIVEN_off_properties_WHEN_setting_off_geometry_shape_THEN_shape_group_has_class_nxoff_geometry(
     component
 ):
-
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
 
     with patch("nexus_constructor.component.OFFGeometryNexus"):
