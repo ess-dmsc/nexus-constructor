@@ -12,10 +12,17 @@ from nexus_constructor.geometry import (
     OFFGeometryNexus,
 )
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
+from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
+    UserDefinedChopperChecker,
+)
+from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
+    DiskChopperGeometryCreator,
+)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
+    CHOPPER_CLASS_NAME,
 )
 from nexus_constructor.validators import (
     UnitValidator,
@@ -344,8 +351,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 pixel_data=pixel_data,
             )
         else:
-            geometry_model = NoShapeGeometry()
-            component.remove_shape()
+            chopper_checker = UserDefinedChopperChecker(self.fieldsListWidget)
+            if (
+                component.nx_class == CHOPPER_CLASS_NAME
+                and chopper_checker.validate_chopper()
+            ):
+                geometry_model = DiskChopperGeometryCreator(
+                    chopper_checker.chopper_details
+                ).create_disk_chopper_geometry()
+            else:
+                geometry_model = NoShapeGeometry()
+                component.remove_shape()
 
         return geometry_model
 

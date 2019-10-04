@@ -38,6 +38,8 @@ COMPONENT_TYPES = {
     "NXxraylens",
 }
 
+CHOPPER_CLASS_NAME = "NXdisk_chopper"
+
 
 def __list_base_class_files(file_list):
     for file in file_list:
