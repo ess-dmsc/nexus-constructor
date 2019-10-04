@@ -1,4 +1,4 @@
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
 from typing import List
 

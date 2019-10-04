@@ -17,7 +17,7 @@ from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import (

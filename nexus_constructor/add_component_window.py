@@ -19,7 +19,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
     DiskChopperGeometryCreator,
 )
 from ui.add_component import Ui_AddComponentDialog
-from nexus_constructor.component_type import (
+from nexus_constructor.component.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
     CHOPPER_CLASS_NAME,
@@ -37,7 +37,7 @@ from nexus_constructor.component_tree_model import ComponentTreeModel
 import os
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
 
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid

@@ -1,5 +1,5 @@
 import pytest
-from nexus_constructor.component_type import (
+from nexus_constructor.component.component_type import (
     __list_base_class_files,
     _create_base_class_dict,
 )

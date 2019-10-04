@@ -3,7 +3,7 @@ from nexus_constructor.component_tree_model import (
     ComponentInfo,
     LinkTransformation,
 )
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
 import pytest

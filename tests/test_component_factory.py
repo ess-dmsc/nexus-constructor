@@ -1,6 +1,6 @@
-from nexus_constructor.chopper_component import ChopperComponent
-from nexus_constructor.component import Component
-from nexus_constructor.component_factory import create_component
+from nexus_constructor.component.chopper_component import ChopperComponent
+from nexus_constructor.component.component import Component
+from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.nexus import nexus_wrapper as nx
 
 
