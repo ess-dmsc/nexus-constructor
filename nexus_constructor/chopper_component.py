@@ -7,21 +7,31 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     DiskChopperGeometryCreator,
 )
-from typing import Optional, Union
+from nexus_constructor.transformations import Transformation
+from typing import Optional, Union, List, Tuple
 
 
 class ChopperComponent(Component):
-    def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
+    def get_shape(
+        self
+    ) -> Tuple[
+        Optional[Union[OFFGeometry, CylindricalGeometry]],
+        Optional[List[Transformation]],
+    ]:
         # If there is a shape group then use that
-        shape = super().get_shape()
+        shape, _ = super().get_shape()
         if shape is not None:
-            return shape
+            return shape, None
 
         # Otherwise see if we can generate shape from the details we have
         chopper_checker = NexusDefinedChopperChecker(self.group)
         if chopper_checker.validate_chopper():
-            return DiskChopperGeometryCreator(
-                chopper_checker.chopper_details
-            ).create_disk_chopper_geometry()
+            return (
+                DiskChopperGeometryCreator(
+                    chopper_checker.chopper_details
+                ).create_disk_chopper_geometry(),
+                None,
+            )
         else:
             print("Validation failed. Unable to create disk chopper mesh.")
+        return None, None

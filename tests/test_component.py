@@ -322,7 +322,7 @@ def test_can_add_cylinder_shape_to_and_component_and_get_the_same_shape_back():
     radius = 37.0
     component.set_cylinder_shape(axis, height, radius)
 
-    cylinder = component.get_shape()
+    cylinder, _ = component.get_shape()
     assert isinstance(cylinder, CylindricalGeometry)
     assert cylinder.height == approx(height)
     assert cylinder.radius == approx(radius)
@@ -349,7 +349,7 @@ def test_can_add_mesh_shape_to_and_component_and_get_the_same_shape_back():
     input_mesh = OFFGeometryNoNexus(vertices, faces)
     component.set_off_shape(input_mesh)
 
-    output_mesh = component.get_shape()
+    output_mesh, _ = component.get_shape()
     assert isinstance(output_mesh, OFFGeometryNexus)
     assert output_mesh.faces[0] == triangle
     assert output_mesh.vertices[2].x() == approx(vertex_2_x)
@@ -362,7 +362,7 @@ def test_can_override_existing_shape():
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
     component.set_cylinder_shape()
-    cylinder = component.get_shape()
+    cylinder, _ = component.get_shape()
     assert isinstance(
         cylinder, CylindricalGeometry
     ), "Expect shape to initially be a cylinder"
@@ -371,7 +371,7 @@ def test_can_override_existing_shape():
     faces = [[0, 1, 2]]
     input_mesh = OFFGeometryNoNexus(vertices, faces)
     component.set_off_shape(input_mesh)
-    output_mesh = component.get_shape()
+    output_mesh, _ = component.get_shape()
     assert isinstance(output_mesh, OFFGeometryNexus), "Expect shape to now be a mesh"
 
 

@@ -1,5 +1,5 @@
 import h5py
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Union, Tuple
 from PySide2.QtGui import QVector3D
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
@@ -25,7 +25,6 @@ from nexus_constructor.geometry import (
 )
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 import numpy as np
-
 
 SHAPE_GROUP_NAME = "shape"
 PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
@@ -339,14 +338,28 @@ class Component:
             )
         return shape_group
 
-    def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
+    def get_shape(
+        self
+    ) -> Tuple[
+        Optional[Union[OFFGeometry, CylindricalGeometry]],
+        Optional[List[Transformation]],
+    ]:
+        """
+        Get the shape of the component if there is one defined, and optionally a
+        list of transformations relative to the component's depends_on chain which
+        describe where the shape should be repeated
+        (used in subclass for components where the shape describes each pixel)
+
+        :return: Component shape, each transformation where the shape is repeated
+        """
         if SHAPE_GROUP_NAME in self.group:
             shape_group = self.group[SHAPE_GROUP_NAME]
             nx_class = get_nx_class(shape_group)
             if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
-                return CylindricalGeometry(self.file, shape_group)
+                return CylindricalGeometry(self.file, shape_group), None
             if nx_class == OFF_GEOMETRY_NEXUS_NAME:
-                return OFFGeometryNexus(self.file, shape_group)
+                return OFFGeometryNexus(self.file, shape_group), None
+        return None, None
 
     def remove_shape(self):
         if SHAPE_GROUP_NAME in self.group:
