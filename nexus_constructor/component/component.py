@@ -68,6 +68,18 @@ def _transforms_are_equivalent(
     return transform_1.absolute_path == transform_2.absolute_path
 
 
+def get_shape_from_component(
+    component_group: h5py.Group, nexus_file: nx.NexusWrapper, shape_group_name: str
+):
+    if shape_group_name in component_group:
+        shape_group = component_group[shape_group_name]
+        nx_class = get_nx_class(shape_group)
+        if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
+            return CylindricalGeometry(nexus_file, shape_group)
+        if nx_class == OFF_GEOMETRY_NEXUS_NAME:
+            return OFFGeometryNexus(nexus_file, shape_group)
+
+
 class Component:
     """
     Provides an interface to an existing component group in a NeXus file
@@ -352,14 +364,8 @@ class Component:
 
         :return: Component shape, each transformation where the shape is repeated
         """
-        if SHAPE_GROUP_NAME in self.group:
-            shape_group = self.group[SHAPE_GROUP_NAME]
-            nx_class = get_nx_class(shape_group)
-            if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
-                return CylindricalGeometry(self.file, shape_group), None
-            if nx_class == OFF_GEOMETRY_NEXUS_NAME:
-                return OFFGeometryNexus(self.file, shape_group), None
-        return None, None
+        shape = get_shape_from_component(self.group, self.file, SHAPE_GROUP_NAME)
+        return shape, None
 
     def remove_shape(self):
         if SHAPE_GROUP_NAME in self.group:
