@@ -38,7 +38,7 @@ def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_a
     )
 
 
-def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_is_converted_to_cm():
+def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_is_converted_to_m():
     chopper_details = ChopperDetails(
         slits=N_SLITS,
         slit_edges=EDGES_ARR,
@@ -52,7 +52,7 @@ def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_s
     assert chopper_details.slit_height * 100 == pytest.approx(SLIT_HEIGHT_LENGTH)
 
 
-def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius_is_converted_to_cm():
+def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius_is_converted_to_m():
     chopper_details = ChopperDetails(
         slits=N_SLITS,
         slit_edges=EDGES_ARR,
