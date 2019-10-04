@@ -72,7 +72,7 @@ class Instrument:
         if nx_class in COMPONENTS_IN_ENTRY:
             parent_group = self.nexus.entry
         component_group = self.nexus.create_nx_group(name, nx_class, parent_group)
-        component = Component(self.nexus, component_group)
+        component = create_component(self.nexus, component_group)
         component.description = description
         return component
 
