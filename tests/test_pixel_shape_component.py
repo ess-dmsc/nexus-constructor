@@ -1,5 +1,6 @@
 from nexus_constructor.component.pixel_shape_component import PixelShapeComponent
 from nexus_constructor.nexus import nexus_wrapper as nx
+from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 import numpy as np
 
 
@@ -22,7 +23,8 @@ def test_GIVEN_a_PixelShapeComponent_WHEN_calling_get_shape_THEN_shape_and_trans
     faces = [0]
     winding_order = [0, 1, 2, 3]
 
-    wrapper.set_field_value(shape_group, "vertices", vertices)
+    vertices_field = wrapper.set_field_value(shape_group, "vertices", vertices)
+    wrapper.set_attribute_value(vertices_field, "units", "m")
     wrapper.set_field_value(shape_group, "winding_order", winding_order)
     wrapper.set_field_value(shape_group, "faces", faces)
 
@@ -37,8 +39,9 @@ def test_GIVEN_a_PixelShapeComponent_WHEN_calling_get_shape_THEN_shape_and_trans
     assert isinstance(pixel_component, PixelShapeComponent)
     shape, transformations = pixel_component.get_shape()
 
-    assert np.array_equal(shape.vertices, vertices)
-    assert np.array_equal(shape.faces, faces)
+    for vertex_index, vertex in enumerate(shape.vertices):
+        assert np.allclose(qvector3d_to_numpy_array(vertex), vertices[vertex_index])
+    assert np.allclose(shape.faces, [winding_order])
 
     assert (
         len(transformations) == x_offsets.size()
