@@ -87,7 +87,7 @@ class InstrumentView(QWidget):
         self.give_colors_to_materials()
 
         # Initialise cube objects
-        self.sample_cube_dimensions = [1, 1, 1]
+        self.sample_cube_dimensions = [0.1, 0.1, 0.1]
         self.cube_entity = None
         self.cube_mesh = Qt3DExtras.QCuboidMesh()
 
