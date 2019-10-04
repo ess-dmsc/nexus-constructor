@@ -19,7 +19,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     _fields_have_correct_type,
     _edges_array_has_correct_shape,
 )
-from tests.chopper_test_resources import (
+from tests.chopper_test_helpers import (
     N_SLITS,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,

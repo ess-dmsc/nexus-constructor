@@ -1,7 +1,7 @@
 import numpy as np
 
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
-from tests.chopper_test_resources import (
+from tests.chopper_test_helpers import (
     N_SLITS,
     EDGES_ARR,
     RADIUS_LENGTH,
