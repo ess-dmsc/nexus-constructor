@@ -176,6 +176,9 @@ def create_writer_commands(
     job_id="",
     start_time=None,
     stop_time=None,
+    use_hdf_swmr=True,
+    service_id=None,
+    abort_on_uninitialised_stream=False,
 ):
     """
     :param nexus_structure: dictionary containing nexus file structure
@@ -184,6 +187,9 @@ def create_writer_commands(
     :param job_id: filewriter job_id
     :param start_time: ms from unix epoch
     :param stop_time: ms from unix epoch
+    :param abort_on_uninitialised_stream: Whether to abort if the stream cannot be initialised
+    :param service_id: The identifier for the instance of the file-writer that should handle this command. Only needed if multiple file-writers present
+    :param use_hdf_swmr: Whether to use HDF5's Single Writer Multiple Reader (SWMR) capabilities. Default is true in the filewriter
     :return: A write command and stop command with specified job_id.
     """
     if not job_id:
@@ -198,9 +204,18 @@ def create_writer_commands(
     }
     if start_time is not None:
         write_cmd["start_time"] = start_time
+    if not use_hdf_swmr:
+        write_cmd["use_hdf_swmr"] = use_hdf_swmr
+
+    if abort_on_uninitialised_stream:
+        write_cmd["abort_on_unitialised_stream"] = abort_on_uninitialised_stream
 
     stop_cmd = {"cmd": "FileWriter_stop", "job_id": job_id}
     if stop_time is not None:
         stop_cmd["stop_time"] = stop_time
+
+    if service_id is not None:
+        write_cmd["service_id"] = service_id
+        stop_cmd["service_id"] = service_id
 
     return write_cmd, stop_cmd
