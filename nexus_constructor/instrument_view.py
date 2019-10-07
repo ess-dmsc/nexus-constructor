@@ -1,10 +1,10 @@
-from typing import Tuple
+from typing import Tuple, List
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QRectF
-from PySide2.QtGui import QVector3D, QColor, QQuaternion
+from PySide2.QtGui import QVector3D, QColor
 from PySide2.QtWidgets import QWidget, QVBoxLayout
 
 from nexus_constructor.gnomon import Gnomon
@@ -113,6 +113,9 @@ class InstrumentView(QWidget):
         self.component_meshes = {}
         self.component_entities = {}
         self.component_transformations = {}
+        self.component_positions = (
+            {}
+        )  # Value is List[QVector3D], shape is repeated at each QVector3D
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.gnomon.setup_beam_cylinder()
@@ -200,18 +203,35 @@ class InstrumentView(QWidget):
         clear_buffers = Qt3DRender.QClearBuffers(camera_selector)
         return clear_buffers
 
-    def add_component(self, name: str, geometry: OFFGeometry):
+    def add_component(
+        self, name: str, geometry: OFFGeometry, positions: List[QVector3D] = None
+    ):
         """
         Add a component to the instrument view given a name and its geometry.
         :param name: The name of the component.
         :param geometry: The geometry information of the component that is used to create a mesh.
+        :param positions: Mesh is repeated at each of these positions
         """
+        if positions is None:
+            positions = [QVector3D(0, 0, 0)]
         mesh = OffMesh(geometry.off_geometry)
 
-        entity = create_qentity([mesh, self.grey_material], self.component_root_entity)
-
         self.component_meshes[name] = mesh
-        self.component_entities[name] = entity
+        position_transforms = []
+        for position in positions:
+            transform = Qt3DCore.QTransform()
+            transform.setTranslation(position)
+            position_transforms.append(transform)
+        self.component_positions[name] = position_transforms
+        # Note, the a list comprehension like below doesn't work (end up with segfault)
+        # self.component_positions[name] = [Qt3DCore.QTransform().setTranslation(position) for position in positions]
+        self.component_entities[name] = [
+            create_qentity(
+                [mesh, self.grey_material, position_transform],
+                self.component_root_entity,
+            )
+            for position_transform in self.component_positions[name]
+        ]
 
     def clear_all_components(self):
         """
@@ -225,8 +245,8 @@ class InstrumentView(QWidget):
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
         """
-
-        self.component_entities[name].setParent(None)
+        for entity in self.component_entities[name]:
+            entity.setParent(None)
 
         try:
             del self.component_entities[name]
@@ -243,6 +263,7 @@ class InstrumentView(QWidget):
         """
         try:
             del self.component_transformations[component_name]
+            del self.component_positions[component_name]
         except KeyError:
             pass
 

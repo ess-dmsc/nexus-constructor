@@ -4,6 +4,7 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
+from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.geometry import (
     OFFGeometry,
     OFFGeometryNoNexus,
@@ -387,15 +388,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         pixel_data = self.pixel_options.generate_pixel_data()
 
         if self.component_to_edit:
-            geometry = self.edit_existing_component(
+            shape, positions = self.edit_existing_component(
                 component_name, description, nx_class, pixel_data
             )
         else:
-            geometry = self.create_new_component(
+            shape, positions = self.create_new_component(
                 component_name, description, nx_class, pixel_data
             )
 
-        self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), geometry)
+        self.instrument.nexus.component_added.emit(
+            self.nameLineEdit.text(), shape, positions
+        )
 
     def create_new_component(
         self,
@@ -416,18 +419,22 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component = self.instrument.create_component(
             component_name, nx_class, description
         )
-        geometry = self.generate_geometry_model(component, pixel_data)
+        self.generate_geometry_model(component, pixel_data)
 
         # In the future this should check if the class is NXdetector or NXdetector_module
         if nx_class == "NXdetector":
-            if type(pixel_data) is PixelMapping:
+            if isinstance(pixel_data, PixelMapping):
                 component.record_detector_number(pixel_data)
-            if type(pixel_data) is PixelGrid:
+            if isinstance(pixel_data, PixelGrid):
                 component.record_pixel_grid(pixel_data)
 
         add_fields_to_component(component, self.fieldsListWidget)
         self.component_model.add_component(component)
-        return geometry
+
+        component_with_geometry = create_component(
+            self.instrument.nexus, component.group
+        )
+        return component_with_geometry.get_shape()
 
     def edit_existing_component(
         self,
@@ -451,8 +458,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if self.component_to_edit.get_shape()[0] and self.parent():
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
-        geometry = self.generate_geometry_model(self.component_to_edit, pixel_data)
-        return geometry
+        self.generate_geometry_model(self.component_to_edit, pixel_data)
+        component_with_geometry = create_component(
+            self.instrument.nexus, self.component_to_edit.group
+        )
+        return component_with_geometry.get_shape()
 
     def change_pixel_options_visibility(self):
         """
