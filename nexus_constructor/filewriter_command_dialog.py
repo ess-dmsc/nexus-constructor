@@ -73,10 +73,10 @@ class FilewriterCommandDialog(QDialog):
         """
         return (
             self.nexus_file_name_edit.text(),
-            self.start_time_picker.date()
+            self.start_time_picker.date().toTime_t()
             if self.start_time_enabled.checkState() == Qt.CheckState.Checked
             else None,
-            self.stop_time_picker.date()
+            self.stop_time_picker.date().toTime_t()
             if self.stop_time_enabled.checkState() == Qt.CheckState.Checked
             else None,
             self.service_id_lineedit.text(),

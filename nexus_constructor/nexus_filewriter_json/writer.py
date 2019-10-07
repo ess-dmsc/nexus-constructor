@@ -7,7 +7,16 @@ import uuid
 
 
 def generate_json(
-    data: Instrument, file, streams=None, links=None, nexus_file_name: str = ""
+    data: Instrument,
+    file,
+    streams=None,
+    links=None,
+    nexus_file_name: str = "",
+    start_time: str = None,
+    stop_time: str = None,
+    service_id: str = None,
+    abort_uninitialised: bool = False,
+    use_swmr: bool = True,
 ):
     """
     Returns a formatted json string built from a given Instrument
@@ -27,7 +36,15 @@ def generate_json(
 
     converter = NexusToDictConverter()
     tree = converter.convert(data.nexus.entry, streams, links)
-    write_command, stop_command = create_writer_commands(tree, nexus_file_name)
+    write_command, stop_command = create_writer_commands(
+        tree,
+        nexus_file_name,
+        start_time=start_time,
+        stop_time=stop_time,
+        service_id=service_id,
+        abort_on_uninitialised_stream=abort_uninitialised,
+        use_hdf_swmr=use_swmr,
+    )
     object_to_json_file(write_command, file)
 
 

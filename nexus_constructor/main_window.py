@@ -314,15 +314,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if filename:
             dialog = FilewriterCommandDialog()
             dialog.exec_()
-            name, ok_pressed = dialog.get_arguments()
-            if ok_pressed:
-                with open(filename, "w") as file:
-                    writer.generate_json(
-                        self.instrument,
-                        file,
-                        nexus_file_name=name,
-                        links=self.instrument.get_links(),
-                    )
+            nexus_file_name, start_time, stop_time, service_id, abort_on_uninitialised_stream, use_swmr = (
+                dialog.get_arguments()
+            )
+            with open(filename, "w") as file:
+                writer.generate_json(
+                    self.instrument,
+                    file,
+                    nexus_file_name=nexus_file_name,
+                    links=self.instrument.get_links(),
+                )
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
