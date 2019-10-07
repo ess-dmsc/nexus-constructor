@@ -1,15 +1,6 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'main_window.ui',
-# licensing of 'main_window.ui' applies.
-#
-# Created: Thu Jul  4 14:44:16 2019
-#      by: pyside2-uic  running on PySide2 5.12.3
-#
-# WARNING! All changes made in this file will be lost!
-
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 from PySide2.QtWidgets import QSplitter
+from nexus_constructor.instrument_view import InstrumentView
 
 
 class Ui_MainWindow(object):
@@ -53,7 +44,9 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab, "")
         self.splitter.addWidget(self.tabWidget)
         self.sceneWidget = InstrumentView(self.splitter)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sceneWidget.sizePolicy().hasHeightForWidth())
@@ -77,7 +70,9 @@ class Ui_MainWindow(object):
         self.actionExport_to_NeXus_file = QtWidgets.QAction(MainWindow)
         self.actionExport_to_NeXus_file.setObjectName("actionExport_to_NeXus_file")
         self.actionExport_to_Filewriter_JSON = QtWidgets.QAction(MainWindow)
-        self.actionExport_to_Filewriter_JSON.setObjectName("actionExport_to_Filewriter_JSON")
+        self.actionExport_to_Filewriter_JSON.setObjectName(
+            "actionExport_to_Filewriter_JSON"
+        )
         self.menuFile.addAction(self.actionOpen_NeXus_file)
         self.menuFile.addAction(self.actionExport_to_NeXus_file)
         self.menuFile.addAction(self.actionExport_to_Filewriter_JSON)
@@ -88,12 +83,34 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "NeXus Constructor", None, -1))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtWidgets.QApplication.translate("MainWindow", "Components", None, -1))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtWidgets.QApplication.translate("MainWindow", "NeXus File Layout", None, -1))
-        self.menuFile.setTitle(QtWidgets.QApplication.translate("MainWindow", "File", None, -1))
-        self.actionOpen_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Open NeXus file", None, -1))
-        self.actionExport_to_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Export to NeXus file", None, -1))
-        self.actionExport_to_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to Filewriter JSON", None, -1))
-
-from nexus_constructor.instrument_view import InstrumentView
+        MainWindow.setWindowTitle(
+            QtWidgets.QApplication.translate(
+                "MainWindow", "NeXus Constructor", None, -1
+            )
+        )
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_2),
+            QtWidgets.QApplication.translate("MainWindow", "Components", None, -1),
+        )
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab),
+            QtWidgets.QApplication.translate(
+                "MainWindow", "NeXus File Layout", None, -1
+            ),
+        )
+        self.menuFile.setTitle(
+            QtWidgets.QApplication.translate("MainWindow", "File", None, -1)
+        )
+        self.actionOpen_NeXus_file.setText(
+            QtWidgets.QApplication.translate("MainWindow", "Open NeXus file", None, -1)
+        )
+        self.actionExport_to_NeXus_file.setText(
+            QtWidgets.QApplication.translate(
+                "MainWindow", "Export to NeXus file", None, -1
+            )
+        )
+        self.actionExport_to_Filewriter_JSON.setText(
+            QtWidgets.QApplication.translate(
+                "MainWindow", "Export to Filewriter JSON", None, -1
+            )
+        )
