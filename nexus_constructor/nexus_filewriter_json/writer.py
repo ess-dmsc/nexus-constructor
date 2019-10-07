@@ -208,16 +208,18 @@ def create_writer_commands(
     return write_cmd, stop_cmd
 
 
-def generate_forwarder_command(file, streams: Dict[str, Dict[str, Any]]):
+def generate_forwarder_command(
+    file, streams: Dict[str, Dict[str, Any]], provider_type: str
+):
     tree_dict = dict()
     tree_dict["cmd"] = "add"
-    stream_list = _extract_forwarder_stream_info(streams)
+    stream_list = _extract_forwarder_stream_info(streams, provider_type)
     tree_dict["streams"] = stream_list
     object_to_json_file(tree_dict, file)
 
 
 def _extract_forwarder_stream_info(
-    streams: Dict[str, Dict[str, Any]]
+    streams: Dict[str, Dict[str, Any]], provider_type: str
 ) -> List[Dict[str, Union[Dict, str]]]:
     """
     Extracts the forwarder stream information to write a forwarder JSON command.
@@ -232,6 +234,7 @@ def _extract_forwarder_stream_info(
                 {
                     "channel": stream["source"],
                     "converter": {"schema": writer_module, "topic": stream["topic"]},
+                    "channel_provider_type": provider_type,
                 }
             )
     return stream_list

@@ -330,12 +330,24 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     )
 
     def save_to_forwarder_json(self):
+
         filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
         if filename:
-            with open(filename, "w") as file:
-                writer.generate_forwarder_command(
-                    file, streams=self.instrument.get_streams()
-                )
+            provider_type, ok_pressed = QInputDialog.getItem(
+                None,
+                "Provider type",
+                "Select provider type for PVs",
+                ["ca", "pva"],
+                0,
+                False,
+            )
+            if ok_pressed:
+                with open(filename, "w") as file:
+                    writer.generate_forwarder_command(
+                        file,
+                        streams=self.instrument.get_streams(),
+                        provider_type=provider_type,
+                    )
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
