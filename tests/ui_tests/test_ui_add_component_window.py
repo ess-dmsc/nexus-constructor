@@ -65,6 +65,20 @@ for i, component_class in enumerate(
     else:
         NO_PIXEL_OPTIONS[component_class] = i
 
+# Select a subset of the component class to use in parameterised tests
+# Should include any for which the UI is specialised
+_components_subset = ["NXdetector", "NXdetector_module", "NXdisk_chopper", "NXsensor"]
+COMPONENT_TYPES_SUBSET = {
+    class_name: position_in_combo_box
+    for class_name, position_in_combo_box in ALL_COMPONENT_TYPES.items()
+    if class_name in _components_subset
+}
+NO_PIXEL_OPTIONS_SUBSET = {
+    class_name: position_in_combo_box
+    for class_name, position_in_combo_box in NO_PIXEL_OPTIONS.items()
+    if class_name in _components_subset
+}
+
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
 FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(DATASET_TYPE.keys())}
@@ -418,7 +432,7 @@ def test_UI_GIVEN_nothing_WHEN_selecting_shape_with_units_THEN_default_units_are
 
 
 @pytest.mark.parametrize("pixels_class", PIXEL_OPTIONS.keys())
-@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("any_component_type", COMPONENT_TYPES_SUBSET)
 @pytest.mark.parametrize("pixel_shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_invisible_to_visible(
     qtbot, template, dialog, pixels_class, any_component_type, pixel_shape_name
@@ -435,7 +449,7 @@ def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_p
     assert dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES.keys())
+@pytest.mark.parametrize("any_component_type", COMPONENT_TYPES_SUBSET.keys())
 def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_options_go_from_visible_to_invisible(
     qtbot, template, dialog, any_component_type
 ):
@@ -448,7 +462,7 @@ def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_opt
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS.keys())
+@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS_SUBSET.keys())
 @pytest.mark.parametrize("pixels_class", PIXEL_OPTIONS.keys())
 @pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_or_cylinder_shape_THEN_pixel_options_becomes_invisible(
@@ -1022,7 +1036,7 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_choosing_shape_THEN_relevant_fiel
     assert not dialog.geometryFileBox.isVisible()
 
 
-@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS.keys())
+@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS_SUBSET.keys())
 def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_mapping_list_remains_empty(
     qtbot, template, dialog, no_pixels_class, mock_pixel_options
 ):
