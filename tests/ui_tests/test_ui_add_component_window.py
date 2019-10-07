@@ -67,7 +67,7 @@ for i, component_class in enumerate(
 
 # Select a subset of the component class to use in parameterised tests
 # Should include any for which the UI is specialised
-_components_subset = ["NXdetector", "NXdetector_module", "NXdisk_chopper", "NXsensor"]
+_components_subset = {"NXdetector", "NXdetector_module", "NXdisk_chopper", "NXsensor"}
 COMPONENT_TYPES_SUBSET = {
     class_name: position_in_combo_box
     for class_name, position_in_combo_box in ALL_COMPONENT_TYPES.items()

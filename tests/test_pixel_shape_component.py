@@ -1,4 +1,4 @@
-from nexus_constructor.component.pixel_shape_component import PixelShapeComponent
+from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 import numpy as np
@@ -35,8 +35,8 @@ def test_GIVEN_a_PixelShapeComponent_WHEN_calling_get_shape_THEN_shape_and_trans
     wrapper.set_field_value(detector_group, "x_pixel_offset", x_offsets)
     wrapper.set_field_value(detector_group, "y_pixel_offset", y_offsets)
 
-    pixel_component = PixelShapeComponent(wrapper, detector_group)
-    assert isinstance(pixel_component, PixelShapeComponent)
+    pixel_component = PixelShape(wrapper, detector_group)
+    assert isinstance(pixel_component, PixelShape)
     shape, transformations = pixel_component.get_shape()
 
     for vertex_index, vertex in enumerate(shape.vertices):

@@ -1,4 +1,4 @@
-from nexus_constructor.component.component import Component
+from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.geometry.cylindrical_geometry import CylindricalGeometry
 from nexus_constructor.geometry import OFFGeometry
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
@@ -11,7 +11,7 @@ from typing import Optional, Union, List, Tuple
 from PySide2.QtGui import QVector3D
 
 
-class ChopperComponent(Component):
+class ChopperShape(ComponentShape):
     def get_shape(
         self
     ) -> Tuple[
@@ -23,7 +23,7 @@ class ChopperComponent(Component):
             return shape, None
 
         # Otherwise see if we can generate shape from the details we have
-        chopper_checker = NexusDefinedChopperChecker(self.group)
+        chopper_checker = NexusDefinedChopperChecker(self.component_group)
         if chopper_checker.validate_chopper():
             return (
                 DiskChopperGeometryCreator(

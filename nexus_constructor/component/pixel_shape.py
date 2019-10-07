@@ -1,5 +1,5 @@
-from nexus_constructor.component.component import (
-    Component,
+from nexus_constructor.component.component_shape import (
+    ComponentShape,
     PIXEL_SHAPE_GROUP_NAME,
     get_shape_from_component,
 )
@@ -36,14 +36,22 @@ def _create_transformation_vectors_for_pixel_offsets(
     ]
 
 
-class PixelShapeComponent(Component):
+class PixelShape(ComponentShape):
     def get_shape(
         self
     ) -> Tuple[
         Optional[Union[OFFGeometry, CylindricalGeometry]], Optional[List[QVector3D]]
     ]:
-        shape = get_shape_from_component(self.group, self.file, PIXEL_SHAPE_GROUP_NAME)
+        shape = get_shape_from_component(
+            self.component_group, self.file, PIXEL_SHAPE_GROUP_NAME
+        )
         return (
             shape,
-            _create_transformation_vectors_for_pixel_offsets(self.group, self.file),
+            _create_transformation_vectors_for_pixel_offsets(
+                self.component_group, self.file
+            ),
         )
+
+    def remove_shape(self):
+        if PIXEL_SHAPE_GROUP_NAME in self.component_group:
+            del self.component_group[PIXEL_SHAPE_GROUP_NAME]
