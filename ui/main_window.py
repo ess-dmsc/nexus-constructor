@@ -3,8 +3,8 @@
 # Form implementation generated from reading ui file 'main_window.ui',
 # licensing of 'main_window.ui' applies.
 #
-# Created: Thu Jul  4 14:44:16 2019
-#      by: pyside2-uic  running on PySide2 5.12.3
+# Created: Mon Oct  7 10:08:27 2019
+#      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -58,8 +58,8 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.sceneWidget, 0, 1, 1, 2)
         self.verticalLayout_3.addLayout(self.gridLayout_3)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar()
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1287, 22))
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1287, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -73,9 +73,12 @@ class Ui_MainWindow(object):
         self.actionExport_to_NeXus_file.setObjectName("actionExport_to_NeXus_file")
         self.actionExport_to_Filewriter_JSON = QtWidgets.QAction(MainWindow)
         self.actionExport_to_Filewriter_JSON.setObjectName("actionExport_to_Filewriter_JSON")
+        self.actionExport_to_Forwarder_JSON = QtWidgets.QAction(MainWindow)
+        self.actionExport_to_Forwarder_JSON.setObjectName("actionExport_to_Forwarder_JSON")
         self.menuFile.addAction(self.actionOpen_NeXus_file)
         self.menuFile.addAction(self.actionExport_to_NeXus_file)
         self.menuFile.addAction(self.actionExport_to_Filewriter_JSON)
+        self.menuFile.addAction(self.actionExport_to_Forwarder_JSON)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -90,5 +93,6 @@ class Ui_MainWindow(object):
         self.actionOpen_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Open NeXus file", None, -1))
         self.actionExport_to_NeXus_file.setText(QtWidgets.QApplication.translate("MainWindow", "Export to NeXus file", None, -1))
         self.actionExport_to_Filewriter_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to Filewriter JSON", None, -1))
+        self.actionExport_to_Forwarder_JSON.setText(QtWidgets.QApplication.translate("MainWindow", "Export to Forwarder JSON", None, -1))
 
 from nexus_constructor.instrument_view import InstrumentView
