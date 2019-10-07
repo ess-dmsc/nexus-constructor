@@ -43,6 +43,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.actionExport_to_Filewriter_JSON.triggered.connect(
             self.save_to_filewriter_json
         )
+        self.actionExport_to_Forwarder_JSON.triggered.connect(
+            self.save_to_forwarder_json
+        )
 
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
@@ -309,7 +312,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.save_file(filename)
 
     def save_to_filewriter_json(self):
-        filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
+        filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
         if filename:
             name, ok_pressed = QInputDialog.getText(
                 None,
@@ -325,6 +328,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                         streams=self.instrument.get_streams(),
                         links=self.instrument.get_links(),
                     )
+
+    def save_to_forwarder_json(self):
+        filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
+        if filename:
+            with open(filename, "w") as file:
+                writer.generate_f142_command(
+                    file, streams=self.instrument.get_streams()
+                )
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)

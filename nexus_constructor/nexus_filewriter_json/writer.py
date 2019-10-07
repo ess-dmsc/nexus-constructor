@@ -204,3 +204,15 @@ def create_writer_commands(
         stop_cmd["stop_time"] = stop_time
 
     return write_cmd, stop_cmd
+
+
+def generate_f142_command(file, streams):
+    tree_dict = dict()
+    tree_dict["cmd"] = "add"
+
+    streams_dict = dict()
+
+    # TODO: list all of the pvs here.
+
+    tree_dict["streams"] = streams_dict
+    object_to_json_file(tree_dict, file)
