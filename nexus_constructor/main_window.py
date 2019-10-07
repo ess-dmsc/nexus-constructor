@@ -333,7 +333,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
         if filename:
             with open(filename, "w") as file:
-                writer.generate_f142_command(
+                writer.generate_forwarder_command(
                     file, streams=self.instrument.get_streams()
                 )
 

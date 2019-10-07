@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 import h5py
 
 from nexus_constructor.instrument import Instrument
@@ -206,13 +208,20 @@ def create_writer_commands(
     return write_cmd, stop_cmd
 
 
-def generate_f142_command(file, streams):
+def generate_forwarder_command(file, streams: Dict[str, Dict[str, Any]]):
     tree_dict = dict()
     tree_dict["cmd"] = "add"
+    stream_list = []
 
-    streams_dict = dict()
+    for _, stream in streams.items():
+        writer_module = stream["writer_module"]
+        if writer_module == "f142" or writer_module == "TdcTime":
+            stream_list.append(
+                {
+                    "channel": stream["source"],
+                    "converter": {"schema": writer_module, "topic": stream["topic"]},
+                }
+            )
 
-    # TODO: list all of the pvs here.
-
-    tree_dict["streams"] = streams_dict
+    tree_dict["streams"] = stream_list
     object_to_json_file(tree_dict, file)
