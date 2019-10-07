@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Union, Tuple
 
 from PySide2.QtCore import QDateTime, Qt
 from PySide2.QtWidgets import (
@@ -63,14 +64,20 @@ class FilewriterCommandDialog(QDialog):
                 True
             ) if is_start_time else self.stop_time_picker.setEnabled(True)
 
-    def get_arguments(self):
+    def get_arguments(
+        self
+    ) -> Tuple[str, Union[str, None], Union[str, None], str, bool, bool]:
+        """
+        gets the arguments of required and optional fields for the filewriter command. 
+        :return: Tuple containing all of the fields. 
+        """
         return (
             self.nexus_file_name_edit.text(),
             self.start_time_picker.date()
             if self.start_time_enabled.checkState() == Qt.CheckState.Checked
             else None,
             self.stop_time_picker.date()
-            if self.stop_time_enabled.checkState() == Qt.Checkstate.Checked
+            if self.stop_time_enabled.checkState() == Qt.CheckState.Checked
             else None,
             self.service_id_lineedit.text(),
             self.abort_on_unitialised_stream_checkbox.checkState()
