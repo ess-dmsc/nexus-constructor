@@ -10,23 +10,32 @@
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+
 class Ui_PixelOptionsWidget(object):
     def setupUi(self, PixelOptionsWidget):
         PixelOptionsWidget.setObjectName("PixelOptionsWidget")
         PixelOptionsWidget.resize(560, 403)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding
+        )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(PixelOptionsWidget.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            PixelOptionsWidget.sizePolicy().hasHeightForWidth()
+        )
         PixelOptionsWidget.setSizePolicy(sizePolicy)
         PixelOptionsWidget.setMinimumSize(QtCore.QSize(560, 20))
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(PixelOptionsWidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.pixelOptionsBox = QtWidgets.QGroupBox(PixelOptionsWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding
+        )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pixelOptionsBox.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.pixelOptionsBox.sizePolicy().hasHeightForWidth()
+        )
         self.pixelOptionsBox.setSizePolicy(sizePolicy)
         self.pixelOptionsBox.setMinimumSize(QtCore.QSize(0, 20))
         self.pixelOptionsBox.setObjectName("pixelOptionsBox")
@@ -97,11 +106,13 @@ class Ui_PixelOptionsWidget(object):
         self.countFirstComboBox.setObjectName("countFirstComboBox")
         self.gridLayout_5.addWidget(self.countFirstComboBox, 4, 2, 1, 2)
         self.rowCountSpinBox = QtWidgets.QSpinBox(self.pixelGridBox)
+        self.rowCountSpinBox.setMinimum(1)
         self.rowCountSpinBox.setMaximum(1000000)
         self.rowCountSpinBox.setProperty("value", 1)
         self.rowCountSpinBox.setObjectName("rowCountSpinBox")
         self.gridLayout_5.addWidget(self.rowCountSpinBox, 0, 1, 1, 1)
         self.columnCountSpinBox = QtWidgets.QSpinBox(self.pixelGridBox)
+        self.columnCountSpinBox.setMinimum(1)
         self.columnCountSpinBox.setMaximum(1000000)
         self.columnCountSpinBox.setProperty("value", 1)
         self.columnCountSpinBox.setObjectName("columnCountSpinBox")
@@ -144,26 +155,120 @@ class Ui_PixelOptionsWidget(object):
         QtCore.QMetaObject.connectSlotsByName(PixelOptionsWidget)
 
     def retranslateUi(self, PixelOptionsWidget):
-        PixelOptionsWidget.setWindowTitle(QtWidgets.QApplication.translate("PixelOptionsWidget", "Form", None, -1))
-        self.pixelOptionsBox.setTitle(QtWidgets.QApplication.translate("PixelOptionsWidget", "Pixel options", None, -1))
-        self.pixelLayoutBox.setTitle(QtWidgets.QApplication.translate("PixelOptionsWidget", "Pixel layout:", None, -1))
-        self.singlePixelRadioButton.setToolTip(QtWidgets.QApplication.translate("PixelOptionsWidget", "The defined cylinder or mesh shape describes each identical pixel in the detector", None, -1))
-        self.singlePixelRadioButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Repeated Single Pixel Shape", None, -1))
-        self.entireShapeRadioButton.setToolTip(QtWidgets.QApplication.translate("PixelOptionsWidget", "The defined cylinder or mesh shape describes the shape of the entire detector", None, -1))
-        self.entireShapeRadioButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Entire Shape", None, -1))
-        self.noPixelsButton.setToolTip(QtWidgets.QApplication.translate("PixelOptionsWidget", "The defined cylinder or mesh shape does not define the shape of the detector pixels", None, -1))
-        self.noPixelsButton.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "No Pixels", None, -1))
-        self.pixelGridBox.setTitle(QtWidgets.QApplication.translate("PixelOptionsWidget", "Pixel grid:", None, -1))
-        self.rowLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Row:", None, -1))
-        self.rowHeightLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Row height:", None, -1))
-        self.columnWidthLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Column width:", None, -1))
-        self.firstIDLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "First ID:", None, -1))
-        self.columnsLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Columns:", None, -1))
-        self.countFirstLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Count first along:", None, -1))
-        self.countingFromLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Start counting from:", None, -1))
-        self.startCountingComboBox.setItemText(0, QtWidgets.QApplication.translate("PixelOptionsWidget", "Bottom Left", None, -1))
-        self.startCountingComboBox.setItemText(1, QtWidgets.QApplication.translate("PixelOptionsWidget", "Bottom Right", None, -1))
-        self.startCountingComboBox.setItemText(2, QtWidgets.QApplication.translate("PixelOptionsWidget", "Top Left", None, -1))
-        self.startCountingComboBox.setItemText(3, QtWidgets.QApplication.translate("PixelOptionsWidget", "Top Right", None, -1))
-        self.pixelMappingLabel.setText(QtWidgets.QApplication.translate("PixelOptionsWidget", "Pixel mapping:", None, -1))
-
+        PixelOptionsWidget.setWindowTitle(
+            QtWidgets.QApplication.translate("PixelOptionsWidget", "Form", None, -1)
+        )
+        self.pixelOptionsBox.setTitle(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Pixel options", None, -1
+            )
+        )
+        self.pixelLayoutBox.setTitle(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Pixel layout:", None, -1
+            )
+        )
+        self.singlePixelRadioButton.setToolTip(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget",
+                "The defined cylinder or mesh shape describes each identical pixel in the detector",
+                None,
+                -1,
+            )
+        )
+        self.singlePixelRadioButton.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Repeated Single Pixel Shape", None, -1
+            )
+        )
+        self.entireShapeRadioButton.setToolTip(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget",
+                "The defined cylinder or mesh shape describes the shape of the entire detector",
+                None,
+                -1,
+            )
+        )
+        self.entireShapeRadioButton.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Entire Shape", None, -1
+            )
+        )
+        self.noPixelsButton.setToolTip(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget",
+                "The defined cylinder or mesh shape does not define the shape of the detector pixels",
+                None,
+                -1,
+            )
+        )
+        self.noPixelsButton.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "No Pixels", None, -1
+            )
+        )
+        self.pixelGridBox.setTitle(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Pixel grid:", None, -1
+            )
+        )
+        self.rowLabel.setText(
+            QtWidgets.QApplication.translate("PixelOptionsWidget", "Row:", None, -1)
+        )
+        self.rowHeightLabel.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Row height:", None, -1
+            )
+        )
+        self.columnWidthLabel.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Column width:", None, -1
+            )
+        )
+        self.firstIDLabel.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "First ID:", None, -1
+            )
+        )
+        self.columnsLabel.setText(
+            QtWidgets.QApplication.translate("PixelOptionsWidget", "Columns:", None, -1)
+        )
+        self.countFirstLabel.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Count first along:", None, -1
+            )
+        )
+        self.countingFromLabel.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Start counting from:", None, -1
+            )
+        )
+        self.startCountingComboBox.setItemText(
+            0,
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Bottom Left", None, -1
+            ),
+        )
+        self.startCountingComboBox.setItemText(
+            1,
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Bottom Right", None, -1
+            ),
+        )
+        self.startCountingComboBox.setItemText(
+            2,
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Top Left", None, -1
+            ),
+        )
+        self.startCountingComboBox.setItemText(
+            3,
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Top Right", None, -1
+            ),
+        )
+        self.pixelMappingLabel.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Pixel mapping:", None, -1
+            )
+        )
