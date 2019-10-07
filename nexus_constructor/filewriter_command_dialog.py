@@ -12,6 +12,8 @@ from PySide2.QtWidgets import (
     QPushButton,
 )
 
+from nexus_constructor.ui_utils import validate_line_edit
+
 TIME_FORMAT = "yyyy MM dd hh:mm:ss"
 
 
@@ -25,6 +27,7 @@ class FilewriterCommandDialog(QDialog):
         filename_validator = CommandDialogOKButtonValidator(self)
         self.nexus_file_name_edit.setValidator(filename_validator)
         filename_validator.is_valid.connect(self.validate)
+        self.validate(False)
 
         self.start_time_enabled = QCheckBox()
         self.start_time_picker = QDateTimeEdit(QDateTime.currentDateTime())
@@ -60,8 +63,11 @@ class FilewriterCommandDialog(QDialog):
 
     def validate(self, is_valid):
         self.ok_button.setEnabled(is_valid)
-        self.nexus_file_name_edit.setToolTip("Filename invalid" if not is_valid else "")
-
+        validate_line_edit(
+            self.nexus_file_name_edit,
+            is_valid,
+            tooltip_on_reject="Invalid NeXus file name",
+        )
 
     def state_changed(self, is_start_time: bool, state: Qt.CheckState):
         if state != Qt.CheckState.Checked:
