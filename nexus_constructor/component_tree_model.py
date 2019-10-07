@@ -221,7 +221,7 @@ class ComponentTreeModel(QAbstractItemModel):
         if not index.isValid():
             return QModelIndex()
         parent_item = index.internalPointer()
-        if type(parent_item) is Component:
+        if isinstance(parent_item, Component):
             return QModelIndex()
         elif type(parent_item) is TransformationsList:
             try:
@@ -248,7 +248,7 @@ class ComponentTreeModel(QAbstractItemModel):
 
         parent_item = parent.internalPointer()
 
-        if type(parent_item) is Component:
+        if isinstance(parent_item, Component):
             return 2
         elif type(parent_item) is TransformationsList:
             if parent_item.has_link:

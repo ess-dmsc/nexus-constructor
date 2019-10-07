@@ -9,6 +9,7 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
 from mock import Mock, call, patch, mock_open
 from pytestqt.qtbot import QtBot
+import numpy as np
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -20,7 +21,7 @@ from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_options import PixelOptions
-from nexus_constructor.validators import FieldType, PixelValidator
+from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -65,6 +66,9 @@ for i, component_class in enumerate(
         NO_PIXEL_OPTIONS[component_class] = i
 
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
+
+FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(DATASET_TYPE.keys())}
+FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 
 @pytest.fixture(scope="function")
@@ -150,6 +154,177 @@ def create_add_component_dialog():
     component = ComponentTreeModel(instrument)
     nexus_wrapper_count += 1
     return AddComponentDialog(instrument, component)
+
+
+def enter_file_path(
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    file_path: str,
+    file_contents: str,
+):
+    """
+    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
+    geometry file.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param file_path: The desired file path.
+    :param file_contents: The file contents that are returned by the open mock.
+    """
+    with patch(
+        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
+    ):
+        with patch("builtins.open", mock_open(read_data=file_contents)):
+            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
+
+
+def enter_component_name(
+    qtbot: pytestqt.qtbot.QtBot,
+    template: PySide2.QtWidgets.QDialog,
+    dialog: AddComponentDialog,
+    component_name: str,
+):
+    """
+    Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
+    name.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param component_name: The desired component name.
+    """
+    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClicks(dialog.nameLineEdit, component_name)
+    show_and_close_window(qtbot, template)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup(request):
+    """
+    Creates a QtBot at the end of all the tests and has it wait. This seems to be necessary in order to prevent
+    the use of fixtures from causing a segmentation fault.
+    """
+
+    def make_another_qtest():
+        bot = QtBot(request)
+        bot.wait(1)
+
+    request.addfinalizer(make_another_qtest)
+
+
+def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
+    """
+    Finds the shape type button that contains the given text.
+    :param dialog: An instance of an AddComponentDialog.
+    :param button_name: The name of the desired button.
+    :return: The QRadioButton for the given shape type.
+    """
+    for child in dialog.shapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
+        if child.text() == button_name:
+            return child
+
+
+def make_pixel_options_disappear(
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    component_index: int,
+):
+    """
+    Create the conditions to allow the disappearance of the pixel options by pressing the NoShape button.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param component_index: The index of a component type.
+    """
+    systematic_button_press(qtbot, template, dialog.noShapeRadioButton)
+    dialog.componentTypeComboBox.setCurrentIndex(component_index)
+    show_and_close_window(qtbot, template)
+
+
+def make_pixel_options_appear(
+    qtbot: pytestqt.qtbot.QtBot,
+    button: QRadioButton,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    pixel_options_index: int = PIXEL_OPTIONS["NXdetector"],
+):
+    """
+    Create the conditions to allow the appearance of the pixel options by choosing NXdetector or NXdetector_module as
+    the component type and NXcylindrical_geometry or NXoff_geometry as the shape type.
+    :param qtbot: The qtbot testing tool.
+    :param button: The Mesh or Cylinder radio button.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
+    """
+    systematic_button_press(qtbot, template, button)
+    dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
+    show_and_close_window(qtbot, template)
+
+
+def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
+    """
+    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
+    given string.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog object.
+    :param units: The desired units input.
+    """
+    word_length = len(dialog.unitsLineEdit.text())
+    for _ in range(word_length):
+        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+
+    if len(units) > 0:
+        qtbot.keyClicks(dialog.unitsLineEdit, units)
+
+
+def enter_disk_chopper_fields(
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+):
+
+    qtbot.keyClicks(dialog.nameLineEdit, "ThisIsADiskChopper")
+    dialog.componentTypeComboBox.setCurrentIndex(ALL_COMPONENT_TYPES["NXdisk_chopper"])
+
+    for _ in range(4):
+        systematic_button_press(qtbot, template, dialog.addFieldPushButton)
+
+    fields_widgets = [
+        dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(i))
+        for i in range(4)
+    ]
+
+    qtbot.keyClicks(fields_widgets[0].field_name_edit, "slits")
+    qtbot.keyClicks(fields_widgets[1].field_name_edit, "slit_edges")
+    qtbot.keyClicks(fields_widgets[2].field_name_edit, "radius")
+    qtbot.keyClicks(fields_widgets[3].field_name_edit, "slit_height")
+
+    show_and_close_window(qtbot, template)
+
+    fields_widgets[0].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Integer"])
+    fields_widgets[1].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[2].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[3].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+
+    show_and_close_window(qtbot, template)
+
+    fields_widgets[1].field_type_combo.setCurrentIndex(
+        FIELD_TYPES[FieldType.array_dataset.value]
+    )
+
+    show_and_close_window(qtbot, template)
+
+    qtbot.keyClicks(fields_widgets[0].value_line_edit, "6")
+    qtbot.keyClicks(fields_widgets[2].value_line_edit, "200")
+    qtbot.keyClicks(fields_widgets[3].value_line_edit, "100")
+
+    fields_widgets[1].table_view.model.array = np.array(
+        [[(i * 10.0)] for i in range(12)]
+    )
+
+    show_and_close_window(qtbot, template)
 
 
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
@@ -1360,6 +1535,32 @@ def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(qt
     assert field.value.path == h5py.SoftLink(field_target).path
 
 
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_geometry_is_created(
+    qtbot, dialog, template
+):
+
+    enter_disk_chopper_fields(qtbot, dialog, template)
+
+    with patch(
+        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+    ) as chopper_creator:
+        dialog.on_ok()
+        chopper_creator.assert_called_once()
+
+
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_chopper_geometry_is_not_created(
+    qtbot, dialog, template
+):
+
+    systematic_button_press(qtbot, template, dialog.meshRadioButton)
+    enter_file_path(
+        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
+    )
+    show_and_close_window(qtbot, template)
+
+    enter_disk_chopper_fields(qtbot, dialog, template)
+
+
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_correct_options(
     qtbot
 ):
@@ -1580,101 +1781,39 @@ def enter_file_path(
             systematic_button_press(qtbot, template, dialog.fileBrowseButton)
 
 
-def enter_component_name(
-    qtbot: pytestqt.qtbot.QtBot,
-    template: PySide2.QtWidgets.QDialog,
-    dialog: AddComponentDialog,
-    component_name: str,
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_THEN_chopper_geometry_is_not_created(
+    qtbot, dialog, template
 ):
-    """
-    Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
-    name.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param component_name: The desired component name.
-    """
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
-    qtbot.keyClicks(dialog.nameLineEdit, component_name)
+
+    systematic_button_press(qtbot, template, dialog.CylinderRadioButton)
     show_and_close_window(qtbot, template)
 
+    enter_disk_chopper_fields(qtbot, dialog, template)
 
-@pytest.fixture(scope="session", autouse=True)
-def cleanup(request):
-    """
-    Creates a QtBot at the end of all the tests and has it wait. This seems to be necessary in order to prevent
-    the use of fixtures from causing a segmentation fault.
-    """
-
-    def make_another_qtest():
-        bot = QtBot(request)
-        bot.wait(1)
-
-    request.addfinalizer(make_another_qtest)
+    with patch(
+        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+    ) as chopper_creator:
+        dialog.on_ok()
+        chopper_creator.assert_not_called()
 
 
-def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
-    """
-    Finds the shape type button that contains the given text.
-    :param dialog: An instance of an AddComponentDialog.
-    :param button_name: The name of the desired button.
-    :return: The QRadioButton for the given shape type.
-    """
-    for child in dialog.shapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
-        if child.text() == button_name:
-            return child
-
-
-def make_pixel_options_disappear(
-    qtbot: pytestqt.qtbot.QtBot,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    component_index: int,
+def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
+    qtbot, dialog, template
 ):
-    """
-    Create the conditions to allow the disappearance of the pixel options by pressing the NoShape button.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param component_index: The index of a component type.
-    """
-    systematic_button_press(qtbot, template, dialog.noShapeRadioButton)
-    dialog.componentTypeComboBox.setCurrentIndex(component_index)
-    show_and_close_window(qtbot, template)
 
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
-def make_pixel_options_appear(
-    qtbot: pytestqt.qtbot.QtBot,
-    button: QRadioButton,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    pixel_options_index: int = PIXEL_OPTIONS["NXdetector"],
-):
-    """
-    Create the conditions to allow the appearance of the pixel options by choosing NXdetector or NXdetector_module as
-    the component type and NXcylindrical_geometry or NXoff_geometry as the shape type.
-    :param qtbot: The qtbot testing tool.
-    :param button: The Mesh or Cylinder radio button.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
-    """
-    systematic_button_press(qtbot, template, button)
-    dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
-    show_and_close_window(qtbot, template)
+    field.field_type_combo.setCurrentText(FieldType.link.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
 
+    field_name = "testfield"
+    field_target = "/somewhere/"
 
-def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: str):
-    """
-    Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
-    given string.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
-    :param units: The desired units input.
-    """
-    word_length = len(dialog.unitsLineEdit.text())
-    for _ in range(word_length):
-        qtbot.keyClick(dialog.unitsLineEdit, Qt.Key_Backspace)
+    field.field_name_edit.setText(field_name)
+    field.value_line_edit.setText(field_target)
 
-    if len(units) > 0:
-        qtbot.keyClicks(dialog.unitsLineEdit, units)
+    assert field.dtype == h5py.SoftLink
+
+    assert field.name == field_name
+    assert field.value.path == h5py.SoftLink(field_target).path

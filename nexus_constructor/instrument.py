@@ -7,6 +7,7 @@ from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.component import Component
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.transformations import Transformation
+from nexus_constructor.component_factory import create_component
 
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -107,7 +108,7 @@ class Instrument:
                 if "NX_class" in node.attrs.keys():
                     nx_class = get_nx_class(node)
                     if nx_class and nx_class in self.nx_component_classes:
-                        component_list.append(Component(self.nexus, node))
+                        component_list.append(create_component(self.nexus, node))
 
         self.nexus.entry.visititems(find_components)
         return component_list
