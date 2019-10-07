@@ -311,6 +311,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
         if filename:
+
             name, ok_pressed = QInputDialog.getText(
                 None,
                 "NeXus file output name",
