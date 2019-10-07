@@ -14,6 +14,7 @@ import os
 import h5py
 
 from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.filewriter_command_dialog import FilewriterCommandDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
@@ -311,12 +312,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
         if filename:
-
-            name, ok_pressed = QInputDialog.getText(
-                None,
-                "NeXus file output name",
-                "Name for output NeXus file to include in JSON command:",
-            )
+            dialog = FilewriterCommandDialog()
+            dialog.exec_()
+            name, ok_pressed = dialog.get_arguments()
             if ok_pressed:
                 with open(filename, "w") as file:
                     writer.generate_json(
