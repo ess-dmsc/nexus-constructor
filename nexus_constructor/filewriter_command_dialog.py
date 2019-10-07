@@ -1,4 +1,6 @@
-from PySide2.QtCore import QDateTime
+from functools import partial
+
+from PySide2.QtCore import QDateTime, Qt
 from PySide2.QtWidgets import (
     QDialog,
     QFormLayout,
@@ -22,10 +24,14 @@ class FilewriterCommandDialog(QDialog):
         self.start_time_enabled = QCheckBox()
         self.start_time_picker = QDateTimeEdit(QDateTime.currentDateTime())
         self.start_time_picker.setDisplayFormat(TIME_FORMAT)
+        self.start_time_enabled.stateChanged.connect(partial(self.state_changed, True))
+        self.start_time_enabled.setChecked(True)
 
         self.stop_time_enabled = QCheckBox()
         self.stop_time_picker = QDateTimeEdit(QDateTime.currentDateTime())
         self.stop_time_picker.setDisplayFormat(TIME_FORMAT)
+        self.stop_time_enabled.stateChanged.connect(partial(self.state_changed, False))
+        self.stop_time_enabled.setChecked(True)
 
         self.service_id_lineedit = QLineEdit()
         self.abort_on_unitialised_stream_checkbox = QCheckBox()
@@ -47,5 +53,27 @@ class FilewriterCommandDialog(QDialog):
         self.ok_button.clicked.connect(self.close)
         self.layout().addRow(self.ok_button)
 
+    def state_changed(self, is_start_time: bool, state: Qt.CheckState):
+        if state != Qt.CheckState.Checked:
+            self.start_time_picker.setEnabled(
+                False
+            ) if is_start_time else self.stop_time_picker.setEnabled(False)
+        else:
+            self.start_time_picker.setEnabled(
+                True
+            ) if is_start_time else self.stop_time_picker.setEnabled(True)
+
     def get_arguments(self):
-        return "", True
+        return (
+            self.nexus_file_name_edit.text(),
+            self.start_time_picker.date()
+            if self.start_time_enabled.checkState() == Qt.CheckState.Checked
+            else None,
+            self.stop_time_picker.date()
+            if self.stop_time_enabled.checkState() == Qt.Checkstate.Checked
+            else None,
+            self.service_id_lineedit.text(),
+            self.abort_on_unitialised_stream_checkbox.checkState()
+            == Qt.CheckState.Checked,
+            self.use_swmr_checkbox.checkState() == Qt.CheckState.Checked,
+        )
