@@ -53,6 +53,7 @@ class FilewriterCommandDialog(QDialog):
         self.ok_button = QPushButton("Ok")
         self.ok_button.clicked.connect(self.close)
         self.layout().addRow(self.ok_button)
+        # TODO: add validation of ok button
 
     def state_changed(self, is_start_time: bool, state: Qt.CheckState):
         if state != Qt.CheckState.Checked:
@@ -73,10 +74,10 @@ class FilewriterCommandDialog(QDialog):
         """
         return (
             self.nexus_file_name_edit.text(),
-            self.start_time_picker.date().toTime_t()
+            self.start_time_picker.dateTime().toMSecsSinceEpoch()
             if self.start_time_enabled.checkState() == Qt.CheckState.Checked
             else None,
-            self.stop_time_picker.date().toTime_t()
+            self.stop_time_picker.dateTime().toMSecsSinceEpoch()
             if self.stop_time_enabled.checkState() == Qt.CheckState.Checked
             else None,
             self.service_id_lineedit.text(),
