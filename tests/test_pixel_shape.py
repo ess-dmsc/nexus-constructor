@@ -4,7 +4,7 @@ from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 import numpy as np
 
 
-def test_GIVEN_a_PixelShapeComponent_WHEN_calling_get_shape_THEN_shape_and_transformations_are_returned():
+def test_GIVEN_a_PixelShape_WHEN_calling_get_shape_THEN_shape_and_transformations_are_returned():
     wrapper = nx.NexusWrapper("file_with_detector")
     detector_group = wrapper.create_nx_group(
         "detector", "NXdetector", wrapper.instrument
@@ -35,9 +35,9 @@ def test_GIVEN_a_PixelShapeComponent_WHEN_calling_get_shape_THEN_shape_and_trans
     wrapper.set_field_value(detector_group, "x_pixel_offset", x_offsets)
     wrapper.set_field_value(detector_group, "y_pixel_offset", y_offsets)
 
-    pixel_component = PixelShape(wrapper, detector_group)
-    assert isinstance(pixel_component, PixelShape)
-    shape, transformations = pixel_component.get_shape()
+    pixel_shape = PixelShape(wrapper, detector_group)
+    assert isinstance(pixel_shape, PixelShape)
+    shape, transformations = pixel_shape.get_shape()
 
     for vertex_index, vertex in enumerate(shape.vertices):
         assert np.allclose(qvector3d_to_numpy_array(vertex), vertices[vertex_index])
