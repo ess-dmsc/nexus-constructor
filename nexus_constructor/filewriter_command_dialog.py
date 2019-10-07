@@ -1,7 +1,8 @@
 from functools import partial
 from typing import Union, Tuple
 
-from PySide2.QtCore import QDateTime, Qt
+from PySide2.QtCore import QDateTime, Qt, Signal
+from PySide2.QtGui import QValidator
 from PySide2.QtWidgets import (
     QDialog,
     QFormLayout,
@@ -21,6 +22,9 @@ class FilewriterCommandDialog(QDialog):
         self.setLayout(QFormLayout())
 
         self.nexus_file_name_edit = QLineEdit()
+        filename_validator = CommandDialogOKButtonValidator(self)
+        self.nexus_file_name_edit.setValidator(filename_validator)
+        filename_validator.is_valid.connect(self.validate)
 
         self.start_time_enabled = QCheckBox()
         self.start_time_picker = QDateTimeEdit(QDateTime.currentDateTime())
@@ -53,7 +57,11 @@ class FilewriterCommandDialog(QDialog):
         self.ok_button = QPushButton("Ok")
         self.ok_button.clicked.connect(self.close)
         self.layout().addRow(self.ok_button)
-        # TODO: add validation of ok button
+
+    def validate(self, is_valid):
+        self.ok_button.setEnabled(is_valid)
+        self.nexus_file_name_edit.setToolTip("Filename invalid" if not is_valid else "")
+
 
     def state_changed(self, is_start_time: bool, state: Qt.CheckState):
         if state != Qt.CheckState.Checked:
@@ -85,3 +93,25 @@ class FilewriterCommandDialog(QDialog):
             == Qt.CheckState.Checked,
             self.use_swmr_checkbox.checkState() == Qt.CheckState.Checked,
         )
+
+
+class CommandDialogOKButtonValidator(QValidator):
+    """
+    Validator to ensure item names are unique within a model that has a 'name' property
+
+    The validationFailed signal is emitted if an entered name is not unique.
+    """
+
+    def __init__(self, dialog: FilewriterCommandDialog):
+        super().__init__()
+        self.dialog = dialog
+
+    def validate(self, input: str, pos: int):
+        if not input or not input.endswith("nxs"):
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
+
+    is_valid = Signal(bool)
