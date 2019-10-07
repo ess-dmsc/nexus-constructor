@@ -545,7 +545,7 @@ def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_com
     assert tree_model.rowCount(QModelIndex()) == 3
     second_component_index = tree_model.index(2, 0, QModelIndex())
     second_component = second_component_index.internalPointer()
-    second_shape, _ = second_component.get_shape()
+    second_shape, _ = second_component.shape
     assert second_shape.axis_direction == axis_direction
     assert second_shape.height == height
     assert second_shape.units == units
@@ -592,7 +592,7 @@ def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_T
     assert tree_model.rowCount(QModelIndex()) == 3
     second_component_index = tree_model.index(2, 0, QModelIndex())
     second_component = second_component_index.internalPointer()
-    second_shape, _ = second_component.get_shape()
+    second_shape, _ = second_component.shape
 
     assert second_shape.vertices == vertices
     assert second_shape.faces == faces

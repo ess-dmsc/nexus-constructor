@@ -87,9 +87,9 @@ class Component:
         self.file = nexus_file
         self.group = group
         if shape is not None:
-            self.shape = shape
+            self._shape = shape
         else:
-            self.shape = ComponentShape(nexus_file, group)
+            self._shape = ComponentShape(nexus_file, group)
 
     @property
     def name(self):
@@ -346,14 +346,15 @@ class Component:
             shape_group = self.file.create_nx_group(
                 PIXEL_SHAPE_GROUP_NAME, nexus_name, self.group
             )
-            self.shape = PixelShape(self.file, self.group)
+            self._shape = PixelShape(self.file, self.group)
         else:
             shape_group = self.file.create_nx_group(
                 SHAPE_GROUP_NAME, nexus_name, self.group
             )
         return shape_group
 
-    def get_shape(
+    @property
+    def shape(
         self
     ) -> Tuple[
         Optional[Union[OFFGeometry, CylindricalGeometry]], Optional[List[QVector3D]]
@@ -366,10 +367,10 @@ class Component:
 
         :return: Component shape, each transformation where the shape is repeated
         """
-        return self.shape.get_shape()
+        return self._shape.get_shape()
 
     def remove_shape(self):
-        self.shape.remove_shape()
+        self._shape.remove_shape()
 
     def duplicate(self, components_list: List["Component"]) -> "Component":
         return Component(

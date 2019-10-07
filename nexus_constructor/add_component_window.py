@@ -229,7 +229,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nameLineEdit.setText(self.component_to_edit.name)
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
-        component_shape, _ = self.component_to_edit.get_shape()
+        component_shape, _ = self.component_to_edit.shape
         if not component_shape or isinstance(component_shape, OFFGeometryNoNexus):
             self.noShapeRadioButton.setChecked(True)
             self.noShapeRadioButton.clicked.emit()
@@ -434,7 +434,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component_with_geometry = create_component(
             self.instrument.nexus, component.group
         )
-        return component_with_geometry.get_shape()
+        return component_with_geometry.shape
 
     def edit_existing_component(
         self,
@@ -455,14 +455,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_to_edit.nx_class = nx_class
         self.component_to_edit.description = description
         # remove the previous shape from the qt3d view
-        if self.component_to_edit.get_shape()[0] and self.parent():
+        if self.component_to_edit.shape[0] and self.parent():
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         self.generate_geometry_model(self.component_to_edit, pixel_data)
         component_with_geometry = create_component(
             self.instrument.nexus, self.component_to_edit.group
         )
-        return component_with_geometry.get_shape()
+        return component_with_geometry.shape
 
     def change_pixel_options_visibility(self):
         """

@@ -107,7 +107,7 @@ def test_can_get_off_geometry_properties():
 
     component.set_off_shape(shape)
 
-    nexus_shape, _ = component.get_shape()
+    nexus_shape, _ = component.shape
     assert isinstance(nexus_shape, OFFGeometryNexus)
     assert nexus_shape.faces == faces
     assert nexus_shape.vertices[3].x() == approx(vertex_3_x)
@@ -132,7 +132,7 @@ def test_can_set_off_geometry_properties():
 
     component.set_off_shape(shape)
 
-    nexus_shape, _ = component.get_shape()
+    nexus_shape, _ = component.shape
 
     vertex_2_x = 0.5
     vertex_2_y = -0.5
@@ -164,7 +164,7 @@ def test_can_record_list_of_vertices_for_each_face():
     )
 
     component.set_off_shape(shape)
-    nexus_shape, _ = component.get_shape()
+    nexus_shape, _ = component.shape
 
     test_input_vertex_indices_split_by_face = [
         [0, 1, 2],
@@ -210,7 +210,7 @@ def test_can_retrieve_list_of_vertices_for_each_face():
         [7, 8, 9, 10, 11],
     ]
 
-    nexus_shape, _ = component.get_shape()
+    nexus_shape, _ = component.shape
 
     nexus_wrapper.set_field_value(
         nexus_shape.group, "winding_order", test_input_flat_list_of_vertex_indices
