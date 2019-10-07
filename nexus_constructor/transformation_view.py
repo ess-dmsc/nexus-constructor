@@ -70,17 +70,46 @@ class EditTransformationLink(QFrame):
         self.instrument = instrument
         self.link_frame = Ui_Link()
         self.link_frame.setupUi(self)
+        self.populate_combo_box()
+
+    def populate_combo_box(self):
+        try:
+            self.link_frame.TransformationsComboBox.currentIndexChanged.disconnect()
+        except Exception:
+            pass
+        self.link_frame.TransformationsComboBox.clear()
+        self.link_frame.TransformationsComboBox.addItem("(None)")
+        self.link_frame.TransformationsComboBox.setCurrentIndex(0)
         components = self.instrument.get_component_list()
         for current_component in components:
             transformations = current_component.transforms
-            for transform in transformations:
-                self.link_frame.TransformationsComboBox.addItem(transform.name)
+            self.link_frame.TransformationsComboBox.addItem(current_component.name, userData = current_component)
+            last_index = self.link_frame.TransformationsComboBox.count() - 1
+            if len(transformations) == 0:
+                self.link_frame.TransformationsComboBox.model().item(last_index).setEnabled(False)
+            if current_component.absolute_path == self.link.parent.parent_component.absolute_path:
+                self.link_frame.TransformationsComboBox.model().item(last_index).setEnabled(False)
+            if self.link.linked_component != None and self.link.linked_component.absolute_path == current_component.absolute_path:
+                self.link_frame.TransformationsComboBox.setCurrentIndex(self.link_frame.TransformationsComboBox.count() - 1)
+        self.link_frame.TransformationsComboBox.currentIndexChanged.connect(self.set_new_index)
+
+    def set_new_index(self, new_index):
+        if new_index == -1:
+            return
+        if new_index == 0:
+            self.link.linked_component = None
+            self.link.parent.parent_component.depends_on = None
+            return
+        current_component = self.link_frame.TransformationsComboBox.currentData()
+        self.link.linked_component = current_component
+        if len(self.link.parent) == 0:
+            self.link.parent.parent_component.depends_on = current_component.transforms[0]
+        else:
+            self.link.parent.parent_component.depends_on = self.link.parent[0]
+            self.link.parent[-1].depends_on = current_component.transforms[0]
 
     def enable(self):
-        print("EditTransformationLink.enable not implemented.")
-
-    def disable(self):
-        print("EditTransformationLink.disable not implemented.")
+        self.populate_combo_box()
 
     def saveChanges(self):
-        print("EditTransformationLink.saveChanges not implemented.")
+        pass

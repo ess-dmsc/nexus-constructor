@@ -17,7 +17,7 @@ class LinkTransformation:
     def __init__(self, parent: TransformationsList):
         super().__init__()
         self.parent = parent
-        self.link_transformation = None
+        self.linked_component = None
 
 
 class ComponentTreeModel(QAbstractItemModel):
@@ -105,6 +105,15 @@ class ComponentTreeModel(QAbstractItemModel):
         component.remove_transformation(remove_transform)
         transformation_list.pop(remove_pos)
         self.endRemoveRows()
+        component.depends_on = None
+        if len(transformation_list) > 0:
+            component.depends_on = transformation_list[0]
+            for i in range(len(transformation_list) - 1):
+                transformation_list[i].depends_on = transformation_list[i + 1]
+            if transformation_list.has_link:
+                transformation_list[-1].depends_on = transformation_list.link.link_transformation
+        elif transformation_list.has_link:
+            component.depends_on = transformation_list.link.link_transformation
 
     def __remove_component(self, index: QModelIndex):
         remove_index = self.components.index(index.internalPointer())
@@ -170,17 +179,11 @@ class ComponentTreeModel(QAbstractItemModel):
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
         self.endInsertRows()
-        # Update depends on
-        # if target_pos == 0:
-        #     parent_component.depends_on = new_transformation
-        # else:
-        #     parent_transform = transformation_list[target_pos]
-        #     parent_transform.depends_on = new_transformation
-        # if target_pos < len(transformation_list) - 1:
-        #     child_transform = transformation_list[target_pos + 1]
-        #     new_transformation.depends_on = child_transform
-        # if target_pos == len(transformation_list) - 1 and transformation_list.has_link:
-        #     new_transformation.depends_on = transformation_list.link.link_transformation
+        parent_component.depends_on = transformation_list[0]
+        for i in range(len(transformation_list) - 1):
+            transformation_list[i].depends_on = transformation_list[i + 1]
+        if transformation_list.has_link:
+            transformation_list[-1].depends_on = transformation_list.link.linked_component.transforms[0]
 
     def add_translation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, "translation")
