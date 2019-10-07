@@ -128,6 +128,8 @@ class Transformation:
             )
             if not isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = np.array([dependee_of_list])
+            if dependee_of_list.dtype != 'U':
+                dependee_of_list = dependee_of_list.astype("U")
             dependee_of_list = np.append(
                 dependee_of_list, np.array([dependent.absolute_path])
             )

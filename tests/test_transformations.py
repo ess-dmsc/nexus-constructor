@@ -50,19 +50,19 @@ def test_can_get_transform_properties():
     ), "Expected the transform type to match what was in the NeXus file"
 
 
+def create_transform(nexus_file, name):
+    initial_value = 42
+    initial_vector = QVector3D(1.0, 0.0, 0.0)
+    initial_type = "Translation"
+    dataset = _add_transform_to_file(nexus_file, name, initial_value, initial_vector, initial_type)
+    return Transformation(nexus_file, dataset)
+
 def test_can_set_transform_properties():
     nexus_wrapper = NexusWrapper(str(uuid1()))
 
     initial_name = "slartibartfast"
-    initial_value = 42
-    initial_vector = QVector3D(1.0, 0.0, 0.0)
-    initial_type = "Translation"
 
-    transform_dataset = _add_transform_to_file(
-        nexus_wrapper, initial_name, initial_value, initial_vector, initial_type
-    )
-
-    transform = Transformation(nexus_wrapper, transform_dataset)
+    transform = create_transform(nexus_wrapper, initial_name)
 
     test_name = "beeblebrox"
     test_value = 34
@@ -86,3 +86,167 @@ def test_can_set_transform_properties():
     assert (
         transform.type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
+
+
+def test_set_one_dependent():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform1.register_dependent(transform2)
+
+    set_dependents = transform1.get_dependents()
+
+    assert(len(set_dependents) == 1)
+    assert (set_dependents[0] == transform2.absolute_path)
+
+
+def test_set_two_dependents():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform3 = create_transform(nexus_wrapper, "transform_3")
+
+    transform1.register_dependent(transform2)
+    transform1.register_dependent(transform3)
+
+    set_dependents = transform1.get_dependents()
+
+    assert(len(set_dependents) == 2)
+    assert (set_dependents[0] == transform2.absolute_path)
+    assert (set_dependents[1] == transform3.absolute_path)
+
+def test_set_three_dependents():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform3 = create_transform(nexus_wrapper, "transform_3")
+
+    transform4 = create_transform(nexus_wrapper, "transform_4")
+
+    transform1.register_dependent(transform2)
+    transform1.register_dependent(transform3)
+    transform1.register_dependent(transform4)
+
+    set_dependents = transform1.get_dependents()
+
+    assert(len(set_dependents) == 3)
+    assert (set_dependents[0] == transform2.absolute_path)
+    assert (set_dependents[1] == transform3.absolute_path)
+    assert (set_dependents[2] == transform4.absolute_path)
+
+def test_deregister_dependent():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+
+    transform1.register_dependent(transform2)
+    transform1.deregister_dependent(transform2)
+
+    set_dependents = transform1.get_dependents()
+
+    assert set_dependents == None
+
+def test_reregister_dependent():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform3 = create_transform(nexus_wrapper, "transform_3")
+
+
+    transform1.register_dependent(transform2)
+    transform1.deregister_dependent(transform2)
+    transform1.register_dependent(transform3)
+
+    set_dependents = transform1.get_dependents()
+
+    assert(len(set_dependents) == 1)
+    assert (set_dependents[0] == transform3.absolute_path)
+
+from tests.helpers import add_component_to_file
+
+def test_set_one_dependent_component():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component = add_component_to_file(nexus_wrapper, "test_component")
+
+    transform.register_dependent(component)
+
+    set_dependents = transform.get_dependents()
+
+    assert(len(set_dependents) == 1)
+    assert (set_dependents[0] == component.absolute_path)
+
+def test_set_two_dependent_components():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component1 = add_component_to_file(nexus_wrapper, component_name = "test_component1")
+    component2 = add_component_to_file(nexus_wrapper, component_name = "test_component2")
+
+    transform.register_dependent(component1)
+    transform.register_dependent(component2)
+
+    set_dependents = transform.get_dependents()
+
+    assert(len(set_dependents) == 2)
+    assert (set_dependents[0] == component1.absolute_path)
+    assert (set_dependents[1] == component2.absolute_path)
+
+def test_set_three_dependent_components():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component1 = add_component_to_file(nexus_wrapper, component_name = "test_component1")
+    component2 = add_component_to_file(nexus_wrapper, component_name = "test_component2")
+    component3 = add_component_to_file(nexus_wrapper, component_name = "test_component3")
+
+    transform.register_dependent(component1)
+    transform.register_dependent(component2)
+    transform.register_dependent(component3)
+
+    set_dependents = transform.get_dependents()
+
+    assert(len(set_dependents) == 3)
+    assert (set_dependents[0] == component1.absolute_path)
+    assert (set_dependents[1] == component2.absolute_path)
+    assert (set_dependents[2] == component3.absolute_path)
+
+def test_deregister_three_dependent_components():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component1 = add_component_to_file(nexus_wrapper, component_name = "test_component1")
+    component2 = add_component_to_file(nexus_wrapper, component_name = "test_component2")
+    component3 = add_component_to_file(nexus_wrapper, component_name = "test_component3")
+
+    transform.register_dependent(component1)
+    transform.register_dependent(component2)
+    transform.register_dependent(component3)
+
+    transform.deregister_dependent(component1)
+    transform.deregister_dependent(component2)
+    transform.deregister_dependent(component3)
+
+    set_dependents = transform.get_dependents()
+
+    assert(len(set_dependents) == 0)
