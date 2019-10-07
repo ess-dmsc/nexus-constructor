@@ -134,21 +134,6 @@ def test_UI_GIVEN_valid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_
     assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, True]
 
 
-def test_UI_GIVEN_zero_for_both_row_and_column_count_WHEN_entering_pixel_grid_options_THEN_both_fields_become_red(
-    qtbot, template, pixel_options
-):
-
-    count_fields = [pixel_options.rowCountSpinBox, pixel_options.columnCountSpinBox]
-
-    # Enter zero in the count fields by pressing the down key
-    for field in count_fields:
-        qtbot.keyClick(field, Qt.Key_Down)
-
-    # Check that the background has turned red because the input in invalid
-    for field in count_fields:
-        assert field.styleSheet() == RED_SPIN_BOX_STYLE_SHEET
-
-
 def test_UI_GIVEN_invalid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_valid_pixel_mapping_causes_validity_to_change(
     qtbot, template, pixel_options
 ):
@@ -230,7 +215,7 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
     qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
 
     # Check that the test for unacceptable pixel states gives True
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [True, False]
+    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
 
 
 def test_UI_GIVEN_invalid_mapping_and_grid_WHEN_entering_pixel_options_THEN_changing_to_no_pixels_causes_validity_to_change(
@@ -294,17 +279,6 @@ def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixe
         assert field.styleSheet() == WHITE_SPIN_BOX_STYLE_SHEET
 
 
-def test_UI_GIVEN_row_count_is_zero_WHEN_entering_pixel_grid_THEN_row_height_becomes_disabled(
-    qtbot, template, pixel_options
-):
-
-    # Enter zero in the row count field by pressing the down key
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-
-    # Check that the row height spin box is now disabled
-    assert not pixel_options.rowHeightSpinBox.isEnabled()
-
-
 def test_UI_GIVEN_row_count_is_not_zero_WHEN_entering_pixel_grid_THEN_row_height_becomes_enabled(
     qtbot, template, pixel_options
 ):
@@ -315,17 +289,6 @@ def test_UI_GIVEN_row_count_is_not_zero_WHEN_entering_pixel_grid_THEN_row_height
 
     # Check that the row height spin box is now enabled
     assert pixel_options.rowHeightSpinBox.isEnabled()
-
-
-def test_UI_GIVEN_column_count_is_zero_WHEN_entering_pixel_grid_THEN_column_width_becomes_disabled(
-    qtbot, template, pixel_options
-):
-
-    # Enter zero in the column count field by pressing the down key
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
-
-    # Check that the column width spin box is now disabled
-    assert not pixel_options.columnWidthSpinBox.isEnabled()
 
 
 def test_UI_GIVEN_column_count_is_not_zero_WHEN_entering_pixel_grid_THEN_column_width_becomes_enabled(
@@ -466,17 +429,6 @@ def test_UI_GIVEN_mapping_list_provided_by_user_WHEN_entering_pixel_data_THEN_ca
         )
 
     assert pixel_options.generate_pixel_data().pixel_ids == expected_id_list
-
-
-def test_UI_GIVEN_row_or_column_count_of_zero_WHEN_creating_pixel_grid_THEN_pixel_grid_generated_by_widget_has_zero_for_value_of_matching_size_field(
-    qtbot, template, pixel_options
-):
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-    assert pixel_options.generate_pixel_data().row_height == 0
-
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Up)
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
-    assert pixel_options.generate_pixel_data().col_width == 0
 
 
 def test_UI_GIVEN_no_pixels_button_is_pressed_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_none(
