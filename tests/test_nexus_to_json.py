@@ -1,5 +1,6 @@
 import io
 import json
+from ast import literal_eval
 
 import numpy as np
 
@@ -10,6 +11,7 @@ from nexus_constructor.nexus_filewriter_json.writer import (
     create_writer_commands,
     object_to_json_file,
     generate_json,
+    generate_forwarder_command,
 )
 import h5py
 
@@ -330,3 +332,69 @@ def test_GIVEN_string_list_WHEN_getting_data_and_type_THEN_returns_correct_dtype
 
     assert data == [x.decode("ASCII") for x in list(dataset_value)]
     assert size == (len(dataset_value),)
+
+
+def test_GIVEN_stream_with_no_forwarder_streams_WHEN_generating_forwarder_command_THEN_output_does_not_contain_any_pvs():
+    streams = {
+        "stream1": {"writer_module": "ev42", "source": "source1", "topic": "topic1"}
+    }
+
+    dummy_file = io.StringIO()
+    generate_forwarder_command(dummy_file, streams)
+
+    assert not literal_eval(dummy_file.getvalue())["streams"]
+
+
+def test_GIVEN_stream_with_f142_command_WHEN_generating_forwarder_command_THEN_output_contains_pv():
+    pv_name = "pv1"
+    topic = "localhost:9092/someTopic"
+    writer_module = "f142"
+    streams = {
+        "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic}
+    }
+
+    dummy_file = io.StringIO()
+    generate_forwarder_command(dummy_file, streams)
+
+    streams_ = literal_eval(dummy_file.getvalue())["streams"]
+    assert len(streams_) == 1
+    assert streams_[0]["channel"] == pv_name
+    assert streams_[0]["converter"]["topic"] == topic
+    assert streams_[0]["converter"]["schema"] == writer_module
+
+
+def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142_is_contained():
+    pv_name = "pv1"
+    topic = "localhost:9092/someTopic"
+    writer_module = "f142"
+    streams = {
+        "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic},
+        "stream2": {"writer_module": "ev42", "source": "source1", "topic": "topic1"},
+    }
+
+    dummy_file = io.StringIO()
+    generate_forwarder_command(dummy_file, streams)
+
+    streams_ = literal_eval(dummy_file.getvalue())["streams"]
+    assert len(streams_) == 1
+    assert streams_[0]["channel"] == pv_name
+    assert streams_[0]["converter"]["topic"] == topic
+    assert streams_[0]["converter"]["schema"] == writer_module
+
+
+def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_output_contains_pv():
+    pv_name = "tdcpv1"
+    topic = "localhost:9092/someOtherTopic"
+    writer_module = "TdcTime"
+    streams = {
+        "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic}
+    }
+
+    dummy_file = io.StringIO()
+    generate_forwarder_command(dummy_file, streams)
+
+    streams_ = literal_eval(dummy_file.getvalue())["streams"]
+    assert len(streams_) == 1
+    assert streams_[0]["channel"] == pv_name
+    assert streams_[0]["converter"]["topic"] == topic
+    assert streams_[0]["converter"]["schema"] == writer_module

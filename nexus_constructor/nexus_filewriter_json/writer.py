@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List, Union
 
 import h5py
 
@@ -211,8 +211,20 @@ def create_writer_commands(
 def generate_forwarder_command(file, streams: Dict[str, Dict[str, Any]]):
     tree_dict = dict()
     tree_dict["cmd"] = "add"
-    stream_list = []
+    stream_list = _extract_forwarder_stream_info(streams)
+    tree_dict["streams"] = stream_list
+    object_to_json_file(tree_dict, file)
 
+
+def _extract_forwarder_stream_info(
+    streams: Dict[str, Dict[str, Any]]
+) -> List[Dict[str, Union[Dict, str]]]:
+    """
+    Extracts the forwarder stream information to write a forwarder JSON command.
+    :param streams: A dictionary containing all streams in the nexus file
+    :return: A list of streams containing dictionaries of PV names, topics and schemas.
+    """
+    stream_list = []
     for _, stream in streams.items():
         writer_module = stream["writer_module"]
         if writer_module == "f142" or writer_module == "TdcTime":
@@ -222,6 +234,4 @@ def generate_forwarder_command(file, streams: Dict[str, Dict[str, Any]]):
                     "converter": {"schema": writer_module, "topic": stream["topic"]},
                 }
             )
-
-    tree_dict["streams"] = stream_list
-    object_to_json_file(tree_dict, file)
+    return stream_list
