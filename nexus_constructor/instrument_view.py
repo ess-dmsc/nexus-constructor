@@ -225,13 +225,23 @@ class InstrumentView(QWidget):
         self.component_positions[name] = position_transforms
         # Note, the a list comprehension like below doesn't work (end up with segfault)
         # self.component_positions[name] = [Qt3DCore.QTransform().setTranslation(position) for position in positions]
-        self.component_entities[name] = [
-            create_qentity(
-                [mesh, self.grey_material, position_transform],
-                self.component_root_entity,
-            )
-            for position_transform in self.component_positions[name]
-        ]
+        self.create_entities(name)
+
+    def create_entities(self, name):
+        with DetachedRootEntity(
+            self.component_root_entity, self.combined_component_axes_entity
+        ):
+            self.component_entities[name] = [
+                create_qentity(
+                    [
+                        self.component_meshes[name],
+                        self.grey_material,
+                        position_transform,
+                    ],
+                    self.component_root_entity,
+                )
+                for position_transform in self.component_positions[name]
+            ]
 
     def clear_all_components(self):
         """
@@ -319,3 +329,22 @@ class InstrumentView(QWidget):
         self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()
+
+
+class DetachedRootEntity:
+    """
+    Context manager for detaching the component root entity
+    This is useful for reducing CPU load if making many changes to the scene at the same time
+    """
+
+    def __init__(self, component_root_entity, parent_of_root_entity):
+        self._component_root_entity = component_root_entity
+        self._parent_of_root_entity = parent_of_root_entity
+
+    def __enter__(self):
+        # Detach root entity
+        self._component_root_entity.setParent(None)
+
+    def __exit__(self, *args):
+        # Reattach root entity
+        self._component_root_entity.setParent(self._parent_of_root_entity)

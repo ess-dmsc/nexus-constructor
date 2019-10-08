@@ -9,6 +9,7 @@ silx
 xmltodict
 numpy
 pytest-qt
+tqdm
 
 # PySide2 has had some issues with new versions and packaging so we will pin it
 PySide2==5.13.0
