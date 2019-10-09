@@ -227,7 +227,8 @@ class InstrumentView(QWidget):
         :param name: The name of the component.
         """
 
-        self.component_entities[name].setParent(None)
+        if name in self.component_entities.keys():
+            self.component_entities[name].setParent(None)
 
         try:
             del self.component_entities[name]
