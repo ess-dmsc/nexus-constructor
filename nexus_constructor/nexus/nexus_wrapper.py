@@ -1,6 +1,6 @@
 import h5py
 from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar, Optional, List
+from typing import Any, TypeVar, Optional, List, Union
 import numpy as np
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
@@ -185,9 +185,13 @@ class NexusWrapper(QObject):
             value = str(value, "utf8")
         return value
 
-    def get_fields(self, group: h5py.Group) -> List[h5py.Group]:
-        # TODO: get all fields
-        pass
+    def get_fields(self, group: h5py.Group) -> List[Union[h5py.Dataset, h5py.Group]]:
+        fields = []
+        for item in group.values():
+            if isinstance(item, h5py.Dataset):
+                fields.append(item)
+        # TODO: handle streams and other groups
+        return fields
 
     @staticmethod
     def _recreate_dataset(parent_group: h5py.Group, name: str, value: Any, dtype=None):
