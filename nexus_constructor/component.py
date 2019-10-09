@@ -101,6 +101,9 @@ class Component:
     def set_field(self, name: str, value: Any, dtype=None):
         self.file.set_field_value(self.group, name, value, dtype)
 
+    def get_fields(self):
+        return self.file.get_fields(self.group)
+
     @property
     def nx_class(self):
         return get_nx_class(self.group)
