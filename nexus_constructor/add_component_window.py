@@ -31,6 +31,7 @@ from nexus_constructor.validators import (
     GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
     OkValidator,
+    FieldType,
 )
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
@@ -251,27 +252,32 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         fields = self.component_to_edit.get_fields()
         if fields:
             for field in fields:
+                new_ui_field = self.add_field()
+                new_ui_field.name = field.name.split("/")[-1]
                 if isinstance(field, h5py.Dataset):
                     dtype = field.dtype
                     value = field.value
+                    new_ui_field.dtype = dtype
                     if np.isscalar(value):
-                        # scalar
+                        new_ui_field.field_type = FieldType.scalar_dataset.value
+                        new_ui_field.value = field.value[()]
                         pass
                     else:
-                        # array
+                        new_ui_field.field_type = FieldType.array_dataset.value
                         pass
                 elif isinstance(field, h5py.Group):
                     if isinstance(field, h5py.SoftLink):
-                        # link
-                        pass
+                        new_ui_field.field_type = FieldType.link.value
+                        new_ui_field.value = field.path
                     if (
                         hasattr(field, "NX_class")
                         and field.attrs["NX_class"] == "NCstream"
                     ):
+                        new_ui_field.field_type = FieldType.kafka_stream.value
                         # stream
                         pass
 
-    def add_field(self):
+    def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
         field = FieldWidget(
             self.possible_fields, self.fieldsListWidget, self.instrument
@@ -282,6 +288,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.fieldsListWidget.addItem(item)
         self.fieldsListWidget.setItemWidget(item, field)
+        return field
 
     def select_field(self, widget):
         self.fieldsListWidget.setItemSelected(widget, True)

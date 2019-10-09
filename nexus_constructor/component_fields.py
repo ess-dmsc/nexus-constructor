@@ -154,9 +154,18 @@ class FieldWidget(QFrame):
     def field_type(self):
         return FieldType(self.field_type_combo.currentText())
 
+    @field_type.setter
+    def field_type(self, field_type: str):
+        self.field_type_combo.setCurrentText(field_type)
+        self.field_type_changed()
+
     @property
     def name(self):
         return self.field_name_edit.text()
+
+    @name.setter
+    def name(self, name):
+        self.field_name_edit.setText(name)
 
     @property
     def dtype(self):
@@ -166,6 +175,12 @@ class FieldWidget(QFrame):
             return self.table_view.model.array.dtype
         if self.field_type == FieldType.link:
             return h5py.SoftLink
+
+    @dtype.setter
+    def dtype(self, dtype):
+        self.value_type_combo.setCurrentText(
+            next(key for key, value in DATASET_TYPE.items() if value == dtype)
+        )
 
     @property
     def value(self):
@@ -182,6 +197,17 @@ class FieldWidget(QFrame):
             return np.squeeze(self.table_view.model.array)
         elif self.field_type == FieldType.link:
             return h5py.SoftLink(self.value_line_edit.text())
+
+    @value.setter
+    def value(self, value):
+        if self.field_type == FieldType.scalar_dataset:
+            self.value_line_edit.setText(str(value))
+        elif self.field_type == FieldType.array_dataset:
+            # TODO: populate array list widget
+            pass
+        elif self.field_type == FieldType.link:
+            self.value_line_edit.setText(value)
+        # TODO: streams
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
