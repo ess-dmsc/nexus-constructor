@@ -6,7 +6,7 @@ from nexus_constructor.instrument_view import InstrumentView
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1287, 712)
+        MainWindow.resize(1280, 720)
         self.central_widget = QtWidgets.QWidget(MainWindow)
         self.central_widget.setObjectName("centralwidget")
 
@@ -62,7 +62,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.central_widget)
 
         self.menu_bar = QtWidgets.QMenuBar()
-        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1287, 22))
+        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1280, 720))
         self.menu_bar.setObjectName("menubar")
         self.file_menu = QtWidgets.QMenu(self.menu_bar)
         self.file_menu.setObjectName("menuFile")
