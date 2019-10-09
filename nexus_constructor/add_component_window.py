@@ -1,5 +1,6 @@
 from enum import Enum
 
+import h5py
 from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
@@ -42,6 +43,7 @@ from nexus_constructor.geometry.geometry_loader import load_geometry
 
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
+import numpy as np
 
 
 class GeometryType(Enum):
@@ -248,8 +250,26 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.unitsLineEdit.setText(component_shape.units)
         fields = self.component_to_edit.get_fields()
         if fields:
-            # TODO: do something with them!
-            pass
+            for field in fields:
+                if isinstance(field, h5py.Dataset):
+                    dtype = field.dtype
+                    value = field.value
+                    if np.isscalar(value):
+                        # scalar
+                        pass
+                    else:
+                        # array
+                        pass
+                elif isinstance(field, h5py.Group):
+                    if isinstance(field, h5py.SoftLink):
+                        # link
+                        pass
+                    if (
+                        hasattr(field, "NX_class")
+                        and field.attrs["NX_class"] == "NCstream"
+                    ):
+                        # stream
+                        pass
 
     def add_field(self):
         item = QListWidgetItem()
