@@ -212,6 +212,9 @@ class InstrumentView(QWidget):
         :param geometry: The geometry information of the component that is used to create a mesh.
         :param positions: Mesh is repeated at each of these positions
         """
+        if geometry is None:
+            return
+
         if positions is None:
             positions = [QVector3D(0, 0, 0)]
         mesh = OffMesh(geometry.off_geometry)

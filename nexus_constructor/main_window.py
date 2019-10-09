@@ -338,8 +338,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _update_3d_view_with_component_shapes(self):
         for component in self.instrument.get_component_list():
             shape, positions = component.shape
-            if shape:
-                self.sceneWidget.add_component(component.name, shape, positions)
+            self.sceneWidget.add_component(component.name, shape, positions)
 
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
