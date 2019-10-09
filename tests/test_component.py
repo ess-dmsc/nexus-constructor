@@ -301,7 +301,7 @@ def test_transforms_link_is_correct():
     component2.depends_on = transform2
 
     new_component = Component(component1.file, component1.group)
-    assert new_component.transforms.link.component_link == component2
+    assert new_component.transforms.link.linked_component == component2
 
 
 def test_transforms_has_no_link():

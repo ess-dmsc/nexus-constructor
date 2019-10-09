@@ -11,7 +11,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_ids_from_pixel_grid,
     get_detector_number_from_pixel_mapping,
 )
-from nexus_constructor.transformations import Transformation, TransformationsList
+from nexus_constructor.transformations import Transformation
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
@@ -32,7 +32,7 @@ PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
 CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
 OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"
 DEPENDS_ON_STR = "depends_on"
-
+LINK_STR = "has_link"
 
 class DependencyError(Exception):
     """
@@ -68,11 +68,63 @@ def _transforms_are_equivalent(
 ):
     return transform_1.absolute_path == transform_2.absolute_path
 
+class TransformationsList(list):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent_component = parent
+        self.link = LinkTransformation(self)
+
+    @property
+    def has_link(self):
+        has_link_value = self.parent_component.file.get_attribute_value(self.parent_component.group, LINK_STR)
+        if has_link_value == None:
+            has_link_value = False
+            if len(self.parent_component.transforms) == 0 and self.parent_component.depends_on != None and "/transformations/" in self.parent_component.depends_on.absolute_path:
+                has_link_value = True
+            for elem in self.parent_component.transforms:
+                if "/transformations/" in elem.depends_on.absolute_path and (self.parent_component.absolute_path + "/transformations/") not in elem.depends_on.absolute_path:
+                    has_link_value = True
+                    break
+            self.parent_component.file.set_attribute_value(self.parent_component.group, LINK_STR, has_link_value)
+        return bool(has_link_value)
+
+    @has_link.setter
+    def has_link(self, value: bool):
+        self.parent_component.file.set_attribute_value(self.parent_component.group, LINK_STR, value)
+
 class LinkTransformation:
     def __init__(self, parent: TransformationsList):
         super().__init__()
         self.parent = parent
-        self.linked_component = None
+
+    @property
+    def linked_component(self):
+        if not self.parent.has_link:
+            return None
+        if self.parent.parent_component.depends_on != None and "/transformations/" in self.parent.parent_component.depends_on.absolute_path and len(self.parent.parent_component.transforms) == 0:
+            component_path = self.parent.parent_component.depends_on.absolute_path[:self.parent.parent_component.depends_on.absolute_path.find("/transformations/")]
+            return Component(self.parent.parent_component.file, self.parent.parent_component.file.nexus_file[component_path])
+        for elem in self.parent:
+            if "/transformations/" in elem.depends_on.absolute_path and (self.parent.parent_component.absolute_path + "/transformations/") not in elem.depends_on.absolute_path:
+                component_path = elem.depends_on.absolute_path[:elem.depends_on.absolute_path.find("/transformations/")]
+                return Component(self.parent.parent_component.file, self.parent.parent_component.file.nexus_file[component_path])
+        return None
+
+    @linked_component.setter
+    def linked_component(self, value):
+        parent_component = self.parent.parent_component
+        target = None
+        if len(parent_component.transforms) == 0:
+            target = parent_component
+        else:
+            for c_transform in parent_component.transforms:
+                if parent_component.absolute_path + "/transformations/" not in c_transform.depends_on.absolute_path:
+                    target = c_transform
+                    break
+        if value != None:
+            target.depends_on = value.depends_on
+            return
+        target.depends_on = None
 
 class Component:
     """
@@ -82,6 +134,8 @@ class Component:
     def __init__(self, nexus_file: nx.NexusWrapper, group: h5py.Group):
         self.file = nexus_file
         self.group = group
+        if self.nx_class == None:
+            raise RuntimeError("Component class is not set.")
 
     def __eq__(self, other):
         try:
@@ -174,15 +228,6 @@ class Component:
         transforms = TransformationsList(self)
         depends_on = self.get_field(DEPENDS_ON_STR)
         self._get_transform(depends_on, transforms, local_only=True)
-        this_component_path = self.absolute_path
-        for elem in transforms:
-            if "/transformations/" in elem.depends_on.absolute_path and (this_component_path + "/transformations/") not in elem.depends_on.absolute_path:
-                transforms.has_link = True
-                c_link = LinkTransformation(transforms)
-                other_component_path = elem.depends_on.absolute_path[:elem.depends_on.absolute_path.find("/transformations/")]
-                c_link.component_link = Component(self.file, self.file.nexus_file[other_component_path])
-                transforms.link = c_link
-                break
         return transforms
 
     def add_translation(

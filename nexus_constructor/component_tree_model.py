@@ -1,8 +1,8 @@
-from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
+from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
-from nexus_constructor.component import Component, LinkTransformation
-from nexus_constructor.transformations import Transformation, TransformationsList
+from nexus_constructor.component import Component, LinkTransformation, TransformationsList
+from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import generate_unique_name
 
@@ -13,6 +13,8 @@ class ComponentInfo(object):
         self.parent = parent
 
 class ComponentTreeModel(QAbstractItemModel):
+    data_changed = Signal("QModelIndex", "QModelIndex")
+
     def __init__(self, instrument: Instrument, parent=None):
         super().__init__(parent)
         self.instrument = instrument
@@ -64,9 +66,7 @@ class ComponentTreeModel(QAbstractItemModel):
             return
         target_pos = len(transformation_list)
         self.beginInsertRows(target_index, target_pos, target_pos)
-        transformation_link = LinkTransformation(transformation_list)
         transformation_list.has_link = True
-        transformation_list.link = transformation_link
         self.endInsertRows()
 
     def add_component(self, new_component: Component):
@@ -80,12 +80,22 @@ class ComponentTreeModel(QAbstractItemModel):
         remove_pos = len(transformation_list)
         self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
         transformation_list.has_link = False
-        transformation_list.link = None
         self.endRemoveRows()
         # Update depends on
         if len(transformation_list) > 0:
             parent_transform = transformation_list[len(transformation_list) - 1]
             parent_transform.depends_on = None
+
+    def __update_link_rows(self):
+        nr_of_components = self.rowCount(QModelIndex())
+        for i in range(nr_of_components):
+            component_index = self.index(i, 0, QModelIndex())
+            transformations_index = self.index(1, 0, component_index)
+            transformations = transformations_index.internalPointer()
+            if transformations.has_link:
+                transformation_rows = self.rowCount(transformations_index)
+                link_index = self.index(transformation_rows - 1, 0, transformations_index)
+                self.dataChanged.emit(link_index, link_index)
 
     def __remove_transformation(self, index: QModelIndex):
         remove_transform = index.internalPointer()
@@ -95,6 +105,7 @@ class ComponentTreeModel(QAbstractItemModel):
         component = transformation_list.parent_component
 
         remove_transform.remove_from_dependee_chain()
+        self.__update_link_rows()
 
         self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
         component.remove_transformation(remove_transform)

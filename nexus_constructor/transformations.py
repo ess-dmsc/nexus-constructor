@@ -8,14 +8,6 @@ TransformationOrComponent = TypeVar(
     "TransformationOrComponent", "Transformation", "Component"
 )
 
-
-class TransformationsList(list):
-    def __init__(self, parent):
-        super().__init__()
-        self.parent_component = parent
-        self.has_link = False
-
-
 class Transformation:
     """
     Provides an interface to an existing transformation dataset in a NeXus file
@@ -187,6 +179,8 @@ class Transformation:
     def remove_from_dependee_chain(self):
         dependees = self.get_dependents()
         new_depends_on = self.depends_on
+        if self.depends_on.absolute_path == "/":
+            new_depends_on = None
         for elem in dependees:
             elem.depends_on = new_depends_on
             self.deregister_dependent(elem)

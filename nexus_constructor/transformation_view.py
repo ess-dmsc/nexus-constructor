@@ -66,9 +66,9 @@ def links_back_to_component(reference: Component, comparison: Component):
         return True
     if not comparison.transforms.has_link:
         return False
-    if comparison.transforms.link.component_link == None:
+    if comparison.transforms.link.linked_component == None:
         return False
-    return links_back_to_component(reference, comparison.transforms.link.component_link)
+    return links_back_to_component(reference, comparison.transforms.link.linked_component)
 
 class EditTransformationLink(QFrame):
     def __init__(
@@ -87,7 +87,7 @@ class EditTransformationLink(QFrame):
         except Exception:
             pass
         self.link_frame.TransformationsComboBox.clear()
-        self.link_frame.TransformationsComboBox.addItem("(None)")
+        self.link_frame.TransformationsComboBox.addItem("(None)", userData=None)
         self.link_frame.TransformationsComboBox.setCurrentIndex(0)
         components = self.instrument.get_component_list()
         for current_component in components:
@@ -106,24 +106,7 @@ class EditTransformationLink(QFrame):
     def set_new_index(self, new_index):
         if new_index == -1:
             return
-        if new_index == 0:
-            self.link.linked_component = None
-            parent_component = self.link.parent.parent_component
-            if len(parent_component.transforms) == 0:
-                parent_component.depends_on = None
-            else:
-                for c_transform in parent_component.transforms:
-                    if parent_component.absolute_path + "/transformations/" not in c_transform.depends_on.absolute_path:
-                        c_transform.depends_on = None
-                        break
-            return
-        current_component = self.link_frame.TransformationsComboBox.currentData()
-        self.link.linked_component = current_component
-        if len(self.link.parent) == 0:
-            self.link.parent.parent_component.depends_on = current_component.transforms[0]
-        else:
-            self.link.parent.parent_component.depends_on = self.link.parent[0]
-            self.link.parent[-1].depends_on = current_component.transforms[0]
+        self.link.linked_component = self.link_frame.TransformationsComboBox.currentData()
 
     def enable(self):
         self.populate_combo_box()
