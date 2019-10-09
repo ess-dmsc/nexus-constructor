@@ -485,6 +485,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if self.component_to_edit.get_shape() and self.parent():
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
+        add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         geometry = self.generate_geometry_model(self.component_to_edit, pixel_data)
         return geometry
 
