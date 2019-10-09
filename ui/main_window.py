@@ -55,14 +55,7 @@ class Ui_MainWindow(object):
         self.splitter.addWidget(self.tab_widget)
 
         self.sceneWidget = InstrumentView(self.splitter)
-        size_policy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
-        size_policy.setHorizontalStretch(1)
-        size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(self.sceneWidget.sizePolicy().hasHeightForWidth())
-        self.sceneWidget.setSizePolicy(size_policy)
-        self.sceneWidget.setMinimumSize(QtCore.QSize(745, 0))
+        self.sceneWidget.setMinimumSize(QtCore.QSize(800, 0))
         self.sceneWidget.setObjectName("sceneWidget")
         self.splitter.addWidget(self.sceneWidget)
 
