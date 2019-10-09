@@ -1,5 +1,5 @@
 import json
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
@@ -8,17 +8,35 @@ Read the JSON, perform some validation and construct an in-memory NeXus file fro
 """
 
 
-def _validate_broker(broker_string: str):
+def _validate_broker(broker: Union[str, object]):
     pass
 
 
-def _validate_command(command_string: str):
+def _validate_job_id(job_id: Union[str, object]):
+    pass
+
+
+def _validate_file_attributes(file_attributes: Union[str, object]):
+    pass
+
+
+def _validate_nexus_structure(nexus_structure: Union[str, object]):
+    pass
+
+
+def _validate_command(command: Union[str, object]):
     allowed_commands = {"FileWriter_new"}
-    if command_string not in allowed_commands:
+    if command not in allowed_commands:
         return '"cmd" field contains invalid string'
 
 
-REQUIRED_FIELDS = {"cmd": _validate_command, "broker": _validate_broker}
+REQUIRED_FIELDS = {
+    "cmd": _validate_command,
+    "broker": _validate_broker,
+    "job_id": _validate_job_id,
+    "file_attributes": _validate_file_attributes,
+    "nexus_structure": _validate_nexus_structure,
+}
 
 
 def validate_top_level_fields(json_data: dict) -> List[str]:

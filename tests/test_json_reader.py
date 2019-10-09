@@ -12,6 +12,11 @@ def test_GIVEN_empty_json_string_WHEN_json_to_nexus_called_THEN_error_is_raised(
         json_to_nexus("")
 
 
+def test_GIVEN_invalid_json_string_WHEN_json_to_nexus_called_THEN_error_is_raised():
+    with pytest.raises(ValueError):
+        json_to_nexus("{")
+
+
 def test_GIVEN_json_with_missing_required_fields_WHEN_validated_THEN_message_returned_for_each_missing_field():
     json_input = r"{}"
     json_data = json.loads(json_input)
@@ -35,4 +40,21 @@ def test_GIVEN_json_with_valid_required_fields_WHEN_validated_THEN_no_messages_r
     messages = validate_top_level_fields(json_data)
     assert (
         len(messages) == 0
+    ), "Expect no messages if all required fields are present and valid"
+
+
+def test_GIVEN_json_with_invalid_required_fields_WHEN_validated_THEN_message_returned_for_each_invalid_field():
+    json_input = (
+        r"{"
+        r'"cmd": "INVALID_CMD",'
+        r'"broker": "localhost:9092",'
+        r'"job_id": "test_job",'
+        r'"file_attributes": "INVALID_FILE_ATTRS",'
+        r'"nexus_structure": "INVALID_NEXUS_STRUCTURE"'
+        r"}"
+    )
+    json_data = json.loads(json_input)
+    messages = validate_top_level_fields(json_data)
+    assert (
+        len(messages) == 3
     ), "Expect no messages if all required fields are present and valid"
