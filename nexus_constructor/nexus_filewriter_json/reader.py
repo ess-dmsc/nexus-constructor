@@ -9,7 +9,7 @@ Read the JSON, perform some validation and construct an in-memory NeXus file fro
 
 
 def _validate_broker(broker_string: str):
-    return False
+    pass
 
 
 def _validate_command(command_string: str):
@@ -18,7 +18,7 @@ def _validate_command(command_string: str):
         return '"cmd" field contains invalid string'
 
 
-REQUIRED_FIELDS = {"cmd": None, "broker": _validate_broker}
+REQUIRED_FIELDS = {"cmd": _validate_command, "broker": _validate_broker}
 
 
 def validate_top_level_fields(json_data: dict) -> List[str]:
