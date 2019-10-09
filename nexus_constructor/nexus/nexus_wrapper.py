@@ -190,7 +190,11 @@ class NexusWrapper(QObject):
         for item in group.values():
             if isinstance(item, h5py.Dataset):
                 fields.append(item)
-        # TODO: handle streams and other groups
+            if isinstance(item, h5py.Group):
+                if isinstance(item, h5py.SoftLink):
+                    fields.append(item)
+                if hasattr("NX_class", item) and item.attrs["NX_class"] == "NCstream":
+                    fields.append(item)
         return fields
 
     @staticmethod
