@@ -203,8 +203,7 @@ class FieldWidget(QFrame):
         if self.field_type == FieldType.scalar_dataset:
             self.value_line_edit.setText(str(value))
         elif self.field_type == FieldType.array_dataset:
-            # TODO: populate array list widget
-            pass
+            self.table_view.model.array = value
         elif self.field_type == FieldType.link:
             self.value_line_edit.setText(value)
         # TODO: streams

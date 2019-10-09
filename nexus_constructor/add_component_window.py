@@ -261,10 +261,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                     if np.isscalar(value):
                         new_ui_field.field_type = FieldType.scalar_dataset.value
                         new_ui_field.value = field.value[()]
-                        pass
                     else:
                         new_ui_field.field_type = FieldType.array_dataset.value
-                        pass
+                        new_ui_field.value = value
                 elif isinstance(field, h5py.Group):
                     if isinstance(field, h5py.SoftLink):
                         new_ui_field.field_type = FieldType.link.value
