@@ -265,10 +265,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                         new_ui_field.field_type = FieldType.array_dataset.value
                         new_ui_field.value = value
                 elif isinstance(field, h5py.Group):
-                    if isinstance(field, h5py.SoftLink):
+                    if isinstance(
+                        field.parent.get(field.name, getlink=True), h5py.SoftLink
+                    ):
                         new_ui_field.field_type = FieldType.link.value
-                        new_ui_field.value = field.path
-                    if (
+                        new_ui_field.value = field.parent.get(
+                            field.name, getlink=True
+                        ).path
+                    elif (
                         hasattr(field, "NX_class")
                         and field.attrs["NX_class"] == "NCstream"
                     ):
