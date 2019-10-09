@@ -38,14 +38,14 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         super().setupUi(parent_widget)
 
         self.pixel_validator = PixelValidator(
-            parent_widget, self.singlePixelRadioButton, self.entireShapeRadioButton
+            parent_widget, self.single_pixel_radio_button, self.entire_shape_radio_button
         )
 
         # Have the radio buttons change the visibility of the pixel options
         self.setup_visibility_signals()
 
         # Have the pixel mapping button populate the list widget if necessary
-        self.entireShapeRadioButton.clicked.connect(
+        self.entire_shape_radio_button.clicked.connect(
             self.generate_pixel_mapping_if_required
         )
 
@@ -53,9 +53,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.setup_pixel_grid_options()
 
         # Cause the overall Pixel Options validity to change when a different type of Pixel Layout has been selected
-        self.singlePixelRadioButton.clicked.connect(self.update_pixel_input_validity)
-        self.entireShapeRadioButton.clicked.connect(self.update_pixel_input_validity)
-        self.noPixelsButton.clicked.connect(self.update_pixel_input_validity)
+        self.single_pixel_radio_button.clicked.connect(self.update_pixel_input_validity)
+        self.entire_shape_radio_button.clicked.connect(self.update_pixel_input_validity)
+        self.no_pixels_button.clicked.connect(self.update_pixel_input_validity)
 
         # Update the validity
         self.update_pixel_input_validity()
@@ -80,13 +80,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Instructs the Single Pixel/Entire Shape/No Pixels buttons to alter the visibility of items in the
         PixelOptionsWidget.
         """
-        self.singlePixelRadioButton.clicked.connect(
+        self.single_pixel_radio_button.clicked.connect(
             lambda: self.update_pixel_layout_visibility(True, False)
         )
-        self.entireShapeRadioButton.clicked.connect(
+        self.entire_shape_radio_button.clicked.connect(
             lambda: self.update_pixel_layout_visibility(False, True)
         )
-        self.noPixelsButton.clicked.connect(self.hide_pixel_options_stack)
+        self.no_pixels_button.clicked.connect(self.hide_pixel_options_stack)
 
     def setup_pixel_grid_options(self):
         """
@@ -95,32 +95,32 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
 
         # Make the column and row count spin boxes in the Pixel Grid trigger a validity update
-        self.rowCountSpinBox.valueChanged.connect(self.update_pixel_grid_validity)
-        self.columnCountSpinBox.valueChanged.connect(self.update_pixel_grid_validity)
+        self.row_count_spin_box.valueChanged.connect(self.update_pixel_grid_validity)
+        self.column_count_spin_box.valueChanged.connect(self.update_pixel_grid_validity)
 
         # Make the row/column count being set to zero cause its matching distance field to become disabled
-        self.columnCountSpinBox.valueChanged.connect(
+        self.column_count_spin_box.valueChanged.connect(
             lambda: self.disable_or_enable_distance_field(
-                self.columnCountSpinBox, self.columnWidthSpinBox
+                self.column_count_spin_box, self.column_width_spin_box
             )
         )
-        self.rowCountSpinBox.valueChanged.connect(
+        self.row_count_spin_box.valueChanged.connect(
             lambda: self.disable_or_enable_distance_field(
-                self.rowCountSpinBox, self.rowHeightSpinBox
+                self.row_count_spin_box, self.row_height_spin_box
             )
         )
 
         # Prevent both the rows and columns in the PixelGrid from being zero
-        self.columnCountSpinBox.valueChanged.connect(
+        self.column_count_spin_box.valueChanged.connect(
             self.forbid_both_row_and_columns_being_zero
         )
-        self.rowCountSpinBox.valueChanged.connect(
+        self.row_count_spin_box.valueChanged.connect(
             self.forbid_both_row_and_columns_being_zero
         )
 
         # Manually add options to the "Count first along" combo box. This is done here because inserting these options
         # through Qt Designer doesn't work.
-        self.countFirstComboBox.addItems(list(self.count_direction.keys()))
+        self.count_first_combo_box.addItems(list(self.count_direction.keys()))
 
     def get_validator(self):
         """
@@ -136,7 +136,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         AddComponentDialog will call the method for populating the pixel mapping list. If these conditions are not meant
         then the list will remain empty.
         """
-        if self.pixelMappingListWidget.count() == 0:
+        if self.pixel_mapping_list_widget.count() == 0:
             self.pixel_mapping_button_pressed.emit()
 
     @staticmethod
@@ -156,12 +156,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Changes the StyleSheet of the column and row count spin boxes in the Pixel Grid depending on their validity.
         Sets them to red if both are zero, white if one or neither of them are zero.
         """
-        if self.rowCountSpinBox.value() == 0 and self.columnCountSpinBox.value() == 0:
-            self.rowCountSpinBox.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
-            self.columnCountSpinBox.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
+        if self.row_count_spin_box.value() == 0 and self.column_count_spin_box.value() == 0:
+            self.row_count_spin_box.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
+            self.column_count_spin_box.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
         else:
-            self.rowCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
-            self.columnCountSpinBox.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
+            self.row_count_spin_box.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
+            self.column_count_spin_box.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
 
     def update_pixel_grid_validity(self):
         """
@@ -171,8 +171,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         self.pixel_validator.set_pixel_grid_valid(
             not (
-                self.rowCountSpinBox.value() == 0
-                and self.columnCountSpinBox.value() == 0
+                    self.row_count_spin_box.value() == 0
+                    and self.column_count_spin_box.value() == 0
             )
         )
 
@@ -182,12 +182,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         :param pixel_grid: Bool indicating whether or not to show the pixel grid options.
         :param pixel_mapping: Bool indicating whether or not to show the pixel mapping options.
         """
-        self.pixelOptionsStack.setVisible(True)
+        self.pixel_options_stack.setVisible(True)
 
         if pixel_grid:
-            self.pixelOptionsStack.setCurrentIndex(0)
+            self.pixel_options_stack.setCurrentIndex(0)
         if pixel_mapping:
-            self.pixelOptionsStack.setCurrentIndex(1)
+            self.pixel_options_stack.setCurrentIndex(1)
 
     def populate_pixel_mapping_list_with_mesh(self, filename: str):
         """
@@ -235,7 +235,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Conceals the Pixel Options stack (containing the Pixel Grid and Pixel Mapping options). This takes place when
         the No Pixels button has been pressed.
         """
-        self.pixelOptionsStack.setVisible(False)
+        self.pixel_options_stack.setVisible(False)
 
     def get_pixel_mapping_ids(self):
         """
@@ -263,16 +263,16 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         distance value to be recorded as zero.
         :return: A PixelData object or None.
         """
-        if self.singlePixelRadioButton.isChecked():
+        if self.single_pixel_radio_button.isChecked():
 
-            rows = self.rowCountSpinBox.value()
-            row_height = self.rowHeightSpinBox.value()
+            rows = self.row_count_spin_box.value()
+            row_height = self.row_height_spin_box.value()
 
             if rows == 0:
                 row_height = 0
 
-            columns = self.columnCountSpinBox.value()
-            col_width = self.columnWidthSpinBox.value()
+            columns = self.column_count_spin_box.value()
+            col_width = self.column_width_spin_box.value()
 
             if columns == 0:
                 col_width = 0
@@ -282,19 +282,19 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 columns=columns,
                 row_height=row_height,
                 col_width=col_width,
-                first_id=self.firstIDSpinBox.value(),
+                first_id=self.first_id_spin_box.value(),
                 count_direction=self.count_direction[
-                    self.countFirstComboBox.currentText()
+                    self.count_first_combo_box.currentText()
                 ],
                 initial_count_corner=self.initial_count_corner[
-                    self.startCountingComboBox.currentText()
+                    self.start_counting_combo_box.currentText()
                 ],
             )
 
-        if self.entireShapeRadioButton.isChecked():
+        if self.entire_shape_radio_button.isChecked():
             return PixelMapping(self.get_pixel_mapping_ids())
 
-        if self.noPixelsButton.isChecked():
+        if self.no_pixels_button.isChecked():
             return None
 
     def update_pixel_input_validity(self):
@@ -302,9 +302,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Changes the state of the OK Validator depending on whether or not the pixel input is valid. If The No Pixel
         option has been selected then there is nothing to do outside of calling `validate_pixels` again.
         """
-        if self.singlePixelRadioButton.isChecked():
+        if self.single_pixel_radio_button.isChecked():
             self.update_pixel_grid_validity()
-        elif self.entireShapeRadioButton.isChecked():
+        elif self.entire_shape_radio_button.isChecked():
             self.update_pixel_mapping_validity()
         else:
             self.pixel_validator.inform_ok_validator()
@@ -315,7 +315,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         pixel mapping list.
         :return: A bool indicating the current index of the PixelOptions stack.
         """
-        return self.pixelOptionsStack.currentIndex() != 1
+        return self.pixel_options_stack.currentIndex() != 1
 
     def reset_pixel_mapping_list(self):
         """
@@ -324,7 +324,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         mesh and cylinder.
         """
         self.pixel_mapping_widgets = []
-        self.pixelMappingListWidget.clear()
+        self.pixel_mapping_list_widget.clear()
 
     def create_pixel_mapping_list(self, n_items, text):
         """
@@ -335,7 +335,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         for i in range(n_items):
             pixel_mapping_widget = PixelMappingWidget(
-                self.pixelMappingListWidget, i, text
+                self.pixel_mapping_list_widget, i, text
             )
             pixel_mapping_widget.pixelIDLineEdit.textChanged.connect(
                 self.update_pixel_mapping_validity
@@ -345,8 +345,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             list_item = QListWidgetItem()
             list_item.setSizeHint(pixel_mapping_widget.sizeHint())
 
-            self.pixelMappingListWidget.addItem(list_item)
-            self.pixelMappingListWidget.setItemWidget(list_item, pixel_mapping_widget)
+            self.pixel_mapping_list_widget.addItem(list_item)
+            self.pixel_mapping_list_widget.setItemWidget(list_item, pixel_mapping_widget)
 
             # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
