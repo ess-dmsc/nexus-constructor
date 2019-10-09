@@ -15,28 +15,12 @@ class Ui_PixelOptionsWidget(object):
     def setupUi(self, PixelOptionsWidget):
         PixelOptionsWidget.setObjectName("PixelOptionsWidget")
         PixelOptionsWidget.resize(560, 403)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding
-        )
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            PixelOptionsWidget.sizePolicy().hasHeightForWidth()
-        )
-        PixelOptionsWidget.setSizePolicy(sizePolicy)
+
         PixelOptionsWidget.setMinimumSize(QtCore.QSize(560, 20))
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(PixelOptionsWidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.pixelOptionsBox = QtWidgets.QGroupBox(PixelOptionsWidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding
-        )
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.pixelOptionsBox.sizePolicy().hasHeightForWidth()
-        )
-        self.pixelOptionsBox.setSizePolicy(sizePolicy)
+
         self.pixelOptionsBox.setMinimumSize(QtCore.QSize(0, 20))
         self.pixelOptionsBox.setObjectName("pixelOptionsBox")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.pixelOptionsBox)
