@@ -100,7 +100,7 @@ def test_set_one_dependent():
     set_dependents = transform1.get_dependents()
 
     assert(len(set_dependents) == 1)
-    assert (set_dependents[0] == transform2.absolute_path)
+    assert (set_dependents[0] == transform2)
 
 
 def test_set_two_dependents():
@@ -118,8 +118,8 @@ def test_set_two_dependents():
     set_dependents = transform1.get_dependents()
 
     assert(len(set_dependents) == 2)
-    assert (set_dependents[0] == transform2.absolute_path)
-    assert (set_dependents[1] == transform3.absolute_path)
+    assert (set_dependents[0] == transform2)
+    assert (set_dependents[1] == transform3)
 
 def test_set_three_dependents():
     nexus_wrapper = NexusWrapper(str(uuid1()))
@@ -139,9 +139,9 @@ def test_set_three_dependents():
     set_dependents = transform1.get_dependents()
 
     assert(len(set_dependents) == 3)
-    assert (set_dependents[0] == transform2.absolute_path)
-    assert (set_dependents[1] == transform3.absolute_path)
-    assert (set_dependents[2] == transform4.absolute_path)
+    assert (set_dependents[0] == transform2)
+    assert (set_dependents[1] == transform3)
+    assert (set_dependents[2] == transform4)
 
 def test_deregister_dependent():
     nexus_wrapper = NexusWrapper(str(uuid1()))
@@ -157,6 +157,45 @@ def test_deregister_dependent():
     set_dependents = transform1.get_dependents()
 
     assert set_dependents == None
+
+def test_deregister_unregistered_dependent_alt1():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform1.deregister_dependent(transform2)
+
+    assert transform1.get_dependents() == None
+
+def test_deregister_unregistered_dependent_alt2():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+    transform3 = create_transform(nexus_wrapper, "transform_3")
+
+    transform1.register_dependent(transform3)
+    transform1.deregister_dependent(transform2)
+
+    assert len(transform1.get_dependents()) == 1
+    assert transform1.get_dependents()[0] == transform3
+
+def test_deregister_unregistered_dependent_alt3():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+    transform3 = create_transform(nexus_wrapper, "transform_2_alt")
+    transform4 = create_transform(nexus_wrapper, "transform_3")
+
+    transform1.register_dependent(transform3)
+    transform1.register_dependent(transform4)
+    transform1.deregister_dependent(transform2)
+
+    assert len(transform1.get_dependents()) == 2
+    assert transform1.get_dependents()[0] == transform3
+    assert transform1.get_dependents()[1] == transform4
 
 def test_reregister_dependent():
     nexus_wrapper = NexusWrapper(str(uuid1()))
@@ -175,7 +214,7 @@ def test_reregister_dependent():
     set_dependents = transform1.get_dependents()
 
     assert(len(set_dependents) == 1)
-    assert (set_dependents[0] == transform3.absolute_path)
+    assert (set_dependents[0] == transform3)
 
 from tests.helpers import add_component_to_file
 
@@ -191,7 +230,7 @@ def test_set_one_dependent_component():
     set_dependents = transform.get_dependents()
 
     assert(len(set_dependents) == 1)
-    assert (set_dependents[0] == component.absolute_path)
+    assert (set_dependents[0] == component)
 
 def test_set_two_dependent_components():
     nexus_wrapper = NexusWrapper(str(uuid1()))
@@ -207,8 +246,8 @@ def test_set_two_dependent_components():
     set_dependents = transform.get_dependents()
 
     assert(len(set_dependents) == 2)
-    assert (set_dependents[0] == component1.absolute_path)
-    assert (set_dependents[1] == component2.absolute_path)
+    assert (set_dependents[0] == component1)
+    assert (set_dependents[1] == component2)
 
 def test_set_three_dependent_components():
     nexus_wrapper = NexusWrapper(str(uuid1()))
@@ -226,9 +265,9 @@ def test_set_three_dependent_components():
     set_dependents = transform.get_dependents()
 
     assert(len(set_dependents) == 3)
-    assert (set_dependents[0] == component1.absolute_path)
-    assert (set_dependents[1] == component2.absolute_path)
-    assert (set_dependents[2] == component3.absolute_path)
+    assert (set_dependents[0] == component1)
+    assert (set_dependents[1] == component2)
+    assert (set_dependents[2] == component3)
 
 def test_deregister_three_dependent_components():
     nexus_wrapper = NexusWrapper(str(uuid1()))
@@ -250,3 +289,17 @@ def test_deregister_three_dependent_components():
     set_dependents = transform.get_dependents()
 
     assert(len(set_dependents) == 0)
+
+def test_register_dependent_twice():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component1 = add_component_to_file(nexus_wrapper, component_name = "test_component1")
+
+    transform.register_dependent(component1)
+    transform.register_dependent(component1)
+
+    set_dependents = transform.get_dependents()
+
+    assert(len(set_dependents) == 1)

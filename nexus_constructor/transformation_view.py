@@ -5,6 +5,7 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.component_tree_model import LinkTransformation
+from nexus_constructor.component import Component
 
 
 class EditTransformation(QGroupBox):
@@ -60,6 +61,14 @@ class EditRotation(EditTransformation):
         self.transformation_frame.valueLabel.setText("Rotation (°)")
         self.setTitle("Rotation")
 
+def links_back_to_component(reference: Component, comparison: Component):
+    if reference == comparison:
+        return True
+    if not comparison.transforms.has_link:
+        return False
+    if comparison.transforms.link.component_link == None:
+        return False
+    return links_back_to_component(reference, comparison.transforms.link.component_link)
 
 class EditTransformationLink(QFrame):
     def __init__(
@@ -85,11 +94,12 @@ class EditTransformationLink(QFrame):
             transformations = current_component.transforms
             self.link_frame.TransformationsComboBox.addItem(current_component.name, userData = current_component)
             last_index = self.link_frame.TransformationsComboBox.count() - 1
+
+            if links_back_to_component(self.link.parent.parent_component, current_component):
+                self.link_frame.TransformationsComboBox.model().item(last_index).setEnabled(False)
             if len(transformations) == 0:
                 self.link_frame.TransformationsComboBox.model().item(last_index).setEnabled(False)
-            if current_component.absolute_path == self.link.parent.parent_component.absolute_path:
-                self.link_frame.TransformationsComboBox.model().item(last_index).setEnabled(False)
-            if self.link.linked_component != None and self.link.linked_component.absolute_path == current_component.absolute_path:
+            if self.link.linked_component != None and self.link.linked_component == current_component:
                 self.link_frame.TransformationsComboBox.setCurrentIndex(self.link_frame.TransformationsComboBox.count() - 1)
         self.link_frame.TransformationsComboBox.currentIndexChanged.connect(self.set_new_index)
 

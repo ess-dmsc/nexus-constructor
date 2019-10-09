@@ -68,6 +68,11 @@ def _transforms_are_equivalent(
 ):
     return transform_1.absolute_path == transform_2.absolute_path
 
+class LinkTransformation:
+    def __init__(self, parent: TransformationsList):
+        super().__init__()
+        self.parent = parent
+        self.linked_component = None
 
 class Component:
     """
@@ -77,6 +82,12 @@ class Component:
     def __init__(self, nexus_file: nx.NexusWrapper, group: h5py.Group):
         self.file = nexus_file
         self.group = group
+
+    def __eq__(self, other):
+        try:
+            return other.absolute_path == self.absolute_path
+        except Exception:
+            return False
 
     @property
     def name(self):
@@ -151,7 +162,7 @@ class Component:
                 return
             transforms.append(Transformation(self.file, transform_dataset))
             if DEPENDS_ON_STR in transform_dataset.attrs.keys():
-                self._get_transform(transform_dataset.attrs[DEPENDS_ON_STR], transforms)
+                self._get_transform(transform_dataset.attrs[DEPENDS_ON_STR], transforms, local_only)
 
     @property
     def transforms(self) -> TransformationsList:
@@ -163,6 +174,16 @@ class Component:
         transforms = TransformationsList(self)
         depends_on = self.get_field(DEPENDS_ON_STR)
         self._get_transform(depends_on, transforms, local_only=True)
+        this_component_path = self.absolute_path
+        for elem in transforms:
+            if "/transformations/" in elem.depends_on.absolute_path and (this_component_path + "/transformations/") not in elem.depends_on.absolute_path:
+                transforms.has_link = True
+                c_link = LinkTransformation(transforms)
+                other_component_path = elem.depends_on.absolute_path[:elem.depends_on.absolute_path.find("/transformations/")]
+                print("Other component path: {}".format(other_component_path))
+                c_link.component_link = Component(self.file, self.file.nexus_file[other_component_path])
+                transforms.link = c_link
+                break
         return transforms
 
     def add_translation(

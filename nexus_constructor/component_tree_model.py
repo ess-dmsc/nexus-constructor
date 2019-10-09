@@ -1,7 +1,7 @@
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
-from nexus_constructor.component import Component
+from nexus_constructor.component import Component, LinkTransformation
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import generate_unique_name
@@ -11,14 +11,6 @@ class ComponentInfo(object):
     def __init__(self, parent: Component):
         super().__init__()
         self.parent = parent
-
-
-class LinkTransformation:
-    def __init__(self, parent: TransformationsList):
-        super().__init__()
-        self.parent = parent
-        self.linked_component = None
-
 
 class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, instrument: Instrument, parent=None):
@@ -101,19 +93,13 @@ class ComponentTreeModel(QAbstractItemModel):
         transformation_list_index = self.parent(index)
         remove_pos = transformation_list.index(remove_transform)
         component = transformation_list.parent_component
+
+        remove_transform.remove_from_dependee_chain()
+
         self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
         component.remove_transformation(remove_transform)
         transformation_list.pop(remove_pos)
         self.endRemoveRows()
-        component.depends_on = None
-        if len(transformation_list) > 0:
-            component.depends_on = transformation_list[0]
-            for i in range(len(transformation_list) - 1):
-                transformation_list[i].depends_on = transformation_list[i + 1]
-            if transformation_list.has_link:
-                transformation_list[-1].depends_on = transformation_list.link.link_transformation
-        elif transformation_list.has_link:
-            component.depends_on = transformation_list.link.link_transformation
 
     def __remove_component(self, index: QModelIndex):
         remove_index = self.components.index(index.internalPointer())
