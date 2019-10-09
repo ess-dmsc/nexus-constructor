@@ -1,7 +1,7 @@
 import io
 import json
-
 import numpy as np
+import h5py
 
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
@@ -11,11 +11,7 @@ from nexus_constructor.nexus_filewriter_json.writer import (
     object_to_json_file,
     generate_json,
 )
-import h5py
-
-
-def create_in_memory_file(filename):
-    return h5py.File(filename, mode="x", driver="core", backing_store=False)
+from tests.helpers import create_in_memory_file
 
 
 def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():

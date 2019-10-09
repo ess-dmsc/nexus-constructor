@@ -5,7 +5,7 @@ from nexus_constructor.nexus.nexus_wrapper import (
     append_nxs_extension,
     get_nx_class,
 )
-from tests.test_nexus_to_json import create_in_memory_file
+from tests.helpers import create_in_memory_file
 
 
 def test_GIVEN_nothing_WHEN_creating_nexus_wrapper_THEN_file_contains_entry_group_with_correct_nx_class():

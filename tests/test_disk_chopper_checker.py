@@ -26,7 +26,7 @@ from tests.chopper_test_helpers import (
     EDGES_ARR,
     CONVERT_DEGREES_TO_RADIANS,
 )
-from tests.test_nexus_to_json import create_in_memory_file
+from tests.helpers import create_in_memory_file
 
 
 @pytest.fixture(scope="function")
