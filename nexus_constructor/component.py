@@ -134,8 +134,6 @@ class Component:
     def __init__(self, nexus_file: nx.NexusWrapper, group: h5py.Group):
         self.file = nexus_file
         self.group = group
-        if self.nx_class == None:
-            raise RuntimeError("Component class is not set.")
 
     def __eq__(self, other):
         try:
