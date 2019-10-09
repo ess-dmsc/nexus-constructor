@@ -26,6 +26,7 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
     OFFGeometryNoNexus,
+    NoShapeGeometry,
 )
 
 
@@ -554,3 +555,9 @@ def test_GIVEN_off_properties_WHEN_setting_off_geometry_shape_THEN_shape_group_h
     assert (
         component.group[SHAPE_GROUP_NAME].attrs["NX_class"] == OFF_GEOMETRY_NEXUS_NAME
     )
+
+
+def test_GIVEN_component_with_no_shape_information_WHEN_shape_is_requested_THEN_returns_NoShapeGeometry(
+    component
+):
+    assert isinstance(component.shape[0], NoShapeGeometry)

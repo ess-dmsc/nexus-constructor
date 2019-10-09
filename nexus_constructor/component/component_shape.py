@@ -2,7 +2,7 @@ import h5py
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.geometry.cylindrical_geometry import CylindricalGeometry
-from nexus_constructor.geometry import OFFGeometryNexus
+from nexus_constructor.geometry import OFFGeometryNexus, NoShapeGeometry
 
 SHAPE_GROUP_NAME = "shape"
 PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
@@ -20,6 +20,9 @@ def get_shape_from_component(
             return CylindricalGeometry(nexus_file, shape_group)
         if nx_class == OFF_GEOMETRY_NEXUS_NAME:
             return OFFGeometryNexus(nexus_file, shape_group)
+
+    # else return a placeholder to indicate the component's position
+    return NoShapeGeometry()
 
 
 class ComponentShape:
