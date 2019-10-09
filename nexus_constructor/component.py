@@ -34,6 +34,7 @@ OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"
 DEPENDS_ON_STR = "depends_on"
 LINK_STR = "has_link"
 
+
 class DependencyError(Exception):
     """
     Raised when trying to carry out an operation which would invalidate the depends_on chain
@@ -68,6 +69,7 @@ def _transforms_are_equivalent(
 ):
     return transform_1.absolute_path == transform_2.absolute_path
 
+
 class TransformationsList(list):
     def __init__(self, parent):
         super().__init__()
@@ -76,21 +78,37 @@ class TransformationsList(list):
 
     @property
     def has_link(self):
-        has_link_value = self.parent_component.file.get_attribute_value(self.parent_component.group, LINK_STR)
+        has_link_value = self.parent_component.file.get_attribute_value(
+            self.parent_component.group, LINK_STR
+        )
         if has_link_value == None:
             has_link_value = False
-            if len(self.parent_component.transforms) == 0 and self.parent_component.depends_on != None and "/transformations/" in self.parent_component.depends_on.absolute_path:
+            if (
+                len(self.parent_component.transforms) == 0
+                and self.parent_component.depends_on != None
+                and "/transformations/"
+                in self.parent_component.depends_on.absolute_path
+            ):
                 has_link_value = True
             for elem in self.parent_component.transforms:
-                if "/transformations/" in elem.depends_on.absolute_path and (self.parent_component.absolute_path + "/transformations/") not in elem.depends_on.absolute_path:
+                if (
+                    "/transformations/" in elem.depends_on.absolute_path
+                    and (self.parent_component.absolute_path + "/transformations/")
+                    not in elem.depends_on.absolute_path
+                ):
                     has_link_value = True
                     break
-            self.parent_component.file.set_attribute_value(self.parent_component.group, LINK_STR, has_link_value)
+            self.parent_component.file.set_attribute_value(
+                self.parent_component.group, LINK_STR, has_link_value
+            )
         return bool(has_link_value)
 
     @has_link.setter
     def has_link(self, value: bool):
-        self.parent_component.file.set_attribute_value(self.parent_component.group, LINK_STR, value)
+        self.parent_component.file.set_attribute_value(
+            self.parent_component.group, LINK_STR, value
+        )
+
 
 class LinkTransformation:
     def __init__(self, parent: TransformationsList):
@@ -101,13 +119,34 @@ class LinkTransformation:
     def linked_component(self):
         if not self.parent.has_link:
             return None
-        if self.parent.parent_component.depends_on != None and "/transformations/" in self.parent.parent_component.depends_on.absolute_path and len(self.parent.parent_component.transforms) == 0:
-            component_path = self.parent.parent_component.depends_on.absolute_path[:self.parent.parent_component.depends_on.absolute_path.find("/transformations/")]
-            return Component(self.parent.parent_component.file, self.parent.parent_component.file.nexus_file[component_path])
+        if (
+            self.parent.parent_component.depends_on != None
+            and "/transformations/"
+            in self.parent.parent_component.depends_on.absolute_path
+            and len(self.parent.parent_component.transforms) == 0
+        ):
+            component_path = self.parent.parent_component.depends_on.absolute_path[
+                : self.parent.parent_component.depends_on.absolute_path.find(
+                    "/transformations/"
+                )
+            ]
+            return Component(
+                self.parent.parent_component.file,
+                self.parent.parent_component.file.nexus_file[component_path],
+            )
         for elem in self.parent:
-            if "/transformations/" in elem.depends_on.absolute_path and (self.parent.parent_component.absolute_path + "/transformations/") not in elem.depends_on.absolute_path:
-                component_path = elem.depends_on.absolute_path[:elem.depends_on.absolute_path.find("/transformations/")]
-                return Component(self.parent.parent_component.file, self.parent.parent_component.file.nexus_file[component_path])
+            if (
+                "/transformations/" in elem.depends_on.absolute_path
+                and (self.parent.parent_component.absolute_path + "/transformations/")
+                not in elem.depends_on.absolute_path
+            ):
+                component_path = elem.depends_on.absolute_path[
+                    : elem.depends_on.absolute_path.find("/transformations/")
+                ]
+                return Component(
+                    self.parent.parent_component.file,
+                    self.parent.parent_component.file.nexus_file[component_path],
+                )
         return None
 
     @linked_component.setter
@@ -118,13 +157,17 @@ class LinkTransformation:
             target = parent_component
         else:
             for c_transform in parent_component.transforms:
-                if parent_component.absolute_path + "/transformations/" not in c_transform.depends_on.absolute_path:
+                if (
+                    parent_component.absolute_path + "/transformations/"
+                    not in c_transform.depends_on.absolute_path
+                ):
                     target = c_transform
                     break
         if value != None:
             target.depends_on = value.depends_on
             return
         target.depends_on = None
+
 
 class Component:
     """
@@ -214,7 +257,9 @@ class Component:
                 return
             transforms.append(Transformation(self.file, transform_dataset))
             if DEPENDS_ON_STR in transform_dataset.attrs.keys():
-                self._get_transform(transform_dataset.attrs[DEPENDS_ON_STR], transforms, local_only)
+                self._get_transform(
+                    transform_dataset.attrs[DEPENDS_ON_STR], transforms, local_only
+                )
 
     @property
     def transforms(self) -> TransformationsList:

@@ -1,7 +1,11 @@
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
-from nexus_constructor.component import Component, LinkTransformation, TransformationsList
+from nexus_constructor.component import (
+    Component,
+    LinkTransformation,
+    TransformationsList,
+)
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import generate_unique_name
@@ -11,6 +15,7 @@ class ComponentInfo(object):
     def __init__(self, parent: Component):
         super().__init__()
         self.parent = parent
+
 
 class ComponentTreeModel(QAbstractItemModel):
     data_changed = Signal("QModelIndex", "QModelIndex")
@@ -94,7 +99,9 @@ class ComponentTreeModel(QAbstractItemModel):
             transformations = transformations_index.internalPointer()
             if transformations.has_link:
                 transformation_rows = self.rowCount(transformations_index)
-                link_index = self.index(transformation_rows - 1, 0, transformations_index)
+                link_index = self.index(
+                    transformation_rows - 1, 0, transformations_index
+                )
                 self.dataChanged.emit(link_index, link_index)
 
     def __remove_transformation(self, index: QModelIndex):
@@ -180,7 +187,9 @@ class ComponentTreeModel(QAbstractItemModel):
         for i in range(len(transformation_list) - 1):
             transformation_list[i].depends_on = transformation_list[i + 1]
         if transformation_list.has_link:
-            transformation_list[-1].depends_on = transformation_list.link.linked_component.transforms[0]
+            transformation_list[
+                -1
+            ].depends_on = transformation_list.link.linked_component.transforms[0]
 
     def add_translation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, "translation")

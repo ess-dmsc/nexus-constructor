@@ -241,6 +241,7 @@ def test_transforms_contains_only_local_transforms_not_full_depends_on_chain():
         second_component.transforms
     ), "Expect transforms list to contain only the 1 transform local to this component"
 
+
 def test_transforms_contains_only_local_transforms_alt():
     nexus_wrapper = create_nexus_wrapper()
     component1 = add_component_to_file(
@@ -251,19 +252,22 @@ def test_transforms_contains_only_local_transforms_alt():
     )
 
     transform1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
-    transform2 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=transform1)
+    transform2 = component1.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=transform1
+    )
     transform3 = component2.add_rotation(
         QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=transform2
     )
     component1.depends_on = transform2
     component2.depends_on = transform3
 
-    assert len(
-        component1.transforms
-    ) == 2, "Expect transforms list to contain only the 2 transforms local to this component"
-    assert len(
-        component2.transforms
-    ) == 1, "Expect transforms list to contain only the 1 transform local to this component"
+    assert (
+        len(component1.transforms) == 2
+    ), "Expect transforms list to contain only the 2 transforms local to this component"
+    assert (
+        len(component2.transforms) == 1
+    ), "Expect transforms list to contain only the 1 transform local to this component"
+
 
 def test_transforms_has_link():
     nexus_wrapper = create_nexus_wrapper()
@@ -283,6 +287,7 @@ def test_transforms_has_link():
 
     new_component = Component(component1.file, component1.group)
     assert new_component.transforms.has_link
+
 
 def test_transforms_link_is_correct():
     nexus_wrapper = create_nexus_wrapper()

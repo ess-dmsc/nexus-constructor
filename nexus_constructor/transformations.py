@@ -8,6 +8,7 @@ TransformationOrComponent = TypeVar(
     "TransformationOrComponent", "Transformation", "Component"
 )
 
+
 class Transformation:
     """
     Provides an interface to an existing transformation dataset in a NeXus file
@@ -129,9 +130,12 @@ class Transformation:
                 dependee_of_list = np.array([dependee_of_list])
             dependee_of_list = dependee_of_list.astype("U")
             if dependent.absolute_path not in dependee_of_list:
-               dependee_of_list = np.append(
-                    dependee_of_list, np.array([dependent.absolute_path]))
-               self.file.set_attribute_value(self.dataset, "dependee_of", dependee_of_list)
+                dependee_of_list = np.append(
+                    dependee_of_list, np.array([dependent.absolute_path])
+                )
+                self.file.set_attribute_value(
+                    self.dataset, "dependee_of", dependee_of_list
+                )
 
     def deregister_dependent(self, former_dependent: TransformationOrComponent):
         """
@@ -157,10 +161,15 @@ class Transformation:
                     self.dataset, "dependee_of", dependee_of_list
                 )
             else:
-                print("Unable to de-register dependent {} from {} due to it not being registered.".format(former_dependent.absolute_path, self.absolute_path))
+                print(
+                    "Unable to de-register dependent {} from {} due to it not being registered.".format(
+                        former_dependent.absolute_path, self.absolute_path
+                    )
+                )
 
     def get_dependents(self):
         import nexus_constructor.component as comp
+
         if "dependee_of" in self.dataset.attrs.keys():
             return_dependents = []
             dependents = self.file.get_attribute_value(self.dataset, "dependee_of")
@@ -185,4 +194,3 @@ class Transformation:
             elem.depends_on = new_depends_on
             self.deregister_dependent(elem)
         self.depends_on = None
-
