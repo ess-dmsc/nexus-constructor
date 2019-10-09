@@ -180,7 +180,6 @@ class Component:
                 transforms.has_link = True
                 c_link = LinkTransformation(transforms)
                 other_component_path = elem.depends_on.absolute_path[:elem.depends_on.absolute_path.find("/transformations/")]
-                print("Other component path: {}".format(other_component_path))
                 c_link.component_link = Component(self.file, self.file.nexus_file[other_component_path])
                 transforms.link = c_link
                 break

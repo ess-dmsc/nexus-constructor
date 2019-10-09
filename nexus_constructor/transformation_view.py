@@ -108,7 +108,14 @@ class EditTransformationLink(QFrame):
             return
         if new_index == 0:
             self.link.linked_component = None
-            self.link.parent.parent_component.depends_on = None
+            parent_component = self.link.parent.parent_component
+            if len(parent_component.transforms) == 0:
+                parent_component.depends_on = None
+            else:
+                for c_transform in parent_component.transforms:
+                    if parent_component.absolute_path + "/transformations/" not in c_transform.depends_on.absolute_path:
+                        c_transform.depends_on = None
+                        break
             return
         current_component = self.link_frame.TransformationsComboBox.currentData()
         self.link.linked_component = current_component
