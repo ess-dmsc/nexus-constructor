@@ -39,6 +39,6 @@ def test_GIVEN_json_containing_entry_group_WHEN_json_to_nexus_called_THEN_entry_
       }
     }
     """
-    nexus_wrapper = json_to_nexus(test_json)
-    assert "entry" in nexus_wrapper.nexus_file
-    assert is_nexus_class(nexus_wrapper.nexus_file["test_entry"], "NXentry")
+    nexus_file = json_to_nexus(test_json)
+    assert "test_entry" in nexus_file
+    assert is_nexus_class(nexus_file["test_entry"], "NXentry")
