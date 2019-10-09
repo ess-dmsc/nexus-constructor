@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple
 
 from PySide2.Qt3DCore import Qt3DCore
@@ -233,7 +234,9 @@ class InstrumentView(QWidget):
             del self.component_entities[name]
             del self.component_meshes[name]
         except KeyError:
-            print("Unable to delete component " + name + " because it doesn't exist.")
+            logging.error(
+                f"Unable to delete component {name} because it doesn't exist."
+            )
 
         self._delete_all_transformations(name)
 

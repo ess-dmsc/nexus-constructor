@@ -1,3 +1,4 @@
+import logging
 from typing import Sequence
 
 from PySide2.QtWidgets import QListWidget
@@ -78,7 +79,7 @@ def _fields_have_correct_type(fields_dict: dict):
     if not correct_slit_edges_type:
         problems.append(_incorrect_field_type_message(fields_dict, SLIT_EDGES_NAME))
 
-    print(UNABLE + "\n".join(problems))
+    logging.error(f"{UNABLE}\n{problems}")
     return False
 
 
@@ -88,21 +89,15 @@ def _edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple):
     :return: True if the edges array is 1D. False otherwise.
     """
     if edges_dim > 2:
-        print(
-            UNABLE
-            + "Expected slit edges array to be 1D but it has {} dimensions.".format(
-                edges_dim
-            )
+        logging.warning(
+            f"{UNABLE} Expected slit edges array to be 1D but it has {edges_dim} dimensions."
         )
         return False
 
     if edges_dim == 2:
         if edges_shape[0] != 1 and edges_shape[1] != 1:
-            print(
-                UNABLE
-                + "Expected slit edges array to be 1D but it has shape {}.".format(
-                    edges_shape
-                )
+            logging.warning(
+                f"{UNABLE} Expected slit edges array to be 1D but it has shape {edges_shape}."
             )
             return False
 
@@ -124,34 +119,29 @@ def _input_describes_valid_chopper(
     """
     # Check that the number of slit edges is equal to two times the number of slits
     if len(chopper_details.slit_edges) != 2 * chopper_details.slits:
-        print(
-            UNABLE
-            + "Size of slit edges array should be twice the number of slits. Instead there are {} slits and {} slit edges.".format(
-                chopper_details.slits, len(chopper_details.slit_edges)
-            )
+        logging.error(
+            f"{UNABLE} Size of slit edges array should be twice the number of slits. Instead there are {chopper_details.slits} slits and {len(chopper_details.slit_edges)} slit edges."
         )
         return False
 
     # Check that the slit height is smaller than the radius
     if chopper_details.slit_height >= chopper_details.radius:
-        print(
-            UNABLE
-            + "Slit height should be smaller than radius. Instead slit height is {} and radius is {}".format(
-                chopper_details.slit_height, chopper_details.radius
-            )
+        logging.error(
+            f"{UNABLE} Slit height should be smaller than radius. Instead slit height is {chopper_details.slit_height} and radius is {chopper_details.radius}"
         )
         return False
 
     # Check that the list of slit edges is sorted
     if not (np.diff(slit_edges) >= 0).all():
-        print(UNABLE + "Slit edges array is not sorted. Found values:", slit_edges)
+        logging.error(
+            f"{UNABLE} Slit edges array is not sorted. Found values: {slit_edges}"
+        )
         return False
 
     # Check that there are no repeated angles
     if len(slit_edges) != len(np.unique(slit_edges)):
-        print(
-            UNABLE + "Angles in slit edges array should be unique. Found values:",
-            slit_edges,
+        logging.error(
+            f"{UNABLE} Angles in slit edges array should be unique. Found values: {slit_edges}"
         )
         return False
 
@@ -159,8 +149,8 @@ def _input_describes_valid_chopper(
     if (chopper_details.slit_edges != sorted(chopper_details.slit_edges)) and (
         chopper_details.slit_edges[-1] >= chopper_details.slit_edges[0]
     ):
-        print(
-            UNABLE + "Slit edges contains overlapping slits. Found values:", slit_edges
+        logging.error(
+            f"{UNABLE} Slit edges contains overlapping slits. Found values: {slit_edges}"
         )
         return False
 
@@ -196,7 +186,9 @@ class UserDefinedChopperChecker:
         missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
 
         if len(missing_fields) > 0:
-            print(UNABLE + "Required field(s) missing:", ", ".join(missing_fields))
+            logging.eror(
+                f"{UNABLE} Required field(s) missing:", ", ".join(missing_fields)
+            )
             return False
 
         return True
