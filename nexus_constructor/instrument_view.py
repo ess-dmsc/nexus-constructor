@@ -228,9 +228,9 @@ class InstrumentView(QWidget):
         self.component_positions[name] = position_transforms
         # Note, the a list comprehension like below doesn't work (end up with segfault)
         # self.component_positions[name] = [Qt3DCore.QTransform().setTranslation(position) for position in positions]
-        self.create_entities(name)
+        self._create_entities(name)
 
-    def create_entities(self, name):
+    def _create_entities(self, name):
         with DetachedRootEntity(
             self.component_root_entity, self.combined_component_axes_entity
         ):

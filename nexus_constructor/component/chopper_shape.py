@@ -1,6 +1,6 @@
 from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.geometry.cylindrical_geometry import CylindricalGeometry
-from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.geometry import OFFGeometry, NoShapeGeometry
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     NexusDefinedChopperChecker,
 )
@@ -15,7 +15,8 @@ class ChopperShape(ComponentShape):
     def get_shape(
         self
     ) -> Tuple[
-        Optional[Union[OFFGeometry, CylindricalGeometry]], Optional[List[QVector3D]]
+        Optional[Union[OFFGeometry, CylindricalGeometry, NoShapeGeometry]],
+        Optional[List[QVector3D]],
     ]:
         # If there is a shape group then use that
         shape, _ = super().get_shape()
