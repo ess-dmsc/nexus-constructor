@@ -54,13 +54,19 @@ class NexusWrapper(QObject):
     component_removed = Signal(str)
     show_entries_dialog = Signal("QVariant", "QVariant")
 
-    def __init__(self, filename: str = "NeXus File"):
+    def __init__(
+        self,
+        filename: str = "NeXus File",
+        entry_name: str = "entry",
+        instrument_name: str = "instrument",
+    ):
         super().__init__()
         self.nexus_file = set_up_in_memory_nexus_file(filename)
-        self.entry = self.create_nx_group("entry", "NXentry", self.nexus_file)
-
+        self.entry = self.create_nx_group(entry_name, "NXentry", self.nexus_file)
+        self.instrument = self.create_nx_group(
+            instrument_name, "NXinstrument", self.entry
+        )
         self.create_nx_group("sample", "NXsample", self.entry)
-        self.instrument = self.create_nx_group("instrument", "NXinstrument", self.entry)
 
         self._emit_file()
 
