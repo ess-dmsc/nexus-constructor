@@ -42,15 +42,6 @@ class Ui_MainWindow(object):
         self.silx_tab_layout = QtWidgets.QGridLayout(self.silx_tab)
         self.silx_tab_layout.setObjectName("gridLayout_2")
 
-        self.silx_vertical_layout = QtWidgets.QVBoxLayout()
-        self.silx_vertical_layout.setObjectName("verticalLayout")
-
-        self.silx_widget = QtWidgets.QWidget(self.silx_tab)
-        self.silx_widget.setObjectName("widget")
-
-        self.silx_vertical_layout.addWidget(self.silx_widget)
-        self.silx_tab_layout.addLayout(self.silx_vertical_layout, 0, 0, 1, 1)
-
         self.tab_widget.addTab(self.silx_tab, "")
         self.splitter.addWidget(self.tab_widget)
 

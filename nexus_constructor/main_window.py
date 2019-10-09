@@ -58,7 +58,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.file_changed.connect(
             self.update_nexus_file_structure_view
         )
-        self.silx_vertical_layout.addWidget(self.widget)
+        self.silx_tab_layout.addWidget(self.widget)
         self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
@@ -91,7 +91,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.new_component_action.triggered.connect(self.show_add_component_window)
         self.component_tool_bar.addAction(self.new_component_action)
         self.new_translation_action = QAction(
-            QIcon("ui/new_translation.png"), "New translation", self.component_tree_view_tab
+            QIcon("ui/new_translation.png"),
+            "New translation",
+            self.component_tree_view_tab,
         )
         self.new_translation_action.triggered.connect(self.on_add_translation)
         self.new_translation_action.setEnabled(False)
@@ -116,13 +118,17 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.duplicate_action.setEnabled(False)
 
         self.edit_component_action = QAction(
-            QIcon("ui/edit_component.png"), "Edit Component", self.component_tree_view_tab
+            QIcon("ui/edit_component.png"),
+            "Edit Component",
+            self.component_tree_view_tab,
         )
         self.edit_component_action.setEnabled(False)
         self.edit_component_action.triggered.connect(self.show_edit_component_dialog)
         self.component_tool_bar.addAction(self.edit_component_action)
 
-        self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.component_tree_view_tab)
+        self.delete_action = QAction(
+            QIcon("ui/delete.png"), "Delete", self.component_tree_view_tab
+        )
         self.delete_action.triggered.connect(self.on_delete_item)
         self.delete_action.setEnabled(False)
         self.component_tool_bar.addAction(self.delete_action)
@@ -261,16 +267,18 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             component_index = self.component_model.parent(trans_list_index)
             self.component_tree_view.expand(component_index)
 
-    def add_transformation(self, type):
+    def add_transformation(self, transformation_type):
         selected = self.component_tree_view.selectedIndexes()
         if len(selected) > 0:
             current_index = selected[0]
-            if type == "translation":
+            if transformation_type == "translation":
                 self.component_model.add_translation(current_index)
-            elif type == "rotation":
+            elif transformation_type == "rotation":
                 self.component_model.add_rotation(current_index)
             else:
-                raise ValueError("Unknown transformation type: {}".format(type))
+                raise ValueError(
+                    "Unknown transformation type: {}".format(transformation_type)
+                )
             self.expand_transformation_list(current_index)
 
     def on_add_translation(self):
