@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Union, TextIO
 
-from nexus_constructor.json.filewriter_json_writer import object_to_json_file
+from nexus_constructor.json.helpers import object_to_json_file
 
 
 def generate_forwarder_command(

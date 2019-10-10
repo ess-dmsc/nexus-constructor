@@ -2,8 +2,9 @@ import h5py
 
 from nexus_constructor.instrument import Instrument
 import numpy as np
-import json
 import uuid
+
+from nexus_constructor.json.helpers import object_to_json_file
 
 
 def generate_json(
@@ -155,18 +156,6 @@ class NexusToDictConverter:
             root_dict["dataset"]["size"] = size
 
         return root_dict
-
-
-def object_to_json_file(tree_dict, file):
-    """
-    Create a JSON file describing the NeXus file
-    WARNING, output files can easily be 10 times the size of input NeXus file
-
-    :param tree_dict: Root node of the tree.
-    :param file: File object to store the tree in.
-    """
-
-    json.dump(tree_dict, file, indent=2, sort_keys=False)
 
 
 def create_writer_commands(

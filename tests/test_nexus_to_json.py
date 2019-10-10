@@ -9,9 +9,9 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.json.filewriter_json_writer import (
     NexusToDictConverter,
     create_writer_commands,
-    object_to_json_file,
     generate_json,
 )
+from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
 import h5py
 
