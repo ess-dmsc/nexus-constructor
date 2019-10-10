@@ -6,6 +6,7 @@ from nexus_constructor.instrument_view import InstrumentView
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+
         MainWindow.resize(1280, 720)
         self.central_widget = QtWidgets.QWidget(MainWindow)
         self.central_widget.setObjectName("centralwidget")
@@ -82,9 +83,11 @@ class Ui_MainWindow(object):
         self.export_to_filewriter_JSON_action.setObjectName(
             "actionExport_to_Filewriter_JSON"
         )
+        self.export_to_forwarder_JSON_action = QtWidgets.QAction(MainWindow)
         self.file_menu.addAction(self.open_nexus_file_action)
         self.file_menu.addAction(self.export_to_nexus_file_action)
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
+        self.file_menu.addAction(self.export_to_forwarder_JSON_action)
         self.menu_bar.addAction(self.file_menu.menuAction())
 
     def retranslateUi(self, MainWindow):
@@ -117,5 +120,10 @@ class Ui_MainWindow(object):
         self.export_to_filewriter_JSON_action.setText(
             QtWidgets.QApplication.translate(
                 "MainWindow", "Export to Filewriter JSON", None, -1
+            )
+        )
+        self.export_to_forwarder_JSON_action.setText(
+            QtWidgets.QApplication.translate(
+                "MainWindow", "Export to Forwarder JSON", None, -1
             )
         )

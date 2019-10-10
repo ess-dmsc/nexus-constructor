@@ -13,6 +13,7 @@ import silx.gui.hdf5
 import os
 import h5py
 
+import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
@@ -24,7 +25,7 @@ from nexus_constructor.component_tree_view import (
     ComponentEditorDelegate,
     LinkTransformation,
 )
-from nexus_constructor.nexus_filewriter_json import writer
+from nexus_constructor.json import filewriter_json_writer
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
@@ -42,6 +43,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.open_nexus_file_action.triggered.connect(self.open_nexus_file)
         self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_filewriter_json
+        )
+        self.export_to_forwarder_JSON_action.triggered.connect(
+            self.save_to_forwarder_json
         )
 
         # Clear the 3d view when closed
@@ -317,7 +321,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.save_file(filename)
 
     def save_to_filewriter_json(self):
-        filename = file_dialog(True, "Save JSON File", JSON_FILE_TYPES)
+        filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
         if filename:
             name, ok_pressed = QInputDialog.getText(
                 None,
@@ -326,12 +330,32 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             )
             if ok_pressed:
                 with open(filename, "w") as file:
-                    writer.generate_json(
+                    filewriter_json_writer.generate_json(
                         self.instrument,
                         file,
                         nexus_file_name=name,
                         streams=self.instrument.get_streams(),
                         links=self.instrument.get_links(),
+                    )
+
+    def save_to_forwarder_json(self):
+
+        filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
+        if filename:
+            provider_type, ok_pressed = QInputDialog.getItem(
+                None,
+                "Provider type",
+                "Select provider type for PVs",
+                ["ca", "pva"],
+                0,
+                False,
+            )
+            if ok_pressed:
+                with open(filename, "w") as file:
+                    nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
+                        file,
+                        streams=self.instrument.get_streams(),
+                        provider_type=provider_type,
                     )
 
     def open_nexus_file(self):

@@ -235,7 +235,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
         component_shape, _ = self.component_to_edit.shape
-        if not component_shape or isinstance(component_shape, OFFGeometryNoNexus):
+        if not component_shape or isinstance(component_shape, NoShapeGeometry):
             self.noShapeRadioButton.setChecked(True)
             self.noShapeRadioButton.clicked.emit()
         else:
