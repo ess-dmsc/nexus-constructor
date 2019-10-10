@@ -15,7 +15,7 @@ from PySide2.QtWidgets import (
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.instrument import Instrument

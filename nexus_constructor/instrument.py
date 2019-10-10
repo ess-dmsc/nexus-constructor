@@ -2,12 +2,14 @@ import os
 from typing import List, Dict
 
 import h5py
-from nexus_constructor.component_type import make_dictionary_of_class_definitions
+from nexus_constructor.component.component_type import (
+    make_dictionary_of_class_definitions,
+)
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.transformations import Transformation
-from nexus_constructor.component_factory import create_component
+from nexus_constructor.component.component_factory import create_component
 
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
@@ -72,7 +74,7 @@ class Instrument:
         if nx_class in COMPONENTS_IN_ENTRY:
             parent_group = self.nexus.entry
         component_group = self.nexus.create_nx_group(name, nx_class, parent_group)
-        component = Component(self.nexus, component_group)
+        component = create_component(self.nexus, component_group)
         component.description = description
         return component
 

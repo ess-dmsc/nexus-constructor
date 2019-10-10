@@ -11,9 +11,9 @@ from mock import Mock, call, patch, mock_open
 from pytestqt.qtbot import QtBot
 import numpy as np
 
-from nexus_constructor import component_type
+from nexus_constructor.component import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
@@ -64,6 +64,20 @@ for i, component_class in enumerate(
         PIXEL_OPTIONS[component_class] = i
     else:
         NO_PIXEL_OPTIONS[component_class] = i
+
+# Select a subset of the component class to use in parameterised tests
+# Should include any for which the UI is specialised
+_components_subset = {"NXdetector", "NXdisk_chopper", "NXsensor"}
+COMPONENT_TYPES_SUBSET = {
+    class_name: position_in_combo_box
+    for class_name, position_in_combo_box in ALL_COMPONENT_TYPES.items()
+    if class_name in _components_subset
+}
+NO_PIXEL_OPTIONS_SUBSET = {
+    class_name: position_in_combo_box
+    for class_name, position_in_combo_box in NO_PIXEL_OPTIONS.items()
+    if class_name in _components_subset
+}
 
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
@@ -418,7 +432,7 @@ def test_UI_GIVEN_nothing_WHEN_selecting_shape_with_units_THEN_default_units_are
 
 
 @pytest.mark.parametrize("pixels_class", PIXEL_OPTIONS.keys())
-@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("any_component_type", COMPONENT_TYPES_SUBSET)
 @pytest.mark.parametrize("pixel_shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_invisible_to_visible(
     qtbot, template, dialog, pixels_class, any_component_type, pixel_shape_name
@@ -435,7 +449,7 @@ def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_p
     assert dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES.keys())
+@pytest.mark.parametrize("any_component_type", COMPONENT_TYPES_SUBSET.keys())
 def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_options_go_from_visible_to_invisible(
     qtbot, template, dialog, any_component_type
 ):
@@ -448,7 +462,7 @@ def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_opt
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS.keys())
+@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS_SUBSET.keys())
 @pytest.mark.parametrize("pixels_class", PIXEL_OPTIONS.keys())
 @pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_or_cylinder_shape_THEN_pixel_options_becomes_invisible(
@@ -1022,7 +1036,7 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_choosing_shape_THEN_relevant_fiel
     assert not dialog.geometryFileBox.isVisible()
 
 
-@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS.keys())
+@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS_SUBSET.keys())
 def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_mapping_list_remains_empty(
     qtbot, template, dialog, no_pixels_class, mock_pixel_options
 ):
@@ -1191,67 +1205,6 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
     )
 
 
-def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_module_THEN_pixel_data_isnt_stored_in_component(
-    qtbot, template, dialog, mock_pixel_options
-):
-
-    # Make the pixel options appear but choose NXdetector_module rather than NXdetector
-    make_pixel_options_appear(
-        qtbot,
-        dialog.CylinderRadioButton,
-        dialog,
-        template,
-        PIXEL_OPTIONS["NXdetector_module"],
-    )
-
-    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
-
-    enter_file_path(
-        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
-    )
-
-    mock_component = Mock(spec=Component)
-    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelGrid())
-
-    show_and_close_window(qtbot, template)
-
-    # Call the on_ok method as if the user had pressed Add Component
-    with patch("nexus_constructor.instrument.Component") as mock_component_constructor:
-        mock_component_constructor.return_value = mock_component
-        dialog.on_ok()
-        mock_component.record_pixel_grid.assert_not_called()
-
-
-def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_module_THEN_pixel_data_isnt_stored_in_component(
-    qtbot, template, dialog, mock_pixel_options
-):
-
-    # Make the pixel options appear but choose NXdetector_module rather than NXdetector
-    make_pixel_options_appear(
-        qtbot,
-        dialog.CylinderRadioButton,
-        dialog,
-        template,
-        PIXEL_OPTIONS["NXdetector_module"],
-    )
-
-    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
-
-    enter_file_path(
-        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
-    )
-
-    mock_component = Mock(spec=Component)
-    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping())
-
-    show_and_close_window(qtbot, template)
-
-    # Call the on_ok method as if the user had pressed Add Component
-    with patch("nexus_constructor.instrument.Component", return_value=mock_component):
-        dialog.on_ok()
-        mock_component.record_detector_number.assert_not_called()
-
-
 def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
     qtbot, template, dialog, mock_pixel_options
 ):
@@ -1266,16 +1219,23 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
-    mock_component = Mock(spec=Component)
-    pixel_grid = PixelGrid()
-    mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_grid)
+    with h5py.File(
+        "test_file", mode="x", driver="core", backing_store=False
+    ) as nexus_file:
+        test_group = nexus_file.create_group("test_component_group")
+        mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
+        pixel_grid = PixelGrid()
+        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_grid)
 
-    show_and_close_window(qtbot, template)
+        show_and_close_window(qtbot, template)
 
-    # Call the on_ok method as if the user had pressed Add Component
-    with patch("nexus_constructor.instrument.Component", return_value=mock_component):
-        dialog.on_ok()
-        mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
+        # Call the on_ok method as if the user had pressed Add Component
+        with patch(
+            "nexus_constructor.component.component_factory.Component",
+            return_value=mock_component,
+        ):
+            dialog.on_ok()
+            mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
 
 
 def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
@@ -1292,16 +1252,24 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
-    mock_component = Mock(spec=Component)
-    pixel_mapping = PixelMapping()
-    mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_mapping)
+    with h5py.File(
+        "test_file", mode="x", driver="core", backing_store=False
+    ) as nexus_file:
+        test_group = nexus_file.create_group("test_component_group")
+        mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
 
-    show_and_close_window(qtbot, template)
+        pixel_mapping = PixelMapping(pixel_ids=[1])
+        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_mapping)
 
-    # Call the on_ok method as if the user had pressed Add Component
-    with patch("nexus_constructor.instrument.Component", return_value=mock_component):
-        dialog.on_ok()
-        mock_component.record_detector_number.assert_called_once_with(pixel_mapping)
+        show_and_close_window(qtbot, template)
+
+        # Call the on_ok method as if the user had pressed Add Component
+        with patch(
+            "nexus_constructor.component.component_factory.Component",
+            return_value=mock_component,
+        ):
+            dialog.on_ok()
+            mock_component.record_detector_number.assert_called_once_with(pixel_mapping)
 
 
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
