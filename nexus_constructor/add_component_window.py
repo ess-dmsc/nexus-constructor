@@ -22,9 +22,9 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
     DiskChopperGeometryCreator,
 )
 from nexus_constructor.stream_advanced_options import (
-    nexus_indices_index_every_mb,
-    nexus_indices_index_every_kb,
-    store_latest_into,
+    NEXUS_INDICES_INDEX_EVERY_MB,
+    NEXUS_INDICES_INDEX_EVERY_KB,
+    STORE_LATEST_INTO,
 )
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import (
@@ -323,24 +323,24 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 new_ui_field.streams_widget.scalar_radio.setChecked(True)
 
             if (
-                nexus_indices_index_every_kb in field.keys()
-                or nexus_indices_index_every_mb in field.keys()
-                or store_latest_into in field.keys()
+                NEXUS_INDICES_INDEX_EVERY_KB in field.keys()
+                or NEXUS_INDICES_INDEX_EVERY_MB in field.keys()
+                or STORE_LATEST_INTO in field.keys()
             ):
                 new_ui_field.streams_widget.f142_advanced_group_box.setEnabled(True)
                 new_ui_field.streams_widget.set_advanced_options_state()
 
-            if nexus_indices_index_every_mb in field.keys():
+            if NEXUS_INDICES_INDEX_EVERY_MB in field.keys():
                 new_ui_field.streams_widget.f142_nexus_indices_index_every_mb_spinbox.setValue(
-                    field[nexus_indices_index_every_mb][()]
+                    field[NEXUS_INDICES_INDEX_EVERY_MB][()]
                 )
-            if nexus_indices_index_every_kb in field.keys():
+            if NEXUS_INDICES_INDEX_EVERY_KB in field.keys():
                 new_ui_field.streams_widget.f142_nexus_indices_index_every_kb_spinbox.setValue(
-                    field[nexus_indices_index_every_kb][()]
+                    field[NEXUS_INDICES_INDEX_EVERY_KB][()]
                 )
-            if store_latest_into in field.keys():
+            if STORE_LATEST_INTO in field.keys():
                 new_ui_field.streams_widget.f142_nexus_store_latest_into_spinbox.setValue(
-                    field[store_latest_into][()]
+                    field[STORE_LATEST_INTO][()]
                 )
 
         if schema == "ev42":
