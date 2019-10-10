@@ -12,6 +12,7 @@ class Ui_MainWindow(object):
 
         self.splitter = QSplitter(self.central_widget)
         self.splitter.setChildrenCollapsible(False)
+        self.splitter.setOpaqueResize(True)
 
         self.main_grid_layout = QtWidgets.QGridLayout(self.central_widget)
         self.main_grid_layout.addWidget(self.splitter)
@@ -34,10 +35,12 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.tab_widget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.splitter.setStretchFactor(0, 0)
+        self.splitter.setStretchFactor(1, 1)
 
     def _set_up_3d_view(self):
         self.sceneWidget = InstrumentView(self.splitter)
-        self.sceneWidget.setMinimumSize(QtCore.QSize(800, 0))
+        self.sceneWidget.setMinimumSize(QtCore.QSize(600, 0))
         self.sceneWidget.setObjectName("sceneWidget")
         self.splitter.addWidget(self.sceneWidget)
 
