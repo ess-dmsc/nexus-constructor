@@ -185,7 +185,7 @@ class NexusToDictConverter:
 def create_writer_commands(
     nexus_structure,
     output_filename,
-    broker="localhost:9092",
+    broker,
     job_id="",
     start_time=None,
     stop_time=None,
