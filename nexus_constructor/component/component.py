@@ -1,6 +1,8 @@
 import h5py
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Union, Tuple
 from PySide2.QtGui import QVector3D
+
+from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
@@ -24,13 +26,15 @@ from nexus_constructor.geometry import (
     record_vertices_in_file,
 )
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
+from nexus_constructor.component.component_shape import (
+    CYLINDRICAL_GEOMETRY_NEXUS_NAME,
+    OFF_GEOMETRY_NEXUS_NAME,
+    PIXEL_SHAPE_GROUP_NAME,
+    SHAPE_GROUP_NAME,
+    ComponentShape,
+)
 import numpy as np
 
-
-SHAPE_GROUP_NAME = "shape"
-PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
-CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
-OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"
 DEPENDS_ON_STR = "depends_on"
 
 
@@ -74,9 +78,18 @@ class Component:
     Provides an interface to an existing component group in a NeXus file
     """
 
-    def __init__(self, nexus_file: nx.NexusWrapper, group: h5py.Group):
+    def __init__(
+        self,
+        nexus_file: nx.NexusWrapper,
+        group: h5py.Group,
+        shape: Optional[ComponentShape] = None,
+    ):
         self.file = nexus_file
         self.group = group
+        if shape is not None:
+            self._shape = shape
+        else:
+            self._shape = ComponentShape(nexus_file, group)
 
     @property
     def name(self):
@@ -310,11 +323,11 @@ class Component:
         self.remove_shape()
 
         shape_group = self.create_shape_nx_group(
-            OFF_GEOMETRY_NEXUS_NAME, type(pixel_data) is PixelGrid
+            OFF_GEOMETRY_NEXUS_NAME, isinstance(pixel_data, PixelGrid)
         )
 
         pixel_mapping = None
-        if type(pixel_data) is PixelMapping:
+        if isinstance(pixel_data, PixelMapping):
             pixel_mapping = pixel_data
 
         record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
@@ -336,24 +349,31 @@ class Component:
             shape_group = self.file.create_nx_group(
                 PIXEL_SHAPE_GROUP_NAME, nexus_name, self.group
             )
+            self._shape = PixelShape(self.file, self.group)
         else:
             shape_group = self.file.create_nx_group(
                 SHAPE_GROUP_NAME, nexus_name, self.group
             )
         return shape_group
 
-    def get_shape(self) -> Optional[Union[OFFGeometry, CylindricalGeometry]]:
-        if SHAPE_GROUP_NAME in self.group:
-            shape_group = self.group[SHAPE_GROUP_NAME]
-            nx_class = get_nx_class(shape_group)
-            if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
-                return CylindricalGeometry(self.file, shape_group)
-            if nx_class == OFF_GEOMETRY_NEXUS_NAME:
-                return OFFGeometryNexus(self.file, shape_group)
+    @property
+    def shape(
+        self
+    ) -> Tuple[
+        Optional[Union[OFFGeometry, CylindricalGeometry]], Optional[List[QVector3D]]
+    ]:
+        """
+        Get the shape of the component if there is one defined, and optionally a
+        list of transformations relative to the component's depends_on chain which
+        describe where the shape should be repeated
+        (used in subclass for components where the shape describes each pixel)
+
+        :return: Component shape, each transformation where the shape is repeated
+        """
+        return self._shape.get_shape()
 
     def remove_shape(self):
-        if SHAPE_GROUP_NAME in self.group:
-            del self.group[SHAPE_GROUP_NAME]
+        self._shape.remove_shape()
 
     def duplicate(self, components_list: List["Component"]) -> "Component":
         return Component(
