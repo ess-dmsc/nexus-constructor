@@ -3,8 +3,9 @@
 # Mirror the basic requirements
 -r requirements.txt
 
-# cx_Freeze is used for packaging, the pypi version does not have a fix for Python 3.7 on Windows 10 (https://github.com/anthony-tuininga/cx_Freeze/issues/407)
-git+https://github.com/anthony-tuininga/cx_Freeze.git@master
+# Packaging
+cx_freeze
+
 # newer versions of jsonschema don't work with the executables built by cx_Freeze
 jsonschema==2.6.0
 
