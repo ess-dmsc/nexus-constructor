@@ -1,15 +1,21 @@
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union, TextIO
 
 from nexus_constructor.json.filewriter_json_writer import object_to_json_file
 
 
 def generate_forwarder_command(
-    file, streams: Dict[str, Dict[str, Any]], provider_type: str
+    output_file: TextIO, streams: Dict[str, Dict[str, Any]], provider_type: str
 ):
+    """
+    Generate a forwarder command containing a list of PVs and which topics to route them to.
+    :param output_file: file object to write the JSON output to.
+    :param streams: dictionary of stream objects.
+    :param provider_type: whether to use channel access or pv access protocol
+    """
     tree_dict = dict()
     stream_list = _extract_forwarder_stream_info(streams, provider_type)
     tree_dict["streams"] = stream_list
-    object_to_json_file(tree_dict, file)
+    object_to_json_file(tree_dict, output_file)
 
 
 def _extract_forwarder_stream_info(
