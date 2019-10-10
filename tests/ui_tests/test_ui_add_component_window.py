@@ -1466,6 +1466,43 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     assert field.value[...] == field_value
 
 
+def test_UI_GIVEN_field_widget_with_stream_type_THEN_stream_dialog_shown(qtbot):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+    assert field.streams_widget.isEnabled()
+
+
+def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(qtbot):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.link.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    field_name = "testfield"
+    field_target = "/somewhere/"
+
+    field.field_name_edit.setText(field_name)
+    field.value_line_edit.setText(field_target)
+
+    assert field.dtype == h5py.SoftLink
+
+    assert field.name == field_name
+    assert field.value.path == h5py.SoftLink(field_target).path
+
+
 def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_geometry_is_created(
     qtbot, dialog, template
 ):
@@ -1491,11 +1528,202 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_
 
     enter_disk_chopper_fields(qtbot, dialog, template)
 
-    with patch(
-        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
-    ) as chopper_creator:
-        dialog.on_ok()
-        chopper_creator.assert_not_called()
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_correct_options(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("f142")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+    assert streams_widget.source_label.isEnabled()
+    assert streams_widget.source_line_edit.isEnabled()
+    assert streams_widget.type_label.isEnabled()
+    assert streams_widget.type_combo.isEnabled()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ev42_THEN_stream_dialog_shown_with_correct_options(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("ev42")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+
+    assert not streams_widget.source_label.isVisible()
+    assert not streams_widget.source_line_edit.isVisible()
+    assert not streams_widget.type_label.isVisible()
+    assert not streams_widget.type_combo.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stream_dialog_shown_with_correct_options(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("ns10")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+
+    assert not streams_widget.type_label.isVisible()
+    assert not streams_widget.type_combo.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_hs00_THEN_stream_dialog_shown_with_correct_options(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("hs00")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+
+    assert not streams_widget.type_label.isVisible()
+    assert not streams_widget.type_combo.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_to_double_THEN_stream_dialog_shown_with_array_size_option(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget.schema_combo.setCurrentText("f142")
+    streams_widget.schema_combo.currentTextChanged.emit(
+        streams_widget.schema_combo.currentText()
+    )
+
+    streams_widget.array_radio.setChecked(True)
+    streams_widget.array_radio.clicked.emit()
+
+    assert streams_widget.topic_label.isVisible()
+    assert streams_widget.topic_line_edit.isVisible()
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+    assert streams_widget.type_label.isVisible()
+    assert streams_widget.type_combo.isVisible()
+
+    assert streams_widget.array_size_label.isVisible()
+    assert streams_widget.array_size_spinbox.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_array_size_option_and_correct_value_in_nexus_file(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    name = "test"
+
+    field.field_name_edit.setText(name)
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget.schema_combo.setCurrentText("f142")
+    streams_widget.schema_combo.currentTextChanged.emit(
+        streams_widget.schema_combo.currentText()
+    )
+
+    streams_widget.array_radio.setChecked(True)
+    streams_widget.array_radio.clicked.emit()
+
+    array_size = 2
+    streams_widget.array_size_spinbox.setValue(array_size)
+
+    group = streams_widget.get_stream_group()
+
+    assert name in group.name
+
+    assert "array_size" in group
+
+    assert group["array_size"][()] == array_size
 
 
 def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_THEN_chopper_geometry_is_not_created(
@@ -1512,25 +1740,3 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
     ) as chopper_creator:
         dialog.on_ok()
         chopper_creator.assert_not_called()
-
-
-def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
-    qtbot, dialog, template
-):
-
-    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
-    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-
-    field.field_type_combo.setCurrentText(FieldType.link.value)
-    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
-
-    field_name = "testfield"
-    field_target = "/somewhere/"
-
-    field.field_name_edit.setText(field_name)
-    field.value_line_edit.setText(field_target)
-
-    assert field.dtype == h5py.SoftLink
-
-    assert field.name == field_name
-    assert field.value.path == h5py.SoftLink(field_target).path

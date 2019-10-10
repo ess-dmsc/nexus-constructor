@@ -215,6 +215,10 @@ class NexusWrapper(QObject):
         if dtype == np.object:
             dtype = h5py.special_dtype(vlen=str)
 
+        if isinstance(value, h5py.Group):
+            value.copy(dest=group, source=value)
+            return group[name]
+
         if name in group:
             if dtype is None or group[name].dtype == dtype:
                 try:
