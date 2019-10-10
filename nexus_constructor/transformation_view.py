@@ -67,7 +67,7 @@ def links_back_to_component(reference: Component, comparison: Component):
         return True
     if not comparison.transforms.has_link:
         return False
-    if comparison.transforms.link.linked_component == None:
+    if comparison.transforms.link.linked_component is None:
         return False
     return links_back_to_component(
         reference, comparison.transforms.link.linked_component
@@ -112,7 +112,7 @@ class EditTransformationLink(QFrame):
                     last_index
                 ).setEnabled(False)
             if (
-                self.link.linked_component != None
+                self.link.linked_component is not None
                 and self.link.linked_component == current_component
             ):
                 self.link_frame.TransformationsComboBox.setCurrentIndex(

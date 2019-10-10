@@ -3,6 +3,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 from uuid import uuid1
+from tests.helpers import add_component_to_file
 
 transform_type = "Transformation"
 rotation_type = "Rotation"
@@ -160,7 +161,7 @@ def test_deregister_dependent():
 
     set_dependents = transform1.get_dependents()
 
-    assert set_dependents == None
+    assert set_dependents is None
 
 
 def test_deregister_unregistered_dependent_alt1():
@@ -171,7 +172,7 @@ def test_deregister_unregistered_dependent_alt1():
 
     transform1.deregister_dependent(transform2)
 
-    assert transform1.get_dependents() == None
+    assert transform1.get_dependents() is None
 
 
 def test_deregister_unregistered_dependent_alt2():
@@ -222,9 +223,6 @@ def test_reregister_dependent():
 
     assert len(set_dependents) == 1
     assert set_dependents[0] == transform3
-
-
-from tests.helpers import add_component_to_file
 
 
 def test_set_one_dependent_component():

@@ -26,7 +26,6 @@ from nexus_constructor.geometry import (
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 import numpy as np
 
-
 SHAPE_GROUP_NAME = "shape"
 PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
 CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
@@ -81,11 +80,11 @@ class TransformationsList(list):
         has_link_value = self.parent_component.file.get_attribute_value(
             self.parent_component.group, LINK_STR
         )
-        if has_link_value == None:
+        if has_link_value is None:
             has_link_value = False
             if (
                 len(self.parent_component.transforms) == 0
-                and self.parent_component.depends_on != None
+                and self.parent_component.depends_on is not None
                 and "/transformations/"
                 in self.parent_component.depends_on.absolute_path
             ):
@@ -120,7 +119,7 @@ class LinkTransformation:
         if not self.parent.has_link:
             return None
         if (
-            self.parent.parent_component.depends_on != None
+            self.parent.parent_component.depends_on is not None
             and "/transformations/"
             in self.parent.parent_component.depends_on.absolute_path
             and len(self.parent.parent_component.transforms) == 0
@@ -163,7 +162,7 @@ class LinkTransformation:
                 ):
                     target = c_transform
                     break
-        if value != None:
+        if value is not None:
             target.depends_on = value.depends_on
             return
         target.depends_on = None

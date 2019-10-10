@@ -13,7 +13,6 @@ from PySide2.QtGui import QVector3D
 import pytest
 from pytest import approx
 import numpy as np
-import h5py
 
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
