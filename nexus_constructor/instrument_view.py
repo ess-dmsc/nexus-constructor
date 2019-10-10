@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
@@ -32,7 +32,6 @@ class InstrumentView(QWidget):
         del self.view
 
     def __init__(self, parent):
-
         super().__init__()
 
         self.root_entity = Qt3DCore.QEntity()
@@ -114,6 +113,9 @@ class InstrumentView(QWidget):
         self.component_meshes = {}
         self.component_entities = {}
         self.component_transformations = {}
+        self.component_positions = (
+            {}
+        )  # Value is List[QVector3D], shape is repeated at each QVector3D
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.gnomon.setup_beam_cylinder()
@@ -201,18 +203,48 @@ class InstrumentView(QWidget):
         clear_buffers = Qt3DRender.QClearBuffers(camera_selector)
         return clear_buffers
 
-    def add_component(self, name: str, geometry: OFFGeometry):
+    def add_component(
+        self, name: str, geometry: OFFGeometry, positions: List[QVector3D] = None
+    ):
         """
         Add a component to the instrument view given a name and its geometry.
         :param name: The name of the component.
         :param geometry: The geometry information of the component that is used to create a mesh.
+        :param positions: Mesh is repeated at each of these positions
         """
+        if geometry is None:
+            return
+
+        if positions is None:
+            positions = [QVector3D(0, 0, 0)]
         mesh = OffMesh(geometry.off_geometry)
 
-        entity = create_qentity([mesh, self.grey_material], self.component_root_entity)
-
         self.component_meshes[name] = mesh
-        self.component_entities[name] = entity
+        position_transforms = []
+        for position in positions:
+            transform = Qt3DCore.QTransform()
+            transform.setTranslation(position)
+            position_transforms.append(transform)
+        self.component_positions[name] = position_transforms
+        # Note, the a list comprehension like below doesn't work (end up with segfault)
+        # self.component_positions[name] = [Qt3DCore.QTransform().setTranslation(position) for position in positions]
+        self._create_entities(name)
+
+    def _create_entities(self, name):
+        with DetachedRootEntity(
+            self.component_root_entity, self.combined_component_axes_entity
+        ):
+            self.component_entities[name] = [
+                create_qentity(
+                    [
+                        self.component_meshes[name],
+                        self.grey_material,
+                        position_transform,
+                    ],
+                    self.component_root_entity,
+                )
+                for position_transform in self.component_positions[name]
+            ]
 
     def clear_all_components(self):
         """
@@ -226,8 +258,8 @@ class InstrumentView(QWidget):
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
         """
-
-        self.component_entities[name].setParent(None)
+        for entity in self.component_entities[name]:
+            entity.setParent(None)
 
         try:
             del self.component_entities[name]
@@ -244,6 +276,7 @@ class InstrumentView(QWidget):
         """
         try:
             del self.component_transformations[component_name]
+            del self.component_positions[component_name]
         except KeyError:
             pass
 
@@ -266,7 +299,7 @@ class InstrumentView(QWidget):
         dark_red = QColor("#b00")
 
         self.grey_material = create_material(black, grey)
-        self.red_material = create_material(red, dark_red)
+        self.red_material = create_material(red, dark_red, alpha=0.5)
         self.beam_material = create_material(blue, light_blue, alpha=0.5)
 
     @staticmethod
@@ -296,7 +329,25 @@ class InstrumentView(QWidget):
         Calls the methods for defining materials, setting up the sample cube, and setting up the neutrons. Beam-related
         functions are called outside of this method to ensure that those things are generated last.
         """
-
         self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()
+
+
+class DetachedRootEntity:
+    """
+    Context manager for detaching the component root entity
+    This is useful for reducing CPU load if making many changes to the scene at the same time
+    """
+
+    def __init__(self, component_root_entity, parent_of_root_entity):
+        self._component_root_entity = component_root_entity
+        self._parent_of_root_entity = parent_of_root_entity
+
+    def __enter__(self):
+        # Detach root entity
+        self._component_root_entity.setParent(None)
+
+    def __exit__(self, *args):
+        # Reattach root entity
+        self._component_root_entity.setParent(self._parent_of_root_entity)

@@ -1,7 +1,7 @@
 from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
 from PySide2.QtGui import QVector3D
 
-__half_side_length = 0.5
+__half_side_length = 0.05
 
 OFFCube = OFFGeometryNoNexus(
     vertices=[
