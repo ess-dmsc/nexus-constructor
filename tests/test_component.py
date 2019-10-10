@@ -1,6 +1,6 @@
 from mock import patch
 
-from nexus_constructor.component import (
+from nexus_constructor.component.component import (
     DependencyError,
     Component,
     SHAPE_GROUP_NAME,
@@ -26,6 +26,7 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
     OFFGeometryNoNexus,
+    NoShapeGeometry,
 )
 
 
@@ -322,7 +323,7 @@ def test_can_add_cylinder_shape_to_and_component_and_get_the_same_shape_back():
     radius = 37.0
     component.set_cylinder_shape(axis, height, radius)
 
-    cylinder = component.get_shape()
+    cylinder, _ = component.shape
     assert isinstance(cylinder, CylindricalGeometry)
     assert cylinder.height == approx(height)
     assert cylinder.radius == approx(radius)
@@ -349,7 +350,7 @@ def test_can_add_mesh_shape_to_and_component_and_get_the_same_shape_back():
     input_mesh = OFFGeometryNoNexus(vertices, faces)
     component.set_off_shape(input_mesh)
 
-    output_mesh = component.get_shape()
+    output_mesh, _ = component.shape
     assert isinstance(output_mesh, OFFGeometryNexus)
     assert output_mesh.faces[0] == triangle
     assert output_mesh.vertices[2].x() == approx(vertex_2_x)
@@ -362,7 +363,7 @@ def test_can_override_existing_shape():
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
     component.set_cylinder_shape()
-    cylinder = component.get_shape()
+    cylinder, _ = component.shape
     assert isinstance(
         cylinder, CylindricalGeometry
     ), "Expect shape to initially be a cylinder"
@@ -371,7 +372,7 @@ def test_can_override_existing_shape():
     faces = [[0, 1, 2]]
     input_mesh = OFFGeometryNoNexus(vertices, faces)
     component.set_off_shape(input_mesh)
-    output_mesh = component.get_shape()
+    output_mesh, _ = component.shape
     assert isinstance(output_mesh, OFFGeometryNexus), "Expect shape to now be a mesh"
 
 
@@ -423,7 +424,7 @@ def test_GIVEN_pixel_mapping_WHEN_setting_cylinder_shape_THEN_cylindrical_geomet
     pixel_mapping = PixelMapping()
 
     with patch(
-        "nexus_constructor.component.CylindricalGeometry"
+        "nexus_constructor.component.component.CylindricalGeometry"
     ) as mock_cylindrical_geometry_constructor:
         component.set_cylinder_shape(pixel_data=pixel_mapping)
         mock_cylindrical_geometry_constructor.assert_called_once_with(
@@ -440,7 +441,7 @@ def test_GIVEN_pixel_mapping_WHEN_setting_off_geometry_shape_THEN_off_geometry_i
     filename = "somefile.off"
 
     with patch(
-        "nexus_constructor.component.OFFGeometryNexus"
+        "nexus_constructor.component.component.OFFGeometryNexus"
     ) as mock_off_geometry_constructor:
 
         component.set_off_shape(
@@ -461,9 +462,8 @@ def test_GIVEN_pixel_mapping_WHEN_setting_off_geometry_shape_THEN_off_geometry_i
 def test_GIVEN_no_pixel_data_WHEN_setting_cylinder_shape_THEN_shape_group_has_name_shape(
     component
 ):
-
     with patch(
-        "nexus_constructor.component.CylindricalGeometry"
+        "nexus_constructor.component.component.CylindricalGeometry"
     ) as mock_cylindrical_geometry_constructor:
         component.set_cylinder_shape(pixel_data=None)
         mock_cylindrical_geometry_constructor.assert_called_once_with(
@@ -474,13 +474,12 @@ def test_GIVEN_no_pixel_data_WHEN_setting_cylinder_shape_THEN_shape_group_has_na
 def test_GIVEN_no_pixel_data_WHEN_setting_off_geometry_shape_THEN_shape_group_has_name_shape(
     component
 ):
-
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
     units = "m"
     filename = "somefile.off"
 
     with patch(
-        "nexus_constructor.component.OFFGeometryNexus"
+        "nexus_constructor.component.component.OFFGeometryNexus"
     ) as mock_off_geometry_constructor:
 
         component.set_off_shape(
@@ -497,11 +496,10 @@ def test_GIVEN_no_pixel_data_WHEN_setting_off_geometry_shape_THEN_shape_group_ha
 def test_GIVEN_pixel_grid_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_is_not_called_with_pixel_data(
     component
 ):
-
     pixel_grid = PixelGrid()
 
     with patch(
-        "nexus_constructor.component.CylindricalGeometry"
+        "nexus_constructor.component.component.CylindricalGeometry"
     ) as mock_cylindrical_geometry_constructor:
         component.set_cylinder_shape(pixel_data=pixel_grid)
         mock_cylindrical_geometry_constructor.assert_called_once_with(
@@ -512,14 +510,13 @@ def test_GIVEN_pixel_grid_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_
 def test_GIVEN_pixel_grid_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_not_called_with_pixel_data(
     component
 ):
-
     pixel_grid = PixelGrid()
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
     units = "m"
     filename = "somefile.off"
 
     with patch(
-        "nexus_constructor.component.OFFGeometryNexus"
+        "nexus_constructor.component.component.OFFGeometryNexus"
     ) as mock_off_geometry_constructor:
 
         component.set_off_shape(
@@ -540,7 +537,6 @@ def test_GIVEN_pixel_grid_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_n
 def test_GIVEN_cylinder_properties_WHEN_setting_cylindrical_geometry_shape_THEN_shape_group_has_class_nxcylindrical_geometry(
     component
 ):
-
     component.set_cylinder_shape()
     assert (
         component.group[SHAPE_GROUP_NAME].attrs["NX_class"]
@@ -551,12 +547,17 @@ def test_GIVEN_cylinder_properties_WHEN_setting_cylindrical_geometry_shape_THEN_
 def test_GIVEN_off_properties_WHEN_setting_off_geometry_shape_THEN_shape_group_has_class_nxoff_geometry(
     component
 ):
-
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
 
-    with patch("nexus_constructor.component.OFFGeometryNexus"):
+    with patch("nexus_constructor.component.component.OFFGeometryNexus"):
         component.set_off_shape(loaded_geometry=off_geometry)
 
     assert (
         component.group[SHAPE_GROUP_NAME].attrs["NX_class"] == OFF_GEOMETRY_NEXUS_NAME
     )
+
+
+def test_GIVEN_component_with_no_shape_information_WHEN_shape_is_requested_THEN_returns_NoShapeGeometry(
+    component
+):
+    assert isinstance(component.shape[0], NoShapeGeometry)
