@@ -265,28 +265,34 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                     value = field.value
                     new_ui_field.dtype = dtype
                     if np.isscalar(value):
-                        new_ui_field.field_type = FieldType.scalar_dataset.value
-                        if field.dtype == h5py.special_dtype(vlen=str):
-                            new_ui_field.value = field.value
-                        else:
-                            new_ui_field.value = field.value[()]
+                        self._update_existing_scalar_field(field, new_ui_field)
                     else:
-                        new_ui_field.field_type = FieldType.array_dataset.value
-                        new_ui_field.value = value
+                        self._update_existing_array_field(new_ui_field, value)
                 elif isinstance(field, h5py.Group):
                     if isinstance(
                         field.parent.get(field.name, getlink=True), h5py.SoftLink
                     ):
-                        new_ui_field.field_type = FieldType.link.value
-                        new_ui_field.value = field.parent.get(
-                            field.name, getlink=True
-                        ).path
+                        self._update_existing_link_field(field, new_ui_field)
                     elif (
                         "NX_class" in field.attrs.keys()
                         and field.attrs["NX_class"] == "NCstream"
                     ):
                         self._update_existing_stream_info(field, new_ui_field)
 
+    def _update_existing_link_field(self, field, new_ui_field):
+        new_ui_field.field_type = FieldType.link.value
+        new_ui_field.value = field.parent.get(field.name, getlink=True).path
+
+    def _update_existing_array_field(self, new_ui_field, value):
+        new_ui_field.field_type = FieldType.array_dataset.value
+        new_ui_field.value = value
+
+    def _update_existing_scalar_field(self, field, new_ui_field):
+        new_ui_field.field_type = FieldType.scalar_dataset.value
+        if field.dtype == h5py.special_dtype(vlen=str):
+            new_ui_field.value = field.value
+        else:
+            new_ui_field.value = field.value[()]
 
     def _update_existing_stream_info(self, field, new_ui_field):
         new_ui_field.field_type = FieldType.kafka_stream.value
