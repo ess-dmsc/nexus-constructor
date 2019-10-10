@@ -5,6 +5,7 @@ Based off of a qml custom mesh example at https://github.com/iLya84a/qt3d/blob/m
 and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
+import logging
 
 from nexus_constructor.pixel_data import PixelData, PixelGrid
 from nexus_constructor.geometry import OFFGeometry
@@ -118,7 +119,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         self.addAttribute(normalAttribute)
         self.vertex_count = len(vertex_buffer_values) // 3
 
-        print("Qt mesh built")
+        logging.info("Qt mesh built")
 
     def create_attribute(self, buffer_values, name):
         SIZE_OF_FLOAT_IN_STRUCT = 4

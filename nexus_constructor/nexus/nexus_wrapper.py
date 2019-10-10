@@ -1,3 +1,5 @@
+import logging
+
 import h5py
 from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar, Optional
@@ -78,13 +80,13 @@ class NexusWrapper(QObject):
         :return: None
         """
         if filename:
-            print(filename)
+            logging.debug(filename)
             file = h5py.File(append_nxs_extension(filename), mode="x")
             try:
                 file.copy(source=self.nexus_file["/entry/"], dest="/entry/")
-                print("Saved to NeXus file")
+                logging.info("Saved to NeXus file")
             except ValueError as e:
-                print(f"File writing failed: {e}")
+                logging.error(f"File writing failed: {e}")
 
     def open_file(self, filename: str):
         """
@@ -134,7 +136,7 @@ class NexusWrapper(QObject):
         self.instrument = self.get_instrument_group_from_entry(self.entry)
         self.nexus_file = nexus_file
 
-        print("NeXus file loaded")
+        logging.info("NeXus file loaded")
         self._emit_file()
 
     def rename_node(self, node: h5Node, new_name: str):

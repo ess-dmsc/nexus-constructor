@@ -1,3 +1,5 @@
+import logging
+
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
@@ -231,7 +233,7 @@ class ComponentTreeModel(QAbstractItemModel):
                     parent_item.parent_component,
                 )
             except ValueError as e:
-                print(e)
+                logging.error(e)
         elif type(parent_item) is ComponentInfo:
             return self.createIndex(
                 self.components.index(parent_item.parent), 0, parent_item.parent

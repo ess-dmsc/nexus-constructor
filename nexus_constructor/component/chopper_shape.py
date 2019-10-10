@@ -1,3 +1,5 @@
+import logging
+
 from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.geometry.cylindrical_geometry import CylindricalGeometry
 from nexus_constructor.geometry import OFFGeometry, NoShapeGeometry
@@ -33,5 +35,5 @@ class ChopperShape(ComponentShape):
                 None,
             )
         else:
-            print("Validation failed. Unable to create disk chopper mesh.")
+            logging.warning("Validation failed. Unable to create disk chopper mesh.")
         return None, None
