@@ -344,8 +344,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 )
 
         if schema == "ev42":
+            # TODO: ev42 specific fields
             pass
-        # TODO: schema specific fields
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
