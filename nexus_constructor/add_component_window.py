@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from enum import Enum
 
 from PySide2.QtGui import QVector3D
@@ -70,6 +71,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             os.path.abspath(os.path.join(os.curdir, "definitions"))
         )
+        self.nx_component_classes = OrderedDict(
+            sorted(self.nx_component_classes.items())
+        )
+
         self.cad_file_name = None
         self.possible_fields = []
         self.component_to_edit = component_to_edit

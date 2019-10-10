@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Union
 
 import h5py
 from nexus_constructor.component.component_type import (
@@ -30,8 +30,17 @@ def _separate_dot_field_group_hierarchy(
             previous_group[subgroup] = dict()
         if subgroup == dots_in_field_name[-1]:
             # set the value of the field to the last item in the list
-            previous_group[subgroup] = str(item[1][...])
+            previous_group[subgroup] = _handle_stream_dataset(item[1][...])
         previous_group = previous_group[subgroup]
+
+
+def _handle_stream_dataset(stream_dataset: h5py.Dataset) -> Union[str, bool, int]:
+    if stream_dataset.dtype == h5py.special_dtype(vlen=str):
+        return str(stream_dataset)
+    if stream_dataset.dtype == bool:
+        return bool(stream_dataset)
+    if stream_dataset.dtype == int:
+        return int(stream_dataset)
 
 
 class Instrument:
@@ -134,7 +143,9 @@ class Instrument:
                                     item_dict, dots_in_field_name, item
                                 )
                             else:
-                                item_dict[item[0]] = str(item[1][...])
+                                item_dict[item[0]] = _handle_stream_dataset(
+                                    item[1][...]
+                                )
                         streams_dict[node.name] = item_dict
 
         self.nexus.entry.visititems(find_streams)

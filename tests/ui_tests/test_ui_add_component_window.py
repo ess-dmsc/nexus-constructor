@@ -1703,29 +1703,6 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     assert group["array_size"][()] == array_size
 
 
-def enter_file_path(
-    qtbot: pytestqt.qtbot.QtBot,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    file_path: str,
-    file_contents: str,
-):
-    """
-    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
-    geometry file.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param file_path: The desired file path.
-    :param file_contents: The file contents that are returned by the open mock.
-    """
-    with patch(
-        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
-    ):
-        with patch("builtins.open", mock_open(read_data=file_contents)):
-            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
-
-
 def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_THEN_chopper_geometry_is_not_created(
     qtbot, dialog, template
 ):
