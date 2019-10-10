@@ -67,7 +67,7 @@ def test_GIVEN_json_containing_entry_group_WHEN_json_to_nexus_called_THEN_entry_
 
 def test_GIVEN_json_containing_dataset_WHEN_json_to_nexus_called_THEN_dataset_created_in_NeXus():
     dataset_name = "test_dataset"
-    dataset_value = 1817.0
+    dataset_value = 1817
     attribute_name = "test_attribute"
     attribute_value = 42
     test_json = f"""
@@ -97,5 +97,6 @@ def test_GIVEN_json_containing_dataset_WHEN_json_to_nexus_called_THEN_dataset_cr
 
     assert dataset_name in nexus_file
     assert np.isclose(nexus_file[dataset_name][...], dataset_value)
+    assert nexus_file[dataset_name][...].dtype == np.float32
     assert attribute_name in nexus_file[dataset_name].attrs.keys()
     assert nexus_file[dataset_name].attrs[attribute_name] == attribute_value
