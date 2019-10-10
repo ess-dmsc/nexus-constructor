@@ -13,6 +13,7 @@ def generate_json(
     streams=None,
     links=None,
     nexus_file_name: str = "",
+    broker: str = "",
     start_time: str = None,
     stop_time: str = None,
     service_id: str = None,
@@ -40,6 +41,7 @@ def generate_json(
     write_command, stop_command = create_writer_commands(
         tree,
         nexus_file_name,
+        broker=broker,
         start_time=start_time,
         stop_time=stop_time,
         service_id=service_id,

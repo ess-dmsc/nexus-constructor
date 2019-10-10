@@ -326,7 +326,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if filename:
             dialog = FilewriterCommandDialog()
             dialog.exec_()
-            nexus_file_name, start_time, stop_time, service_id, abort_on_uninitialised_stream, use_swmr = (
+            nexus_file_name, broker, start_time, stop_time, service_id, abort_on_uninitialised_stream, use_swmr = (
                 dialog.get_arguments()
             )
             with open(filename, "w") as file:
@@ -334,6 +334,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     self.instrument,
                     file,
                     nexus_file_name=nexus_file_name,
+                    broker=broker,
                     streams=self.instrument.get_streams(),
                     links=self.instrument.get_links(),
                     start_time=start_time,

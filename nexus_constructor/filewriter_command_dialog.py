@@ -34,6 +34,9 @@ class FilewriterCommandDialog(QDialog):
         self.ok_button = QPushButton("Ok")
         self.ok_button.clicked.connect(self.close)
 
+        self.broker_line_edit = QLineEdit()
+        self.broker_line_edit.setPlaceholderText("(broker:port/topic)")
+
         self.validate(False)
 
         self.start_time_enabled = QCheckBox()
@@ -49,18 +52,20 @@ class FilewriterCommandDialog(QDialog):
         self.stop_time_enabled.setChecked(True)
 
         self.service_id_lineedit = QLineEdit()
-        self.abort_on_unitialised_stream_checkbox = QCheckBox()
+        self.service_id_lineedit.setPlaceholderText("(Optional)")
+        self.abort_on_uninitialised_stream_checkbox = QCheckBox()
         self.use_swmr_checkbox = QCheckBox()
         self.use_swmr_checkbox.setChecked(True)
 
         self.layout().addRow("nexus_file_name", self.nexus_file_name_edit)
+        self.layout().addRow("broker", self.broker_line_edit)
         self.layout().addRow("specify start time?", self.start_time_enabled)
         self.layout().addRow("start_time", self.start_time_picker)
         self.layout().addRow("specify stop time?", self.stop_time_enabled)
         self.layout().addRow("stop_time", self.stop_time_picker)
         self.layout().addRow("service_id", self.service_id_lineedit)
         self.layout().addRow(
-            "abort_on_uninitialised_stream", self.abort_on_unitialised_stream_checkbox
+            "abort_on_uninitialised_stream", self.abort_on_uninitialised_stream_checkbox
         )
         self.layout().addRow("use_hdf_swmr", self.use_swmr_checkbox)
         self.layout().addRow(self.ok_button)
@@ -85,13 +90,14 @@ class FilewriterCommandDialog(QDialog):
 
     def get_arguments(
         self
-    ) -> Tuple[str, Union[str, None], Union[str, None], str, bool, bool]:
+    ) -> Tuple[str, str, Union[str, None], Union[str, None], str, bool, bool]:
         """
         gets the arguments of required and optional fields for the filewriter command.
         :return: Tuple containing all of the fields.
         """
         return (
             self.nexus_file_name_edit.text(),
+            self.broker_line_edit.text(),
             self.start_time_picker.dateTime().toMSecsSinceEpoch()
             if self.start_time_enabled.checkState() == Qt.CheckState.Checked
             else None,
@@ -99,7 +105,7 @@ class FilewriterCommandDialog(QDialog):
             if self.stop_time_enabled.checkState() == Qt.CheckState.Checked
             else None,
             self.service_id_lineedit.text(),
-            self.abort_on_unitialised_stream_checkbox.checkState()
+            self.abort_on_uninitialised_stream_checkbox.checkState()
             == Qt.CheckState.Checked,
             self.use_swmr_checkbox.checkState() == Qt.CheckState.Checked,
         )
