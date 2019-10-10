@@ -261,8 +261,7 @@ class InstrumentView(QWidget):
 
         if name in self.component_entities.keys():
             for entity in self.component_entities[name]:
-            entity.setParent(None)
-
+                entity.setParent(None)
 
         try:
             del self.component_entities[name]
