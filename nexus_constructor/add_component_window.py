@@ -266,7 +266,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                     new_ui_field.dtype = dtype
                     if np.isscalar(value):
                         new_ui_field.field_type = FieldType.scalar_dataset.value
-                        new_ui_field.value = field.value[()]
+                        if field.dtype == h5py.special_dtype(vlen=str):
+                            new_ui_field.value = field.value
+                        else:
+                            new_ui_field.value = field.value[()]
                     else:
                         new_ui_field.field_type = FieldType.array_dataset.value
                         new_ui_field.value = value
@@ -282,24 +285,23 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                         "NX_class" in field.attrs.keys()
                         and field.attrs["NX_class"] == "NCstream"
                     ):
-                        new_ui_field.field_type = FieldType.kafka_stream.value
-                        schema = field["writer_module"][()]
-                        new_ui_field.streams_widget.schema_combo.setCurrentText(
-                            str(schema)
-                        )
-                        new_ui_field.streams_widget.topic_line_edit.setText(
-                            str(field["topic"][()])
-                        )
-                        if schema != "ev42":
-                            new_ui_field.streams_widget.source_line_edit.setText(
-                                str(field["source"][()])
-                            )
-                        if schema == "f142":
-                            pass
-                        if schema == "ev42":
-                            pass
+                        self._update_existing_stream_info(field, new_ui_field)
 
-                        # TODO: schema specific fields
+
+    def _update_existing_stream_info(self, field, new_ui_field):
+        new_ui_field.field_type = FieldType.kafka_stream.value
+        schema = field["writer_module"][()]
+        new_ui_field.streams_widget.schema_combo.setCurrentText(str(schema))
+        new_ui_field.streams_widget.topic_line_edit.setText(str(field["topic"][()]))
+        if schema != "ev42":
+            new_ui_field.streams_widget.source_line_edit.setText(
+                str(field["source"][()])
+            )
+        if schema == "f142":
+            pass
+        if schema == "ev42":
+            pass
+        # TODO: schema specific fields
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
