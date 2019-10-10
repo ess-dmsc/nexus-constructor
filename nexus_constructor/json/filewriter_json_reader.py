@@ -6,6 +6,7 @@ from typing import Union, List
 Read the JSON and construct an in-memory NeXus file from the nexus_structure field
 """
 JsonValue = Union[List, str, float, int, dict]
+NexusObject = Union[h5py.Group, h5py.Dataset]
 
 
 def _add_to_nexus(children: List[dict], current_group: h5py.Group):
@@ -15,13 +16,26 @@ def _add_to_nexus(children: List[dict], current_group: h5py.Group):
     for child in children:
         if child["type"] == "group":
             _add_group(child, current_group)
+        if child["type"] == "dataset":
+            _add_dataset(child, current_group)
 
 
-def _add_group(child, current_group):
-    new_group = current_group.create_group(child["name"])
-    for attribute in child["attributes"]:
-        new_group.attrs[attribute["name"]] = attribute["values"]
-    _add_to_nexus(child["children"], new_group)
+def _add_dataset(json_object: dict, current_group: h5py.Group):
+    new_dataset = current_group.create_dataset(
+        json_object["name"], data=json_object["values"]
+    )
+    _add_attributes(json_object, new_dataset)
+
+
+def _add_group(json_object: dict, current_group: h5py.Group):
+    new_group = current_group.create_group(json_object["name"])
+    _add_attributes(json_object, new_group)
+    _add_to_nexus(json_object["children"], new_group)
+
+
+def _add_attributes(json_object: dict, nexus_object: NexusObject):
+    for attribute in json_object["attributes"]:
+        nexus_object.attrs[attribute["name"]] = attribute["values"]
 
 
 def _create_in_memory_file(filename):
