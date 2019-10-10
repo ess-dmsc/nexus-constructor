@@ -18,6 +18,10 @@ TIME_FORMAT = "yyyy MM dd hh:mm:ss"
 
 
 class FilewriterCommandDialog(QDialog):
+    """
+    Used for the required and optional fields when saving a filewriter command JSON file.
+    """
+
     def __init__(self):
         super(FilewriterCommandDialog, self).__init__()
         self.setModal(True)
@@ -61,7 +65,7 @@ class FilewriterCommandDialog(QDialog):
         self.layout().addRow("use_hdf_swmr", self.use_swmr_checkbox)
         self.layout().addRow(self.ok_button)
 
-    def validate(self, is_valid):
+    def validate(self, is_valid: bool):
         self.ok_button.setEnabled(is_valid)
         validate_line_edit(
             self.nexus_file_name_edit,
@@ -112,7 +116,7 @@ class CommandDialogOKButtonValidator(QValidator):
         super().__init__()
         self.dialog = dialog
 
-    def validate(self, input: str, pos: int):
+    def validate(self, input: str, pos: int) -> QValidator.State:
         if not input or not input.endswith("nxs"):
             self.is_valid.emit(False)
             return QValidator.Intermediate
