@@ -39,12 +39,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def setupUi(self, main_window):
         super().setupUi(main_window)
 
-        self.actionExport_to_NeXus_file.triggered.connect(self.save_to_nexus_file)
-        self.actionOpen_NeXus_file.triggered.connect(self.open_nexus_file)
-        self.actionExport_to_Filewriter_JSON.triggered.connect(
+        self.export_to_nexus_file_action.triggered.connect(self.save_to_nexus_file)
+        self.open_nexus_file_action.triggered.connect(self.open_nexus_file)
+        self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_filewriter_json
         )
-        self.actionExport_to_Forwarder_JSON.triggered.connect(
+        self.export_to_forwarder_JSON_action.triggered.connect(
             self.save_to_forwarder_json
         )
 
@@ -62,7 +62,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.file_changed.connect(
             self.update_nexus_file_structure_view
         )
-        self.verticalLayout.addWidget(self.widget)
+        self.silx_tab_layout.addWidget(self.widget)
         self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
@@ -78,55 +78,61 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def _set_up_tree_view(self):
         self._set_up_component_model()
-        self.componentTreeView.setDragEnabled(True)
-        self.componentTreeView.setAcceptDrops(True)
-        self.componentTreeView.setDropIndicatorShown(True)
-        self.componentTreeView.header().hide()
-        self.componentTreeView.updateEditorGeometries()
-        self.componentTreeView.updateGeometries()
-        self.componentTreeView.updateGeometry()
-        self.componentTreeView.clicked.connect(self.on_clicked)
-        self.componentTreeView.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.component_tree_view.setDragEnabled(True)
+        self.component_tree_view.setAcceptDrops(True)
+        self.component_tree_view.setDropIndicatorShown(True)
+        self.component_tree_view.header().hide()
+        self.component_tree_view.updateEditorGeometries()
+        self.component_tree_view.updateGeometries()
+        self.component_tree_view.updateGeometry()
+        self.component_tree_view.clicked.connect(self.on_clicked)
+        self.component_tree_view.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        self.component_tool_bar = QToolBar("Actions", self.tab_2)
+        self.component_tool_bar = QToolBar("Actions", self.component_tree_view_tab)
         self.new_component_action = QAction(
-            QIcon("ui/new_component.png"), "New component", self.tab_2
+            QIcon("ui/new_component.png"), "New component", self.component_tree_view_tab
         )
         self.new_component_action.triggered.connect(self.show_add_component_window)
         self.component_tool_bar.addAction(self.new_component_action)
         self.new_translation_action = QAction(
-            QIcon("ui/new_translation.png"), "New translation", self.tab_2
+            QIcon("ui/new_translation.png"),
+            "New translation",
+            self.component_tree_view_tab,
         )
         self.new_translation_action.triggered.connect(self.on_add_translation)
         self.new_translation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_translation_action)
         self.new_rotation_action = QAction(
-            QIcon("ui/new_rotation.png"), "New rotation", self.tab_2
+            QIcon("ui/new_rotation.png"), "New rotation", self.component_tree_view_tab
         )
         self.new_rotation_action.triggered.connect(self.on_add_rotation)
         self.new_rotation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_rotation_action)
         self.create_link_action = QAction(
-            QIcon("ui/create_link.png"), "Create link", self.tab_2
+            QIcon("ui/create_link.png"), "Create link", self.component_tree_view_tab
         )
         self.create_link_action.triggered.connect(self.on_create_link)
         self.create_link_action.setEnabled(False)
         self.component_tool_bar.addAction(self.create_link_action)
         self.duplicate_action = QAction(
-            QIcon("ui/duplicate.png"), "Duplicate", self.tab_2
+            QIcon("ui/duplicate.png"), "Duplicate", self.component_tree_view_tab
         )
         self.component_tool_bar.addAction(self.duplicate_action)
         self.duplicate_action.triggered.connect(self.on_duplicate_node)
         self.duplicate_action.setEnabled(False)
 
         self.edit_component_action = QAction(
-            QIcon("ui/edit_component.png"), "Edit Component", self.tab_2
+            QIcon("ui/edit_component.png"),
+            "Edit Component",
+            self.component_tree_view_tab,
         )
         self.edit_component_action.setEnabled(False)
         self.edit_component_action.triggered.connect(self.show_edit_component_dialog)
         self.component_tool_bar.addAction(self.edit_component_action)
 
-        self.delete_action = QAction(QIcon("ui/delete.png"), "Delete", self.tab_2)
+        self.delete_action = QAction(
+            QIcon("ui/delete.png"), "Delete", self.component_tree_view_tab
+        )
         self.delete_action.triggered.connect(self.on_delete_item)
         self.delete_action.setEnabled(False)
         self.component_tool_bar.addAction(self.delete_action)
@@ -135,13 +141,13 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _set_up_component_model(self):
         self.component_model = ComponentTreeModel(self.instrument)
         self.component_delegate = ComponentEditorDelegate(
-            self.componentTreeView, self.instrument
+            self.component_tree_view, self.instrument
         )
-        self.componentTreeView.setItemDelegate(self.component_delegate)
-        self.componentTreeView.setModel(self.component_model)
+        self.component_tree_view.setItemDelegate(self.component_delegate)
+        self.component_tree_view.setModel(self.component_model)
 
     def show_edit_component_dialog(self):
-        selected_component = self.componentTreeView.selectedIndexes()[
+        selected_component = self.component_tree_view.selectedIndexes()[
             0
         ].internalPointer()
         self.show_add_component_window(selected_component)
@@ -184,7 +190,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.entries_dialog.show()
 
     def set_button_state(self):
-        indices = self.componentTreeView.selectedIndexes()
+        indices = self.component_tree_view.selectedIndexes()
         if len(indices) == 0 or len(indices) != 1:
             self.delete_action.setEnabled(False)
             self.duplicate_action.setEnabled(False)
@@ -232,7 +238,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 self.create_link_action.setEnabled(False)
 
     def on_create_link(self):
-        selected = self.componentTreeView.selectedIndexes()
+        selected = self.component_tree_view.selectedIndexes()
         if len(selected) > 0:
             self.component_model.add_link(selected[0])
             self.expand_transformation_list(selected[0])
@@ -242,7 +248,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.set_button_state()
 
     def on_duplicate_node(self):
-        selected = self.componentTreeView.selectedIndexes()
+        selected = self.component_tree_view.selectedIndexes()
         if len(selected) > 0:
             self.component_model.duplicate_node(selected[0])
             self.expand_transformation_list(selected[0])
@@ -252,29 +258,31 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if isinstance(current_pointer, TransformationsList) or isinstance(
             current_pointer, Component
         ):
-            self.componentTreeView.expand(node)
+            self.component_tree_view.expand(node)
             if isinstance(current_pointer, Component):
                 trans_list_index = self.component_model.index(1, 0, node)
-                self.componentTreeView.expand(trans_list_index)
+                self.component_tree_view.expand(trans_list_index)
             else:
                 component_index = self.component_model.parent(node)
-                self.componentTreeView.expand(component_index)
+                self.component_tree_view.expand(component_index)
         elif isinstance(current_pointer, Transformation):
             trans_list_index = self.component_model.parent(node)
-            self.componentTreeView.expand(trans_list_index)
+            self.component_tree_view.expand(trans_list_index)
             component_index = self.component_model.parent(trans_list_index)
-            self.componentTreeView.expand(component_index)
+            self.component_tree_view.expand(component_index)
 
-    def add_transformation(self, type):
-        selected = self.componentTreeView.selectedIndexes()
+    def add_transformation(self, transformation_type):
+        selected = self.component_tree_view.selectedIndexes()
         if len(selected) > 0:
             current_index = selected[0]
-            if type == "translation":
+            if transformation_type == "translation":
                 self.component_model.add_translation(current_index)
-            elif type == "rotation":
+            elif transformation_type == "rotation":
                 self.component_model.add_rotation(current_index)
             else:
-                raise ValueError("Unknown transformation type: {}".format(type))
+                raise ValueError(
+                    "Unknown transformation type: {}".format(transformation_type)
+                )
             self.expand_transformation_list(current_index)
 
     def on_add_translation(self):
@@ -374,7 +382,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.add_component_window.show()
 
     def on_delete_item(self):
-        selected = self.componentTreeView.selectedIndexes()
+        selected = self.component_tree_view.selectedIndexes()
         for item in selected:
             self.component_model.remove_node(item)
         self.set_button_state()
