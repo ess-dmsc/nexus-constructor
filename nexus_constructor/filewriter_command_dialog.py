@@ -87,8 +87,8 @@ class FilewriterCommandDialog(QDialog):
         self
     ) -> Tuple[str, Union[str, None], Union[str, None], str, bool, bool]:
         """
-        gets the arguments of required and optional fields for the filewriter command. 
-        :return: Tuple containing all of the fields. 
+        gets the arguments of required and optional fields for the filewriter command.
+        :return: Tuple containing all of the fields.
         """
         return (
             self.nexus_file_name_edit.text(),

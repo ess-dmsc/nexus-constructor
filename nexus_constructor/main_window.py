@@ -2,7 +2,6 @@ from PySide2.QtWidgets import (
     QAction,
     QToolBar,
     QAbstractItemView,
-    QInputDialog,
     QMainWindow,
     QApplication,
 )
