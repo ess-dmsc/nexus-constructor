@@ -212,7 +212,6 @@ def generate_forwarder_command(
     file, streams: Dict[str, Dict[str, Any]], provider_type: str
 ):
     tree_dict = dict()
-    tree_dict["cmd"] = "add"
     stream_list = _extract_forwarder_stream_info(streams, provider_type)
     tree_dict["streams"] = stream_list
     object_to_json_file(tree_dict, file)
