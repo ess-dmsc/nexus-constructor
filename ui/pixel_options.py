@@ -32,6 +32,22 @@ class Ui_PixelOptionsWidget(object):
             self.pixel_layout_group_box
         )
         self.pixel_layout_group_box_layout.setObjectName("horizontalLayout_7")
+        self._set_up_radio_buttons()
+        self.group_box_layout.addWidget(self.pixel_layout_group_box)
+
+        self._set_up_pixel_options_stack()
+
+        self._set_up_pixel_mapping()
+
+        self.group_box_layout.addWidget(self.pixel_options_stack)
+        self.main_layout.addWidget(self.pixel_options_group_box)
+
+        self.retranslateUi(PixelOptionsWidget)
+        self.pixel_options_stack.setCurrentIndex(0)
+        self.count_first_combo_box.setCurrentIndex(-1)
+        QtCore.QMetaObject.connectSlotsByName(PixelOptionsWidget)
+
+    def _set_up_radio_buttons(self):
         self.single_pixel_radio_button = QtWidgets.QRadioButton(
             self.pixel_layout_group_box
         )
@@ -46,20 +62,8 @@ class Ui_PixelOptionsWidget(object):
         self.no_pixels_button = QtWidgets.QRadioButton(self.pixel_layout_group_box)
         self.no_pixels_button.setObjectName("noPixelsButton")
         self.pixel_layout_group_box_layout.addWidget(self.no_pixels_button)
-        self.group_box_layout.addWidget(self.pixel_layout_group_box)
-        self.pixel_options_stack = QtWidgets.QStackedWidget(
-            self.pixel_options_group_box
-        )
-        self.pixel_options_stack.setMinimumSize(QtCore.QSize(518, 192))
-        self.pixel_options_stack.setObjectName("pixelOptionsStack")
-        self.pixel_grid_page = QtWidgets.QWidget()
-        self.pixel_grid_page.setObjectName("pixelGridPage")
-        self.pixel_grid_page_layout = QtWidgets.QVBoxLayout(self.pixel_grid_page)
-        self.pixel_grid_page_layout.setObjectName("verticalLayout")
 
-        self._set_up_pixel_grid_group_box()
-
-        self.pixel_options_stack.addWidget(self.pixel_grid_page)
+    def _set_up_pixel_mapping(self):
         self.pixel_mapping_page = QtWidgets.QWidget()
         self.pixel_mapping_page.setObjectName("pixelMappingPage")
         self.pixel_mapping_page_layout = QtWidgets.QVBoxLayout(self.pixel_mapping_page)
@@ -71,13 +75,19 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_mapping_list_widget.setObjectName("pixelMappingListWidget")
         self.pixel_mapping_page_layout.addWidget(self.pixel_mapping_list_widget)
         self.pixel_options_stack.addWidget(self.pixel_mapping_page)
-        self.group_box_layout.addWidget(self.pixel_options_stack)
-        self.main_layout.addWidget(self.pixel_options_group_box)
 
-        self.retranslateUi(PixelOptionsWidget)
-        self.pixel_options_stack.setCurrentIndex(0)
-        self.count_first_combo_box.setCurrentIndex(-1)
-        QtCore.QMetaObject.connectSlotsByName(PixelOptionsWidget)
+    def _set_up_pixel_options_stack(self):
+        self.pixel_options_stack = QtWidgets.QStackedWidget(
+            self.pixel_options_group_box
+        )
+        self.pixel_options_stack.setMinimumSize(QtCore.QSize(518, 192))
+        self.pixel_options_stack.setObjectName("pixelOptionsStack")
+        self.pixel_grid_page = QtWidgets.QWidget()
+        self.pixel_grid_page.setObjectName("pixelGridPage")
+        self.pixel_grid_page_layout = QtWidgets.QVBoxLayout(self.pixel_grid_page)
+        self.pixel_grid_page_layout.setObjectName("verticalLayout")
+        self._set_up_pixel_grid_group_box()
+        self.pixel_options_stack.addWidget(self.pixel_grid_page)
 
     def _set_up_pixel_grid_group_box(self):
         self.pixel_grid_group_box = QtWidgets.QGroupBox(self.pixel_grid_page)
@@ -113,6 +123,7 @@ class Ui_PixelOptionsWidget(object):
         self.start_counting_combo_box.setInsertPolicy(
             QtWidgets.QComboBox.InsertAtCurrent
         )
+
         self.start_counting_combo_box.setObjectName("startCountingComboBox")
         self.start_counting_combo_box.addItem("")
         self.start_counting_combo_box.addItem("")
@@ -121,6 +132,7 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_grid_group_box_layout.addWidget(
             self.start_counting_combo_box, 3, 2, 1, 2
         )
+
         self.count_first_combo_box = QtWidgets.QComboBox(self.pixel_grid_group_box)
         self.count_first_combo_box.setCurrentText("")
         self.count_first_combo_box.setMaxCount(2)
@@ -129,6 +141,7 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_grid_group_box_layout.addWidget(
             self.count_first_combo_box, 4, 2, 1, 2
         )
+
         self.row_count_spin_box = QtWidgets.QSpinBox(self.pixel_grid_group_box)
         self.row_count_spin_box.setMinimum(1)
         self.row_count_spin_box.setMaximum(1000000)
@@ -143,6 +156,7 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_grid_group_box_layout.addWidget(
             self.column_count_spin_box, 1, 1, 1, 1
         )
+
         self.first_id_spin_box = QtWidgets.QSpinBox(self.pixel_grid_group_box)
         self.first_id_spin_box.setMaximum(1000000)
         self.first_id_spin_box.setObjectName("firstIDSpinBox")
