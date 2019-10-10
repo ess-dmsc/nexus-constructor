@@ -2,10 +2,12 @@ from tests.helpers import create_nexus_wrapper, add_component_to_file
 from PySide2.QtGui import QVector3D
 from nexus_constructor.component import Component
 
+
 def test_linked_component_is_none_1():
     nexus_wrapper = create_nexus_wrapper()
     component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
     assert component1.transforms.link.linked_component == None
+
 
 def test_linked_component_is_none_2():
     nexus_wrapper = create_nexus_wrapper()
@@ -13,11 +15,13 @@ def test_linked_component_is_none_2():
     component1.transforms.has_link = False
     assert component1.transforms.link.linked_component == None
 
+
 def test_linked_component_is_none_3():
     nexus_wrapper = create_nexus_wrapper()
     component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
     new_component = Component(component1.file, component1.group)
     assert new_component.transforms.link.linked_component == None
+
 
 def test_linked_component_via_transform_1():
     nexus_wrapper = create_nexus_wrapper()
@@ -29,6 +33,7 @@ def test_linked_component_via_transform_1():
 
     new_component = Component(component1.file, component1.group)
     assert new_component.transforms.link.linked_component == component2
+
 
 def test_linked_component_via_transform_2():
     nexus_wrapper = create_nexus_wrapper()
@@ -43,6 +48,7 @@ def test_linked_component_via_transform_2():
     new_component = Component(component1.file, component1.group)
     assert new_component.transforms.link.linked_component == component2
 
+
 def test_linked_component_via_component_1():
     nexus_wrapper = create_nexus_wrapper()
     component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
@@ -53,6 +59,7 @@ def test_linked_component_via_component_1():
 
     new_component = Component(component1.file, component1.group)
     assert new_component.transforms.link.linked_component == component2
+
 
 def test_linked_component_via_component_2():
     nexus_wrapper = create_nexus_wrapper()

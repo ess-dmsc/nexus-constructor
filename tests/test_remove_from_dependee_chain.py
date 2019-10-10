@@ -1,6 +1,7 @@
 from tests.helpers import create_nexus_wrapper, add_component_to_file
 from PySide2.QtGui import QVector3D
 
+
 def test_remove_from_beginning_1():
     nexus_wrapper = create_nexus_wrapper()
     component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
@@ -9,6 +10,7 @@ def test_remove_from_beginning_1():
     assert len(rot.get_dependents()) == 1
     rot.remove_from_dependee_chain()
     assert component1.depends_on.absolute_path == "/"
+
 
 def test_remove_from_beginning_2():
     nexus_wrapper = create_nexus_wrapper()
@@ -22,6 +24,7 @@ def test_remove_from_beginning_2():
     assert len(rot2.get_dependents()) == 1
     assert rot2.get_dependents()[0] == component1
     assert component1.depends_on == rot2
+
 
 def test_remove_from_beginning_3():
     nexus_wrapper = create_nexus_wrapper()
@@ -39,6 +42,7 @@ def test_remove_from_beginning_3():
     assert component1 in rot2.get_dependents()
     assert component1.depends_on == rot2
     assert component1.transforms.link.linked_component == component2
+
 
 def test_remove_from_middle():
     nexus_wrapper = create_nexus_wrapper()

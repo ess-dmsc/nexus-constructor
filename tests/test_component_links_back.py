@@ -10,6 +10,7 @@ def test_does_not_link_back_1():
 
     assert not links_back_to_component(component1, component2)
 
+
 def test_does_not_link_back_2():
     nexus_wrapper = create_nexus_wrapper()
     component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
@@ -18,6 +19,7 @@ def test_does_not_link_back_2():
     component2.depends_on = translation1
 
     assert not links_back_to_component(component1, component2)
+
 
 def test_does_not_link_back_3():
     nexus_wrapper = create_nexus_wrapper()
@@ -29,6 +31,7 @@ def test_does_not_link_back_3():
     component2.transforms.link.linked_component = component3
 
     assert not links_back_to_component(component1, component2)
+
 
 def test_does_not_link_back_4():
     nexus_wrapper = create_nexus_wrapper()
@@ -42,6 +45,7 @@ def test_does_not_link_back_4():
     component2.transforms.link.linked_component = component3
 
     assert not links_back_to_component(component1, component2)
+
 
 def test_links_back_1():
     nexus_wrapper = create_nexus_wrapper()
@@ -57,6 +61,7 @@ def test_links_back_1():
 
     assert links_back_to_component(component1, component2)
 
+
 def test_links_back_2():
     nexus_wrapper = create_nexus_wrapper()
     component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
@@ -67,10 +72,9 @@ def test_links_back_2():
 
     assert links_back_to_component(component1, component2)
 
+
 def test_links_back_3():
     nexus_wrapper = create_nexus_wrapper()
     component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
 
     assert links_back_to_component(component1, component1)
-
-
