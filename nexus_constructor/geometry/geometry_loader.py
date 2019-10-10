@@ -1,3 +1,5 @@
+import logging
+
 from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus
 from nexusutils.readwriteoff import parse_off_file
 from nexus_constructor.unit_converter import calculate_unit_conversion_factor
@@ -61,7 +63,7 @@ def load_geometry_from_file_object(
     else:
         geometry.faces = []
         geometry.vertices = []
-        print("geometry file extension not supported")
+        logging.error("geometry file extension not supported")
 
     return geometry
 
@@ -85,7 +87,7 @@ def _load_off_geometry(
         for x, y, z in (vertex for vertex in vertices)
     ]
     geometry.faces = [face.tolist()[1:] for face in faces]
-    print("OFF loaded")
+    logging.info("OFF loaded")
     return geometry
 
 
@@ -115,5 +117,5 @@ def _load_stl_geometry(
     geometry.faces = [
         [i * 3, (i * 3) + 1, (i * 3) + 2] for i in range(len(mesh_data.vectors))
     ]
-    print("STL loaded")
+    logging.info("STL loaded")
     return geometry

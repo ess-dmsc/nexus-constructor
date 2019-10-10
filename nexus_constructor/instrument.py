@@ -1,19 +1,46 @@
 import os
-from typing import List, Dict
+from typing import List, Dict, Any, Tuple, Union
 
 import h5py
-from nexus_constructor.component_type import make_dictionary_of_class_definitions
+from nexus_constructor.component.component_type import (
+    make_dictionary_of_class_definitions,
+)
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.transformations import Transformation
-from nexus_constructor.component_factory import create_component
+from nexus_constructor.component.component_factory import create_component
 
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
 
 def _convert_name_with_spaces(component_name):
     return component_name.replace(" ", "_")
+
+
+def _separate_dot_field_group_hierarchy(
+    item_dict: Dict[Any, Any],
+    dots_in_field_name: List[str],
+    item: Tuple[str, h5py.Group],
+):
+    previous_group = item_dict
+    for subgroup in dots_in_field_name:
+        # do not overwrite a group unless it doesn't yet exist
+        if subgroup not in previous_group:
+            previous_group[subgroup] = dict()
+        if subgroup == dots_in_field_name[-1]:
+            # set the value of the field to the last item in the list
+            previous_group[subgroup] = _handle_stream_dataset(item[1][...])
+        previous_group = previous_group[subgroup]
+
+
+def _handle_stream_dataset(stream_dataset: h5py.Dataset) -> Union[str, bool, int]:
+    if stream_dataset.dtype == h5py.special_dtype(vlen=str):
+        return str(stream_dataset)
+    if stream_dataset.dtype == bool:
+        return bool(stream_dataset)
+    if stream_dataset.dtype == int:
+        return int(stream_dataset)
 
 
 class Instrument:
@@ -72,7 +99,7 @@ class Instrument:
         if nx_class in COMPONENTS_IN_ENTRY:
             parent_group = self.nexus.entry
         component_group = self.nexus.create_nx_group(name, nx_class, parent_group)
-        component = Component(self.nexus, component_group)
+        component = create_component(self.nexus, component_group)
         component.description = description
         return component
 
@@ -96,6 +123,33 @@ class Instrument:
 
         self.nexus.entry.visititems(find_components)
         return component_list
+
+    def get_streams(self) -> Dict[str, Dict[str, str]]:
+        """
+        Find all streams and return them in the expected format for JSON serialisiation.
+        :return: A dictionary of stream groups, with their respective field names and values.
+        """
+        streams_dict = dict()
+
+        def find_streams(_, node):
+            if isinstance(node, h5py.Group):
+                if "NX_class" in node.attrs:
+                    if node.attrs["NX_class"] == "NCstream":
+                        item_dict = dict()
+                        for item in node.items():
+                            dots_in_field_name = item[0].split(".")
+                            if len(dots_in_field_name) > 1:
+                                _separate_dot_field_group_hierarchy(
+                                    item_dict, dots_in_field_name, item
+                                )
+                            else:
+                                item_dict[item[0]] = _handle_stream_dataset(
+                                    item[1][...]
+                                )
+                        streams_dict[node.name] = item_dict
+
+        self.nexus.entry.visititems(find_streams)
+        return streams_dict
 
     def get_links(self) -> Dict[str, h5py.Group]:
         links_dict = dict()

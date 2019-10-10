@@ -11,9 +11,9 @@ from mock import Mock, call, patch, mock_open
 from pytestqt.qtbot import QtBot
 import numpy as np
 
-from nexus_constructor import component_type
+from nexus_constructor.component import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
@@ -64,6 +64,20 @@ for i, component_class in enumerate(
         PIXEL_OPTIONS[component_class] = i
     else:
         NO_PIXEL_OPTIONS[component_class] = i
+
+# Select a subset of the component class to use in parameterised tests
+# Should include any for which the UI is specialised
+_components_subset = {"NXdetector", "NXdisk_chopper", "NXsensor"}
+COMPONENT_TYPES_SUBSET = {
+    class_name: position_in_combo_box
+    for class_name, position_in_combo_box in ALL_COMPONENT_TYPES.items()
+    if class_name in _components_subset
+}
+NO_PIXEL_OPTIONS_SUBSET = {
+    class_name: position_in_combo_box
+    for class_name, position_in_combo_box in NO_PIXEL_OPTIONS.items()
+    if class_name in _components_subset
+}
 
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
@@ -154,29 +168,6 @@ def create_add_component_dialog():
     component = ComponentTreeModel(instrument)
     nexus_wrapper_count += 1
     return AddComponentDialog(instrument, component)
-
-
-def enter_file_path(
-    qtbot: pytestqt.qtbot.QtBot,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    file_path: str,
-    file_contents: str,
-):
-    """
-    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
-    geometry file.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param file_path: The desired file path.
-    :param file_contents: The file contents that are returned by the open mock.
-    """
-    with patch(
-        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
-    ):
-        with patch("builtins.open", mock_open(read_data=file_contents)):
-            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
 
 
 def enter_component_name(
@@ -418,7 +409,7 @@ def test_UI_GIVEN_nothing_WHEN_selecting_shape_with_units_THEN_default_units_are
 
 
 @pytest.mark.parametrize("pixels_class", PIXEL_OPTIONS.keys())
-@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES)
+@pytest.mark.parametrize("any_component_type", COMPONENT_TYPES_SUBSET)
 @pytest.mark.parametrize("pixel_shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_pixel_options_go_from_invisible_to_visible(
     qtbot, template, dialog, pixels_class, any_component_type, pixel_shape_name
@@ -435,7 +426,7 @@ def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_p
     assert dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.parametrize("any_component_type", ALL_COMPONENT_TYPES.keys())
+@pytest.mark.parametrize("any_component_type", COMPONENT_TYPES_SUBSET.keys())
 def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_options_go_from_visible_to_invisible(
     qtbot, template, dialog, any_component_type
 ):
@@ -448,7 +439,7 @@ def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_opt
     assert not dialog.pixelOptionsWidget.isVisible()
 
 
-@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS.keys())
+@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS_SUBSET.keys())
 @pytest.mark.parametrize("pixels_class", PIXEL_OPTIONS.keys())
 @pytest.mark.parametrize("shape_name", SHAPE_TYPE_BUTTONS[1:])
 def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_component_with_mesh_or_cylinder_shape_THEN_pixel_options_becomes_invisible(
@@ -1022,7 +1013,7 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_choosing_shape_THEN_relevant_fiel
     assert not dialog.geometryFileBox.isVisible()
 
 
-@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS.keys())
+@pytest.mark.parametrize("no_pixels_class", NO_PIXEL_OPTIONS_SUBSET.keys())
 def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_mapping_list_remains_empty(
     qtbot, template, dialog, no_pixels_class, mock_pixel_options
 ):
@@ -1191,67 +1182,6 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
     )
 
 
-def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_module_THEN_pixel_data_isnt_stored_in_component(
-    qtbot, template, dialog, mock_pixel_options
-):
-
-    # Make the pixel options appear but choose NXdetector_module rather than NXdetector
-    make_pixel_options_appear(
-        qtbot,
-        dialog.CylinderRadioButton,
-        dialog,
-        template,
-        PIXEL_OPTIONS["NXdetector_module"],
-    )
-
-    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
-
-    enter_file_path(
-        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
-    )
-
-    mock_component = Mock(spec=Component)
-    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelGrid())
-
-    show_and_close_window(qtbot, template)
-
-    # Call the on_ok method as if the user had pressed Add Component
-    with patch("nexus_constructor.instrument.Component") as mock_component_constructor:
-        mock_component_constructor.return_value = mock_component
-        dialog.on_ok()
-        mock_component.record_pixel_grid.assert_not_called()
-
-
-def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_module_THEN_pixel_data_isnt_stored_in_component(
-    qtbot, template, dialog, mock_pixel_options
-):
-
-    # Make the pixel options appear but choose NXdetector_module rather than NXdetector
-    make_pixel_options_appear(
-        qtbot,
-        dialog.CylinderRadioButton,
-        dialog,
-        template,
-        PIXEL_OPTIONS["NXdetector_module"],
-    )
-
-    enter_component_name(qtbot, template, dialog, UNIQUE_COMPONENT_NAME)
-
-    enter_file_path(
-        qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
-    )
-
-    mock_component = Mock(spec=Component)
-    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping())
-
-    show_and_close_window(qtbot, template)
-
-    # Call the on_ok method as if the user had pressed Add Component
-    with patch("nexus_constructor.instrument.Component", return_value=mock_component):
-        dialog.on_ok()
-        mock_component.record_detector_number.assert_not_called()
-
-
 def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
     qtbot, template, dialog, mock_pixel_options
 ):
@@ -1266,16 +1196,23 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
-    mock_component = Mock(spec=Component)
-    pixel_grid = PixelGrid()
-    mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_grid)
+    with h5py.File(
+        "test_file", mode="x", driver="core", backing_store=False
+    ) as nexus_file:
+        test_group = nexus_file.create_group("test_component_group")
+        mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
+        pixel_grid = PixelGrid()
+        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_grid)
 
-    show_and_close_window(qtbot, template)
+        show_and_close_window(qtbot, template)
 
-    # Call the on_ok method as if the user had pressed Add Component
-    with patch("nexus_constructor.instrument.Component", return_value=mock_component):
-        dialog.on_ok()
-        mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
+        # Call the on_ok method as if the user had pressed Add Component
+        with patch(
+            "nexus_constructor.component.component_factory.Component",
+            return_value=mock_component,
+        ):
+            dialog.on_ok()
+            mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
 
 
 def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
@@ -1292,16 +1229,24 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
         qtbot, dialog, template, VALID_CUBE_MESH_FILE_PATH, VALID_CUBE_OFF_FILE
     )
 
-    mock_component = Mock(spec=Component)
-    pixel_mapping = PixelMapping()
-    mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_mapping)
+    with h5py.File(
+        "test_file", mode="x", driver="core", backing_store=False
+    ) as nexus_file:
+        test_group = nexus_file.create_group("test_component_group")
+        mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
 
-    show_and_close_window(qtbot, template)
+        pixel_mapping = PixelMapping(pixel_ids=[1])
+        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_mapping)
 
-    # Call the on_ok method as if the user had pressed Add Component
-    with patch("nexus_constructor.instrument.Component", return_value=mock_component):
-        dialog.on_ok()
-        mock_component.record_detector_number.assert_called_once_with(pixel_mapping)
+        show_and_close_window(qtbot, template)
+
+        # Call the on_ok method as if the user had pressed Add Component
+        with patch(
+            "nexus_constructor.component.component_factory.Component",
+            return_value=mock_component,
+        ):
+            dialog.on_ok()
+            mock_component.record_detector_number.assert_called_once_with(pixel_mapping)
 
 
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
@@ -1498,6 +1443,43 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     assert field.value[...] == field_value
 
 
+def test_UI_GIVEN_field_widget_with_stream_type_THEN_stream_dialog_shown(qtbot):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+    assert field.streams_widget.isEnabled()
+
+
+def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(qtbot):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.link.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    field_name = "testfield"
+    field_target = "/somewhere/"
+
+    field.field_name_edit.setText(field_name)
+    field.value_line_edit.setText(field_target)
+
+    assert field.dtype == h5py.SoftLink
+
+    assert field.name == field_name
+    assert field.value.path == h5py.SoftLink(field_target).path
+
+
 def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_geometry_is_created(
     qtbot, dialog, template
 ):
@@ -1523,11 +1505,202 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_
 
     enter_disk_chopper_fields(qtbot, dialog, template)
 
-    with patch(
-        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
-    ) as chopper_creator:
-        dialog.on_ok()
-        chopper_creator.assert_not_called()
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_correct_options(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("f142")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+    assert streams_widget.source_label.isEnabled()
+    assert streams_widget.source_line_edit.isEnabled()
+    assert streams_widget.type_label.isEnabled()
+    assert streams_widget.type_combo.isEnabled()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ev42_THEN_stream_dialog_shown_with_correct_options(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("ev42")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+
+    assert not streams_widget.source_label.isVisible()
+    assert not streams_widget.source_line_edit.isVisible()
+    assert not streams_widget.type_label.isVisible()
+    assert not streams_widget.type_combo.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stream_dialog_shown_with_correct_options(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("ns10")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+
+    assert not streams_widget.type_label.isVisible()
+    assert not streams_widget.type_combo.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_hs00_THEN_stream_dialog_shown_with_correct_options(
+    qtbot
+):
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("hs00")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+
+    assert not streams_widget.type_label.isVisible()
+    assert not streams_widget.type_combo.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_to_double_THEN_stream_dialog_shown_with_array_size_option(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget.schema_combo.setCurrentText("f142")
+    streams_widget.schema_combo.currentTextChanged.emit(
+        streams_widget.schema_combo.currentText()
+    )
+
+    streams_widget.array_radio.setChecked(True)
+    streams_widget.array_radio.clicked.emit()
+
+    assert streams_widget.topic_label.isVisible()
+    assert streams_widget.topic_line_edit.isVisible()
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+    assert streams_widget.type_label.isVisible()
+    assert streams_widget.type_combo.isVisible()
+
+    assert streams_widget.array_size_label.isVisible()
+    assert streams_widget.array_size_spinbox.isVisible()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_array_size_option_and_correct_value_in_nexus_file(
+    qtbot
+):
+
+    dialog, template = create_add_component_template(qtbot)
+
+    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
+    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    name = "test"
+
+    field.field_name_edit.setText(name)
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget.schema_combo.setCurrentText("f142")
+    streams_widget.schema_combo.currentTextChanged.emit(
+        streams_widget.schema_combo.currentText()
+    )
+
+    streams_widget.array_radio.setChecked(True)
+    streams_widget.array_radio.clicked.emit()
+
+    array_size = 2
+    streams_widget.array_size_spinbox.setValue(array_size)
+
+    group = streams_widget.get_stream_group()
+
+    assert name in group.name
+
+    assert "array_size" in group
+
+    assert group["array_size"][()] == array_size
 
 
 def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_THEN_chopper_geometry_is_not_created(
@@ -1546,23 +1719,24 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
         chopper_creator.assert_not_called()
 
 
-def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
-    qtbot, dialog, template
+def enter_file_path(
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    file_path: str,
+    file_contents: str,
 ):
-
-    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
-    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-
-    field.field_type_combo.setCurrentText(FieldType.link.value)
-    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
-
-    field_name = "testfield"
-    field_target = "/somewhere/"
-
-    field.field_name_edit.setText(field_name)
-    field.value_line_edit.setText(field_target)
-
-    assert field.dtype == h5py.SoftLink
-
-    assert field.name == field_name
-    assert field.value.path == h5py.SoftLink(field_target).path
+    """
+    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
+    geometry file.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param file_path: The desired file path.
+    :param file_contents: The file contents that are returned by the open mock.
+    """
+    with patch(
+        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
+    ):
+        with patch("builtins.open", mock_open(read_data=file_contents)):
+            systematic_button_press(qtbot, template, dialog.fileBrowseButton)

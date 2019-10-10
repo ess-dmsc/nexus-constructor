@@ -1,3 +1,5 @@
+import logging
+
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
 from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
@@ -77,10 +79,10 @@ class EditTransformationLink(QFrame):
                 self.link_frame.TransformationsComboBox.addItem(transform.name)
 
     def enable(self):
-        print("EditTransformationLink.enable not implemented.")
+        logging.warning("EditTransformationLink.enable not implemented.")
 
     def disable(self):
-        print("EditTransformationLink.disable not implemented.")
+        logging.warning("EditTransformationLink.disable not implemented.")
 
     def saveChanges(self):
-        print("EditTransformationLink.saveChanges not implemented.")
+        logging.warning("EditTransformationLink.saveChanges not implemented.")
