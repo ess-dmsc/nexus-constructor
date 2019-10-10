@@ -1,5 +1,5 @@
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from uuid import uuid1
 from typing import Any
 import h5py

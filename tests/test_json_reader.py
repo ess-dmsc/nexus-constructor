@@ -1,6 +1,6 @@
 import pytest
 import h5py
-from nexus_constructor.nexus_filewriter_json.reader import json_to_nexus
+from nexus_constructor.json.filewriter_json_reader import json_to_nexus
 
 
 def is_nexus_class(group: h5py.Group, class_name: str):

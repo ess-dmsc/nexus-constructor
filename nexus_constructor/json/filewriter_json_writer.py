@@ -2,8 +2,9 @@ import h5py
 
 from nexus_constructor.instrument import Instrument
 import numpy as np
-import json
 import uuid
+
+from nexus_constructor.json.helpers import object_to_json_file
 
 
 def generate_json(
@@ -78,13 +79,13 @@ class NexusToDictConverter:
             size = data.shape
             data = data.tolist()
         if dtype.char == "S" or dtype == h5py.special_dtype(vlen=str):
-            if isinstance(data, list):
-                data = [str_item.decode("utf-8") for str_item in data]
-            else:
-                try:
+            try:
+                if isinstance(data, list):
+                    data = [str_item.decode("utf-8") for str_item in data]
+                else:
                     data = data.decode("utf-8")
-                except AttributeError:
-                    pass
+            except AttributeError:  # Already a str (decoded)
+                pass
             dtype = "string"
         elif dtype == np.float64:
             dtype = "double"
@@ -96,7 +97,12 @@ class NexusToDictConverter:
     def _handle_attributes(root, root_dict):
         if "NX_class" in root.attrs:
             nx_class = root.attrs["NX_class"]
-            if nx_class and nx_class != "NXfield" and nx_class != "NXgroup":
+            if (
+                nx_class
+                and nx_class != "NXfield"
+                and nx_class != "NXgroup"
+                and nx_class != "NCstream"
+            ):
                 root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
             if len(root.attrs) > 1:
                 if "attributes" not in root_dict:
@@ -155,18 +161,6 @@ class NexusToDictConverter:
             root_dict["dataset"]["size"] = size
 
         return root_dict
-
-
-def object_to_json_file(tree_dict, file):
-    """
-    Create a JSON file describing the NeXus file
-    WARNING, output files can easily be 10 times the size of input NeXus file
-
-    :param tree_dict: Root node of the tree.
-    :param file: File object to store the tree in.
-    """
-
-    json.dump(tree_dict, file, indent=2, sort_keys=False)
 
 
 def create_writer_commands(
