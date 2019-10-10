@@ -161,7 +161,7 @@ def test_GIVEN_dot_separated_field_name_WHEN_getting_streams_THEN_dict_is_return
 
     assert "nexus" in streams["/entry/streams"]
     assert "indices" in streams["/entry/streams"]["nexus"]
-    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_mb"] == str(val)
+    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_mb"] == val
 
 
 def test_GIVEN_several_dot_separated_field_names_with_similar_prefixes_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
@@ -185,5 +185,5 @@ def test_GIVEN_several_dot_separated_field_names_with_similar_prefixes_WHEN_gett
 
     assert "nexus" in streams["/entry/streams"]
     assert "indices" in streams["/entry/streams"]["nexus"]
-    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_mb"] == str(val)
-    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_kb"] == str(val2)
+    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_mb"] == val
+    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_kb"] == val2
