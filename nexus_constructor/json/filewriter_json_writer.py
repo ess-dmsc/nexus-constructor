@@ -221,10 +221,11 @@ def create_writer_commands(
         write_cmd["use_hdf_swmr"] = use_hdf_swmr
 
     if abort_on_uninitialised_stream:
-        write_cmd["abort_on_unitialised_stream"] = abort_on_uninitialised_stream
+        write_cmd["abort_on_uninitialised_stream"] = abort_on_uninitialised_stream
 
     stop_cmd = {"cmd": "FileWriter_stop", "job_id": job_id}
     if stop_time is not None:
+        write_cmd["stop_time"] = stop_time
         stop_cmd["stop_time"] = stop_time
 
     if service_id is not None:
