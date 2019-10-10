@@ -21,37 +21,47 @@ class Ui_MainWindow(object):
         self.tab_widget = QtWidgets.QTabWidget(self.central_widget)
         self.tab_widget.setMinimumSize(QtCore.QSize(500, 0))
         self.tab_widget.setObjectName("tabWidget")
-        self.component_tree_view_tab = QtWidgets.QWidget()
-        self.component_tree_view_tab.setObjectName("tab_2")
-
-        self.tree_view_layout = QtWidgets.QVBoxLayout(self.component_tree_view_tab)
-        self.tree_view_layout.setObjectName("verticalLayout_2")
-
-        self.componentsTabLayout = QtWidgets.QVBoxLayout()
-        self.componentsTabLayout.setObjectName("componentsTabLayout")
-
-        self.component_tree_view = QtWidgets.QTreeView(self.component_tree_view_tab)
-        self.component_tree_view.setObjectName("componentTreeView")
-        self.componentsTabLayout.addWidget(self.component_tree_view)
-        self.tree_view_layout.addLayout(self.componentsTabLayout)
-
-        self.tab_widget.addTab(self.component_tree_view_tab, "")
-        self.silx_tab = QtWidgets.QWidget()
-        self.silx_tab.setObjectName("tab")
-
-        self.silx_tab_layout = QtWidgets.QGridLayout(self.silx_tab)
-        self.silx_tab_layout.setObjectName("gridLayout_2")
-
-        self.tab_widget.addTab(self.silx_tab, "")
+        self._set_up_component_tree_view()
+        self._set_up_silx_view()
         self.splitter.addWidget(self.tab_widget)
 
+        self._set_up_3d_view()
+
+        MainWindow.setCentralWidget(self.central_widget)
+
+        self._set_up_menus(MainWindow)
+
+        self.retranslateUi(MainWindow)
+        self.tab_widget.setCurrentIndex(0)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def _set_up_3d_view(self):
         self.sceneWidget = InstrumentView(self.splitter)
         self.sceneWidget.setMinimumSize(QtCore.QSize(800, 0))
         self.sceneWidget.setObjectName("sceneWidget")
         self.splitter.addWidget(self.sceneWidget)
 
-        MainWindow.setCentralWidget(self.central_widget)
+    def _set_up_silx_view(self):
+        self.silx_tab = QtWidgets.QWidget()
+        self.silx_tab.setObjectName("tab")
+        self.silx_tab_layout = QtWidgets.QGridLayout(self.silx_tab)
+        self.silx_tab_layout.setObjectName("gridLayout_2")
+        self.tab_widget.addTab(self.silx_tab, "")
 
+    def _set_up_component_tree_view(self):
+        self.component_tree_view_tab = QtWidgets.QWidget()
+        self.component_tree_view_tab.setObjectName("tab_2")
+        self.tree_view_layout = QtWidgets.QVBoxLayout(self.component_tree_view_tab)
+        self.tree_view_layout.setObjectName("verticalLayout_2")
+        self.componentsTabLayout = QtWidgets.QVBoxLayout()
+        self.componentsTabLayout.setObjectName("componentsTabLayout")
+        self.component_tree_view = QtWidgets.QTreeView(self.component_tree_view_tab)
+        self.component_tree_view.setObjectName("componentTreeView")
+        self.componentsTabLayout.addWidget(self.component_tree_view)
+        self.tree_view_layout.addLayout(self.componentsTabLayout)
+        self.tab_widget.addTab(self.component_tree_view_tab, "")
+
+    def _set_up_menus(self, MainWindow):
         self.menu_bar = QtWidgets.QMenuBar()
         self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1280, 720))
         self.menu_bar.setObjectName("menubar")
@@ -73,10 +83,6 @@ class Ui_MainWindow(object):
         self.file_menu.addAction(self.export_to_nexus_file_action)
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
         self.menu_bar.addAction(self.file_menu.menuAction())
-
-        self.retranslateUi(MainWindow)
-        self.tab_widget.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(
