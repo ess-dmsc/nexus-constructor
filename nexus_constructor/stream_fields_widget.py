@@ -18,9 +18,17 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
-from nexus_constructor.stream_advanced_options import nexus_indices_index_every_mb, nexus_indices_index_every_kb, \
-    store_latest_into, nexus_chunk_chunk_mb, nexus_chunk_chunk_kb, nexus_buffer_size_mb, nexus_buffer_size_kb, \
-    nexus_buffer_packet_max_kb
+from nexus_constructor.stream_advanced_options import (
+    nexus_indices_index_every_mb,
+    nexus_indices_index_every_kb,
+    store_latest_into,
+    nexus_chunk_chunk_mb,
+    nexus_chunk_chunk_kb,
+    nexus_buffer_size_mb,
+    nexus_buffer_size_kb,
+    nexus_buffer_packet_max_kb,
+    adc_pulse_debug,
+)
 
 SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime"]
 F142_TYPES = [
@@ -139,14 +147,14 @@ class StreamFieldsWidget(QDialog):
         )
         self.ev42_advanced_group_box.setLayout(QFormLayout())
 
-        self.ev42_adc_pulse_debug_label = QLabel("adc_pulse_debug")
+        self.ev42_adc_pulse_debug_label = QLabel(adc_pulse_debug)
         self.ev42_adc_pulse_debug_checkbox = QCheckBox()
 
         minimum_value = 0
         maximum_value = 100000000
 
         self.ev42_nexus_indices_index_every_mb_label = QLabel(
-            "nexus.indices.index_every_mb"
+            nexus_indices_index_every_mb
         )
         self.ev42_nexus_indices_index_every_mb_spinbox = QSpinBox()
         self.ev42_nexus_indices_index_every_mb_spinbox.setRange(
@@ -154,40 +162,30 @@ class StreamFieldsWidget(QDialog):
         )
 
         self.ev42_nexus_indices_index_every_kb_label = QLabel(
-            "nexus.indices.index_every_kb"
+            nexus_indices_index_every_kb
         )
         self.ev42_nexus_indices_index_every_kb_spinbox = QSpinBox()
         self.ev42_nexus_indices_index_every_kb_spinbox.setRange(
             minimum_value, maximum_value
         )
 
-
-
         self.ev42_nexus_chunk_chunk_mb_label = QLabel(nexus_chunk_chunk_mb)
         self.ev42_nexus_chunk_chunk_mb_spinbox = QSpinBox()
         self.ev42_nexus_chunk_chunk_mb_spinbox.setRange(minimum_value, maximum_value)
-
-
 
         self.ev42_nexus_chunk_chunk_kb_label = QLabel(nexus_chunk_chunk_kb)
         self.ev42_nexus_chunk_chunk_kb_spinbox = QSpinBox()
         self.ev42_nexus_chunk_chunk_kb_spinbox.setRange(minimum_value, maximum_value)
 
-
-
         self.ev42_nexus_buffer_size_mb_label = QLabel(nexus_buffer_size_mb)
         self.ev42_nexus_buffer_size_mb_spinbox = QSpinBox()
         self.ev42_nexus_buffer_size_mb_spinbox.setRange(minimum_value, maximum_value)
-
 
         self.ev42_nexus_buffer_size_kb_label = QLabel(nexus_buffer_size_kb)
         self.ev42_nexus_buffer_size_kb_spinbox = QSpinBox()
         self.ev42_nexus_buffer_size_kb_spinbox.setRange(minimum_value, maximum_value)
 
-
-        self.ev42_nexus_buffer_packet_max_kb_label = QLabel(
-            nexus_buffer_packet_max_kb
-        )
+        self.ev42_nexus_buffer_packet_max_kb_label = QLabel(nexus_buffer_packet_max_kb)
         self.ev42_nexus_buffer_packet_max_kb_spinbox = QSpinBox()
         self.ev42_nexus_buffer_packet_max_kb_spinbox.setRange(
             minimum_value, maximum_value
@@ -232,9 +230,6 @@ class StreamFieldsWidget(QDialog):
 
         minimum_value = 0
         maximum_value = 100000000
-
-
-
 
         self.f142_nexus_indices_index_every_mb_label = QLabel(
             nexus_indices_index_every_mb
@@ -372,42 +367,42 @@ class StreamFieldsWidget(QDialog):
         """
         if self.advanced_options_enabled:
             stream_group.create_dataset(
-                self.ev42_adc_pulse_debug_label.text(),
+                adc_pulse_debug,
                 dtype=bool,
                 data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
             )
             stream_group.create_dataset(
-                self.ev42_nexus_indices_index_every_mb_label.text(),
+                nexus_indices_index_every_mb,
                 dtype=int,
                 data=self.ev42_nexus_indices_index_every_mb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.ev42_nexus_indices_index_every_kb_label.text(),
+                nexus_indices_index_every_kb,
                 dtype=int,
                 data=self.ev42_nexus_indices_index_every_kb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.ev42_nexus_chunk_chunk_mb_label.text(),
+                nexus_chunk_chunk_mb,
                 dtype=int,
                 data=self.ev42_nexus_chunk_chunk_mb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.ev42_nexus_chunk_chunk_kb_label.text(),
+                nexus_chunk_chunk_kb,
                 dtype=int,
                 data=self.ev42_nexus_chunk_chunk_kb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.ev42_nexus_buffer_size_mb_label.text(),
+                nexus_buffer_size_mb,
                 dtype=int,
                 data=self.ev42_nexus_buffer_size_mb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.ev42_nexus_buffer_size_kb_label.text(),
+                nexus_buffer_size_kb,
                 dtype=int,
                 data=self.ev42_nexus_buffer_size_kb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.ev42_nexus_buffer_packet_max_kb_label.text(),
+                nexus_buffer_packet_max_kb,
                 dtype=int,
                 data=self.ev42_nexus_buffer_packet_max_kb_spinbox.value(),
             )
@@ -427,17 +422,17 @@ class StreamFieldsWidget(QDialog):
         if self.advanced_options_enabled:
             # Use strings for names, we don't care if it's byte-encoded as it will output to JSON anyway.
             stream_group.create_dataset(
-                self.f142_nexus_indices_index_every_mb_label.text(),
+                nexus_indices_index_every_mb,
                 dtype=int,
                 data=self.f142_nexus_indices_index_every_mb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.f142_nexus_indices_index_every_kb_label.text(),
+                nexus_indices_index_every_kb,
                 dtype=int,
                 data=self.f142_nexus_indices_index_every_kb_spinbox.value(),
             )
             stream_group.create_dataset(
-                self.f142_nexus_store_latest_into_label.text(),
+                store_latest_into,
                 dtype=int,
                 data=self.f142_nexus_store_latest_into_spinbox.value(),
             )
