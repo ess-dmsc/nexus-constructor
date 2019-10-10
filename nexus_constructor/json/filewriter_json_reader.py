@@ -34,7 +34,6 @@ def json_to_nexus(json_input: str) -> h5py.File:
     :param json_input:
     :return: NeXus file and any warning messages produced from validating the JSON
     """
-
     if not json_input:
         raise ValueError("Empty json string, nothing to load!")
 
