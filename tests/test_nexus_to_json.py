@@ -6,13 +6,13 @@ import numpy as np
 
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.nexus_filewriter_json.writer import (
+from nexus_constructor.json.filewriter_json_writer import (
     NexusToDictConverter,
     create_writer_commands,
     object_to_json_file,
     generate_json,
-    generate_forwarder_command,
 )
+from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
 import h5py
 
 

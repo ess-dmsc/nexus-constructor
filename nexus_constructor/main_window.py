@@ -13,6 +13,7 @@ import silx.gui.hdf5
 import os
 import h5py
 
+import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
@@ -24,7 +25,7 @@ from nexus_constructor.component_tree_view import (
     ComponentEditorDelegate,
     LinkTransformation,
 )
-from nexus_constructor.nexus_filewriter_json import writer
+from nexus_constructor.json import filewriter_json_writer
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
@@ -321,7 +322,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             )
             if ok_pressed:
                 with open(filename, "w") as file:
-                    writer.generate_json(
+                    filewriter_json_writer.generate_json(
                         self.instrument,
                         file,
                         nexus_file_name=name,
@@ -343,7 +344,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             )
             if ok_pressed:
                 with open(filename, "w") as file:
-                    writer.generate_forwarder_command(
+                    nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
                         file,
                         streams=self.instrument.get_streams(),
                         provider_type=provider_type,
