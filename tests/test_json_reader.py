@@ -20,6 +20,26 @@ def test_GIVEN_invalid_json_string_WHEN_json_to_nexus_called_THEN_error_is_raise
         json_to_nexus("{")
 
 
+def test_GIVEN_json_containing_group_WHEN_json_to_nexus_called_THEN_group_created_in_NeXus():
+    group_name = "test_group"
+    test_json = f"""
+    {{
+      "nexus_structure": {{
+        "children": [
+          {{
+            "type": "group",
+            "name": "{group_name}",
+            "children": []
+          }}
+        ]
+      }}
+    }}
+    """
+    nexus_file = json_to_nexus(test_json)
+    assert group_name in nexus_file
+    assert isinstance(nexus_file[group_name], h5py.Group)
+
+
 def test_GIVEN_json_containing_entry_group_WHEN_json_to_nexus_called_THEN_entry_created_in_NeXus():
     test_json = """
     {

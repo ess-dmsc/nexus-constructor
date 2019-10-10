@@ -34,8 +34,9 @@ def _add_group(json_object: dict, current_group: h5py.Group):
 
 
 def _add_attributes(json_object: dict, nexus_object: NexusObject):
-    for attribute in json_object["attributes"]:
-        nexus_object.attrs[attribute["name"]] = attribute["values"]
+    if "attributes" in json_object:
+        for attribute in json_object["attributes"]:
+            nexus_object.attrs[attribute["name"]] = attribute["values"]
 
 
 def _create_in_memory_file(filename):
