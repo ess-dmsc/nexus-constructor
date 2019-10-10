@@ -27,6 +27,9 @@ class FilewriterCommandDialog(QDialog):
         filename_validator = CommandDialogOKButtonValidator(self)
         self.nexus_file_name_edit.setValidator(filename_validator)
         filename_validator.is_valid.connect(self.validate)
+        self.ok_button = QPushButton("Ok")
+        self.ok_button.clicked.connect(self.close)
+
         self.validate(False)
 
         self.start_time_enabled = QCheckBox()
@@ -56,9 +59,6 @@ class FilewriterCommandDialog(QDialog):
             "abort_on_uninitialised_stream", self.abort_on_unitialised_stream_checkbox
         )
         self.layout().addRow("use_hdf_swmr", self.use_swmr_checkbox)
-
-        self.ok_button = QPushButton("Ok")
-        self.ok_button.clicked.connect(self.close)
         self.layout().addRow(self.ok_button)
 
     def validate(self, is_valid):
