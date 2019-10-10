@@ -289,6 +289,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                         new_ui_field.streams_widget.topic_line_edit.setText(
                             str(field["topic"])
                         )
+                        if field["writer_module"] != "ev42":
+                            new_ui_field.streams_widget.source_line_edit.setText(
+                                str(field["source"])
+                            )
                         # TODO: schema specific fields
 
     def add_field(self) -> FieldWidget:
