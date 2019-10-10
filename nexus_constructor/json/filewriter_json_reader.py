@@ -1,5 +1,6 @@
 import json
 import h5py
+import numpy as np
 from typing import Union, List
 
 """
@@ -7,6 +8,17 @@ Read the JSON and construct an in-memory NeXus file from the nexus_structure fie
 """
 JsonValue = Union[List, str, float, int, dict]
 NexusObject = Union[h5py.Group, h5py.Dataset]
+
+
+_json_type_to_numpy = {
+    "string": str,
+    "float": np.float32,
+    "double": np.float64,
+    "int32": np.int32,
+    "int64": np.int64,
+    "uint32": np.uint32,
+    "uint64": np.uint64,
+}
 
 
 def _add_to_nexus(children: List[dict], current_group: h5py.Group):
@@ -21,8 +33,9 @@ def _add_to_nexus(children: List[dict], current_group: h5py.Group):
 
 
 def _add_dataset(json_object: dict, current_group: h5py.Group):
+    numpy_type = _json_type_to_numpy[json_object["dataset"]["type"]]
     new_dataset = current_group.create_dataset(
-        json_object["name"], data=json_object["values"]
+        json_object["name"], dtype=numpy_type, data=json_object["values"]
     )
     _add_attributes(json_object, new_dataset)
 
