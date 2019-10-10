@@ -279,12 +279,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                             field.name, getlink=True
                         ).path
                     elif (
-                        hasattr(field, "NX_class")
+                        "NX_class" in field.attrs.keys()
                         and field.attrs["NX_class"] == "NCstream"
                     ):
                         new_ui_field.field_type = FieldType.kafka_stream.value
-                        # stream
-                        pass
+                        new_ui_field.streams_widget.schema_combo.setCurrentText(
+                            str(field["writer_module"])
+                        )
+                        new_ui_field.streams_widget.topic_line_edit.setText(
+                            str(field["topic"])
+                        )
+                        # TODO: schema specific fields
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()

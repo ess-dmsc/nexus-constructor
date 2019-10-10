@@ -195,7 +195,7 @@ class NexusWrapper(QObject):
             if isinstance(item, h5py.Group):
                 if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
                     fields.append(item)
-                if hasattr(item, "NX_class") and item.attrs["NX_class"] == "NCstream":
+                if "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream":
                     fields.append(item)
         return fields
 
