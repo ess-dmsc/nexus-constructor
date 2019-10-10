@@ -18,7 +18,7 @@ from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 from nexus_constructor.transformations import Transformation, TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import (
@@ -362,8 +362,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def _update_3d_view_with_component_shapes(self):
         for component in self.instrument.get_component_list():
-            if component.get_shape():
-                self.sceneWidget.add_component(component.name, component.get_shape())
+            shape, positions = component.shape
+            self.sceneWidget.add_component(component.name, shape, positions)
 
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
