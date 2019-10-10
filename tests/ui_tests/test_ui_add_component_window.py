@@ -1717,3 +1717,26 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
     ) as chopper_creator:
         dialog.on_ok()
         chopper_creator.assert_not_called()
+
+
+def enter_file_path(
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    file_path: str,
+    file_contents: str,
+):
+    """
+    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
+    geometry file.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param file_path: The desired file path.
+    :param file_contents: The file contents that are returned by the open mock.
+    """
+    with patch(
+        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
+    ):
+        with patch("builtins.open", mock_open(read_data=file_contents)):
+            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
