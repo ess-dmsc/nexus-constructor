@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Union
 
 import h5py
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
@@ -32,7 +32,7 @@ def _separate_dot_field_group_hierarchy(
         previous_group = previous_group[subgroup]
 
 
-def _handle_stream_dataset(stream_dataset: h5py.Dataset):
+def _handle_stream_dataset(stream_dataset: h5py.Dataset) -> Union[str, bool, int]:
     if stream_dataset.dtype == h5py.special_dtype(vlen=str):
         return str(stream_dataset)
     if stream_dataset.dtype == bool:
