@@ -264,7 +264,10 @@ def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixe
     qtbot, template, pixel_options
 ):
 
-    count_fields = [pixel_options.row_count_spin_box, pixel_options.column_count_spin_box]
+    count_fields = [
+        pixel_options.row_count_spin_box,
+        pixel_options.column_count_spin_box,
+    ]
 
     # Set both spin boxes to zero
     for field in count_fields:

@@ -38,7 +38,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         super().setupUi(parent_widget)
 
         self.pixel_validator = PixelValidator(
-            parent_widget, self.single_pixel_radio_button, self.entire_shape_radio_button
+            parent_widget,
+            self.single_pixel_radio_button,
+            self.entire_shape_radio_button,
         )
 
         # Have the radio buttons change the visibility of the pixel options
@@ -156,7 +158,10 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Changes the StyleSheet of the column and row count spin boxes in the Pixel Grid depending on their validity.
         Sets them to red if both are zero, white if one or neither of them are zero.
         """
-        if self.row_count_spin_box.value() == 0 and self.column_count_spin_box.value() == 0:
+        if (
+            self.row_count_spin_box.value() == 0
+            and self.column_count_spin_box.value() == 0
+        ):
             self.row_count_spin_box.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
             self.column_count_spin_box.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
         else:
@@ -171,8 +176,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         self.pixel_validator.set_pixel_grid_valid(
             not (
-                    self.row_count_spin_box.value() == 0
-                    and self.column_count_spin_box.value() == 0
+                self.row_count_spin_box.value() == 0
+                and self.column_count_spin_box.value() == 0
             )
         )
 
@@ -346,7 +351,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             list_item.setSizeHint(pixel_mapping_widget.sizeHint())
 
             self.pixel_mapping_list_widget.addItem(list_item)
-            self.pixel_mapping_list_widget.setItemWidget(list_item, pixel_mapping_widget)
+            self.pixel_mapping_list_widget.setItemWidget(
+                list_item, pixel_mapping_widget
+            )
 
             # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
