@@ -190,6 +190,10 @@ class Transformation:
         new_depends_on = self.depends_on
         if self.depends_on.absolute_path == "/":
             new_depends_on = None
+        else:
+            for elem in dependees:
+                if isinstance(elem, Transformation):
+                    new_depends_on.register_dependent(elem)
         for elem in dependees:
             elem.depends_on = new_depends_on
             self.deregister_dependent(elem)
