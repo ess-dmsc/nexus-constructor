@@ -1,0 +1,8 @@
+nexus_indices_index_every_mb = "nexus.indices.index_every_mb"
+nexus_indices_index_every_kb = "nexus.indices.index_every_kb"
+store_latest_into = "store_latest_into"
+nexus_chunk_chunk_mb = "nexus.chunk.chunk_mb"
+nexus_chunk_chunk_kb = "nexus.chunk.chunk_kb"
+nexus_buffer_size_mb = "nexus.buffer.size_mb"
+nexus_buffer_size_kb = "nexus.buffer.size_kb"
+nexus_buffer_packet_max_kb = "nexus.buffer.packet_max_kb"

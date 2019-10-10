@@ -18,6 +18,10 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
+from nexus_constructor.stream_advanced_options import nexus_indices_index_every_mb, nexus_indices_index_every_kb, \
+    store_latest_into, nexus_chunk_chunk_mb, nexus_chunk_chunk_kb, nexus_buffer_size_mb, nexus_buffer_size_kb, \
+    nexus_buffer_packet_max_kb
+
 SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime"]
 F142_TYPES = [
     "byte",
@@ -157,24 +161,32 @@ class StreamFieldsWidget(QDialog):
             minimum_value, maximum_value
         )
 
-        self.ev42_nexus_chunk_chunk_mb_label = QLabel("nexus.chunk.chunk_mb")
+
+
+        self.ev42_nexus_chunk_chunk_mb_label = QLabel(nexus_chunk_chunk_mb)
         self.ev42_nexus_chunk_chunk_mb_spinbox = QSpinBox()
         self.ev42_nexus_chunk_chunk_mb_spinbox.setRange(minimum_value, maximum_value)
 
-        self.ev42_nexus_chunk_chunk_kb_label = QLabel("nexus.chunk.chunk_kb")
+
+
+        self.ev42_nexus_chunk_chunk_kb_label = QLabel(nexus_chunk_chunk_kb)
         self.ev42_nexus_chunk_chunk_kb_spinbox = QSpinBox()
         self.ev42_nexus_chunk_chunk_kb_spinbox.setRange(minimum_value, maximum_value)
 
-        self.ev42_nexus_buffer_size_mb_label = QLabel("nexus.buffer.size_mb")
+
+
+        self.ev42_nexus_buffer_size_mb_label = QLabel(nexus_buffer_size_mb)
         self.ev42_nexus_buffer_size_mb_spinbox = QSpinBox()
         self.ev42_nexus_buffer_size_mb_spinbox.setRange(minimum_value, maximum_value)
 
-        self.ev42_nexus_buffer_size_kb_label = QLabel("nexus.buffer.size_kb")
+
+        self.ev42_nexus_buffer_size_kb_label = QLabel(nexus_buffer_size_kb)
         self.ev42_nexus_buffer_size_kb_spinbox = QSpinBox()
         self.ev42_nexus_buffer_size_kb_spinbox.setRange(minimum_value, maximum_value)
 
+
         self.ev42_nexus_buffer_packet_max_kb_label = QLabel(
-            "nexus.buffer.packet_max_kb"
+            nexus_buffer_packet_max_kb
         )
         self.ev42_nexus_buffer_packet_max_kb_spinbox = QSpinBox()
         self.ev42_nexus_buffer_packet_max_kb_spinbox.setRange(
@@ -220,8 +232,12 @@ class StreamFieldsWidget(QDialog):
 
         minimum_value = 0
         maximum_value = 100000000
+
+
+
+
         self.f142_nexus_indices_index_every_mb_label = QLabel(
-            "nexus.indices.index_every_mb"
+            nexus_indices_index_every_mb
         )
         self.f142_nexus_indices_index_every_mb_spinbox = QSpinBox()
         self.f142_nexus_indices_index_every_mb_spinbox.setRange(
@@ -229,14 +245,14 @@ class StreamFieldsWidget(QDialog):
         )
 
         self.f142_nexus_indices_index_every_kb_label = QLabel(
-            "nexus.indices.index_every_kb"
+            nexus_indices_index_every_kb
         )
         self.f142_nexus_indices_index_every_kb_spinbox = QSpinBox()
         self.f142_nexus_indices_index_every_kb_spinbox.setRange(
             minimum_value, maximum_value
         )
 
-        self.f142_nexus_store_latest_into_label = QLabel("store_latest_into")
+        self.f142_nexus_store_latest_into_label = QLabel(store_latest_into)
         self.f142_nexus_store_latest_into_spinbox = QSpinBox()
         self.f142_nexus_store_latest_into_spinbox.setRange(minimum_value, maximum_value)
 

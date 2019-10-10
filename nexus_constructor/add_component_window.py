@@ -21,6 +21,11 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     DiskChopperGeometryCreator,
 )
+from nexus_constructor.stream_advanced_options import (
+    nexus_indices_index_every_mb,
+    nexus_indices_index_every_kb,
+    store_latest_into,
+)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import (
     make_dictionary_of_class_definitions,
@@ -34,6 +39,7 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     OkValidator,
     FieldType,
+    DATASET_TYPE,
 )
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
@@ -304,7 +310,39 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 str(field["source"][()])
             )
         if schema == "f142":
-            pass
+            new_ui_field.streams_widget.type_combo.setCurrentText(field["type"][0])
+
+            if "array_size" in field.keys():
+                new_ui_field.streams_widget.array_radio.setChecked(True)
+                new_ui_field.streams_widget.scalar_radio.setChecked(False)
+                new_ui_field.streams_widget.array_size_spinbox.setValue(
+                    field["array_size"][()]
+                )
+            else:
+                new_ui_field.streams_widget.array_radio.setChecked(False)
+                new_ui_field.streams_widget.scalar_radio.setChecked(True)
+
+            if (
+                nexus_indices_index_every_kb in field.keys()
+                or nexus_indices_index_every_mb in field.keys()
+                or store_latest_into in field.keys()
+            ):
+                new_ui_field.streams_widget.f142_advanced_group_box.setEnabled(True)
+                new_ui_field.streams_widget.set_advanced_options_state()
+
+            if nexus_indices_index_every_mb in field.keys():
+                new_ui_field.streams_widget.f142_nexus_indices_index_every_mb_spinbox.setValue(
+                    field[nexus_indices_index_every_mb][()]
+                )
+            if nexus_indices_index_every_kb in field.keys():
+                new_ui_field.streams_widget.f142_nexus_indices_index_every_kb_spinbox.setValue(
+                    field[nexus_indices_index_every_kb][()]
+                )
+            if store_latest_into in field.keys():
+                new_ui_field.streams_widget.f142_nexus_store_latest_into_spinbox.setValue(
+                    field[store_latest_into][()]
+                )
+
         if schema == "ev42":
             pass
         # TODO: schema specific fields
