@@ -1,5 +1,3 @@
-from nexus_constructor.component import Component
-from nexus_constructor.transformations import Transformation
 from nexus_constructor.transformation_view import links_back_to_component
 from tests.helpers import create_nexus_wrapper, add_component_to_file
 from PySide2.QtGui import QVector3D
