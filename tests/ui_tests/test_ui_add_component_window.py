@@ -156,29 +156,6 @@ def create_add_component_dialog():
     return AddComponentDialog(instrument, component)
 
 
-def enter_file_path(
-    qtbot: pytestqt.qtbot.QtBot,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    file_path: str,
-    file_contents: str,
-):
-    """
-    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
-    geometry file.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param file_path: The desired file path.
-    :param file_contents: The file contents that are returned by the open mock.
-    """
-    with patch(
-        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
-    ):
-        with patch("builtins.open", mock_open(read_data=file_contents)):
-            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
-
-
 def enter_component_name(
     qtbot: pytestqt.qtbot.QtBot,
     template: PySide2.QtWidgets.QDialog,
@@ -1795,25 +1772,3 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
     ) as chopper_creator:
         dialog.on_ok()
         chopper_creator.assert_not_called()
-
-
-def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
-    qtbot, dialog, template
-):
-
-    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
-    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-
-    field.field_type_combo.setCurrentText(FieldType.link.value)
-    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
-
-    field_name = "testfield"
-    field_target = "/somewhere/"
-
-    field.field_name_edit.setText(field_name)
-    field.value_line_edit.setText(field_target)
-
-    assert field.dtype == h5py.SoftLink
-
-    assert field.name == field_name
-    assert field.value.path == h5py.SoftLink(field_target).path
