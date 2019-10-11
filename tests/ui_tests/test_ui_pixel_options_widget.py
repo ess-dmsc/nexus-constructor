@@ -9,7 +9,6 @@ from nexus_constructor.pixel_options import PixelOptions
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
-    RED_SPIN_BOX_STYLE_SHEET,
     WHITE_SPIN_BOX_STYLE_SHEET,
     VALID_CUBE_OFF_FILE,
     CORRECT_CUBE_FACES,
@@ -55,20 +54,20 @@ def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_si
     show_and_close_window(qtbot, template)
 
     # Check that the single grid button is checked and the pixel grid option is visible by default
-    assert pixel_options.singlePixelRadioButton.isChecked()
-    assert pixel_options.pixelOptionsStack.isVisible()
-    assert pixel_options.pixelOptionsStack.currentIndex() == 0
+    assert pixel_options.single_pixel_radio_button.isChecked()
+    assert pixel_options.pixel_options_stack.isVisible()
+    assert pixel_options.pixel_options_stack.currentIndex() == 0
 
 
 def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_mapping_becomes_visisble(
     qtbot, template, pixel_options
 ):
     # Press the entire shape button under pixel layout
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
     # Check that the pixel mapping items are visible
-    assert pixel_options.pixelOptionsStack.isVisible()
-    assert pixel_options.pixelOptionsStack.currentIndex() == 1
+    assert pixel_options.pixel_options_stack.isVisible()
+    assert pixel_options.pixel_options_stack.currentIndex() == 1
 
 
 def test_UI_GIVEN_user_selects_no_pixels_WHEN_changing_pixel_layout_THEN_pixel_options_stack_becomes_invisible(
@@ -76,10 +75,10 @@ def test_UI_GIVEN_user_selects_no_pixels_WHEN_changing_pixel_layout_THEN_pixel_o
 ):
 
     # Press the entire shape button under pixel layout
-    systematic_button_press(qtbot, template, pixel_options.noPixelsButton)
+    systematic_button_press(qtbot, template, pixel_options.no_pixels_button)
 
     # Check that the pixel mapping items are visible
-    assert not pixel_options.pixelOptionsStack.isVisible()
+    assert not pixel_options.pixel_options_stack.isVisible()
 
 
 def test_UI_GIVEN_user_selects_single_pixel_WHEN_changing_pixel_layout_THEN_pixel_grid_becomes_visible(
@@ -87,11 +86,11 @@ def test_UI_GIVEN_user_selects_single_pixel_WHEN_changing_pixel_layout_THEN_pixe
 ):
 
     # Single pixel is selected by default so switch to entire shape then switch back
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
-    systematic_button_press(qtbot, template, pixel_options.singlePixelRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
+    systematic_button_press(qtbot, template, pixel_options.single_pixel_radio_button)
 
-    assert pixel_options.pixelOptionsStack.isVisible()
-    assert pixel_options.pixelOptionsStack.currentIndex() == 0
+    assert pixel_options.pixel_options_stack.isVisible()
+    assert pixel_options.pixel_options_stack.currentIndex() == 0
 
 
 def test_UI_GIVEN_user_selects_pixel_grid_WHEN_changing_pixel_layout_THEN_pixel_grid_is_set_to_true_in_ok_validator(
@@ -99,7 +98,7 @@ def test_UI_GIVEN_user_selects_pixel_grid_WHEN_changing_pixel_layout_THEN_pixel_
 ):
 
     # Press the pixel grid button
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
     # Check that the pixel grid boolean has become true
     assert pixel_options.pixel_validator.pixel_grid_is_valid
@@ -111,7 +110,7 @@ def test_UI_GIVEN_user_selects_no_pixels_and_gives_valid_nonpixel_input_WHEN_cha
     qtbot, template, pixel_options
 ):
 
-    systematic_button_press(qtbot, template, pixel_options.noPixelsButton)
+    systematic_button_press(qtbot, template, pixel_options.no_pixels_button)
 
     # Check that the add component button is enabled
     assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
@@ -122,31 +121,16 @@ def test_UI_GIVEN_valid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_
 ):
 
     # Change the first ID
-    qtbot.keyClick(pixel_options.firstIDSpinBox, Qt.Key_Up)
-    qtbot.keyClick(pixel_options.firstIDSpinBox, Qt.Key_Up)
+    qtbot.keyClick(pixel_options.first_id_spin_box, Qt.Key_Up)
+    qtbot.keyClick(pixel_options.first_id_spin_box, Qt.Key_Up)
     show_and_close_window(qtbot, template)
 
     assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
 
     # Switch to pixel mapping
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
     assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, True]
-
-
-def test_UI_GIVEN_zero_for_both_row_and_column_count_WHEN_entering_pixel_grid_options_THEN_both_fields_become_red(
-    qtbot, template, pixel_options
-):
-
-    count_fields = [pixel_options.rowCountSpinBox, pixel_options.columnCountSpinBox]
-
-    # Enter zero in the count fields by pressing the down key
-    for field in count_fields:
-        qtbot.keyClick(field, Qt.Key_Down)
-
-    # Check that the background has turned red because the input in invalid
-    for field in count_fields:
-        assert field.styleSheet() == RED_SPIN_BOX_STYLE_SHEET
 
 
 def test_UI_GIVEN_invalid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_valid_pixel_mapping_causes_validity_to_change(
@@ -156,11 +140,11 @@ def test_UI_GIVEN_invalid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_t
     manually_create_pixel_mapping_list(pixel_options)
 
     # Make the pixel grid invalid
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.row_count_spin_box, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.column_count_spin_box, Qt.Key_Down)
 
     # Change to the pixel mapping layout
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
     manually_create_pixel_mapping_list(pixel_options)
 
@@ -176,11 +160,11 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
 ):
 
     # Make the pixel grid invalid
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.row_count_spin_box, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.column_count_spin_box, Qt.Key_Down)
 
     # Change to pixel mapping
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
     manually_create_pixel_mapping_list(pixel_options)
 
@@ -196,7 +180,7 @@ def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changin
 ):
 
     # Change to pixel mapping
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
     manually_create_pixel_mapping_list(pixel_options)
 
@@ -204,7 +188,7 @@ def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changin
     qtbot.keyClicks(pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "abc")
 
     # Switch to pixel grid
-    systematic_button_press(qtbot, template, pixel_options.singlePixelRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.single_pixel_radio_button)
 
     # Check that the test for unacceptable pixel states gives False
     assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
@@ -215,7 +199,7 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
 ):
 
     # Change to pixel mapping
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
     manually_create_pixel_mapping_list(pixel_options)
 
@@ -223,14 +207,14 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
     qtbot.keyClicks(pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
 
     # Change to pixel grid
-    systematic_button_press(qtbot, template, pixel_options.singlePixelRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.single_pixel_radio_button)
 
     # Make the pixel grid invalid
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.row_count_spin_box, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.column_count_spin_box, Qt.Key_Down)
 
     # Check that the test for unacceptable pixel states gives True
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [True, False]
+    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
 
 
 def test_UI_GIVEN_invalid_mapping_and_grid_WHEN_entering_pixel_options_THEN_changing_to_no_pixels_causes_validity_to_change(
@@ -238,18 +222,18 @@ def test_UI_GIVEN_invalid_mapping_and_grid_WHEN_entering_pixel_options_THEN_chan
 ):
 
     # Make the pixel grid invalid
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.row_count_spin_box, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.column_count_spin_box, Qt.Key_Down)
 
     # Change to pixel mapping
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     manually_create_pixel_mapping_list(pixel_options)
 
     # Give invalid input
     qtbot.keyClicks(pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "abc")
 
     # Change to no pixels
-    systematic_button_press(qtbot, template, pixel_options.noPixelsButton)
+    systematic_button_press(qtbot, template, pixel_options.no_pixels_button)
 
     # Check that the test for unacceptable pixel states gives false
     assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
@@ -260,17 +244,17 @@ def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_ha
 ):
 
     # Check that the pixel-related fields start out with the expected default values
-    assert pixel_options.rowCountSpinBox.value() == 1
-    assert pixel_options.columnCountSpinBox.value() == 1
-    assert pixel_options.rowHeightSpinBox.value() == 0.5
-    assert pixel_options.columnWidthSpinBox.value() == 0.5
-    assert pixel_options.firstIDSpinBox.value() == 0
+    assert pixel_options.row_count_spin_box.value() == 1
+    assert pixel_options.column_count_spin_box.value() == 1
+    assert pixel_options.row_height_spin_box.value() == 0.5
+    assert pixel_options.column_width_spin_box.value() == 0.5
+    assert pixel_options.first_id_spin_box.value() == 0
     assert (
-        pixel_options.startCountingComboBox.currentText()
+        pixel_options.start_counting_combo_box.currentText()
         == list(pixel_options.initial_count_corner.keys())[0]
     )
     assert (
-        pixel_options.countFirstComboBox.currentText()
+        pixel_options.count_first_combo_box.currentText()
         == list(pixel_options.count_direction.keys())[0]
     )
 
@@ -279,7 +263,10 @@ def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixe
     qtbot, template, pixel_options
 ):
 
-    count_fields = [pixel_options.rowCountSpinBox, pixel_options.columnCountSpinBox]
+    count_fields = [
+        pixel_options.row_count_spin_box,
+        pixel_options.column_count_spin_box,
+    ]
 
     # Set both spin boxes to zero
     for field in count_fields:
@@ -294,38 +281,16 @@ def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixe
         assert field.styleSheet() == WHITE_SPIN_BOX_STYLE_SHEET
 
 
-def test_UI_GIVEN_row_count_is_zero_WHEN_entering_pixel_grid_THEN_row_height_becomes_disabled(
-    qtbot, template, pixel_options
-):
-
-    # Enter zero in the row count field by pressing the down key
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-
-    # Check that the row height spin box is now disabled
-    assert not pixel_options.rowHeightSpinBox.isEnabled()
-
-
 def test_UI_GIVEN_row_count_is_not_zero_WHEN_entering_pixel_grid_THEN_row_height_becomes_enabled(
     qtbot, template, pixel_options
 ):
 
     # Make the row count go to zero and then back to one again
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Up)
+    qtbot.keyClick(pixel_options.row_count_spin_box, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.row_count_spin_box, Qt.Key_Up)
 
     # Check that the row height spin box is now enabled
-    assert pixel_options.rowHeightSpinBox.isEnabled()
-
-
-def test_UI_GIVEN_column_count_is_zero_WHEN_entering_pixel_grid_THEN_column_width_becomes_disabled(
-    qtbot, template, pixel_options
-):
-
-    # Enter zero in the column count field by pressing the down key
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
-
-    # Check that the column width spin box is now disabled
-    assert not pixel_options.columnWidthSpinBox.isEnabled()
+    assert pixel_options.row_height_spin_box.isEnabled()
 
 
 def test_UI_GIVEN_column_count_is_not_zero_WHEN_entering_pixel_grid_THEN_column_width_becomes_enabled(
@@ -333,30 +298,30 @@ def test_UI_GIVEN_column_count_is_not_zero_WHEN_entering_pixel_grid_THEN_column_
 ):
 
     # Make the column count go to zero and then back to one again
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Up)
+    qtbot.keyClick(pixel_options.column_count_spin_box, Qt.Key_Down)
+    qtbot.keyClick(pixel_options.column_count_spin_box, Qt.Key_Up)
 
     # Check that the column width spin box is now enabled
-    assert pixel_options.columnWidthSpinBox.isEnabled()
+    assert pixel_options.column_width_spin_box.isEnabled()
 
 
 def test_UI_GIVEN_user_provides_mesh_file_WHEN_entering_pixel_mapping_THEN_pixel_mapping_list_is_populated_with_correct_number_of_widgets(
     qtbot, template, pixel_options
 ):
 
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     manually_create_pixel_mapping_list(pixel_options)
-    assert pixel_options.pixelMappingListWidget.count() == CORRECT_CUBE_FACES
+    assert pixel_options.pixel_mapping_list_widget.count() == CORRECT_CUBE_FACES
 
 
 def test_UI_GIVEN_mesh_file_changes_WHEN_entering_pxixel_mapping_THEN_pixel_mapping_list_changes(
     qtbot, template, pixel_options
 ):
 
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     manually_create_pixel_mapping_list(pixel_options)
     manually_create_pixel_mapping_list(pixel_options, VALID_OCTA_OFF_FILE)
-    assert pixel_options.pixelMappingListWidget.count() == CORRECT_OCTA_FACES
+    assert pixel_options.pixel_mapping_list_widget.count() == CORRECT_OCTA_FACES
 
 
 def test_UI_GIVEN_cylinder_number_WHEN_entering_pixel_mapping_THEN_pixel_mapping_list_is_populated_with_correct_number_of_widgets(
@@ -364,9 +329,9 @@ def test_UI_GIVEN_cylinder_number_WHEN_entering_pixel_mapping_THEN_pixel_mapping
 ):
 
     cylinder_number = 6
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     pixel_options.populate_pixel_mapping_list_with_cylinder_number(cylinder_number)
-    assert pixel_options.pixelMappingListWidget.count() == cylinder_number
+    assert pixel_options.pixel_mapping_list_widget.count() == cylinder_number
 
 
 def test_UI_GIVEN_cylinder_number_changes_WHEN_entering_pixel_mapping_THEN_pixel_mapping_list_changes(
@@ -375,14 +340,14 @@ def test_UI_GIVEN_cylinder_number_changes_WHEN_entering_pixel_mapping_THEN_pixel
 
     first_cylinder_number = 6
     second_cylinder_number = first_cylinder_number - 1
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     pixel_options.populate_pixel_mapping_list_with_cylinder_number(
         first_cylinder_number
     )
     pixel_options.populate_pixel_mapping_list_with_cylinder_number(
         second_cylinder_number
     )
-    assert pixel_options.pixelMappingListWidget.count() == second_cylinder_number
+    assert pixel_options.pixel_mapping_list_widget.count() == second_cylinder_number
 
 
 def test_UI_GIVEN_user_switches_to_pixel_mapping_WHEN_creating_component_THEN_pixel_mapping_signal_is_emitted(
@@ -397,7 +362,7 @@ def test_UI_GIVEN_user_switches_to_pixel_mapping_WHEN_creating_component_THEN_pi
         emitted = not emitted
 
     pixel_options.pixel_mapping_button_pressed.connect(check_that_signal_is_emitted)
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     assert emitted
 
 
@@ -407,7 +372,7 @@ def test_UI_GIVEN_mesh_file_WHEN_generating_mapping_list_THEN_filename_returned_
 
     filename = "a/mesh/file.off"
 
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     manually_create_pixel_mapping_list(pixel_options, filename=filename)
 
     assert pixel_options.get_current_mapping_filename() == filename
@@ -420,7 +385,7 @@ def test_UI_GIVEN_user_opens_two_different_files_WHEN_creating_off_geometry_THEN
     first_filename = "a/mesh/file.off"
     second_filename = "a/different/mesh/file.off"
 
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     manually_create_pixel_mapping_list(pixel_options, filename=first_filename)
     manually_create_pixel_mapping_list(pixel_options, filename=second_filename)
 
@@ -431,7 +396,7 @@ def test_UI_GIVEN_user_switches_from_mesh_to_cylinder_WHEN_creating_cylindrical_
     qtbot, template, pixel_options
 ):
 
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     manually_create_pixel_mapping_list(pixel_options)
 
     pixel_options.populate_pixel_mapping_list_with_cylinder_number(12)
@@ -444,17 +409,17 @@ def test_UI_GIVEN_entire_shape_button_is_not_selected_WHEN_calling_pixel_mapping
 ):
 
     manually_create_pixel_mapping_list(pixel_options)
-    assert pixel_options.pixelMappingListWidget.count() == 0
+    assert pixel_options.pixel_mapping_list_widget.count() == 0
 
     pixel_options.populate_pixel_mapping_list_with_cylinder_number(4)
-    assert pixel_options.pixelMappingListWidget.count() == 0
+    assert pixel_options.pixel_mapping_list_widget.count() == 0
 
 
 def test_UI_GIVEN_mapping_list_provided_by_user_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_mapping_with_list_that_matches_user_input(
     qtbot, template, pixel_options
 ):
 
-    systematic_button_press(qtbot, template, pixel_options.entireShapeRadioButton)
+    systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
     num_faces = 6
     expected_id_list = [i if i % 2 != 0 else None for i in range(num_faces)]
     manually_create_pixel_mapping_list(pixel_options)
@@ -468,20 +433,9 @@ def test_UI_GIVEN_mapping_list_provided_by_user_WHEN_entering_pixel_data_THEN_ca
     assert pixel_options.generate_pixel_data().pixel_ids == expected_id_list
 
 
-def test_UI_GIVEN_row_or_column_count_of_zero_WHEN_creating_pixel_grid_THEN_pixel_grid_generated_by_widget_has_zero_for_value_of_matching_size_field(
-    qtbot, template, pixel_options
-):
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Down)
-    assert pixel_options.generate_pixel_data().row_height == 0
-
-    qtbot.keyClick(pixel_options.rowCountSpinBox, Qt.Key_Up)
-    qtbot.keyClick(pixel_options.columnCountSpinBox, Qt.Key_Down)
-    assert pixel_options.generate_pixel_data().col_width == 0
-
-
 def test_UI_GIVEN_no_pixels_button_is_pressed_WHEN_entering_pixel_data_THEN_calling_generate_pixel_data_returns_none(
     qtbot, template, pixel_options
 ):
 
-    systematic_button_press(qtbot, template, pixel_options.noPixelsButton)
+    systematic_button_press(qtbot, template, pixel_options.no_pixels_button)
     assert pixel_options.generate_pixel_data() is None

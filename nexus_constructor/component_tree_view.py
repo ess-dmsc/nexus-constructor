@@ -9,7 +9,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
-from nexus_constructor.component import Component, TransformationsList
+from nexus_constructor.component.component import Component, TransformationsList
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
 from PySide2.QtGui import QPixmap, QRegion, QPainter

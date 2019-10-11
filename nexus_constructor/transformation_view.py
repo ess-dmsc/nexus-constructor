@@ -1,3 +1,5 @@
+import logging
+
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
 from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
@@ -5,7 +7,7 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.component_tree_model import LinkTransformation
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 
 
 class EditTransformation(QGroupBox):
@@ -100,7 +102,6 @@ class EditTransformationLink(QFrame):
                 current_component.name, userData=current_component
             )
             last_index = self.link_frame.TransformationsComboBox.count() - 1
-
             if links_back_to_component(
                 self.link.parent.parent_component, current_component
             ):

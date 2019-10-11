@@ -1,3 +1,5 @@
+import logging
+
 import h5py
 from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar, Optional
@@ -31,12 +33,14 @@ def get_nx_class(group: h5py.Group) -> Optional[str]:
         return None
 
     nx_class = group.attrs["NX_class"]
+    return decode_bytes_string(nx_class)
 
+
+def decode_bytes_string(nexus_string):
     try:
-        nx_class = str(nx_class, encoding="utf-8")
+        return str(nexus_string, encoding="utf8")
     except TypeError:
-        pass
-    return nx_class
+        return nexus_string
 
 
 class NexusWrapper(QObject):
@@ -47,7 +51,8 @@ class NexusWrapper(QObject):
 
     # Signal that indicates the nexus file has been changed in some way
     file_changed = Signal("QVariant")
-    component_added = Signal(str, "QVariant")
+    file_opened = Signal("QVariant")
+    component_added = Signal(str, "QVariant", "QVariant")
     component_removed = Signal(str)
     show_entries_dialog = Signal("QVariant", "QVariant")
 
@@ -75,13 +80,13 @@ class NexusWrapper(QObject):
         :return: None
         """
         if filename:
-            print(filename)
+            logging.debug(filename)
             file = h5py.File(append_nxs_extension(filename), mode="x")
             try:
                 file.copy(source=self.nexus_file["/entry/"], dest="/entry/")
-                print("Saved to NeXus file")
+                logging.info("Saved to NeXus file")
             except ValueError as e:
-                print(f"File writing failed: {e}")
+                logging.error(f"File writing failed: {e}")
 
     def open_file(self, filename: str):
         """
@@ -91,9 +96,11 @@ class NexusWrapper(QObject):
         """
         if filename:
             nexus_file = h5py.File(
-                filename, mode="r", backing_store=False, driver="core"
+                filename, mode="r+", backing_store=False, driver="core"
             )
-            return self.find_entries_in_file(nexus_file)
+            entries = self.find_entries_in_file(nexus_file)
+            self.file_opened.emit(nexus_file)
+            return entries
 
     def find_entries_in_file(self, nexus_file: h5py.File):
         """
@@ -129,7 +136,7 @@ class NexusWrapper(QObject):
         self.instrument = self.get_instrument_group_from_entry(self.entry)
         self.nexus_file = nexus_file
 
-        print("NeXus file loaded")
+        logging.info("NeXus file loaded")
         self._emit_file()
 
     def rename_node(self, node: h5Node, new_name: str):
@@ -207,6 +214,10 @@ class NexusWrapper(QObject):
 
         if dtype == np.object:
             dtype = h5py.special_dtype(vlen=str)
+
+        if isinstance(value, h5py.Group):
+            value.copy(dest=group, source=value)
+            return group[name]
 
         if name in group:
             if dtype is None or group[name].dtype == dtype:

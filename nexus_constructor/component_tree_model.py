@@ -1,12 +1,14 @@
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
-from nexus_constructor.component import (
+from nexus_constructor.component.component import (
     Component,
     LinkTransformation,
     TransformationsList,
 )
 from nexus_constructor.transformations import Transformation
+import logging
+
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import generate_unique_name
 
@@ -230,7 +232,7 @@ class ComponentTreeModel(QAbstractItemModel):
         if not index.isValid():
             return QModelIndex()
         parent_item = index.internalPointer()
-        if type(parent_item) is Component:
+        if isinstance(parent_item, Component):
             return QModelIndex()
         elif type(parent_item) is TransformationsList:
             try:
@@ -240,7 +242,7 @@ class ComponentTreeModel(QAbstractItemModel):
                     parent_item.parent_component,
                 )
             except ValueError as e:
-                print(e)
+                logging.error(e)
         elif type(parent_item) is ComponentInfo:
             return self.createIndex(
                 self.components.index(parent_item.parent), 0, parent_item.parent
@@ -257,7 +259,7 @@ class ComponentTreeModel(QAbstractItemModel):
 
         parent_item = parent.internalPointer()
 
-        if type(parent_item) is Component:
+        if isinstance(parent_item, Component):
             return 2
         elif type(parent_item) is TransformationsList:
             if parent_item.has_link:

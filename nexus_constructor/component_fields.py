@@ -11,13 +11,15 @@ from PySide2.QtWidgets import (
     QListWidget,
     QMessageBox,
     QGridLayout,
+    QFormLayout,
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List
-from nexus_constructor.component import Component
+from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -27,6 +29,7 @@ from nexus_constructor.validators import (
     NameValidator,
     HDFLocationExistsValidator,
 )
+import numpy as np
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -73,10 +76,14 @@ class FieldWidget(QFrame):
         instrument: Instrument = None,
     ):
         super(FieldWidget, self).__init__(parent)
+
+        self.edit_dialog = QDialog(parent=self)
         self.instrument = instrument
-        self.edit_dialog = QDialog()
+
         self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
+
+        self.streams_widget = StreamFieldsWidget(self.edit_dialog)
 
         self.field_type_combo = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
@@ -176,9 +183,12 @@ class FieldWidget(QFrame):
                     name=str(uuid.uuid4()), driver="core", backing_store=False
                 ).create_dataset(name=self.name, dtype=dtype, data=val)
             return dtype(val)
-        elif self.field_type == FieldType.array_dataset:
-            return self.table_view.model.array
-        elif self.field_type == FieldType.link:
+        if self.field_type == FieldType.array_dataset:
+            # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
+            return np.squeeze(self.table_view.model.array)
+        if self.field_type == FieldType.kafka_stream:
+            return self.streams_widget.get_stream_group()
+        if self.field_type == FieldType.link:
             return h5py.SoftLink(self.value_line_edit.text())
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
@@ -252,8 +262,8 @@ class FieldWidget(QFrame):
                 f"Edit {self.value_type_combo.currentText()} Array field"
             )
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
-            # TODO: show kafka stream panel
-            pass
+            self.edit_dialog.setLayout(QFormLayout())
+            self.edit_dialog.layout().addWidget(self.streams_widget)
         elif self.field_type_combo.currentText() == FieldType.nx_class.value:
             # TODO: show nx class panels
             pass
