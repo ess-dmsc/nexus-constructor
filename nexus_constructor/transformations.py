@@ -168,7 +168,7 @@ class Transformation:
                 )
 
     def get_dependents(self):
-        import nexus_constructor.component as comp
+        import nexus_constructor.component.component as comp
 
         if "dependee_of" in self.dataset.attrs.keys():
             return_dependents = []

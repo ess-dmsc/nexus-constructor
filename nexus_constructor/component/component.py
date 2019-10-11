@@ -35,10 +35,6 @@ from nexus_constructor.component.component_shape import (
 )
 import numpy as np
 
-SHAPE_GROUP_NAME = "shape"
-PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
-CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
-OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"
 DEPENDS_ON_STR = "depends_on"
 LINK_STR = "has_link"
 
