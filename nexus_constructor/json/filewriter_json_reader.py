@@ -30,6 +30,23 @@ def _add_to_nexus(children: List[dict], current_group: h5py.Group):
             _add_group(child, current_group)
         if child["type"] == "dataset":
             _add_dataset(child, current_group)
+        if child["type"] == "stream":
+            _add_stream(child, current_group)
+
+
+def _add_stream(json_object: dict, current_group: h5py.Group):
+    stream_group = current_group.create_group(json_object["stream"]["source"])
+    stream_group.attrs["NX_class"] = "NCstream"
+    add_datasets(json_object["stream"], stream_group)
+
+
+def add_datasets(json_object, stream_group):
+    for field_name, field_value in json_object.items():
+        if isinstance(field_value, dict):
+            new_group = stream_group.create_group(field_name)
+            add_datasets(field_value, new_group)
+        else:
+            stream_group.create_dataset(name=field_name, data=field_value)
 
 
 def _add_dataset(json_object: dict, current_group: h5py.Group):
