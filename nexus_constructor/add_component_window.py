@@ -25,6 +25,12 @@ from nexus_constructor.stream_advanced_options import (
     NEXUS_INDICES_INDEX_EVERY_MB,
     NEXUS_INDICES_INDEX_EVERY_KB,
     STORE_LATEST_INTO,
+    NEXUS_BUFFER_PACKET_MAX_KB,
+    NEXUS_BUFFER_SIZE_KB,
+    NEXUS_BUFFER_SIZE_MB,
+    NEXUS_CHUNK_CHUNK_KB,
+    NEXUS_CHUNK_CHUNK_MB,
+    ADC_PULSE_DEBUG,
 )
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import (
@@ -315,9 +321,57 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if schema == "ev42":
             self.__fill_in_existing_ev42_fields(field, new_ui_field)
 
-    def __file_in_existing_ev42_fields(self, field, new_ui_field):
-        # TODO: ev42 fields
-        pass
+    def __fill_in_existing_ev42_fields(self, field, new_ui_field):
+        if (
+            any(
+                [
+                    ADC_PULSE_DEBUG,
+                    NEXUS_INDICES_INDEX_EVERY_MB,
+                    NEXUS_INDICES_INDEX_EVERY_KB,
+                    NEXUS_CHUNK_CHUNK_MB,
+                    NEXUS_CHUNK_CHUNK_KB,
+                    NEXUS_BUFFER_SIZE_MB,
+                    NEXUS_BUFFER_SIZE_KB,
+                    NEXUS_BUFFER_PACKET_MAX_KB,
+                ]
+            )
+            in field.keys()
+        ):
+            new_ui_field.streams_widget.ev42_advanced_group_box.setEnabled(True)
+            new_ui_field.streams_widget.set_advanced_options_state()
+
+        if ADC_PULSE_DEBUG in field.keys():
+            new_ui_field.streams_widget.ev42_adc_pulse_debug_checkbox.setChecked(
+                bool(field[ADC_PULSE_DEBUG][()])
+            )
+        if NEXUS_INDICES_INDEX_EVERY_MB in field.keys():
+            new_ui_field.streams_widget.ev42_nexus_indices_index_every_mb_spinbox.setValue(
+                field[NEXUS_INDICES_INDEX_EVERY_MB][()]
+            )
+        if NEXUS_INDICES_INDEX_EVERY_KB in field.keys():
+            new_ui_field.streams_widget.ev42_nexus_indices_index_every_kb_spinbox.setValue(
+                field[NEXUS_INDICES_INDEX_EVERY_KB][()]
+            )
+        if NEXUS_CHUNK_CHUNK_MB in field.keys():
+            new_ui_field.streams_widget.ev42_nexus_chunk_chunk_mb_spinbox.setValue(
+                field[NEXUS_CHUNK_CHUNK_MB][()]
+            )
+        if NEXUS_CHUNK_CHUNK_KB in field.keys():
+            new_ui_field.streams_widget.ev42_nexus_chunk_chunk_kb_spinbox.setValue(
+                field[NEXUS_CHUNK_CHUNK_KB][()]
+            )
+        if NEXUS_BUFFER_SIZE_MB in field.keys():
+            new_ui_field.streams_widget.ev42_nexus_buffer_size_mb_spinbox.setValue(
+                field[NEXUS_BUFFER_SIZE_MB][()]
+            )
+        if NEXUS_BUFFER_SIZE_KB in field.keys():
+            new_ui_field.streams_widget.ev42_nexus_buffer_size_kb_spinbox.setValue(
+                field[NEXUS_BUFFER_SIZE_KB][()]
+            )
+        if NEXUS_BUFFER_PACKET_MAX_KB in field.keys():
+            new_ui_field.streams_widget.ev42_nexus_buffer_packet_max_kb_spinbox.setValue(
+                field[NEXUS_BUFFER_PACKET_MAX_KB][()]
+            )
 
     def __fill_in_existing_f142_fields(self, field, new_ui_field):
         new_ui_field.streams_widget.type_combo.setCurrentText(field["type"][0])
