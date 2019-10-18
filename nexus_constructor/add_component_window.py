@@ -310,42 +310,45 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 str(field["source"][()])
             )
         if schema == "f142":
-            new_ui_field.streams_widget.type_combo.setCurrentText(field["type"][0])
-
-            if "array_size" in field.keys():
-                new_ui_field.streams_widget.array_radio.setChecked(True)
-                new_ui_field.streams_widget.scalar_radio.setChecked(False)
-                new_ui_field.streams_widget.array_size_spinbox.setValue(
-                    field["array_size"][()]
-                )
-            else:
-                new_ui_field.streams_widget.array_radio.setChecked(False)
-                new_ui_field.streams_widget.scalar_radio.setChecked(True)
-
-            if (
-                NEXUS_INDICES_INDEX_EVERY_KB in field.keys()
-                or NEXUS_INDICES_INDEX_EVERY_MB in field.keys()
-                or STORE_LATEST_INTO in field.keys()
-            ):
-                new_ui_field.streams_widget.f142_advanced_group_box.setEnabled(True)
-                new_ui_field.streams_widget.set_advanced_options_state()
-
-            if NEXUS_INDICES_INDEX_EVERY_MB in field.keys():
-                new_ui_field.streams_widget.f142_nexus_indices_index_every_mb_spinbox.setValue(
-                    field[NEXUS_INDICES_INDEX_EVERY_MB][()]
-                )
-            if NEXUS_INDICES_INDEX_EVERY_KB in field.keys():
-                new_ui_field.streams_widget.f142_nexus_indices_index_every_kb_spinbox.setValue(
-                    field[NEXUS_INDICES_INDEX_EVERY_KB][()]
-                )
-            if STORE_LATEST_INTO in field.keys():
-                new_ui_field.streams_widget.f142_nexus_store_latest_into_spinbox.setValue(
-                    field[STORE_LATEST_INTO][()]
-                )
+            self.__fill_in_existing_f142_fields(field, new_ui_field)
 
         if schema == "ev42":
-            # TODO: ev42 specific fields
-            pass
+            self.__fill_in_existing_ev42_fields(field, new_ui_field)
+
+    def __file_in_existing_ev42_fields(self, field, new_ui_field):
+        # TODO: ev42 fields
+        pass
+
+    def __fill_in_existing_f142_fields(self, field, new_ui_field):
+        new_ui_field.streams_widget.type_combo.setCurrentText(field["type"][0])
+        if "array_size" in field.keys():
+            new_ui_field.streams_widget.array_radio.setChecked(True)
+            new_ui_field.streams_widget.scalar_radio.setChecked(False)
+            new_ui_field.streams_widget.array_size_spinbox.setValue(
+                field["array_size"][()]
+            )
+        else:
+            new_ui_field.streams_widget.array_radio.setChecked(False)
+            new_ui_field.streams_widget.scalar_radio.setChecked(True)
+        if (
+            NEXUS_INDICES_INDEX_EVERY_KB in field.keys()
+            or NEXUS_INDICES_INDEX_EVERY_MB in field.keys()
+            or STORE_LATEST_INTO in field.keys()
+        ):
+            new_ui_field.streams_widget.f142_advanced_group_box.setEnabled(True)
+            new_ui_field.streams_widget.set_advanced_options_state()
+        if NEXUS_INDICES_INDEX_EVERY_MB in field.keys():
+            new_ui_field.streams_widget.f142_nexus_indices_index_every_mb_spinbox.setValue(
+                field[NEXUS_INDICES_INDEX_EVERY_MB][()]
+            )
+        if NEXUS_INDICES_INDEX_EVERY_KB in field.keys():
+            new_ui_field.streams_widget.f142_nexus_indices_index_every_kb_spinbox.setValue(
+                field[NEXUS_INDICES_INDEX_EVERY_KB][()]
+            )
+        if STORE_LATEST_INTO in field.keys():
+            new_ui_field.streams_widget.f142_nexus_store_latest_into_spinbox.setValue(
+                field[STORE_LATEST_INTO][()]
+            )
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
