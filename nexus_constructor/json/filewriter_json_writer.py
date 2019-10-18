@@ -27,7 +27,7 @@ def generate_json(
         streams = {}
 
     converter = NexusToDictConverter()
-    tree = converter.convert(data.nexus.entry, streams, links)
+    tree = converter.convert(data.nexus.nexus_file, streams, links)
     write_command, stop_command = create_writer_commands(tree, nexus_file_name)
     object_to_json_file(write_command, file)
 
