@@ -15,6 +15,7 @@ from PySide2.QtWidgets import (
 from nexus_constructor.ui_utils import validate_line_edit
 
 TIME_FORMAT = "yyyy MM dd hh:mm:ss"
+HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 
 
 class FilewriterCommandDialog(QDialog):
@@ -35,7 +36,7 @@ class FilewriterCommandDialog(QDialog):
         self.ok_button.clicked.connect(self.close)
 
         self.broker_line_edit = QLineEdit()
-        self.broker_line_edit.setPlaceholderText("(broker:port/topic)")
+        self.broker_line_edit.setPlaceholderText("(broker:port)")
 
         self.validate(False)
 
@@ -75,7 +76,7 @@ class FilewriterCommandDialog(QDialog):
         validate_line_edit(
             self.nexus_file_name_edit,
             is_valid,
-            tooltip_on_reject="Invalid NeXus file name",
+            tooltip_on_reject=f"Invalid NeXus file name - Should end with {HDF_FILE_EXTENSIONS}",
         )
 
     def state_changed(self, is_start_time: bool, state: Qt.CheckState):
@@ -123,7 +124,7 @@ class CommandDialogOKButtonValidator(QValidator):
         self.dialog = dialog
 
     def validate(self, input: str, pos: int) -> QValidator.State:
-        if not input or not input.endswith("nxs"):
+        if not input or not input.endswith(HDF_FILE_EXTENSIONS):
             self.is_valid.emit(False)
             return QValidator.Intermediate
 
