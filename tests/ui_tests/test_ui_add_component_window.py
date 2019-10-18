@@ -1660,14 +1660,16 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_
     assert streams_widget.array_size_spinbox.isVisible()
 
 
-def test_UI_GIVEN_initial_component_THEN_webbrowser_url_is_correct(qtbot):
+def test_UI_GIVEN_initial_component_THEN_webbrowser_url_contains_component_class(qtbot):
     dialog, template = create_add_component_template(qtbot)
 
     current_nx_class = dialog.componentTypeComboBox.currentText()
     assert current_nx_class in dialog.webEngineView.url().toString()
 
 
-def test_UI_GIVEN_change_of_component_type_THEN_webbrowser_url_is_updated(qtbot):
+def test_UI_GIVEN_change_of_component_type_THEN_webbrowser_url_is_updated_and_contains_component_class(
+    qtbot
+):
     dialog, template = create_add_component_template(qtbot)
     current_nx_class = dialog.componentTypeComboBox.currentText()
 
