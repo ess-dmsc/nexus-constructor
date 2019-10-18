@@ -422,13 +422,6 @@ def test_GIVEN_complete_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_req
     assert nexus_defined_chopper_checker.required_fields_present()
 
 
-def test_GIVEN_nexus_disk_chopper_with_no_name_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[NAME]
-    assert not nexus_defined_chopper_checker.required_fields_present()
-
-
 def test_GIVEN_nexus_disk_chopper_with_no_slits_value_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
     nexus_defined_chopper_checker
 ):
