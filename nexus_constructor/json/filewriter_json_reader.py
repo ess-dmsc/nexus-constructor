@@ -85,10 +85,7 @@ def json_to_nexus(json_input: str) -> h5py.File:
     json_data = json.loads(json_input)
     nexus_file = _create_in_memory_file("json_to_nexus")
 
-    try:
-        nexus_structure = json_data["nexus_structure"]
-        _add_to_nexus(nexus_structure["children"], nexus_file)
-    except:
-        raise Exception("Error trying to parse nexus_structure")
+    nexus_structure = json_data["nexus_structure"]
+    _add_to_nexus(nexus_structure["children"], nexus_file)
 
     return nexus_file

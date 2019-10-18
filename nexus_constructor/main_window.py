@@ -26,6 +26,7 @@ from nexus_constructor.component_tree_view import (
     LinkTransformation,
 )
 from nexus_constructor.json import filewriter_json_writer
+from nexus_constructor.json.filewriter_json_reader import json_to_nexus
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
@@ -41,6 +42,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         self.export_to_nexus_file_action.triggered.connect(self.save_to_nexus_file)
         self.open_nexus_file_action.triggered.connect(self.open_nexus_file)
+        self.open_json_file_action.triggered.connect(self.open_json_file)
         self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_filewriter_json
         )
@@ -339,7 +341,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     )
 
     def save_to_forwarder_json(self):
-
         filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
         if filename:
             provider_type, ok_pressed = QInputDialog.getItem(
@@ -362,6 +363,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
         if self.instrument.nexus.open_file(filename):
             self._update_views()
+
+    def open_json_file(self):
+        filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
+        with open(filename, "r") as json_file:
+            json_data = json_file.read()
+            nexus_file = json_to_nexus(json_data)
+            if self.instrument.nexus.load_nexus_file(nexus_file):
+                self._update_views()
 
     def _update_views(self):
         self.sceneWidget.clear_all_components()
