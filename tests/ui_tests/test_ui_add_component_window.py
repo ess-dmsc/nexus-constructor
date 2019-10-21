@@ -1338,6 +1338,143 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
             assert dialog.cylinderOptionsBox.isEnabled()
 
 
+def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_scalar_field"))
+    model = ComponentTreeModel(instrument)
+    component_name = "chopper1"
+    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+
+    field_name = "scalar"
+    field_value = "test"
+    component.set_field(field_name, field_value, dtype=h5py.special_dtype(vlen=str))
+
+    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog.pixel_options = Mock(spec=PixelOptions)
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.fieldsListWidget.model().hasIndex(0, 0)
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    assert widget.field_type_combo.currentText().lower() == "scalar dataset"
+
+    assert widget.name == field_name
+    assert widget.value[()] == field_value
+
+
+def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_array_field"))
+    model = ComponentTreeModel(instrument)
+    component_name = "chopper1"
+    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+
+    field_name = "array"
+    field_value = np.array([1, 2, 3, 4, 5])
+    component.set_field(field_name, field_value)
+    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog.pixel_options = Mock(spec=PixelOptions)
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    assert dialog.fieldsListWidget.model().hasIndex(0, 0)
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    assert widget.field_type_combo.currentText().lower() == "array dataset"
+    assert widget.name == field_name
+    assert np.array_equal(widget.value, field_value)
+
+
+def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_multiple_fields"))
+    model = ComponentTreeModel(instrument)
+    component_name = "chopper1"
+    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+
+    field_name1 = "array"
+    field_value1 = np.array([1, 2, 3, 4, 5])
+    component.set_field(field_name1, field_value1)
+
+    field_name2 = "scalar"
+    field_value2 = 1
+    component.set_field(field_name2, field_value2)
+
+    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog.pixel_options = Mock(spec=PixelOptions)
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    assert widget.field_type_combo.currentText().lower() == "array dataset"
+    assert widget.name == field_name1
+    assert np.array_equal(widget.value, field_value1)
+
+    widget2 = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(1))
+    assert widget2.field_type_combo.currentText().lower() == "scalar dataset"
+    assert widget2.name == field_name2
+    assert widget2.value == field_value2
+
+
+def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
+    qtbot
+):
+    instrument = Instrument(NexusWrapper("test_component_editing_f142_stream_field"))
+    model = ComponentTreeModel(instrument)
+    component_name = "chopper1"
+    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+
+    field_name = "stream1"
+
+    file = h5py.File("temp", driver="core", backing_store=False)
+    stream_group = file.create_group(name=field_name)
+    stream_group.attrs["NX_class"] = "NCstream"
+
+    topic = "topic1"
+    pvname = "source1"
+    pvtype = "double"
+
+    stream_group.create_dataset(
+        "writer_module", dtype=h5py.special_dtype(vlen=str), data="f142"
+    )
+    stream_group.create_dataset("topic", dtype=h5py.special_dtype(vlen=str), data=topic)
+    stream_group.create_dataset(
+        "source", dtype=h5py.special_dtype(vlen=str), data=pvname
+    )
+    stream_group.create_dataset("type", dtype=h5py.special_dtype(vlen=str), data=pvtype)
+
+    field_name1 = "stream1"
+    component.set_field(field_name1, stream_group)
+
+    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog.pixel_options = Mock(spec=PixelOptions)
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    assert widget.name == field_name
+
+    stream_group = widget.value
+    assert stream_group["topic"][()] == topic
+    assert stream_group["source"][()] == pvname
+    assert stream_group["type"][()] == pvtype
+
+    assert widget.streams_widget.topic_line_edit.text() == topic
+    assert widget.streams_widget.schema_combo.currentText() == "f142"
+    assert widget.streams_widget.source_line_edit.text() == pvname
+    assert widget.streams_widget.type_combo.currentText() == pvtype
+
+
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
     qtbot
 ):
