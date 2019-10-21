@@ -1389,12 +1389,14 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
     assert widget.name == field_name
     assert np.array_equal(widget.value, field_value)
 
-def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_target(qtbot):
+
+def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_target(
+    qtbot
+):
     instrument = Instrument(NexusWrapper("test_component_editing_link_field"))
     model = ComponentTreeModel(instrument)
     component_name = "chopper1"
     component = instrument.create_component(component_name, "NXdisk_chopper", "")
-
 
     file = h5py.File("temp", driver="core", backing_store=False)
     entry = file.create_group(name="entry")
@@ -1415,6 +1417,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
     assert widget.field_type_combo.currentText().lower() == "link"
     assert widget.name == link_name
     assert widget.value.path == entry.name
+
 
 def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
     qtbot
