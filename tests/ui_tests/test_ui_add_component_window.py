@@ -1389,6 +1389,32 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
     assert widget.name == field_name
     assert np.array_equal(widget.value, field_value)
 
+def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_target(qtbot):
+    instrument = Instrument(NexusWrapper("test_component_editing_link_field"))
+    model = ComponentTreeModel(instrument)
+    component_name = "chopper1"
+    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+
+
+    file = h5py.File("temp", driver="core", backing_store=False)
+    entry = file.create_group(name="entry")
+
+    link_name = "link1"
+    link = h5py.SoftLink(entry.name)
+
+    component.set_field(link_name, link)
+
+    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog.pixel_options = Mock(spec=PixelOptions)
+    template = QDialog()
+    template.ui = dialog
+    template.ui.setupUi(template)
+    qtbot.addWidget(template)
+
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    assert widget.field_type_combo.currentText().lower() == "link"
+    assert widget.name == link_name
+    assert widget.value.path == entry.name
 
 def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
     qtbot
