@@ -44,11 +44,13 @@ UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
-
+DEFINITIONS_DIR = os.path.join(os.getcwd(), "definitions")
 
 instrument = Instrument(NexusWrapper("pixels"))
 component = ComponentTreeModel(instrument)
-add_component_dialog = AddComponentDialog(instrument, component)
+add_component_dialog = AddComponentDialog(
+    instrument, component, definitions_dir=DEFINITIONS_DIR
+)
 
 PIXEL_OPTIONS = dict()
 NO_PIXEL_OPTIONS = dict()
@@ -167,7 +169,7 @@ def create_add_component_dialog():
     instrument = Instrument(NexusWrapper(nexus_name))
     component = ComponentTreeModel(instrument)
     nexus_wrapper_count += 1
-    return AddComponentDialog(instrument, component)
+    return AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
 
 
 def enter_component_name(
@@ -1271,7 +1273,11 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument, component_model, component_to_edit=component, parent=None
+                instrument,
+                component_model,
+                component_to_edit=component,
+                definitions_dir=DEFINITIONS_DIR,
+                parent=None,
             )
             template = QDialog()
             template.ui = dialog
@@ -1299,7 +1305,11 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument, component_model, component_to_edit=component, parent=None
+                instrument,
+                component_model,
+                component_to_edit=component,
+                definitions_dir=DEFINITIONS_DIR,
+                parent=None,
             )
             template = QDialog()
             template.ui = dialog
@@ -1326,7 +1336,10 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument, component_model, component_to_edit=component
+                instrument,
+                component_model,
+                component_to_edit=component,
+                definitions_dir=DEFINITIONS_DIR,
             )
             dialog.pixel_options = Mock(spec=PixelOptions)
             template = QDialog()
@@ -1361,7 +1374,10 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
     )
 
     dialog = AddComponentDialog(
-        instrument, component_model, component_to_edit=component
+        instrument,
+        component_model,
+        component_to_edit=component,
+        definitions_dir=DEFINITIONS_DIR,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
@@ -1399,7 +1415,10 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data
     )
 
     dialog = AddComponentDialog(
-        instrument, component_model, component_to_edit=component
+        instrument,
+        component_model,
+        component_to_edit=component,
+        definitions_dir=DEFINITIONS_DIR,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
