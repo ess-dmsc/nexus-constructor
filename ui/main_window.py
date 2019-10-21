@@ -117,7 +117,7 @@ class Ui_MainWindow(object):
         )
         self.open_json_file_action.setText(
             QtWidgets.QApplication.translate(
-                "MainWindow", "Open File Writer JSON file", None, -1
+                "MainWindow", "Open Filewriter JSON file", None, -1
             )
         )
         self.export_to_nexus_file_action.setText(
