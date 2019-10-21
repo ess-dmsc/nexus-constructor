@@ -70,11 +70,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.delete_component
         )
 
-        self.set_up_warning_window()
-
         self.widget.setVisible(True)
 
         self._set_up_tree_view()
+        self.set_up_warning_window()
 
     def _set_up_tree_view(self):
         self._set_up_component_model()
