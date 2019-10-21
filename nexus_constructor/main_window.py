@@ -37,7 +37,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def __init__(self, instrument: Instrument):
         super().__init__()
         self.instrument = instrument
-        self.definitions_dir = os.path.join(os.getcwd(), "definitions")
+        self.definitions_dir = os.path.abspath(os.path.join(os.getcwd(), "definitions"))
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
