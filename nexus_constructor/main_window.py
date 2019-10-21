@@ -1,5 +1,3 @@
-import logging
-
 from PySide2.QtWidgets import (
     QAction,
     QToolBar,
@@ -298,11 +296,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         Sets up the warning dialog that is shown when the definitions submodule has not been cloned.
         :return:
         """
-        logging.info(f"current dir: {os.getcwd()}")
-        logging.info(f"definitions dir: {self.definitions_dir}")
-        logging.info("definitions dir exists") if os.path.exists(
-            self.definitions_dir
-        ) else None
 
         # Will contain .git even if missing so check that it does not contain just that file.
         if (
