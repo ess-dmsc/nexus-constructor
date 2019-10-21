@@ -37,6 +37,7 @@ import numpy as np
 
 DEPENDS_ON_STR = "depends_on"
 LINK_STR = "has_link"
+TRANSFORM_STR = "/transformations/"
 
 
 class DependencyError(Exception):
@@ -90,14 +91,14 @@ class TransformationsList(list):
             if (
                 len(self.parent_component.transforms) == 0
                 and self.parent_component.depends_on is not None
-                and "/transformations/"
+                and TRANSFORM_STR
                 in self.parent_component.depends_on.absolute_path
             ):
                 has_link_value = True
             for elem in self.parent_component.transforms:
                 if (
-                    "/transformations/" in elem.depends_on.absolute_path
-                    and (self.parent_component.absolute_path + "/transformations/")
+                    TRANSFORM_STR in elem.depends_on.absolute_path
+                    and (self.parent_component.absolute_path + TRANSFORM_STR)
                     not in elem.depends_on.absolute_path
                 ):
                     has_link_value = True
@@ -125,13 +126,13 @@ class LinkTransformation:
             return None
         if (
             self.parent.parent_component.depends_on is not None
-            and "/transformations/"
+            and TRANSFORM_STR
             in self.parent.parent_component.depends_on.absolute_path
             and len(self.parent.parent_component.transforms) == 0
         ):
             component_path = self.parent.parent_component.depends_on.absolute_path[
                 : self.parent.parent_component.depends_on.absolute_path.find(
-                    "/transformations/"
+                    TRANSFORM_STR
                 )
             ]
             return Component(
@@ -140,12 +141,12 @@ class LinkTransformation:
             )
         for elem in self.parent:
             if (
-                "/transformations/" in elem.depends_on.absolute_path
-                and (self.parent.parent_component.absolute_path + "/transformations/")
+                TRANSFORM_STR in elem.depends_on.absolute_path
+                and (self.parent.parent_component.absolute_path + TRANSFORM_STR)
                 not in elem.depends_on.absolute_path
             ):
                 component_path = elem.depends_on.absolute_path[
-                    : elem.depends_on.absolute_path.find("/transformations/")
+                    : elem.depends_on.absolute_path.find(TRANSFORM_STR)
                 ]
                 return Component(
                     self.parent.parent_component.file,
@@ -162,7 +163,7 @@ class LinkTransformation:
         else:
             for c_transform in parent_component.transforms:
                 if (
-                    parent_component.absolute_path + "/transformations/"
+                    parent_component.absolute_path + TRANSFORM_STR
                     not in c_transform.depends_on.absolute_path
                 ):
                     target = c_transform
