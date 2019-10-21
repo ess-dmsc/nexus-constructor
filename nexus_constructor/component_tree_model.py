@@ -1,11 +1,10 @@
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
-from nexus_constructor.component.component import (
-    Component,
-    LinkTransformation,
-    TransformationsList,
-)
+from nexus_constructor.component.component import Component
+from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.component.link_transformation import LinkTransformation
+
 from nexus_constructor.transformations import Transformation
 import logging
 
@@ -186,12 +185,15 @@ class ComponentTreeModel(QAbstractItemModel):
         transformation_list.insert(target_pos, new_transformation)
         self.endInsertRows()
         parent_component.depends_on = transformation_list[0]
+        linked_component = None
+        if transformation_list.has_link:
+            linked_component = transformation_list.link.linked_component
         for i in range(len(transformation_list) - 1):
             transformation_list[i].depends_on = transformation_list[i + 1]
         if transformation_list.has_link:
-            transformation_list[
-                -1
-            ].depends_on = transformation_list.link.linked_component.transforms[0]
+            transformation_list.link.linked_component = linked_component
+            if linked_component is not None:
+                transformation_list[-1].depends_on = transformation_list.link.linked_component.transforms[0]
 
     def add_translation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, "translation")

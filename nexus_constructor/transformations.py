@@ -186,15 +186,15 @@ class Transformation:
             return return_dependents
 
     def remove_from_dependee_chain(self):
-        dependees = self.get_dependents()
+        all_dependees = self.get_dependents()
         new_depends_on = self.depends_on
         if self.depends_on.absolute_path == "/":
             new_depends_on = None
         else:
-            for elem in dependees:
-                if isinstance(elem, Transformation):
-                    new_depends_on.register_dependent(elem)
-        for elem in dependees:
-            elem.depends_on = new_depends_on
-            self.deregister_dependent(elem)
+            for dependee in all_dependees:
+                if isinstance(dependee, Transformation):
+                    new_depends_on.register_dependent(dependee)
+        for dependee in all_dependees:
+            dependee.depends_on = new_depends_on
+            self.deregister_dependent(dependee)
         self.depends_on = None

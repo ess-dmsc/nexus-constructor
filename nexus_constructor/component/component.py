@@ -3,6 +3,7 @@ from typing import Any, List, Optional, Union, Tuple
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.component.pixel_shape import PixelShape
+from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
@@ -36,9 +37,6 @@ from nexus_constructor.component.component_shape import (
 import numpy as np
 
 DEPENDS_ON_STR = "depends_on"
-LINK_STR = "has_link"
-TRANSFORM_STR = "/transformations/"
-
 
 class DependencyError(Exception):
     """
@@ -73,106 +71,6 @@ def _transforms_are_equivalent(
     transform_1: Transformation, transform_2: Transformation
 ):
     return transform_1.absolute_path == transform_2.absolute_path
-
-
-class TransformationsList(list):
-    def __init__(self, parent):
-        super().__init__()
-        self.parent_component = parent
-        self.link = LinkTransformation(self)
-
-    @property
-    def has_link(self):
-        has_link_value = self.parent_component.file.get_attribute_value(
-            self.parent_component.group, LINK_STR
-        )
-        if has_link_value is None:
-            has_link_value = False
-            if (
-                len(self.parent_component.transforms) == 0
-                and self.parent_component.depends_on is not None
-                and TRANSFORM_STR
-                in self.parent_component.depends_on.absolute_path
-            ):
-                has_link_value = True
-            for elem in self.parent_component.transforms:
-                if (
-                    TRANSFORM_STR in elem.depends_on.absolute_path
-                    and (self.parent_component.absolute_path + TRANSFORM_STR)
-                    not in elem.depends_on.absolute_path
-                ):
-                    has_link_value = True
-                    break
-            self.parent_component.file.set_attribute_value(
-                self.parent_component.group, LINK_STR, has_link_value
-            )
-        return bool(has_link_value)
-
-    @has_link.setter
-    def has_link(self, value: bool):
-        self.parent_component.file.set_attribute_value(
-            self.parent_component.group, LINK_STR, value
-        )
-
-
-class LinkTransformation:
-    def __init__(self, parent: TransformationsList):
-        super().__init__()
-        self.parent = parent
-
-    @property
-    def linked_component(self):
-        if not self.parent.has_link:
-            return None
-        if (
-            self.parent.parent_component.depends_on is not None
-            and TRANSFORM_STR
-            in self.parent.parent_component.depends_on.absolute_path
-            and len(self.parent.parent_component.transforms) == 0
-        ):
-            component_path = self.parent.parent_component.depends_on.absolute_path[
-                : self.parent.parent_component.depends_on.absolute_path.find(
-                    TRANSFORM_STR
-                )
-            ]
-            return Component(
-                self.parent.parent_component.file,
-                self.parent.parent_component.file.nexus_file[component_path],
-            )
-        for elem in self.parent:
-            if (
-                TRANSFORM_STR in elem.depends_on.absolute_path
-                and (self.parent.parent_component.absolute_path + TRANSFORM_STR)
-                not in elem.depends_on.absolute_path
-            ):
-                component_path = elem.depends_on.absolute_path[
-                    : elem.depends_on.absolute_path.find(TRANSFORM_STR)
-                ]
-                return Component(
-                    self.parent.parent_component.file,
-                    self.parent.parent_component.file.nexus_file[component_path],
-                )
-        return None
-
-    @linked_component.setter
-    def linked_component(self, value):
-        parent_component = self.parent.parent_component
-        target = None
-        if len(parent_component.transforms) == 0:
-            target = parent_component
-        else:
-            for c_transform in parent_component.transforms:
-                if (
-                    parent_component.absolute_path + TRANSFORM_STR
-                    not in c_transform.depends_on.absolute_path
-                ):
-                    target = c_transform
-                    break
-        if value is not None:
-            target.depends_on = value.depends_on
-            return
-        target.depends_on = None
-
 
 class Component:
     """
