@@ -48,8 +48,11 @@ build_exe_options = {
         "babel",
         "sphinx",
     ],
-    "bin_includes": ["libssl.so"],
-    "include_files": [("ui", "ui"), ("definitions", "definitions")],
+    "bin_includes": ["libssl.so", "definitions"],
+    "include_files": [
+        ("ui", "ui"),
+        ("definitions", os.path.join("lib", "definitions")),
+    ],
 }
 
 # GUI applications require a different base on Windows (the default is for a console application).
