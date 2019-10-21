@@ -86,10 +86,8 @@ class EditTransformationLink(QFrame):
         self.populate_combo_box()
 
     def populate_combo_box(self):
-        try:
-            self.link_frame.TransformationsComboBox.currentIndexChanged.disconnect()
-        except Exception:
-            pass
+        self.link_frame.TransformationsComboBox.blockSignals(True)
+
         self.link_frame.TransformationsComboBox.clear()
         self.link_frame.TransformationsComboBox.addItem("(None)", userData=None)
         self.link_frame.TransformationsComboBox.setCurrentIndex(0)
@@ -120,6 +118,7 @@ class EditTransformationLink(QFrame):
         self.link_frame.TransformationsComboBox.currentIndexChanged.connect(
             self.set_new_index
         )
+        self.link_frame.TransformationsComboBox.blockSignals(False)
 
     def set_new_index(self, new_index):
         if new_index == -1:
