@@ -60,6 +60,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         instrument: Instrument,
         component_model: ComponentTreeModel,
         component_to_edit: Component = None,
+        definitions_dir: str = "",
         parent=None,
     ):
         super(AddComponentDialog, self).__init__()
@@ -69,7 +70,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_model = component_model
         self.geometry_model = None
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
-            os.path.join(os.getcwd(), "definitions")
+            definitions_dir
         )
         self.nx_component_classes = OrderedDict(
             sorted(self.nx_component_classes.items())

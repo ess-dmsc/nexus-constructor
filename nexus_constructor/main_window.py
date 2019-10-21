@@ -37,6 +37,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def __init__(self, instrument: Instrument):
         super().__init__()
         self.instrument = instrument
+        self.definitions_dir = os.path.join(os.getcwd(), "definitions")
+
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
@@ -297,15 +299,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         Sets up the warning dialog that is shown when the definitions submodule has not been cloned.
         :return:
         """
-        definitions_dir = os.path.join(os.getcwd(), "definitions")
         logging.info(f"current dir: {os.getcwd()}")
-        logging.info(f"definitions dir: {definitions_dir}")
+        logging.info(f"definitions dir: {self.definitions_dir}")
         logging.info("definitions dir exists") if os.path.exists(
-            definitions_dir
+            self.definitions_dir
         ) else None
 
         # Will contain .git even if missing so check that it does not contain just that file.
-        if not os.path.exists(definitions_dir) or len(os.listdir(definitions_dir)) <= 1:
+        if not os.path.exists(self.definitions_dir) or len(os.listdir(self.definitions_dir)) <= 1:
             self.warning_window = QDialog()
             self.warning_window.setWindowTitle("NeXus definitions missing")
             self.warning_window.setLayout(QGridLayout())
@@ -382,7 +383,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
         self.add_component_window.ui = AddComponentDialog(
-            self.instrument, self.component_model, component, parent=self
+            self.instrument, self.component_model, component, definitions_dir=self.definitions_dir, parent=self
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
