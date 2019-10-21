@@ -39,7 +39,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument = instrument
         self.definitions_dir = os.path.join(os.getcwd(), "definitions")
 
-
     def setupUi(self, main_window):
         super().setupUi(main_window)
 
@@ -306,7 +305,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         ) else None
 
         # Will contain .git even if missing so check that it does not contain just that file.
-        if not os.path.exists(self.definitions_dir) or len(os.listdir(self.definitions_dir)) <= 1:
+        if (
+            not os.path.exists(self.definitions_dir)
+            or len(os.listdir(self.definitions_dir)) <= 1
+        ):
             self.warning_window = QDialog()
             self.warning_window.setWindowTitle("NeXus definitions missing")
             self.warning_window.setLayout(QGridLayout())
@@ -383,7 +385,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
         self.add_component_window.ui = AddComponentDialog(
-            self.instrument, self.component_model, component, definitions_dir=self.definitions_dir, parent=self
+            self.instrument,
+            self.component_model,
+            component,
+            definitions_dir=self.definitions_dir,
+            parent=self,
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
