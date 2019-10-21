@@ -181,6 +181,8 @@ class FieldWidget(QFrame):
             return self.table_view.model.array.dtype
         if self.field_type == FieldType.link:
             return h5py.SoftLink
+        if self.field_type == FieldType.kafka_stream:
+            return h5py.Group
 
     @dtype.setter
     def dtype(self, dtype):
