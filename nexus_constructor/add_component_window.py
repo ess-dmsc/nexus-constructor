@@ -36,7 +36,6 @@ from nexus_constructor.validators import (
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.component_tree_model import ComponentTreeModel
-import os
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component.component import Component
