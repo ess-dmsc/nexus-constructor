@@ -1,3 +1,5 @@
+import logging
+
 from PySide2.QtWidgets import (
     QAction,
     QToolBar,
@@ -296,6 +298,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         :return:
         """
         definitions_dir = os.path.join(os.curdir, "definitions")
+        logging.info(f"current dir: {os.curdir}")
+        logging.info(f"definitions dir: {definitions_dir}")
+        logging.info("definitions dir exists") if os.path.exists(
+            definitions_dir
+        ) else None
 
         # Will contain .git even if missing so check that it does not contain just that file.
         if not os.path.exists(definitions_dir) or len(os.listdir(definitions_dir)) <= 1:
