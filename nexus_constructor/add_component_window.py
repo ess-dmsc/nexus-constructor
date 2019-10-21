@@ -69,7 +69,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_model = component_model
         self.geometry_model = None
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
-            os.path.abspath(os.path.join(os.curdir, "definitions"))
+            os.path.join(os.getcwd(), "definitions")
         )
         self.nx_component_classes = OrderedDict(
             sorted(self.nx_component_classes.items())
