@@ -321,21 +321,21 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.__fill_in_existing_ev42_fields(field, new_ui_field)
 
     def __fill_in_existing_ev42_fields(self, field, new_ui_field):
-        if (
-            any(
-                [
-                    ADC_PULSE_DEBUG,
-                    NEXUS_INDICES_INDEX_EVERY_MB,
-                    NEXUS_INDICES_INDEX_EVERY_KB,
-                    NEXUS_CHUNK_CHUNK_MB,
-                    NEXUS_CHUNK_CHUNK_KB,
-                    NEXUS_BUFFER_SIZE_MB,
-                    NEXUS_BUFFER_SIZE_KB,
-                    NEXUS_BUFFER_PACKET_MAX_KB,
-                ]
-            )
-            in field.keys()
-        ):
+        advanced_options = False
+        for item in field.keys():
+            if item in [
+                ADC_PULSE_DEBUG,
+                NEXUS_INDICES_INDEX_EVERY_MB,
+                NEXUS_INDICES_INDEX_EVERY_KB,
+                NEXUS_CHUNK_CHUNK_MB,
+                NEXUS_CHUNK_CHUNK_KB,
+                NEXUS_BUFFER_SIZE_MB,
+                NEXUS_BUFFER_SIZE_KB,
+                NEXUS_BUFFER_PACKET_MAX_KB,
+            ]:
+                advanced_options = True
+
+        if advanced_options:
             new_ui_field.streams_widget.ev42_advanced_group_box.setEnabled(True)
             new_ui_field.streams_widget.set_advanced_options_state()
 
@@ -373,7 +373,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
 
     def __fill_in_existing_f142_fields(self, field, new_ui_field):
-        new_ui_field.streams_widget.type_combo.setCurrentText(field["type"][0])
+        new_ui_field.streams_widget.type_combo.setCurrentText(field["type"][()])
         if "array_size" in field.keys():
             new_ui_field.streams_widget.array_radio.setChecked(True)
             new_ui_field.streams_widget.scalar_radio.setChecked(False)
