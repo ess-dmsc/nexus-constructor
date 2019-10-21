@@ -297,8 +297,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         Sets up the warning dialog that is shown when the definitions submodule has not been cloned.
         :return:
         """
-        definitions_dir = os.path.join(os.curdir, "definitions")
-        logging.info(f"current dir: {os.curdir}")
+        definitions_dir = os.path.join(os.getcwd(), "definitions")
+        logging.info(f"current dir: {os.getcwd()}")
         logging.info(f"definitions dir: {definitions_dir}")
         logging.info("definitions dir exists") if os.path.exists(
             definitions_dir
