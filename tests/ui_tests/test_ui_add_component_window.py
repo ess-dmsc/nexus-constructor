@@ -22,6 +22,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
+from tests.test_utils import DEFINITIONS_DIR
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -44,9 +45,8 @@ UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
-DEFINITIONS_DIR = os.path.join(os.getcwd(), "definitions")
 
-instrument = Instrument(NexusWrapper("pixels"))
+instrument = Instrument(NexusWrapper("pixels"), DEFINITIONS_DIR)
 component = ComponentTreeModel(instrument)
 add_component_dialog = AddComponentDialog(
     instrument, component, definitions_dir=DEFINITIONS_DIR
@@ -166,7 +166,7 @@ def create_add_component_dialog():
     """
     global nexus_wrapper_count
     nexus_name = "test" + str(nexus_wrapper_count)
-    instrument = Instrument(NexusWrapper(nexus_name))
+    instrument = Instrument(NexusWrapper(nexus_name), DEFINITIONS_DIR)
     component = ComponentTreeModel(instrument)
     nexus_wrapper_count += 1
     return AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
@@ -1254,7 +1254,9 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_name"))
+    instrument = Instrument(
+        NexusWrapper("test_component_editing_name"), DEFINITIONS_DIR
+    )
 
     component_model = ComponentTreeModel(instrument)
 
@@ -1293,7 +1295,9 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
 def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_radio_is_checked(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_no_shape"))
+    instrument = Instrument(
+        NexusWrapper("test_component_editing_no_shape"), DEFINITIONS_DIR
+    )
     component_model = ComponentTreeModel(instrument)
 
     component = instrument.create_component("test", "NXpinhole", "")
@@ -1322,7 +1326,9 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
 def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_cylinder"))
+    instrument = Instrument(
+        NexusWrapper("test_component_editing_cylinder"), DEFINITIONS_DIR
+    )
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"
@@ -1354,7 +1360,7 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_off"))
+    instrument = Instrument(NexusWrapper("test_component_editing_off"), DEFINITIONS_DIR)
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"
@@ -1393,7 +1399,9 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data_is_in_line_edits(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_off_filepath"))
+    instrument = Instrument(
+        NexusWrapper("test_component_editing_off_filepath"), DEFINITIONS_DIR
+    )
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"

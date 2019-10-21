@@ -2,6 +2,7 @@ import h5py
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import _convert_name_with_spaces, Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from tests.test_utils import DEFINITIONS_DIR
 
 
 def test_GIVEN_name_with_spaces_WHEN_converting_name_with_spaces_THEN_converts_spaces_in_name_to_underscores():
@@ -16,7 +17,7 @@ def test_GIVEN_name_without_spaces_WHEN_converting_name_with_spaces_THEN_name_do
 
 def test_GIVEN_nothing_WHEN_getting_components_list_THEN_list_contains_sample_and_no_components():
     wrapper = NexusWrapper("component_list_with_sample")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
     assert len(instrument.get_component_list()) == 1
 
 
@@ -35,7 +36,7 @@ def check_if_component_is_in_component_list(
 
 def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_added_component():
     wrapper = NexusWrapper("test_components_list")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
 
     component_type = "NXcrystal"
     name = "test_crystal"
@@ -49,7 +50,7 @@ def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_add
 
 def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_components_list_does_not_contain_component():
     wrapper = NexusWrapper("test_components_list")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
 
     component_type = "NXcrystal"
     name = "test_crystal"
@@ -71,7 +72,7 @@ def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_componen
 
 def test_GIVEN_instrument_with_one_stream_WHEN_finding_streams_THEN_streams_dictionary_is_populated():
     wrapper = NexusWrapper("test_streams")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
 
     component_type = "NCstream"
     name = "test_crystal"
@@ -89,7 +90,7 @@ def test_GIVEN_instrument_with_one_stream_WHEN_finding_streams_THEN_streams_dict
 
 def test_GIVEN_instrument_with_stream_with_incorrect_nx_class_for_stream_WHEN_finding_streams_THEN_streams_dictionary_is_empty():
     wrapper = NexusWrapper("test_streams_none")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
 
     component_type = "NXcrystal"
     name = "test_crystal"
@@ -132,7 +133,7 @@ def test_dependents_list_is_created_by_instrument():
 
     nexus_wrapper = NexusWrapper("test_file_with_transforms")
     nexus_wrapper.load_file(entry_group, in_memory_test_file)
-    Instrument(nexus_wrapper)
+    Instrument(nexus_wrapper, DEFINITIONS_DIR)
 
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)
     assert (
@@ -147,7 +148,7 @@ def test_dependents_list_is_created_by_instrument():
 
 def test_GIVEN_dot_separated_field_name_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
     wrapper = NexusWrapper("test_streams_dict")
-    inst = Instrument(wrapper)
+    inst = Instrument(wrapper, DEFINITIONS_DIR)
 
     streams_group = wrapper.entry.create_group("streams")
     streams_group.attrs["NX_class"] = "NCstream"
@@ -166,7 +167,7 @@ def test_GIVEN_dot_separated_field_name_WHEN_getting_streams_THEN_dict_is_return
 
 def test_GIVEN_several_dot_separated_field_names_with_similar_prefixes_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
     wrapper = NexusWrapper("test_streams_dict_multiple")
-    inst = Instrument(wrapper)
+    inst = Instrument(wrapper, DEFINITIONS_DIR)
 
     streams_group = wrapper.entry.create_group("streams")
     streams_group.attrs["NX_class"] = "NCstream"
