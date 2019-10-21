@@ -1,9 +1,9 @@
 import h5py
-
-from nexus_constructor.instrument import Instrument
 import numpy as np
 import uuid
+import logging
 
+from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import object_to_json_file
 
 
@@ -27,9 +27,20 @@ def generate_json(
         streams = {}
 
     converter = NexusToDictConverter()
-    tree = converter.convert(data.nexus.entry, streams, links)
+    tree = converter.convert(data.nexus.nexus_file, streams, links)
     write_command, stop_command = create_writer_commands(tree, nexus_file_name)
     object_to_json_file(write_command, file)
+
+
+def cast_to_int(data):
+    """
+    Python 3+ has an unlimited-size integer representation
+    We can convert any numpy integer type to Python int for serialising to JSON
+    """
+    if isinstance(data, list):
+        return [int(data_value) for data_value in data]
+    else:
+        return int(data)
 
 
 class NexusToDictConverter:
@@ -87,10 +98,26 @@ class NexusToDictConverter:
             except AttributeError:  # Already a str (decoded)
                 pass
             dtype = "string"
-        elif dtype == np.float64:
-            dtype = "double"
         elif dtype == np.float32:
             dtype = "float"
+        elif dtype == np.float64:
+            dtype = "double"
+        elif dtype == np.int32:
+            dtype = "int32"
+            data = cast_to_int(data)
+        elif dtype == np.int64:
+            dtype = "int64"
+            data = cast_to_int(data)
+        elif dtype == np.uint32:
+            dtype = "uint32"
+            data = cast_to_int(data)
+        elif dtype == np.uint64:
+            dtype = "uint64"
+            data = cast_to_int(data)
+        else:
+            logging.error(
+                f"Unrecognised type {dtype}, don't know what to record as in JSON"
+            )
         return data, dtype, size
 
     @staticmethod
