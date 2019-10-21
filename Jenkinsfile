@@ -131,7 +131,7 @@ return {
                 stage("Test executable") {
                 timeout(time:5, unit:'SECONDS') {
                     bat """
-                       cd \\build
+                       cd \\build\\nexus-constructor_windows_${git_commit_short}\\
                        .\\NexusConstructor.exe
                     """
                     }
