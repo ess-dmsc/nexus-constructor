@@ -34,10 +34,10 @@ JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
-    def __init__(self, instrument: Instrument):
+    def __init__(self, instrument: Instrument, definitions_dir: str):
         super().__init__()
         self.instrument = instrument
-        self.definitions_dir = os.path.abspath(os.path.join(os.getcwd(), "definitions"))
+        self.definitions_dir = definitions_dir
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
