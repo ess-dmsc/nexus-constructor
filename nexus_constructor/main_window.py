@@ -309,7 +309,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 )
             )
             # Set add component button to disabled, as it wouldn't work without the definitions.
-            self.pushButton.setEnabled(False)
+            self.new_component_action.setEnabled(False)
             self.warning_window.show()
 
     def update_nexus_file_structure_view(self, nexus_file):
