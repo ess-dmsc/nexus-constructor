@@ -36,6 +36,8 @@ def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct
     assert dtype == expected_dtype
     assert np.isclose(data, expected_value)
 
+    file.close()
+
 
 def test_GIVEN_float64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
     expected_dtype = "double"
@@ -52,6 +54,46 @@ def test_GIVEN_float64_WHEN_getting_data_and_dtype_THEN_function_returns_correct
     assert size == expected_size
     assert dtype == expected_dtype
     assert data == expected_value
+
+    file.close()
+
+
+def test_GIVEN_int32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
+    expected_dtype = "int32"
+    expected_size = 1
+    expected_value = np.int32(42)
+
+    file = create_in_memory_file("test1")
+    dataset = file.create_dataset("test_dataset", dtype="int32", data=expected_value)
+
+    converter = NexusToDictConverter()
+
+    data, dtype, size = converter._get_data_and_type(dataset)
+
+    assert size == expected_size
+    assert dtype == expected_dtype
+    assert data == expected_value
+
+    file.close()
+
+
+def test_GIVEN_int64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
+    expected_dtype = "int64"
+    expected_size = 1
+    expected_value = np.int64(171798691842)  # bigger than max 32b int
+
+    file = create_in_memory_file("test1")
+    dataset = file.create_dataset("test_dataset", dtype="int64", data=expected_value)
+
+    converter = NexusToDictConverter()
+
+    data, dtype, size = converter._get_data_and_type(dataset)
+
+    assert size == expected_size
+    assert dtype == expected_dtype
+    assert data == expected_value
+
+    file.close()
 
 
 def test_GIVEN_single_string_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
@@ -70,6 +112,8 @@ def test_GIVEN_single_string_WHEN_getting_data_and_dtype_THEN_function_returns_c
     assert dtype == expected_dtype
     assert bytes(data, "ASCII") == expected_value
 
+    file.close()
+
 
 def test_GIVEN_array_WHEN_getting_data_and_dtype_THEN_function_returns_correcte_fw_json_dtype_and_values():
     expected_dtype = "float"
@@ -83,6 +127,8 @@ def test_GIVEN_array_WHEN_getting_data_and_dtype_THEN_function_returns_correcte_
     assert size == (len(expected_values),)
     assert np.allclose(data, expected_values)
     assert dtype == expected_dtype
+
+    file.close()
 
 
 def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist_in_root_dict():
@@ -105,6 +151,8 @@ def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist
     assert ds["values"] == dataset_value
     assert "size" not in ds["dataset"]
 
+    file.close()
+
 
 def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_in_root_dict():
     file = create_in_memory_file("test6")
@@ -125,6 +173,8 @@ def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_
     assert ds["values"] == dataset_value
     assert ds["dataset"]["size"] == (len(dataset_value),)
 
+    file.close()
+
 
 def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appended_to_children():
     file = create_in_memory_file("test7")
@@ -141,6 +191,8 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
 
     assert group.name == root_dict["children"][0]["name"]
     assert group_contents == root_dict["children"][0]["children"][0]["stream"]
+
+    file.close()
 
 
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children():
@@ -162,6 +214,8 @@ def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_
     assert file[group_name].name == root_dict["children"][0]["name"]
     assert file[group_name].name == root_dict["children"][0]["children"][0]["name"]
     assert group_to_be_linked.name == root_dict["children"][0]["children"][0]["target"]
+
+    file.close()
 
 
 def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN_attributes_end_up_in_file():
@@ -213,6 +267,8 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
 
     assert field2.name == root_dict["children"][0]["children"][1]["name"]
     assert field2value == root_dict["children"][0]["children"][1]["values"]
+
+    file.close()
 
 
 def test_GIVEN_start_time_WHEN_creating_writercommands_THEN_start_time_is_included_in_command():
@@ -277,7 +333,9 @@ def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is
 
     output_file_dict = json.loads(file.getvalue())
 
-    component = output_file_dict["nexus_structure"]["children"][0]["children"][0]
+    component = output_file_dict["nexus_structure"]["children"][0]["children"][0][
+        "children"
+    ][0]
 
     assert component["name"].lstrip("/entry/instrument/") == component_name
     assert (
