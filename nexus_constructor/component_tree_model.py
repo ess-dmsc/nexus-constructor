@@ -193,7 +193,9 @@ class ComponentTreeModel(QAbstractItemModel):
         if transformation_list.has_link:
             transformation_list.link.linked_component = linked_component
             if linked_component is not None:
-                transformation_list[-1].depends_on = transformation_list.link.linked_component.transforms[0]
+                transformation_list[
+                    -1
+                ].depends_on = transformation_list.link.linked_component.transforms[0]
 
     def add_translation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, "translation")

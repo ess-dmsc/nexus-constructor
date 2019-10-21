@@ -3,11 +3,13 @@ from nexus_constructor.component.transformations_list import TransformationsList
 
 TRANSFORM_STR = "/transformations/"
 
+
 class LinkTransformation:
     """
     Used for keeping track of links (depends_on) to transformations outside the
     current component and for keeping track of the parent transformation list.
     """
+
     def __init__(self, parent: TransformationsList):
         super().__init__()
         self.parent = parent
@@ -16,8 +18,8 @@ class LinkTransformation:
         for transformation in self.parent:
             if self.parent._transform_has_external_link(transformation):
                 component_path = transformation.depends_on.absolute_path[
-                                 : transformation.depends_on.absolute_path.find(TRANSFORM_STR)
-                                 ]
+                    : transformation.depends_on.absolute_path.find(TRANSFORM_STR)
+                ]
                 return Component(
                     self.parent.parent_component.file,
                     self.parent.parent_component.file.nexus_file[component_path],

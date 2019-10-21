@@ -38,6 +38,7 @@ import numpy as np
 
 DEPENDS_ON_STR = "depends_on"
 
+
 class DependencyError(Exception):
     """
     Raised when trying to carry out an operation which would invalidate the depends_on chain
@@ -71,6 +72,7 @@ def _transforms_are_equivalent(
     transform_1: Transformation, transform_2: Transformation
 ):
     return transform_1.absolute_path == transform_2.absolute_path
+
 
 class Component:
     """
