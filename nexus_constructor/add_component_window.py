@@ -611,8 +611,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_to_edit.nx_class = nx_class
         self.component_to_edit.description = description
         # remove the previous shape from the qt3d view
-        if self.component_to_edit.shape[0] and self.parent():
-            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
+        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
+            self.instrument.remove_component(self.component_to_edit)
+
 
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
