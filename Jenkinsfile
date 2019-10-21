@@ -128,6 +128,14 @@ return {
                     bat """
                     python setup.py build_exe"""
                 } // stage
+                stage("Test executable") {
+                timeout(time:5, unit:'SECONDS') {
+                    bat """
+                       cd \\build
+                       .\\NexusConstructor.exe
+                    """
+                    }
+                }
                 stage('Archive Executable') {
                     def git_commit_short = scm_vars.GIT_COMMIT.take(7)
                     powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
