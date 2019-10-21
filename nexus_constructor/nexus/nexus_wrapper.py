@@ -190,7 +190,10 @@ class NexusWrapper(QObject):
     def get_fields(self, group: h5py.Group) -> List[Union[h5py.Dataset, h5py.Group]]:
         fields = []
         for item in group.values():
-            if isinstance(item, h5py.Dataset):
+            if (
+                isinstance(item, h5py.Dataset)
+                and item.name.split("/")[-1] != "description"
+            ):
                 fields.append(item)
             if isinstance(item, h5py.Group):
                 if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
