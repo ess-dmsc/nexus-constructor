@@ -50,7 +50,7 @@ build_exe_options = {
     ],
     "bin_includes": ["libssl.so", "definitions"],
     "include_files": [
-        ("ui", "ui"),
+        ("ui", os.path.join("lib", "ui")),
         ("definitions", os.path.join("lib", "definitions")),
     ],
 }
