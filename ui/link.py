@@ -48,5 +48,5 @@ class Ui_Link(object):
     def retranslateUi(self, Link):
         Link.setWindowTitle(QtWidgets.QApplication.translate("Link", "Frame", None, -1))
         self.groupBox.setTitle(QtWidgets.QApplication.translate("Link", "Link", None, -1))
-        self.selectLinkLabel.setText(QtWidgets.QApplication.translate("Link", "Drag and drop or select transformation", None, -1))
+        self.selectLinkLabel.setText(QtWidgets.QApplication.translate("Link", "Select component", None, -1))
 
