@@ -374,8 +374,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
+        existing_file = self.instrument.nexus.nexus_file
         if self.instrument.nexus.open_file(filename):
             self._update_views()
+            existing_file.close()
 
     def open_json_file(self):
         filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
@@ -383,7 +385,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             with open(filename, "r") as json_file:
                 json_data = json_file.read()
 
-                self.instrument.nexus.nexus_file.close()  # close existing file
                 try:
                     nexus_file = json_to_nexus(json_data)
                 except Exception as exception:
@@ -394,8 +395,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     )
                     return
 
+                existing_file = self.instrument.nexus.nexus_file
                 if self.instrument.nexus.load_nexus_file(nexus_file):
                     self._update_views()
+                    existing_file.close()
 
     def _update_views(self):
         self.sceneWidget.clear_all_components()
