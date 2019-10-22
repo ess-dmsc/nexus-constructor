@@ -1,6 +1,7 @@
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.component.component import Component
 from uuid import uuid1
+import h5py
 from typing import Any
 import h5py
 
@@ -23,3 +24,16 @@ def add_component_to_file(
     component_group.create_dataset(field_name, data=field_value)
     component = Component(nexus_wrapper, component_group)
     return component
+
+
+class InMemoryFile(object):
+    def __init__(self, filename):
+        self.file_obj = h5py.File(
+            filename, mode="x", driver="core", backing_store=False
+        )
+
+    def __enter__(self):
+        return self.file_obj
+
+    def __exit__(self, type, value, traceback):
+        self.file_obj.close()

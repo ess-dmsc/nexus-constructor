@@ -3,6 +3,7 @@ from typing import Any, List, Optional, Union, Tuple
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.component.pixel_shape import PixelShape
+from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
@@ -13,7 +14,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_ids_from_pixel_grid,
     get_detector_number_from_pixel_mapping,
 )
-from nexus_constructor.transformations import Transformation, TransformationsList
+from nexus_constructor.transformations import Transformation
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
@@ -91,6 +92,12 @@ class Component:
         else:
             self._shape = ComponentShape(nexus_file, group)
 
+    def __eq__(self, other):
+        try:
+            return other.absolute_path == self.absolute_path
+        except Exception:
+            return False
+
     @property
     def name(self):
         return nx.get_name_of_node(self.group)
@@ -164,7 +171,9 @@ class Component:
                 return
             transforms.append(Transformation(self.file, transform_dataset))
             if DEPENDS_ON_STR in transform_dataset.attrs.keys():
-                self._get_transform(transform_dataset.attrs[DEPENDS_ON_STR], transforms)
+                self._get_transform(
+                    transform_dataset.attrs[DEPENDS_ON_STR], transforms, local_only
+                )
 
     @property
     def transforms(self) -> TransformationsList:

@@ -262,7 +262,6 @@ class NexusDefinedChopperChecker:
             self._radius_units = decode_bytes_string(
                 self._disk_chopper[RADIUS_NAME].attrs["units"]
             )
-            self._disk_chopper[NAME][()],
 
         except KeyError:
             return False
