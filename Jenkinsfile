@@ -129,10 +129,11 @@ return {
                     python setup.py build_exe"""
                 } // stage
                 stage("Test executable") {
-                timeout(time:5, unit:'SECONDS') {
+                timeout(time:15, unit:'SECONDS') {
                     bat """
                        cd \\build\\nexus-constructor_windows_${git_commit_short}\\
-                       .\\NexusConstructor.exe
+                       net start .\\NexusConstructor.exe
+                       net stop NexusConstructor.exe
                     """
                     }
                 }
