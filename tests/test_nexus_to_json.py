@@ -535,3 +535,30 @@ def test_GIVEN_stream_with_pv_forwarding_to_three_topics_WHEN_generating_forward
     assert streams_[0]["converter"][0]["topic"] == topic1
     assert streams_[0]["converter"][1]["topic"] == topic2
     assert streams_[0]["converter"][2]["topic"] == topic3
+
+
+def test_GIVEN_blank_service_id_WHEN_generating_start_and_stop_commands_THEN_service_id_not_in_write_or_stop_command():
+    start_cmd, stop_cmd = create_writer_commands(
+        {}, output_filename="file.nxs", broker="broker", job_id="123", service_id=""
+    )
+    assert "service_id" not in start_cmd.keys()
+    assert "service_id" not in stop_cmd.keys()
+
+
+def test_GIVEN_disable_hdf_swmr_WHEN_writing_start_command_THEN_disable_hdf_swmr_in_write_cmd():
+    start_cmd, _ = create_writer_commands(
+        {}, output_filename="file.nxs", broker="broker", use_hdf_swmr=False
+    )
+    assert "use_hdf_swmr" in start_cmd.keys()
+    assert not start_cmd["use_hdf_swmr"]
+
+
+def test_GIVEN_abort_uninitialised_stream_WHEN_writing_start_command_THEN_abort_uninitialised_stream_is_in_start_cmd():
+    start_cmd, _ = create_writer_commands(
+        {},
+        output_filename="file.nxs",
+        broker="broker",
+        abort_on_uninitialised_stream=True,
+    )
+    assert "abort_on_uninitialised_stream" in start_cmd.keys()
+    assert start_cmd["abort_on_uninitialised_stream"]
