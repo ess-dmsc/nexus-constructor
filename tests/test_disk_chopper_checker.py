@@ -26,7 +26,7 @@ from tests.chopper_test_helpers import (
     EDGES_ARR,
     CONVERT_DEGREES_TO_RADIANS,
 )
-from tests.test_nexus_to_json import create_in_memory_file
+from tests.helpers import InMemoryFile
 
 
 @pytest.fixture(scope="function")
@@ -118,18 +118,17 @@ def user_defined_chopper_checker(mock_fields_list_widget):
 
 @pytest.fixture(scope="function")
 def nexus_disk_chopper():
-    nexus_file = create_in_memory_file("test_disk_chopper")
-    disk_chopper_group = nexus_file.create_group("Disk Chopper")
-    disk_chopper_group[NAME] = "abc"
-    disk_chopper_group[SLITS_NAME] = N_SLITS
-    disk_chopper_group[SLIT_EDGES_NAME] = EDGES_ARR
-    disk_chopper_group[RADIUS_NAME] = RADIUS_LENGTH
-    disk_chopper_group[SLIT_HEIGHT_NAME] = SLIT_HEIGHT_LENGTH
-    disk_chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
-    disk_chopper_group[RADIUS_NAME].attrs["units"] = str.encode("m")
-    disk_chopper_group[SLIT_HEIGHT_NAME].attrs["units"] = str.encode("m")
-    yield disk_chopper_group
-    nexus_file.close()
+    with InMemoryFile("test_disk_chopper") as nexus_file:
+        disk_chopper_group = nexus_file.create_group("Disk Chopper")
+        disk_chopper_group[NAME] = "abc"
+        disk_chopper_group[SLITS_NAME] = N_SLITS
+        disk_chopper_group[SLIT_EDGES_NAME] = EDGES_ARR
+        disk_chopper_group[RADIUS_NAME] = RADIUS_LENGTH
+        disk_chopper_group[SLIT_HEIGHT_NAME] = SLIT_HEIGHT_LENGTH
+        disk_chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
+        disk_chopper_group[RADIUS_NAME].attrs["units"] = str.encode("m")
+        disk_chopper_group[SLIT_HEIGHT_NAME].attrs["units"] = str.encode("m")
+        yield disk_chopper_group
 
 
 @pytest.fixture(scope="function")
