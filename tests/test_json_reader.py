@@ -130,3 +130,33 @@ def test_GIVEN_json_containing_stream_WHEN_json_to_nexus_called_THEN_stream_crea
     nexus_file = json_to_nexus(test_json)
     assert group_name in nexus_file
     assert nexus_file[group_name]
+
+
+def test_GIVEN_json_containing_link_WHEN_json_to_nexus_called_THEN_link_created_in_NeXus():
+    dataset_name = "test_dataset"
+    link_name = "test_link"
+    test_json = f"""
+       {{
+         "nexus_structure": {{
+           "children": [
+             {{
+               "type": "dataset",
+               "name": "{dataset_name}",
+               "dataset": {{
+                 "type": "int32",
+                 "size": [1]
+               }},
+               "values": [1]
+             }},
+             {{
+                "type": "link",
+                "name": "{link_name}",
+                "target": "/dataset_name"
+             }}
+           ]
+         }}
+       }}
+       """
+    nexus_file = json_to_nexus(test_json)
+
+    assert isinstance(nexus_file.get(link_name, getlink=True), h5py.SoftLink)
