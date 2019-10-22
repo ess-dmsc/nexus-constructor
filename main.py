@@ -10,12 +10,13 @@ from PySide2 import QtCore
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.instrument import Instrument
+from os import path
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     app = QApplication(sys.argv)
     app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-    app.setWindowIcon(QIcon("ui/icon.png"))
+    app.setWindowIcon(QIcon(path.join("ui", "icon.png")))
     window = QMainWindow()
     nexus_wrapper = NexusWrapper()
     instrument = Instrument(nexus_wrapper)
