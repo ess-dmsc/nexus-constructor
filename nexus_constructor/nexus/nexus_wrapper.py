@@ -113,7 +113,8 @@ class NexusWrapper(QObject):
 
     def find_entries_in_file(self, nexus_file: h5py.File):
         """
-        Find the entry group in the specified nexus file. If there are multiple, emit the signal required to show the multiple entry selection dialog in the UI.
+        Find the entry group in the specified nexus file. If there are multiple, emit the signal required to
+        show the multiple entry selection dialog in the UI.
         :param nexus_file: A reference to the nexus file to check for the entry group.
         """
         entries_in_root = dict()

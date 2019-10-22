@@ -1,6 +1,7 @@
 import json
 import h5py
 import numpy as np
+import uuid
 from typing import Union, List
 
 """
@@ -11,7 +12,7 @@ NexusObject = Union[h5py.Group, h5py.Dataset]
 
 
 _json_type_to_numpy = {
-    "string": str,
+    "string": h5py.special_dtype(vlen=str),
     "float": np.float32,
     "double": np.float64,
     "int32": np.int32,
@@ -83,7 +84,7 @@ def json_to_nexus(json_input: str) -> h5py.File:
         raise ValueError("Empty json string, nothing to load!")
 
     json_data = json.loads(json_input)
-    nexus_file = _create_in_memory_file("json_to_nexus")
+    nexus_file = _create_in_memory_file(str(uuid.uuid4()))
 
     nexus_structure = json_data["nexus_structure"]
     _add_to_nexus(nexus_structure["children"], nexus_file)

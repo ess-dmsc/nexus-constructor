@@ -43,6 +43,17 @@ def cast_to_int(data):
         return int(data)
 
 
+def _add_attributes(root, root_dict):
+    if "attributes" not in root_dict:
+        root_dict["attributes"] = []
+    root_dict["attributes"] = []
+    for attr_name, attr in root.attrs.items():
+        if isinstance(attr, bytes):
+            attr = attr.decode("utf8")
+        new_attribute = {"name": attr_name, "values": attr}
+        root_dict["attributes"].append(new_attribute)
+
+
 class NexusToDictConverter:
     """
     Class used to convert nexus format root to python dict
@@ -134,14 +145,9 @@ class NexusToDictConverter:
                     nx_class = nx_class.decode("utf8")
                 root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
             if len(root.attrs) > 1:
-                if "attributes" not in root_dict:
-                    root_dict["attributes"] = []
-                root_dict["attributes"] = []
-                for attr_name, attr in root.attrs.items():
-                    if isinstance(attr, bytes):
-                        attr = attr.decode("utf8")
-                    new_attribute = {"name": attr_name, "values": attr}
-                    root_dict["attributes"].append(new_attribute)
+                _add_attributes(root, root_dict)
+        else:
+            _add_attributes(root, root_dict)
         return root_dict
 
     def _handle_group(self, root: h5py.Group):

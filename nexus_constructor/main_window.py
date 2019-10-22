@@ -379,21 +379,23 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def open_json_file(self):
         filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
-        with open(filename, "r") as json_file:
-            json_data = json_file.read()
+        if filename:
+            with open(filename, "r") as json_file:
+                json_data = json_file.read()
 
-            try:
-                nexus_file = json_to_nexus(json_data)
-            except Exception as exception:
-                show_warning_dialog(
-                    "Provided file not recognised as valid JSON",
-                    "Invalid JSON",
-                    f"{exception}",
-                )
-                return
+                self.instrument.nexus.nexus_file.close()  # close existing file
+                try:
+                    nexus_file = json_to_nexus(json_data)
+                except Exception as exception:
+                    show_warning_dialog(
+                        "Provided file not recognised as valid JSON",
+                        "Invalid JSON",
+                        f"{exception}",
+                    )
+                    return
 
-            if self.instrument.nexus.load_nexus_file(nexus_file):
-                self._update_views()
+                if self.instrument.nexus.load_nexus_file(nexus_file):
+                    self._update_views()
 
     def _update_views(self):
         self.sceneWidget.clear_all_components()
