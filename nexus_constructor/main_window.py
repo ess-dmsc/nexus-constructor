@@ -90,12 +90,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         self.component_tool_bar = QToolBar("Actions", self.component_tree_view_tab)
         self.new_component_action = QAction(
-            QIcon("ui/new_component.png"), "New component", self.component_tree_view_tab
+            QIcon(os.path.join("ui", "new_component.png")), "New component", self.component_tree_view_tab
         )
         self.new_component_action.triggered.connect(self.show_add_component_window)
         self.component_tool_bar.addAction(self.new_component_action)
         self.new_translation_action = QAction(
-            QIcon("ui/new_translation.png"),
+            QIcon(os.path.join("ui", "new_translation.png")),
             "New translation",
             self.component_tree_view_tab,
         )
@@ -103,26 +103,26 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.new_translation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_translation_action)
         self.new_rotation_action = QAction(
-            QIcon("ui/new_rotation.png"), "New rotation", self.component_tree_view_tab
+            QIcon(os.path.join("ui","new_rotation.png")), "New rotation", self.component_tree_view_tab
         )
         self.new_rotation_action.triggered.connect(self.on_add_rotation)
         self.new_rotation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_rotation_action)
         self.create_link_action = QAction(
-            QIcon("ui/create_link.png"), "Create link", self.component_tree_view_tab
+            QIcon(os.path.join("ui","create_link.png")), "Create link", self.component_tree_view_tab
         )
         self.create_link_action.triggered.connect(self.on_create_link)
         self.create_link_action.setEnabled(False)
         self.component_tool_bar.addAction(self.create_link_action)
         self.duplicate_action = QAction(
-            QIcon("ui/duplicate.png"), "Duplicate", self.component_tree_view_tab
+            QIcon(os.path.join("ui","duplicate.png")), "Duplicate", self.component_tree_view_tab
         )
         self.component_tool_bar.addAction(self.duplicate_action)
         self.duplicate_action.triggered.connect(self.on_duplicate_node)
         self.duplicate_action.setEnabled(False)
 
         self.edit_component_action = QAction(
-            QIcon("ui/edit_component.png"),
+            QIcon(os.path.join("ui","edit_component.png")),
             "Edit Component",
             self.component_tree_view_tab,
         )
@@ -131,7 +131,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tool_bar.addAction(self.edit_component_action)
 
         self.delete_action = QAction(
-            QIcon("ui/delete.png"), "Delete", self.component_tree_view_tab
+            QIcon(os.path.join("ui","delete.png")), "Delete", self.component_tree_view_tab
         )
         self.delete_action.triggered.connect(self.on_delete_item)
         self.delete_action.setEnabled(False)
