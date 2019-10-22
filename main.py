@@ -16,7 +16,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     app = QApplication(sys.argv)
     app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-    app.setWindowIcon(QIcon("ui/icon.png"))
+    app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
     window = QMainWindow()
     nexus_wrapper = NexusWrapper()
     definitions_dir = os.path.abspath(os.path.join(os.getcwd(), "definitions"))
