@@ -33,6 +33,8 @@ def _add_to_nexus(children: List[dict], current_group: h5py.Group):
             _add_dataset(child, current_group)
         if child["type"] == "stream":
             _add_stream(child, current_group)
+        if child["type"] == "link":
+            _add_link(child, current_group)
 
 
 def _add_stream(json_object: dict, current_group: h5py.Group):
@@ -48,6 +50,10 @@ def add_datasets(json_object, stream_group):
             add_datasets(field_value, new_group)
         else:
             stream_group.create_dataset(name=field_name, data=field_value)
+
+
+def _add_link(json_object: dict, current_group: h5py.Group):
+    current_group[json_object["name"]] = h5py.SoftLink(json_object["target"])
 
 
 def _add_dataset(json_object: dict, current_group: h5py.Group):
