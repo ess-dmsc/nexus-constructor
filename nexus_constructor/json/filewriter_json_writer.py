@@ -228,7 +228,7 @@ def create_writer_commands(
         write_cmd["stop_time"] = stop_time
         stop_cmd["stop_time"] = stop_time
 
-    if service_id is not None:
+    if service_id is not None and service_id:
         write_cmd["service_id"] = service_id
         stop_cmd["service_id"] = service_id
 
