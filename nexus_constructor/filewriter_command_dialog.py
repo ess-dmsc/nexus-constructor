@@ -1,8 +1,7 @@
 from functools import partial
 from typing import Union, Tuple
 
-from PySide2.QtCore import QDateTime, Qt, Signal
-from PySide2.QtGui import QValidator
+from PySide2.QtCore import QDateTime, Qt
 from PySide2.QtWidgets import (
     QDialog,
     QFormLayout,
@@ -13,9 +12,12 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import (
+    CommandDialogOKButtonValidator,
+    HDF_FILE_EXTENSIONS,
+)
 
 TIME_FORMAT = "yyyy MM dd hh:mm:ss"
-HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 
 
 class FilewriterCommandDialog(QDialog):
@@ -29,7 +31,7 @@ class FilewriterCommandDialog(QDialog):
         self.setLayout(QFormLayout())
 
         self.nexus_file_name_edit = QLineEdit()
-        filename_validator = CommandDialogOKButtonValidator(self)
+        filename_validator = CommandDialogOKButtonValidator()
         self.nexus_file_name_edit.setValidator(filename_validator)
         filename_validator.is_valid.connect(self.validate)
         self.ok_button = QPushButton("Ok")
@@ -110,25 +112,3 @@ class FilewriterCommandDialog(QDialog):
             == Qt.CheckState.Checked,
             self.use_swmr_checkbox.checkState() == Qt.CheckState.Checked,
         )
-
-
-class CommandDialogOKButtonValidator(QValidator):
-    """
-    Validator to ensure item names are unique within a model that has a 'name' property
-
-    The validationFailed signal is emitted if an entered name is not unique.
-    """
-
-    def __init__(self, dialog: FilewriterCommandDialog):
-        super().__init__()
-        self.dialog = dialog
-
-    def validate(self, input: str, pos: int) -> QValidator.State:
-        if not input or not input.endswith(HDF_FILE_EXTENSIONS):
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
-
-        self.is_valid.emit(True)
-        return QValidator.Acceptable
-
-    is_valid = Signal(bool)
