@@ -9,13 +9,6 @@ TransformationOrComponent = TypeVar(
 )
 
 
-class TransformationsList(list):
-    def __init__(self, parent):
-        super().__init__()
-        self.parent_component = parent
-        self.has_link = False
-
-
 class Transformation:
     """
     Provides an interface to an existing transformation dataset in a NeXus file
@@ -24,6 +17,12 @@ class Transformation:
     def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
         self.file = nexus_file
         self.dataset = dataset
+
+    def __eq__(self, other):
+        try:
+            return other.absolute_path == self.absolute_path
+        except Exception:
+            return False
 
     @property
     def name(self):
@@ -118,6 +117,7 @@ class Transformation:
         Note, "dependee_of" attribute is not part of the NeXus format
         :param dependent: transform or component that depends on this one
         """
+
         if "dependee_of" not in self.dataset.attrs.keys():
             self.file.set_attribute_value(
                 self.dataset, "dependee_of", dependent.absolute_path
@@ -128,10 +128,14 @@ class Transformation:
             )
             if not isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = np.array([dependee_of_list])
-            dependee_of_list = np.append(
-                dependee_of_list, np.array([dependent.absolute_path])
-            )
-            self.file.set_attribute_value(self.dataset, "dependee_of", dependee_of_list)
+            dependee_of_list = dependee_of_list.astype("U")
+            if dependent.absolute_path not in dependee_of_list:
+                dependee_of_list = np.append(
+                    dependee_of_list, np.array([dependent.absolute_path])
+                )
+                self.file.set_attribute_value(
+                    self.dataset, "dependee_of", dependee_of_list
+                )
 
     def deregister_dependent(self, former_dependent: TransformationOrComponent):
         """
@@ -149,17 +153,48 @@ class Transformation:
             ):
                 # Must be a single string rather than a list, so simply delete it
                 self.file.delete_attribute(self.dataset, "dependee_of")
-            else:
+            elif isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = dependee_of_list[
                     dependee_of_list != former_dependent.absolute_path
                 ]
                 self.file.set_attribute_value(
                     self.dataset, "dependee_of", dependee_of_list
                 )
+            else:
+                print(
+                    "Unable to de-register dependent {} from {} due to it not being registered.".format(
+                        former_dependent.absolute_path, self.absolute_path
+                    )
+                )
 
     def get_dependents(self):
+        import nexus_constructor.component.component as comp
+
         if "dependee_of" in self.dataset.attrs.keys():
+            return_dependents = []
             dependents = self.file.get_attribute_value(self.dataset, "dependee_of")
             if not isinstance(dependents, np.ndarray):
-                return [dependents]
-            return dependents.tolist()
+                dependents = [dependents]
+            for path in dependents:
+                node = self.file.nexus_file[path]
+                if isinstance(node, h5py.Group):
+                    return_dependents.append(comp.Component(self.file, node))
+                elif isinstance(node, h5py.Dataset):
+                    return_dependents.append(Transformation(self.file, node))
+                else:
+                    raise RuntimeError("Unknown type of node.")
+            return return_dependents
+
+    def remove_from_dependee_chain(self):
+        all_dependees = self.get_dependents()
+        new_depends_on = self.depends_on
+        if self.depends_on.absolute_path == "/":
+            new_depends_on = None
+        else:
+            for dependee in all_dependees:
+                if isinstance(dependee, Transformation):
+                    new_depends_on.register_dependent(dependee)
+        for dependee in all_dependees:
+            dependee.depends_on = new_depends_on
+            self.deregister_dependent(dependee)
+        self.depends_on = None
