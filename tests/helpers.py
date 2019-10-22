@@ -3,7 +3,6 @@ from nexus_constructor.component.component import Component
 from uuid import uuid1
 import h5py
 from typing import Any
-import h5py
 
 
 def create_in_memory_file(filename):
