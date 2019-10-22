@@ -130,13 +130,16 @@ class NexusToDictConverter:
                 and nx_class != "NXgroup"
                 and nx_class != "NCstream"
             ):
+                if isinstance(nx_class, bytes):
+                    nx_class = nx_class.decode("utf8")
                 root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
             if len(root.attrs) > 1:
                 if "attributes" not in root_dict:
                     root_dict["attributes"] = []
                 root_dict["attributes"] = []
                 for attr_name, attr in root.attrs.items():
-                    # data, dtype, size = self._get_data_and_type(attr)
+                    if isinstance(attr, bytes):
+                        attr = attr.decode("utf8")
                     new_attribute = {"name": attr_name, "values": attr}
                     root_dict["attributes"].append(new_attribute)
         return root_dict

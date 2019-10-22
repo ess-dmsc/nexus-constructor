@@ -131,6 +131,34 @@ def test_GIVEN_array_WHEN_getting_data_and_dtype_THEN_function_returns_correcte_
     file.close()
 
 
+def test_GIVEN_nx_class_and_attributes_are_bytes_WHEN_output_to_json_THEN_they_are_written_as_utf8():
+    file = create_in_memory_file("test_string_attributes")
+
+    dataset_name = "test_ds"
+    dataset_value = 1
+    dataset_dtype = np.int32
+
+    dataset = file.create_dataset(dataset_name, data=dataset_value, dtype=dataset_dtype)
+    test_nx_class = b"NXpinhole"
+    test_string_attr = b"some_string"
+    dataset.attrs["NX_class"] = test_nx_class
+    dataset.attrs["string_attr"] = test_string_attr
+
+    converter = NexusToDictConverter()
+    root_dict = converter.convert(file, [], [])
+
+    ds = root_dict["children"][0]
+
+    for attribute in ds["attributes"]:
+        assert attribute["name"] in ["NX_class", "string_attr"]
+        if attribute["name"] == "NX_class":
+            assert attribute["values"] == test_nx_class.decode("utf8")
+        elif attribute["name"] == "string_attr":
+            assert attribute["values"] == test_string_attr.decode("utf8")
+
+    file.close()
+
+
 def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist_in_root_dict():
     file = create_in_memory_file("test5")
 
