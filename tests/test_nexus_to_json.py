@@ -562,3 +562,11 @@ def test_GIVEN_abort_uninitialised_stream_WHEN_writing_start_command_THEN_abort_
     )
     assert "abort_on_uninitialised_stream" in start_cmd.keys()
     assert start_cmd["abort_on_uninitialised_stream"]
+
+
+def test_GIVEN_none_as_service_id_WHEN_generating_writer_commands_THEN_service_id_is_not_in_commands():
+    start_cmd, stop_cmd = create_writer_commands(
+        {}, output_filename="file.nxs", broker="broker", job_id="123", service_id=None
+    )
+    assert "service_id" not in start_cmd.keys()
+    assert "service_id" not in stop_cmd.keys()
