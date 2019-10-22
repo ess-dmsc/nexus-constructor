@@ -91,7 +91,7 @@ larger_folders = [
 
 setup(
     name="Nexus Constructor",
-    version="2.0-pre",
+    version="2.0",
     description="NeXus file constructor with 3D view for components",
     options={"build_exe": build_exe_options},
     executables=[
