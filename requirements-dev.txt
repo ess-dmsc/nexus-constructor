@@ -4,7 +4,7 @@
 -r requirements.txt
 
 # Packaging
-cx_freeze
+git+https://github.com/anthony-tuininga/cx_Freeze@7566412ec2f1a6bf35312439cb1eca1e8e434a82
 
 # newer versions of jsonschema don't work with the executables built by cx_Freeze
 jsonschema==2.6.0
