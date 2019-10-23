@@ -17,32 +17,23 @@ class InstrumentViewAxes(object):
         :param component_root_entity: The root entity for the instrument view components.
         :param line_length: The length of the line in the axes.
         """
-
-        self.line_entities = []
-        self.line_meshes = []
-        self.line_materials = []
-        self.line_geometries = []
-
         vertices = [0 for _ in range(3)]
 
         for i, color in enumerate(
             [AxisColors.X.value, AxisColors.Y.value, AxisColors.Z.value]
         ):
-            self.line_meshes.append(Qt3DRender.QGeometryRenderer())
+            mesh = Qt3DRender.QGeometryRenderer(component_root_entity)
 
             line_vertices = vertices[:]
             line_vertices[i] = line_length
-            self.line_geometries.append(
-                LineGeometry(QtCore.QByteArray(self.create_data_array(line_vertices)))
-            )
+            geometry = LineGeometry(QtCore.QByteArray(self.create_data_array(line_vertices)), component_root_entity)
 
-            self.set_mesh_properties(self.line_meshes[i], self.line_geometries[i])
-            self.line_materials.append(create_material(color, color))
-            self.line_entities.append(
-                create_qentity(
-                    [self.line_meshes[i], self.line_materials[i]], component_root_entity
+            self.set_mesh_properties(mesh, geometry)
+            material = create_material(color, color, component_root_entity)
+            create_qentity(
+                    [mesh, material], component_root_entity
                 )
-            )
+
 
     @staticmethod
     def create_data_array(line_vertices: List[float]):

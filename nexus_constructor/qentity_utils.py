@@ -9,9 +9,9 @@ from PySide2.QtGui import QColor
 def create_material(
     ambient: QColor,
     diffuse: QColor,
+    parent: Qt3DCore.QEntity,
     alpha: float = None,
     remove_shininess: bool = False,
-    parent: Qt3DCore.QEntity = None,
 ) -> Qt3DRender.QMaterial:
     """
     Creates a material and then sets its ambient, diffuse, alpha (if provided) properties. Sets shininess to zero if

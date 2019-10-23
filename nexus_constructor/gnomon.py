@@ -72,20 +72,16 @@ class Gnomon:
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
 
-        self.x_material = Qt3DExtras.QPhongMaterial()
-        self.y_material = Qt3DExtras.QPhongMaterial()
-        self.z_material = Qt3DExtras.QPhongMaterial()
-
         diffuse_color = QColor("grey")
 
         self.x_material = create_material(
-            AxisColors.X.value, diffuse_color, remove_shininess=True
+            AxisColors.X.value, diffuse_color, root_entity, remove_shininess=True
         )
         self.y_material = create_material(
-            AxisColors.Y.value, diffuse_color, remove_shininess=True
+            AxisColors.Y.value, diffuse_color, root_entity, remove_shininess=True
         )
         self.z_material = create_material(
-            AxisColors.Z.value, diffuse_color, remove_shininess=True
+            AxisColors.Z.value, diffuse_color, root_entity, remove_shininess=True
         )
 
         # Initialise beam objects

@@ -83,27 +83,28 @@ class InstrumentView(QWidget):
         self.surface_selector.setSurface(self.view)
 
         # Initialise materials
-        self.grey_material = None
-        self.red_material = None
-        self.beam_material = None
-        self.give_colors_to_materials()
+        dark_red = QColor("#b00")
+        self.red_material = create_material(QColor("red"), dark_red, self.root_entity, alpha=0.5)
+
+        neutron_material = create_material(QColor("black"), QColor("grey"), self.root_entity)
+        beam_material = create_material(QColor("blue"), QColor("lightblue"), self.root_entity, alpha=0.5)
+
+        # Create the gnomon resources and get its camera
+        self.gnomon = Gnomon(
+            self.gnomon_root_entity,
+            self.view.camera(),
+            beam_material,
+            neutron_material,
+        )
+        self.gnomon_camera = self.gnomon.get_gnomon_camera()
 
         # Initialise cube objects
         self.sample_cube_dimensions = [0.1, 0.1, 0.1]
         self.cube_entity = None
         self.cube_mesh = Qt3DExtras.QCuboidMesh()
 
-        # Create the gnomon resources and get its camera
-        self.gnomon = Gnomon(
-            self.gnomon_root_entity,
-            self.view.camera(),
-            self.beam_material,
-            self.grey_material,
-        )
-        self.gnomon_camera = self.gnomon.get_gnomon_camera()
-
         # Create the axes lines objects
-        self.instrument_view_axes = InstrumentViewAxes(
+        InstrumentViewAxes(
             self.axes_root_entity, self.view.camera().farPlane()
         )
 
@@ -218,7 +219,7 @@ class InstrumentView(QWidget):
 
         mesh = OffMesh(geometry.off_geometry, self.component_root_entity)
 
-        component_material = create_material(QColor("black"), QColor("grey"), parent=self.component_root_entity)
+        component_material = create_material(QColor("black"), QColor("grey"), self.component_root_entity)
 
         start_creating_entities = timer()
 
@@ -283,22 +284,6 @@ class InstrumentView(QWidget):
 
     def delete_single_transformation(self, component_name, transformation_name):
         pass
-
-    def give_colors_to_materials(self):
-        """
-        Creates several QColors and uses them to configure the different materials that will be used for the objects in
-        the 3D view.
-        """
-        red = QColor("red")
-        black = QColor("black")
-        grey = QColor("grey")
-        blue = QColor("blue")
-        light_blue = QColor("lightblue")
-        dark_red = QColor("#b00")
-
-        self.grey_material = create_material(black, grey)
-        self.red_material = create_material(red, dark_red, alpha=0.5)
-        self.beam_material = create_material(blue, light_blue, alpha=0.5)
 
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
