@@ -113,7 +113,6 @@ class InstrumentView(QWidget):
         self.initialise_view()
 
         # Dictionaries for component-related objects also to prevent them from going out of scope
-        self.component_meshes = {}
         self.component_entities = {}
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
@@ -217,8 +216,7 @@ class InstrumentView(QWidget):
         if positions is None:
             positions = [QVector3D(0, 0, 0)]
 
-        mesh = OffMesh(geometry.off_geometry)
-        self.component_meshes[name] = mesh
+        mesh = OffMesh(geometry.off_geometry, self.component_root_entity)
 
         component_material = create_material(QColor("black"), QColor("grey"), parent=self.component_root_entity)
 
@@ -246,7 +244,6 @@ class InstrumentView(QWidget):
                 entity.addComponent(mesh)
                 done_adding_mesh = timer()
 
-                print("OFFMesh is shared {} and enabled {}".format(mesh.isShareable(), mesh.isEnabled()))
                 print("Time creating transform: {}".format(start_adding_comps - start_creating_transform))
                 print("Time adding transform {}: {}".format(str(transform), done_adding_transform - start_adding_comps))
                 print("Time adding material {}: {}".format(str(component_material), done_adding_material - done_adding_transform))
@@ -264,7 +261,6 @@ class InstrumentView(QWidget):
         """
         resets the entities in qt3d so all components are cleared form the 3d view.
         """
-        self.component_meshes = dict()
         self.component_entities = dict()
 
     def delete_component(self, name):
@@ -277,7 +273,6 @@ class InstrumentView(QWidget):
 
         try:
             del self.component_entities[name]
-            del self.component_meshes[name]
         except KeyError:
             logging.error(
                 f"Unable to delete component {name} because it doesn't exist."

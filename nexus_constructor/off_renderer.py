@@ -10,6 +10,7 @@ import logging
 from nexus_constructor.pixel_data import PixelData, PixelGrid
 from nexus_constructor.geometry import OFFGeometry
 from PySide2.Qt3DRender import Qt3DRender
+from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D
 import struct
 import itertools
@@ -167,8 +168,8 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
     """
 
-    def __init__(self, geometry: OFFGeometry, pixel_data: PixelData = None):
-        super().__init__(None)
+    def __init__(self, geometry: OFFGeometry, parent: Qt3DCore.QEntity, pixel_data: PixelData = None):
+        super().__init__(parent)
 
         self.setInstanceCount(1)
         qt_geometry = QtOFFGeometry(geometry, pixel_data, self)
