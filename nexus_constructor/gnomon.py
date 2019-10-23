@@ -10,14 +10,12 @@ from nexus_constructor.qentity_utils import create_material, create_qentity
 
 
 class Gnomon:
-    def __init__(self, root_entity, main_camera, beam_material, grey_material):
+    def __init__(self, root_entity, main_camera):
         """
         A class that houses the Qt3D items (entities, transformations, etc) related to the gnomon (or axis indicator).
         The gnomon/axis indicator is an object that appears in the bottom right-hand corner of the instrument view that
         shows the direction of the x, y, and z axes.
         :param root_entity: The root entity for the gnomon.
-        :param beam_material: The semi-transparent material that is used for the beam in the gnomon.
-        :param grey_material: The material that is used to pain the neutrons.
         :param main_camera: The main component view camera.
         """
 
@@ -25,8 +23,8 @@ class Gnomon:
         self.gnomon_cylinder_length = 4
         self.main_camera = main_camera
         self.gnomon_camera = self.create_gnomon_camera(main_camera)
-        self.beam_material = beam_material
-        self.grey_material = grey_material
+        self.beam_material = create_material(QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5)
+        self.neutron_material = create_material(QColor("black"), QColor("grey"), self.gnomon_root_entity)
 
         self.x_axis_entity = None
         self.y_axis_entity = None
@@ -487,7 +485,7 @@ class Gnomon:
             self.neutron_objects["entities"][i] = create_qentity(
                 [
                     self.neutron_objects["meshes"][i],
-                    self.grey_material,
+                    self.neutron_material,
                     self.neutron_objects["transforms"][i],
                 ],
                 self.gnomon_root_entity,

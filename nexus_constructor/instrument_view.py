@@ -82,26 +82,11 @@ class InstrumentView(QWidget):
         self.surface_selector = Qt3DRender.QRenderSurfaceSelector()
         self.surface_selector.setSurface(self.view)
 
-        # Initialise materials
-        dark_red = QColor("#b00")
-        self.red_material = create_material(QColor("red"), dark_red, self.root_entity, alpha=0.5)
-
-        neutron_material = create_material(QColor("black"), QColor("grey"), self.root_entity)
-        beam_material = create_material(QColor("blue"), QColor("lightblue"), self.root_entity, alpha=0.5)
-
         # Create the gnomon resources and get its camera
         self.gnomon = Gnomon(
             self.gnomon_root_entity,
             self.view.camera(),
-            beam_material,
-            neutron_material,
         )
-        self.gnomon_camera = self.gnomon.get_gnomon_camera()
-
-        # Initialise cube objects
-        self.sample_cube_dimensions = [0.1, 0.1, 0.1]
-        self.cube_entity = None
-        self.cube_mesh = Qt3DExtras.QCuboidMesh()
 
         # Create the axes lines objects
         InstrumentViewAxes(
@@ -147,8 +132,9 @@ class InstrumentView(QWidget):
         self.update_gnomon_size()
 
         # Filter out the gnomon for just the gnomon camera to see
+        gnomon_camera = self.gnomon.get_gnomon_camera()
         gnomon_clear_buffers = self.create_camera_filter(
-            self.gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
+            self.gnomon_viewport, self.gnomon_root_entity, gnomon_camera
         )
         # Make the gnomon appear in front of everything else
         gnomon_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
@@ -302,9 +288,12 @@ class InstrumentView(QWidget):
         """
         Sets up the cube that represents a sample in the 3D view by giving the cube entity a mesh and a material.
         """
-        self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
-        self.cube_entity = create_qentity(
-            [self.cube_mesh, self.red_material], self.component_root_entity
+        cube_mesh = Qt3DExtras.QCuboidMesh(self.component_root_entity)
+        self.set_cube_mesh_dimensions(cube_mesh, *[0.1, 0.1, 0.1])
+        dark_red = QColor("#b00")
+        sample_material = create_material(QColor("red"), dark_red, self.component_root_entity, alpha=0.5)
+        create_qentity(
+            [cube_mesh, sample_material], self.component_root_entity
         )
 
     def initialise_view(self):
