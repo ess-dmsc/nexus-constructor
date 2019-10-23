@@ -15,8 +15,6 @@ from nexus_constructor.off_renderer import OffMesh
 from nexus_constructor.geometry import OFFGeometry
 from nexus_constructor.qentity_utils import create_qentity, create_material
 
-from timeit import default_timer as timer
-
 
 class InstrumentView(QWidget):
     """
