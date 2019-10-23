@@ -6,6 +6,7 @@ and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
 import logging
+from typing import List, Tuple
 
 from nexus_constructor.pixel_data import PixelData, PixelGrid
 from nexus_constructor.geometry import OFFGeometry
@@ -89,6 +90,29 @@ def create_normal_buffer(vertices, faces):
     return normal_buffer_values
 
 
+def repeat_shape_over_grid(
+    model: OFFGeometry, grid: PixelGrid
+) -> Tuple[List[List[int]], List[QVector3D]]:
+    faces = []
+    vertices = []
+    for row in range(grid.rows):
+        for col in range(grid.columns):
+            faces += [
+                [i + (col + (row * grid.columns)) * len(model.vertices) for i in face]
+                for face in model.faces
+            ]
+            vertices += [
+                QVector3D(
+                    vec.x() + (col * grid.col_width),
+                    vec.y() + (row * grid.row_height),
+                    vec.z(),
+                )
+                for vec in model.vertices
+            ]
+
+    return faces, vertices
+
+
 class QtOFFGeometry(Qt3DRender.QGeometry):
     """
     Builds vertex and normal buffers from arbitrary OFF geometry files that contain the faces in the geometry - these
@@ -101,7 +125,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         super().__init__(parent)
 
         if isinstance(pixel_data, PixelGrid):
-            faces, vertices = self.repeat_shape_over_grid(model, pixel_data)
+            faces, vertices = repeat_shape_over_grid(model, pixel_data)
         else:
             faces = model.faces
             vertices = model.vertices
@@ -137,29 +161,6 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         attribute.setCount(len(buffer_values))
         attribute.setName(name)
         return attribute
-
-    def repeat_shape_over_grid(self, model: OFFGeometry, grid: PixelGrid):
-        faces = []
-        vertices = []
-        for row in range(grid.rows):
-            for col in range(grid.columns):
-                faces += [
-                    [
-                        i + (col + (row * grid.columns)) * len(model.vertices)
-                        for i in face
-                    ]
-                    for face in model.faces
-                ]
-                vertices += [
-                    QVector3D(
-                        vec.x() + (col * grid.col_width),
-                        vec.y() + (row * grid.row_height),
-                        vec.z(),
-                    )
-                    for vec in model.vertices
-                ]
-
-        return faces, vertices
 
 
 class OffMesh(Qt3DRender.QGeometryRenderer):
