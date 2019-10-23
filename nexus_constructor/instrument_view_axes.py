@@ -26,14 +26,14 @@ class InstrumentViewAxes(object):
 
             line_vertices = vertices[:]
             line_vertices[i] = line_length
-            geometry = LineGeometry(QtCore.QByteArray(self.create_data_array(line_vertices)), component_root_entity)
+            geometry = LineGeometry(
+                QtCore.QByteArray(self.create_data_array(line_vertices)),
+                component_root_entity,
+            )
 
             self.set_mesh_properties(mesh, geometry)
             material = create_material(color, color, component_root_entity)
-            create_qentity(
-                    [mesh, material], component_root_entity
-                )
-
+            create_qentity([mesh, material], component_root_entity)
 
     @staticmethod
     def create_data_array(line_vertices: List[float]):

@@ -168,7 +168,12 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
     """
 
-    def __init__(self, geometry: OFFGeometry, parent: Qt3DCore.QEntity, pixel_data: PixelData = None):
+    def __init__(
+        self,
+        geometry: OFFGeometry,
+        parent: Qt3DCore.QEntity,
+        pixel_data: PixelData = None,
+    ):
         super().__init__(parent)
 
         self.setInstanceCount(1)

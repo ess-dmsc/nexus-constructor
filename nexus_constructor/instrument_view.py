@@ -83,15 +83,10 @@ class InstrumentView(QWidget):
         self.surface_selector.setSurface(self.view)
 
         # Create the gnomon resources and get its camera
-        self.gnomon = Gnomon(
-            self.gnomon_root_entity,
-            self.view.camera(),
-        )
+        self.gnomon = Gnomon(self.gnomon_root_entity, self.view.camera())
 
         # Create the axes lines objects
-        InstrumentViewAxes(
-            self.axes_root_entity, self.view.camera().farPlane()
-        )
+        InstrumentViewAxes(self.axes_root_entity, self.view.camera().farPlane())
 
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
         # components and axis lines
@@ -205,7 +200,7 @@ class InstrumentView(QWidget):
         mesh = OffMesh(geometry.off_geometry, self.component_root_entity)
 
         with DetachedRootEntity(
-                self.component_root_entity, self.combined_component_axes_entity
+            self.component_root_entity, self.combined_component_axes_entity
         ):
             for position in positions:
                 transform = Qt3DCore.QTransform(self.component_root_entity)
@@ -215,7 +210,11 @@ class InstrumentView(QWidget):
                     create_qentity(
                         [
                             mesh,
-                            create_material(QColor("black"), QColor("grey"), self.component_root_entity),
+                            create_material(
+                                QColor("black"),
+                                QColor("grey"),
+                                self.component_root_entity,
+                            ),
                             transform,
                         ],
                         self.component_root_entity,
@@ -269,10 +268,10 @@ class InstrumentView(QWidget):
         cube_mesh = Qt3DExtras.QCuboidMesh(self.component_root_entity)
         self.set_cube_mesh_dimensions(cube_mesh, *[0.1, 0.1, 0.1])
         dark_red = QColor("#b00")
-        sample_material = create_material(QColor("red"), dark_red, self.component_root_entity, alpha=0.5)
-        create_qentity(
-            [cube_mesh, sample_material], self.component_root_entity
+        sample_material = create_material(
+            QColor("red"), dark_red, self.component_root_entity, alpha=0.5
         )
+        create_qentity([cube_mesh, sample_material], self.component_root_entity)
 
     def initialise_view(self):
         """

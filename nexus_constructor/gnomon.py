@@ -23,8 +23,12 @@ class Gnomon:
         self.gnomon_cylinder_length = 4
         self.main_camera = main_camera
         self.gnomon_camera = self.create_gnomon_camera(main_camera)
-        self.beam_material = create_material(QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5)
-        self.neutron_material = create_material(QColor("black"), QColor("grey"), self.gnomon_root_entity)
+        self.beam_material = create_material(
+            QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5
+        )
+        self.neutron_material = create_material(
+            QColor("black"), QColor("grey"), self.gnomon_root_entity
+        )
 
         self.x_axis_entity = None
         self.y_axis_entity = None
