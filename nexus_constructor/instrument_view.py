@@ -15,6 +15,8 @@ from nexus_constructor.off_renderer import OffMesh
 from nexus_constructor.geometry import OFFGeometry
 from nexus_constructor.qentity_utils import create_qentity, create_material
 
+from timeit import default_timer as timer
+
 
 class InstrumentView(QWidget):
     """
@@ -113,10 +115,6 @@ class InstrumentView(QWidget):
         # Dictionaries for component-related objects also to prevent them from going out of scope
         self.component_meshes = {}
         self.component_entities = {}
-        self.component_transformations = {}
-        self.component_positions = (
-            {}
-        )  # Value is List[QVector3D], shape is repeated at each QVector3D
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.gnomon.setup_beam_cylinder()
@@ -218,34 +216,49 @@ class InstrumentView(QWidget):
 
         if positions is None:
             positions = [QVector3D(0, 0, 0)]
+
         mesh = OffMesh(geometry.off_geometry)
-
         self.component_meshes[name] = mesh
-        position_transforms = []
-        for position in positions:
-            transform = Qt3DCore.QTransform()
-            transform.setTranslation(position)
-            position_transforms.append(transform)
-        self.component_positions[name] = position_transforms
-        # Note, the a list comprehension like below doesn't work (end up with segfault)
-        # self.component_positions[name] = [Qt3DCore.QTransform().setTranslation(position) for position in positions]
-        self._create_entities(name)
 
-    def _create_entities(self, name):
+        component_material = create_material(QColor("black"), QColor("grey"), parent=self.component_root_entity)
+
+        start_creating_entities = timer()
+
         with DetachedRootEntity(
             self.component_root_entity, self.combined_component_axes_entity
         ):
-            self.component_entities[name] = [
-                create_qentity(
-                    [
-                        self.component_meshes[name],
-                        self.grey_material,
-                        position_transform,
-                    ],
-                    self.component_root_entity,
-                )
-                for position_transform in self.component_positions[name]
-            ]
+            entities = []
+            for position in positions:
+                entity = Qt3DCore.QEntity(self.component_root_entity)
+
+                start_creating_transform = timer()
+                transform = Qt3DCore.QTransform(entity)
+                transform.setTranslation(position)
+
+                start_adding_comps = timer()
+
+                entity.addComponent(transform)
+                done_adding_transform = timer()
+
+                entity.addComponent(component_material)
+                done_adding_material = timer()
+
+                entity.addComponent(mesh)
+                done_adding_mesh = timer()
+
+                print("OFFMesh is shared {} and enabled {}".format(mesh.isShareable(), mesh.isEnabled()))
+                print("Time creating transform: {}".format(start_adding_comps - start_creating_transform))
+                print("Time adding transform {}: {}".format(str(transform), done_adding_transform - start_adding_comps))
+                print("Time adding material {}: {}".format(str(component_material), done_adding_material - done_adding_transform))
+                print("Time adding mesh {}: {}".format(str(mesh), done_adding_mesh - done_adding_material))
+
+                entities.append(entity)
+
+        self.component_entities[name] = entities
+
+        stop = timer()
+
+        print("Full added component: {}".format(stop-start_creating_entities))
 
     def clear_all_components(self):
         """
@@ -269,19 +282,6 @@ class InstrumentView(QWidget):
             logging.error(
                 f"Unable to delete component {name} because it doesn't exist."
             )
-
-        self._delete_all_transformations(name)
-
-    def _delete_all_transformations(self, component_name):
-        """
-        Deletes all the transformations associated with a component. Doesn't print a message in the case of a KeyError
-        because components without transformations can exist.
-        """
-        try:
-            del self.component_transformations[component_name]
-            del self.component_positions[component_name]
-        except KeyError:
-            pass
 
     def add_transformation(self, component_name, transformation_name):
         pass
@@ -349,8 +349,14 @@ class DetachedRootEntity:
 
     def __enter__(self):
         # Detach root entity
+        start = timer()
         self._component_root_entity.setParent(None)
+        stop = timer()
+        print("Detatching parent: {}".format(stop - start))
 
     def __exit__(self, *args):
         # Reattach root entity
+        start = timer()
         self._component_root_entity.setParent(self._parent_of_root_entity)
+        stop = timer()
+        print("Setting parent: {}".format(stop-start))

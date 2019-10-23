@@ -11,6 +11,7 @@ def create_material(
     diffuse: QColor,
     alpha: float = None,
     remove_shininess: bool = False,
+    parent: Qt3DCore.QEntity = None,
 ) -> Qt3DRender.QMaterial:
     """
     Creates a material and then sets its ambient, diffuse, alpha (if provided) properties. Sets shininess to zero if
@@ -24,10 +25,10 @@ def create_material(
     """
 
     if alpha is not None:
-        material = Qt3DExtras.QPhongAlphaMaterial()
+        material = Qt3DExtras.QPhongAlphaMaterial(parent)
         material.setAlpha(alpha)
     else:
-        material = Qt3DExtras.QPhongMaterial()
+        material = Qt3DExtras.QPhongMaterial(parent)
 
     if remove_shininess:
         material.setShininess(0)
