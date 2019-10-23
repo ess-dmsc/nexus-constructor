@@ -23,12 +23,6 @@ class Gnomon:
         self.gnomon_cylinder_length = 4
         self.main_camera = main_camera
         self.gnomon_camera = self.create_gnomon_camera(main_camera)
-        self.beam_material = create_material(
-            QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5
-        )
-        self.neutron_material = create_material(
-            QColor("black"), QColor("grey"), self.gnomon_root_entity
-        )
 
         self.x_text_transformation = Qt3DCore.QTransform()
         self.y_text_transformation = Qt3DCore.QTransform()
@@ -61,22 +55,6 @@ class Gnomon:
         self.num_neutrons = 9
 
         self.neutron_animation_length = self.gnomon_cylinder_length * 1.5
-
-        # Create a dictionary for neutron-related objects so that they are always in scope and not destroyed by C++
-        self.neutron_objects = {
-            "entities": [],
-            "meshes": [],
-            "transforms": [],
-            "animation_controllers": [],
-            "animations": [],
-        }
-
-        for _ in range(self.num_neutrons):
-            self.neutron_objects["entities"].append(
-                Qt3DCore.QEntity(self.gnomon_root_entity)
-            )
-            self.neutron_objects["meshes"].append(Qt3DExtras.QSphereMesh())
-            self.neutron_objects["transforms"].append(Qt3DCore.QTransform())
 
     def get_gnomon_camera(self):
         """
@@ -375,9 +353,11 @@ class Gnomon:
             cylinder_mesh, 1.5, self.neutron_animation_length, 2
         )
         self.set_beam_transform(cylinder_transform, self.neutron_animation_length)
+        beam_material = create_material(
+            QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5
+        )
         create_qentity(
-            [cylinder_mesh, self.beam_material, cylinder_transform],
-            self.gnomon_root_entity,
+            [cylinder_mesh, beam_material, cylinder_transform], self.gnomon_root_entity
         )
 
     @staticmethod
@@ -425,23 +405,16 @@ class Gnomon:
         neutron_radius = 1.5
 
         for i in range(self.num_neutrons):
+            mesh = Qt3DExtras.QSphereMesh(self.gnomon_root_entity)
+            self.set_sphere_mesh_radius(mesh, neutron_radius)
 
-            self.set_sphere_mesh_radius(
-                self.neutron_objects["meshes"][i], neutron_radius
-            )
-
+            transform = Qt3DCore.QTransform(self.gnomon_root_entity)
             neutron_animation_controller = NeutronAnimationController(
-                x_offsets[i] * 0.5,
-                y_offsets[i] * 0.5,
-                self.neutron_objects["transforms"][i],
+                x_offsets[i] * 0.5, y_offsets[i] * 0.5, transform
             )
-            neutron_animation_controller.set_target(
-                self.neutron_objects["transforms"][i]
-            )
+            neutron_animation_controller.set_target(transform)
 
-            neutron_animation = QPropertyAnimation(
-                self.neutron_objects["transforms"][i]
-            )
+            neutron_animation = QPropertyAnimation(transform)
             self.set_neutron_animation_properties(
                 neutron_animation,
                 neutron_animation_controller,
@@ -449,16 +422,8 @@ class Gnomon:
                 time_span_offsets[i],
             )
 
-            self.neutron_objects["animation_controllers"].append(
-                neutron_animation_controller
+            neutron_material = create_material(
+                QColor("black"), QColor("grey"), self.gnomon_root_entity
             )
-            self.neutron_objects["animations"].append(neutron_animation)
 
-            self.neutron_objects["entities"][i] = create_qentity(
-                [
-                    self.neutron_objects["meshes"][i],
-                    self.neutron_material,
-                    self.neutron_objects["transforms"][i],
-                ],
-                self.gnomon_root_entity,
-            )
+            create_qentity([mesh, neutron_material, transform], self.gnomon_root_entity)

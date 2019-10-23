@@ -78,11 +78,7 @@ class InstrumentView(QWidget):
         # Choose a fixed height and width for the gnomon so that this can be preserved when the 3D view is resized
         self.gnomon_height = self.gnomon_width = 140
 
-        # Set up view surface selector for filtering
-        self.surface_selector = Qt3DRender.QRenderSurfaceSelector()
-        self.surface_selector.setSurface(self.view)
-
-        # Create the gnomon resources and get its camera
+        # Create the gnomon resources
         self.gnomon = Gnomon(self.gnomon_root_entity, self.view.camera())
 
         # Create the axes lines objects
@@ -93,7 +89,7 @@ class InstrumentView(QWidget):
         self.create_layers()
         self.initialise_view()
 
-        # Dictionaries for component-related objects also to prevent them from going out of scope
+        # Dictionary of components so that we can delete them later
         self.component_entities = {}
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
@@ -107,9 +103,13 @@ class InstrumentView(QWidget):
         Assigns the gnomon view and component view to different cameras and viewports. Controls the buffer behaviour of
         the different viewports so that the depth buffer behaves in such a way that the gnomon is always in front.
         """
+        # Set up view surface selector for filtering
+        surface_selector = Qt3DRender.QRenderSurfaceSelector(self.root_entity)
+        surface_selector.setSurface(self.view)
+
         main_camera = self.view.camera()
-        viewport = Qt3DRender.QViewport(self.surface_selector)
-        self.view.setActiveFrameGraph(self.surface_selector)
+        viewport = Qt3DRender.QViewport(surface_selector)
+        self.view.setActiveFrameGraph(surface_selector)
 
         # Filters out just the instrument for the main camera to see
         component_clear_buffers = self.create_camera_filter(
@@ -123,7 +123,7 @@ class InstrumentView(QWidget):
         component_clear_buffers.setClearColor(QColor("lightgrey"))
 
         # Create a viewport for gnomon in small section of the screen
-        self.gnomon_viewport = Qt3DRender.QViewport(self.surface_selector)
+        self.gnomon_viewport = Qt3DRender.QViewport(surface_selector)
         self.update_gnomon_size()
 
         # Filter out the gnomon for just the gnomon camera to see
@@ -206,18 +206,13 @@ class InstrumentView(QWidget):
                 transform = Qt3DCore.QTransform(self.component_root_entity)
                 transform.setTranslation(position)
 
+                material = create_material(
+                    QColor("black"), QColor("grey"), self.component_root_entity
+                )
+
                 self.component_entities[name] = [
                     create_qentity(
-                        [
-                            mesh,
-                            create_material(
-                                QColor("black"),
-                                QColor("grey"),
-                                self.component_root_entity,
-                            ),
-                            transform,
-                        ],
-                        self.component_root_entity,
+                        [mesh, material, transform], self.component_root_entity
                     )
                 ]
 
