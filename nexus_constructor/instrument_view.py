@@ -202,47 +202,25 @@ class InstrumentView(QWidget):
 
         if positions is None:
             positions = [QVector3D(0, 0, 0)]
-
         mesh = OffMesh(geometry.off_geometry, self.component_root_entity)
 
-        component_material = create_material(QColor("black"), QColor("grey"), self.component_root_entity)
-
-        start_creating_entities = timer()
-
         with DetachedRootEntity(
-            self.component_root_entity, self.combined_component_axes_entity
+                self.component_root_entity, self.combined_component_axes_entity
         ):
-            entities = []
             for position in positions:
-                entity = Qt3DCore.QEntity(self.component_root_entity)
-
-                start_creating_transform = timer()
-                transform = Qt3DCore.QTransform(entity)
+                transform = Qt3DCore.QTransform(self.component_root_entity)
                 transform.setTranslation(position)
 
-                start_adding_comps = timer()
-
-                entity.addComponent(transform)
-                done_adding_transform = timer()
-
-                entity.addComponent(component_material)
-                done_adding_material = timer()
-
-                entity.addComponent(mesh)
-                done_adding_mesh = timer()
-
-                print("Time creating transform: {}".format(start_adding_comps - start_creating_transform))
-                print("Time adding transform {}: {}".format(str(transform), done_adding_transform - start_adding_comps))
-                print("Time adding material {}: {}".format(str(component_material), done_adding_material - done_adding_transform))
-                print("Time adding mesh {}: {}".format(str(mesh), done_adding_mesh - done_adding_material))
-
-                entities.append(entity)
-
-        self.component_entities[name] = entities
-
-        stop = timer()
-
-        print("Full added component: {}".format(stop-start_creating_entities))
+                self.component_entities[name] = [
+                    create_qentity(
+                        [
+                            mesh,
+                            create_material(QColor("black"), QColor("grey"), self.component_root_entity),
+                            transform,
+                        ],
+                        self.component_root_entity,
+                    )
+                ]
 
     def clear_all_components(self):
         """
@@ -318,14 +296,8 @@ class DetachedRootEntity:
 
     def __enter__(self):
         # Detach root entity
-        start = timer()
         self._component_root_entity.setParent(None)
-        stop = timer()
-        print("Detatching parent: {}".format(stop - start))
 
     def __exit__(self, *args):
         # Reattach root entity
-        start = timer()
         self._component_root_entity.setParent(self._parent_of_root_entity)
-        stop = timer()
-        print("Setting parent: {}".format(stop-start))
