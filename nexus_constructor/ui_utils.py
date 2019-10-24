@@ -1,6 +1,7 @@
+from typing import Optional
 import numpy as np
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFileDialog
+from PySide2.QtWidgets import QFileDialog, QMessageBox
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
 import re
 
@@ -85,3 +86,13 @@ def generate_unique_name(base: str, items: list):
     # find the highest number in use, and go one higher
     tailing_numbers = [int(name[len(base) :]) for name in similar_names if name != base]
     return base + str(max(tailing_numbers) + 1)
+
+
+def show_warning_dialog(
+    message: str, title: str, additional_info: Optional[str], parent=None
+):
+    msg = QMessageBox(
+        QMessageBox.Warning, title, message, buttons=QMessageBox.Ok, parent=parent
+    )
+    msg.setInformativeText(additional_info)
+    msg.show()

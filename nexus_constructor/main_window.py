@@ -5,7 +5,6 @@ from PySide2.QtWidgets import (
     QInputDialog,
     QMainWindow,
     QApplication,
-    QMessageBox,
 )
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
@@ -13,12 +12,11 @@ from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButt
 import silx.gui.hdf5
 import os
 import h5py
-from typing import Optional
 
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.ui_utils import file_dialog
+from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
 from nexus_constructor.component.component import Component, TransformationsList
 from nexus_constructor.transformations import Transformation
@@ -33,16 +31,6 @@ from nexus_constructor.json.filewriter_json_reader import json_to_nexus
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
-
-
-def show_warning_dialog(message: str, title: str, additional_info: Optional[str]):
-    msg = QMessageBox()
-    msg.setIcon(QMessageBox.Warning)
-    msg.setText(message)
-    msg.setInformativeText(additional_info)
-    msg.setWindowTitle(title)
-    msg.setStandardButtons(QMessageBox.Ok)
-    msg.exec_()
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
@@ -392,6 +380,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                         "Provided file not recognised as valid JSON",
                         "Invalid JSON",
                         f"{exception}",
+                        parent=self,
                     )
                     return
 

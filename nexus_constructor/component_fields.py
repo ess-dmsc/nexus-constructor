@@ -9,7 +9,6 @@ from PySide2.QtWidgets import (
     QComboBox,
     QDialog,
     QListWidget,
-    QMessageBox,
     QGridLayout,
     QFormLayout,
 )
@@ -21,7 +20,7 @@ from nexus_constructor.component.component import Component
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.ui_utils import validate_line_edit, show_warning_dialog
 from nexus_constructor.validators import (
     FieldValueValidator,
     FieldType,
@@ -282,11 +281,10 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
             component.set_field(
                 name=widget.name, value=widget.value, dtype=widget.dtype
             )
-        except ValueError:
-            dialog = QMessageBox(
-                icon=QMessageBox.Warning,
-                text=f"Warning: field {widget.name} not added",
+        except ValueError as error:
+            show_warning_dialog(
+                f"Warning: field {widget.name} not added",
+                title="Field invalid",
+                additional_info=str(error),
                 parent=fields_widget.parent().parent(),
             )
-            dialog.setWindowTitle("Field invalid")
-            dialog.show()
