@@ -10,6 +10,7 @@ from typing import List, Tuple
 
 from nexus_constructor.geometry import OFFGeometry
 from PySide2.Qt3DRender import Qt3DRender
+from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D
 import struct
 import itertools
@@ -169,14 +170,20 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
     """
 
-    def __init__(self, geometry: OFFGeometry, positions: List[QVector3D] = None):
+    def __init__(
+        self,
+        geometry: OFFGeometry,
+        parent: Qt3DCore.QEntity,
+        positions: List[QVector3D] = None,
+    ):
         """
         Creates a geometry renderer for OFF geometry.
         :param geometry: The geometry to render
+        :param parent: The parent entity to attach the mesh to.
         :param positions: A list of positions to copy the mesh into. If None specified a single mesh is
         produced at the origin.
         """
-        super().__init__(None)
+        super().__init__(parent)
 
         self.setInstanceCount(1)
         qt_geometry = QtOFFGeometry(geometry, positions, self)

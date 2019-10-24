@@ -11,7 +11,7 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
     ambient = Mock()
     diffuse = Mock()
 
-    mock_material = create_material(ambient, diffuse)
+    mock_material = create_material(ambient, diffuse, None)
 
     mock_material.setAmbient.assert_called_once_with(ambient)
     mock_material.setDiffuse.assert_called_once_with(diffuse)
@@ -28,7 +28,7 @@ def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_TH
     diffuse = Mock()
     alpha = 0.5
 
-    mock_alpha_material = create_material(ambient, diffuse, alpha=alpha)
+    mock_alpha_material = create_material(ambient, diffuse, None, alpha=alpha)
 
     mock_alpha_material.setAmbient.assert_called_once_with(ambient)
     mock_alpha_material.setDiffuse.assert_called_once_with(diffuse)
@@ -44,7 +44,7 @@ def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shin
     ambient = Mock()
     diffuse = Mock()
 
-    mock_material = create_material(ambient, diffuse, remove_shininess=True)
+    mock_material = create_material(ambient, diffuse, None, remove_shininess=True)
 
     mock_material.setAmbient.assert_called_once_with(ambient)
     mock_material.setDiffuse.assert_called_once_with(diffuse)
