@@ -274,6 +274,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 if isinstance(field, h5py.Dataset):
                     dtype = field.dtype
                     value = field.value
+                    if "S" in str(dtype):
+                        dtype = h5py.special_dtype(vlen=str)
                     new_ui_field.dtype = dtype
                     if np.isscalar(value):
                         self._update_existing_scalar_field(field, new_ui_field)
@@ -303,7 +305,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if field.dtype == h5py.special_dtype(vlen=str):
             new_ui_field.value = field.value
         else:
-            new_ui_field.value = field.value[()]
+            new_ui_field.value = field[()]
 
     def _update_existing_stream_info(self, field, new_ui_field):
         new_ui_field.field_type = FieldType.kafka_stream.value
