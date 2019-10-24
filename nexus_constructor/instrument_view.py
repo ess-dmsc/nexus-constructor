@@ -267,22 +267,3 @@ class InstrumentView(QWidget):
         self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()
-
-
-class DetachedRootEntity:
-    """
-    Context manager for detaching the component root entity
-    This is useful for reducing CPU load if making many changes to the scene at the same time
-    """
-
-    def __init__(self, component_root_entity, parent_of_root_entity):
-        self._component_root_entity = component_root_entity
-        self._parent_of_root_entity = parent_of_root_entity
-
-    def __enter__(self):
-        # Detach root entity
-        self._component_root_entity.setParent(None)
-
-    def __exit__(self, *args):
-        # Reattach root entity
-        self._component_root_entity.setParent(self._parent_of_root_entity)
