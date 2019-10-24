@@ -193,28 +193,19 @@ class InstrumentView(QWidget):
         if geometry is None:
             return
 
-        if positions is None:
-            positions = [QVector3D(0, 0, 0)]
-        mesh = OffMesh(geometry.off_geometry, self.component_root_entity)
+        mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
 
         self.component_entities[name] = []
 
-        with DetachedRootEntity(
-            self.component_root_entity, self.combined_component_axes_entity
-        ):
-            for position in positions:
-                transform = Qt3DCore.QTransform(self.component_root_entity)
-                transform.setTranslation(position)
+        material = create_material(
+            QColor("black"), QColor("grey"), self.component_root_entity
+        )
 
-                material = create_material(
-                    QColor("black"), QColor("grey"), self.component_root_entity
-                )
-
-                self.component_entities[name].append(
-                    create_qentity(
-                        [mesh, material, transform], self.component_root_entity
-                    )
-                )
+        self.component_entities[name].append(
+            create_qentity(
+                [mesh, material], self.component_root_entity
+            )
+        )
 
     def clear_all_components(self):
         """
