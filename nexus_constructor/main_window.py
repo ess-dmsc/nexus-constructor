@@ -304,17 +304,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         # Will contain .git even if missing so check that it does not contain just that file.
         if not os.path.exists(definitions_dir) or len(os.listdir(definitions_dir)) <= 1:
-            self.warning_window = QDialog()
-            self.warning_window.setWindowTitle("NeXus definitions missing")
-            self.warning_window.setLayout(QGridLayout())
-            self.warning_window.layout().addWidget(
-                QLabel(
-                    "Warning: NeXus definitions are missing. Did you forget to clone the submodules?\n run git submodule update --init "
-                )
+            show_warning_dialog(
+                "Warning: NeXus definitions are missing. Did you forget to clone the submodules?\n run git submodule update --init ",
+                title="NeXus definitions missing",
+                parent=self,
             )
-            # Set add component button to disabled, as it wouldn't work without the definitions.
-            self.pushButton.setEnabled(False)
-            self.warning_window.show()
 
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
