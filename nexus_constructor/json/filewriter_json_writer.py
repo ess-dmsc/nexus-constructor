@@ -2,9 +2,13 @@ import h5py
 import numpy as np
 import uuid
 import logging
+from typing import Union
 
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import object_to_json_file
+
+
+NexusObject = Union[h5py.Group, h5py.Dataset]
 
 
 def generate_json(
@@ -43,7 +47,7 @@ def cast_to_int(data):
         return int(data)
 
 
-def _add_attributes(root, root_dict):
+def _add_attributes(root: NexusObject, root_dict: dict):
     if "attributes" not in root_dict:
         root_dict["attributes"] = []
     root_dict["attributes"] = []
@@ -63,7 +67,7 @@ class NexusToDictConverter:
         self._kafka_streams = dict()
         self._links = dict()
 
-    def convert(self, nexus_root, streams, links):
+    def convert(self, nexus_root: NexusObject, streams: dict, links: dict):
         """
         Converts the given nexus_root to dict with correct replacement of
         the streams
@@ -78,7 +82,7 @@ class NexusToDictConverter:
             "children": [self._root_to_dict(entry) for _, entry in nexus_root.items()]
         }
 
-    def _root_to_dict(self, root):
+    def _root_to_dict(self, root: NexusObject):
         if isinstance(root, h5py.Group):
             root_dict = self._handle_group(root)
         else:
@@ -132,7 +136,7 @@ class NexusToDictConverter:
         return data, dtype, size
 
     @staticmethod
-    def _handle_attributes(root, root_dict):
+    def _handle_attributes(root: NexusObject, root_dict: dict):
         if "NX_class" in root.attrs:
             nx_class = root.attrs["NX_class"]
             if (

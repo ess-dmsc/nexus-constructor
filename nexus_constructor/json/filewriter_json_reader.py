@@ -21,19 +21,21 @@ _json_type_to_numpy = {
     "uint64": np.uint64,
 }
 
+TYPE = "type"
+
 
 def _add_to_nexus(children: List[dict], current_group: h5py.Group):
     """
     Go top down through JSON description constructing NeXus file
     """
     for child in children:
-        if child["type"] == "group":
+        if child[TYPE] == "group":
             _add_group(child, current_group)
-        if child["type"] == "dataset":
+        elif child[TYPE] == "dataset":
             _add_dataset(child, current_group)
-        if child["type"] == "stream":
+        elif child[TYPE] == "stream":
             _add_stream(child, current_group)
-        if child["type"] == "link":
+        elif child[TYPE] == "link":
             _add_link(child, current_group)
 
 
@@ -43,7 +45,7 @@ def _add_stream(json_object: dict, current_group: h5py.Group):
     add_datasets(json_object["stream"], stream_group)
 
 
-def add_datasets(json_object, stream_group):
+def add_datasets(json_object: dict, stream_group: h5py.Group):
     for field_name, field_value in json_object.items():
         if isinstance(field_value, dict):
             new_group = stream_group.create_group(field_name)
@@ -57,7 +59,7 @@ def _add_link(json_object: dict, current_group: h5py.Group):
 
 
 def _add_dataset(json_object: dict, current_group: h5py.Group):
-    numpy_type = _json_type_to_numpy[json_object["dataset"]["type"]]
+    numpy_type = _json_type_to_numpy[json_object["dataset"][TYPE]]
     new_dataset = current_group.create_dataset(
         json_object["name"], dtype=numpy_type, data=json_object["values"]
     )
@@ -76,7 +78,7 @@ def _add_attributes(json_object: dict, nexus_object: NexusObject):
             nexus_object.attrs[attribute["name"]] = attribute["values"]
 
 
-def _create_in_memory_file(filename):
+def _create_in_memory_file(filename: str) -> h5py.File:
     return h5py.File(filename, mode="x", driver="core", backing_store=False)
 
 
