@@ -171,7 +171,7 @@ class NexusToDictConverter:
             root_dict["children"].append(
                 {
                     "type": "link",
-                    "name": root.name,
+                    "name": root.name.split("/")[-1],
                     "target": self._links[root.name]
                     .file.get(root.name, getlink=True)
                     .path,
