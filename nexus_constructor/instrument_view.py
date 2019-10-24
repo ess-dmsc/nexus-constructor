@@ -197,6 +197,8 @@ class InstrumentView(QWidget):
             positions = [QVector3D(0, 0, 0)]
         mesh = OffMesh(geometry.off_geometry, self.component_root_entity)
 
+        self.component_entities[name] = []
+
         with DetachedRootEntity(
             self.component_root_entity, self.combined_component_axes_entity
         ):
@@ -208,11 +210,11 @@ class InstrumentView(QWidget):
                     QColor("black"), QColor("grey"), self.component_root_entity
                 )
 
-                self.component_entities[name] = [
+                self.component_entities[name].append(
                     create_qentity(
                         [mesh, material, transform], self.component_root_entity
                     )
-                ]
+                )
 
     def clear_all_components(self):
         """
