@@ -202,9 +202,7 @@ class InstrumentView(QWidget):
         )
 
         self.component_entities[name].append(
-            create_qentity(
-                [mesh, material], self.component_root_entity
-            )
+            create_qentity([mesh, material], self.component_root_entity)
         )
 
     def clear_all_components(self):
