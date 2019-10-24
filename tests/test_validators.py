@@ -14,6 +14,7 @@ from nexus_constructor.validators import (
     NullableIntValidator,
     NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
+    CommandDialogOKButtonValidator,
 )
 import attr
 from PySide2.QtGui import QValidator
@@ -461,3 +462,21 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
 
     assert validator.validate("test.off", 0) == QValidator.Intermediate
     validator.is_valid.emit.assert_called_once_with(False)
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        ("file.nxs", QValidator.Acceptable),
+        ("file.hdf5", QValidator.Acceptable),
+        ("file.hdf", QValidator.Acceptable),
+        ("file.json", QValidator.Intermediate),
+        ("", QValidator.Intermediate),
+    ],
+)
+def test_GIVEN_valid_file_extensions_WHEN_validating_nexus_filename_for_filewriter_options_THEN_validator_emits_true(
+    test_input, expected
+):
+    validator = CommandDialogOKButtonValidator()
+    validator.is_valid = Mock()
+    assert validator.validate(test_input, 0) == expected
