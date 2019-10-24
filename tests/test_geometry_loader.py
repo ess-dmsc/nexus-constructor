@@ -255,18 +255,15 @@ def test_GIVEN_unrecognised_file_extension_WHEN_loading_geometry_THEN_returns_em
 def get_dummy_OFF():
     # A square with a triangle on the side
     original_vertices = [
-            QVector3D(0, 0, 0),
-            QVector3D(0, 1, 0),
-            QVector3D(1, 1, 0),
-            QVector3D(1, 0, 0),
-            QVector3D(1.5, 0.5, 0),
-        ]
+        QVector3D(0, 0, 0),
+        QVector3D(0, 1, 0),
+        QVector3D(1, 1, 0),
+        QVector3D(1, 0, 0),
+        QVector3D(1.5, 0.5, 0),
+    ]
     original_faces = [[0, 1, 2, 3], [2, 3, 4]]
 
-    return OFFGeometryNoNexus(
-        vertices=original_vertices,
-        faces=original_faces,
-    )
+    return OFFGeometryNoNexus(vertices=original_vertices, faces=original_faces)
 
 
 def test_WHEN_generate_off_mesh_with_no_repeat_THEN_off_unchanged():
@@ -287,8 +284,8 @@ def test_WHEN_generate_off_mesh_with_three_copies_THEN_original_shape_remains():
 
     faces, vertices = repeat_shape_over_positions(off_geometry, positions)
 
-    assert faces[:len(off_geometry.faces)] == off_geometry.faces
-    assert vertices[:len(off_geometry.vertices)] == off_geometry.vertices
+    assert faces[: len(off_geometry.faces)] == off_geometry.faces
+    assert vertices[: len(off_geometry.vertices)] == off_geometry.vertices
 
 
 def _test_position_with_single_translation_helper(translation):
@@ -298,8 +295,8 @@ def _test_position_with_single_translation_helper(translation):
 
     faces, vertices = repeat_shape_over_positions(off_geometry, positions)
 
-    second_shape_faces = faces[len(off_geometry.faces):]
-    second_shape_vertices = vertices[len(off_geometry.vertices):]
+    second_shape_faces = faces[len(off_geometry.faces) :]
+    second_shape_vertices = vertices[len(off_geometry.vertices) :]
 
     # Faces will just be the same but every vertex added to be len(vertices)
     shifted_faces = []
@@ -315,36 +312,45 @@ def _test_position_with_single_translation_helper(translation):
 
 
 def test_WHEN_generate_off_mesh_with_single_x_position_THEN_second_shape_just_translation_of_first():
-    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(QVector3D(1, 0, 0))
+    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
+        QVector3D(1, 0, 0)
+    )
 
     # Vertices will be the same by shifted by 1
     for vertex in second_shape_vertices:
-        vertex.setX(vertex.x()-1)
+        vertex.setX(vertex.x() - 1)
 
     assert second_shape_vertices == original_vertices
 
 
 def test_WHEN_generate_off_mesh_with_single_y_position_THEN_second_shape_just_translation_of_first():
-    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(QVector3D(0, 1, 0))
+    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
+        QVector3D(0, 1, 0)
+    )
 
     # Vertices will be the same by shifted by 1
     for vertex in second_shape_vertices:
-        vertex.setY(vertex.y()-1)
+        vertex.setY(vertex.y() - 1)
 
     assert second_shape_vertices == original_vertices
 
 
 def test_WHEN_generate_off_mesh_with_single_negative_z_position_THEN_second_shape_just_translation_of_first():
-    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(QVector3D(0, 0, -1))
+    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
+        QVector3D(0, 0, -1)
+    )
 
     # Vertices will be the same by shifted by 1
     for vertex in second_shape_vertices:
-        vertex.setZ(vertex.z()+1)
+        vertex.setZ(vertex.z() + 1)
 
     assert second_shape_vertices == original_vertices
 
+
 def test_WHEN_generate_off_mesh_with_single_diagonal_position_THEN_second_shape_just_translation_of_first():
-    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(QVector3D(0, 1, -1))
+    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
+        QVector3D(0, 1, -1)
+    )
 
     for vertex in second_shape_vertices:
         vertex.setZ(vertex.z() + 1)
