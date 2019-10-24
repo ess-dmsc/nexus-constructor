@@ -1,9 +1,7 @@
-from nexus_constructor.pixel_data import PixelGrid
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
-from nexus_constructor.off_renderer import QtOFFGeometry
+from nexus_constructor.off_renderer import repeat_shape_over_positions
 from PySide2.QtGui import QVector3D
-import struct
 from io import StringIO
 
 
@@ -253,111 +251,108 @@ def test_GIVEN_unrecognised_file_extension_WHEN_loading_geometry_THEN_returns_em
     assert len(geometry.faces) == 0
 
 
-def test_generate_off_mesh_without_repeating_grid():
+def get_dummy_OFF():
     # A square with a triangle on the side
-    off_geometry = OFFGeometryNoNexus(
-        vertices=[
-            QVector3D(0, 0, 0),
-            QVector3D(0, 1, 0),
-            QVector3D(1, 1, 0),
-            QVector3D(1, 0, 0),
-            QVector3D(1.5, 0.5, 0),
-        ],
-        faces=[[0, 1, 2, 3], [2, 3, 4]],
-    )
-    qt_geometry = QtOFFGeometry(off_geometry, None)
-    # 3 triangles total, 3 points per triangle
-    assert qt_geometry.vertex_count == 3 * 3
-    vertex_data_bytes = eval(str(qt_geometry.attributes()[0].buffer().data()))
-    vertex_data = list(
-        struct.unpack("%sf" % (qt_geometry.vertex_count * 3), vertex_data_bytes)
-    )
-    generated_triangles = [
-        vertex_data[i : i + 9] for i in range(0, len(vertex_data), 9)
+    original_vertices = [
+        QVector3D(0, 0, 0),
+        QVector3D(0, 1, 0),
+        QVector3D(1, 1, 0),
+        QVector3D(1, 0, 0),
+        QVector3D(1.5, 0.5, 0),
     ]
+    original_faces = [[0, 1, 2, 3], [2, 3, 4]]
 
-    triangles = [
-        [0, 0, 0, 0, 1, 0, 1, 1, 0],
-        [0, 0, 0, 1, 1, 0, 1, 0, 0],
-        [1, 1, 0, 1, 0, 0, 1.5, 0.5, 0],
-    ]
-    # check the triangles are present
-    for triangle in triangles:
-        assert triangle in generated_triangles
+    return OFFGeometryNoNexus(vertices=original_vertices, faces=original_faces)
 
 
-def test_generate_off_mesh_with_repeating_grid():
-    rows = 2
-    row_height = 3
-    columns = 5
-    column_width = 7
-    # A square with a triangle on the side
-    off_geometry = OFFGeometryNoNexus(
-        vertices=[
-            QVector3D(0, 0, 0),
-            QVector3D(0, 1, 0),
-            QVector3D(1, 1, 0),
-            QVector3D(1, 0, 0),
-            QVector3D(1.5, 0.5, 0),
-        ],
-        faces=[[0, 1, 2, 3], [2, 3, 4]],
+def test_WHEN_generate_off_mesh_with_no_repeat_THEN_off_unchanged():
+    off_geometry = get_dummy_OFF()
+
+    positions = [QVector3D(0, 0, 0)]
+
+    faces, vertices = repeat_shape_over_positions(off_geometry, positions)
+
+    assert faces == off_geometry.faces
+    assert vertices == off_geometry.vertices
+
+
+def test_WHEN_generate_off_mesh_with_three_copies_THEN_original_shape_remains():
+    off_geometry = get_dummy_OFF()
+
+    positions = [QVector3D(0, 0, 0), QVector3D(0, 0, 1), QVector3D(1, 0, 0)]
+
+    faces, vertices = repeat_shape_over_positions(off_geometry, positions)
+
+    assert faces[: len(off_geometry.faces)] == off_geometry.faces
+    assert vertices[: len(off_geometry.vertices)] == off_geometry.vertices
+
+
+def _test_position_with_single_translation_helper(translation):
+    off_geometry = get_dummy_OFF()
+
+    positions = [QVector3D(0, 0, 0), translation]
+
+    faces, vertices = repeat_shape_over_positions(off_geometry, positions)
+
+    second_shape_faces = faces[len(off_geometry.faces) :]
+    second_shape_vertices = vertices[len(off_geometry.vertices) :]
+
+    # Faces will just be the same but every vertex added to be len(vertices)
+    shifted_faces = []
+    for face in second_shape_faces:
+        shifted_face = []
+        for vertex in face:
+            shifted_face.append(vertex - len(off_geometry.vertices))
+        shifted_faces.append(shifted_face)
+
+    assert shifted_faces == off_geometry.faces
+
+    return off_geometry.vertices, second_shape_vertices
+
+
+def test_WHEN_generate_off_mesh_with_single_x_position_THEN_second_shape_just_translation_of_first():
+    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
+        QVector3D(1, 0, 0)
     )
-    qt_geometry = QtOFFGeometry(
-        off_geometry,
-        PixelGrid(
-            rows=rows, row_height=row_height, columns=columns, col_width=column_width
-        ),
-    )
-    # rows of copies, 3 triangles total, 3 points per triangle
-    assert qt_geometry.vertex_count == rows * columns * 3 * 3
 
-    vertex_data_bytes = eval(str(qt_geometry.attributes()[0].buffer().data()))
-    vertex_data = list(
-        struct.unpack("%sf" % (qt_geometry.vertex_count * 3), vertex_data_bytes)
-    )
-    generated_triangles = [
-        vertex_data[i : i + 9] for i in range(0, len(vertex_data), 9)
-    ]
+    # Vertices will be the same by shifted by 1
+    for vertex in second_shape_vertices:
+        vertex.setX(vertex.x() - 1)
 
-    for i in range(rows):
-        for j in range(columns):
-            x_offset = j * column_width
-            y_offset = i * row_height
-            triangles = [
-                [
-                    0 + x_offset,
-                    0 + y_offset,
-                    0,
-                    0 + x_offset,
-                    1 + y_offset,
-                    0,
-                    1 + x_offset,
-                    1 + y_offset,
-                    0,
-                ],
-                [
-                    0 + x_offset,
-                    0 + y_offset,
-                    0,
-                    1 + x_offset,
-                    1 + y_offset,
-                    0,
-                    1 + x_offset,
-                    0 + y_offset,
-                    0,
-                ],
-                [
-                    1 + x_offset,
-                    1 + y_offset,
-                    0,
-                    1 + x_offset,
-                    0 + y_offset,
-                    0,
-                    1.5 + x_offset,
-                    0.5 + y_offset,
-                    0,
-                ],
-            ]
-            # check the triangles are present
-            for triangle in triangles:
-                assert triangle in generated_triangles
+    assert second_shape_vertices == original_vertices
+
+
+def test_WHEN_generate_off_mesh_with_single_y_position_THEN_second_shape_just_translation_of_first():
+    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
+        QVector3D(0, 1, 0)
+    )
+
+    # Vertices will be the same by shifted by 1
+    for vertex in second_shape_vertices:
+        vertex.setY(vertex.y() - 1)
+
+    assert second_shape_vertices == original_vertices
+
+
+def test_WHEN_generate_off_mesh_with_single_negative_z_position_THEN_second_shape_just_translation_of_first():
+    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
+        QVector3D(0, 0, -1)
+    )
+
+    # Vertices will be the same by shifted by 1
+    for vertex in second_shape_vertices:
+        vertex.setZ(vertex.z() + 1)
+
+    assert second_shape_vertices == original_vertices
+
+
+def test_WHEN_generate_off_mesh_with_single_diagonal_position_THEN_second_shape_just_translation_of_first():
+    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
+        QVector3D(0, 1, -1)
+    )
+
+    for vertex in second_shape_vertices:
+        vertex.setZ(vertex.z() + 1)
+        vertex.setY(vertex.y() - 1)
+
+    assert second_shape_vertices == original_vertices

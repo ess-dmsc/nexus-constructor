@@ -193,28 +193,17 @@ class InstrumentView(QWidget):
         if geometry is None:
             return
 
-        if positions is None:
-            positions = [QVector3D(0, 0, 0)]
-        mesh = OffMesh(geometry.off_geometry, self.component_root_entity)
+        mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
 
         self.component_entities[name] = []
 
-        with DetachedRootEntity(
-            self.component_root_entity, self.combined_component_axes_entity
-        ):
-            for position in positions:
-                transform = Qt3DCore.QTransform(self.component_root_entity)
-                transform.setTranslation(position)
+        material = create_material(
+            QColor("black"), QColor("grey"), self.component_root_entity
+        )
 
-                material = create_material(
-                    QColor("black"), QColor("grey"), self.component_root_entity
-                )
-
-                self.component_entities[name].append(
-                    create_qentity(
-                        [mesh, material, transform], self.component_root_entity
-                    )
-                )
+        self.component_entities[name].append(
+            create_qentity([mesh, material], self.component_root_entity)
+        )
 
     def clear_all_components(self):
         """
@@ -276,22 +265,3 @@ class InstrumentView(QWidget):
         self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()
-
-
-class DetachedRootEntity:
-    """
-    Context manager for detaching the component root entity
-    This is useful for reducing CPU load if making many changes to the scene at the same time
-    """
-
-    def __init__(self, component_root_entity, parent_of_root_entity):
-        self._component_root_entity = component_root_entity
-        self._parent_of_root_entity = parent_of_root_entity
-
-    def __enter__(self):
-        # Detach root entity
-        self._component_root_entity.setParent(None)
-
-    def __exit__(self, *args):
-        # Reattach root entity
-        self._component_root_entity.setParent(self._parent_of_root_entity)
