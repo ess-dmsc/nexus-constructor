@@ -73,8 +73,14 @@ class FieldWidget(QFrame):
         possible_field_names: List[str],
         parent: QListWidget = None,
         instrument: Instrument = None,
+        stream_group_name: str = None,
     ):
         super(FieldWidget, self).__init__(parent)
+
+        # We don't really care about this as it'll never end up in the JSON, but in order to save it into a nexus file it needs a name.
+        self.stream_group_name = (
+            stream_group_name if stream_group_name is not None else str(uuid.uuid4())
+        )
 
         self.edit_dialog = QDialog(parent=self)
         self.instrument = instrument
@@ -161,7 +167,11 @@ class FieldWidget(QFrame):
 
     @property
     def name(self):
-        return self.field_name_edit.text()
+        return (
+            self.field_name_edit.text()
+            if self.field_type != FieldType.kafka_stream
+            else self.stream_group_name
+        )
 
     @property
     def dtype(self):
