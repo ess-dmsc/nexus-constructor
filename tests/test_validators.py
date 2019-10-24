@@ -27,7 +27,7 @@ class ObjectWithName:
 
 
 def assess_names(
-    names: List[ObjectWithName], new_name, expected_validity, invalid=None
+    names: List[ObjectWithName], new_name, expected_validity, invalid_names=None
 ):
     """
     Tests the validity of a given name at a given index in a TransformationModel and InstrumentModel with an existing
@@ -37,14 +37,17 @@ def assess_names(
     :param new_name: The name to check the validity of a change/insert into the model
     :param expected_validity: Whether the name change/insert is expected to be valid
     """
-    validator = NameValidator(names, invalid)
+    validator = NameValidator(names, invalid_names)
     assert (
         validator.validate(new_name, 0) == QValidator.Acceptable
     ) == expected_validity
 
 
 def test_name_validator_name_in_invalid_names():
-    assess_names([], "test", expected_validity=False, invalid=["test"])
+    invalid_names = ["test"]
+    assess_names(
+        [], invalid_names[0], expected_validity=False, invalid_names=invalid_names
+    )
 
 
 def test_name_validator_new_unique_name():
