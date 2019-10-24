@@ -265,7 +265,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderXLineEdit.setValue(component_shape.axis_direction.x())
                 self.cylinderYLineEdit.setValue(component_shape.axis_direction.y())
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
-            self.unitsLineEdit.setText(component_shape.units)
+                self.unitsLineEdit.setText(component_shape.units)
         fields = self.component_to_edit.get_fields()
         if fields:
             for field in fields:
