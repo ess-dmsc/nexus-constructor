@@ -101,7 +101,7 @@ def test_GIVEN_a_triangle_WHEN_creating_off_geometry_with_no_pixel_data_THEN_ver
 
 
 def test_WHEN_creating_off_mesh_with_cube_THEN_geometry_contains_cube():
-    off_mesh = OffMesh(OFFCube)
+    off_mesh = OffMesh(OFFCube, None)
     assert (
         off_mesh.geometry().vertex_count
         == VERTICES_IN_TRIANGLE * TRIANGLES_IN_SQUARE * VERTICES_IN_CUBE
@@ -114,6 +114,6 @@ def test_GIVEN_geometry_WHEN_creating_off_mesh_THEN_geometry_contains_original_g
         faces=[[0, 1, 2]],
     )
 
-    off_mesh = OffMesh(off_output)
+    off_mesh = OffMesh(off_output, None)
 
     assert off_mesh.geometry().vertex_count == VERTICES_IN_TRIANGLE
