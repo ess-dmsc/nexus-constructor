@@ -2,9 +2,9 @@ from PySide2.QtWidgets import (
     QAction,
     QToolBar,
     QAbstractItemView,
-    QInputDialog,
     QMainWindow,
     QApplication,
+    QInputDialog,
 )
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
@@ -15,11 +15,13 @@ import h5py
 
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.filewriter_command_dialog import FilewriterCommandDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
-from nexus_constructor.component.component import Component
-from nexus_constructor.transformations import Transformation, TransformationsList
+from nexus_constructor.component.component import Component, TransformationsList
+from nexus_constructor.transformations import Transformation
+
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import (
     ComponentEditorDelegate,
@@ -323,20 +325,25 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
         if filename:
-            name, ok_pressed = QInputDialog.getText(
-                None,
-                "NeXus file output name",
-                "Name for output NeXus file to include in JSON command:",
+            dialog = FilewriterCommandDialog()
+            dialog.exec_()
+            nexus_file_name, broker, start_time, stop_time, service_id, abort_on_uninitialised_stream, use_swmr = (
+                dialog.get_arguments()
             )
-            if ok_pressed:
-                with open(filename, "w") as file:
-                    filewriter_json_writer.generate_json(
-                        self.instrument,
-                        file,
-                        nexus_file_name=name,
-                        streams=self.instrument.get_streams(),
-                        links=self.instrument.get_links(),
-                    )
+            with open(filename, "w") as file:
+                filewriter_json_writer.generate_json(
+                    self.instrument,
+                    file,
+                    nexus_file_name=nexus_file_name,
+                    broker=broker,
+                    streams=self.instrument.get_streams(),
+                    links=self.instrument.get_links(),
+                    start_time=start_time,
+                    stop_time=stop_time,
+                    service_id=service_id,
+                    abort_uninitialised=abort_on_uninitialised_stream,
+                    use_swmr=use_swmr,
+                )
 
     def save_to_forwarder_json(self):
 
