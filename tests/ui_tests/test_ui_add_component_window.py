@@ -1716,8 +1716,6 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
 
     group = streams_widget.get_stream_group()
 
-    assert name in group.name
-
     assert "array_size" in group
 
     assert group["array_size"][()] == array_size

@@ -230,8 +230,7 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
             file, streams={f"/{group_name}": group_contents}, links=[]
         )
 
-        assert group.name == root_dict["children"][0]["name"]
-        assert group_contents == root_dict["children"][0]["children"][0]["stream"]
+        assert group_contents == root_dict["children"][0]["stream"]
 
 
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children():
@@ -249,11 +248,8 @@ def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_
             file, streams={}, links={file[group_name].name: group_to_be_linked}
         )
 
-        assert file[group_name].name == root_dict["children"][0]["name"]
-        assert file[group_name].name == root_dict["children"][0]["children"][0]["name"]
-        assert (
-            group_to_be_linked.name == root_dict["children"][0]["children"][0]["target"]
-        )
+        assert file[group_name].name.split("/")[-1] == root_dict["children"][0]["name"]
+        assert group_to_be_linked.name == root_dict["children"][0]["target"]
 
 
 def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN_attributes_end_up_in_file():
