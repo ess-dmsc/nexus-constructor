@@ -144,7 +144,7 @@ class ComponentTreeModel(QAbstractItemModel):
                 return
         remove_index = self.components.index(index.internalPointer())
         self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
-        for transform in component.transforms:
+        for transform in transforms:
             transform.remove_from_dependee_chain()
         self.instrument.remove_component(component)
         self.components.pop(remove_index)
