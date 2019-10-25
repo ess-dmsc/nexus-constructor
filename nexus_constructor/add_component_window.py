@@ -46,7 +46,6 @@ from nexus_constructor.geometry.geometry_loader import load_geometry
 
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
-import numpy as np
 
 
 class GeometryType(Enum):
@@ -291,31 +290,39 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderYLineEdit.setValue(component_shape.axis_direction.y())
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
-        fields = self.component_to_edit.get_fields()
-        for field in fields:
-            new_ui_field = self.add_field()
-            new_ui_field.name = field.name.split("/")[-1]
-            if isinstance(field, h5py.Dataset):
-                dtype = field.dtype
-                value = field[()]
-                if "S" in str(dtype):
-                    dtype = h5py.special_dtype(vlen=str)
-                new_ui_field.dtype = dtype
-                if np.isscalar(value):
-                    update_existing_scalar_field(field, new_ui_field)
-                else:
-                    update_existing_array_field(value, new_ui_field)
-            elif isinstance(field, h5py.Group):
-                if isinstance(
-                    field.parent.get(field.name, getlink=True), h5py.SoftLink
-                ):
-                    update_existing_link_field(field, new_ui_field)
-                elif (
-                    "NX_class" in field.attrs.keys()
-                    and field.attrs["NX_class"] == "NCstream"
-                ):
-                    new_ui_field.field_type = FieldType.kafka_stream.value
-                    new_ui_field.streams_widget.update_existing_stream_info(field)
+
+        scalar_fields, array_fields, stream_fields, link_fields = (
+            self.component_to_edit.get_fields()
+        )
+
+        for field in scalar_fields:
+            new_ui_field = self.create_new_ui_field(field)
+            dtype = field.dtype
+            if "S" in str(dtype):
+                dtype = h5py.special_dtype(vlen=str)
+            new_ui_field.dtype = dtype
+            update_existing_scalar_field(field, new_ui_field)
+
+        for field in array_fields:
+            new_ui_field = self.create_new_ui_field(field)
+            dtype = field.dtype
+            value = field[()]
+            new_ui_field.dtype = dtype
+            update_existing_array_field(value, new_ui_field)
+
+        for field in stream_fields:
+            new_ui_field = self.create_new_ui_field(field)
+            new_ui_field.field_type = FieldType.kafka_stream.value
+            new_ui_field.streams_widget.update_existing_stream_info(field)
+
+        for field in link_fields:
+            new_ui_field = self.create_new_ui_field(field)
+            update_existing_link_field(field, new_ui_field)
+
+    def create_new_ui_field(self, field):
+        new_ui_field = self.add_field()
+        new_ui_field.name = field.name.split("/")[-1]
+        return new_ui_field
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()

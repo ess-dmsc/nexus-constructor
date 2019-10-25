@@ -2,7 +2,7 @@ import logging
 
 import h5py
 from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar, Optional, List, Union
+from typing import Any, TypeVar, Optional, List
 import numpy as np
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
@@ -43,22 +43,31 @@ def decode_bytes_string(nexus_string):
         return nexus_string
 
 
-def get_fields(group: h5py.Group) -> List[Union[h5py.Dataset, h5py.Group]]:
+def get_fields(
+    group: h5py.Group
+) -> (List[h5py.Dataset], List[h5py.Dataset], List[h5py.Group], List[h5py.Group]):
     """
     Return a list of fields in a given component group.
     :param group: The hdf5 component group to check for fields
     :return: A list of a fields, regardless of field type
     """
-    fields = []
+    scalar_fields = []
+    array_fields = []
+    stream_fields = []
+    link_fields = []
     for item in group.values():
         if isinstance(item, h5py.Dataset) and item.name.split("/")[-1] != "description":
-            fields.append(item)
-        if isinstance(item, h5py.Group):
+            if np.isscalar(item.value):
+                scalar_fields.append(item)
+            array_fields.append(item)
+        elif isinstance(item, h5py.Group):
             if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
-                fields.append(item)
-            if "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream":
-                fields.append(item)
-    return fields
+                link_fields.append(item)
+            elif (
+                "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream"
+            ):
+                stream_fields.append(item)
+    return scalar_fields, array_fields, stream_fields, link_fields
 
 
 class NexusWrapper(QObject):
