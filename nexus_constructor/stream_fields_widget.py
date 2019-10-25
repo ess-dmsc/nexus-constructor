@@ -1,6 +1,6 @@
 import uuid
 from functools import partial
-from typing import List, Dict
+from typing import List, ItemsView
 
 import h5py
 from PySide2.QtCore import Qt
@@ -53,7 +53,7 @@ def check_if_advanced_options_should_be_enabled(
     return advanced_options
 
 
-def fill_in_advanced_options(elements: Dict[str, QSpinBox], field: h5py.Group):
+def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
     for nxs_string, spinner in elements:
         if nxs_string in field.keys():
             spinner.setValue(field[nxs_string][()])
