@@ -36,6 +36,21 @@ F142_TYPES = [
 STRING_DTYPE = h5py.special_dtype(vlen=str)
 
 
+def check_if_advanced_options_should_be_enabled(elements, field):
+    advanced_options = False
+    for item in field.keys():
+        if item in elements:
+            advanced_options = True
+            break
+    return advanced_options
+
+
+def fill_in_advanced_options(elements, field):
+    for nxs_string, spinner in elements:
+        if nxs_string in field.keys():
+            spinner.setValue(field[nxs_string][()])
+
+
 class StreamFieldsWidget(QDialog):
     """
     A stream widget containing schema-specific properties.
@@ -333,7 +348,7 @@ class StreamFieldsWidget(QDialog):
         :param new_ui_field: The new UI field to be filled in
         """
 
-        advanced_options = self.check_if_advanced_options_should_be_enabled(
+        advanced_options = check_if_advanced_options_should_be_enabled(
             self.ev42_nexus_elements, field
         )
 
@@ -346,17 +361,7 @@ class StreamFieldsWidget(QDialog):
                 bool(field[ADC_PULSE_DEBUG][()])
             )
 
-        self.fill_in_advanced_options(
-            self.ev42_nexus_to_spinner_ui_element.items(), field
-        )
-
-    def check_if_advanced_options_should_be_enabled(self, elements, field):
-        advanced_options = False
-        for item in field.keys():
-            if item in elements:
-                advanced_options = True
-                break
-        return advanced_options
+        fill_in_advanced_options(self.ev42_nexus_to_spinner_ui_element.items(), field)
 
     def fill_in_existing_f142_fields(self, field: h5py.Group):
         """
@@ -373,7 +378,7 @@ class StreamFieldsWidget(QDialog):
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
 
-        advanced_options = self.check_if_advanced_options_should_be_enabled(
+        advanced_options = check_if_advanced_options_should_be_enabled(
             self.f142_nexus_elements, field
         )
 
@@ -381,14 +386,7 @@ class StreamFieldsWidget(QDialog):
             self.f142_advanced_group_box.setEnabled(True)
             self.set_advanced_options_state()
 
-        self.fill_in_advanced_options(
-            self.f142_nexus_to_spinner_ui_element.items(), field
-        )
-
-    def fill_in_advanced_options(self, elements, field):
-        for nxs_string, spinner in elements:
-            if nxs_string in field.keys():
-                spinner.setValue(field[nxs_string][()])
+        fill_in_advanced_options(self.f142_nexus_to_spinner_ui_element.items(), field)
 
     def update_existing_stream_info(self, field: h5py.Group):
         """
