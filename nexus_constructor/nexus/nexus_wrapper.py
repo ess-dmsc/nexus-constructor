@@ -59,6 +59,7 @@ def get_fields(
         if isinstance(item, h5py.Dataset) and item.name.split("/")[-1] != "description":
             if np.isscalar(item.value):
                 scalar_fields.append(item)
+                break
             array_fields.append(item)
         elif isinstance(item, h5py.Group):
             if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):

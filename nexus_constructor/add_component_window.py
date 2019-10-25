@@ -14,7 +14,11 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
+from nexus_constructor.component_fields import (
+    FieldWidget,
+    add_fields_to_component,
+    INVALID_FIELD_NAMES,
+)
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     UserDefinedChopperChecker,
 )
@@ -534,6 +538,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # remove the previous shape from the qt3d view
         if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
             self.instrument.remove_component(self.component_to_edit)
+
+        # remove previous fields
+        for field_group in self.component_to_edit.group.values():
+            if field_group.name.split("/")[-1] not in INVALID_FIELD_NAMES:
+                del self.instrument.nexus.nexus_file[field_group.name]
 
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
