@@ -36,6 +36,16 @@ F142_TYPES = [
 
 STRING_DTYPE = h5py.special_dtype(vlen=str)
 
+NEXUS_INDICES_INDEX_EVERY_MB = "nexus.indices.index_every_mb"
+NEXUS_INDICES_INDEX_EVERY_KB = "nexus.indices.index_every_kb"
+STORE_LATEST_INTO = "store_latest_into"
+NEXUS_CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
+NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
+NEXUS_BUFFER_SIZE_MB = "nexus.buffer.size_mb"
+NEXUS_BUFFER_SIZE_KB = "nexus.buffer.size_kb"
+NEXUS_BUFFER_PACKET_MAX_KB = "nexus.buffer.packet_max_kb"
+ADC_PULSE_DEBUG = "adc_pulse_debug"
+
 
 def check_if_advanced_options_should_be_enabled(
     elements: List[str], field: h5py.Group
@@ -404,14 +414,3 @@ class StreamFieldsWidget(QDialog):
             self.fill_in_existing_f142_fields(field)
         if schema == "ev42":
             self.fill_in_existing_ev42_fields(field)
-
-
-NEXUS_INDICES_INDEX_EVERY_MB = "nexus.indices.index_every_mb"
-NEXUS_INDICES_INDEX_EVERY_KB = "nexus.indices.index_every_kb"
-STORE_LATEST_INTO = "store_latest_into"
-NEXUS_CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
-NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
-NEXUS_BUFFER_SIZE_MB = "nexus.buffer.size_mb"
-NEXUS_BUFFER_SIZE_KB = "nexus.buffer.size_kb"
-NEXUS_BUFFER_PACKET_MAX_KB = "nexus.buffer.packet_max_kb"
-ADC_PULSE_DEBUG = "adc_pulse_debug"
