@@ -18,18 +18,6 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
-from nexus_constructor.stream_advanced_options import (
-    NEXUS_INDICES_INDEX_EVERY_MB,
-    NEXUS_INDICES_INDEX_EVERY_KB,
-    STORE_LATEST_INTO,
-    NEXUS_CHUNK_CHUNK_MB,
-    NEXUS_CHUNK_CHUNK_KB,
-    NEXUS_BUFFER_SIZE_MB,
-    NEXUS_BUFFER_SIZE_KB,
-    NEXUS_BUFFER_PACKET_MAX_KB,
-    ADC_PULSE_DEBUG,
-)
-
 SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime"]
 F142_TYPES = [
     "byte",
@@ -544,3 +532,14 @@ class StreamFieldsWidget(QDialog):
 
         if schema == "ev42":
             self.fill_in_existing_ev42_fields(field)
+
+
+NEXUS_INDICES_INDEX_EVERY_MB = "nexus.indices.index_every_mb"
+NEXUS_INDICES_INDEX_EVERY_KB = "nexus.indices.index_every_kb"
+STORE_LATEST_INTO = "store_latest_into"
+NEXUS_CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
+NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
+NEXUS_BUFFER_SIZE_MB = "nexus.buffer.size_mb"
+NEXUS_BUFFER_SIZE_KB = "nexus.buffer.size_kb"
+NEXUS_BUFFER_PACKET_MAX_KB = "nexus.buffer.packet_max_kb"
+ADC_PULSE_DEBUG = "adc_pulse_debug"
