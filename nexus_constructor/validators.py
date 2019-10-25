@@ -81,12 +81,15 @@ class NameValidator(QValidator):
     The validationFailed signal is emitted if an entered name is not unique.
     """
 
-    def __init__(self, list_model: List):
+    def __init__(self, list_model: List, invalid_names=None):
         super().__init__()
+        if invalid_names is None:
+            invalid_names = []
         self.list_model = list_model
+        self.invalid_names = invalid_names
 
     def validate(self, input: str, pos: int):
-        if not input:
+        if not input or input in self.invalid_names:
             self.is_valid.emit(False)
             return QValidator.Intermediate
 
