@@ -21,17 +21,6 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     DiskChopperGeometryCreator,
 )
-from nexus_constructor.stream_advanced_options import (
-    NEXUS_INDICES_INDEX_EVERY_MB,
-    NEXUS_INDICES_INDEX_EVERY_KB,
-    STORE_LATEST_INTO,
-    NEXUS_BUFFER_PACKET_MAX_KB,
-    NEXUS_BUFFER_SIZE_KB,
-    NEXUS_BUFFER_SIZE_MB,
-    NEXUS_CHUNK_CHUNK_KB,
-    NEXUS_CHUNK_CHUNK_MB,
-    ADC_PULSE_DEBUG,
-)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import (
     make_dictionary_of_class_definitions,
@@ -97,118 +86,6 @@ def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget)
         new_ui_field.value = field.value
     else:
         new_ui_field.value = field[()]
-
-
-def fill_in_existing_ev42_fields(field: h5py.Group, new_ui_field: FieldWidget):
-    """
-    Fill in specific existing ev42 fields into the new UI field.
-    :param field: The stream group
-    :param new_ui_field: The new UI field to be filled in
-    """
-    advanced_options = False
-    for item in field.keys():
-        if item in [
-            ADC_PULSE_DEBUG,
-            NEXUS_INDICES_INDEX_EVERY_MB,
-            NEXUS_INDICES_INDEX_EVERY_KB,
-            NEXUS_CHUNK_CHUNK_MB,
-            NEXUS_CHUNK_CHUNK_KB,
-            NEXUS_BUFFER_SIZE_MB,
-            NEXUS_BUFFER_SIZE_KB,
-            NEXUS_BUFFER_PACKET_MAX_KB,
-        ]:
-            advanced_options = True
-
-    if advanced_options:
-        new_ui_field.streams_widget.ev42_advanced_group_box.setEnabled(True)
-        new_ui_field.streams_widget.set_advanced_options_state()
-
-    if ADC_PULSE_DEBUG in field.keys():
-        new_ui_field.streams_widget.ev42_adc_pulse_debug_checkbox.setChecked(
-            bool(field[ADC_PULSE_DEBUG][()])
-        )
-    if NEXUS_INDICES_INDEX_EVERY_MB in field.keys():
-        new_ui_field.streams_widget.ev42_nexus_indices_index_every_mb_spinbox.setValue(
-            field[NEXUS_INDICES_INDEX_EVERY_MB][()]
-        )
-    if NEXUS_INDICES_INDEX_EVERY_KB in field.keys():
-        new_ui_field.streams_widget.ev42_nexus_indices_index_every_kb_spinbox.setValue(
-            field[NEXUS_INDICES_INDEX_EVERY_KB][()]
-        )
-    if NEXUS_CHUNK_CHUNK_MB in field.keys():
-        new_ui_field.streams_widget.ev42_nexus_chunk_chunk_mb_spinbox.setValue(
-            field[NEXUS_CHUNK_CHUNK_MB][()]
-        )
-    if NEXUS_CHUNK_CHUNK_KB in field.keys():
-        new_ui_field.streams_widget.ev42_nexus_chunk_chunk_kb_spinbox.setValue(
-            field[NEXUS_CHUNK_CHUNK_KB][()]
-        )
-    if NEXUS_BUFFER_SIZE_MB in field.keys():
-        new_ui_field.streams_widget.ev42_nexus_buffer_size_mb_spinbox.setValue(
-            field[NEXUS_BUFFER_SIZE_MB][()]
-        )
-    if NEXUS_BUFFER_SIZE_KB in field.keys():
-        new_ui_field.streams_widget.ev42_nexus_buffer_size_kb_spinbox.setValue(
-            field[NEXUS_BUFFER_SIZE_KB][()]
-        )
-    if NEXUS_BUFFER_PACKET_MAX_KB in field.keys():
-        new_ui_field.streams_widget.ev42_nexus_buffer_packet_max_kb_spinbox.setValue(
-            field[NEXUS_BUFFER_PACKET_MAX_KB][()]
-        )
-
-
-def fill_in_existing_f142_fields(field: h5py.Group, new_ui_field: FieldWidget):
-    """
-    Fill in specific existing f142 fields into the new UI field.
-    :param field: The stream group
-    :param new_ui_field: The new UI field to be filled in
-    """
-    new_ui_field.streams_widget.type_combo.setCurrentText(field["type"][()])
-    if "array_size" in field.keys():
-        new_ui_field.streams_widget.array_radio.setChecked(True)
-        new_ui_field.streams_widget.scalar_radio.setChecked(False)
-        new_ui_field.streams_widget.array_size_spinbox.setValue(field["array_size"][()])
-    else:
-        new_ui_field.streams_widget.array_radio.setChecked(False)
-        new_ui_field.streams_widget.scalar_radio.setChecked(True)
-    if (
-        NEXUS_INDICES_INDEX_EVERY_KB in field.keys()
-        or NEXUS_INDICES_INDEX_EVERY_MB in field.keys()
-        or STORE_LATEST_INTO in field.keys()
-    ):
-        new_ui_field.streams_widget.f142_advanced_group_box.setEnabled(True)
-        new_ui_field.streams_widget.set_advanced_options_state()
-    if NEXUS_INDICES_INDEX_EVERY_MB in field.keys():
-        new_ui_field.streams_widget.f142_nexus_indices_index_every_mb_spinbox.setValue(
-            field[NEXUS_INDICES_INDEX_EVERY_MB][()]
-        )
-    if NEXUS_INDICES_INDEX_EVERY_KB in field.keys():
-        new_ui_field.streams_widget.f142_nexus_indices_index_every_kb_spinbox.setValue(
-            field[NEXUS_INDICES_INDEX_EVERY_KB][()]
-        )
-    if STORE_LATEST_INTO in field.keys():
-        new_ui_field.streams_widget.f142_nexus_store_latest_into_spinbox.setValue(
-            field[STORE_LATEST_INTO][()]
-        )
-
-
-def update_existing_stream_info(field: h5py.Group, new_ui_field: FieldWidget):
-    """
-    Fill in stream fields and properties into the new UI field.
-    :param field: The stream group
-    :param new_ui_field: The new UI field to be filled in
-    """
-    new_ui_field.field_type = FieldType.kafka_stream.value
-    schema = field["writer_module"][()]
-    new_ui_field.streams_widget.schema_combo.setCurrentText(str(schema))
-    new_ui_field.streams_widget.topic_line_edit.setText(str(field["topic"][()]))
-    if schema != "ev42":
-        new_ui_field.streams_widget.source_line_edit.setText(str(field["source"][()]))
-    if schema == "f142":
-        fill_in_existing_f142_fields(field, new_ui_field)
-
-    if schema == "ev42":
-        fill_in_existing_ev42_fields(field, new_ui_field)
 
 
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
@@ -437,7 +314,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                     "NX_class" in field.attrs.keys()
                     and field.attrs["NX_class"] == "NCstream"
                 ):
-                    update_existing_stream_info(field, new_ui_field)
+                    new_ui_field.field_type = FieldType.kafka_stream.value
+                    new_ui_field.streams_widget.update_existing_stream_info(field)
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()

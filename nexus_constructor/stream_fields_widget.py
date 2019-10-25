@@ -436,3 +436,111 @@ class StreamFieldsWidget(QDialog):
                 dtype=int,
                 data=self.f142_nexus_store_latest_into_spinbox.value(),
             )
+
+    def fill_in_existing_ev42_fields(self, field: h5py.Group):
+        """
+        Fill in specific existing ev42 fields into the new UI field.
+        :param field: The stream group
+        :param new_ui_field: The new UI field to be filled in
+        """
+        advanced_options = False
+        for item in field.keys():
+            if item in [
+                ADC_PULSE_DEBUG,
+                NEXUS_INDICES_INDEX_EVERY_MB,
+                NEXUS_INDICES_INDEX_EVERY_KB,
+                NEXUS_CHUNK_CHUNK_MB,
+                NEXUS_CHUNK_CHUNK_KB,
+                NEXUS_BUFFER_SIZE_MB,
+                NEXUS_BUFFER_SIZE_KB,
+                NEXUS_BUFFER_PACKET_MAX_KB,
+            ]:
+                advanced_options = True
+
+        if advanced_options:
+            self.ev42_advanced_group_box.setEnabled(True)
+            self.set_advanced_options_state()
+
+        if ADC_PULSE_DEBUG in field.keys():
+            self.ev42_adc_pulse_debug_checkbox.setChecked(
+                bool(field[ADC_PULSE_DEBUG][()])
+            )
+        if NEXUS_INDICES_INDEX_EVERY_MB in field.keys():
+            self.ev42_nexus_indices_index_every_mb_spinbox.setValue(
+                field[NEXUS_INDICES_INDEX_EVERY_MB][()]
+            )
+        if NEXUS_INDICES_INDEX_EVERY_KB in field.keys():
+            self.ev42_nexus_indices_index_every_kb_spinbox.setValue(
+                field[NEXUS_INDICES_INDEX_EVERY_KB][()]
+            )
+        if NEXUS_CHUNK_CHUNK_MB in field.keys():
+            self.ev42_nexus_chunk_chunk_mb_spinbox.setValue(
+                field[NEXUS_CHUNK_CHUNK_MB][()]
+            )
+        if NEXUS_CHUNK_CHUNK_KB in field.keys():
+            self.ev42_nexus_chunk_chunk_kb_spinbox.setValue(
+                field[NEXUS_CHUNK_CHUNK_KB][()]
+            )
+        if NEXUS_BUFFER_SIZE_MB in field.keys():
+            self.ev42_nexus_buffer_size_mb_spinbox.setValue(
+                field[NEXUS_BUFFER_SIZE_MB][()]
+            )
+        if NEXUS_BUFFER_SIZE_KB in field.keys():
+            self.ev42_nexus_buffer_size_kb_spinbox.setValue(
+                field[NEXUS_BUFFER_SIZE_KB][()]
+            )
+        if NEXUS_BUFFER_PACKET_MAX_KB in field.keys():
+            self.ev42_nexus_buffer_packet_max_kb_spinbox.setValue(
+                field[NEXUS_BUFFER_PACKET_MAX_KB][()]
+            )
+
+    def fill_in_existing_f142_fields(self, field: h5py.Group):
+        """
+        Fill in specific existing f142 fields into the new UI field.
+        :param field: The stream group
+        :param new_ui_field: The new UI field to be filled in
+        """
+        self.type_combo.setCurrentText(field["type"][()])
+        if "array_size" in field.keys():
+            self.array_radio.setChecked(True)
+            self.scalar_radio.setChecked(False)
+            self.array_size_spinbox.setValue(field["array_size"][()])
+        else:
+            self.array_radio.setChecked(False)
+            self.scalar_radio.setChecked(True)
+        if (
+            NEXUS_INDICES_INDEX_EVERY_KB in field.keys()
+            or NEXUS_INDICES_INDEX_EVERY_MB in field.keys()
+            or STORE_LATEST_INTO in field.keys()
+        ):
+            self.f142_advanced_group_box.setEnabled(True)
+            self.set_advanced_options_state()
+        if NEXUS_INDICES_INDEX_EVERY_MB in field.keys():
+            self.f142_nexus_indices_index_every_mb_spinbox.setValue(
+                field[NEXUS_INDICES_INDEX_EVERY_MB][()]
+            )
+        if NEXUS_INDICES_INDEX_EVERY_KB in field.keys():
+            self.f142_nexus_indices_index_every_kb_spinbox.setValue(
+                field[NEXUS_INDICES_INDEX_EVERY_KB][()]
+            )
+        if STORE_LATEST_INTO in field.keys():
+            self.f142_nexus_store_latest_into_spinbox.setValue(
+                field[STORE_LATEST_INTO][()]
+            )
+
+    def update_existing_stream_info(self, field: h5py.Group):
+        """
+        Fill in stream fields and properties into the new UI field.
+        :param field: The stream group
+        :param new_ui_field: The new UI field to be filled in
+        """
+        schema = field["writer_module"][()]
+        self.schema_combo.setCurrentText(str(schema))
+        self.topic_line_edit.setText(str(field["topic"][()]))
+        if schema != "ev42":
+            self.source_line_edit.setText(str(field["source"][()]))
+        if schema == "f142":
+            self.fill_in_existing_f142_fields(field)
+
+        if schema == "ev42":
+            self.fill_in_existing_ev42_fields(field)
