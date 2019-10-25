@@ -415,30 +415,29 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
         fields = self.component_to_edit.get_fields()
-        if fields:
-            for field in fields:
-                new_ui_field = self.add_field()
-                new_ui_field.name = field.name.split("/")[-1]
-                if isinstance(field, h5py.Dataset):
-                    dtype = field.dtype
-                    value = field[()]
-                    if "S" in str(dtype):
-                        dtype = h5py.special_dtype(vlen=str)
-                    new_ui_field.dtype = dtype
-                    if np.isscalar(value):
-                        update_existing_scalar_field(field, new_ui_field)
-                    else:
-                        update_existing_array_field(value, new_ui_field)
-                elif isinstance(field, h5py.Group):
-                    if isinstance(
-                        field.parent.get(field.name, getlink=True), h5py.SoftLink
-                    ):
-                        update_existing_link_field(field, new_ui_field)
-                    elif (
-                        "NX_class" in field.attrs.keys()
-                        and field.attrs["NX_class"] == "NCstream"
-                    ):
-                        update_existing_stream_info(field, new_ui_field)
+        for field in fields:
+            new_ui_field = self.add_field()
+            new_ui_field.name = field.name.split("/")[-1]
+            if isinstance(field, h5py.Dataset):
+                dtype = field.dtype
+                value = field[()]
+                if "S" in str(dtype):
+                    dtype = h5py.special_dtype(vlen=str)
+                new_ui_field.dtype = dtype
+                if np.isscalar(value):
+                    update_existing_scalar_field(field, new_ui_field)
+                else:
+                    update_existing_array_field(value, new_ui_field)
+            elif isinstance(field, h5py.Group):
+                if isinstance(
+                    field.parent.get(field.name, getlink=True), h5py.SoftLink
+                ):
+                    update_existing_link_field(field, new_ui_field)
+                elif (
+                    "NX_class" in field.attrs.keys()
+                    and field.attrs["NX_class"] == "NCstream"
+                ):
+                    update_existing_stream_info(field, new_ui_field)
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
