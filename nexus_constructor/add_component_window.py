@@ -273,7 +273,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 new_ui_field.name = field.name.split("/")[-1]
                 if isinstance(field, h5py.Dataset):
                     dtype = field.dtype
-                    value = field.value
+                    value = field[()]
                     if "S" in str(dtype):
                         dtype = h5py.special_dtype(vlen=str)
                     new_ui_field.dtype = dtype
