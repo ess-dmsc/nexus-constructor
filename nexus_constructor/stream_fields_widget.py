@@ -45,12 +45,7 @@ def check_if_advanced_options_should_be_enabled(
     :param elements: list of names to check if exist
     :param field: the field group
     """
-    advanced_options = False
-    for item in field.keys():
-        if item in elements:
-            advanced_options = True
-            break
-    return advanced_options
+    return any(item in field.keys() for item in elements)
 
 
 def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
