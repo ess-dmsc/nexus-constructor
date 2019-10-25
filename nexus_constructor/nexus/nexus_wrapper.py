@@ -43,6 +43,24 @@ def decode_bytes_string(nexus_string):
         return nexus_string
 
 
+def get_fields(group: h5py.Group) -> List[Union[h5py.Dataset, h5py.Group]]:
+    """
+    Return a list of fields in a given component group.
+    :param group: The hdf5 component group to check for fields
+    :return: A list of a fields, regardless of field type
+    """
+    fields = []
+    for item in group.values():
+        if isinstance(item, h5py.Dataset) and item.name.split("/")[-1] != "description":
+            fields.append(item)
+        if isinstance(item, h5py.Group):
+            if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
+                fields.append(item)
+            if "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream":
+                fields.append(item)
+    return fields
+
+
 class NexusWrapper(QObject):
     """
     Contains the NeXus file and functions to add and edit components in the NeXus file structure.
@@ -186,24 +204,6 @@ class NexusWrapper(QObject):
         if value.dtype.type is np.string_:
             value = str(value, "utf8")
         return value
-
-    def get_fields(self, group: h5py.Group) -> List[Union[h5py.Dataset, h5py.Group]]:
-        fields = []
-        for item in group.values():
-            if (
-                isinstance(item, h5py.Dataset)
-                and item.name.split("/")[-1] != "description"
-            ):
-                fields.append(item)
-            if isinstance(item, h5py.Group):
-                if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
-                    fields.append(item)
-                if (
-                    "NX_class" in item.attrs.keys()
-                    and item.attrs["NX_class"] == "NCstream"
-                ):
-                    fields.append(item)
-        return fields
 
     @staticmethod
     def _recreate_dataset(parent_group: h5py.Group, name: str, value: Any, dtype=None):
