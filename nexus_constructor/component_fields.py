@@ -15,7 +15,7 @@ from PySide2.QtWidgets import (
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
-from typing import List
+from typing import List, Union
 from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
@@ -167,7 +167,7 @@ class FieldWidget(QFrame):
         )
 
     @property
-    def field_type(self):
+    def field_type(self) -> FieldType:
         return FieldType(self.field_type_combo.currentText())
 
     @field_type.setter
@@ -176,15 +176,15 @@ class FieldWidget(QFrame):
         self.field_type_changed()
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.field_name_edit.text()
 
     @name.setter
-    def name(self, name):
+    def name(self, name: str):
         self.field_name_edit.setText(name)
 
     @property
-    def dtype(self):
+    def dtype(self) -> Union[h5py.Datatype, h5py.SoftLink, h5py.Group]:
         if self.field_type == FieldType.scalar_dataset:
             return self.value.dtype
         if self.field_type == FieldType.array_dataset:
@@ -195,7 +195,7 @@ class FieldWidget(QFrame):
             return h5py.Group
 
     @dtype.setter
-    def dtype(self, dtype):
+    def dtype(self, dtype: h5py.Datatype):
         self.value_type_combo.setCurrentText(
             next(key for key, value in DATASET_TYPE.items() if value == dtype)
         )
@@ -226,7 +226,6 @@ class FieldWidget(QFrame):
             self.table_view.model.array = value
         elif self.field_type == FieldType.link:
             self.value_line_edit.setText(value)
-        # TODO: streams
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:

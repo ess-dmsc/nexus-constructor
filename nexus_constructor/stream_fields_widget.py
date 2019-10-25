@@ -1,5 +1,6 @@
 import uuid
 from functools import partial
+from typing import List, Dict
 
 import h5py
 from PySide2.QtCore import Qt
@@ -36,7 +37,14 @@ F142_TYPES = [
 STRING_DTYPE = h5py.special_dtype(vlen=str)
 
 
-def check_if_advanced_options_should_be_enabled(elements, field):
+def check_if_advanced_options_should_be_enabled(
+    elements: List[str], field: h5py.Group
+) -> bool:
+    """
+    Checks whether the advanced options box should be enabled by checking if any of the advanced options have existing values.
+    :param elements: list of names to check if exist
+    :param field: the field group
+    """
     advanced_options = False
     for item in field.keys():
         if item in elements:
@@ -45,7 +53,7 @@ def check_if_advanced_options_should_be_enabled(elements, field):
     return advanced_options
 
 
-def fill_in_advanced_options(elements, field):
+def fill_in_advanced_options(elements: Dict[str, QSpinBox], field: h5py.Group):
     for nxs_string, spinner in elements:
         if nxs_string in field.keys():
             spinner.setValue(field[nxs_string][()])
@@ -62,8 +70,8 @@ class StreamFieldsWidget(QDialog):
         self.setLayout(QGridLayout())
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
-        self.minimum_value = 0
-        self.maximum_value = 100000000
+        self.minimum_spinbox_value = 0
+        self.maximum_spinbox_value = 100000000
 
         self.hs00_unimplemented_label = QLabel(
             "hs00 (Event histograms) has not yet been fully implemented."
@@ -173,7 +181,7 @@ class StreamFieldsWidget(QDialog):
         for nexus_string in self.ev42_nexus_elements:
             label = QLabel(nexus_string)
             spinner = QSpinBox()
-            spinner.setRange(self.minimum_value, self.maximum_value)
+            spinner.setRange(self.minimum_spinbox_value, self.maximum_spinbox_value)
 
             self.ev42_advanced_group_box.layout().addRow(label, spinner)
 
@@ -198,7 +206,7 @@ class StreamFieldsWidget(QDialog):
         for nexus_string in self.f142_nexus_elements:
             label = QLabel(nexus_string)
             spinner = QSpinBox()
-            spinner.setRange(self.minimum_value, self.maximum_value)
+            spinner.setRange(self.minimum_spinbox_value, self.maximum_spinbox_value)
 
             self.f142_advanced_group_box.layout().addRow(label, spinner)
             self.f142_nexus_to_spinner_ui_element[nexus_string] = spinner
@@ -219,10 +227,8 @@ class StreamFieldsWidget(QDialog):
     def set_advanced_options_state(self):
         """Used for getting the stream options when the dialog is closed."""
         self.advanced_options_enabled = (
-            True
-            if self.ev42_advanced_group_box.isVisible()
+            self.ev42_advanced_group_box.isVisible()
             or self.f142_advanced_group_box.isVisible()
-            else False
         )
 
     def _show_array_size(self, show: bool):
