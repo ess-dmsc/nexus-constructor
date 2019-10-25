@@ -68,14 +68,15 @@ def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
     new_ui_field.value = field.parent.get(field.name, getlink=True).path
 
 
-def update_existing_array_field(value: h5py.Dataset, new_ui_field: FieldWidget):
+def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
     """
     Fill in a UI array field for an existing array field in the component group
     :param value: The array dataset's value to copy to the UI fields list model
     :param new_ui_field: The new UI field to fill in with existing data
     """
+    new_ui_field.dtype = field.dtype
     new_ui_field.field_type = FieldType.array_dataset.value
-    new_ui_field.value = value
+    new_ui_field.value = field[()]
 
 
 def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget):
@@ -84,11 +85,24 @@ def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget)
     :param field: The dataset to copy into the value line edit
     :param new_ui_field: The new UI field to fill in with existing data
     """
-    new_ui_field.field_type = FieldType.scalar_dataset.value
-    if field.dtype == h5py.special_dtype(vlen=str):
+    dtype = field.dtype
+    if "S" in str(dtype):
+        dtype = h5py.special_dtype(vlen=str)
         new_ui_field.value = field.value
     else:
         new_ui_field.value = field[()]
+    new_ui_field.dtype = dtype
+    new_ui_field.field_type = FieldType.scalar_dataset.value
+
+
+def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+    """
+    Fill in a UI stream field for an existing stream field in the component group
+    :param field: The dataset to copy into the value line edit
+    :param new_ui_field: The new UI field to fill in with existing data
+    """
+    new_ui_field.field_type = FieldType.kafka_stream.value
+    new_ui_field.streams_widget.update_existing_stream_info(field)
 
 
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
@@ -299,29 +313,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.component_to_edit.get_fields()
         )
 
-        for field in scalar_fields:
-            new_ui_field = self.create_new_ui_field(field)
-            dtype = field.dtype
-            if "S" in str(dtype):
-                dtype = h5py.special_dtype(vlen=str)
-            new_ui_field.dtype = dtype
-            update_existing_scalar_field(field, new_ui_field)
+        update_methods = {
+            scalar_fields: update_existing_scalar_field,
+            array_fields: update_existing_array_field,
+            stream_fields: update_existing_stream_field,
+            link_fields: update_existing_link_field,
+        }
 
-        for field in array_fields:
-            new_ui_field = self.create_new_ui_field(field)
-            dtype = field.dtype
-            value = field[()]
-            new_ui_field.dtype = dtype
-            update_existing_array_field(value, new_ui_field)
-
-        for field in stream_fields:
-            new_ui_field = self.create_new_ui_field(field)
-            new_ui_field.field_type = FieldType.kafka_stream.value
-            new_ui_field.streams_widget.update_existing_stream_info(field)
-
-        for field in link_fields:
-            new_ui_field = self.create_new_ui_field(field)
-            update_existing_link_field(field, new_ui_field)
+        for fields, update_method in update_methods:
+            for field in fields:
+                new_ui_field = self.create_new_ui_field(field)
+                update_method(field, new_ui_field)
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
