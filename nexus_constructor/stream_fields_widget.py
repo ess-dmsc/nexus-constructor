@@ -183,14 +183,23 @@ class StreamFieldsWidget(QDialog):
             self.ev42_adc_pulse_debug_label, self.ev42_adc_pulse_debug_checkbox
         )
 
-        for nexus_string in self.ev42_nexus_elements:
+        self.add_labels_and_spinboxes_for_advanced_options(
+            self.ev42_nexus_elements,
+            self.ev42_advanced_group_box,
+            self.ev42_nexus_to_spinner_ui_element,
+        )
+
+    def add_labels_and_spinboxes_for_advanced_options(
+        self, elements, group_box, nexus_to_spinner
+    ):
+        for nexus_string in elements:
             label = QLabel(nexus_string)
             spinner = QSpinBox()
             spinner.setRange(self.minimum_spinbox_value, self.maximum_spinbox_value)
 
-            self.ev42_advanced_group_box.layout().addRow(label, spinner)
+            group_box.layout().addRow(label, spinner)
 
-            self.ev42_nexus_to_spinner_ui_element[nexus_string] = spinner
+            nexus_to_spinner[nexus_string] = spinner
 
     def _set_up_f142_group_box(self):
         """
@@ -208,13 +217,11 @@ class StreamFieldsWidget(QDialog):
             STORE_LATEST_INTO,
         ]
 
-        for nexus_string in self.f142_nexus_elements:
-            label = QLabel(nexus_string)
-            spinner = QSpinBox()
-            spinner.setRange(self.minimum_spinbox_value, self.maximum_spinbox_value)
-
-            self.f142_advanced_group_box.layout().addRow(label, spinner)
-            self.f142_nexus_to_spinner_ui_element[nexus_string] = spinner
+        self.add_labels_and_spinboxes_for_advanced_options(
+            self.f142_nexus_elements,
+            self.f142_advanced_group_box,
+            self.f142_nexus_to_spinner_ui_element,
+        )
 
     def _show_advanced_options(self):
         schema = self.schema_combo.currentText()
