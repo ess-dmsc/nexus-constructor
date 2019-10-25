@@ -9,6 +9,7 @@ from PySide2.QtGui import QColor
 def create_material(
     ambient: QColor,
     diffuse: QColor,
+    parent: Qt3DCore.QEntity,
     alpha: float = None,
     remove_shininess: bool = False,
 ) -> Qt3DRender.QMaterial:
@@ -24,10 +25,10 @@ def create_material(
     """
 
     if alpha is not None:
-        material = Qt3DExtras.QPhongAlphaMaterial()
+        material = Qt3DExtras.QPhongAlphaMaterial(parent)
         material.setAlpha(alpha)
     else:
-        material = Qt3DExtras.QPhongMaterial()
+        material = Qt3DExtras.QPhongMaterial(parent)
 
     if remove_shininess:
         material.setShininess(0)

@@ -31,10 +31,17 @@ from nexus_constructor.validators import (
 )
 import numpy as np
 
+# These are invalid because there are separate inputs in the UI for these fields and therefore inputting them through
+# the field name line edit would cause conflicts.
+INVALID_FIELD_NAMES = ["description", "shape", "depends_on"]
+
 
 class FieldNameLineEdit(QLineEdit):
     def __init__(self, possible_field_names: List[str]):
         super().__init__()
+        possible_field_names = [
+            x for x in possible_field_names if x not in INVALID_FIELD_NAMES
+        ]
         self.update_possible_fields(possible_field_names)
         self.setPlaceholderText("Name of new field")
         self.setMinimumWidth(160)
@@ -146,7 +153,10 @@ class FieldWidget(QFrame):
         field_widgets = []
         for i in range(parent.count()):
             field_widgets.append(parent.itemWidget(parent.item(i)))
-        self.field_name_edit.setValidator(NameValidator(field_widgets))
+
+        self.field_name_edit.setValidator(
+            NameValidator(field_widgets, invalid_names=INVALID_FIELD_NAMES)
+        )
         self.field_name_edit.validator().is_valid.connect(
             partial(
                 validate_line_edit,

@@ -76,47 +76,19 @@ class InstrumentView(QWidget):
         # Choose a fixed height and width for the gnomon so that this can be preserved when the 3D view is resized
         self.gnomon_height = self.gnomon_width = 140
 
-        # Set up view surface selector for filtering
-        self.surface_selector = Qt3DRender.QRenderSurfaceSelector()
-        self.surface_selector.setSurface(self.view)
-
-        # Initialise materials
-        self.grey_material = None
-        self.red_material = None
-        self.beam_material = None
-        self.give_colors_to_materials()
-
-        # Initialise cube objects
-        self.sample_cube_dimensions = [0.1, 0.1, 0.1]
-        self.cube_entity = None
-        self.cube_mesh = Qt3DExtras.QCuboidMesh()
-
-        # Create the gnomon resources and get its camera
-        self.gnomon = Gnomon(
-            self.gnomon_root_entity,
-            self.view.camera(),
-            self.beam_material,
-            self.grey_material,
-        )
-        self.gnomon_camera = self.gnomon.get_gnomon_camera()
+        # Create the gnomon resources
+        self.gnomon = Gnomon(self.gnomon_root_entity, self.view.camera())
 
         # Create the axes lines objects
-        self.instrument_view_axes = InstrumentViewAxes(
-            self.axes_root_entity, self.view.camera().farPlane()
-        )
+        InstrumentViewAxes(self.axes_root_entity, self.view.camera().farPlane())
 
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
         # components and axis lines
         self.create_layers()
         self.initialise_view()
 
-        # Dictionaries for component-related objects also to prevent them from going out of scope
-        self.component_meshes = {}
+        # Dictionary of components so that we can delete them later
         self.component_entities = {}
-        self.component_transformations = {}
-        self.component_positions = (
-            {}
-        )  # Value is List[QVector3D], shape is repeated at each QVector3D
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.gnomon.setup_beam_cylinder()
@@ -129,9 +101,13 @@ class InstrumentView(QWidget):
         Assigns the gnomon view and component view to different cameras and viewports. Controls the buffer behaviour of
         the different viewports so that the depth buffer behaves in such a way that the gnomon is always in front.
         """
+        # Set up view surface selector for filtering
+        surface_selector = Qt3DRender.QRenderSurfaceSelector(self.root_entity)
+        surface_selector.setSurface(self.view)
+
         main_camera = self.view.camera()
-        viewport = Qt3DRender.QViewport(self.surface_selector)
-        self.view.setActiveFrameGraph(self.surface_selector)
+        viewport = Qt3DRender.QViewport(surface_selector)
+        self.view.setActiveFrameGraph(surface_selector)
 
         # Filters out just the instrument for the main camera to see
         component_clear_buffers = self.create_camera_filter(
@@ -145,12 +121,13 @@ class InstrumentView(QWidget):
         component_clear_buffers.setClearColor(QColor("lightgrey"))
 
         # Create a viewport for gnomon in small section of the screen
-        self.gnomon_viewport = Qt3DRender.QViewport(self.surface_selector)
+        self.gnomon_viewport = Qt3DRender.QViewport(surface_selector)
         self.update_gnomon_size()
 
         # Filter out the gnomon for just the gnomon camera to see
+        gnomon_camera = self.gnomon.get_gnomon_camera()
         gnomon_clear_buffers = self.create_camera_filter(
-            self.gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
+            self.gnomon_viewport, self.gnomon_root_entity, gnomon_camera
         )
         # Make the gnomon appear in front of everything else
         gnomon_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
@@ -216,42 +193,22 @@ class InstrumentView(QWidget):
         if geometry is None:
             return
 
-        if positions is None:
-            positions = [QVector3D(0, 0, 0)]
-        mesh = OffMesh(geometry.off_geometry)
+        mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
 
-        self.component_meshes[name] = mesh
-        position_transforms = []
-        for position in positions:
-            transform = Qt3DCore.QTransform()
-            transform.setTranslation(position)
-            position_transforms.append(transform)
-        self.component_positions[name] = position_transforms
-        # Note, the a list comprehension like below doesn't work (end up with segfault)
-        # self.component_positions[name] = [Qt3DCore.QTransform().setTranslation(position) for position in positions]
-        self._create_entities(name)
+        self.component_entities[name] = []
 
-    def _create_entities(self, name):
-        with DetachedRootEntity(
-            self.component_root_entity, self.combined_component_axes_entity
-        ):
-            self.component_entities[name] = [
-                create_qentity(
-                    [
-                        self.component_meshes[name],
-                        self.grey_material,
-                        position_transform,
-                    ],
-                    self.component_root_entity,
-                )
-                for position_transform in self.component_positions[name]
-            ]
+        material = create_material(
+            QColor("black"), QColor("grey"), self.component_root_entity
+        )
+
+        self.component_entities[name].append(
+            create_qentity([mesh, material], self.component_root_entity)
+        )
 
     def clear_all_components(self):
         """
         resets the entities in qt3d so all components are cleared form the 3d view.
         """
-        self.component_meshes = dict()
         self.component_entities = dict()
 
     def delete_component(self, name):
@@ -264,46 +221,16 @@ class InstrumentView(QWidget):
 
         try:
             del self.component_entities[name]
-            del self.component_meshes[name]
         except KeyError:
             logging.error(
                 f"Unable to delete component {name} because it doesn't exist."
             )
-
-        self._delete_all_transformations(name)
-
-    def _delete_all_transformations(self, component_name):
-        """
-        Deletes all the transformations associated with a component. Doesn't print a message in the case of a KeyError
-        because components without transformations can exist.
-        """
-        try:
-            del self.component_transformations[component_name]
-            del self.component_positions[component_name]
-        except KeyError:
-            pass
 
     def add_transformation(self, component_name, transformation_name):
         pass
 
     def delete_single_transformation(self, component_name, transformation_name):
         pass
-
-    def give_colors_to_materials(self):
-        """
-        Creates several QColors and uses them to configure the different materials that will be used for the objects in
-        the 3D view.
-        """
-        red = QColor("red")
-        black = QColor("black")
-        grey = QColor("grey")
-        blue = QColor("blue")
-        light_blue = QColor("lightblue")
-        dark_red = QColor("#b00")
-
-        self.grey_material = create_material(black, grey)
-        self.red_material = create_material(red, dark_red, alpha=0.5)
-        self.beam_material = create_material(blue, light_blue, alpha=0.5)
 
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
@@ -322,10 +249,13 @@ class InstrumentView(QWidget):
         """
         Sets up the cube that represents a sample in the 3D view by giving the cube entity a mesh and a material.
         """
-        self.set_cube_mesh_dimensions(self.cube_mesh, *self.sample_cube_dimensions)
-        self.cube_entity = create_qentity(
-            [self.cube_mesh, self.red_material], self.component_root_entity
+        cube_mesh = Qt3DExtras.QCuboidMesh(self.component_root_entity)
+        self.set_cube_mesh_dimensions(cube_mesh, *[0.1, 0.1, 0.1])
+        dark_red = QColor("#b00")
+        sample_material = create_material(
+            QColor("red"), dark_red, self.component_root_entity, alpha=0.5
         )
+        create_qentity([cube_mesh, sample_material], self.component_root_entity)
 
     def initialise_view(self):
         """
@@ -335,22 +265,3 @@ class InstrumentView(QWidget):
         self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()
-
-
-class DetachedRootEntity:
-    """
-    Context manager for detaching the component root entity
-    This is useful for reducing CPU load if making many changes to the scene at the same time
-    """
-
-    def __init__(self, component_root_entity, parent_of_root_entity):
-        self._component_root_entity = component_root_entity
-        self._parent_of_root_entity = parent_of_root_entity
-
-    def __enter__(self):
-        # Detach root entity
-        self._component_root_entity.setParent(None)
-
-    def __exit__(self, *args):
-        # Reattach root entity
-        self._component_root_entity.setParent(self._parent_of_root_entity)

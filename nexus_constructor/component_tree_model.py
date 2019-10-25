@@ -1,6 +1,8 @@
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
 import PySide2.QtGui
 from PySide2.QtGui import QVector3D
+from PySide2.QtWidgets import QMessageBox
+
 from nexus_constructor.component.component import Component
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component.link_transformation import LinkTransformation
@@ -121,9 +123,25 @@ class ComponentTreeModel(QAbstractItemModel):
         self.endRemoveRows()
 
     def __remove_component(self, index: QModelIndex):
+        component = index.internalPointer()
+        transforms = component.transforms
+        if transforms and transforms[0].get_dependents():
+            reply = QMessageBox.question(
+                None,
+                "Delete component?",
+                "this component has transformations that are depended on. Are you sure you want to delete it?",
+                QMessageBox.Yes,
+                QMessageBox.No,
+            )
+            if reply == QMessageBox.Yes:
+                pass
+            elif reply == QMessageBox.No:
+                return
         remove_index = self.components.index(index.internalPointer())
         self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
-        self.instrument.remove_component(index.internalPointer())
+        for transform in transforms:
+            transform.remove_from_dependee_chain()
+        self.instrument.remove_component(component)
         self.components.pop(remove_index)
         self.endRemoveRows()
 
