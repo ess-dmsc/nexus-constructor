@@ -5,7 +5,7 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_fields
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_x_offsets_from_pixel_grid,
@@ -122,7 +122,7 @@ class Component:
         self.file.set_field_value(self.group, name, value, dtype)
 
     def get_fields(self):
-        return self.file.get_fields(self.group)
+        return get_fields(self.group)
 
     @property
     def nx_class(self):

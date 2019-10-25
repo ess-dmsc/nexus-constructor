@@ -1287,10 +1287,9 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
 def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_radio_is_checked(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_no_shape"))
-    component_model = ComponentTreeModel(instrument)
-
-    component = instrument.create_component("test", "NXpinhole", "")
+    component, instrument, model = create_group_with_component(
+        "test", "test_component_editing_no_shape"
+    )
 
     with patch("nexus_constructor.validators.PixelValidator") as mock_pixel_validator:
         mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
@@ -1299,7 +1298,7 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument, component_model, component_to_edit=component, parent=None
+                instrument, model, component_to_edit=component, parent=None
             )
             template = QDialog()
             template.ui = dialog
@@ -1341,10 +1340,10 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
 def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_scalar_field"))
-    model = ComponentTreeModel(instrument)
-    component_name = "chopper1"
-    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+
+    component, instrument, model = create_group_with_component(
+        "chopper1", "test_component_editing_scalar_field"
+    )
 
     field_name = "scalar"
     field_value = "test"
@@ -1365,13 +1364,22 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
     assert widget.value[()] == field_value
 
 
+def create_group_with_component(component_name: str, file_name: str):
+    """
+    Convenience method, for when we don't really care about the component and just want one to be added to a file
+    """
+    instrument = Instrument(NexusWrapper(file_name))
+    model = ComponentTreeModel(instrument)
+    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+    return component, instrument, model
+
+
 def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_array_field"))
-    model = ComponentTreeModel(instrument)
-    component_name = "chopper1"
-    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+    component, instrument, model = create_group_with_component(
+        "chopper1", "test_component_editing_array_field"
+    )
 
     field_name = "array"
     field_value = np.array([1, 2, 3, 4, 5])
@@ -1393,13 +1401,11 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
 def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_target(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_link_field"))
-    model = ComponentTreeModel(instrument)
-    component_name = "chopper1"
-    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+    component, instrument, model = create_group_with_component(
+        "chopper1", "test_component_editing_link_field"
+    )
 
-    file = h5py.File("temp", driver="core", backing_store=False)
-    entry = file.create_group(name="entry")
+    entry = instrument.nexus.nexus_file["entry"]
 
     link_name = "link1"
     link = h5py.SoftLink(entry.name)
@@ -1422,10 +1428,9 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
 def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_multiple_fields"))
-    model = ComponentTreeModel(instrument)
-    component_name = "chopper1"
-    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+    component, instrument, model = create_group_with_component(
+        "chopper1", "test_component_editing_multiple_fields"
+    )
 
     field_name1 = "array"
     field_value1 = np.array([1, 2, 3, 4, 5])
@@ -1456,10 +1461,9 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
 def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_f142_stream_field"))
-    model = ComponentTreeModel(instrument)
-    component_name = "chopper1"
-    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+    component, instrument, model = create_group_with_component(
+        "chopper1", "test_component_editing_f142_stream_field"
+    )
 
     field_name = "stream1"
 
