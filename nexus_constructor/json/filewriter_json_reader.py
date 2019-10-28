@@ -61,7 +61,9 @@ def _add_link(json_object: dict, current_group: h5py.Group):
 def _add_dataset(json_object: dict, current_group: h5py.Group):
     numpy_type = _json_type_to_numpy[json_object["dataset"][TYPE]]
     values = json_object["values"]
-    if json_object["dataset"][TYPE] == "string":
+    if json_object["dataset"][TYPE] == "string" and isinstance(
+        json_object["values"], list
+    ):
         values = [value.encode("utf8") for value in json_object["values"]]
     new_dataset = current_group.create_dataset(
         json_object["name"], dtype=numpy_type, data=values
