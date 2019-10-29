@@ -285,6 +285,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 raise ValueError(
                     "Unknown transformation type: {}".format(transformation_type)
                 )
+            self._update_transformations_3d_view()
             self.expand_transformation_list(current_index)
 
     def on_add_translation(self):
@@ -370,7 +371,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if self.instrument.nexus.open_file(filename):
             self._update_views()
 
+    def _update_transformations_3d_view(self):
+        self.sceneWidget.clear_all_transformations()
+        for component in self.instrument.get_component_list():
+            if component.name != "sample":
+                self.sceneWidget.add_transformation(component.name, component.transform)
+
     def _update_views(self):
+        self.sceneWidget.clear_all_transformations()
         self.sceneWidget.clear_all_components()
         self._update_3d_view_with_component_shapes()
         self._set_up_component_model()
@@ -379,6 +387,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         for component in self.instrument.get_component_list():
             shape, positions = component.shape
             self.sceneWidget.add_component(component.name, shape, positions)
+            self.sceneWidget.add_transformation(component.name, component.transform)
 
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()

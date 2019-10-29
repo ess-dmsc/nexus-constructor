@@ -87,8 +87,9 @@ class InstrumentView(QWidget):
         self.create_layers()
         self.initialise_view()
 
-        # Dictionary of components so that we can delete them later
+        # Dictionary of components and transformations so that we can delete them later
         self.component_entities = {}
+        self.transformations = {}
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.gnomon.setup_beam_cylinder()
@@ -201,9 +202,13 @@ class InstrumentView(QWidget):
             QColor("black"), QColor("grey"), self.component_root_entity
         )
 
-        self.component_entities[name].append(
-            create_qentity([mesh, material], self.component_root_entity)
+        self.component_entities[name] = create_qentity(
+            [mesh, material], self.component_root_entity
         )
+
+        # self.component_entities[name].append(
+        #    create_qentity([mesh, material], self.component_root_entity)
+        # )
 
     def clear_all_components(self):
         """
@@ -216,8 +221,9 @@ class InstrumentView(QWidget):
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
         """
-        for entity in self.component_entities[name]:
-            entity.setParent(None)
+        # for entity in self.component_entities[name]:
+        #    entity.setParent(None)
+        self.component_entities[name].setParent(None)
 
         try:
             del self.component_entities[name]
@@ -226,11 +232,25 @@ class InstrumentView(QWidget):
                 f"Unable to delete component {name} because it doesn't exist."
             )
 
-    def add_transformation(self, component_name, transformation_name):
-        pass
+    def add_transformation(
+        self, component_name: str, transformation: Qt3DCore.QTransform
+    ):
+        """
+        Add a transformation to a component, each component has a single transformation which contains
+        the resultant transformation for its entire depends_on chain of translations and rotations
+        """
+        self.transformations[component_name] = transformation
+        component = self.component_entities[component_name]
+        # transformation.setParent(component)
+        component.addComponent(transformation)
 
-    def delete_single_transformation(self, component_name, transformation_name):
-        pass
+    def clear_all_transformations(self):
+        """
+        Remove all transformations from all components
+        """
+        for component_name, transformation in self.transformations.items():
+            self.component_entities[component_name].removeComponent(transformation)
+        self.transformations = {}
 
     @staticmethod
     def set_cube_mesh_dimensions(cube_mesh, x, y, z):
