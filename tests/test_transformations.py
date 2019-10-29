@@ -314,3 +314,17 @@ def test_register_dependent_twice():
     set_dependents = transform.get_dependents()
 
     assert len(set_dependents) == 1
+
+
+def test_can_get_transformation_as_4_by_4_matrix():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    initial_value = 42
+    initial_vector = QVector3D(1.0, 0.0, 0.0)
+    initial_type = "Translation"
+    dataset = _add_transform_to_file(
+        nexus_wrapper, "test_transform", initial_value, initial_vector, initial_type
+    )
+    transformation = Transformation(nexus_wrapper, dataset)
+
+    print(transformation.qvector)
