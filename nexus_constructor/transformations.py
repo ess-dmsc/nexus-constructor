@@ -1,5 +1,6 @@
 import numpy as np
-from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.Qt3DCore import Qt3DCore
 import h5py
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar
@@ -31,6 +32,19 @@ class Transformation:
     @name.setter
     def name(self, new_name: str):
         self.file.rename_node(self.dataset, new_name)
+
+    @property
+    def qmatrix(self) -> QMatrix4x4:
+        """
+        Get a Qt3DCore.QTransform describing the transformation
+        """
+        transform = Qt3DCore.QTransform()
+        if self.type == "Rotation":
+            quaternion = transform.fromAxisAndAngle(self.vector, -self.value)
+            transform.setRotation(quaternion)
+        elif self.type == "Translation":
+            transform.setTranslation(self.vector * self.value)
+        return transform.matrix()
 
     @property
     def absolute_path(self):

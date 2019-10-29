@@ -1,3 +1,6 @@
+from PySide2.QtGui import QMatrix4x4
+import numpy as np
+
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
@@ -316,15 +319,59 @@ def test_register_dependent_twice():
     assert len(set_dependents) == 1
 
 
-def test_can_get_transformation_as_4_by_4_matrix():
+def test_can_get_translation_as_4_by_4_matrix():
     nexus_wrapper = NexusWrapper(str(uuid1()))
 
-    initial_value = 42
-    initial_vector = QVector3D(1.0, 0.0, 0.0)
-    initial_type = "Translation"
+    test_value = 42.0
+    test_vector = QVector3D(1.0, 0.0, 0.0)
+    test_type = "Translation"
     dataset = _add_transform_to_file(
-        nexus_wrapper, "test_transform", initial_value, initial_vector, initial_type
+        nexus_wrapper, "test_transform", test_value, test_vector, test_type
     )
     transformation = Transformation(nexus_wrapper, dataset)
 
-    print(transformation.qvector)
+    test_matrix = transformation.qmatrix
+    expected_matrix = np.array(
+        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, test_value, 0, 0, 1)
+    )
+    assert np.allclose(expected_matrix, np.array(test_matrix.data()))
+
+
+def test_can_get_rotation_as_4_by_4_matrix():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    test_value = np.pi / 2.0
+    test_vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
+    test_type = "Rotation"
+    dataset = _add_transform_to_file(
+        nexus_wrapper,
+        "test_transform",
+        test_value * (180 / np.pi),
+        test_vector,
+        test_type,
+    )
+    transformation = Transformation(nexus_wrapper, dataset)
+
+    test_matrix = transformation.qmatrix
+    # for a rotation around the y-axis:
+    expected_matrix = np.array(
+        (
+            np.cos(test_value),
+            0,
+            np.sin(test_value),
+            0,
+            0,
+            1,
+            0,
+            0,
+            -np.sin(test_value),
+            0,
+            np.cos(test_value),
+            0,
+            0,
+            0,
+            0,
+            1,
+        )
+    )
+    assert np.allclose(expected_matrix, np.array(test_matrix.data()), atol=1.0e-7)
