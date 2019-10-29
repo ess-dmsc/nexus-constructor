@@ -50,7 +50,7 @@ class Transformation:
     def absolute_path(self):
         """
         Get absolute path of the transform dataset in the NeXus file,
-        this is guarenteed to be unique so it can be used as an ID for this Transformation
+        this is guaranteed to be unique so it can be used as an ID for this Transformation
         :return: absolute path of the transform dataset in the NeXus file,
         """
         return self.dataset.name
