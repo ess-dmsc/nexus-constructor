@@ -153,7 +153,7 @@ def test_GIVEN_variable_length_string_type_dataset_WHEN_getting_value_THEN_retur
     dataset_name = "vlen_str_dataset"
     string_data = b"This is a string"
     wrapper.nexus_file.create_dataset(
-        dataset_name, dtype=h5py.string_dtype(), data=string_data
+        dataset_name, dtype=h5py.special_dtype(vlen=str), data=string_data
     )
 
     assert wrapper.get_field_value(
