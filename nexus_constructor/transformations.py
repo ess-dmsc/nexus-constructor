@@ -43,7 +43,7 @@ class Transformation:
             quaternion = transform.fromAxisAndAngle(self.vector, self.value)
             transform.setRotation(quaternion)
         elif self.type == "Translation":
-            transform.setTranslation(self.vector * self.value)
+            transform.setTranslation(self.vector.normalized() * self.value)
         return transform.matrix()
 
     @property
