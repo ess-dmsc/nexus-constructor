@@ -323,7 +323,8 @@ def test_can_get_translation_as_4_by_4_matrix():
     nexus_wrapper = NexusWrapper(str(uuid1()))
 
     test_value = 42.0
-    test_vector = QVector3D(1.0, 0.0, 0.0)
+    # Note, it should not matter if this is not set to a unit vector
+    test_vector = QVector3D(2.0, 0.0, 0.0)
     test_type = "Translation"
     dataset = _add_transform_to_file(
         nexus_wrapper, "test_transform", test_value, test_vector, test_type
