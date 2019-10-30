@@ -1,6 +1,4 @@
-from PySide2.QtGui import QMatrix4x4
 import numpy as np
-
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any

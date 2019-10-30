@@ -1,5 +1,4 @@
 from mock import patch
-
 from nexus_constructor.component.component import (
     DependencyError,
     Component,
@@ -9,7 +8,7 @@ from nexus_constructor.component.component import (
     OFF_GEOMETRY_NEXUS_NAME,
 )
 from cmath import isclose
-from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.QtGui import QVector3D
 import pytest
 from pytest import approx
 import numpy as np
