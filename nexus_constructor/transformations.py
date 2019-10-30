@@ -40,7 +40,7 @@ class Transformation:
         """
         transform = Qt3DCore.QTransform()
         if self.type == "Rotation":
-            quaternion = transform.fromAxisAndAngle(self.vector, -self.value)
+            quaternion = transform.fromAxisAndAngle(self.vector, self.value)
             transform.setRotation(quaternion)
         elif self.type == "Translation":
             transform.setTranslation(self.vector * self.value)
