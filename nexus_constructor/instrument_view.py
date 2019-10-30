@@ -206,10 +206,6 @@ class InstrumentView(QWidget):
             [mesh, material], self.component_root_entity
         )
 
-        # self.component_entities[name].append(
-        #    create_qentity([mesh, material], self.component_root_entity)
-        # )
-
     def clear_all_components(self):
         """
         resets the entities in qt3d so all components are cleared form the 3d view.
@@ -221,8 +217,6 @@ class InstrumentView(QWidget):
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
         """
-        # for entity in self.component_entities[name]:
-        #    entity.setParent(None)
         self.component_entities[name].setParent(None)
 
         try:
@@ -241,7 +235,6 @@ class InstrumentView(QWidget):
         """
         self.transformations[component_name] = transformation
         component = self.component_entities[component_name]
-        # transformation.setParent(component)
         component.addComponent(transformation)
 
     def clear_all_transformations(self):
