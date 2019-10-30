@@ -5,7 +5,7 @@ from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.geometry import OFFGeometryNoNexus, NoShapeGeometry
 
 """
 Tests here document the conditions under which the factory creates components of different types
@@ -39,6 +39,9 @@ def test_GIVEN_an_NXdisk_chopper_group_WHEN_calling_create_component_THEN_compon
     )
     new_component = create_component(wrapper, chopper_group)
     assert isinstance(new_component._shape, ChopperShape)
+    assert isinstance(
+        new_component.shape[0], NoShapeGeometry
+    ), "Expect chopper component to return NoShapeGeometry as it has insufficient details to create a mesh of the disk shape"
 
 
 def test_GIVEN_an_NXdisk_chopper_group_WHEN_calling_create_component_THEN_component_returns_OFFGeometry_of_chopper():
