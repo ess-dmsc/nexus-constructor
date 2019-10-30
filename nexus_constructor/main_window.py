@@ -71,6 +71,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.component_removed.connect(
             self.sceneWidget.delete_component
         )
+        self.instrument.nexus.transformation_changed.connect(
+            self._update_transformations_3d_view
+        )
 
         self.set_up_warning_window()
 
@@ -285,7 +288,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 raise ValueError(
                     "Unknown transformation type: {}".format(transformation_type)
                 )
-            self._update_transformations_3d_view()
             self.expand_transformation_list(current_index)
 
     def on_add_translation(self):

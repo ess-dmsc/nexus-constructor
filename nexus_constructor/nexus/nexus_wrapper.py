@@ -54,6 +54,7 @@ class NexusWrapper(QObject):
     file_opened = Signal("QVariant")
     component_added = Signal(str, "QVariant", "QVariant")
     component_removed = Signal(str)
+    transformation_changed = Signal()
     show_entries_dialog = Signal("QVariant", "QVariant")
 
     def __init__(self, filename: str = "NeXus File"):
