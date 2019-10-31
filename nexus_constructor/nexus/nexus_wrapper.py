@@ -5,6 +5,8 @@ from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar, Optional, List
 import numpy as np
 
+from nexus_constructor.component_fields import INVALID_FIELD_NAMES
+
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
@@ -56,7 +58,10 @@ def get_fields(
     stream_fields = []
     link_fields = []
     for item in group.values():
-        if isinstance(item, h5py.Dataset) and item.name.split("/")[-1] != "description":
+        if (
+            isinstance(item, h5py.Dataset)
+            and item.name.split("/")[-1] not in INVALID_FIELD_NAMES
+        ):
             if np.isscalar(item[()]):
                 scalar_fields.append(item)
                 continue
