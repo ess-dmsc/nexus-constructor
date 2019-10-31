@@ -18,6 +18,7 @@ from typing import List, Union
 from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import validate_line_edit, show_warning_dialog
@@ -30,9 +31,7 @@ from nexus_constructor.validators import (
 )
 import numpy as np
 
-# These are invalid because there are separate inputs in the UI for these fields and therefore inputting them through
-# the field name line edit would cause conflicts.
-INVALID_FIELD_NAMES = ["description", "shape", "depends_on"]
+
 
 
 class FieldNameLineEdit(QLineEdit):

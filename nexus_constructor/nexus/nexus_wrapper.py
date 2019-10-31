@@ -5,7 +5,7 @@ from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar, Optional, List
 import numpy as np
 
-from nexus_constructor.component_fields import INVALID_FIELD_NAMES
+from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
