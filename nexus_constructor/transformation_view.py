@@ -21,7 +21,7 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.xSpinBox.setValue(current_vector.x())
         self.transformation_frame.ySpinBox.setValue(current_vector.y())
         self.transformation_frame.zSpinBox.setValue(current_vector.z())
-        self.transformation_frame.nameLineEdit.setText(self.transformation.name)
+        self.transformation_frame.name_line_edit.setText(self.transformation.name)
         self.transformation_frame.valueSpinBox.setValue(self.transformation.value)
         self.disable()
 
@@ -30,19 +30,17 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.ySpinBox.setEnabled(False)
         self.transformation_frame.zSpinBox.setEnabled(False)
         self.transformation_frame.valueSpinBox.setEnabled(False)
-        self.transformation_frame.nameLineEdit.setEnabled(False)
-        self.transformation_frame.editButton.setText("Edit")
+        self.transformation_frame.name_line_edit.setEnabled(False)
 
     def enable(self):
         self.transformation_frame.xSpinBox.setEnabled(True)
         self.transformation_frame.ySpinBox.setEnabled(True)
         self.transformation_frame.zSpinBox.setEnabled(True)
         self.transformation_frame.valueSpinBox.setEnabled(True)
-        self.transformation_frame.nameLineEdit.setEnabled(True)
-        self.transformation_frame.editButton.setText("Done")
+        self.transformation_frame.name_line_edit.setEnabled(True)
 
     def saveChanges(self):
-        self.transformation.name = self.transformation_frame.nameLineEdit.text()
+        self.transformation.name = self.transformation_frame.name_line_edit.text()
         self.transformation.vector = QVector3D(
             self.transformation_frame.xSpinBox.value(),
             self.transformation_frame.ySpinBox.value(),
@@ -57,7 +55,7 @@ class EditTranslation(EditTransformation):
         self, parent: QWidget, transformation: Transformation, instrument: Instrument
     ):
         super().__init__(parent, transformation, instrument)
-        self.transformation_frame.valueLabel.setText("Position (m)")
+        self.transformation_frame.valueLabel.setText("Distance (m)")
         self.setTitle("Translation")
 
 
@@ -66,7 +64,7 @@ class EditRotation(EditTransformation):
         self, parent: QWidget, transformation: Transformation, instrument: Instrument
     ):
         super().__init__(parent, transformation, instrument)
-        self.transformation_frame.valueLabel.setText("Rotation (°)")
+        self.transformation_frame.valueLabel.setText("Angle (°)")
         self.setTitle("Rotation")
 
 
