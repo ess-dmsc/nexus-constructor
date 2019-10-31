@@ -89,7 +89,7 @@ def generate_unique_name(base: str, items: list):
 
 
 def show_warning_dialog(
-    message: str, title: str, additional_info: Optional[str], parent=None
+    message: str, title: str, additional_info: Optional[str] = "", parent=None
 ):
     msg = QMessageBox(
         QMessageBox.Warning, title, message, buttons=QMessageBox.Ok, parent=parent

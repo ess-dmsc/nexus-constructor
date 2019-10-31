@@ -67,8 +67,6 @@ def cast_to_int(data):
 
 
 def _add_attributes(root: NexusObject, root_dict: dict):
-    if "attributes" not in root_dict:
-        root_dict["attributes"] = []
     root_dict["attributes"] = []
     for attr_name, attr in root.attrs.items():
         if isinstance(attr, bytes):

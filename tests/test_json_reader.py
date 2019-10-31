@@ -102,6 +102,42 @@ def test_GIVEN_json_containing_dataset_WHEN_json_to_nexus_called_THEN_dataset_cr
     assert nexus_file[dataset_name].attrs[attribute_name] == attribute_value
 
 
+def test_GIVEN_json_containing_string_dataset_and_attribute_WHEN_json_to_nexus_called_THEN_dataset_created_in_NeXus():
+    dataset_name = "test_dataset"
+    dataset_value = "How long is a string?"
+    attribute_name = "test_attribute"
+    attribute_value = "forty-two"
+    test_json = f"""
+    {{
+      "nexus_structure": {{
+        "children": [
+          {{
+            "type": "dataset",
+            "name": "{dataset_name}",
+            "attributes": [
+              {{
+                "name": "{attribute_name}",
+                "values": "{attribute_value}"
+              }}
+            ],
+            "dataset": {{
+              "type": "string",
+              "size": [1]
+            }},
+            "values": ["{dataset_value}"]
+          }}
+        ]
+      }}
+    }}
+    """
+    nexus_file = json_to_nexus(test_json)
+
+    assert dataset_name in nexus_file
+    assert nexus_file[dataset_name][...] == dataset_value
+    assert attribute_name in nexus_file[dataset_name].attrs.keys()
+    assert nexus_file[dataset_name].attrs[attribute_name] == attribute_value
+
+
 def test_GIVEN_json_containing_stream_WHEN_json_to_nexus_called_THEN_stream_created_in_NeXus():
     group_name = "test_group"
     test_json = f"""
