@@ -36,4 +36,4 @@ class ChopperShape(ComponentShape):
             )
         else:
             logging.warning("Validation failed. Unable to create disk chopper mesh.")
-        return None, None
+        return NoShapeGeometry(), None
