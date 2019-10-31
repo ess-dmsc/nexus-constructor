@@ -5,7 +5,7 @@ from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.geometry import OFFGeometryNoNexus, OFFGeometryNexus
 
 """
 Tests here document the conditions under which the factory creates components of different types
@@ -84,6 +84,29 @@ def test_GIVEN_an_nx_group_with_no_shape_WHEN_calling_create_component_THEN_comp
     monitor_group = wrapper.create_nx_group("monitor", "NXmonitor", wrapper.instrument)
     new_component = create_component(wrapper, monitor_group)
     assert isinstance(new_component._shape, ComponentShape)
+
+
+def test_GIVEN_an_nx_group_with_shape_WHEN_calling_create_component_THEN_component_returns_OFFGeometry():
+    wrapper = nx.NexusWrapper("file_with_component_with_shape")
+    monitor_group = wrapper.create_nx_group("monitor", "NXmonitor", wrapper.instrument)
+    new_component = create_component(wrapper, monitor_group)
+
+    shape_group = wrapper.create_nx_group(
+        "shape", "NXoff_geometry", new_component.group
+    )
+    vertices_dataset = wrapper.set_field_value(
+        shape_group,
+        "vertices",
+        np.array([[0, 2, -2], [-1, -1, 1], [1, -1, 1]]),
+        dtype=np.float,
+    )
+    wrapper.set_field_value(
+        shape_group, "winding_order", np.array([0, 1, 2]), dtype=np.int32
+    )
+    wrapper.set_field_value(shape_group, "faces", np.array([0]), dtype=np.int32)
+    wrapper.set_attribute_value(vertices_dataset, "units", "m")
+
+    assert isinstance(new_component.shape[0], OFFGeometryNexus)
 
 
 def test_GIVEN_an_NXdetector_group_with_detector_shape_WHEN_calling_create_component_THEN_component_has_a_ComponentShape():
