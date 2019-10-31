@@ -73,6 +73,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.component_removed.connect(
             self.sceneWidget.delete_component
         )
+        self.instrument.nexus.transformation_changed.connect(
+            self._update_transformations_3d_view
+        )
 
         self.set_up_warning_window()
 
@@ -389,7 +392,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     self._update_views()
                     existing_file.close()
 
+    def _update_transformations_3d_view(self):
+        self.sceneWidget.clear_all_transformations()
+        for component in self.instrument.get_component_list():
+            if component.name != "sample":
+                self.sceneWidget.add_transformation(component.name, component.transform)
+
     def _update_views(self):
+        self.sceneWidget.clear_all_transformations()
         self.sceneWidget.clear_all_components()
         self._update_3d_view_with_component_shapes()
         self._set_up_component_model()
@@ -398,6 +408,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         for component in self.instrument.get_component_list():
             shape, positions = component.shape
             self.sceneWidget.add_component(component.name, shape, positions)
+            self.sceneWidget.add_transformation(component.name, component.transform)
 
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()

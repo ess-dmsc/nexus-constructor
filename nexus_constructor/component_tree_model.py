@@ -121,6 +121,7 @@ class ComponentTreeModel(QAbstractItemModel):
         component.remove_transformation(remove_transform)
         transformation_list.pop(remove_pos)
         self.endRemoveRows()
+        self.instrument.nexus.transformation_changed.emit()
 
     def __remove_component(self, index: QModelIndex):
         component = index.internalPointer()
@@ -214,6 +215,7 @@ class ComponentTreeModel(QAbstractItemModel):
                 transformation_list[
                     -1
                 ].depends_on = transformation_list.link.linked_component.transforms[0]
+        self.instrument.nexus.transformation_changed.emit()
 
     def add_translation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, "translation")
