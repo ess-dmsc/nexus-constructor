@@ -57,7 +57,7 @@ def get_fields(
     link_fields = []
     for item in group.values():
         if isinstance(item, h5py.Dataset) and item.name.split("/")[-1] != "description":
-            if np.isscalar(item.value):
+            if np.isscalar(item[()]):
                 scalar_fields.append(item)
                 continue
             array_fields.append(item)
