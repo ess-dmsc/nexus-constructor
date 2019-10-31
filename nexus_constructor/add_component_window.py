@@ -295,7 +295,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             if isinstance(component_shape, OFFGeometryNexus):
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
-                self.fileLineEdit.setText(component_shape.file_path)
+                if component_shape.file_path:
+                    self.fileLineEdit.setText(component_shape.file_path)
             elif isinstance(component_shape, CylindricalGeometry):
                 self.CylinderRadioButton.clicked.emit()
                 self.CylinderRadioButton.setChecked(True)
