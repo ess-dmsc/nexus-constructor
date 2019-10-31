@@ -5,7 +5,11 @@ from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.geometry import OFFGeometryNoNexus, NoShapeGeometry, OFFGeometryNexus
+from nexus_constructor.geometry import (
+    OFFGeometryNoNexus,
+    NoShapeGeometry,
+    OFFGeometryNexus,
+)
 
 """
 Tests here document the conditions under which the factory creates components of different types
