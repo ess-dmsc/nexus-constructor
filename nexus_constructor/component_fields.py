@@ -32,8 +32,6 @@ from nexus_constructor.validators import (
 import numpy as np
 
 
-
-
 class FieldNameLineEdit(QLineEdit):
     def __init__(self, possible_field_names: List[str]):
         super().__init__()

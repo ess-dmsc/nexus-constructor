@@ -14,10 +14,7 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.component_fields import (
-    FieldWidget,
-    add_fields_to_component,
-)
+from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     UserDefinedChopperChecker,
