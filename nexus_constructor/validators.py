@@ -12,6 +12,9 @@ from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
 
+HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
+
+
 class NullableIntValidator(QIntValidator):
     """
     A validator that accepts integers as well as empty input.
@@ -78,12 +81,15 @@ class NameValidator(QValidator):
     The validationFailed signal is emitted if an entered name is not unique.
     """
 
-    def __init__(self, list_model: List):
+    def __init__(self, list_model: List, invalid_names=None):
         super().__init__()
+        if invalid_names is None:
+            invalid_names = []
         self.list_model = list_model
+        self.invalid_names = invalid_names
 
     def validate(self, input: str, pos: int):
-        if not input:
+        if not input or input in self.invalid_names:
             self.is_valid.emit(False)
             return QValidator.Intermediate
 
@@ -402,5 +408,26 @@ class HDFLocationExistsValidator(QValidator):
     def _emit_and_return(self, valid: bool) -> QValidator.State:
         self.is_valid.emit(valid)
         return QValidator.Acceptable if valid else QValidator.Intermediate
+
+    is_valid = Signal(bool)
+
+
+class CommandDialogOKButtonValidator(QValidator):
+    """
+    Validator to ensure item names are unique within a model that has a 'name' property
+
+    The validationFailed signal is emitted if an entered name is not unique.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input or not input.endswith(HDF_FILE_EXTENSIONS):
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
 
     is_valid = Signal(bool)

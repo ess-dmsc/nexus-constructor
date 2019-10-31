@@ -1,5 +1,3 @@
-import logging
-
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
 from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
@@ -7,11 +5,15 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.component_tree_model import LinkTransformation
+from nexus_constructor.component.component import Component
 
 
 class EditTransformation(QGroupBox):
-    def __init__(self, parent: QWidget, transformation: Transformation):
+    def __init__(
+        self, parent: QWidget, transformation: Transformation, instrument: Instrument
+    ):
         super().__init__(parent)
+        self.instrument = instrument
         self.transformation_frame = Ui_Transformation()
         self.transformation_frame.setupUi(self)
         self.transformation = transformation
@@ -47,20 +49,37 @@ class EditTransformation(QGroupBox):
             self.transformation_frame.zSpinBox.value(),
         )
         self.transformation.value = self.transformation_frame.valueSpinBox.value()
+        self.instrument.nexus.transformation_changed.emit()
 
 
 class EditTranslation(EditTransformation):
-    def __init__(self, parent: QWidget, transformation: Transformation):
-        super().__init__(parent, transformation)
+    def __init__(
+        self, parent: QWidget, transformation: Transformation, instrument: Instrument
+    ):
+        super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Position (m)")
         self.setTitle("Translation")
 
 
 class EditRotation(EditTransformation):
-    def __init__(self, parent: QWidget, transformation: Transformation):
-        super().__init__(parent, transformation)
+    def __init__(
+        self, parent: QWidget, transformation: Transformation, instrument: Instrument
+    ):
+        super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Rotation (°)")
         self.setTitle("Rotation")
+
+
+def links_back_to_component(reference: Component, comparison: Component):
+    if reference == comparison:
+        return True
+    if not comparison.transforms.has_link:
+        return False
+    if comparison.transforms.link.linked_component is None:
+        return False
+    return links_back_to_component(
+        reference, comparison.transforms.link.linked_component
+    )
 
 
 class EditTransformationLink(QFrame):
@@ -72,17 +91,52 @@ class EditTransformationLink(QFrame):
         self.instrument = instrument
         self.link_frame = Ui_Link()
         self.link_frame.setupUi(self)
+        self.populate_combo_box()
+
+    def populate_combo_box(self):
+        self.link_frame.TransformationsComboBox.blockSignals(True)
+
+        self.link_frame.TransformationsComboBox.clear()
+        self.link_frame.TransformationsComboBox.addItem("(None)", userData=None)
+        self.link_frame.TransformationsComboBox.setCurrentIndex(0)
         components = self.instrument.get_component_list()
         for current_component in components:
             transformations = current_component.transforms
-            for transform in transformations:
-                self.link_frame.TransformationsComboBox.addItem(transform.name)
+            self.link_frame.TransformationsComboBox.addItem(
+                current_component.name, userData=current_component
+            )
+            last_index = self.link_frame.TransformationsComboBox.count() - 1
+            if links_back_to_component(
+                self.link.parent.parent_component, current_component
+            ):
+                self.link_frame.TransformationsComboBox.model().item(
+                    last_index
+                ).setEnabled(False)
+            if len(transformations) == 0:
+                self.link_frame.TransformationsComboBox.model().item(
+                    last_index
+                ).setEnabled(False)
+            if (
+                self.link.linked_component is not None
+                and self.link.linked_component == current_component
+            ):
+                self.link_frame.TransformationsComboBox.setCurrentIndex(
+                    self.link_frame.TransformationsComboBox.count() - 1
+                )
+        self.link_frame.TransformationsComboBox.currentIndexChanged.connect(
+            self.set_new_index
+        )
+        self.link_frame.TransformationsComboBox.blockSignals(False)
+
+    def set_new_index(self, new_index):
+        if new_index == -1:
+            return
+        self.link.linked_component = (
+            self.link_frame.TransformationsComboBox.currentData()
+        )
 
     def enable(self):
-        logging.warning("EditTransformationLink.enable not implemented.")
-
-    def disable(self):
-        logging.warning("EditTransformationLink.disable not implemented.")
+        self.populate_combo_box()
 
     def saveChanges(self):
-        logging.warning("EditTransformationLink.saveChanges not implemented.")
+        self.instrument.nexus.transformation_changed.emit()

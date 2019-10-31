@@ -9,19 +9,19 @@ from PySide2.QtWidgets import (
     QComboBox,
     QDialog,
     QListWidget,
-    QMessageBox,
     QGridLayout,
     QFormLayout,
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
-from typing import List
+from typing import List, Union
 from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.ui_utils import validate_line_edit, show_warning_dialog
 from nexus_constructor.validators import (
     FieldValueValidator,
     FieldType,
@@ -35,6 +35,9 @@ import numpy as np
 class FieldNameLineEdit(QLineEdit):
     def __init__(self, possible_field_names: List[str]):
         super().__init__()
+        possible_field_names = [
+            x for x in possible_field_names if x not in INVALID_FIELD_NAMES
+        ]
         self.update_possible_fields(possible_field_names)
         self.setPlaceholderText("Name of new field")
         self.setMinimumWidth(160)
@@ -74,8 +77,14 @@ class FieldWidget(QFrame):
         possible_field_names: List[str],
         parent: QListWidget = None,
         instrument: Instrument = None,
+        stream_group_name: str = None,
     ):
         super(FieldWidget, self).__init__(parent)
+
+        # We don't really care about this as it'll never end up in the JSON, but in order to save it into a nexus file it needs a name.
+        self.stream_group_name = (
+            stream_group_name if stream_group_name is not None else str(uuid.uuid4())
+        )
 
         self.edit_dialog = QDialog(parent=self)
         self.instrument = instrument
@@ -146,7 +155,10 @@ class FieldWidget(QFrame):
         field_widgets = []
         for i in range(parent.count()):
             field_widgets.append(parent.itemWidget(parent.item(i)))
-        self.field_name_edit.setValidator(NameValidator(field_widgets))
+
+        self.field_name_edit.setValidator(
+            NameValidator(field_widgets, invalid_names=INVALID_FIELD_NAMES)
+        )
         self.field_name_edit.validator().is_valid.connect(
             partial(
                 validate_line_edit,
@@ -157,21 +169,42 @@ class FieldWidget(QFrame):
         )
 
     @property
-    def field_type(self):
+    def field_type(self) -> FieldType:
         return FieldType(self.field_type_combo.currentText())
 
-    @property
-    def name(self):
-        return self.field_name_edit.text()
+    @field_type.setter
+    def field_type(self, field_type: str):
+        self.field_type_combo.setCurrentText(field_type)
+        self.field_type_changed()
 
     @property
-    def dtype(self):
+    def name(self) -> str:
+        return (
+            self.field_name_edit.text()
+            if self.field_type != FieldType.kafka_stream
+            else self.stream_group_name
+        )
+
+    @name.setter
+    def name(self, name: str):
+        self.field_name_edit.setText(name)
+
+    @property
+    def dtype(self) -> Union[h5py.Datatype, h5py.SoftLink, h5py.Group]:
         if self.field_type == FieldType.scalar_dataset:
             return self.value.dtype
         if self.field_type == FieldType.array_dataset:
             return self.table_view.model.array.dtype
         if self.field_type == FieldType.link:
             return h5py.SoftLink
+        if self.field_type == FieldType.kafka_stream:
+            return h5py.Group
+
+    @dtype.setter
+    def dtype(self, dtype: h5py.Datatype):
+        self.value_type_combo.setCurrentText(
+            next(key for key, value in DATASET_TYPE.items() if value == dtype)
+        )
 
     @property
     def value(self):
@@ -191,6 +224,15 @@ class FieldWidget(QFrame):
         if self.field_type == FieldType.link:
             return h5py.SoftLink(self.value_line_edit.text())
 
+    @value.setter
+    def value(self, value):
+        if self.field_type == FieldType.scalar_dataset:
+            self.value_line_edit.setText(str(value))
+        elif self.field_type == FieldType.array_dataset:
+            self.table_view.model.array = value
+        elif self.field_type == FieldType.link:
+            self.value_line_edit.setText(value)
+
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
             self.something_clicked.emit()
@@ -205,7 +247,7 @@ class FieldWidget(QFrame):
         elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
             self.set_visibility(False, False, True, True)
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
-            self.set_visibility(False, False, True, False)
+            self.set_visibility(False, False, True, False, show_name_line_edit=False)
         elif self.field_type_combo.currentText() == FieldType.link.value:
             self.set_visibility(True, False, False, False)
             self._set_up_value_validator(True)
@@ -241,15 +283,17 @@ class FieldWidget(QFrame):
 
     def set_visibility(
         self,
-        show_value_line_edit,
-        show_nx_class_combo,
-        show_edit_button,
-        show_value_type_combo,
+        show_value_line_edit: bool,
+        show_nx_class_combo: bool,
+        show_edit_button: bool,
+        show_value_type_combo: bool,
+        show_name_line_edit: bool = True,
     ):
         self.value_line_edit.setVisible(show_value_line_edit)
         self.nx_class_combo.setVisible(show_nx_class_combo)
         self.edit_button.setVisible(show_edit_button)
         self.value_type_combo.setVisible(show_value_type_combo)
+        self.field_name_edit.setVisible(show_name_line_edit)
 
     def show_edit_dialog(self):
         if self.field_type_combo.currentText() == FieldType.array_dataset.value:
@@ -282,11 +326,10 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
             component.set_field(
                 name=widget.name, value=widget.value, dtype=widget.dtype
             )
-        except ValueError:
-            dialog = QMessageBox(
-                icon=QMessageBox.Warning,
-                text=f"Warning: field {widget.name} not added",
+        except ValueError as error:
+            show_warning_dialog(
+                f"Warning: field {widget.name} not added",
+                title="Field invalid",
+                additional_info=str(error),
                 parent=fields_widget.parent().parent(),
             )
-            dialog.setWindowTitle("Field invalid")
-            dialog.show()

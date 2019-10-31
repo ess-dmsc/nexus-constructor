@@ -1,5 +1,6 @@
 import numpy as np
-from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.Qt3DCore import Qt3DCore
 import h5py
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar
@@ -7,13 +8,6 @@ from typing import TypeVar
 TransformationOrComponent = TypeVar(
     "TransformationOrComponent", "Transformation", "Component"
 )
-
-
-class TransformationsList(list):
-    def __init__(self, parent):
-        super().__init__()
-        self.parent_component = parent
-        self.has_link = False
 
 
 class Transformation:
@@ -25,6 +19,12 @@ class Transformation:
         self.file = nexus_file
         self.dataset = dataset
 
+    def __eq__(self, other):
+        try:
+            return other.absolute_path == self.absolute_path
+        except Exception:
+            return False
+
     @property
     def name(self):
         return nx.get_name_of_node(self.dataset)
@@ -34,10 +34,23 @@ class Transformation:
         self.file.rename_node(self.dataset, new_name)
 
     @property
+    def qmatrix(self) -> QMatrix4x4:
+        """
+        Get a Qt3DCore.QTransform describing the transformation
+        """
+        transform = Qt3DCore.QTransform()
+        if self.type == "Rotation":
+            quaternion = transform.fromAxisAndAngle(self.vector, self.value)
+            transform.setRotation(quaternion)
+        elif self.type == "Translation":
+            transform.setTranslation(self.vector.normalized() * self.value)
+        return transform.matrix()
+
+    @property
     def absolute_path(self):
         """
         Get absolute path of the transform dataset in the NeXus file,
-        this is guarenteed to be unique so it can be used as an ID for this Transformation
+        this is guaranteed to be unique so it can be used as an ID for this Transformation
         :return: absolute path of the transform dataset in the NeXus file,
         """
         return self.dataset.name
@@ -118,6 +131,7 @@ class Transformation:
         Note, "dependee_of" attribute is not part of the NeXus format
         :param dependent: transform or component that depends on this one
         """
+
         if "dependee_of" not in self.dataset.attrs.keys():
             self.file.set_attribute_value(
                 self.dataset, "dependee_of", dependent.absolute_path
@@ -128,10 +142,14 @@ class Transformation:
             )
             if not isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = np.array([dependee_of_list])
-            dependee_of_list = np.append(
-                dependee_of_list, np.array([dependent.absolute_path])
-            )
-            self.file.set_attribute_value(self.dataset, "dependee_of", dependee_of_list)
+            dependee_of_list = dependee_of_list.astype("U")
+            if dependent.absolute_path not in dependee_of_list:
+                dependee_of_list = np.append(
+                    dependee_of_list, np.array([dependent.absolute_path])
+                )
+                self.file.set_attribute_value(
+                    self.dataset, "dependee_of", dependee_of_list
+                )
 
     def deregister_dependent(self, former_dependent: TransformationOrComponent):
         """
@@ -149,17 +167,48 @@ class Transformation:
             ):
                 # Must be a single string rather than a list, so simply delete it
                 self.file.delete_attribute(self.dataset, "dependee_of")
-            else:
+            elif isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = dependee_of_list[
                     dependee_of_list != former_dependent.absolute_path
                 ]
                 self.file.set_attribute_value(
                     self.dataset, "dependee_of", dependee_of_list
                 )
+            else:
+                print(
+                    "Unable to de-register dependent {} from {} due to it not being registered.".format(
+                        former_dependent.absolute_path, self.absolute_path
+                    )
+                )
 
     def get_dependents(self):
+        import nexus_constructor.component.component as comp
+
         if "dependee_of" in self.dataset.attrs.keys():
+            return_dependents = []
             dependents = self.file.get_attribute_value(self.dataset, "dependee_of")
             if not isinstance(dependents, np.ndarray):
-                return [dependents]
-            return dependents.tolist()
+                dependents = [dependents]
+            for path in dependents:
+                node = self.file.nexus_file[path]
+                if isinstance(node, h5py.Group):
+                    return_dependents.append(comp.Component(self.file, node))
+                elif isinstance(node, h5py.Dataset):
+                    return_dependents.append(Transformation(self.file, node))
+                else:
+                    raise RuntimeError("Unknown type of node.")
+            return return_dependents
+
+    def remove_from_dependee_chain(self):
+        all_dependees = self.get_dependents()
+        new_depends_on = self.depends_on
+        if self.depends_on.absolute_path == "/":
+            new_depends_on = None
+        else:
+            for dependee in all_dependees:
+                if isinstance(dependee, Transformation):
+                    new_depends_on.register_dependent(dependee)
+        for dependee in all_dependees:
+            dependee.depends_on = new_depends_on
+            self.deregister_dependent(dependee)
+        self.depends_on = None

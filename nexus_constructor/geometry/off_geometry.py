@@ -234,7 +234,11 @@ class OFFGeometryNexus(OFFGeometry):
 
     @property
     def file_path(self):
-        return str(self.group["cad_file_path"][...])
+        cad_file_path = "cad_file_path"
+        if cad_file_path in self.group.keys():
+            return str(self.group[cad_file_path][...])
+        else:
+            return None
 
     @file_path.setter
     def file_path(self, file_path: str):

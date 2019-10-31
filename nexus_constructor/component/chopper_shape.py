@@ -22,7 +22,7 @@ class ChopperShape(ComponentShape):
     ]:
         # If there is a shape group then use that
         shape, _ = super().get_shape()
-        if shape is not None:
+        if not isinstance(shape, NoShapeGeometry):
             return shape, None
 
         # Otherwise see if we can generate shape from the details we have
@@ -36,4 +36,4 @@ class ChopperShape(ComponentShape):
             )
         else:
             logging.warning("Validation failed. Unable to create disk chopper mesh.")
-        return None, None
+        return NoShapeGeometry(), None

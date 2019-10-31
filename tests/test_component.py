@@ -1,5 +1,4 @@
 from mock import patch
-
 from nexus_constructor.component.component import (
     DependencyError,
     Component,
@@ -240,6 +239,92 @@ def test_transforms_contains_only_local_transforms_not_full_depends_on_chain():
     assert len(
         second_component.transforms
     ), "Expect transforms list to contain only the 1 transform local to this component"
+
+
+def test_transforms_contains_only_local_transforms_alt():
+    nexus_wrapper = create_nexus_wrapper()
+    component1 = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    component2 = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+
+    transform1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    transform2 = component1.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=transform1
+    )
+    transform3 = component2.add_rotation(
+        QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=transform2
+    )
+    component1.depends_on = transform2
+    component2.depends_on = transform3
+
+    assert (
+        len(component1.transforms) == 2
+    ), "Expect transforms list to contain only the 2 transforms local to this component"
+    assert (
+        len(component2.transforms) == 1
+    ), "Expect transforms list to contain only the 1 transform local to this component"
+
+
+def test_transforms_has_link():
+    nexus_wrapper = create_nexus_wrapper()
+    component1 = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    component2 = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+
+    transform1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    transform2 = component2.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    transform1.depends_on = transform2
+
+    component1.depends_on = transform1
+    component2.depends_on = transform2
+
+    new_component = Component(component1.file, component1.group)
+    assert new_component.transforms.has_link
+
+
+def test_transforms_link_is_correct():
+    nexus_wrapper = create_nexus_wrapper()
+    component1 = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    component2 = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+
+    transform1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    transform2 = component2.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    transform1.depends_on = transform2
+
+    component1.depends_on = transform1
+    component2.depends_on = transform2
+
+    new_component = Component(component1.file, component1.group)
+    assert new_component.transforms.link.linked_component == component2
+
+
+def test_transforms_has_no_link():
+    nexus_wrapper = create_nexus_wrapper()
+    component1 = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "component_name"
+    )
+    component2 = add_component_to_file(
+        nexus_wrapper, "some_field", 42, "other_component_name"
+    )
+
+    transform1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    transform2 = component2.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+
+    component1.depends_on = transform1
+    component2.depends_on = transform2
+
+    new_component = Component(component1.file, component1.group)
+    assert not new_component.transforms.has_link
 
 
 def test_removing_transformation_which_has_a_dependent_transform_in_another_component_is_not_allowed():
@@ -561,3 +646,76 @@ def test_GIVEN_component_with_no_shape_information_WHEN_shape_is_requested_THEN_
     component
 ):
     assert isinstance(component.shape[0], NoShapeGeometry)
+
+
+def test_GIVEN_component_with_no_depends_on_field_WHEN_get_transformation_THEN_returns_identity_matrix(
+    component
+):
+    assert component.transform.matrix().isIdentity()
+
+
+def test_GIVEN_component_with_single_translation_WHEN_get_transformation_THEN_returns_the_translation(
+    component
+):
+    translation_vector = QVector3D(0.42, -0.17, 3.0)
+    translation = component.add_translation(translation_vector, "test_translation")
+    component.depends_on = translation
+
+    expected_matrix = np.array(
+        (
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            translation_vector.x(),
+            translation_vector.y(),
+            translation_vector.z(),
+            1,
+        )
+    )
+    assert np.allclose(expected_matrix, np.array(component.transform.matrix().data()))
+
+
+def test_GIVEN_component_with_two_translations_WHEN_get_transformation_THEN_returns_composite_translation(
+    component
+):
+    first_translation_vector = QVector3D(0.42, -0.17, 3.0)
+    first_translation = component.add_translation(
+        first_translation_vector, "first_test_translation"
+    )
+    second_translation_vector = QVector3D(0.42, -0.17, 3.0)
+    second_translation = component.add_translation(
+        second_translation_vector, "second_test_translation", first_translation
+    )
+    component.depends_on = second_translation
+    # component depends on second_translation which depends on first_translation
+
+    expected_matrix = np.array(
+        (
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            first_translation_vector.x() + second_translation_vector.x(),
+            first_translation_vector.y() + second_translation_vector.y(),
+            first_translation_vector.z() + second_translation_vector.z(),
+            1,
+        )
+    )
+    assert np.allclose(expected_matrix, np.array(component.transform.matrix().data()))

@@ -1,8 +1,10 @@
+import numpy as np
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 from uuid import uuid1
+from tests.helpers import add_component_to_file
 
 transform_type = "Transformation"
 rotation_type = "Rotation"
@@ -50,19 +52,22 @@ def test_can_get_transform_properties():
     ), "Expected the transform type to match what was in the NeXus file"
 
 
+def create_transform(nexus_file, name):
+    initial_value = 42
+    initial_vector = QVector3D(1.0, 0.0, 0.0)
+    initial_type = "Translation"
+    dataset = _add_transform_to_file(
+        nexus_file, name, initial_value, initial_vector, initial_type
+    )
+    return Transformation(nexus_file, dataset)
+
+
 def test_can_set_transform_properties():
     nexus_wrapper = NexusWrapper(str(uuid1()))
 
     initial_name = "slartibartfast"
-    initial_value = 42
-    initial_vector = QVector3D(1.0, 0.0, 0.0)
-    initial_type = "Translation"
 
-    transform_dataset = _add_transform_to_file(
-        nexus_wrapper, initial_name, initial_value, initial_vector, initial_type
-    )
-
-    transform = Transformation(nexus_wrapper, transform_dataset)
+    transform = create_transform(nexus_wrapper, initial_name)
 
     test_name = "beeblebrox"
     test_value = 34
@@ -86,3 +91,283 @@ def test_can_set_transform_properties():
     assert (
         transform.type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
+
+
+def test_set_one_dependent():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform1.register_dependent(transform2)
+
+    set_dependents = transform1.get_dependents()
+
+    assert len(set_dependents) == 1
+    assert set_dependents[0] == transform2
+
+
+def test_set_two_dependents():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform3 = create_transform(nexus_wrapper, "transform_3")
+
+    transform1.register_dependent(transform2)
+    transform1.register_dependent(transform3)
+
+    set_dependents = transform1.get_dependents()
+
+    assert len(set_dependents) == 2
+    assert set_dependents[0] == transform2
+    assert set_dependents[1] == transform3
+
+
+def test_set_three_dependents():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform3 = create_transform(nexus_wrapper, "transform_3")
+
+    transform4 = create_transform(nexus_wrapper, "transform_4")
+
+    transform1.register_dependent(transform2)
+    transform1.register_dependent(transform3)
+    transform1.register_dependent(transform4)
+
+    set_dependents = transform1.get_dependents()
+
+    assert len(set_dependents) == 3
+    assert set_dependents[0] == transform2
+    assert set_dependents[1] == transform3
+    assert set_dependents[2] == transform4
+
+
+def test_deregister_dependent():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform1.register_dependent(transform2)
+    transform1.deregister_dependent(transform2)
+
+    set_dependents = transform1.get_dependents()
+
+    assert set_dependents is None
+
+
+def test_deregister_unregistered_dependent_alt1():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform1.deregister_dependent(transform2)
+
+    assert transform1.get_dependents() is None
+
+
+def test_deregister_unregistered_dependent_alt2():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+    transform3 = create_transform(nexus_wrapper, "transform_3")
+
+    transform1.register_dependent(transform3)
+    transform1.deregister_dependent(transform2)
+
+    assert len(transform1.get_dependents()) == 1
+    assert transform1.get_dependents()[0] == transform3
+
+
+def test_deregister_unregistered_dependent_alt3():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+    transform3 = create_transform(nexus_wrapper, "transform_2_alt")
+    transform4 = create_transform(nexus_wrapper, "transform_3")
+
+    transform1.register_dependent(transform3)
+    transform1.register_dependent(transform4)
+    transform1.deregister_dependent(transform2)
+
+    assert len(transform1.get_dependents()) == 2
+    assert transform1.get_dependents()[0] == transform3
+    assert transform1.get_dependents()[1] == transform4
+
+
+def test_reregister_dependent():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform1 = create_transform(nexus_wrapper, "transform_1")
+
+    transform2 = create_transform(nexus_wrapper, "transform_2")
+
+    transform3 = create_transform(nexus_wrapper, "transform_3")
+
+    transform1.register_dependent(transform2)
+    transform1.deregister_dependent(transform2)
+    transform1.register_dependent(transform3)
+
+    set_dependents = transform1.get_dependents()
+
+    assert len(set_dependents) == 1
+    assert set_dependents[0] == transform3
+
+
+def test_set_one_dependent_component():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component = add_component_to_file(nexus_wrapper, "test_component")
+
+    transform.register_dependent(component)
+
+    set_dependents = transform.get_dependents()
+
+    assert len(set_dependents) == 1
+    assert set_dependents[0] == component
+
+
+def test_set_two_dependent_components():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component1 = add_component_to_file(nexus_wrapper, component_name="test_component1")
+    component2 = add_component_to_file(nexus_wrapper, component_name="test_component2")
+
+    transform.register_dependent(component1)
+    transform.register_dependent(component2)
+
+    set_dependents = transform.get_dependents()
+
+    assert len(set_dependents) == 2
+    assert set_dependents[0] == component1
+    assert set_dependents[1] == component2
+
+
+def test_set_three_dependent_components():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component1 = add_component_to_file(nexus_wrapper, component_name="test_component1")
+    component2 = add_component_to_file(nexus_wrapper, component_name="test_component2")
+    component3 = add_component_to_file(nexus_wrapper, component_name="test_component3")
+
+    transform.register_dependent(component1)
+    transform.register_dependent(component2)
+    transform.register_dependent(component3)
+
+    set_dependents = transform.get_dependents()
+
+    assert len(set_dependents) == 3
+    assert set_dependents[0] == component1
+    assert set_dependents[1] == component2
+    assert set_dependents[2] == component3
+
+
+def test_deregister_three_dependent_components():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component1 = add_component_to_file(nexus_wrapper, component_name="test_component1")
+    component2 = add_component_to_file(nexus_wrapper, component_name="test_component2")
+    component3 = add_component_to_file(nexus_wrapper, component_name="test_component3")
+
+    transform.register_dependent(component1)
+    transform.register_dependent(component2)
+    transform.register_dependent(component3)
+
+    transform.deregister_dependent(component1)
+    transform.deregister_dependent(component2)
+    transform.deregister_dependent(component3)
+
+    set_dependents = transform.get_dependents()
+
+    assert len(set_dependents) == 0
+
+
+def test_register_dependent_twice():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    transform = create_transform(nexus_wrapper, "transform_1")
+
+    component1 = add_component_to_file(nexus_wrapper, component_name="test_component1")
+
+    transform.register_dependent(component1)
+    transform.register_dependent(component1)
+
+    set_dependents = transform.get_dependents()
+
+    assert len(set_dependents) == 1
+
+
+def test_can_get_translation_as_4_by_4_matrix():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    test_value = 42.0
+    # Note, it should not matter if this is not set to a unit vector
+    test_vector = QVector3D(2.0, 0.0, 0.0)
+    test_type = "Translation"
+    dataset = _add_transform_to_file(
+        nexus_wrapper, "test_transform", test_value, test_vector, test_type
+    )
+    transformation = Transformation(nexus_wrapper, dataset)
+
+    test_matrix = transformation.qmatrix
+    expected_matrix = np.array(
+        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, test_value, 0, 0, 1)
+    )
+    assert np.allclose(expected_matrix, np.array(test_matrix.data()))
+
+
+def test_can_get_rotation_as_4_by_4_matrix():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    test_value = 45.0  # degrees
+    test_vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
+    test_type = "Rotation"
+    dataset = _add_transform_to_file(
+        nexus_wrapper, "test_transform", test_value, test_vector, test_type
+    )
+    transformation = Transformation(nexus_wrapper, dataset)
+
+    test_matrix = transformation.qmatrix
+    # for a rotation around the y-axis:
+    test_value_radians = np.deg2rad(test_value)
+    expected_matrix = np.array(
+        (
+            np.cos(-test_value_radians),
+            0,
+            np.sin(-test_value_radians),
+            0,
+            0,
+            1,
+            0,
+            0,
+            -np.sin(-test_value_radians),
+            0,
+            np.cos(-test_value_radians),
+            0,
+            0,
+            0,
+            0,
+            1,
+        )
+    )
+    assert np.allclose(expected_matrix, np.array(test_matrix.data()), atol=1.0e-7)

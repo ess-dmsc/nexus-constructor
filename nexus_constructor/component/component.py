@@ -1,10 +1,12 @@
 import h5py
 from typing import Any, List, Optional, Union, Tuple
-from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.Qt3DCore import Qt3DCore
 
 from nexus_constructor.component.pixel_shape import PixelShape
+from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_fields
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_x_offsets_from_pixel_grid,
@@ -13,7 +15,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_ids_from_pixel_grid,
     get_detector_number_from_pixel_mapping,
 )
-from nexus_constructor.transformations import Transformation, TransformationsList
+from nexus_constructor.transformations import Transformation
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
@@ -91,6 +93,12 @@ class Component:
         else:
             self._shape = ComponentShape(nexus_file, group)
 
+    def __eq__(self, other):
+        try:
+            return other.absolute_path == self.absolute_path
+        except Exception:
+            return False
+
     @property
     def name(self):
         return nx.get_name_of_node(self.group)
@@ -113,6 +121,9 @@ class Component:
 
     def set_field(self, name: str, value: Any, dtype=None):
         self.file.set_field_value(self.group, name, value, dtype)
+
+    def get_fields(self):
+        return get_fields(self.group)
 
     @property
     def nx_class(self):
@@ -164,7 +175,23 @@ class Component:
                 return
             transforms.append(Transformation(self.file, transform_dataset))
             if DEPENDS_ON_STR in transform_dataset.attrs.keys():
-                self._get_transform(transform_dataset.attrs[DEPENDS_ON_STR], transforms)
+                self._get_transform(
+                    self.file.get_attribute_value(transform_dataset, DEPENDS_ON_STR),
+                    transforms,
+                    local_only,
+                )
+
+    @property
+    def transform(self) -> Qt3DCore.QTransform:
+        """
+        Get a QTransform describing the position and orientation of the component
+        """
+        transform_matrix = QMatrix4x4()
+        for transform in self.transforms_full_chain:
+            transform_matrix *= transform.qmatrix
+        transformation = Qt3DCore.QTransform()
+        transformation.setMatrix(transform_matrix)
+        return transformation
 
     @property
     def transforms(self) -> TransformationsList:

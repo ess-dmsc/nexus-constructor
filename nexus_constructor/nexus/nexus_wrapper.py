@@ -2,8 +2,10 @@ import logging
 
 import h5py
 from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar, Optional
+from typing import Any, TypeVar, Optional, List
 import numpy as np
+
+from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
@@ -43,6 +45,37 @@ def decode_bytes_string(nexus_string):
         return nexus_string
 
 
+def get_fields(
+    group: h5py.Group
+) -> (List[h5py.Dataset], List[h5py.Dataset], List[h5py.Group], List[h5py.Group]):
+    """
+    Return a list of fields in a given component group.
+    :param group: The hdf5 component group to check for fields
+    :return: A list of a fields, regardless of field type
+    """
+    scalar_fields = []
+    array_fields = []
+    stream_fields = []
+    link_fields = []
+    for item in group.values():
+        if (
+            isinstance(item, h5py.Dataset)
+            and item.name.split("/")[-1] not in INVALID_FIELD_NAMES
+        ):
+            if np.isscalar(item[()]):
+                scalar_fields.append(item)
+                continue
+            array_fields.append(item)
+        elif isinstance(item, h5py.Group):
+            if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
+                link_fields.append(item)
+            elif (
+                "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream"
+            ):
+                stream_fields.append(item)
+    return scalar_fields, array_fields, stream_fields, link_fields
+
+
 class NexusWrapper(QObject):
     """
     Contains the NeXus file and functions to add and edit components in the NeXus file structure.
@@ -54,15 +87,22 @@ class NexusWrapper(QObject):
     file_opened = Signal("QVariant")
     component_added = Signal(str, "QVariant", "QVariant")
     component_removed = Signal(str)
+    transformation_changed = Signal()
     show_entries_dialog = Signal("QVariant", "QVariant")
 
-    def __init__(self, filename: str = "NeXus File"):
+    def __init__(
+        self,
+        filename: str = "NeXus File",
+        entry_name: str = "entry",
+        instrument_name: str = "instrument",
+    ):
         super().__init__()
         self.nexus_file = set_up_in_memory_nexus_file(filename)
-        self.entry = self.create_nx_group("entry", "NXentry", self.nexus_file)
-
+        self.entry = self.create_nx_group(entry_name, "NXentry", self.nexus_file)
+        self.instrument = self.create_nx_group(
+            instrument_name, "NXinstrument", self.entry
+        )
         self.create_nx_group("sample", "NXsample", self.entry)
-        self.instrument = self.create_nx_group("instrument", "NXinstrument", self.entry)
 
         self._emit_file()
 
@@ -98,13 +138,17 @@ class NexusWrapper(QObject):
             nexus_file = h5py.File(
                 filename, mode="r+", backing_store=False, driver="core"
             )
-            entries = self.find_entries_in_file(nexus_file)
-            self.file_opened.emit(nexus_file)
-            return entries
+            return self.load_nexus_file(nexus_file)
+
+    def load_nexus_file(self, nexus_file: h5py.File):
+        entries = self.find_entries_in_file(nexus_file)
+        self.file_opened.emit(nexus_file)
+        return entries
 
     def find_entries_in_file(self, nexus_file: h5py.File):
         """
-        Find the entry group in the specified nexus file. If there are multiple, emit the signal required to show the multiple entry selection dialog in the UI.
+        Find the entry group in the specified nexus file. If there are multiple, emit the signal required to
+        show the multiple entry selection dialog in the UI.
         :param nexus_file: A reference to the nexus file to check for the entry group.
         """
         entries_in_root = dict()
@@ -185,6 +229,12 @@ class NexusWrapper(QObject):
         value = group[name][...]
         if value.dtype.type is np.string_:
             value = str(value, "utf8")
+        elif (
+            group[name].dtype.metadata is not None
+            and "vlen" in group[name].dtype.metadata.keys()
+            and group[name].dtype.metadata["vlen"] == str
+        ):
+            value = str(value.astype(np.string_), "utf8")
         return value
 
     @staticmethod
@@ -216,6 +266,8 @@ class NexusWrapper(QObject):
             dtype = h5py.special_dtype(vlen=str)
 
         if isinstance(value, h5py.Group):
+            if name in group:
+                del group[name]
             value.copy(dest=group, source=value)
             return group[name]
 

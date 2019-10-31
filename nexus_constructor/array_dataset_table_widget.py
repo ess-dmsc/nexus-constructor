@@ -119,6 +119,8 @@ class ArrayDatasetTableModel(QAbstractTableModel):
         :param parent: Unused.
         :return: Number of dimensions there are in the array.
         """
+        if self.array.ndim == 1:
+            return 1
         return self.array.shape[1]
 
     def data(self, index: QModelIndex, role: int = ...) -> str:
