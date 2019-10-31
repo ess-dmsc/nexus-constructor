@@ -248,8 +248,29 @@ def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_
             file, streams={}, links={file[group_name].name: group_to_be_linked}
         )
 
+        assert root_dict["children"][0]["type"] == "link"
         assert file[group_name].name.split("/")[-1] == root_dict["children"][0]["name"]
         assert group_to_be_linked.name == root_dict["children"][0]["target"]
+
+
+def test_GIVEN_link_in_group_children_that_is_a_dataset_WHEN_handling_group_THEN_link_is_appended_to_children():
+    with InMemoryFile("test_file") as file:
+        ds_to_be_linked_name = "test_linked_dataset"
+        dataset_to_be_linked = file.create_dataset(ds_to_be_linked_name, data=1)
+        dataset_to_be_linked.attrs["NX_class"] = "NXgroup"
+
+        group_name = "test_group_with_link"
+        file[group_name] = h5py.SoftLink(dataset_to_be_linked.name)
+        file[group_name].attrs["NX_class"] = "NXgroup"
+
+        converter = NexusToDictConverter()
+        root_dict = converter.convert(
+            file, streams={}, links={file[group_name].name: dataset_to_be_linked}
+        )
+
+        assert root_dict["children"][0]["type"] == "link"
+        assert file[group_name].name.split("/")[-1] == root_dict["children"][0]["name"]
+        assert dataset_to_be_linked.name == root_dict["children"][0]["target"]
 
 
 def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN_attributes_end_up_in_file():
