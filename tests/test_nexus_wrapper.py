@@ -1,3 +1,4 @@
+import h5py
 from mock import Mock
 
 from nexus_constructor.nexus.nexus_wrapper import (
@@ -145,3 +146,17 @@ def test_GIVEN_group_with_bytes_attribute_WHEN_getting_attribute_value_THEN_retu
     attr_value_as_str = attr_value.decode("utf-8")
 
     assert wrapper.get_attribute_value(test_group, attr_name) == attr_value_as_str
+
+
+def test_GIVEN_variable_length_string_type_dataset_WHEN_getting_value_THEN_returned_as_str():
+    wrapper = NexusWrapper(filename="test_read_vlen_str_dataset")
+    dataset_name = "vlen_str_dataset"
+    string_data = b"This is a string"
+    wrapper.nexus_file.create_dataset(
+        dataset_name, dtype=h5py.special_dtype(vlen=str), data=string_data
+    )
+
+    assert wrapper.get_field_value(
+        wrapper.nexus_file, dataset_name
+    ) == string_data.decode("utf8")
+    assert isinstance(wrapper.get_field_value(wrapper.nexus_file, dataset_name), str)

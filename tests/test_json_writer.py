@@ -1,8 +1,8 @@
 import io
 import json
 from ast import literal_eval
-
 import numpy as np
+import h5py
 
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
@@ -14,7 +14,6 @@ from nexus_constructor.json.filewriter_json_writer import (
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
 from tests.helpers import InMemoryFile
-import h5py
 
 
 def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
@@ -151,6 +150,28 @@ def test_GIVEN_nx_class_and_attributes_are_bytes_WHEN_output_to_json_THEN_they_a
                 assert attribute["values"] == test_nx_class.decode("utf8")
             elif attribute["name"] == "string_attr":
                 assert attribute["values"] == test_string_attr.decode("utf8")
+
+
+def test_GIVEN_dataset_with_an_attribute_WHEN_output_to_json_THEN_attribute_is_present_in_json():
+    with InMemoryFile("test_file") as file:
+        dataset_name = "test_ds"
+        dataset_value = 1
+        dataset_dtype = np.int32
+
+        dataset = file.create_dataset(
+            dataset_name, data=dataset_value, dtype=dataset_dtype
+        )
+        test_attr_value = 42
+        test_attr_name = "test_attr"
+        dataset.attrs[test_attr_name] = test_attr_value
+
+        converter = NexusToDictConverter()
+        root_dict = converter.convert(file, [], [])
+
+        ds = root_dict["children"][0]
+
+        assert ds["attributes"][0]["name"] == test_attr_name
+        assert ds["attributes"][0]["values"] == test_attr_value
 
 
 def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist_in_root_dict():

@@ -390,7 +390,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
 
-        pixel_data = self.pixel_options.generate_pixel_data()
+        pixel_data = (
+            self.pixel_options.generate_pixel_data()
+            if nx_class in PIXEL_COMPONENT_TYPES
+            else None
+        )
 
         if self.component_to_edit:
             shape, positions = self.edit_existing_component(
