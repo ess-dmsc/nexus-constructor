@@ -9,7 +9,6 @@ from PySide2.QtWidgets import (
     QComboBox,
     QDialog,
     QListWidget,
-    QMessageBox,
     QGridLayout,
     QFormLayout,
 )
@@ -21,7 +20,7 @@ from nexus_constructor.component.component import Component
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.ui_utils import validate_line_edit, show_warning_dialog
 from nexus_constructor.validators import (
     FieldValueValidator,
     FieldType,
@@ -81,8 +80,14 @@ class FieldWidget(QFrame):
         possible_field_names: List[str],
         parent: QListWidget = None,
         instrument: Instrument = None,
+        stream_group_name: str = None,
     ):
         super(FieldWidget, self).__init__(parent)
+
+        # We don't really care about this as it'll never end up in the JSON, but in order to save it into a nexus file it needs a name.
+        self.stream_group_name = (
+            stream_group_name if stream_group_name is not None else str(uuid.uuid4())
+        )
 
         self.edit_dialog = QDialog(parent=self)
         self.instrument = instrument
@@ -177,7 +182,11 @@ class FieldWidget(QFrame):
 
     @property
     def name(self) -> str:
-        return self.field_name_edit.text()
+        return (
+            self.field_name_edit.text()
+            if self.field_type != FieldType.kafka_stream
+            else self.stream_group_name
+        )
 
     @name.setter
     def name(self, name: str):
@@ -241,7 +250,7 @@ class FieldWidget(QFrame):
         elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
             self.set_visibility(False, False, True, True)
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
-            self.set_visibility(False, False, True, False)
+            self.set_visibility(False, False, True, False, show_name_line_edit=False)
         elif self.field_type_combo.currentText() == FieldType.link.value:
             self.set_visibility(True, False, False, False)
             self._set_up_value_validator(True)
@@ -277,15 +286,17 @@ class FieldWidget(QFrame):
 
     def set_visibility(
         self,
-        show_value_line_edit,
-        show_nx_class_combo,
-        show_edit_button,
-        show_value_type_combo,
+        show_value_line_edit: bool,
+        show_nx_class_combo: bool,
+        show_edit_button: bool,
+        show_value_type_combo: bool,
+        show_name_line_edit: bool = True,
     ):
         self.value_line_edit.setVisible(show_value_line_edit)
         self.nx_class_combo.setVisible(show_nx_class_combo)
         self.edit_button.setVisible(show_edit_button)
         self.value_type_combo.setVisible(show_value_type_combo)
+        self.field_name_edit.setVisible(show_name_line_edit)
 
     def show_edit_dialog(self):
         if self.field_type_combo.currentText() == FieldType.array_dataset.value:
@@ -318,11 +329,10 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
             component.set_field(
                 name=widget.name, value=widget.value, dtype=widget.dtype
             )
-        except ValueError:
-            dialog = QMessageBox(
-                icon=QMessageBox.Warning,
-                text=f"Warning: field {widget.name} not added",
+        except ValueError as error:
+            show_warning_dialog(
+                f"Warning: field {widget.name} not added",
+                title="Field invalid",
+                additional_info=str(error),
                 parent=fields_widget.parent().parent(),
             )
-            dialog.setWindowTitle("Field invalid")
-            dialog.show()

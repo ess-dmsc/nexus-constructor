@@ -2,9 +2,13 @@ import h5py
 import numpy as np
 import uuid
 import logging
+from typing import Union
 
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import object_to_json_file
+
+
+NexusObject = Union[h5py.Group, h5py.Dataset]
 
 
 def generate_json(
@@ -62,16 +66,25 @@ def cast_to_int(data):
         return int(data)
 
 
+def _add_attributes(root: NexusObject, root_dict: dict):
+    root_dict["attributes"] = []
+    for attr_name, attr in root.attrs.items():
+        if isinstance(attr, bytes):
+            attr = attr.decode("utf8")
+        new_attribute = {"name": attr_name, "values": attr}
+        root_dict["attributes"].append(new_attribute)
+
+
 class NexusToDictConverter:
     """
     Class used to convert nexus format root to python dict
     """
 
     def __init__(self):
-        self._kafka_streams = dict()
-        self._links = dict()
+        self._kafka_streams = {}
+        self._links = {}
 
-    def convert(self, nexus_root, streams, links):
+    def convert(self, nexus_root: NexusObject, streams: dict, links: dict):
         """
         Converts the given nexus_root to dict with correct replacement of
         the streams
@@ -86,7 +99,7 @@ class NexusToDictConverter:
             "children": [self._root_to_dict(entry) for _, entry in nexus_root.items()]
         }
 
-    def _root_to_dict(self, root):
+    def _root_to_dict(self, root: NexusObject):
         if isinstance(root, h5py.Group):
             root_dict = self._handle_group(root)
         else:
@@ -140,7 +153,7 @@ class NexusToDictConverter:
         return data, dtype, size
 
     @staticmethod
-    def _handle_attributes(root, root_dict):
+    def _handle_attributes(root: NexusObject, root_dict: dict):
         if "NX_class" in root.attrs:
             nx_class = root.attrs["NX_class"]
             if (
@@ -153,14 +166,9 @@ class NexusToDictConverter:
                     nx_class = nx_class.decode("utf8")
                 root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
             if len(root.attrs) > 1:
-                if "attributes" not in root_dict:
-                    root_dict["attributes"] = []
-                root_dict["attributes"] = []
-                for attr_name, attr in root.attrs.items():
-                    if isinstance(attr, bytes):
-                        attr = attr.decode("utf8")
-                    new_attribute = {"name": attr_name, "values": attr}
-                    root_dict["attributes"].append(new_attribute)
+                _add_attributes(root, root_dict)
+        else:
+            _add_attributes(root, root_dict)
         return root_dict
 
     def _handle_group(self, root: h5py.Group):
@@ -173,18 +181,11 @@ class NexusToDictConverter:
         # Add the entries
         entries = list(root.values())
         if root.name in self._kafka_streams:
-            root_dict["children"].append(
-                {"type": "stream", "stream": self._kafka_streams[root.name]}
-            )
+            root_dict = {"type": "stream", "stream": self._kafka_streams[root.name]}
+
         elif root.name in self._links.keys():
-            root_dict["children"].append(
-                {
-                    "type": "link",
-                    "name": root.name,
-                    "target": self._links[root.name]
-                    .file.get(root.name, getlink=True)
-                    .path,
-                }
+            root_dict = self._create_link_root_dict(
+                root, self._links[root.name].file.get(root.name, getlink=True).path
             )
         elif entries:
             for entry in entries:
@@ -193,23 +194,33 @@ class NexusToDictConverter:
 
         return root_dict
 
-    def _handle_dataset(self, root: h5py.Dataset):
+    def _handle_dataset(self, root: Union[h5py.Dataset, h5py.SoftLink]):
         """
         Generate JSON dict for a h5py dataset.
         :param root: h5py dataset to generate dict from.
         :return: generated dictionary of dataset values and attrs.
         """
         data, dataset_type, size = self._get_data_and_type(root)
-        root_dict = {
-            "type": "dataset",
-            "name": root.name,
-            "dataset": {"type": dataset_type},
-            "values": data,
-        }
-        if size != 1:
-            root_dict["dataset"]["size"] = size
+
+        if self._links and root.name in self._links.keys():
+            root_dict = self._create_link_root_dict(
+                root, root.file.get(root.name, getlink=True).path
+            )
+        else:
+            root_dict = {
+                "type": "dataset",
+                "name": root.name,
+                "dataset": {"type": dataset_type},
+                "values": data,
+            }
+            if size != 1:
+                root_dict["dataset"]["size"] = size
 
         return root_dict
+
+    @staticmethod
+    def _create_link_root_dict(root, target):
+        return {"type": "link", "name": root.name.split("/")[-1], "target": target}
 
 
 def create_writer_commands(

@@ -1495,7 +1495,6 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
     qtbot.addWidget(template)
 
     widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-    assert widget.name == field_name
 
     stream_group = widget.value
     assert stream_group["topic"][()] == topic
@@ -1885,8 +1884,6 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     streams_widget.array_size_spinbox.setValue(array_size)
 
     group = streams_widget.get_stream_group()
-
-    assert name in group.name
 
     assert "array_size" in group
 

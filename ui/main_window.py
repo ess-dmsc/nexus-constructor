@@ -77,6 +77,8 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.status_bar)
         self.open_nexus_file_action = QtWidgets.QAction(MainWindow)
         self.open_nexus_file_action.setObjectName("actionOpen_NeXus_file")
+        self.open_json_file_action = QtWidgets.QAction(MainWindow)
+        self.open_json_file_action.setObjectName("actionOpen_JSON_file")
         self.export_to_nexus_file_action = QtWidgets.QAction(MainWindow)
         self.export_to_nexus_file_action.setObjectName("actionExport_to_NeXus_file")
         self.export_to_filewriter_JSON_action = QtWidgets.QAction(MainWindow)
@@ -85,6 +87,7 @@ class Ui_MainWindow(object):
         )
         self.export_to_forwarder_JSON_action = QtWidgets.QAction(MainWindow)
         self.file_menu.addAction(self.open_nexus_file_action)
+        self.file_menu.addAction(self.open_json_file_action)
         self.file_menu.addAction(self.export_to_nexus_file_action)
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
         self.file_menu.addAction(self.export_to_forwarder_JSON_action)
@@ -111,6 +114,11 @@ class Ui_MainWindow(object):
         )
         self.open_nexus_file_action.setText(
             QtWidgets.QApplication.translate("MainWindow", "Open NeXus file", None, -1)
+        )
+        self.open_json_file_action.setText(
+            QtWidgets.QApplication.translate(
+                "MainWindow", "Open Filewriter JSON file", None, -1
+            )
         )
         self.export_to_nexus_file_action.setText(
             QtWidgets.QApplication.translate(

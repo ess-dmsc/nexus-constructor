@@ -63,9 +63,11 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             frame.layout.addWidget(frame.label)
         elif isinstance(value, Transformation):
             if value.type == "Translation":
-                frame.transformation_frame = EditTranslation(frame, value)
+                frame.transformation_frame = EditTranslation(
+                    frame, value, self.instrument
+                )
             elif value.type == "Rotation":
-                frame.transformation_frame = EditRotation(frame, value)
+                frame.transformation_frame = EditRotation(frame, value, self.instrument)
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
         elif isinstance(value, LinkTransformation):
             frame.transformation_frame = EditTransformationLink(

@@ -25,11 +25,25 @@ def _add_component_to_file(
     return component_group
 
 
+class FakeTransformationChangedSignal:
+    def __init__(self):
+        pass
+
+    def emit(self):
+        pass
+
+
+class FakeNexusWrapper:
+    def __init__(self):
+        self.transformation_changed = FakeTransformationChangedSignal()
+
+
 class FakeInstrument(list):
     def __init__(self, component_list=[]):
         super().__init__()
         for current in component_list:
             self.append(current)
+        self.nexus = FakeNexusWrapper()
 
     def get_component_list(self):
         return self

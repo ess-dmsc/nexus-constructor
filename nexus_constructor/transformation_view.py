@@ -9,8 +9,11 @@ from nexus_constructor.component.component import Component
 
 
 class EditTransformation(QGroupBox):
-    def __init__(self, parent: QWidget, transformation: Transformation):
+    def __init__(
+        self, parent: QWidget, transformation: Transformation, instrument: Instrument
+    ):
         super().__init__(parent)
+        self.instrument = instrument
         self.transformation_frame = Ui_Transformation()
         self.transformation_frame.setupUi(self)
         self.transformation = transformation
@@ -46,18 +49,23 @@ class EditTransformation(QGroupBox):
             self.transformation_frame.zSpinBox.value(),
         )
         self.transformation.value = self.transformation_frame.valueSpinBox.value()
+        self.instrument.nexus.transformation_changed.emit()
 
 
 class EditTranslation(EditTransformation):
-    def __init__(self, parent: QWidget, transformation: Transformation):
-        super().__init__(parent, transformation)
+    def __init__(
+        self, parent: QWidget, transformation: Transformation, instrument: Instrument
+    ):
+        super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Position (m)")
         self.setTitle("Translation")
 
 
 class EditRotation(EditTransformation):
-    def __init__(self, parent: QWidget, transformation: Transformation):
-        super().__init__(parent, transformation)
+    def __init__(
+        self, parent: QWidget, transformation: Transformation, instrument: Instrument
+    ):
+        super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Rotation (°)")
         self.setTitle("Rotation")
 
@@ -131,4 +139,4 @@ class EditTransformationLink(QFrame):
         self.populate_combo_box()
 
     def saveChanges(self):
-        pass
+        self.instrument.nexus.transformation_changed.emit()

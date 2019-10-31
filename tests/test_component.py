@@ -1,5 +1,4 @@
 from mock import patch
-
 from nexus_constructor.component.component import (
     DependencyError,
     Component,
@@ -647,3 +646,76 @@ def test_GIVEN_component_with_no_shape_information_WHEN_shape_is_requested_THEN_
     component
 ):
     assert isinstance(component.shape[0], NoShapeGeometry)
+
+
+def test_GIVEN_component_with_no_depends_on_field_WHEN_get_transformation_THEN_returns_identity_matrix(
+    component
+):
+    assert component.transform.matrix().isIdentity()
+
+
+def test_GIVEN_component_with_single_translation_WHEN_get_transformation_THEN_returns_the_translation(
+    component
+):
+    translation_vector = QVector3D(0.42, -0.17, 3.0)
+    translation = component.add_translation(translation_vector, "test_translation")
+    component.depends_on = translation
+
+    expected_matrix = np.array(
+        (
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            translation_vector.x(),
+            translation_vector.y(),
+            translation_vector.z(),
+            1,
+        )
+    )
+    assert np.allclose(expected_matrix, np.array(component.transform.matrix().data()))
+
+
+def test_GIVEN_component_with_two_translations_WHEN_get_transformation_THEN_returns_composite_translation(
+    component
+):
+    first_translation_vector = QVector3D(0.42, -0.17, 3.0)
+    first_translation = component.add_translation(
+        first_translation_vector, "first_test_translation"
+    )
+    second_translation_vector = QVector3D(0.42, -0.17, 3.0)
+    second_translation = component.add_translation(
+        second_translation_vector, "second_test_translation", first_translation
+    )
+    component.depends_on = second_translation
+    # component depends on second_translation which depends on first_translation
+
+    expected_matrix = np.array(
+        (
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            first_translation_vector.x() + second_translation_vector.x(),
+            first_translation_vector.y() + second_translation_vector.y(),
+            first_translation_vector.z() + second_translation_vector.z(),
+            1,
+        )
+    )
+    assert np.allclose(expected_matrix, np.array(component.transform.matrix().data()))

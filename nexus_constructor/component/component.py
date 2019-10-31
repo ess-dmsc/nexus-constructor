@@ -1,6 +1,7 @@
 import h5py
 from typing import Any, List, Optional, Union, Tuple
-from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.Qt3DCore import Qt3DCore
 
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
@@ -175,8 +176,22 @@ class Component:
             transforms.append(Transformation(self.file, transform_dataset))
             if DEPENDS_ON_STR in transform_dataset.attrs.keys():
                 self._get_transform(
-                    transform_dataset.attrs[DEPENDS_ON_STR], transforms, local_only
+                    self.file.get_attribute_value(transform_dataset, DEPENDS_ON_STR),
+                    transforms,
+                    local_only,
                 )
+
+    @property
+    def transform(self) -> Qt3DCore.QTransform:
+        """
+        Get a QTransform describing the position and orientation of the component
+        """
+        transform_matrix = QMatrix4x4()
+        for transform in self.transforms_full_chain:
+            transform_matrix *= transform.qmatrix
+        transformation = Qt3DCore.QTransform()
+        transformation.setMatrix(transform_matrix)
+        return transformation
 
     @property
     def transforms(self) -> TransformationsList:
