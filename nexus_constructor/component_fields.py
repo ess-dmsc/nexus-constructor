@@ -14,10 +14,11 @@ from PySide2.QtWidgets import (
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
-from typing import List
+from typing import List, Union
 from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import validate_line_edit, show_warning_dialog
@@ -29,10 +30,6 @@ from nexus_constructor.validators import (
     HDFLocationExistsValidator,
 )
 import numpy as np
-
-# These are invalid because there are separate inputs in the UI for these fields and therefore inputting them through
-# the field name line edit would cause conflicts.
-INVALID_FIELD_NAMES = ["description", "shape", "depends_on"]
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -172,25 +169,42 @@ class FieldWidget(QFrame):
         )
 
     @property
-    def field_type(self):
+    def field_type(self) -> FieldType:
         return FieldType(self.field_type_combo.currentText())
 
+    @field_type.setter
+    def field_type(self, field_type: str):
+        self.field_type_combo.setCurrentText(field_type)
+        self.field_type_changed()
+
     @property
-    def name(self):
+    def name(self) -> str:
         return (
             self.field_name_edit.text()
             if self.field_type != FieldType.kafka_stream
             else self.stream_group_name
         )
 
+    @name.setter
+    def name(self, name: str):
+        self.field_name_edit.setText(name)
+
     @property
-    def dtype(self):
+    def dtype(self) -> Union[h5py.Datatype, h5py.SoftLink, h5py.Group]:
         if self.field_type == FieldType.scalar_dataset:
             return self.value.dtype
         if self.field_type == FieldType.array_dataset:
             return self.table_view.model.array.dtype
         if self.field_type == FieldType.link:
             return h5py.SoftLink
+        if self.field_type == FieldType.kafka_stream:
+            return h5py.Group
+
+    @dtype.setter
+    def dtype(self, dtype: h5py.Datatype):
+        self.value_type_combo.setCurrentText(
+            next(key for key, value in DATASET_TYPE.items() if value == dtype)
+        )
 
     @property
     def value(self):
@@ -209,6 +223,15 @@ class FieldWidget(QFrame):
             return self.streams_widget.get_stream_group()
         if self.field_type == FieldType.link:
             return h5py.SoftLink(self.value_line_edit.text())
+
+    @value.setter
+    def value(self, value):
+        if self.field_type == FieldType.scalar_dataset:
+            self.value_line_edit.setText(str(value))
+        elif self.field_type == FieldType.array_dataset:
+            self.table_view.model.array = value
+        elif self.field_type == FieldType.link:
+            self.value_line_edit.setText(value)
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:

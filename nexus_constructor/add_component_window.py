@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from enum import Enum
 
+import h5py
 from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
@@ -14,6 +15,7 @@ from nexus_constructor.geometry import (
     OFFGeometryNexus,
 )
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
+from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     UserDefinedChopperChecker,
 )
@@ -32,6 +34,7 @@ from nexus_constructor.validators import (
     GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
     OkValidator,
+    FieldType,
 )
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
@@ -50,6 +53,53 @@ class GeometryType(Enum):
     NONE = 1
     CYLINDER = 2
     MESH = 3
+
+
+def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
+    """
+    Fill in a UI link field for an existing link in the component
+    :param field: The link field in the component group
+    :param new_ui_field: The new UI field to fill in with existing data
+    """
+    new_ui_field.field_type = FieldType.link.value
+    new_ui_field.value = field.parent.get(field.name, getlink=True).path
+
+
+def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+    """
+    Fill in a UI array field for an existing array field in the component group
+    :param value: The array dataset's value to copy to the UI fields list model
+    :param new_ui_field: The new UI field to fill in with existing data
+    """
+    new_ui_field.dtype = field.dtype
+    new_ui_field.field_type = FieldType.array_dataset.value
+    new_ui_field.value = field[()]
+
+
+def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+    """
+    Fill in a UI scalar field for an existing scalar field in the component group
+    :param field: The dataset to copy into the value line edit
+    :param new_ui_field: The new UI field to fill in with existing data
+    """
+    dtype = field.dtype
+    if "S" in str(dtype):
+        dtype = h5py.special_dtype(vlen=str)
+        new_ui_field.value = field.value
+    else:
+        new_ui_field.value = field[()]
+    new_ui_field.dtype = dtype
+    new_ui_field.field_type = FieldType.scalar_dataset.value
+
+
+def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+    """
+    Fill in a UI stream field for an existing stream field in the component group
+    :param field: The dataset to copy into the value line edit
+    :param new_ui_field: The new UI field to fill in with existing data
+    """
+    new_ui_field.field_type = FieldType.kafka_stream.value
+    new_ui_field.streams_widget.update_existing_stream_info(field)
 
 
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
@@ -230,6 +280,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixel_options.reset_pixel_mapping_list()
 
     def _fill_existing_entries(self):
+        """
+        Fill in component details in the UI if editing a component
+        """
         self.buttonBox.setText("Edit Component")
         self.nameLineEdit.setText(self.component_to_edit.name)
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
@@ -242,7 +295,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             if isinstance(component_shape, OFFGeometryNexus):
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
-                self.fileLineEdit.setText(component_shape.file_path)
+                if component_shape.file_path:
+                    self.fileLineEdit.setText(component_shape.file_path)
             elif isinstance(component_shape, CylindricalGeometry):
                 self.CylinderRadioButton.clicked.emit()
                 self.CylinderRadioButton.setChecked(True)
@@ -251,9 +305,30 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderXLineEdit.setValue(component_shape.axis_direction.x())
                 self.cylinderYLineEdit.setValue(component_shape.axis_direction.y())
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
-            self.unitsLineEdit.setText(component_shape.units)
+                self.unitsLineEdit.setText(component_shape.units)
 
-    def add_field(self):
+        scalar_fields, array_fields, stream_fields, link_fields = (
+            self.component_to_edit.get_fields()
+        )
+
+        update_methods = [
+            (scalar_fields, update_existing_scalar_field),
+            (array_fields, update_existing_array_field),
+            (stream_fields, update_existing_stream_field),
+            (link_fields, update_existing_link_field),
+        ]
+
+        for fields, update_method in update_methods:
+            for field in fields:
+                new_ui_field = self.create_new_ui_field(field)
+                update_method(field, new_ui_field)
+
+    def create_new_ui_field(self, field):
+        new_ui_field = self.add_field()
+        new_ui_field.name = field.name.split("/")[-1]
+        return new_ui_field
+
+    def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
         field = FieldWidget(
             self.possible_fields, self.fieldsListWidget, self.instrument
@@ -264,6 +339,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.fieldsListWidget.addItem(item)
         self.fieldsListWidget.setItemWidget(item, field)
+        return field
 
     def select_field(self, widget):
         self.fieldsListWidget.setItemSelected(widget, True)
@@ -464,9 +540,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_to_edit.nx_class = nx_class
         self.component_to_edit.description = description
         # remove the previous shape from the qt3d view
-        if self.component_to_edit.shape[0] and self.parent():
-            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
+        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
+            self.instrument.remove_component(self.component_to_edit)
 
+        # remove previous fields
+        for field_group in self.component_to_edit.group.values():
+            if field_group.name.split("/")[-1] not in INVALID_FIELD_NAMES:
+                del self.instrument.nexus.nexus_file[field_group.name]
+
+        add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
         component_with_geometry = create_component(
             self.instrument.nexus, self.component_to_edit.group
