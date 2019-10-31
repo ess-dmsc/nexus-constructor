@@ -56,13 +56,19 @@ class NexusWrapper(QObject):
     component_removed = Signal(str)
     show_entries_dialog = Signal("QVariant", "QVariant")
 
-    def __init__(self, filename: str = "NeXus File"):
+    def __init__(
+        self,
+        filename: str = "NeXus File",
+        entry_name: str = "entry",
+        instrument_name: str = "instrument",
+    ):
         super().__init__()
         self.nexus_file = set_up_in_memory_nexus_file(filename)
-        self.entry = self.create_nx_group("entry", "NXentry", self.nexus_file)
-
+        self.entry = self.create_nx_group(entry_name, "NXentry", self.nexus_file)
+        self.instrument = self.create_nx_group(
+            instrument_name, "NXinstrument", self.entry
+        )
         self.create_nx_group("sample", "NXsample", self.entry)
-        self.instrument = self.create_nx_group("instrument", "NXinstrument", self.entry)
 
         self._emit_file()
 
@@ -98,13 +104,17 @@ class NexusWrapper(QObject):
             nexus_file = h5py.File(
                 filename, mode="r+", backing_store=False, driver="core"
             )
-            entries = self.find_entries_in_file(nexus_file)
-            self.file_opened.emit(nexus_file)
-            return entries
+            return self.load_nexus_file(nexus_file)
+
+    def load_nexus_file(self, nexus_file: h5py.File):
+        entries = self.find_entries_in_file(nexus_file)
+        self.file_opened.emit(nexus_file)
+        return entries
 
     def find_entries_in_file(self, nexus_file: h5py.File):
         """
-        Find the entry group in the specified nexus file. If there are multiple, emit the signal required to show the multiple entry selection dialog in the UI.
+        Find the entry group in the specified nexus file. If there are multiple, emit the signal required to
+        show the multiple entry selection dialog in the UI.
         :param nexus_file: A reference to the nexus file to check for the entry group.
         """
         entries_in_root = dict()
