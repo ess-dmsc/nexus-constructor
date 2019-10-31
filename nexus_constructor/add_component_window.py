@@ -313,12 +313,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.component_to_edit.get_fields()
         )
 
-        update_methods = {
-            scalar_fields: update_existing_scalar_field,
-            array_fields: update_existing_array_field,
-            stream_fields: update_existing_stream_field,
-            link_fields: update_existing_link_field,
-        }
+        update_methods = [
+            (scalar_fields, update_existing_scalar_field),
+            (array_fields, update_existing_array_field),
+            (stream_fields, update_existing_stream_field),
+            (link_fields, update_existing_link_field),
+        ]
 
         for fields, update_method in update_methods:
             for field in fields:

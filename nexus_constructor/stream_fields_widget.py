@@ -41,9 +41,6 @@ NEXUS_INDICES_INDEX_EVERY_KB = "nexus.indices.index_every_kb"
 STORE_LATEST_INTO = "store_latest_into"
 NEXUS_CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
 NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
-NEXUS_BUFFER_SIZE_MB = "nexus.buffer.size_mb"
-NEXUS_BUFFER_SIZE_KB = "nexus.buffer.size_kb"
-NEXUS_BUFFER_PACKET_MAX_KB = "nexus.buffer.packet_max_kb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
 
 
@@ -164,9 +161,6 @@ class StreamFieldsWidget(QDialog):
             NEXUS_INDICES_INDEX_EVERY_KB,
             NEXUS_CHUNK_CHUNK_MB,
             NEXUS_CHUNK_CHUNK_KB,
-            NEXUS_BUFFER_SIZE_MB,
-            NEXUS_BUFFER_SIZE_KB,
-            NEXUS_BUFFER_PACKET_MAX_KB,
         ]
 
         self.ev42_nexus_to_spinner_ui_element = {}
@@ -260,7 +254,7 @@ class StreamFieldsWidget(QDialog):
             self.show_advanced_options_button.setVisible(True)
             self.f142_advanced_group_box.setVisible(False)
         elif schema == "ev42":
-            self._set_edits_visible(False, False)
+            self._set_edits_visible(True, False)
             self.show_advanced_options_button.setVisible(True)
             self.ev42_advanced_group_box.setVisible(False)
         elif schema == "hs00":
@@ -306,13 +300,12 @@ class StreamFieldsWidget(QDialog):
         )
 
         schema = self.schema_combo.currentText()
-
+        stream_group.create_dataset(
+            "source", dtype=STRING_DTYPE, data=self.source_line_edit.text()
+        )
         if schema == "f142":
             self._create_f142_fields(stream_group)
-        if schema != "ev42":
-            stream_group.create_dataset(
-                "source", dtype=STRING_DTYPE, data=self.source_line_edit.text()
-            )
+
         elif schema == "ev42":
             self._create_ev42_fields(stream_group)
         return stream_group
@@ -417,8 +410,7 @@ class StreamFieldsWidget(QDialog):
         schema = field["writer_module"][()]
         self.schema_combo.setCurrentText(str(schema))
         self.topic_line_edit.setText(str(field["topic"][()]))
-        if schema != "ev42":
-            self.source_line_edit.setText(str(field["source"][()]))
+        self.source_line_edit.setText(str(field["source"][()]))
         if schema == "f142":
             self.fill_in_existing_f142_fields(field)
         if schema == "ev42":
