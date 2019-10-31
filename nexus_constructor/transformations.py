@@ -1,5 +1,6 @@
 import numpy as np
-from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.Qt3DCore import Qt3DCore
 import h5py
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar
@@ -33,10 +34,23 @@ class Transformation:
         self.file.rename_node(self.dataset, new_name)
 
     @property
+    def qmatrix(self) -> QMatrix4x4:
+        """
+        Get a Qt3DCore.QTransform describing the transformation
+        """
+        transform = Qt3DCore.QTransform()
+        if self.type == "Rotation":
+            quaternion = transform.fromAxisAndAngle(self.vector, self.value)
+            transform.setRotation(quaternion)
+        elif self.type == "Translation":
+            transform.setTranslation(self.vector.normalized() * self.value)
+        return transform.matrix()
+
+    @property
     def absolute_path(self):
         """
         Get absolute path of the transform dataset in the NeXus file,
-        this is guarenteed to be unique so it can be used as an ID for this Transformation
+        this is guaranteed to be unique so it can be used as an ID for this Transformation
         :return: absolute path of the transform dataset in the NeXus file,
         """
         return self.dataset.name

@@ -299,9 +299,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         if self.entire_shape_radio_button.isChecked():
             return PixelMapping(self.get_pixel_mapping_ids())
 
-        if self.no_pixels_button.isChecked():
-            return None
-
     def update_pixel_input_validity(self):
         """
         Changes the state of the OK Validator depending on whether or not the pixel input is valid. If The No Pixel
