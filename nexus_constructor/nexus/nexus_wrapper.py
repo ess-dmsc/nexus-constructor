@@ -195,6 +195,12 @@ class NexusWrapper(QObject):
         value = group[name][...]
         if value.dtype.type is np.string_:
             value = str(value, "utf8")
+        elif (
+            group[name].dtype.metadata is not None
+            and "vlen" in group[name].dtype.metadata.keys()
+            and group[name].dtype.metadata["vlen"] == str
+        ):
+            value = str(value.astype(np.string_), "utf8")
         return value
 
     @staticmethod
