@@ -17,7 +17,7 @@ import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.filewriter_command_dialog import FilewriterCommandDialog
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.ui_utils import file_dialog
+from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
 from nexus_constructor.component.component import Component, TransformationsList
 from nexus_constructor.transformations import Transformation
@@ -28,6 +28,7 @@ from nexus_constructor.component_tree_view import (
     LinkTransformation,
 )
 from nexus_constructor.json import filewriter_json_writer
+from nexus_constructor.json.filewriter_json_reader import json_to_nexus
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
@@ -43,6 +44,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         self.export_to_nexus_file_action.triggered.connect(self.save_to_nexus_file)
         self.open_nexus_file_action.triggered.connect(self.open_nexus_file)
+        self.open_json_file_action.triggered.connect(self.open_json_file)
         self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_filewriter_json
         )
@@ -302,17 +304,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         # Will contain .git even if missing so check that it does not contain just that file.
         if not os.path.exists(definitions_dir) or len(os.listdir(definitions_dir)) <= 1:
-            self.warning_window = QDialog()
-            self.warning_window.setWindowTitle("NeXus definitions missing")
-            self.warning_window.setLayout(QGridLayout())
-            self.warning_window.layout().addWidget(
-                QLabel(
-                    "Warning: NeXus definitions are missing. Did you forget to clone the submodules?\n run git submodule update --init "
-                )
+            show_warning_dialog(
+                "Warning: NeXus definitions are missing. Did you forget to clone the submodules?\n run git submodule update --init ",
+                title="NeXus definitions missing",
+                parent=self,
             )
-            # Set add component button to disabled, as it wouldn't work without the definitions.
-            self.pushButton.setEnabled(False)
-            self.warning_window.show()
 
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
@@ -346,7 +342,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 )
 
     def save_to_forwarder_json(self):
-
         filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
         if filename:
             provider_type, ok_pressed = QInputDialog.getItem(
@@ -367,8 +362,32 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def open_nexus_file(self):
         filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
+        existing_file = self.instrument.nexus.nexus_file
         if self.instrument.nexus.open_file(filename):
             self._update_views()
+            existing_file.close()
+
+    def open_json_file(self):
+        filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
+        if filename:
+            with open(filename, "r") as json_file:
+                json_data = json_file.read()
+
+                try:
+                    nexus_file = json_to_nexus(json_data)
+                except Exception as exception:
+                    show_warning_dialog(
+                        "Provided file not recognised as valid JSON",
+                        "Invalid JSON",
+                        f"{exception}",
+                        parent=self,
+                    )
+                    return
+
+                existing_file = self.instrument.nexus.nexus_file
+                if self.instrument.nexus.load_nexus_file(nexus_file):
+                    self._update_views()
+                    existing_file.close()
 
     def _update_views(self):
         self.sceneWidget.clear_all_components()

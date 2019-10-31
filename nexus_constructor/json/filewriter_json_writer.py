@@ -2,9 +2,13 @@ import h5py
 import numpy as np
 import uuid
 import logging
+from typing import Union
 
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import object_to_json_file
+
+
+NexusObject = Union[h5py.Group, h5py.Dataset]
 
 
 def generate_json(
@@ -62,6 +66,15 @@ def cast_to_int(data):
         return int(data)
 
 
+def _add_attributes(root: NexusObject, root_dict: dict):
+    root_dict["attributes"] = []
+    for attr_name, attr in root.attrs.items():
+        if isinstance(attr, bytes):
+            attr = attr.decode("utf8")
+        new_attribute = {"name": attr_name, "values": attr}
+        root_dict["attributes"].append(new_attribute)
+
+
 class NexusToDictConverter:
     """
     Class used to convert nexus format root to python dict
@@ -71,7 +84,7 @@ class NexusToDictConverter:
         self._kafka_streams = dict()
         self._links = dict()
 
-    def convert(self, nexus_root, streams, links):
+    def convert(self, nexus_root: NexusObject, streams: dict, links: dict):
         """
         Converts the given nexus_root to dict with correct replacement of
         the streams
@@ -86,7 +99,7 @@ class NexusToDictConverter:
             "children": [self._root_to_dict(entry) for _, entry in nexus_root.items()]
         }
 
-    def _root_to_dict(self, root):
+    def _root_to_dict(self, root: NexusObject):
         if isinstance(root, h5py.Group):
             root_dict = self._handle_group(root)
         else:
@@ -140,7 +153,7 @@ class NexusToDictConverter:
         return data, dtype, size
 
     @staticmethod
-    def _handle_attributes(root, root_dict):
+    def _handle_attributes(root: NexusObject, root_dict: dict):
         if "NX_class" in root.attrs:
             nx_class = root.attrs["NX_class"]
             if (
@@ -153,14 +166,9 @@ class NexusToDictConverter:
                     nx_class = nx_class.decode("utf8")
                 root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
             if len(root.attrs) > 1:
-                if "attributes" not in root_dict:
-                    root_dict["attributes"] = []
-                root_dict["attributes"] = []
-                for attr_name, attr in root.attrs.items():
-                    if isinstance(attr, bytes):
-                        attr = attr.decode("utf8")
-                    new_attribute = {"name": attr_name, "values": attr}
-                    root_dict["attributes"].append(new_attribute)
+                _add_attributes(root, root_dict)
+        else:
+            _add_attributes(root, root_dict)
         return root_dict
 
     def _handle_group(self, root: h5py.Group):
