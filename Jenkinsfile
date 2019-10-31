@@ -43,15 +43,15 @@ builders = pipeline_builder.createBuilders { container ->
         container.sh """
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
-            build_env/bin/pip --proxy ${https_proxy} install -r requirements.txt
-            build_env/bin/pip --proxy ${https_proxy} install codecov==2.0.15 black
+            build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
+            git submodule update --init
             """
     } // stage
     
     pipeline_builder.stage("Check formatting") {
         container.sh """
             cd ${project}
-            build_env/bin/python -m black . --check --exclude=build_env/
+            build_env/bin/python -m black . --check
         """
     } // stage
     
@@ -67,21 +67,14 @@ builders = pipeline_builder.createBuilders { container ->
         try {
                 container.sh """
                     cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --junit-xml=/home/jenkins/${project}/test_results.xml --assert=plain --cov=nexus_constructor --cov-report=xml
+                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --ignore=tests/ui_tests
                 """
             }
             catch(err) {
                 testsError = err
                 currentBuild.result = 'FAILURE'
             }
-        withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
-            container.sh """
-                cd ${project}
-                build_env/bin/codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
-                """
-        }
-        container.copyFrom("${project}/test_results.xml", 'test_results.xml')
-        junit "test_results.xml"
+
     } // stage
     
     if (env.CHANGE_ID) {
@@ -110,24 +103,37 @@ return {
               scm_vars = checkout scm
             }  // stage
             stage("Setup") {
-                  bat """python -m pip install --user -r requirements.txt
+                  bat """
+                  git submodule update --init
+                  python -m pip install --upgrade virtualenv
+                  python -m pip install --user -r requirements-dev.txt
+                  python -m pip install codecov==2.0.15
                 """
             } // stage
             stage("Run tests") {
-                bat """python -m pytest . -s
+                bat """
+                set PYTEST_QT_API=pyside2
+                python -m pytest . -s --ignore=definitions --assert=plain --cov=nexus_constructor --cov-report=xml --junit-xml=test_results.xml
                 """
+
+        withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
+            bat """
+                codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
+                """
+        }
+                junit "test_results.xml"
             } // stage
-            if (env.CHANGE_ID) {
-                stage("Build Executable") {
-                    bat """
-                    python setup.py build_exe"""
-                } // stage
-                stage('Archive Executable') {
-                    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-                    powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
-                    archiveArtifacts 'nexus-constructor*.zip'
-                } // stage
-            } // if
+            // if (env.CHANGE_ID) {
+                // stage("Build Executable") {
+                    // bat """
+                    // python setup.py build_exe"""
+                // } // stage
+                // stage('Archive Executable') {
+                    // def git_commit_short = scm_vars.GIT_COMMIT.take(7)
+                    // powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
+                    // archiveArtifacts 'nexus-constructor*.zip'
+                // } // stage
+            // } // if
           } // dir
       } //ws
     } // node
@@ -147,12 +153,11 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user -r requirements.txt"
+                    sh "python3 -m pip install --user -r requirements-dev.txt && git submodule update --init"
                 } // stage
-                stage('Build Executable') {
-                    sh "python3 setup.py build_exe"
+                stage('Run tests') {
+                    sh "python3 -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/"
                 } // stage
-                 // archive as well
             } // dir
         } // node
     } // return
@@ -171,10 +176,7 @@ node("docker") {
         }
     }
     
-    // disabled for now as the build isn't setup for Mac OS just yet.
-    // builders['macOS'] = get_macos_pipeline()
-
-    // Only build executables on windows if it is a PR build
+    builders['macOS'] = get_macos_pipeline()
     builders['windows10'] = get_win10_pipeline()
     parallel builders
 }

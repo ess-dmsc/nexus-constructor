@@ -12,10 +12,18 @@ Currently tested on Windows 10 and CentOS 7, it should also work on other Linux 
 This project is developed for Python 3.6, so an install of 3.6 or higher
 is required. https://www.python.org/downloads/
 
-Python dependencies are listed in requirements.txt at the root of the
+Runtime Python dependencies are listed in requirements.txt at the root of the
 repository. They can be installed from a terminal by running
 ```
 pip install -r requirements.txt
+```
+
+### Development dependencies
+
+Development dependencies (including all runtime dependencies) can be installed by using the following command: 
+
+```
+pip install -r requirements-dev.txt
 ```
 
 The black pre-commit hook (installed by [pre-commit](https://pre-commit.com/)) requires Python 3.6 or above.
@@ -24,6 +32,8 @@ You need to once run
 pre-commit install
 ```
 to activate the pre-commit check.
+
+Submodules should be cloned by running `git submodule update --init`
 
 ## Running the application
 

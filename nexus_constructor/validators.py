@@ -1,11 +1,32 @@
-"""Validators to be used on QML input fields"""
-from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from PySide2.QtCore import Property, Qt, Signal
+import h5py
+from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator
 import pint
+import os
+from typing import List
+import numpy as np
+from enum import Enum
+
+from PySide2.QtWidgets import QComboBox, QWidget, QRadioButton
+from nexusutils.readwriteoff import parse_off_file
+from stl import mesh
+
+
+HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 
 
 class NullableIntValidator(QIntValidator):
+    """
+    A validator that accepts integers as well as empty input.
+    """
+
+    def __init__(self, bottom=None):
+
+        super().__init__()
+
+        if bottom is not None:
+            super().setBottom(bottom)
+
     def validate(self, input: str, pos: int):
         if input == "":
             return QValidator.Acceptable
@@ -32,157 +53,366 @@ class UnitValidator(QValidator):
             AttributeError,
             pint.compat.tokenize.TokenError,
         ):
-            self.validationFailed.emit()
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
         # Attempt to find 1 metre in terms of the unit. This will ensure that it's a length.
         try:
             self.ureg.metre.from_(unit)
         except (pint.errors.DimensionalityError, ValueError):
-            self.validationFailed.emit()
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
         # Reject input in the form of "2 metres," "40 cm," etc
         if unit.magnitude != 1:
-            self.validationFailed.emit()
+            self.is_valid.emit(False)
             return QValidator.Intermediate
 
-        self.validationSuccess.emit()
+        self.is_valid.emit(True)
         return QValidator.Acceptable
 
-    # Create signals because the QML LabeledTextField doesn't have "onAccepted"
-    validationSuccess = Signal()
-    validationFailed = Signal()
+    is_valid = Signal(bool)
 
 
-class ValidatorOnListModel(QValidator):
+class NameValidator(QValidator):
     """
-    Base class for validators that check an indexed item against other components in an InstrumentModel
+    Validator to ensure item names are unique within a model that has a 'name' property
 
-    Exposes properties that can be set in QML for the component index, and instrument model.
-    In QML these can be set with 'myindex' and 'model'
-    A signal 'validationFailed' is included so that error messages can be displayed in the UI to explain the failure.
-
-    Getters and setters, while un-pythonic, are required for the Qt properties system
-    https://wiki.qt.io/Qt_for_Python_UsingQtProperties
+    The validationFailed signal is emitted if an entered name is not unique.
     """
 
-    def __init__(self):
+    def __init__(self, list_model: List, invalid_names=None):
         super().__init__()
-        self.list_model = InstrumentModel()
-        self.model_index = 0
+        if invalid_names is None:
+            invalid_names = []
+        self.list_model = list_model
+        self.invalid_names = invalid_names
 
-    def get_index(self):
-        return self.model_index
+    def validate(self, input: str, pos: int):
+        if not input or input in self.invalid_names:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
 
-    def set_index(self, val: int):
-        self.model_index = val
+        names_in_list = [item.name for item in self.list_model]
+        if input in names_in_list:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
 
-    @Signal
-    def index_changed(self):
-        pass
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
 
-    myindex = Property(int, get_index, set_index, notify=index_changed)
-
-    def get_model(self):
-        return self.list_model
-
-    def set_model(self, val: InstrumentModel):
-        self.list_model = val
-
-    @Signal
-    def model_changed(self):
-        pass
-
-    model = Property("QVariant", get_model, set_model, notify=model_changed)
-
-    validationFailed = Signal()
+    is_valid = Signal(bool)
 
 
-class TransformParentValidator(ValidatorOnListModel):
+GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
+
+
+class GeometryFileValidator(QValidator):
     """
-    Validator to prevent circular transform parent dependencies being created in an instrument model
+    Validator to ensure file exists and is the correct file type.
     """
 
-    def __init__(self):
-        super().__init__()
-
-    def validate(self, proposed_parent_name: str, pos: int):
-        """
-        Validates the input as the name of a component's transform parent to check it won't cause a circular dependency
-
-        The signal 'validationFailed' is emitted only if a circular dependency is found
-        (http://doc.qt.io/qt-5/qvalidator.html#validate)
-        :param proposed_parent_name: The name of the component being considered for assignment as a transform parent
-        :param pos: The cursor position in proposed_parent_name. Required to match the QValidator API. Not used.
+    def __init__(self, file_types):
         """
 
-        # A mapping of component indexes to the indexes of their parents
-        parents, fully_mapped = self.populate_parent_mapping(proposed_parent_name)
-        if not fully_mapped:
-            return QValidator.Invalid
+        :param file_types: dict of file extensions that are valid.
+        """
+        super().__init__()
+        self.file_types = file_types
 
-        if self.valid_parent_mapping(parents):
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input:
+            return self._emit_and_return(False)
+        if not self.is_file(input):
+            return self._emit_and_return(False)
+        for suffixes in self.file_types.values():
+            for suff in suffixes:
+                if input.endswith(f".{suff}"):
+                    if suff in GEOMETRY_FILE_TYPES["OFF Files"]:
+                        return self._validate_off_file(input)
+                    if suff in GEOMETRY_FILE_TYPES["STL Files"]:
+                        return self._validate_stl_file(input)
+        return self._emit_and_return(False)
+
+    def _validate_stl_file(self, input: str) -> QValidator.State:
+        try:
+            try:
+                mesh.Mesh.from_file(
+                    "", fh=self.open_file(input), calculate_normals=False
+                )
+            except UnicodeDecodeError:
+                # File is in binary format - load it again
+                mesh.Mesh.from_file(
+                    "", fh=self.open_file(input, mode="rb"), calculate_normals=False
+                )
+            return self._emit_and_return(True)
+        except (TypeError, AssertionError, RuntimeError, ValueError):
+            # File is invalid
+            return self._emit_and_return(False)
+
+    def _emit_and_return(self, is_valid: bool) -> QValidator.State:
+        self.is_valid.emit(is_valid)
+        if is_valid:
             return QValidator.Acceptable
         else:
-            return QValidator.Invalid
+            return QValidator.Intermediate
 
-    def populate_parent_mapping(self, proposed_parent_name):
+    def _validate_off_file(self, input: str) -> QValidator.State:
+        try:
+            if parse_off_file(self.open_file(input)) is None:
+                # An invalid file can cause the function to return None
+                return self._emit_and_return(False)
+        except (ValueError, TypeError, StopIteration, IndexError):
+            # File is invalid
+            return self._emit_and_return(False)
+        return self._emit_and_return(True)
+
+    @staticmethod
+    def is_file(input: str) -> bool:
+        return os.path.isfile(input)
+
+    @staticmethod
+    def open_file(filename: str, mode: str = "r"):
+        return open(filename, mode)
+
+    is_valid = Signal(bool)
+
+
+class PixelValidator(QObject):
+    def __init__(
+        self,
+        pixel_options: QWidget,
+        pixel_grid_button: QRadioButton,
+        pixel_mapping_button: QRadioButton,
+    ):
         """
-        Builds a dictionary that maps component indexes to the indexes of their parents
-
-        :param proposed_parent_name: The name of the component being considered as a parent for the component at this
-        validators index
-        :returns: The mapping, and a boolean indicating if the mapping was fully populated
+        Validates the pixel-related input and informs the OKValidator for the Add Component Window of any changes.
+        :param pixel_options: The PixelOptions object that holds pixel-related UI elements.
+        :param pixel_grid_button: The pixel grid radio button.
+        :param pixel_mapping_button: The pixel mapping radio button.
         """
-        mapping = {}
-        # Build the parents mapping, including the mapping that would be set by the new assignment
-        candidate_parent_index = -1
-        for component in self.list_model.components:
-            index = self.list_model.components.index(component)
-            if component.transform_parent is None:
-                parent_index = 0
-            else:
-                parent_index = self.list_model.components.index(
-                    component.transform_parent
-                )
-            mapping[index] = parent_index
-            if component.name == proposed_parent_name:
-                candidate_parent_index = index
-        if candidate_parent_index == -1:
-            # input is not a valid parent name
-            return mapping, False
-        mapping[self.model_index] = candidate_parent_index
-        return mapping, True
+        super().__init__()
+        self.pixel_options = pixel_options
+        self.pixel_grid_button = pixel_grid_button
+        self.pixel_grid_is_valid = True
+        self.pixel_mapping_button = pixel_mapping_button
+        self.pixel_mapping_is_valid = False
 
-    def valid_parent_mapping(self, parents):
+    def set_pixel_mapping_valid(self, is_valid: bool):
         """
-        Explores a parent id mapping dictionary from the validators index to determine if it's valid
-
-        A valid parent hierarchy is one that ends in a component being its own parent.
-        The validationFailed signal is emitted if a circular dependency is found.
-        :param parents: A mapping of component indexes to the indexes of their parent
-        :return: A boolean indicating if the component at the validators index has a valid parent hierarchy
+        Set the validity of the pixel mapping and inform the OKValidator of the change.
+        :param is_valid: Whether or not the pixel mapping is valid.
         """
-        visited = {self.model_index}
-        index = self.model_index
-        # Explore the parent mapping as a graph until all connections have been explored or a loop is found
-        for _ in range(len(parents)):
-            parent_index = parents[index]
-            if parent_index == index:
-                # self looping, acceptable end of tree
-                return True
-            if parent_index in visited:
-                # loop found
-                self.validationFailed.emit()
-                return False
-            visited.add(parent_index)
-            index = parent_index
-        # A result should have been found in the loop. Fail the validation
-        return False
+        self.pixel_mapping_is_valid = is_valid
+        self.inform_ok_validator()
+
+    def set_pixel_grid_valid(self, is_valid: bool):
+        """
+        Set the validity of the pixel grid and inform the OKValidator of the change.
+        :param is_valid: Whether or not the pixel grid is valid.
+        """
+        self.pixel_grid_is_valid = is_valid
+        self.inform_ok_validator()
+
+    def unacceptable_pixel_states(self):
+        """
+        Determines if the current input in the pixel options is valid.
+        """
+
+        # Return nothing if the PixelOptions widget isn't presently visible. This will cause the OKValidator to not take
+        # the contents of the pixel-related fields into account when assessing the overall validity of the Add Component
+        # input.
+        if not self.pixel_options.isVisible():
+            return []
+
+        # If the PixelOptions widget is visible then return the state of the radio buttons and their related inputs.
+        return [
+            self.pixel_grid_button.isChecked() and not self.pixel_grid_is_valid,
+            self.pixel_mapping_button.isChecked() and not self.pixel_mapping_is_valid,
+        ]
+
+    def inform_ok_validator(self):
+        """
+        Sends a signal to the OKValidator that tells it to perform another validity check.
+        :return:
+        """
+        self.reassess_validity.emit()
+
+    reassess_validity = Signal()
 
 
-class NameValidator(ValidatorOnListModel):
+class OkValidator(QObject):
+    """
+    Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
+    """
+
+    def __init__(
+        self,
+        no_geometry_button: QRadioButton,
+        mesh_button: QRadioButton,
+        pixel_validator: PixelValidator,
+    ):
+        super().__init__()
+        self.name_is_valid = False
+        self.file_is_valid = False
+        self.units_are_valid = False
+        self.no_geometry_button = no_geometry_button
+        self.mesh_button = mesh_button
+        self.pixel_validator = pixel_validator
+        self.pixel_validator.reassess_validity.connect(self.validate_ok)
+
+    def set_name_valid(self, is_valid):
+        self.name_is_valid = is_valid
+        self.validate_ok()
+
+    def set_file_valid(self, is_valid):
+        self.file_is_valid = is_valid
+        self.validate_ok()
+
+    def set_units_valid(self, is_valid):
+        self.units_are_valid = is_valid
+        self.validate_ok()
+
+    def validate_ok(self):
+        """
+        Validates the fields in order to dictate whether the OK button should be disabled or enabled.
+        :return: None, but emits the isValid signal.
+        """
+        unacceptable = [
+            not self.name_is_valid,
+            not self.no_geometry_button.isChecked() and not self.units_are_valid,
+            self.mesh_button.isChecked() and not self.file_is_valid,
+        ] + self.pixel_validator.unacceptable_pixel_states()
+        self.is_valid.emit(not any(unacceptable))
+
+    # Signal to indicate that the fields are valid or invalid. False: invalid.
+    is_valid = Signal(bool)
+
+
+class FieldType(Enum):
+    scalar_dataset = "Scalar dataset"
+    array_dataset = "Array dataset"
+    kafka_stream = "Kafka stream"
+    link = "Link"
+    nx_class = "NX class/group"
+
+
+DATASET_TYPE = {
+    "Byte": np.byte,
+    "UByte": np.ubyte,
+    "Short": np.short,
+    "UShort": np.ushort,
+    "Integer": np.intc,
+    "UInteger": np.uintc,
+    "Long": np.int_,
+    "ULong": np.uint,
+    "Float": np.single,
+    "Double": np.double,
+    "String": h5py.special_dtype(vlen=str),
+}
+
+
+class FieldValueValidator(QValidator):
+    """
+    Validates the field value line edit to check that the entered string is castable to the selected numpy type.
+    """
+
+    def __init__(self, field_type_combo: QComboBox, dataset_type_combo: QComboBox):
+        super().__init__()
+        self.field_type_combo = field_type_combo
+        self.dataset_type_combo = dataset_type_combo
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        """
+        Validates against being blank and the correct numpy type
+        :param input: the current string of the field value
+        :param pos: mouse position cursor(ignored, just here to satisfy overriding function)
+        :return: QValidator state (Acceptable, Intermediate, Invalid) - returning intermediate because invalid stops the user from typing.
+        """
+        if not input:  # More criteria here
+            return self._emit_and_return(False)
+        elif self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
+            try:
+                if (
+                    h5py.check_dtype(
+                        vlen=DATASET_TYPE[self.dataset_type_combo.currentText()]
+                    )
+                    == str
+                ):
+                    return self._emit_and_return(True)
+            except AttributeError:
+                pass
+
+            try:
+                DATASET_TYPE[self.dataset_type_combo.currentText()](input)
+            except ValueError:
+                return self._emit_and_return(False)
+        return self._emit_and_return(True)
+
+    def _emit_and_return(self, valid: bool) -> QValidator.State:
+        self.is_valid.emit(valid)
+        return QValidator.Acceptable if valid else QValidator.Intermediate
+
+    is_valid = Signal(bool)
+
+
+class NumpyDTypeValidator(QValidator):
+    """
+    Check given string can be cast to the specified numpy dtype
+    """
+
+    def __init__(self, dtype: np.dtype):
+        super().__init__()
+        self.dtype = dtype
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        try:
+            if h5py.check_dtype(vlen=self.dtype) == str:
+                self.is_valid.emit(True)
+                return QValidator.Acceptable
+        except AttributeError:
+            try:
+                self.dtype(input)
+            except ValueError:
+                self.is_valid.emit(False)
+                return QValidator.Intermediate
+
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
+
+    is_valid = Signal(bool)
+
+
+class HDFLocationExistsValidator(QValidator):
+    """
+    For checking that a location exists in a given HDF file
+    """
+
+    def __init__(self, file: h5py.File, field_type):
+        super(HDFLocationExistsValidator, self).__init__()
+        self.file = file
+        self.field_combo = field_type
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input:
+            self._emit_and_return(False)
+        if not self.field_combo.currentText == FieldType.link.value:
+            self._emit_and_return(True)
+
+        in_file = input in self.file
+        return self._emit_and_return(in_file)
+
+    def _emit_and_return(self, valid: bool) -> QValidator.State:
+        self.is_valid.emit(valid)
+        return QValidator.Acceptable if valid else QValidator.Intermediate
+
+    is_valid = Signal(bool)
+
+
+class CommandDialogOKButtonValidator(QValidator):
     """
     Validator to ensure item names are unique within a model that has a 'name' property
 
@@ -192,21 +422,12 @@ class NameValidator(ValidatorOnListModel):
     def __init__(self):
         super().__init__()
 
-    def validate(self, input: str, pos: int):
-        name_role = Qt.DisplayRole
-        for role, name in self.list_model.roleNames().items():
-            if name == b"name":
-                name_role = role
-                break
-        for i in range(self.list_model.rowCount()):
-            if i != self.model_index:
-                index = self.list_model.createIndex(i, 0)
-                name_at_index = self.list_model.data(index, name_role)
-                if name_at_index == input:
-                    self.validationFailed.emit()
-                    return QValidator.Invalid
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not input or not input.endswith(HDF_FILE_EXTENSIONS):
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
 
-        self.validationSuccess.emit()
+        self.is_valid.emit(True)
         return QValidator.Acceptable
 
-    validationSuccess = Signal()
+    is_valid = Signal(bool)

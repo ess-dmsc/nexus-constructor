@@ -5,10 +5,12 @@ Based off of a qml custom mesh example at https://github.com/iLya84a/qt3d/blob/m
 and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
+import logging
+from typing import List, Tuple
 
-from nexus_constructor.pixel_data import PixelData, PixelGrid
-from nexus_constructor.geometry_types import OFFGeometry
+from nexus_constructor.geometry import OFFGeometry
 from PySide2.Qt3DRender import Qt3DRender
+from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D
 import struct
 import itertools
@@ -88,6 +90,22 @@ def create_normal_buffer(vertices, faces):
     return normal_buffer_values
 
 
+def repeat_shape_over_positions(
+    model: OFFGeometry, positions: List[QVector3D]
+) -> Tuple[List[List[int]], List[QVector3D]]:
+    faces = []
+    vertices = []
+    for i, position in enumerate(positions):
+        vertices.extend([vertex + position for vertex in model.vertices])
+        faces.extend(
+            [
+                [vertex + i * len(model.vertices) for vertex in face]
+                for face in model.faces
+            ]
+        )
+    return faces, vertices
+
+
 class QtOFFGeometry(Qt3DRender.QGeometry):
     """
     Builds vertex and normal buffers from arbitrary OFF geometry files that contain the faces in the geometry - these
@@ -96,14 +114,23 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
 
     q_attribute = Qt3DRender.QAttribute
 
-    def __init__(self, model: OFFGeometry, pixel_data: PixelData, parent=None):
+    def __init__(
+        self, model: OFFGeometry, positions: List[QVector3D] = None, parent=None
+    ):
+        """
+        Creates the geometry for the OFF to be displayed in Qt3D.
+        :param model: The geometry to render
+        :param positions: The posit
+        :param parent: A list of positions to copy the mesh into. If None specified a single mesh is
+        produced at the origin.
+        """
         super().__init__(parent)
 
-        if isinstance(pixel_data, PixelGrid):
-            faces, vertices = self.repeat_shape_over_grid(model, pixel_data)
-        else:
-            faces = model.faces
-            vertices = model.vertices
+        if positions is None:
+            positions = [QVector3D(0, 0, 0)]
+
+        faces, vertices = repeat_shape_over_positions(model, positions)
+
         vertex_buffer_values = list(create_vertex_buffer(vertices, faces))
         normal_buffer_values = create_normal_buffer(vertices, faces)
 
@@ -118,7 +145,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         self.addAttribute(normalAttribute)
         self.vertex_count = len(vertex_buffer_values) // 3
 
-        print("Qt mesh built")
+        logging.info("Qt mesh built")
 
     def create_attribute(self, buffer_values, name):
         SIZE_OF_FLOAT_IN_STRUCT = 4
@@ -137,40 +164,29 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         attribute.setName(name)
         return attribute
 
-    def repeat_shape_over_grid(self, model: OFFGeometry, grid: PixelGrid):
-        faces = []
-        vertices = []
-        for row in range(grid.rows):
-            for col in range(grid.columns):
-                faces += [
-                    [
-                        i + (col + (row * grid.columns)) * len(model.vertices)
-                        for i in face
-                    ]
-                    for face in model.faces
-                ]
-                vertices += [
-                    QVector3D(
-                        vec.x() + (col * grid.col_width),
-                        vec.y() + (row * grid.row_height),
-                        vec.z(),
-                    )
-                    for vec in model.vertices
-                ]
-
-        return faces, vertices
-
 
 class OffMesh(Qt3DRender.QGeometryRenderer):
     """
     An implementation of QGeometryRenderer that allows arbitrary OFF geometries to be rendered in Qt3D
     """
 
-    def __init__(self, geometry: OFFGeometry, pixel_data: PixelData = None):
-        super().__init__(None)
+    def __init__(
+        self,
+        geometry: OFFGeometry,
+        parent: Qt3DCore.QEntity,
+        positions: List[QVector3D] = None,
+    ):
+        """
+        Creates a geometry renderer for OFF geometry.
+        :param geometry: The geometry to render
+        :param parent: The parent entity to attach the mesh to.
+        :param positions: A list of positions to copy the mesh into. If None specified a single mesh is
+        produced at the origin.
+        """
+        super().__init__(parent)
 
         self.setInstanceCount(1)
-        qt_geometry = QtOFFGeometry(geometry, pixel_data, self)
+        qt_geometry = QtOFFGeometry(geometry, positions, self)
         self.setVertexCount(qt_geometry.vertex_count)
         self.setFirstVertex(0)
         self.setPrimitiveType(Qt3DRender.QGeometryRenderer.Triangles)

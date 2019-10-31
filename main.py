@@ -1,27 +1,25 @@
 """
 Entry script for the nexus constructor application.
-Requires Python 3.5+
+Requires Python 3.6+
 """
-
+import logging
 import sys
-from os import path, environ
-from nexus_constructor.application import Application
-from PySide2.QtGui import QGuiApplication, QIcon
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2 import QtCore
+from nexus_constructor.main_window import MainWindow
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.instrument import Instrument
 
 if __name__ == "__main__":
-    location = sys.executable if getattr(sys, "frozen", False) else __file__
-    resource_folder = path.join(path.dirname(location), "resources")
-
-    environ["QT_QUICK_CONTROLS_CONF"] = path.join(
-        resource_folder, "qtquickcontrols2.conf"
-    )
-
-    app = QGuiApplication(sys.argv)
-
-    # Non-blank name and organisation name are required by DefaultFileDialog
-    app.setOrganizationName("name")
-    app.setOrganizationDomain("domain")
-    app.setWindowIcon(QIcon(path.join(resource_folder, "images", "icon.png")))
-
-    window = Application(resource_folder)
+    logging.basicConfig(level=logging.INFO)
+    app = QApplication(sys.argv)
+    app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+    app.setWindowIcon(QIcon("ui/icon.png"))
+    window = QMainWindow()
+    nexus_wrapper = NexusWrapper()
+    instrument = Instrument(nexus_wrapper)
+    ui = MainWindow(instrument)
+    ui.setupUi(window)
+    window.show()
     sys.exit(app.exec_())

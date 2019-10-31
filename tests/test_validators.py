@@ -1,144 +1,102 @@
 """Tests for custom validators in the nexus_constructor.validators module"""
-from nexus_constructor.component import Component
-from nexus_constructor.transformations import Translation
-from nexus_constructor.qml_models.instrument_model import InstrumentModel
-from nexus_constructor.qml_models.transform_model import TransformationModel
+from io import StringIO
+from typing import List
+
+import pytest
+
 from nexus_constructor.validators import (
     NameValidator,
-    TransformParentValidator,
     UnitValidator,
+    FieldValueValidator,
+    FieldType,
+    GeometryFileValidator,
+    OkValidator,
+    NullableIntValidator,
+    NumpyDTypeValidator,
+    GEOMETRY_FILE_TYPES,
+    CommandDialogOKButtonValidator,
 )
+import attr
 from PySide2.QtGui import QValidator
+from mock import Mock
+import numpy as np
 
 
-def assess_component_tree(count: int, parent_mappings: dict, results: dict):
-    """
-    Test the validity of a transform parent network of components
-
-    Builds an InstrumentModel with components connected according to parent_mappings, then for each provided result,
-    checks a components validity if it were to be set to its current parent.
-    :param count: the number of components to create
-    :param parent_mappings: a dictionary of int -> int representing child and parent index numbers
-    :param results: a dictionary of int -> boolean representing the index of components to check validity for, and
-    their expected validity
-    """
-    components = [Component(name=str(i)) for i in range(count)]
-    for child, parent in parent_mappings.items():
-        components[child].transform_parent = components[parent]
-
-    model = InstrumentModel()
-    model.components = components
-
-    validator = TransformParentValidator()
-    validator.list_model = model
-
-    for index, expected_result in results.items():
-        validator.model_index = index
-        parent_name = components[index].transform_parent.name
-        assert (
-            validator.validate(parent_name, 0) == QValidator.Acceptable
-        ) == expected_result
+@attr.s
+class ObjectWithName:
+    name = attr.ib(str)
 
 
-def test_parent_validator_self_loop_terminated_tree():
-    """A parent tree where the root item points to itself is valid"""
-    parent_mappings = {0: 0, 1: 0, 2: 1, 3: 1, 4: 0}
-    results = {0: True, 1: True, 2: True, 3: True, 4: True}
-    assess_component_tree(5, parent_mappings, results)
-
-
-def test_parent_validator_none_terminated_tree():
-    """A parent tree where the root item has no parent is valid"""
-    parent_mappings = {1: 0, 2: 1, 3: 1, 4: 0}
-    results = {1: True, 2: True, 3: True, 4: True}
-    assess_component_tree(5, parent_mappings, results)
-
-
-def test_parent_validator_2_item_loop():
-    """A loop between two items is invalid, as would be any item with its parent in that loop"""
-    parent_mappings = {0: 1, 1: 0, 2: 1}
-    results = {0: False, 1: False, 2: False}
-    assess_component_tree(3, parent_mappings, results)
-
-
-def test_parent_validator_3_item_loop():
-    """A loop between three items is invalid, and items with parents in that loop should be too"""
-    parent_mappings = {0: 1, 1: 2, 2: 0, 3: 2}
-    results = {0: False, 1: False, 2: False, 3: False}
-    assess_component_tree(4, parent_mappings, results)
-
-
-def test_parent_validator_chain_beside_loop():
-    """Even if there's a loop, items disconnected from it would still be valid"""
-    parent_mappings = {0: 1, 1: 0, 2: 2, 3: 2}
-    results = {0: False, 1: False, 2: True, 3: True}
-    assess_component_tree(4, parent_mappings, results)
-
-
-def assess_names(names: list, index, new_name, expected_validity):
+def assess_names(
+    names: List[ObjectWithName], new_name, expected_validity, invalid_names=None
+):
     """
     Tests the validity of a given name at a given index in a TransformationModel and InstrumentModel with an existing
     list of named transforms
 
     :param names: The names to give to items in the model before validating a change
-    :param index: The index to change/insert the new name at in the model
     :param new_name: The name to check the validity of a change/insert into the model
     :param expected_validity: Whether the name change/insert is expected to be valid
     """
-    models = [TransformationModel(), InstrumentModel()]
-    models[0].transforms = [Translation(name=name) for name in names]
-    models[0].deletable = [True for _ in names]
-    models[1].components = [Component(name=name) for name in names]
-
-    for model in models:
-        assess_names_in_model(model, index, new_name, expected_validity)
-
-
-def assess_names_in_model(model, index, new_name, expected_validity):
-    """
-    Tests the validity of a given name at a given index in a model of named items
-
-    :param model: The model of named items to test against
-    :param index: The index to change/insert the new name at in the model
-    :param new_name: The name to check the validity of a change/insert into the model
-    :param expected_validity: Whether the name change/insert is expected to be valid
-    """
-    validator = NameValidator()
-    validator.list_model = model
-    validator.model_index = index
-
+    validator = NameValidator(names, invalid_names)
     assert (
         validator.validate(new_name, 0) == QValidator.Acceptable
     ) == expected_validity
 
 
+def test_name_validator_name_in_invalid_names():
+    invalid_names = ["test"]
+    assess_names(
+        [], invalid_names[0], expected_validity=False, invalid_names=invalid_names
+    )
+
+
 def test_name_validator_new_unique_name():
     """A name that's not already in the model, being added at a new index should be valid"""
-    assess_names(["foo", "bar", "baz"], 3, "asdf", True)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "asdf",
+        True,
+    )
+
+
+def test_an_empty_name_is_not_valid():
+    empty_name = ""
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        empty_name,
+        False,
+    )
 
 
 def test_name_validator_new_existing_name():
     """A name that is already in the model is not valid at a new index"""
-    assess_names(["foo", "bar", "baz"], 3, "foo", False)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "foo",
+        False,
+    )
 
 
 def test_name_validator_set_to_new_name():
     """A name that's not in the model should be valid at an existing index"""
-    assess_names(["foo", "bar", "baz"], 1, "asdf", True)
-
-
-def test_name_validator_set_to_current_name():
-    """A name should be valid at an index where it's already present"""
-    assess_names(["foo", "bar", "baz"], 1, "bar", True)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "asdf",
+        True,
+    )
 
 
 def test_name_validator_set_to_duplicate_name():
     """A name that's already at an index should not be valid at another index"""
-    assess_names(["foo", "bar", "baz"], 1, "foo", False)
+    assess_names(
+        [ObjectWithName("foo"), ObjectWithName("bar"), ObjectWithName("baz")],
+        "foo",
+        False,
+    )
 
 
 def test_unit_validator():
-
     validator = UnitValidator()
 
     lengths = ["mile", "cm", "centimetre", "yard", "km"]
@@ -164,3 +122,370 @@ def test_unit_validator():
 
     for unit in not_lengths:
         assert validator.validate(unit, 0) == QValidator.Intermediate
+
+
+def test_GIVEN_empty_string_WHEN_validating_field_value_THEN_returns_intermediate_and_emits_signal_with_false():
+    validator = FieldValueValidator(object, object)
+    validator.is_valid = Mock()
+
+    assert validator.validate("", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+class DummyCombo:
+    def __init__(self, current_item):
+        self.current_text = current_item
+
+    def currentText(self):
+        return self.current_text
+
+
+def test_GIVEN_valid_string_value_WHEN_validating_field_value_THEN_returns_acceptable_and_emits_signal_with_true():
+    strvalue = "123a"
+
+    field_type_combo = DummyCombo(FieldType.scalar_dataset.value)
+    dataset_type_combo = DummyCombo("String")
+
+    validator = FieldValueValidator(field_type_combo, dataset_type_combo)
+    validator.is_valid = Mock()
+
+    assert validator.validate(strvalue, 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_invalid_float_value_WHEN_validating_field_value_THEN_returns_intermediate_and_emits_signal_with_false():
+    invalid_value = "sdfn"
+
+    field_type_combo = DummyCombo(FieldType.scalar_dataset.value)
+    dataset_type_combo = DummyCombo("Float")
+
+    validator = FieldValueValidator(field_type_combo, dataset_type_combo)
+    validator.is_valid = Mock()
+
+    assert validator.validate(invalid_value, 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_no_input_WHEN_validating_geometry_file_THEN_returns_intermediate_and_emits_signal_with_false():
+    validator = GeometryFileValidator([])
+
+    validator.is_valid = Mock()
+
+    assert validator.validate("", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_invalid_file_WHEN_validating_geometry_file_THEN_returns_intermediate_and_emits_signal_with_false():
+    validator = GeometryFileValidator([])
+
+    validator.is_valid = Mock()
+    validator.is_file = lambda x: False
+
+    assert validator.validate("", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_file_not_ending_with_correct_suffix_WHEN_validating_geometry_file_THEN_emits_signal_with_false():
+    file_types = {"OFF files": ["off", ["OFF"]]}
+    validator = GeometryFileValidator(file_types)
+
+    validator.is_valid = Mock()
+    validator.is_file = lambda x: True
+    assert validator.validate("something.json", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def create_content_ok_validator():
+    """
+    Create an OkValidator and button mocks that mimic the conditions for valid input.
+    :return: An OkValidator that emits True when `validate_ok` is called and mocks for the no geometry and mesh buttons.
+    """
+    mock_no_geometry_button = Mock()
+    mock_mesh_button = Mock()
+
+    pixel_validator = Mock()
+    pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
+
+    mock_no_geometry_button.isChecked = Mock(return_value=False)
+    mock_mesh_button.isChecked = Mock(return_value=True)
+
+    validator = OkValidator(mock_no_geometry_button, mock_mesh_button, pixel_validator)
+    validator.set_units_valid(True)
+    validator.set_name_valid(True)
+    validator.set_file_valid(True)
+
+    return (validator, mock_mesh_button, mock_no_geometry_button)
+
+
+def inspect_signal(result, expected):
+    """
+    Function for checking that the signal emitted matches an expected value. Used for the OkValidator tests.
+    :param result: The value emitted by the signal.
+    :param expected: The expected value required for the test to pass.
+    """
+    assert result == expected
+
+
+def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.validate_ok()
+
+
+def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_name_valid(False)
+
+
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unchecked_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_units_valid(False)
+
+
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THEN_false_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
+    validator.set_file_valid(False)
+
+
+def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_checked_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    mock_no_geometry_button.isChecked = Mock(return_value=True)
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.set_units_valid(False)
+
+
+def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_THEN_true_signal_is_emitted():
+
+    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
+    mock_mesh_button.isChecked = Mock(return_value=False)
+    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
+    validator.set_file_valid(False)
+
+
+def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
+
+    validator = NullableIntValidator()
+    assert validator.validate("", 0) == QValidator.Acceptable
+
+
+@pytest.mark.parametrize("invalid_input", ["fff", "!", "       "])
+def test_GIVEN_nonemptry_string_WHEN_using_nullable_int_validator_THEN_returns_invalid(
+    invalid_input
+):
+
+    validator = NullableIntValidator()
+    assert validator.validate(invalid_input, 0)[0] == QValidator.State.Invalid
+
+
+def test_GIVEN_integer_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
+
+    validator = NullableIntValidator()
+    assert validator.validate("5", 0)[0] == QValidator.State.Acceptable
+
+
+def test_GIVEN_no_input_WHEN_using_numpy_validator_with_byte_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.byte)
+    validator.is_valid = Mock()
+
+    assert validator.validate("", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_valid_input_WHEN_using_numpy_validator_with_integer_as_dtype_THEN_true_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.intc)
+    validator.is_valid = Mock()
+
+    assert validator.validate("1", 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_floating_point_value_WHEN_using_numpy_validator_with_integer_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.intc)
+    validator.is_valid = Mock()
+
+    assert validator.validate("1.2", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_alphabetical_chars_WHEN_using_numpy_validator_with_float_as_dtype_THEN_false_signal_is_emitted():
+    validator = NumpyDTypeValidator(np.float)
+    validator.is_valid = Mock()
+
+    assert validator.validate("test", 0) == QValidator.Intermediate
+
+
+def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    valid_off_file = (
+        "OFF\n"
+        "#  cube.off\n"
+        "#  A cube\n"
+        "8 6 0\n"
+        "-0.500000 -0.500000 0.500000\n"
+        "0.500000 -0.500000 0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "0.500000 0.500000 0.500000\n"
+        "-0.500000 0.500000 -0.500000\n"
+        "0.500000 0.500000 -0.500000\n"
+        "-0.500000 -0.500000 -0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "4 0 1 3 2\n"
+        "4 2 3 5 4\n"
+        "4 4 5 7 6\n"
+        "4 6 7 1 0\n"
+        "4 1 7 5 3\n"
+        "4 6 0 2 4\n"
+    )
+
+    validator.open_file = Mock(return_value=StringIO("".join(valid_off_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.off", 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_invalid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    # File missing a point
+    invalid_off_file = (
+        "OFF\n"
+        "#  cube.off\n"
+        "#  A cube\n"
+        "8 6 0\n"
+        "-0.500000 -0.500000 0.500000\n"
+        "0.500000 -0.500000 0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "0.500000 0.500000 0.500000\n"
+        "-0.500000 0.500000 -0.500000\n"
+        "0.500000 0.500000 -0.500000\n"
+        "-0.500000 -0.500000 -0.500000\n"
+        "4 0 1 3 2\n"
+        "4 2 3 5 4\n"
+        "4 4 5 7 6\n"
+        "4 6 7 1 0\n"
+        "4 1 7 5 3\n"
+        "4 6 0 2 4\n"
+    )
+
+    validator.open_file = Mock(return_value=StringIO("".join(invalid_off_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.off", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_valid_stl_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    valid_stl_file = (
+        "solid dart\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "vertex 1.00000E+000 2.50000E-001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 8.09000E-001 5.87800E-001 0.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 6.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "endsolid dart\n"
+    )
+
+    validator.open_file = Mock(return_value=StringIO("".join(valid_stl_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.stl", 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
+
+
+def test_GIVEN_invalid_stl_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    # File with missing endloop statement
+    invalid_stl_file = (
+        "solid dart\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "vertex 1.00000E+000 2.50000E-001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 0.00000E+000 0.00000E+000 -1.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "vertex 3.10000E+001 1.00000E+001 1.00000E+000\n"
+        "endloop\n"
+        "endfacet\n"
+        "facet normal 8.09000E-001 5.87800E-001 0.00000E+000\n"
+        "outer loop\n"
+        "vertex 3.10000E+001 4.15500E+001 1.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 6.00000E+000\n"
+        "vertex 6.10000E+001 2.50000E-001 1.00000E+000\n"
+        "endfacet\n"
+        "endsolid dart\n"
+    )
+
+    validator.open_file = Mock(return_value=StringIO("".join(invalid_stl_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.stl", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_false():
+    validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
+    validator.is_valid = Mock()
+
+    blank_off_file = ""
+
+    validator.open_file = Mock(return_value=StringIO("".join(blank_off_file)))
+    validator.is_file = Mock(return_value=True)
+
+    assert validator.validate("test.off", 0) == QValidator.Intermediate
+    validator.is_valid.emit.assert_called_once_with(False)
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        ("file.nxs", QValidator.Acceptable),
+        ("file.hdf5", QValidator.Acceptable),
+        ("file.hdf", QValidator.Acceptable),
+        ("file.json", QValidator.Intermediate),
+        ("", QValidator.Intermediate),
+    ],
+)
+def test_GIVEN_valid_file_extensions_WHEN_validating_nexus_filename_for_filewriter_options_THEN_validator_emits_true(
+    test_input, expected
+):
+    validator = CommandDialogOKButtonValidator()
+    validator.is_valid = Mock()
+    assert validator.validate(test_input, 0) == expected
