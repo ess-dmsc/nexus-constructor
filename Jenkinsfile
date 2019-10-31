@@ -106,7 +106,7 @@ return {
                   bat """
                   git submodule update --init
                   python -m pip install --upgrade virtualenv
-                  python -m pip install --user -r requirements-dev.txt
+                  python -m pip install --user -r requirements-dev.txt --force-reinstall=git+https://github.com/anthony-tuininga/cx_Freeze@7566412ec2f1a6bf35312439cb1eca1e8e434a82
                   python -m pip install codecov==2.0.15
                 """
             } // stage
@@ -128,6 +128,11 @@ return {
                     bat """
                     python setup.py build_exe"""
                 } // stage
+                stage('Archive Executable') {
+                    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
+                    powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
+                    archiveArtifacts 'nexus-constructor*.zip'
+                } // stage
                 stage("Test executable") {
                 timeout(time:15, unit:'SECONDS') {
                     bat """
@@ -136,11 +141,6 @@ return {
                     """
                     }
                 }
-                stage('Archive Executable') {
-                    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-                    powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
-                    archiveArtifacts 'nexus-constructor*.zip'
-                } // stage
             } // if
           } // dir
       } //ws
