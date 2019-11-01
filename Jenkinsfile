@@ -134,13 +134,12 @@ return {
                     archiveArtifacts 'nexus-constructor*.zip'
                 } // stage
                 stage("Test executable") {
-                timeout(time:15, unit:'SECONDS') {
-                    bat """
-                       net start .\\build\\nexus-constructor_windows_${git_commit_short}\\NexusConstructor.exe
-                       net stop .\\build\\nexus-constructor_windows_${git_commit_short}\\NexusConstructor.exe
-                    """
-                    }
-                }
+                    timeout(time:15, unit:'SECONDS') {
+                        bat """
+                           .\\build\\nexus-constructor_windows_${git_commit_short}\\NexusConstructor.exe --help
+                        """
+                        }
+                } // stage
             } // if
           } // dir
       } //ws
