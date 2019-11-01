@@ -12,6 +12,7 @@ import os
 
 # Dependencies are automatically detected, but it struggles with some parts of numpy.
 build_exe_options = {
+    "optimize": 1,
     "packages": ["numpy.core._methods", "numpy.lib.format", "pkg_resources._vendor"],
     "excludes": [
         "pytest",
@@ -48,8 +49,8 @@ build_exe_options = {
         "babel",
         "sphinx",
     ],
-    "bin_includes": ["libssl.so"],
-    "include_files": ["ui", "definitions"],
+    "bin_includes": ["libssl.so", "definitions"],
+    "include_files": [("ui", "ui"), ("definitions", "definitions")],
 }
 
 # GUI applications require a different base on Windows (the default is for a console application).
@@ -62,17 +63,35 @@ else:
     removable = []
     extension = ""
 
+qt_prefix = os.path.join("lib", "PySide2")
+qt_lib_prefix = os.path.join(qt_prefix, "Qt", "lib")
+
 larger_folders = [
-    "platforms",
     os.path.join("definitions", "manual"),
-    "imageformats",
-    "mpl-data",
-    os.path.join("lib", "PySide2", "Qt", "qml"),
+    os.path.join(qt_prefix, "QtCharts.abi3.so"),
+    os.path.join(qt_prefix, "QtTextToSpeech.abi3.so"),
+    os.path.join(qt_prefix, "QtRemoteObjects.abi3.so"),
+    os.path.join(qt_prefix, "QtScriptTools.abi3.so"),
+    os.path.join(qt_prefix, "QtQuick.abi3.so"),
+    os.path.join(qt_prefix, "QtQml.abi3.so"),
+    os.path.join(qt_prefix, "QtSql.abi3.so"),
+    os.path.join(qt_prefix, "QtLocation.abi3.so"),
+    os.path.join(qt_prefix, "QtMultimedia.abi3.so"),
+    os.path.join(qt_prefix, "QtSensors.abi3.so"),
+    os.path.join(qt_prefix, "examples"),
+    os.path.join(qt_lib_prefix, "libQt5Help.so.5"),
+    os.path.join(qt_lib_prefix, "libQt5Gamepad.so.5"),
+    os.path.join(qt_lib_prefix, "libQt5Location.so.5"),
+    os.path.join(qt_lib_prefix, "libQt5Multimedia.so.5"),
+    os.path.join(qt_lib_prefix, "libQt5ScriptTools.so.5"),
+    os.path.join(qt_lib_prefix, "libQt5Bluetooth.so.5"),
+    os.path.join(qt_lib_prefix, "libQt5QuickControls2.so.5"),
+    os.path.join(qt_lib_prefix, "libQt5VirtualKeyboard.so.5"),
 ]
 
 setup(
     name="Nexus Constructor",
-    version="2.0-pre",
+    version="2.0",
     description="NeXus file constructor with 3D view for components",
     options={"build_exe": build_exe_options},
     executables=[

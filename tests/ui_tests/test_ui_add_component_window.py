@@ -22,6 +22,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
+from tests.test_utils import DEFINITIONS_DIR
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -45,10 +46,11 @@ NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
 
-
-instrument = Instrument(NexusWrapper("pixels"))
+instrument = Instrument(NexusWrapper("pixels"), DEFINITIONS_DIR)
 component = ComponentTreeModel(instrument)
-add_component_dialog = AddComponentDialog(instrument, component)
+add_component_dialog = AddComponentDialog(
+    instrument, component, definitions_dir=DEFINITIONS_DIR
+)
 
 PIXEL_OPTIONS = dict()
 NO_PIXEL_OPTIONS = dict()
@@ -164,10 +166,10 @@ def create_add_component_dialog():
     """
     global nexus_wrapper_count
     nexus_name = "test" + str(nexus_wrapper_count)
-    instrument = Instrument(NexusWrapper(nexus_name))
+    instrument = Instrument(NexusWrapper(nexus_name), DEFINITIONS_DIR)
     component = ComponentTreeModel(instrument)
     nexus_wrapper_count += 1
-    return AddComponentDialog(instrument, component)
+    return AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
 
 
 def enter_component_name(
@@ -1252,7 +1254,9 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_name"))
+    instrument = Instrument(
+        NexusWrapper("test_component_editing_name"), DEFINITIONS_DIR
+    )
 
     component_model = ComponentTreeModel(instrument)
 
@@ -1271,7 +1275,11 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument, component_model, component_to_edit=component, parent=None
+                instrument,
+                component_model,
+                component_to_edit=component,
+                definitions_dir=DEFINITIONS_DIR,
+                parent=None,
             )
             template = QDialog()
             template.ui = dialog
@@ -1298,7 +1306,11 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument, model, component_to_edit=component, parent=None
+                instrument,
+                model,
+                component_to_edit=component,
+                definitions_dir=DEFINITIONS_DIR,
+                parent=None,
             )
             template = QDialog()
             template.ui = dialog
@@ -1311,7 +1323,9 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
 def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_cylinder"))
+    instrument = Instrument(
+        NexusWrapper("test_component_editing_cylinder"), DEFINITIONS_DIR
+    )
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"
@@ -1325,7 +1339,10 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument, component_model, component_to_edit=component
+                instrument,
+                component_model,
+                component_to_edit=component,
+                definitions_dir=DEFINITIONS_DIR,
             )
             dialog.pixel_options = Mock(spec=PixelOptions)
             template = QDialog()
@@ -1349,7 +1366,9 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
     field_value = "test"
     component.set_field(field_name, field_value, dtype=h5py.special_dtype(vlen=str))
 
-    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog = AddComponentDialog(
+        instrument, model, component_to_edit=component, definitions_dir=DEFINITIONS_DIR
+    )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
@@ -1368,7 +1387,7 @@ def create_group_with_component(component_name: str, file_name: str):
     """
     Convenience method, for when we don't really care about the component and just want one to be added to a file
     """
-    instrument = Instrument(NexusWrapper(file_name))
+    instrument = Instrument(NexusWrapper(file_name), DEFINITIONS_DIR)
     model = ComponentTreeModel(instrument)
     component = instrument.create_component(component_name, "NXdisk_chopper", "")
     return component, instrument, model
@@ -1384,7 +1403,9 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
     field_name = "array"
     field_value = np.array([1, 2, 3, 4, 5])
     component.set_field(field_name, field_value)
-    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog = AddComponentDialog(
+        instrument, model, component_to_edit=component, definitions_dir=DEFINITIONS_DIR
+    )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
@@ -1412,7 +1433,9 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
 
     component.set_field(link_name, link)
 
-    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog = AddComponentDialog(
+        instrument, model, component_to_edit=component, definitions_dir=DEFINITIONS_DIR
+    )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
@@ -1440,7 +1463,9 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     field_value2 = 1
     component.set_field(field_name2, field_value2)
 
-    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog = AddComponentDialog(
+        instrument, model, component_to_edit=component, definitions_dir=DEFINITIONS_DIR
+    )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
@@ -1487,7 +1512,9 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
     field_name1 = "stream1"
     component.set_field(field_name1, stream_group)
 
-    dialog = AddComponentDialog(instrument, model, component_to_edit=component)
+    dialog = AddComponentDialog(
+        instrument, model, component_to_edit=component, definitions_dir=DEFINITIONS_DIR
+    )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
     template.ui = dialog
@@ -1510,7 +1537,7 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_off"))
+    instrument = Instrument(NexusWrapper("test_component_editing_off"), DEFINITIONS_DIR)
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"
@@ -1530,7 +1557,10 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
     )
 
     dialog = AddComponentDialog(
-        instrument, component_model, component_to_edit=component
+        instrument,
+        component_model,
+        component_to_edit=component,
+        definitions_dir=DEFINITIONS_DIR,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
@@ -1546,7 +1576,9 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data_is_in_line_edits(
     qtbot
 ):
-    instrument = Instrument(NexusWrapper("test_component_editing_off_filepath"))
+    instrument = Instrument(
+        NexusWrapper("test_component_editing_off_filepath"), DEFINITIONS_DIR
+    )
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"
@@ -1568,7 +1600,10 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data
     )
 
     dialog = AddComponentDialog(
-        instrument, component_model, component_to_edit=component
+        instrument,
+        component_model,
+        component_to_edit=component,
+        definitions_dir=DEFINITIONS_DIR,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()

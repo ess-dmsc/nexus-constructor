@@ -1,4 +1,3 @@
-import os
 from typing import List, Dict, Any, Tuple, Union
 
 import h5py
@@ -52,14 +51,10 @@ class Instrument:
     for example between component and NexusWrapper
     """
 
-    def __init__(self, nexus_file: nx.NexusWrapper):
+    def __init__(self, nexus_file: nx.NexusWrapper, definitions_dir):
         self.nexus = nexus_file
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
-            os.path.abspath(
-                os.path.join(
-                    os.path.realpath(__file__), os.pardir, os.pardir, "definitions"
-                )
-            )
+            definitions_dir
         )
         self._generate_transform_dependency_lists()
 

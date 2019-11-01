@@ -13,6 +13,8 @@ from typing import Any
 from uuid import uuid1
 from PySide2.QtGui import QVector3D
 
+from tests.test_utils import DEFINITIONS_DIR
+
 
 def _add_component_to_file(
     nexus_wrapper: NexusWrapper,
@@ -467,7 +469,9 @@ def test_add_link_multiple_times():
 
 
 def test_duplicate_component():
-    data_under_test = Instrument(NexusWrapper("test_component_model_duplicate"))
+    data_under_test = Instrument(
+        NexusWrapper("test_component_model_duplicate"), DEFINITIONS_DIR
+    )
     under_test = ComponentTreeModel(data_under_test)
 
     assert under_test.rowCount(QModelIndex()) == 1  # Sample
@@ -478,7 +482,9 @@ def test_duplicate_component():
 
 
 def test_duplicate_transform_fail():
-    data_under_test = Instrument(NexusWrapper("test_component_model_duplicate_fail"))
+    data_under_test = Instrument(
+        NexusWrapper("test_component_model_duplicate_fail"), DEFINITIONS_DIR
+    )
     under_test = ComponentTreeModel(data_under_test)
 
     under_test.add_component(get_component())
@@ -495,7 +501,7 @@ def test_duplicate_transform_fail():
 
 def test_remove_component():
     wrapper = NexusWrapper("test_remove_component")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
     under_test = ComponentTreeModel(instrument)
     instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
@@ -506,7 +512,7 @@ def test_remove_component():
 
 def test_remove_transformation():
     wrapper = NexusWrapper("test_remove_transformation")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
     under_test = ComponentTreeModel(instrument)
     instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
@@ -520,7 +526,7 @@ def test_remove_transformation():
 
 def test_remove_link():
     wrapper = NexusWrapper("test_remove_link")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
     under_test = ComponentTreeModel(instrument)
     instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
@@ -535,7 +541,7 @@ def test_remove_link():
 
 def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file():
     wrapper = NexusWrapper("test_duplicate_cyl_shape")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
 
     first_component_name = "component1"
     first_component_nx_class = "NXdetector"
@@ -567,7 +573,7 @@ def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_com
 
 def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file():
     wrapper = NexusWrapper("test_duplicate_off_shape")
-    instrument = Instrument(wrapper)
+    instrument = Instrument(wrapper, DEFINITIONS_DIR)
 
     first_component_name = "component1"
     first_component_nx_class = "NXdetector"

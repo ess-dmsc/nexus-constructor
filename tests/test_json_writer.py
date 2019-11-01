@@ -14,6 +14,7 @@ from nexus_constructor.json.filewriter_json_writer import (
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
 from tests.helpers import InMemoryFile
+from tests.test_utils import DEFINITIONS_DIR
 
 
 def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
@@ -375,7 +376,7 @@ def test_GIVEN_nexus_object_and_fake_fileIO_WHEN_calling_object_to_json_file_THE
 def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is_written_containing_components():
     file = io.StringIO(newline=None)
     wrapper = NexusWrapper("test.nxs")
-    data = Instrument(wrapper)
+    data = Instrument(wrapper, DEFINITIONS_DIR)
 
     component_name = "pinhole"
     component_nx_class = "NXpinhole"

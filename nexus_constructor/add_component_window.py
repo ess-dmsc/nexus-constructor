@@ -39,7 +39,6 @@ from nexus_constructor.validators import (
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.component_tree_model import ComponentTreeModel
-import os
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component.component import Component
@@ -110,6 +109,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         instrument: Instrument,
         component_model: ComponentTreeModel,
         component_to_edit: Component = None,
+        definitions_dir: str = "",
         parent=None,
     ):
         super(AddComponentDialog, self).__init__()
@@ -119,7 +119,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_model = component_model
         self.geometry_model = None
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
-            os.path.abspath(os.path.join(os.curdir, "definitions"))
+            definitions_dir
         )
         self.nx_component_classes = OrderedDict(
             sorted(self.nx_component_classes.items())

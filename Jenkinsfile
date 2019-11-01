@@ -123,17 +123,25 @@ return {
         }
                 junit "test_results.xml"
             } // stage
-            // if (env.CHANGE_ID) {
-                // stage("Build Executable") {
-                    // bat """
-                    // python setup.py build_exe"""
-                // } // stage
-                // stage('Archive Executable') {
-                    // def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-                    // powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
-                    // archiveArtifacts 'nexus-constructor*.zip'
-                // } // stage
-            // } // if
+            if (env.CHANGE_ID) {
+                stage("Build Executable") {
+                    bat """
+                    python setup.py build_exe"""
+                } // stage
+                stage('Archive Executable') {
+                    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
+                    powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
+                    archiveArtifacts 'nexus-constructor*.zip'
+                } // stage
+                stage("Test executable") {
+                    timeout(time:15, unit:'SECONDS') {
+                        bat """
+                        cd build\\e*\\
+                        NexusConstructor.exe --help
+                        """
+                        }
+                } // stage
+            } // if
           } // dir
       } //ws
     } // node

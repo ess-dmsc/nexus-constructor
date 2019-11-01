@@ -35,9 +35,10 @@ JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
-    def __init__(self, instrument: Instrument):
+    def __init__(self, instrument: Instrument, definitions_dir: str):
         super().__init__()
         self.instrument = instrument
+        self.definitions_dir = definitions_dir
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
@@ -77,11 +78,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self._update_transformations_3d_view
         )
 
-        self.set_up_warning_window()
-
         self.widget.setVisible(True)
 
         self._set_up_tree_view()
+        self.set_up_warning_window()
 
     def _set_up_tree_view(self):
         self._set_up_component_model()
@@ -97,12 +97,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         self.component_tool_bar = QToolBar("Actions", self.component_tree_view_tab)
         self.new_component_action = QAction(
-            QIcon("ui/new_component.png"), "New component", self.component_tree_view_tab
+            QIcon(os.path.join("ui", "new_component.png")),
+            "New component",
+            self.component_tree_view_tab,
         )
         self.new_component_action.triggered.connect(self.show_add_component_window)
         self.component_tool_bar.addAction(self.new_component_action)
         self.new_translation_action = QAction(
-            QIcon("ui/new_translation.png"),
+            QIcon(os.path.join("ui", "new_translation.png")),
             "New translation",
             self.component_tree_view_tab,
         )
@@ -110,26 +112,32 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.new_translation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_translation_action)
         self.new_rotation_action = QAction(
-            QIcon("ui/new_rotation.png"), "New rotation", self.component_tree_view_tab
+            QIcon(os.path.join("ui", "new_rotation.png")),
+            "New rotation",
+            self.component_tree_view_tab,
         )
         self.new_rotation_action.triggered.connect(self.on_add_rotation)
         self.new_rotation_action.setEnabled(False)
         self.component_tool_bar.addAction(self.new_rotation_action)
         self.create_link_action = QAction(
-            QIcon("ui/create_link.png"), "Create link", self.component_tree_view_tab
+            QIcon(os.path.join("ui", "create_link.png")),
+            "Create link",
+            self.component_tree_view_tab,
         )
         self.create_link_action.triggered.connect(self.on_create_link)
         self.create_link_action.setEnabled(False)
         self.component_tool_bar.addAction(self.create_link_action)
         self.duplicate_action = QAction(
-            QIcon("ui/duplicate.png"), "Duplicate", self.component_tree_view_tab
+            QIcon(os.path.join("ui", "duplicate.png")),
+            "Duplicate",
+            self.component_tree_view_tab,
         )
         self.component_tool_bar.addAction(self.duplicate_action)
         self.duplicate_action.triggered.connect(self.on_duplicate_node)
         self.duplicate_action.setEnabled(False)
 
         self.edit_component_action = QAction(
-            QIcon("ui/edit_component.png"),
+            QIcon(os.path.join("ui", "edit_component.png")),
             "Edit Component",
             self.component_tree_view_tab,
         )
@@ -138,7 +146,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tool_bar.addAction(self.edit_component_action)
 
         self.delete_action = QAction(
-            QIcon("ui/delete.png"), "Delete", self.component_tree_view_tab
+            QIcon(os.path.join("ui", "delete.png")),
+            "Delete",
+            self.component_tree_view_tab,
         )
         self.delete_action.triggered.connect(self.on_delete_item)
         self.delete_action.setEnabled(False)
@@ -303,10 +313,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         Sets up the warning dialog that is shown when the definitions submodule has not been cloned.
         :return:
         """
-        definitions_dir = os.path.join(os.curdir, "definitions")
 
         # Will contain .git even if missing so check that it does not contain just that file.
-        if not os.path.exists(definitions_dir) or len(os.listdir(definitions_dir)) <= 1:
+        if (
+            not os.path.exists(self.definitions_dir)
+            or len(os.listdir(self.definitions_dir)) <= 1
+        ):
             show_warning_dialog(
                 "Warning: NeXus definitions are missing. Did you forget to clone the submodules?\n run git submodule update --init ",
                 title="NeXus definitions missing",
@@ -413,7 +425,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
         self.add_component_window.ui = AddComponentDialog(
-            self.instrument, self.component_model, component, parent=self
+            self.instrument,
+            self.component_model,
+            component,
+            definitions_dir=self.definitions_dir,
+            parent=self,
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()

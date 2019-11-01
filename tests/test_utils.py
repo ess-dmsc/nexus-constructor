@@ -1,3 +1,5 @@
+import os
+
 from mock import Mock
 
 from nexus_constructor.ui_utils import validate_line_edit, generate_unique_name
@@ -109,3 +111,6 @@ def test_GIVEN_name_with_1_as_suffix_and_name_with_11_already_in_list_WHEN_gener
     assert (
         generate_unique_name(comp.name, [comp, DummyComponent(comp.name + "1")])
     ) == "something12"
+
+
+DEFINITIONS_DIR = os.path.join(os.getcwd(), "definitions")
