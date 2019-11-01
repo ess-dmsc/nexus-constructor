@@ -106,7 +106,7 @@ return {
                   bat """
                   git submodule update --init
                   python -m pip install --upgrade virtualenv
-                  python -m pip install --user -r requirements-dev.txt --force-reinstall
+                  python -m pip install --user -r requirements-dev.txt
                   python -m pip install codecov==2.0.15
                 """
             } // stage
