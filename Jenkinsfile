@@ -136,6 +136,7 @@ return {
                 stage("Test executable") {
                     timeout(time:15, unit:'SECONDS') {
                         bat """
+                        dir .
                            .\\build\\*\\NexusConstructor.exe --help
                         """
                         }
