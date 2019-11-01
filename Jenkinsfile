@@ -137,7 +137,7 @@ return {
                     timeout(time:15, unit:'SECONDS') {
                         bat """
                         dir .
-                        cd build\\*\\
+                        cd build\\e*\\
                         NexusConstructor.exe --help
                         """
                         }
