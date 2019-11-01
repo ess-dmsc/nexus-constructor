@@ -56,6 +56,7 @@ class EditTranslation(EditTransformation):
     ):
         super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Distance (m)")
+        self.transformation_frame.value_spinbox.setRange(0, 10000000)
         self.setTitle("Translation")
 
 
@@ -65,6 +66,7 @@ class EditRotation(EditTransformation):
     ):
         super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Angle (°)")
+        self.transformation_frame.value_spinbox.setRange(0, 360)
         self.setTitle("Rotation")
 
 
