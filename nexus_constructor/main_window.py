@@ -297,9 +297,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             elif transformation_type == "rotation":
                 self.component_model.add_rotation(current_index)
             else:
-                raise ValueError(
-                    "Unknown transformation type: {}".format(transformation_type)
-                )
+                raise ValueError(f"Unknown transformation type: {transformation_type}")
             self.expand_transformation_list(current_index)
 
     def on_add_translation(self):

@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
@@ -175,10 +177,8 @@ class Transformation:
                     self.dataset, "dependee_of", dependee_of_list
                 )
             else:
-                print(
-                    "Unable to de-register dependent {} from {} due to it not being registered.".format(
-                        former_dependent.absolute_path, self.absolute_path
-                    )
+                logging.warning(
+                    f"Unable to de-register dependent {former_dependent.absolute_path} from {self.absolute_path} due to it not being registered."
                 )
 
     def get_dependents(self):

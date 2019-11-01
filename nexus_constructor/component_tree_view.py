@@ -53,7 +53,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.layout.setContentsMargins(0, 0, 0, 0)
         frame.setLayout(frame.layout)
         if isinstance(value, Component):
-            frame.label = QLabel("{} ({})".format(value.name, value.nx_class), frame)
+            frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
             frame.layout.addWidget(frame.label)
         elif isinstance(value, TransformationsList):
             frame.label = QLabel("Transformations", frame)

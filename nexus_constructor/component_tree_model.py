@@ -44,11 +44,11 @@ class ComponentTreeModel(QAbstractItemModel):
         if not index.isValid():
             return Qt.NoItemFlags
         parent_item = index.internalPointer()
-        if issubclass(type(parent_item), Component):
+        if isinstance(parent_item, Component):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        elif issubclass(type(parent_item), ComponentInfo):
+        elif isinstance(parent_item, ComponentInfo):
             return Qt.ItemIsEnabled
-        elif type(parent_item) is TransformationsList:
+        elif isinstance(parent_item, TransformationsList):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
@@ -163,7 +163,7 @@ class ComponentTreeModel(QAbstractItemModel):
         elif isinstance(node_object, Transformation):
             raise NotImplementedError("Duplication of transformations not implemented")
 
-    def add_transformation(self, parent_index: QModelIndex, type: str):
+    def add_transformation(self, parent_index: QModelIndex, transformation_type: str):
         parent_item = parent_index.internalPointer()
         transformation_list = None
         parent_component = None
@@ -186,19 +186,19 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_component = transformation_list.parent_component
             target_pos = transformation_list.index(parent_item) + 1
             target_index = self.parent(parent_index)
-        if type == "translation":
+        if transformation_type == "translation":
             new_transformation = parent_component.add_translation(
                 name=generate_unique_name("Translation", transformation_list),
                 vector=QVector3D(1.0, 0, 0),
             )
-        elif type == "rotation":
+        elif transformation_type == "rotation":
             new_transformation = parent_component.add_rotation(
                 name=generate_unique_name("Rotation", transformation_list),
                 axis=QVector3D(1.0, 0, 0),
                 angle=0.0,
             )
         else:
-            raise ValueError("Unknown transformation type: {}".format(type))
+            raise ValueError(f"Unknown transformation type: {transformation_type}")
         new_transformation.parent = transformation_list
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
@@ -246,7 +246,7 @@ class ComponentTreeModel(QAbstractItemModel):
                 return self.createIndex(1, 0, parent_item.stored_transforms)
             else:
                 return QModelIndex()
-        elif type(parent_item) is TransformationsList:
+        elif isinstance(parent_item, TransformationsList):
             if parent_item.has_link and row == len(parent_item):
                 return self.createIndex(row, 0, parent_item.link)
             return self.createIndex(row, 0, parent_item[row])
@@ -258,7 +258,7 @@ class ComponentTreeModel(QAbstractItemModel):
         parent_item = index.internalPointer()
         if isinstance(parent_item, Component):
             return QModelIndex()
-        elif type(parent_item) is TransformationsList:
+        elif isinstance(parent_item, TransformationsList):
             try:
                 return self.createIndex(
                     self.components.index(parent_item.parent_component),
@@ -267,11 +267,11 @@ class ComponentTreeModel(QAbstractItemModel):
                 )
             except ValueError as e:
                 logging.error(e)
-        elif type(parent_item) is ComponentInfo:
+        elif isinstance(parent_item, ComponentInfo):
             return self.createIndex(
                 self.components.index(parent_item.parent), 0, parent_item.parent
             )
-        elif issubclass(type(parent_item), Transformation):
+        elif isinstance(parent_item, Transformation):
             return self.createIndex(1, 0, parent_item.parent)
         elif isinstance(parent_item, LinkTransformation):
             return self.createIndex(1, 0, parent_item.parent)
@@ -285,13 +285,13 @@ class ComponentTreeModel(QAbstractItemModel):
 
         if isinstance(parent_item, Component):
             return 2
-        elif type(parent_item) is TransformationsList:
+        elif isinstance(parent_item, TransformationsList):
             if parent_item.has_link:
                 return len(parent_item) + 1
             return len(parent_item)
-        elif issubclass(type(parent_item), Transformation):
+        elif isinstance(parent_item, Transformation):
             return 0
-        elif type(parent_item) is ComponentInfo:
+        elif isinstance(parent_item, ComponentInfo):
             return 0
         elif isinstance(parent_item, LinkTransformation):
             return 0
