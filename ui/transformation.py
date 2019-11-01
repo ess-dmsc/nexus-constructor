@@ -40,11 +40,6 @@ class Ui_Transformation(object):
         self.valueSpinBox.setMaximumSize(QtCore.QSize(100, 16777215))
         self.length_layout.addWidget(self.valueSpinBox)
 
-        self.line_2 = QtWidgets.QFrame(Transformation)
-        self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.length_layout.addWidget(self.line_2)
-
         self.main_layout.addLayout(self.length_layout)
         self.frame_layout.addLayout(self.main_layout)
 
