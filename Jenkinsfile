@@ -134,10 +134,9 @@ return {
                     archiveArtifacts 'nexus-constructor*.zip'
                 } // stage
                 stage("Test executable") {
-                    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
                     timeout(time:15, unit:'SECONDS') {
                         bat """
-                           .\\build\\nexus-constructor_windows_${git_commit_short}\\NexusConstructor.exe --help
+                           .\\build\\*\\NexusConstructor.exe --help
                         """
                         }
                 } // stage
