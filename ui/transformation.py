@@ -1,114 +1,90 @@
-# -*- coding: utf-8 -*-
+from PySide2.QtCore import QSize, QMetaObject
+from PySide2.QtWidgets import (
+    QLabel,
+    QFormLayout,
+    QApplication,
+    QDoubleSpinBox,
+    QHBoxLayout,
+    QFrame,
+    QLineEdit,
+    QVBoxLayout,
+)
 
-# Form implementation generated from reading ui file 'transformation.ui',
-# licensing of 'transformation.ui' applies.
-#
-# Created: Wed Jul 17 14:31:45 2019
-#      by: pyside2-uic  running on PySide2 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
-
-from PySide2 import QtCore, QtGui, QtWidgets
 
 class Ui_Transformation(object):
     def setupUi(self, Transformation):
         Transformation.setObjectName("Transformation")
         Transformation.resize(361, 171)
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(Transformation)
-        self.verticalLayout_2.setContentsMargins(6, 6, 6, 6)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.mainLayout = QtWidgets.QVBoxLayout()
-        self.mainLayout.setSpacing(7)
-        self.mainLayout.setObjectName("mainLayout")
-        self.nameLayout = QtWidgets.QHBoxLayout()
-        self.nameLayout.setSpacing(-1)
-        self.nameLayout.setObjectName("nameLayout")
-        self.nameLabel = QtWidgets.QLabel(Transformation)
-        self.nameLabel.setObjectName("nameLabel")
-        self.nameLayout.addWidget(self.nameLabel)
-        self.nameLineEdit = QtWidgets.QLineEdit(Transformation)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.nameLineEdit.sizePolicy().hasHeightForWidth())
-        self.nameLineEdit.setSizePolicy(sizePolicy)
-        self.nameLineEdit.setObjectName("nameLineEdit")
-        self.nameLayout.addWidget(self.nameLineEdit)
-        self.mainLayout.addLayout(self.nameLayout)
-        self.line = QtWidgets.QFrame(Transformation)
-        self.line.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line.setObjectName("line")
-        self.mainLayout.addWidget(self.line)
-        self.vectorLabel = QtWidgets.QLabel(Transformation)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.vectorLabel.sizePolicy().hasHeightForWidth())
-        self.vectorLabel.setSizePolicy(sizePolicy)
-        self.vectorLabel.setObjectName("vectorLabel")
-        self.mainLayout.addWidget(self.vectorLabel)
-        self.vectorLayout = QtWidgets.QHBoxLayout()
-        self.vectorLayout.setSpacing(-1)
-        self.vectorLayout.setObjectName("vectorLayout")
-        self.xPosLabel = QtWidgets.QLabel(Transformation)
-        self.xPosLabel.setObjectName("xPosLabel")
-        self.vectorLayout.addWidget(self.xPosLabel)
-        self.xSpinBox = QtWidgets.QDoubleSpinBox(Transformation)
-        self.xSpinBox.setObjectName("xSpinBox")
-        self.vectorLayout.addWidget(self.xSpinBox)
-        self.yPosLabel = QtWidgets.QLabel(Transformation)
-        self.yPosLabel.setObjectName("yPosLabel")
-        self.vectorLayout.addWidget(self.yPosLabel)
-        self.ySpinBox = QtWidgets.QDoubleSpinBox(Transformation)
-        self.ySpinBox.setObjectName("ySpinBox")
-        self.vectorLayout.addWidget(self.ySpinBox)
-        self.zPosLabel = QtWidgets.QLabel(Transformation)
-        self.zPosLabel.setObjectName("zPosLabel")
-        self.vectorLayout.addWidget(self.zPosLabel)
-        self.zSpinBox = QtWidgets.QDoubleSpinBox(Transformation)
-        self.zSpinBox.setObjectName("zSpinBox")
-        self.vectorLayout.addWidget(self.zSpinBox)
-        self.mainLayout.addLayout(self.vectorLayout)
-        self.line_3 = QtWidgets.QFrame(Transformation)
-        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_3.setObjectName("line_3")
-        self.mainLayout.addWidget(self.line_3)
-        self.lengthLayout = QtWidgets.QHBoxLayout()
-        self.lengthLayout.setSpacing(-1)
-        self.lengthLayout.setObjectName("lengthLayout")
-        self.valueLabel = QtWidgets.QLabel(Transformation)
-        self.valueLabel.setObjectName("valueLabel")
-        self.lengthLayout.addWidget(self.valueLabel)
-        self.valueSpinBox = QtWidgets.QDoubleSpinBox(Transformation)
-        self.valueSpinBox.setMaximumSize(QtCore.QSize(100, 16777215))
-        self.valueSpinBox.setObjectName("valueSpinBox")
-        self.lengthLayout.addWidget(self.valueSpinBox)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.lengthLayout.addItem(spacerItem)
-        self.line_2 = QtWidgets.QFrame(Transformation)
-        self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_2.setObjectName("line_2")
-        self.lengthLayout.addWidget(self.line_2)
-        self.editButton = QtWidgets.QPushButton(Transformation)
-        self.editButton.setObjectName("editButton")
-        self.lengthLayout.addWidget(self.editButton)
-        self.mainLayout.addLayout(self.lengthLayout)
-        self.verticalLayout_2.addLayout(self.mainLayout)
+        self.frame_layout = QVBoxLayout(Transformation)
+        self.frame_layout.setContentsMargins(6, 6, 6, 6)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setSpacing(7)
+        self.name_layout = QHBoxLayout()
+        self.name_layout.setSpacing(-1)
+        self.name_label = QLabel("Name", Transformation)
+        self.name_layout.addWidget(self.name_label)
+        self.name_line_edit = QLineEdit(Transformation)
+
+        self.name_layout.addWidget(self.name_line_edit)
+        self.main_layout.addLayout(self.name_layout)
+        self.line_1 = QFrame(Transformation)
+        self.line_1.setFrameShape(QFrame.HLine)
+        self.line_1.setFrameShadow(QFrame.Sunken)
+        self.main_layout.addWidget(self.line_1)
+
+        self.vector_label = QLabel("Vector", Transformation)
+
+        self.main_layout.addWidget(self.vector_label)
+
+        self._set_up_vector_box(Transformation)
+
+        self.line_3 = QFrame(Transformation)
+        self.line_3.setFrameShape(QFrame.HLine)
+        self.line_3.setFrameShadow(QFrame.Sunken)
+        self.main_layout.addWidget(self.line_3)
+        self.length_layout = QHBoxLayout()
+        self.length_layout.setSpacing(-1)
+        self.valueLabel = QLabel("Length", Transformation)
+        self.length_layout.addWidget(self.valueLabel)
+        self.value_spinbox = QDoubleSpinBox(Transformation)
+        self.value_spinbox.setMaximumSize(QSize(100, 16777215))
+        self.length_layout.addWidget(self.value_spinbox)
+
+        self.main_layout.addLayout(self.length_layout)
+        self.frame_layout.addLayout(self.main_layout)
 
         self.retranslateUi(Transformation)
-        QtCore.QMetaObject.connectSlotsByName(Transformation)
+        QMetaObject.connectSlotsByName(Transformation)
+
+    def _set_up_vector_box(self, Transformation):
+        XYZ_MINIMUM = 0
+        XYZ_MAXIMUM = 1000000
+        self.vector_layout = QHBoxLayout()
+
+        self.x_layout = QFormLayout()
+        self.x_spinbox = QDoubleSpinBox(Transformation)
+        self.x_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
+        self.x_layout.addRow("x:", self.x_spinbox)
+        self.vector_layout.addLayout(self.x_layout)
+
+        self.y_layout = QFormLayout()
+        self.y_spinbox = QDoubleSpinBox(Transformation)
+        self.y_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
+        self.y_layout.addRow("y:", self.y_spinbox)
+        self.vector_layout.addLayout(self.y_layout)
+
+        self.z_layout = QFormLayout()
+        self.z_spinbox = QDoubleSpinBox(Transformation)
+        self.z_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
+        self.z_layout.addRow("z:", self.z_spinbox)
+        self.vector_layout.addLayout(self.z_layout)
+
+        self.main_layout.addLayout(self.vector_layout)
 
     def retranslateUi(self, Transformation):
-        Transformation.setWindowTitle(QtWidgets.QApplication.translate("Transformation", "GroupBox", None, -1))
-        Transformation.setTitle(QtWidgets.QApplication.translate("Transformation", "Translation", None, -1))
-        self.nameLabel.setText(QtWidgets.QApplication.translate("Transformation", "Name", None, -1))
-        self.vectorLabel.setText(QtWidgets.QApplication.translate("Transformation", "Vector", None, -1))
-        self.xPosLabel.setText(QtWidgets.QApplication.translate("Transformation", "x", None, -1))
-        self.yPosLabel.setText(QtWidgets.QApplication.translate("Transformation", "y", None, -1))
-        self.zPosLabel.setText(QtWidgets.QApplication.translate("Transformation", "z", None, -1))
-        self.valueLabel.setText(QtWidgets.QApplication.translate("Transformation", "Length", None, -1))
-        self.editButton.setText(QtWidgets.QApplication.translate("Transformation", "Edit", None, -1))
-
+        Transformation.setWindowTitle(
+            QApplication.translate("Transformation", "GroupBox", None, -1)
+        )
+        Transformation.setTitle(
+            QApplication.translate("Transformation", "Translation", None, -1)
+        )

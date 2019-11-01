@@ -18,37 +18,35 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.setupUi(self)
         self.transformation = transformation
         current_vector = self.transformation.vector
-        self.transformation_frame.xSpinBox.setValue(current_vector.x())
-        self.transformation_frame.ySpinBox.setValue(current_vector.y())
-        self.transformation_frame.zSpinBox.setValue(current_vector.z())
-        self.transformation_frame.nameLineEdit.setText(self.transformation.name)
-        self.transformation_frame.valueSpinBox.setValue(self.transformation.value)
+        self.transformation_frame.x_spinbox.setValue(current_vector.x())
+        self.transformation_frame.y_spinbox.setValue(current_vector.y())
+        self.transformation_frame.z_spinbox.setValue(current_vector.z())
+        self.transformation_frame.name_line_edit.setText(self.transformation.name)
+        self.transformation_frame.value_spinbox.setValue(self.transformation.value)
         self.disable()
 
     def disable(self):
-        self.transformation_frame.xSpinBox.setEnabled(False)
-        self.transformation_frame.ySpinBox.setEnabled(False)
-        self.transformation_frame.zSpinBox.setEnabled(False)
-        self.transformation_frame.valueSpinBox.setEnabled(False)
-        self.transformation_frame.nameLineEdit.setEnabled(False)
-        self.transformation_frame.editButton.setText("Edit")
+        self.transformation_frame.x_spinbox.setEnabled(False)
+        self.transformation_frame.y_spinbox.setEnabled(False)
+        self.transformation_frame.z_spinbox.setEnabled(False)
+        self.transformation_frame.value_spinbox.setEnabled(False)
+        self.transformation_frame.name_line_edit.setEnabled(False)
 
     def enable(self):
-        self.transformation_frame.xSpinBox.setEnabled(True)
-        self.transformation_frame.ySpinBox.setEnabled(True)
-        self.transformation_frame.zSpinBox.setEnabled(True)
-        self.transformation_frame.valueSpinBox.setEnabled(True)
-        self.transformation_frame.nameLineEdit.setEnabled(True)
-        self.transformation_frame.editButton.setText("Done")
+        self.transformation_frame.x_spinbox.setEnabled(True)
+        self.transformation_frame.y_spinbox.setEnabled(True)
+        self.transformation_frame.z_spinbox.setEnabled(True)
+        self.transformation_frame.value_spinbox.setEnabled(True)
+        self.transformation_frame.name_line_edit.setEnabled(True)
 
     def saveChanges(self):
-        self.transformation.name = self.transformation_frame.nameLineEdit.text()
+        self.transformation.name = self.transformation_frame.name_line_edit.text()
         self.transformation.vector = QVector3D(
-            self.transformation_frame.xSpinBox.value(),
-            self.transformation_frame.ySpinBox.value(),
-            self.transformation_frame.zSpinBox.value(),
+            self.transformation_frame.x_spinbox.value(),
+            self.transformation_frame.y_spinbox.value(),
+            self.transformation_frame.z_spinbox.value(),
         )
-        self.transformation.value = self.transformation_frame.valueSpinBox.value()
+        self.transformation.value = self.transformation_frame.value_spinbox.value()
         self.instrument.nexus.transformation_changed.emit()
 
 
@@ -57,7 +55,8 @@ class EditTranslation(EditTransformation):
         self, parent: QWidget, transformation: Transformation, instrument: Instrument
     ):
         super().__init__(parent, transformation, instrument)
-        self.transformation_frame.valueLabel.setText("Position (m)")
+        self.transformation_frame.valueLabel.setText("Distance (m)")
+        self.transformation_frame.value_spinbox.setRange(0, 10000000)
         self.setTitle("Translation")
 
 
@@ -66,7 +65,8 @@ class EditRotation(EditTransformation):
         self, parent: QWidget, transformation: Transformation, instrument: Instrument
     ):
         super().__init__(parent, transformation, instrument)
-        self.transformation_frame.valueLabel.setText("Rotation (°)")
+        self.transformation_frame.valueLabel.setText("Angle (°)")
+        self.transformation_frame.value_spinbox.setRange(0, 360)
         self.setTitle("Rotation")
 
 
