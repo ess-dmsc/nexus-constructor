@@ -137,7 +137,7 @@ return {
                 timeout(time:15, unit:'SECONDS') {
                     bat """
                        net start .\\build\\nexus-constructor_windows_${git_commit_short}\\NexusConstructor.exe
-                       net stop NexusConstructor.exe
+                       net stop .\\build\\nexus-constructor_windows_${git_commit_short}\\NexusConstructor.exe
                     """
                     }
                 }
