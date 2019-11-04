@@ -1,6 +1,7 @@
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 
+from nexus_constructor.component.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
@@ -62,12 +63,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # Update the validity
         self.update_pixel_input_validity()
 
-    def fill_existing_entries(self):
+    def fill_existing_entries(self, component_to_edit: Component):
         """
         Populate the pixel fields based on what is already stored in the NeXus file.
         :return:
         """
-        pass
+        print("Pixel options need to be filled again!")
 
     def get_current_mapping_filename(self):
         """
@@ -112,14 +113,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             )
         )
 
-        # Prevent both the rows and columns in the PixelGrid from being zero
-        self.column_count_spin_box.valueChanged.connect(
-            self.forbid_both_row_and_columns_being_zero
-        )
-        self.row_count_spin_box.valueChanged.connect(
-            self.forbid_both_row_and_columns_being_zero
-        )
-
         # Manually add options to the "Count first along" combo box. This is done here because inserting these options
         # through Qt Designer doesn't work.
         self.count_first_combo_box.addItems(list(self.count_direction.keys()))
@@ -152,21 +145,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         :param distance_spin_box: The matching row height/column width spin box.
         """
         distance_spin_box.setEnabled(count_spin_box.value() != 0)
-
-    def forbid_both_row_and_columns_being_zero(self):
-        """
-        Changes the StyleSheet of the column and row count spin boxes in the Pixel Grid depending on their validity.
-        Sets them to red if both are zero, white if one or neither of them are zero.
-        """
-        if (
-            self.row_count_spin_box.value() == 0
-            and self.column_count_spin_box.value() == 0
-        ):
-            self.row_count_spin_box.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
-            self.column_count_spin_box.setStyleSheet(RED_BACKGROUND_STYLE_SHEET)
-        else:
-            self.row_count_spin_box.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
-            self.column_count_spin_box.setStyleSheet(WHITE_BACKGROUND_STYLE_SHEET)
 
     def update_pixel_grid_validity(self):
         """
