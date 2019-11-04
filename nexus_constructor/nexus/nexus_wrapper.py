@@ -142,7 +142,6 @@ class NexusWrapper(QObject):
 
     def load_nexus_file(self, nexus_file: h5py.File):
         entries = self.find_entries_in_file(nexus_file)
-
         self.file_opened.emit(nexus_file)
         return entries
 
@@ -211,7 +210,27 @@ class NexusWrapper(QObject):
         """
         Fill in the dependee_of attribute for transformations that are linked to.
         """
-        pass
+        depends_on_chain = {}
+
+        def find_dependee_of(_, node):
+            if isinstance(node, h5py.Group):
+                if "depends_on" in node.keys():
+                    depends_on_chain[node.name] = node["depends_on"][()]
+
+        self.nexus_file["/"].visititems(find_dependee_of)
+
+        dependee_of = {}
+        for group_name, depends_on_value in depends_on_chain.items():
+            # if depends_on_value in [dataset.name for dataset in transforms]:
+            if depends_on_value not in dependee_of.keys():
+                # Create new list for the transform
+                dependee_of[depends_on_value] = []
+            dependee_of[depends_on_value].append(group_name)
+
+        for transform, depends_on_list in dependee_of.items():
+            self.nexus_file[transform].attrs["dependee_of"] = np.array(
+                depends_on_list, dtype=h5py.special_dtype(vlen=str)
+            )
 
     def duplicate_nx_group(
         self, group_to_duplicate: h5py.Group, new_group_name: str

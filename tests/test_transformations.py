@@ -377,15 +377,21 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
     nexus_wrapper = NexusWrapper(str(uuid1()))
     transform_name = "transform_1"
     transform = create_transform(nexus_wrapper, transform_name)
-    component1 = add_component_to_file(nexus_wrapper, component_name="test_component1")
-    component2 = add_component_to_file(nexus_wrapper, component_name="test_component2")
+
+    component1_name = "test_component1"
+    component2_name = "test_component2"
+
+    component1 = add_component_to_file(nexus_wrapper, component_name=component1_name)
+    component2 = add_component_to_file(nexus_wrapper, component_name=component2_name)
     component1.depends_on = transform
     component2.depends_on = transform
-    del transform.dataset.attrs["dependee_of"]
+    dependee_of = "dependee_of"
+    del transform.dataset.attrs[dependee_of]
 
     nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
-
     new_transform_group = nexus_wrapper.nexus_file[transform_name]
 
-    assert hasattr(new_transform_group, "dependee_of")
-    assert len(new_transform_group.attrs["dependee_of"]) == 2
+    assert dependee_of in new_transform_group.attrs
+    assert len(new_transform_group.attrs[dependee_of]) == 2
+    assert new_transform_group.attrs[dependee_of][0] == "/" + component1_name
+    assert new_transform_group.attrs[dependee_of][1] == "/" + component2_name
