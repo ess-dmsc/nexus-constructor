@@ -223,9 +223,12 @@ class NexusWrapper(QObject):
         for group_name, depends_on_value in depends_on_chain.items():
             # if depends_on_value in [dataset.name for dataset in transforms]:
             if depends_on_value not in dependee_of.keys():
-                # Create new list for the transform
-                dependee_of[depends_on_value] = []
-            dependee_of[depends_on_value].append(group_name)
+                dependee_of[depends_on_value] = group_name
+            else:
+                if isinstance(dependee_of[depends_on_value], str):
+                    # If there is already a single dependee_of value, create a list instead of just holding the single value.
+                    dependee_of[depends_on_value] = [dependee_of[depends_on_value]]
+                dependee_of[depends_on_value].append(group_name)
 
         for transform, depends_on_list in dependee_of.items():
             self.nexus_file[transform].attrs["dependee_of"] = np.array(
