@@ -73,20 +73,19 @@ def get_detector_ids_from_pixel_grid(grid: PixelGrid):
         # Reshape the array. Without an order argument this will be column-major order by default.
         ids = ids.reshape(grid.rows, grid.columns)
 
-    if grid.initial_count_corner == Corner.TOP_LEFT:
-        # Return the array as it is in the case of a top-left starting corner.
-        return ids
-
     if grid.initial_count_corner == Corner.TOP_RIGHT:
         # Invert the columns in the case of a top-right starting corner.
-        return np.fliplr(ids)
+        ids = np.fliplr(ids)
 
     if grid.initial_count_corner == Corner.BOTTOM_LEFT:
         # Invert the rows in the case of a bottom-left starting corner.
-        return np.flipud(ids)
+        ids = np.flipud(ids)
 
     # Rotate the array 180 degrees clockwise in the case of a bottom-right starting corner.
-    return np.rot90(ids, 2)
+    if grid.initial_count_corner == Corner.BOTTOM_RIGHT:
+        ids = np.rot90(ids, 2)
+
+    return convert_to_scalar_if_array_has_one_element(ids)
 
 
 def convert_to_scalar_if_array_has_one_element(value_array: np.ndarray):
