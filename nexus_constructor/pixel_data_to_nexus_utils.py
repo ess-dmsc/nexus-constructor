@@ -8,7 +8,8 @@ def get_detector_faces_from_pixel_mapping(mapping: PixelMapping):
     Returns a list of tuples. Each tuple contains a face ID followed by the face's detector ID.
     Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
     """
-    return list(enumerate([id for id in mapping.pixel_ids if id is not None]))
+    detector_faces = list(enumerate([id for id in mapping.pixel_ids if id is not None]))
+    return convert_to_scalar_if_list_has_one_element(detector_faces)
 
 
 def get_detector_number_from_pixel_mapping(mapping: PixelMapping):
@@ -16,7 +17,8 @@ def get_detector_number_from_pixel_mapping(mapping: PixelMapping):
     Returns a list of pixel IDs. Used for writing information to the detector_number field in NXdetector and
     NXcylindrical_geometry.
     """
-    return [id for id in mapping.pixel_ids if id is not None]
+    detector_numbers = [id for id in mapping.pixel_ids if id is not None]
+    return convert_to_scalar_if_list_has_one_element(detector_numbers)
 
 
 def get_x_offsets_from_pixel_grid(grid: PixelGrid):
@@ -80,3 +82,11 @@ def get_detector_ids_from_pixel_grid(grid: PixelGrid):
 
     # Rotate the array 180 degrees clockwise in the case of a bottom-right starting corner.
     return np.rot90(ids, 2)
+
+
+def convert_to_scalar_if_list_has_one_element(value_list):
+
+    if len(value_list) > 1:
+        return value_list
+
+    return value_list[0]

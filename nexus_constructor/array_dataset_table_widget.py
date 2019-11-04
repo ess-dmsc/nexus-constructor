@@ -125,6 +125,7 @@ class ArrayDatasetTableModel(QAbstractTableModel):
 
     def data(self, index: QModelIndex, role: int = ...) -> str:
         if role == Qt.DisplayRole or role == Qt.EditRole:
+            print(self.array)
             value = self.array[index.row()][index.column()]
             return str(value)
 
