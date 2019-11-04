@@ -1,4 +1,5 @@
 import numpy as np
+from typing import List
 
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 
@@ -50,7 +51,9 @@ def get_z_offsets_from_pixel_grid(grid: PixelGrid):
     Returns a list of 'row' lists of 'column' length.
     Each entry in the sublists are z positions of pixel instances in the given PixelGrid.
     """
-    return [[0] * grid.columns] * grid.rows
+    return convert_to_scalar_if_array_has_one_element(
+        np.zeros((grid.rows, grid.columns))
+    )
 
 
 def get_detector_ids_from_pixel_grid(grid: PixelGrid):
@@ -84,7 +87,15 @@ def get_detector_ids_from_pixel_grid(grid: PixelGrid):
     return np.rot90(ids, 2)
 
 
-def convert_to_scalar_if_list_has_one_element(value_list):
+def convert_to_scalar_if_array_has_one_element(value_array: np.ndarray):
+
+    if value_array.size > 1:
+        return value_array
+
+    return value_array.item()
+
+
+def convert_to_scalar_if_list_has_one_element(value_list: List):
 
     if len(value_list) > 1:
         return value_list

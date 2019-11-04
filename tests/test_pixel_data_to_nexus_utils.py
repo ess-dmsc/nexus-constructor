@@ -26,7 +26,7 @@ EXPECTED_DETECTOR_IDS = {
     },
 }
 
-ROW_COL_VALS = [1, 4, 7]
+ROW_COL_VALS = [4, 7]
 
 
 @pytest.fixture(scope="function")
@@ -117,11 +117,7 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_z_offsets_THEN_z_offsets_are_a
 
     z_offsets = get_z_offsets_from_pixel_grid(pixel_grid)
 
-    assert len(z_offsets) == pixel_grid.rows
-    expected_row = [0 for _ in range(pixel_grid.columns)]
-
-    for actual_row in z_offsets:
-        assert actual_row == expected_row
+    assert np.array_equal(np.zeros((rows, columns)), z_offsets)
 
 
 @pytest.mark.parametrize("direction", CountDirection)
