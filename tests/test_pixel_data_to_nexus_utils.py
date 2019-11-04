@@ -60,6 +60,15 @@ def test_GIVEN_list_of_ids_WHEN_calling_detector_faces_THEN_correct_detector_fac
     assert get_detector_faces_from_pixel_mapping(pixel_mapping) == expected_faces
 
 
+def test_GIVEN_single_id_WHEN_calling_detector_faces_THEN_list_is_not_returned(
+    pixel_mapping
+):
+
+    pixel_id = 3
+    pixel_mapping.pixel_ids = [pixel_id]
+    assert get_detector_faces_from_pixel_mapping(pixel_mapping) == (0, pixel_id)
+
+
 def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_number_list_is_returned(
     pixel_mapping
 ):
@@ -67,6 +76,15 @@ def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_nu
     expected_numbers = [id for id in pixel_mapping.pixel_ids if id is not None]
 
     assert get_detector_number_from_pixel_mapping(pixel_mapping) == expected_numbers
+
+
+def test_GIVEN_single_id_WHEN_calling_detector_number_THEN_list_is_not_returned(
+    pixel_mapping
+):
+
+    pixel_id = 3
+    pixel_mapping.pixel_ids = [pixel_id]
+    assert get_detector_number_from_pixel_mapping(pixel_mapping) == pixel_id
 
 
 @pytest.mark.parametrize("rows", ROW_COL_VALS)
@@ -136,3 +154,17 @@ def test_GIVEN_direction_and_initial_count_corner_WHEN_calling_pixel_grid_detect
         np.array(EXPECTED_DETECTOR_IDS[direction][corner]) + pixel_grid.first_id,
         get_detector_ids_from_pixel_grid(pixel_grid),
     )
+
+
+def test_GIVEN_one_by_one_pixel_grid_when_calling_offset_functions_THEN_offsets_and_pixel_id_are_scalars(
+    pixel_grid
+):
+
+    pixel_grid.rows = 1
+    pixel_grid.columns = 1
+
+    assert get_x_offsets_from_pixel_grid(pixel_grid) == 0
+    assert get_y_offsets_from_pixel_grid(pixel_grid) == 0
+    assert get_z_offsets_from_pixel_grid(pixel_grid) == 0
+
+    assert get_detector_ids_from_pixel_grid(pixel_grid) == pixel_grid.first_id
