@@ -371,3 +371,21 @@ def test_can_get_rotation_as_4_by_4_matrix():
         )
     )
     assert np.allclose(expected_matrix, np.array(test_matrix.data()), atol=1.0e-7)
+
+
+def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_attr_WHEN_opening_nexus_file_THEN_components_linked_contain_dependee_of_attribute():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    transform_name = "transform_1"
+    transform = create_transform(nexus_wrapper, transform_name)
+    component1 = add_component_to_file(nexus_wrapper, component_name="test_component1")
+    component2 = add_component_to_file(nexus_wrapper, component_name="test_component2")
+    component1.depends_on = transform
+    component2.depends_on = transform
+    del transform.dataset.attrs["dependee_of"]
+
+    nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
+
+    new_transform_group = nexus_wrapper.nexus_file[transform_name]
+
+    assert hasattr(new_transform_group, "dependee_of")
+    assert len(new_transform_group.attrs["dependee_of"]) == 2

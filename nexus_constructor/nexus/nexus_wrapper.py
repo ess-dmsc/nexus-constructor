@@ -142,6 +142,7 @@ class NexusWrapper(QObject):
 
     def load_nexus_file(self, nexus_file: h5py.File):
         entries = self.find_entries_in_file(nexus_file)
+        # TODO: add dependee_of attributes
         self.file_opened.emit(nexus_file)
         return entries
 
