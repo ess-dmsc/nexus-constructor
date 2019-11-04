@@ -68,7 +68,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Populate the pixel fields based on what is already stored in the NeXus file.
         :return:
         """
-        print("Pixel options need to be filled again!")
+        if component_to_edit.get_field("detector_faces") is not None:
+            pass
+
+        elif component_to_edit.get_field("detector_number") is not None:
+            pass
+        else:
+            self.no_pixels_button.setChecked(True)
 
     def get_current_mapping_filename(self):
         """
