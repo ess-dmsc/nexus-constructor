@@ -31,7 +31,7 @@ def get_x_offsets_from_pixel_grid(grid: PixelGrid):
     end = half_distance * (grid.columns - 1)
 
     offsets = np.linspace(start=-end, stop=end, num=grid.columns)
-    return np.tile(offsets, (grid.rows, 1))
+    return convert_to_scalar_if_array_has_one_element(np.tile(offsets, (grid.rows, 1)))
 
 
 def get_y_offsets_from_pixel_grid(grid: PixelGrid):
@@ -43,7 +43,9 @@ def get_y_offsets_from_pixel_grid(grid: PixelGrid):
     end = half_distance * (grid.rows - 1)
 
     offsets = np.linspace(start=end, stop=-end, num=grid.rows)
-    return np.tile(offsets, (grid.columns, 1)).transpose()
+    return convert_to_scalar_if_array_has_one_element(
+        np.tile(offsets, (grid.columns, 1)).transpose()
+    )
 
 
 def get_z_offsets_from_pixel_grid(grid: PixelGrid):
