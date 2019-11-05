@@ -1,3 +1,4 @@
+from typing import Union
 from PySide2.QtWidgets import (
     QDialog,
     QGridLayout,
@@ -10,6 +11,7 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QComboBox,
 )
+import numpy as np
 
 
 class FieldAttrsDialog(QDialog):
@@ -20,6 +22,7 @@ class FieldAttrsDialog(QDialog):
         self.layout().setSizeConstraint(QLayout.SetNoConstraint)
 
         self.list_widget = QListWidget()
+        self.list_widget.setSpacing(5)
         self.add_button = QPushButton("Add attr")
         self.add_button.clicked.connect(self._add_attr)
         self.remove_button = QPushButton("Remove attr")
@@ -53,8 +56,17 @@ class FieldAttrFrame(QFrame):
         self.layout().addWidget(self.attr_value_lineedit)
         self.layout().addWidget(self.array_or_scalar)
 
-        if name:
-            self.attr_name_lineedit.setText(name)
+        if name and value:
+            self.value(name, value)
 
-        if value:
-            self.attr_value_lineedit.setText(value)
+    @property
+    def value(self) -> Union[str, Union[np.generic, np.ndarray]]:
+        pass
+
+    @value.setter
+    def value(self, new_name: str, new_value: Union[np.generic, np.ndarray]):
+        self.attr_name_lineedit.setText(new_name)
+        if np.isscalar(new_value):
+            self.attr_value_lineedit.setText(str(new_value))
+        else:
+            pass  # fill in array - not sure how to do this yet
