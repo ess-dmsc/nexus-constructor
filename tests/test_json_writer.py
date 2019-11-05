@@ -156,9 +156,11 @@ def test_GIVEN_nx_class_and_attributes_are_bytes_WHEN_output_to_json_THEN_they_a
             assert attribute["values"] == test_string_attr.decode("utf8")
 
 
-@pytest.mark.parametrize("test_input", [42, 4.2, "test"])
+@pytest.mark.parametrize(
+    "test_input,expected_type", [(42, np.int64), (4.2, np.float64), ("test", str)]
+)
 def test_GIVEN_dataset_with_an_attribute_WHEN_output_to_json_THEN_attribute_is_present_in_json(
-    file, test_input
+    file, test_input, expected_type
 ):
     dataset_name = "test_ds"
     dataset_value = 1
@@ -175,11 +177,14 @@ def test_GIVEN_dataset_with_an_attribute_WHEN_output_to_json_THEN_attribute_is_p
 
     assert ds["attributes"][0]["name"] == test_attr_name
     assert ds["attributes"][0]["values"] == test_input
+    assert type(ds["attributes"][0]["values"]) == expected_type
 
 
-@pytest.mark.parametrize("test_input", [[1, 2, 3], [1.1, 2.2, 3.3]])
+@pytest.mark.parametrize(
+    "test_input,expected_type", [([1, 2, 3], np.int64), ([1.1, 2.2, 3.3], np.float64)]
+)
 def test_GIVEN_dataset_with_an_array_attribute_WHEN_output_to_json_THEN_attribute_is_present_in_json(
-    file, test_input
+    file, test_input, expected_type
 ):
     dataset_name = "test_ds"
     dataset_value = 1
@@ -196,6 +201,7 @@ def test_GIVEN_dataset_with_an_array_attribute_WHEN_output_to_json_THEN_attribut
 
     assert ds["attributes"][0]["name"] == test_attr_name
     assert ds["attributes"][0]["values"].tolist() == test_input
+    assert ds["attributes"][0]["values"].dtype == expected_type
 
 
 def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist_in_root_dict(
