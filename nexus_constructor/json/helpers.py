@@ -2,12 +2,12 @@ import json
 import numpy as np
 
 
-def handle_non_std_types(Value):
-    if type(Value) is np.bool_:
-        return bool(Value)
-    elif type(Value) is np.ndarray:
-        return list(Value)
-    raise (TypeError("Unknown type: {}".format(type(Value))))
+def handle_non_std_types(value):
+    if type(value) is np.bool_:
+        return bool(value)
+    elif type(value) is np.ndarray:
+        return list(value)
+    raise (TypeError("Unknown type: {}".format(type(value))))
 
 
 def object_to_json_file(tree_dict, file):
