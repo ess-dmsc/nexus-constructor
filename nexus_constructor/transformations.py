@@ -47,7 +47,9 @@ class Transformation:
         elif self.type.lower() == "translation":
             transform.setTranslation(self.vector.normalized() * self.value)
         else:
-            raise(RuntimeError("Unknown transformation of type \"{}\".".format(self.type)))
+            raise (
+                RuntimeError('Unknown transformation of type "{}".'.format(self.type))
+            )
         return transform.matrix()
 
     @property
