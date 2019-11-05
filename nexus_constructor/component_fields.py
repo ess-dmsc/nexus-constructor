@@ -18,6 +18,7 @@ from typing import List, Union
 from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
@@ -87,6 +88,7 @@ class FieldWidget(QFrame):
         )
 
         self.edit_dialog = QDialog(parent=self)
+        self.attrs_dialog = FieldAttrsDialog(parent=self)
         self.instrument = instrument
 
         self.table_view = ArrayDatasetTableWidget()
@@ -122,6 +124,7 @@ class FieldWidget(QFrame):
         self.attrs_button = QPushButton("Attrs")
         self.attrs_button.setMaximumSize(edit_button_size, edit_button_size)
         self.attrs_button.setSizePolicy(fix_horizontal_size)
+        self.attrs_button.clicked.connect(self.show_attrs_dialog)
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.field_name_edit)
@@ -316,6 +319,9 @@ class FieldWidget(QFrame):
             # TODO: show nx class panels
             pass
         self.edit_dialog.show()
+
+    def show_attrs_dialog(self):
+        self.attrs_dialog.show()
 
 
 def add_fields_to_component(component: Component, fields_widget: QListWidget):
