@@ -69,12 +69,26 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         if component_to_edit.get_field("x_pixel_offset") is not None:
             self.single_pixel_radio_button.setChecked(True)
+            self.update_pixel_layout_visibility(True, False)
+            self._fill_single_pixel_fields(component_to_edit)
 
         elif component_to_edit.get_field("detector_number") is not None:
             self.entire_shape_radio_button.setChecked(True)
+            self.update_pixel_layout_visibility(False, True)
+            self._fill_entire_shape_fields(component_to_edit)
 
         else:
             self.no_pixels_button.setChecked(True)
+            self.pixel_options_stack.setVisible(False)
+
+    def _fill_single_pixel_fields(self, component_to_edit: Component):
+
+        x_pixel_offset = component_to_edit.get_field("x_pixel_offset")
+        self.row_count_spin_box.setValue(x_pixel_offset.shape[0])
+        self.column_count_spin_box.setValue(x_pixel_offset.shape[1])
+
+    def _fill_entire_shape_fields(self, component_to_edit: Component):
+        pass
 
     def get_current_mapping_filename(self):
         """
@@ -175,7 +189,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         if pixel_grid:
             self.pixel_options_stack.setCurrentIndex(0)
-        if pixel_mapping:
+        elif pixel_mapping:
             self.pixel_options_stack.setCurrentIndex(1)
 
     def populate_pixel_mapping_list_with_mesh(self, filename: str):
