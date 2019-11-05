@@ -101,8 +101,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             self._fill_row_information(y_pixel_offset)
             self._fill_column_information(x_pixel_offset)
 
-        if check_data_is_an_array(detector_numbers):
             self.first_id_spin_box.setValue(np.amin(detector_numbers))
+
         else:
             self.first_id_spin_box.setValue(detector_numbers)
 
