@@ -12,9 +12,20 @@ from ui.pixel_options import Ui_PixelOptionsWidget
 RED_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #f6989d }"
 WHITE_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #FFFFFF }"
 
+BOTTOM_LEFT_TEXT = "Bottom Left"
+BOTTOM_RIGHT_TEXT = "Bottom Right"
+TOP_LEFT_TEXT = "Top Left"
+TOP_RIGHT_TEXT = "Top Right"
+
 
 def check_data_is_an_array(data) -> bool:
-
+    """
+    At the moment it appears as though a scalar can still be returned as an array when using `get_field_value` (though
+    it could just be me doing the wrong thing). This function checks if an array contains more than one value so that
+    Pixel Data can be edited in the case of a Single Shape.
+    :param data: The data value from the NeXus file.
+    :return: True if the data is a scalar or an array containing a single value, False otherwise.
+    """
     if type(data) is not np.ndarray:
         return False
 
@@ -34,10 +45,10 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             "Columns": CountDirection.COLUMN,
         }
         self.initial_count_corner = {
-            "Bottom Left": Corner.BOTTOM_LEFT,
-            "Bottom Right": Corner.BOTTOM_RIGHT,
-            "Top Left": Corner.TOP_LEFT,
-            "Top Right": Corner.TOP_RIGHT,
+            BOTTOM_LEFT_TEXT: Corner.BOTTOM_LEFT,
+            BOTTOM_RIGHT_TEXT: Corner.BOTTOM_RIGHT,
+            TOP_LEFT_TEXT: Corner.TOP_LEFT,
+            TOP_RIGHT_TEXT: Corner.TOP_RIGHT,
         }
 
         self.pixel_validator = None
@@ -98,13 +109,32 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         if check_data_is_an_array(x_pixel_offset):
 
+            # If the pixel offset information is multidimensional then extra steps need to be taken to restore the info
             self._fill_row_information(y_pixel_offset)
             self._fill_column_information(x_pixel_offset)
-
-            self.first_id_spin_box.setValue(np.amin(detector_numbers))
+            self._fill_detector_number_information(detector_numbers)
 
         else:
+
+            # If the pixel offset information represents a single pixel
             self.first_id_spin_box.setValue(detector_numbers)
+
+    def _fill_detector_number_information(self, detector_numbers: np.ndarray):
+
+        first_id = np.amin(detector_numbers)
+        self.first_id_spin_box.setValue(first_id)
+
+        first_id_index = np.where(detector_numbers == first_id)
+        first_id_index = (first_id_index[0][0], first_id_index[1][0])
+
+        if first_id_index == (0, 0):
+            self.start_counting_combo_box.setCurrentText(TOP_LEFT_TEXT)
+        elif first_id_index[0] == 0:
+            self.start_counting_combo_box.setCurrentText(TOP_RIGHT_TEXT)
+        elif first_id_index[1] == 0:
+            self.start_counting_combo_box.setCurrentText(BOTTOM_LEFT_TEXT)
+        else:
+            self.start_counting_combo_box.setCurrentText(BOTTOM_RIGHT_TEXT)
 
     def _fill_row_information(self, y_pixel_offset: np.ndarray):
 
