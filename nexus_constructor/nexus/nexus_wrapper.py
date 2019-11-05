@@ -222,19 +222,11 @@ class NexusWrapper(QObject):
         transforms_dependee_of = {}
         for group_name, depends_on_transform in component_depends_on.items():
             if depends_on_transform not in transforms_dependee_of.keys():
-                # If there is only one component that depends on the transformation, set the attr to a string
-                # of its path
-                transforms_dependee_of[depends_on_transform] = group_name
-            else:
-                if isinstance(transforms_dependee_of[depends_on_transform], str):
-                    # If there is already a single dependee_of value, create a list instead of just holding the
-                    # single value.
-                    transforms_dependee_of[depends_on_transform] = [
-                        transforms_dependee_of[depends_on_transform]
-                    ]
-                transforms_dependee_of[depends_on_transform].append(group_name)
+                transforms_dependee_of[depends_on_transform] = []
+            transforms_dependee_of[depends_on_transform].append(group_name)
 
         for transform, dependee_of in transforms_dependee_of.items():
+            # numpy should cast to a scalar value if there is just one item.
             self.nexus_file[transform].attrs["dependee_of"] = np.array(
                 dependee_of, dtype=h5py.special_dtype(vlen=str)
             )
