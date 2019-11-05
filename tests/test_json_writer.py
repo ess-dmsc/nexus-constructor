@@ -177,6 +177,27 @@ def test_GIVEN_dataset_with_an_attribute_WHEN_output_to_json_THEN_attribute_is_p
     assert ds["attributes"][0]["values"] == test_input
 
 
+@pytest.mark.parametrize("test_input", [[1, 2, 3], [1.1, 2.2, 3.3]])
+def test_GIVEN_dataset_with_an_array_attribute_WHEN_output_to_json_THEN_attribute_is_present_in_json(
+    file, test_input
+):
+    dataset_name = "test_ds"
+    dataset_value = 1
+    dataset_dtype = np.int32
+
+    dataset = file.create_dataset(dataset_name, data=dataset_value, dtype=dataset_dtype)
+    test_attr_name = "test_attr"
+    dataset.attrs[test_attr_name] = test_input
+
+    converter = NexusToDictConverter()
+    root_dict = converter.convert(file, [], [])
+
+    ds = root_dict["children"][0]
+
+    assert ds["attributes"][0]["name"] == test_attr_name
+    assert ds["attributes"][0]["values"].tolist() == test_input
+
+
 def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist_in_root_dict(
     file
 ):
