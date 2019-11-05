@@ -1,5 +1,6 @@
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
+import numpy as np
 
 from nexus_constructor.component.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
@@ -84,8 +85,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
     def _fill_single_pixel_fields(self, component_to_edit: Component):
 
         x_pixel_offset = component_to_edit.get_field("x_pixel_offset")
+        detector_numbers = component_to_edit.get_field("detector_number")
+
         self.row_count_spin_box.setValue(x_pixel_offset.shape[0])
         self.column_count_spin_box.setValue(x_pixel_offset.shape[1])
+
+        self.first_id_spin_box.setValue(np.amin(detector_numbers))
 
     def _fill_entire_shape_fields(self, component_to_edit: Component):
         pass
