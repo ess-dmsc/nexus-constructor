@@ -179,7 +179,7 @@ class NexusToDictConverter:
         :param root: h5py group to generate dict from.
         :return: generated dict of group and children.
         """
-        root_dict = {"type": "group", "name": root.name, "children": []}
+        root_dict = {"type": "group", "name": root.name.split("/")[-1], "children": []}
         # Add the entries
         entries = list(root.values())
         if root.name in self._kafka_streams:
@@ -211,7 +211,7 @@ class NexusToDictConverter:
         else:
             root_dict = {
                 "type": "dataset",
-                "name": root.name,
+                "name": root.name.split("/")[-1],
                 "dataset": {"type": dataset_type},
                 "values": data,
             }
