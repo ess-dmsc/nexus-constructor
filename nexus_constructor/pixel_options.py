@@ -17,6 +17,9 @@ BOTTOM_RIGHT_TEXT = "Bottom Right"
 TOP_LEFT_TEXT = "Top Left"
 TOP_RIGHT_TEXT = "Top Right"
 
+ROWS_TEXT = "Rows"
+COLUMNS_TEXT = "Columns"
+
 
 def check_data_is_an_array(data) -> bool:
     """
@@ -119,23 +122,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             # If the pixel offset information represents a single pixel
             self.first_id_spin_box.setValue(detector_numbers)
 
-    def _fill_detector_number_information(self, detector_numbers: np.ndarray):
-
-        first_id = np.amin(detector_numbers)
-        self.first_id_spin_box.setValue(first_id)
-
-        first_id_index = np.where(detector_numbers == first_id)
-        first_id_index = (first_id_index[0][0], first_id_index[1][0])
-
-        if first_id_index == (0, 0):
-            self.start_counting_combo_box.setCurrentText(TOP_LEFT_TEXT)
-        elif first_id_index[0] == 0:
-            self.start_counting_combo_box.setCurrentText(TOP_RIGHT_TEXT)
-        elif first_id_index[1] == 0:
-            self.start_counting_combo_box.setCurrentText(BOTTOM_LEFT_TEXT)
-        else:
-            self.start_counting_combo_box.setCurrentText(BOTTOM_RIGHT_TEXT)
-
     def _fill_row_information(self, y_pixel_offset: np.ndarray):
 
         n_rows = y_pixel_offset.shape[0]
@@ -151,6 +137,45 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         col_width = np.abs(x_pixel_offset[0][1] - x_pixel_offset[0][0])
         self.column_width_spin_box.setValue(col_width)
+
+    def _fill_detector_number_information(self, detector_numbers: np.ndarray):
+
+        first_id = np.amin(detector_numbers)
+        self.first_id_spin_box.setValue(first_id)
+
+        first_id_index = np.where(detector_numbers == first_id)
+        first_id_index = (first_id_index[0][0], first_id_index[1][0])
+
+        first_id_plus_one = first_id + 1
+
+        count_along_text = COLUMNS_TEXT
+        right_of_first_id = (first_id_index[0], first_id_index[1] + 1)
+        left_of_first_id = (first_id_index[0], first_id_index[1] - 1)
+
+        if first_id_index == (0, 0):
+            self.start_counting_combo_box.setCurrentText(TOP_LEFT_TEXT)
+
+            if detector_numbers[right_of_first_id] == first_id_plus_one:
+                count_along_text = ROWS_TEXT
+
+        elif first_id_index[0] == 0:
+            self.start_counting_combo_box.setCurrentText(TOP_RIGHT_TEXT)
+
+            if detector_numbers[left_of_first_id] == first_id_plus_one:
+                count_along_text = ROWS_TEXT
+
+        elif first_id_index[1] == 0:
+            self.start_counting_combo_box.setCurrentText(BOTTOM_LEFT_TEXT)
+
+            if detector_numbers[right_of_first_id] == first_id_plus_one:
+                count_along_text = ROWS_TEXT
+        else:
+            self.start_counting_combo_box.setCurrentText(BOTTOM_RIGHT_TEXT)
+
+            if detector_numbers[left_of_first_id] == first_id_plus_one:
+                count_along_text = ROWS_TEXT
+
+        self.count_first_combo_box.setCurrentText(count_along_text)
 
     def _fill_entire_shape_fields(self, component_to_edit: Component):
         pass
