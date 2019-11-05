@@ -179,7 +179,7 @@ class NexusWrapper(QObject):
         self.entry = entry
         self.instrument = self.get_instrument_group_from_entry(self.entry)
         self.nexus_file = nexus_file
-        self._populate_transforms_chain()
+        self._generate_dependee_of_attributes()
         logging.info("NeXus file loaded")
         self._emit_file()
 
@@ -206,33 +206,37 @@ class NexusWrapper(QObject):
         self._emit_file()
         return group
 
-    def _populate_transforms_chain(self):
+    def _generate_dependee_of_attributes(self):
         """
         Fill in the dependee_of attribute for transformations that are linked to.
         """
-        depends_on_chain = {}
+        component_depends_on = {}
 
-        def find_dependee_of(_, node):
+        def find_depends_on_for_components(_, node):
             if isinstance(node, h5py.Group):
                 if "depends_on" in node.keys():
-                    depends_on_chain[node.name] = node["depends_on"][()]
+                    component_depends_on[node.name] = node["depends_on"][()]
 
-        self.nexus_file["/"].visititems(find_dependee_of)
+        self.nexus_file["/"].visititems(find_depends_on_for_components)
 
-        dependee_of = {}
-        for group_name, depends_on_value in depends_on_chain.items():
-            # if depends_on_value in [dataset.name for dataset in transforms]:
-            if depends_on_value not in dependee_of.keys():
-                dependee_of[depends_on_value] = group_name
+        transforms_dependee_of = {}
+        for group_name, depends_on_transform in component_depends_on.items():
+            if depends_on_transform not in transforms_dependee_of.keys():
+                # If there is only one component that depends on the transformation, set the attr to a string
+                # of its path
+                transforms_dependee_of[depends_on_transform] = group_name
             else:
-                if isinstance(dependee_of[depends_on_value], str):
-                    # If there is already a single dependee_of value, create a list instead of just holding the single value.
-                    dependee_of[depends_on_value] = [dependee_of[depends_on_value]]
-                dependee_of[depends_on_value].append(group_name)
+                if isinstance(transforms_dependee_of[depends_on_transform], str):
+                    # If there is already a single dependee_of value, create a list instead of just holding the
+                    # single value.
+                    transforms_dependee_of[depends_on_transform] = [
+                        transforms_dependee_of[depends_on_transform]
+                    ]
+                transforms_dependee_of[depends_on_transform].append(group_name)
 
-        for transform, depends_on_list in dependee_of.items():
+        for transform, dependee_of in transforms_dependee_of.items():
             self.nexus_file[transform].attrs["dependee_of"] = np.array(
-                depends_on_list, dtype=h5py.special_dtype(vlen=str)
+                dependee_of, dtype=h5py.special_dtype(vlen=str)
             )
 
     def duplicate_nx_group(
