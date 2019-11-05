@@ -324,9 +324,9 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
     converter = NexusToDictConverter()
     root_dict = converter.convert(file, streams=dict(), links=dict())
 
-    assert group.name == root_dict["children"][0]["name"]
+    assert group.name.split("/")[-1] == root_dict["children"][0]["name"]
 
-    assert field1.name == root_dict["children"][0]["children"][0]["name"]
+    assert field1.name.split("/")[-1] == root_dict["children"][0]["children"][0]["name"]
     assert field1value == root_dict["children"][0]["children"][0]["values"]
     assert (
         "NX_class" == root_dict["children"][0]["children"][0]["attributes"][0]["name"]
@@ -345,7 +345,7 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
         == root_dict["children"][0]["children"][0]["attributes"][1]["values"]
     )
 
-    assert field2.name == root_dict["children"][0]["children"][1]["name"]
+    assert field2.name.split("/")[-1] == root_dict["children"][0]["children"][1]["name"]
     assert field2value == root_dict["children"][0]["children"][1]["values"]
 
 
