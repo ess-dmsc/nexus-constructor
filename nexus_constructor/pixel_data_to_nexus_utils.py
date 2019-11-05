@@ -97,7 +97,7 @@ def convert_to_scalar_if_array_has_one_element(value_array: np.ndarray):
     if value_array.size > 1:
         return value_array
 
-    return value_array.item()
+    return value_array.item(0)
 
 
 def convert_to_scalar_if_list_has_one_element(value_list: List):

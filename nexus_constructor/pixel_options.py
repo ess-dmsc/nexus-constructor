@@ -13,6 +13,14 @@ RED_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #f6989d }"
 WHITE_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #FFFFFF }"
 
 
+def check_data_is_an_array(data) -> bool:
+
+    if type(data) is not np.ndarray:
+        return False
+
+    return data.size > 1
+
+
 class PixelOptions(Ui_PixelOptionsWidget, QObject):
     def __init__(self):
 
@@ -85,12 +93,34 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
     def _fill_single_pixel_fields(self, component_to_edit: Component):
 
         x_pixel_offset = component_to_edit.get_field("x_pixel_offset")
+        y_pixel_offset = component_to_edit.get_field("y_pixel_offset")
         detector_numbers = component_to_edit.get_field("detector_number")
 
-        self.row_count_spin_box.setValue(x_pixel_offset.shape[0])
-        self.column_count_spin_box.setValue(x_pixel_offset.shape[1])
+        if check_data_is_an_array(x_pixel_offset):
 
-        self.first_id_spin_box.setValue(np.amin(detector_numbers))
+            self._fill_row_information(y_pixel_offset)
+            self._fill_column_information(x_pixel_offset)
+
+        if check_data_is_an_array(detector_numbers):
+            self.first_id_spin_box.setValue(np.amin(detector_numbers))
+        else:
+            self.first_id_spin_box.setValue(detector_numbers)
+
+    def _fill_row_information(self, y_pixel_offset: np.ndarray):
+
+        n_rows = y_pixel_offset.shape[0]
+        self.row_count_spin_box.setValue(n_rows)
+
+        row_height = np.abs(y_pixel_offset[0][0] - y_pixel_offset[1][0])
+        self.row_height_spin_box.setValue(row_height)
+
+    def _fill_column_information(self, x_pixel_offset: np.ndarray):
+
+        n_cols = x_pixel_offset.shape[1]
+        self.column_count_spin_box.setValue(n_cols)
+
+        col_width = np.abs(x_pixel_offset[0][1] - x_pixel_offset[0][0])
+        self.column_width_spin_box.setValue(col_width)
 
     def _fill_entire_shape_fields(self, component_to_edit: Component):
         pass
