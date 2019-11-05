@@ -1,10 +1,12 @@
-from PySide2.QtWidgets import QDialog, QGridLayout, QListWidget, QPushButton
+from PySide2.QtWidgets import QDialog, QGridLayout, QListWidget, QPushButton, QLayout
 
 
 class FieldAttrsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setLayout(QGridLayout())
+        self.setWindowTitle("Edit Attributes")
+        self.layout().setSizeConstraint(QLayout.SetNoConstraint)
 
         self.list_widget = QListWidget()
         self.add_button = QPushButton("Add attr")
