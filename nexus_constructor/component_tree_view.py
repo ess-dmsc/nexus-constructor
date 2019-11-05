@@ -69,7 +69,11 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             elif value.type.lower() == "rotation":
                 frame.transformation_frame = EditRotation(frame, value, self.instrument)
             else:
-                raise(RuntimeError("Transformation type \"{}\" is unknown.".format(value.type)))
+                raise (
+                    RuntimeError(
+                        'Transformation type "{}" is unknown.'.format(value.type)
+                    )
+                )
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
         elif isinstance(value, LinkTransformation):
             frame.transformation_frame = EditTransformationLink(
