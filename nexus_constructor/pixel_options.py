@@ -66,13 +66,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
     def fill_existing_entries(self, component_to_edit: Component):
         """
         Populate the pixel fields based on what is already stored in the NeXus file.
-        :return:
         """
-        if component_to_edit.get_field("detector_faces") is not None:
-            pass
+        if component_to_edit.get_field("x_pixel_offset") is not None:
+            self.single_pixel_radio_button.setChecked(True)
 
         elif component_to_edit.get_field("detector_number") is not None:
-            pass
+            self.entire_shape_radio_button.setChecked(True)
+
         else:
             self.no_pixels_button.setChecked(True)
 
