@@ -10,6 +10,7 @@ from nexus_constructor.json.filewriter_json_writer import (
     NexusToDictConverter,
     create_writer_commands,
     generate_json,
+    _add_attributes,
 )
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
@@ -77,7 +78,7 @@ def test_GIVEN_int32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_f
 def test_GIVEN_int64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype():
     expected_dtype = "int64"
     expected_size = 1
-    expected_value = np.int64(171798691842)  # bigger than max 32b int
+    expected_value = np.int64(171_798_691_842)  # bigger than max 32b int
 
     with InMemoryFile("test_file") as file:
         dataset = file.create_dataset(
@@ -609,3 +610,26 @@ def test_GIVEN_none_as_service_id_WHEN_generating_writer_commands_THEN_service_i
     )
     assert "service_id" not in start_cmd.keys()
     assert "service_id" not in stop_cmd.keys()
+
+
+def test_GIVEN_no_attributes_WHEN_adding_attributes_THEN_root_dict_is_not_changed():
+    with InMemoryFile("test_file") as file:
+        root_dict = dict()
+        dataset = file.create_dataset("test", data=123)
+        assert not dataset.attrs.keys()
+        _add_attributes(dataset, root_dict)
+        assert not root_dict
+
+
+def test_GIVEN_attribute_WHEN_adding_attributes_THEN_attrs_are_added_to_root_dict():
+    with InMemoryFile("test_file") as file:
+        root_dict = dict()
+        dataset_name = "test"
+        dataset = file.create_dataset(dataset_name, data=123)
+        attr_key = "something"
+        attr_value = "some_value"
+        dataset.attrs[attr_key] = attr_value
+        _add_attributes(dataset, root_dict)
+        assert root_dict["attributes"]
+        assert root_dict["attributes"][0]["name"] == attr_key
+        assert root_dict["attributes"][0]["values"] == attr_value

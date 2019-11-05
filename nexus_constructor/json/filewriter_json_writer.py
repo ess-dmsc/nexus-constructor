@@ -67,12 +67,14 @@ def cast_to_int(data):
 
 
 def _add_attributes(root: NexusObject, root_dict: dict):
-    root_dict["attributes"] = []
+    attrs = []
     for attr_name, attr in root.attrs.items():
         if isinstance(attr, bytes):
             attr = attr.decode("utf8")
         new_attribute = {"name": attr_name, "values": attr}
-        root_dict["attributes"].append(new_attribute)
+        attrs.append(new_attribute)
+    if attrs:
+        root_dict["attributes"] = attrs
 
 
 class NexusToDictConverter:
