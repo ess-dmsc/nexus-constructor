@@ -179,7 +179,7 @@ class NexusWrapper(QObject):
         self.entry = entry
         self.instrument = self.get_instrument_group_from_entry(self.entry)
         self.nexus_file = nexus_file
-
+        self._generate_dependee_of_attributes()
         logging.info("NeXus file loaded")
         self._emit_file()
 
@@ -205,6 +205,31 @@ class NexusWrapper(QObject):
         group.attrs["NX_class"] = nx_class
         self._emit_file()
         return group
+
+    def _generate_dependee_of_attributes(self):
+        """
+        Fill in the dependee_of attribute for transformations that are linked to.
+        """
+        component_depends_on = {}
+
+        def find_depends_on_for_components(_, node):
+            if isinstance(node, h5py.Group):
+                if "depends_on" in node.keys():
+                    component_depends_on[node.name] = node["depends_on"][()]
+
+        self.nexus_file["/"].visititems(find_depends_on_for_components)
+
+        transforms_dependee_of = {}
+        for group_name, depends_on_transform in component_depends_on.items():
+            if depends_on_transform not in transforms_dependee_of.keys():
+                transforms_dependee_of[depends_on_transform] = []
+            transforms_dependee_of[depends_on_transform].append(group_name)
+
+        for transform, dependee_of in transforms_dependee_of.items():
+            # numpy should cast to a scalar value if there is just one item.
+            self.nexus_file[transform].attrs["dependee_of"] = np.array(
+                dependee_of, dtype=h5py.special_dtype(vlen=str)
+            )
 
     def duplicate_nx_group(
         self, group_to_duplicate: h5py.Group, new_group_name: str
