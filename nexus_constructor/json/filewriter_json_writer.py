@@ -61,7 +61,7 @@ def cast_to_int(data):
     We can convert any numpy integer type to Python int for serialising to JSON
     """
     if isinstance(data, list):
-        return [int(data_value) for data_value in data]
+        return data
     else:
         return int(data)
 
