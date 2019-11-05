@@ -19,10 +19,9 @@ class FieldAttrsDialog(QDialog):
         super().__init__(parent)
         self.setLayout(QGridLayout())
         self.setWindowTitle("Edit Attributes")
-        self.layout().setSizeConstraint(QLayout.SetNoConstraint)
 
         self.list_widget = QListWidget()
-        self.list_widget.setSpacing(5)
+        self.list_widget.setMinimumSize(800, 600)
         self.add_button = QPushButton("Add attr")
         self.add_button.clicked.connect(self._add_attr)
         self.remove_button = QPushButton("Remove attr")
@@ -45,19 +44,33 @@ class FieldAttrsDialog(QDialog):
 class FieldAttrFrame(QFrame):
     def __init__(self, parent=None, name=None, value=None):
         super().__init__(parent)
+        self.array = []
         self.setMinimumHeight(40)
         self.setLayout(QHBoxLayout())
         self.attr_name_lineedit = QLineEdit()
         self.attr_value_lineedit = QLineEdit()
         self.array_or_scalar = QComboBox()
-        self.array_or_scalar.addItems(["Array", "Scalar"])
+        self.array_or_scalar.addItems(["Scalar", "Array"])
+        self.array_or_scalar.currentTextChanged.connect(self.type_changed)
+        self.array_edit_button = QPushButton("Edit Array")
+        self.array_edit_button.clicked.connect(self.edit_array)
 
         self.layout().addWidget(self.attr_name_lineedit)
-        self.layout().addWidget(self.attr_value_lineedit)
         self.layout().addWidget(self.array_or_scalar)
+        self.layout().addWidget(self.attr_value_lineedit)
+        self.layout().addWidget(self.array_edit_button)
+
+        self.type_changed("Scalar")
 
         if name and value:
             self.value(name, value)
+
+    def type_changed(self, item: str):
+        self.attr_value_lineedit.setVisible(item == "Scalar")
+        self.array_edit_button.setVisible(item == "Array")
+
+    def edit_array(self, _):
+        pass
 
     @property
     def value(self) -> Union[str, Union[np.generic, np.ndarray]]:
