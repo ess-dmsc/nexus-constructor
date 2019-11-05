@@ -41,11 +41,13 @@ class Transformation:
         Get a Qt3DCore.QTransform describing the transformation
         """
         transform = Qt3DCore.QTransform()
-        if self.type == "Rotation":
+        if self.type.lower() == "rotation":
             quaternion = transform.fromAxisAndAngle(self.vector, self.value)
             transform.setRotation(quaternion)
-        elif self.type == "Translation":
+        elif self.type.lower() == "translation":
             transform.setTranslation(self.vector.normalized() * self.value)
+        else:
+            raise(RuntimeError("Unknown transformation of type \"{}\".".format(self.type)))
         return transform.matrix()
 
     @property
