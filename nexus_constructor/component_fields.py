@@ -115,10 +115,13 @@ class FieldWidget(QFrame):
 
         self.edit_button = QPushButton("Edit")
         edit_button_size = 50
-        self.edit_button.setMinimumWidth(edit_button_size)
-        self.edit_button.setMaximumWidth(edit_button_size)
+        self.edit_button.setMaximumSize(edit_button_size, edit_button_size)
         self.edit_button.setSizePolicy(fix_horizontal_size)
         self.edit_button.clicked.connect(self.show_edit_dialog)
+
+        self.attrs_button = QPushButton("Attrs")
+        self.attrs_button.setMaximumSize(edit_button_size, edit_button_size)
+        self.attrs_button.setSizePolicy(fix_horizontal_size)
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.field_name_edit)
@@ -127,6 +130,7 @@ class FieldWidget(QFrame):
         self.layout.addWidget(self.nx_class_combo)
         self.layout.addWidget(self.edit_button)
         self.layout.addWidget(self.value_type_combo)
+        self.layout.addWidget(self.attrs_button)
 
         self.layout.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout)
