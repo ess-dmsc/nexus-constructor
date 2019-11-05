@@ -42,6 +42,7 @@ class FieldAttrsDialog(QDialog):
 class FieldAttrFrame(QFrame):
     def __init__(self, parent=None, name=None, value=None):
         super().__init__(parent)
+        self.setMinimumHeight(40)
         self.setLayout(QHBoxLayout())
         self.attr_name_lineedit = QLineEdit()
         self.attr_value_lineedit = QLineEdit()
