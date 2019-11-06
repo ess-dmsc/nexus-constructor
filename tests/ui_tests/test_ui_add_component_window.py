@@ -362,7 +362,7 @@ def test_UI_GIVEN_nothing_WHEN_changing_component_shape_type_THEN_add_component_
     assert not dialog.buttonBox.isEnabled()
 
 
-def test_UI_GIVEN_nothong_WHEN_selecting_cylinder_type_THEN_relevant_fields_are_shown(
+def test_UI_GIVEN_nothing_WHEN_selecting_cylinder_type_THEN_relevant_fields_are_shown(
     qtbot, template, dialog
 ):
     # Click on the cylinder shape button
