@@ -1,4 +1,5 @@
 import pytest
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QWidget
 
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
@@ -35,11 +36,11 @@ def test_GIVEN_id_WHEN_calling_set_id_THEN_id_is_set(pixel_mapping_widget):
 
 
 def test_GIVEN_id_has_been_given_WHEN_calling_get_id_THEN_id_is_returned(
-    pixel_mapping_widget
+    qtbot, pixel_mapping_widget
 ):
 
     id = 5
-    pixel_mapping_widget.set_id(id)
+    qtbot.keyClick(pixel_mapping_widget.pixelIDLineEdit, Qt.Key_5)
     assert pixel_mapping_widget.get_id() == id
 
 
