@@ -259,28 +259,6 @@ def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_ha
     )
 
 
-def test_UI_GIVEN_nonzero_value_for_both_row_and_column_count_WHEN_entering_pixel_grid_options_THEN_both_fields_become_white(
-    qtbot, template, pixel_options
-):
-
-    count_fields = [
-        pixel_options.row_count_spin_box,
-        pixel_options.column_count_spin_box,
-    ]
-
-    # Set both spin boxes to zero
-    for field in count_fields:
-        qtbot.keyClick(field, Qt.Key_Down)
-
-    # Set both spin boxes to one
-    for field in count_fields:
-        qtbot.keyClick(field, Qt.Key_Up)
-
-    # Check that the background has turned white because the input is acceptable
-    for field in count_fields:
-        assert field.styleSheet() == WHITE_SPIN_BOX_STYLE_SHEET
-
-
 def test_UI_GIVEN_row_count_is_not_zero_WHEN_entering_pixel_grid_THEN_row_height_becomes_enabled(
     qtbot, template, pixel_options
 ):
