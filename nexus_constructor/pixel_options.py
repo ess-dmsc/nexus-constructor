@@ -114,8 +114,14 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         if check_data_is_an_array(x_pixel_offset):
 
             # If the pixel offset information is multidimensional then extra steps need to be taken to restore the info
-            self._fill_row_information(y_pixel_offset)
-            self._fill_column_information(x_pixel_offset)
+            n_rows, row_height = self._get_row_information(y_pixel_offset)
+            self.row_count_spin_box.setValue(n_rows)
+            self.row_height_spin_box.setValue(row_height)
+
+            n_cols, col_width = self._get_column_information(x_pixel_offset)
+            self.column_count_spin_box.setValue(n_cols)
+            self.column_width_spin_box.setValue(col_width)
+
             first_id, start_counting_text, count_along_text = self._get_detector_number_information(
                 detector_numbers
             )
@@ -129,23 +135,24 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             # If the pixel offset information represents a single pixel
             self.first_id_spin_box.setValue(detector_numbers)
 
-    def _fill_row_information(self, y_pixel_offset: np.ndarray):
+    @staticmethod
+    def _get_row_information(y_pixel_offset: np.ndarray):
 
         n_rows = y_pixel_offset.shape[0]
-        self.row_count_spin_box.setValue(n_rows)
-
         row_height = np.abs(y_pixel_offset[0][0] - y_pixel_offset[1][0])
-        self.row_height_spin_box.setValue(row_height)
 
-    def _fill_column_information(self, x_pixel_offset: np.ndarray):
+        return n_rows, row_height
+
+    @staticmethod
+    def _get_column_information(x_pixel_offset: np.ndarray):
 
         n_cols = x_pixel_offset.shape[1]
-        self.column_count_spin_box.setValue(n_cols)
-
         col_width = np.abs(x_pixel_offset[0][1] - x_pixel_offset[0][0])
-        self.column_width_spin_box.setValue(col_width)
 
-    def _get_detector_number_information(self, detector_numbers: np.ndarray):
+        return n_cols, col_width
+
+    @staticmethod
+    def _get_detector_number_information(detector_numbers: np.ndarray):
 
         first_id = np.amin(detector_numbers)
 
@@ -190,9 +197,20 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         shape = component_to_edit.shape[0]
 
         if type(shape) is OFFGeometryNexus:
-            print("Detector faces", shape.detector_faces)
+
+            n_faces, detector_faces = self._get_detector_face_information(shape)
+            self.create_pixel_mapping_list(n_faces, "face")
+
+            for detector_face in detector_faces:
+                print(detector_face)
+                self.pixel_mapping_widgets[detector_face[0]].set_id(detector_face[1])
+
         else:
             print("Detector number", shape.detector_number)
+
+    @staticmethod
+    def _get_detector_face_information(shape: OFFGeometryNexus):
+        return len(shape.faces), shape.detector_faces
 
     def get_current_mapping_filename(self):
         """
@@ -430,7 +448,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.pixel_mapping_widgets = []
         self.pixel_mapping_list_widget.clear()
 
-    def create_pixel_mapping_list(self, n_items, text):
+    def create_pixel_mapping_list(self, n_items: int, text: str):
         """
         Creates a list of pixel mapping widgets.
         :param n_items: The number of widgets to create.
