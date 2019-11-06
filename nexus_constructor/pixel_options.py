@@ -3,6 +3,7 @@ from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 import numpy as np
 
 from nexus_constructor.component.component import Component
+from nexus_constructor.geometry import OFFGeometryNexus
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
@@ -115,7 +116,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             # If the pixel offset information is multidimensional then extra steps need to be taken to restore the info
             self._fill_row_information(y_pixel_offset)
             self._fill_column_information(x_pixel_offset)
-            self._fill_detector_number_information(detector_numbers)
+            first_id, start_counting_text, count_along_text = self._get_detector_number_information(
+                detector_numbers
+            )
+
+            self.first_id_spin_box.setValue(first_id)
+            self.start_counting_combo_box.setCurrentText(start_counting_text)
+            self.count_first_combo_box.setCurrentText(count_along_text)
 
         else:
 
@@ -138,10 +145,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         col_width = np.abs(x_pixel_offset[0][1] - x_pixel_offset[0][0])
         self.column_width_spin_box.setValue(col_width)
 
-    def _fill_detector_number_information(self, detector_numbers: np.ndarray):
+    def _get_detector_number_information(self, detector_numbers: np.ndarray):
 
         first_id = np.amin(detector_numbers)
-        self.first_id_spin_box.setValue(first_id)
 
         first_id_index = np.where(detector_numbers == first_id)
         first_id_index = (first_id_index[0][0], first_id_index[1][0])
@@ -152,33 +158,41 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         right_of_first_id = (first_id_index[0], first_id_index[1] + 1)
         left_of_first_id = (first_id_index[0], first_id_index[1] - 1)
 
+        start_counting_text = None
+
         if first_id_index == (0, 0):
-            self.start_counting_combo_box.setCurrentText(TOP_LEFT_TEXT)
+            start_counting_text = TOP_LEFT_TEXT
 
             if detector_numbers[right_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
 
         elif first_id_index[0] == 0:
-            self.start_counting_combo_box.setCurrentText(TOP_RIGHT_TEXT)
+            start_counting_text = TOP_RIGHT_TEXT
 
             if detector_numbers[left_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
 
         elif first_id_index[1] == 0:
-            self.start_counting_combo_box.setCurrentText(BOTTOM_LEFT_TEXT)
+            start_counting_text = BOTTOM_LEFT_TEXT
 
             if detector_numbers[right_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
         else:
-            self.start_counting_combo_box.setCurrentText(BOTTOM_RIGHT_TEXT)
+            start_counting_text = BOTTOM_RIGHT_TEXT
 
             if detector_numbers[left_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
 
-        self.count_first_combo_box.setCurrentText(count_along_text)
+        return first_id, start_counting_text, count_along_text
 
     def _fill_entire_shape_fields(self, component_to_edit: Component):
-        pass
+
+        shape = component_to_edit.shape[0]
+
+        if type(shape) is OFFGeometryNexus:
+            print("Detector faces", shape.detector_faces)
+        else:
+            print("Detector number", shape.detector_number)
 
     def get_current_mapping_filename(self):
         """
