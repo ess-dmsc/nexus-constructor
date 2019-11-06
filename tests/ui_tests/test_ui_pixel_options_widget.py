@@ -9,7 +9,6 @@ from nexus_constructor.pixel_options import PixelOptions
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
-    WHITE_SPIN_BOX_STYLE_SHEET,
     VALID_CUBE_OFF_FILE,
     CORRECT_CUBE_FACES,
     VALID_OCTA_OFF_FILE,
