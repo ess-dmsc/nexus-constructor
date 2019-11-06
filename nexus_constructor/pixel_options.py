@@ -213,7 +213,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
                 self.create_pixel_mapping_list(len(detector_number), "cylinder")
 
-                for i in range(detector_number):
+                for i in range(len(detector_number)):
                     self.pixel_mapping_widgets[i].set_id(detector_number[i])
 
             else:
