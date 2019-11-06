@@ -13,6 +13,7 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
+from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.validators import DATASET_TYPE
 
 
@@ -92,8 +93,8 @@ class FieldAttrFrame(QFrame):
         return self.array_or_scalar_combo.currentText() == "Scalar"
 
     def show_edit_array_dialog(self, _):
-        dialog = ArrayEditDialog(self.array, self.dtype)
-        dialog.show()
+        self.dialog = ArrayDatasetTableWidget(self.dtype)
+        self.dialog.show()
 
     @property
     def value(self) -> Tuple[str, Union[np.generic, np.ndarray]]:
@@ -102,7 +103,7 @@ class FieldAttrFrame(QFrame):
                 self.attr_name_lineedit.text(),
                 self.dtype(self.attr_value_lineedit.text()),
             )
-        return self.attr_name_lineedit.text(), self.array
+        return self.attr_name_lineedit.text(), self.dialog.model.array
 
     @value.setter
     def value(self, new_name: str, new_value: Union[np.generic, np.ndarray]):
@@ -116,9 +117,3 @@ class FieldAttrFrame(QFrame):
         else:
             self.type_changed("Array")
             self.array = new_value.data
-
-
-class ArrayEditDialog(QDialog):
-    def __init__(self, array, dtype, parent=None):
-        super().__init__(parent)
-        pass
