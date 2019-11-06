@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple
 from PySide2.QtWidgets import (
     QDialog,
     QGridLayout,
@@ -46,7 +46,7 @@ class FieldAttrsDialog(QDialog):
 class FieldAttrFrame(QFrame):
     def __init__(self, parent=None, name=None, value=None):
         super().__init__(parent)
-        self.array = []
+        self.array = None
         self.setMinimumHeight(40)
         self.setLayout(QHBoxLayout())
         self.attr_name_lineedit = QLineEdit()
@@ -58,7 +58,7 @@ class FieldAttrFrame(QFrame):
         self.array_or_scalar_combo.addItems(["Scalar", "Array"])
         self.array_or_scalar_combo.currentTextChanged.connect(self.type_changed)
         self.array_edit_button = QPushButton("Edit Array")
-        self.array_edit_button.clicked.connect(self.edit_array)
+        self.array_edit_button.clicked.connect(self.show_edit_array_dialog)
 
         self.layout().addWidget(self.attr_name_lineedit)
         self.layout().addWidget(self.array_or_scalar_combo)
@@ -75,17 +75,35 @@ class FieldAttrFrame(QFrame):
         self.attr_value_lineedit.setVisible(item == "Scalar")
         self.array_edit_button.setVisible(item == "Array")
 
-    def edit_array(self, _):
+    @property
+    def dtype(self):
+        return DATASET_TYPE[self.attr_type_combo.currentText()]
+
+    @property
+    def is_scalar(self):
+        return self.array_or_scalar_combo.currentText() == "Scalar"
+
+    def show_edit_array_dialog(self, _):
         pass
 
     @property
-    def value(self) -> Union[str, Union[np.generic, np.ndarray]]:
-        pass
+    def value(self) -> Tuple[str, Union[np.generic, np.ndarray]]:
+        if self.is_scalar:
+            return (
+                self.attr_name_lineedit.text(),
+                self.dtype(self.attr_value_lineedit.text()),
+            )
+        return self.attr_name_lineedit.text(), self.array
 
     @value.setter
     def value(self, new_name: str, new_value: Union[np.generic, np.ndarray]):
         self.attr_name_lineedit.setText(new_name)
+        self.attr_type_combo.setCurrentText(
+            next(key for key, value in DATASET_TYPE.items() if value == new_value.dtype)
+        )
         if np.isscalar(new_value):
+            self.type_changed("Scalar")
             self.attr_value_lineedit.setText(str(new_value))
         else:
-            pass  # fill in array - not sure how to do this yet
+            self.type_changed("Array")
+            self.array = new_value.data
