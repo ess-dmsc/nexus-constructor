@@ -1,6 +1,7 @@
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 import numpy as np
+from typing import List
 
 from nexus_constructor.component.component import Component
 from nexus_constructor.geometry import OFFGeometryNexus
@@ -202,11 +203,23 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             self.create_pixel_mapping_list(n_faces, "face")
 
             for detector_face in detector_faces:
-                print(detector_face)
                 self.pixel_mapping_widgets[detector_face[0]].set_id(detector_face[1])
 
         else:
-            print("Detector number", shape.detector_number)
+
+            detector_number = shape.detector_number
+
+            if type(detector_number) is List:
+
+                self.create_pixel_mapping_list(len(detector_number), "cylinder")
+
+                for i in range(detector_number):
+                    self.pixel_mapping_widgets[i].set_id(detector_number[i])
+
+            else:
+
+                self.create_pixel_mapping_list(1, "cylinder")
+                self.pixel_mapping_widgets[0].set_id(detector_number)
 
     @staticmethod
     def _get_detector_face_information(shape: OFFGeometryNexus):
