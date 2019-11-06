@@ -69,7 +69,7 @@ class FieldAttrFrame(QFrame):
         self.type_changed("Scalar")
 
         if name and value:
-            self.value(name, value)
+            self.value = name, value
 
     def type_changed(self, item: str):
         self.attr_value_lineedit.setVisible(item == "Scalar")
@@ -84,7 +84,8 @@ class FieldAttrFrame(QFrame):
         return self.array_or_scalar_combo.currentText() == "Scalar"
 
     def show_edit_array_dialog(self, _):
-        pass
+        dialog = ArrayEditDialog(self.array, self.dtype)
+        dialog.show()
 
     @property
     def value(self) -> Tuple[str, Union[np.generic, np.ndarray]]:
@@ -107,3 +108,9 @@ class FieldAttrFrame(QFrame):
         else:
             self.type_changed("Array")
             self.array = new_value.data
+
+
+class ArrayEditDialog(QDialog):
+    def __init__(self, array, dtype, parent=None):
+        super().__init__(parent)
+        pass
