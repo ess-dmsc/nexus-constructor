@@ -66,13 +66,17 @@ def cast_to_int(data):
         return int(data)
 
 
+ATTR_BLACKLIST = ["dependee_of"]
+
+
 def _add_attributes(root: NexusObject, root_dict: dict):
     attrs = []
     for attr_name, attr in root.attrs.items():
-        if isinstance(attr, bytes):
-            attr = attr.decode("utf8")
-        new_attribute = {"name": attr_name, "values": attr}
-        attrs.append(new_attribute)
+        if attr_name not in ATTR_BLACKLIST:
+            if isinstance(attr, bytes):
+                attr = attr.decode("utf8")
+            new_attribute = {"name": attr_name, "values": attr}
+            attrs.append(new_attribute)
     if attrs:
         root_dict["attributes"] = attrs
 
