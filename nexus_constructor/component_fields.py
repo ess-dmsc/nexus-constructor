@@ -215,7 +215,7 @@ class FieldWidget(QFrame):
         )
 
     @property
-    def value(self):
+    def value(self) -> Union[h5py.Dataset, h5py.Group, h5py.SoftLink]:
         return_object = None
         if self.field_type == FieldType.scalar_dataset:
             dtype = DATASET_TYPE[self.value_type_combo.currentText()]
@@ -230,7 +230,11 @@ class FieldWidget(QFrame):
                 ).create_dataset(name=self.name, dtype=dtype, data=dtype(val))
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
-            return_object = np.squeeze(self.table_view.model.array)
+            return_object = h5py.File(
+                name=str(uuid.uuid4()), driver="core", backing_store=False
+            ).create_dataset(
+                name=self.name, data=np.squeeze(self.table_view.model.array)
+            )
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()
         elif self.field_type == FieldType.link:
