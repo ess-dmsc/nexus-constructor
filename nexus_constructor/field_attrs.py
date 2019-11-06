@@ -13,6 +13,8 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
+from nexus_constructor.validators import DATASET_TYPE
+
 
 class FieldAttrsDialog(QDialog):
     def __init__(self, parent=None):
@@ -49,14 +51,18 @@ class FieldAttrFrame(QFrame):
         self.setLayout(QHBoxLayout())
         self.attr_name_lineedit = QLineEdit()
         self.attr_value_lineedit = QLineEdit()
-        self.array_or_scalar = QComboBox()
-        self.array_or_scalar.addItems(["Scalar", "Array"])
-        self.array_or_scalar.currentTextChanged.connect(self.type_changed)
+        self.attr_type_combo = QComboBox()
+        self.attr_type_combo.addItems([*DATASET_TYPE.keys()])
+
+        self.array_or_scalar_combo = QComboBox()
+        self.array_or_scalar_combo.addItems(["Scalar", "Array"])
+        self.array_or_scalar_combo.currentTextChanged.connect(self.type_changed)
         self.array_edit_button = QPushButton("Edit Array")
         self.array_edit_button.clicked.connect(self.edit_array)
 
         self.layout().addWidget(self.attr_name_lineedit)
-        self.layout().addWidget(self.array_or_scalar)
+        self.layout().addWidget(self.array_or_scalar_combo)
+        self.layout().addWidget(self.attr_type_combo)
         self.layout().addWidget(self.attr_value_lineedit)
         self.layout().addWidget(self.array_edit_button)
 
