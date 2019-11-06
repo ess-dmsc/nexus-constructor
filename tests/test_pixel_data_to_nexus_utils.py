@@ -53,10 +53,10 @@ def pixel_mapping():
 def test_GIVEN_list_of_ids_WHEN_calling_detector_faces_THEN_correct_detector_faces_list_is_returned(
     pixel_mapping
 ):
-
-    ids_with_none_removed = [id for id in pixel_mapping.pixel_ids if id is not None]
     expected_faces = [
-        (i, ids_with_none_removed[i]) for i in range(len(ids_with_none_removed))
+        (i, pixel_mapping.pixel_ids[i])
+        for i in range(len(pixel_mapping.pixel_ids))
+        if pixel_mapping.pixel_ids[i] is not None
     ]
 
     assert get_detector_faces_from_pixel_mapping(pixel_mapping) == expected_faces
