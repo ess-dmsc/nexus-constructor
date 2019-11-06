@@ -221,10 +221,13 @@ class FieldWidget(QFrame):
             dtype = DATASET_TYPE[self.value_type_combo.currentText()]
             val = self.value_line_edit.text()
             if dtype == h5py.special_dtype(vlen=str):
-                return h5py.File(
+                return_object = h5py.File(
                     name=str(uuid.uuid4()), driver="core", backing_store=False
                 ).create_dataset(name=self.name, dtype=dtype, data=val)
-            return_object = dtype(val)
+            else:
+                return_object = h5py.File(
+                    name=str(uuid.uuid4()), driver="core", backing_store=False
+                ).create_dataset(name=self.name, dtype=dtype, data=dtype(val))
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             return_object = np.squeeze(self.table_view.model.array)
@@ -235,13 +238,9 @@ class FieldWidget(QFrame):
         else:
             logging.error(f"unknown field type: {self.name}")
 
-        for attr_name, attr_value in self.attrs:
+        for attr_name, attr_value in self.attrs_dialog.get_attrs().items():
             return_object.attrs[attr_name] = attr_value
         return return_object
-
-    @property
-    def attrs(self):
-        return {}
 
     @value.setter
     def value(self, value):

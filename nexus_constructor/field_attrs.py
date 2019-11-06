@@ -42,6 +42,14 @@ class FieldAttrsDialog(QDialog):
         for index in self.list_widget.selectedIndexes():
             self.list_widget.takeItem(index.row())
 
+    def get_attrs(self):
+        attrs_dict = {}
+        for index in range(self.list_widget.count()):
+            item = self.list_widget.item(index)
+            widget = self.list_widget.itemWidget(item)
+            attrs_dict[widget.value[0]] = widget.value[1]
+        return attrs_dict
+
 
 class FieldAttrFrame(QFrame):
     def __init__(self, parent=None, name=None, value=None):
