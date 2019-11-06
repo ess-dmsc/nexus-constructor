@@ -173,7 +173,9 @@ class Component:
             ):
                 # We're done, the next transformation is not stored in this component
                 return
-            transforms.append(Transformation(self.file, transform_dataset))
+            new_transform = Transformation(self.file, transform_dataset)
+            new_transform.parent = transforms
+            transforms.append(new_transform)
             if DEPENDS_ON_STR in transform_dataset.attrs.keys():
                 self._get_transform(
                     self.file.get_attribute_value(transform_dataset, DEPENDS_ON_STR),

@@ -18,6 +18,10 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.setupUi(self)
         self.transformation = transformation
         current_vector = self.transformation.vector
+        self.transformation_frame.x_spinbox.setRange(-10000000, 10000000)
+        self.transformation_frame.y_spinbox.setRange(-10000000, 10000000)
+        self.transformation_frame.z_spinbox.setRange(-10000000, 10000000)
+        self.transformation_frame.value_spinbox.setRange(-10000000, 10000000)
         self.transformation_frame.x_spinbox.setValue(current_vector.x())
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
@@ -56,7 +60,6 @@ class EditTranslation(EditTransformation):
     ):
         super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Distance (m)")
-        self.transformation_frame.value_spinbox.setRange(0, 10000000)
         self.setTitle("Translation")
 
 
@@ -66,7 +69,6 @@ class EditRotation(EditTransformation):
     ):
         super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Angle (°)")
-        self.transformation_frame.value_spinbox.setRange(0, 360)
         self.setTitle("Rotation")
 
 

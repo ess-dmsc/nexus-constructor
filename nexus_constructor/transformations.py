@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
@@ -39,11 +41,15 @@ class Transformation:
         Get a Qt3DCore.QTransform describing the transformation
         """
         transform = Qt3DCore.QTransform()
-        if self.type == "Rotation":
+        if self.type.lower() == "rotation":
             quaternion = transform.fromAxisAndAngle(self.vector, self.value)
             transform.setRotation(quaternion)
-        elif self.type == "Translation":
+        elif self.type.lower() == "translation":
             transform.setTranslation(self.vector.normalized() * self.value)
+        else:
+            raise (
+                RuntimeError('Unknown transformation of type "{}".'.format(self.type))
+            )
         return transform.matrix()
 
     @property
@@ -175,10 +181,8 @@ class Transformation:
                     self.dataset, "dependee_of", dependee_of_list
                 )
             else:
-                print(
-                    "Unable to de-register dependent {} from {} due to it not being registered.".format(
-                        former_dependent.absolute_path, self.absolute_path
-                    )
+                logging.warning(
+                    f"Unable to de-register dependent {former_dependent.absolute_path} from {self.absolute_path} due to it not being registered."
                 )
 
     def get_dependents(self):

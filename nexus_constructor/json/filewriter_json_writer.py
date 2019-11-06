@@ -61,18 +61,20 @@ def cast_to_int(data):
     We can convert any numpy integer type to Python int for serialising to JSON
     """
     if isinstance(data, list):
-        return [int(data_value) for data_value in data]
+        return data
     else:
         return int(data)
 
 
 def _add_attributes(root: NexusObject, root_dict: dict):
-    root_dict["attributes"] = []
+    attrs = []
     for attr_name, attr in root.attrs.items():
         if isinstance(attr, bytes):
             attr = attr.decode("utf8")
         new_attribute = {"name": attr_name, "values": attr}
-        root_dict["attributes"].append(new_attribute)
+        attrs.append(new_attribute)
+    if attrs:
+        root_dict["attributes"] = attrs
 
 
 class NexusToDictConverter:
@@ -177,7 +179,7 @@ class NexusToDictConverter:
         :param root: h5py group to generate dict from.
         :return: generated dict of group and children.
         """
-        root_dict = {"type": "group", "name": root.name, "children": []}
+        root_dict = {"type": "group", "name": root.name.split("/")[-1], "children": []}
         # Add the entries
         entries = list(root.values())
         if root.name in self._kafka_streams:
@@ -209,7 +211,7 @@ class NexusToDictConverter:
         else:
             root_dict = {
                 "type": "dataset",
-                "name": root.name,
+                "name": root.name.split("/")[-1],
                 "dataset": {"type": dataset_type},
                 "values": data,
             }

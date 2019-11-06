@@ -53,7 +53,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.layout.setContentsMargins(0, 0, 0, 0)
         frame.setLayout(frame.layout)
         if isinstance(value, Component):
-            frame.label = QLabel("{} ({})".format(value.name, value.nx_class), frame)
+            frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
             frame.layout.addWidget(frame.label)
         elif isinstance(value, TransformationsList):
             frame.label = QLabel("Transformations", frame)
@@ -62,12 +62,18 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             frame.label = QLabel("(Place holder)", frame)
             frame.layout.addWidget(frame.label)
         elif isinstance(value, Transformation):
-            if value.type == "Translation":
+            if value.type.lower() == "translation":
                 frame.transformation_frame = EditTranslation(
                     frame, value, self.instrument
                 )
-            elif value.type == "Rotation":
+            elif value.type.lower() == "rotation":
                 frame.transformation_frame = EditRotation(frame, value, self.instrument)
+            else:
+                raise (
+                    RuntimeError(
+                        'Transformation type "{}" is unknown.'.format(value.type)
+                    )
+                )
             frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
         elif isinstance(value, LinkTransformation):
             frame.transformation_frame = EditTransformationLink(

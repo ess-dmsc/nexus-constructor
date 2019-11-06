@@ -35,9 +35,7 @@ def _incorrect_field_type_message(fields_dict: dict, field_name: str):
     :param field_name: The name of the field that failed the check.
     :return: A string that contains the name of the field, the type it should have, and the type the user entered.
     """
-    return "Wrong {} type. Expected {} but found {}.".format(
-        field_name, EXPECTED_TYPE_ERROR_MSG[field_name], type(fields_dict[field_name])
-    )
+    return f"Wrong {field_name} type. Expected {EXPECTED_TYPE_ERROR_MSG[field_name]} but found {type(fields_dict[field_name])}."
 
 
 def _check_data_type(data_type, expected_types):
