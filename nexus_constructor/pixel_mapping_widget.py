@@ -28,10 +28,8 @@ class PixelMappingWidget(QWidget):
 
         self.setLayout(self.layout)
 
-    def set_id(self, pixel_id: int):
-        self.pixelIDLineEdit.setText(str(pixel_id))
-
-    def get_id(self):
+    @property
+    def id(self):
         """
         :return: The user-entered ID converted to an int. Returns None if the text field is empty.
         """
@@ -40,3 +38,7 @@ class PixelMappingWidget(QWidget):
             return int(text)
 
         return None
+
+    @id.setter
+    def id(self, pixel_id: int):
+        self.pixelIDLineEdit.setText(str(pixel_id))

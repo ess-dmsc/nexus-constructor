@@ -31,7 +31,7 @@ def test_GIVEN_id_number_and_text_WHEN_creating_pixel_mapping_widget_THEN_widget
 def test_GIVEN_id_WHEN_calling_set_id_THEN_id_is_set(pixel_mapping_widget):
 
     id = 5
-    pixel_mapping_widget.set_id(id)
+    pixel_mapping_widget.id = id
     assert pixel_mapping_widget.pixelIDLineEdit.text() == str(id)
 
 
@@ -41,11 +41,11 @@ def test_GIVEN_id_has_been_given_WHEN_calling_get_id_THEN_id_is_returned(
 
     id = 5
     qtbot.keyClick(pixel_mapping_widget.pixelIDLineEdit, Qt.Key_5)
-    assert pixel_mapping_widget.get_id() == id
+    assert pixel_mapping_widget.id == id
 
 
 def test_GIVEN_id_has_not_been_given_WHEN_calling_get_id_THEN_none_is_returned(
     pixel_mapping_widget
 ):
 
-    assert pixel_mapping_widget.get_id() is None
+    assert pixel_mapping_widget.id is None
