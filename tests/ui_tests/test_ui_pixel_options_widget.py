@@ -1,11 +1,12 @@
 from unittest.mock import mock_open
 
 import pytest
+import numpy as np
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QWidget
 from mock import patch
 
-from nexus_constructor.pixel_options import PixelOptions
+from nexus_constructor.pixel_options import PixelOptions, check_data_is_an_array
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -416,3 +417,21 @@ def test_UI_GIVEN_no_pixels_button_is_pressed_WHEN_entering_pixel_data_THEN_call
 
     systematic_button_press(qtbot, template, pixel_options.no_pixels_button)
     assert pixel_options.generate_pixel_data() is None
+
+
+def test_GIVEN_scalar_value_WHEN_calling_check_data_is_an_array_THEN_returns_false():
+
+    data = 3.5
+    assert not check_data_is_an_array(data)
+
+
+def test_GIVEN_array_with_single_element_WHEN_calling_check_data_is_an_array_THEN_returns_false():
+
+    data = np.array([3.5])
+    assert not check_data_is_an_array(data)
+
+
+def test_GIVEN_array_with_multiple_elements_WHEN_calling_check_data_is_an_array_THEN_returns_true():
+
+    data = np.array([i for i in range(5)])
+    assert check_data_is_an_array(data)
