@@ -6,6 +6,8 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QWidget
 from mock import patch
 
+from nexus_constructor.pixel_data import PixelGrid, Corner, CountDirection
+from nexus_constructor.pixel_data_to_nexus_utils import get_y_offsets_from_pixel_grid
 from nexus_constructor.pixel_options import PixelOptions, check_data_is_an_array
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
@@ -30,6 +32,21 @@ def pixel_options(qtbot, template):
     template.ui.setupUi(template)
     qtbot.addWidget(template)
     return pixel_options
+
+
+@pytest.fixture(scope="function")
+def pixel_grid():
+
+    pixel_grid = PixelGrid
+    pixel_grid.rows = 5
+    pixel_grid.columns = 4
+    pixel_grid.row_height = 1.5
+    pixel_grid.col_width = 0.4
+    pixel_grid.first_id = 2
+    pixel_grid.count_direction = CountDirection.ROW
+    pixel_grid.initial_count_corner = Corner.BOTTOM_LEFT
+
+    return pixel_grid
 
 
 def manually_create_pixel_mapping_list(
@@ -435,3 +452,14 @@ def test_GIVEN_array_with_multiple_elements_WHEN_calling_check_data_is_an_array_
 
     data = np.array([i for i in range(5)])
     assert check_data_is_an_array(data)
+
+
+def test_GIVEN_array_of_pixel_offsets_WHEN_finding_row_properties_THEN_expected_values_are_returned(
+    pixel_options, pixel_grid
+):
+
+    y_pixel_offsets = get_y_offsets_from_pixel_grid(pixel_grid)
+    n_rows, row_height = pixel_options._get_row_information(y_pixel_offsets)
+
+    assert n_rows == pixel_grid.rows
+    assert row_height == pixel_grid.row_height
