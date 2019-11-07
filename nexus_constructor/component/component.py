@@ -325,7 +325,7 @@ class Component:
         )
 
         pixel_mapping = None
-        if type(pixel_data) is PixelMapping:
+        if isinstance(pixel_data, PixelMapping):
             pixel_mapping = pixel_data
 
         vertices = calculate_vertices(axis_direction, height, radius)
