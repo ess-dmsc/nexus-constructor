@@ -203,7 +203,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             self.create_pixel_mapping_list(n_faces, "face")
 
             for detector_face in detector_faces:
-                self.pixel_mapping_widgets[detector_face[0]].set_id(detector_face[1])
+                self.pixel_mapping_widgets[detector_face[0]].id = detector_face[1]
 
         else:
 
@@ -214,12 +214,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 self.create_pixel_mapping_list(len(detector_number), "cylinder")
 
                 for i in range(len(detector_number)):
-                    self.pixel_mapping_widgets[i].set_id(detector_number[i])
+                    self.pixel_mapping_widgets[i].id = detector_number[i]
 
             else:
 
                 self.create_pixel_mapping_list(1, "cylinder")
-                self.pixel_mapping_widgets[0].set_id(detector_number)
+                self.pixel_mapping_widgets[0].id = detector_number
 
     @staticmethod
     def _get_detector_face_information(shape: OFFGeometryNexus):
@@ -380,7 +380,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         :return: A list of the IDs for the current PixelMappingWidgets.
         """
         return [
-            pixel_mapping_widget.get_id()
+            pixel_mapping_widget.id
             for pixel_mapping_widget in self.pixel_mapping_widgets
         ]
 
@@ -388,9 +388,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         Checks that at least one ID has been given in the Pixel Mapping and then updates the PixelValidator.
         """
-        nonempty_ids = [
-            widget.get_id() is not None for widget in self.pixel_mapping_widgets
-        ]
+        nonempty_ids = [widget.id is not None for widget in self.pixel_mapping_widgets]
         self.pixel_validator.set_pixel_mapping_valid(any(nonempty_ids))
 
     def generate_pixel_data(self):
