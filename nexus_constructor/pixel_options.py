@@ -138,11 +138,17 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     @staticmethod
     def _get_row_information(y_pixel_offset: np.ndarray):
-
+        """
+        Determine the number of rows and the row height from a component that's being edited.
+        :param y_pixel_offset: The array of y pixel offsets from the component.
+        :return: The number of rows and the row height. If there is only one row, the row height is assumed to be None.
+        """
         n_rows = y_pixel_offset.shape[0]
-        row_height = np.abs(y_pixel_offset[0][0] - y_pixel_offset[1][0])
 
-        return n_rows, row_height
+        if n_rows > 1:
+            return n_rows, np.abs(y_pixel_offset[0][0] - y_pixel_offset[1][0])
+
+        return n_rows, None
 
     @staticmethod
     def _get_column_information(x_pixel_offset: np.ndarray):

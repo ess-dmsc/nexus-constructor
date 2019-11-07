@@ -463,3 +463,15 @@ def test_GIVEN_array_of_pixel_offsets_WHEN_finding_row_properties_THEN_expected_
 
     assert n_rows == pixel_grid.rows
     assert row_height == pixel_grid.row_height
+
+
+def test_GIVEN_pixel_grid_with_single_row_WHEN_finding_row_properties_THEN_expected_values_are_returned(
+    pixel_options, pixel_grid
+):
+
+    pixel_grid.rows = 1
+    y_pixel_offsets = get_y_offsets_from_pixel_grid(pixel_grid)
+    n_rows, row_height = pixel_options._get_row_information(y_pixel_offsets)
+
+    assert n_rows == pixel_grid.rows
+    assert row_height is None
