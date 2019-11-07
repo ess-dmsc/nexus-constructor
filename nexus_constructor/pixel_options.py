@@ -197,7 +197,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         shape = component_to_edit.shape[0]
 
-        if type(shape) is OFFGeometryNexus:
+        if isinstance(shape, OFFGeometryNexus):
 
             n_faces, detector_faces = self._get_detector_face_information(shape)
             self.create_pixel_mapping_list(n_faces, "face")
@@ -209,7 +209,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
             detector_number = shape.detector_number
 
-            if type(detector_number) is List:
+            if isinstance(detector_number, List):
 
                 self.create_pixel_mapping_list(len(detector_number), "cylinder")
 
