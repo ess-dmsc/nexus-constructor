@@ -31,7 +31,7 @@ def check_data_is_an_array(data) -> bool:
     :param data: The data value from the NeXus file.
     :return: True if the data is a scalar or an array containing a single value, False otherwise.
     """
-    if type(data) is not np.ndarray:
+    if np.isscalar(data):
         return False
 
     return data.size > 1
