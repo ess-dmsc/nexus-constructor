@@ -19,6 +19,13 @@ BOTTOM_RIGHT_TEXT = "Bottom Right"
 TOP_LEFT_TEXT = "Top Left"
 TOP_RIGHT_TEXT = "Top Right"
 
+INITIAL_COUNT_CORNER = {
+    BOTTOM_LEFT_TEXT: Corner.BOTTOM_LEFT,
+    BOTTOM_RIGHT_TEXT: Corner.BOTTOM_RIGHT,
+    TOP_LEFT_TEXT: Corner.TOP_LEFT,
+    TOP_RIGHT_TEXT: Corner.TOP_RIGHT,
+}
+
 ROWS_TEXT = "Rows"
 COLUMNS_TEXT = "Columns"
 
@@ -48,12 +55,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.count_direction = {
             "Rows": CountDirection.ROW,
             "Columns": CountDirection.COLUMN,
-        }
-        self.initial_count_corner = {
-            BOTTOM_LEFT_TEXT: Corner.BOTTOM_LEFT,
-            BOTTOM_RIGHT_TEXT: Corner.BOTTOM_RIGHT,
-            TOP_LEFT_TEXT: Corner.TOP_LEFT,
-            TOP_RIGHT_TEXT: Corner.TOP_RIGHT,
         }
 
         self.pixel_validator = None
@@ -152,11 +153,17 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     @staticmethod
     def _get_column_information(x_pixel_offset: np.ndarray):
-
+        """
+        Determine the number of columns and the column width from a component that's being edited.
+        :param x_pixel_offset: The array of x pixel offsets from the component.
+        :return:
+        """
         n_cols = x_pixel_offset.shape[1]
-        col_width = np.abs(x_pixel_offset[0][1] - x_pixel_offset[0][0])
 
-        return n_cols, col_width
+        if n_cols > 1:
+            return n_cols, np.abs(x_pixel_offset[0][1] - x_pixel_offset[0][0])
+
+        return n_cols, None
 
     @staticmethod
     def _get_detector_number_information(detector_numbers: np.ndarray):
@@ -172,30 +179,34 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         right_of_first_id = (first_id_index[0], first_id_index[1] + 1)
         left_of_first_id = (first_id_index[0], first_id_index[1] - 1)
 
-        start_counting_text = None
-
-        if first_id_index == (0, 0):
-            start_counting_text = TOP_LEFT_TEXT
-
-            if detector_numbers[right_of_first_id] == first_id_plus_one:
-                count_along_text = ROWS_TEXT
-
-        elif first_id_index[0] == 0:
-            start_counting_text = TOP_RIGHT_TEXT
-
-            if detector_numbers[left_of_first_id] == first_id_plus_one:
-                count_along_text = ROWS_TEXT
-
-        elif first_id_index[1] == 0:
-            start_counting_text = BOTTOM_LEFT_TEXT
-
-            if detector_numbers[right_of_first_id] == first_id_plus_one:
-                count_along_text = ROWS_TEXT
+        if first_id_index[0] == 0:
+            start_counting_text = "Top "
         else:
-            start_counting_text = BOTTOM_RIGHT_TEXT
+            start_counting_text = "Bottom "
 
-            if detector_numbers[left_of_first_id] == first_id_plus_one:
-                count_along_text = ROWS_TEXT
+        if first_id_index[1] == 0:
+            start_counting_text += "Left"
+        else:
+            start_counting_text += "Right"
+
+        # if first_id_index == (0, 0):
+        #
+        #     if detector_numbers[right_of_first_id] == first_id_plus_one:
+        #         count_along_text = ROWS_TEXT
+        #
+        # elif first_id_index[0] == 0:
+        #
+        #     if detector_numbers[left_of_first_id] == first_id_plus_one:
+        #         count_along_text = ROWS_TEXT
+        #
+        # elif first_id_index[1] == 0:
+        #
+        #     if detector_numbers[right_of_first_id] == first_id_plus_one:
+        #         count_along_text = ROWS_TEXT
+        # else:
+        #
+        #     if detector_numbers[left_of_first_id] == first_id_plus_one:
+        #         count_along_text = ROWS_TEXT
 
         return first_id, start_counting_text, count_along_text
 
@@ -428,7 +439,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 count_direction=self.count_direction[
                     self.count_first_combo_box.currentText()
                 ],
-                initial_count_corner=self.initial_count_corner[
+                initial_count_corner=INITIAL_COUNT_CORNER[
                     self.start_counting_combo_box.currentText()
                 ],
             )

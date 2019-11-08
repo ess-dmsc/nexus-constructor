@@ -7,8 +7,16 @@ from PySide2.QtWidgets import QWidget
 from mock import patch
 
 from nexus_constructor.pixel_data import PixelGrid, Corner, CountDirection
-from nexus_constructor.pixel_data_to_nexus_utils import get_y_offsets_from_pixel_grid
-from nexus_constructor.pixel_options import PixelOptions, check_data_is_an_array
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    get_y_offsets_from_pixel_grid,
+    get_x_offsets_from_pixel_grid,
+    get_detector_ids_from_pixel_grid,
+)
+from nexus_constructor.pixel_options import (
+    PixelOptions,
+    check_data_is_an_array,
+    INITIAL_COUNT_CORNER,
+)
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -462,7 +470,7 @@ def test_GIVEN_array_of_pixel_offsets_WHEN_finding_row_properties_THEN_expected_
     n_rows, row_height = pixel_options._get_row_information(y_pixel_offsets)
 
     assert n_rows == pixel_grid.rows
-    assert row_height == pixel_grid.row_height
+    assert np.isclose(row_height, pixel_grid.row_height)
 
 
 def test_GIVEN_pixel_grid_with_single_row_WHEN_finding_row_properties_THEN_expected_values_are_returned(
@@ -475,3 +483,54 @@ def test_GIVEN_pixel_grid_with_single_row_WHEN_finding_row_properties_THEN_expec
 
     assert n_rows == pixel_grid.rows
     assert row_height is None
+
+
+def test_GIVEN_array_of_pixel_offsets_WHEN_finding_column_properties_THEN_expected_values_are_returned(
+    pixel_options, pixel_grid
+):
+
+    x_pixel_offsets = get_x_offsets_from_pixel_grid(pixel_grid)
+    n_columns, column_width = pixel_options._get_column_information(x_pixel_offsets)
+
+    assert n_columns == pixel_grid.columns
+    assert np.isclose(column_width, pixel_grid.col_width)
+
+
+def test_GIVEN_pixel_grid_with_single_column_WHEN_finding_column_properties_THEN_expected_values_are_returned(
+    pixel_options, pixel_grid
+):
+
+    pixel_grid.columns = 1
+    x_pixel_offsets = get_x_offsets_from_pixel_grid(pixel_grid)
+
+    n_columns, column_width = pixel_options._get_column_information(x_pixel_offsets)
+
+    assert n_columns == pixel_grid.columns
+    assert column_width is None
+
+
+@pytest.mark.parametrize("corner", INITIAL_COUNT_CORNER.values())
+def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_values_are_returned(
+    pixel_options, pixel_grid, corner
+):
+
+    pixel_grid.initial_count_corner = corner
+    detector_numbers = get_detector_ids_from_pixel_grid(pixel_grid)
+
+    _, start_counting_text, _ = pixel_options._get_detector_number_information(
+        detector_numbers
+    )
+
+    assert INITIAL_COUNT_CORNER[start_counting_text] == corner
+
+
+def test_GIVEN_row_or_column_of_pixels_WHEN_calling_detector_number_information_THEN_expected_values_are_returned(
+    pixel_options, pixel_grid
+):
+    pass
+
+
+def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_value_is_returned(
+    pixel_options, pixel_grid
+):
+    pass
