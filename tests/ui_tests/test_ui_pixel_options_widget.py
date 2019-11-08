@@ -524,10 +524,33 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
     assert INITIAL_COUNT_CORNER[start_counting_text] == corner
 
 
-def test_GIVEN_row_or_column_of_pixels_WHEN_calling_detector_number_information_THEN_expected_values_are_returned(
+@pytest.mark.xfail
+def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_values_are_returned(
     pixel_options, pixel_grid
 ):
-    pass
+    pixel_options.rows = 1
+    detector_numbers = get_detector_ids_from_pixel_grid(pixel_grid)
+
+    _, start_counting_text, _ = pixel_options._get_detector_number_information(
+        detector_numbers
+    )
+
+    assert start_counting_text in ["Right", "Left"]
+
+
+@pytest.mark.xfail
+def test_GIVEN_column_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_values_are_returned(
+    pixel_options, pixel_grid
+):
+
+    pixel_options.columns = 1
+    detector_numbers = get_detector_ids_from_pixel_grid(pixel_grid)
+
+    _, start_counting_text, _ = pixel_options._get_detector_number_information(
+        detector_numbers
+    )
+
+    assert start_counting_text in ["Top", "Bottom"]
 
 
 def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_value_is_returned(
