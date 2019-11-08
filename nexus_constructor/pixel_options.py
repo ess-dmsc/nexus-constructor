@@ -29,6 +29,8 @@ INITIAL_COUNT_CORNER = {
 ROWS_TEXT = "Rows"
 COLUMNS_TEXT = "Columns"
 
+COUNT_DIRECTION = {ROWS_TEXT: CountDirection.ROW, COLUMNS_TEXT: CountDirection.COLUMN}
+
 
 def check_data_is_an_array(data) -> bool:
     """
@@ -50,12 +52,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         QObject.__init__(self)
 
         self.pixel_mapping_widgets = []
-
-        # Dictionaries that map user-input to known pixel grid options. Used when creating the PixelGrid.
-        self.count_direction = {
-            "Rows": CountDirection.ROW,
-            "Columns": CountDirection.COLUMN,
-        }
 
         self.pixel_validator = None
         self.current_mapping_filename = None
@@ -185,28 +181,18 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             start_counting_text = "Bottom "
 
         if first_id_index[1] == 0:
+
             start_counting_text += "Left"
+
+            if detector_numbers[right_of_first_id] == first_id_plus_one:
+                count_along_text = ROWS_TEXT
+
         else:
+
             start_counting_text += "Right"
 
-        # if first_id_index == (0, 0):
-        #
-        #     if detector_numbers[right_of_first_id] == first_id_plus_one:
-        #         count_along_text = ROWS_TEXT
-        #
-        # elif first_id_index[0] == 0:
-        #
-        #     if detector_numbers[left_of_first_id] == first_id_plus_one:
-        #         count_along_text = ROWS_TEXT
-        #
-        # elif first_id_index[1] == 0:
-        #
-        #     if detector_numbers[right_of_first_id] == first_id_plus_one:
-        #         count_along_text = ROWS_TEXT
-        # else:
-        #
-        #     if detector_numbers[left_of_first_id] == first_id_plus_one:
-        #         count_along_text = ROWS_TEXT
+            if detector_numbers[left_of_first_id] == first_id_plus_one:
+                count_along_text = ROWS_TEXT
 
         return first_id, start_counting_text, count_along_text
 
@@ -287,7 +273,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         # Manually add options to the "Count first along" combo box. This is done here because inserting these options
         # through Qt Designer doesn't work.
-        self.count_first_combo_box.addItems(list(self.count_direction.keys()))
+        self.count_first_combo_box.addItems(list(COUNT_DIRECTION.keys()))
 
     def get_validator(self):
         """
@@ -436,7 +422,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 row_height=row_height,
                 col_width=col_width,
                 first_id=self.first_id_spin_box.value(),
-                count_direction=self.count_direction[
+                count_direction=COUNT_DIRECTION[
                     self.count_first_combo_box.currentText()
                 ],
                 initial_count_corner=INITIAL_COUNT_CORNER[

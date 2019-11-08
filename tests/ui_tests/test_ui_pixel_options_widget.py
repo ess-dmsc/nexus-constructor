@@ -16,6 +16,7 @@ from nexus_constructor.pixel_options import (
     PixelOptions,
     check_data_is_an_array,
     INITIAL_COUNT_CORNER,
+    COUNT_DIRECTION,
 )
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
@@ -276,11 +277,11 @@ def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_ha
     assert pixel_options.first_id_spin_box.value() == 0
     assert (
         pixel_options.start_counting_combo_box.currentText()
-        == list(pixel_options.initial_count_corner.keys())[0]
+        == list(INITIAL_COUNT_CORNER.keys())[0]
     )
     assert (
         pixel_options.count_first_combo_box.currentText()
-        == list(pixel_options.count_direction.keys())[0]
+        == list(COUNT_DIRECTION.keys())[0]
     )
 
 
@@ -510,7 +511,7 @@ def test_GIVEN_pixel_grid_with_single_column_WHEN_finding_column_properties_THEN
 
 
 @pytest.mark.parametrize("corner", INITIAL_COUNT_CORNER.values())
-def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_values_are_returned(
+def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_are_returned(
     pixel_options, pixel_grid, corner
 ):
 
@@ -525,7 +526,7 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 
 
 @pytest.mark.xfail
-def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_values_are_returned(
+def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_is_returned(
     pixel_options, pixel_grid
 ):
     pixel_options.rows = 1
@@ -539,7 +540,7 @@ def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_e
 
 
 @pytest.mark.xfail
-def test_GIVEN_column_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_values_are_returned(
+def test_GIVEN_column_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_is_returned(
     pixel_options, pixel_grid
 ):
 
@@ -553,7 +554,7 @@ def test_GIVEN_column_of_pixels_WHEN_calling_get_detector_number_information_THE
     assert start_counting_text in ["Top", "Bottom"]
 
 
-def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_value_is_returned(
+def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_first_id_is_returned(
     pixel_options, pixel_grid
 ):
     pixel_grid.first_id = 4
@@ -562,3 +563,17 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
     first_id, _, _ = pixel_options._get_detector_number_information(detector_numbers)
 
     assert first_id == pixel_grid.first_id
+
+
+@pytest.mark.parametrize("count_along", COUNT_DIRECTION.values())
+def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_count_direction_is_returned(
+    pixel_options, pixel_grid, count_along
+):
+    pixel_grid.count_direction = count_along
+
+    detector_numbers = get_detector_ids_from_pixel_grid(pixel_grid)
+    _, _, count_direction = pixel_options._get_detector_number_information(
+        detector_numbers
+    )
+
+    assert COUNT_DIRECTION[count_direction] == count_along
