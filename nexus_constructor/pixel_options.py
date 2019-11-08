@@ -152,7 +152,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         Determine the number of columns and the column width from a component that's being edited.
         :param x_pixel_offset: The array of x pixel offsets from the component.
-        :return:
+        :return: The number of columns and the column width. if there is only one column, column width is assumed to be
+        None.
         """
         n_cols = x_pixel_offset.shape[1]
 
@@ -163,34 +164,45 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     @staticmethod
     def _get_detector_number_information(detector_numbers: np.ndarray):
-
+        """
+        Determine the first pixel ID, the count direction, and the location of the first pixel from a component that's
+        being edited.
+        :param detector_numbers: The array of detector numbers from the component.
+        :return:
+        """
+        # Find the first pixel and its index in the detector number array
         first_id = np.amin(detector_numbers)
-
         first_id_index = np.where(detector_numbers == first_id)
         first_id_index = (first_id_index[0][0], first_id_index[1][0])
 
-        first_id_plus_one = first_id + 1
-
-        count_along_text = COLUMNS_TEXT
+        # Find the indices that are right and left of the first ID
         right_of_first_id = (first_id_index[0], first_id_index[1] + 1)
         left_of_first_id = (first_id_index[0], first_id_index[1] - 1)
 
+        # Use the index from the first pixel to determine if the first ID is at the top or bottom of the grid
         if first_id_index[0] == 0:
-            start_counting_text = "Top "
+            start_counting_text = "Top"
         else:
-            start_counting_text = "Bottom "
+            start_counting_text = "Bottom"
 
+        # Set the count along text to columns
+        count_along_text = COLUMNS_TEXT
+
+        # Find the value after the first ID
+        first_id_plus_one = first_id + 1
+
+        # Determine if the first ID is on the right or left of the pixel grid
         if first_id_index[1] == 0:
-
-            start_counting_text += "Left"
-
+            start_counting_text += " Left"
+            # If the first pixel is on the left of the grid, check if the pixel right to it is the second pixel
+            # If it is the second pixel, the count along value is Rows, otherwise it will remain as Columns
             if detector_numbers[right_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
 
         else:
-
-            start_counting_text += "Right"
-
+            start_counting_text += " Right"
+            # If the first pixel is on the right of the grid, check if the pixel to its left is the second pixel
+            # If it is the second pixel, the count along value is Rows, otherwise it will remain as columns
             if detector_numbers[left_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
 
