@@ -556,4 +556,9 @@ def test_GIVEN_column_of_pixels_WHEN_calling_get_detector_number_information_THE
 def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_value_is_returned(
     pixel_options, pixel_grid
 ):
-    pass
+    pixel_grid.first_id = 4
+
+    detector_numbers = get_detector_ids_from_pixel_grid(pixel_grid)
+    first_id, _, _ = pixel_options._get_detector_number_information(detector_numbers)
+
+    assert first_id == pixel_grid.first_id
