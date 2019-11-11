@@ -12,12 +12,15 @@ from PySide2.QtCore import QSettings
 import time
 from nexus_constructor.json.filewriter_json_writer import generate_json
 from nexus_constructor.ui_utils import validate_line_edit
+import io
 
 
 def extract_addr_and_topic(in_string):
-    correct_string_re = re.compile("(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)")
+    correct_string_re = re.compile(
+        "(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"
+    )  # noqa: W605
     match_res = re.match(correct_string_re, in_string)
-    if match_res != None:
+    if match_res is not None:
         return match_res.group(2), match_res.group(7)
     return None
 

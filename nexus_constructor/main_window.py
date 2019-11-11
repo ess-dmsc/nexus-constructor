@@ -173,7 +173,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def _setupFileWriterCtrl(self, main_window):
         try:
-            import kafka
+            import kafka  # noqa: F401
 
             self.control_file_writer_action = QtWidgets.QAction(main_window)
             self.control_file_writer_action.setObjectName("actionControlFileWriter")

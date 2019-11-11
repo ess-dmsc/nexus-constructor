@@ -63,7 +63,7 @@ class StatusConsumer:
                 return
             try:
                 consumer = KafkaConsumer(bootstrap_servers=self.broker)
-            except NoBrokersAvailable as e:
+            except NoBrokersAvailable:
                 time.sleep(2)
                 continue
             break

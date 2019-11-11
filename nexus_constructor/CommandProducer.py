@@ -1,4 +1,4 @@
-from kafka import KafkaProducer, TopicPartition
+from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
 import threading
 import time
