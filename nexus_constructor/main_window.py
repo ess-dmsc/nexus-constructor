@@ -8,7 +8,7 @@ from PySide2.QtWidgets import (
 )
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
-
+from PySide2 import QtWidgets
 import silx.gui.hdf5
 import os
 import h5py
@@ -42,6 +42,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
+        self._setupFileWriterCtrl(main_window)
+        self.file_writer_ctrl_window = None
 
         self.export_to_nexus_file_action.triggered.connect(self.save_to_nexus_file)
         self.open_nexus_file_action.triggered.connect(self.open_nexus_file)
@@ -168,6 +170,28 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             0
         ].internalPointer()
         self.show_add_component_window(selected_component)
+
+    def _setupFileWriterCtrl(self, main_window):
+        try:
+            import kafka
+            self.control_file_writer_action = QtWidgets.QAction(main_window)
+            self.control_file_writer_action.setObjectName("actionControlFileWriter")
+            self.file_menu.addAction(self.control_file_writer_action)
+            self.control_file_writer_action.setText(
+                QtWidgets.QApplication.translate(
+                    "MainWindow", "Control file-writer", None, -1
+                )
+            )
+            self.control_file_writer_action.triggered.connect(self.show_control_file_writer_window)
+        except ImportError:
+            pass
+
+    def show_control_file_writer_window(self):
+        if self.file_writer_ctrl_window is None:
+            from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
+            self.file_writer_ctrl_window = FileWriterCtrl(self.instrument)
+        self.file_writer_ctrl_window.show()
+        self.file_writer_ctrl_window.raise_()
 
     def show_entries_dialog(self, map_of_entries: dict, nexus_file: h5py.File):
         """
