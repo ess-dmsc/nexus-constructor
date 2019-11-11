@@ -5,6 +5,7 @@ import time
 from queue import Queue
 from copy import copy
 
+
 class CommandProducer:
     def __init__(self, address, topic):
         self.address = address
@@ -30,7 +31,7 @@ class CommandProducer:
         return return_status
 
     def sendCommand(self, message):
-        self.msg_queue.put(message, block = True)
+        self.msg_queue.put(message, block=True)
 
     def _setConnected(self, is_connected):
         self.command_lock.acquire()
@@ -43,7 +44,9 @@ class CommandProducer:
             if not self.run_thread:
                 return
             try:
-                producer = KafkaProducer(bootstrap_servers = self.address, max_request_size = 100_000_000)
+                producer = KafkaProducer(
+                    bootstrap_servers=self.address, max_request_size=100_000_000
+                )
             except NoBrokersAvailable:
                 time.sleep(2)
                 continue
@@ -56,7 +59,7 @@ class CommandProducer:
         self._setConnected(True)
         while self.run_thread:
             if not self.msg_queue.empty():
-                send_msg = self.msg_queue.get(block = False)
+                send_msg = self.msg_queue.get(block=False)
                 producer.send(self.topic, send_msg)
             else:
                 time.sleep(0.2)

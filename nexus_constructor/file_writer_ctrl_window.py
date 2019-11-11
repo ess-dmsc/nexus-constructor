@@ -13,6 +13,7 @@ import time
 from nexus_constructor.json.filewriter_json_writer import generate_json
 from nexus_constructor.ui_utils import validate_line_edit
 
+
 def extract_addr_and_topic(in_string):
     correct_string_re = re.compile("(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)")
     match_res = re.match(correct_string_re, in_string)
@@ -20,11 +21,13 @@ def extract_addr_and_topic(in_string):
         return match_res.group(2), match_res.group(7)
     return None
 
+
 class FileWriter:
     def __init__(self, name, row):
         self.name = name
         self.row = row
         self.last_time = 0
+
 
 class File:
     def __init__(self, name, row, writer_id, job_id):
@@ -33,6 +36,7 @@ class File:
         self.writer_id = writer_id
         self.job_id = job_id
         self.last_time = 0
+
 
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def __init__(self, instrument: Instrument):
@@ -60,7 +64,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.commandBrokerEdit.textChanged.connect(self.onCommandBrokerTextChanged)
         self.commandBrokerChangeTimer = QTimer()
         self.commandBrokerChangeTimer.setSingleShot(True)
-        self.commandBrokerChangeTimer.timeout.connect(self.onCommandBrokerTextChangeTimer)
+        self.commandBrokerChangeTimer.timeout.connect(
+            self.onCommandBrokerTextChangeTimer
+        )
         self.command_producer = None
 
         self.fileNameLineEdit.textChanged.connect(self.onFileNameChange)
@@ -84,7 +90,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.fileWritersList.setModel(self.model)
         self.fileWritersList.setColumnWidth(0, 320)
 
-        self.fileModel= QStandardItemModel(0, 3, self)
+        self.fileModel = QStandardItemModel(0, 3, self)
         self.fileModel.setHeaderData(0, QtCore.Qt.Horizontal, "File name")
         self.fileModel.setHeaderData(1, QtCore.Qt.Horizontal, "Last seen")
         self.fileModel.setHeaderData(2, QtCore.Qt.Horizontal, "File writer")
@@ -97,7 +103,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         QApplication.instance().aboutToQuit.connect(self.doCleanup)
 
     def updateFileNamePlaceholder(self):
-        placeholder_file_name = time.strftime("Data_%Y%m%d_%H%M%S.nxs", time.localtime())
+        placeholder_file_name = time.strftime(
+            "Data_%Y%m%d_%H%M%S.nxs", time.localtime()
+        )
         self.fileNameLineEdit.setPlaceholderText(placeholder_file_name)
 
     def restore_settings(self):
@@ -105,7 +113,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.commandBrokerEdit.setText(self.settings.value("command_broker_addr"))
         temp = self.settings.value("use_swmr", False)
         self.useSWMRCheckBox.setChecked(temp)
-        self.useStartTimeCheckBox.setChecked(self.settings.value("use_start_time", False))
+        self.useStartTimeCheckBox.setChecked(
+            self.settings.value("use_start_time", False)
+        )
         self.useStopTimeCheckBox.setChecked(self.settings.value("use_stop_time", False))
         self.fileNameLineEdit.setText(self.settings.value("file_name"))
 
@@ -126,7 +136,6 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         else:
             self.commandBrokerLed.turn_on(self.command_producer.isConnected())
         self.updateCommandPossible()
-
 
     def onTextChanged(self):
         self.statusBrokerChangeTimer.start(1000)
@@ -170,12 +179,30 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.command_producer.__del__()
 
     def updateCommandPossible(self):
-        start_stop_is_ok = not (self.useStopTimeCheckBox.isChecked() and self.useStartTimeCheckBox.isChecked() and self.startDateTime.dateTime() > self.stopDateTime.dateTime())
-        validate_line_edit(self.startDateTime, start_stop_is_ok, "Start time occurs later than stop time.", "Start time")
-        validate_line_edit(self.stopDateTime, start_stop_is_ok, "Start time occurs later than stop time.",
-                           "Stop time")
+        start_stop_is_ok = not (
+            self.useStopTimeCheckBox.isChecked()
+            and self.useStartTimeCheckBox.isChecked()
+            and self.startDateTime.dateTime() > self.stopDateTime.dateTime()
+        )
+        validate_line_edit(
+            self.startDateTime,
+            start_stop_is_ok,
+            "Start time occurs later than stop time.",
+            "Start time",
+        )
+        validate_line_edit(
+            self.stopDateTime,
+            start_stop_is_ok,
+            "Start time occurs later than stop time.",
+            "Stop time",
+        )
 
-        if self.command_producer is not None and self.command_producer.isConnected() and not self.command_producer.hasUnsentMessages() and start_stop_is_ok:
+        if (
+            self.command_producer is not None
+            and self.command_producer.isConnected()
+            and not self.command_producer.hasUnsentMessages()
+            and start_stop_is_ok
+        ):
             self.sendCommandButton.setEnabled(True)
         else:
             self.sendCommandButton.setEnabled(False)
@@ -188,7 +215,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             if key not in self.known_writers:
                 NrOfFWRows = self.model.rowCount(QtCore.QModelIndex())
                 new_file_writer = FileWriter(key, NrOfFWRows)
-                self.known_writers[key]= new_file_writer
+                self.known_writers[key] = new_file_writer
                 self.model.insertRow(NrOfFWRows)
                 self.model.setData(self.model.index(NrOfFWRows, 0), key)
                 self.model.setData(self.model.index(NrOfFWRows, 1), time_str)
@@ -207,11 +234,13 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 writer_id = updated_list[key]["writer_id"]
                 file_id = updated_list[key]["file_id"]
                 new_file = File(key, NrOfFWRows, writer_id, file_id)
-                self.known_files[key]= new_file
+                self.known_files[key] = new_file
                 self.fileModel.insertRow(NrOfFWRows)
                 self.fileModel.setData(self.fileModel.index(NrOfFWRows, 0), key)
                 self.fileModel.setData(self.fileModel.index(NrOfFWRows, 1), time_str)
-                self.fileModel.setData(self.fileModel.index(NrOfFWRows, 2), new_file.writer_id)
+                self.fileModel.setData(
+                    self.fileModel.index(NrOfFWRows, 2), new_file.writer_id
+                )
             cFile = self.known_files[key]
             if current_time != self.known_files[key].last_time:
                 self.fileModel.setData(self.fileModel.index(cFile.row, 1), time_str)
@@ -235,17 +264,18 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             file_name = self.fileNameLineEdit.text()
             if len(file_name) == 0:
                 file_name = self.fileNameLineEdit.placeholderText()
-            generate_json(data=self.instrument,
-                          file=in_memory_file,
-                          streams=self.instrument.get_streams(),
-                          links=self.instrument.get_links(),
-                          nexus_file_name=file_name,
-                          broker=broker,
-                          start_time=start_time,
-                          stop_time=stop_time,
-                          service_id=None,
-                          use_swmr=self.useSWMRCheckBox.isChecked()
-                          )
+            generate_json(
+                data=self.instrument,
+                file=in_memory_file,
+                streams=self.instrument.get_streams(),
+                links=self.instrument.get_links(),
+                nexus_file_name=file_name,
+                broker=broker,
+                start_time=start_time,
+                stop_time=stop_time,
+                service_id=None,
+                use_swmr=self.useSWMRCheckBox.isChecked(),
+            )
             self.command_producer.sendCommand(self.start_msg)
             self.sendCommandButton.setEnabled(False)
 
@@ -256,12 +286,18 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.stopFileWritingButton.setEnabled(False)
 
     def onStopFileWriting(self):
-        stopWritingMsgTemplate = """ "cmd": "FileWriter_stop", "job_id": "{}", "service_id": "{}" """
+        stopWritingMsgTemplate = (
+            """ "cmd": "FileWriter_stop", "job_id": "{}", "service_id": "{}" """
+        )
         selected_files = self.filesList.selectedIndexes()
         for indice in selected_files:
             for fileKey in self.known_files:
                 cFile = self.known_files[fileKey]
                 if indice.row() == cFile.row:
-                    send_msg = stopWritingMsgTemplate.format(cFile.job_id, cFile.writer_id)
-                    self.command_producer.sendCommand(("{" + send_msg + "}").encode("utf-8"))
+                    send_msg = stopWritingMsgTemplate.format(
+                        cFile.job_id, cFile.writer_id
+                    )
+                    self.command_producer.sendCommand(
+                        ("{" + send_msg + "}").encode("utf-8")
+                    )
                     break

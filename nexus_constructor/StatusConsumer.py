@@ -5,6 +5,7 @@ import time
 from kafka.errors import NoBrokersAvailable
 import json
 
+
 class StatusConsumer:
     def __init__(self, broker, topic):
         self.broker = broker
@@ -15,7 +16,7 @@ class StatusConsumer:
         self.status_lock = threading.Lock()
         self.run_thread = True
 
-        self.thread = threading.Thread(target = self.status_thread)
+        self.thread = threading.Thread(target=self.status_thread)
         self.thread.start()
 
     def __del__(self):
@@ -93,15 +94,18 @@ class StatusConsumer:
                     if msg_obj["type"] == "filewriter_status_master":
                         writer_id = msg_obj["service_id"]
                         if writer_id not in known_writers:
-                            known_writers[writer_id] = {"last_seen":0}
+                            known_writers[writer_id] = {"last_seen": 0}
                         known_writers[writer_id]["last_seen"] = msg.timestamp
                         for file_id in msg_obj["files"]:
                             file_name = msg_obj["files"][file_id]["filename"]
                             if file_name not in known_files:
-                                known_files[file_name] = {"file_id": file_id, "file_name":file_name, "last_seen":0, "writer_id":writer_id}
+                                known_files[file_name] = {
+                                    "file_id": file_id,
+                                    "file_name": file_name,
+                                    "last_seen": 0,
+                                    "writer_id": writer_id,
+                                }
                             known_files[file_name]["last_seen"] = msg.timestamp
             if had_updates:
                 self._setFilewriters(known_writers)
                 self._setFiles(known_files)
-
-

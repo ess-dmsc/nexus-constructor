@@ -174,6 +174,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _setupFileWriterCtrl(self, main_window):
         try:
             import kafka
+
             self.control_file_writer_action = QtWidgets.QAction(main_window)
             self.control_file_writer_action.setObjectName("actionControlFileWriter")
             self.file_menu.addAction(self.control_file_writer_action)
@@ -182,13 +183,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     "MainWindow", "Control file-writer", None, -1
                 )
             )
-            self.control_file_writer_action.triggered.connect(self.show_control_file_writer_window)
+            self.control_file_writer_action.triggered.connect(
+                self.show_control_file_writer_window
+            )
         except ImportError:
             pass
 
     def show_control_file_writer_window(self):
         if self.file_writer_ctrl_window is None:
             from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
+
             self.file_writer_ctrl_window = FileWriterCtrl(self.instrument)
         self.file_writer_ctrl_window.show()
         self.file_writer_ctrl_window.raise_()
