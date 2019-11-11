@@ -4,16 +4,6 @@ from mock import Mock
 
 from nexus_constructor.ui_utils import validate_line_edit, generate_unique_name
 
-from PySide2.QtGui import QColor
-
-
-class DummyPalette:
-    def setAutoFillBackground(self, value: bool):
-        pass
-
-    def setColor(self, role, colour: QColor):
-        self.colour = colour
-
 
 class DummyLineEdit:
     def setStyleSheet(self, str):
@@ -22,29 +12,17 @@ class DummyLineEdit:
     def setToolTip(self, str):
         self.toolTip = str
 
-    def palette(self):
-        return DummyPalette()
-
-    def setPalette(self, new_palette: DummyPalette):
-        self.palette = new_palette
-
-    def backgroundRole(self):
-        return None
-
-    def setAutoFillBackground(self, value: bool):
-        pass
-
 
 def test_GIVEN_invalid_WHEN_validating_line_edit_THEN_line_edit_turns_red():
     line_edit = DummyLineEdit()
     validate_line_edit(line_edit, False)
-    assert line_edit.palette.colour == QColor("red")
+    assert "background-color: #f6989d" in line_edit.stylesheet
 
 
 def test_GIVEN_valid_WHEN_validating_line_edit_THEN_line_edit_turns_white():
     line_edit = DummyLineEdit()
     validate_line_edit(line_edit, True)
-    assert line_edit.palette.colour == QColor("white")
+    assert "background-color: #FFFFFF" in line_edit.stylesheet
 
 
 def test_GIVEN_valid_WHEN_validating_line_edit_with_tooltip_THEN_line_edit_tooltip_is_changed():

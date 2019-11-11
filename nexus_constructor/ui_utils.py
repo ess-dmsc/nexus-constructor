@@ -1,7 +1,7 @@
 from typing import Optional
 import numpy as np
-from PySide2.QtGui import QVector3D, QColor
-from PySide2.QtWidgets import QFileDialog, QMessageBox, QWidget
+from PySide2.QtGui import QVector3D
+from PySide2.QtWidgets import QFileDialog, QMessageBox
 from nexus_constructor.file_dialog_options import FILE_DIALOG_NATIVE
 import re
 
@@ -35,7 +35,7 @@ def file_dialog(is_save, caption, filter):
 
 
 def validate_line_edit(
-    line_edit: QWidget,
+    line_edit,
     is_valid: bool,
     tooltip_on_reject="",
     tooltip_on_accept="",
@@ -50,11 +50,8 @@ def validate_line_edit(
     :param tooltip_on_reject: Tooltip to display if line edit is invalid.
     :return: None.
     """
-    colour = "white" if is_valid else "red"
-    palette = line_edit.palette()
-    palette.setColor(line_edit.backgroundRole(), QColor(colour))
-    line_edit.setPalette(palette)
-    line_edit.setAutoFillBackground(True)
+    colour = "#FFFFFF" if is_valid else "#f6989d"
+    line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
     if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):
         tooltip_on_reject += suggestion_callable()
     line_edit.setToolTip(tooltip_on_accept) if is_valid else line_edit.setToolTip(
