@@ -1,6 +1,7 @@
 import logging
-from typing import Sequence
+from typing import Sequence, Dict
 
+import h5py
 from PySide2.QtWidgets import QListWidget
 import numpy as np
 from h5py import Group
@@ -38,14 +39,18 @@ def _incorrect_field_type_message(fields_dict: dict, field_name: str):
     return f"Wrong {field_name} type. Expected {EXPECTED_TYPE_ERROR_MSG[field_name]} but found {type(fields_dict[field_name])}."
 
 
-def _check_data_type(data_type, expected_types):
+def _check_data_type(data_type:h5py.Dataset, expected_types):
     try:
-        return data_type.dtype in expected_types
+        py_data_type = data_type.dtype
+        if isinstance(data_type, np.int64):
+            # Fix for windows - for some reason int64 is the default numpy int type on windows...
+            py_data_type = np.int32
+        return py_data_type in expected_types
     except AttributeError:
         return False
 
 
-def _fields_have_correct_type(fields_dict: dict):
+def _fields_have_correct_type(fields_dict: Dict[str, "FieldWidget"]):
     correct_slits_type = _check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
     correct_radius_type = _check_data_type(fields_dict[RADIUS_NAME], FLOAT_TYPES)
     correct_slit_height_type = _check_data_type(
@@ -158,7 +163,7 @@ def _input_describes_valid_chopper(
 class UserDefinedChopperChecker:
     def __init__(self, fields_widget: QListWidget):
 
-        self.fields_dict = dict()
+        self.fields_dict = {}
         self._chopper_details = None
 
         self._angle_units = "deg"
@@ -226,7 +231,7 @@ class UserDefinedChopperChecker:
 class NexusDefinedChopperChecker:
     def __init__(self, disk_chopper: Group):
 
-        self.fields_dict = dict()
+        self.fields_dict = {}
         self._chopper_details = None
         self._angle_units = None
         self._slit_height_units = None
