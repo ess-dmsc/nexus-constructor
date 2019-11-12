@@ -210,7 +210,7 @@ class InstrumentView(QWidget):
         """
         resets the entities in qt3d so all components are cleared form the 3d view.
         """
-        for component, _ in self.component_entities.items():
+        for component in self.component_entities.keys():
             self.component_entities[component].setParent(None)
         self.component_entities = dict()
 
