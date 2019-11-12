@@ -2,7 +2,7 @@ from ui.Led import Led
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
 from PySide2.QtWidgets import QMainWindow, QApplication, QWidget
 from PySide2.QtCore import QTimer, QDateTime
-from PySide2.QtGui import QStandardItemModel
+from PySide2.QtGui import QStandardItemModel, QColor
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
 import re
