@@ -13,6 +13,7 @@ import time
 from nexus_constructor.json.filewriter_json_writer import generate_json
 import io
 
+
 def validate_line_edit(
     line_edit: QWidget,
     is_valid: bool,
@@ -39,6 +40,7 @@ def validate_line_edit(
     line_edit.setToolTip(tooltip_on_accept) if is_valid else line_edit.setToolTip(
         tooltip_on_reject
     )
+
 
 def extract_addr_and_topic(in_string):
     correct_string_re = re.compile(
