@@ -39,13 +39,13 @@ def _incorrect_field_type_message(fields_dict: dict, field_name: str):
     return f"Wrong {field_name} type. Expected {EXPECTED_TYPE_ERROR_MSG[field_name]} but found {type(fields_dict[field_name])}."
 
 
-def _check_data_type(data_type: h5py.Dataset, expected_types):
+def _check_data_type(field_widget, expected_types):
     try:
-        py_data_type = data_type.dtype
-        if isinstance(data_type, np.int64):
+        dtype = field_widget.dtype
+        if isinstance(field_widget, np.int64):
             # Fix for windows - for some reason int64 is the default numpy int type on windows...
-            py_data_type = np.int32
-        return py_data_type in expected_types
+            dtype = np.int32
+        return dtype in expected_types
     except AttributeError:
         return False
 
