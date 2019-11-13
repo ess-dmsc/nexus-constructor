@@ -9,6 +9,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PySide2 import QtCore, QtGui, QtWidgets
+from nexus_constructor.BrokerTopicEdit import BrokerTopicEdit
 
 class Ui_FilewriterCtrl(object):
     def setupUi(self, FilewriterCtrl):
@@ -32,7 +33,7 @@ class Ui_FilewriterCtrl(object):
         self.statusBrokerLabel = QtWidgets.QLabel(self.centralwidget)
         self.statusBrokerLabel.setObjectName("statusBrokerLabel")
         self.statusTopicLayout.addWidget(self.statusBrokerLabel)
-        self.statusBrokerEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.statusBrokerEdit = BrokerTopicEdit(self.centralwidget)
         self.statusBrokerEdit.setPlaceholderText("address:port/topic")
         self.statusBrokerEdit.setObjectName("statusBrokerEdit")
         self.statusTopicLayout.addWidget(self.statusBrokerEdit)
