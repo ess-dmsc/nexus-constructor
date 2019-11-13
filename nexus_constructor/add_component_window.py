@@ -84,7 +84,7 @@ def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget)
     dtype = field.dtype
     if "S" in str(dtype):
         dtype = h5py.special_dtype(vlen=str)
-        new_ui_field.value = field.value
+        new_ui_field.value = field[()]
     else:
         new_ui_field.value = field[()]
     new_ui_field.dtype = dtype
