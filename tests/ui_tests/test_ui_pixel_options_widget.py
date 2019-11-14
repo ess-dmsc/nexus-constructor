@@ -84,27 +84,7 @@ def nx_geometry_group(nexus_wrapper):
 @pytest.fixture(scope="function")
 def off_geometry(nexus_wrapper, nx_geometry_group, pixel_mapping):
 
-    off_file = (
-        "OFF\n"
-        "#  cube.off\n"
-        "#  A cube\n"
-        "8 6 0\n"
-        "-0.500000 -0.500000 0.500000\n"
-        "0.500000 -0.500000 0.500000\n"
-        "-0.500000 0.500000 0.500000\n"
-        "0.500000 0.500000 0.500000\n"
-        "-0.500000 0.500000 -0.500000\n"
-        "0.500000 0.500000 -0.500000\n"
-        "-0.500000 -0.500000 -0.500000\n"
-        "-0.500000 0.500000 0.500000\n"
-        "4 0 1 3 2\n"
-        "4 2 3 5 4\n"
-        "4 4 5 7 6\n"
-        "4 6 7 1 0\n"
-        "4 1 7 5 3\n"
-        "4 6 0 2 4\n"
-    )
-    off_string = StringIO("".join(off_file))
+    off_string = StringIO("".join(VALID_CUBE_OFF_FILE))
     off_geometry = load_geometry_from_file_object(off_string, ".off", "m")
     return off_geometry
 
@@ -115,7 +95,7 @@ def component_with_pixel_grid(
 ):
     component = Component(nexus_wrapper, nx_geometry_group)
     component.record_pixel_grid(pixel_grid)
-    component.set_off_shape(off_geometry)
+    component.set_off_shape(off_geometry, pixel_data=pixel_grid)
 
     return component
 
