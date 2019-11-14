@@ -429,8 +429,6 @@ class Component:
 
     def record_detector_number(self, pixel_mapping: PixelMapping):
 
-        print("Mapping...")
-
         self.set_field(
             "detector_number",
             get_detector_number_from_pixel_mapping(pixel_mapping),

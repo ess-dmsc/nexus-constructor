@@ -1,3 +1,4 @@
+from io import StringIO
 from unittest.mock import mock_open
 
 import pytest
@@ -7,7 +8,7 @@ from PySide2.QtWidgets import QWidget
 from mock import patch
 
 from nexus_constructor.component.component import Component
-from nexus_constructor.geometry import OFFGeometryNexus
+from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.pixel_data import PixelGrid, Corner, CountDirection, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_y_offsets_from_pixel_grid,
@@ -65,7 +66,7 @@ def pixel_grid():
 
 @pytest.fixture(scope="function")
 def pixel_mapping(nexus_wrapper):
-    return PixelMapping([i if i % 3 != 0 else None for i in range(20)])
+    return PixelMapping([i if i % 3 != 0 else None for i in range(6)])
 
 
 @pytest.fixture(scope="function")
@@ -81,8 +82,30 @@ def nx_geometry_group(nexus_wrapper):
 
 
 @pytest.fixture(scope="function")
-def off_geometry(nexus_wrapper, nx_geometry_group):
-    off_geometry = OFFGeometryNexus(nexus_wrapper, nx_geometry_group)
+def off_geometry(nexus_wrapper, nx_geometry_group, pixel_mapping):
+
+    off_file = (
+        "OFF\n"
+        "#  cube.off\n"
+        "#  A cube\n"
+        "8 6 0\n"
+        "-0.500000 -0.500000 0.500000\n"
+        "0.500000 -0.500000 0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "0.500000 0.500000 0.500000\n"
+        "-0.500000 0.500000 -0.500000\n"
+        "0.500000 0.500000 -0.500000\n"
+        "-0.500000 -0.500000 -0.500000\n"
+        "-0.500000 0.500000 0.500000\n"
+        "4 0 1 3 2\n"
+        "4 2 3 5 4\n"
+        "4 4 5 7 6\n"
+        "4 6 7 1 0\n"
+        "4 1 7 5 3\n"
+        "4 6 0 2 4\n"
+    )
+    off_string = StringIO("".join(off_file))
+    off_geometry = load_geometry_from_file_object(off_string, ".off", "m")
     return off_geometry
 
 
@@ -90,9 +113,9 @@ def off_geometry(nexus_wrapper, nx_geometry_group):
 def component_with_pixel_grid(
     pixel_grid, nexus_wrapper, nx_geometry_group, off_geometry
 ):
-
     component = Component(nexus_wrapper, nx_geometry_group)
     component.record_pixel_grid(pixel_grid)
+    component.set_off_shape(off_geometry)
 
     return component
 
@@ -101,9 +124,9 @@ def component_with_pixel_grid(
 def component_with_pixel_mapping(
     nexus_wrapper, nx_geometry_group, pixel_mapping, off_geometry
 ):
-
     component = Component(nexus_wrapper, nx_geometry_group)
     component.record_detector_number(pixel_mapping)
+    component.set_off_shape(off_geometry, pixel_data=pixel_mapping)
 
     return component
 
@@ -638,7 +661,6 @@ def test_GIVEN_component_with_a_pixel_grid_WHEN_editing_a_component_THEN_pixel_g
     assert pixel_options.pixel_options_stack.currentIndex() == PIXEL_GRID_STACK_INDEX
 
 
-@pytest.mark.xfail
 def test_GIVEN_component_with_a_pixel_mapping_WHEN_editing_a_component_THEN_pixel_mapping_options_are_checked_and_visible(
     pixel_options, component_with_pixel_mapping
 ):
