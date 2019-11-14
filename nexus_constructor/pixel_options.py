@@ -19,6 +19,9 @@ BOTTOM_RIGHT_TEXT = "Bottom Right"
 TOP_LEFT_TEXT = "Top Left"
 TOP_RIGHT_TEXT = "Top Right"
 
+PIXEL_GRID_STACK_INDEX = 0
+PIXEL_MAPPING_STACK_INDEX = 1
+
 INITIAL_COUNT_CORNER = {
     BOTTOM_LEFT_TEXT: Corner.BOTTOM_LEFT,
     BOTTOM_RIGHT_TEXT: Corner.BOTTOM_RIGHT,
@@ -36,7 +39,7 @@ def check_data_is_an_array(data) -> bool:
     """
     At the moment it appears as though a scalar can still be returned as an array when using `get_field_value` (though
     it could just be me doing the wrong thing). This function checks if an array contains more than one value so that
-    Pixel Data can be edited in the case of a Single Shape.
+    Pixel Data can be edited in the case of a single Shape.
     :param data: The data value from the NeXus file.
     :return: True if the data is a scalar or an array containing a single value, False otherwise.
     """
@@ -104,34 +107,43 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             self.pixel_options_stack.setVisible(False)
 
     def _fill_single_pixel_fields(self, component_to_edit: Component):
-
+        """
+        Fill the "single pixel" fields of a component that's being edited and contains pixel information.
+        :param component_to_edit: The component that's being edited.
+        """
+        # Retrieve the pixel offsets and detector number from the component
         x_pixel_offset = component_to_edit.get_field("x_pixel_offset")
         y_pixel_offset = component_to_edit.get_field("y_pixel_offset")
         detector_numbers = component_to_edit.get_field("detector_number")
 
+        # Check that x offset is more than one value
         if check_data_is_an_array(x_pixel_offset):
 
-            # If the pixel offset information is multidimensional then extra steps need to be taken to restore the info
+            # Set the number of rows and the row height
             n_rows, row_height = self._get_row_information(y_pixel_offset)
             self.row_count_spin_box.setValue(n_rows)
             self.row_height_spin_box.setValue(row_height)
 
+            # Set the number of columns and the column width
             n_cols, col_width = self._get_column_information(x_pixel_offset)
             self.column_count_spin_box.setValue(n_cols)
             self.column_width_spin_box.setValue(col_width)
 
+            # Set the first ID, start counting option, and the count direction option
             first_id, start_counting_text, count_along_text = self._get_detector_number_information(
                 detector_numbers
             )
-
             self.first_id_spin_box.setValue(first_id)
             self.start_counting_combo_box.setCurrentText(start_counting_text)
             self.count_first_combo_box.setCurrentText(count_along_text)
 
         else:
-
             # If the pixel offset information represents a single pixel
             self.first_id_spin_box.setValue(detector_numbers)
+
+            # Set the row and column counts to 1
+            self.row_count_spin_box.setValue(1)
+            self.column_count_spin_box.setValue(1)
 
     @staticmethod
     def _get_row_information(y_pixel_offset: np.ndarray):
@@ -175,7 +187,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         first_id_index = np.where(detector_numbers == first_id)
         first_id_index = (first_id_index[0][0], first_id_index[1][0])
 
-        # Find the indices that are right and left of the first ID
+        # Find the indices that are right and left of the first ID. A pixel will not always exist in these places, so
+        # a check is done before accessing the values at these indices.
         right_of_first_id = (first_id_index[0], first_id_index[1] + 1)
         left_of_first_id = (first_id_index[0], first_id_index[1] - 1)
 
@@ -194,14 +207,14 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # Determine if the first ID is on the right or left of the pixel grid
         if first_id_index[1] == 0:
             start_counting_text += " Left"
-            # If the first pixel is on the left of the grid, check if the pixel right to it is the second pixel
+            # If the first pixel is on the left of the grid, check if its neighbour on the right is the second pixel
             # If it is the second pixel, the count along value is Rows, otherwise it will remain as Columns
             if detector_numbers[right_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
 
         else:
             start_counting_text += " Right"
-            # If the first pixel is on the right of the grid, check if the pixel to its left is the second pixel
+            # If the first pixel is on the right of the grid, check if its neighbour on the left is the second pixel
             # If it is the second pixel, the count along value is Rows, otherwise it will remain as columns
             if detector_numbers[left_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
@@ -209,11 +222,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         return first_id, start_counting_text, count_along_text
 
     def _fill_entire_shape_fields(self, component_to_edit: Component):
-
+        """
+        Fill the "entire shape" fields a component that is being edited and contains pixel data.
+        :param component_to_edit: The component being edited.
+        """
         shape = component_to_edit.shape[0]
 
         if isinstance(shape, OFFGeometryNexus):
-
             n_faces, detector_faces = self._get_detector_face_information(shape)
             self.create_pixel_mapping_list(n_faces, "face")
 
@@ -221,18 +236,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 self.pixel_mapping_widgets[detector_face[0]].id = detector_face[1]
 
         else:
-
             detector_number = shape.detector_number
-
             if isinstance(detector_number, List):
-
                 self.create_pixel_mapping_list(len(detector_number), "cylinder")
-
                 for i in range(len(detector_number)):
                     self.pixel_mapping_widgets[i].id = detector_number[i]
 
             else:
-
                 self.create_pixel_mapping_list(1, "cylinder")
                 self.pixel_mapping_widgets[0].id = detector_number
 
@@ -338,9 +348,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.pixel_options_stack.setVisible(True)
 
         if pixel_grid:
-            self.pixel_options_stack.setCurrentIndex(0)
+            self.pixel_options_stack.setCurrentIndex(PIXEL_GRID_STACK_INDEX)
         elif pixel_mapping:
-            self.pixel_options_stack.setCurrentIndex(1)
+            self.pixel_options_stack.setCurrentIndex(PIXEL_MAPPING_STACK_INDEX)
 
     def populate_pixel_mapping_list_with_mesh(self, filename: str):
         """
@@ -463,7 +473,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         pixel mapping list.
         :return: A bool indicating the current index of the PixelOptions stack.
         """
-        return self.pixel_options_stack.currentIndex() != 1
+        return self.pixel_options_stack.currentIndex() != PIXEL_MAPPING_STACK_INDEX
 
     def reset_pixel_mapping_list(self):
         """

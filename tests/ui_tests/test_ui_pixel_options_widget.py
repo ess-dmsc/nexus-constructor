@@ -6,7 +6,9 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QWidget
 from mock import patch
 
-from nexus_constructor.pixel_data import PixelGrid, Corner, CountDirection
+from nexus_constructor.component.component import Component
+from nexus_constructor.geometry import OFFGeometryNexus
+from nexus_constructor.pixel_data import PixelGrid, Corner, CountDirection, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_y_offsets_from_pixel_grid,
     get_x_offsets_from_pixel_grid,
@@ -17,7 +19,10 @@ from nexus_constructor.pixel_options import (
     check_data_is_an_array,
     INITIAL_COUNT_CORNER,
     COUNT_DIRECTION,
+    PIXEL_GRID_STACK_INDEX,
+    PIXEL_MAPPING_STACK_INDEX,
 )
+from tests.helpers import create_nexus_wrapper
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -56,6 +61,51 @@ def pixel_grid():
     pixel_grid.initial_count_corner = Corner.BOTTOM_LEFT
 
     return pixel_grid
+
+
+@pytest.fixture(scope="function")
+def pixel_mapping(nexus_wrapper):
+    return PixelMapping([i if i % 3 != 0 else None for i in range(20)])
+
+
+@pytest.fixture(scope="function")
+def nexus_wrapper():
+    return create_nexus_wrapper()
+
+
+@pytest.fixture(scope="function")
+def nx_geometry_group(nexus_wrapper):
+    return nexus_wrapper.create_nx_group(
+        "test_geometry", "NXoff_geometry", nexus_wrapper.entry
+    )
+
+
+@pytest.fixture(scope="function")
+def off_geometry(nexus_wrapper, nx_geometry_group):
+    off_geometry = OFFGeometryNexus(nexus_wrapper, nx_geometry_group)
+    return off_geometry
+
+
+@pytest.fixture(scope="function")
+def component_with_pixel_grid(
+    pixel_grid, nexus_wrapper, nx_geometry_group, off_geometry
+):
+
+    component = Component(nexus_wrapper, nx_geometry_group)
+    component.record_pixel_grid(pixel_grid)
+
+    return component
+
+
+@pytest.fixture(scope="function")
+def component_with_pixel_mapping(
+    nexus_wrapper, nx_geometry_group, pixel_mapping, off_geometry
+):
+
+    component = Component(nexus_wrapper, nx_geometry_group)
+    component.record_detector_number(pixel_mapping)
+
+    return component
 
 
 def manually_create_pixel_mapping_list(
@@ -577,3 +627,21 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
     )
 
     assert COUNT_DIRECTION[count_direction] == count_along
+
+
+def test_GIVEN_component_with_a_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_options_are_checked_and_visible(
+    pixel_options, component_with_pixel_grid
+):
+
+    pixel_options.fill_existing_entries(component_with_pixel_grid)
+    assert pixel_options.single_pixel_radio_button.isChecked()
+    assert pixel_options.pixel_options_stack.currentIndex() == PIXEL_GRID_STACK_INDEX
+
+
+@pytest.mark.xfail
+def test_GIVEN_component_with_a_pixel_mapping_WHEN_editing_a_component_THEN_pixel_mapping_options_are_checked_and_visible(
+    pixel_options, component_with_pixel_mapping
+):
+    pixel_options.fill_existing_entries(component_with_pixel_mapping)
+    assert pixel_options.entire_shape_radio_button.isChecked()
+    assert pixel_options.pixel_options_stack.currentIndex() == PIXEL_MAPPING_STACK_INDEX
