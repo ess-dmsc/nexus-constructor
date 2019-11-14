@@ -660,3 +660,5 @@ def test_GIVEN_component_with_pixel_grid_WHEN_editing_a_component_THEN_pixel_gri
 
     assert pixel_options.row_height_spin_box.value() == pixel_grid.row_height
     assert pixel_options.column_width_spin_box.value() == pixel_grid.col_width
+
+    assert pixel_options.first_id_spin_box.value() == pixel_grid.first_id
