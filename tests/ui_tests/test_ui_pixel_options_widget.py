@@ -647,3 +647,16 @@ def test_GIVEN_component_with_a_pixel_mapping_WHEN_editing_a_component_THEN_pixe
     pixel_options.fill_existing_entries(component_with_pixel_mapping)
     assert pixel_options.entire_shape_radio_button.isChecked()
     assert pixel_options.pixel_options_stack.currentIndex() == PIXEL_MAPPING_STACK_INDEX
+
+
+def test_GIVEN_component_with_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_properties_are_recovered(
+    pixel_options, pixel_grid, component_with_pixel_grid
+):
+
+    pixel_options.fill_existing_entries(component_with_pixel_grid)
+
+    assert pixel_options.row_count_spin_box.value() == pixel_grid.rows
+    assert pixel_options.column_count_spin_box.value() == pixel_grid.columns
+
+    assert pixel_options.row_height_spin_box.value() == pixel_grid.row_height
+    assert pixel_options.column_width_spin_box.value() == pixel_grid.col_width
