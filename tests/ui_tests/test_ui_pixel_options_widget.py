@@ -111,6 +111,14 @@ def component_with_pixel_mapping(
     return component
 
 
+@pytest.fixture(scope="function")
+def component_with_no_pixel_data(nexus_wrapper, nx_geometry_group, off_geometry):
+    component = Component(nexus_wrapper, nx_geometry_group)
+    component.set_off_shape(off_geometry)
+
+    return component
+
+
 def manually_create_pixel_mapping_list(
     pixel_options: PixelOptions,
     file_contents: str = VALID_CUBE_OFF_FILE,
@@ -604,20 +612,36 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 
 
 def test_GIVEN_component_with_a_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_options_are_checked_and_visible(
-    pixel_options, component_with_pixel_grid
+    qtbot, template, pixel_options, component_with_pixel_grid
 ):
 
     pixel_options.fill_existing_entries(component_with_pixel_grid)
+    show_and_close_window(qtbot, template)
+
     assert pixel_options.single_pixel_radio_button.isChecked()
+    assert pixel_options.pixel_options_stack.isVisible()
     assert pixel_options.pixel_options_stack.currentIndex() == PIXEL_GRID_STACK_INDEX
 
 
 def test_GIVEN_component_with_a_pixel_mapping_WHEN_editing_a_component_THEN_pixel_mapping_options_are_checked_and_visible(
-    pixel_options, component_with_pixel_mapping
+    qtbot, template, pixel_options, component_with_pixel_mapping
 ):
     pixel_options.fill_existing_entries(component_with_pixel_mapping)
+    show_and_close_window(qtbot, template)
+
     assert pixel_options.entire_shape_radio_button.isChecked()
+    assert pixel_options.pixel_options_stack.isVisible()
     assert pixel_options.pixel_options_stack.currentIndex() == PIXEL_MAPPING_STACK_INDEX
+
+
+def test_GIVEN_component_with_no_pixel_data_WHEN_editing_component_THEN_pixel_options_arent_visible(
+    qtbot, template, pixel_options, component_with_no_pixel_data
+):
+    pixel_options.fill_existing_entries(component_with_no_pixel_data)
+    show_and_close_window(qtbot, template)
+
+    assert pixel_options.no_pixels_button.isChecked()
+    assert not pixel_options.pixel_options_stack.isVisible()
 
 
 def test_GIVEN_component_with_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_properties_are_recovered(
@@ -688,7 +712,7 @@ def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct
     for i in range(len(pixel_mapping.pixel_ids)):
         id_in_interface = pixel_options.pixel_mapping_widgets[i].pixelIDLineEdit.text()
 
-        if id_in_interface is "":
+        if not id_in_interface:
             assert pixel_mapping.pixel_ids[i] is None
         else:
             assert int(id_in_interface) == pixel_mapping.pixel_ids[i]
