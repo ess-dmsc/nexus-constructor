@@ -669,3 +669,26 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
         INITIAL_COUNT_CORNER[pixel_options.start_counting_combo_box.currentText()]
         == corner
     )
+
+
+def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct_number_of_mapping_widgets_are_created(
+    pixel_options, pixel_mapping, component_with_pixel_mapping
+):
+
+    pixel_options.fill_existing_entries(component_with_pixel_mapping)
+    assert len(pixel_options.pixel_mapping_widgets) == len(pixel_mapping.pixel_ids)
+
+
+def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct_ids_are_present(
+    pixel_options, pixel_mapping, component_with_pixel_mapping
+):
+
+    pixel_options.fill_existing_entries(component_with_pixel_mapping)
+
+    for i in range(len(pixel_mapping.pixel_ids)):
+        id_in_interface = pixel_options.pixel_mapping_widgets[i].pixelIDLineEdit.text()
+
+        if id_in_interface is "":
+            assert pixel_mapping.pixel_ids[i] is None
+        else:
+            assert int(id_in_interface) == pixel_mapping.pixel_ids[i]
