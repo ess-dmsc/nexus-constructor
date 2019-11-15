@@ -563,21 +563,6 @@ def test_GIVEN_pixel_grid_with_single_column_WHEN_finding_column_properties_THEN
     assert column_width is None
 
 
-@pytest.mark.parametrize("corner", INITIAL_COUNT_CORNER.values())
-def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_are_returned(
-    pixel_options, pixel_grid, corner
-):
-
-    pixel_grid.initial_count_corner = corner
-    detector_numbers = get_detector_ids_from_pixel_grid(pixel_grid)
-
-    _, start_counting_text, _ = pixel_options._get_detector_number_information(
-        detector_numbers
-    )
-
-    assert INITIAL_COUNT_CORNER[start_counting_text] == corner
-
-
 @pytest.mark.xfail
 def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_is_returned(
     pixel_options, pixel_grid
@@ -618,20 +603,6 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
     assert first_id == pixel_grid.first_id
 
 
-@pytest.mark.parametrize("count_along", COUNT_DIRECTION.values())
-def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_count_direction_is_returned(
-    pixel_options, pixel_grid, count_along
-):
-    pixel_grid.count_direction = count_along
-
-    detector_numbers = get_detector_ids_from_pixel_grid(pixel_grid)
-    _, _, count_direction = pixel_options._get_detector_number_information(
-        detector_numbers
-    )
-
-    assert COUNT_DIRECTION[count_direction] == count_along
-
-
 def test_GIVEN_component_with_a_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_options_are_checked_and_visible(
     pixel_options, component_with_pixel_grid
 ):
@@ -667,7 +638,34 @@ def test_GIVEN_component_with_pixel_grid_WHEN_editing_a_component_THEN_pixel_gri
         INITIAL_COUNT_CORNER[pixel_options.start_counting_combo_box.currentText()]
         == pixel_grid.initial_count_corner
     )
+
+
+@pytest.mark.parametrize("count_along", COUNT_DIRECTION.values())
+def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_count_direction_is_returned(
+    pixel_options, pixel_grid, count_along, component_with_pixel_grid, off_geometry
+):
+    pixel_grid.count_direction = count_along
+    component_with_pixel_grid.record_pixel_grid(pixel_grid)
+    component_with_pixel_grid.set_off_shape(off_geometry, pixel_data=pixel_grid)
+    pixel_options.fill_existing_entries(component_with_pixel_grid)
+
     assert (
         COUNT_DIRECTION[pixel_options.count_first_combo_box.currentText()]
         == pixel_grid.count_direction
+    )
+
+
+@pytest.mark.parametrize("corner", INITIAL_COUNT_CORNER.values())
+def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_are_returned(
+    pixel_options, pixel_grid, corner, off_geometry, component_with_pixel_grid
+):
+
+    pixel_grid.initial_count_corner = corner
+    component_with_pixel_grid.record_pixel_grid(pixel_grid)
+    component_with_pixel_grid.set_off_shape(off_geometry, pixel_data=pixel_grid)
+    pixel_options.fill_existing_entries(component_with_pixel_grid)
+
+    assert (
+        INITIAL_COUNT_CORNER[pixel_options.start_counting_combo_box.currentText()]
+        == corner
     )
