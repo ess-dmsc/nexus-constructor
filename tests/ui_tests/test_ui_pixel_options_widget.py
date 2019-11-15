@@ -8,6 +8,7 @@ from PySide2.QtWidgets import QWidget
 from mock import patch
 
 from nexus_constructor.component.component import Component
+from nexus_constructor.geometry import OFFGeometryNexus
 from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.pixel_data import PixelGrid, Corner, CountDirection, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -101,6 +102,34 @@ def widgets_match_pixel_mapping(
                 return False
 
     return True
+
+
+def replace_pixel_mapping_in_component(
+    component: Component, pixel_mapping: PixelMapping, off_geometry: OFFGeometryNexus
+):
+    """
+    Change the pixel mapping that is currently stored in a Component. Used to see if everything behaves correctly even
+    for pixel data with 'special' properties.
+    :param component: The component to have its pixel data replaced.
+    :param pixel_mapping: The PixelMapping or PixielGrid object.
+    :param off_geometry: The OffGeometry.
+    """
+    component.record_detector_number(pixel_mapping)
+    component.set_off_shape(off_geometry, pixel_data=pixel_mapping)
+
+
+def replace_pixel_grid_in_component(
+    component: Component, pixel_grid: PixelGrid, off_geometry: OFFGeometryNexus
+):
+    """
+    Change the pixel grid that is currently stored in a Component. Used to see if everything behaves correctly even
+    for pixel data with 'special' properties.
+    :param component: The component to have its pixel data replaced.
+    :param pixel_grid: The PixielGrid object.
+    :param off_geometry: The OffGeometry.
+    """
+    component.record_pixel_grid(pixel_grid)
+    component.set_off_shape(off_geometry, pixel_data=pixel_grid)
 
 
 @pytest.fixture(scope="function")
@@ -691,8 +720,7 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
     pixel_options, pixel_grid, count_along, component_with_pixel_grid, off_geometry
 ):
     pixel_grid.count_direction = count_along
-    component_with_pixel_grid.record_pixel_grid(pixel_grid)
-    component_with_pixel_grid.set_off_shape(off_geometry, pixel_data=pixel_grid)
+    replace_pixel_grid_in_component(component_with_pixel_grid, pixel_grid, off_geometry)
     pixel_options.fill_existing_entries(component_with_pixel_grid)
 
     assert (
@@ -707,8 +735,7 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 ):
 
     pixel_grid.initial_count_corner = corner
-    component_with_pixel_grid.record_pixel_grid(pixel_grid)
-    component_with_pixel_grid.set_off_shape(off_geometry, pixel_data=pixel_grid)
+    replace_pixel_grid_in_component(component_with_pixel_grid, pixel_grid, off_geometry)
     pixel_options.fill_existing_entries(component_with_pixel_grid)
 
     assert (
@@ -737,8 +764,8 @@ def test_GIVEN_component_with_single_id_WHEN_editing_pixel_data_THEN_correct_num
     pixel_options, pixel_mapping, component_with_pixel_mapping, off_geometry
 ):
     pixel_mapping.pixel_ids = [None for i in range(5)] + [4]
-    component_with_pixel_mapping.record_detector_number(pixel_mapping)
-    component_with_pixel_mapping.set_off_shape(off_geometry, pixel_data=pixel_mapping)
-    pixel_options.fill_existing_entries(component_with_pixel_mapping)
+    replace_pixel_mapping_in_component(
+        component_with_pixel_mapping, pixel_mapping, off_geometry
+    )
 
     assert widgets_match_pixel_mapping(pixel_mapping, pixel_options)
