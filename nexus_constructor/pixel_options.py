@@ -139,11 +139,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         else:
             # If the pixel offset information represents a single pixel
-            self.first_id_spin_box.setValue(detector_numbers)
-
-            # Set the row and column counts to 1
-            self.row_count_spin_box.setValue(1)
-            self.column_count_spin_box.setValue(1)
+            pass
 
     @staticmethod
     def _get_row_information(y_pixel_offset: np.ndarray):
@@ -429,14 +425,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             rows = self.row_count_spin_box.value()
             row_height = self.row_height_spin_box.value()
 
-            if rows == 0:
-                row_height = 0
-
             columns = self.column_count_spin_box.value()
             col_width = self.column_width_spin_box.value()
-
-            if columns == 0:
-                col_width = 0
 
             return PixelGrid(
                 rows=rows,
