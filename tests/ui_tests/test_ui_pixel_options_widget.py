@@ -81,6 +81,28 @@ def nx_geometry_group(nexus_wrapper):
     )
 
 
+def widgets_match_pixel_mapping(
+    pixel_mapping: PixelMapping, pixel_options: PixelOptions
+) -> bool:
+    """
+    Checks that the contents of the pixel mapping widgets match the contents of a PixelMapping object.
+    :param pixel_mapping: The Pixel Mapping object that is being edited via the PixelOptions interface.
+    :param pixel_options: The PixelOptions widget.
+    :return: True if the widget and PixelMapping match. False otherwise.
+    """
+    for i in range(len(pixel_mapping.pixel_ids)):
+        id_in_interface = pixel_options.pixel_mapping_widgets[i].pixelIDLineEdit.text()
+
+        if not id_in_interface:
+            if pixel_mapping.pixel_ids[i] is not None:
+                return False
+        else:
+            if int(id_in_interface) != pixel_mapping.pixel_ids[i]:
+                return False
+
+    return True
+
+
 @pytest.fixture(scope="function")
 def off_geometry(nexus_wrapper, nx_geometry_group, pixel_mapping):
 
@@ -708,11 +730,15 @@ def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct
 ):
 
     pixel_options.fill_existing_entries(component_with_pixel_mapping)
+    assert widgets_match_pixel_mapping(pixel_mapping, pixel_options)
 
-    for i in range(len(pixel_mapping.pixel_ids)):
-        id_in_interface = pixel_options.pixel_mapping_widgets[i].pixelIDLineEdit.text()
 
-        if not id_in_interface:
-            assert pixel_mapping.pixel_ids[i] is None
-        else:
-            assert int(id_in_interface) == pixel_mapping.pixel_ids[i]
+def test_GIVEN_component_with_single_id_WHEN_editing_pixel_data_THEN_correct_number_of_mapping_widgets_are_created(
+    pixel_options, pixel_mapping, component_with_pixel_mapping, off_geometry
+):
+    pixel_mapping.pixel_ids = [None for i in range(5)] + [4]
+    component_with_pixel_mapping.record_detector_number(pixel_mapping)
+    component_with_pixel_mapping.set_off_shape(off_geometry, pixel_data=pixel_mapping)
+    pixel_options.fill_existing_entries(component_with_pixel_mapping)
+
+    assert widgets_match_pixel_mapping(pixel_mapping, pixel_options)
