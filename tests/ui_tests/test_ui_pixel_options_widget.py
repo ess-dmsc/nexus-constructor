@@ -67,7 +67,7 @@ def pixel_grid():
 
 @pytest.fixture(scope="function")
 def pixel_mapping(nexus_wrapper):
-    return PixelMapping([i if i % 3 != 0 else None for i in range(6)])
+    return PixelMapping([i if i % 3 != 0 else None for i in range(CORRECT_CUBE_FACES)])
 
 
 @pytest.fixture(scope="function")
@@ -125,7 +125,7 @@ def replace_pixel_grid_in_component(
     Change the pixel grid that is currently stored in a Component. Used to see if everything behaves correctly even
     for pixel data with 'special' properties.
     :param component: The component to have its pixel data replaced.
-    :param pixel_grid: The PixielGrid object.
+    :param pixel_grid: The PixelGrid object.
     :param off_geometry: The OffGeometry.
     """
     component.record_pixel_grid(pixel_grid)
@@ -178,6 +178,8 @@ def manually_create_pixel_mapping_list(
     """
     Manually creates a pixel mapping list by passing a mesh filename and opening a mesh by mocking open.
     :param pixel_options: The PixelOptions object that deals with opening the mesh file.
+    :param file_contents: The OFF file in string format.
+    :param filename: The filename passed to the mesh-opening method. Must end in off.
     """
     with patch(
         "nexus_constructor.geometry.geometry_loader.open",
@@ -197,7 +199,7 @@ def test_UI_GIVEN_component_with_pixel_fields_WHEN_choosing_pixel_layout_THEN_si
     assert pixel_options.pixel_options_stack.currentIndex() == 0
 
 
-def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_mapping_becomes_visisble(
+def test_UI_GIVEN_user_selects_entire_shape_WHEN_choosing_pixel_layout_THEN_pixel_mapping_becomes_visible(
     qtbot, template, pixel_options
 ):
     # Press the entire shape button under pixel layout
@@ -578,7 +580,6 @@ def test_GIVEN_array_with_multiple_elements_WHEN_calling_check_data_is_an_array_
 def test_GIVEN_array_of_pixel_offsets_WHEN_finding_row_properties_THEN_expected_values_are_returned(
     pixel_options, pixel_grid
 ):
-
     y_pixel_offsets = get_y_offsets_from_pixel_grid(pixel_grid)
     n_rows, row_height = pixel_options._get_row_information(y_pixel_offsets)
 
@@ -589,7 +590,6 @@ def test_GIVEN_array_of_pixel_offsets_WHEN_finding_row_properties_THEN_expected_
 def test_GIVEN_pixel_grid_with_single_row_WHEN_finding_row_properties_THEN_expected_values_are_returned(
     pixel_options, pixel_grid
 ):
-
     pixel_grid.rows = 1
     y_pixel_offsets = get_y_offsets_from_pixel_grid(pixel_grid)
     n_rows, row_height = pixel_options._get_row_information(y_pixel_offsets)
@@ -601,7 +601,6 @@ def test_GIVEN_pixel_grid_with_single_row_WHEN_finding_row_properties_THEN_expec
 def test_GIVEN_array_of_pixel_offsets_WHEN_finding_column_properties_THEN_expected_values_are_returned(
     pixel_options, pixel_grid
 ):
-
     x_pixel_offsets = get_x_offsets_from_pixel_grid(pixel_grid)
     n_columns, column_width = pixel_options._get_column_information(x_pixel_offsets)
 
@@ -612,7 +611,6 @@ def test_GIVEN_array_of_pixel_offsets_WHEN_finding_column_properties_THEN_expect
 def test_GIVEN_pixel_grid_with_single_column_WHEN_finding_column_properties_THEN_expected_values_are_returned(
     pixel_options, pixel_grid
 ):
-
     pixel_grid.columns = 1
     x_pixel_offsets = get_x_offsets_from_pixel_grid(pixel_grid)
 
@@ -640,7 +638,6 @@ def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_e
 def test_GIVEN_column_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_is_returned(
     pixel_options, pixel_grid
 ):
-
     pixel_options.columns = 1
     detector_numbers = get_detector_ids_from_pixel_grid(pixel_grid)
 
@@ -665,7 +662,6 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 def test_GIVEN_component_with_a_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_options_are_checked_and_visible(
     qtbot, template, pixel_options, component_with_pixel_grid
 ):
-
     pixel_options.fill_existing_entries(component_with_pixel_grid)
     show_and_close_window(qtbot, template)
 
@@ -698,7 +694,6 @@ def test_GIVEN_component_with_no_pixel_data_WHEN_editing_component_THEN_pixel_op
 def test_GIVEN_component_with_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_properties_are_recovered(
     pixel_options, pixel_grid, component_with_pixel_grid
 ):
-
     pixel_options.fill_existing_entries(component_with_pixel_grid)
 
     assert pixel_options.row_count_spin_box.value() == pixel_grid.rows
@@ -733,7 +728,6 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_are_returned(
     pixel_options, pixel_grid, corner, off_geometry, component_with_pixel_grid
 ):
-
     pixel_grid.initial_count_corner = corner
     replace_pixel_grid_in_component(component_with_pixel_grid, pixel_grid, off_geometry)
     pixel_options.fill_existing_entries(component_with_pixel_grid)
@@ -747,7 +741,6 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct_number_of_mapping_widgets_are_created(
     pixel_options, pixel_mapping, component_with_pixel_mapping
 ):
-
     pixel_options.fill_existing_entries(component_with_pixel_mapping)
     assert len(pixel_options.pixel_mapping_widgets) == len(pixel_mapping.pixel_ids)
 
@@ -755,7 +748,6 @@ def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct
 def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct_ids_are_present(
     pixel_options, pixel_mapping, component_with_pixel_mapping
 ):
-
     pixel_options.fill_existing_entries(component_with_pixel_mapping)
     assert widgets_match_pixel_mapping(pixel_mapping, pixel_options)
 
@@ -763,7 +755,7 @@ def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct
 def test_GIVEN_component_with_single_id_WHEN_editing_pixel_data_THEN_correct_number_of_mapping_widgets_are_created(
     pixel_options, pixel_mapping, component_with_pixel_mapping, off_geometry
 ):
-    pixel_mapping.pixel_ids = [None for i in range(5)] + [4]
+    pixel_mapping.pixel_ids = [None for _ in range(CORRECT_CUBE_FACES - 1)] + [4]
     replace_pixel_mapping_in_component(
         component_with_pixel_mapping, pixel_mapping, off_geometry
     )

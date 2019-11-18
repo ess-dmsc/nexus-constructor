@@ -422,17 +422,11 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         if self.single_pixel_radio_button.isChecked():
 
-            rows = self.row_count_spin_box.value()
-            row_height = self.row_height_spin_box.value()
-
-            columns = self.column_count_spin_box.value()
-            col_width = self.column_width_spin_box.value()
-
             return PixelGrid(
-                rows=rows,
-                columns=columns,
-                row_height=row_height,
-                col_width=col_width,
+                rows=self.row_count_spin_box.value(),
+                columns=self.column_count_spin_box.value(),
+                row_height=self.row_height_spin_box.value(),
+                col_width=self.column_width_spin_box.value(),
                 first_id=self.first_id_spin_box.value(),
                 count_direction=COUNT_DIRECTION[
                     self.count_first_combo_box.currentText()
