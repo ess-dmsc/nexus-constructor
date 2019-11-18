@@ -246,7 +246,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         if detector_faces.shape == (2,):
             self.pixel_mapping_widgets[detector_faces[0]].id = detector_faces[1]
         else:
-            self.create_pixel_mapping_list(n_faces, "face")
             for detector_face in detector_faces:
                 self.pixel_mapping_widgets[detector_face[0]].id = detector_face[1]
 
