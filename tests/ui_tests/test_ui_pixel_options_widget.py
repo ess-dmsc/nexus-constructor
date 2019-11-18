@@ -759,5 +759,6 @@ def test_GIVEN_component_with_single_id_WHEN_editing_pixel_data_THEN_correct_num
     replace_pixel_mapping_in_component(
         component_with_pixel_mapping, pixel_mapping, off_geometry
     )
+    pixel_options.fill_existing_entries(component_with_pixel_mapping)
 
     assert widgets_match_pixel_mapping(pixel_mapping, pixel_options)
