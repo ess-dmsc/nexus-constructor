@@ -202,12 +202,9 @@ class FieldWidget(QFrame):
 
     @dtype.setter
     def dtype(self, dtype: h5py.Datatype):
-        if dtype == np.object:
-            self.value_type_combo.setCurrentText("String")
-        elif dtype == np.float64:
-            self.value_type_combo.setCurrentText("Float")
-        elif dtype == np.int64:
-            self.value_type_combo.setCurrentText("Integer")
+        type_map = {np.object: "String", np.float: "Float", np.int64: "Integer"}
+        if dtype in type_map:
+            self.value_type_combo.setCurrentText(type_map[dtype])
         else:
             self.value_type_combo.setCurrentText(
                 next(key for key, value in DATASET_TYPE.items() if value == dtype)
