@@ -810,7 +810,7 @@ def test_GIVEN_component_with_single_id_WHEN_editing_pixel_data_THEN_correct_num
     assert widgets_match_pixel_mapping(pixel_mapping_with_six_pixels, pixel_options)
 
 
-def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_THEN_pixel_data_is_recovered(
+def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_with_single_pixel_THEN_pixel_data_is_recovered(
     pixel_options,
     cylindrical_component_with_pixel_mapping,
     nx_cylindrical_geometry_group,
@@ -826,3 +826,27 @@ def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_THEN_pixel_data_i
     )
     n_cylinders = cylinders.size / 3
     assert n_cylinders == len(pixel_options.pixel_mapping_widgets)
+    assert (
+        pixel_options.pixel_mapping_widgets[0].id
+        == pixel_mapping_with_single_pixel.pixel_ids[0]
+    )
+
+
+def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_with_multiple_pixels_THEN_pixel_data_is_recovered(
+    pixel_options,
+    cylindrical_component_with_pixel_mapping,
+    nx_cylindrical_geometry_group,
+    pixel_mapping_with_six_pixels,
+):
+
+    cylindrical_geometry = cylindrical_component_with_pixel_mapping.set_cylinder_shape(
+        pixel_data=pixel_mapping_with_six_pixels
+    )
+    pixel_options.fill_existing_entries(cylindrical_component_with_pixel_mapping)
+
+    cylinders = cylindrical_geometry.file.get_field_value(
+        cylindrical_geometry.group, "cylinders"
+    )
+    n_cylinders = cylinders.size / 3
+    assert n_cylinders == len(pixel_options.pixel_mapping_widgets)
+    assert widgets_match_pixel_mapping(pixel_mapping_with_six_pixels, pixel_options)

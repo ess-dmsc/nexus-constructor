@@ -492,7 +492,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             pixel_mapping_widget = PixelMappingWidget(
                 self.pixel_mapping_list_widget, i, text
             )
-            pixel_mapping_widget.pixelIDLineEdit.textChanged.connect(
+            pixel_mapping_widget.pixelIDLineEdit.textEdited.connect(
                 self.update_pixel_mapping_validity
             )
 
