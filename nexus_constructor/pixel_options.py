@@ -55,14 +55,14 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         self.pixel_mapping_widgets = []
 
-        self.pixel_validator = None
+        self._pixel_validator = None
         self.current_mapping_filename = None
 
     def setupUi(self, parent_widget):
 
         super().setupUi(parent_widget)
 
-        self.pixel_validator = PixelValidator(
+        self._pixel_validator = PixelValidator(
             parent_widget,
             self.single_pixel_radio_button,
             self.entire_shape_radio_button,
@@ -310,12 +310,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # through Qt Designer doesn't work.
         self.count_first_combo_box.addItems(list(COUNT_DIRECTION.keys()))
 
-    def get_validator(self):
+    @property
+    def validator(self):
         """
         :return: The PixelOptions' PixelValidator. This is needed in the AddComponentDialog so that it has knowledge
         of the PixelOptions' validity status.
         """
-        return self.pixel_validator
+        return self._pixel_validator
 
     def generate_pixel_mapping_if_required(self):
         """
@@ -345,7 +346,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         that the rows or columns have a non-zero value. It is invalid if both are zero. The Spin Boxes enforce
         everything else so this is the only check required.
         """
-        self.pixel_validator.set_pixel_grid_valid(
+        self._pixel_validator.set_pixel_grid_valid(
             not (
                 self.row_count_spin_box.value() == 0
                 and self.column_count_spin_box.value() == 0
@@ -427,7 +428,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Checks that at least one ID has been given in the Pixel Mapping and then updates the PixelValidator.
         """
         nonempty_ids = [widget.id is not None for widget in self.pixel_mapping_widgets]
-        self.pixel_validator.set_pixel_mapping_valid(any(nonempty_ids))
+        self._pixel_validator.set_pixel_mapping_valid(any(nonempty_ids))
 
     def generate_pixel_data(self):
         """
@@ -466,7 +467,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         elif self.entire_shape_radio_button.isChecked():
             self.update_pixel_mapping_validity()
         else:
-            self.pixel_validator.inform_ok_validator()
+            self._pixel_validator.inform_ok_validator()
 
     def pixel_mapping_not_visible(self):
         """

@@ -131,7 +131,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.valid_file_given = False
         self.pixel_options = None
 
-    def setupUi(self, parent_dialog):
+    def setupUi(self, parent_dialog, pixel_options: PixelOptions = PixelOptions()):
         """ Sets up push buttons and validators for the add component window. """
         super().setupUi(parent_dialog)
 
@@ -206,7 +206,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
-        self.pixel_options = PixelOptions()
+        self.pixel_options = pixel_options
         self.pixel_options.setupUi(self.pixelOptionsWidget)
         self.pixelOptionsWidget.ui = self.pixel_options
 
@@ -217,9 +217,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
 
         self.ok_validator = OkValidator(
-            self.noShapeRadioButton,
-            self.meshRadioButton,
-            self.pixel_options.get_validator(),
+            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
         )
         self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
 

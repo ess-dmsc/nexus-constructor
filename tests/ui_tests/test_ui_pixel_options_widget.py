@@ -270,9 +270,9 @@ def test_UI_GIVEN_user_selects_pixel_grid_WHEN_changing_pixel_layout_THEN_pixel_
     systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
     # Check that the pixel grid boolean has become true
-    assert pixel_options.pixel_validator.pixel_grid_is_valid
+    assert pixel_options._pixel_validator.pixel_grid_is_valid
     # Check that the pixel_mapping boolean has become false
-    assert not pixel_options.pixel_validator.pixel_mapping_is_valid
+    assert not pixel_options._pixel_validator.pixel_mapping_is_valid
 
 
 def test_UI_GIVEN_user_selects_no_pixels_and_gives_valid_nonpixel_input_WHEN_changing_pixel_layout_THEN_add_component_button_is_enabled(
@@ -282,7 +282,7 @@ def test_UI_GIVEN_user_selects_no_pixels_and_gives_valid_nonpixel_input_WHEN_cha
     systematic_button_press(qtbot, template, pixel_options.no_pixels_button)
 
     # Check that the add component button is enabled
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
+    assert pixel_options._pixel_validator.unacceptable_pixel_states() == [False, False]
 
 
 def test_UI_GIVEN_valid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_pixel_mapping_causes_validity_to_change(
@@ -294,12 +294,12 @@ def test_UI_GIVEN_valid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_
     qtbot.keyClick(pixel_options.first_id_spin_box, Qt.Key_Up)
     show_and_close_window(qtbot, template)
 
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
+    assert pixel_options._pixel_validator.unacceptable_pixel_states() == [False, False]
 
     # Switch to pixel mapping
     systematic_button_press(qtbot, template, pixel_options.entire_shape_radio_button)
 
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, True]
+    assert pixel_options._pixel_validator.unacceptable_pixel_states() == [False, True]
 
 
 def test_UI_GIVEN_invalid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_to_valid_pixel_mapping_causes_validity_to_change(
@@ -321,7 +321,7 @@ def test_UI_GIVEN_invalid_pixel_grid_WHEN_entering_pixel_options_THEN_changing_t
     qtbot.keyClicks(pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "22")
 
     # Check the test for unacceptable pixel states gives False
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
+    assert pixel_options._pixel_validator.unacceptable_pixel_states() == [False, False]
 
 
 def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_to_invalid_pixel_mapping_causes_validity_to_change(
@@ -341,7 +341,7 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
     qtbot.keyClicks(pixel_options.pixel_mapping_widgets[0].pixelIDLineEdit, "abc")
 
     # Check that test for unacceptable pixel states gives True
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, True]
+    assert pixel_options._pixel_validator.unacceptable_pixel_states() == [False, True]
 
 
 def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_to_valid_pixel_grid_causes_validity_to_change(
@@ -360,7 +360,7 @@ def test_UI_GIVEN_invalid_pixel_mapping_WHEN_entering_pixel_options_THEN_changin
     systematic_button_press(qtbot, template, pixel_options.single_pixel_radio_button)
 
     # Check that the test for unacceptable pixel states gives False
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
+    assert pixel_options._pixel_validator.unacceptable_pixel_states() == [False, False]
 
 
 def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_to_invalid_pixel_grid_causes_validity_to_change(
@@ -383,7 +383,7 @@ def test_UI_GIVEN_valid_pixel_mapping_WHEN_entering_pixel_options_THEN_changing_
     qtbot.keyClick(pixel_options.column_count_spin_box, Qt.Key_Down)
 
     # Check that the test for unacceptable pixel states gives True
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
+    assert pixel_options._pixel_validator.unacceptable_pixel_states() == [False, False]
 
 
 def test_UI_GIVEN_invalid_mapping_and_grid_WHEN_entering_pixel_options_THEN_changing_to_no_pixels_causes_validity_to_change(
@@ -405,7 +405,7 @@ def test_UI_GIVEN_invalid_mapping_and_grid_WHEN_entering_pixel_options_THEN_chan
     systematic_button_press(qtbot, template, pixel_options.no_pixels_button)
 
     # Check that the test for unacceptable pixel states gives false
-    assert pixel_options.pixel_validator.unacceptable_pixel_states() == [False, False]
+    assert pixel_options._pixel_validator.unacceptable_pixel_states() == [False, False]
 
 
 def test_UI_GIVEN_nothing_WHEN_pixel_mapping_options_are_visible_THEN_options_have_expected_default_values(
