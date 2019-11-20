@@ -145,6 +145,19 @@ def mock_pixel_validator(dialog, mock_pixel_options):
     return pixel_validator
 
 
+def create_add_component_dialog():
+    """
+    Creates an AddComponentDialog object for use in a testing template.
+    :return: An instance of an AddComponentDialog object.
+    """
+    global nexus_wrapper_count
+    nexus_name = "test" + str(nexus_wrapper_count)
+    instrument = Instrument(NexusWrapper(nexus_name), DEFINITIONS_DIR)
+    component = ComponentTreeModel(instrument)
+    nexus_wrapper_count += 1
+    return AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
+
+
 def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
     """
     Creates a template Add Component Dialog and sets this up for testing.
@@ -157,19 +170,6 @@ def create_add_component_template(qtbot: pytestqt.qtbot.QtBot):
     template.ui.setupUi(template)
     qtbot.addWidget(template)
     return dialog, template
-
-
-def create_add_component_dialog():
-    """
-    Creates an AddComponentDialog object for use in a testing template.
-    :return: An instance of an AddComponentDialog object.
-    """
-    global nexus_wrapper_count
-    nexus_name = "test" + str(nexus_wrapper_count)
-    instrument = Instrument(NexusWrapper(nexus_name), DEFINITIONS_DIR)
-    component = ComponentTreeModel(instrument)
-    nexus_wrapper_count += 1
-    return AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
 
 
 def enter_component_name(
@@ -1670,9 +1670,9 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     assert field.value[...] == field_value
 
 
-def test_UI_GIVEN_field_widget_with_stream_type_THEN_stream_dialog_shown(qtbot):
-
-    dialog, template = create_add_component_template(qtbot)
+def test_UI_GIVEN_field_widget_with_stream_type_THEN_stream_dialog_shown(
+    qtbot, dialog, template
+):
 
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
@@ -1686,8 +1686,9 @@ def test_UI_GIVEN_field_widget_with_stream_type_THEN_stream_dialog_shown(qtbot):
     assert field.streams_widget.isEnabled()
 
 
-def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(qtbot):
-    dialog, template = create_add_component_template(qtbot)
+def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
+    qtbot, dialog, template
+):
 
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
@@ -1734,10 +1735,8 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_correct_options(
-    qtbot
+    qtbot, dialog, template
 ):
-    dialog, template = create_add_component_template(qtbot)
-
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
@@ -1762,11 +1761,8 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ev42_THEN_stream_dialog_shown_with_correct_options(
-    qtbot
+    qtbot, dialog, template
 ):
-
-    dialog, template = create_add_component_template(qtbot)
-
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
@@ -1792,10 +1788,8 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ev42_THEN_stre
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stream_dialog_shown_with_correct_options(
-    qtbot
+    qtbot, dialog, template
 ):
-    dialog, template = create_add_component_template(qtbot)
-
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
@@ -1821,10 +1815,8 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stre
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_hs00_THEN_stream_dialog_shown_with_correct_options(
-    qtbot
+    qtbot, dialog, template
 ):
-    dialog, template = create_add_component_template(qtbot)
-
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
@@ -1850,11 +1842,8 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_hs00_THEN_stre
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_to_double_THEN_stream_dialog_shown_with_array_size_option(
-    qtbot
+    qtbot, dialog, template
 ):
-
-    dialog, template = create_add_component_template(qtbot)
-
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
@@ -1887,17 +1876,16 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_
     assert streams_widget.array_size_spinbox.isVisible()
 
 
-def test_UI_GIVEN_initial_component_THEN_webbrowser_url_contains_component_class(qtbot):
-    dialog, template = create_add_component_template(qtbot)
-
+def test_UI_GIVEN_initial_component_THEN_webbrowser_url_contains_component_class(
+    qtbot, dialog, template
+):
     current_nx_class = dialog.componentTypeComboBox.currentText()
     assert current_nx_class in dialog.webEngineView.url().toString()
 
 
 def test_UI_GIVEN_change_of_component_type_THEN_webbrowser_url_is_updated_and_contains_component_class(
-    qtbot
+    qtbot, dialog, template
 ):
-    dialog, template = create_add_component_template(qtbot)
     current_nx_class = dialog.componentTypeComboBox.currentText()
 
     new_nx_class = dialog.componentTypeComboBox.itemText(3)
@@ -1908,11 +1896,8 @@ def test_UI_GIVEN_change_of_component_type_THEN_webbrowser_url_is_updated_and_co
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_array_size_option_and_correct_value_in_nexus_file(
-    qtbot
+    qtbot, dialog, template
 ):
-
-    dialog, template = create_add_component_template(qtbot)
-
     qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
     field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
