@@ -1,7 +1,6 @@
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 import numpy as np
-from typing import List
 
 from nexus_constructor.component.component import Component
 from nexus_constructor.geometry import OFFGeometryNexus

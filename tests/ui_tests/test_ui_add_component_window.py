@@ -272,6 +272,29 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
         qtbot.keyClicks(dialog.unitsLineEdit, units)
 
 
+def enter_file_path(
+    qtbot: pytestqt.qtbot.QtBot,
+    dialog: AddComponentDialog,
+    template: PySide2.QtWidgets.QDialog,
+    file_path: str,
+    file_contents: str,
+):
+    """
+    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
+    geometry file.
+    :param qtbot: The qtbot testing tool.
+    :param dialog: An instance of an AddComponentDialog.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param file_path: The desired file path.
+    :param file_contents: The file contents that are returned by the open mock.
+    """
+    with patch(
+        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
+    ):
+        with patch("builtins.open", mock_open(read_data=file_contents)):
+            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
+
+
 def enter_disk_chopper_fields(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
@@ -1941,24 +1964,7 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
         chopper_creator.assert_not_called()
 
 
-def enter_file_path(
-    qtbot: pytestqt.qtbot.QtBot,
-    dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
-    file_path: str,
-    file_contents: str,
+def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
+    qtbot, dialog, template
 ):
-    """
-    Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
-    geometry file.
-    :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
-    :param template: The window/widget that holds the AddComponentDialog.
-    :param file_path: The desired file path.
-    :param file_contents: The file contents that are returned by the open mock.
-    """
-    with patch(
-        "nexus_constructor.add_component_window.file_dialog", return_value=file_path
-    ):
-        with patch("builtins.open", mock_open(read_data=file_contents)):
-            systematic_button_press(qtbot, template, dialog.fileBrowseButton)
+    pass
