@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Union, Tuple
 
 import h5py
@@ -28,7 +29,7 @@ class FieldAttrsDialog(QDialog):
         self.list_widget = QListWidget()
         self.list_widget.setMinimumSize(800, 600)
         self.add_button = QPushButton("Add attr")
-        self.add_button.clicked.connect(self._add_attr)
+        self.add_button.clicked.connect(self.__add_attr)
         self.remove_button = QPushButton("Remove attr")
         self.remove_button.clicked.connect(self._remove_attrs)
 
@@ -41,14 +42,21 @@ class FieldAttrsDialog(QDialog):
 
     def _fill_existing_attrs(self, existing_dataset: h5py.Dataset):
         for name, value in existing_dataset.attrs:
-            self._add_attr(FieldAttrFrame(name, value))
+            frame = FieldAttrFrame(name, value)
+            self._add_attr(existing_frame=frame)
+
+    def __add_attr(self):
+        """
+        Only used for button presses. Any additional arguments from the signal are ignored.
+        """
+        self._add_attr()
 
     def _add_attr(self, existing_frame=None):
         item = QListWidgetItem()
         self.list_widget.addItem(item)
-        self.list_widget.setItemWidget(
-            item, existing_frame if existing_frame is not None else FieldAttrFrame()
-        )
+        frame = existing_frame if existing_frame is not None else FieldAttrFrame()
+        item.setSizeHint(frame.sizeHint())
+        self.list_widget.setItemWidget(item, frame)
 
     def _remove_attrs(self):
         for index in self.list_widget.selectedIndexes():
