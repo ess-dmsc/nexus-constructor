@@ -229,6 +229,10 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         else:
             detector_number = shape.detector_number
+
+            cylinders = shape.cylinders
+            n_cylinders = cylinders.size / 3
+
             if isinstance(detector_number, List):
                 self.create_pixel_mapping_list(len(detector_number), "cylinder")
                 for i in range(len(detector_number)):
