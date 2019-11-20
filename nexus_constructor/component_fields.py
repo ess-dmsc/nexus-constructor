@@ -215,6 +215,16 @@ class FieldWidget(QFrame):
         )
 
     @property
+    def attrs(self):
+        return self.value.attrs
+
+    @attrs.setter
+    def attrs(self, attrs):
+        for attr_name, attr_value in attrs:
+            # TODO: setter
+            pass
+
+    @property
     def value(self) -> Union[h5py.Dataset, h5py.Group, h5py.SoftLink]:
         return_object = None
         if self.field_type == FieldType.scalar_dataset:

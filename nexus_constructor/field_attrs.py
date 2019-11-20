@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Union, Tuple
 
 import h5py
@@ -7,7 +6,6 @@ from PySide2.QtWidgets import (
     QGridLayout,
     QListWidget,
     QPushButton,
-    QLayout,
     QListWidgetItem,
     QLineEdit,
     QFrame,
