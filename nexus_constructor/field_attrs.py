@@ -1,4 +1,6 @@
 from typing import Union, Tuple
+
+import h5py
 from PySide2.QtWidgets import (
     QDialog,
     QGridLayout,
@@ -18,7 +20,7 @@ from nexus_constructor.validators import DATASET_TYPE
 
 
 class FieldAttrsDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, existing_field_dataset: h5py.Dataset = None):
         super().__init__(parent)
         self.setLayout(QGridLayout())
         self.setWindowTitle("Edit Attributes")
@@ -34,10 +36,19 @@ class FieldAttrsDialog(QDialog):
         self.layout().addWidget(self.add_button, 0, 1)
         self.layout().addWidget(self.remove_button, 1, 1)
 
-    def _add_attr(self):
+        if existing_field_dataset is not None:
+            self._fill_existing_attrs(existing_field_dataset)
+
+    def _fill_existing_attrs(self, existing_dataset: h5py.Dataset):
+        for name, value in existing_dataset.attrs:
+            self._add_attr(FieldAttrFrame(name, value))
+
+    def _add_attr(self, existing_frame=None):
         item = QListWidgetItem()
         self.list_widget.addItem(item)
-        self.list_widget.setItemWidget(item, FieldAttrFrame())
+        self.list_widget.setItemWidget(
+            item, existing_frame if existing_frame is not None else FieldAttrFrame()
+        )
 
     def _remove_attrs(self):
         for index in self.list_widget.selectedIndexes():
