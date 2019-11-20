@@ -239,10 +239,16 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 self.pixel_mapping_widgets[0].id = detector_number
 
     def _fill_off_geometry_pixel_mapping(self, shape: OFFGeometryNexus):
-
+        """
+        Fill in the pixel mapping information from an OFFGeometry component.
+        :param shape: The shape data from the NeXus file.
+        """
+        # Retrieve the detector face information from the shape and use this to create the required number of pixel
+        # mapping widgets
         n_faces, detector_faces = self._get_detector_face_information(shape)
         self.create_pixel_mapping_list(n_faces, "face")
 
+        # Populate the pixel mapping widgets based on the contents of the detector_faces array
         if detector_faces.shape == (2,):
             self.pixel_mapping_widgets[detector_faces[0]].id = detector_faces[1]
         else:

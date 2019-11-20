@@ -66,19 +66,31 @@ def pixel_grid():
 
 
 @pytest.fixture(scope="function")
-def pixel_mapping(nexus_wrapper):
-    return PixelMapping([i if i % 3 != 0 else None for i in range(CORRECT_CUBE_FACES)])
-
-
-@pytest.fixture(scope="function")
 def nexus_wrapper():
     return create_nexus_wrapper()
 
 
 @pytest.fixture(scope="function")
-def nx_geometry_group(nexus_wrapper):
+def pixel_mapping_with_six_pixels():
+    return PixelMapping([i if i % 3 != 0 else None for i in range(CORRECT_CUBE_FACES)])
+
+
+@pytest.fixture(scope="function")
+def pixel_mapping_with_single_pixel():
+    return PixelMapping([3])
+
+
+@pytest.fixture(scope="function")
+def nx_off_geometry_group(nexus_wrapper):
     return nexus_wrapper.create_nx_group(
         "test_geometry", "NXoff_geometry", nexus_wrapper.entry
+    )
+
+
+@pytest.fixture(scope="function")
+def nx_cylindrical_geometry_group(nexus_wrapper):
+    return nexus_wrapper.create_nx_group(
+        "test_geometry", "NXcylindrical_geometry", nexus_wrapper.entry
     )
 
 
@@ -104,7 +116,7 @@ def widgets_match_pixel_mapping(
     return True
 
 
-def replace_pixel_mapping_in_component(
+def replace_pixel_mapping_in_off_component(
     component: Component, pixel_mapping: PixelMapping, off_geometry: OFFGeometryNexus
 ):
     """
@@ -118,7 +130,7 @@ def replace_pixel_mapping_in_component(
     component.set_off_shape(off_geometry, pixel_data=pixel_mapping)
 
 
-def replace_pixel_grid_in_component(
+def replace_pixel_grid_in_off_component(
     component: Component, pixel_grid: PixelGrid, off_geometry: OFFGeometryNexus
 ):
     """
@@ -133,7 +145,9 @@ def replace_pixel_grid_in_component(
 
 
 @pytest.fixture(scope="function")
-def off_geometry(nexus_wrapper, nx_geometry_group, pixel_mapping):
+def off_geometry_file(
+    nexus_wrapper, nx_off_geometry_group, pixel_mapping_with_six_pixels
+):
 
     off_string = StringIO("".join(VALID_CUBE_OFF_FILE))
     off_geometry = load_geometry_from_file_object(off_string, ".off", "m")
@@ -141,31 +155,46 @@ def off_geometry(nexus_wrapper, nx_geometry_group, pixel_mapping):
 
 
 @pytest.fixture(scope="function")
-def component_with_pixel_grid(
-    pixel_grid, nexus_wrapper, nx_geometry_group, off_geometry
+def off_component_with_pixel_grid(
+    pixel_grid, nexus_wrapper, nx_off_geometry_group, off_geometry_file
 ):
-    component = Component(nexus_wrapper, nx_geometry_group)
+    component = Component(nexus_wrapper, nx_off_geometry_group)
     component.record_pixel_grid(pixel_grid)
-    component.set_off_shape(off_geometry, pixel_data=pixel_grid)
+    component.set_off_shape(off_geometry_file, pixel_data=pixel_grid)
 
     return component
 
 
 @pytest.fixture(scope="function")
-def component_with_pixel_mapping(
-    nexus_wrapper, nx_geometry_group, pixel_mapping, off_geometry
+def off_component_with_pixel_mapping(
+    nexus_wrapper,
+    nx_off_geometry_group,
+    pixel_mapping_with_six_pixels,
+    off_geometry_file,
 ):
-    component = Component(nexus_wrapper, nx_geometry_group)
-    component.record_detector_number(pixel_mapping)
-    component.set_off_shape(off_geometry, pixel_data=pixel_mapping)
+    component = Component(nexus_wrapper, nx_off_geometry_group)
+    component.record_detector_number(pixel_mapping_with_six_pixels)
+    component.set_off_shape(off_geometry_file, pixel_data=pixel_mapping_with_six_pixels)
 
     return component
 
 
 @pytest.fixture(scope="function")
-def component_with_no_pixel_data(nexus_wrapper, nx_geometry_group, off_geometry):
-    component = Component(nexus_wrapper, nx_geometry_group)
-    component.set_off_shape(off_geometry)
+def off_component_with_no_pixel_data(
+    nexus_wrapper, nx_off_geometry_group, off_geometry_file
+):
+    component = Component(nexus_wrapper, nx_off_geometry_group)
+    component.set_off_shape(off_geometry_file)
+
+    return component
+
+
+@pytest.fixture(scope="function")
+def cylindrical_component_with_pixel_mapping(
+    nexus_wrapper, nx_cylindrical_geometry_group, pixel_mapping_with_single_pixel
+):
+    component = Component(nexus_wrapper, nx_cylindrical_geometry_group)
+    component.record_detector_number(pixel_mapping_with_single_pixel)
 
     return component
 
@@ -660,9 +689,9 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 
 
 def test_GIVEN_component_with_a_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_options_are_checked_and_visible(
-    qtbot, template, pixel_options, component_with_pixel_grid
+    qtbot, template, pixel_options, off_component_with_pixel_grid
 ):
-    pixel_options.fill_existing_entries(component_with_pixel_grid)
+    pixel_options.fill_existing_entries(off_component_with_pixel_grid)
     show_and_close_window(qtbot, template)
 
     assert pixel_options.single_pixel_radio_button.isChecked()
@@ -671,9 +700,9 @@ def test_GIVEN_component_with_a_pixel_grid_WHEN_editing_a_component_THEN_pixel_g
 
 
 def test_GIVEN_component_with_a_pixel_mapping_WHEN_editing_a_component_THEN_pixel_mapping_options_are_checked_and_visible(
-    qtbot, template, pixel_options, component_with_pixel_mapping
+    qtbot, template, pixel_options, off_component_with_pixel_mapping
 ):
-    pixel_options.fill_existing_entries(component_with_pixel_mapping)
+    pixel_options.fill_existing_entries(off_component_with_pixel_mapping)
     show_and_close_window(qtbot, template)
 
     assert pixel_options.entire_shape_radio_button.isChecked()
@@ -682,9 +711,9 @@ def test_GIVEN_component_with_a_pixel_mapping_WHEN_editing_a_component_THEN_pixe
 
 
 def test_GIVEN_component_with_no_pixel_data_WHEN_editing_component_THEN_pixel_options_arent_visible(
-    qtbot, template, pixel_options, component_with_no_pixel_data
+    qtbot, template, pixel_options, off_component_with_no_pixel_data
 ):
-    pixel_options.fill_existing_entries(component_with_no_pixel_data)
+    pixel_options.fill_existing_entries(off_component_with_no_pixel_data)
     show_and_close_window(qtbot, template)
 
     assert pixel_options.no_pixels_button.isChecked()
@@ -692,9 +721,9 @@ def test_GIVEN_component_with_no_pixel_data_WHEN_editing_component_THEN_pixel_op
 
 
 def test_GIVEN_component_with_pixel_grid_WHEN_editing_a_component_THEN_pixel_grid_properties_are_recovered(
-    pixel_options, pixel_grid, component_with_pixel_grid
+    pixel_options, pixel_grid, off_component_with_pixel_grid
 ):
-    pixel_options.fill_existing_entries(component_with_pixel_grid)
+    pixel_options.fill_existing_entries(off_component_with_pixel_grid)
 
     assert pixel_options.row_count_spin_box.value() == pixel_grid.rows
     assert pixel_options.column_count_spin_box.value() == pixel_grid.columns
@@ -712,11 +741,17 @@ def test_GIVEN_component_with_pixel_grid_WHEN_editing_a_component_THEN_pixel_gri
 
 @pytest.mark.parametrize("count_along", COUNT_DIRECTION.values())
 def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_count_direction_is_returned(
-    pixel_options, pixel_grid, count_along, component_with_pixel_grid, off_geometry
+    pixel_options,
+    pixel_grid,
+    count_along,
+    off_component_with_pixel_grid,
+    off_geometry_file,
 ):
     pixel_grid.count_direction = count_along
-    replace_pixel_grid_in_component(component_with_pixel_grid, pixel_grid, off_geometry)
-    pixel_options.fill_existing_entries(component_with_pixel_grid)
+    replace_pixel_grid_in_off_component(
+        off_component_with_pixel_grid, pixel_grid, off_geometry_file
+    )
+    pixel_options.fill_existing_entries(off_component_with_pixel_grid)
 
     assert (
         COUNT_DIRECTION[pixel_options.count_first_combo_box.currentText()]
@@ -726,11 +761,13 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 
 @pytest.mark.parametrize("corner", INITIAL_COUNT_CORNER.values())
 def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_are_returned(
-    pixel_options, pixel_grid, corner, off_geometry, component_with_pixel_grid
+    pixel_options, pixel_grid, corner, off_geometry_file, off_component_with_pixel_grid
 ):
     pixel_grid.initial_count_corner = corner
-    replace_pixel_grid_in_component(component_with_pixel_grid, pixel_grid, off_geometry)
-    pixel_options.fill_existing_entries(component_with_pixel_grid)
+    replace_pixel_grid_in_off_component(
+        off_component_with_pixel_grid, pixel_grid, off_geometry_file
+    )
+    pixel_options.fill_existing_entries(off_component_with_pixel_grid)
 
     assert (
         INITIAL_COUNT_CORNER[pixel_options.start_counting_combo_box.currentText()]
@@ -739,26 +776,53 @@ def test_GIVEN_detector_numbers_WHEN_calling_get_detector_number_information_THE
 
 
 def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct_number_of_mapping_widgets_are_created(
-    pixel_options, pixel_mapping, component_with_pixel_mapping
+    pixel_options, pixel_mapping_with_six_pixels, off_component_with_pixel_mapping
 ):
-    pixel_options.fill_existing_entries(component_with_pixel_mapping)
-    assert len(pixel_options.pixel_mapping_widgets) == len(pixel_mapping.pixel_ids)
+    pixel_options.fill_existing_entries(off_component_with_pixel_mapping)
+    assert len(pixel_options.pixel_mapping_widgets) == len(
+        pixel_mapping_with_six_pixels.pixel_ids
+    )
 
 
 def test_GIVEN_component_with_pixel_mapping_WHEN_editing_pixel_data_THEN_correct_ids_are_present(
-    pixel_options, pixel_mapping, component_with_pixel_mapping
+    pixel_options, pixel_mapping_with_six_pixels, off_component_with_pixel_mapping
 ):
-    pixel_options.fill_existing_entries(component_with_pixel_mapping)
-    assert widgets_match_pixel_mapping(pixel_mapping, pixel_options)
+    pixel_options.fill_existing_entries(off_component_with_pixel_mapping)
+    assert widgets_match_pixel_mapping(pixel_mapping_with_six_pixels, pixel_options)
 
 
 def test_GIVEN_component_with_single_id_WHEN_editing_pixel_data_THEN_correct_number_of_mapping_widgets_are_created(
-    pixel_options, pixel_mapping, component_with_pixel_mapping, off_geometry
+    pixel_options,
+    pixel_mapping_with_six_pixels,
+    off_component_with_pixel_mapping,
+    off_geometry_file,
 ):
-    pixel_mapping.pixel_ids = [None for _ in range(CORRECT_CUBE_FACES - 1)] + [4]
-    replace_pixel_mapping_in_component(
-        component_with_pixel_mapping, pixel_mapping, off_geometry
+    pixel_mapping_with_six_pixels.pixel_ids = [
+        None for _ in range(CORRECT_CUBE_FACES - 1)
+    ] + [4]
+    replace_pixel_mapping_in_off_component(
+        off_component_with_pixel_mapping,
+        pixel_mapping_with_six_pixels,
+        off_geometry_file,
     )
-    pixel_options.fill_existing_entries(component_with_pixel_mapping)
+    pixel_options.fill_existing_entries(off_component_with_pixel_mapping)
 
-    assert widgets_match_pixel_mapping(pixel_mapping, pixel_options)
+    assert widgets_match_pixel_mapping(pixel_mapping_with_six_pixels, pixel_options)
+
+
+def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_THEN_pixel_data_is_recovered(
+    pixel_options,
+    cylindrical_component_with_pixel_mapping,
+    nx_cylindrical_geometry_group,
+    pixel_mapping_with_single_pixel,
+):
+    cylindrical_geometry = cylindrical_component_with_pixel_mapping.set_cylinder_shape(
+        pixel_data=pixel_mapping_with_single_pixel
+    )
+    pixel_options.fill_existing_entries(cylindrical_component_with_pixel_mapping)
+
+    cylinders = cylindrical_geometry.file.get_field_value(
+        cylindrical_geometry.group, "cylinders"
+    )
+    n_cylinders = cylinders.size / 3
+    assert n_cylinders == len(pixel_options.pixel_mapping_widgets)
