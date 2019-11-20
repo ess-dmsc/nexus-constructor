@@ -821,8 +821,7 @@ def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_with_single_pixel
     )
     pixel_options.fill_existing_entries(cylindrical_component_with_pixel_mapping)
 
-    cylinders = cylindrical_geometry.cylinders
-    n_cylinders = cylinders.size / 3
+    n_cylinders = cylindrical_geometry.cylinders.size / 3
     assert n_cylinders == len(pixel_options.pixel_mapping_widgets)
     assert (
         pixel_options.pixel_mapping_widgets[0].id
@@ -842,7 +841,6 @@ def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_with_multiple_pix
     )
     pixel_options.fill_existing_entries(cylindrical_component_with_pixel_mapping)
 
-    cylinders = cylindrical_geometry.cylinders
-    n_cylinders = cylinders.size / 3
+    n_cylinders = cylindrical_geometry.cylinders.size / 3
     assert n_cylinders == len(pixel_options.pixel_mapping_widgets)
     # assert widgets_match_pixel_mapping(pixel_mapping_with_six_pixels, pixel_options)

@@ -229,17 +229,14 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         else:
             detector_number = shape.detector_number
+            n_cylinders = shape.cylinders.size // 3
 
-            cylinders = shape.cylinders
-            n_cylinders = cylinders.size / 3
-
-            if isinstance(detector_number, List):
-                self.create_pixel_mapping_list(len(detector_number), "cylinder")
-                for i in range(len(detector_number)):
-                    self.pixel_mapping_widgets[i].id = detector_number[i]
+            if n_cylinders > 1:
+                self.create_pixel_mapping_list(n_cylinders, "cylinder")
+                # TODO: Restore pixel mapping in the case of multiple cylinders
 
             else:
-                self.create_pixel_mapping_list(1, "cylinder")
+                self.create_pixel_mapping_list(n_cylinders, "cylinder")
                 self.pixel_mapping_widgets[0].id = detector_number
 
     def _fill_off_geometry_pixel_mapping(self, shape: OFFGeometryNexus):
