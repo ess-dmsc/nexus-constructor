@@ -188,11 +188,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         right_of_first_id = (first_id_index[0], first_id_index[1] + 1)
         left_of_first_id = (first_id_index[0], first_id_index[1] - 1)
 
+        start_counting = []
+
         # Use the index from the first pixel to determine if the first ID is at the top or bottom of the grid
         if first_id_index[0] == 0:
-            start_counting_text = "Top"
+            start_counting.append("Top")
         else:
-            start_counting_text = "Bottom"
+            start_counting.append("Bottom")
 
         # Set the count along text to columns
         count_along_text = COLUMNS_TEXT
@@ -202,18 +204,20 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         # Determine if the first ID is on the right or left of the pixel grid
         if first_id_index[1] == 0:
-            start_counting_text += " Left"
+            start_counting.append("Left")
             # If the first pixel is on the left of the grid, check if its neighbour on the right is the second pixel
             # If it is the second pixel, the count along value is Rows, otherwise it will remain as Columns
             if detector_numbers[right_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
 
         else:
-            start_counting_text += " Right"
+            start_counting.append("Right")
             # If the first pixel is on the right of the grid, check if its neighbour on the left is the second pixel
             # If it is the second pixel, the count along value is Rows, otherwise it will remain as columns
             if detector_numbers[left_of_first_id] == first_id_plus_one:
                 count_along_text = ROWS_TEXT
+
+        start_counting_text = " ".join(start_counting)
 
         return first_id, start_counting_text, count_along_text
 
