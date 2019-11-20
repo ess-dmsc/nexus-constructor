@@ -1965,6 +1965,7 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
 
 
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
-    qtbot, dialog, template
+    qtbot, dialog, template, mock_pixel_options
 ):
-    pass
+
+    mock_pixel_options.fill_existing_entries.assert_called_once()
