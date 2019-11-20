@@ -285,7 +285,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         Fill in component details in the UI if editing a component
         """
-        self.buttonBox.setText("Edit Component")
         self.nameLineEdit.setText(self.component_to_edit.name)
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)

@@ -22,6 +22,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
+from tests.helpers import create_nexus_wrapper
 from tests.test_utils import DEFINITIONS_DIR
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
@@ -133,12 +134,21 @@ def add_component_dialog(qtbot, template, mock_pixel_options):
 
 
 @pytest.fixture(scope="function")
-def edit_component_dialog(qtbot, template):
+def component():
+    nexus_wrapper = create_nexus_wrapper()
+    component = Component(
+        nexus_wrapper, nexus_wrapper.nexus_file.create_group("Component")
+    )
+    return component
+
+
+@pytest.fixture(scope="function")
+def edit_component_dialog(qtbot, template, component):
 
     instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
-    component = ComponentTreeModel(instrument)
+    component_tree = ComponentTreeModel(instrument)
     dialog = AddComponentDialog(
-        instrument, component, True, definitions_dir=DEFINITIONS_DIR
+        instrument, component_tree, component, definitions_dir=DEFINITIONS_DIR
     )
     template.ui = dialog
     template.ui.setupUi(template)
