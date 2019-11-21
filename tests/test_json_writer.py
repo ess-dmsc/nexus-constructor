@@ -15,14 +15,8 @@ from nexus_constructor.json.filewriter_json_writer import (
 )
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
-from tests.helpers import InMemoryFile
+from tests.helpers import file  # noqa: F401
 from tests.test_utils import DEFINITIONS_DIR
-
-
-@pytest.fixture
-def file():
-    with InMemoryFile("test_file") as file:
-        yield file
 
 
 def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype(

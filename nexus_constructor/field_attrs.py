@@ -21,7 +21,7 @@ from nexus_constructor.validators import DATASET_TYPE, FieldValueValidator
 
 
 class FieldAttrsDialog(QDialog):
-    def __init__(self, parent=None, existing_field_dataset: h5py.Dataset = None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setLayout(QGridLayout())
         self.setWindowTitle("Edit Attributes")

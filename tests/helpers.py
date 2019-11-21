@@ -1,3 +1,5 @@
+import pytest
+
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.component.component import Component
 from uuid import uuid1
@@ -36,3 +38,9 @@ class InMemoryFile(object):
 
     def __exit__(self, type, value, traceback):
         self.file_obj.close()
+
+
+@pytest.fixture
+def file():
+    with InMemoryFile("test_file") as file:
+        yield file
