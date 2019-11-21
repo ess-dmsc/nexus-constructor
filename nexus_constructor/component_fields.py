@@ -249,9 +249,9 @@ class FieldWidget(QFrame):
             return_object = h5py.SoftLink(self.value_line_edit.text())
         else:
             logging.error(f"unknown field type: {self.name}")
-
-        for attr_name, attr_value in self.attrs_dialog.get_attrs().items():
-            return_object.attrs[attr_name] = attr_value
+        if self.field_type != FieldType.link:
+            for attr_name, attr_value in self.attrs_dialog.get_attrs().items():
+                return_object.attrs[attr_name] = attr_value
         return return_object
 
     @value.setter

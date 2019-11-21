@@ -37,9 +37,6 @@ class FieldAttrsDialog(QDialog):
         self.layout().addWidget(self.add_button, 0, 1)
         self.layout().addWidget(self.remove_button, 1, 1)
 
-        if existing_field_dataset is not None:
-            self.fill_existing_attrs(existing_field_dataset)
-
     def fill_existing_attrs(self, existing_dataset: h5py.Dataset):
         for name, value in existing_dataset.attrs.items():
             frame = FieldAttrFrame(name, value)
@@ -149,7 +146,7 @@ class FieldAttrFrame(QFrame):
         new_value = name_and_value[1]
         self.attr_name_lineedit.setText(new_name)
         self.attr_dtype_combo.setCurrentText(
-            new_value
+            "String"
             if isinstance(new_value, str)
             else next(
                 key for key, value in DATASET_TYPE.items() if value == new_value.dtype
