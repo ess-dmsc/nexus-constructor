@@ -115,7 +115,10 @@ class FieldAttrFrame(QFrame):
 
     @property
     def value(self) -> Tuple[str, Union[np.generic, np.ndarray]]:
+
         if self.is_scalar:
+            if self.dtype == DATASET_TYPE["String"]:
+                return self.attr_name_lineedit.text(), self.attr_value_lineedit.text()
             return (
                 self.attr_name_lineedit.text(),
                 self.dtype(self.attr_value_lineedit.text()),
@@ -128,7 +131,11 @@ class FieldAttrFrame(QFrame):
         new_value = name_and_value[1]
         self.attr_name_lineedit.setText(new_name)
         self.attr_type_combo.setCurrentText(
-            next(key for key, value in DATASET_TYPE.items() if value == new_value.dtype)
+            new_value
+            if isinstance(new_value, str)
+            else next(
+                key for key, value in DATASET_TYPE.items() if value == new_value.dtype
+            )
         )
         if np.isscalar(new_value):
             self.type_changed("Scalar")
