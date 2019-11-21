@@ -213,7 +213,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if self.component_to_edit:
             self._fill_existing_entries()
 
-            if self.edit_pixel_data():
+            if self.get_pixel_visibility_condition():
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
 
         self.ok_validator = OkValidator(
@@ -259,15 +259,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
 
         self.change_pixel_options_visibility()
-
-    def edit_pixel_data(self):
-        pixel_nx_class = (
-            self.componentTypeComboBox.currentText() in PIXEL_COMPONENT_TYPES
-        )
-        pixel_geometry = (
-            self.meshRadioButton.isChecked() or self.CylinderRadioButton.isChecked()
-        )
-        return pixel_nx_class and pixel_geometry
 
     def set_pixel_related_changes(self):
         """
