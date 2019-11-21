@@ -16,7 +16,7 @@ from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component.component import Component
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.geometry import OFFGeometryNoNexus, CylindricalGeometry
+from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
@@ -119,13 +119,13 @@ def mock_pixel_options():
 
 
 @pytest.fixture(scope="function")
-def add_component_dialog(qtbot, template):
+def add_component_dialog(qtbot, template, mock_pixel_options):
 
     instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
     component = ComponentTreeModel(instrument)
     dialog = AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
     template.ui = dialog
-    template.ui.setupUi(template)
+    template.ui.setupUi(template, mock_pixel_options)
     qtbot.addWidget(template)
 
     yield dialog
@@ -135,7 +135,7 @@ def add_component_dialog(qtbot, template):
 
 
 @pytest.fixture(scope="function")
-def component():
+def component_with_cylindrical_geometry():
     nexus_wrapper = create_nexus_wrapper()
     shape_group = nexus_wrapper.create_nx_group(
         "shape", "NXcylindrical_geometry", nexus_wrapper.instrument
@@ -149,12 +149,17 @@ def component():
 
 
 @pytest.fixture(scope="function")
-def edit_component_dialog(qtbot, template, component, mock_pixel_options):
+def edit_component_dialog(
+    qtbot, template, component_with_cylindrical_geometry, mock_pixel_options
+):
 
     instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
     component_tree = ComponentTreeModel(instrument)
     dialog = AddComponentDialog(
-        instrument, component_tree, component, definitions_dir=DEFINITIONS_DIR
+        instrument,
+        component_tree,
+        component_with_cylindrical_geometry,
+        definitions_dir=DEFINITIONS_DIR,
     )
     template.ui = dialog
     template.ui.setupUi(template, mock_pixel_options)
