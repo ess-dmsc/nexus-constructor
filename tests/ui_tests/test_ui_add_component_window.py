@@ -14,8 +14,9 @@ import numpy as np
 from nexus_constructor.component import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component.component import Component
+from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.geometry import OFFGeometryNoNexus, CylindricalGeometry
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
@@ -118,13 +119,13 @@ def mock_pixel_options():
 
 
 @pytest.fixture(scope="function")
-def add_component_dialog(qtbot, template, mock_pixel_options):
+def add_component_dialog(qtbot, template):
 
     instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
     component = ComponentTreeModel(instrument)
     dialog = AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
     template.ui = dialog
-    template.ui.setupUi(template, mock_pixel_options)
+    template.ui.setupUi(template)
     qtbot.addWidget(template)
 
     yield dialog
@@ -136,14 +137,19 @@ def add_component_dialog(qtbot, template, mock_pixel_options):
 @pytest.fixture(scope="function")
 def component():
     nexus_wrapper = create_nexus_wrapper()
-    component = Component(
-        nexus_wrapper, nexus_wrapper.nexus_file.create_group("Component")
+    shape_group = nexus_wrapper.create_nx_group(
+        "shape", "NXcylindrical_geometry", nexus_wrapper.instrument
     )
+    nexus_wrapper.create_nx_group(
+        "detector_shape", "NXcylindrical_geometry", shape_group
+    )
+    component = create_component(nexus_wrapper, shape_group)
+    component.set_cylinder_shape()
     return component
 
 
 @pytest.fixture(scope="function")
-def edit_component_dialog(qtbot, template, component):
+def edit_component_dialog(qtbot, template, component, mock_pixel_options):
 
     instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
     component_tree = ComponentTreeModel(instrument)
@@ -151,7 +157,7 @@ def edit_component_dialog(qtbot, template, component):
         instrument, component_tree, component, definitions_dir=DEFINITIONS_DIR
     )
     template.ui = dialog
-    template.ui.setupUi(template)
+    template.ui.setupUi(template, mock_pixel_options)
     qtbot.addWidget(template)
 
     yield dialog
@@ -2148,4 +2154,5 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_T
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
     qtbot, edit_component_dialog, template, mock_pixel_options
 ):
+    show_and_close_window(qtbot, template)
     mock_pixel_options.fill_existing_entries.assert_called_once()
