@@ -297,7 +297,11 @@ class FieldWidget(QFrame):
             tooltip_on_reject = "HDF Path is not valid"
         else:
             self.value_line_edit.setValidator(
-                FieldValueValidator(self.field_type_combo, self.value_type_combo)
+                FieldValueValidator(
+                    self.field_type_combo,
+                    self.value_type_combo,
+                    FieldType.scalar_dataset.value,
+                )
             )
             tooltip_on_accept = "Value is cast-able to numpy type."
             tooltip_on_reject = "Value is not cast-able to selected numpy type."

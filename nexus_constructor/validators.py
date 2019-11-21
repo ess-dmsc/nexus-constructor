@@ -317,10 +317,16 @@ class FieldValueValidator(QValidator):
     Validates the field value line edit to check that the entered string is castable to the selected numpy type.
     """
 
-    def __init__(self, field_type_combo: QComboBox, dataset_type_combo: QComboBox):
+    def __init__(
+        self,
+        field_type_combo: QComboBox,
+        dataset_type_combo: QComboBox,
+        scalar_text: str = "Scalar",
+    ):
         super().__init__()
         self.field_type_combo = field_type_combo
         self.dataset_type_combo = dataset_type_combo
+        self.scalar = scalar_text
 
     def validate(self, input: str, pos: int) -> QValidator.State:
         """
@@ -331,7 +337,7 @@ class FieldValueValidator(QValidator):
         """
         if not input:  # More criteria here
             return self._emit_and_return(False)
-        elif self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
+        elif self.field_type_combo.currentText() == self.scalar:
             try:
                 if (
                     h5py.check_dtype(

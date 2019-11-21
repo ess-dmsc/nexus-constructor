@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Union, Tuple
 
 import h5py
@@ -15,7 +16,8 @@ from PySide2.QtWidgets import (
 import numpy as np
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
-from nexus_constructor.validators import DATASET_TYPE
+from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import DATASET_TYPE, FieldValueValidator
 
 
 class FieldAttrsDialog(QDialog):
@@ -77,8 +79,6 @@ class FieldAttrFrame(QFrame):
         self.setLayout(QHBoxLayout())
         self.attr_name_lineedit = QLineEdit()
         self.attr_value_lineedit = QLineEdit()
-        self.attr_type_combo = QComboBox()
-        self.attr_type_combo.addItems([*DATASET_TYPE.keys()])
 
         self.array_or_scalar_combo = QComboBox()
         self.array_or_scalar_combo.addItems(["Scalar", "Array"])
@@ -86,9 +86,14 @@ class FieldAttrFrame(QFrame):
         self.array_edit_button = QPushButton("Edit Array")
         self.array_edit_button.clicked.connect(self.show_edit_array_dialog)
 
+        self.attr_dtype_combo = QComboBox()
+        self.attr_dtype_combo.addItems([*DATASET_TYPE.keys()])
+        self.attr_dtype_combo.currentTextChanged.connect(self.dtype_changed)
+        self.dtype_changed(self.attr_dtype_combo.currentText())
+
         self.layout().addWidget(self.attr_name_lineedit)
         self.layout().addWidget(self.array_or_scalar_combo)
-        self.layout().addWidget(self.attr_type_combo)
+        self.layout().addWidget(self.attr_dtype_combo)
         self.layout().addWidget(self.attr_value_lineedit)
         self.layout().addWidget(self.array_edit_button)
 
@@ -101,9 +106,22 @@ class FieldAttrFrame(QFrame):
         self.attr_value_lineedit.setVisible(item == "Scalar")
         self.array_edit_button.setVisible(item == "Array")
 
+    def dtype_changed(self, _: str):
+        self.attr_value_lineedit.setValidator(
+            FieldValueValidator(self.array_or_scalar_combo, self.attr_dtype_combo)
+        )
+        self.attr_value_lineedit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.attr_value_lineedit,
+                tooltip_on_accept="Value is cast-able to numpy type.",
+                tooltip_on_reject="Value is not cast-able to selected numpy type.",
+            )
+        )
+
     @property
     def dtype(self):
-        return DATASET_TYPE[self.attr_type_combo.currentText()]
+        return DATASET_TYPE[self.attr_dtype_combo.currentText()]
 
     @property
     def is_scalar(self):
@@ -117,7 +135,7 @@ class FieldAttrFrame(QFrame):
     def value(self) -> Tuple[str, Union[np.generic, np.ndarray]]:
 
         if self.is_scalar:
-            if self.dtype == DATASET_TYPE["String"]:
+            if self.dtype == DATASET_TYPE["String"] or isinstance(self.dtype, str):
                 return self.attr_name_lineedit.text(), self.attr_value_lineedit.text()
             return (
                 self.attr_name_lineedit.text(),
@@ -130,7 +148,7 @@ class FieldAttrFrame(QFrame):
         new_name = name_and_value[0]
         new_value = name_and_value[1]
         self.attr_name_lineedit.setText(new_name)
-        self.attr_type_combo.setCurrentText(
+        self.attr_dtype_combo.setCurrentText(
             new_value
             if isinstance(new_value, str)
             else next(
