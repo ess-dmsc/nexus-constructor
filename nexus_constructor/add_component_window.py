@@ -448,7 +448,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         return geometry_model
 
-    def get_pixel_visibility_condition(self):
+    def get_pixel_visibility_condition(self) -> bool:
         """
         Determines if it is necessary to make the pixel options visible.
         :return: A bool indicating if the current shape and component type allow for pixel-related input.

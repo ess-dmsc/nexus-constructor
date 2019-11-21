@@ -828,6 +828,17 @@ def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_with_single_pixel
         == pixel_mapping_with_single_pixel.pixel_ids[0]
     )
 
+@pytest.mark.parametrize("old_value", [5, 15])
+@pytest.mark.parametrize("new_value", [5, 15])
+def test_GIVEN_call_to_create_pixel_mapping_widgets_WHEN_editing_a_component_THEN_previous_widgets_are_removed(
+    pixel_options, old_value, new_value
+):
+    pixel_options.create_pixel_mapping_list(old_value, "")
+    assert len(pixel_options.pixel_mapping_widgets) == old_value
+
+    pixel_options.create_pixel_mapping_list(new_value, "")
+    assert len(pixel_options.pixel_mapping_widgets) ==  new_value
+
 
 def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_with_multiple_pixels_THEN_expected_number_of_widgets_is_created(
     pixel_options,

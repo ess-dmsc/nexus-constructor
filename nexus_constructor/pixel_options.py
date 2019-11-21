@@ -492,6 +492,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         :param n_items: The number of widgets to create.
         :param text: The label to be displayed next to the line edit. This is either faces or cylinders.
         """
+        self.pixel_mapping_widgets.clear()
 
         for i in range(n_items):
             pixel_mapping_widget = PixelMappingWidget(
