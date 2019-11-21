@@ -145,6 +145,7 @@ def component_with_cylindrical_geometry():
     )
     component = create_component(nexus_wrapper, shape_group)
     component.set_cylinder_shape()
+    component.nx_class = "NXdetector"
     return component
 
 
