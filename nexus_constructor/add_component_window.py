@@ -322,7 +322,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             for field in fields:
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
-                new_ui_field.attrs = field.attrs
+                new_ui_field.attrs = field
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()

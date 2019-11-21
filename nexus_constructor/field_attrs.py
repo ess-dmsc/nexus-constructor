@@ -36,10 +36,10 @@ class FieldAttrsDialog(QDialog):
         self.layout().addWidget(self.remove_button, 1, 1)
 
         if existing_field_dataset is not None:
-            self._fill_existing_attrs(existing_field_dataset)
+            self.fill_existing_attrs(existing_field_dataset)
 
-    def _fill_existing_attrs(self, existing_dataset: h5py.Dataset):
-        for name, value in existing_dataset.attrs:
+    def fill_existing_attrs(self, existing_dataset: h5py.Dataset):
+        for name, value in existing_dataset.attrs.items():
             frame = FieldAttrFrame(name, value)
             self._add_attr(existing_frame=frame)
 
@@ -70,7 +70,7 @@ class FieldAttrsDialog(QDialog):
 
 
 class FieldAttrFrame(QFrame):
-    def __init__(self, parent=None, name=None, value=None):
+    def __init__(self, name=None, value=None, parent=None):
         super().__init__(parent)
         self.array = None
         self.setMinimumHeight(40)
@@ -95,7 +95,7 @@ class FieldAttrFrame(QFrame):
         self.type_changed("Scalar")
 
         if name and value:
-            self.value = name, value
+            self.value = (name, value)
 
     def type_changed(self, item: str):
         self.attr_value_lineedit.setVisible(item == "Scalar")
@@ -123,7 +123,9 @@ class FieldAttrFrame(QFrame):
         return self.attr_name_lineedit.text(), self.dialog.model.array
 
     @value.setter
-    def value(self, new_name: str, new_value: Union[np.generic, np.ndarray]):
+    def value(self, name_and_value: Tuple[str, Union[np.generic, np.ndarray]]):
+        new_name = name_and_value[0]
+        new_value = name_and_value[1]
         self.attr_name_lineedit.setText(new_name)
         self.attr_type_combo.setCurrentText(
             next(key for key, value in DATASET_TYPE.items() if value == new_value.dtype)

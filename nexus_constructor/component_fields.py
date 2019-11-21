@@ -215,14 +215,12 @@ class FieldWidget(QFrame):
         )
 
     @property
-    def attrs(self):
+    def attrs(self) -> h5py.Dataset.attrs:
         return self.value.attrs
 
     @attrs.setter
-    def attrs(self, attrs):
-        for attr_name, attr_value in attrs:
-            # TODO: setter
-            pass
+    def attrs(self, field: h5py.Dataset):
+        self.attrs_dialog.fill_existing_attrs(field)
 
     @property
     def value(self) -> Union[h5py.Dataset, h5py.Group, h5py.SoftLink]:
