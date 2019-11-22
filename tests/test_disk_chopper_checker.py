@@ -35,7 +35,7 @@ def value_side_effect(key, data):
     :param key: The key passed to __getitem__
     :param data: The data returned from the call.
     :return: data if the correct key has been provided, None otherwise. If something other than an empty tuple is given,
-    returning None should still cause tests to fail even though it it isn't raising an exception.
+    returning None should still cause tests to fail even though it isn't raising an exception.
     """
     if key == ():
         return data
