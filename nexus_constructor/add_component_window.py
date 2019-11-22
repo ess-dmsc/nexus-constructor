@@ -243,7 +243,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
         self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
-
         self.addFieldPushButton.clicked.connect(self.add_field)
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
