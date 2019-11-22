@@ -29,11 +29,21 @@ from tests.chopper_test_helpers import (
 from tests.helpers import InMemoryFile
 
 
+def value_side_effect(key, value):
+
+    if key == ():
+        return value
+
+    return None
+
+
 @pytest.fixture(scope="function")
 def mock_slits_widget():
     mock_slits_widget = Mock(spec=FieldWidget)
     mock_slits_widget.name = SLITS_NAME
-    mock_slits_widget.value.__getitem__ = Mock(return_value=N_SLITS)
+    mock_slits_widget.value.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(key, value=N_SLITS)
+    )
     mock_slits_widget.dtype = np.intc
 
     return mock_slits_widget
@@ -53,7 +63,9 @@ def mock_slit_edges_widget():
 def mock_radius_widget():
     mock_radius_widget = Mock(spec=FieldWidget)
     mock_radius_widget.name = RADIUS_NAME
-    mock_radius_widget.value.__getitem__ = Mock(return_value=RADIUS_LENGTH)
+    mock_radius_widget.value.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(key, value=RADIUS_LENGTH)
+    )
     mock_radius_widget.dtype = np.single
 
     return mock_radius_widget
@@ -63,7 +75,9 @@ def mock_radius_widget():
 def mock_slit_height_widget():
     mock_slit_height_widget = Mock(spec=FieldWidget)
     mock_slit_height_widget.name = SLIT_HEIGHT_NAME
-    mock_slit_height_widget.value.__getitem__ = Mock(return_value=SLIT_HEIGHT_LENGTH)
+    mock_slit_height_widget.value.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(key, value=SLIT_HEIGHT_LENGTH)
+    )
     mock_slit_height_widget.dtype = np.single
 
     return mock_slit_height_widget
