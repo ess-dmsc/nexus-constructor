@@ -294,6 +294,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.noShapeRadioButton.clicked.emit()
         else:
             if isinstance(component_shape, OFFGeometryNexus):
+                self.cad_file_name = component_shape.file_path
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
                 if component_shape.file_path:
