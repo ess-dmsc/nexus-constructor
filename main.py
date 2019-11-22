@@ -18,8 +18,8 @@ if __name__ == "__main__":
     if "help" in parser.parse_args():
         exit(0)
     logging.basicConfig(level=logging.INFO)
+    QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     app = QApplication(sys.argv)
-    app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
     window = QMainWindow()
     nexus_wrapper = NexusWrapper()
