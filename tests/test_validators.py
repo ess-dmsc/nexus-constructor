@@ -146,7 +146,9 @@ def test_GIVEN_valid_string_value_WHEN_validating_field_value_THEN_returns_accep
     field_type_combo = DummyCombo(FieldType.scalar_dataset.value)
     dataset_type_combo = DummyCombo("String")
 
-    validator = FieldValueValidator(field_type_combo, dataset_type_combo)
+    validator = FieldValueValidator(
+        field_type_combo, dataset_type_combo, FieldType.scalar_dataset.value
+    )
     validator.is_valid = Mock()
 
     assert validator.validate(strvalue, 0) == QValidator.Acceptable
@@ -159,7 +161,9 @@ def test_GIVEN_invalid_float_value_WHEN_validating_field_value_THEN_returns_inte
     field_type_combo = DummyCombo(FieldType.scalar_dataset.value)
     dataset_type_combo = DummyCombo("Float")
 
-    validator = FieldValueValidator(field_type_combo, dataset_type_combo)
+    validator = FieldValueValidator(
+        field_type_combo, dataset_type_combo, FieldType.scalar_dataset.value
+    )
     validator.is_valid = Mock()
 
     assert validator.validate(invalid_value, 0) == QValidator.Intermediate

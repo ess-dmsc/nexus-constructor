@@ -323,6 +323,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             for field in fields:
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
+                new_ui_field.attrs = field
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
@@ -545,7 +546,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         # remove the previous shape from the qt3d view
         if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
-            self.instrument.remove_component(self.component_to_edit)
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         self.component_to_edit.name = component_name
         self.component_to_edit.nx_class = nx_class

@@ -1689,7 +1689,7 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     widget2 = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
     assert widget2.field_type_combo.currentText().lower() == "scalar dataset"
     assert widget2.name == field_name2
-    assert widget2.value == field_value2
+    assert widget2.value[()] == field_value2
 
 
 def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(

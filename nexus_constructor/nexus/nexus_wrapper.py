@@ -123,7 +123,11 @@ class NexusWrapper(QObject):
             logging.debug(filename)
             file = h5py.File(append_nxs_extension(filename), mode="x")
             try:
-                file.copy(source=self.nexus_file["/entry/"], dest="/entry/")
+                file.copy(
+                    source=self.nexus_file["/entry/"],
+                    dest="/entry/",
+                    without_attrs=False,
+                )
                 logging.info("Saved to NeXus file")
             except ValueError as e:
                 logging.error(f"File writing failed: {e}")
@@ -265,7 +269,7 @@ class NexusWrapper(QObject):
     @staticmethod
     def _recreate_dataset(parent_group: h5py.Group, name: str, value: Any, dtype=None):
         del parent_group[name]
-        parent_group.create_dataset(name, data=value, dtype=dtype)
+        return parent_group.create_dataset(name, data=value, dtype=dtype)
 
     def set_field_value(
         self, group: h5py.Group, name: str, value: Any, dtype=None
@@ -283,29 +287,36 @@ class NexusWrapper(QObject):
             group[name] = value
             return group[name]
 
-        if dtype is str:
-            dtype = f"|S{len(value)}"
-            value = np.array(value).astype(dtype)
-
-        if dtype == np.object:
-            dtype = h5py.special_dtype(vlen=str)
-
         if isinstance(value, h5py.Group):
             if name in group:
                 del group[name]
             value.copy(dest=group, source=value)
             return group[name]
 
+        if dtype is str:
+            dtype = f"|S{len(value)}"
+            value = np.array(value).astype(dtype)
+
+        if dtype == np.object:
+            dtype = h5py.special_dtype(vlen=str)
+        ds = None
         if name in group:
             if dtype is None or group[name].dtype == dtype:
                 try:
                     group[name][...] = value
                 except TypeError:
-                    self._recreate_dataset(group, name, value, dtype)
+                    ds = self._recreate_dataset(group, name, value, dtype)
             else:
-                self._recreate_dataset(group, name, value, dtype)
+                ds = self._recreate_dataset(group, name, value, dtype)
         else:
-            group.create_dataset(name, data=value, dtype=dtype)
+            ds = group.create_dataset(name, data=value, dtype=dtype)
+
+        try:
+            for k, v in value.attrs.items():
+                ds.attrs[k] = v
+        except AttributeError:
+            pass
+
         self._emit_file()
         return group[name]
 
