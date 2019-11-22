@@ -209,10 +209,10 @@ class UserDefinedChopperChecker:
             return False
 
         self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS_NAME].value,
+            self.fields_dict[SLITS_NAME].value[()],
             self.fields_dict[SLIT_EDGES_NAME].value,
-            self.fields_dict[RADIUS_NAME].value,
-            self.fields_dict[SLIT_HEIGHT_NAME].value,
+            self.fields_dict[RADIUS_NAME].value[()],
+            self.fields_dict[SLIT_HEIGHT_NAME].value[()],
             self._angle_units,
             self._slit_height_units,
             self._radius_units,
