@@ -28,6 +28,7 @@ from nexus_constructor.component.component_type import (
     PIXEL_COMPONENT_TYPES,
     CHOPPER_CLASS_NAME,
 )
+from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import (
     UnitValidator,
     NameValidator,
@@ -43,7 +44,6 @@ from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
-
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
 
@@ -211,6 +211,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelOptionsWidget.ui = self.pixel_options
 
         if self.component_to_edit:
+            parent_dialog.setWindowTitle(
+                f"Edit Component: {get_name_of_node(self.component_to_edit.group)}"
+            )
             self._fill_existing_entries()
             self.pixel_options.fill_existing_entries()
 
