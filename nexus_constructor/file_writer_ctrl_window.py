@@ -299,7 +299,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 file=in_memory_file,
                 streams=self.instrument.get_streams(),
                 links=self.instrument.get_links(),
-                nexus_file_name=file_name,
+                nexus_file_name="/data/kafka-to-nexus/" + file_name,
                 broker=broker,
                 start_time=start_time,
                 stop_time=stop_time,
