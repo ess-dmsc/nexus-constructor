@@ -242,6 +242,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+        self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
         self.addFieldPushButton.clicked.connect(self.add_field)
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
@@ -294,6 +295,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.noShapeRadioButton.clicked.emit()
         else:
             if isinstance(component_shape, OFFGeometryNexus):
+                self.cad_file_name = component_shape.file_path
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
                 if component_shape.file_path:
