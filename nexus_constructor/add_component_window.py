@@ -535,15 +535,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :param pixel_data: The component PixelData. Can be None.
         :return: The geometry object.
         """
+        # remove the previous shape from the qt3d view
+        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         # remove previous fields
         for field_group in self.component_to_edit.group.values():
             if field_group.name.split("/")[-1] not in INVALID_FIELD_NAMES:
                 del self.instrument.nexus.nexus_file[field_group.name]
-
-        # remove the previous shape from the qt3d view
-        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
-            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         self.component_to_edit.name = component_name
         self.component_to_edit.nx_class = nx_class
