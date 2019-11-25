@@ -510,11 +510,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
         self.generate_geometry_model(component, pixel_data)
 
-        if nx_class in PIXEL_COMPONENT_TYPES:
-            if isinstance(pixel_data, PixelMapping):
-                component.record_detector_number(pixel_data)
-            if isinstance(pixel_data, PixelGrid):
-                component.record_pixel_grid(pixel_data)
+        self.write_pixel_data_to_component(component, nx_class, pixel_data)
 
         add_fields_to_component(component, self.fieldsListWidget)
         self.component_model.add_component(component)
@@ -553,12 +549,32 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_to_edit.nx_class = nx_class
         self.component_to_edit.description = description
 
+        self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
+
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
         component_with_geometry = create_component(
             self.instrument.nexus, self.component_to_edit.group
         )
         return component_with_geometry.shape
+
+    @staticmethod
+    def write_pixel_data_to_component(
+        component: Component, nx_class: str, pixel_data: PixelData
+    ):
+        """
+        Writes the detector number/pixel grid data to a component.
+        :param component: The component to modify.
+        :param nx_class: The NXclass of the component.
+        :param pixel_data: The pixel data.
+        """
+        if pixel_data is None or nx_class not in PIXEL_COMPONENT_TYPES:
+            return
+
+        if isinstance(pixel_data, PixelMapping):
+            component.record_detector_number(pixel_data)
+        if isinstance(pixel_data, PixelGrid):
+            component.record_pixel_grid(pixel_data)
 
     def change_pixel_options_visibility(self):
         """
