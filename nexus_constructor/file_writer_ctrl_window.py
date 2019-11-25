@@ -281,7 +281,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
 
     def onSendCommand(self):
         if self.command_producer is not None:
-            in_memory_file = io.BytesIO()
+            in_memory_file = io.StringIO()
             broker = self.brokerLineEdit.text()
             if len(broker) == 0:
                 broker = self.brokerLineEdit.placeholderText()
@@ -306,7 +306,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 service_id=None,
                 use_swmr=self.useSWMRCheckBox.isChecked(),
             )
-            self.command_producer.sendCommand(self.start_msg)
+            in_memory_file.seek(0)
+            send_msg = in_memory_file.read()
+            self.command_producer.sendCommand(send_msg)
             self.sendCommandButton.setEnabled(False)
 
     def onClickedFileList(self):

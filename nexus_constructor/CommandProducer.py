@@ -60,6 +60,8 @@ class CommandProducer:
         while self.run_thread:
             if not self.msg_queue.empty():
                 send_msg = self.msg_queue.get(block=False)
+                if type(send_msg) == str:
+                    send_msg = send_msg.encode("utf-8")
                 producer.send(self.topic, send_msg)
             else:
                 time.sleep(0.2)
