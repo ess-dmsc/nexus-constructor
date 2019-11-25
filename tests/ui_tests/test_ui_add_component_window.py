@@ -188,6 +188,16 @@ def mock_pixel_validator(add_component_dialog, mock_pixel_options):
     return pixel_validator
 
 
+@pytest.fixture(scope="function")
+def mock_component():
+
+    nexus_file = h5py.File("test_file", mode="x", driver="core", backing_store=False)
+    test_group = nexus_file.create_group("test_component_group")
+    mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
+    yield mock_component
+    nexus_file.close()
+
+
 def enter_component_name(
     qtbot: pytestqt.qtbot.QtBot,
     template: PySide2.QtWidgets.QDialog,
@@ -1378,7 +1388,7 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
 
 
 def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
-    qtbot, template, add_component_dialog, mock_pixel_options
+    qtbot, template, add_component_dialog, mock_pixel_options, mock_component
 ):
 
     make_pixel_options_appear(
@@ -1399,27 +1409,22 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
         VALID_CUBE_OFF_FILE,
     )
 
-    with h5py.File(
-        "test_file", mode="x", driver="core", backing_store=False
-    ) as nexus_file:
-        test_group = nexus_file.create_group("test_component_group")
-        mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
-        pixel_grid = PixelGrid()
-        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_grid)
+    pixel_grid = PixelGrid()
+    mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_grid)
+    show_and_close_window(qtbot, template)
 
-        show_and_close_window(qtbot, template)
-
-        # Call the on_ok method as if the user had pressed Add Component
-        with patch(
-            "nexus_constructor.component.component_factory.Component",
-            return_value=mock_component,
-        ):
-            add_component_dialog.on_ok()
-            mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
+    # Call the on_ok method as if the user had pressed Add Component
+    with patch(
+        "nexus_constructor.component.component_factory.Component",
+        return_value=mock_component,
+    ):
+        add_component_dialog.on_ok()
+        mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
+        mock_component.record_detector_number.assert_not_called()
 
 
 def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
-    qtbot, template, add_component_dialog, mock_pixel_options
+    qtbot, template, add_component_dialog, mock_pixel_options, mock_component
 ):
 
     make_pixel_options_appear(
@@ -1440,24 +1445,52 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
         VALID_CUBE_OFF_FILE,
     )
 
-    with h5py.File(
-        "test_file", mode="x", driver="core", backing_store=False
-    ) as nexus_file:
-        test_group = nexus_file.create_group("test_component_group")
-        mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
+    pixel_mapping = PixelMapping(pixel_ids=[1])
+    mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_mapping)
+    show_and_close_window(qtbot, template)
 
-        pixel_mapping = PixelMapping(pixel_ids=[1])
-        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_mapping)
+    # Call the on_ok method as if the user had pressed Add Component
+    with patch(
+        "nexus_constructor.component.component_factory.Component",
+        return_value=mock_component,
+    ):
+        add_component_dialog.on_ok()
+        mock_component.record_detector_number.assert_called_once_with(pixel_mapping)
+        mock_component.record_pixel_grid.assert_not_called()
 
-        show_and_close_window(qtbot, template)
 
-        # Call the on_ok method as if the user had pressed Add Component
-        with patch(
-            "nexus_constructor.component.component_factory.Component",
-            return_value=mock_component,
-        ):
-            add_component_dialog.on_ok()
-            mock_component.record_detector_number.assert_called_once_with(pixel_mapping)
+def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_writing_methods_are_not_called(
+    qtbot, template, add_component_dialog, mock_pixel_options, mock_component
+):
+    make_pixel_options_appear(
+        qtbot,
+        add_component_dialog.meshRadioButton,
+        add_component_dialog,
+        template,
+        PIXEL_OPTIONS["NXdetector"],
+    )
+
+    enter_component_name(qtbot, template, add_component_dialog, UNIQUE_COMPONENT_NAME)
+
+    enter_file_path(
+        qtbot,
+        add_component_dialog,
+        template,
+        VALID_CUBE_MESH_FILE_PATH,
+        VALID_CUBE_OFF_FILE,
+    )
+
+    mock_pixel_options.generate_pixel_data = Mock(return_value=None)
+    show_and_close_window(qtbot, template)
+
+    # Call the on_ok method as if the user had pressed Add Component
+    with patch(
+        "nexus_constructor.component.component_factory.Component",
+        return_value=mock_component,
+    ):
+        add_component_dialog.on_ok()
+        mock_component.record_detector_number.assert_not_called()
+        mock_component.record_pixel_grid.assert_not_called()
 
 
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
