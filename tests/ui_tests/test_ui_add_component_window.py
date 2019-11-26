@@ -2271,8 +2271,28 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_gri
     )
 
 
-def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pixel_mapping_is_written():
-    pass
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pixel_mapping_is_written(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    prev_mapping = [5]
+    new_mapping = [6]
+
+    # Create a component with a pixel mapping
+    component_name = "ComponentWithMapping"
+    make_pixel_options_appear(
+        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, template
+    )
+    enter_component_name(qtbot, template, add_component_dialog, component_name)
+    mock_pixel_options.generate_pixel_data = Mock(
+        return_value=PixelMapping(prev_mapping)
+    )
+    add_component_dialog.on_ok()
+
+    # Retrieve new component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+    assert component_to_edit.get_field("detector_number") == prev_mapping
 
 
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapping_replaces_grid():
