@@ -1,4 +1,4 @@
-from PySide2.QtCore import Qt, QSize, QPoint, QModelIndex, QAbstractItemModel, QObject
+from PySide2.QtCore import Qt, QSize, QPoint, QModelIndex, QAbstractItemModel, QObject, QState
 from PySide2.QtWidgets import (
     QStyledItemDelegate,
     QFrame,
@@ -12,7 +12,7 @@ from nexus_constructor.component_tree_model import ComponentInfo, LinkTransforma
 from nexus_constructor.component.component import Component, TransformationsList
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
-from PySide2.QtGui import QPixmap, QRegion, QPainter
+from PySide2.QtGui import QPixmap, QRegion, QPainter, QColor
 from nexus_constructor.transformation_view import (
     EditTranslation,
     EditRotation,
@@ -94,6 +94,11 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         pixmap.setDevicePixelRatio(ratio)
         frame.render(pixmap, QPoint(), QRegion())
         painter.drawPixmap(option.rect, pixmap)
+        if index in self.parent().selectedIndexes():
+            colour = QColor("lightblue")
+            colour.setAlpha(100)
+            painter.fillRect(option.rect, colour)
+
 
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
