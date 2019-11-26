@@ -2212,3 +2212,35 @@ def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_
 ):
     show_and_close_window(qtbot, template)
     mock_pixel_options.fill_existing_entries.assert_called_once()
+
+
+def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_grid_is_written():
+    pass
+
+
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pixel_mapping_is_written():
+    pass
+
+
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapping_replaces_grid():
+    pass
+
+
+def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_grid_is_erased():
+    pass
+
+
+def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_mapping_replaces_grid():
+    pass
+
+
+def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_mapping_THEN_mapping_is_erased():
+    pass
+
+
+def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_no_pixel_data_THEN_pixel_grid_is_created():
+    pass
+
+
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_no_pixel_data_THEN_pixel_mapping_is_created():
+    pass
