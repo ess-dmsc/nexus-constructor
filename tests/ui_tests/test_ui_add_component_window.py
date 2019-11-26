@@ -2212,31 +2212,3 @@ def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_
 ):
     show_and_close_window(qtbot, template)
     mock_pixel_options.fill_existing_entries.assert_called_once()
-
-
-def test_UI_GIVEN_component_with_cylindrical_geometry_WHEN_editing_a_component_THEN_previous_shape_is_deleted_in_instrument_view(
-    qtbot, add_component_dialog, template, parent_mock
-):
-    # Create a component with a Cylindrical Geometry
-    component_name = "CylindricalComponent"
-    systematic_button_press(qtbot, template, add_component_dialog.CylinderRadioButton)
-    show_and_close_window(qtbot, template)
-    add_component_dialog.cylinderHeightLineEdit.setValue(1)
-    add_component_dialog.cylinderRadiusLineEdit.setValue(1)
-    add_component_dialog.nameLineEdit.setText(component_name)
-    add_component_dialog.on_ok()
-
-    # Retrieve the component from the list of components
-    new_component = add_component_dialog.instrument.get_component_list()[0]
-
-    # Set the mock for the parent and sceneWidget
-    add_component_dialog.parent = Mock(return_value=parent_mock)
-
-    # Set the component to edit
-    add_component_dialog.component_to_edit = new_component
-
-    # Call the edit component method
-    add_component_dialog.edit_existing_component(component_name, "", "NXdetector", None)
-
-    # Check that this leads to a call to delete component in the sceneWidget mock
-    parent_mock.sceneWidget.delete_component.assert_called_once_with(component_name)

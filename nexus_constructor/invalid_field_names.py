@@ -11,5 +11,5 @@ INVALID_FIELD_NAMES = [
     "z_pixel_offset",
     "detector_number",
     "detector_faces",
-    "pixel_shape"
+    "pixel_shape",
 ]
