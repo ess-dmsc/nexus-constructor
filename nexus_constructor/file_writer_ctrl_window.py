@@ -142,11 +142,17 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.statusBrokerEdit.setText(self.settings.value("status_broker_addr"))
         self.commandBrokerEdit.setText(self.settings.value("command_broker_addr"))
         temp = self.settings.value("use_swmr", False)
-        self.useSWMRCheckBox.setChecked(temp)
-        self.useStartTimeCheckBox.setChecked(
-            self.settings.value("use_start_time", False)
-        )
-        self.useStopTimeCheckBox.setChecked(self.settings.value("use_stop_time", False))
+        if type(temp) == str:
+            temp = temp == "True"
+        self.useSWMRCheckBox.setChecked(bool(temp))
+        temp = self.settings.value("use_start_time", False)
+        if type(temp) == str:
+            temp = temp == "True"
+        self.useStartTimeCheckBox.setChecked(temp)
+        temp = self.settings.value("use_stop_time", False)
+        if type(temp) == str:
+            temp = temp == "True"
+        self.useStopTimeCheckBox.setChecked(temp)
         self.fileNameLineEdit.setText(self.settings.value("file_name"))
 
     def onCheckConnectionStatus(self):
