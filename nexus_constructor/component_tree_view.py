@@ -1,4 +1,4 @@
-from PySide2.QtCore import Qt, QSize, QPoint, QModelIndex, QAbstractItemModel, QObject, QState
+from PySide2.QtCore import Qt, QSize, QPoint, QModelIndex, QAbstractItemModel, QObject
 from PySide2.QtWidgets import (
     QStyledItemDelegate,
     QFrame,
@@ -98,7 +98,6 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             colour = QColor("lightblue")
             colour.setAlpha(100)
             painter.fillRect(option.rect, colour)
-
 
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
