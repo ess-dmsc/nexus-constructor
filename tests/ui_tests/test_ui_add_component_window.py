@@ -409,6 +409,33 @@ def get_new_component_from_dialog(dialog: AddComponentDialog, name: str) -> Comp
             return component
 
 
+def enter_component_with_pixel_grid(
+    add_component_dialog: AddComponentDialog,
+    component_name: str,
+    mock_pixel_options: Mock,
+    pixel_grid_size: int,
+    qtbot: pytestqt.qtbot.QtBot,
+    template: PySide2.QtWidgets.QDialog,
+):
+    """
+
+    :param add_component_dialog:
+    :param component_name:
+    :param mock_pixel_options:
+    :param pixel_grid_size:
+    :param qtbot:
+    :param template:
+    :return:
+    """
+    make_pixel_options_appear(
+        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, template
+    )
+    enter_component_name(qtbot, template, add_component_dialog, component_name)
+    mock_pixel_options.generate_pixel_data = Mock(
+        return_value=PixelGrid(rows=pixel_grid_size, columns=pixel_grid_size)
+    )
+
+
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot
@@ -2235,36 +2262,32 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_gri
 
     # Create a component with a pixel grid
     component_name = "ComponentWithGrid"
-    make_pixel_options_appear(
-        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, template
-    )
-    enter_component_name(qtbot, template, add_component_dialog, component_name)
-    mock_pixel_options.generate_pixel_data = Mock(
-        return_value=PixelGrid(rows=prev_pixel_grid_size, columns=prev_pixel_grid_size)
+    enter_component_with_pixel_grid(
+        add_component_dialog,
+        component_name,
+        mock_pixel_options,
+        prev_pixel_grid_size,
+        qtbot,
+        template,
     )
     add_component_dialog.on_ok()
 
-    # Retrieve the new component
+    # Retrieve the newly created component
     component_to_edit = get_new_component_from_dialog(
         add_component_dialog, component_name
     )
 
-    assert component_to_edit.get_field("x_pixel_offset").shape == (
-        prev_pixel_grid_size,
-        prev_pixel_grid_size,
-    )
-
-    # Give the AddComponentDialog a `component_to_edit` value so it behaves like an Edit Component window
+    # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
     add_component_dialog.component_to_edit = component_to_edit
     add_component_dialog.parent = Mock(return_value=parent_mock)
 
-    # Generate new pixel data
+    # Instruct the pixel options mock to generate different pixel data
     mock_pixel_options.generate_pixel_data = Mock(
         return_value=PixelGrid(rows=new_pixel_grid_size, columns=new_pixel_grid_size)
     )
     add_component_dialog.on_ok()
 
-    # Check that the change is pixel data is now stored in the component
+    # Check that the change in pixel data is now stored in the component
     assert component_to_edit.get_field("x_pixel_offset").shape == (
         new_pixel_grid_size,
         new_pixel_grid_size,
@@ -2288,23 +2311,53 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
     )
     add_component_dialog.on_ok()
 
-    # Retrieve new component
+    # Retrieve newly created component
     component_to_edit = get_new_component_from_dialog(
         add_component_dialog, component_name
     )
 
+    # Make the Add Component dialog behave like an Edit Component dialog
     add_component_dialog.component_to_edit = component_to_edit
     add_component_dialog.parent = Mock(return_value=parent_mock)
+
+    # Instruct the pixel options mock to generate a different pixel mapping
     mock_pixel_options.generate_pixel_data = Mock(
         return_value=PixelMapping(new_mapping)
     )
     add_component_dialog.on_ok()
 
+    # Check that the change in pixel mapping is now stored in the component
     assert component_to_edit.get_field("detector_number") == new_mapping
 
 
-def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapping_replaces_grid():
-    pass
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapping_replaces_grid(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+
+    # Create a component with a pixel grid
+    component_name = "ComponentWithGrid"
+    enter_component_with_pixel_grid(
+        add_component_dialog, component_name, mock_pixel_options, 3, qtbot, template
+    )
+    add_component_dialog.on_ok()
+
+    # Retrieve the newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
+    add_component_dialog.component_to_edit = component_to_edit
+    add_component_dialog.parent = Mock(return_value=parent_mock)
+
+    # Instruct the pixel options mock to generate different pixel data
+    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping([3]))
+    add_component_dialog.on_ok()
+
+    # Check that the pixel grid values no longer exist
+    assert component_to_edit.get_field("x_pixel_offset") is None
+    assert component_to_edit.get_field("y_pixel_offset") is None
+    assert component_to_edit.get_field("z_pixel_offset") is None
 
 
 def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_grid_is_erased():
