@@ -4,4 +4,8 @@ max-line-length = 80
 max-complexity = 18
 select = B,C,E,F,W,T4,B9
 exclude = ui/,build*,definitions
-per-file-ignores = nexus_constructor/geometry/__init__.py:F401
+per-file-ignores =
+    nexus_constructor/geometry/__init__.py:F401
+    tests/test_json_writer.py:F811
+    tests/ui_tests/test_stream_fields_widget.py:F811
+    tests/ui_tests/test_ui_field_attrs.py:F811

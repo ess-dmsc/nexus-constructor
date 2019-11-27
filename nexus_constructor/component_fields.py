@@ -1,3 +1,4 @@
+import logging
 import uuid
 from functools import partial
 
@@ -18,6 +19,7 @@ from typing import List, Union
 from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
@@ -87,6 +89,7 @@ class FieldWidget(QFrame):
         )
 
         self.edit_dialog = QDialog(parent=self)
+        self.attrs_dialog = FieldAttrsDialog(parent=self)
         self.instrument = instrument
 
         self.table_view = ArrayDatasetTableWidget()
@@ -115,10 +118,14 @@ class FieldWidget(QFrame):
 
         self.edit_button = QPushButton("Edit")
         edit_button_size = 50
-        self.edit_button.setMinimumWidth(edit_button_size)
-        self.edit_button.setMaximumWidth(edit_button_size)
+        self.edit_button.setMaximumSize(edit_button_size, edit_button_size)
         self.edit_button.setSizePolicy(fix_horizontal_size)
         self.edit_button.clicked.connect(self.show_edit_dialog)
+
+        self.attrs_button = QPushButton("Attrs")
+        self.attrs_button.setMaximumSize(edit_button_size, edit_button_size)
+        self.attrs_button.setSizePolicy(fix_horizontal_size)
+        self.attrs_button.clicked.connect(self.show_attrs_dialog)
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.field_name_edit)
@@ -127,6 +134,7 @@ class FieldWidget(QFrame):
         self.layout.addWidget(self.nx_class_combo)
         self.layout.addWidget(self.edit_button)
         self.layout.addWidget(self.value_type_combo)
+        self.layout.addWidget(self.attrs_button)
 
         self.layout.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout)
@@ -202,27 +210,54 @@ class FieldWidget(QFrame):
 
     @dtype.setter
     def dtype(self, dtype: h5py.Datatype):
+        type_map = {np.object: "String", np.float64: "Float", np.int64: "Integer"}
+        for item in type_map.keys():
+            if dtype == item:
+                self.value_type_combo.setCurrentText(type_map[item])
+                return
         self.value_type_combo.setCurrentText(
             next(key for key, value in DATASET_TYPE.items() if value == dtype)
         )
 
     @property
-    def value(self):
+    def attrs(self) -> h5py.Dataset.attrs:
+        return self.value.attrs
+
+    @attrs.setter
+    def attrs(self, field: h5py.Dataset):
+        self.attrs_dialog.fill_existing_attrs(field)
+
+    @property
+    def value(self) -> Union[h5py.Dataset, h5py.Group, h5py.SoftLink]:
+        return_object = None
         if self.field_type == FieldType.scalar_dataset:
             dtype = DATASET_TYPE[self.value_type_combo.currentText()]
             val = self.value_line_edit.text()
             if dtype == h5py.special_dtype(vlen=str):
-                return h5py.File(
+                return_object = h5py.File(
                     name=str(uuid.uuid4()), driver="core", backing_store=False
                 ).create_dataset(name=self.name, dtype=dtype, data=val)
-            return dtype(val)
-        if self.field_type == FieldType.array_dataset:
+            else:
+                return_object = h5py.File(
+                    name=str(uuid.uuid4()), driver="core", backing_store=False
+                ).create_dataset(name=self.name, dtype=dtype, data=dtype(val))
+        elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
-            return np.squeeze(self.table_view.model.array)
-        if self.field_type == FieldType.kafka_stream:
-            return self.streams_widget.get_stream_group()
-        if self.field_type == FieldType.link:
-            return h5py.SoftLink(self.value_line_edit.text())
+            return_object = h5py.File(
+                name=str(uuid.uuid4()), driver="core", backing_store=False
+            ).create_dataset(
+                name=self.name, data=np.squeeze(self.table_view.model.array)
+            )
+        elif self.field_type == FieldType.kafka_stream:
+            return_object = self.streams_widget.get_stream_group()
+        elif self.field_type == FieldType.link:
+            return_object = h5py.SoftLink(self.value_line_edit.text())
+        else:
+            logging.error(f"unknown field type: {self.name}")
+        if self.field_type != FieldType.link:
+            for attr_name, attr_value in self.attrs_dialog.get_attrs().items():
+                return_object.attrs[attr_name] = attr_value
+        return return_object
 
     @value.setter
     def value(self, value):
@@ -267,7 +302,11 @@ class FieldWidget(QFrame):
             tooltip_on_reject = "HDF Path is not valid"
         else:
             self.value_line_edit.setValidator(
-                FieldValueValidator(self.field_type_combo, self.value_type_combo)
+                FieldValueValidator(
+                    self.field_type_combo,
+                    self.value_type_combo,
+                    FieldType.scalar_dataset.value,
+                )
             )
             tooltip_on_accept = "Value is cast-able to numpy type."
             tooltip_on_reject = "Value is not cast-able to selected numpy type."
@@ -312,6 +351,9 @@ class FieldWidget(QFrame):
             # TODO: show nx class panels
             pass
         self.edit_dialog.show()
+
+    def show_attrs_dialog(self):
+        self.attrs_dialog.show()
 
 
 def add_fields_to_component(component: Component, fields_widget: QListWidget):

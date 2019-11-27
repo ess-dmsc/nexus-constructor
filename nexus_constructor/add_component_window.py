@@ -28,6 +28,7 @@ from nexus_constructor.component.component_type import (
     PIXEL_COMPONENT_TYPES,
     CHOPPER_CLASS_NAME,
 )
+from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import (
     UnitValidator,
     NameValidator,
@@ -43,7 +44,6 @@ from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
-
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
 
@@ -84,7 +84,7 @@ def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget)
     dtype = field.dtype
     if "S" in str(dtype):
         dtype = h5py.special_dtype(vlen=str)
-        new_ui_field.value = field.value
+        new_ui_field.value = field[()]
     else:
         new_ui_field.value = field[()]
     new_ui_field.dtype = dtype
@@ -165,7 +165,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        component_list = self.instrument.get_component_list()
+        component_list = self.instrument.get_component_list().copy()
 
         if self.component_to_edit:
             for item in component_list:
@@ -211,6 +211,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelOptionsWidget.ui = self.pixel_options
 
         if self.component_to_edit:
+            parent_dialog.setWindowTitle(
+                f"Edit Component: {get_name_of_node(self.component_to_edit.group)}"
+            )
             self._fill_existing_entries()
             self.pixel_options.fill_existing_entries()
 
@@ -242,6 +245,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+        self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
         self.addFieldPushButton.clicked.connect(self.add_field)
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
@@ -293,6 +297,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.noShapeRadioButton.clicked.emit()
         else:
             if isinstance(component_shape, OFFGeometryNexus):
+                self.cad_file_name = component_shape.file_path
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
                 if component_shape.file_path:
@@ -322,6 +327,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             for field in fields:
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
+                new_ui_field.attrs = field
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
@@ -536,17 +542,19 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :param pixel_data: The component PixelData. Can be None.
         :return: The geometry object.
         """
-        self.component_to_edit.name = component_name
-        self.component_to_edit.nx_class = nx_class
-        self.component_to_edit.description = description
-        # remove the previous shape from the qt3d view
-        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
-            self.instrument.remove_component(self.component_to_edit)
 
         # remove previous fields
         for field_group in self.component_to_edit.group.values():
             if field_group.name.split("/")[-1] not in INVALID_FIELD_NAMES:
                 del self.instrument.nexus.nexus_file[field_group.name]
+
+        # remove the previous shape from the qt3d view
+        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
+
+        self.component_to_edit.name = component_name
+        self.component_to_edit.nx_class = nx_class
+        self.component_to_edit.description = description
 
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)

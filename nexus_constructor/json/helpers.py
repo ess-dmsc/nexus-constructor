@@ -7,8 +7,9 @@ def handle_non_std_types(value):
         return bool(value)
     elif type(value) is np.ndarray:
         return list(value)
-    raise (TypeError("Unknown type: {}".format(str(type(value)))))
-
+    elif type(value) is np.int8:
+        return int(value)
+    raise (TypeError("Unknown type: {}".format(type(value))))
 
 def object_to_json_file(tree_dict, file):
     """
