@@ -3,11 +3,11 @@ import numpy as np
 
 
 def handle_non_std_types(value):
-    if type(value) is np.bool_:
+    if type(value) is np.bool_ or type(value) is np.bool:
         return bool(value)
     elif type(value) is np.ndarray:
         return list(value)
-    raise (TypeError("Unknown type: {}".format(type(value))))
+    raise (TypeError("Unknown type: {}".format(str(type(value)))))
 
 
 def object_to_json_file(tree_dict, file):

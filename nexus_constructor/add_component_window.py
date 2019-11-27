@@ -142,11 +142,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.buttonBox.setEnabled(False)
 
         # Set default URL to nexus base classes in web view
-        self.webEngineView.setUrl(
-            QUrl(
-                "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
-            )
-        )
+        # self.webEngineView.setUrl(
+        #     QUrl(
+        #         "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
+        #     )
+        # )
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
@@ -359,11 +359,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
     def on_nx_class_changed(self):
-        self.webEngineView.setUrl(
-            QUrl(
-                f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
-            )
-        )
+        # self.webEngineView.setUrl(
+        #     QUrl(
+        #         f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
+        #     )
+        # )
         self.possible_fields = self.nx_component_classes[
             self.componentTypeComboBox.currentText()
         ]
