@@ -4,4 +4,9 @@
 # the field name line edit would cause conflicts.
 from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
 
-INVALID_FIELD_NAMES = ["description", "shape", "depends_on"] + PIXEL_FIELDS
+INVALID_FIELD_NAMES = [
+    "description",
+    "shape",
+    "depends_on",
+    "pixel_shape",
+] + PIXEL_FIELDS

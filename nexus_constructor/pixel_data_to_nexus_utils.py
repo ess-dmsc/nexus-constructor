@@ -7,7 +7,6 @@ PIXEL_FIELDS = [
     "x_pixel_offset",
     "y_pixel_offset",
     "z_pixel_offset",
-    "pixel_shape",
     "detector_number",
     "detector_faces",
 ]

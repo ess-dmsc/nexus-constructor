@@ -384,6 +384,7 @@ class Component:
             shape_group = self.file.create_nx_group(
                 SHAPE_GROUP_NAME, nexus_name, self.group
             )
+            self._shape = ComponentShape(self.file, self.group)
         return shape_group
 
     @property

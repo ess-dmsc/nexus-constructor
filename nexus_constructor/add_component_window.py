@@ -600,16 +600,19 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         that the pixel options are visible then performs further checks depending on if the mesh or cylinder button
         has been selected.
         """
-        if not self.pixelOptionsWidget.isVisible():
-            return
+        try:
+            if not self.pixelOptionsWidget.isVisible():
+                return
 
-        if self.meshRadioButton.isChecked():
-            self.create_pixel_mapping_list_for_mesh()
+            if self.meshRadioButton.isChecked():
+                self.create_pixel_mapping_list_for_mesh()
 
-        if self.CylinderRadioButton.isChecked():
-            self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
-                self.cylinderCountSpinBox.value()
-            )
+            if self.CylinderRadioButton.isChecked():
+                self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
+                    self.cylinderCountSpinBox.value()
+                )
+        except RuntimeError:
+            pass
 
     def create_pixel_mapping_list_for_mesh(self):
         """
