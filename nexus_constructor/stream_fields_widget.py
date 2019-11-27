@@ -19,7 +19,7 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
-SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime",  "senv"]
+SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime", "senv"]
 F142_TYPES = [
     "byte",
     "ubyte",
