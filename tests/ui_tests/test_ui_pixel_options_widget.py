@@ -126,7 +126,7 @@ def replace_pixel_mapping_in_off_component(
     :param pixel_mapping: The PixelMapping or PixielGrid object.
     :param off_geometry: The OffGeometry.
     """
-    component.record_detector_number(pixel_mapping)
+    component.record_pixel_mapping(pixel_mapping)
     component.set_off_shape(off_geometry, pixel_data=pixel_mapping)
 
 
@@ -173,7 +173,7 @@ def off_component_with_pixel_mapping(
     off_geometry_file,
 ):
     component = Component(nexus_wrapper, nx_off_geometry_group)
-    component.record_detector_number(pixel_mapping_with_six_pixels)
+    component.record_pixel_mapping(pixel_mapping_with_six_pixels)
     component.set_off_shape(off_geometry_file, pixel_data=pixel_mapping_with_six_pixels)
 
     return component
@@ -194,7 +194,7 @@ def cylindrical_component_with_pixel_mapping(
     nexus_wrapper, nx_cylindrical_geometry_group, pixel_mapping_with_single_pixel
 ):
     component = Component(nexus_wrapper, nx_cylindrical_geometry_group)
-    component.record_detector_number(pixel_mapping_with_single_pixel)
+    component.record_pixel_mapping(pixel_mapping_with_single_pixel)
 
     return component
 

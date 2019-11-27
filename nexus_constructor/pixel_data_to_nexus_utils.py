@@ -3,6 +3,15 @@ from typing import List
 
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 
+PIXEL_FIELDS = [
+    "x_pixel_offset",
+    "y_pixel_offset",
+    "z_pixel_offset",
+    "pixel_shape",
+    "detector_number",
+    "detector_faces",
+]
+
 
 def get_detector_faces_from_pixel_mapping(mapping: PixelMapping):
     """

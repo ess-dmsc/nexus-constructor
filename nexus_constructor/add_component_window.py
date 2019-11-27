@@ -570,11 +570,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :param nx_class: The NXclass of the component.
         :param pixel_data: The pixel data.
         """
+        component.clear_pixel_data()
+
         if pixel_data is None or nx_class not in PIXEL_COMPONENT_TYPES:
             return
 
         if isinstance(pixel_data, PixelMapping):
-            component.record_detector_number(pixel_data)
+            component.record_pixel_mapping(pixel_data)
         if isinstance(pixel_data, PixelGrid):
             component.record_pixel_grid(pixel_data)
 

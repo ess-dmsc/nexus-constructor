@@ -2,14 +2,6 @@
 
 # These are invalid because there are separate inputs in the UI for these fields and therefore inputting them through
 # the field name line edit would cause conflicts.
-INVALID_FIELD_NAMES = [
-    "description",
-    "shape",
-    "depends_on",
-    "x_pixel_offset",
-    "y_pixel_offset",
-    "z_pixel_offset",
-    "detector_number",
-    "detector_faces",
-    "pixel_shape",
-]
+from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
+
+INVALID_FIELD_NAMES = ["description", "shape", "depends_on"] + PIXEL_FIELDS

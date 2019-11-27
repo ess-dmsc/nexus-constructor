@@ -1493,7 +1493,7 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
     ):
         add_component_dialog.on_ok()
         mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
-        mock_component.record_detector_number.assert_not_called()
+        mock_component.record_pixel_mapping.assert_not_called()
 
 
 def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
@@ -1528,7 +1528,7 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
         return_value=mock_component,
     ):
         add_component_dialog.on_ok()
-        mock_component.record_detector_number.assert_called_once_with(pixel_mapping)
+        mock_component.record_pixel_mapping.assert_called_once_with(pixel_mapping)
         mock_component.record_pixel_grid.assert_not_called()
 
 
@@ -1562,7 +1562,7 @@ def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
         return_value=mock_component,
     ):
         add_component_dialog.on_ok()
-        mock_component.record_detector_number.assert_not_called()
+        mock_component.record_pixel_mapping.assert_not_called()
         mock_component.record_pixel_grid.assert_not_called()
 
 
