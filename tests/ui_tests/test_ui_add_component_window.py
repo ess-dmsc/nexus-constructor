@@ -16,12 +16,12 @@ from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component.component import Component
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.geometry import OFFGeometryNoNexus, CylindricalGeometry
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.pixel_data import PixelGrid, PixelMapping
+from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
 from tests.helpers import create_nexus_wrapper
@@ -434,6 +434,23 @@ def enter_component_with_pixel_grid(
     mock_pixel_options.generate_pixel_data = Mock(
         return_value=PixelGrid(rows=pixel_grid_size, columns=pixel_grid_size)
     )
+
+
+def create_edit_component_window(
+    add_component_dialog: AddComponentDialog,
+    component_to_edit: Component,
+    parent_mock: Mock,
+    mock_pixel_options: Mock = None,
+    pixel_data: PixelData = None,
+):
+
+    # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
+    add_component_dialog.component_to_edit = component_to_edit
+    add_component_dialog.parent = Mock(return_value=parent_mock)
+
+    # Instruct the pixel options mock to generate different pixel data
+    if mock_pixel_options is not None:
+        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_data)
 
 
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
@@ -2277,13 +2294,13 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_gri
         add_component_dialog, component_name
     )
 
-    # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
-    add_component_dialog.component_to_edit = component_to_edit
-    add_component_dialog.parent = Mock(return_value=parent_mock)
-
-    # Instruct the pixel options mock to generate different pixel data
-    mock_pixel_options.generate_pixel_data = Mock(
-        return_value=PixelGrid(rows=new_pixel_grid_size, columns=new_pixel_grid_size)
+    # Make the Add Component dialog behave like an Edit Component dialog
+    create_edit_component_window(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelGrid(rows=new_pixel_grid_size, columns=new_pixel_grid_size),
     )
     add_component_dialog.on_ok()
 
@@ -2292,13 +2309,14 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_gri
         new_pixel_grid_size,
         new_pixel_grid_size,
     )
+    assert isinstance(component_to_edit.shape[0], CylindricalGeometry)
 
 
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pixel_mapping_is_written(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
-    prev_mapping = [5]
-    new_mapping = [6]
+    prev_detector_numbers = [5]
+    new_detector_numbers = [6]
 
     # Create a component with a pixel mapping
     component_name = "ComponentWithMapping"
@@ -2307,7 +2325,7 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
     )
     enter_component_name(qtbot, template, add_component_dialog, component_name)
     mock_pixel_options.generate_pixel_data = Mock(
-        return_value=PixelMapping(prev_mapping)
+        return_value=PixelMapping(prev_detector_numbers)
     )
     add_component_dialog.on_ok()
 
@@ -2317,22 +2335,24 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
-    add_component_dialog.component_to_edit = component_to_edit
-    add_component_dialog.parent = Mock(return_value=parent_mock)
-
-    # Instruct the pixel options mock to generate a different pixel mapping
-    mock_pixel_options.generate_pixel_data = Mock(
-        return_value=PixelMapping(new_mapping)
+    create_edit_component_window(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelMapping(new_detector_numbers),
     )
     add_component_dialog.on_ok()
 
     # Check that the change in pixel mapping is now stored in the component
-    assert component_to_edit.get_field("detector_number") == new_mapping
+    assert component_to_edit.get_field("detector_number") == new_detector_numbers
+    assert isinstance(component_to_edit.shape[0], CylindricalGeometry)
 
 
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapping_replaces_grid(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
+    detector_number = [3]
 
     # Create a component with a pixel grid
     component_name = "ComponentWithGrid"
@@ -2346,18 +2366,24 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapp
         add_component_dialog, component_name
     )
 
-    # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
-    add_component_dialog.component_to_edit = component_to_edit
-    add_component_dialog.parent = Mock(return_value=parent_mock)
-
-    # Instruct the pixel options mock to generate different pixel data
-    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping([3]))
+    # Make the Add Component dialog behave like an Edit Component dialog
+    create_edit_component_window(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelMapping(detector_number),
+    )
     add_component_dialog.on_ok()
 
     # Check that the pixel grid values no longer exist
     assert component_to_edit.get_field("x_pixel_offset") is None
     assert component_to_edit.get_field("y_pixel_offset") is None
     assert component_to_edit.get_field("z_pixel_offset") is None
+
+    # Check that the detector numbers field has the information from the Pixel Mapping
+    assert component_to_edit.get_field("detector_number") == detector_number
+    assert isinstance(component_to_edit.shape[0], CylindricalGeometry)
 
 
 def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_grid_is_erased():
