@@ -2386,8 +2386,33 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapp
     assert isinstance(component_to_edit.shape[0], CylindricalGeometry)
 
 
-def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_grid_is_erased():
-    pass
+def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_grid_is_erased(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+
+    # Create a component with a pixel grid
+    component_name = "ComponentWithGrid"
+    enter_component_with_pixel_grid(
+        add_component_dialog, component_name, mock_pixel_options, 3, qtbot, template
+    )
+    add_component_dialog.on_ok()
+
+    # Retrieve the newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    create_edit_component_window(
+        add_component_dialog, component_to_edit, parent_mock, mock_pixel_options, None
+    )
+    add_component_dialog.on_ok()
+
+    # Check that all pixel data values no longer exist
+    assert component_to_edit.get_field("x_pixel_offset") is None
+    assert component_to_edit.get_field("y_pixel_offset") is None
+    assert component_to_edit.get_field("z_pixel_offset") is None
+    assert component_to_edit.get_field("detector_number") is None
 
 
 def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_mapping_replaces_grid():
