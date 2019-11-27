@@ -2415,12 +2415,70 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_gr
     assert component_to_edit.get_field("detector_number") is None
 
 
-def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_mapping_replaces_grid():
-    pass
+def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_grid_replaces_mapping(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+
+    grid_size = 5
+
+    # Create a component with a pixel mapping
+    component_name = "ComponentWithMapping"
+    make_pixel_options_appear(
+        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, template
+    )
+    enter_component_name(qtbot, template, add_component_dialog, component_name)
+    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping([5]))
+    add_component_dialog.on_ok()
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    create_edit_component_window(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelGrid(rows=grid_size, columns=grid_size),
+    )
+    add_component_dialog.on_ok()
+
+    # Check that the change in pixel data is now stored in the component
+    assert component_to_edit.get_field("x_pixel_offset").shape == (grid_size, grid_size)
+    assert component_to_edit.get_field("detector_number").shape == (
+        grid_size,
+        grid_size,
+    )
 
 
-def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_mapping_THEN_mapping_is_erased():
-    pass
+def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_mapping_THEN_mapping_is_erased(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+
+    # Create a component with a pixel mapping
+    component_name = "ComponentWithMapping"
+    make_pixel_options_appear(
+        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, template
+    )
+    enter_component_name(qtbot, template, add_component_dialog, component_name)
+    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping([5]))
+    add_component_dialog.on_ok()
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    create_edit_component_window(
+        add_component_dialog, component_to_edit, parent_mock, mock_pixel_options, None
+    )
+    add_component_dialog.on_ok()
+
+    # Check that the pixel mapping data has been cleared
+    assert component_to_edit.get_field("detector_number") is None
 
 
 def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_no_pixel_data_THEN_pixel_grid_is_created():
