@@ -47,6 +47,7 @@ class Ui_Transformation(object):
         self.valueLabel = QLabel("Length", Transformation)
         self.length_layout.addWidget(self.valueLabel)
         self.value_spinbox = QDoubleSpinBox(Transformation)
+        self.value_spinbox.setDecimals(8)
         self.value_spinbox.setMaximumSize(QSize(100, 16777215))
         self.length_layout.addWidget(self.value_spinbox)
 
@@ -59,23 +60,27 @@ class Ui_Transformation(object):
     def _set_up_vector_box(self, Transformation):
         XYZ_MINIMUM = 0
         XYZ_MAXIMUM = 1000000
+        PRECISION = 5
         self.vector_layout = QHBoxLayout()
 
         self.x_layout = QFormLayout()
         self.x_spinbox = QDoubleSpinBox(Transformation)
         self.x_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
+        self.x_spinbox.setDecimals(PRECISION)
         self.x_layout.addRow("x:", self.x_spinbox)
         self.vector_layout.addLayout(self.x_layout)
 
         self.y_layout = QFormLayout()
         self.y_spinbox = QDoubleSpinBox(Transformation)
         self.y_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
+        self.y_spinbox.setDecimals(PRECISION)
         self.y_layout.addRow("y:", self.y_spinbox)
         self.vector_layout.addLayout(self.y_layout)
 
         self.z_layout = QFormLayout()
         self.z_spinbox = QDoubleSpinBox(Transformation)
         self.z_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
+        self.z_spinbox.setDecimals(PRECISION)
         self.z_layout.addRow("z:", self.z_spinbox)
         self.vector_layout.addLayout(self.z_layout)
 
