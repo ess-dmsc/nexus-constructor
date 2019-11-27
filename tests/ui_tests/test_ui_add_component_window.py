@@ -2292,7 +2292,15 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
     component_to_edit = get_new_component_from_dialog(
         add_component_dialog, component_name
     )
-    assert component_to_edit.get_field("detector_number") == prev_mapping
+
+    add_component_dialog.component_to_edit = component_to_edit
+    add_component_dialog.parent = Mock(return_value=parent_mock)
+    mock_pixel_options.generate_pixel_data = Mock(
+        return_value=PixelMapping(new_mapping)
+    )
+    add_component_dialog.on_ok()
+
+    assert component_to_edit.get_field("detector_number") == new_mapping
 
 
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapping_replaces_grid():
