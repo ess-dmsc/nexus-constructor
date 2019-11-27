@@ -91,6 +91,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         Populate the pixel fields based on what is already stored in the NeXus file.
         """
+        self.reset_pixel_mapping_list()
+
         if component_to_edit.get_field("x_pixel_offset") is not None:
             self.single_pixel_radio_button.setChecked(True)
             self.update_pixel_layout_visibility(True, False)
@@ -492,7 +494,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         :param n_items: The number of widgets to create.
         :param text: The label to be displayed next to the line edit. This is either faces or cylinders.
         """
-        self.pixel_mapping_widgets.clear()
+        self.reset_pixel_mapping_list()
 
         for i in range(n_items):
             pixel_mapping_widget = PixelMappingWidget(
