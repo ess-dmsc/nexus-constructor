@@ -395,7 +395,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             return
 
         # Set the mapping filename to None as cylinder mappings are not based on a mesh file.
-        self.current_mapping_filename = None
         self.reset_pixel_mapping_list()
         self.create_pixel_mapping_list(cylinder_number, "cylinder")
 
@@ -487,6 +486,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         self.pixel_mapping_widgets = []
         self.pixel_mapping_list_widget.clear()
+        self.current_mapping_filename = None
 
     def create_pixel_mapping_list(self, n_items: int, text: str):
         """
@@ -515,11 +515,5 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
             # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
-
-    def mapping_list_is_empty(self):
-        """
-        :return: True if there are zero pixel mapping widgets, false otherwise.
-        """
-        return len(self.pixel_mapping_widgets) == 0
 
     pixel_mapping_button_pressed = Signal()

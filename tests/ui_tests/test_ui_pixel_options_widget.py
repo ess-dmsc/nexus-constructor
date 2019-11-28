@@ -839,19 +839,3 @@ def test_GIVEN_call_to_create_pixel_mapping_widgets_WHEN_editing_a_component_THE
 
     pixel_options.create_pixel_mapping_list(new_value, "")
     assert len(pixel_options.pixel_mapping_widgets) == new_value
-
-
-def test_pixel_options_GIVEN_zero_mapping_widgets_WHEN_calling_mapping_list_is_empty_THEN_returns_true(
-    pixel_options
-):
-
-    pixel_options.pixel_mapping_widgets = []
-    assert pixel_options.mapping_list_is_empty()
-
-
-def test_pixel_options_GIVEN_nonzero_mapping_widgets_WHEN_calling_mapping_list_is_empty_THEN_returns_false(
-    pixel_options
-):
-
-    pixel_options.pixel_mapping_widgets = [None]
-    assert not pixel_options.mapping_list_is_empty()
