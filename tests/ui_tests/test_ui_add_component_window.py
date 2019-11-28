@@ -2486,7 +2486,7 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_gr
     )
 
     # Check that all pixel data values no longer exist
-    for field in PIXEL_FIELDS:
+    for field in PIXEL_FIELDS + ["pixel_shape"]:
         assert component_to_edit.get_field(field) is None
 
     assert isinstance(component_to_edit.shape[0], expected_geometry)
