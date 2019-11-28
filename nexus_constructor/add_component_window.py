@@ -97,6 +97,7 @@ def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget)
     :param field: The dataset to copy into the value line edit
     :param new_ui_field: The new UI field to fill in with existing data
     """
+    new_ui_field.name = get_name_of_node(field)
     new_ui_field.field_type = FieldType.kafka_stream.value
     new_ui_field.streams_widget.update_existing_stream_info(field)
 
