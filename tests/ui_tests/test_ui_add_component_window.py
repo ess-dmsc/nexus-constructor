@@ -2179,12 +2179,12 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stre
 
 @pytest.mark.parametrize("test_input", ["TdcTime", "senv"])
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_THEN_stream_dialog_shown_with_correct_options(
-    qtbot, test_input
+    qtbot, test_input, add_component_dialog, template
 ):
-    dialog, template = create_add_component_template(qtbot)
-
-    qtbot.mouseClick(dialog.addFieldPushButton, Qt.LeftButton)
-    field = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
 
     field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
     field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
