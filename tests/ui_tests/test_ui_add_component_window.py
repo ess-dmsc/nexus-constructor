@@ -415,14 +415,14 @@ def get_new_component_from_dialog(dialog: AddComponentDialog, name: str) -> Comp
             return component
 
 
-def enter_component_with_pixel_grid(
+def enter_component_with_pixel_fields(
     add_component_dialog: AddComponentDialog,
     button: QRadioButton,
     component_name: str,
     mock_pixel_options: Mock,
-    pixel_grid_size: int,
     qtbot: pytestqt.qtbot.QtBot,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
+    pixel_data: PixelData,
 ):
     """
     :param add_component_dialog:
@@ -431,16 +431,51 @@ def enter_component_with_pixel_grid(
     :param pixel_grid_size:
     :param qtbot:
     :param template:
-    :return:
     """
     make_pixel_options_appear(qtbot, button, add_component_dialog, template)
     enter_component_name(qtbot, template, add_component_dialog, component_name)
-    mock_pixel_options.generate_pixel_data = Mock(
-        return_value=PixelGrid(rows=pixel_grid_size, columns=pixel_grid_size)
+    mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_data)
+
+
+def enter_and_create_component_with_pixel_data(
+    add_component_dialog: AddComponentDialog,
+    component_name: str,
+    cylinders: bool,
+    mock_pixel_options: Mock,
+    qtbot: pytestqt.qtbot.QtBot,
+    template: QDialog,
+    pixel_data: PixelData = None,
+):
+
+    if cylinders:
+        button = add_component_dialog.CylinderRadioButton
+        expected_geometry = CylindricalGeometry
+    else:
+        button = add_component_dialog.meshRadioButton
+        expected_geometry = OFFGeometryNexus
+
+    enter_component_with_pixel_fields(
+        add_component_dialog,
+        button,
+        component_name,
+        mock_pixel_options,
+        qtbot,
+        template,
+        pixel_data,
     )
+    if not cylinders:
+        enter_file_path(
+            qtbot,
+            add_component_dialog,
+            template,
+            VALID_CUBE_MESH_FILE_PATH,
+            VALID_CUBE_OFF_FILE,
+        )
+    add_component_dialog.on_ok()
+    return expected_geometry
 
 
-def create_edit_component_window(
+def edit_component_with_pixel_fields(
     add_component_dialog: AddComponentDialog,
     component_to_edit: Component,
     parent_mock: Mock,
@@ -455,6 +490,8 @@ def create_edit_component_window(
     # Instruct the pixel options mock to generate different pixel data
     if mock_pixel_options is not None:
         mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_data)
+
+    add_component_dialog.on_ok()
 
 
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
@@ -2284,39 +2321,20 @@ def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_
 def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_grid_is_written(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
 ):
-
     prev_pixel_grid_size = 5
     new_pixel_grid_size = 3
 
-    if cylinders:
-        button = add_component_dialog.CylinderRadioButton
-        expected_geometry = CylindricalGeometry
-    else:
-        button = add_component_dialog.meshRadioButton
-        expected_geometry = OFFGeometryNexus
-
     # Create a component with a pixel grid
     component_name = "ComponentWithGrid"
-    enter_component_with_pixel_grid(
+    expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
-        button,
         component_name,
+        cylinders,
         mock_pixel_options,
-        prev_pixel_grid_size,
         qtbot,
         template,
+        PixelGrid(rows=prev_pixel_grid_size, columns=prev_pixel_grid_size),
     )
-
-    if not cylinders:
-        enter_file_path(
-            qtbot,
-            add_component_dialog,
-            template,
-            VALID_CUBE_MESH_FILE_PATH,
-            VALID_CUBE_OFF_FILE,
-        )
-
-    add_component_dialog.on_ok()
 
     # Retrieve the newly created component
     component_to_edit = get_new_component_from_dialog(
@@ -2324,14 +2342,13 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_gri
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
-    create_edit_component_window(
+    edit_component_with_pixel_fields(
         add_component_dialog,
         component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=new_pixel_grid_size, columns=new_pixel_grid_size),
     )
-    add_component_dialog.on_ok()
 
     # Check that the change in pixel data is now stored in the component
     assert component_to_edit.get_field("x_pixel_offset").shape == (
@@ -2348,31 +2365,17 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
     prev_detector_numbers = [5]
     new_detector_numbers = [6]
 
-    if cylinders:
-        button = add_component_dialog.CylinderRadioButton
-        expected_geometry = CylindricalGeometry
-    else:
-        button = add_component_dialog.meshRadioButton
-        expected_geometry = OFFGeometryNexus
-
     # Create a component with a pixel mapping
     component_name = "ComponentWithMapping"
-    make_pixel_options_appear(qtbot, button, add_component_dialog, template)
-    enter_component_name(qtbot, template, add_component_dialog, component_name)
-    mock_pixel_options.generate_pixel_data = Mock(
-        return_value=PixelMapping(prev_detector_numbers)
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        cylinders,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelMapping(prev_detector_numbers),
     )
-
-    if not cylinders:
-        enter_file_path(
-            qtbot,
-            add_component_dialog,
-            template,
-            VALID_CUBE_MESH_FILE_PATH,
-            VALID_CUBE_OFF_FILE,
-        )
-
-    add_component_dialog.on_ok()
 
     # Retrieve newly created component
     component_to_edit = get_new_component_from_dialog(
@@ -2380,14 +2383,13 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
-    create_edit_component_window(
+    edit_component_with_pixel_fields(
         add_component_dialog,
         component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelMapping(new_detector_numbers),
     )
-    add_component_dialog.on_ok()
 
     shape = component_to_edit.shape[0]
 
@@ -2403,37 +2405,17 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapping_replaces_grid(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
 ):
-    detector_number = [3]
-
-    if cylinders:
-        button = add_component_dialog.CylinderRadioButton
-        expected_geometry = CylindricalGeometry
-    else:
-        button = add_component_dialog.meshRadioButton
-        expected_geometry = OFFGeometryNexus
-
     # Create a component with a pixel grid
     component_name = "GridToMapping"
-    enter_component_with_pixel_grid(
+    expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
-        button,
         component_name,
+        cylinders,
         mock_pixel_options,
-        3,
         qtbot,
         template,
+        PixelGrid(),
     )
-
-    if not cylinders:
-        enter_file_path(
-            qtbot,
-            add_component_dialog,
-            template,
-            VALID_CUBE_MESH_FILE_PATH,
-            VALID_CUBE_OFF_FILE,
-        )
-
-    add_component_dialog.on_ok()
 
     # Retrieve the newly created component
     component_to_edit = get_new_component_from_dialog(
@@ -2441,14 +2423,14 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapp
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
-    create_edit_component_window(
+    detector_number = [3]
+    edit_component_with_pixel_fields(
         add_component_dialog,
         component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelMapping(detector_number),
     )
-    add_component_dialog.on_ok()
 
     # Check that the pixel grid values no longer exist
     assert component_to_edit.get_field("x_pixel_offset") is None
@@ -2472,35 +2454,17 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapp
 def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_grid_is_erased(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
 ):
-    if cylinders:
-        button = add_component_dialog.CylinderRadioButton
-        expected_geometry = CylindricalGeometry
-    else:
-        button = add_component_dialog.meshRadioButton
-        expected_geometry = OFFGeometryNexus
-
     # Create a component with a pixel grid
     component_name = "GridToNoPixels"
-    enter_component_with_pixel_grid(
+    expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
-        button,
         component_name,
+        cylinders,
         mock_pixel_options,
-        3,
         qtbot,
         template,
+        PixelGrid(),
     )
-
-    if not cylinders:
-        enter_file_path(
-            qtbot,
-            add_component_dialog,
-            template,
-            VALID_CUBE_MESH_FILE_PATH,
-            VALID_CUBE_OFF_FILE,
-        )
-
-    add_component_dialog.on_ok()
 
     # Retrieve the newly created component
     component_to_edit = get_new_component_from_dialog(
@@ -2508,10 +2472,9 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_gr
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
-    create_edit_component_window(
+    edit_component_with_pixel_fields(
         add_component_dialog, component_to_edit, parent_mock, mock_pixel_options, None
     )
-    add_component_dialog.on_ok()
 
     # Check that all pixel data values no longer exist
     assert component_to_edit.get_field("x_pixel_offset") is None
@@ -2526,32 +2489,17 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_gr
 def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_grid_replaces_mapping(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
 ):
-
-    grid_size = 5
-
-    if cylinders:
-        button = add_component_dialog.CylinderRadioButton
-        expected_geometry = CylindricalGeometry
-    else:
-        button = add_component_dialog.meshRadioButton
-        expected_geometry = OFFGeometryNexus
-
     # Create a component with a pixel mapping
     component_name = "MappingToGrid"
-    make_pixel_options_appear(qtbot, button, add_component_dialog, template)
-    enter_component_name(qtbot, template, add_component_dialog, component_name)
-    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping([5]))
-
-    if not cylinders:
-        enter_file_path(
-            qtbot,
-            add_component_dialog,
-            template,
-            VALID_CUBE_MESH_FILE_PATH,
-            VALID_CUBE_OFF_FILE,
-        )
-
-    add_component_dialog.on_ok()
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        cylinders,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelMapping([5]),
+    )
 
     # Retrieve newly created component
     component_to_edit = get_new_component_from_dialog(
@@ -2559,14 +2507,14 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_grid
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
-    create_edit_component_window(
+    grid_size = 5
+    edit_component_with_pixel_fields(
         add_component_dialog,
         component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=grid_size, columns=grid_size),
     )
-    add_component_dialog.on_ok()
 
     # Check that the change in pixel data is now stored in the component
     assert component_to_edit.get_field("x_pixel_offset").shape == (grid_size, grid_size)
@@ -2577,41 +2525,29 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_grid
 
     shape = component_to_edit.shape[0]
 
+    if not cylinders:
+        assert shape.detector_faces is None
+
     # Check that _shape is a PixelShape
     assert isinstance(component_to_edit._shape, PixelShape)
     assert isinstance(shape, expected_geometry)
-
-    if not cylinders:
-        assert shape.detector_faces is None
 
 
 @pytest.mark.parametrize("cylinders", [True, False])
 def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_mapping_THEN_mapping_is_erased(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
 ):
-    if cylinders:
-        button = add_component_dialog.CylinderRadioButton
-        expected_geometry = CylindricalGeometry
-    else:
-        button = add_component_dialog.meshRadioButton
-        expected_geometry = OFFGeometryNexus
-
     # Create a component with a pixel mapping
     component_name = "MappingToNoPixels"
-    make_pixel_options_appear(qtbot, button, add_component_dialog, template)
-    enter_component_name(qtbot, template, add_component_dialog, component_name)
-    mock_pixel_options.generate_pixel_data = Mock(return_value=PixelMapping([5]))
-
-    if not cylinders:
-        enter_file_path(
-            qtbot,
-            add_component_dialog,
-            template,
-            VALID_CUBE_MESH_FILE_PATH,
-            VALID_CUBE_OFF_FILE,
-        )
-
-    add_component_dialog.on_ok()
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        cylinders,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelMapping([5]),
+    )
 
     # Retrieve newly created component
     component_to_edit = get_new_component_from_dialog(
@@ -2619,10 +2555,9 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_mapping_THEN_mappi
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
-    create_edit_component_window(
+    edit_component_with_pixel_fields(
         add_component_dialog, component_to_edit, parent_mock, mock_pixel_options, None
     )
-    add_component_dialog.on_ok()
 
     shape = component_to_edit.shape[0]
 
@@ -2638,32 +2573,16 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_mapping_THEN_mappi
 def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_no_pixel_data_THEN_pixel_grid_is_created(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
 ):
-
-    grid_size = 6
-
-    if cylinders:
-        button = add_component_dialog.CylinderRadioButton
-        expected_geometry = CylindricalGeometry
-    else:
-        button = add_component_dialog.meshRadioButton
-        expected_geometry = OFFGeometryNexus
-
     # Create a component with no pixel data
     component_name = "NoPixelsToGrid"
-    make_pixel_options_appear(qtbot, button, add_component_dialog, template)
-    enter_component_name(qtbot, template, add_component_dialog, component_name)
-    mock_pixel_options.generate_pixel_data = Mock(return_value=None)
-
-    if not cylinders:
-        enter_file_path(
-            qtbot,
-            add_component_dialog,
-            template,
-            VALID_CUBE_MESH_FILE_PATH,
-            VALID_CUBE_OFF_FILE,
-        )
-
-    add_component_dialog.on_ok()
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        cylinders,
+        mock_pixel_options,
+        qtbot,
+        template,
+    )
 
     # Retrieve newly created component
     component_to_edit = get_new_component_from_dialog(
@@ -2671,14 +2590,14 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_no_pixel_data_THEN_pixe
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
-    create_edit_component_window(
+    grid_size = 6
+    edit_component_with_pixel_fields(
         add_component_dialog,
         component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=grid_size, columns=grid_size),
     )
-    add_component_dialog.on_ok()
 
     # Check that the change in pixel data is now stored in the component
     assert component_to_edit.get_field("x_pixel_offset").shape == (grid_size, grid_size)
@@ -2690,47 +2609,31 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_no_pixel_data_THEN_pixe
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_no_pixel_data_THEN_pixel_mapping_is_created(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
 ):
-
-    detector_number = [4]
-
-    if cylinders:
-        button = add_component_dialog.CylinderRadioButton
-        expected_geometry = CylindricalGeometry
-    else:
-        button = add_component_dialog.meshRadioButton
-        expected_geometry = OFFGeometryNexus
-
     # Create a component with no pixel data
     component_name = "NoPixelsToMapping"
-    make_pixel_options_appear(qtbot, button, add_component_dialog, template)
-    enter_component_name(qtbot, template, add_component_dialog, component_name)
-    mock_pixel_options.generate_pixel_data = Mock(return_value=None)
-
-    if not cylinders:
-        enter_file_path(
-            qtbot,
-            add_component_dialog,
-            template,
-            VALID_CUBE_MESH_FILE_PATH,
-            VALID_CUBE_OFF_FILE,
-        )
-
-    add_component_dialog.on_ok()
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        cylinders,
+        mock_pixel_options,
+        qtbot,
+        template,
+    )
 
     # Retrieve newly created component
     component_to_edit = get_new_component_from_dialog(
         add_component_dialog, component_name
     )
 
-    # Make the Add Component dialog behave like an Edit Component dialog
-    create_edit_component_window(
+    # Make the Add Component dialog behave like an Edit Component dialog and create a pixel mapping
+    detector_number = [4]
+    edit_component_with_pixel_fields(
         add_component_dialog,
         component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelMapping(detector_number),
     )
-    add_component_dialog.on_ok()
 
     shape = component_to_edit.shape[0]
 
