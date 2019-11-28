@@ -631,6 +631,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def update_pixel_input_validity(self):
         """
-        :return:
+        Instruct the PixelOptions widget to carry out another check for input validity.
         """
         self.pixel_options.update_pixel_input_validity()
