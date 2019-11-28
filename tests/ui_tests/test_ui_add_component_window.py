@@ -28,6 +28,7 @@ from nexus_constructor.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
+from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
 from tests.helpers import create_nexus_wrapper
@@ -52,6 +53,13 @@ UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"
 VALID_UNITS = "km"
 INVALID_UNITS = "abc"
+
+PIXEL_GRID_FIELDS = [
+    "x_pixel_offset",
+    "y_pixel_offset",
+    "z_pixel_offset",
+    "pixel_shape",
+]
 
 instrument = Instrument(NexusWrapper("pixels"), DEFINITIONS_DIR)
 component = ComponentTreeModel(instrument)
@@ -2351,10 +2359,12 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_gri
     )
 
     # Check that the change in pixel data is now stored in the component
-    assert component_to_edit.get_field("x_pixel_offset").shape == (
-        new_pixel_grid_size,
-        new_pixel_grid_size,
-    )
+    for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
+        assert component_to_edit.get_field(field).shape == (
+            new_pixel_grid_size,
+            new_pixel_grid_size,
+        )
+
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
 
@@ -2433,9 +2443,8 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapp
     )
 
     # Check that the pixel grid values no longer exist
-    assert component_to_edit.get_field("x_pixel_offset") is None
-    assert component_to_edit.get_field("y_pixel_offset") is None
-    assert component_to_edit.get_field("z_pixel_offset") is None
+    for field in PIXEL_GRID_FIELDS:
+        assert component_to_edit.get_field(field) is None
 
     # Check that the detector numbers field has the information from the Pixel Mapping
     assert component_to_edit.get_field("detector_number") == detector_number
@@ -2477,10 +2486,8 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_gr
     )
 
     # Check that all pixel data values no longer exist
-    assert component_to_edit.get_field("x_pixel_offset") is None
-    assert component_to_edit.get_field("y_pixel_offset") is None
-    assert component_to_edit.get_field("z_pixel_offset") is None
-    assert component_to_edit.get_field("detector_number") is None
+    for field in PIXEL_FIELDS:
+        assert component_to_edit.get_field(field) is None
 
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
@@ -2517,11 +2524,8 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_grid
     )
 
     # Check that the change in pixel data is now stored in the component
-    assert component_to_edit.get_field("x_pixel_offset").shape == (grid_size, grid_size)
-    assert component_to_edit.get_field("detector_number").shape == (
-        grid_size,
-        grid_size,
-    )
+    for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
+        assert component_to_edit.get_field(field).shape == (grid_size, grid_size)
 
     shape = component_to_edit.shape[0]
 
@@ -2600,7 +2604,8 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_no_pixel_data_THEN_pixe
     )
 
     # Check that the change in pixel data is now stored in the component
-    assert component_to_edit.get_field("x_pixel_offset").shape == (grid_size, grid_size)
+    for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
+        assert component_to_edit.get_field(field).shape == (grid_size, grid_size)
 
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
