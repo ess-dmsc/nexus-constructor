@@ -183,7 +183,9 @@ class NexusToDictConverter:
         # Add the entries
         entries = list(root.values())
         if root.name in self._kafka_streams:
-            root_dict = {"type": "stream", "stream": self._kafka_streams[root.name]}
+            root_dict["children"].append(
+                {"type": "stream", "stream": self._kafka_streams[root.name]}
+            )
 
         elif root.name in self._links.keys():
             root_dict = self._create_link_root_dict(

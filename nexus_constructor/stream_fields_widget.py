@@ -19,7 +19,7 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
-SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime"]
+SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime", "senv"]
 F142_TYPES = [
     "byte",
     "ubyte",
@@ -262,7 +262,7 @@ class StreamFieldsWidget(QDialog):
             self.hs00_unimplemented_label.setVisible(True)
         elif schema == "ns10":
             self._set_edits_visible(True, False, "nicos/<device>/<parameter>")
-        elif schema == "TdcTime":
+        elif schema == "TdcTime" or schema == "senv":
             self._set_edits_visible(True, False)
 
     def _set_edits_visible(self, source: bool, type: bool, source_hint=None):
@@ -288,7 +288,7 @@ class StreamFieldsWidget(QDialog):
         )
         group = temp_file.create_group("children")
         group.create_dataset(name="type", dtype=STRING_DTYPE, data="stream")
-        stream_group = group.create_group(self.parent().parent().name)
+        stream_group = group.create_group(self.parent().parent().field_name_edit.text())
         stream_group.attrs["NX_class"] = "NCstream"
         stream_group.create_dataset(
             name="topic", dtype=STRING_DTYPE, data=self.topic_line_edit.text()

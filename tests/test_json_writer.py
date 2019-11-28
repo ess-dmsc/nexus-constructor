@@ -247,7 +247,8 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
         file, streams={f"/{group_name}": group_contents}, links=[]
     )
 
-    assert group_contents == root_dict["children"][0]["stream"]
+    assert group_name == root_dict["children"][0]["name"]
+    assert group_contents == root_dict["children"][0]["children"][0]["stream"]
 
 
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children(

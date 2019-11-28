@@ -83,11 +83,6 @@ class FieldWidget(QFrame):
     ):
         super(FieldWidget, self).__init__(parent)
 
-        # We don't really care about this as it'll never end up in the JSON, but in order to save it into a nexus file it needs a name.
-        self.stream_group_name = (
-            stream_group_name if stream_group_name is not None else str(uuid.uuid4())
-        )
-
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
         self.instrument = instrument
@@ -187,11 +182,7 @@ class FieldWidget(QFrame):
 
     @property
     def name(self) -> str:
-        return (
-            self.field_name_edit.text()
-            if self.field_type != FieldType.kafka_stream
-            else self.stream_group_name
-        )
+        return self.field_name_edit.text()
 
     @name.setter
     def name(self, name: str):
@@ -282,7 +273,7 @@ class FieldWidget(QFrame):
         elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
             self.set_visibility(False, False, True, True)
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
-            self.set_visibility(False, False, True, False, show_name_line_edit=False)
+            self.set_visibility(False, False, True, False, show_name_line_edit=True)
         elif self.field_type_combo.currentText() == FieldType.link.value:
             self.set_visibility(True, False, False, False)
             self._set_up_value_validator(True)
