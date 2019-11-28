@@ -73,7 +73,10 @@ def get_fields(
                 "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream"
             ):
                 stream_fields.append(item)
-            elif (len(["NCstream" in dataset.attrs.values() for dataset in item.values()])>0):
+            elif (
+                len(["NCstream" in dataset.attrs.values() for dataset in item.values()])
+                > 0
+            ):
                 stream_fields.append(item)
     return scalar_fields, array_fields, stream_fields, link_fields
 
