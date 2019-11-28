@@ -841,21 +841,17 @@ def test_GIVEN_call_to_create_pixel_mapping_widgets_WHEN_editing_a_component_THE
     assert len(pixel_options.pixel_mapping_widgets) == new_value
 
 
-def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_with_multiple_pixels_THEN_expected_number_of_widgets_is_created(
-    pixel_options,
-    cylindrical_component_with_pixel_mapping,
-    nx_cylindrical_geometry_group,
-    pixel_mapping_with_six_pixels,
+def test_pixel_options_GIVEN_zero_mapping_widgets_WHEN_calling_mapping_list_is_empty_THEN_returns_true(
+    pixel_options
 ):
-    # TODO: Add test once pixel mapping accepts multiple cylinders
-    pass
+
+    pixel_options.pixel_mapping_widgets = []
+    assert pixel_options.mapping_list_is_empty()
 
 
-def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_WITH_multiple_pixels_THEN_pixel_data_is_recovered(
-    pixel_options,
-    cylindrical_component_with_pixel_mapping,
-    nx_cylindrical_geometry_group,
-    pixel_mapping_with_six_pixels,
+def test_pixel_options_GIVEN_nonzero_mapping_widgets_WHEN_calling_mapping_list_is_empty_THEN_returns_false(
+    pixel_options
 ):
-    # TODO: Add test once pixel mapping accepts multiple cylinders
-    pass
+
+    pixel_options.pixel_mapping_widgets = [None]
+    assert not pixel_options.mapping_list_is_empty()

@@ -2547,3 +2547,20 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_no_pixel_data_THEN_p
 
     # Check that the change in pixel data is now stored in the component
     assert component_to_edit.get_field("detector_number") == detector_number
+
+
+def test_UI_GIVEN_pixel_options_with_empty_mapping_list_WHEN_calling_create_pixel_mapping_list_for_mesh_THEN_list_is_created(
+    qtbot, template, add_component_dialog, mock_pixel_options
+):
+
+    cad_file_name = "a_file.off"
+    add_component_dialog.cad_file_name = cad_file_name
+    add_component_dialog.valid_file_given = True
+
+    mock_pixel_options.get_current_mapping_filename = Mock(return_value=cad_file_name)
+    mock_pixel_options.mapping_list_is_empty = Mock(return_value=True)
+
+    add_component_dialog.create_pixel_mapping_list_for_mesh()
+    mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_called_once_with(
+        cad_file_name
+    )

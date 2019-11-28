@@ -622,7 +622,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if (
             self.cad_file_name is not None
             and self.valid_file_given
-            and self.pixel_options.get_current_mapping_filename() != self.cad_file_name
+            and (
+                self.pixel_options.get_current_mapping_filename() != self.cad_file_name
+                or self.pixel_options.mapping_list_is_empty()
+            )
         ):
             self.pixel_options.populate_pixel_mapping_list_with_mesh(self.cad_file_name)
 

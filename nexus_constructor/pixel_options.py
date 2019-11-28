@@ -516,4 +516,10 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
             self.pixel_mapping_widgets.append(pixel_mapping_widget)
 
+    def mapping_list_is_empty(self):
+        """
+        :return: True if there are zero pixel mapping widgets, false otherwise.
+        """
+        return len(self.pixel_mapping_widgets) == 0
+
     pixel_mapping_button_pressed = Signal()
