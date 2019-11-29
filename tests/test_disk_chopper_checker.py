@@ -19,6 +19,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     _fields_have_correct_type,
     _edges_array_has_correct_shape,
     UNITS_REQUIRED,
+    _units_are_valid,
 )
 from tests.chopper_test_helpers import (
     N_SLITS,
@@ -29,11 +30,18 @@ from tests.chopper_test_helpers import (
 )
 from tests.helpers import InMemoryFile
 
+IMPROPER_UNITS = {
+    SLIT_EDGES_NAME: "lumen",
+    SLIT_HEIGHT_NAME: "terabytes",
+    RADIUS_NAME: "rutherford",
+}
+
 
 def value_side_effect(given_key, expected_key, data):
     """
     Function for mimicking a call to dataset.value[()] or dataset.attrs[attribute_name]
-    :param key: The key passed to __getitem__
+    :param given_key: The key passed to __getitem__
+    :param expected_key: The key which stores the data.
     :param data: The data returned from the call.
     :return: data if the correct key has been provided, otherwise a KeyError is raised.
     """
@@ -43,6 +51,11 @@ def value_side_effect(given_key, expected_key, data):
 
 
 def always_raise_key_error(key):
+    """
+    Raises a key error regardless of input.
+    :param key:
+    :return:
+    """
     raise KeyError
 
 
@@ -564,3 +577,31 @@ def test_user_defined_chopper_checker_GIVEN_units_missing_WHEN_checking_that_req
         field_that_needs_units
     ].attrs.__getitem__ = Mock(side_effect=always_raise_key_error)
     assert not user_defined_chopper_checker.required_fields_present()
+
+
+@pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
+def test_chopper_checker_GIVEN_input_cant_be_convered_to_any_units_WHEN_validating_units_THEN_returns_false(
+    user_defined_chopper_checker, field_that_needs_units
+):
+    user_defined_chopper_checker.fields_dict[
+        field_that_needs_units
+    ].attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(
+            key, expected_key="units", data="notaunit"
+        )
+    )
+    assert not _units_are_valid(user_defined_chopper_checker.fields_dict)
+
+
+@pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
+def test_chopper_checker_GIVEN_input_is_the_wrong_type_of_unit_THEN_validating_units_THEN_returns_false(
+    user_defined_chopper_checker, field_that_needs_units
+):
+    user_defined_chopper_checker.fields_dict[
+        field_that_needs_units
+    ].attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(
+            key, expected_key="units", data=IMPROPER_UNITS[field_that_needs_units]
+        )
+    )
+    assert not _units_are_valid(user_defined_chopper_checker.fields_dict)

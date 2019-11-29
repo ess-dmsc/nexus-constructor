@@ -161,6 +161,10 @@ def _input_describes_valid_chopper(
     return True
 
 
+def _units_are_valid(fields: dict):
+    return True
+
+
 class UserDefinedChopperChecker:
     def __init__(self, fields_widget: QListWidget):
 
@@ -184,7 +188,7 @@ class UserDefinedChopperChecker:
 
     def required_fields_present(self):
         """
-        Checks that all of the fields required to create the disk chopper are present.
+        Checks that all of the fields and attributes required to create the disk chopper are present.
         :return: True if all the required fields are present. False otherwise.
         """
         missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
@@ -195,17 +199,17 @@ class UserDefinedChopperChecker:
             )
             return False
 
-        units_missing = []
+        missing_units = []
 
         for field in UNITS_REQUIRED:
             try:
                 self.fields_dict[field].attrs["units"]
             except KeyError:
-                units_missing.append(field)
+                missing_units.append(field)
 
-        if len(units_missing) > 0:
+        if len(missing_units) > 0:
             logging.info(
-                f"{UNABLE} Units are missing from field(s):", ",".join(units_missing)
+                f"{UNABLE} Units are missing from field(s):", ",".join(missing_units)
             )
             return False
 
@@ -221,6 +225,7 @@ class UserDefinedChopperChecker:
         if not (
             self.required_fields_present()
             and _fields_have_correct_type(self.fields_dict)
+            and _units_are_valid(self.fields_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].value.ndim,
                 self.fields_dict[SLIT_EDGES_NAME].value.shape,
