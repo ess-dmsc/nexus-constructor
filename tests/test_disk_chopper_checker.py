@@ -20,6 +20,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     _edges_array_has_correct_shape,
     UNITS_REQUIRED,
     _units_are_valid,
+    EXPECTED_UNIT_TYPE,
 )
 from tests.chopper_test_helpers import (
     N_SLITS,
@@ -602,6 +603,22 @@ def test_chopper_checker_GIVEN_unit_has_wrong_type_WHEN_validating_units_THEN_re
     ].attrs.__getitem__ = Mock(
         side_effect=lambda key: value_side_effect(
             key, expected_key="units", data=IMPROPER_UNITS[field_that_needs_units]
+        )
+    )
+    assert not _units_are_valid(user_defined_chopper_checker.fields_dict)
+
+
+@pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
+def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validationg_units_THEN_returns_false(
+    user_defined_chopper_checker, field_that_needs_units
+):
+    user_defined_chopper_checker.fields_dict[
+        field_that_needs_units
+    ].attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(
+            key,
+            expected_key="units",
+            data="50" + EXPECTED_UNIT_TYPE[field_that_needs_units],
         )
     )
     assert not _units_are_valid(user_defined_chopper_checker.fields_dict)
