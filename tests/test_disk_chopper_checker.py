@@ -42,7 +42,7 @@ def value_side_effect(given_key, expected_key, data):
     raise KeyError
 
 
-def always_raise_key_error():
+def always_raise_key_error(key):
     raise KeyError
 
 

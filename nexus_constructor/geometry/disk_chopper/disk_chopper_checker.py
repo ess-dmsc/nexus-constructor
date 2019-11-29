@@ -195,6 +195,20 @@ class UserDefinedChopperChecker:
             )
             return False
 
+        units_missing = []
+
+        for field in UNITS_REQUIRED:
+            try:
+                self.fields_dict[field].attrs["units"]
+            except KeyError:
+                units_missing.append(field)
+
+        if len(units_missing) > 0:
+            logging.info(
+                f"{UNABLE} Units are missing from field(s):", ",".join(units_missing)
+            )
+            return False
+
         return True
 
     def validate_chopper(self):
