@@ -474,7 +474,7 @@ def test_GIVEN_stream_with_no_forwarder_streams_WHEN_generating_forwarder_comman
     }
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "ca")
+    generate_forwarder_command(dummy_file, streams, "ca", "")
 
     assert not literal_eval(dummy_file.getvalue())["streams"]
 
@@ -488,7 +488,7 @@ def test_GIVEN_stream_with_f142_command_WHEN_generating_forwarder_command_THEN_o
     }
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "ca")
+    generate_forwarder_command(dummy_file, streams, "ca", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1
@@ -507,7 +507,7 @@ def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142
     }
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "ca")
+    generate_forwarder_command(dummy_file, streams, "ca", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1
@@ -525,7 +525,7 @@ def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_ou
     }
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "pva")
+    generate_forwarder_command(dummy_file, streams, "pva", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1
@@ -548,7 +548,7 @@ def test_GIVEN_stream_with_one_pv_with_two_topics_WHEN_generating_forwarder_comm
     }
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "ca")
+    generate_forwarder_command(dummy_file, streams, "ca", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
 
@@ -576,7 +576,7 @@ def test_GIVEN_stream_with_pv_forwarding_to_three_topics_WHEN_generating_forward
     }
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "pva")
+    generate_forwarder_command(dummy_file, streams, "pva", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
 
