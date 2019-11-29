@@ -60,6 +60,9 @@ def mock_slit_edges_widget():
     mock_slit_edges_widget.name = SLIT_EDGES_NAME
     mock_slit_edges_widget.value = np.array([0.0, 43.4, 82.6, 150.1, 220.0, 250.3])
     mock_slit_edges_widget.dtype = np.single
+    mock_slit_edges_widget.attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(key, expected_key="units", data="deg")
+    )
 
     return mock_slit_edges_widget
 
@@ -74,6 +77,9 @@ def mock_radius_widget():
         )
     )
     mock_radius_widget.dtype = np.single
+    mock_radius_widget.attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(key, expected_key="units", data="cm")
+    )
 
     return mock_radius_widget
 
@@ -88,6 +94,9 @@ def mock_slit_height_widget():
         )
     )
     mock_slit_height_widget.dtype = np.single
+    mock_slit_height_widget.attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(key, expected_key="units", data="cm")
+    )
 
     return mock_slit_height_widget
 
