@@ -29,7 +29,7 @@ from tests.chopper_test_helpers import (
 from tests.helpers import InMemoryFile
 
 
-def value_side_effect(key, data):
+def value_side_effect(given_key, expected_key, data):
     """
     Function for mimicking a call to dataset.value[()]
     :param key: The key passed to __getitem__
@@ -37,7 +37,7 @@ def value_side_effect(key, data):
     :return: data if the correct key has been provided, None otherwise. If something other than an empty tuple is given,
     returning None should still cause tests to fail even though it isn't raising an exception.
     """
-    if key == ():
+    if given_key == expected_key:
         return data
     return None
 
@@ -47,7 +47,7 @@ def mock_slits_widget():
     mock_slits_widget = Mock(spec=FieldWidget)
     mock_slits_widget.name = SLITS_NAME
     mock_slits_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, data=N_SLITS)
+        side_effect=lambda key: value_side_effect(key, expected_key=(), data=N_SLITS)
     )
     mock_slits_widget.dtype = np.intc
 
@@ -69,7 +69,9 @@ def mock_radius_widget():
     mock_radius_widget = Mock(spec=FieldWidget)
     mock_radius_widget.name = RADIUS_NAME
     mock_radius_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, data=RADIUS_LENGTH)
+        side_effect=lambda key: value_side_effect(
+            key, expected_key=(), data=RADIUS_LENGTH
+        )
     )
     mock_radius_widget.dtype = np.single
 
@@ -81,7 +83,9 @@ def mock_slit_height_widget():
     mock_slit_height_widget = Mock(spec=FieldWidget)
     mock_slit_height_widget.name = SLIT_HEIGHT_NAME
     mock_slit_height_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, data=SLIT_HEIGHT_LENGTH)
+        side_effect=lambda key: value_side_effect(
+            key, expected_key=(), data=SLIT_HEIGHT_LENGTH
+        )
     )
     mock_slit_height_widget.dtype = np.single
 
@@ -537,3 +541,9 @@ def test_GIVEN_validation_passes_WHEN_validating_nexus_disk_chopper_THEN_chopper
     assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
     assert chopper_details.radius == pytest.approx(RADIUS_LENGTH)
     assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
+
+
+def test_user_defined_chopper_checker_GIVEN_units_missing_WHEN_checking_that_required_fields_are_present_THEN_returns_false(
+    user_defined_chopper_checker
+):
+    pass
