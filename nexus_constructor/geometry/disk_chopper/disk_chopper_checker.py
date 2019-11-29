@@ -27,6 +27,8 @@ REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES_NAME, SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT
 INT_TYPES = [value for value in DATASET_TYPE.values() if "int" in str(value)]
 FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)]
 
+UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
+
 
 def _incorrect_field_type_message(fields_dict: dict, field_name: str):
     """

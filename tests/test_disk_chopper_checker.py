@@ -18,6 +18,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     _check_data_type,
     _fields_have_correct_type,
     _edges_array_has_correct_shape,
+    UNITS_REQUIRED,
 )
 from tests.chopper_test_helpers import (
     N_SLITS,
@@ -31,15 +32,18 @@ from tests.helpers import InMemoryFile
 
 def value_side_effect(given_key, expected_key, data):
     """
-    Function for mimicking a call to dataset.value[()]
+    Function for mimicking a call to dataset.value[()] or dataset.attrs[attribute_name]
     :param key: The key passed to __getitem__
     :param data: The data returned from the call.
-    :return: data if the correct key has been provided, None otherwise. If something other than an empty tuple is given,
-    returning None should still cause tests to fail even though it isn't raising an exception.
+    :return: data if the correct key has been provided, otherwise a KeyError is raised.
     """
     if given_key == expected_key:
         return data
-    return None
+    raise KeyError
+
+
+def always_raise_key_error():
+    raise KeyError
 
 
 @pytest.fixture(scope="function")
@@ -552,7 +556,11 @@ def test_GIVEN_validation_passes_WHEN_validating_nexus_disk_chopper_THEN_chopper
     assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
 
 
+@pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_user_defined_chopper_checker_GIVEN_units_missing_WHEN_checking_that_required_fields_are_present_THEN_returns_false(
-    user_defined_chopper_checker
+    user_defined_chopper_checker, field_that_needs_units
 ):
-    pass
+    user_defined_chopper_checker.fields_dict[
+        field_that_needs_units
+    ].attrs.__getitem__ = Mock(side_effect=always_raise_key_error)
+    assert not user_defined_chopper_checker.required_fields_present()
