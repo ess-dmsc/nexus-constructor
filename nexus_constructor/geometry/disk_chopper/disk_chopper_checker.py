@@ -1,6 +1,7 @@
 import logging
 from typing import Sequence, Dict
 
+import pint
 from PySide2.QtWidgets import QListWidget
 import numpy as np
 from h5py import Group
@@ -28,6 +29,7 @@ INT_TYPES = [value for value in DATASET_TYPE.values() if "int" in str(value)]
 FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)]
 
 UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
+EXPECTED_UNIT_TYPE = {RADIUS_NAME: "mm", SLIT_EDGES_NAME: "deg", SLIT_HEIGHT_NAME: "mm"}
 
 
 def _incorrect_field_type_message(fields_dict: dict, field_name: str):
@@ -161,7 +163,39 @@ def _input_describes_valid_chopper(
     return True
 
 
-def _units_are_valid(fields: dict):
+def _units_are_valid(fields_dict: dict) -> bool:
+    """
+
+    :param fields_dict:
+    :return:
+    """
+    bad_units = set()
+    ureg = pint.UnitRegistry()
+
+    for field in UNITS_REQUIRED:
+        unit_input = fields_dict[field].attrs["units"]
+        try:
+            unit = ureg(unit_input)
+        except (
+            pint.errors.UndefinedUnitError,
+            AttributeError,
+            pint.compat.tokenize.TokenError,
+        ):
+            bad_units.add(field)
+            continue
+
+        try:
+            unit.to(EXPECTED_UNIT_TYPE[field])
+        except (pint.errors.DimensionalityError, ValueError):
+            bad_units.add(field)
+            continue
+
+        if unit.magnitude != 1:
+            bad_units.add(field)
+
+    if len(bad_units) > 0:
+        return False
+
     return True
 
 
@@ -301,7 +335,6 @@ class NexusDefinedChopperChecker:
         if not (
             self.required_fields_present()
             and _fields_have_correct_type(self.fields_dict)
-            and _units_are_valid(self.fields_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].ndim,
                 self.fields_dict[SLIT_EDGES_NAME].shape,

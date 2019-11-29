@@ -95,7 +95,7 @@ def mock_radius_widget():
     )
     mock_radius_widget.dtype = np.single
     mock_radius_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key="units", data="cm")
+        side_effect=lambda key: value_side_effect(key, expected_key="units", data="mm")
     )
 
     return mock_radius_widget
@@ -112,7 +112,7 @@ def mock_slit_height_widget():
     )
     mock_slit_height_widget.dtype = np.single
     mock_slit_height_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key="units", data="cm")
+        side_effect=lambda key: value_side_effect(key, expected_key="units", data="mm")
     )
 
     return mock_slit_height_widget
@@ -580,7 +580,7 @@ def test_user_defined_chopper_checker_GIVEN_units_missing_WHEN_checking_that_req
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
-def test_chopper_checker_GIVEN_input_cant_be_convered_to_any_units_WHEN_validating_units_THEN_returns_false(
+def test_chopper_checker_GIVEN_input_cant_be_converted_to_any_units_WHEN_validating_units_THEN_returns_false(
     user_defined_chopper_checker, field_that_needs_units
 ):
     user_defined_chopper_checker.fields_dict[
@@ -594,7 +594,7 @@ def test_chopper_checker_GIVEN_input_cant_be_convered_to_any_units_WHEN_validati
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
-def test_chopper_checker_GIVEN_input_is_the_wrong_type_of_unit_THEN_validating_units_THEN_returns_false(
+def test_chopper_checker_GIVEN_unit_has_wrong_type_WHEN_validating_units_THEN_returns_false(
     user_defined_chopper_checker, field_that_needs_units
 ):
     user_defined_chopper_checker.fields_dict[
