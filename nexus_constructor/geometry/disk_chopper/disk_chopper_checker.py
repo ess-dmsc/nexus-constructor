@@ -1,13 +1,17 @@
 import logging
 from typing import Sequence, Dict
 
-import pint
 from PySide2.QtWidgets import QListWidget
 import numpy as np
 from h5py import Group
 
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from nexus_constructor.nexus.nexus_wrapper import decode_bytes_string
+from nexus_constructor.unit_utils import (
+    units_are_recognised_by_pint,
+    units_are_expected_type,
+    units_have_dimension_of_one,
+)
 from nexus_constructor.validators import DATASET_TYPE
 
 SLIT_EDGES_NAME = "slit_edges"
@@ -170,28 +174,17 @@ def _units_are_valid(fields_dict: dict) -> bool:
     :return:
     """
     bad_units = set()
-    ureg = pint.UnitRegistry()
 
     for field in UNITS_REQUIRED:
         unit_input = fields_dict[field].attrs["units"]
-        try:
-            unit = ureg(unit_input)
-        except (
-            pint.errors.UndefinedUnitError,
-            AttributeError,
-            pint.compat.tokenize.TokenError,
+
+        if not (
+            units_are_recognised_by_pint(unit_input)
+            and units_are_expected_type(unit_input, EXPECTED_UNIT_TYPE[field])
+            and units_have_dimension_of_one(unit_input)
         ):
             bad_units.add(field)
             continue
-
-        try:
-            unit.to(EXPECTED_UNIT_TYPE[field])
-        except (pint.errors.DimensionalityError, ValueError):
-            bad_units.add(field)
-            continue
-
-        if unit.magnitude != 1:
-            bad_units.add(field)
 
     if len(bad_units) > 0:
         return False

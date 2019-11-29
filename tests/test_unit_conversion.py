@@ -1,4 +1,4 @@
-from nexus_constructor.unit_converter import calculate_unit_conversion_factor
+from nexus_constructor.unit_utils import calculate_unit_conversion_factor
 from pytest import approx
 
 
