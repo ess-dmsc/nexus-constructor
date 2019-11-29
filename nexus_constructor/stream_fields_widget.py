@@ -315,19 +315,21 @@ class StreamFieldsWidget(QDialog):
         :param stream_group: The group to apply fields to.
         """
         if self.advanced_options_enabled:
-            stream_group.create_dataset(
-                ADC_PULSE_DEBUG,
-                dtype=bool,
-                data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
-            )
+            if self.ev42_adc_pulse_debug_checkbox.isChecked():
+                stream_group.create_dataset(
+                    ADC_PULSE_DEBUG,
+                    dtype=bool,
+                    data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
+                )
 
             for (
                 nexus_string,
                 ui_element,
             ) in self.ev42_nexus_to_spinner_ui_element.items():
-                stream_group.create_dataset(
-                    nexus_string, dtype=int, data=ui_element.value()
-                )
+                if ui_element.value() > 0:
+                    stream_group.create_dataset(
+                        nexus_string, dtype=int, data=ui_element.value()
+                    )
 
     def _create_f142_fields(self, stream_group: h5py.Group):
         """
@@ -347,9 +349,10 @@ class StreamFieldsWidget(QDialog):
                 nexus_string,
                 ui_element,
             ) in self.f142_nexus_to_spinner_ui_element.items():
-                stream_group.create_dataset(
-                    nexus_string, dtype=int, data=ui_element.value()
-                )
+                if ui_element.value() > 0:
+                    stream_group.create_dataset(
+                        nexus_string, dtype=int, data=ui_element.value()
+                    )
 
     def fill_in_existing_ev42_fields(self, field: h5py.Group):
         """
