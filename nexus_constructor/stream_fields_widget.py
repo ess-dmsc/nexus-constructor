@@ -283,7 +283,7 @@ class StreamFieldsWidget(QDialog):
         """
 
         temp_file = h5py.File(
-            name=str(uuid.uuid4()), driver="core", backing_store=False
+            name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
         )
         group = temp_file.create_group("children")
         group.create_dataset(name="type", dtype=STRING_DTYPE, data="stream")
