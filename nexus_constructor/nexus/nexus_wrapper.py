@@ -59,9 +59,7 @@ def get_fields(
     link_fields = []
     for item in group.values():
         if get_name_of_node(item) not in INVALID_FIELD_NAMES:
-            if (
-                isinstance(item, h5py.Dataset)
-            ):
+            if isinstance(item, h5py.Dataset):
                 if np.isscalar(item[()]):
                     scalar_fields.append(item)
                     continue
@@ -70,11 +68,17 @@ def get_fields(
                 if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
                     link_fields.append(item)
                 elif (
-                    "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream"
+                    "NX_class" in item.attrs.keys()
+                    and item.attrs["NX_class"] == "NCstream"
                 ):
                     stream_fields.append(item)
                 elif (
-                    len(["NCstream" in dataset.attrs.values() for dataset in item.values()])
+                    len(
+                        [
+                            "NCstream" in dataset.attrs.values()
+                            for dataset in item.values()
+                        ]
+                    )
                     > 0
                 ):
                     stream_fields.append(item)
