@@ -12,6 +12,7 @@ from nexus_constructor.json.filewriter_json_writer import (
     create_writer_commands,
     generate_json,
     _add_attributes,
+    ATTR_BLACKLIST,
 )
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
@@ -247,7 +248,8 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
         file, streams={f"/{group_name}": group_contents}, links=[]
     )
 
-    assert group_contents == root_dict["children"][0]["stream"]
+    assert group_name == root_dict["children"][0]["name"]
+    assert group_contents == root_dict["children"][0]["children"][0]["stream"]
 
 
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children(
@@ -641,3 +643,14 @@ def test_GIVEN_attribute_WHEN_adding_attributes_THEN_attrs_are_added_to_root_dic
     assert root_dict["attributes"]
     assert root_dict["attributes"][0]["name"] == attr_key
     assert root_dict["attributes"][0]["values"] == attr_value
+
+
+def test_GIVEN_attribute_in_blacklist_WHEN_adding_attributes_THEN_attrs_is_blank(file):
+    root_dict = dict()
+    dataset_name = "test"
+    dataset = file.create_dataset(dataset_name, data=123)
+    attr_key = ATTR_BLACKLIST[0]
+    attr_value = "some_value"
+    dataset.attrs[attr_key] = attr_value
+    _add_attributes(dataset, root_dict)
+    assert not root_dict
