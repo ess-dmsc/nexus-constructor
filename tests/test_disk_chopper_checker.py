@@ -53,9 +53,8 @@ def value_side_effect(given_key, expected_key, data):
 
 def always_raise_key_error(key):
     """
-    Raises a key error regardless of input.
+    Raises a key error regardless of input. Mimics
     :param key:
-    :return:
     """
     raise KeyError
 
@@ -96,7 +95,7 @@ def mock_radius_widget():
     )
     mock_radius_widget.dtype = np.single
     mock_radius_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key="units", data="mm")
+        side_effect=lambda key: value_side_effect(key, expected_key="units", data="m")
     )
 
     return mock_radius_widget
@@ -113,7 +112,7 @@ def mock_slit_height_widget():
     )
     mock_slit_height_widget.dtype = np.single
     mock_slit_height_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key="units", data="mm")
+        side_effect=lambda key: value_side_effect(key, expected_key="units", data="m")
     )
 
     return mock_slit_height_widget
@@ -272,8 +271,9 @@ def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_ar
 
 
 def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
-    user_defined_chopper_checker
+    user_defined_chopper_checker, mock_slit_edges_widget
 ):
+    print(mock_slit_edges_widget.attrs["units"])
     assert user_defined_chopper_checker.validate_chopper()
 
 
@@ -609,7 +609,7 @@ def test_chopper_checker_GIVEN_unit_has_wrong_type_WHEN_validating_units_THEN_re
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
-def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validationg_units_THEN_returns_false(
+def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validating_units_THEN_returns_false(
     user_defined_chopper_checker, field_that_needs_units
 ):
     user_defined_chopper_checker.fields_dict[
