@@ -300,25 +300,36 @@ class NexusDefinedChopperChecker:
 
     def required_fields_present(self) -> bool:
 
-        try:
+        missing_fields = []
 
-            self.fields_dict[SLITS_NAME] = self._disk_chopper[SLITS_NAME][()]
-            self.fields_dict[SLIT_EDGES_NAME] = self._disk_chopper[SLIT_EDGES_NAME][()]
-            self.fields_dict[RADIUS_NAME] = self._disk_chopper[RADIUS_NAME][()]
-            self.fields_dict[SLIT_HEIGHT_NAME] = self._disk_chopper[SLIT_HEIGHT_NAME][
-                ()
-            ]
-            self.units_dict[SLIT_EDGES_NAME] = (
-                self._disk_chopper[SLIT_EDGES_NAME].attrs["units"].decode()
-            )
-            self.units_dict[SLIT_HEIGHT_NAME] = (
-                self._disk_chopper[SLIT_HEIGHT_NAME].attrs["units"].decode()
-            )
-            self.units_dict[RADIUS_NAME] = (
-                self._disk_chopper[RADIUS_NAME].attrs["units"].decode()
-            )
+        for field in REQUIRED_CHOPPER_FIELDS:
+            try:
+                self.fields_dict[field] = self._disk_chopper[field][()]
+            except KeyError:
+                missing_fields.append(field)
 
-        except (KeyError, AttributeError):
+        if len(missing_fields) > 0:
+            logging.info(
+                f"{UNABLE} Required field(s) missing:", ",".join(missing_fields)
+            )
+            return False
+
+        missing_units = []
+
+        for field in UNITS_REQUIRED:
+            try:
+                self.units_dict[field] = (
+                    self._disk_chopper[field].attrs["units"].decode()
+                )
+            except (KeyError, AttributeError):
+                missing_units.append(field)
+
+        if len(missing_units) > 0:
+            logging.info(
+                f"{UNABLE} Unable to recover unit information from field(s):",
+                ",".join(missing_fields),
+                ". Either absent or not in the form of a byte string.",
+            )
             return False
 
         return True
