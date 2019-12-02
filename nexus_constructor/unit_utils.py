@@ -56,4 +56,4 @@ def calculate_unit_conversion_factor(units: str, desired_units: str) -> float:
     :return: A float value for converting between the original units and the desired units.
     """
     input_quantity = 1.0 * ureg.parse_expression(units)
-    return input_quantity.to(ureg(desired_units)).magnitude
+    return input_quantity.to(desired_units).magnitude
