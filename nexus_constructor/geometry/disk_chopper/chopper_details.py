@@ -1,8 +1,11 @@
 import numpy as np
+import pint
 
 from nexus_constructor.unit_utils import calculate_unit_conversion_factor
 
 TWO_PI = np.pi * 2
+
+ureg = pint.UnitRegistry()
 
 
 class ChopperDetails:
@@ -32,22 +35,14 @@ class ChopperDetails:
         self._radius = radius
         self._slit_height = slit_height
 
-        # Convert the angles to radians (if necessary) and make sure they are all less then two pi
-        if angle_units == "deg":
-            self._slit_edges = [np.deg2rad(edge) % TWO_PI for edge in slit_edges]
-        else:
-            self._slit_edges = [edge % TWO_PI for edge in slit_edges]
+        # Convert the angles to radians and make sure they are all less then two pi
+        slit_edges_factor = calculate_unit_conversion_factor(angle_units, "radians")
+        self._slit_edges = [edge * slit_edges_factor % TWO_PI for edge in slit_edges]
 
-        # Something should check that the units a valid before we get to this point
-        if slit_height_units != "m":
-
-            factor = calculate_unit_conversion_factor(slit_height_units)
-            self._slit_height *= factor
-
-        if radius_units != "m":
-
-            factor = calculate_unit_conversion_factor(radius_units)
-            self._radius *= factor
+        self._slit_height *= calculate_unit_conversion_factor(
+            slit_height_units, "metres"
+        )
+        self._radius *= calculate_unit_conversion_factor(radius_units, "metres")
 
     @property
     def slits(self):

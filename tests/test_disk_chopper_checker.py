@@ -26,8 +26,8 @@ from tests.chopper_test_helpers import (
     N_SLITS,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
-    EDGES_ARR,
-    CONVERT_DEGREES_TO_RADIANS,
+    DEGREES_EDGES_ARR,
+    RADIANS_EDGES_ARR,
 )
 from tests.helpers import InMemoryFile
 
@@ -53,8 +53,8 @@ def value_side_effect(given_key, expected_key, data):
 
 def always_raise_key_error(key):
     """
-    Raises a key error regardless of input. Mimics
-    :param key:
+    Raises a key error regardless of input. Used to mimic a field with a missing "units" attribute.
+    :param key: The key used for the call to dataset.attrs[key].
     """
     raise KeyError
 
@@ -75,7 +75,7 @@ def mock_slits_widget():
 def mock_slit_edges_widget():
     mock_slit_edges_widget = Mock(spec=FieldWidget)
     mock_slit_edges_widget.name = SLIT_EDGES_NAME
-    mock_slit_edges_widget.value = np.array([0.0, 43.4, 82.6, 150.1, 220.0, 250.3])
+    mock_slit_edges_widget.value = DEGREES_EDGES_ARR
     mock_slit_edges_widget.dtype = np.single
     mock_slit_edges_widget.attrs.__getitem__ = Mock(
         side_effect=lambda key: value_side_effect(key, expected_key="units", data="deg")
@@ -171,7 +171,7 @@ def nexus_disk_chopper():
         disk_chopper_group = nexus_file.create_group("Disk Chopper")
         disk_chopper_group[NAME] = "abc"
         disk_chopper_group[SLITS_NAME] = N_SLITS
-        disk_chopper_group[SLIT_EDGES_NAME] = EDGES_ARR
+        disk_chopper_group[SLIT_EDGES_NAME] = RADIANS_EDGES_ARR
         disk_chopper_group[RADIUS_NAME] = RADIUS_LENGTH
         disk_chopper_group[SLIT_HEIGHT_NAME] = SLIT_HEIGHT_LENGTH
         disk_chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
@@ -447,9 +447,7 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
     user_defined_chopper_checker.validate_chopper()
     details = user_defined_chopper_checker.chopper_details
 
-    radian_slit_edges = CONVERT_DEGREES_TO_RADIANS(mock_slit_edges_widget.value)
-
-    assert np.array_equal(details.slit_edges, radian_slit_edges)
+    assert np.allclose(details.slit_edges, RADIANS_EDGES_ARR)
     assert details.slits == mock_slits_widget.value[()]
     assert details.radius == pytest.approx(mock_radius_widget.value[()])
     assert details.slit_height == pytest.approx(mock_slit_height_widget.value[()])
@@ -464,7 +462,7 @@ def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_de
     assert chopper_details.slits == N_SLITS
     assert chopper_details.radius == pytest.approx(RADIUS_LENGTH)
     assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
-    assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
+    assert np.allclose(chopper_details.slit_edges, RADIANS_EDGES_ARR)
 
 
 def test_GIVEN_valid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_true(
@@ -565,7 +563,7 @@ def test_GIVEN_validation_passes_WHEN_validating_nexus_disk_chopper_THEN_chopper
     chopper_details = nexus_defined_chopper_checker.chopper_details
 
     assert chopper_details.slits == N_SLITS
-    assert np.array_equal(chopper_details.slit_edges, EDGES_ARR)
+    assert np.allclose(chopper_details.slit_edges, RADIANS_EDGES_ARR)
     assert chopper_details.radius == pytest.approx(RADIUS_LENGTH)
     assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
 
@@ -644,9 +642,9 @@ def test_user_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validati
 
 
 @pytest.mark.parametrize(
-    "units_attribute", ["degree", "degrees", "degs", "arcdegree", "arcdegrees"]
+    "units_attribute", ["degree", "degrees", "degs", "arcdegree", "arcdegrees", "°"]
 )
-def test_chopper_checker_GIVEN_different_ways_of_writing_degrees_WHEN_creating_chopper_details_THEN_slit_edges_array_is_not_converted(
+def test_chopper_checker_GIVEN_different_ways_of_writing_degrees_WHEN_creating_chopper_details_THEN_slit_edges_array_is_converted(
     user_defined_chopper_checker, mock_slit_edges_widget, units_attribute
 ):
 
@@ -656,7 +654,24 @@ def test_chopper_checker_GIVEN_different_ways_of_writing_degrees_WHEN_creating_c
         )
     )
     user_defined_chopper_checker.validate_chopper()
-    assert np.array_equal(
-        user_defined_chopper_checker.chopper_details.slit_edges,
-        mock_slit_edges_widget.value,
+    assert np.allclose(
+        user_defined_chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR
+    )
+
+
+@pytest.mark.parametrize(
+    "units_attribute", ["degree", "degrees", "degs", "arcdegree", "arcdegrees", "°"]
+)
+def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_chopper_details_THEN_slit_edges_array_is_not_converted(
+    user_defined_chopper_checker, mock_slit_edges_widget, units_attribute
+):
+
+    mock_slit_edges_widget.attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(
+            key, expected_key="units", data=units_attribute
+        )
+    )
+    user_defined_chopper_checker.validate_chopper()
+    assert np.allclose(
+        user_defined_chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR
     )
