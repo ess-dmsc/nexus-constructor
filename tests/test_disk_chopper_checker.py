@@ -624,9 +624,20 @@ def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validating_units_
     assert not _units_are_valid(user_defined_chopper_checker.fields_dict)
 
 
-def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_checking_field_types_THEN_returns_false(
+def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validating_chopper_THEN_returns_false(
     nexus_defined_chopper_checker, nexus_disk_chopper
 ):
 
-    nexus_disk_chopper[SLIT_HEIGHT_NAME].attrs["units"] = EDGES_ARR
+    nexus_disk_chopper[SLIT_HEIGHT_NAME].attrs["units"] = np.array(
+        [i for i in range(10)]
+    )
     assert not nexus_defined_chopper_checker.validate_chopper()
+
+
+def test_user_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validating_chopper_THEN_returns_false(
+    user_defined_chopper_checker, mock_radius_widget
+):
+    mock_radius_widget.attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(key, expected_key="units", data=True)
+    )
+    assert not user_defined_chopper_checker.validate_chopper()
