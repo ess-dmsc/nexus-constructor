@@ -214,7 +214,7 @@ class UserDefinedChopperChecker:
             self.fields_dict[widget.name] = widget
 
     @property
-    def chopper_details(self):
+    def chopper_details(self) -> ChopperDetails:
         """
         :return: The ChopperDetails object of the user-defined disk chopper.
         """
@@ -292,7 +292,7 @@ class NexusDefinedChopperChecker:
         self._disk_chopper = disk_chopper
 
     @property
-    def chopper_details(self):
+    def chopper_details(self) -> ChopperDetails:
         """
         :return: The ChopperDetails object of the NeXus-defined disk chopper.
         """

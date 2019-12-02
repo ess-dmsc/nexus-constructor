@@ -641,3 +641,22 @@ def test_user_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validati
         side_effect=lambda key: value_side_effect(key, expected_key="units", data=True)
     )
     assert not user_defined_chopper_checker.validate_chopper()
+
+
+@pytest.mark.parametrize(
+    "units_attribute", ["degree", "degrees", "degs", "arcdegree", "arcdegrees"]
+)
+def test_chopper_checker_GIVEN_different_ways_of_writing_degrees_WHEN_creating_chopper_details_THEN_slit_edges_array_is_not_converted(
+    user_defined_chopper_checker, mock_slit_edges_widget, units_attribute
+):
+
+    mock_slit_edges_widget.attrs.__getitem__ = Mock(
+        side_effect=lambda key: value_side_effect(
+            key, expected_key="units", data=units_attribute
+        )
+    )
+    user_defined_chopper_checker.validate_chopper()
+    assert np.array_equal(
+        user_defined_chopper_checker.chopper_details.slit_edges,
+        mock_slit_edges_widget.value,
+    )
