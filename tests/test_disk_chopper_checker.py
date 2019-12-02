@@ -663,6 +663,7 @@ def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_c
     user_defined_chopper_checker, mock_slit_edges_widget, units_attribute
 ):
 
+    mock_slit_edges_widget.value = RADIANS_EDGES_ARR
     mock_slit_edges_widget.attrs.__getitem__ = Mock(
         side_effect=lambda key: value_side_effect(
             key, expected_key="units", data=units_attribute
