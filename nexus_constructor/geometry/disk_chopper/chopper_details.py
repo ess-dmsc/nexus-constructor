@@ -1,11 +1,8 @@
 import numpy as np
-import pint
 
 from nexus_constructor.unit_utils import calculate_unit_conversion_factor
 
 TWO_PI = np.pi * 2
-
-ureg = pint.UnitRegistry()
 
 
 class ChopperDetails:
