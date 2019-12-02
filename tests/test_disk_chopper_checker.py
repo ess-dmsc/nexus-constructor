@@ -57,7 +57,8 @@ def always_raise_key_error(key):
     Raises a key error regardless of input. Used to mimic a field with a missing "units" attribute.
     :param key: The key used for the call to dataset.attrs[key].
     """
-    raise KeyError
+    if key is None or key is not None:
+        raise KeyError
 
 
 @pytest.fixture(scope="function")

@@ -26,9 +26,7 @@ class ChopperDetails:
         :param slit_edges: The list of slit edge angles in the disk chopper.
         :param radius: The radius of the slit chopper.
         :param slit_height: The slit height.
-        :param angle_units: The units of the slit edges. At the moment all slit edges provided are assumed to be degrees
-            because the faculty for specifying attributes of fields hasn't yet been implemented in the Add Component
-            Dialog.
+        :param angle_units: The units of the slit edges.
         :param slit_height_units: The units for the slit length.
         :param radius_units: The units for the radius.
         """
