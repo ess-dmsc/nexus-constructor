@@ -34,7 +34,7 @@ class ChopperDetails:
 
         # Convert the angles to radians and make sure they are all less then two pi
         slit_edges_factor = calculate_unit_conversion_factor(angle_units, "radians")
-        self._slit_edges = [edge * slit_edges_factor % TWO_PI for edge in slit_edges]
+        self._slit_edges = [(edge * slit_edges_factor) % TWO_PI for edge in slit_edges]
 
         self._slit_height *= calculate_unit_conversion_factor(
             slit_height_units, "metres"

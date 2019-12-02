@@ -10,26 +10,27 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     RADIUS_NAME,
     SLIT_EDGES_NAME,
     UserDefinedChopperChecker,
-    INT_TYPES,
-    FLOAT_TYPES,
-    _incorrect_field_type_message,
     NexusDefinedChopperChecker,
     NAME,
-    _check_data_type,
     _fields_have_correct_type,
     _edges_array_has_correct_shape,
     UNITS_REQUIRED,
     _units_are_valid,
     EXPECTED_UNIT_TYPE,
+    _check_data_type,
+    FLOAT_TYPES,
+    _incorrect_field_type_message,
+    INT_TYPES,
 )
 from tests.chopper_test_helpers import (
     N_SLITS,
+    DEGREES_EDGES_ARR,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
-    DEGREES_EDGES_ARR,
     RADIANS_EDGES_ARR,
 )
 from tests.helpers import InMemoryFile
+
 
 IMPROPER_UNITS = {
     SLIT_EDGES_NAME: "lumen",
@@ -75,12 +76,11 @@ def mock_slits_widget():
 def mock_slit_edges_widget():
     mock_slit_edges_widget = Mock(spec=FieldWidget)
     mock_slit_edges_widget.name = SLIT_EDGES_NAME
-    mock_slit_edges_widget.value = DEGREES_EDGES_ARR
+    mock_slit_edges_widget.value = np.array(DEGREES_EDGES_ARR)
     mock_slit_edges_widget.dtype = np.single
     mock_slit_edges_widget.attrs.__getitem__ = Mock(
         side_effect=lambda key: value_side_effect(key, expected_key="units", data="deg")
     )
-
     return mock_slit_edges_widget
 
 
@@ -273,7 +273,6 @@ def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_ar
 def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
     user_defined_chopper_checker, mock_slit_edges_widget
 ):
-    print(mock_slit_edges_widget.attrs["units"])
     assert user_defined_chopper_checker.validate_chopper()
 
 
@@ -659,10 +658,8 @@ def test_chopper_checker_GIVEN_different_ways_of_writing_degrees_WHEN_creating_c
     )
 
 
-@pytest.mark.parametrize(
-    "units_attribute", ["degree", "degrees", "degs", "arcdegree", "arcdegrees", "°"]
-)
-def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_chopper_details_THEN_slit_edges_array_is_not_converted(
+@pytest.mark.parametrize("units_attribute", ["radians", "rad", "radian"])
+def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_chopper_details_THEN_slit_edges_array_has_expected_values(
     user_defined_chopper_checker, mock_slit_edges_widget, units_attribute
 ):
 

@@ -3,7 +3,7 @@ import numpy as np
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 
 N_SLITS = 3
-DEGREES_EDGES_ARR = np.array([0.0, 43.4, 82.6, 150.1, 220.0, 250.3])
+DEGREES_EDGES_ARR = [0.0, 43.4, 82.6, 150.1, 220.0, 250.3]
 RADIUS_LENGTH = 200.3
 SLIT_HEIGHT_LENGTH = 70.1
 EXPECTED_Z = RADIUS_LENGTH * 0.025
