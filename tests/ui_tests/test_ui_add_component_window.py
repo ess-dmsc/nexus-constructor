@@ -15,6 +15,7 @@ from nexus_constructor.component import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.field_attrs import FieldAttrFrame
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
@@ -316,6 +317,22 @@ def enter_disk_chopper_fields(
     fields_widgets[1].table_view.model.array = np.array(
         [[(i * 10.0)] for i in range(12)]
     )
+
+    slit_edges_attribute_frame = FieldAttrFrame()
+    slit_edges_attribute_frame.attr_dtype_combo.setCurrentText("String")
+    slit_edges_attribute_frame.value = ("units", "deg")
+
+    radius_attribute_frame = FieldAttrFrame()
+    radius_attribute_frame.attr_dtype_combo.setCurrentText("String")
+    radius_attribute_frame.value = ("units", "mm")
+
+    slit_height_attribute_frame = FieldAttrFrame()
+    slit_height_attribute_frame.attr_dtype_combo.setCurrentText("String")
+    slit_height_attribute_frame.value = ("units", "mm")
+
+    fields_widgets[1].attrs_dialog._add_attr(slit_edges_attribute_frame)
+    fields_widgets[2].attrs_dialog._add_attr(radius_attribute_frame)
+    fields_widgets[3].attrs_dialog._add_attr(slit_height_attribute_frame)
 
     show_and_close_window(qtbot, template)
 
