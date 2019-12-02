@@ -28,7 +28,7 @@ def units_are_expected_type(input: str, expected_unit_type: str) -> bool:
     :return: True if the conversion was successful, False otherwise.
     """
     try:
-        ureg(input).to(expected_unit_type)
+        ureg(expected_unit_type).to(input)
     except (pint.errors.DimensionalityError, ValueError):
         return False
 

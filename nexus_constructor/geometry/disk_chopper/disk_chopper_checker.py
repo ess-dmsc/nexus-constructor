@@ -167,16 +167,16 @@ def _input_describes_valid_chopper(
     return True
 
 
-def _units_are_valid(fields_dict: dict) -> bool:
+def _units_are_valid(units_dict: dict) -> bool:
     """
 
-    :param fields_dict:
+    :param units_dict:
     :return:
     """
     bad_units = set()
 
     for field in UNITS_REQUIRED:
-        unit_input = fields_dict[field].attrs["units"]
+        unit_input = units_dict[field]
 
         if not (
             units_are_recognised_by_pint(unit_input)
@@ -196,11 +196,8 @@ class UserDefinedChopperChecker:
     def __init__(self, fields_widget: QListWidget):
 
         self.fields_dict = {}
+        self.units_dict = {}
         self._chopper_details = None
-
-        self._angle_units = "deg"
-        self._slit_height_units = "m"
-        self._radius_units = "m"
 
         for i in range(fields_widget.count()):
             widget = fields_widget.itemWidget(fields_widget.item(i))
@@ -230,7 +227,8 @@ class UserDefinedChopperChecker:
 
         for field in UNITS_REQUIRED:
             try:
-                self.fields_dict[field].attrs["units"]
+                self.units_dict[field] = self.fields_dict[field].attrs["units"]
+                print(self.fields_dict[field].attrs["units"])
             except KeyError:
                 missing_units.append(field)
 
@@ -265,9 +263,9 @@ class UserDefinedChopperChecker:
             self.fields_dict[SLIT_EDGES_NAME].value,
             self.fields_dict[RADIUS_NAME].value[()],
             self.fields_dict[SLIT_HEIGHT_NAME].value[()],
-            self._angle_units,
-            self._slit_height_units,
-            self._radius_units,
+            self.units_dict[SLIT_EDGES_NAME],
+            self.units_dict[SLIT_HEIGHT_NAME],
+            self.units_dict[RADIUS_NAME],
         )
 
         return _input_describes_valid_chopper(
@@ -279,10 +277,8 @@ class NexusDefinedChopperChecker:
     def __init__(self, disk_chopper: Group):
 
         self.fields_dict = {}
+        self.units_dict = {}
         self._chopper_details = None
-        self._angle_units = None
-        self._slit_height_units = None
-        self._radius_units = None
 
         self._disk_chopper = disk_chopper
 
@@ -303,13 +299,13 @@ class NexusDefinedChopperChecker:
             self.fields_dict[SLIT_HEIGHT_NAME] = self._disk_chopper[SLIT_HEIGHT_NAME][
                 ()
             ]
-            self._angle_units = decode_bytes_string(
+            self.units_dict[SLIT_EDGES_NAME] = decode_bytes_string(
                 self._disk_chopper[SLIT_EDGES_NAME].attrs["units"]
             )
-            self._slit_height_units = decode_bytes_string(
+            self.units_dict[SLIT_HEIGHT_NAME] = decode_bytes_string(
                 self._disk_chopper[SLIT_HEIGHT_NAME].attrs["units"]
             )
-            self._radius_units = decode_bytes_string(
+            self.units_dict[RADIUS_NAME] = decode_bytes_string(
                 self._disk_chopper[RADIUS_NAME].attrs["units"]
             )
 
@@ -340,9 +336,9 @@ class NexusDefinedChopperChecker:
             self.fields_dict[SLIT_EDGES_NAME],
             self.fields_dict[RADIUS_NAME],
             self.fields_dict[SLIT_HEIGHT_NAME],
-            self._angle_units,
-            self._slit_height_units,
-            self._radius_units,
+            self.units_dict[SLIT_EDGES_NAME],
+            self.units_dict[SLIT_HEIGHT_NAME],
+            self.units_dict[RADIUS_NAME],
         )
 
         return _input_describes_valid_chopper(
