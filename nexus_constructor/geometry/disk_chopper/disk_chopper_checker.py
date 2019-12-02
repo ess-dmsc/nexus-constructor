@@ -6,7 +6,6 @@ import numpy as np
 from h5py import Group
 
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
-from nexus_constructor.nexus.nexus_wrapper import decode_bytes_string
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_are_expected_type,
@@ -309,17 +308,17 @@ class NexusDefinedChopperChecker:
             self.fields_dict[SLIT_HEIGHT_NAME] = self._disk_chopper[SLIT_HEIGHT_NAME][
                 ()
             ]
-            self.units_dict[SLIT_EDGES_NAME] = decode_bytes_string(
-                self._disk_chopper[SLIT_EDGES_NAME].attrs["units"]
+            self.units_dict[SLIT_EDGES_NAME] = (
+                self._disk_chopper[SLIT_EDGES_NAME].attrs["units"].decode()
             )
-            self.units_dict[SLIT_HEIGHT_NAME] = decode_bytes_string(
-                self._disk_chopper[SLIT_HEIGHT_NAME].attrs["units"]
+            self.units_dict[SLIT_HEIGHT_NAME] = (
+                self._disk_chopper[SLIT_HEIGHT_NAME].attrs["units"].decode()
             )
-            self.units_dict[RADIUS_NAME] = decode_bytes_string(
-                self._disk_chopper[RADIUS_NAME].attrs["units"]
+            self.units_dict[RADIUS_NAME] = (
+                self._disk_chopper[RADIUS_NAME].attrs["units"].decode()
             )
 
-        except KeyError:
+        except (KeyError, AttributeError):
             return False
 
         return True

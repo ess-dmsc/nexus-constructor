@@ -622,3 +622,11 @@ def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validating_units_
         )
     )
     assert not _units_are_valid(user_defined_chopper_checker.fields_dict)
+
+
+def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_checking_field_types_THEN_returns_false(
+    nexus_defined_chopper_checker, nexus_disk_chopper
+):
+
+    nexus_disk_chopper[SLIT_HEIGHT_NAME].attrs["units"] = EDGES_ARR
+    assert not nexus_defined_chopper_checker.validate_chopper()
