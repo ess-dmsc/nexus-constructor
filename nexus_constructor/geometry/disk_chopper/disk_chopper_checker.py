@@ -192,7 +192,7 @@ def _units_are_valid(units_dict: dict) -> bool:
             continue
         if not units_have_dimension_of_one(unit_input):
             logging.info(
-                f"{UNABLE} Units for {field} have wrong dimension. Found value: {unit_input}"
+                f"{UNABLE} Units for {field} should habe a dimension of one. Found value: {unit_input}"
             )
             bad_units.add(field)
             continue
