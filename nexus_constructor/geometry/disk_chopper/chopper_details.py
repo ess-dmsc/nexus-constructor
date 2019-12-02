@@ -1,6 +1,10 @@
 import numpy as np
 
-from nexus_constructor.unit_utils import calculate_unit_conversion_factor
+from nexus_constructor.unit_utils import (
+    calculate_unit_conversion_factor,
+    RADIANS,
+    METRES,
+)
 
 TWO_PI = np.pi * 2
 
@@ -33,13 +37,13 @@ class ChopperDetails:
         self._slit_height = slit_height
 
         # Convert the angles to radians and make sure they are all less then two pi
-        slit_edges_factor = calculate_unit_conversion_factor(angle_units, "radians")
+        slit_edges_factor = calculate_unit_conversion_factor(angle_units, RADIANS)
         self._slit_edges = [(edge * slit_edges_factor) % TWO_PI for edge in slit_edges]
 
         self._slit_height *= calculate_unit_conversion_factor(
             slit_height_units, "metres"
         )
-        self._radius *= calculate_unit_conversion_factor(radius_units, "metres")
+        self._radius *= calculate_unit_conversion_factor(radius_units, METRES)
 
     @property
     def slits(self):
