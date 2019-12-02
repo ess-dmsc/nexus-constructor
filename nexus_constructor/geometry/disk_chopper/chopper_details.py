@@ -41,7 +41,7 @@ class ChopperDetails:
         self._slit_edges = [(edge * slit_edges_factor) % TWO_PI for edge in slit_edges]
 
         self._slit_height *= calculate_unit_conversion_factor(
-            slit_height_units, "metres"
+            slit_height_units, METRES
         )
         self._radius *= calculate_unit_conversion_factor(radius_units, METRES)
 
