@@ -45,7 +45,7 @@ def units_have_dimension_of_one(input: str) -> bool:
     return ureg(input).magnitude == 1
 
 
-def calculate_unit_conversion_factor(units: str):
+def calculate_unit_conversion_factor(units: str) -> float:
     """
     Determines the factor for multiplying the geometry file points in order to convert it from its original units to
     metres.

@@ -36,7 +36,7 @@ UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
 EXPECTED_UNIT_TYPE = {RADIUS_NAME: "mm", SLIT_EDGES_NAME: "deg", SLIT_HEIGHT_NAME: "mm"}
 
 
-def _incorrect_field_type_message(fields_dict: dict, field_name: str):
+def _incorrect_field_type_message(fields_dict: dict, field_name: str) -> str:
     """
     Creates a string explaining to the user that the field input did not have the expected type.
     :param fields_dict: The dictionary containing the different data fields for the disk chopper.
@@ -46,7 +46,7 @@ def _incorrect_field_type_message(fields_dict: dict, field_name: str):
     return f"Wrong {field_name} type. Expected {EXPECTED_TYPE_ERROR_MSG[field_name]} but found {type(fields_dict[field_name])}."
 
 
-def _check_data_type(field_widget, expected_types):
+def _check_data_type(field_widget, expected_types) -> bool:
     try:
         dtype = field_widget.dtype
         if isinstance(field_widget, np.int64):
@@ -93,7 +93,7 @@ def _fields_have_correct_type(fields_dict: Dict[str, "FieldWidget"]):
     return False
 
 
-def _edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple):
+def _edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple) -> bool:
     """
     Checks that the edges array consists of either one row or one column.
     :return: True if the edges array is 1D. False otherwise.
@@ -116,7 +116,7 @@ def _edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple):
 
 def _input_describes_valid_chopper(
     chopper_details: ChopperDetails, slit_edges: Sequence
-):
+) -> bool:
     """
     A final check that the input has the following properties:
         - The length of the slit edges array is twice the number of slits
@@ -210,7 +210,7 @@ class UserDefinedChopperChecker:
         """
         return self._chopper_details
 
-    def required_fields_present(self):
+    def required_fields_present(self) -> bool:
         """
         Checks that all of the fields and attributes required to create the disk chopper are present.
         :return: True if all the required fields are present. False otherwise.
@@ -240,7 +240,7 @@ class UserDefinedChopperChecker:
 
         return True
 
-    def validate_chopper(self):
+    def validate_chopper(self) -> bool:
         """
         Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
         fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
@@ -289,7 +289,7 @@ class NexusDefinedChopperChecker:
         """
         return self._chopper_details
 
-    def required_fields_present(self):
+    def required_fields_present(self) -> bool:
 
         try:
 
@@ -314,7 +314,7 @@ class NexusDefinedChopperChecker:
 
         return True
 
-    def validate_chopper(self):
+    def validate_chopper(self) -> bool:
         """
         Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
         fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
