@@ -321,15 +321,16 @@ class NexusDefinedChopperChecker:
                 self.units_dict[field] = (
                     self._disk_chopper[field].attrs["units"].decode()
                 )
-            except (KeyError, AttributeError):
+            except KeyError:
                 missing_units.append(field)
+                logging.info(f"{UNABLE} Unit information is missing from {field}.")
+            except AttributeError:
+                missing_units.append(field)
+                logging.info(
+                    f"{UNABLE} Unit information in {field} cannot be decoded to a byte string."
+                )
 
         if len(missing_units) > 0:
-            logging.info(
-                f"{UNABLE} Unable to recover unit information from field(s):",
-                ",".join(missing_fields),
-                ". Either absent or not in the form of a byte string.",
-            )
             return False
 
         return True
