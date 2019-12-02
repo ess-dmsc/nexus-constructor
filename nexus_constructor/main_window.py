@@ -5,6 +5,7 @@ from PySide2.QtWidgets import (
     QMainWindow,
     QApplication,
     QInputDialog,
+    QLineEdit,
 )
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
@@ -393,12 +394,20 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 0,
                 False,
             )
+            default_broker, ok_pressed = QInputDialog.getText(
+                None,
+                "Default broker",
+                "broker:",
+                text="//broker:port/",
+                echo=QLineEdit.Normal,
+            )
             if ok_pressed:
                 with open(filename, "w") as file:
                     nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
                         file,
                         streams=self.instrument.get_streams(),
                         provider_type=provider_type,
+                        default_broker=default_broker,
                     )
 
     def open_nexus_file(self):
