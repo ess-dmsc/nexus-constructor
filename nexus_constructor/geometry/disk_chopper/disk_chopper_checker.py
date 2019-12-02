@@ -169,20 +169,31 @@ def _input_describes_valid_chopper(
 
 def _units_are_valid(units_dict: dict) -> bool:
     """
-
-    :param units_dict:
-    :return:
+    Checks that the units for the slit edges, radius, and slit height are valid.
+    :param units_dict: The dictionary of units for the slit edges, radius, and slit height.
+    :return: True if the units are all valid, False otherwise.
     """
     bad_units = set()
 
     for field in UNITS_REQUIRED:
         unit_input = units_dict[field]
 
-        if not (
-            units_are_recognised_by_pint(unit_input)
-            and units_are_expected_type(unit_input, EXPECTED_UNIT_TYPE[field])
-            and units_have_dimension_of_one(unit_input)
-        ):
+        if not units_are_recognised_by_pint(unit_input):
+            logging.info(
+                f"{UNABLE} Units for {field} are not recognised. Found value: {unit_input}"
+            )
+            bad_units.add(field)
+            continue
+        if not units_are_expected_type(unit_input, EXPECTED_UNIT_TYPE[field]):
+            logging.info(
+                f"{UNABLE} Units for {field} have wrong type. Found {unit_input} but expected something that can be converted to {EXPECTED_UNIT_TYPE[field]}."
+            )
+            bad_units.add(field)
+            continue
+        if not units_have_dimension_of_one(unit_input):
+            logging.info(
+                f"{UNABLE} Units for {field} have wrong dimension. Found value: {unit_input}"
+            )
             bad_units.add(field)
             continue
 
