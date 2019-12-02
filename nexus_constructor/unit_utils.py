@@ -48,12 +48,12 @@ def units_have_dimension_of_one(input: str) -> bool:
     return ureg(input).magnitude == 1
 
 
-def calculate_unit_conversion_factor(units: str, desired_units: str) -> float:
+def calculate_unit_conversion_factor(original_units: str, desired_units: str) -> float:
     """
     Determines the factor for multiplying values in the original units so that they are now in the desired units.
-    :param units: The original units.
-    :param desired_units: The units that to be used for the conversion.
-    :return: A float value for converting between the original units and the desired units.
+    :param original_units: The original units.
+    :param desired_units: The units that the original units are to be converted to.
+    :return: A float value for converting from the original units and the desired units.
     """
-    input_quantity = 1.0 * ureg.parse_expression(units)
+    input_quantity = 1.0 * ureg(original_units)
     return input_quantity.to(desired_units).magnitude
