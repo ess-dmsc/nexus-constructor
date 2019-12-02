@@ -323,6 +323,7 @@ class NexusDefinedChopperChecker:
         if not (
             self.required_fields_present()
             and _fields_have_correct_type(self.fields_dict)
+            and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].ndim,
                 self.fields_dict[SLIT_EDGES_NAME].shape,
