@@ -602,7 +602,7 @@ def test_GIVEN_array_with_single_element_WHEN_calling_check_data_is_an_array_THE
 
 def test_GIVEN_array_with_multiple_elements_WHEN_calling_check_data_is_an_array_THEN_returns_true():
 
-    data = np.array([i for i in range(5)])
+    data = np.arange(5)
     assert check_data_is_an_array(data)
 
 
