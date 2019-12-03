@@ -1,4 +1,4 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union, List
 
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
@@ -7,7 +7,13 @@ import numpy as np
 from nexus_constructor.component.component import Component
 from nexus_constructor.geometry import OFFGeometryNexus
 from nexus_constructor.geometry.geometry_loader import load_geometry
-from nexus_constructor.pixel_data import PixelGrid, PixelMapping, CountDirection, Corner
+from nexus_constructor.pixel_data import (
+    PixelGrid,
+    PixelMapping,
+    CountDirection,
+    Corner,
+    PixelData,
+)
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.validators import PixelValidator
 from ui.pixel_options import Ui_PixelOptionsWidget
@@ -268,10 +274,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 self.pixel_mapping_widgets[detector_face[0]].id = detector_face[1]
 
     @staticmethod
-    def _get_detector_face_information(shape: OFFGeometryNexus):
+    def _get_detector_face_information(
+        shape: OFFGeometryNexus
+    ) -> Tuple[int, np.ndarray]:
         return len(shape.faces), shape.detector_faces
 
-    def get_current_mapping_filename(self):
+    def get_current_mapping_filename(self) -> str:
         """
         Retrieves the filename of the mesh that has been used to generate the list of pixel mapping widgets. Used in
         order to prevent creating the same list twice should the same file be selected twice with the file dialog.
@@ -405,7 +413,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.create_pixel_mapping_list(cylinder_number, "cylinder")
 
     @staticmethod
-    def get_number_of_faces_from_mesh_file(filename: str):
+    def get_number_of_faces_from_mesh_file(filename: str) -> int:
         """
         Creates a temporary geometry and uses this is order to determine the number of faces in the file.
         :param filename: The filename for the mesh.
@@ -421,7 +429,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         self.pixel_options_stack.setVisible(False)
 
-    def get_pixel_mapping_ids(self):
+    def get_pixel_mapping_ids(self) -> List[int]:
         """
         :return: A list of the IDs for the current PixelMappingWidgets.
         """
@@ -437,7 +445,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         nonempty_ids = [widget.id is not None for widget in self.pixel_mapping_widgets]
         self._pixel_validator.set_pixel_mapping_valid(any(nonempty_ids))
 
-    def generate_pixel_data(self):
+    def generate_pixel_data(self) -> PixelData:
         """
         Creates the appropriate PixelData object depending on user selection then gives it the information that the
         user entered in the relevant fields. If the "No Pixel" button has been pressed then the method returns None.
@@ -476,7 +484,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         else:
             self._pixel_validator.inform_ok_validator()
 
-    def pixel_mapping_not_visible(self):
+    def pixel_mapping_not_visible(self) -> bool:
         """
         Checks if the pixel mapping options are visible. This is used to determine if it is necessary to generate a
         pixel mapping list.
