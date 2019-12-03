@@ -215,7 +215,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 f"Edit Component: {get_name_of_node(self.component_to_edit.group)}"
             )
             self._fill_existing_entries()
-
             if self.get_pixel_visibility_condition():
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
 

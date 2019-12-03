@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List
+from typing import List, Tuple, Union
 
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 
@@ -12,7 +12,9 @@ PIXEL_FIELDS = [
 ]
 
 
-def get_detector_faces_from_pixel_mapping(mapping: PixelMapping):
+def get_detector_faces_from_pixel_mapping(
+    mapping: PixelMapping
+) -> Union[List[Tuple[int, int]], Tuple[int, int]]:
     """
     Returns a list of tuples. Each tuple contains a face ID followed by the face's detector ID.
     Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
@@ -23,7 +25,9 @@ def get_detector_faces_from_pixel_mapping(mapping: PixelMapping):
     return convert_to_scalar_if_list_has_one_element(detector_faces)
 
 
-def get_detector_number_from_pixel_mapping(mapping: PixelMapping):
+def get_detector_number_from_pixel_mapping(
+    mapping: PixelMapping
+) -> Union[List[int], int]:
     """
     Returns a list of pixel IDs. Used for writing information to the detector_number field in NXdetector and
     NXcylindrical_geometry.
@@ -32,7 +36,7 @@ def get_detector_number_from_pixel_mapping(mapping: PixelMapping):
     return convert_to_scalar_if_list_has_one_element(detector_numbers)
 
 
-def get_x_offsets_from_pixel_grid(grid: PixelGrid):
+def get_x_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
     """
     Returns an array of x-offsets. Each value in the array is the x position of a pixel instance defined in the
     PixelGrid.
@@ -44,7 +48,7 @@ def get_x_offsets_from_pixel_grid(grid: PixelGrid):
     return convert_to_scalar_if_array_has_one_element(np.tile(offsets, (grid.rows, 1)))
 
 
-def get_y_offsets_from_pixel_grid(grid: PixelGrid):
+def get_y_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
     """
     Returns an array of y-offsets. Each value in the array is the y position of a pixel instance defined in the
     PixelGrid.
@@ -58,7 +62,7 @@ def get_y_offsets_from_pixel_grid(grid: PixelGrid):
     )
 
 
-def get_z_offsets_from_pixel_grid(grid: PixelGrid):
+def get_z_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
     """
     Returns a list of 'row' lists of 'column' length.
     Each entry in the sublists are z positions of pixel instances in the given PixelGrid.
@@ -68,7 +72,7 @@ def get_z_offsets_from_pixel_grid(grid: PixelGrid):
     )
 
 
-def get_detector_ids_from_pixel_grid(grid: PixelGrid):
+def get_detector_ids_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, int]:
     """
     Returns an array of detector IDs. Starts with a 1D array of numbers and reorders them depending on the count
     direction and initial count corner supplied by the user.
@@ -98,7 +102,9 @@ def get_detector_ids_from_pixel_grid(grid: PixelGrid):
     return convert_to_scalar_if_array_has_one_element(ids)
 
 
-def convert_to_scalar_if_array_has_one_element(value_array: np.ndarray):
+def convert_to_scalar_if_array_has_one_element(
+    value_array: np.ndarray
+) -> Union[np.ndarray, float]:
     """
     Prevents a single value from being returned as an array.
     :param value_array: The array containing pixel information.
@@ -110,7 +116,9 @@ def convert_to_scalar_if_array_has_one_element(value_array: np.ndarray):
     return value_array.item(0)
 
 
-def convert_to_scalar_if_list_has_one_element(value_list: List):
+def convert_to_scalar_if_list_has_one_element(
+    value_list: List
+) -> Union[List[int], int, List[Tuple[int, int]], Tuple[int, int]]:
     """
     Prevents a single value from being returned as a list.
     :param value_list: The list containing pixel information.
