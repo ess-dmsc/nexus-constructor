@@ -101,6 +101,7 @@ class FieldWidget(QFrame):
 
         self.value_type_combo = QComboBox()
         self.value_type_combo.addItems(list(DATASET_TYPE.keys()))
+        self.value_type_combo.setCurrentIndex(list(DATASET_TYPE.keys()).index("Double"))
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit = QLineEdit()
@@ -200,7 +201,7 @@ class FieldWidget(QFrame):
 
     @dtype.setter
     def dtype(self, dtype: h5py.Datatype):
-        type_map = {np.object: "String", np.float64: "Float", np.int64: "Integer"}
+        type_map = {np.object: "String", np.float32: "Float", np.float64: "Double", np.int64: "Integer"}
         for item in type_map.keys():
             if dtype == item:
                 self.value_type_combo.setCurrentText(type_map[item])

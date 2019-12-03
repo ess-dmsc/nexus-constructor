@@ -28,7 +28,7 @@ class Transformation:
             return False
 
     @property
-    def name(self):
+    def name(self) -> str:
         return nx.get_name_of_node(self.dataset)
 
     @name.setter

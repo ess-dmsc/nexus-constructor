@@ -491,6 +491,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.instrument.nexus.component_added.emit(
             self.nameLineEdit.text(), shape, positions
         )
+        if hasattr(self, "reset_func"):
+            self.reset_func()
 
     def create_new_component(
         self,

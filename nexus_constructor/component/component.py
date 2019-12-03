@@ -105,7 +105,21 @@ class Component:
 
     @name.setter
     def name(self, new_name: str):
+        old_name = self.name
         self.file.rename_node(self.group, new_name)
+        old_depends_on_str = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
+        if old_depends_on_str != "." and old_depends_on_str != None:
+            new_depends_on_str = old_depends_on_str.replace("/" + old_name + "/transformations", "/" + new_name + "/transformations")
+            self.file.set_attribute_value(self.group, DEPENDS_ON_STR, new_depends_on_str)
+
+        if hasattr(self, "stored_transforms"):
+            for i in range(len(self.stored_transforms)):
+                c_transform = self.stored_transforms[i]
+                new_transform = Transformation(self.file, self.file.nexus_file.file[self.absolute_path + "/transformations/" + c_transform.name])
+                new_transform.parent = self.stored_transforms
+                self.stored_transforms[i] = new_transform
+            for c_trans in self.stored_transforms:
+                print(c_trans.absolute_path)
 
     @property
     def absolute_path(self):
@@ -149,7 +163,7 @@ class Component:
         :return: List of transforms
         """
         transforms = TransformationsList(self)
-        depends_on = self.get_field(DEPENDS_ON_STR)
+        depends_on = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
         self._get_transform(depends_on, transforms)
         return transforms
 
@@ -166,7 +180,10 @@ class Component:
         :param local_only: If True then only add transformations which are stored within this component
         """
         if depends_on is not None and depends_on != ".":
-            transform_dataset = self.file.nexus_file[depends_on]
+            try:
+                transform_dataset = self.file.nexus_file[depends_on]
+            except KeyError as e:
+                print(e)
             if (
                 local_only
                 and transform_dataset.parent.parent.name != self.absolute_path
@@ -203,7 +220,7 @@ class Component:
         :return:
         """
         transforms = TransformationsList(self)
-        depends_on = self.get_field(DEPENDS_ON_STR)
+        depends_on = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
         self._get_transform(depends_on, transforms, local_only=True)
         return transforms
 
@@ -227,7 +244,7 @@ class Component:
         self.file.set_attribute_value(
             field, "vector", qvector3d_to_numpy_array(unit_vector)
         )
-        self.file.set_attribute_value(field, "transformation_type", "Translation")
+        self.file.set_attribute_value(field, "transformation_type", "translation")
 
         translation_transform = Transformation(self.file, field)
         translation_transform.depends_on = depends_on
@@ -255,7 +272,7 @@ class Component:
         field = self.file.set_field_value(transforms_group, name, angle, float)
         self.file.set_attribute_value(field, "units", "degrees")
         self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))
-        self.file.set_attribute_value(field, "transformation_type", "Rotation")
+        self.file.set_attribute_value(field, "transformation_type", "rotation")
         rotation_transform = Transformation(self.file, field)
         rotation_transform.depends_on = depends_on
         return rotation_transform
@@ -284,7 +301,7 @@ class Component:
 
     @property
     def depends_on(self):
-        depends_on_path = self.file.get_field_value(self.group, DEPENDS_ON_STR)
+        depends_on_path = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
         if depends_on_path is None:
             return None
         return Transformation(self.file, self.file.nexus_file[depends_on_path])
@@ -293,16 +310,17 @@ class Component:
     def depends_on(self, transformation: Transformation):
         existing_depends_on = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
         if existing_depends_on is not None:
-            Transformation(
-                self.file, self.file[existing_depends_on]
-            ).deregister_dependent(self)
+            try:
+                old_transformation_path = self.file.nexus_file[existing_depends_on]
+                Transformation(self.file, old_transformation_path).deregister_dependent(self)
+            except KeyError:
+                pass
 
         if transformation is None:
-            self.file.set_field_value(self.group, DEPENDS_ON_STR, ".", str)
+            self.file.set_attribute_value(self.group, DEPENDS_ON_STR, ".")
         else:
-            self.file.set_field_value(
-                self.group, DEPENDS_ON_STR, transformation.absolute_path, str
-            )
+            self.file.set_attribute_value(
+                self.group, DEPENDS_ON_STR, transformation.absolute_path)
             transformation.register_dependent(self)
 
     def set_cylinder_shape(
@@ -402,12 +420,17 @@ class Component:
         self._shape.remove_shape()
 
     def duplicate(self, components_list: List["Component"]) -> "Component":
-        return Component(
+        duplicated_group = self.file.duplicate_nx_group(
+                self.group, generate_unique_name(self.name, components_list))
+        new_component = Component(
             self.file,
-            self.file.duplicate_nx_group(
-                self.group, generate_unique_name(self.name, components_list)
-            ),
+            duplicated_group,
         )
+        if len(self.transforms) != 0:
+            old_depends_on_str = self.depends_on.absolute_path
+            new_depends_on_str = old_depends_on_str.replace(self.name, new_component.name)
+            new_component.file.set_attribute_value(new_component.group, "depends_on", new_depends_on_str)
+        return new_component
 
     def record_pixel_grid(self, pixel_grid: PixelGrid):
         """

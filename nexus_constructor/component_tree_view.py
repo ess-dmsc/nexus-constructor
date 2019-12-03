@@ -59,7 +59,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             frame.label = QLabel("Transformations", frame)
             frame.layout.addWidget(frame.label)
         elif isinstance(value, ComponentInfo):
-            frame.label = QLabel("(Place holder)", frame)
+            frame.label = QLabel("", frame)
             frame.layout.addWidget(frame.label)
         elif isinstance(value, Transformation):
             if value.type.lower() == "translation":

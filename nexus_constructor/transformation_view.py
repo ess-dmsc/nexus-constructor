@@ -45,6 +45,14 @@ class EditTransformation(QGroupBox):
 
     def saveChanges(self):
         self.transformation.name = self.transformation_frame.name_line_edit.text()
+        transform_index = self.transformation.parent.index(self.transformation)
+        if transform_index == 0:
+            self.transformation.parent.parent_component.depends_on = self.transformation
+        elif transform_index == -1:
+            raise RuntimeError("Position of transformation \"{}\" is unknown.".format(self.transformation.name))
+        else:
+            self.transformation.parent.stored_transforms[transform_index - 1].depends_on = self.transformation
+
         self.transformation.vector = QVector3D(
             self.transformation_frame.x_spinbox.value(),
             self.transformation_frame.y_spinbox.value(),

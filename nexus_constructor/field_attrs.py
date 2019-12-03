@@ -85,6 +85,7 @@ class FieldAttrFrame(QFrame):
 
         self.attr_dtype_combo = QComboBox()
         self.attr_dtype_combo.addItems([*DATASET_TYPE.keys()])
+        self.attr_dtype_combo.setCurrentIndex(list(DATASET_TYPE.keys()).index("Double"))
         self.attr_dtype_combo.currentTextChanged.connect(self.dtype_changed)
         self.dtype_changed(self.attr_dtype_combo.currentText())
 

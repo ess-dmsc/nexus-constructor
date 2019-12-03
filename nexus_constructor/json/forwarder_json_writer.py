@@ -35,7 +35,7 @@ def _extract_forwarder_stream_info(
     )  # key is pv name, value is index in stream_list where stream exists
     for _, stream in streams.items():
         writer_module = stream["writer_module"]
-        if writer_module == "f142" or writer_module == "TdcTime":
+        if writer_module == "f142" or writer_module == "tdct":
             pv_name = stream["source"]
             if pv_name not in pv_names.keys():
                 stream_list.append(

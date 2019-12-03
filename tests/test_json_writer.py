@@ -519,7 +519,7 @@ def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142
 def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_output_contains_pv():
     pv_name = "tdcpv1"
     topic = "localhost:9092/someOtherTopic"
-    writer_module = "TdcTime"
+    writer_module = "tdct"
     streams = {
         "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic}
     }

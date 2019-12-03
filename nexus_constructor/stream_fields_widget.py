@@ -19,7 +19,7 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
-SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime", "senv"]
+SCHEMAS = ["ev42", "f142", "hs00", "ns10", "tdct", "senv"]
 F142_TYPES = [
     "byte",
     "ubyte",
@@ -36,11 +36,11 @@ F142_TYPES = [
 
 STRING_DTYPE = h5py.special_dtype(vlen=str)
 
-NEXUS_INDICES_INDEX_EVERY_MB = "nexus.indices.index_every_mb"
-NEXUS_INDICES_INDEX_EVERY_KB = "nexus.indices.index_every_kb"
-STORE_LATEST_INTO = "store_latest_into"
-NEXUS_CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
-NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
+# NEXUS_INDICES_INDEX_EVERY_MB = "nexus.indices.index_every_mb"
+# NEXUS_INDICES_INDEX_EVERY_KB = "nexus.indices.index_every_kb"
+# STORE_LATEST_INTO = "store_latest_into"
+# NEXUS_CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
+# NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
 
 
@@ -155,12 +155,12 @@ class StreamFieldsWidget(QDialog):
         """
         Sets up the UI for ev42 advanced options.
         """
-        self.ev42_nexus_elements = [
-            NEXUS_INDICES_INDEX_EVERY_MB,
-            NEXUS_INDICES_INDEX_EVERY_KB,
-            NEXUS_CHUNK_CHUNK_MB,
-            NEXUS_CHUNK_CHUNK_KB,
-        ]
+        # self.ev42_nexus_elements = [
+        #     NEXUS_INDICES_INDEX_EVERY_MB,
+        #     NEXUS_INDICES_INDEX_EVERY_KB,
+        #     NEXUS_CHUNK_CHUNK_MB,
+        #     NEXUS_CHUNK_CHUNK_KB,
+        # ]
 
         self.ev42_nexus_to_spinner_ui_element = {}
 
@@ -176,11 +176,11 @@ class StreamFieldsWidget(QDialog):
             self.ev42_adc_pulse_debug_label, self.ev42_adc_pulse_debug_checkbox
         )
 
-        self.add_labels_and_spinboxes_for_advanced_options(
-            self.ev42_nexus_elements,
-            self.ev42_advanced_group_box,
-            self.ev42_nexus_to_spinner_ui_element,
-        )
+        # self.add_labels_and_spinboxes_for_advanced_options(
+        #     self.ev42_nexus_elements,
+        #     self.ev42_advanced_group_box,
+        #     self.ev42_nexus_to_spinner_ui_element,
+        # )
 
     def add_labels_and_spinboxes_for_advanced_options(
         self, elements, group_box, nexus_to_spinner
@@ -204,17 +204,17 @@ class StreamFieldsWidget(QDialog):
         self.f142_advanced_group_box.setLayout(QFormLayout())
         self.f142_nexus_to_spinner_ui_element = {}
 
-        self.f142_nexus_elements = [
-            NEXUS_INDICES_INDEX_EVERY_MB,
-            NEXUS_INDICES_INDEX_EVERY_KB,
-            STORE_LATEST_INTO,
-        ]
+        # self.f142_nexus_elements = [
+            # NEXUS_INDICES_INDEX_EVERY_MB,
+            # NEXUS_INDICES_INDEX_EVERY_KB,
+            # STORE_LATEST_INTO,
+        # ]
 
-        self.add_labels_and_spinboxes_for_advanced_options(
-            self.f142_nexus_elements,
-            self.f142_advanced_group_box,
-            self.f142_nexus_to_spinner_ui_element,
-        )
+        # self.add_labels_and_spinboxes_for_advanced_options(
+        #     self.f142_nexus_elements,
+        #     self.f142_advanced_group_box,
+        #     self.f142_nexus_to_spinner_ui_element,
+        # )
 
     def _show_advanced_options(self):
         schema = self.schema_combo.currentText()
@@ -261,7 +261,7 @@ class StreamFieldsWidget(QDialog):
             self.hs00_unimplemented_label.setVisible(True)
         elif schema == "ns10":
             self._set_edits_visible(True, False, "nicos/<device>/<parameter>")
-        elif schema == "TdcTime" or schema == "senv":
+        elif schema == "tdct" or schema == "senv":
             self._set_edits_visible(True, False)
 
     def _set_edits_visible(self, source: bool, type: bool, source_hint=None):

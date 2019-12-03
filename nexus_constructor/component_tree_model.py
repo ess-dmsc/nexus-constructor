@@ -77,6 +77,9 @@ class ComponentTreeModel(QAbstractItemModel):
         transformation_list.has_link = True
         self.endInsertRows()
 
+    def endUpdateSelected(self):
+        self.dataChanged()
+
     def add_component(self, new_component: Component):
         self.beginInsertRows(QModelIndex(), len(self.components), len(self.components))
         self.components.append(new_component)

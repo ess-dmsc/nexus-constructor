@@ -58,7 +58,18 @@ class ArrayDatasetTableModel(QAbstractTableModel):
     def __init__(self, dtype: np.dtype, parent: ArrayDatasetTableWidget):
         super().__init__()
         self.setParent(parent)
-        self.array = np.array([[0]], dtype=dtype)
+        self.int_array = np.array([[0]], dtype=dtype)
+
+    @property
+    def array(self) -> np.ndarray:
+        return self.int_array
+
+    @array.setter
+    def array(self, array: np.ndarray):
+        if array.ndim == 1:
+            self.int_array = np.array([array])
+        else:
+            self.int_array = array
 
     def update_array_dtype(self, dtype: np.dtype):
         """
@@ -69,21 +80,21 @@ class ArrayDatasetTableModel(QAbstractTableModel):
         """
         self.beginResetModel()
         try:
-            self.array = np.array(self.array.data, dtype=dtype)
+            self.int_array = np.array(self.int_array.data, dtype=dtype)
         except ValueError:
-            self.array = np.array([[0]], dtype=dtype)
+            self.int_array = np.array([[0]], dtype=dtype)
         self.parent().view.itemDelegate().dtype = dtype
         self.endResetModel()
 
     def add_row(self):
         self.beginResetModel()
-        self.array.resize((self.array.shape[0] + 1, self.array.shape[1]))
+        self.int_array = np.resize(self.int_array, (self.int_array.shape[0] + 1, self.int_array.shape[1]))
         self.endResetModel()
 
     def add_column(self):
         self.beginResetModel()
-        self.array = np.column_stack(
-            (self.array, np.zeros(np.shape(self.array)[0], dtype=self.array.dtype))
+        self.int_array = np.column_stack(
+            (self.int_array, np.zeros(np.shape(self.int_array)[0], dtype=self.int_array.dtype))
         )
         self.endResetModel()
 
@@ -94,12 +105,12 @@ class ArrayDatasetTableModel(QAbstractTableModel):
         """
         self.beginResetModel()
         for index in self.parent().view.selectedIndexes():
-            if is_row and self.array.shape[0] <= 1:
+            if is_row and self.int_array.shape[0] <= 1:
                 return
-            elif not is_row and self.array.shape[1] <= 1:
+            elif not is_row and self.int_array.shape[1] <= 1:
                 return
-            self.array = np.delete(
-                self.array,
+            self.int_array = np.delete(
+                self.int_array,
                 (index.row() if is_row else index.column()),
                 axis=int(not is_row),
             )
@@ -111,7 +122,7 @@ class ArrayDatasetTableModel(QAbstractTableModel):
         :param parent: Unused.
         :return: Number of elements in each dimension.
         """
-        return self.array.shape[0]
+        return self.int_array.shape[0]
 
     def columnCount(self, parent: QModelIndex = ...) -> int:
         """
@@ -119,13 +130,13 @@ class ArrayDatasetTableModel(QAbstractTableModel):
         :param parent: Unused.
         :return: Number of dimensions there are in the array.
         """
-        if self.array.ndim == 1:
+        if self.int_array.ndim == 1:
             return 1
-        return self.array.shape[1]
+        return self.int_array.shape[1]
 
     def data(self, index: QModelIndex, role: int = ...) -> str:
         if role == Qt.DisplayRole or role == Qt.EditRole:
-            value = self.array[index.row()][index.column()]
+            value = self.int_array[index.row()][index.column()]
             return str(value)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
@@ -148,7 +159,7 @@ class ArrayDatasetTableModel(QAbstractTableModel):
 
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
         if index.isValid() and role == Qt.EditRole and value:
-            self.array[index.row()][index.column()] = value
+            self.int_array[index.row()][index.column()] = value
             self.dataChanged.emit(index, index)
             return True
         return False

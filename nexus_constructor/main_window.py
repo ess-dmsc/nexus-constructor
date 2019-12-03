@@ -170,7 +170,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         selected_component = self.component_tree_view.selectedIndexes()[
             0
         ].internalPointer()
-        self.show_add_component_window(selected_component)
+        self.component_model.beginResetModel()
+        self.show_add_component_window(selected_component, end_reset=True)
 
     def _setupFileWriterCtrl(self, main_window):
         try:
@@ -457,7 +458,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_component(component.name, shape, positions)
             self.sceneWidget.add_transformation(component.name, component.transform)
 
-    def show_add_component_window(self, component: Component = None):
+    def show_add_component_window(self, component: Component = None, end_reset: bool = False):
         self.add_component_window = QDialog()
         self.add_component_window.ui = AddComponentDialog(
             self.instrument,
@@ -467,6 +468,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             parent=self,
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
+        if end_reset:
+            self.add_component_window.ui.reset_func = self.component_model.endResetModel
         self.add_component_window.show()
 
     def on_delete_item(self):
