@@ -599,7 +599,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         Tells the pixel options widget to populate the pixel mapping widget provided certain conditions are met. Checks
         that the pixel options are visible then performs further checks depending on if the mesh or cylinder button
         has been selected. The RuntimeError occurs when editing a component and switching from a Pixel Grid/No Shape
-        to a PixelMapping and try-except appears to be the only way to handle it for now.
+        to a PixelMapping. It says that the Pixel Options widget and Mesh/Cylinder buttons have been deleted even though
+        they ought to be "brand new" when the Edit Component Window opens. A try-except block appears to be the only way
+        to handle it for now.
         """
         try:
             if not self.pixelOptionsWidget.isVisible():
