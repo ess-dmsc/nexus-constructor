@@ -195,7 +195,7 @@ class Component:
             transforms.append(new_transform)
             if DEPENDS_ON_STR in transform_dataset.attrs.keys():
                 self._get_transform(
-                    self.file.get_field_value(transform_dataset, DEPENDS_ON_STR),
+                    self.file.get_attribute_value(transform_dataset, DEPENDS_ON_STR),
                     transforms,
                     local_only,
                 )
