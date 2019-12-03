@@ -1,3 +1,5 @@
+from typing import Tuple, Optional
+
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 import numpy as np
@@ -143,11 +145,11 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             pass
 
     @staticmethod
-    def _get_row_information(y_pixel_offset: np.ndarray):
+    def _get_row_information(y_pixel_offset: np.ndarray) -> Tuple[int, Optional[float]]:
         """
         Determine the number of rows and the row height from a component that's being edited.
         :param y_pixel_offset: The array of y pixel offsets from the component.
-        :return: The number of rows and the row height. If there is only one row, the row height is assumed to be None.
+        :return: The number of rows and the row height. If there is only one row, the row height is treated as None.
         """
         n_rows = y_pixel_offset.shape[0]
 
@@ -157,11 +159,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         return n_rows, None
 
     @staticmethod
-    def _get_column_information(x_pixel_offset: np.ndarray):
+    def _get_column_information(
+        x_pixel_offset: np.ndarray
+    ) -> Tuple[int, Optional[float]]:
         """
         Determine the number of columns and the column width from a component that's being edited.
         :param x_pixel_offset: The array of x pixel offsets from the component.
-        :return: The number of columns and the column width. if there is only one column, column width is assumed to be
+        :return: The number of columns and the column width. if there is only one column, column width is treated as
         None.
         """
         n_cols = x_pixel_offset.shape[1]
@@ -172,7 +176,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         return n_cols, None
 
     @staticmethod
-    def _get_detector_number_information(detector_numbers: np.ndarray):
+    def _get_detector_number_information(
+        detector_numbers: np.ndarray
+    ) -> Tuple[int, str, str]:
         """
         Determine the first pixel ID, the count direction, and the location of the first pixel from a component that's
         being edited.
