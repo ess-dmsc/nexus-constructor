@@ -32,7 +32,11 @@ INT_TYPES = [value for value in DATASET_TYPE.values() if "int" in str(value)]
 FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)]
 
 UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
-EXPECTED_UNIT_TYPE = {RADIUS_NAME: "mm", SLIT_EDGES_NAME: "deg", SLIT_HEIGHT_NAME: "mm"}
+EXPECTED_UNIT_TYPE = {
+    RADIUS_NAME: "millimetres",
+    SLIT_EDGES_NAME: "degrees",
+    SLIT_HEIGHT_NAME: "millimetres",
+}
 
 
 def _incorrect_field_type_message(fields_dict: dict, field_name: str) -> str:
@@ -191,7 +195,7 @@ def _units_are_valid(units_dict: dict) -> bool:
             continue
         if not units_have_dimension_of_one(unit_input):
             logging.info(
-                f"{UNABLE} Units for {field} should habe a dimension of one. Found value: {unit_input}"
+                f"{UNABLE} Units for {field} should have a dimension of one. Found value: {unit_input}"
             )
             bad_units.append(field)
             continue

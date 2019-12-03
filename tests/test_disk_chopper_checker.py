@@ -162,6 +162,17 @@ def fields_dict_mocks(
 
 
 @pytest.fixture(scope="function")
+def units_dict_mocks(
+    mock_radius_widget, mock_slit_edges_widget, mock_slit_height_widget
+):
+    return {
+        RADIUS_NAME: mock_radius_widget.attrs["units"],
+        SLIT_EDGES_NAME: mock_slit_edges_widget.attrs["units"],
+        SLIT_HEIGHT_NAME: mock_slit_height_widget.attrs["units"],
+    }
+
+
+@pytest.fixture(scope="function")
 def user_defined_chopper_checker(mock_fields_list_widget):
     return UserDefinedChopperChecker(mock_fields_list_widget)
 
@@ -580,52 +591,33 @@ def test_user_defined_chopper_checker_GIVEN_units_missing_WHEN_checking_that_req
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_chopper_checker_GIVEN_input_cant_be_converted_to_any_units_WHEN_validating_units_THEN_returns_false(
-    user_defined_chopper_checker, field_that_needs_units
+    field_that_needs_units, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[
-        field_that_needs_units
-    ].attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key="units", data="notaunit"
-        )
-    )
-    assert not _units_are_valid(user_defined_chopper_checker.fields_dict)
+    units_dict_mocks[field_that_needs_units] = "notaunit"
+    assert not _units_are_valid(units_dict_mocks)
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_chopper_checker_GIVEN_unit_has_wrong_type_WHEN_validating_units_THEN_returns_false(
-    user_defined_chopper_checker, field_that_needs_units
+    user_defined_chopper_checker, field_that_needs_units, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[
-        field_that_needs_units
-    ].attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key="units", data=IMPROPER_UNITS[field_that_needs_units]
-        )
-    )
-    assert not _units_are_valid(user_defined_chopper_checker.fields_dict)
+    units_dict_mocks[field_that_needs_units] = IMPROPER_UNITS[field_that_needs_units]
+    assert not _units_are_valid(units_dict_mocks)
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validating_units_THEN_returns_false(
-    user_defined_chopper_checker, field_that_needs_units
+    user_defined_chopper_checker, field_that_needs_units, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[
-        field_that_needs_units
-    ].attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key,
-            expected_key="units",
-            data="50" + EXPECTED_UNIT_TYPE[field_that_needs_units],
-        )
+    units_dict_mocks[field_that_needs_units] = (
+        "50 " + EXPECTED_UNIT_TYPE[field_that_needs_units]
     )
-    assert not _units_are_valid(user_defined_chopper_checker.fields_dict)
+    assert not _units_are_valid(units_dict_mocks)
 
 
 def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validating_chopper_THEN_returns_false(
     nexus_defined_chopper_checker, nexus_disk_chopper
 ):
-
     nexus_disk_chopper[SLIT_HEIGHT_NAME].attrs["units"] = np.array(
         [i for i in range(10)]
     )
