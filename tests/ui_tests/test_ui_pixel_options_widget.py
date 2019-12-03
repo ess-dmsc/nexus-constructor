@@ -650,7 +650,7 @@ def test_GIVEN_pixel_grid_with_single_column_WHEN_finding_column_properties_THEN
 
 
 @pytest.mark.xfail(
-    "The function for recovering Pixel Grid information expects an array with more than one column/row. A single row of pixels isn't handled yet."
+    reason="The function for recovering Pixel Grid information expects an array with more than one column/row. A single row of pixels isn't handled yet."
 )
 def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_is_returned(
     pixel_options, pixel_grid
@@ -666,7 +666,7 @@ def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_e
 
 
 @pytest.mark.xfail(
-    "The function for recovering Pixel Grid information expects an array with more than one column/row. A single column of pixels isn't handled yet."
+    reason="The function for recovering Pixel Grid information expects an array with more than one column/row. A single column of pixels isn't handled yet."
 )
 def test_GIVEN_column_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_is_returned(
     pixel_options, pixel_grid
