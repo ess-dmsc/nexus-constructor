@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, Union, List
+from typing import Tuple, Optional, List
 
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
@@ -189,7 +189,8 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Determine the first pixel ID, the count direction, and the location of the first pixel from a component that's
         being edited.
         :param detector_numbers: The array of detector numbers from the component.
-        :return:
+        :return: The first ID, start counting text, and count along text that should be placed in the Edit Component
+        Window.
         """
         # Find the first pixel and its index in the detector number array
         first_id = np.amin(detector_numbers)
