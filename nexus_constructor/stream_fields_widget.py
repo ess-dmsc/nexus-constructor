@@ -360,7 +360,7 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
-        all_ev42_elements = list(self.ev42_nexus_elements)
+        all_ev42_elements = [] #list(self.ev42_nexus_elements)
         all_ev42_elements.append(ADC_PULSE_DEBUG)
 
         advanced_options = check_if_advanced_options_should_be_enabled(

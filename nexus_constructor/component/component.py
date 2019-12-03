@@ -107,10 +107,10 @@ class Component:
     def name(self, new_name: str):
         old_name = self.name
         self.file.rename_node(self.group, new_name)
-        old_depends_on_str = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
+        old_depends_on_str = self.file.get_field_value(self.group, DEPENDS_ON_STR)
         if old_depends_on_str != "." and old_depends_on_str != None:
             new_depends_on_str = old_depends_on_str.replace("/" + old_name + "/transformations", "/" + new_name + "/transformations")
-            self.file.set_attribute_value(self.group, DEPENDS_ON_STR, new_depends_on_str)
+            self.file.set_field_value(self.group, DEPENDS_ON_STR, new_depends_on_str)
 
         if hasattr(self, "stored_transforms"):
             for i in range(len(self.stored_transforms)):
@@ -163,7 +163,7 @@ class Component:
         :return: List of transforms
         """
         transforms = TransformationsList(self)
-        depends_on = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
+        depends_on = self.file.get_field_value(self.group, DEPENDS_ON_STR)
         self._get_transform(depends_on, transforms)
         return transforms
 
@@ -195,7 +195,7 @@ class Component:
             transforms.append(new_transform)
             if DEPENDS_ON_STR in transform_dataset.attrs.keys():
                 self._get_transform(
-                    self.file.get_attribute_value(transform_dataset, DEPENDS_ON_STR),
+                    self.file.get_field_value(transform_dataset, DEPENDS_ON_STR),
                     transforms,
                     local_only,
                 )
@@ -220,7 +220,7 @@ class Component:
         :return:
         """
         transforms = TransformationsList(self)
-        depends_on = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
+        depends_on = self.file.get_field_value(self.group, DEPENDS_ON_STR)
         self._get_transform(depends_on, transforms, local_only=True)
         return transforms
 
@@ -301,14 +301,14 @@ class Component:
 
     @property
     def depends_on(self):
-        depends_on_path = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
+        depends_on_path = self.file.get_field_value(self.group, DEPENDS_ON_STR)
         if depends_on_path is None:
             return None
         return Transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
     def depends_on(self, transformation: Transformation):
-        existing_depends_on = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
+        existing_depends_on = self.file.get_field_value(self.group, DEPENDS_ON_STR)
         if existing_depends_on is not None:
             try:
                 old_transformation_path = self.file.nexus_file[existing_depends_on]
@@ -317,9 +317,9 @@ class Component:
                 pass
 
         if transformation is None:
-            self.file.set_attribute_value(self.group, DEPENDS_ON_STR, ".")
+            self.file.set_field_value(self.group, DEPENDS_ON_STR, ".")
         else:
-            self.file.set_attribute_value(
+            self.file.set_field_value(
                 self.group, DEPENDS_ON_STR, transformation.absolute_path)
             transformation.register_dependent(self)
 
@@ -429,7 +429,7 @@ class Component:
         if len(self.transforms) != 0:
             old_depends_on_str = self.depends_on.absolute_path
             new_depends_on_str = old_depends_on_str.replace(self.name, new_component.name)
-            new_component.file.set_attribute_value(new_component.group, "depends_on", new_depends_on_str)
+            new_component.file.set_field_value(new_component.group, DEPENDS_ON_STR, new_depends_on_str)
         return new_component
 
     def record_pixel_grid(self, pixel_grid: PixelGrid):
