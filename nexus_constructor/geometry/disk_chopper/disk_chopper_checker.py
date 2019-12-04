@@ -314,7 +314,7 @@ class NexusDefinedChopperChecker:
 
         if len(missing_fields) > 0:
             logging.info(
-                f"{UNABLE} Required field(s) missing:", ",".join(missing_fields)
+                f"{UNABLE} Required field(s) missing:", ", ".join(missing_fields)
             )
             return False
 

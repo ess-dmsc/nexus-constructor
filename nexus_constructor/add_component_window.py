@@ -510,7 +510,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component = self.instrument.create_component(
             component_name, nx_class, description
         )
-        self.generate_geometry_model(component, pixel_data)
+        geometry_model = self.generate_geometry_model(component, pixel_data)
 
         # In the future this should check if the class is NXdetector or NXdetector_module
         if nx_class == "NXdetector":
@@ -525,7 +525,20 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component_with_geometry = create_component(
             self.instrument.nexus, component.group
         )
+
+        if self.component_is_chopper_with_no_shape(nx_class):
+            return geometry_model, None
+
         return component_with_geometry.shape
+
+    def component_is_chopper_with_no_shape(self, nx_class: str) -> bool:
+        """
+        Checks if the component has class `NXdisk_chopper` and No Shape. This means it meets the criteria to possibly
+        have a chopper mesh.
+        :param nx_class: The class of the component.
+        :return: True if the No Shape button is checked and the class is a disk chopper, False otherwise.
+        """
+        return self.noShapeRadioButton.isChecked() and nx_class == CHOPPER_CLASS_NAME
 
     def edit_existing_component(
         self,
