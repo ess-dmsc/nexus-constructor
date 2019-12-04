@@ -15,6 +15,7 @@ from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_are_expected_type,
     units_have_dimension_of_one,
+    METRES,
 )
 
 HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
@@ -52,7 +53,7 @@ class UnitValidator(QValidator):
 
         if not (
             units_are_recognised_by_pint(input)
-            and units_are_expected_type(input, "metre")
+            and units_are_expected_type(input, METRES)
             and units_have_dimension_of_one(input)
         ):
             self.is_valid.emit(False)

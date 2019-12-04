@@ -14,7 +14,6 @@ def degree_to_radian(x):
 
 
 CONVERT_DEGREES_TO_RADIANS = np.vectorize(degree_to_radian)
-
 RADIANS_EDGES_ARR = CONVERT_DEGREES_TO_RADIANS(DEGREES_EDGES_ARR)
 
 
