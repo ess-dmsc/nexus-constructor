@@ -16,7 +16,7 @@ from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.field_attrs import FieldAttrFrame
-from nexus_constructor.geometry import OFFGeometryNoNexus
+from nexus_constructor.geometry import OFFGeometryNoNexus, NoShapeGeometry
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
@@ -1714,6 +1714,19 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_ch
         chopper_creator.assert_called_once()
 
 
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_nexus_chopper_creator_is_not_called(
+    qtbot, dialog, template
+):
+    enter_disk_chopper_fields(qtbot, dialog, template)
+
+    with patch(
+        "nexus_constructor.component.chopper_shape.ChopperShape.get_shape"
+    ) as get_shape_from_nexus:
+        get_shape_from_nexus.return_value = (NoShapeGeometry(), None)
+        dialog.on_ok()
+        get_shape_from_nexus.assert_not_called()
+
+
 def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_chopper_geometry_is_not_created(
     qtbot, dialog, template
 ):
@@ -1725,6 +1738,12 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_
     show_and_close_window(qtbot, template)
 
     enter_disk_chopper_fields(qtbot, dialog, template)
+
+    with patch(
+        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+    ) as chopper_creator:
+        dialog.on_ok()
+        chopper_creator.assert_not_called()
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_correct_options(
