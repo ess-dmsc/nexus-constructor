@@ -841,7 +841,11 @@ def test_GIVEN_call_to_create_pixel_mapping_widgets_WHEN_editing_a_component_THE
     new_value = values[1]
 
     pixel_options.create_pixel_mapping_list(old_value, "")
+    widget_1 = pixel_options.pixel_mapping_widgets[0]
     assert len(pixel_options.pixel_mapping_widgets) == old_value
 
     pixel_options.create_pixel_mapping_list(new_value, "")
+    widget_2 = pixel_options.pixel_mapping_widgets[0]
     assert len(pixel_options.pixel_mapping_widgets) == new_value
+
+    assert widget_1 is not widget_2
