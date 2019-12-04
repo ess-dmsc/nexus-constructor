@@ -247,7 +247,7 @@ class UserDefinedChopperChecker:
 
         if len(missing_units) > 0:
             logging.info(
-                f"{UNABLE} Units are missing from field(s):", ",".join(missing_units)
+                f"{UNABLE} Units are missing from field(s):", ", ".join(missing_units)
             )
             return False
 
