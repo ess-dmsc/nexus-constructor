@@ -359,7 +359,6 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
             component.set_field(
                 name=widget.name, value=widget.value, dtype=widget.dtype
             )
-            print(widget.__dir__)
         except ValueError as error:
             show_warning_dialog(
                 f"Warning: field {widget.name} not added",
