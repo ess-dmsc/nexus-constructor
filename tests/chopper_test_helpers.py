@@ -21,7 +21,7 @@ RADIANS_EDGES_ARR = CONVERT_DEGREES_TO_RADIANS(DEGREES_EDGES_ARR)
 def chopper_details():
     return ChopperDetails(
         slits=N_SLITS,
-        slit_edges=CONVERT_DEGREES_TO_RADIANS(DEGREES_EDGES_ARR),
+        slit_edges=RADIANS_EDGES_ARR,
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
         angle_units="rad",
