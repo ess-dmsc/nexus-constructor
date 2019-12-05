@@ -5,6 +5,7 @@ import h5py
 from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
+import PySide2
 
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.geometry import (
@@ -132,6 +133,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.valid_file_given = False
         self.pixel_options = None
 
+    def eventFilter(self, watched:PySide2.QtCore.QObject, event:PySide2.QtCore.QEvent):
+        if event.type() == PySide2.QtCore.QEvent.Close:
+            if hasattr(self, "reset_func"):
+                self.reset_func()
+        return False
+
     def setupUi(self, parent_dialog):
         """ Sets up push buttons and validators for the add component window. """
         super().setupUi(parent_dialog)
@@ -148,6 +155,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         #         "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
         #     )
         # )
+        parent_dialog.installEventFilter(self)
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
