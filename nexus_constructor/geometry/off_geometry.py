@@ -275,7 +275,6 @@ def record_vertices_in_file(
     :param nexus_wrapper: Wrapper for the file the data will be stored in
     :param group: The shape group node
     :param new_vertices: The new vertices data, list of cartesian coords for each vertex
-    :return:
     """
     vertices = [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
     vertices_node = nexus_wrapper.set_field_value(group, "vertices", vertices)

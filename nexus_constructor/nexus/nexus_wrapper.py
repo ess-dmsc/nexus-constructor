@@ -320,6 +320,13 @@ class NexusWrapper(QObject):
         self._emit_file()
         return group[name]
 
+    def delete_field_value(self, group: h5py.Group, name: str):
+        try:
+            del group[name]
+            self._emit_file()
+        except KeyError:
+            pass
+
     @staticmethod
     def get_attribute_value(node: h5Node, name: str) -> Optional[Any]:
         if name in node.attrs.keys():

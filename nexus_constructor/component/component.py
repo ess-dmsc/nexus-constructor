@@ -14,6 +14,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_z_offsets_from_pixel_grid,
     get_detector_ids_from_pixel_grid,
     get_detector_number_from_pixel_mapping,
+    PIXEL_FIELDS,
 )
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
@@ -121,6 +122,9 @@ class Component:
 
     def set_field(self, name: str, value: Any, dtype=None):
         self.file.set_field_value(self.group, name, value, dtype)
+
+    def delete_field(self, name: str):
+        self.file.delete_field_value(self.group, name)
 
     def get_fields(self):
         return get_fields(self.group)
@@ -325,7 +329,7 @@ class Component:
         )
 
         pixel_mapping = None
-        if type(pixel_data) is PixelMapping:
+        if isinstance(pixel_data, PixelMapping):
             pixel_mapping = pixel_data
 
         vertices = calculate_vertices(axis_direction, height, radius)
@@ -380,6 +384,7 @@ class Component:
             shape_group = self.file.create_nx_group(
                 SHAPE_GROUP_NAME, nexus_name, self.group
             )
+            self._shape = ComponentShape(self.file, self.group)
         return shape_group
 
     @property
@@ -427,10 +432,20 @@ class Component:
             "detector_number", get_detector_ids_from_pixel_grid(pixel_grid), "int64"
         )
 
-    def record_detector_number(self, pixel_mapping: PixelMapping):
-
+    def record_pixel_mapping(self, pixel_mapping: PixelMapping):
+        """
+        Records the pixel mapping data to the NeXus file.
+        :param pixel_mapping: The PixelMapping created from the input provided to the Add/Edit Component Window.
+        """
         self.set_field(
             "detector_number",
             get_detector_number_from_pixel_mapping(pixel_mapping),
             "int64",
         )
+
+    def clear_pixel_data(self):
+        """
+        Removes the existing pixel data from the NeXus file. Used when editing pixel data.
+        """
+        for field in PIXEL_FIELDS:
+            self.delete_field(field)

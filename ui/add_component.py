@@ -178,7 +178,6 @@ class Ui_AddComponentDialog(object):
         self.horizontalLayout_3.addWidget(self.unitsLineEdit)
         self.gridLayout_2.addWidget(self.unitsbox, 0, 0, 1, 1)
         self.pixelOptionsWidget = QtWidgets.QWidget(self.shapeOptionsBox)
-        self.pixelOptionsWidget.setObjectName("pixelOptionsWidget")
         self.gridLayout_2.addWidget(self.pixelOptionsWidget, 4, 0, 1, 1)
         self.verticalLayout_2.addWidget(self.shapeOptionsBox)
         self.fieldsBox = QtWidgets.QGroupBox(self.widget)

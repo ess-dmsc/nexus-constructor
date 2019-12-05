@@ -131,7 +131,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.valid_file_given = False
         self.pixel_options = None
 
-    def setupUi(self, parent_dialog):
+    def setupUi(self, parent_dialog, pixel_options: PixelOptions = PixelOptions()):
         """ Sets up push buttons and validators for the add component window. """
         super().setupUi(parent_dialog)
 
@@ -206,7 +206,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
-        self.pixel_options = PixelOptions()
+        self.pixel_options = pixel_options
         self.pixel_options.setupUi(self.pixelOptionsWidget)
         self.pixelOptionsWidget.ui = self.pixel_options
 
@@ -215,12 +215,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 f"Edit Component: {get_name_of_node(self.component_to_edit.group)}"
             )
             self._fill_existing_entries()
-            self.pixel_options.fill_existing_entries()
+            if self.get_pixel_visibility_condition():
+                self.pixel_options.fill_existing_entries(self.component_to_edit)
 
         self.ok_validator = OkValidator(
-            self.noShapeRadioButton,
-            self.meshRadioButton,
-            self.pixel_options.get_validator(),
+            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
         )
         self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
 
@@ -262,6 +261,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.CylinderRadioButton.clicked.connect(self.set_pixel_related_changes)
         self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
 
+        self.change_pixel_options_visibility()
+
     def set_pixel_related_changes(self):
         """
         Manages the pixel-related changes that are induced by changing the shape type. This entails changing the
@@ -287,7 +288,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         Fill in component details in the UI if editing a component
         """
-        self.buttonBox.setText("Edit Component")
         self.nameLineEdit.setText(self.component_to_edit.name)
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
@@ -457,7 +457,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         return geometry_model
 
-    def get_pixel_visibility_condition(self):
+    def get_pixel_visibility_condition(self) -> bool:
         """
         Determines if it is necessary to make the pixel options visible.
         :return: A bool indicating if the current shape and component type allow for pixel-related input.
@@ -516,12 +516,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
         geometry_model = self.generate_geometry_model(component, pixel_data)
 
-        # In the future this should check if the class is NXdetector or NXdetector_module
-        if nx_class == "NXdetector":
-            if isinstance(pixel_data, PixelMapping):
-                component.record_detector_number(pixel_data)
-            if isinstance(pixel_data, PixelGrid):
-                component.record_pixel_grid(pixel_data)
+        self.write_pixel_data_to_component(component, nx_class, pixel_data)
 
         add_fields_to_component(component, self.fieldsListWidget)
         self.component_model.add_component(component)
@@ -576,12 +571,34 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.component_to_edit.nx_class = nx_class
         self.component_to_edit.description = description
 
+        self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
+
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
         component_with_geometry = create_component(
             self.instrument.nexus, self.component_to_edit.group
         )
         return component_with_geometry.shape
+
+    @staticmethod
+    def write_pixel_data_to_component(
+        component: Component, nx_class: str, pixel_data: PixelData
+    ):
+        """
+        Writes the detector number/pixel grid data to a component.
+        :param component: The component to modify.
+        :param nx_class: The NXclass of the component.
+        :param pixel_data: The pixel data.
+        """
+        component.clear_pixel_data()
+
+        if pixel_data is None or nx_class not in PIXEL_COMPONENT_TYPES:
+            return
+
+        if isinstance(pixel_data, PixelMapping):
+            component.record_pixel_mapping(pixel_data)
+        if isinstance(pixel_data, PixelGrid):
+            component.record_pixel_grid(pixel_data)
 
     def change_pixel_options_visibility(self):
         """
@@ -601,19 +618,24 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         Tells the pixel options widget to populate the pixel mapping widget provided certain conditions are met. Checks
         that the pixel options are visible then performs further checks depending on if the mesh or cylinder button
-        has been selected.
+        has been selected. The RuntimeError occurs when editing a component and switching from a Pixel Grid/No Shape
+        to a PixelMapping. It says that the Pixel Options widget and Mesh/Cylinder buttons have been deleted even though
+        they ought to be "brand new" when the Edit Component Window opens. A try-except block appears to be the only way
+        to handle it for now.
         """
+        try:
+            if not self.pixelOptionsWidget.isVisible():
+                return
 
-        if not self.pixelOptionsWidget.isVisible():
-            return
+            if self.meshRadioButton.isChecked():
+                self.create_pixel_mapping_list_for_mesh()
 
-        if self.meshRadioButton.isChecked():
-            self.create_pixel_mapping_list_for_mesh()
-
-        if self.CylinderRadioButton.isChecked():
-            self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
-                self.cylinderCountSpinBox.value()
-            )
+            if self.CylinderRadioButton.isChecked():
+                self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
+                    self.cylinderCountSpinBox.value()
+                )
+        except RuntimeError:
+            pass
 
     def create_pixel_mapping_list_for_mesh(self):
         """
@@ -623,12 +645,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if (
             self.cad_file_name is not None
             and self.valid_file_given
-            and self.pixel_options.get_current_mapping_filename() != self.cad_file_name
+            and (
+                self.pixel_options.get_current_mapping_filename() != self.cad_file_name
+            )
         ):
             self.pixel_options.populate_pixel_mapping_list_with_mesh(self.cad_file_name)
 
     def update_pixel_input_validity(self):
         """
-        :return:
+        Instruct the PixelOptions widget to carry out another check for input validity.
         """
         self.pixel_options.update_pixel_input_validity()

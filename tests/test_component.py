@@ -496,7 +496,7 @@ def test_GIVEN_pixel_mapping_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_
 ):
     pixel_id_list = [i for i in range(5)]
     pixel_mapping = PixelMapping(pixel_id_list)
-    component.record_detector_number(pixel_mapping)
+    component.record_pixel_mapping(pixel_mapping)
 
     assert np.array_equal(
         component.get_field("detector_number"), np.array(pixel_id_list)
@@ -719,3 +719,28 @@ def test_GIVEN_component_with_two_translations_WHEN_get_transformation_THEN_retu
         )
     )
     assert np.allclose(expected_matrix, np.array(component.transform.matrix().data()))
+
+
+def test_GIVEN_component_with_pixel_mapping_WHEN_removing_pixel_data_THEN_pixel_mapping_is_cleared(
+    component
+):
+
+    pixel_mapping = PixelMapping([i for i in range(6)])
+    component.record_pixel_mapping(pixel_mapping)
+
+    component.clear_pixel_data()
+    assert component.get_field("detector_number") is None
+
+
+def test_GIVEN_component_with_pixel_grid_WHEN_removing_pixel_data_THEN_pixel_grid_is_cleared(
+    component
+):
+
+    pixel_grid = PixelGrid()
+    component.record_pixel_grid(pixel_grid)
+
+    component.clear_pixel_data()
+    assert component.get_field("detector_number") is None
+    assert component.get_field("x_pixel_offset") is None
+    assert component.get_field("y_pixel_offset") is None
+    assert component.get_field("z_pixel_offset") is None

@@ -9,6 +9,8 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_ids_from_pixel_grid,
     get_z_offsets_from_pixel_grid,
     get_detector_number_from_pixel_mapping,
+    convert_to_scalar_if_list_has_one_element,
+    convert_to_scalar_if_array_has_one_element,
 )
 
 EXPECTED_DETECTOR_IDS = {
@@ -26,7 +28,7 @@ EXPECTED_DETECTOR_IDS = {
     },
 }
 
-ROW_COL_VALS = [1, 4, 7]
+ROW_COL_VALS = [4, 7]
 
 
 @pytest.fixture(scope="function")
@@ -51,13 +53,22 @@ def pixel_mapping():
 def test_GIVEN_list_of_ids_WHEN_calling_detector_faces_THEN_correct_detector_faces_list_is_returned(
     pixel_mapping
 ):
-
-    ids_with_none_removed = [id for id in pixel_mapping.pixel_ids if id is not None]
     expected_faces = [
-        (i, ids_with_none_removed[i]) for i in range(len(ids_with_none_removed))
+        (i, pixel_mapping.pixel_ids[i])
+        for i in range(len(pixel_mapping.pixel_ids))
+        if pixel_mapping.pixel_ids[i] is not None
     ]
 
     assert get_detector_faces_from_pixel_mapping(pixel_mapping) == expected_faces
+
+
+def test_GIVEN_single_id_WHEN_calling_detector_faces_THEN_list_is_not_returned(
+    pixel_mapping
+):
+
+    pixel_id = 3
+    pixel_mapping.pixel_ids = [pixel_id]
+    assert get_detector_faces_from_pixel_mapping(pixel_mapping) == (0, pixel_id)
 
 
 def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_number_list_is_returned(
@@ -67,6 +78,15 @@ def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_nu
     expected_numbers = [id for id in pixel_mapping.pixel_ids if id is not None]
 
     assert get_detector_number_from_pixel_mapping(pixel_mapping) == expected_numbers
+
+
+def test_GIVEN_single_id_WHEN_calling_detector_number_THEN_list_is_not_returned(
+    pixel_mapping
+):
+
+    pixel_id = 3
+    pixel_mapping.pixel_ids = [pixel_id]
+    assert get_detector_number_from_pixel_mapping(pixel_mapping) == pixel_id
 
 
 @pytest.mark.parametrize("rows", ROW_COL_VALS)
@@ -117,11 +137,7 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_z_offsets_THEN_z_offsets_are_a
 
     z_offsets = get_z_offsets_from_pixel_grid(pixel_grid)
 
-    assert len(z_offsets) == pixel_grid.rows
-    expected_row = [0 for _ in range(pixel_grid.columns)]
-
-    for actual_row in z_offsets:
-        assert actual_row == expected_row
+    assert np.array_equal(np.zeros((rows, columns)), z_offsets)
 
 
 @pytest.mark.parametrize("direction", CountDirection)
@@ -140,3 +156,41 @@ def test_GIVEN_direction_and_initial_count_corner_WHEN_calling_pixel_grid_detect
         np.array(EXPECTED_DETECTOR_IDS[direction][corner]) + pixel_grid.first_id,
         get_detector_ids_from_pixel_grid(pixel_grid),
     )
+
+
+def test_GIVEN_one_by_one_pixel_grid_when_calling_offset_functions_THEN_offsets_and_pixel_id_are_scalars(
+    pixel_grid
+):
+
+    pixel_grid.rows = 1
+    pixel_grid.columns = 1
+
+    assert get_x_offsets_from_pixel_grid(pixel_grid) == 0
+    assert get_y_offsets_from_pixel_grid(pixel_grid) == 0
+    assert get_z_offsets_from_pixel_grid(pixel_grid) == 0
+
+    assert get_detector_ids_from_pixel_grid(pixel_grid) == pixel_grid.first_id
+
+
+def test_GIVEN_list_with_multiple_elements_WHEN_calling_convert_to_scalar_THEN_list_is_returned():
+
+    a_list = [i for i in range(5)]
+    assert convert_to_scalar_if_list_has_one_element(a_list) == a_list
+
+
+def test_GIVEN_list_with_single_element_WHEN_calling_convert_to_scalar_THEN_single_element_is_returned():
+
+    element = 8
+    assert convert_to_scalar_if_list_has_one_element([element]) == element
+
+
+def test_GIVEN_array_with_multiple_elements_WHEN_calling_convert_to_scalar_THEN_array_is_returned():
+
+    array = np.ones((5, 5))
+    assert np.array_equal(convert_to_scalar_if_array_has_one_element(array), array)
+
+
+def test_GIVEN_array_with_one_element_WHEN_calling_convert_to_scalar_THEN_element_is_returned():
+
+    array = np.ones(1)
+    assert np.array_equal(convert_to_scalar_if_array_has_one_element(array), 1)
