@@ -5,6 +5,7 @@ from PySide2.QtWidgets import QWidget
 from mock import Mock
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.validators import DATASET_TYPE
 
 
 @pytest.fixture(scope="function")
@@ -44,3 +45,25 @@ def test_UI_GIVEN_data_has_different_shapes_WHEN_getting_array_from_component_TH
     assert array_dataset_table_widget.model.data(model_index, Qt.DisplayRole) == str(
         array[value_index]
     )
+
+
+@pytest.mark.parametrize("orig_data_type", DATASET_TYPE.values())
+@pytest.mark.parametrize("new_data_type", DATASET_TYPE.values())
+def test_UI_GIVEN_data_type_WHEN_changing_data_type_THEN_change_is_successful(
+    array_dataset_table_widget, orig_data_type, new_data_type
+):
+
+    array = np.arange(10, dtype=orig_data_type)
+    array_dataset_table_widget.model.array = array
+    array_dataset_table_widget.model.update_array_dtype(np.float16)
+
+    assert np.array_equal(array, array_dataset_table_widget.model.array)
+
+
+@pytest.mark.skip(
+    "Don't actually know what causes the ValueError. All possible conversions appear to work."
+)
+def test_UI_GIVEN_array_cant_be_converted_WHEN_changing_data_type_THEN_array_resets(
+    array_dataset_table_widget
+):
+    pass
