@@ -67,3 +67,25 @@ def test_UI_GIVEN_array_cant_be_converted_WHEN_changing_data_type_THEN_array_res
     array_dataset_table_widget
 ):
     pass
+
+
+def test_UI_GIVEN_add_row_button_pressed_THEN_array_size_changes(
+    array_dataset_table_widget
+):
+
+    array_dataset_table_widget.add_row_button.trigger()
+    assert array_dataset_table_widget.model.array.shape == (2, 1)
+
+
+def test_UI_GIVEN_add_column_button_pressed_THEN_array_size_changes(
+    array_dataset_table_widget
+):
+
+    array_dataset_table_widget.add_column_button.trigger()
+    assert array_dataset_table_widget.model.array.shape == (1, 2)
+
+
+def test_UI_GIVEN_remove_row_button_pressed_THEN_array_size_changes(
+    array_dataset_table_widget
+):
+    pass
