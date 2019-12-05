@@ -358,15 +358,17 @@ def enter_disk_chopper_fields(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
     template: PySide2.QtWidgets.QDialog,
+    component_name: str = "ThisIsADiskChopper",
 ):
     """
-    Mimics a user creating an NXdisk_chopper by filling in the related fields.
+    Mimics a user creating an NXdisk_chopper by filling in the related fields/attributes.
     :param qtbot: The qtbot testing tool.
     :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
+    :param component_name: The name of the Disk Chopper.
     """
     # Set the name and NXclass of the component
-    qtbot.keyClicks(dialog.nameLineEdit, "ThisIsADiskChopper")
+    qtbot.keyClicks(dialog.nameLineEdit, component_name)
     dialog.componentTypeComboBox.setCurrentIndex(ALL_COMPONENT_TYPES["NXdisk_chopper"])
 
     # Press the Add Field button four times and create a list of fields widgets
@@ -410,6 +412,7 @@ def enter_disk_chopper_fields(
         [[(i * 10.0)] for i in range(12)]
     )
 
+    # Set the units attributes
     slit_edges_attribute_frame = FieldAttrFrame()
     slit_edges_attribute_frame.attr_dtype_combo.setCurrentText("String")
     slit_edges_attribute_frame.value = ("units", "deg")
@@ -451,12 +454,13 @@ def enter_component_with_pixel_fields(
     pixel_data: PixelData,
 ):
     """
-    :param add_component_dialog:
-    :param component_name:
-    :param mock_pixel_options:
-    :param pixel_grid_size:
-    :param qtbot:
-    :param template:
+    :param add_component_dialog: The AddComponentDialog.
+    :param component_name: The name of the component.
+    :param button: The button that is selected (Mesh or Cylinder) when creating the component with Pixel Data.
+    :param mock_pixel_options: A mock of the PixelOptions that will be instructed to return a PixelGrid, a PixelMapping,
+        or None.
+    :param qtbot: The QtBot testing tool.
+    :param template: The QDialog that stores the Add Component
     """
     make_pixel_options_appear(qtbot, button, add_component_dialog, template)
     enter_component_name(qtbot, template, add_component_dialog, component_name)
@@ -472,6 +476,9 @@ def enter_and_create_component_with_pixel_data(
     template: QDialog,
     pixel_data: PixelData = None,
 ):
+    """
+
+    """
 
     if cylinders:
         button = add_component_dialog.CylinderRadioButton
@@ -2709,3 +2716,33 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_no_pixel_data_THEN_p
         assert shape.detector_faces[1] == detector_number[0]
 
     assert isinstance(shape, expected_geometry)
+
+
+def test_UI_GIVEN_changing_fields_WHEN_editing_a_component_with_a_chopper_mesh_THEN_previous_chopper_mesh_is_removed_from_instrument_view(
+    qtbot, template, add_component_dialog, parent_mock
+):
+
+    component_name = "DiskChopper"
+    enter_disk_chopper_fields(qtbot, add_component_dialog, template, component_name)
+    add_component_dialog.on_ok()
+
+    disk_chopper_component = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    add_component_dialog.component_to_edit = disk_chopper_component
+    add_component_dialog.parent = Mock(return_value=parent_mock)
+
+    widget = None
+    for i in range(4):
+        widget = add_component_dialog.fieldsListWidget.itemWidget(
+            add_component_dialog.fieldsListWidget.item(i)
+        )
+        if widget.name == "radius":
+            break
+
+    assert widget is not None
+    prev_value = widget.value[()]
+    widget.value = prev_value + 50
+
+    add_component_dialog.on_ok()
