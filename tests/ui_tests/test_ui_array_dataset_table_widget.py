@@ -26,14 +26,17 @@ def test_UI_GIVEN_data_has_different_shapes_WHEN_getting_array_from_component_TH
 ):
 
     model_index = Mock(spec=QModelIndex)
-    model_index.row.return_value = array_shape[0] - 1
-    value_index = (array_shape[0] - 1,)
+    last_value_x = array_shape[0] - 1
+    model_index.row.return_value = last_value_x
+    value_index = (last_value_x,)
 
     array_size = array_shape[0]
+
     if len(array_shape) > 1:
         array_size *= array_shape[1]
-        model_index.column.return_value = array_shape[1] - 1
-        value_index = (array_shape[0] - 1, array_shape[1] - 1)
+        last_value_y = array_shape[1] - 1
+        model_index.column.return_value = last_value_y
+        value_index = (last_value_x, last_value_y)
 
     array = np.arange(array_size).reshape(array_shape)
     array_dataset_table_widget.model.array = array
