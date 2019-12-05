@@ -114,11 +114,15 @@ class CylindricalGeometry:
         """
         # flatten cylinders in case there are multiple cylinders defined, we'll take the first three elements,
         # so effectively any cylinder after the first one is ignored
-        cylinders = self.file.get_field_value(self.group, "cylinders").flatten()
+        cylinders = self.cylinders.flatten()
         vertices = self.file.get_field_value(self.group, "vertices")
         return tuple(
             numpy_array_to_qvector3d(vertices[cylinders[i], :]) for i in range(3)
         )
+
+    @property
+    def cylinders(self) -> np.ndarray:
+        return self.file.get_field_value(self.group, "cylinders")
 
     @property
     def radius(self) -> float:
