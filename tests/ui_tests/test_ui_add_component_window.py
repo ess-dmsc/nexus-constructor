@@ -2746,3 +2746,5 @@ def test_UI_GIVEN_changing_fields_WHEN_editing_a_component_with_a_chopper_mesh_T
     widget.value = prev_value + 50
 
     add_component_dialog.on_ok()
+
+    parent_mock.sceneWidget.delete_component.assert_called_once_with(component_name)
