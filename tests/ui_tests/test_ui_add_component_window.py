@@ -460,7 +460,7 @@ def enter_component_with_pixel_fields(
     :param mock_pixel_options: A mock of the PixelOptions that will be instructed to return a PixelGrid, a PixelMapping,
         or None.
     :param qtbot: The QtBot testing tool.
-    :param template: The QDialog that stores the Add Component
+    :param template: The QDialog that stores the Add Component widget.
     """
     make_pixel_options_appear(qtbot, button, add_component_dialog, template)
     enter_component_name(qtbot, template, add_component_dialog, component_name)
@@ -477,9 +477,15 @@ def enter_and_create_component_with_pixel_data(
     pixel_data: PixelData = None,
 ):
     """
-
+    Mimics the user creating a component with PixelData and then pressing the "Add Component" button. Used for testing
+    pixel data editing.
+    :param add_component_dialog: The AddComponentDialog.
+    :param cylinders: A bool that decides if the shape is a Cylinder or an OFF Mesh. Determines which button is pressed.
+    :param mock_pixel_options: Mock Pixel Options that return Pixel Data.
+    :param qtbot: The qtbot testing tool.
+    :param template: The QDialog that stores the Add Component widget.
+    :param pixel_data: The PixelData returned by the mock Pixel Options when the "Add Component" button is pressed.
     """
-
     if cylinders:
         button = add_component_dialog.CylinderRadioButton
         expected_geometry = CylindricalGeometry
@@ -515,7 +521,15 @@ def edit_component_with_pixel_fields(
     mock_pixel_options: Mock = None,
     pixel_data: PixelData = None,
 ):
-
+    """
+    Mimics a component with PixelData being edited.
+    :param add_component_dialog: The AddComponentDialog.
+    :param component_to_edit: The component being edited.
+    :param parent_mock: A mock of the AddComponentDialog parent.
+    :param mock_pixel_options: A PixelOptions mock that will generate new, different Pixel Data when the
+        "Edit Component" button is pressed.
+    :param pixel_data: The PixelData that is "generated" by the PixelOptions mock.
+    """
     # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
     add_component_dialog.component_to_edit = component_to_edit
     add_component_dialog.parent = Mock(return_value=parent_mock)
