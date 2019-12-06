@@ -119,9 +119,13 @@ class Transformation:
         """
         existing_depends_on = self.file.get_attribute_value(self.dataset, "depends_on")
         if existing_depends_on is not None:
-            Transformation(
-                self.file, self.file.nexus_file[existing_depends_on]
-            ).deregister_dependent(self)
+            try:
+                transformation_dataset = self.file.nexus_file[existing_depends_on]
+                Transformation(
+                    self.file, transformation_dataset
+                ).deregister_dependent(self)
+            except KeyError:
+                pass #Ugly hack for now
 
         if depends_on is None:
             self.file.set_attribute_value(self.dataset, "depends_on", ".")

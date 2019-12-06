@@ -51,7 +51,7 @@ class EditTransformation(QGroupBox):
         elif transform_index == -1:
             raise RuntimeError("Position of transformation \"{}\" is unknown.".format(self.transformation.name))
         else:
-            self.transformation.parent.stored_transforms[transform_index - 1].depends_on = self.transformation
+            self.transformation.parent[transform_index - 1].depends_on = self.transformation
 
         self.transformation.vector = QVector3D(
             self.transformation_frame.x_spinbox.value(),

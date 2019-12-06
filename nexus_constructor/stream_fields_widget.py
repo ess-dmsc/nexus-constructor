@@ -95,6 +95,7 @@ class StreamFieldsWidget(QDialog):
         self.type_label = QLabel("Type: ")
         self.type_combo = QComboBox()
         self.type_combo.addItems(F142_TYPES)
+        self.type_combo.setCurrentIndex(F142_TYPES.index("double"))
 
         self.show_advanced_options_button = QPushButton(
             text="Show/hide advanced options"
@@ -393,9 +394,10 @@ class StreamFieldsWidget(QDialog):
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
 
-        advanced_options = check_if_advanced_options_should_be_enabled(
-            self.f142_nexus_elements, field
-        )
+        advanced_options = False
+        # check_if_advanced_options_should_be_enabled(
+        #     self.f142_nexus_elements, field
+        # )
 
         if advanced_options:
             self.f142_advanced_group_box.setEnabled(True)
