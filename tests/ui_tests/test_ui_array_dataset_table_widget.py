@@ -55,14 +55,12 @@ def test_UI_GIVEN_data_type_WHEN_changing_data_type_THEN_change_is_successful(
 
     array = np.arange(10, dtype=orig_data_type)
     array_dataset_table_widget.model.array = array
-    array_dataset_table_widget.model.update_array_dtype(np.float16)
+    array_dataset_table_widget.model.update_array_dtype(new_data_type)
 
     assert np.array_equal(array, array_dataset_table_widget.model.array)
 
 
-@pytest.mark.skip(
-    "Don't actually know what causes the ValueError. All possible conversions appear to work."
-)
+@pytest.mark.skip("Don't actually know what causes the ValueError.")
 def test_UI_GIVEN_array_cant_be_converted_WHEN_changing_data_type_THEN_array_resets(
     array_dataset_table_widget
 ):
@@ -85,7 +83,7 @@ def test_UI_GIVEN_add_column_button_pressed_THEN_array_size_changes(
     assert array_dataset_table_widget.model.array.shape == (1, 2)
 
 
-def test_UI_GIVEN_remove_row_button_pressed_THEN_array_size_changes(
+def test_UI_GIVEN_remove_row_button_pressed_WHEN_table_has_more_than_one_row_THEN_array_size_changes(
     array_dataset_table_widget
 ):
 
@@ -99,7 +97,7 @@ def test_UI_GIVEN_remove_row_button_pressed_THEN_array_size_changes(
     assert array_dataset_table_widget.model.array.shape == (1, 1)
 
 
-def test_UI_GIVEN_remove_column_button_pressed_THEN_array_size_changes(
+def test_UI_GIVEN_remove_column_button_pressed_WHEN_table_has_more_than_one_column_THEN_array_size_changes(
     array_dataset_table_widget, qtbot
 ):
     array_dataset_table_widget.add_column_button.trigger()
@@ -110,3 +108,45 @@ def test_UI_GIVEN_remove_column_button_pressed_THEN_array_size_changes(
     array_dataset_table_widget.remove_column_button.trigger()
 
     assert array_dataset_table_widget.model.array.shape == (1, 1)
+
+
+def test_UI_GIVEN_remove_row_button_pressed_WHEN_table_has_one_row_THEN_array_size_is_unchanged(
+    array_dataset_table_widget
+):
+    selection_index = array_dataset_table_widget.model.index(0, 0)
+    array_dataset_table_widget.view.selectionModel().select(
+        selection_index, QItemSelectionModel.Select
+    )
+    array_dataset_table_widget.remove_row_button.trigger()
+
+    assert array_dataset_table_widget.model.array.shape == (1, 1)
+
+
+def test_UI_GIVEN_remove_column_button_pressed_WHEN_table_has_one_column_THEN_array_size_is_unchanged(
+    array_dataset_table_widget
+):
+    selection_index = array_dataset_table_widget.model.index(0, 0)
+    array_dataset_table_widget.view.selectionModel().select(
+        selection_index, QItemSelectionModel.Select
+    )
+    array_dataset_table_widget.remove_column_button.trigger()
+
+    assert array_dataset_table_widget.model.array.shape == (1, 1)
+
+
+def test_UI_GIVEN_data_is_entered_WHEN_data_and_index_are_valid_THEN_array_changes(
+    array_dataset_table_widget
+):
+
+    selection_index = array_dataset_table_widget.model.index(0, 0)
+    data = 3
+    array_dataset_table_widget.model.setData(selection_index, data, Qt.EditRole)
+    assert array_dataset_table_widget.model.array[0][0] == data
+
+
+def test_UI_GIVEN_data_is_entered_WHEN_data_index_is_invalid_THEN_set_data_returns_false(
+    array_dataset_table_widget
+):
+
+    selection_index = array_dataset_table_widget.model.index(5, 5)
+    assert not array_dataset_table_widget.model.setData(selection_index, 3, Qt.EditRole)
