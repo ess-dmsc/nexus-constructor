@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from PySide2.QtCore import QModelIndex, Qt
+from PySide2.QtCore import QModelIndex, Qt, QItemSelectionModel
 from PySide2.QtWidgets import QWidget
 from mock import Mock
 
@@ -88,17 +88,25 @@ def test_UI_GIVEN_add_column_button_pressed_THEN_array_size_changes(
 def test_UI_GIVEN_remove_row_button_pressed_THEN_array_size_changes(
     array_dataset_table_widget
 ):
+
     array_dataset_table_widget.add_row_button.trigger()
+    selection_index = array_dataset_table_widget.model.index(1, 0)
+    array_dataset_table_widget.view.selectionModel().select(
+        selection_index, QItemSelectionModel.Select
+    )
     array_dataset_table_widget.remove_row_button.trigger()
 
     assert array_dataset_table_widget.model.array.shape == (1, 1)
 
 
 def test_UI_GIVEN_remove_column_button_pressed_THEN_array_size_changes(
-    array_dataset_table_widget
+    array_dataset_table_widget, qtbot
 ):
-
     array_dataset_table_widget.add_column_button.trigger()
+    selection_index = array_dataset_table_widget.model.index(0, 1)
+    array_dataset_table_widget.view.selectionModel().select(
+        selection_index, QItemSelectionModel.Select
+    )
     array_dataset_table_widget.remove_column_button.trigger()
 
     assert array_dataset_table_widget.model.array.shape == (1, 1)
