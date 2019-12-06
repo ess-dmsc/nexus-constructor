@@ -60,7 +60,12 @@ def _check_data_type(field_widget, expected_types) -> bool:
         return False
 
 
-def _fields_have_correct_type(fields_dict: Dict[str, "FieldWidget"]):
+def _fields_have_correct_type(fields_dict: Dict[str, "FieldWidget"]) -> bool:
+    """
+    Checks that the fields required to create a Chopper mesh have the expected data types.
+    :param fields_dict: The dictionary of field names and their field widgets/NeXus datasets.
+    :return: True if all the fields have the correct types, False otherwise.
+    """
     correct_slits_type = _check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
     correct_radius_type = _check_data_type(fields_dict[RADIUS_NAME], FLOAT_TYPES)
     correct_slit_height_type = _check_data_type(
@@ -99,6 +104,8 @@ def _fields_have_correct_type(fields_dict: Dict[str, "FieldWidget"]):
 def _edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple) -> bool:
     """
     Checks that the edges array consists of either one row or one column.
+    :param edges_dim: The number of dimensions in the slit edges array.
+    :param edges_shape: The shape of the slit edges array.
     :return: True if the edges array is 1D. False otherwise.
     """
     if edges_dim > 2:
@@ -128,6 +135,10 @@ def _input_describes_valid_chopper(
         - The slit edges array doesn't contain repeated angles.
         - The slit edges array doesn't contain overlapping slits.
     If this is all true then a chopper mesh can be created.
+    :param chopper_details: The Chopper Details object.
+    :param slit_edges: The original slit edges array provided by the user/contained in the NeXus file that has not yet
+        been converted to radians (though it may already be in radians). Used when logging errors about slit edges
+        data so it's in a format the user recognises.
     :return: True if all the conditions above are met. False otherwise.
     """
     # Check that the number of slit edges is equal to two times the number of slits
@@ -140,7 +151,7 @@ def _input_describes_valid_chopper(
     # Check that the slit height is smaller than the radius
     if chopper_details.slit_height >= chopper_details.radius:
         logging.info(
-            f"{UNABLE} Slit height should be smaller than radius. Instead slit height is {chopper_details.slit_height} and radius is {chopper_details.radius}"
+            f"{UNABLE} Slit height should be smaller than radius. Instead slit height is {chopper_details.slit_height} metres and radius is {chopper_details.radius} metres."
         )
         return False
 
@@ -227,7 +238,7 @@ class UserDefinedChopperChecker:
     def required_fields_present(self) -> bool:
         """
         Checks that all of the fields and attributes required to create the disk chopper are present.
-        :return: True if all the required fields are present. False otherwise.
+        :return: True if all the required fields are present, False otherwise.
         """
         missing_fields = REQUIRED_CHOPPER_FIELDS - self.fields_dict.keys()
 
@@ -258,7 +269,7 @@ class UserDefinedChopperChecker:
         Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
         fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
         and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
-        :return: True if the chopper is valid. False otherwise.
+        :return: True if the chopper is valid, False otherwise.
         """
         if not (
             self.required_fields_present()
@@ -303,7 +314,10 @@ class NexusDefinedChopperChecker:
         return self._chopper_details
 
     def required_fields_present(self) -> bool:
-
+        """
+        Checks that the required fields and attributes are present in the NeXus file.
+        :return: True if all the information needed to create a chopper mesh is present, False otherwise.
+        """
         missing_fields = []
 
         for field in REQUIRED_CHOPPER_FIELDS:

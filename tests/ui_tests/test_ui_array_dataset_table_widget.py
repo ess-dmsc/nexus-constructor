@@ -150,3 +150,5 @@ def test_UI_GIVEN_data_is_entered_WHEN_data_index_is_invalid_THEN_set_data_retur
 
     selection_index = array_dataset_table_widget.model.index(5, 5)
     assert not array_dataset_table_widget.model.setData(selection_index, 3, Qt.EditRole)
+
+    array_dataset_table_widget.view.itemDelegate()
