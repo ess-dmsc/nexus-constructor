@@ -82,9 +82,6 @@ class ComponentTreeModel(QAbstractItemModel):
         self.components.append(new_component)
         self.endInsertRows()
 
-    def get_component(self, index: int):
-        return self.components[index]
-
     def __remove_link(self, index: QModelIndex):
         transformation_list = index.internalPointer().parent
         transformation_list_index = self.parent(index)
