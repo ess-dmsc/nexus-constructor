@@ -453,4 +453,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def on_zoom_item(self):
         selected = self.component_tree_view.selectedIndexes()[0]
         component = selected.internalPointer()
-        self.sceneWidget.zoom_to_component(component.name)
+        self.sceneWidget.zoom_to_component(
+            component.name,
+            self.sceneWidget.sample_cube,
+            self.sceneWidget.component_entities,
+            self.sceneWidget.view.camera(),
+        )

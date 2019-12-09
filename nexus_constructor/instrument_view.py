@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
@@ -207,19 +207,23 @@ class InstrumentView(QWidget):
             [mesh, material], self.component_root_entity
         )
 
-        self.zoom_to_component(name)
-
-    def zoom_to_component(self, component_name: str):
+    @staticmethod
+    def zoom_to_component(
+        component_name: str,
+        sample: Qt3DCore.QEntity,
+        component_dict: Dict[str, Qt3DCore.QEntity],
+        camera: Qt3DRender.QCamera,
+    ):
         """
         Instructs the camera to zoom in on an individual component.
         :param component_name: The name of the component.
         """
         if component_name == "sample":
-            entity = self.sample_cube
+            entity = sample
         else:
-            entity = self.component_entities[component_name]
+            entity = component_dict[component_name]
 
-        self.view.camera().viewEntity(entity)
+        camera.viewEntity(entity)
 
     def clear_all_components(self):
         """
