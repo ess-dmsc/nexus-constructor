@@ -69,3 +69,15 @@ def test_GIVEN_data_type_changes_WHEN_editing_component_THEN_validate_method_is_
     ) as mock_validate:
         widget.attr_dtype_combo.setCurrentIndex(2)
         mock_validate.assert_called_once()
+
+
+def test_GIVEN_edit_array_button_pressed_WHEN_attribute_is_an_array_THEN_array_widget_opens(
+    qtbot, field_attrs_dialog
+):
+
+    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+    widget = get_attribute_widget(0, field_attrs_dialog.list_widget)
+    widget.array_or_scalar_combo.setCurrentText("Array")
+
+    qtbot.mouseClick(widget.array_edit_button, Qt.LeftButton)
+    assert widget.dialog.isVisible()
