@@ -160,7 +160,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.component_tree_view_tab,
         )
         self.zoom_action.triggered.connect(self.on_zoom_item)
-        self.zoom_action.setEnabled(True)
+        self.zoom_action.setEnabled(False)
         self.component_tool_bar.addAction(self.zoom_action)
 
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
@@ -224,8 +224,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.new_rotation_action.setEnabled(False)
             self.new_translation_action.setEnabled(False)
             self.create_link_action.setEnabled(False)
+            self.zoom_action.setEnabled(False)
         else:
             selected_object = indices[0].internalPointer()
+            if isinstance(selected_object, Component):
+                self.zoom_action.setEnabled(True)
             if isinstance(selected_object, Component) or isinstance(
                 selected_object, Transformation
             ):

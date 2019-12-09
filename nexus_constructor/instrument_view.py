@@ -36,6 +36,7 @@ class InstrumentView(QWidget):
         super().__init__()
 
         self.root_entity = Qt3DCore.QEntity()
+        self.sample_cube = None
 
         # Make additional entities for the gnomon and instrument components
         self.combined_component_axes_entity = Qt3DCore.QEntity(self.root_entity)
@@ -209,7 +210,12 @@ class InstrumentView(QWidget):
         self.zoom_to_component(name)
 
     def zoom_to_component(self, component_name: str):
-        self.view.camera().viewEntity(self.component_entities[component_name])
+        if component_name == "sample":
+            entity = self.sample_cube
+        else:
+            entity = self.component_entities[component_name]
+
+        self.view.camera().viewEntity(entity)
 
     def clear_all_components(self):
         """
@@ -275,7 +281,9 @@ class InstrumentView(QWidget):
         sample_material = create_material(
             QColor("red"), dark_red, self.component_root_entity, alpha=0.5
         )
-        create_qentity([cube_mesh, sample_material], self.component_root_entity)
+        self.sample_cube = create_qentity(
+            [cube_mesh, sample_material], self.component_root_entity
+        )
 
     def initialise_view(self):
         """
