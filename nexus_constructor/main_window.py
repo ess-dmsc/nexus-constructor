@@ -227,8 +227,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.zoom_action.setEnabled(False)
         else:
             selected_object = indices[0].internalPointer()
-            if isinstance(selected_object, Component):
-                self.zoom_action.setEnabled(True)
+            self.zoom_action.setEnabled(isinstance(selected_object, Component))
             if isinstance(selected_object, Component) or isinstance(
                 selected_object, Transformation
             ):
