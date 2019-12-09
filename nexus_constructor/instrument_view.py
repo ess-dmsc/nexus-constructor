@@ -210,6 +210,10 @@ class InstrumentView(QWidget):
         self.zoom_to_component(name)
 
     def zoom_to_component(self, component_name: str):
+        """
+        Instructs the camera to zoom in on an individual component.
+        :param component_name: The name of the component.
+        """
         if component_name == "sample":
             entity = self.sample_cube
         else:
