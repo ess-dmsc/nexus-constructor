@@ -81,3 +81,18 @@ def test_GIVEN_edit_array_button_pressed_WHEN_attribute_is_an_array_THEN_array_w
 
     qtbot.mouseClick(widget.array_edit_button, Qt.LeftButton)
     assert widget.dialog.isVisible()
+
+
+def test_GIVEN_attribute_is_an_array_WHEN_getting_data_THEN_array_is_returned(
+    qtbot, field_attrs_dialog
+):
+
+    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+    widget = get_attribute_widget(0, field_attrs_dialog.list_widget)
+    widget.array_or_scalar_combo.setCurrentText("Array")
+
+    data = np.arange(9).reshape((3, 3))
+    qtbot.mouseClick(widget.array_edit_button, Qt.LeftButton)
+    widget.dialog.model.array = data
+
+    assert np.array_equal(widget.value, data)
