@@ -153,6 +153,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.delete_action.triggered.connect(self.on_delete_item)
         self.delete_action.setEnabled(False)
         self.component_tool_bar.addAction(self.delete_action)
+
+        self.zoom_action = QAction(
+            QIcon(os.path.join("ui", "zoom.svg")),
+            "Zoom To Component",
+            self.component_tree_view_tab,
+        )
+        self.zoom_action.triggered.connect(self.on_zoom_item)
+        self.zoom_action.setEnabled(True)
+        self.component_tool_bar.addAction(self.zoom_action)
+
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
     def _set_up_component_model(self):
@@ -437,3 +447,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         for item in selected:
             self.component_model.remove_node(item)
         self.set_button_state()
+
+    def on_zoom_item(self):
+        selected = self.component_tree_view.selectedIndexes()[0]
+        component = selected.internalPointer()
+        self.sceneWidget.zoom_to_component(component.name)

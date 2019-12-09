@@ -206,6 +206,11 @@ class InstrumentView(QWidget):
             [mesh, material], self.component_root_entity
         )
 
+        self.zoom_to_component(name)
+
+    def zoom_to_component(self, component_name: str):
+        self.view.camera().viewEntity(self.component_entities[component_name])
+
     def clear_all_components(self):
         """
         resets the entities in qt3d so all components are cleared form the 3d view.
