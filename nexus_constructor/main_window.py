@@ -161,6 +161,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
         self.zoom_action.triggered.connect(self.on_zoom_item)
         self.zoom_action.setEnabled(False)
+        self.component_tool_bar.addSeparator()
         self.component_tool_bar.addAction(self.zoom_action)
 
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
@@ -218,7 +219,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def set_button_state(self):
         indices = self.component_tree_view.selectedIndexes()
-        if len(indices) == 0 or len(indices) != 1:
+        if len(indices) != 1:
             self.delete_action.setEnabled(False)
             self.duplicate_action.setEnabled(False)
             self.new_rotation_action.setEnabled(False)
@@ -227,8 +228,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.zoom_action.setEnabled(False)
         else:
             selected_object = indices[0].internalPointer()
-            self.zoom_action.setEnabled(isinstance(selected_object, Component))
-            if isinstance(selected_object, Component) or isinstance(
+            selected_object_is_component = isinstance(selected_object, Component)
+            self.zoom_action.setEnabled(selected_object_is_component)
+
+            if selected_object_is_component or isinstance(
                 selected_object, Transformation
             ):
                 self.delete_action.setEnabled(True)
@@ -238,6 +241,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 self.delete_action.setEnabled(False)
                 self.duplicate_action.setEnabled(False)
                 self.edit_component_action.setEnabled(False)
+
             if isinstance(selected_object, LinkTransformation):
                 self.new_rotation_action.setEnabled(False)
                 self.new_translation_action.setEnabled(False)
@@ -246,7 +250,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 self.new_rotation_action.setEnabled(True)
                 self.new_translation_action.setEnabled(True)
 
-            if isinstance(selected_object, Component):
+            if selected_object_is_component:
                 if not hasattr(selected_object, "stored_transforms"):
                     selected_object.stored_transforms = selected_object.transforms
                 if not selected_object.stored_transforms.has_link:
