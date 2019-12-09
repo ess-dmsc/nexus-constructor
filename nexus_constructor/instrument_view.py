@@ -165,7 +165,11 @@ class InstrumentView(QWidget):
         return height_ratio, width_ratio
 
     @staticmethod
-    def create_camera_filter(viewport, visible_entity, camera_to_filter):
+    def create_camera_filter(
+        viewport: Qt3DRender.QViewport,
+        visible_entity: Qt3DCore.QEntity,
+        camera_to_filter: Qt3DRender.QCamera,
+    ) -> Qt3DRender.QClearBuffers:
         """
         Filter the objects that are visible to a camera.
         :param viewport: The viewport that the camera is using.
@@ -207,7 +211,10 @@ class InstrumentView(QWidget):
             [mesh, material], self.component_root_entity
         )
 
-    def get_entity(self, component_name: str):
+    def get_entity(self, component_name: str) -> Qt3DCore.QEntity:
+        """
+        Obtain the entity from the InstrumentView based on its name.
+        """
         if component_name == "sample":
             return self.sample_entity
         return self.component_entities[component_name]
@@ -229,7 +236,7 @@ class InstrumentView(QWidget):
             self.component_entities[component].setParent(None)
         self.component_entities = dict()
 
-    def delete_component(self, name):
+    def delete_component(self, name: str):
         """
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
@@ -263,7 +270,9 @@ class InstrumentView(QWidget):
         self.transformations = {}
 
     @staticmethod
-    def set_cube_mesh_dimensions(cube_mesh, x, y, z):
+    def set_cube_mesh_dimensions(
+        cube_mesh: Qt3DExtras.QCuboidMesh, x: float, y: float, z: float
+    ):
         """
         Sets the dimensions of a cube mesh.
         :param cube_mesh: The cube mesh to modify.
