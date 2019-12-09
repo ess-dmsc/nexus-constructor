@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, List, Dict
+from typing import Tuple, List
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
