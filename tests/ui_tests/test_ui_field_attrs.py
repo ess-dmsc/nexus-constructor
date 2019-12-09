@@ -1,4 +1,5 @@
 import pytest
+from PySide2.QtCore import Qt
 
 from nexus_constructor.field_attrs import FieldAttrsDialog
 import numpy as np
@@ -26,3 +27,11 @@ def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_a
 
     assert len(field_attrs_dialog.get_attrs()) == 1
     assert field_attrs_dialog.get_attrs()[attr_key] == attr_val
+
+
+def test_GIVEN_add_attr_button_pressed_WHEN_changing_attributes_THEN_new_attribute_is_created(
+    qtbot, field_attrs_dialog
+):
+
+    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+    assert field_attrs_dialog.list_widget.count() == 1
