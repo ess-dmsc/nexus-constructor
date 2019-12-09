@@ -1,7 +1,10 @@
+from unittest.mock import patch
+
 import pytest
 from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QListWidget
 
-from nexus_constructor.field_attrs import FieldAttrsDialog
+from nexus_constructor.field_attrs import FieldAttrsDialog, FieldAttrFrame
 import numpy as np
 from tests.helpers import file  # noqa: F401
 
@@ -12,6 +15,11 @@ def field_attrs_dialog(qtbot):
     dialog = FieldAttrsDialog()
     qtbot.addWidget(dialog)
     return dialog
+
+
+def get_attribute_widget(index: int, list_widget: QListWidget) -> FieldAttrFrame:
+    item = list_widget.item(index)
+    return list_widget.itemWidget(item)
 
 
 @pytest.mark.parametrize("attr_val", ["test", 123, 1.1, np.ushort(12)])
@@ -42,6 +50,22 @@ def test_GIVEN_remove_attribute_button_pressed_WHEN_changing_attributes_THEN_sel
 ):
 
     qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
-    field_attrs_dialog.list_widget.setCurrentRow(0)
+    qtbot.mouseClick(
+        get_attribute_widget(0, field_attrs_dialog.list_widget), Qt.LeftButton
+    )
     qtbot.mouseClick(field_attrs_dialog.remove_button, Qt.LeftButton)
     assert field_attrs_dialog.list_widget.count() == 0
+
+
+def test_GIVEN_data_type_changes_WHEN_editing_component_THEN_validate_method_is_called(
+    qtbot, field_attrs_dialog
+):
+
+    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+    widget = get_attribute_widget(0, field_attrs_dialog.list_widget)
+
+    with patch(
+        "nexus_constructor.field_attrs.FieldValueValidator.validate"
+    ) as mock_validate:
+        widget.attr_dtype_combo.setCurrentIndex(2)
+        mock_validate.assert_called_once()
