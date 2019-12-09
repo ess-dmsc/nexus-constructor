@@ -29,9 +29,19 @@ def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_a
     assert field_attrs_dialog.get_attrs()[attr_key] == attr_val
 
 
-def test_GIVEN_add_attr_button_pressed_WHEN_changing_attributes_THEN_new_attribute_is_created(
+def test_GIVEN_add_attribute_button_pressed_WHEN_changing_attributes_THEN_new_attribute_is_created(
     qtbot, field_attrs_dialog
 ):
 
     qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
     assert field_attrs_dialog.list_widget.count() == 1
+
+
+def test_GIVEN_remove_attribute_button_pressed_WHEN_changing_attributes_THEN_selected_attribute_is_removed(
+    qtbot, field_attrs_dialog
+):
+
+    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+    field_attrs_dialog.list_widget.setCurrentRow(0)
+    qtbot.mouseClick(field_attrs_dialog.remove_button, Qt.LeftButton)
+    assert field_attrs_dialog.list_widget.count() == 0
