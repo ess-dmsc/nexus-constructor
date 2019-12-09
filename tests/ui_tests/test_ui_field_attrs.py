@@ -22,6 +22,17 @@ def get_attribute_widget(index: int, list_widget: QListWidget) -> FieldAttrFrame
     return list_widget.itemWidget(item)
 
 
+def add_attribute(field_attrs_dialog, qtbot):
+    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+
+
+def add_array_attribute(field_attrs_dialog, qtbot):
+    add_attribute(field_attrs_dialog, qtbot)
+    widget = get_attribute_widget(0, field_attrs_dialog.list_widget)
+    widget.array_or_scalar_combo.setCurrentText("Array")
+    return widget
+
+
 @pytest.mark.parametrize("attr_val", ["test", 123, 1.1, np.ushort(12)])
 def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_and_attrs_are_filled_in_correctly(
     qtbot, file, attr_val, field_attrs_dialog
@@ -41,7 +52,7 @@ def test_GIVEN_add_attribute_button_pressed_WHEN_changing_attributes_THEN_new_at
     qtbot, field_attrs_dialog
 ):
 
-    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+    add_attribute(field_attrs_dialog, qtbot)
     assert field_attrs_dialog.list_widget.count() == 1
 
 
@@ -49,7 +60,7 @@ def test_GIVEN_remove_attribute_button_pressed_WHEN_changing_attributes_THEN_sel
     qtbot, field_attrs_dialog
 ):
 
-    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+    add_attribute(field_attrs_dialog, qtbot)
     qtbot.mouseClick(
         get_attribute_widget(0, field_attrs_dialog.list_widget), Qt.LeftButton
     )
@@ -61,7 +72,7 @@ def test_GIVEN_data_type_changes_WHEN_editing_component_THEN_validate_method_is_
     qtbot, field_attrs_dialog
 ):
 
-    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
+    add_attribute(field_attrs_dialog, qtbot)
     widget = get_attribute_widget(0, field_attrs_dialog.list_widget)
 
     with patch(
@@ -75,9 +86,7 @@ def test_GIVEN_edit_array_button_pressed_WHEN_attribute_is_an_array_THEN_array_w
     qtbot, field_attrs_dialog
 ):
 
-    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
-    widget = get_attribute_widget(0, field_attrs_dialog.list_widget)
-    widget.array_or_scalar_combo.setCurrentText("Array")
+    widget = add_array_attribute(field_attrs_dialog, qtbot)
 
     qtbot.mouseClick(widget.array_edit_button, Qt.LeftButton)
     assert widget.dialog.isVisible()
@@ -87,12 +96,20 @@ def test_GIVEN_attribute_is_an_array_WHEN_getting_data_THEN_array_is_returned(
     qtbot, field_attrs_dialog
 ):
 
-    qtbot.mouseClick(field_attrs_dialog.add_button, Qt.LeftButton)
-    widget = get_attribute_widget(0, field_attrs_dialog.list_widget)
-    widget.array_or_scalar_combo.setCurrentText("Array")
+    widget = add_array_attribute(field_attrs_dialog, qtbot)
 
     data = np.arange(9).reshape((3, 3))
     qtbot.mouseClick(widget.array_edit_button, Qt.LeftButton)
     widget.dialog.model.array = data
 
-    assert np.array_equal(widget.value, data)
+    assert np.array_equal(widget.value[1], data)
+
+
+def test_GIVEN_array_and_attribute_name_set_WHEN_changing_attribute_THEN_array_attribute_set(
+    qtbot, field_attrs_dialog
+):
+    widget = add_array_attribute(field_attrs_dialog, qtbot)
+    data = np.arange(9).reshape((3, 3))
+    widget.value = ("AttributeName", data)
+
+    assert np.array_equal(widget.array, data)
