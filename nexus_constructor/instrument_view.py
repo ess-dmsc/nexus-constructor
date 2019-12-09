@@ -36,7 +36,7 @@ class InstrumentView(QWidget):
         super().__init__()
 
         self.root_entity = Qt3DCore.QEntity()
-        self.sample_cube = None
+        self.sample_entity = None
 
         # Make additional entities for the gnomon and instrument components
         self.combined_component_axes_entity = Qt3DCore.QEntity(self.root_entity)
@@ -207,22 +207,18 @@ class InstrumentView(QWidget):
             [mesh, material], self.component_root_entity
         )
 
-    @staticmethod
-    def zoom_to_component(
-        component_name: str,
-        sample: Qt3DCore.QEntity,
-        component_dict: Dict[str, Qt3DCore.QEntity],
-        camera: Qt3DRender.QCamera,
-    ):
-        """
-        Instructs the camera to zoom in on an individual component.
-        :param component_name: The name of the component.
-        """
+    def get_entity(self, component_name: str):
         if component_name == "sample":
-            entity = sample
-        else:
-            entity = component_dict[component_name]
+            return self.sample_entity
+        return self.component_entities[component_name]
 
+    @staticmethod
+    def zoom_to_component(entity: Qt3DCore.QEntity, camera: Qt3DRender.QCamera):
+        """
+        Instructs a camera to zoom in on an individual component.
+        :param entity: The component entity that the camera should zoom in on.
+        :param camera: The camera that will do the zooming.
+        """
         camera.viewEntity(entity)
 
     def clear_all_components(self):
@@ -289,7 +285,7 @@ class InstrumentView(QWidget):
         sample_material = create_material(
             QColor("red"), dark_red, self.component_root_entity, alpha=0.5
         )
-        self.sample_cube = create_qentity(
+        self.sample_entity = create_qentity(
             [cube_mesh, sample_material], self.component_root_entity
         )
 
