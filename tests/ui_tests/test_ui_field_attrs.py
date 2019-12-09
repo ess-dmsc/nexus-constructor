@@ -7,6 +7,7 @@ from PySide2.QtWidgets import QListWidget
 from nexus_constructor.field_attrs import FieldAttrsDialog, FieldAttrFrame
 import numpy as np
 from tests.helpers import file  # noqa: F401
+from tests.ui_tests.ui_test_utils import show_and_close_window
 
 
 @pytest.fixture(scope="function")
@@ -102,7 +103,12 @@ def test_GIVEN_attribute_is_an_array_WHEN_getting_data_THEN_array_is_returned(
     qtbot.mouseClick(widget.array_edit_button, Qt.LeftButton)
     widget.dialog.model.array = data
 
-    assert np.array_equal(widget.value[1], data)
+    attribute_name = "AttributeName"
+    qtbot.keyClicks(widget.attr_name_lineedit, attribute_name)
+
+    name, value = widget.value
+    assert name == attribute_name
+    assert np.array_equal(value, data)
 
 
 def test_GIVEN_array_and_attribute_name_set_WHEN_changing_attribute_THEN_array_attribute_set(
@@ -113,3 +119,25 @@ def test_GIVEN_array_and_attribute_name_set_WHEN_changing_attribute_THEN_array_a
     widget.value = ("AttributeName", data)
 
     assert np.array_equal(widget.array, data)
+
+
+def test_GIVEN_type_changed_to_array_WHEN_changing_attribute_THEN_edit_array_button_is_visible(
+    qtbot, field_attrs_dialog
+):
+
+    widget = add_array_attribute(field_attrs_dialog, qtbot)
+    widget.type_changed("Array")
+    show_and_close_window(qtbot, field_attrs_dialog)
+    assert widget.array_edit_button.isVisible()
+    assert not widget.attr_value_lineedit.isVisible()
+
+
+def test_GIVEN_type_changed_to_scalar_WHEN_changing_attribute_THEN_value_line_edit_is_visible(
+    qtbot, field_attrs_dialog
+):
+
+    widget = add_array_attribute(field_attrs_dialog, qtbot)
+    widget.type_changed("Scalar")
+    show_and_close_window(qtbot, field_attrs_dialog)
+    assert not widget.array_edit_button.isVisible()
+    assert widget.attr_value_lineedit.isVisible()
