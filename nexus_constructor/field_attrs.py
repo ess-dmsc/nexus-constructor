@@ -144,6 +144,12 @@ class FieldAttrFrame(QFrame):
     def value(self, name_and_value: Tuple[str, Union[np.generic, np.ndarray]]):
         new_name = name_and_value[0]
         new_value = name_and_value[1]
+
+        if isinstance(new_value, bytes):
+            decoded = new_value.decode("utf-8")
+            if isinstance(decoded, str):
+                new_value = decoded
+
         self.attr_name_lineedit.setText(new_name)
         self.attr_dtype_combo.setCurrentText(
             "String"
