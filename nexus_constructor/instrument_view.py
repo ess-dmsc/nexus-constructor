@@ -36,7 +36,6 @@ class InstrumentView(QWidget):
         super().__init__()
 
         self.root_entity = Qt3DCore.QEntity()
-        self.sample_entity = None
 
         # Make additional entities for the gnomon and instrument components
         self.combined_component_axes_entity = Qt3DCore.QEntity(self.root_entity)
