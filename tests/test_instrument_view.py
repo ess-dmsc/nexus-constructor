@@ -14,9 +14,7 @@ def template(qtbot):
 @pytest.fixture(scope="function")
 def instrument_view(qtbot, template):
     instrument_view = InstrumentView(template)
-    yield instrument_view
-    instrument_view.delete()
-    instrument_view.close()
+    return instrument_view
 
 
 def test_GIVEN_cube_dimensions_WHEN_calling_set_cube_mesh_dimesions_THEN_dimensions_set():
@@ -57,7 +55,7 @@ def test_GIVEN_3D_view_and_gnomon_sizes_WHEN_calling_calculate_gnomon_rect_THEN_
 
 
 def test_GIVEN_entity_and_camera_WHEN_zooming_to_component_THEN_camera_zooms_to_component(
-    instrument_view
+    instrument_view, template, qtbot
 ):
 
     mock_entity = Mock()
