@@ -145,6 +145,7 @@ class FieldAttrFrame(QFrame):
         new_name = name_and_value[0]
         new_value = name_and_value[1]
 
+        # Decode the attribute value if it's in byte form
         if isinstance(new_value, bytes):
             decoded = new_value.decode("utf-8")
             if isinstance(decoded, str):
