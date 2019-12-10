@@ -1,6 +1,22 @@
+import pytest
+from PySide2.QtWidgets import QWidget
 from mock import Mock
 
 from nexus_constructor.instrument_view import InstrumentView
+
+
+@pytest.fixture(scope="function")
+def template(qtbot):
+    template = QWidget()
+    return template
+
+
+@pytest.fixture(scope="function")
+def instrument_view(qtbot, template):
+    instrument_view = InstrumentView(template)
+    yield instrument_view
+    instrument_view.delete()
+    instrument_view.close()
 
 
 def test_GIVEN_cube_dimensions_WHEN_calling_set_cube_mesh_dimesions_THEN_dimensions_set():
@@ -40,10 +56,12 @@ def test_GIVEN_3D_view_and_gnomon_sizes_WHEN_calling_calculate_gnomon_rect_THEN_
     assert expected_height_ratio == actual_height_ratio
 
 
-def test_GIVEN_entity_and_camera_WHEN_zooming_to_component_THEN_camera_zooms_to_component():
+def test_GIVEN_entity_and_camera_WHEN_zooming_to_component_THEN_camera_zooms_to_component(
+    instrument_view
+):
 
     mock_entity = Mock()
     mock_camera = Mock()
 
-    InstrumentView.zoom_to_component(mock_entity, mock_camera)
+    instrument_view.zoom_to_component(mock_entity, mock_camera)
     mock_camera.viewEntity.assert_called_once()

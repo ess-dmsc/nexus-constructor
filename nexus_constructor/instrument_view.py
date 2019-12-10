@@ -83,14 +83,14 @@ class InstrumentView(QWidget):
         # Create the axes lines objects
         InstrumentViewAxes(self.axes_root_entity, self.view.camera().farPlane())
 
+        # Dictionary of components and transformations so that we can delete them later
+        self.component_entities = {}
+        self.transformations = {}
+
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
         # components and axis lines
         self.create_layers()
         self.initialise_view()
-
-        # Dictionary of components and transformations so that we can delete them later
-        self.component_entities = {}
-        self.transformations = {}
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.gnomon.setup_beam_cylinder()
@@ -200,9 +200,6 @@ class InstrumentView(QWidget):
             return
 
         mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
-
-        self.component_entities[name] = []
-
         material = create_material(
             QColor("black"), QColor("grey"), self.component_root_entity
         )
@@ -215,9 +212,12 @@ class InstrumentView(QWidget):
         """
         Obtain the entity from the InstrumentView based on its name.
         """
-        if component_name == "sample":
-            return self.sample_entity
-        return self.component_entities[component_name]
+        try:
+            return self.component_entities[component_name]
+        except KeyError:
+            logging.error(
+                f"Unable to retrieve component {component_name} because it doesn't exist."
+            )
 
     @staticmethod
     def zoom_to_component(entity: Qt3DCore.QEntity, camera: Qt3DRender.QCamera):
@@ -241,16 +241,13 @@ class InstrumentView(QWidget):
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
         """
-        if name == "sample":
-            self.sample_entity.setParent(None)
-        else:
-            try:
-                self.component_entities[name].setParent(None)
-                del self.component_entities[name]
-            except KeyError:
-                logging.error(
-                    f"Unable to delete component {name} because it doesn't exist."
-                )
+        try:
+            self.component_entities[name].setParent(None)
+            del self.component_entities[name]
+        except KeyError:
+            logging.error(
+                f"Unable to delete component {name} because it doesn't exist."
+            )
 
     def add_transformation(
         self, component_name: str, transformation: Qt3DCore.QTransform
@@ -296,7 +293,7 @@ class InstrumentView(QWidget):
         sample_material = create_material(
             QColor("red"), dark_red, self.component_root_entity, alpha=0.5
         )
-        self.sample_entity = create_qentity(
+        self.component_entities["sample"] = create_qentity(
             [cube_mesh, sample_material], self.component_root_entity
         )
 
