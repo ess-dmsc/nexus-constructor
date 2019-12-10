@@ -241,14 +241,16 @@ class InstrumentView(QWidget):
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
         """
-        self.component_entities[name].setParent(None)
-
-        try:
-            del self.component_entities[name]
-        except KeyError:
-            logging.error(
-                f"Unable to delete component {name} because it doesn't exist."
-            )
+        if name == "sample":
+            self.sample_entity.setParent(None)
+        else:
+            try:
+                self.component_entities[name].setParent(None)
+                del self.component_entities[name]
+            except KeyError:
+                logging.error(
+                    f"Unable to delete component {name} because it doesn't exist."
+                )
 
     def add_transformation(
         self, component_name: str, transformation: Qt3DCore.QTransform
