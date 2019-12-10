@@ -33,7 +33,7 @@ def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_a
     assert field_attributes_dialog.get_attrs()[attr_key] == attr_val
 
 
-def test_GIVEN_attribute_value_is_byte_string_WHEN_setting_value_THEN_string_is_decoded_in_lineedit(
+def test_GIVEN_attribute_value_is_byte_string_WHEN_filling_existing_values_THEN_string_is_decoded_in_lineedit(
     qtbot, field_attributes_dialog, file
 ):
 
