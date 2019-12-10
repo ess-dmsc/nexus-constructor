@@ -96,75 +96,59 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.component_tool_bar = QToolBar("Actions", self.component_tree_view_tab)
-        self.new_component_action = QAction(
-            QIcon(os.path.join("ui", "new_component.png")),
-            "New component",
-            self.component_tree_view_tab,
+        self.new_component_action = self.create_and_add_toolbar_action(
+            "new_component.png", "New Component", self.show_add_component_window, True
         )
-        self.new_component_action.triggered.connect(self.show_add_component_window)
-        self.component_tool_bar.addAction(self.new_component_action)
-        self.new_translation_action = QAction(
-            QIcon(os.path.join("ui", "new_translation.png")),
-            "New translation",
-            self.component_tree_view_tab,
+        self.new_translation_action = self.create_and_add_toolbar_action(
+            "new_translation.png", "New Translation", self.on_add_translation
         )
-        self.new_translation_action.triggered.connect(self.on_add_translation)
-        self.new_translation_action.setEnabled(False)
-        self.component_tool_bar.addAction(self.new_translation_action)
-        self.new_rotation_action = QAction(
-            QIcon(os.path.join("ui", "new_rotation.png")),
-            "New rotation",
-            self.component_tree_view_tab,
+        self.new_rotation_action = self.create_and_add_toolbar_action(
+            "new_rotation.png", "New Rotation", self.on_add_rotation
         )
-        self.new_rotation_action.triggered.connect(self.on_add_rotation)
-        self.new_rotation_action.setEnabled(False)
-        self.component_tool_bar.addAction(self.new_rotation_action)
-        self.create_link_action = QAction(
-            QIcon(os.path.join("ui", "create_link.png")),
-            "Create link",
-            self.component_tree_view_tab,
+        self.create_link_action = self.create_and_add_toolbar_action(
+            "create_link.png", "Create Link", self.on_create_link
         )
-        self.create_link_action.triggered.connect(self.on_create_link)
-        self.create_link_action.setEnabled(False)
-        self.component_tool_bar.addAction(self.create_link_action)
-        self.duplicate_action = QAction(
-            QIcon(os.path.join("ui", "duplicate.png")),
-            "Duplicate",
-            self.component_tree_view_tab,
+        self.duplicate_action = self.create_and_add_toolbar_action(
+            "duplicate.png", "Duplicate", self.on_duplicate_node
         )
-        self.component_tool_bar.addAction(self.duplicate_action)
-        self.duplicate_action.triggered.connect(self.on_duplicate_node)
-        self.duplicate_action.setEnabled(False)
-
-        self.edit_component_action = QAction(
-            QIcon(os.path.join("ui", "edit_component.png")),
-            "Edit Component",
-            self.component_tree_view_tab,
+        self.edit_component_action = self.create_and_add_toolbar_action(
+            "edit_component.png", "Edit Component", self.show_edit_component_dialog
         )
-        self.edit_component_action.setEnabled(False)
-        self.edit_component_action.triggered.connect(self.show_edit_component_dialog)
-        self.component_tool_bar.addAction(self.edit_component_action)
-
-        self.delete_action = QAction(
-            QIcon(os.path.join("ui", "delete.png")),
-            "Delete",
-            self.component_tree_view_tab,
+        self.delete_action = self.create_and_add_toolbar_action(
+            "delete.png", "Delete", self.on_delete_item
         )
-        self.delete_action.triggered.connect(self.on_delete_item)
-        self.delete_action.setEnabled(False)
-        self.component_tool_bar.addAction(self.delete_action)
-
-        self.zoom_action = QAction(
-            QIcon(os.path.join("ui", "zoom.svg")),
-            "Zoom To Component",
-            self.component_tree_view_tab,
+        self.zoom_action = self.create_and_add_toolbar_action(
+            "zoom.svg", "Zoom To Component", self.on_zoom_item
         )
-        self.zoom_action.triggered.connect(self.on_zoom_item)
-        self.zoom_action.setEnabled(False)
-        self.component_tool_bar.addSeparator()
-        self.component_tool_bar.addAction(self.zoom_action)
+        self.component_tool_bar.insertSeparator(self.zoom_action)
 
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
+
+    def create_and_add_toolbar_action(
+        self,
+        icon_path: str,
+        mouse_over_name: str,
+        trigger_method: classmethod,
+        set_enabled: bool = False,
+    ):
+        """
+        Create a QAction and add it to the component toolbar.
+        :param icon_path: The location of the action icon relative to the "ui" folder.
+        :param mouse_over_name: The text that should appear when the mouse is on the icon.
+        :param trigger_method: The method that should be called when the icon is clicked.
+        :param set_enabled: A bool indicating whether or not the action should be enabled immediately after it's been
+            created. Only needs to be true for the Add Component button.
+        :return The new QAction.
+        """
+        toolbar_action = QAction(
+            QIcon(os.path.join("ui", icon_path)),
+            mouse_over_name,
+            self.component_tree_view_tab,
+        )
+        toolbar_action.triggered.connect(trigger_method)
+        toolbar_action.setEnabled(set_enabled)
+        self.component_tool_bar.addAction(toolbar_action)
+        return toolbar_action
 
     def _set_up_component_model(self):
         self.component_model = ComponentTreeModel(self.instrument)
