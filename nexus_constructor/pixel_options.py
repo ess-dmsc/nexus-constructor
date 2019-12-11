@@ -101,25 +101,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         self.reset_pixel_mapping_list()
 
-        x_pixel_offset = component_to_edit.get_field("x_pixel_offset")
-        y_pixel_offset = component_to_edit.get_field("y_pixel_offset")
-        detector_numbers = component_to_edit.get_field("detector_number")
-
-        if x_pixel_offset is not None:
+        if component_to_edit.get_field("x_pixel_offset") is not None:
             self.single_pixel_radio_button.setChecked(True)
             self.update_pixel_layout_visibility(True, False)
-            if (
-                isinstance(x_pixel_offset, np.ndarray)
-                and len(x_pixel_offset.shape) != 2
-            ):
-                x_pixel_offset, y_pixel_offset, detector_numbers = self._reshape_pixel_data(
-                    x_pixel_offset, y_pixel_offset, detector_numbers
-                )
-            self._fill_single_pixel_fields(
-                x_pixel_offset, y_pixel_offset, detector_numbers
-            )
+            self._fill_single_pixel_fields(component_to_edit)
 
-        elif detector_numbers is not None:
+        elif component_to_edit.get_field("detector_number") is not None:
             self.entire_shape_radio_button.setChecked(True)
             self.update_pixel_layout_visibility(False, True)
             self._fill_entire_shape_fields(component_to_edit)
@@ -128,32 +115,16 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             self.no_pixels_button.setChecked(True)
             self.pixel_options_stack.setVisible(False)
 
-    def _reshape_pixel_data(
-        self,
-        x_pixel_offset: np.ndarray,
-        y_pixel_offset: np.ndarray,
-        detector_numbers: np.ndarray,
-    ):
-        first = y_pixel_offset[0]
-        row_size = np.where(y_pixel_offset != first)[0][0]
-        col_size = y_pixel_offset.size // row_size
-
-        return (
-            x_pixel_offset.reshape((col_size, row_size)),
-            y_pixel_offset.reshape((col_size, row_size)),
-            detector_numbers.reshape((col_size, row_size)),
-        )
-
-    def _fill_single_pixel_fields(
-        self,
-        x_pixel_offset: np.ndarray,
-        y_pixel_offset: np.ndarray,
-        detector_numbers: np.ndarray,
-    ):
+    def _fill_single_pixel_fields(self, component_to_edit: Component):
         """
         Fill the "single pixel" fields of a component that's being edited and contains pixel information.
         :param component_to_edit: The component that's being edited.
         """
+        # Retrieve the pixel offsets and detector number from the component
+        x_pixel_offset = component_to_edit.get_field("x_pixel_offset")
+        y_pixel_offset = component_to_edit.get_field("y_pixel_offset")
+        detector_numbers = component_to_edit.get_field("detector_number")
+
         # Check that x offset is more than one value
         if check_data_is_an_array(x_pixel_offset):
 
