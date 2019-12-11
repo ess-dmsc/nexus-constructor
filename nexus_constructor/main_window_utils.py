@@ -3,6 +3,11 @@ import os
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QAction, QToolBar, QWidget
 
+from nexus_constructor.component.component import Component
+from nexus_constructor.component.link_transformation import LinkTransformation
+from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.transformations import Transformation
+
 
 def create_and_add_toolbar_action(
     icon_path: str,
@@ -30,3 +35,66 @@ def create_and_add_toolbar_action(
     toolbar_action.setEnabled(set_enabled)
     component_tool_bar.addAction(toolbar_action)
     return toolbar_action
+
+
+def set_button_state(
+    component_tree_view: QWidget,
+    delete_action: QAction,
+    duplicate_action: QAction,
+    new_rotation_action: QAction,
+    new_translation_action: QAction,
+    create_link_action: QAction,
+    zoom_action: QAction,
+    edit_component_action: QAction,
+):
+    """
+
+    """
+    indices = component_tree_view.selectedIndexes()
+    if len(indices) != 1:
+        delete_action.setEnabled(False)
+        duplicate_action.setEnabled(False)
+        new_rotation_action.setEnabled(False)
+        new_translation_action.setEnabled(False)
+        create_link_action.setEnabled(False)
+        zoom_action.setEnabled(False)
+    else:
+        selected_object = indices[0].internalPointer()
+        zoom_action.setEnabled(isinstance(selected_object, Component))
+        if isinstance(selected_object, Component) or isinstance(
+            selected_object, Transformation
+        ):
+            delete_action.setEnabled(True)
+            duplicate_action.setEnabled(True)
+            edit_component_action.setEnabled(True)
+        else:
+            delete_action.setEnabled(False)
+            duplicate_action.setEnabled(False)
+            edit_component_action.setEnabled(False)
+        if isinstance(selected_object, LinkTransformation):
+            new_rotation_action.setEnabled(False)
+            new_translation_action.setEnabled(False)
+            delete_action.setEnabled(True)
+        else:
+            new_rotation_action.setEnabled(True)
+            new_translation_action.setEnabled(True)
+
+        if isinstance(selected_object, Component):
+            if not hasattr(selected_object, "stored_transforms"):
+                selected_object.stored_transforms = selected_object.transforms
+            if not selected_object.stored_transforms.has_link:
+                create_link_action.setEnabled(True)
+            else:
+                create_link_action.setEnabled(False)
+        elif isinstance(selected_object, TransformationsList):
+            if not selected_object.has_link:
+                create_link_action.setEnabled(True)
+            else:
+                create_link_action.setEnabled(False)
+        elif isinstance(selected_object, Transformation):
+            if not selected_object.parent.has_link:
+                create_link_action.setEnabled(True)
+            else:
+                create_link_action.setEnabled(False)
+        else:
+            create_link_action.setEnabled(False)

@@ -15,7 +15,10 @@ import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.filewriter_command_dialog import FilewriterCommandDialog
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.main_window_utils import create_and_add_toolbar_action
+from nexus_constructor.main_window_utils import (
+    create_and_add_toolbar_action,
+    set_button_state,
+)
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
 from nexus_constructor.component.component import Component, TransformationsList
@@ -207,54 +210,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.entries_dialog.show()
 
     def set_button_state(self):
-        indices = self.component_tree_view.selectedIndexes()
-        if len(indices) != 1:
-            self.delete_action.setEnabled(False)
-            self.duplicate_action.setEnabled(False)
-            self.new_rotation_action.setEnabled(False)
-            self.new_translation_action.setEnabled(False)
-            self.create_link_action.setEnabled(False)
-            self.zoom_action.setEnabled(False)
-        else:
-            selected_object = indices[0].internalPointer()
-            self.zoom_action.setEnabled(isinstance(selected_object, Component))
-            if isinstance(selected_object, Component) or isinstance(
-                selected_object, Transformation
-            ):
-                self.delete_action.setEnabled(True)
-                self.duplicate_action.setEnabled(True)
-                self.edit_component_action.setEnabled(True)
-            else:
-                self.delete_action.setEnabled(False)
-                self.duplicate_action.setEnabled(False)
-                self.edit_component_action.setEnabled(False)
-            if isinstance(selected_object, LinkTransformation):
-                self.new_rotation_action.setEnabled(False)
-                self.new_translation_action.setEnabled(False)
-                self.delete_action.setEnabled(True)
-            else:
-                self.new_rotation_action.setEnabled(True)
-                self.new_translation_action.setEnabled(True)
-
-            if isinstance(selected_object, Component):
-                if not hasattr(selected_object, "stored_transforms"):
-                    selected_object.stored_transforms = selected_object.transforms
-                if not selected_object.stored_transforms.has_link:
-                    self.create_link_action.setEnabled(True)
-                else:
-                    self.create_link_action.setEnabled(False)
-            elif isinstance(selected_object, TransformationsList):
-                if not selected_object.has_link:
-                    self.create_link_action.setEnabled(True)
-                else:
-                    self.create_link_action.setEnabled(False)
-            elif isinstance(selected_object, Transformation):
-                if not selected_object.parent.has_link:
-                    self.create_link_action.setEnabled(True)
-                else:
-                    self.create_link_action.setEnabled(False)
-            else:
-                self.create_link_action.setEnabled(False)
+        set_button_state(
+            self.component_tree_view,
+            self.delete_action,
+            self.duplicate_action,
+            self.new_rotation_action,
+            self.new_translation_action,
+            self.create_link_action,
+            self.zoom_action,
+            self.edit_component_action,
+        )
 
     def on_create_link(self):
         selected = self.component_tree_view.selectedIndexes()
