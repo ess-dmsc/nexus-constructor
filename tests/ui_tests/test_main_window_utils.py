@@ -224,7 +224,7 @@ def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_ex
     assert all([not action.isEnabled() for action in actions])
 
 
-def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_expected_buttons_are_enabled(
+def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons_are_enabled(
     component_tree_view,
     delete_action,
     duplicate_action,
@@ -233,6 +233,7 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_expected_bu
     create_link_action,
     zoom_action,
     edit_component_action,
+    set_of_all_actions,
 ):
     index = component_tree_view.indexAt(QPoint(0, 0))
     component_tree_view.setCurrentIndex(index)
@@ -248,13 +249,7 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_expected_bu
         edit_component_action,
     )
 
-    component_selected_actions = [
-        delete_action,
-        duplicate_action,
-        edit_component_action,
-        zoom_action,
-    ]
-    assert all([action.isEnabled() for action in component_selected_actions])
+    assert all([action.isEnabled() for action in set_of_all_actions])
 
 
 def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expected_buttons_are_enabled(
@@ -304,9 +299,9 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
         create_link_action,
     }
     assert all([action.isEnabled() for action in transformation_selected_actions])
-    assert all(
+    assert not any(
         [
-            not action.isEnabled()
+            action.isEnabled()
             for action in set_of_all_actions - transformation_selected_actions
         ]
     )
