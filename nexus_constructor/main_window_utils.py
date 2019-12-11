@@ -48,7 +48,15 @@ def set_button_state(
     edit_component_action: QAction,
 ):
     """
-
+    Changes the button states based on user interaction with the component list.
+    :param component_tree_view:
+    :param delete_action: The action for deleting an item.
+    :param duplicate_action: The action for duplicating an item.
+    :param new_rotation_action: The action for creating a new rotation.
+    :param new_translation_action: The action for creating a new translation.
+    :param create_link_action: The action for creating a link.
+    :param zoom_action: The action for zooming on a component.
+    :param edit_component_action: The action for editing a component.
     """
     indices = component_tree_view.selectedIndexes()
     if len(indices) != 1:
