@@ -128,6 +128,27 @@ def edit_component_action(trigger_method_mock, tool_bar, tree_view_tab):
     )
 
 
+@pytest.fixture(scope="function")
+def set_of_all_actions(
+    delete_action,
+    duplicate_action,
+    new_rotation_action,
+    new_translation_action,
+    create_link_action,
+    zoom_action,
+    edit_component_action,
+):
+    return {
+        delete_action,
+        duplicate_action,
+        new_rotation_action,
+        new_translation_action,
+        create_link_action,
+        zoom_action,
+        edit_component_action,
+    }
+
+
 @pytest.mark.parametrize("set_enabled", [True, False])
 def test_GIVEN_action_properties_WHEN_creating_action_THEN_action_has_expected_attributes(
     icon_path,
@@ -246,8 +267,7 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     zoom_action,
     edit_component_action,
     component_model,
-    template,
-    qtbot,
+    set_of_all_actions,
 ):
     # Select the sample in the component tree view
     sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
@@ -256,10 +276,11 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     component_model.add_transformation(sample_component_index, "translation")
     # Expand the tree at the sample
     component_tree_view.expand(sample_component_index)
-    # Retrieve the index of the transofmration list and expand the tree at this point
+    # Retrieve the index of the transformation list and expand the tree at this point
     transformation_list_index = component_model.index(1, 0, sample_component_index)
     component_tree_view.expand(transformation_list_index)
-    # Retrieve the index of the transformation that has just been created and set it to the current index
+    # Retrieve the index of the transformation that has just been created and set it as the current index of the tree
+    # view
     transformation_index = component_model.index(0, 0, transformation_list_index)
     component_tree_view.setCurrentIndex(transformation_index)
 
@@ -274,9 +295,18 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
         edit_component_action,
     )
 
-    transformation_selected_actions = [
+    transformation_selected_actions = {
         delete_action,
         duplicate_action,
         edit_component_action,
-    ]
+        new_rotation_action,
+        new_translation_action,
+        create_link_action,
+    }
     assert all([action.isEnabled() for action in transformation_selected_actions])
+    assert all(
+        [
+            not action.isEnabled()
+            for action in set_of_all_actions - transformation_selected_actions
+        ]
+    )
