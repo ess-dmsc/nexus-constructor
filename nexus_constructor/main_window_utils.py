@@ -23,7 +23,7 @@ def create_and_add_toolbar_action(
     :param mouse_over_text: The text that should appear when the mouse is above the icon.
     :param trigger_method: The method that should be called when the icon is clicked.
     :param component_tool_bar: The tool bad that the action is added to.
-    :param component_tree_view_tab: No idea...
+    :param component_tree_view_tab: The tab for the component tree view.
     :param set_enabled: A bool indicating whether or not the action should be enabled immediately after it's been
         created. Only needs to be true for the Add Component button.
     :return The new QAction.
