@@ -25,10 +25,7 @@ from nexus_constructor.component.component import Component, TransformationsList
 from nexus_constructor.transformations import Transformation
 
 from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.component_tree_view import (
-    ComponentEditorDelegate,
-    LinkTransformation,
-)
+from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.json import filewriter_json_writer
 from nexus_constructor.json.filewriter_json_reader import json_to_nexus
 
