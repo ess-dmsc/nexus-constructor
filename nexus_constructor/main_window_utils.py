@@ -1,7 +1,7 @@
 import os
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QAction, QToolBar, QWidget
+from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView
 
 from nexus_constructor.component.component import Component
 from nexus_constructor.component.link_transformation import LinkTransformation
@@ -38,7 +38,7 @@ def create_and_add_toolbar_action(
 
 
 def set_button_state(
-    component_tree_view: QWidget,
+    component_tree_view: QTreeView,
     delete_action: QAction,
     duplicate_action: QAction,
     new_rotation_action: QAction,
@@ -48,8 +48,8 @@ def set_button_state(
     edit_component_action: QAction,
 ):
     """
-    Changes the button states based on user interaction with the component list.
-    :param component_tree_view:
+    Changes the button states based on user interaction with the component tree view.
+    :param component_tree_view: The component tree view.
     :param delete_action: The action for deleting an item.
     :param duplicate_action: The action for duplicating an item.
     :param new_rotation_action: The action for creating a new rotation.
