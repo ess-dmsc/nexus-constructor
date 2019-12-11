@@ -14,8 +14,8 @@ from nexus_constructor.main_window_utils import (
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from tests.test_utils import DEFINITIONS_DIR
 from tests.ui_tests.ui_test_utils import (
-    show_window_and_wait_for_interaction,
-)  # noqa: F401
+    show_window_and_wait_for_interaction, # noqa: F401
+)
 
 
 @pytest.fixture
