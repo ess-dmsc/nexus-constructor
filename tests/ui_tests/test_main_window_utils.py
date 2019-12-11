@@ -258,7 +258,6 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     component_tree_view.expand(sample_component_index)
     # Retrieve the index of the transofmration list and expand the tree at this point
     transformation_list_index = component_model.index(1, 0, sample_component_index)
-    component_tree_view.setCurrentIndex(transformation_list_index)
     component_tree_view.expand(transformation_list_index)
     # Retrieve the index of the transformation that has just been created and set it to the current index
     transformation_index = component_model.index(0, 0, transformation_list_index)
