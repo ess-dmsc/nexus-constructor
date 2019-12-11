@@ -1,10 +1,9 @@
 from unittest.mock import Mock
 
 import pytest
-from PySide2.QtCore import QModelIndex
+from PySide2.QtCore import QPoint
 from PySide2.QtWidgets import QToolBar, QWidget, QTreeView
 
-from nexus_constructor.component.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.instrument import Instrument
@@ -211,9 +210,24 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_expected_bu
     component_model,
     instrument,
 ):
-    # Add a component to the component model
-    nexus_file = instrument.nexus.nexus_file
-    component_group = nexus_file.create_dataset("Component", data=1)
-    component_model.add_component(Component(nexus_file, component_group))
+    index = component_tree_view.indexAt(QPoint(0, 0))
+    component_tree_view.setCurrentIndex(index)
 
-    component_tree_view.rootIndex()
+    set_button_state(
+        component_tree_view,
+        delete_action,
+        duplicate_action,
+        new_rotation_action,
+        new_translation_action,
+        create_link_action,
+        zoom_action,
+        edit_component_action,
+    )
+
+    component_selected_actions = [
+        delete_action,
+        duplicate_action,
+        edit_component_action,
+        zoom_action,
+    ]
+    assert all([action.isEnabled() for action in component_selected_actions])
