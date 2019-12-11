@@ -13,6 +13,9 @@ from nexus_constructor.main_window_utils import (
 )
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from tests.test_utils import DEFINITIONS_DIR
+from tests.ui_tests.ui_test_utils import (
+    show_window_and_wait_for_interaction,
+)  # noqa: F401
 
 
 @pytest.fixture
@@ -58,11 +61,13 @@ def component_model(instrument):
 
 
 @pytest.fixture(scope="function")
-def component_tree_view(template, instrument, component_model):
+def component_tree_view(template, instrument, component_model, qtbot):
     component_tree_view = QTreeView(template)
     component_delegate = ComponentEditorDelegate(component_tree_view, instrument)
     component_tree_view.setItemDelegate(component_delegate)
     component_tree_view.setModel(component_model)
+    qtbot.addWidget(component_tree_view)
+    template.ui = component_tree_view
     return component_tree_view
 
 
@@ -207,8 +212,6 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_expected_bu
     create_link_action,
     zoom_action,
     edit_component_action,
-    component_model,
-    instrument,
 ):
     index = component_tree_view.indexAt(QPoint(0, 0))
     component_tree_view.setCurrentIndex(index)
@@ -231,3 +234,50 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_expected_bu
         zoom_action,
     ]
     assert all([action.isEnabled() for action in component_selected_actions])
+
+
+def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expected_buttons_are_enabled(
+    component_tree_view,
+    delete_action,
+    duplicate_action,
+    new_rotation_action,
+    new_translation_action,
+    create_link_action,
+    zoom_action,
+    edit_component_action,
+    component_model,
+    template,
+    qtbot,
+):
+    # Select the sample in the component tree view
+    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    component_tree_view.setCurrentIndex(sample_component_index)
+    # Add a transformation to the sample
+    component_model.add_transformation(sample_component_index, "translation")
+    # Expand the tree at the sample
+    component_tree_view.expand(sample_component_index)
+    # Retrieve the index of the transofmration list and expand the tree at this point
+    transformation_list_index = component_model.index(1, 0, sample_component_index)
+    component_tree_view.setCurrentIndex(transformation_list_index)
+    component_tree_view.expand(transformation_list_index)
+    # Retrieve the index of the transformation that has just been created and set it to the current index
+    transformation_index = component_model.index(0, 0, transformation_list_index)
+    component_tree_view.setCurrentIndex(transformation_index)
+
+    set_button_state(
+        component_tree_view,
+        delete_action,
+        duplicate_action,
+        new_rotation_action,
+        new_translation_action,
+        create_link_action,
+        zoom_action,
+        edit_component_action,
+    )
+
+    transformation_selected_actions = [
+        delete_action,
+        duplicate_action,
+        edit_component_action,
+    ]
+    assert all([action.isEnabled() for action in transformation_selected_actions])
