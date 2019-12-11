@@ -127,14 +127,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def create_and_add_toolbar_action(
         self,
         icon_path: str,
-        mouse_over_name: str,
+        mouse_over_text: str,
         trigger_method: classmethod,
         set_enabled: bool = False,
     ):
         """
         Create a QAction and add it to the component toolbar.
         :param icon_path: The location of the action icon relative to the "ui" folder.
-        :param mouse_over_name: The text that should appear when the mouse is on the icon.
+        :param mouse_over_text: The text that should appear when the mouse is above the icon.
         :param trigger_method: The method that should be called when the icon is clicked.
         :param set_enabled: A bool indicating whether or not the action should be enabled immediately after it's been
             created. Only needs to be true for the Add Component button.
@@ -142,7 +142,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         """
         toolbar_action = QAction(
             QIcon(os.path.join("ui", icon_path)),
-            mouse_over_name,
+            mouse_over_text,
             self.component_tree_view_tab,
         )
         toolbar_action.triggered.connect(trigger_method)
