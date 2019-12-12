@@ -19,6 +19,7 @@ from nexus_constructor.main_window_utils import (
     create_and_add_toolbar_action,
     set_button_state,
     expand_transformation_list,
+    add_transformation,
 )
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
@@ -239,16 +240,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         expand_transformation_list(node, self.component_tree_view, self.component_model)
 
     def add_transformation(self, transformation_type):
-        selected = self.component_tree_view.selectedIndexes()
-        if len(selected) > 0:
-            current_index = selected[0]
-            if transformation_type == "translation":
-                self.component_model.add_translation(current_index)
-            elif transformation_type == "rotation":
-                self.component_model.add_rotation(current_index)
-            else:
-                raise ValueError(f"Unknown transformation type: {transformation_type}")
-            self.expand_transformation_list(current_index)
+        add_transformation(
+            transformation_type, self.component_tree_view, self.component_model
+        )
 
     def on_add_translation(self):
         self.add_transformation("translation")

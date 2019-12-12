@@ -131,3 +131,20 @@ def expand_transformation_list(
         component_tree_view.expand(trans_list_index)
         component_index = component_model.parent(trans_list_index)
         component_tree_view.expand(component_index)
+
+
+def add_transformation(
+    transformation_type,
+    component_tree_view: QTreeView,
+    component_model: ComponentTreeModel,
+):
+    selected = component_tree_view.selectedIndexes()
+    if len(selected) > 0:
+        current_index = selected[0]
+        if transformation_type == "translation":
+            component_model.add_translation(current_index)
+        elif transformation_type == "rotation":
+            component_model.add_rotation(current_index)
+        else:
+            raise ValueError(f"Unknown transformation type: {transformation_type}")
+        expand_transformation_list(current_index, component_tree_view, component_model)
