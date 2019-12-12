@@ -38,3 +38,12 @@ def test_GIVEN_3D_view_and_gnomon_sizes_WHEN_calling_calculate_gnomon_rect_THEN_
 
     assert expected_width_ratio == actual_width_ratio
     assert expected_height_ratio == actual_height_ratio
+
+
+def test_GIVEN_entity_and_camera_WHEN_zooming_to_component_THEN_camera_zooms_to_component():
+
+    mock_entity = Mock()
+    mock_camera = Mock()
+
+    InstrumentView.zoom_to_component(mock_entity, mock_camera)
+    mock_camera.viewEntity.assert_called_once()
