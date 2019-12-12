@@ -52,15 +52,6 @@ def value_side_effect(given_key, expected_key, data):
     raise KeyError
 
 
-def always_raise_key_error(key):
-    """
-    Raises a key error regardless of input. Used to mimic a field with a missing "units" attribute.
-    :param key: The key used for the call to dataset.attrs[key].
-    """
-    if key is None or key is not None:
-        raise KeyError
-
-
 @pytest.fixture(scope="function")
 def mock_slits_widget():
     mock_slits_widget = Mock(spec=FieldWidget)
@@ -585,7 +576,7 @@ def test_user_defined_chopper_checker_GIVEN_units_missing_WHEN_checking_that_req
 ):
     user_defined_chopper_checker.fields_dict[
         field_that_needs_units
-    ].attrs.__getitem__ = Mock(side_effect=always_raise_key_error)
+    ].attrs.__getitem__ = Mock(side_effect=KeyError)
     assert not user_defined_chopper_checker.required_fields_present()
 
 
