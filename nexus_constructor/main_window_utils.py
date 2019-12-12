@@ -85,13 +85,15 @@ def set_button_state(
             or isinstance(selected_object, Transformation)
         )
 
+        new_rotation_action.setEnabled(
+            not isinstance(selected_object, LinkTransformation)
+        )
+        new_translation_action.setEnabled(
+            not isinstance(selected_object, LinkTransformation)
+        )
+
         if isinstance(selected_object, LinkTransformation):
-            new_rotation_action.setEnabled(False)
-            new_translation_action.setEnabled(False)
             delete_action.setEnabled(True)
-        else:
-            new_rotation_action.setEnabled(True)
-            new_translation_action.setEnabled(True)
 
         if isinstance(selected_object, Component):
             if not hasattr(selected_object, "stored_transforms"):
