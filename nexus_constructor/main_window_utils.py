@@ -1,11 +1,13 @@
 import os
 
+from PySide2.QtCore import QModelIndex
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView
 
 from nexus_constructor.component.component import Component
 from nexus_constructor.component.link_transformation import LinkTransformation
 from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.transformations import Transformation
 
 
@@ -106,3 +108,26 @@ def set_button_state(
                 create_link_action.setEnabled(False)
         else:
             create_link_action.setEnabled(False)
+
+
+def expand_transformation_list(
+    node: QModelIndex,
+    component_tree_view: QTreeView,
+    component_model: ComponentTreeModel,
+):
+    current_pointer = node.internalPointer()
+    if isinstance(current_pointer, TransformationsList) or isinstance(
+        current_pointer, Component
+    ):
+        component_tree_view.expand(node)
+        if isinstance(current_pointer, Component):
+            trans_list_index = component_model.index(1, 0, node)
+            component_tree_view.expand(trans_list_index)
+        else:
+            component_index = component_model.parent(node)
+            component_tree_view.expand(component_index)
+    elif isinstance(current_pointer, Transformation):
+        trans_list_index = component_model.parent(node)
+        component_tree_view.expand(trans_list_index)
+        component_index = component_model.parent(trans_list_index)
+        component_tree_view.expand(component_index)

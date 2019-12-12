@@ -18,6 +18,7 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window_utils import (
     create_and_add_toolbar_action,
     set_button_state,
+    expand_transformation_list,
 )
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
@@ -235,22 +236,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.expand_transformation_list(selected[0])
 
     def expand_transformation_list(self, node):
-        current_pointer = node.internalPointer()
-        if isinstance(current_pointer, TransformationsList) or isinstance(
-            current_pointer, Component
-        ):
-            self.component_tree_view.expand(node)
-            if isinstance(current_pointer, Component):
-                trans_list_index = self.component_model.index(1, 0, node)
-                self.component_tree_view.expand(trans_list_index)
-            else:
-                component_index = self.component_model.parent(node)
-                self.component_tree_view.expand(component_index)
-        elif isinstance(current_pointer, Transformation):
-            trans_list_index = self.component_model.parent(node)
-            self.component_tree_view.expand(trans_list_index)
-            component_index = self.component_model.parent(trans_list_index)
-            self.component_tree_view.expand(component_index)
+        expand_transformation_list(node, self.component_tree_view, self.component_model)
 
     def add_transformation(self, transformation_type):
         selected = self.component_tree_view.selectedIndexes()
