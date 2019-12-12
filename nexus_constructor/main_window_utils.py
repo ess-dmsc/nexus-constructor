@@ -70,17 +70,21 @@ def set_button_state(
         zoom_action.setEnabled(False)
     else:
         selected_object = indices[0].internalPointer()
+
         zoom_action.setEnabled(isinstance(selected_object, Component))
-        if isinstance(selected_object, Component) or isinstance(
-            selected_object, Transformation
-        ):
-            delete_action.setEnabled(True)
-            duplicate_action.setEnabled(True)
-            edit_component_action.setEnabled(True)
-        else:
-            delete_action.setEnabled(False)
-            duplicate_action.setEnabled(False)
-            edit_component_action.setEnabled(False)
+        delete_action.setEnabled(
+            isinstance(selected_object, Component)
+            or isinstance(selected_object, Transformation)
+        )
+        duplicate_action.setEnabled(
+            isinstance(selected_object, Component)
+            or isinstance(selected_object, Transformation)
+        )
+        edit_component_action.setEnabled(
+            isinstance(selected_object, Component)
+            or isinstance(selected_object, Transformation)
+        )
+
         if isinstance(selected_object, LinkTransformation):
             new_rotation_action.setEnabled(False)
             new_translation_action.setEnabled(False)
@@ -92,20 +96,13 @@ def set_button_state(
         if isinstance(selected_object, Component):
             if not hasattr(selected_object, "stored_transforms"):
                 selected_object.stored_transforms = selected_object.transforms
-            if not selected_object.stored_transforms.has_link:
-                create_link_action.setEnabled(True)
-            else:
-                create_link_action.setEnabled(False)
+            create_link_action.setEnabled(
+                not selected_object.stored_transforms.has_link
+            )
         elif isinstance(selected_object, TransformationsList):
-            if not selected_object.has_link:
-                create_link_action.setEnabled(True)
-            else:
-                create_link_action.setEnabled(False)
+            create_link_action.setEnabled(not selected_object.has_link)
         elif isinstance(selected_object, Transformation):
-            if not selected_object.parent.has_link:
-                create_link_action.setEnabled(True)
-            else:
-                create_link_action.setEnabled(False)
+            create_link_action.setEnabled(not selected_object.parent.has_link)
         else:
             create_link_action.setEnabled(False)
 
