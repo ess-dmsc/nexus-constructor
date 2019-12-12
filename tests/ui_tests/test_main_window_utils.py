@@ -305,3 +305,50 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
             for action in set_of_all_actions - transformation_selected_actions
         ]
     )
+
+
+def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_buttons_are_enabled(
+    component_tree_view,
+    delete_action,
+    duplicate_action,
+    new_rotation_action,
+    new_translation_action,
+    create_link_action,
+    zoom_action,
+    edit_component_action,
+    component_model,
+    set_of_all_actions,
+):
+    # Select the sample in the component tree view
+    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    component_tree_view.setCurrentIndex(sample_component_index)
+    # Add a transformation to the sample
+    component_model.add_link(sample_component_index)
+    # Expand the tree at the sample
+    component_tree_view.expand(sample_component_index)
+    # Retrieve the index of the transformation list and expand the tree at this point
+    transformation_list_index = component_model.index(1, 0, sample_component_index)
+    component_tree_view.expand(transformation_list_index)
+    # Retrieve the index of the link that has just been created and set it as the current index of the tree view
+    link_index = component_model.index(0, 0, transformation_list_index)
+    component_tree_view.setCurrentIndex(link_index)
+
+    set_button_state(
+        component_tree_view,
+        delete_action,
+        duplicate_action,
+        new_rotation_action,
+        new_translation_action,
+        create_link_action,
+        zoom_action,
+        edit_component_action,
+    )
+
+    link_transformation_selected_actions = {delete_action}
+    assert all([action.isEnabled() for action in link_transformation_selected_actions])
+    assert not any(
+        [
+            action.isEnabled()
+            for action in set_of_all_actions - link_transformation_selected_actions
+        ]
+    )
