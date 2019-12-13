@@ -67,8 +67,9 @@ def _data_has_correct_type(
     fields_dict: Dict[str, "FieldWidget"], units_dict: dict
 ) -> bool:
     """
-    Checks that the fields required to create a Chopper mesh have the expected data types.
-    :param fields_dict: The dictionary of field names and their field widgets/NeXus datasets.
+    Checks that the data required to create a Chopper mesh have the expected types.
+    :param fields_dict: The dictionary of field names and their field widgets/NeXus data.
+    :param units_dict: The dictionary of field names and their unit values.
     :return: True if all the fields have the correct types, False otherwise.
     """
     correct_slits_type = _check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
