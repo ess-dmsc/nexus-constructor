@@ -202,7 +202,7 @@ def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_
 
 def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned():
     field_dict = {RADIUS_NAME: "string"}
-    error_message = _incorrect_data_type_message(field_dict, RADIUS_NAME)
+    error_message = _incorrect_data_type_message(field_dict, RADIUS_NAME, "float")
 
     assert (
         error_message
