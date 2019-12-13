@@ -76,19 +76,18 @@ def set_button_state(
         selected_object_is_component_or_transform = isinstance(
             selected_object, (Component, Transformation)
         )
-        delete_action.setEnabled(selected_object_is_component_or_transform)
         duplicate_action.setEnabled(selected_object_is_component_or_transform)
         edit_component_action.setEnabled(selected_object_is_component_or_transform)
 
-        new_rotation_action.setEnabled(
-            not isinstance(selected_object, LinkTransformation)
+        selected_object_is_not_link_transform = not isinstance(
+            selected_object, LinkTransformation
         )
-        new_translation_action.setEnabled(
-            not isinstance(selected_object, LinkTransformation)
+        new_rotation_action.setEnabled(selected_object_is_not_link_transform)
+        new_translation_action.setEnabled(selected_object_is_not_link_transform)
+        delete_action.setEnabled(
+            selected_object_is_component_or_transform
+            or not selected_object_is_not_link_transform
         )
-
-        if isinstance(selected_object, LinkTransformation):
-            delete_action.setEnabled(True)
 
         if isinstance(selected_object, Component):
             if not hasattr(selected_object, "stored_transforms"):
