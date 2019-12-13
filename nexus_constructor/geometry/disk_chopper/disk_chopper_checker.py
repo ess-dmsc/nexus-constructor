@@ -60,7 +60,9 @@ def _check_data_type(field_widget, expected_types) -> bool:
         return False
 
 
-def _fields_have_correct_type(fields_dict: Dict[str, "FieldWidget"]) -> bool:
+def _fields_have_correct_type(
+    fields_dict: Dict[str, "FieldWidget"], units_dict: dict
+) -> bool:
     """
     Checks that the fields required to create a Chopper mesh have the expected data types.
     :param fields_dict: The dictionary of field names and their field widgets/NeXus datasets.
@@ -74,12 +76,18 @@ def _fields_have_correct_type(fields_dict: Dict[str, "FieldWidget"]) -> bool:
     correct_slit_edges_type = _check_data_type(
         fields_dict[SLIT_EDGES_NAME], FLOAT_TYPES
     )
+    correct_radius_units_type = isinstance(units_dict[RADIUS_NAME], str)
+    correct_slit_height_units_type = isinstance(units_dict[SLIT_HEIGHT_NAME], str)
+    correct_slit_edges_units_type = isinstance(units_dict[SLIT_EDGES_NAME], str)
 
     if (
         correct_slits_type
         and correct_radius_type
         and correct_slit_height_type
         and correct_slit_edges_type
+        and correct_radius_units_type
+        and correct_slit_height_units_type
+        and correct_slit_edges_units_type
     ):
         return True
 
@@ -270,7 +278,7 @@ class UserDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and _fields_have_correct_type(self.fields_dict)
+            and _fields_have_correct_type(self.fields_dict, self.units_dict)
             and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].value.ndim,
@@ -355,7 +363,7 @@ class NexusDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and _fields_have_correct_type(self.fields_dict)
+            and _fields_have_correct_type(self.fields_dict, self.units_dict)
             and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].ndim,
