@@ -39,14 +39,17 @@ EXPECTED_UNIT_TYPE = {
 }
 
 
-def _incorrect_field_type_message(fields_dict: dict, field_name: str) -> str:
+def _incorrect_data_type_message(
+    data_dict: dict, field_name: str, expected_type: str
+) -> str:
     """
     Creates a string explaining to the user that the field input did not have the expected type.
-    :param fields_dict: The dictionary containing the different data fields for the disk chopper.
+    :param data_dict: The dictionary containing the different data fields for the disk chopper.
     :param field_name: The name of the field that failed the check.
+    :param expected_type: The expected data type.
     :return: A string that contains the name of the field, the type it should have, and the type the user entered.
     """
-    return f"Wrong {field_name} type. Expected {EXPECTED_TYPE_ERROR_MSG[field_name]} but found {type(fields_dict[field_name])}."
+    return f"Wrong {field_name} type. Expected {expected_type} but found {type(data_dict[field_name])}."
 
 
 def _check_data_type(field_widget, expected_types) -> bool:
@@ -60,7 +63,7 @@ def _check_data_type(field_widget, expected_types) -> bool:
         return False
 
 
-def _fields_have_correct_type(
+def _data_has_correct_type(
     fields_dict: Dict[str, "FieldWidget"], units_dict: dict
 ) -> bool:
     """
@@ -94,16 +97,45 @@ def _fields_have_correct_type(
     problems = []
 
     if not correct_slits_type:
-        problems.append(_incorrect_field_type_message(fields_dict, SLITS_NAME))
+        problems.append(
+            _incorrect_data_type_message(
+                fields_dict, SLITS_NAME, EXPECTED_TYPE_ERROR_MSG[SLITS_NAME]
+            )
+        )
 
     if not correct_radius_type:
-        problems.append(_incorrect_field_type_message(fields_dict, RADIUS_NAME))
+        problems.append(
+            _incorrect_data_type_message(
+                fields_dict, RADIUS_NAME, EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME]
+            )
+        )
 
     if not correct_slit_height_type:
-        problems.append(_incorrect_field_type_message(fields_dict, SLIT_HEIGHT_NAME))
+        problems.append(
+            _incorrect_data_type_message(
+                fields_dict, SLIT_HEIGHT_NAME, EXPECTED_TYPE_ERROR_MSG[SLIT_HEIGHT_NAME]
+            )
+        )
 
     if not correct_slit_edges_type:
-        problems.append(_incorrect_field_type_message(fields_dict, SLIT_EDGES_NAME))
+        problems.append(
+            _incorrect_data_type_message(
+                fields_dict, SLIT_EDGES_NAME, EXPECTED_TYPE_ERROR_MSG[SLIT_EDGES_NAME]
+            )
+        )
+
+    if not correct_radius_units_type:
+        problems.append(_incorrect_data_type_message(units_dict, RADIUS_NAME, "string"))
+
+    if not correct_slit_height_units_type:
+        problems.append(
+            _incorrect_data_type_message(units_dict, SLIT_HEIGHT_NAME, "string")
+        )
+
+    if not correct_slit_edges_units_type:
+        problems.append(
+            _incorrect_data_type_message(units_dict, SLIT_EDGES_NAME, "string")
+        )
 
     logging.info(f"{UNABLE}\n{problems}")
     return False
@@ -278,7 +310,7 @@ class UserDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and _fields_have_correct_type(self.fields_dict, self.units_dict)
+            and _data_has_correct_type(self.fields_dict, self.units_dict)
             and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].value.ndim,
@@ -363,7 +395,7 @@ class NexusDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and _fields_have_correct_type(self.fields_dict, self.units_dict)
+            and _data_has_correct_type(self.fields_dict, self.units_dict)
             and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].ndim,
