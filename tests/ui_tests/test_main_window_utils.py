@@ -480,7 +480,7 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
     )
 
 
-def test_GIVEN_selected_item_is_component_WHEN_expanding_transformation_list_THEN_transformation_list_is_expanded(
+def test_GIVEN_item_is_component_WHEN_expanding_transformation_list_THEN_transformation_list_is_expanded(
     component_tree_view, component_model
 ):
 
@@ -492,3 +492,35 @@ def test_GIVEN_selected_item_is_component_WHEN_expanding_transformation_list_THE
     transformation_list_index = component_model.index(1, 0, sample_component_index)
     assert component_tree_view.isExpanded(transformation_list_index)
     assert component_tree_view.isExpanded(sample_component_index)
+
+
+def test_GIVEN_item_is_transformation_list_WHEN_expanding_transformation_list_THEN_transformation_is_expanded(
+    component_tree_view, component_model
+):
+
+    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    transformation_list_index = component_model.index(1, 0, sample_component_index)
+    expand_transformation_list(
+        transformation_list_index, component_tree_view, component_model
+    )
+
+    assert component_tree_view.isExpanded(sample_component_index)
+    assert component_tree_view.isExpanded(transformation_list_index)
+
+
+def test_GIVEN_item_is_transformation_WHEN_expanding_transformation_list_THEN_transformation_list_is_expanded(
+    component_tree_view, component_model, qtbot, template
+):
+    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    transformation_list_index = component_model.index(1, 0, sample_component_index)
+    component_model.add_translation(sample_component_index)
+    transformation_index = component_model.index(0, 0, transformation_list_index)
+
+    expand_transformation_list(
+        transformation_index, component_tree_view, component_model
+    )
+
+    show_window_and_wait_for_interaction(qtbot, template)
+
+    assert component_tree_view.isExpanded(sample_component_index)
+    assert component_tree_view.isExpanded(transformation_list_index)
