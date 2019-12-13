@@ -72,18 +72,13 @@ def set_button_state(
         selected_object = indices[0].internalPointer()
 
         zoom_action.setEnabled(isinstance(selected_object, Component))
-        delete_action.setEnabled(
-            isinstance(selected_object, Component)
-            or isinstance(selected_object, Transformation)
+
+        selected_object_is_component_or_transform = isinstance(
+            selected_object, (Component, Transformation)
         )
-        duplicate_action.setEnabled(
-            isinstance(selected_object, Component)
-            or isinstance(selected_object, Transformation)
-        )
-        edit_component_action.setEnabled(
-            isinstance(selected_object, Component)
-            or isinstance(selected_object, Transformation)
-        )
+        delete_action.setEnabled(selected_object_is_component_or_transform)
+        duplicate_action.setEnabled(selected_object_is_component_or_transform)
+        edit_component_action.setEnabled(selected_object_is_component_or_transform)
 
         new_rotation_action.setEnabled(
             not isinstance(selected_object, LinkTransformation)

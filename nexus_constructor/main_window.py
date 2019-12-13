@@ -23,8 +23,7 @@ from nexus_constructor.main_window_utils import (
 )
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
-from nexus_constructor.component.component import Component, TransformationsList
-from nexus_constructor.transformations import Transformation
+from nexus_constructor.component.component import Component
 
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
