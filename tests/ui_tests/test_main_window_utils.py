@@ -10,6 +10,7 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window_utils import (
     create_and_add_toolbar_action,
     set_button_state,
+    expand_transformation_list,
 )
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from tests.test_utils import DEFINITIONS_DIR
@@ -477,3 +478,17 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
     assert not any(
         [action.isEnabled() for action in set_of_all_actions - doesnt_have_link_actions]
     )
+
+
+def test_GIVEN_selected_item_is_component_WHEN_expanding_transformation_list_THEN_transformation_list_is_expanded(
+    component_tree_view, component_model
+):
+
+    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    expand_transformation_list(
+        sample_component_index, component_tree_view, component_model
+    )
+
+    transformation_list_index = component_model.index(1, 0, sample_component_index)
+    assert component_tree_view.isExpanded(transformation_list_index)
+    assert component_tree_view.isExpanded(sample_component_index)
