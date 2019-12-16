@@ -226,16 +226,16 @@ class FieldWidget(QFrame):
             val = self.value_line_edit.text()
             if dtype == h5py.special_dtype(vlen=str):
                 return_object = h5py.File(
-                    name=str(uuid.uuid4()), driver="core", backing_store=False
+                    name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
                 ).create_dataset(name=self.name, dtype=dtype, data=val)
             else:
                 return_object = h5py.File(
-                    name=str(uuid.uuid4()), driver="core", backing_store=False
+                    name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
                 ).create_dataset(name=self.name, dtype=dtype, data=dtype(val))
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             return_object = h5py.File(
-                name=str(uuid.uuid4()), driver="core", backing_store=False
+                name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
             ).create_dataset(
                 name=self.name, data=np.squeeze(self.table_view.model.array)
             )
