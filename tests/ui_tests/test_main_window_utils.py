@@ -180,6 +180,15 @@ def get_transformation_list_index(
     return component_model.index(1, 0, component_index)
 
 
+def get_transformation_or_link_index(
+    component_model: ComponentTreeModel,
+    component_tree_view: QTreeView,
+    transformation_list_index: QModelIndex,
+):
+    component_tree_view.expand(transformation_list_index)
+    return component_model.index(0, 0, transformation_list_index)
+
+
 @pytest.mark.parametrize("set_enabled", [True, False])
 def test_GIVEN_action_properties_WHEN_creating_action_THEN_action_has_expected_attributes(
     icon_path,
@@ -302,8 +311,9 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     transformation_list_index = get_transformation_list_index(
         component_model, component_tree_view, sample_component_index
     )
-    component_tree_view.expand(transformation_list_index)
-    transformation_index = component_model.index(0, 0, transformation_list_index)
+    transformation_index = get_transformation_or_link_index(
+        component_model, component_tree_view, transformation_list_index
+    )
     component_tree_view.setCurrentIndex(transformation_index)
 
     set_button_state(
@@ -351,8 +361,9 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     transformation_list_index = get_transformation_list_index(
         component_model, component_tree_view, sample_component_index
     )
-    component_tree_view.expand(transformation_list_index)
-    link_index = component_model.index(0, 0, transformation_list_index)
+    link_index = get_transformation_or_link_index(
+        component_model, component_tree_view, transformation_list_index
+    )
     component_tree_view.setCurrentIndex(link_index)
 
     set_button_state(
@@ -500,7 +511,6 @@ def test_GIVEN_item_is_component_WHEN_expanding_transformation_list_THEN_transfo
     expand_transformation_list(
         sample_component_index, component_tree_view, component_model
     )
-
     transformation_list_index = get_transformation_list_index(
         component_model, component_tree_view, sample_component_index
     )
@@ -533,7 +543,6 @@ def test_GIVEN_item_is_transformation_WHEN_expanding_transformation_list_THEN_tr
     )
     component_model.add_translation(sample_component_index)
     transformation_index = component_model.index(0, 0, transformation_list_index)
-
     expand_transformation_list(
         transformation_index, component_tree_view, component_model
     )
