@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
-from PySide2.QtCore import QPoint
+from PySide2.QtCore import QPoint, QModelIndex
 from PySide2.QtWidgets import QToolBar, QWidget, QTreeView
 
 from nexus_constructor.component_tree_model import ComponentTreeModel
@@ -11,6 +11,7 @@ from nexus_constructor.main_window_utils import (
     create_and_add_toolbar_action,
     set_button_state,
     expand_transformation_list,
+    add_transformation,
 )
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from tests.test_utils import DEFINITIONS_DIR
@@ -148,6 +149,28 @@ def set_of_all_actions(
     }
 
 
+def get_sample_index(component_tree_view: ComponentTreeModel):
+    return component_tree_view.indexAt(QPoint(0, 0))
+
+
+def add_transformation_at_index(
+    component_model: ComponentTreeModel,
+    component_tree_view: QTreeView,
+    component_index: QModelIndex,
+):
+    component_tree_view.setCurrentIndex(component_index)
+    component_model.add_transformation(component_index, "translation")
+
+
+def add_link_at_index(
+    component_model: ComponentTreeModel,
+    component_tree_view: QTreeView,
+    component_index: QModelIndex,
+):
+    component_tree_view.setCurrentIndex(component_index)
+    component_model.add_link(component_index)
+
+
 @pytest.mark.parametrize("set_enabled", [True, False])
 def test_GIVEN_action_properties_WHEN_creating_action_THEN_action_has_expected_attributes(
     icon_path,
@@ -234,8 +257,8 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons
     edit_component_action,
     set_of_all_actions,
 ):
-    index = component_tree_view.indexAt(QPoint(0, 0))
-    component_tree_view.setCurrentIndex(index)
+    sample_index = get_sample_index(component_tree_view)
+    component_tree_view.setCurrentIndex(sample_index)
 
     set_button_state(
         component_tree_view,
@@ -264,10 +287,10 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     set_of_all_actions,
 ):
     # Select the sample in the component tree view
-    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
-    component_tree_view.setCurrentIndex(sample_component_index)
-    # Add a transformation to the sample
-    component_model.add_transformation(sample_component_index, "translation")
+    sample_component_index = get_sample_index(component_tree_view)
+    add_transformation_at_index(
+        component_model, component_tree_view, sample_component_index
+    )
     # Expand the tree at the sample
     component_tree_view.expand(sample_component_index)
     # Retrieve the index of the transformation list and expand the tree at this point
@@ -319,10 +342,8 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     set_of_all_actions,
 ):
     # Select the sample in the component tree view
-    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
-    component_tree_view.setCurrentIndex(sample_component_index)
-    # Add a transformation to the sample
-    component_model.add_link(sample_component_index)
+    sample_component_index = get_sample_index(component_tree_view)
+    add_link_at_index(component_model, component_tree_view, sample_component_index)
     # Expand the tree at the sample
     component_tree_view.expand(sample_component_index)
     # Retrieve the index of the transformation list and expand the tree at this point
@@ -366,10 +387,8 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
     set_of_all_actions,
 ):
     # Select the sample in the component tree view
-    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
-    component_tree_view.setCurrentIndex(sample_component_index)
-    # Add a transformation to the sample
-    component_model.add_link(sample_component_index)
+    sample_component_index = get_sample_index(component_tree_view)
+    add_link_at_index(component_model, component_tree_view, sample_component_index)
     # Expand the tree at the sample
     component_tree_view.expand(sample_component_index)
     # Retrieve the index of the transformation list and expand the tree at this point
@@ -409,10 +428,8 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_T
     set_of_all_actions,
 ):
     # Select the sample in the component tree view
-    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
-    component_tree_view.setCurrentIndex(sample_component_index)
-    # Add a transformation to the sample
-    component_model.add_link(sample_component_index)
+    sample_component_index = get_sample_index(component_tree_view)
+    add_link_at_index(component_model, component_tree_view, sample_component_index)
     # Expand the tree at the sample
     component_tree_view.expand(sample_component_index)
     # Retrieve the index of the transformation list and expand the tree at this point
@@ -450,7 +467,7 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
     set_of_all_actions,
 ):
     # Select the sample in the component tree view
-    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    sample_component_index = get_sample_index(component_tree_view)
     component_tree_view.setCurrentIndex(sample_component_index)
     # Expand the tree at the sample
     component_tree_view.expand(sample_component_index)
@@ -484,7 +501,7 @@ def test_GIVEN_item_is_component_WHEN_expanding_transformation_list_THEN_transfo
     component_tree_view, component_model
 ):
 
-    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    sample_component_index = get_sample_index(component_tree_view)
     expand_transformation_list(
         sample_component_index, component_tree_view, component_model
     )
@@ -498,7 +515,7 @@ def test_GIVEN_item_is_transformation_list_WHEN_expanding_transformation_list_TH
     component_tree_view, component_model
 ):
 
-    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    sample_component_index = get_sample_index(component_tree_view)
     transformation_list_index = component_model.index(1, 0, sample_component_index)
     expand_transformation_list(
         transformation_list_index, component_tree_view, component_model
@@ -509,9 +526,9 @@ def test_GIVEN_item_is_transformation_list_WHEN_expanding_transformation_list_TH
 
 
 def test_GIVEN_item_is_transformation_WHEN_expanding_transformation_list_THEN_transformation_list_is_expanded(
-    component_tree_view, component_model, qtbot, template
+    component_tree_view, component_model
 ):
-    sample_component_index = component_tree_view.indexAt(QPoint(0, 0))
+    sample_component_index = get_sample_index(component_tree_view)
     transformation_list_index = component_model.index(1, 0, sample_component_index)
     component_model.add_translation(sample_component_index)
     transformation_index = component_model.index(0, 0, transformation_list_index)
@@ -520,7 +537,25 @@ def test_GIVEN_item_is_transformation_WHEN_expanding_transformation_list_THEN_tr
         transformation_index, component_tree_view, component_model
     )
 
-    show_window_and_wait_for_interaction(qtbot, template)
-
     assert component_tree_view.isExpanded(sample_component_index)
     assert component_tree_view.isExpanded(transformation_list_index)
+
+
+def test_GIVEN_translation_is_added_WHEN_adding_transformation_THEN_translation_is_added_to_component_model(
+    component_tree_view, component_model
+):
+    sample_component_index = get_sample_index(component_tree_view)
+    component_tree_view.setCurrentIndex(sample_component_index)
+    add_transformation("translation", component_tree_view, component_model)
+
+    # assert
+
+
+def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_added_to_component_model(
+    component_tree_view, component_model
+):
+    sample_component_index = get_sample_index(component_tree_view)
+    component_tree_view.setCurrentIndex(sample_component_index)
+    add_transformation("rotation", component_tree_view, component_model)
+
+    # assert
