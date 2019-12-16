@@ -1,3 +1,4 @@
+from PySide2.QtCore import QModelIndex
 from PySide2.QtWidgets import (
     QToolBar,
     QAbstractItemView,
@@ -92,7 +93,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view.updateEditorGeometries()
         self.component_tree_view.updateGeometries()
         self.component_tree_view.updateGeometry()
-        self.component_tree_view.clicked.connect(self.on_clicked)
+        self.component_tree_view.clicked.connect(self._set_button_state)
         self.component_tree_view.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.component_tool_bar = QToolBar("Actions", self.component_tree_view_tab)
@@ -207,7 +208,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.entries_dialog.layout().addWidget(ok_button)
         self.entries_dialog.show()
 
-    def set_button_state(self):
+    def _set_button_state(self):
         set_button_state(
             self.component_tree_view,
             self.delete_action,
@@ -223,31 +224,31 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         selected = self.component_tree_view.selectedIndexes()
         if len(selected) > 0:
             self.component_model.add_link(selected[0])
-            self.expand_transformation_list(selected[0])
-            self.set_button_state()
+            self._expand_transformation_list(selected[0])
+            self._set_button_state()
 
     def on_clicked(self, index):
-        self.set_button_state()
+        self._set_button_state()
 
     def on_duplicate_node(self):
         selected = self.component_tree_view.selectedIndexes()
         if len(selected) > 0:
             self.component_model.duplicate_node(selected[0])
-            self.expand_transformation_list(selected[0])
+            self._expand_transformation_list(selected[0])
 
-    def expand_transformation_list(self, node):
+    def _expand_transformation_list(self, node: QModelIndex):
         expand_transformation_list(node, self.component_tree_view, self.component_model)
 
-    def add_transformation(self, transformation_type):
+    def _add_transformation(self, transformation_type: str):
         add_transformation(
             transformation_type, self.component_tree_view, self.component_model
         )
 
     def on_add_translation(self):
-        self.add_transformation("translation")
+        self._add_transformation("translation")
 
     def on_add_rotation(self):
-        self.add_transformation("rotation")
+        self._add_transformation("rotation")
 
     def set_up_warning_window(self):
         """
@@ -349,7 +350,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.sceneWidget.clear_all_transformations()
         for component in self.instrument.get_component_list():
             if component.name != "sample":
-                self.sceneWidget.add_transformation(component.name, component.transform)
+                self.sceneWidget._add_transformation(
+                    component.name, component.transform
+                )
 
     def _update_views(self):
         self.sceneWidget.clear_all_transformations()
@@ -361,7 +364,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         for component in self.instrument.get_component_list():
             shape, positions = component.shape
             self.sceneWidget.add_component(component.name, shape, positions)
-            self.sceneWidget.add_transformation(component.name, component.transform)
+            self.sceneWidget._add_transformation(component.name, component.transform)
 
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
@@ -379,7 +382,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         selected = self.component_tree_view.selectedIndexes()
         for item in selected:
             self.component_model.remove_node(item)
-        self.set_button_state()
+        self._set_button_state()
 
     def on_zoom_item(self):
         selected = self.component_tree_view.selectedIndexes()[0]
