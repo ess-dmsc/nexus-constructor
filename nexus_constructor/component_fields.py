@@ -79,7 +79,6 @@ class FieldWidget(QFrame):
         possible_field_names: List[str],
         parent: QListWidget = None,
         instrument: Instrument = None,
-        stream_group_name: str = None,
     ):
         super(FieldWidget, self).__init__(parent)
 

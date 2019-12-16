@@ -73,7 +73,7 @@ class StreamFieldsWidget(QDialog):
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
         self.minimum_spinbox_value = 0
-        self.maximum_spinbox_value = 100000000
+        self.maximum_spinbox_value = 100_000_000
 
         self.hs00_unimplemented_label = QLabel(
             "hs00 (Event histograms) has not yet been fully implemented."
@@ -96,6 +96,9 @@ class StreamFieldsWidget(QDialog):
         self.type_label = QLabel("Type: ")
         self.type_combo = QComboBox()
         self.type_combo.addItems(F142_TYPES)
+
+        self.value_units_edit = QLineEdit()
+        self.value_units_label = QLabel("Value Units:")
 
         self.show_advanced_options_button = QPushButton(
             text="Show/hide advanced options"
@@ -131,24 +134,29 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.source_label, 2, 0)
         self.layout().addWidget(self.source_line_edit, 2, 1)
 
-        self.layout().addWidget(self.type_label, 3, 0)
-        self.layout().addWidget(self.type_combo, 3, 1)
+        self.layout().addWidget(self.value_units_label, 3, 0)
+        self.layout().addWidget(self.value_units_edit, 3, 1)
+        self.value_units_label.setVisible(False)
+        self.value_units_edit.setVisible(False)
 
-        self.layout().addWidget(self.scalar_radio, 4, 0)
-        self.layout().addWidget(self.array_radio, 4, 1)
+        self.layout().addWidget(self.type_label, 4, 0)
+        self.layout().addWidget(self.type_combo, 4, 1)
 
-        self.layout().addWidget(self.array_size_label, 5, 0)
-        self.layout().addWidget(self.array_size_spinbox, 5, 1)
+        self.layout().addWidget(self.scalar_radio, 5, 0)
+        self.layout().addWidget(self.array_radio, 5, 1)
 
-        self.layout().addWidget(self.hs00_unimplemented_label, 6, 0, 1, 2)
+        self.layout().addWidget(self.array_size_label, 6, 0)
+        self.layout().addWidget(self.array_size_spinbox, 6, 1)
+
+        self.layout().addWidget(self.hs00_unimplemented_label, 7, 0, 1, 2)
 
         # Spans both rows
-        self.layout().addWidget(self.show_advanced_options_button, 7, 0, 1, 2)
-        self.layout().addWidget(self.f142_advanced_group_box, 8, 0, 1, 2)
+        self.layout().addWidget(self.show_advanced_options_button, 8, 0, 1, 2)
+        self.layout().addWidget(self.f142_advanced_group_box, 9, 0, 1, 2)
 
-        self.layout().addWidget(self.ev42_advanced_group_box, 9, 0, 1, 2)
+        self.layout().addWidget(self.ev42_advanced_group_box, 10, 0, 1, 2)
 
-        self.layout().addWidget(self.ok_button, 10, 0, 1, 2)
+        self.layout().addWidget(self.ok_button, 11, 0, 1, 2)
 
         self._schema_type_changed(self.schema_combo.currentText())
 
@@ -248,8 +256,12 @@ class StreamFieldsWidget(QDialog):
         self.ev42_advanced_group_box.setVisible(False)
         self.show_advanced_options_button.setVisible(False)
         self.show_advanced_options_button.setChecked(False)
+        self.value_units_label.setVisible(False)
+        self.value_units_edit.setVisible(False)
         self.set_advanced_options_state()
         if schema == "f142":
+            self.value_units_label.setVisible(True)
+            self.value_units_edit.setVisible(True)
             self._set_edits_visible(True, True)
             self.show_advanced_options_button.setVisible(True)
             self.f142_advanced_group_box.setVisible(False)
@@ -341,6 +353,10 @@ class StreamFieldsWidget(QDialog):
         if self.array_radio.isChecked():
             stream_group.create_dataset(
                 "array_size", data=self.array_size_spinbox.value()
+            )
+        if self.value_units_edit.text():
+            stream_group.create_dataset(
+                "value_units", data=self.value_units_edit.text()
             )
         if self.advanced_options_enabled:
             # Use strings for names, we don't care if it's byte-encoded as it will output to JSON anyway.
