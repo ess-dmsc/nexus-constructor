@@ -442,20 +442,20 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 filename=self.fileLineEdit.text(),
                 pixel_data=pixel_data,
             )
-        else:
-            chopper_checker = UserDefinedChopperChecker(self.fieldsListWidget)
-            if (
-                component.nx_class == CHOPPER_CLASS_NAME
-                and chopper_checker.validate_chopper()
-            ):
-                geometry_model = DiskChopperGeometryCreator(
-                    chopper_checker.chopper_details
-                ).create_disk_chopper_geometry()
-            else:
-                geometry_model = NoShapeGeometry()
-                component.remove_shape()
+        # else:
+        #     chopper_checker = UserDefinedChopperChecker(self.fieldsListWidget)
+        #     if (
+        #         component.nx_class == CHOPPER_CLASS_NAME
+        #         and chopper_checker.validate_chopper()
+        #     ):
+        #         geometry_model = DiskChopperGeometryCreator(
+        #             chopper_checker.chopper_details
+        #         ).create_disk_chopper_geometry()
+        #     else:
+        #         geometry_model = NoShapeGeometry()
+        #         component.remove_shape()
 
-        return geometry_model
+        # return geometry_model
 
     def get_pixel_visibility_condition(self) -> bool:
         """
@@ -514,7 +514,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component = self.instrument.create_component(
             component_name, nx_class, description
         )
-        geometry_model = self.generate_geometry_model(component, pixel_data)
+        self.generate_geometry_model(component, pixel_data)
 
         self.write_pixel_data_to_component(component, nx_class, pixel_data)
 
@@ -525,10 +525,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.instrument.nexus, component.group
         )
 
-        # If the component is a "No Shape" with Chopper properties then return the result from generate_geometry_model
-        # instead, as this will be an OFF Chopper Mesh if the input described a valid chopper
-        if self.component_is_chopper_with_no_shape(nx_class):
-            return geometry_model, None
+        # # If the component is a "No Shape" with Chopper properties then return the result from generate_geometry_model
+        # # instead, as this will be an OFF Chopper Mesh if the input described a valid chopper
+        # if self.component_is_chopper_with_no_shape(nx_class):
+        #     return geometry_model, None
 
         return component_with_geometry.shape
 
@@ -557,17 +557,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: The geometry object.
         """
         chopper_with_no_shape = self.component_is_chopper_with_no_shape(nx_class)
-
+        # remove the previous object from the qt3d view
+        if not isinstance(
+            self.component_to_edit.shape[0], NoShapeGeometry
+        ):
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
         # remove previous fields
         for field_group in self.component_to_edit.group.values():
             if field_group.name.split("/")[-1] not in INVALID_FIELD_NAMES:
                 del self.instrument.nexus.nexus_file[field_group.name]
-
-        # remove the previous object from the qt3d view
-        if chopper_with_no_shape or not isinstance(
-            self.component_to_edit.shape[0], NoShapeGeometry
-        ):
-            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         self.component_to_edit.name = component_name
         self.component_to_edit.nx_class = nx_class
