@@ -82,14 +82,14 @@ class InstrumentView(QWidget):
         # Create the axes lines objects
         InstrumentViewAxes(self.axes_root_entity, self.view.camera().farPlane())
 
+        # Dictionary of components and transformations so that we can delete them later
+        self.component_entities = {}
+        self.transformations = {}
+
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
         # components and axis lines
         self.create_layers()
         self.initialise_view()
-
-        # Dictionary of components and transformations so that we can delete them later
-        self.component_entities = {}
-        self.transformations = {}
 
         # Insert the beam cylinder last. This ensures that the semi-transparency works correctly.
         self.gnomon.setup_beam_cylinder()
@@ -164,7 +164,11 @@ class InstrumentView(QWidget):
         return height_ratio, width_ratio
 
     @staticmethod
-    def create_camera_filter(viewport, visible_entity, camera_to_filter):
+    def create_camera_filter(
+        viewport: Qt3DRender.QViewport,
+        visible_entity: Qt3DCore.QEntity,
+        camera_to_filter: Qt3DRender.QCamera,
+    ) -> Qt3DRender.QClearBuffers:
         """
         Filter the objects that are visible to a camera.
         :param viewport: The viewport that the camera is using.
@@ -195,9 +199,6 @@ class InstrumentView(QWidget):
             return
 
         mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
-
-        self.component_entities[name] = []
-
         material = create_material(
             QColor("black"), QColor("grey"), self.component_root_entity
         )
@@ -205,6 +206,26 @@ class InstrumentView(QWidget):
         self.component_entities[name] = create_qentity(
             [mesh, material], self.component_root_entity
         )
+
+    def get_entity(self, component_name: str) -> Qt3DCore.QEntity:
+        """
+        Obtain the entity from the InstrumentView based on its name.
+        """
+        try:
+            return self.component_entities[component_name]
+        except KeyError:
+            logging.error(
+                f"Unable to retrieve component {component_name} because it doesn't exist."
+            )
+
+    @staticmethod
+    def zoom_to_component(entity: Qt3DCore.QEntity, camera: Qt3DRender.QCamera):
+        """
+        Instructs a camera to zoom in on an individual component.
+        :param entity: The component entity that the camera should zoom in on.
+        :param camera: The camera that will do the zooming.
+        """
+        camera.viewEntity(entity)
 
     def clear_all_components(self):
         """
@@ -214,14 +235,13 @@ class InstrumentView(QWidget):
             self.component_entities[component].setParent(None)
         self.component_entities = dict()
 
-    def delete_component(self, name):
+    def delete_component(self, name: str):
         """
         Delete a component from the InstrumentView by removing the components and entity from the dictionaries.
         :param name: The name of the component.
         """
-        self.component_entities[name].setParent(None)
-
         try:
+            self.component_entities[name].setParent(None)
             del self.component_entities[name]
         except KeyError:
             logging.error(
@@ -248,7 +268,9 @@ class InstrumentView(QWidget):
         self.transformations = {}
 
     @staticmethod
-    def set_cube_mesh_dimensions(cube_mesh, x, y, z):
+    def set_cube_mesh_dimensions(
+        cube_mesh: Qt3DExtras.QCuboidMesh, x: float, y: float, z: float
+    ):
         """
         Sets the dimensions of a cube mesh.
         :param cube_mesh: The cube mesh to modify.
@@ -270,7 +292,9 @@ class InstrumentView(QWidget):
         sample_material = create_material(
             QColor("red"), dark_red, self.component_root_entity, alpha=0.5
         )
-        create_qentity([cube_mesh, sample_material], self.component_root_entity)
+        self.component_entities["sample"] = create_qentity(
+            [cube_mesh, sample_material], self.component_root_entity
+        )
 
     def initialise_view(self):
         """
