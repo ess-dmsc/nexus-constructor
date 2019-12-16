@@ -3,7 +3,11 @@ from pytestqt import qtbot
 import pytest
 from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
-from tests.ui_tests.test_ui_add_component_window import add_component_dialog
+from tests.ui_tests.test_ui_add_component_window import (
+    add_component_dialog,
+    template,
+    mock_pixel_options,
+)
 
 
 @pytest.fixture
