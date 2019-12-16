@@ -73,7 +73,7 @@ class StreamFieldsWidget(QDialog):
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
         self.minimum_spinbox_value = 0
-        self.maximum_spinbox_value = 100000000
+        self.maximum_spinbox_value = 100_000_000
 
         self.hs00_unimplemented_label = QLabel(
             "hs00 (Event histograms) has not yet been fully implemented."
@@ -353,6 +353,10 @@ class StreamFieldsWidget(QDialog):
         if self.array_radio.isChecked():
             stream_group.create_dataset(
                 "array_size", data=self.array_size_spinbox.value()
+            )
+        if self.value_units_edit.text():
+            stream_group.create_dataset(
+                "value_units", data=self.value_units_edit.text()
             )
         if self.advanced_options_enabled:
             # Use strings for names, we don't care if it's byte-encoded as it will output to JSON anyway.
