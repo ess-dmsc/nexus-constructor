@@ -1,4 +1,3 @@
-import uuid
 from functools import partial
 from typing import List, ItemsView
 
@@ -18,6 +17,8 @@ from PySide2.QtWidgets import (
     QFormLayout,
 )
 import numpy as np
+
+from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
 
 SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime", "senv"]
 F142_TYPES = [
@@ -283,9 +284,7 @@ class StreamFieldsWidget(QDialog):
         :return: The created HDF group.
         """
 
-        temp_file = h5py.File(
-            name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
-        )
+        temp_file = create_temporary_in_memory_file()
         group = temp_file.create_group("children")
         group.create_dataset(name="type", dtype=STRING_DTYPE, data="stream")
         stream_group = group.create_group(self.parent().parent().field_name_edit.text())

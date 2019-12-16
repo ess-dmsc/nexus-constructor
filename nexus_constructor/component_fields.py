@@ -1,5 +1,4 @@
 import logging
-import uuid
 from functools import partial
 
 import h5py
@@ -21,6 +20,7 @@ from nexus_constructor.component.component import Component
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import validate_line_edit, show_warning_dialog
@@ -225,18 +225,16 @@ class FieldWidget(QFrame):
             dtype = DATASET_TYPE[self.value_type_combo.currentText()]
             val = self.value_line_edit.text()
             if dtype == h5py.special_dtype(vlen=str):
-                return_object = h5py.File(
-                    name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
-                ).create_dataset(name=self.name, dtype=dtype, data=val)
+                return_object = create_temporary_in_memory_file().create_dataset(
+                    name=self.name, dtype=dtype, data=val
+                )
             else:
-                return_object = h5py.File(
-                    name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
-                ).create_dataset(name=self.name, dtype=dtype, data=dtype(val))
+                return_object = create_temporary_in_memory_file().create_dataset(
+                    name=self.name, dtype=dtype, data=dtype(val)
+                )
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
-            return_object = h5py.File(
-                name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
-            ).create_dataset(
+            return_object = create_temporary_in_memory_file().create_dataset(
                 name=self.name, data=np.squeeze(self.table_view.model.array)
             )
         elif self.field_type == FieldType.kafka_stream:
