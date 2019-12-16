@@ -573,3 +573,14 @@ def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_add
 
     assert len(sample_component.transforms) == 1
     assert sample_component.transforms[0].type == "Rotation"
+
+
+def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raises_value_error(
+    component_tree_view, component_model
+):
+    sample_component_index = get_sample_index(component_tree_view)
+    component_tree_view.setCurrentIndex(sample_component_index)
+    with pytest.raises(ValueError):
+        add_transformation(
+            "NotAKnownTransformation", component_tree_view, component_model
+        )
