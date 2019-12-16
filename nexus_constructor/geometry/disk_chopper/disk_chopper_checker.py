@@ -255,7 +255,6 @@ def _units_are_valid(units_dict: dict) -> bool:
     return good_units
 
 
-
 class NexusDefinedChopperChecker:
     def __init__(self, disk_chopper: Group):
 

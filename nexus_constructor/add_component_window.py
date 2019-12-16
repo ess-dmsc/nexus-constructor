@@ -16,12 +16,6 @@ from nexus_constructor.geometry import (
 )
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
-    UserDefinedChopperChecker,
-)
-from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
-    DiskChopperGeometryCreator,
-)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import (
     make_dictionary_of_class_definitions,
@@ -558,9 +552,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         chopper_with_no_shape = self.component_is_chopper_with_no_shape(nx_class)
         # remove the previous object from the qt3d view
-        if not isinstance(
-            self.component_to_edit.shape[0], NoShapeGeometry
-        ):
+        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
         # remove previous fields
         for field_group in self.component_to_edit.group.values():

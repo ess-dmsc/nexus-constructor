@@ -9,7 +9,6 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     SLIT_HEIGHT_NAME,
     RADIUS_NAME,
     SLIT_EDGES_NAME,
-    UserDefinedChopperChecker,
     NexusDefinedChopperChecker,
     NAME,
     _data_has_correct_type,
@@ -164,11 +163,6 @@ def units_dict_mocks(
 
 
 @pytest.fixture(scope="function")
-def user_defined_chopper_checker(mock_fields_list_widget):
-    return UserDefinedChopperChecker(mock_fields_list_widget)
-
-
-@pytest.fixture(scope="function")
 def nexus_disk_chopper():
     with InMemoryFile("test_disk_chopper") as nexus_file:
         disk_chopper_group = nexus_file.create_group("Disk Chopper")
@@ -297,24 +291,18 @@ def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_ar
     assert _edges_array_has_correct_shape(row_array.ndim, row_array.shape)
 
 
-def test_GIVEN_valid_values_WHEN_validating_chopper_input_THEN_returns_true(
-    user_defined_chopper_checker, mock_slit_edges_widget
-):
-    assert user_defined_chopper_checker.validate_chopper()
-
-
 def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    nexus_defined_chopper_checker, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value = np.array(
+    nexus_defined_chopper_checker.required_fields_present()
+    nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME] = np.array(
         [[[i * 1.0 for i in range(6)] for _ in range(6)] for _ in range(6)]
     )
 
-    assert user_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
-        user_defined_chopper_checker.fields_dict, units_dict_mocks
+        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
     )
-    assert not user_defined_chopper_checker.validate_chopper()
+    assert not nexus_defined_chopper_checker.validate_chopper()
 
 
 def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopper_input_THEN_returns_false(
