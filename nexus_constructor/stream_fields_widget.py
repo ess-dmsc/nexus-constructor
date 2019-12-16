@@ -1,6 +1,6 @@
 import uuid
 from functools import partial
-from typing import List, ItemsView
+from typing import List, ItemsView, Dict
 
 import h5py
 from PySide2.QtCore import Qt
@@ -73,7 +73,7 @@ class StreamFieldsWidget(QDialog):
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
         self.minimum_spinbox_value = 0
-        self.maximum_spinbox_value = 100000000
+        self.maximum_spinbox_value = 100_000_000
 
         self.hs00_unimplemented_label = QLabel(
             "hs00 (Event histograms) has not yet been fully implemented."
@@ -316,19 +316,15 @@ class StreamFieldsWidget(QDialog):
         :param stream_group: The group to apply fields to.
         """
         if self.advanced_options_enabled:
-            stream_group.create_dataset(
-                ADC_PULSE_DEBUG,
-                dtype=bool,
-                data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
-            )
-
-            for (
-                nexus_string,
-                ui_element,
-            ) in self.ev42_nexus_to_spinner_ui_element.items():
+            if self.ev42_adc_pulse_debug_checkbox.isChecked():
                 stream_group.create_dataset(
-                    nexus_string, dtype=int, data=ui_element.value()
+                    ADC_PULSE_DEBUG,
+                    dtype=bool,
+                    data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
                 )
+            self.__create_dataset_from_spinner(
+                stream_group, self.ev42_nexus_to_spinner_ui_element
+            )
 
     def _create_f142_fields(self, stream_group: h5py.Group):
         """
@@ -343,11 +339,16 @@ class StreamFieldsWidget(QDialog):
                 "array_size", data=self.array_size_spinbox.value()
             )
         if self.advanced_options_enabled:
-            # Use strings for names, we don't care if it's byte-encoded as it will output to JSON anyway.
-            for (
-                nexus_string,
-                ui_element,
-            ) in self.f142_nexus_to_spinner_ui_element.items():
+            self.__create_dataset_from_spinner(
+                stream_group, self.f142_nexus_to_spinner_ui_element
+            )
+
+    @staticmethod
+    def __create_dataset_from_spinner(
+        stream_group: h5py.Group, nexus_to_spinner_dict: Dict[str, QSpinBox]
+    ):
+        for (nexus_string, ui_element) in nexus_to_spinner_dict.items():
+            if ui_element.value > 0:
                 stream_group.create_dataset(
                     nexus_string, dtype=int, data=ui_element.value()
                 )
