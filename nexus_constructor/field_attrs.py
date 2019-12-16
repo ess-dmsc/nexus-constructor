@@ -115,6 +115,9 @@ class FieldAttrFrame(QFrame):
                 tooltip_on_reject="Value is not cast-able to selected numpy type.",
             )
         )
+        self.attr_value_lineedit.validator().validate(
+            self.attr_value_lineedit.text(), 0
+        )
 
     @property
     def dtype(self):
