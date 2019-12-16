@@ -108,14 +108,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.new_translation_action = create_and_add_toolbar_action(
             "new_translation.png",
             "New Translation",
-            self.on_add_translation,
+            lambda: self._add_transformation("translation"),
             self.component_tool_bar,
             self.component_tree_view_tab,
         )
         self.new_rotation_action = create_and_add_toolbar_action(
             "new_rotation.png",
             "New Rotation",
-            self.on_add_rotation,
+            lambda: self._add_transformation("rotation"),
             self.component_tool_bar,
             self.component_tree_view_tab,
         )
@@ -227,9 +227,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self._expand_transformation_list(selected[0])
             self._set_button_state()
 
-    def on_clicked(self, index):
-        self._set_button_state()
-
     def on_duplicate_node(self):
         selected = self.component_tree_view.selectedIndexes()
         if len(selected) > 0:
@@ -243,12 +240,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         add_transformation(
             transformation_type, self.component_tree_view, self.component_model
         )
-
-    def on_add_translation(self):
-        self._add_transformation("translation")
-
-    def on_add_rotation(self):
-        self._add_transformation("rotation")
 
     def set_up_warning_window(self):
         """
