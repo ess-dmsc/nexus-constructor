@@ -304,6 +304,7 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     component_model,
     set_of_all_actions,
 ):
+    # Create and select a transformation
     sample_component_index = get_sample_index(component_tree_view)
     add_transformation_at_index(
         component_model, component_tree_view, sample_component_index
@@ -356,6 +357,7 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     component_model,
     set_of_all_actions,
 ):
+    # Create and select a link
     sample_component_index = get_sample_index(component_tree_view)
     add_link_at_index(component_model, component_tree_view, sample_component_index)
     transformation_list_index = get_transformation_list_index(
@@ -399,12 +401,9 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
     component_model,
     set_of_all_actions,
 ):
+    # Add a link then select the sample component
     sample_component_index = get_sample_index(component_tree_view)
     add_link_at_index(component_model, component_tree_view, sample_component_index)
-    transformation_list_index = get_transformation_list_index(
-        component_model, component_tree_view, sample_component_index
-    )
-    component_tree_view.expand(transformation_list_index)
     component_tree_view.setCurrentIndex(sample_component_index)
 
     set_button_state(
@@ -437,6 +436,7 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_T
     component_model,
     set_of_all_actions,
 ):
+    # Add a link then select the transformation list
     sample_component_index = get_sample_index(component_tree_view)
     add_link_at_index(component_model, component_tree_view, sample_component_index)
     transformation_list_index = get_transformation_list_index(
@@ -474,8 +474,9 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
     component_model,
     set_of_all_actions,
 ):
+    # Select the transformation list without creating a link
     sample_component_index = get_sample_index(component_tree_view)
-    component_tree_view.setCurrentIndex(sample_component_index)
+
     transformation_list_index = get_transformation_list_index(
         component_model, component_tree_view, sample_component_index
     )
