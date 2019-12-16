@@ -40,7 +40,7 @@ def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_combo_is_changed_THEN_value
     assert widget.value_units_label.isEnabled()
 
 
-def test_ui_stream_field_GIVEN_value_units_is_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_appears_as_dataset(
+def test_ui_stream_field_GIVEN_value_units_is_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_appears_as_field(
     qtbot, create_stream_widget
 ):
 
@@ -57,7 +57,7 @@ def test_ui_stream_field_GIVEN_value_units_is_specified_WHEN_getting_stream_grou
     assert value == group["value_units"][()]
 
 
-def test_ui_stream_field_GIVEN_value_units_is_not_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_does_not_appear_as_dataset(
+def test_ui_stream_field_GIVEN_value_units_is_not_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_does_not_appear_as_field(
     qtbot, create_stream_widget
 ):
 
