@@ -149,7 +149,7 @@ def set_of_all_actions(
     }
 
 
-def get_sample_index(component_tree_view: QTreeView):
+def get_sample_index(component_tree_view: QTreeView) -> QModelIndex:
     return component_tree_view.indexAt(QPoint(0, 0))
 
 
@@ -175,7 +175,7 @@ def get_transformation_list_index(
     component_model: ComponentTreeModel,
     component_tree_view: QTreeView,
     component_index: QModelIndex,
-):
+) -> QModelIndex:
     component_tree_view.expand(component_index)
     return component_model.index(1, 0, component_index)
 
@@ -184,7 +184,7 @@ def get_transformation_or_link_index(
     component_model: ComponentTreeModel,
     component_tree_view: QTreeView,
     transformation_list_index: QModelIndex,
-):
+) -> QModelIndex:
     component_tree_view.expand(transformation_list_index)
     return component_model.index(0, 0, transformation_list_index)
 
@@ -476,7 +476,6 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
 ):
     # Select the transformation list without creating a link
     sample_component_index = get_sample_index(component_tree_view)
-
     transformation_list_index = get_transformation_list_index(
         component_model, component_tree_view, sample_component_index
     )
@@ -552,21 +551,25 @@ def test_GIVEN_item_is_transformation_WHEN_expanding_transformation_list_THEN_tr
     assert component_tree_view.isExpanded(transformation_list_index)
 
 
-def test_GIVEN_translation_is_added_WHEN_adding_transformation_THEN_translation_is_added_to_component_model(
+def test_GIVEN_translation_is_added_WHEN_adding_transformation_THEN_translation_is_added_to_component(
     component_tree_view, component_model
 ):
     sample_component_index = get_sample_index(component_tree_view)
     component_tree_view.setCurrentIndex(sample_component_index)
     add_transformation("translation", component_tree_view, component_model)
+    sample_component = sample_component_index.internalPointer()
 
-    # assert
+    assert len(sample_component.transforms) == 1
+    assert sample_component.transforms[0].type == "Translation"
 
 
-def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_added_to_component_model(
+def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_added_to_component(
     component_tree_view, component_model
 ):
     sample_component_index = get_sample_index(component_tree_view)
     component_tree_view.setCurrentIndex(sample_component_index)
     add_transformation("rotation", component_tree_view, component_model)
+    sample_component = sample_component_index.internalPointer()
 
-    # assert
+    assert len(sample_component.transforms) == 1
+    assert sample_component.transforms[0].type == "Rotation"
