@@ -20,6 +20,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     FLOAT_TYPES,
     _incorrect_data_type_message,
     INT_TYPES,
+    REQUIRED_CHOPPER_FIELDS,
 )
 from tests.chopper_test_helpers import (
     N_SLITS,
@@ -436,32 +437,18 @@ def test_GIVEN_field_has_wrong_type_WHEN_validating_chopper_input_THEN_valid_cho
     )
 
 
-def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_matches_fields_widget_input(
-    user_defined_chopper_checker,
-    mock_slit_edges_widget,
-    mock_slits_widget,
-    mock_radius_widget,
-    mock_slit_height_widget,
+def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_matches_nexus_group(
+    nexus_defined_chopper_checker, nexus_disk_chopper
 ):
-    user_defined_chopper_checker.validate_chopper()
-    details = user_defined_chopper_checker.chopper_details
+    nexus_defined_chopper_checker.validate_chopper()
+    details = nexus_defined_chopper_checker.chopper_details
 
     assert np.allclose(details.slit_edges, RADIANS_EDGES_ARR)
-    assert details.slits == mock_slits_widget.value[()]
-    assert details.radius == pytest.approx(mock_radius_widget.value[()])
-    assert details.slit_height == pytest.approx(mock_slit_height_widget.value[()])
-
-
-def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_details_are_returned(
-    user_defined_chopper_checker
-):
-    user_defined_chopper_checker.validate_chopper()
-    chopper_details = user_defined_chopper_checker.chopper_details
-
-    assert chopper_details.slits == N_SLITS
-    assert chopper_details.radius == pytest.approx(RADIUS_LENGTH)
-    assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
-    assert np.allclose(chopper_details.slit_edges, RADIANS_EDGES_ARR)
+    assert details.slits == nexus_disk_chopper[SLITS_NAME][()]
+    assert details.radius == pytest.approx(nexus_disk_chopper[RADIUS_NAME][()])
+    assert details.slit_height == pytest.approx(
+        nexus_disk_chopper[SLIT_HEIGHT_NAME][()]
+    )
 
 
 def test_GIVEN_valid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_true(
@@ -470,111 +457,20 @@ def test_GIVEN_valid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_valida
     assert nexus_defined_chopper_checker.validate_chopper()
 
 
-def test_GIVEN_complete_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_true(
-    nexus_defined_chopper_checker
-):
-    assert nexus_defined_chopper_checker.required_fields_present()
-
-
+@pytest.mark.parametrize("required_field", REQUIRED_CHOPPER_FIELDS)
 def test_GIVEN_nexus_disk_chopper_with_no_slits_value_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
-    nexus_defined_chopper_checker
+    nexus_defined_chopper_checker, required_field, nexus_disk_chopper
 ):
-    del nexus_defined_chopper_checker._disk_chopper[SLITS_NAME]
+    del nexus_defined_chopper_checker._disk_chopper[required_field]
     assert not nexus_defined_chopper_checker.required_fields_present()
-
-
-def test_GIVEN_nexus_disk_chopper_with_no_slit_edges_array_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[SLIT_EDGES_NAME]
-    assert not nexus_defined_chopper_checker.required_fields_present()
-
-
-def test_GIVEN_nexus_disk_chopper_with_no_radius_value_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[RADIUS_NAME]
-    assert not nexus_defined_chopper_checker.required_fields_present()
-
-
-def test_GIVEN_nexus_disk_chopper_with_no_slit_height_value_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[SLIT_HEIGHT_NAME]
-    assert not nexus_defined_chopper_checker.required_fields_present()
-
-
-def test_GIVEN_nexus_disk_chopper_with_no_slit_edge_units_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[SLITS_NAME]
-    assert not nexus_defined_chopper_checker.required_fields_present()
-
-
-def test_GIVEN_nexus_disk_chopper_with_no_slit_height_units_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[SLIT_HEIGHT_NAME].attrs["units"]
-    assert not nexus_defined_chopper_checker.required_fields_present()
-
-
-def test_GIVEN_nexus_disk_chopper_with_no_radius_units_WHEN_validating_disk_chopper_THEN_required_fields_present_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[RADIUS_NAME].attrs["units"]
-    assert not nexus_defined_chopper_checker.required_fields_present()
-
-
-def test_GIVEN_nexus_disk_chopper_with_wrong_field_type_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[SLITS_NAME]
-    nexus_defined_chopper_checker._disk_chopper[SLITS_NAME] = "string"
-    assert nexus_defined_chopper_checker.required_fields_present()
-    assert not nexus_defined_chopper_checker.validate_chopper()
-
-
-def test_GIVEN_nexus_disk_chopper_with_wrong_edges_array_shape_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_false(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[SLIT_EDGES_NAME]
-    nexus_defined_chopper_checker._disk_chopper[SLIT_EDGES_NAME] = np.ones(shape=(5, 5))
-    nexus_defined_chopper_checker._disk_chopper[SLIT_EDGES_NAME].attrs[
-        "units"
-    ] = str.encode("rad")
-    assert nexus_defined_chopper_checker.required_fields_present()
-    assert not nexus_defined_chopper_checker.validate_chopper()
-
-
-def test_GIVEN_invalid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_true(
-    nexus_defined_chopper_checker
-):
-    del nexus_defined_chopper_checker._disk_chopper[SLITS_NAME]
-    nexus_defined_chopper_checker._disk_chopper[SLITS_NAME] = 200
-    assert nexus_defined_chopper_checker.required_fields_present()
-    assert not nexus_defined_chopper_checker.validate_chopper()
-
-
-def test_GIVEN_validation_passes_WHEN_validating_nexus_disk_chopper_THEN_chopper_details_has_expected_values(
-    nexus_defined_chopper_checker
-):
-    nexus_defined_chopper_checker.validate_chopper()
-    chopper_details = nexus_defined_chopper_checker.chopper_details
-
-    assert chopper_details.slits == N_SLITS
-    assert np.allclose(chopper_details.slit_edges, RADIANS_EDGES_ARR)
-    assert chopper_details.radius == pytest.approx(RADIUS_LENGTH)
-    assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_user_defined_chopper_checker_GIVEN_units_missing_WHEN_checking_that_required_fields_are_present_THEN_returns_false(
-    user_defined_chopper_checker, field_that_needs_units
+    nexus_defined_chopper_checker, nexus_disk_chopper, field_that_needs_units
 ):
-    user_defined_chopper_checker.fields_dict[
-        field_that_needs_units
-    ].attrs.__getitem__ = Mock(side_effect=KeyError)
-    assert not user_defined_chopper_checker.required_fields_present()
+    del nexus_disk_chopper[field_that_needs_units].attrs["units"]
+    assert not nexus_defined_chopper_checker.required_fields_present()
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
