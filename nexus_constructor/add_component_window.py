@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from enum import Enum
 
 import h5py
 from PySide2.QtGui import QVector3D
@@ -46,12 +45,6 @@ from nexus_constructor.component.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
-
-
-class GeometryType(Enum):
-    NONE = 1
-    CYLINDER = 2
-    MESH = 3
 
 
 def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
@@ -117,7 +110,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.setParent(parent)
         self.instrument = instrument
         self.component_model = component_model
-        self.geometry_model = None
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             definitions_dir
         )

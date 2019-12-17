@@ -42,7 +42,7 @@ def generate_json(
 
     converter = NexusToDictConverter()
     tree = converter.convert(data.nexus.nexus_file, streams, links)
-    write_command, stop_command = create_writer_commands(
+    write_command, _ = create_writer_commands(
         tree,
         nexus_file_name,
         broker=broker,

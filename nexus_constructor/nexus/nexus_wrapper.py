@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 import h5py
 from PySide2.QtCore import Signal, QObject
@@ -43,6 +44,14 @@ def decode_bytes_string(nexus_string):
         return str(nexus_string, encoding="utf8")
     except TypeError:
         return nexus_string
+
+
+def create_temporary_in_memory_file() -> h5py.File:
+    """
+    Create a temporary in-memory nexus file with a random name.
+    :return: The file object
+    """
+    return set_up_in_memory_nexus_file(str(uuid.uuid4()))
 
 
 def get_fields(

@@ -18,8 +18,6 @@ from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.validators import PixelValidator
 from ui.pixel_options import Ui_PixelOptionsWidget
 
-RED_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #f6989d }"
-WHITE_BACKGROUND_STYLE_SHEET = "QSpinBox { background-color: #FFFFFF }"
 
 BOTTOM_LEFT_TEXT = "Bottom Left"
 BOTTOM_RIGHT_TEXT = "Bottom Right"
