@@ -483,7 +483,7 @@ def test_chopper_checker_GIVEN_input_cant_be_converted_to_any_units_WHEN_validat
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_chopper_checker_GIVEN_unit_has_wrong_type_WHEN_validating_units_THEN_returns_false(
-    user_defined_chopper_checker, field_that_needs_units, units_dict_mocks
+    field_that_needs_units, units_dict_mocks
 ):
     units_dict_mocks[field_that_needs_units] = IMPROPER_UNITS[field_that_needs_units]
     assert not _units_are_valid(units_dict_mocks)
@@ -491,7 +491,7 @@ def test_chopper_checker_GIVEN_unit_has_wrong_type_WHEN_validating_units_THEN_re
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validating_units_THEN_returns_false(
-    user_defined_chopper_checker, field_that_needs_units, units_dict_mocks
+    field_that_needs_units, units_dict_mocks
 ):
     units_dict_mocks[field_that_needs_units] = (
         "50 " + EXPECTED_UNIT_TYPE[field_that_needs_units]
@@ -508,45 +508,13 @@ def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validat
     assert not nexus_defined_chopper_checker.validate_chopper()
 
 
-def test_user_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validating_chopper_THEN_returns_false(
-    user_defined_chopper_checker, mock_radius_widget
-):
-    mock_radius_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key="units", data=True)
-    )
-    assert not user_defined_chopper_checker.validate_chopper()
-
-
-@pytest.mark.parametrize(
-    "units_attribute", ["degree", "degrees", "degs", "arcdegree", "arcdegrees", "°"]
-)
-def test_chopper_checker_GIVEN_different_ways_of_writing_degrees_WHEN_creating_chopper_details_THEN_slit_edges_array_is_converted(
-    user_defined_chopper_checker, mock_slit_edges_widget, units_attribute
-):
-
-    mock_slit_edges_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key="units", data=units_attribute
-        )
-    )
-    user_defined_chopper_checker.validate_chopper()
-    assert np.allclose(
-        user_defined_chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR
-    )
-
-
 @pytest.mark.parametrize("units_attribute", ["radians", "rad", "radian"])
-def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_chopper_details_THEN_slit_edges_array_has_expected_values(
-    user_defined_chopper_checker, mock_slit_edges_widget, units_attribute
+def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_chopper_details_THEN_slit_edges_array_is_converted(
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_attribute
 ):
-
-    mock_slit_edges_widget.value = RADIANS_EDGES_ARR
-    mock_slit_edges_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key="units", data=units_attribute
-        )
-    )
-    user_defined_chopper_checker.validate_chopper()
+    del nexus_disk_chopper[SLIT_EDGES_NAME].attrs["units"]
+    nexus_disk_chopper[SLIT_EDGES_NAME].attrs["units"] = str.encode(units_attribute)
+    nexus_defined_chopper_checker.validate_chopper()
     assert np.allclose(
-        user_defined_chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR
+        nexus_defined_chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR
     )
