@@ -23,8 +23,8 @@ from tests.chopper_test_helpers import (
     N_SLITS,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
-    degrees_edges_arr,
-    radians_edges_arr,
+    degrees_edges_arr,  # noqa: F401
+    radians_edges_arr,  # noqa: F401
 )
 from tests.helpers import InMemoryFile
 

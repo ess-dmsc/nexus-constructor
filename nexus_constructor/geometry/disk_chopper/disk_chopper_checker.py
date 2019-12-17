@@ -1,7 +1,6 @@
 import logging
 from typing import Sequence, Dict
 
-from PySide2.QtWidgets import QListWidget
 import numpy as np
 from h5py import Group
 

@@ -6,8 +6,8 @@ from tests.chopper_test_helpers import (
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
     CONVERT_DEGREES_TO_RADIANS,
-    radians_edges_arr,
-    degrees_edges_arr,
+    radians_edges_arr,  # noqa: F401
+    degrees_edges_arr,  # noqa: F401
 )
 
 
