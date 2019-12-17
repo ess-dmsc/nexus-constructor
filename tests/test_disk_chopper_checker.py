@@ -292,13 +292,15 @@ def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_ar
 
 
 def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    nexus_defined_chopper_checker.required_fields_present()
-    nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME] = np.array(
+    del nexus_disk_chopper[SLIT_EDGES_NAME]
+    nexus_disk_chopper[SLIT_EDGES_NAME] = np.array(
         [[[i * 1.0 for i in range(6)] for _ in range(6)] for _ in range(6)]
     )
+    nexus_disk_chopper[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
 
+    assert nexus_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
         nexus_defined_chopper_checker.fields_dict, units_dict_mocks
     )
