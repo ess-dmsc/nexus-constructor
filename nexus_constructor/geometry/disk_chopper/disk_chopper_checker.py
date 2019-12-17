@@ -301,9 +301,12 @@ class NexusDefinedChopperChecker:
                     self.units_dict[field] = units.decode()
             except KeyError:
                 missing_units.append(field)
-                logging.info(f"{UNABLE} Unit information is missing from {field}.")
 
         if len(missing_units) > 0:
+            logging.info(
+                f"{UNABLE} Unit information is missing from field(s):",
+                ", ".join(missing_fields),
+            )
             return False
 
         return True
