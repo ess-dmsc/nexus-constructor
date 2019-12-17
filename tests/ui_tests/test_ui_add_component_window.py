@@ -1895,7 +1895,7 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 
     field_name = "stream1"
 
-    file = h5py.File("temp", driver="core", backing_store=False)
+    file = h5py.File("temp", driver="core", backing_store=False, mode="x")
     stream_group = file.create_group(name=field_name)
     stream_group.attrs["NX_class"] = "NCstream"
 
