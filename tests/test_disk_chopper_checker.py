@@ -1,9 +1,6 @@
 import pytest
-from PySide2.QtWidgets import QListWidget
-from mock import Mock
 import numpy as np
 
-from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     SLITS_NAME,
     SLIT_HEIGHT_NAME,
