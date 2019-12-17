@@ -2094,7 +2094,7 @@ def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
     assert field.value.path == h5py.SoftLink(field_target).path
 
 
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_creator_is_called(
+def test_UI_GIVEN_valid_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_creator_is_called(
     qtbot, add_component_dialog, template
 ):
     enter_disk_chopper_fields(qtbot, add_component_dialog, template)
@@ -2108,7 +2108,7 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_ch
 
 
 @pytest.mark.parametrize("geometry_type", ["Cylinder", "Mesh"])
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_chopper_geometry_is_not_created(
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_or_cylinder_shape_THEN_chopper_creator_is_not_called(
     qtbot, add_component_dialog, template, geometry_type
 ):
     systematic_button_press(
