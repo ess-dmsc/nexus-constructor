@@ -19,7 +19,13 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     INT_TYPES,
     REQUIRED_CHOPPER_FIELDS,
 )
-from tests.chopper_test_helpers import N_SLITS, RADIUS_LENGTH, SLIT_HEIGHT_LENGTH
+from tests.chopper_test_helpers import (
+    N_SLITS,
+    RADIUS_LENGTH,
+    SLIT_HEIGHT_LENGTH,
+    degrees_edges_arr,
+    radians_edges_arr,
+)
 from tests.helpers import InMemoryFile
 
 
@@ -52,8 +58,18 @@ def change_nexus_value(chopper_group, field_name, new_value, units: str = None):
 
 
 @pytest.fixture(scope="function")
-def units_dict_mocks():
+def units_dict():
     return {RADIUS_NAME: "m", SLIT_EDGES_NAME: "rad", SLIT_HEIGHT_NAME: "m"}
+
+
+@pytest.fixture(scope="function")
+def fields_dict(radians_edges_arr):
+    return {
+        SLITS_NAME: N_SLITS,
+        RADIUS_NAME: RADIUS_LENGTH,
+        SLIT_EDGES_NAME: radians_edges_arr,
+        SLIT_HEIGHT_NAME: SLIT_HEIGHT_LENGTH,
+    }
 
 
 @pytest.fixture(scope="function")
@@ -77,18 +93,20 @@ def nexus_defined_chopper_checker(nexus_disk_chopper):
 
 
 def test_GIVEN_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_true(
-    mock_radius_widget
+    nexus_disk_chopper
 ):
-    assert _check_data_type(mock_radius_widget, FLOAT_TYPES)
+    assert _check_data_type(nexus_disk_chopper[SLIT_EDGES_NAME][()], FLOAT_TYPES)
 
 
 def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_false(
-    mock_slits_widget
+    nexus_disk_chopper
 ):
-    assert not _check_data_type(mock_slits_widget, FLOAT_TYPES)
+    assert not _check_data_type(nexus_disk_chopper[SLIT_EDGES_NAME][()], INT_TYPES)
 
 
-def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned():
+def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned(
+    fields_dict
+):
     field_dict = {RADIUS_NAME: "string"}
     error_message = _incorrect_data_type_message(field_dict, RADIUS_NAME, "float")
 
@@ -100,74 +118,20 @@ def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_ty
     )
 
 
-def test_GIVEN_valid_fields_information_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_true(
-    fields_dict_mocks, units_dict_mocks
+@pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
+def test_GIVEN_invalid_units_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
+    fields_dict, units_dict, field_that_needs_units
 ):
-    assert _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
+    units_dict[field_that_needs_units] = 123
+    assert not _data_has_correct_type(fields_dict, units_dict)
 
 
-def test_GIVEN_invalid_slits_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
+@pytest.mark.parametrize("required_field", REQUIRED_CHOPPER_FIELDS)
+def test_GIVEN_invalid_field_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
+    fields_dict, units_dict, required_field
 ):
-    fields_dict_mocks[SLITS_NAME].dtype = FLOAT_TYPES[0]
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_invalid_radius_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
-):
-    fields_dict_mocks[RADIUS_NAME].dtype = INT_TYPES[0]
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_invalid_slit_height_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
-):
-    fields_dict_mocks[SLIT_HEIGHT_NAME].dtype = INT_TYPES[0]
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_invalid_slit_edges_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
-):
-    fields_dict_mocks[SLIT_EDGES_NAME].dtype = INT_TYPES[0]
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_invalid_radius_units_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
-):
-
-    units_dict_mocks[RADIUS_NAME] = 123
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_invalid_slit_height_units_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
-):
-
-    units_dict_mocks[SLIT_HEIGHT_NAME] = False
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_invalid_slit_edges_units_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
-):
-
-    units_dict_mocks[SLIT_EDGES_NAME] = 13.2
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_edges_array_with_valid_shape_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
-    valid_array = np.array([i for i in range(6)])
-    assert _edges_array_has_correct_shape(valid_array.ndim, valid_array.shape)
-
-
-def test_GIVEN_edges_array_with_more_than_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false():
-    three_dim_array = np.ones(shape=(5, 5, 5))
-    assert not _edges_array_has_correct_shape(
-        three_dim_array.ndim, three_dim_array.shape
-    )
+    fields_dict[required_field] = False
+    assert not _data_has_correct_type(fields_dict, units_dict)
 
 
 def test_GIVEN_edges_array_with_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false():
@@ -186,7 +150,7 @@ def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_ar
 
 
 def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict
 ):
     change_nexus_value(
         nexus_disk_chopper,
@@ -196,9 +160,7 @@ def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input
     )
 
     assert nexus_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(nexus_defined_chopper_checker.fields_dict, units_dict)
     assert not _edges_array_has_correct_shape(
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
@@ -206,14 +168,12 @@ def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input
 
 
 def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict
 ):
     change_nexus_value(nexus_disk_chopper, SLITS_NAME, 200)
 
     assert nexus_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(nexus_defined_chopper_checker.fields_dict, units_dict)
     assert _edges_array_has_correct_shape(
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
@@ -222,14 +182,12 @@ def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopp
 
 
 def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict
 ):
     change_nexus_value(nexus_disk_chopper, SLIT_HEIGHT_NAME, 200000.1, "m")
 
     assert nexus_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(nexus_defined_chopper_checker.fields_dict, units_dict)
     assert _edges_array_has_correct_shape(
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
@@ -238,15 +196,13 @@ def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_T
 
 
 def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict
 ):
     change_nexus_value(nexus_disk_chopper, SLIT_HEIGHT_NAME, 200000.1, "m")
     change_nexus_value(nexus_disk_chopper, RADIUS_NAME, 200000.1, "m")
 
     assert nexus_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(nexus_defined_chopper_checker.fields_dict, units_dict)
     assert _edges_array_has_correct_shape(
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
@@ -255,18 +211,13 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
 
 
 def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker,
-    nexus_disk_chopper,
-    units_dict_mocks,
-    radians_edges_arr,
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict, radians_edges_arr
 ):
     reversed_array = np.flip(radians_edges_arr)
     change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, reversed_array, "rad")
 
     assert nexus_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(nexus_defined_chopper_checker.fields_dict, units_dict)
     assert _edges_array_has_correct_shape(
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
@@ -275,19 +226,14 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
 
 
 def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker,
-    nexus_disk_chopper,
-    units_dict_mocks,
-    radians_edges_arr,
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict, radians_edges_arr
 ):
     repeating_array = np.copy(radians_edges_arr)
     repeating_array[0] = repeating_array[1]
     change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, repeating_array, "rad")
 
     assert nexus_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(nexus_defined_chopper_checker.fields_dict, units_dict)
     assert _edges_array_has_correct_shape(
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
@@ -296,10 +242,7 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
 
 
 def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker,
-    nexus_disk_chopper,
-    units_dict_mocks,
-    radians_edges_arr,
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict, radians_edges_arr
 ):
     overlapping_array = np.copy(radians_edges_arr)
     overlapping_array[-1] = (
@@ -310,9 +253,7 @@ def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_inp
     change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, overlapping_array, "rad")
 
     assert nexus_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(nexus_defined_chopper_checker.fields_dict, units_dict)
     assert _edges_array_has_correct_shape(
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
         nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
@@ -321,13 +262,13 @@ def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_inp
 
 
 def test_GIVEN_field_has_wrong_type_WHEN_validating_chopper_input_THEN_valid_chopper_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict
 ):
     change_nexus_value(nexus_disk_chopper, SLITS_NAME, "5")
 
     assert nexus_defined_chopper_checker.required_fields_present()
     assert not _data_has_correct_type(
-        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
+        nexus_defined_chopper_checker.fields_dict, units_dict
     )
 
 
@@ -369,28 +310,28 @@ def test_user_defined_chopper_checker_GIVEN_units_missing_WHEN_checking_that_req
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_chopper_checker_GIVEN_input_cant_be_converted_to_any_units_WHEN_validating_units_THEN_returns_false(
-    field_that_needs_units, units_dict_mocks
+    field_that_needs_units, units_dict
 ):
-    units_dict_mocks[field_that_needs_units] = "notaunit"
-    assert not _units_are_valid(units_dict_mocks)
+    units_dict[field_that_needs_units] = "notaunit"
+    assert not _units_are_valid(units_dict)
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_chopper_checker_GIVEN_unit_has_wrong_type_WHEN_validating_units_THEN_returns_false(
-    field_that_needs_units, units_dict_mocks
+    field_that_needs_units, units_dict
 ):
-    units_dict_mocks[field_that_needs_units] = IMPROPER_UNITS[field_that_needs_units]
-    assert not _units_are_valid(units_dict_mocks)
+    units_dict[field_that_needs_units] = IMPROPER_UNITS[field_that_needs_units]
+    assert not _units_are_valid(units_dict)
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
 def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validating_units_THEN_returns_false(
-    field_that_needs_units, units_dict_mocks
+    field_that_needs_units, units_dict
 ):
-    units_dict_mocks[field_that_needs_units] = (
+    units_dict[field_that_needs_units] = (
         "50 " + EXPECTED_UNIT_TYPE[field_that_needs_units]
     )
-    assert not _units_are_valid(units_dict_mocks)
+    assert not _units_are_valid(units_dict)
 
 
 def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validating_chopper_THEN_returns_false(

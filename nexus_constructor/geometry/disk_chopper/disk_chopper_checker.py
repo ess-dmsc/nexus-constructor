@@ -73,12 +73,14 @@ def _data_has_correct_type(
     :return: True if all the fields have the correct types, False otherwise.
     """
     correct_slits_type = _check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
-    correct_radius_type = _check_data_type(fields_dict[RADIUS_NAME], FLOAT_TYPES)
+    correct_radius_type = _check_data_type(
+        fields_dict[RADIUS_NAME], FLOAT_TYPES + INT_TYPES
+    )
     correct_slit_height_type = _check_data_type(
-        fields_dict[SLIT_HEIGHT_NAME], FLOAT_TYPES
+        fields_dict[SLIT_HEIGHT_NAME], FLOAT_TYPES + INT_TYPES
     )
     correct_slit_edges_type = _check_data_type(
-        fields_dict[SLIT_EDGES_NAME], FLOAT_TYPES
+        fields_dict[SLIT_EDGES_NAME], FLOAT_TYPES + INT_TYPES
     )
     correct_radius_units_type = isinstance(units_dict[RADIUS_NAME], str)
     correct_slit_height_units_type = isinstance(units_dict[SLIT_HEIGHT_NAME], str)
