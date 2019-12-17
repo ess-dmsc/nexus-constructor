@@ -371,7 +371,7 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
 def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THEN_returns_false(
     nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    reversed_array = np.flip(nexus_disk_chopper[SLIT_EDGES_NAME][()])
+    reversed_array = np.flip(RADIANS_EDGES_ARR)
     change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, reversed_array, "rad")
 
     assert nexus_defined_chopper_checker.required_fields_present()
@@ -386,84 +386,54 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
 
 
 def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[
-        0
-    ] = user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[1]
+    repeating_array = RADIANS_EDGES_ARR[:]
+    repeating_array[0] = repeating_array[1]
+    change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, repeating_array, "rad")
 
-    assert user_defined_chopper_checker.required_fields_present()
+    assert nexus_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
-        user_defined_chopper_checker.fields_dict, units_dict_mocks
+        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
     )
     assert _edges_array_has_correct_shape(
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.ndim,
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.shape,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
     )
-    assert not user_defined_chopper_checker.validate_chopper()
+    assert not nexus_defined_chopper_checker.validate_chopper()
 
 
 def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[-1] = (
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[0] + 365
+    overlapping_array = RADIANS_EDGES_ARR[:]
+    overlapping_array[-1] = (
+        overlapping_array[0]
+        + (2 * np.pi)
+        + (overlapping_array[1] - overlapping_array[0]) * 0.5
     )
+    change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, overlapping_array, "rad")
 
-    assert user_defined_chopper_checker.required_fields_present()
+    assert nexus_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
-        user_defined_chopper_checker.fields_dict, units_dict_mocks
+        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
     )
     assert _edges_array_has_correct_shape(
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.ndim,
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.shape,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
     )
-    assert not user_defined_chopper_checker.validate_chopper()
-
-
-def test_GIVEN_slits_field_is_missing_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker
-):
-    del user_defined_chopper_checker.fields_dict[SLITS_NAME]
-
-    assert not user_defined_chopper_checker.required_fields_present()
-    assert not user_defined_chopper_checker.validate_chopper()
-
-
-def test_GIVEN_slit_edges_field_is_missing_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker
-):
-    del user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME]
-
-    assert not user_defined_chopper_checker.required_fields_present()
-    assert not user_defined_chopper_checker.validate_chopper()
-
-
-def test_GIVEN_radius_field_is_missing_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker
-):
-    del user_defined_chopper_checker.fields_dict[RADIUS_NAME]
-
-    assert not user_defined_chopper_checker.required_fields_present()
-    assert not user_defined_chopper_checker.validate_chopper()
-
-
-def test_GIVEN_slit_height_field_is_missing_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker
-):
-    del user_defined_chopper_checker.fields_dict[SLIT_HEIGHT_NAME]
-
-    assert not user_defined_chopper_checker.required_fields_present()
-    assert not user_defined_chopper_checker.validate_chopper()
+    assert not nexus_defined_chopper_checker.validate_chopper()
 
 
 def test_GIVEN_field_has_wrong_type_WHEN_validating_chopper_input_THEN_valid_chopper_returns_false(
-    user_defined_chopper_checker
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[RADIUS_NAME].dtype = np.byte
+    change_nexus_value(nexus_disk_chopper, SLITS_NAME, "5")
 
-    assert user_defined_chopper_checker.required_fields_present()
-    assert not user_defined_chopper_checker.validate_chopper()
+    assert nexus_defined_chopper_checker.required_fields_present()
+    assert not _data_has_correct_type(
+        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
+    )
 
 
 def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_matches_fields_widget_input(
