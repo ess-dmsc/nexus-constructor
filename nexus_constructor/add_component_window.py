@@ -275,8 +275,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nameLineEdit.setText(self.component_to_edit.name)
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
-        component_shape = None
-
+        component_shape, _ = self.component_to_edit.shape
         if not component_shape or isinstance(component_shape, NoShapeGeometry):
             self.noShapeRadioButton.setChecked(True)
             self.noShapeRadioButton.clicked.emit()
@@ -491,7 +490,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         component_with_geometry = create_component(
             self.instrument.nexus, component.group
         )
-
         return component_with_geometry.shape
 
     def edit_existing_component(
