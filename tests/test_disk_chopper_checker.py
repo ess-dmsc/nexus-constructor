@@ -51,6 +51,13 @@ def value_side_effect(given_key, expected_key, data):
     raise KeyError
 
 
+def change_nexus_slit_edges(chopper_group, edges, units):
+
+    del chopper_group[SLIT_EDGES_NAME]
+    chopper_group[SLIT_EDGES_NAME] = np.array(edges)
+    chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode(units)
+
+
 @pytest.fixture(scope="function")
 def mock_slits_widget():
     mock_slits_widget = Mock(spec=FieldWidget)
@@ -294,11 +301,11 @@ def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_ar
 def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input_THEN_returns_false(
     nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    del nexus_disk_chopper[SLIT_EDGES_NAME]
-    nexus_disk_chopper[SLIT_EDGES_NAME] = np.array(
-        [[[i * 1.0 for i in range(6)] for _ in range(6)] for _ in range(6)]
+    change_nexus_slit_edges(
+        nexus_disk_chopper,
+        [[[i * 1.0 for i in range(6)] for _ in range(6)] for _ in range(6)],
+        "rad",
     )
-    nexus_disk_chopper[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
 
     assert nexus_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
@@ -308,7 +315,7 @@ def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input
 
 
 def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    nexus_defined_chopper_checker, units_dict_mocks
 ):
     user_defined_chopper_checker.fields_dict[SLITS_NAME].value.__getitem__ = Mock(
         return_value=5
