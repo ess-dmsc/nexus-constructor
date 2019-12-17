@@ -277,9 +277,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
         component_shape = None
 
-        if not self.component_is_chopper_with_no_shape(self.component_to_edit.nx_class):
-            component_shape, _ = self.component_to_edit.shape
-
         if not component_shape or isinstance(component_shape, NoShapeGeometry):
             self.noShapeRadioButton.setChecked(True)
             self.noShapeRadioButton.clicked.emit()
