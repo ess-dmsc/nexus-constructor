@@ -511,11 +511,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.instrument.nexus, component.group
         )
 
-        # # If the component is a "No Shape" with Chopper properties then return the result from generate_geometry_model
-        # # instead, as this will be an OFF Chopper Mesh if the input described a valid chopper
-        # if self.component_is_chopper_with_no_shape(nx_class):
-        #     return geometry_model, None
-
         return component_with_geometry.shape
 
     def component_is_chopper_with_no_shape(self, nx_class: str) -> bool:

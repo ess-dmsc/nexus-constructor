@@ -2094,37 +2094,26 @@ def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
     assert field.value.path == h5py.SoftLink(field_target).path
 
 
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_geometry_is_created(
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_creator_is_called(
     qtbot, add_component_dialog, template
 ):
-
     enter_disk_chopper_fields(qtbot, add_component_dialog, template)
 
     with patch(
-        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+        "nexus_constructor.component.chopper_shape.DiskChopperGeometryCreator.create_disk_chopper_geometry"
     ) as chopper_creator:
+        chopper_creator.return_value = (NoShapeGeometry(), None)
         add_component_dialog.on_ok()
         chopper_creator.assert_called_once()
 
 
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_nexus_chopper_creator_is_not_called(
-    qtbot, add_component_dialog, template
-):
-    enter_disk_chopper_fields(qtbot, add_component_dialog, template)
-
-    with patch(
-        "nexus_constructor.component.chopper_shape.ChopperShape.get_shape"
-    ) as get_shape_from_nexus:
-        get_shape_from_nexus.return_value = (NoShapeGeometry(), None)
-        add_component_dialog.on_ok()
-        get_shape_from_nexus.assert_not_called()
-
-
+@pytest.mark.parametrize("geometry_type", ["Cylinder", "Mesh"])
 def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_chopper_geometry_is_not_created(
-    qtbot, add_component_dialog, template
+    qtbot, add_component_dialog, template, geometry_type
 ):
-
-    systematic_button_press(qtbot, template, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, template, get_shape_type_button(add_component_dialog, geometry_type)
+    )
     enter_file_path(
         qtbot,
         add_component_dialog,
@@ -2133,11 +2122,10 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_
         VALID_CUBE_OFF_FILE,
     )
     show_and_close_window(qtbot, template)
-
     enter_disk_chopper_fields(qtbot, add_component_dialog, template)
 
     with patch(
-        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+        "nexus_constructor.component.chopper_shape.DiskChopperGeometryCreator.create_disk_chopper_geometry"
     ) as chopper_creator:
         add_component_dialog.on_ok()
         chopper_creator.assert_not_called()
@@ -2382,22 +2370,6 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     assert "array_size" in group
 
     assert group["array_size"][()] == array_size
-
-
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_THEN_chopper_geometry_is_not_created(
-    qtbot, add_component_dialog, template
-):
-
-    systematic_button_press(qtbot, template, add_component_dialog.CylinderRadioButton)
-    show_and_close_window(qtbot, template)
-
-    enter_disk_chopper_fields(qtbot, add_component_dialog, template)
-
-    with patch(
-        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
-    ) as chopper_creator:
-        add_component_dialog.on_ok()
-        chopper_creator.assert_not_called()
 
 
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
