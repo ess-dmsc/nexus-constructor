@@ -352,46 +352,37 @@ def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_T
 
 
 def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[
-        SLIT_HEIGHT_NAME
-    ].value.__getitem__ = user_defined_chopper_checker.fields_dict[
-        RADIUS_NAME
-    ].value.__getitem__ = Mock(
-        return_value=20
-    )
+    change_nexus_value(nexus_disk_chopper, SLIT_HEIGHT_NAME, 200000.1, "m")
+    change_nexus_value(nexus_disk_chopper, RADIUS_NAME, 200000.1, "m")
 
-    assert user_defined_chopper_checker.required_fields_present()
+    assert nexus_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
-        user_defined_chopper_checker.fields_dict, units_dict_mocks
+        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
     )
     assert _edges_array_has_correct_shape(
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.ndim,
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.shape,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
     )
-    assert not user_defined_chopper_checker.validate_chopper()
+    assert not nexus_defined_chopper_checker.validate_chopper()
 
 
 def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[
-        0
-    ], user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[1] = (
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[1],
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[0],
-    )
+    reversed_array = np.flip(nexus_disk_chopper[SLIT_EDGES_NAME][()])
+    change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, reversed_array, "rad")
 
-    assert user_defined_chopper_checker.required_fields_present()
+    assert nexus_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
-        user_defined_chopper_checker.fields_dict, units_dict_mocks
+        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
     )
     assert _edges_array_has_correct_shape(
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.ndim,
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.shape,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
     )
-    assert not user_defined_chopper_checker.validate_chopper()
+    assert not nexus_defined_chopper_checker.validate_chopper()
 
 
 def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
