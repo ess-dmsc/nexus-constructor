@@ -22,13 +22,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     INT_TYPES,
     REQUIRED_CHOPPER_FIELDS,
 )
-from tests.chopper_test_helpers import (
-    N_SLITS,
-    DEGREES_EDGES_ARR,
-    RADIUS_LENGTH,
-    SLIT_HEIGHT_LENGTH,
-    RADIANS_EDGES_ARR,
-)
+from tests.chopper_test_helpers import N_SLITS, RADIUS_LENGTH, SLIT_HEIGHT_LENGTH
 from tests.helpers import InMemoryFile
 
 
@@ -61,123 +55,17 @@ def change_nexus_value(chopper_group, field_name, new_value, units: str = None):
 
 
 @pytest.fixture(scope="function")
-def mock_slits_widget():
-    mock_slits_widget = Mock(spec=FieldWidget)
-    mock_slits_widget.name = SLITS_NAME
-    mock_slits_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key=(), data=N_SLITS)
-    )
-    mock_slits_widget.dtype = np.intc
-
-    return mock_slits_widget
+def units_dict_mocks():
+    return {RADIUS_NAME: "m", SLIT_EDGES_NAME: "rad", SLIT_HEIGHT_NAME: "m"}
 
 
 @pytest.fixture(scope="function")
-def mock_slit_edges_widget():
-    mock_slit_edges_widget = Mock(spec=FieldWidget)
-    mock_slit_edges_widget.name = SLIT_EDGES_NAME
-    mock_slit_edges_widget.value = np.array(DEGREES_EDGES_ARR)
-    mock_slit_edges_widget.dtype = np.single
-    mock_slit_edges_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key="units", data="deg")
-    )
-    return mock_slit_edges_widget
-
-
-@pytest.fixture(scope="function")
-def mock_radius_widget():
-    mock_radius_widget = Mock(spec=FieldWidget)
-    mock_radius_widget.name = RADIUS_NAME
-    mock_radius_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key=(), data=RADIUS_LENGTH
-        )
-    )
-    mock_radius_widget.dtype = np.single
-    mock_radius_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key="units", data="m")
-    )
-
-    return mock_radius_widget
-
-
-@pytest.fixture(scope="function")
-def mock_slit_height_widget():
-    mock_slit_height_widget = Mock(spec=FieldWidget)
-    mock_slit_height_widget.name = SLIT_HEIGHT_NAME
-    mock_slit_height_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key=(), data=SLIT_HEIGHT_LENGTH
-        )
-    )
-    mock_slit_height_widget.dtype = np.single
-    mock_slit_height_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key="units", data="m")
-    )
-
-    return mock_slit_height_widget
-
-
-@pytest.fixture(scope="function")
-def mock_widget_list(
-    mock_slits_widget,
-    mock_slit_edges_widget,
-    mock_radius_widget,
-    mock_slit_height_widget,
-):
-
-    return [
-        mock_slits_widget,
-        mock_slit_edges_widget,
-        mock_radius_widget,
-        mock_slit_height_widget,
-    ]
-
-
-@pytest.fixture(scope="function")
-def mock_fields_list_widget(mock_widget_list,):
-    list_widget = Mock(spec=QListWidget)
-    list_widget.count = Mock(return_value=len(mock_widget_list))
-
-    list_widget.itemWidget = Mock(side_effect=mock_widget_list)
-
-    return list_widget
-
-
-@pytest.fixture(scope="function")
-def fields_dict_mocks(
-    mock_slits_widget,
-    mock_slit_edges_widget,
-    mock_radius_widget,
-    mock_slit_height_widget,
-):
-
-    return {
-        SLITS_NAME: mock_slits_widget,
-        SLIT_EDGES_NAME: mock_slit_edges_widget,
-        RADIUS_NAME: mock_radius_widget,
-        SLIT_HEIGHT_NAME: mock_slit_height_widget,
-    }
-
-
-@pytest.fixture(scope="function")
-def units_dict_mocks(
-    mock_radius_widget, mock_slit_edges_widget, mock_slit_height_widget
-):
-    return {
-        RADIUS_NAME: mock_radius_widget.attrs["units"],
-        SLIT_EDGES_NAME: mock_slit_edges_widget.attrs["units"],
-        SLIT_HEIGHT_NAME: mock_slit_height_widget.attrs["units"],
-    }
-
-
-@pytest.fixture(scope="function")
-def nexus_disk_chopper():
+def nexus_disk_chopper(radians_edges_arr):
     with InMemoryFile("test_disk_chopper") as nexus_file:
         disk_chopper_group = nexus_file.create_group("Disk Chopper")
         disk_chopper_group[NAME] = "abc"
         disk_chopper_group[SLITS_NAME] = N_SLITS
-        disk_chopper_group[SLIT_EDGES_NAME] = RADIANS_EDGES_ARR
+        disk_chopper_group[SLIT_EDGES_NAME] = radians_edges_arr
         disk_chopper_group[RADIUS_NAME] = RADIUS_LENGTH
         disk_chopper_group[SLIT_HEIGHT_NAME] = SLIT_HEIGHT_LENGTH
         disk_chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
@@ -370,9 +258,12 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
 
 
 def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
+    nexus_defined_chopper_checker,
+    nexus_disk_chopper,
+    units_dict_mocks,
+    radians_edges_arr,
 ):
-    reversed_array = np.flip(RADIANS_EDGES_ARR)
+    reversed_array = np.flip(radians_edges_arr)
     change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, reversed_array, "rad")
 
     assert nexus_defined_chopper_checker.required_fields_present()
@@ -387,9 +278,12 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
 
 
 def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
+    nexus_defined_chopper_checker,
+    nexus_disk_chopper,
+    units_dict_mocks,
+    radians_edges_arr,
 ):
-    repeating_array = RADIANS_EDGES_ARR[:]
+    repeating_array = np.copy(radians_edges_arr)
     repeating_array[0] = repeating_array[1]
     change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, repeating_array, "rad")
 
@@ -405,9 +299,12 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
 
 
 def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
+    nexus_defined_chopper_checker,
+    nexus_disk_chopper,
+    units_dict_mocks,
+    radians_edges_arr,
 ):
-    overlapping_array = RADIANS_EDGES_ARR[:]
+    overlapping_array = np.copy(radians_edges_arr)
     overlapping_array[-1] = (
         overlapping_array[0]
         + (2 * np.pi)
@@ -443,7 +340,7 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
     nexus_defined_chopper_checker.validate_chopper()
     details = nexus_defined_chopper_checker.chopper_details
 
-    assert np.allclose(details.slit_edges, RADIANS_EDGES_ARR)
+    assert np.allclose(details.slit_edges, nexus_disk_chopper[SLIT_EDGES_NAME][()])
     assert details.slits == nexus_disk_chopper[SLITS_NAME][()]
     assert details.radius == pytest.approx(nexus_disk_chopper[RADIUS_NAME][()])
     assert details.slit_height == pytest.approx(
@@ -510,11 +407,14 @@ def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validat
 
 @pytest.mark.parametrize("units_attribute", ["radians", "rad", "radian"])
 def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_chopper_details_THEN_slit_edges_array_is_converted(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_attribute
+    nexus_defined_chopper_checker,
+    nexus_disk_chopper,
+    units_attribute,
+    radians_edges_arr,
 ):
     del nexus_disk_chopper[SLIT_EDGES_NAME].attrs["units"]
     nexus_disk_chopper[SLIT_EDGES_NAME].attrs["units"] = str.encode(units_attribute)
     nexus_defined_chopper_checker.validate_chopper()
     assert np.allclose(
-        nexus_defined_chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR
+        nexus_defined_chopper_checker.chopper_details.slit_edges, radians_edges_arr
     )
