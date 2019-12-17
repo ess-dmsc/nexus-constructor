@@ -51,17 +51,12 @@ def value_side_effect(given_key, expected_key, data):
     raise KeyError
 
 
-def change_nexus_slit_edges(chopper_group, edges, units):
+def change_nexus_value(chopper_group, field_name, new_value, units: str = None):
 
-    del chopper_group[SLIT_EDGES_NAME]
-    chopper_group[SLIT_EDGES_NAME] = np.array(edges)
-    chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode(units)
-
-
-def change_nexus_slits(chopper_group, slits):
-
-    del chopper_group[SLITS_NAME]
-    chopper_group[SLITS_NAME] = slits
+    del chopper_group[field_name]
+    chopper_group[field_name] = new_value
+    if units is not None:
+        chopper_group[field_name].attrs["units"] = str.encode(units)
 
 
 @pytest.fixture(scope="function")
@@ -307,8 +302,9 @@ def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_ar
 def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input_THEN_returns_false(
     nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    change_nexus_slit_edges(
+    change_nexus_value(
         nexus_disk_chopper,
+        SLIT_EDGES_NAME,
         [[[i * 1.0 for i in range(6)] for _ in range(6)] for _ in range(6)],
         "rad",
     )
@@ -317,13 +313,16 @@ def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input
     assert _data_has_correct_type(
         nexus_defined_chopper_checker.fields_dict, units_dict_mocks
     )
-    assert not nexus_defined_chopper_checker.validate_chopper()
+    assert not _edges_array_has_correct_shape(
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
+    )
 
 
 def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopper_input_THEN_returns_false(
     nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    change_nexus_slits(nexus_disk_chopper, 200)
+    change_nexus_value(nexus_disk_chopper, SLITS_NAME, 200)
 
     assert nexus_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
@@ -337,21 +336,19 @@ def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopp
 
 
 def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict_mocks
 ):
-    user_defined_chopper_checker.fields_dict[SLIT_HEIGHT_NAME].value.__getitem__ = Mock(
-        return_value=201
-    )
+    change_nexus_value(nexus_disk_chopper, SLIT_HEIGHT_NAME, 200000.1, "m")
 
-    assert user_defined_chopper_checker.required_fields_present()
+    assert nexus_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(
-        user_defined_chopper_checker.fields_dict, units_dict_mocks
+        nexus_defined_chopper_checker.fields_dict, units_dict_mocks
     )
     assert _edges_array_has_correct_shape(
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.ndim,
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.shape,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].ndim,
+        nexus_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].shape,
     )
-    assert not user_defined_chopper_checker.validate_chopper()
+    assert not nexus_defined_chopper_checker.validate_chopper()
 
 
 def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_THEN_returns_false(
