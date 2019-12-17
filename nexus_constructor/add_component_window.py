@@ -7,7 +7,6 @@ from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.geometry import (
-    OFFGeometry,
     OFFGeometryNoNexus,
     NoShapeGeometry,
     CylindricalGeometry,
@@ -19,7 +18,6 @@ from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
-    CHOPPER_CLASS_NAME,
 )
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import (
@@ -392,7 +390,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None
-    ) -> OFFGeometry:
+    ):
         """
         Generates a geometry model depending on the type of geometry selected and the current values
         of the line edits that apply to the particular geometry type.
@@ -400,7 +398,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         if self.CylinderRadioButton.isChecked():
 
-            geometry_model = component.set_cylinder_shape(
+            component.set_cylinder_shape(
                 QVector3D(
                     self.cylinderXLineEdit.value(),
                     self.cylinderYLineEdit.value(),
@@ -428,20 +426,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 filename=self.fileLineEdit.text(),
                 pixel_data=pixel_data,
             )
-        # else:
-        #     chopper_checker = UserDefinedChopperChecker(self.fieldsListWidget)
-        #     if (
-        #         component.nx_class == CHOPPER_CLASS_NAME
-        #         and chopper_checker.validate_chopper()
-        #     ):
-        #         geometry_model = DiskChopperGeometryCreator(
-        #             chopper_checker.chopper_details
-        #         ).create_disk_chopper_geometry()
-        #     else:
-        #         geometry_model = NoShapeGeometry()
-        #         component.remove_shape()
-
-        # return geometry_model
 
     def get_pixel_visibility_condition(self) -> bool:
         """
@@ -513,15 +497,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         return component_with_geometry.shape
 
-    def component_is_chopper_with_no_shape(self, nx_class: str) -> bool:
-        """
-        Checks if the component has class `NXdisk_chopper` and No Shape. This means it meets the criteria to possibly
-        construct a chopper mesh with the user input.
-        :param nx_class: The class of the component.
-        :return: True if the No Shape button is checked and the class is a disk chopper, False otherwise.
-        """
-        return self.noShapeRadioButton.isChecked() and nx_class == CHOPPER_CLASS_NAME
-
     def edit_existing_component(
         self,
         component_name: str,
@@ -537,7 +512,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :param pixel_data: The component PixelData. Can be None.
         :return: The geometry object.
         """
-        chopper_with_no_shape = self.component_is_chopper_with_no_shape(nx_class)
         # remove the previous object from the qt3d view
         if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)

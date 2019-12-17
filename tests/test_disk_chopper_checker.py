@@ -19,15 +19,14 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     INT_TYPES,
     REQUIRED_CHOPPER_FIELDS,
 )
-from tests.chopper_test_helpers import (
+from tests.chopper_test_helpers import (  # noqa: F401
     N_SLITS,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
-    degrees_edges_arr,  # noqa: F401
-    radians_edges_arr,  # noqa: F401
+    degrees_edges_arr,
+    radians_edges_arr,
 )
 from tests.helpers import InMemoryFile
-
 
 IMPROPER_UNITS = {
     SLIT_EDGES_NAME: "lumen",

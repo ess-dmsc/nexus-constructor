@@ -7,10 +7,10 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
     DiskChopperGeometryCreator,
     RESOLUTION,
 )
-from tests.chopper_test_helpers import (
+from tests.chopper_test_helpers import (  # noqa: F401
     EXPECTED_Z,
-    degrees_edges_arr,  # noqa: F401
-    radians_edges_arr,  # noqa: F401
+    degrees_edges_arr,
+    radians_edges_arr,
 )
 
 POINT_X = 2.0
