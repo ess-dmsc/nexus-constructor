@@ -7,7 +7,6 @@ from typing import Union, List
 """
 Read the JSON and construct an in-memory NeXus file from the nexus_structure field
 """
-JsonValue = Union[List, str, float, int, dict]
 NexusObject = Union[h5py.Group, h5py.Dataset]
 
 
