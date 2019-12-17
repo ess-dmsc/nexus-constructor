@@ -10,5 +10,3 @@ per-file-ignores =
     tests/ui_tests/test_stream_fields_widget.py:F811
     tests/ui_tests/test_ui_field_attrs.py:F811
     tests/ui_tests/test_ui_fields.py:F811,F401
-    tests/ui_tests/test_chopper_details.py:F811
-    tests/ui_tests/test_disk_chopper_checker.py:F811

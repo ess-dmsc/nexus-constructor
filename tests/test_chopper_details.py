@@ -1,22 +1,22 @@
 import numpy as np
 import pytest
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
-from tests.chopper_test_helpers import (  # noqa: F401
+from tests.chopper_test_helpers import (
     N_SLITS,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
     CONVERT_DEGREES_TO_RADIANS,
-    radians_edges_arr,
-    degrees_edges_arr,
+    RADIANS_EDGES_ARR,
+    DEGREES_EDGES_ARR,
 )
 
 
 def test_GIVEN_initialised_chopper_details_WHEN_getting_properties_THEN_values_returned_match_original_constructor_input(
-    chopper_details, radians_edges_arr
+    chopper_details
 ):
     # ChopperDetails is constructed in the test fixture
     assert chopper_details.slits == N_SLITS
-    assert np.allclose(chopper_details.slit_edges, radians_edges_arr)
+    assert np.allclose(chopper_details.slit_edges, RADIANS_EDGES_ARR)
     assert chopper_details.radius == RADIUS_LENGTH
     assert chopper_details.slit_height == pytest.approx(SLIT_HEIGHT_LENGTH)
 
@@ -39,12 +39,10 @@ def test_GIVEN_angles_in_degrees_WHEN_initialising_chopper_details_object_THEN_a
     )
 
 
-def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_is_converted_to_m(
-    degrees_edges_arr
-):
+def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_slit_height_is_converted_to_m():
     chopper_details = ChopperDetails(
         slits=N_SLITS,
-        slit_edges=degrees_edges_arr,
+        slit_edges=DEGREES_EDGES_ARR,
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
         angle_units="deg",
@@ -55,12 +53,10 @@ def test_GIVEN_slit_height_length_in_cm_WHEN_initialising_chopper_details_THEN_s
     assert chopper_details.slit_height * 100 == pytest.approx(SLIT_HEIGHT_LENGTH)
 
 
-def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius_is_converted_to_m(
-    degrees_edges_arr
-):
+def test_GIVEN_radius_length_in_cm_WHEN_initialising_chopper_details_THEN_radius_is_converted_to_m():
     chopper_details = ChopperDetails(
         slits=N_SLITS,
-        slit_edges=degrees_edges_arr,
+        slit_edges=DEGREES_EDGES_ARR,
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
         angle_units="deg",

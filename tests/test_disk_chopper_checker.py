@@ -23,8 +23,7 @@ from tests.chopper_test_helpers import (  # noqa: F401
     N_SLITS,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
-    degrees_edges_arr,
-    radians_edges_arr,
+    RADIANS_EDGES_ARR,
 )
 from tests.helpers import InMemoryFile
 
@@ -62,22 +61,22 @@ def units_dict():
 
 
 @pytest.fixture(scope="function")
-def fields_dict(radians_edges_arr):
+def fields_dict():
     return {
         SLITS_NAME: N_SLITS,
         RADIUS_NAME: RADIUS_LENGTH,
-        SLIT_EDGES_NAME: radians_edges_arr,
+        SLIT_EDGES_NAME: RADIANS_EDGES_ARR,
         SLIT_HEIGHT_NAME: SLIT_HEIGHT_LENGTH,
     }
 
 
 @pytest.fixture(scope="function")
-def nexus_disk_chopper(radians_edges_arr):
+def nexus_disk_chopper():
     with InMemoryFile("test_disk_chopper") as nexus_file:
         disk_chopper_group = nexus_file.create_group("Disk Chopper")
         disk_chopper_group[NAME] = "abc"
         disk_chopper_group[SLITS_NAME] = N_SLITS
-        disk_chopper_group[SLIT_EDGES_NAME] = radians_edges_arr
+        disk_chopper_group[SLIT_EDGES_NAME] = RADIANS_EDGES_ARR
         disk_chopper_group[RADIUS_NAME] = RADIUS_LENGTH
         disk_chopper_group[SLIT_HEIGHT_NAME] = SLIT_HEIGHT_LENGTH
         disk_chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
@@ -210,9 +209,9 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
 
 
 def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict, radians_edges_arr
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict
 ):
-    reversed_array = np.flip(radians_edges_arr)
+    reversed_array = np.flip(RADIANS_EDGES_ARR)
     change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, reversed_array, "rad")
 
     assert nexus_defined_chopper_checker.required_fields_present()
@@ -225,9 +224,9 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
 
 
 def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict, radians_edges_arr
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict
 ):
-    repeating_array = np.copy(radians_edges_arr)
+    repeating_array = np.copy(RADIANS_EDGES_ARR)
     repeating_array[0] = repeating_array[1]
     change_nexus_value(nexus_disk_chopper, SLIT_EDGES_NAME, repeating_array, "rad")
 
@@ -241,9 +240,9 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
 
 
 def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_input_THEN_returns_false(
-    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict, radians_edges_arr
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_dict
 ):
-    overlapping_array = np.copy(radians_edges_arr)
+    overlapping_array = np.copy(RADIANS_EDGES_ARR)
     overlapping_array[-1] = (
         overlapping_array[0]
         + (2 * np.pi)
@@ -344,14 +343,11 @@ def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validat
 
 @pytest.mark.parametrize("units_attribute", ["radians", "rad", "radian"])
 def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_chopper_details_THEN_slit_edges_array_is_converted(
-    nexus_defined_chopper_checker,
-    nexus_disk_chopper,
-    units_attribute,
-    radians_edges_arr,
+    nexus_defined_chopper_checker, nexus_disk_chopper, units_attribute
 ):
     del nexus_disk_chopper[SLIT_EDGES_NAME].attrs["units"]
     nexus_disk_chopper[SLIT_EDGES_NAME].attrs["units"] = str.encode(units_attribute)
     nexus_defined_chopper_checker.validate_chopper()
     assert np.allclose(
-        nexus_defined_chopper_checker.chopper_details.slit_edges, radians_edges_arr
+        nexus_defined_chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR
     )

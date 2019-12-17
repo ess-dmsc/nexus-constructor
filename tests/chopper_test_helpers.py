@@ -15,21 +15,15 @@ def degree_to_radian(x):
 CONVERT_DEGREES_TO_RADIANS = np.vectorize(degree_to_radian)
 
 
-@pytest.fixture(scope="function")
-def degrees_edges_arr():
-    return [0.0, 43.4, 82.6, 150.1, 220.0, 250.3]
+DEGREES_EDGES_ARR = [0.0, 43.4, 82.6, 150.1, 220.0, 250.3]
+RADIANS_EDGES_ARR = CONVERT_DEGREES_TO_RADIANS(DEGREES_EDGES_ARR)
 
 
 @pytest.fixture(scope="function")
-def radians_edges_arr(degrees_edges_arr):
-    return CONVERT_DEGREES_TO_RADIANS(degrees_edges_arr)
-
-
-@pytest.fixture(scope="function")
-def chopper_details(radians_edges_arr):
+def chopper_details():
     return ChopperDetails(
         slits=N_SLITS,
-        slit_edges=radians_edges_arr,
+        slit_edges=np.copy(RADIANS_EDGES_ARR),
         radius=RADIUS_LENGTH,
         slit_height=SLIT_HEIGHT_LENGTH,
         angle_units="rad",
