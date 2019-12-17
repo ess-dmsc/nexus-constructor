@@ -60,11 +60,14 @@ def test_UI_GIVEN_data_type_WHEN_changing_data_type_THEN_change_is_successful(
     assert np.array_equal(array, array_dataset_table_widget.model.array)
 
 
-@pytest.mark.skip("Don't actually know what causes the ValueError.")
-def test_UI_GIVEN_array_cant_be_converted_WHEN_changing_data_type_THEN_array_resets(
+def test_GIVEN_string_array_WHEN_changing_data_type_to_int_THEN_array_rests(
     array_dataset_table_widget
 ):
-    pass
+    array = np.array(["hello" for _ in range(10)])
+    array_dataset_table_widget.model.array = array
+    array_dataset_table_widget.model.update_array_dtype(DATASET_TYPE["Integer"])
+
+    assert array_dataset_table_widget.model.array.item(0) == 0
 
 
 def test_UI_GIVEN_add_row_button_pressed_THEN_array_size_changes(
