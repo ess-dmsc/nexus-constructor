@@ -62,200 +62,6 @@ def _check_data_type(field_widget, expected_types) -> bool:
         return False
 
 
-def _data_has_correct_type(
-    fields_dict: Dict[str, "FieldWidget"], units_dict: dict
-) -> bool:
-    """
-    Checks that the data required to create a Chopper mesh have the expected types.
-    :param fields_dict: The dictionary of field names and their field widgets/NeXus data.
-    :param units_dict: The dictionary of field names and their unit values.
-    :return: True if all the fields have the correct types, False otherwise.
-    """
-    correct_slits_type = _check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
-    correct_radius_type = _check_data_type(
-        fields_dict[RADIUS_NAME], FLOAT_TYPES + INT_TYPES
-    )
-    correct_slit_height_type = _check_data_type(
-        fields_dict[SLIT_HEIGHT_NAME], FLOAT_TYPES + INT_TYPES
-    )
-    correct_slit_edges_type = _check_data_type(
-        fields_dict[SLIT_EDGES_NAME], FLOAT_TYPES + INT_TYPES
-    )
-    correct_radius_units_type = isinstance(units_dict[RADIUS_NAME], str)
-    correct_slit_height_units_type = isinstance(units_dict[SLIT_HEIGHT_NAME], str)
-    correct_slit_edges_units_type = isinstance(units_dict[SLIT_EDGES_NAME], str)
-
-    if (
-        correct_slits_type
-        and correct_radius_type
-        and correct_slit_height_type
-        and correct_slit_edges_type
-        and correct_radius_units_type
-        and correct_slit_height_units_type
-        and correct_slit_edges_units_type
-    ):
-        return True
-
-    problems = []
-
-    if not correct_slits_type:
-        problems.append(
-            _incorrect_data_type_message(
-                fields_dict, SLITS_NAME, EXPECTED_TYPE_ERROR_MSG[SLITS_NAME]
-            )
-        )
-
-    if not correct_radius_type:
-        problems.append(
-            _incorrect_data_type_message(
-                fields_dict, RADIUS_NAME, EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME]
-            )
-        )
-
-    if not correct_slit_height_type:
-        problems.append(
-            _incorrect_data_type_message(
-                fields_dict, SLIT_HEIGHT_NAME, EXPECTED_TYPE_ERROR_MSG[SLIT_HEIGHT_NAME]
-            )
-        )
-
-    if not correct_slit_edges_type:
-        problems.append(
-            _incorrect_data_type_message(
-                fields_dict, SLIT_EDGES_NAME, EXPECTED_TYPE_ERROR_MSG[SLIT_EDGES_NAME]
-            )
-        )
-
-    if not correct_radius_units_type:
-        problems.append(_incorrect_data_type_message(units_dict, RADIUS_NAME, "string"))
-
-    if not correct_slit_height_units_type:
-        problems.append(
-            _incorrect_data_type_message(units_dict, SLIT_HEIGHT_NAME, "string")
-        )
-
-    if not correct_slit_edges_units_type:
-        problems.append(
-            _incorrect_data_type_message(units_dict, SLIT_EDGES_NAME, "string")
-        )
-
-    logging.info(f"{UNABLE}\n{problems}")
-    return False
-
-
-def _edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple) -> bool:
-    """
-    Checks that the edges array consists of either one row or one column.
-    :param edges_dim: The number of dimensions in the slit edges array.
-    :param edges_shape: The shape of the slit edges array.
-    :return: True if the edges array is 1D. False otherwise.
-    """
-    if edges_dim > 2:
-        logging.info(
-            f"{UNABLE} Expected slit edges array to be 1D but it has {edges_dim} dimensions."
-        )
-        return False
-
-    if edges_dim == 2:
-        if edges_shape[0] != 1 and edges_shape[1] != 1:
-            logging.info(
-                f"{UNABLE} Expected slit edges array to be 1D but it has shape {edges_shape}."
-            )
-            return False
-
-    return True
-
-
-def _input_describes_valid_chopper(
-    chopper_details: ChopperDetails, slit_edges: Sequence
-) -> bool:
-    """
-    A final check that the input has the following properties:
-        - The length of the slit edges array is twice the number of slits
-        - The slit height is smaller than the radius
-        - The slit edges array is sorted.
-        - The slit edges array doesn't contain repeated angles.
-        - The slit edges array doesn't contain overlapping slits.
-    If this is all true then a chopper mesh can be created.
-    :param chopper_details: The Chopper Details object.
-    :param slit_edges: The original slit edges array provided by the user/contained in the NeXus file that has not yet
-        been converted to radians (though it may already be in radians). Used when logging errors about slit edges
-        data so it's in a format the user recognises.
-    :return: True if all the conditions above are met. False otherwise.
-    """
-    # Check that the number of slit edges is equal to two times the number of slits
-    if len(chopper_details.slit_edges) != 2 * chopper_details.slits:
-        logging.info(
-            f"{UNABLE} Size of slit edges array should be twice the number of slits. Instead there are {chopper_details.slits} slits and {len(chopper_details.slit_edges)} slit edges."
-        )
-        return False
-
-    # Check that the slit height is smaller than the radius
-    if chopper_details.slit_height >= chopper_details.radius:
-        logging.info(
-            f"{UNABLE} Slit height should be smaller than radius. Instead slit height is {chopper_details.slit_height} metres and radius is {chopper_details.radius} metres."
-        )
-        return False
-
-    # Check that the list of slit edges is sorted
-    if not (np.diff(slit_edges) >= 0).all():
-        logging.info(
-            f"{UNABLE} Slit edges array is not sorted. Found values: {slit_edges}"
-        )
-        return False
-
-    # Check that there are no repeated angles
-    if len(slit_edges) != len(np.unique(slit_edges)):
-        logging.info(
-            f"{UNABLE} Angles in slit edges array should be unique. Found values: {slit_edges}"
-        )
-        return False
-
-    # Check that the first and last edges do not overlap
-    if (chopper_details.slit_edges != sorted(chopper_details.slit_edges)) and (
-        chopper_details.slit_edges[-1] >= chopper_details.slit_edges[0]
-    ):
-        logging.info(
-            f"{UNABLE} Slit edges contains overlapping slits. Found values: {slit_edges}"
-        )
-        return False
-
-    return True
-
-
-def _units_are_valid(units_dict: dict) -> bool:
-    """
-    Checks that the units for the slit edges, radius, and slit height are valid.
-    :param units_dict: The dictionary of units for the slit edges, radius, and slit height.
-    :return: True if the units are all valid, False otherwise.
-    """
-    good_units = True
-
-    for field in UNITS_REQUIRED:
-        unit_input = units_dict[field]
-
-        if not units_are_recognised_by_pint(unit_input):
-            logging.info(
-                f"{UNABLE} Units for {field} are not recognised. Found value: {unit_input}"
-            )
-            good_units = False
-            continue
-        if not units_are_expected_type(unit_input, EXPECTED_UNIT_TYPE[field]):
-            logging.info(
-                f"{UNABLE} Units for {field} have wrong type. Found {unit_input} but expected something that can be converted to {EXPECTED_UNIT_TYPE[field]}."
-            )
-            good_units = False
-            continue
-        if not units_have_dimension_of_one(unit_input):
-            logging.info(
-                f"{UNABLE} Units for {field} should have a dimension of one. Found value: {unit_input}"
-            )
-            good_units = False
-            continue
-
-    return good_units
-
-
 class NexusDefinedChopperChecker:
     def __init__(self, disk_chopper: Group):
 
@@ -311,6 +117,206 @@ class NexusDefinedChopperChecker:
 
         return True
 
+    @staticmethod
+    def data_has_correct_type(
+        fields_dict: Dict[str, "FieldWidget"], units_dict: dict
+    ) -> bool:
+        """
+        Checks that the data required to create a Chopper mesh have the expected types.
+        :param fields_dict: The dictionary of field names and their field widgets/NeXus data.
+        :param units_dict: The dictionary of field names and their unit values.
+        :return: True if all the fields have the correct types, False otherwise.
+        """
+        correct_slits_type = _check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
+        correct_radius_type = _check_data_type(
+            fields_dict[RADIUS_NAME], FLOAT_TYPES + INT_TYPES
+        )
+        correct_slit_height_type = _check_data_type(
+            fields_dict[SLIT_HEIGHT_NAME], FLOAT_TYPES + INT_TYPES
+        )
+        correct_slit_edges_type = _check_data_type(
+            fields_dict[SLIT_EDGES_NAME], FLOAT_TYPES + INT_TYPES
+        )
+        correct_radius_units_type = isinstance(units_dict[RADIUS_NAME], str)
+        correct_slit_height_units_type = isinstance(units_dict[SLIT_HEIGHT_NAME], str)
+        correct_slit_edges_units_type = isinstance(units_dict[SLIT_EDGES_NAME], str)
+
+        if (
+            correct_slits_type
+            and correct_radius_type
+            and correct_slit_height_type
+            and correct_slit_edges_type
+            and correct_radius_units_type
+            and correct_slit_height_units_type
+            and correct_slit_edges_units_type
+        ):
+            return True
+
+        problems = []
+
+        if not correct_slits_type:
+            problems.append(
+                _incorrect_data_type_message(
+                    fields_dict, SLITS_NAME, EXPECTED_TYPE_ERROR_MSG[SLITS_NAME]
+                )
+            )
+
+        if not correct_radius_type:
+            problems.append(
+                _incorrect_data_type_message(
+                    fields_dict, RADIUS_NAME, EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME]
+                )
+            )
+
+        if not correct_slit_height_type:
+            problems.append(
+                _incorrect_data_type_message(
+                    fields_dict,
+                    SLIT_HEIGHT_NAME,
+                    EXPECTED_TYPE_ERROR_MSG[SLIT_HEIGHT_NAME],
+                )
+            )
+
+        if not correct_slit_edges_type:
+            problems.append(
+                _incorrect_data_type_message(
+                    fields_dict,
+                    SLIT_EDGES_NAME,
+                    EXPECTED_TYPE_ERROR_MSG[SLIT_EDGES_NAME],
+                )
+            )
+
+        if not correct_radius_units_type:
+            problems.append(
+                _incorrect_data_type_message(units_dict, RADIUS_NAME, "string")
+            )
+
+        if not correct_slit_height_units_type:
+            problems.append(
+                _incorrect_data_type_message(units_dict, SLIT_HEIGHT_NAME, "string")
+            )
+
+        if not correct_slit_edges_units_type:
+            problems.append(
+                _incorrect_data_type_message(units_dict, SLIT_EDGES_NAME, "string")
+            )
+
+        logging.info(f"{UNABLE}\n{problems}")
+        return False
+
+    @staticmethod
+    def units_are_valid(units_dict: dict) -> bool:
+        """
+        Checks that the units for the slit edges, radius, and slit height are valid.
+        :param units_dict: The dictionary of units for the slit edges, radius, and slit height.
+        :return: True if the units are all valid, False otherwise.
+        """
+        good_units = True
+
+        for field in UNITS_REQUIRED:
+            unit_input = units_dict[field]
+
+            if not units_are_recognised_by_pint(unit_input):
+                logging.info(
+                    f"{UNABLE} Units for {field} are not recognised. Found value: {unit_input}"
+                )
+                good_units = False
+                continue
+            if not units_are_expected_type(unit_input, EXPECTED_UNIT_TYPE[field]):
+                logging.info(
+                    f"{UNABLE} Units for {field} have wrong type. Found {unit_input} but expected something that can be converted to {EXPECTED_UNIT_TYPE[field]}."
+                )
+                good_units = False
+                continue
+            if not units_have_dimension_of_one(unit_input):
+                logging.info(
+                    f"{UNABLE} Units for {field} should have a dimension of one. Found value: {unit_input}"
+                )
+                good_units = False
+                continue
+
+        return good_units
+
+    @staticmethod
+    def edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple) -> bool:
+        """
+        Checks that the edges array consists of either one row or one column.
+        :param edges_dim: The number of dimensions in the slit edges array.
+        :param edges_shape: The shape of the slit edges array.
+        :return: True if the edges array is 1D. False otherwise.
+        """
+        if edges_dim > 2:
+            logging.info(
+                f"{UNABLE} Expected slit edges array to be 1D but it has {edges_dim} dimensions."
+            )
+            return False
+
+        if edges_dim == 2:
+            if edges_shape[0] != 1 and edges_shape[1] != 1:
+                logging.info(
+                    f"{UNABLE} Expected slit edges array to be 1D but it has shape {edges_shape}."
+                )
+                return False
+
+        return True
+
+    @staticmethod
+    def input_describes_valid_chopper(
+        chopper_details: ChopperDetails, slit_edges: Sequence
+    ) -> bool:
+        """
+        A final check that the input has the following properties:
+            - The length of the slit edges array is twice the number of slits
+            - The slit height is smaller than the radius
+            - The slit edges array is sorted.
+            - The slit edges array doesn't contain repeated angles.
+            - The slit edges array doesn't contain overlapping slits.
+        If this is all true then a chopper mesh can be created.
+        :param chopper_details: The Chopper Details object.
+        :param slit_edges: The original slit edges array provided by the user/contained in the NeXus file that has not yet
+            been converted to radians (though it may already be in radians). Used when logging errors about slit edges
+            data so it's in a format the user recognises.
+        :return: True if all the conditions above are met. False otherwise.
+        """
+        # Check that the number of slit edges is equal to two times the number of slits
+        if len(chopper_details.slit_edges) != 2 * chopper_details.slits:
+            logging.info(
+                f"{UNABLE} Size of slit edges array should be twice the number of slits. Instead there are {chopper_details.slits} slits and {len(chopper_details.slit_edges)} slit edges."
+            )
+            return False
+
+        # Check that the slit height is smaller than the radius
+        if chopper_details.slit_height >= chopper_details.radius:
+            logging.info(
+                f"{UNABLE} Slit height should be smaller than radius. Instead slit height is {chopper_details.slit_height} metres and radius is {chopper_details.radius} metres."
+            )
+            return False
+
+        # Check that the list of slit edges is sorted
+        if not (np.diff(slit_edges) >= 0).all():
+            logging.info(
+                f"{UNABLE} Slit edges array is not sorted. Found values: {slit_edges}"
+            )
+            return False
+
+        # Check that there are no repeated angles
+        if len(slit_edges) != len(np.unique(slit_edges)):
+            logging.info(
+                f"{UNABLE} Angles in slit edges array should be unique. Found values: {slit_edges}"
+            )
+            return False
+
+        # Check that the first and last edges do not overlap
+        if (chopper_details.slit_edges != sorted(chopper_details.slit_edges)) and (
+            chopper_details.slit_edges[-1] >= chopper_details.slit_edges[0]
+        ):
+            logging.info(
+                f"{UNABLE} Slit edges contains overlapping slits. Found values: {slit_edges}"
+            )
+            return False
+
+        return True
+
     def validate_chopper(self) -> bool:
         """
         Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
@@ -320,9 +326,9 @@ class NexusDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and _data_has_correct_type(self.fields_dict, self.units_dict)
-            and _units_are_valid(self.units_dict)
-            and _edges_array_has_correct_shape(
+            and self.data_has_correct_type(self.fields_dict, self.units_dict)
+            and self.units_are_valid(self.units_dict)
+            and self.edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].ndim,
                 self.fields_dict[SLIT_EDGES_NAME].shape,
             )
@@ -339,6 +345,6 @@ class NexusDefinedChopperChecker:
             self.units_dict[RADIUS_NAME],
         )
 
-        return _input_describes_valid_chopper(
+        return self.input_describes_valid_chopper(
             self._chopper_details, self.fields_dict[SLIT_EDGES_NAME]
         )
