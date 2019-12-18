@@ -584,9 +584,3 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
         add_transformation(
             "NotAKnownTransformation", component_tree_view, component_model
         )
-
-
-def test_GIVEN_transformation_is_clicked_on_THEN_transformation_becomes_editable(
-    component_tree_view, component_model
-):
-    sample_component_index = get_sample_index(component_tree_view)
