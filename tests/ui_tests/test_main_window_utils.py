@@ -150,6 +150,11 @@ def set_of_all_actions(
 
 
 def get_sample_index(component_tree_view: QTreeView) -> QModelIndex:
+    """
+    Retrieves the QModelIndex of the sample in the component tree view.
+    :param component_tree_view: The component tree view in the main window.
+    :return: The index of the sample component.
+    """
     return component_tree_view.indexAt(QPoint(0, 0))
 
 
@@ -158,6 +163,12 @@ def add_transformation_at_index(
     component_tree_view: QTreeView,
     component_index: QModelIndex,
 ):
+    """
+    Adds a transformation to the component model at a given index.
+    :param component_model: The component model.
+    :param component_tree_view: The component tree view.
+    :param component_index: The QModelIndex that is selected when the transformation is added.
+    """
     component_tree_view.setCurrentIndex(component_index)
     component_model.add_transformation(component_index, "translation")
 
@@ -167,6 +178,12 @@ def add_link_at_index(
     component_tree_view: QTreeView,
     component_index: QModelIndex,
 ):
+    """
+    Adds a link to the component model at a given index.
+    :param component_model: The component model.
+    :param component_tree_view: The component tree view.
+    :param component_index: The QModelIndex that is selected when the link is added.
+    """
     component_tree_view.setCurrentIndex(component_index)
     component_model.add_link(component_index)
 
@@ -176,6 +193,13 @@ def get_transformation_list_index(
     component_tree_view: QTreeView,
     component_index: QModelIndex,
 ) -> QModelIndex:
+    """
+    Retrieves the index of a component's transformation list from the component tree view.
+    :param component_model: The component model.
+    :param component_tree_view: The component tree view.
+    :param component_index: The index of the component.
+    :return: The index of the component's transformation list.
+    """
     component_tree_view.expand(component_index)
     return component_model.index(1, 0, component_index)
 
@@ -185,6 +209,13 @@ def get_transformation_or_link_index(
     component_tree_view: QTreeView,
     transformation_list_index: QModelIndex,
 ) -> QModelIndex:
+    """
+    Retrieves the index of a component's first transformation or link.
+    :param component_model: The component tree model.
+    :param component_tree_view: The component tree view.
+    :param transformation_list_index: The index of the component's transformation list.
+    :return: The index of the component's first transformation/link.
+    """
     component_tree_view.expand(transformation_list_index)
     return component_model.index(0, 0, transformation_list_index)
 
