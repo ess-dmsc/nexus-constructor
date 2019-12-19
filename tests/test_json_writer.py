@@ -574,7 +574,9 @@ def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_ou
     assert streams_[0]["converter"]["schema"] == writer_module
 
 
-def test_GIVEN_stream_with_one_pv_with_two_topics_WHEN_generating_forwarder_command_THEN_contains_one_converter_with_list():
+def test_GIVEN_stream_with_one_pv_with_two_topics_WHEN_generating_forwarder_command_THEN_contains_one_converter_with_list(
+    file
+):
     pv_name = "testPV"
 
     topic1 = "topic1"
@@ -582,13 +584,20 @@ def test_GIVEN_stream_with_one_pv_with_two_topics_WHEN_generating_forwarder_comm
 
     writer_module = "f142"
 
-    streams = {
-        "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic1},
-        "stream2": {"writer_module": writer_module, "source": pv_name, "topic": topic2},
-    }
+    group = file.create_group("test_group")
+    group.attrs["NX_class"] = "NCstream"
+    group.create_dataset("writer_module", data=writer_module)
+    group.create_dataset("source", data=pv_name)
+    group.create_dataset("topic", data=topic1)
+
+    group2 = file.create_group("test_group2")
+    group2.attrs["NX_class"] = "NCstream"
+    group2.create_dataset("writer_module", data=writer_module)
+    group2.create_dataset("topic", data=topic2)
+    group2.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "ca")
+    generate_forwarder_command(dummy_file, file, "ca")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
 
@@ -600,7 +609,9 @@ def test_GIVEN_stream_with_one_pv_with_two_topics_WHEN_generating_forwarder_comm
     assert streams_[0]["converter"][1]["topic"] == topic2
 
 
-def test_GIVEN_stream_with_pv_forwarding_to_three_topics_WHEN_generating_forwarder_command_THEN_stream_is_added_to_converters():
+def test_GIVEN_stream_with_pv_forwarding_to_three_topics_WHEN_generating_forwarder_command_THEN_stream_is_added_to_converters(
+    file
+):
     pv_name = "testPV"
 
     topic1 = "topic1"
@@ -609,14 +620,26 @@ def test_GIVEN_stream_with_pv_forwarding_to_three_topics_WHEN_generating_forward
 
     writer_module = "f142"
 
-    streams = {
-        "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic1},
-        "stream2": {"writer_module": writer_module, "source": pv_name, "topic": topic2},
-        "stream3": {"writer_module": writer_module, "source": pv_name, "topic": topic3},
-    }
+    group = file.create_group("test_group")
+    group.attrs["NX_class"] = "NCstream"
+    group.create_dataset("writer_module", data=writer_module)
+    group.create_dataset("source", data=pv_name)
+    group.create_dataset("topic", data=topic1)
+
+    group2 = file.create_group("test_group2")
+    group2.attrs["NX_class"] = "NCstream"
+    group2.create_dataset("writer_module", data=writer_module)
+    group2.create_dataset("topic", data=topic2)
+    group2.create_dataset("source", data=pv_name)
+
+    group3 = file.create_group("test_group3")
+    group3.attrs["NX_class"] = "NCstream"
+    group3.create_dataset("writer_module", data=writer_module)
+    group3.create_dataset("topic", data=topic3)
+    group3.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "pva")
+    generate_forwarder_command(dummy_file, file, "pva")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
 
