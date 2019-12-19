@@ -4,9 +4,16 @@ import uuid
 import logging
 from typing import Union
 
+import typing
+
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import object_to_json_file
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
+from nexus_constructor.nexus.nexus_wrapper import (
+    get_nx_class,
+    get_name_of_node,
+    _separate_dot_field_group_hierarchy,
+    _handle_stream_dataset,
+)
 
 NexusObject = Union[h5py.Group, h5py.Dataset]
 
@@ -64,19 +71,23 @@ def cast_to_int(data):
         return int(data)
 
 
-ATTR_BLACKLIST = ["dependee_of"]
+ATTR_NAME_BLACKLIST = ["dependee_of"]
+NX_CLASS_BLACKLIST = ["NXgroup", "NCstream"]
 
 
 def _add_attributes(root: NexusObject, root_dict: dict):
     attrs = []
     for attr_name, attr in root.attrs.items():
-        if attr_name not in ATTR_BLACKLIST:
+        if attr_name == "NX_class" and attr in NX_CLASS_BLACKLIST:
+            break
+        if attr_name not in ATTR_NAME_BLACKLIST:
             if isinstance(attr, bytes):
                 attr = attr.decode("utf8")
             new_attribute = {"name": attr_name, "values": attr}
             attrs.append(new_attribute)
     if attrs:
         root_dict["attributes"] = attrs
+    return root_dict
 
 
 class NexusToDictConverter:
@@ -107,7 +118,7 @@ class NexusToDictConverter:
         else:
             root_dict = self._handle_dataset(root)
 
-        root_dict = self._handle_attributes(root, root_dict)
+        root_dict = _add_attributes(root, root_dict)
         return root_dict
 
     @staticmethod
@@ -154,17 +165,6 @@ class NexusToDictConverter:
             )
         return data, dtype, size
 
-    @staticmethod
-    def _handle_attributes(root: NexusObject, root_dict: dict):
-        nx_class = get_nx_class(root)
-        if nx_class is not None and nx_class in ["NXfield", "NXgroup", "NCstream"]:
-            root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
-            if len(root.attrs) > 1:
-                _add_attributes(root, root_dict)
-        else:
-            _add_attributes(root, root_dict)
-        return root_dict
-
     def _handle_group(self, root: h5py.Group):
         """
         Generate JSON dict for a h5py group.
@@ -173,23 +173,26 @@ class NexusToDictConverter:
         """
         root_dict = {"type": "group", "name": get_name_of_node(root), "children": []}
         # Add the entries
-        entries = list(root.values())
+        group_entries = list(root.values())
         if get_nx_class(root) == "NCstream":
-            root_dict["children"].append(
-                {"type": "stream"}
-            )
+            item_dict = dict()
+            for name, item in root.items():
+                dots_in_field_name = name.split(".")
+                if len(dots_in_field_name) > 1:
+                    _separate_dot_field_group_hierarchy(
+                        item_dict, dots_in_field_name, item
+                    )
+                else:
+                    item_dict[name] = _handle_stream_dataset(item[...])
+            root_dict["children"].append({"type": "stream", "stream": item_dict})
 
         elif root.name in self._links.keys():
             root_dict = self._create_link_root_dict(
                 root, self._links[root.name].file.get(root.name, getlink=True).path
             )
-        elif entries:
-            for entry in entries:
-                child_dict = self._root_to_dict(entry)
-                if get_nx_class(root) == "NCstream":
-                    root_dict["children"]["stream"].append(child_dict)
-                else:
-                    root_dict["children"].append(child_dict)
+        elif group_entries:
+            for entry in group_entries:
+                root_dict["children"].append(self._root_to_dict(entry))
 
         return root_dict
 

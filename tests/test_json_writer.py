@@ -12,7 +12,7 @@ from nexus_constructor.json.filewriter_json_writer import (
     create_writer_commands,
     generate_json,
     _add_attributes,
-    ATTR_BLACKLIST,
+    ATTR_NAME_BLACKLIST,
 )
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
@@ -250,17 +250,15 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
         "array_size": 32,
     }
 
+    for name, value in group_contents.items():
+        group.create_dataset(name, data=value)
+
     converter = NexusToDictConverter()
     root_dict = converter.convert(file, {})
 
     assert group_name == root_dict["children"][0]["name"]
     assert group_contents == root_dict["children"][0]["children"][0]["stream"]
-    assert "NX_class" not in [
-        item["name"] for item in root_dict["children"][0]["attributes"]
-    ]
-    assert "NCstream" not in [
-        item["values"] for item in root_dict["children"][0]["attributes"]
-    ]
+    assert "attributes" not in root_dict["children"][0]
 
 
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children(
@@ -660,7 +658,7 @@ def test_GIVEN_attribute_in_blacklist_WHEN_adding_attributes_THEN_attrs_is_blank
     root_dict = dict()
     dataset_name = "test"
     dataset = file.create_dataset(dataset_name, data=123)
-    attr_key = ATTR_BLACKLIST[0]
+    attr_key = ATTR_NAME_BLACKLIST[0]
     attr_value = "some_value"
     dataset.attrs[attr_key] = attr_value
     _add_attributes(dataset, root_dict)
