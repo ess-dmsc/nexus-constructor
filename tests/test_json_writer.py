@@ -139,7 +139,7 @@ def test_GIVEN_nx_class_and_attributes_are_bytes_WHEN_output_to_json_THEN_they_a
     dataset.attrs["string_attr"] = test_string_attr
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, [], [])
+    root_dict = converter.convert(file, {})
 
     ds = root_dict["children"][0]
 
@@ -164,7 +164,7 @@ def test_GIVEN_dataset_with_an_attribute_WHEN_output_to_json_THEN_attribute_is_p
     dataset.attrs[test_attr_name] = test_input
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, [], [])
+    root_dict = converter.convert(file, {})
 
     ds = root_dict["children"][0]
 
@@ -185,7 +185,7 @@ def test_GIVEN_dataset_with_an_array_attribute_WHEN_output_to_json_THEN_attribut
     dataset.attrs[test_attr_name] = test_input
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, [], [])
+    root_dict = converter.convert(file, {})
 
     ds = root_dict["children"][0]
 
@@ -204,7 +204,7 @@ def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist
     dataset.attrs["NX_class"] = "NXpinhole"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, [], [])
+    root_dict = converter.convert(file, {})
 
     ds = root_dict["children"][0]
 
@@ -225,7 +225,7 @@ def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_
     dataset.attrs["NX_class"] = "NXpinhole"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, [], [])
+    root_dict = converter.convert(file, {})
     ds = root_dict["children"][0]
 
     assert ds["name"].lstrip("/") == dataset_name
@@ -239,17 +239,28 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
 ):
     group_name = "test_group"
     group = file.create_group(group_name)
-    group.attrs["NX_class"] = "NXgroup"
+    group.attrs["NX_class"] = "NCstream"
 
-    group_contents = ["test_contents_item"]
+    group_contents = {
+        "writer_module": "f142",
+        "topic": "topic1",
+        "source": "SIMPLE:DOUBLE",
+        "type": "double",
+        "value_units": "cubits",
+        "array_size": 32,
+    }
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(
-        file, streams={f"/{group_name}": group_contents}, links=[]
-    )
+    root_dict = converter.convert(file, {})
 
     assert group_name == root_dict["children"][0]["name"]
     assert group_contents == root_dict["children"][0]["children"][0]["stream"]
+    assert "NX_class" not in [
+        item["name"] for item in root_dict["children"][0]["attributes"]
+    ]
+    assert "NCstream" not in [
+        item["values"] for item in root_dict["children"][0]["attributes"]
+    ]
 
 
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children(
@@ -265,7 +276,7 @@ def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_
 
     converter = NexusToDictConverter()
     root_dict = converter.convert(
-        file, streams={}, links={file[group_name].name: group_to_be_linked}
+        file, links={file[group_name].name: group_to_be_linked}
     )
 
     assert root_dict["children"][0]["type"] == "link"
@@ -286,7 +297,7 @@ def test_GIVEN_link_in_group_children_that_is_a_dataset_WHEN_handling_group_THEN
 
     converter = NexusToDictConverter()
     root_dict = converter.convert(
-        file, streams={}, links={file[group_name].name: dataset_to_be_linked}
+        file, links={file[group_name].name: dataset_to_be_linked}
     )
 
     assert root_dict["children"][0]["type"] == "link"
@@ -318,7 +329,7 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
     field2.attrs["NX_class"] = "NXfield"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, streams=dict(), links=dict())
+    root_dict = converter.convert(file, links={})
 
     assert group.name.split("/")[-1] == root_dict["children"][0]["name"]
 

@@ -37,11 +37,9 @@ def generate_json(
 
     if links is None:
         links = {}
-    if streams is None:
-        streams = {}
 
     converter = NexusToDictConverter()
-    tree = converter.convert(data.nexus.nexus_file, streams, links)
+    tree = converter.convert(data.nexus.nexus_file, links)
     write_command, _ = create_writer_commands(
         tree,
         nexus_file_name,
@@ -90,16 +88,14 @@ class NexusToDictConverter:
         self._kafka_streams = {}
         self._links = {}
 
-    def convert(self, nexus_root: NexusObject, streams: dict, links: dict):
+    def convert(self, nexus_root: NexusObject, links: dict):
         """
         Converts the given nexus_root to dict with correct replacement of
         the streams
         :param links:
         :param nexus_root
-        :param streams:
         :return: dictionary
         """
-        self._kafka_streams = streams
         self._links = links
         return {
             "children": [self._root_to_dict(entry) for _, entry in nexus_root.items()]
@@ -178,9 +174,9 @@ class NexusToDictConverter:
         root_dict = {"type": "group", "name": get_name_of_node(root), "children": []}
         # Add the entries
         entries = list(root.values())
-        if root.name in self._kafka_streams:
+        if get_nx_class(root) == "NCstream":
             root_dict["children"].append(
-                {"type": "stream", "stream": self._kafka_streams[root.name]}
+                {"type": "stream"}
             )
 
         elif root.name in self._links.keys():
@@ -190,7 +186,10 @@ class NexusToDictConverter:
         elif entries:
             for entry in entries:
                 child_dict = self._root_to_dict(entry)
-                root_dict["children"].append(child_dict)
+                if get_nx_class(root) == "NCstream":
+                    root_dict["children"]["stream"].append(child_dict)
+                else:
+                    root_dict["children"].append(child_dict)
 
         return root_dict
 
