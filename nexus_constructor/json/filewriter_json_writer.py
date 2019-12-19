@@ -6,7 +6,7 @@ from typing import Union
 
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import object_to_json_file
-
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
 
 NexusObject = Union[h5py.Group, h5py.Dataset]
 
@@ -160,17 +160,9 @@ class NexusToDictConverter:
 
     @staticmethod
     def _handle_attributes(root: NexusObject, root_dict: dict):
-        if "NX_class" in root.attrs:
-            nx_class = root.attrs["NX_class"]
-            if (
-                nx_class
-                and nx_class != "NXfield"
-                and nx_class != "NXgroup"
-                and nx_class != "NCstream"
-            ):
-                if isinstance(nx_class, bytes):
-                    nx_class = nx_class.decode("utf8")
-                root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
+        nx_class = get_nx_class(root)
+        if nx_class is not None and nx_class in ["NXfield", "NXgroup", "NCstream"]:
+            root_dict["attributes"] = [{"name": "NX_class", "values": nx_class}]
             if len(root.attrs) > 1:
                 _add_attributes(root, root_dict)
         else:
@@ -183,7 +175,7 @@ class NexusToDictConverter:
         :param root: h5py group to generate dict from.
         :return: generated dict of group and children.
         """
-        root_dict = {"type": "group", "name": root.name.split("/")[-1], "children": []}
+        root_dict = {"type": "group", "name": get_name_of_node(root), "children": []}
         # Add the entries
         entries = list(root.values())
         if root.name in self._kafka_streams:
@@ -217,7 +209,7 @@ class NexusToDictConverter:
         else:
             root_dict = {
                 "type": "dataset",
-                "name": root.name.split("/")[-1],
+                "name": get_name_of_node(root),
                 "dataset": {"type": dataset_type},
                 "values": data,
             }
@@ -228,7 +220,7 @@ class NexusToDictConverter:
 
     @staticmethod
     def _create_link_root_dict(root, target):
-        return {"type": "link", "name": root.name.split("/")[-1], "target": target}
+        return {"type": "link", "name": get_name_of_node(root), "target": target}
 
 
 def create_writer_commands(
