@@ -477,27 +477,39 @@ def test_GIVEN_string_list_WHEN_getting_data_and_type_THEN_returns_correct_dtype
     assert size == (len(dataset_value),)
 
 
-def test_GIVEN_stream_with_no_forwarder_streams_WHEN_generating_forwarder_command_THEN_output_does_not_contain_any_pvs():
-    streams = {
-        "stream1": {"writer_module": "ev42", "source": "source1", "topic": "topic1"}
-    }
+def test_GIVEN_stream_with_no_forwarder_streams_WHEN_generating_forwarder_command_THEN_output_does_not_contain_any_pvs(
+    file
+):
+    group_name = "test_group"
+    group = file.create_group(group_name)
+    group.attrs["NX_class"] = "NCstream"
+
+    group.create_dataset("writer_module", data="ev42")
+    group.create_dataset("source", data="source1")
+    group.create_dataset("topic", data="topic1")
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "ca")
+    generate_forwarder_command(dummy_file, file, "ca")
 
     assert not literal_eval(dummy_file.getvalue())["streams"]
 
 
-def test_GIVEN_stream_with_f142_command_WHEN_generating_forwarder_command_THEN_output_contains_pv():
+def test_GIVEN_stream_with_f142_command_WHEN_generating_forwarder_command_THEN_output_contains_pv(
+    file
+):
     pv_name = "pv1"
-    topic = "localhost:9092/someTopic"
+    topic = "someTopic"
     writer_module = "f142"
-    streams = {
-        "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic}
-    }
+    group_name = "test_group"
+    group = file.create_group(group_name)
+    group.attrs["NX_class"] = "NCstream"
+
+    group.create_dataset("writer_module", data=writer_module)
+    group.create_dataset("topic", data=topic)
+    group.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "ca")
+    generate_forwarder_command(dummy_file, file, "ca")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1

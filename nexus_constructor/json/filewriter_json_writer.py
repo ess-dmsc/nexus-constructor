@@ -4,16 +4,13 @@ import uuid
 import logging
 from typing import Union
 
-import typing
 
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.json.helpers import object_to_json_file
-from nexus_constructor.nexus.nexus_wrapper import (
-    get_nx_class,
-    get_name_of_node,
+from nexus_constructor.json.helpers import (
+    object_to_json_file,
     _separate_dot_field_group_hierarchy,
-    _handle_stream_dataset,
 )
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
 
 NexusObject = Union[h5py.Group, h5py.Dataset]
 
@@ -21,7 +18,6 @@ NexusObject = Union[h5py.Group, h5py.Dataset]
 def generate_json(
     data: Instrument,
     file,
-    streams=None,
     links=None,
     nexus_file_name: str = "",
     broker: str = "",
@@ -96,7 +92,6 @@ class NexusToDictConverter:
     """
 
     def __init__(self):
-        self._kafka_streams = {}
         self._links = {}
 
     def convert(self, nexus_root: NexusObject, links: dict):
@@ -183,7 +178,7 @@ class NexusToDictConverter:
                         item_dict, dots_in_field_name, item
                     )
                 else:
-                    item_dict[name] = _handle_stream_dataset(item[...])
+                    item_dict[name] = item[...][()]
             root_dict["children"].append({"type": "stream", "stream": item_dict})
 
         elif root.name in self._links.keys():

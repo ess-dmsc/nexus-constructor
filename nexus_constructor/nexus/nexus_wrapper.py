@@ -3,10 +3,11 @@ import uuid
 
 import h5py
 from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar, Optional, List, Dict, Tuple, Union
+from typing import Any, TypeVar, Optional, List
 import numpy as np
 
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
@@ -83,57 +84,6 @@ def get_fields(
             ):
                 stream_fields.append(item)
     return scalar_fields, array_fields, stream_fields, link_fields
-
-
-def _separate_dot_field_group_hierarchy(
-    item_dict: Dict[Any, Any],
-    dots_in_field_name: List[str],
-    item: Tuple[str, h5py.Group],
-):
-    previous_group = item_dict
-    for subgroup in dots_in_field_name:
-        # do not overwrite a group unless it doesn't yet exist
-        if subgroup not in previous_group:
-            previous_group[subgroup] = dict()
-        if subgroup == dots_in_field_name[-1]:
-            # set the value of the field to the last item in the list
-            previous_group[subgroup] = _handle_stream_dataset(item[1][...])
-        previous_group = previous_group[subgroup]
-
-
-def _handle_stream_dataset(stream_dataset: h5py.Dataset) -> Union[str, bool, int]:
-    if stream_dataset.dtype == h5py.special_dtype(vlen=str):
-        return str(stream_dataset)
-    if stream_dataset.dtype == bool:
-        return bool(stream_dataset)
-    if stream_dataset.dtype == int:
-        return int(stream_dataset)
-
-
-def get_streams(root) -> Dict[str, Dict[str, str]]:
-    """
-    Find all streams and return them in the expected format for JSON serialisiation.
-    :return: A dictionary of stream groups, with their respective field names and values.
-    """
-    streams_dict = dict()
-
-    def find_streams(_, node):
-        if isinstance(node, h5py.Group):
-            if "NX_class" in node.attrs:
-                if node.attrs["NX_class"] == "NCstream":
-                    item_dict = dict()
-                    for name, item in node.items():
-                        dots_in_field_name = name.split(".")
-                        if len(dots_in_field_name) > 1:
-                            _separate_dot_field_group_hierarchy(
-                                item_dict, dots_in_field_name, item
-                            )
-                        else:
-                            item_dict[name] = _handle_stream_dataset(item[...])
-                    streams_dict[node.name] = item_dict
-
-    root.visititems(find_streams)
-    return streams_dict
 
 
 class NexusWrapper(QObject):

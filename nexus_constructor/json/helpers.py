@@ -1,4 +1,7 @@
 import json
+from typing import Dict, Any, List, Tuple
+
+import h5py
 import numpy as np
 
 
@@ -22,3 +25,19 @@ def object_to_json_file(tree_dict, file):
     """
 
     json.dump(tree_dict, file, indent=2, sort_keys=False, default=handle_non_std_types)
+
+
+def _separate_dot_field_group_hierarchy(
+    item_dict: Dict[Any, Any],
+    dots_in_field_name: List[str],
+    item: Tuple[str, h5py.Group],
+):
+    previous_group = item_dict
+    for subgroup in dots_in_field_name:
+        # do not overwrite a group unless it doesn't yet exist
+        if subgroup not in previous_group:
+            previous_group[subgroup] = dict()
+        if subgroup == dots_in_field_name[-1]:
+            # set the value of the field to the last item in the list
+            previous_group[subgroup] = item[1][...][()]
+        previous_group = previous_group[subgroup]
