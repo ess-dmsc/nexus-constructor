@@ -518,17 +518,29 @@ def test_GIVEN_stream_with_f142_command_WHEN_generating_forwarder_command_THEN_o
     assert streams_[0]["converter"]["schema"] == writer_module
 
 
-def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142_is_contained():
+def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142_is_contained(
+    file
+):
+
+    group = file.create_group("test_group")
+    group.attrs["NX_class"] = "NCstream"
+
+    group.create_dataset("writer_module", data="ev42")
+    group.create_dataset("source", data="source1")
+    group.create_dataset("topic", data="topic1")
+
+    group2 = file.create_group("test_group2")
+    group2.attrs["NX_class"] = "NCstream"
+
     pv_name = "pv1"
     topic = "localhost:9092/someTopic"
     writer_module = "f142"
-    streams = {
-        "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic},
-        "stream2": {"writer_module": "ev42", "source": "source1", "topic": "topic1"},
-    }
+    group2.create_dataset("writer_module", data=writer_module)
+    group2.create_dataset("topic", data=topic)
+    group2.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "ca")
+    generate_forwarder_command(dummy_file, file, "ca")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1
@@ -537,16 +549,23 @@ def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142
     assert streams_[0]["converter"]["schema"] == writer_module
 
 
-def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_output_contains_pv():
+def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_output_contains_pv(
+    file
+):
     pv_name = "tdcpv1"
     topic = "localhost:9092/someOtherTopic"
     writer_module = "TdcTime"
-    streams = {
-        "stream1": {"writer_module": writer_module, "source": pv_name, "topic": topic}
-    }
+
+    group_name = "test_group"
+    group = file.create_group(group_name)
+    group.attrs["NX_class"] = "NCstream"
+
+    group.create_dataset("writer_module", data=writer_module)
+    group.create_dataset("topic", data=topic)
+    group.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, streams, "pva")
+    generate_forwarder_command(dummy_file, file, "pva")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1
