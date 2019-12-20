@@ -140,6 +140,10 @@ def test_GIVEN_json_containing_string_dataset_and_attribute_WHEN_json_to_nexus_c
 
 def test_GIVEN_json_containing_stream_WHEN_json_to_nexus_called_THEN_stream_created_in_NeXus():
     group_name = "test_group"
+    topic = "test_topic"
+    writer_module = "f142"
+    source = "test_source"
+    type = "double"
     test_json = f"""
     {{
       "nexus_structure": {{
@@ -151,10 +155,10 @@ def test_GIVEN_json_containing_stream_WHEN_json_to_nexus_called_THEN_stream_crea
               {{
                 "type": "stream",
                 "stream": {{
-                  "type": "double",
-                  "writer_module": "f142",
-                  "source": "test_source",
-                  "topic": "test_topic"
+                  "type": "{type}",
+                  "writer_module": "{writer_module}",
+                  "source": "{source}",
+                  "topic": "{topic}"
                 }}
               }}
             ]
@@ -166,6 +170,10 @@ def test_GIVEN_json_containing_stream_WHEN_json_to_nexus_called_THEN_stream_crea
     nexus_file = json_to_nexus(test_json)
     assert group_name in nexus_file
     assert nexus_file[group_name]
+    assert nexus_file[group_name]["topic"][()] == topic
+    assert nexus_file[group_name]["writer_module"][()] == writer_module
+    assert nexus_file[group_name]["type"][()] == type
+    assert nexus_file[group_name]["source"][()] == source
 
 
 def test_GIVEN_json_containing_link_WHEN_json_to_nexus_called_THEN_link_created_in_NeXus():
