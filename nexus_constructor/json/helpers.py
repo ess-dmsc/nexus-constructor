@@ -10,7 +10,7 @@ def handle_non_std_types(value):
         return bool(value)
     elif type(value) is np.ndarray:
         return list(value)
-    elif type(value) is np.int8:
+    elif type(value) is np.int8 or type(value) is np.int64:
         return int(value)
     raise (TypeError("Unknown type: {}".format(type(value))))
 
@@ -39,5 +39,5 @@ def _separate_dot_field_group_hierarchy(
             previous_group[subgroup] = dict()
         if subgroup == dots_in_field_name[-1]:
             # set the value of the field to the last item in the list
-            previous_group[subgroup] = item[1][...][()]
+            previous_group[subgroup] = item[...][()]
         previous_group = previous_group[subgroup]
