@@ -335,7 +335,7 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     component_model,
     set_of_all_actions,
 ):
-    # Create and select a transformation
+    # Create a transformation and select it on the component list
     sample_component_index = get_sample_index(component_tree_view)
     add_transformation_at_index(
         component_model, component_tree_view, sample_component_index
@@ -388,7 +388,7 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     component_model,
     set_of_all_actions,
 ):
-    # Create and select a link
+    # Create a link and select it on the component list
     sample_component_index = get_sample_index(component_tree_view)
     add_link_at_index(component_model, component_tree_view, sample_component_index)
     transformation_list_index = get_transformation_list_index(
@@ -432,7 +432,7 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
     component_model,
     set_of_all_actions,
 ):
-    # Add a link then select the sample component
+    # Create a link and then select the sample component
     sample_component_index = get_sample_index(component_tree_view)
     add_link_at_index(component_model, component_tree_view, sample_component_index)
     component_tree_view.setCurrentIndex(sample_component_index)
@@ -467,7 +467,7 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_T
     component_model,
     set_of_all_actions,
 ):
-    # Add a link then select the transformation list
+    # Create a link and then select the transformation list
     sample_component_index = get_sample_index(component_tree_view)
     add_link_at_index(component_model, component_tree_view, sample_component_index)
     transformation_list_index = get_transformation_list_index(
@@ -505,7 +505,7 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
     component_model,
     set_of_all_actions,
 ):
-    # Select the transformation list without creating a link
+    # Don't create a link and then select the transformation list
     sample_component_index = get_sample_index(component_tree_view)
     transformation_list_index = get_transformation_list_index(
         component_model, component_tree_view, sample_component_index
@@ -537,7 +537,6 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
 def test_GIVEN_item_is_component_WHEN_expanding_transformation_list_THEN_transformation_list_is_expanded(
     component_tree_view, component_model
 ):
-
     sample_component_index = get_sample_index(component_tree_view)
     expand_transformation_list(
         sample_component_index, component_tree_view, component_model
@@ -552,7 +551,6 @@ def test_GIVEN_item_is_component_WHEN_expanding_transformation_list_THEN_transfo
 def test_GIVEN_item_is_transformation_list_WHEN_expanding_transformation_list_THEN_transformation_is_expanded(
     component_tree_view, component_model
 ):
-
     sample_component_index = get_sample_index(component_tree_view)
     transformation_list_index = get_transformation_list_index(
         component_model, component_tree_view, sample_component_index
