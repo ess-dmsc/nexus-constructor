@@ -127,15 +127,14 @@ def get_data_and_type(root: h5py.Dataset):
 
 class NexusToDictConverter:
     """
-    Class used to convert nexus format root to python dict
+    Class used to convert NeXus format root to python dict
     """
 
     def convert(self, nexus_root: NexusObject):
         """
         Converts the given nexus_root to dict with correct replacement of
         the streams
-        :param links:
-        :param nexus_root
+        :param nexus_root: the root object to convert from NeXus to JSON
         :return: dictionary
         """
         return {
@@ -163,6 +162,7 @@ class NexusToDictConverter:
             self._handle_stream(root, root_dict)
 
         for entry in root.values():
+            # Check if there are SoftLinks in the group
             if isinstance(root.get(name=entry.name, getlink=True), h5py.SoftLink):
                 self._handle_link(entry, root, root_dict)
             root_dict["children"].append(self._root_to_dict(entry))
@@ -171,6 +171,12 @@ class NexusToDictConverter:
 
     @staticmethod
     def _handle_link(entry: NexusObject, root: h5py.Group, root_dict: Dict):
+        """
+        Create link specific fields in the JSON when a softlink is found.
+        :param entry: The entry (dataset or group) that is to be linked
+        :param root: the group containing the link object
+        :param root_dict: the output dictionary for the JSON writer
+        """
         root_dict["children"].append(
             {
                 "type": "link",
@@ -181,6 +187,11 @@ class NexusToDictConverter:
 
     @staticmethod
     def _handle_stream(root: h5py.Group, root_dict: Dict):
+        """
+        Given a stream group handle the stream-specific fields in the JSON
+        :param root: group containing stream fields
+        :param root_dict: JSON output dictionary
+        """
         item_dict = dict()
         for name, item in root.items():
             dots_in_field_name = name.split(".")
