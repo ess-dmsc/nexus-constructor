@@ -13,6 +13,7 @@ from nexus_constructor.json.filewriter_json_writer import (
     generate_json,
     _add_attributes,
     ATTR_NAME_BLACKLIST,
+    get_data_and_type,
 )
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
@@ -29,9 +30,7 @@ def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct
 
     dataset = file.create_dataset("test_dataset", dtype="float32", data=expected_value)
 
-    converter = NexusToDictConverter()
-
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert size == expected_size
     assert dtype == expected_dtype
@@ -47,9 +46,7 @@ def test_GIVEN_float64_WHEN_getting_data_and_dtype_THEN_function_returns_correct
 
     dataset = file.create_dataset("test_dataset", dtype=np.float64, data=expected_value)
 
-    converter = NexusToDictConverter()
-
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert size == expected_size
     assert dtype == expected_dtype
@@ -65,9 +62,7 @@ def test_GIVEN_int32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_f
 
     dataset = file.create_dataset("test_dataset", dtype="int32", data=expected_value)
 
-    converter = NexusToDictConverter()
-
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert size == expected_size
     assert dtype == expected_dtype
@@ -83,9 +78,7 @@ def test_GIVEN_int64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_f
 
     dataset = file.create_dataset("test_dataset", dtype="int64", data=expected_value)
 
-    converter = NexusToDictConverter()
-
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert size == expected_size
     assert dtype == expected_dtype
@@ -101,9 +94,7 @@ def test_GIVEN_single_string_WHEN_getting_data_and_dtype_THEN_function_returns_c
 
     dataset = file.create_dataset("test_dataset", data=expected_value, dtype="S5")
 
-    converter = NexusToDictConverter()
-
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert size == expected_size
     assert dtype == expected_dtype
@@ -117,8 +108,7 @@ def test_GIVEN_array_WHEN_getting_data_and_dtype_THEN_function_returns_correcte_
     expected_values = [1.1, 1.2, 1.3]
 
     dataset = file.create_dataset("test_dataset", data=expected_values, dtype="float32")
-    converter = NexusToDictConverter()
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert size == (len(expected_values),)
     assert np.allclose(data, expected_values)
@@ -139,7 +129,7 @@ def test_GIVEN_nx_class_and_attributes_are_bytes_WHEN_output_to_json_THEN_they_a
     dataset.attrs["string_attr"] = test_string_attr
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, {})
+    root_dict = converter.convert(file)
 
     ds = root_dict["children"][0]
 
@@ -164,7 +154,7 @@ def test_GIVEN_dataset_with_an_attribute_WHEN_output_to_json_THEN_attribute_is_p
     dataset.attrs[test_attr_name] = test_input
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, {})
+    root_dict = converter.convert(file)
 
     ds = root_dict["children"][0]
 
@@ -185,7 +175,7 @@ def test_GIVEN_dataset_with_an_array_attribute_WHEN_output_to_json_THEN_attribut
     dataset.attrs[test_attr_name] = test_input
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, {})
+    root_dict = converter.convert(file)
 
     ds = root_dict["children"][0]
 
@@ -204,7 +194,7 @@ def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist
     dataset.attrs["NX_class"] = "NXpinhole"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, {})
+    root_dict = converter.convert(file)
 
     ds = root_dict["children"][0]
 
@@ -225,7 +215,7 @@ def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_
     dataset.attrs["NX_class"] = "NXpinhole"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, {})
+    root_dict = converter.convert(file)
     ds = root_dict["children"][0]
 
     assert ds["name"].lstrip("/") == dataset_name
@@ -254,7 +244,7 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
         group.create_dataset(name, data=value)
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, {})
+    root_dict = converter.convert(file)
 
     assert group_name == root_dict["children"][0]["name"]
     assert group_contents == root_dict["children"][0]["children"][0]["stream"]
@@ -264,43 +254,50 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children(
     file
 ):
+    root_group = file.create_group("root")
+
     group_to_be_linked_name = "test_linked_group"
-    group_to_be_linked = file.create_group(group_to_be_linked_name)
+    group_to_be_linked = root_group.create_group(group_to_be_linked_name)
     group_to_be_linked.attrs["NX_class"] = "NXgroup"
 
     group_name = "test_group_with_link"
-    file[group_name] = h5py.SoftLink(group_to_be_linked.name)
-    file[group_name].attrs["NX_class"] = "NXgroup"
+    root_group[group_name] = h5py.SoftLink(group_to_be_linked.name)
+    root_group[group_name].attrs["NX_class"] = "NXgroup"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(
-        file, links={file[group_name].name: group_to_be_linked}
-    )
+    root_dict = converter.convert(file)
 
-    assert root_dict["children"][0]["type"] == "link"
-    assert file[group_name].name.split("/")[-1] == root_dict["children"][0]["name"]
-    assert group_to_be_linked.name == root_dict["children"][0]["target"]
+    assert root_dict["children"][0]["children"][0]["type"] == "link"
+    assert (
+        root_group[group_name].name.split("/")[-1]
+        == root_dict["children"][0]["children"][0]["name"]
+    )
+    assert group_to_be_linked.name == root_dict["children"][0]["children"][0]["target"]
 
 
 def test_GIVEN_link_in_group_children_that_is_a_dataset_WHEN_handling_group_THEN_link_is_appended_to_children(
     file
 ):
+    root_group = file.create_group("root")
     ds_to_be_linked_name = "test_linked_dataset"
-    dataset_to_be_linked = file.create_dataset(ds_to_be_linked_name, data=1)
+    dataset_to_be_linked = root_group.create_dataset(ds_to_be_linked_name, data=1)
     dataset_to_be_linked.attrs["NX_class"] = "NXgroup"
 
     group_name = "test_group_with_link"
-    file[group_name] = h5py.SoftLink(dataset_to_be_linked.name)
-    file[group_name].attrs["NX_class"] = "NXgroup"
+    root_group[group_name] = h5py.SoftLink(dataset_to_be_linked.name)
+    root_group[group_name].attrs["NX_class"] = "NXgroup"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(
-        file, links={file[group_name].name: dataset_to_be_linked}
-    )
+    root_dict = converter.convert(file)
 
-    assert root_dict["children"][0]["type"] == "link"
-    assert file[group_name].name.split("/")[-1] == root_dict["children"][0]["name"]
-    assert dataset_to_be_linked.name == root_dict["children"][0]["target"]
+    assert root_dict["children"][0]["children"][0]["type"] == "link"
+    assert (
+        root_group[group_name].name.split("/")[-1]
+        == root_dict["children"][0]["children"][0]["name"]
+    )
+    assert (
+        dataset_to_be_linked.name == root_dict["children"][0]["children"][0]["target"]
+    )
 
 
 def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN_attributes_end_up_in_file(
@@ -327,7 +324,7 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
     field2.attrs["NX_class"] = "NXfield"
 
     converter = NexusToDictConverter()
-    root_dict = converter.convert(file, links={})
+    root_dict = converter.convert(file)
 
     assert group.name.split("/")[-1] == root_dict["children"][0]["name"]
 
@@ -442,8 +439,7 @@ def test_GIVEN_float64_WHEN_getting_data_and_type_THEN_returns_correct_dtype(fil
     dataset_value = np.float64(2.123)
 
     dataset = file.create_dataset(dataset_name, dtype=dataset_type, data=dataset_value)
-    converter = NexusToDictConverter()
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert data == dataset_value
     assert dtype == "double"
@@ -456,8 +452,7 @@ def test_GIVEN_float_WHEN_getting_data_and_type_THEN_returns_correct_dtype(file)
     dataset_value = np.float32(2.123)
 
     dataset = file.create_dataset(dataset_name, dtype=dataset_type, data=dataset_value)
-    converter = NexusToDictConverter()
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert data == dataset_value
     assert dtype == "float"
@@ -469,9 +464,8 @@ def test_GIVEN_string_list_WHEN_getting_data_and_type_THEN_returns_correct_dtype
     dataset_value = np.string_(["s", "t", "r"])
 
     dataset = file.create_dataset(dataset_name, data=dataset_value)
-    converter = NexusToDictConverter()
 
-    data, dtype, size = converter._get_data_and_type(dataset)
+    data, dtype, size = get_data_and_type(dataset)
 
     assert data == [x.decode("ASCII") for x in list(dataset_value)]
     assert size == (len(dataset_value),)

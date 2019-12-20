@@ -342,7 +342,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     file,
                     nexus_file_name=nexus_file_name,
                     broker=broker,
-                    links=self.instrument.get_links(),
                     start_time=start_time,
                     stop_time=stop_time,
                     service_id=service_id,

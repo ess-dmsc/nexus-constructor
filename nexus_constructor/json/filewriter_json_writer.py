@@ -2,8 +2,7 @@ import h5py
 import numpy as np
 import uuid
 import logging
-from typing import Union
-
+from typing import Union, Dict
 
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import (
@@ -12,13 +11,12 @@ from nexus_constructor.json.helpers import (
 )
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
 
-NexusObject = Union[h5py.Group, h5py.Dataset]
+NexusObject = Union[h5py.Group, h5py.Dataset, h5py.SoftLink]
 
 
 def generate_json(
     data: Instrument,
     file,
-    links=None,
     nexus_file_name: str = "",
     broker: str = "",
     start_time: str = None,
@@ -38,11 +36,8 @@ def generate_json(
     :param nexus_file_name: The NeXus file name in the write command for the filewriter.
     """
 
-    if links is None:
-        links = {}
-
     converter = NexusToDictConverter()
-    tree = converter.convert(data.nexus.nexus_file, links)
+    tree = converter.convert(data.nexus.nexus_file)
     write_command, _ = create_writer_commands(
         tree,
         nexus_file_name,
@@ -86,15 +81,56 @@ def _add_attributes(root: NexusObject, root_dict: dict):
     return root_dict
 
 
+def get_data_and_type(root: h5py.Dataset):
+    """
+    get the value and data type of dataset
+    :param root: h5py dataset
+    :return: the data in the dataset, the datatype and the size of the data in the dataset
+    """
+    size = 1
+    data = root[()]
+    dtype = root.dtype
+    if type(data) is np.ndarray:
+        size = data.shape
+        data = data.tolist()
+    if dtype.char == "S" or dtype == h5py.special_dtype(vlen=str):
+        try:
+            if isinstance(data, list):
+                data = [str_item.decode("utf-8") for str_item in data]
+            else:
+                data = data.decode("utf-8")
+        except AttributeError:  # Already a str (decoded)
+            pass
+        dtype = "string"
+    elif dtype == np.float32:
+        dtype = "float"
+    elif dtype == np.float64:
+        dtype = "double"
+    elif dtype == np.int32:
+        dtype = "int32"
+        data = cast_to_int(data)
+    elif dtype == np.int64:
+        dtype = "int64"
+        data = cast_to_int(data)
+    elif dtype == np.uint32:
+        dtype = "uint32"
+        data = cast_to_int(data)
+    elif dtype == np.uint64:
+        dtype = "uint64"
+        data = cast_to_int(data)
+    else:
+        logging.error(
+            f"Unrecognised type {dtype}, don't know what to record as in JSON"
+        )
+    return data, dtype, size
+
+
 class NexusToDictConverter:
     """
     Class used to convert nexus format root to python dict
     """
 
-    def __init__(self):
-        self._links = {}
-
-    def convert(self, nexus_root: NexusObject, links: dict):
+    def convert(self, nexus_root: NexusObject):
         """
         Converts the given nexus_root to dict with correct replacement of
         the streams
@@ -102,7 +138,6 @@ class NexusToDictConverter:
         :param nexus_root
         :return: dictionary
         """
-        self._links = links
         return {
             "children": [self._root_to_dict(entry) for _, entry in nexus_root.items()]
         }
@@ -116,50 +151,6 @@ class NexusToDictConverter:
         root_dict = _add_attributes(root, root_dict)
         return root_dict
 
-    @staticmethod
-    def _get_data_and_type(root: h5py.Dataset):
-        """
-        get the value and data type of dataset
-        :param root: h5py dataset
-        :return: the data in the dataset, the datatype and the size of the data in the dataset
-        """
-        size = 1
-        data = root[()]
-        dtype = root.dtype
-        if type(data) is np.ndarray:
-            size = data.shape
-            data = data.tolist()
-        if dtype.char == "S" or dtype == h5py.special_dtype(vlen=str):
-            try:
-                if isinstance(data, list):
-                    data = [str_item.decode("utf-8") for str_item in data]
-                else:
-                    data = data.decode("utf-8")
-            except AttributeError:  # Already a str (decoded)
-                pass
-            dtype = "string"
-        elif dtype == np.float32:
-            dtype = "float"
-        elif dtype == np.float64:
-            dtype = "double"
-        elif dtype == np.int32:
-            dtype = "int32"
-            data = cast_to_int(data)
-        elif dtype == np.int64:
-            dtype = "int64"
-            data = cast_to_int(data)
-        elif dtype == np.uint32:
-            dtype = "uint32"
-            data = cast_to_int(data)
-        elif dtype == np.uint64:
-            dtype = "uint64"
-            data = cast_to_int(data)
-        else:
-            logging.error(
-                f"Unrecognised type {dtype}, don't know what to record as in JSON"
-            )
-        return data, dtype, size
-
     def _handle_group(self, root: h5py.Group):
         """
         Generate JSON dict for a h5py group.
@@ -168,56 +159,56 @@ class NexusToDictConverter:
         """
         root_dict = {"type": "group", "name": get_name_of_node(root), "children": []}
         # Add the entries
-        group_entries = list(root.values())
         if get_nx_class(root) == "NCstream":
-            item_dict = dict()
-            for name, item in root.items():
-                dots_in_field_name = name.split(".")
-                if len(dots_in_field_name) > 1:
-                    _separate_dot_field_group_hierarchy(
-                        item_dict, dots_in_field_name, item
-                    )
-                else:
-                    item_dict[name] = item[...][()]
-            root_dict["children"].append({"type": "stream", "stream": item_dict})
+            self._handle_stream(root, root_dict)
 
-        elif root.name in self._links.keys():
-            root_dict = self._create_link_root_dict(
-                root, self._links[root.name].file.get(root.name, getlink=True).path
-            )
-        elif group_entries:
-            for entry in group_entries:
-                root_dict["children"].append(self._root_to_dict(entry))
+        for entry in root.values():
+            if isinstance(root.get(name=entry.name, getlink=True), h5py.SoftLink):
+                self._handle_link(entry, root, root_dict)
+            root_dict["children"].append(self._root_to_dict(entry))
 
         return root_dict
 
-    def _handle_dataset(self, root: Union[h5py.Dataset, h5py.SoftLink]):
+    @staticmethod
+    def _handle_link(entry: NexusObject, root: h5py.Group, root_dict: Dict):
+        root_dict["children"].append(
+            {
+                "type": "link",
+                "name": get_name_of_node(entry),
+                "target": root.get(name=entry.name, getlink=True).path,
+            }
+        )
+
+    @staticmethod
+    def _handle_stream(root: h5py.Group, root_dict: Dict):
+        item_dict = dict()
+        for name, item in root.items():
+            dots_in_field_name = name.split(".")
+            if len(dots_in_field_name) > 1:
+                _separate_dot_field_group_hierarchy(item_dict, dots_in_field_name, item)
+            else:
+                item_dict[name] = item[...][()]
+        root_dict["children"].append({"type": "stream", "stream": item_dict})
+
+    @staticmethod
+    def _handle_dataset(root: Union[h5py.Dataset, h5py.SoftLink]):
         """
         Generate JSON dict for a h5py dataset.
         :param root: h5py dataset to generate dict from.
         :return: generated dictionary of dataset values and attrs.
         """
-        data, dataset_type, size = self._get_data_and_type(root)
+        data, dataset_type, size = get_data_and_type(root)
 
-        if self._links and root.name in self._links.keys():
-            root_dict = self._create_link_root_dict(
-                root, root.file.get(root.name, getlink=True).path
-            )
-        else:
-            root_dict = {
-                "type": "dataset",
-                "name": get_name_of_node(root),
-                "dataset": {"type": dataset_type},
-                "values": data,
-            }
-            if size != 1:
-                root_dict["dataset"]["size"] = size
+        root_dict = {
+            "type": "dataset",
+            "name": get_name_of_node(root),
+            "dataset": {"type": dataset_type},
+            "values": data,
+        }
+        if size != 1:
+            root_dict["dataset"]["size"] = size
 
         return root_dict
-
-    @staticmethod
-    def _create_link_root_dict(root, target):
-        return {"type": "link", "name": get_name_of_node(root), "target": target}
 
 
 def create_writer_commands(
