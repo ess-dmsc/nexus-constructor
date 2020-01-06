@@ -228,7 +228,9 @@ class Component:
         self.file.set_attribute_value(
             field, "vector", qvector3d_to_numpy_array(unit_vector)
         )
-        self.file.set_attribute_value(field, "transformation_type", "Translation")
+        self.file.set_attribute_value(
+            field, "transformation_type", TransformationType.TRANSLATION.value
+        )
 
         translation_transform = Transformation(self.file, field)
         translation_transform.depends_on = depends_on

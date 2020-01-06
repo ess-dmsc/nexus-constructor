@@ -191,7 +191,9 @@ class ComponentTreeModel(QAbstractItemModel):
             target_index = self.parent(parent_index)
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
-                name=generate_unique_name("Translation", transformation_list),
+                name=generate_unique_name(
+                    TransformationType.TRANSLATION.value, transformation_list
+                ),
                 vector=QVector3D(1.0, 0, 0),
             )
         elif transformation_type == TransformationType.ROTATION:
