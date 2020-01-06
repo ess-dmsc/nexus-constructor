@@ -60,16 +60,18 @@ def set_button_state(
     :param zoom_action: The action for zooming on a component.
     :param edit_component_action: The action for editing a component.
     """
-    indices = component_tree_view.selectedIndexes()
-    if len(indices) != 1:
-        delete_action.setEnabled(False)
-        duplicate_action.setEnabled(False)
-        new_rotation_action.setEnabled(False)
-        new_translation_action.setEnabled(False)
-        create_link_action.setEnabled(False)
-        zoom_action.setEnabled(False)
+    selection_indices = component_tree_view.selectedIndexes()
+    if len(selection_indices) != 1:
+        handle_number_of_items_selected_is_not_one(
+            create_link_action,
+            delete_action,
+            duplicate_action,
+            new_rotation_action,
+            new_translation_action,
+            zoom_action,
+        )
     else:
-        selected_object = indices[0].internalPointer()
+        selected_object = selection_indices[0].internalPointer()
 
         zoom_action.setEnabled(isinstance(selected_object, Component))
 
@@ -101,6 +103,31 @@ def set_button_state(
             create_link_action.setEnabled(not selected_object.parent.has_link)
         else:
             create_link_action.setEnabled(False)
+
+
+def handle_number_of_items_selected_is_not_one(
+    delete_action: QAction,
+    duplicate_action: QAction,
+    new_rotation_action: QAction,
+    new_translation_action: QAction,
+    create_link_action: QAction,
+    zoom_action: QAction,
+):
+    """
+    Disables all actions when the number of selected items in the Component Tree View is not equal to one.
+    :param delete_action: The action for deleting an item.
+    :param duplicate_action: The action for duplicating an item.
+    :param new_rotation_action: The action for creating a new rotation.
+    :param new_translation_action: The action for creating a new translation.
+    :param create_link_action: The action for creating a link.
+    :param zoom_action: The action for zooming on a component.
+    """
+    delete_action.setEnabled(False)
+    duplicate_action.setEnabled(False)
+    new_rotation_action.setEnabled(False)
+    new_translation_action.setEnabled(False)
+    create_link_action.setEnabled(False)
+    zoom_action.setEnabled(False)
 
 
 def expand_transformation_list(
