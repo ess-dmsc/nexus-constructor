@@ -383,12 +383,17 @@ def enter_component_with_pixel_fields(
     pixel_data: PixelData,
 ):
     """
-    :param add_component_dialog:
-    :param component_name:
-    :param mock_pixel_options:
-    :param pixel_grid_size:
-    :param qtbot:
-    :param template:
+    Mimics the user entering a component with pixel data by having the pixel options appear and then instructing it to
+    return pixel data.
+    :param add_component_dialog: The AddComponentDialog.
+    :param button: The shape type button that is pressed in order to make the PixelOptions appear. Can be either mesh or
+        cylinder.
+    :param component_name: The component name.
+    :param mock_pixel_options: A mock of the PixelOptions widget that returns fake pixel data when the OK button is
+        pressed.
+    :param qtbot: The QtBot testing tool.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param pixel_data: The pixel data that is returned by the mock PixelOptions.
     """
     make_pixel_options_appear(qtbot, button, add_component_dialog, template)
     enter_component_name(qtbot, template, add_component_dialog, component_name)
@@ -404,6 +409,17 @@ def enter_and_create_component_with_pixel_data(
     template: QDialog,
     pixel_data: PixelData = None,
 ):
+    """
+    Mimics the user entering the details of a component with pixel data and pressing OK.
+    :param add_component_dialog: The AddComponentDialog.
+    :param component_name: The component name.
+    :param cylinders: A bool indicating whether the component has a Cylinder or a Mesh shape.
+    :param mock_pixel_options: A mock of the PixelOptions object.
+    :param qtbot: The QtBot testing tool.
+    :param template: The widget/window that contains the AddComponentDialog.
+    :param pixel_data: The mock pixel data that is returned when the OK button is pressed.
+    :return The expected geometry type of the new component.
+    """
 
     if cylinders:
         button = add_component_dialog.CylinderRadioButton
@@ -437,17 +453,24 @@ def edit_component_with_pixel_fields(
     add_component_dialog: AddComponentDialog,
     component_to_edit: Component,
     parent_mock: Mock,
-    mock_pixel_options: Mock = None,
-    pixel_data: PixelData = None,
+    mock_pixel_options: Mock,
+    new_pixel_data: PixelData = None,
 ):
-
+    """
+    Mimics a user editing the pixel data of an existing component and pressing OK.
+    :param add_component_dialog: The AddComponentDialog.
+    :param component_to_edit: The component to edit.
+    :param parent_mock: A mock of the AddComponentDialog parent. Required only when editing components.
+    :param mock_pixel_options: A mock of the PixelOptions object.
+    :param new_pixel_data: The new pixel data that will be generated when the OK button is pressed. None is used when
+        testing the scenario in which a user removes the existing pixel data.
+    """
     # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
     add_component_dialog.component_to_edit = component_to_edit
     add_component_dialog.parent = Mock(return_value=parent_mock)
 
     # Instruct the pixel options mock to generate different pixel data
-    if mock_pixel_options is not None:
-        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_data)
+    mock_pixel_options.generate_pixel_data = Mock(return_value=new_pixel_data)
 
     add_component_dialog.on_ok()
 

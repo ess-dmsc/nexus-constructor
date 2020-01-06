@@ -147,19 +147,19 @@ def show_window_and_wait_for_interaction(qtbot: QtBot, template: QDialog):
 
 
 @pytest.fixture(scope="function")
-def template(qtbot):
+def template(qtbot) -> QDialog:
     return QDialog()
 
 
 @pytest.fixture(scope="function")
-def nexus_wrapper():
+def nexus_wrapper() -> NexusWrapper:
     nexus_wrapper = NexusWrapper("test")
     yield nexus_wrapper
     nexus_wrapper.nexus_file.close()
 
 
 @pytest.fixture(scope="function")
-def instrument(nexus_wrapper):
+def instrument(nexus_wrapper) -> Instrument:
     return Instrument(nexus_wrapper, DEFINITIONS_DIR)
 
 
@@ -174,10 +174,7 @@ def add_component_dialog(
     template.ui.setupUi(template, mock_pixel_options)
     qtbot.addWidget(template)
 
-    yield dialog
-
-    # Close the file to avoid an error
-    instrument.nexus.nexus_file.close()
+    return dialog
 
 
 @pytest.fixture(scope="function")
