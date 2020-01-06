@@ -51,14 +51,20 @@ def units_are_expected_type(
     return True
 
 
-def units_have_dimension_of_one(input: str) -> bool:
+def units_have_magnitude_of_one(input: str, emit_logging_msg=True) -> bool:
     """
-    Checks that the unit has a dimension of one. This will cause the checks to reject input in the form of "40cm,"
+    Checks that the unit has a magnitude of one. This will cause the checks to reject input in the form of "40cm,"
     "2 radians," etc.
     :param input: The units string.
-    :return: True if the unit has a dimension of one, False otherwise.
+    :return: True if the unit has a magnitude of one, False otherwise.
     """
-    return ureg(input).magnitude == 1
+    if ureg(input).magnitude != 1:
+        if emit_logging_msg:
+            logging.info(
+                f"Unit input {input} has wrong magnitude. The input should have a magnitude of one."
+            )
+        return False
+    return True
 
 
 def calculate_unit_conversion_factor(original_units: str, desired_units: str) -> float:

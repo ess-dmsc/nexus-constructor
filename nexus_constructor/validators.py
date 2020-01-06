@@ -14,7 +14,7 @@ from stl import mesh
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_are_expected_type,
-    units_have_dimension_of_one,
+    units_have_magnitude_of_one,
     METRES,
 )
 
@@ -54,7 +54,7 @@ class UnitValidator(QValidator):
         if not (
             units_are_recognised_by_pint(input)
             and units_are_expected_type(input, METRES)
-            and units_have_dimension_of_one(input)
+            and units_have_magnitude_of_one(input)
         ):
             self.is_valid.emit(False)
             return QValidator.Intermediate

@@ -8,7 +8,7 @@ from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetai
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_are_expected_type,
-    units_have_dimension_of_one,
+    units_have_magnitude_of_one,
 )
 from nexus_constructor.validators import DATASET_TYPE
 
@@ -230,12 +230,11 @@ class NexusDefinedChopperChecker:
                 )
                 good_units = False
                 continue
-            if not units_have_dimension_of_one(unit_input):
+            if not units_have_magnitude_of_one(unit_input, False):
                 logging.info(
-                    f"{UNABLE} Units for {field} should have a dimension of one. Found value: {unit_input}"
+                    f"{UNABLE} Units for {field} should have a magnitude of one. Found value: {unit_input}"
                 )
                 good_units = False
-                continue
 
         return good_units
 
