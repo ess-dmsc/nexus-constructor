@@ -6,7 +6,6 @@ from PySide2.QtWidgets import QToolBar, QWidget, QTreeView
 
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window_utils import (
     create_and_add_toolbar_action,
     set_button_state,

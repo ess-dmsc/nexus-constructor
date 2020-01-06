@@ -2,7 +2,6 @@ import pytest
 
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.component.component import Component
-from uuid import uuid1
 import h5py
 from typing import Any
 
