@@ -13,15 +13,7 @@ from nexus_constructor.main_window_utils import (
     expand_transformation_list,
     add_transformation,
 )
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.transformation_types import TransformationType
-from tests.test_utils import DEFINITIONS_DIR
-from tests.ui_tests.ui_test_utils import show_window_and_wait_for_interaction  # noqa
-
-
-# @pytest.fixture
-# def template(qtbot):
-#     return QWidget()
 
 
 @pytest.fixture
@@ -47,13 +39,6 @@ def mouse_over_text():
 @pytest.fixture(scope="function")
 def trigger_method_mock():
     return Mock()
-
-
-@pytest.fixture(scope="function")
-def instrument():
-    nexus_wrapper = NexusWrapper("test")
-    yield Instrument(nexus_wrapper, DEFINITIONS_DIR)
-    nexus_wrapper.nexus_file.close()
 
 
 @pytest.fixture(scope="function")

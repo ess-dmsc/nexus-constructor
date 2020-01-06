@@ -17,7 +17,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
 )
 from nexus_constructor.pixel_options import (
     PixelOptions,
-    check_data_is_an_array,
+    data_is_an_array_with_more_than_one_element,
     INITIAL_COUNT_CORNER,
     COUNT_DIRECTION,
     PIXEL_GRID_STACK_INDEX,
@@ -578,19 +578,19 @@ def test_UI_GIVEN_no_pixels_button_is_pressed_WHEN_entering_pixel_data_THEN_call
 def test_GIVEN_scalar_value_WHEN_calling_check_data_is_an_array_THEN_returns_false():
 
     data = 3.5
-    assert not check_data_is_an_array(data)
+    assert not data_is_an_array_with_more_than_one_element(data)
 
 
 def test_GIVEN_array_with_single_element_WHEN_calling_check_data_is_an_array_THEN_returns_false():
 
     data = np.array([3.5])
-    assert not check_data_is_an_array(data)
+    assert not data_is_an_array_with_more_than_one_element(data)
 
 
 def test_GIVEN_array_with_multiple_elements_WHEN_calling_check_data_is_an_array_THEN_returns_true():
 
     data = np.arange(5)
-    assert check_data_is_an_array(data)
+    assert data_is_an_array_with_more_than_one_element(data)
 
 
 def test_GIVEN_array_of_pixel_offsets_WHEN_finding_row_properties_THEN_expected_values_are_returned(

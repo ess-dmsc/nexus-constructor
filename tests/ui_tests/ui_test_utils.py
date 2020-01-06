@@ -159,9 +159,15 @@ def nexus_wrapper():
 
 
 @pytest.fixture(scope="function")
-def add_component_dialog(qtbot, template, nexus_wrapper, mock_pixel_options):
+def instrument(nexus_wrapper):
+    return Instrument(nexus_wrapper, DEFINITIONS_DIR)
 
-    instrument = Instrument(nexus_wrapper, DEFINITIONS_DIR)
+
+@pytest.fixture(scope="function")
+def add_component_dialog(
+    qtbot, template, instrument, nexus_wrapper, mock_pixel_options
+):
+
     component = ComponentTreeModel(instrument)
     dialog = AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
     template.ui = dialog
