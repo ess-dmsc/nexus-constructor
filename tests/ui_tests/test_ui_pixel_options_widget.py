@@ -4,7 +4,6 @@ from unittest.mock import mock_open
 import pytest
 import numpy as np
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QWidget
 from mock import patch
 
 from nexus_constructor.component.component import Component
@@ -24,7 +23,6 @@ from nexus_constructor.pixel_options import (
     PIXEL_GRID_STACK_INDEX,
     PIXEL_MAPPING_STACK_INDEX,
 )
-from tests.helpers import create_nexus_wrapper
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -33,12 +31,6 @@ from tests.ui_tests.ui_test_utils import (
     VALID_OCTA_OFF_FILE,
     CORRECT_OCTA_FACES,
 )
-
-
-@pytest.fixture(scope="function")
-def template(qtbot):
-    template = QWidget()
-    return template
 
 
 @pytest.fixture(scope="function")
@@ -63,11 +55,6 @@ def pixel_grid():
     pixel_grid.initial_count_corner = Corner.BOTTOM_LEFT
 
     return pixel_grid
-
-
-@pytest.fixture(scope="function")
-def nexus_wrapper():
-    return create_nexus_wrapper()
 
 
 @pytest.fixture(scope="function")

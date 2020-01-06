@@ -31,7 +31,6 @@ from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
-from tests.helpers import create_nexus_wrapper
 from tests.test_utils import DEFINITIONS_DIR
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
@@ -104,54 +103,7 @@ FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 
 @pytest.fixture(scope="function")
-def template(qtbot):
-    return QDialog()
-
-
-@pytest.fixture(scope="function")
-def mock_pixel_options():
-    """
-    Creates a mock of the PixelOptions widget. Used for some basic testing of AddComponentDialog behaviour that requires
-    interaction with the PixelOptions. Testing of the PixelOptions behaviour takes place in a dedicated file.
-    """
-    pixel_options = Mock(spec=PixelOptions)
-    pixel_options.validator = Mock(spec=PixelValidator)
-    pixel_options.validator.unacceptable_pixel_states = Mock(return_value=[])
-
-    # When the method for creating a pixel mapping is called in PixelOptions, it causes the current mapping filename
-    # stored in PixelOptions to change. This behaviour is going to be mimicked with a side effect mock.
-    def change_mapping_filename(filename):
-        pixel_options.get_current_mapping_filename = Mock(return_value=filename)
-
-    pixel_options.populate_pixel_mapping_list_with_mesh = Mock(
-        side_effect=change_mapping_filename
-    )
-
-    # Make the filename in PixelOptions start as None as this is what the PixelOptions has after its been initialised.
-    change_mapping_filename(None)
-
-    return pixel_options
-
-
-@pytest.fixture(scope="function")
-def add_component_dialog(qtbot, template, mock_pixel_options):
-
-    instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
-    component = ComponentTreeModel(instrument)
-    dialog = AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
-    template.ui = dialog
-    template.ui.setupUi(template, mock_pixel_options)
-    qtbot.addWidget(template)
-
-    yield dialog
-
-    # Close the file to avoid an error
-    instrument.nexus.nexus_file.close()
-
-
-@pytest.fixture(scope="function")
-def component_with_cylindrical_geometry():
-    nexus_wrapper = create_nexus_wrapper()
+def component_with_cylindrical_geometry(nexus_wrapper):
     shape_group = nexus_wrapper.create_nx_group(
         "shape", "NXcylindrical_geometry", nexus_wrapper.instrument
     )
@@ -176,13 +128,14 @@ def parent_mock():
 @pytest.fixture(scope="function")
 def edit_component_dialog(
     qtbot,
+    nexus_wrapper,
     template,
     component_with_cylindrical_geometry,
     mock_pixel_options,
     parent_mock,
 ):
 
-    instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
+    instrument = Instrument(nexus_wrapper, DEFINITIONS_DIR)
     instrument.nexus = component_with_cylindrical_geometry.file
     component_tree = ComponentTreeModel(instrument)
     dialog = AddComponentDialog(
@@ -197,10 +150,7 @@ def edit_component_dialog(
 
     dialog.parent = Mock(return_value=parent_mock)
 
-    yield dialog
-
-    # Close the file to avoid an error
-    instrument.nexus.nexus_file.close()
+    return dialog
 
 
 @pytest.fixture(scope="function")

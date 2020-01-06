@@ -19,9 +19,9 @@ from tests.test_utils import DEFINITIONS_DIR
 from tests.ui_tests.ui_test_utils import show_window_and_wait_for_interaction  # noqa
 
 
-@pytest.fixture
-def template(qtbot):
-    return QWidget()
+# @pytest.fixture
+# def template(qtbot):
+#     return QWidget()
 
 
 @pytest.fixture

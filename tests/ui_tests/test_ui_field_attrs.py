@@ -27,9 +27,9 @@ def add_array_attribute(field_attributes_dialog, qtbot):
     return widget
 
 
-@pytest.fixture(scope="function")
-def template(qtbot):
-    return QDialog()
+# @pytest.fixture(scope="function")
+# def template(qtbot):
+#     return QDialog()
 
 
 @pytest.fixture(scope="function")

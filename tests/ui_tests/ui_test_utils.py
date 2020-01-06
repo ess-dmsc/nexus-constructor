@@ -1,8 +1,18 @@
 import sys
+from unittest.mock import Mock
 
+import pytest
 from PySide2.QtCore import QPoint, Qt
 from PySide2.QtWidgets import QAbstractButton, QDialog
 from pytestqt.qtbot import QtBot
+
+from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.pixel_options import PixelOptions
+from nexus_constructor.validators import PixelValidator
+from tests.test_utils import DEFINITIONS_DIR
 
 RUNNING_ON_WINDOWS = sys.platform.startswith("win")
 
@@ -134,3 +144,56 @@ def show_window_and_wait_for_interaction(qtbot: QtBot, template: QDialog):
         return
     template.show()
     qtbot.stopForInteraction()
+
+
+@pytest.fixture(scope="function")
+def template(qtbot):
+    return QDialog()
+
+
+@pytest.fixture(scope="function")
+def nexus_wrapper():
+    nexus_wrapper = NexusWrapper("test")
+    yield nexus_wrapper
+    nexus_wrapper.nexus_file.close()
+
+
+@pytest.fixture(scope="function")
+def add_component_dialog(qtbot, template, nexus_wrapper, mock_pixel_options):
+
+    instrument = Instrument(nexus_wrapper, DEFINITIONS_DIR)
+    component = ComponentTreeModel(instrument)
+    dialog = AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
+    template.ui = dialog
+    template.ui.setupUi(template, mock_pixel_options)
+    qtbot.addWidget(template)
+
+    yield dialog
+
+    # Close the file to avoid an error
+    instrument.nexus.nexus_file.close()
+
+
+@pytest.fixture(scope="function")
+def mock_pixel_options():
+    """
+    Creates a mock of the PixelOptions widget. Used for some basic testing of AddComponentDialog behaviour that requires
+    interaction with the PixelOptions. Testing of the PixelOptions behaviour takes place in a dedicated file.
+    """
+    pixel_options = Mock(spec=PixelOptions)
+    pixel_options.validator = Mock(spec=PixelValidator)
+    pixel_options.validator.unacceptable_pixel_states = Mock(return_value=[])
+
+    # When the method for creating a pixel mapping is called in PixelOptions, it causes the current mapping filename
+    # stored in PixelOptions to change. This behaviour is going to be mimicked with a side effect mock.
+    def change_mapping_filename(filename):
+        pixel_options.get_current_mapping_filename = Mock(return_value=filename)
+
+    pixel_options.populate_pixel_mapping_list_with_mesh = Mock(
+        side_effect=change_mapping_filename
+    )
+
+    # Make the filename in PixelOptions start as None as this is what the PixelOptions has after its been initialised.
+    change_mapping_filename(None)
+
+    return pixel_options

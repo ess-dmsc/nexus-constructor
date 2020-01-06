@@ -10,13 +10,8 @@ from nexus_constructor.geometry import (
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.pixel_data import PixelMapping
-from .helpers import create_nexus_wrapper, add_component_to_file
+from .helpers import add_component_to_file
 from pytest import approx
-
-
-@pytest.fixture(scope="function")
-def nexus_wrapper():
-    return create_nexus_wrapper()
 
 
 @pytest.fixture
@@ -86,8 +81,7 @@ def test_GIVEN_off_geometry_WHEN_calling_off_geometry_on_offGeometry_THEN_origin
     assert geom.off_geometry == geom
 
 
-def test_can_get_off_geometry_properties():
-    nexus_wrapper = create_nexus_wrapper()
+def test_can_get_off_geometry_properties(nexus_wrapper):
     component = add_component_to_file(nexus_wrapper)
 
     vertex_3_x = 0.0
@@ -115,8 +109,7 @@ def test_can_get_off_geometry_properties():
     assert nexus_shape.vertices[3].z() == approx(vertex_3_z)
 
 
-def test_can_set_off_geometry_properties():
-    nexus_wrapper = create_nexus_wrapper()
+def test_can_set_off_geometry_properties(nexus_wrapper):
     component = add_component_to_file(nexus_wrapper)
 
     vertices = [
@@ -153,9 +146,8 @@ def test_can_set_off_geometry_properties():
     assert nexus_shape.vertices[2].z() == approx(vertex_2_z)
 
 
-def test_can_record_list_of_vertices_for_each_face():
+def test_can_record_list_of_vertices_for_each_face(nexus_wrapper):
     # Reverse process of test_can_retrieve_list_of_vertices_for_each_face
-    nexus_wrapper = create_nexus_wrapper()
     component = add_component_to_file(nexus_wrapper)
 
     shape = OFFGeometryNoNexus(
@@ -186,10 +178,9 @@ def test_can_record_list_of_vertices_for_each_face():
     assert start_index_of_each_face == expected_output_start_index_of_each_face
 
 
-def test_can_retrieve_list_of_vertices_for_each_face():
+def test_can_retrieve_list_of_vertices_for_each_face(nexus_wrapper):
     # Reverse process of test_can_record_list_of_vertices_for_each_face
 
-    nexus_wrapper = create_nexus_wrapper()
     component = add_component_to_file(nexus_wrapper)
 
     shape = OFFGeometryNoNexus(
