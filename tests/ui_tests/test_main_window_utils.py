@@ -14,6 +14,7 @@ from nexus_constructor.main_window_utils import (
     add_transformation,
 )
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.transformation_types import TransformationType
 from tests.test_utils import DEFINITIONS_DIR
 from tests.ui_tests.ui_test_utils import show_window_and_wait_for_interaction  # noqa
 
@@ -170,7 +171,7 @@ def add_transformation_at_index(
     :param component_index: The QModelIndex that is selected when the transformation is added.
     """
     component_tree_view.setCurrentIndex(component_index)
-    component_model.add_transformation(component_index, "translation")
+    component_model.add_transformation(component_index, TransformationType.TRANSLATION)
 
 
 def add_link_at_index(
@@ -585,7 +586,9 @@ def test_GIVEN_translation_is_added_WHEN_adding_transformation_THEN_translation_
 ):
     sample_component_index = get_sample_index(component_tree_view)
     component_tree_view.setCurrentIndex(sample_component_index)
-    add_transformation("translation", component_tree_view, component_model)
+    add_transformation(
+        TransformationType.TRANSLATION, component_tree_view, component_model
+    )
     sample_component = sample_component_index.internalPointer()
 
     assert len(sample_component.transforms) == 1
@@ -597,7 +600,9 @@ def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_add
 ):
     sample_component_index = get_sample_index(component_tree_view)
     component_tree_view.setCurrentIndex(sample_component_index)
-    add_transformation("rotation", component_tree_view, component_model)
+    add_transformation(
+        TransformationType.ROTATION, component_tree_view, component_model
+    )
     sample_component = sample_component_index.internalPointer()
 
     assert len(sample_component.transforms) == 1

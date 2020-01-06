@@ -22,6 +22,7 @@ from nexus_constructor.main_window_utils import (
     expand_transformation_list,
     add_transformation,
 )
+from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
 from nexus_constructor.component.component import Component
@@ -108,14 +109,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.new_translation_action = create_and_add_toolbar_action(
             "new_translation.png",
             "New Translation",
-            lambda: self._add_transformation("translation"),
+            lambda: self._add_transformation(TransformationType.TRANSLATION),
             self.component_tool_bar,
             self.component_tree_view_tab,
         )
         self.new_rotation_action = create_and_add_toolbar_action(
             "new_rotation.png",
             "New Rotation",
-            lambda: self._add_transformation("rotation"),
+            lambda: self._add_transformation(TransformationType.ROTATION),
             self.component_tool_bar,
             self.component_tree_view_tab,
         )
@@ -236,7 +237,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _expand_transformation_list(self, node: QModelIndex):
         expand_transformation_list(node, self.component_tree_view, self.component_model)
 
-    def _add_transformation(self, transformation_type: str):
+    def _add_transformation(self, transformation_type: TransformationType):
         add_transformation(
             transformation_type, self.component_tree_view, self.component_model
         )

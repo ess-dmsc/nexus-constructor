@@ -8,6 +8,7 @@ from nexus_constructor.component.component import Component
 from nexus_constructor.component.link_transformation import LinkTransformation
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.transformations import Transformation
 
 
@@ -154,16 +155,16 @@ def expand_transformation_list(
 
 
 def add_transformation(
-    transformation_type,
+    transformation_type: TransformationType,
     component_tree_view: QTreeView,
     component_model: ComponentTreeModel,
 ):
     selected = component_tree_view.selectedIndexes()
     if len(selected) > 0:
         current_index = selected[0]
-        if transformation_type == "translation":
+        if transformation_type == TransformationType.TRANSLATION:
             component_model.add_translation(current_index)
-        elif transformation_type == "rotation":
+        elif transformation_type == TransformationType.ROTATION:
             component_model.add_rotation(current_index)
         else:
             raise ValueError(f"Unknown transformation type: {transformation_type}")
