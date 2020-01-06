@@ -216,13 +216,15 @@ class NexusDefinedChopperChecker:
         for field in UNITS_REQUIRED:
             unit_input = units_dict[field]
 
-            if not units_are_recognised_by_pint(unit_input):
+            if not units_are_recognised_by_pint(unit_input, False):
                 logging.info(
                     f"{UNABLE} Units for {field} are not recognised. Found value: {unit_input}"
                 )
                 good_units = False
                 continue
-            if not units_are_expected_type(unit_input, EXPECTED_UNIT_TYPE[field]):
+            if not units_are_expected_type(
+                unit_input, EXPECTED_UNIT_TYPE[field], False
+            ):
                 logging.info(
                     f"{UNABLE} Units for {field} have wrong type. Found {unit_input} but expected something that can be converted to {EXPECTED_UNIT_TYPE[field]}."
                 )

@@ -1,3 +1,5 @@
+import logging
+
 import pint
 
 RADIANS = "radians"
@@ -6,10 +8,13 @@ METRES = "metres"
 ureg = pint.UnitRegistry()
 
 
-def units_are_recognised_by_pint(input: str) -> bool:
+def units_are_recognised_by_pint(input: str, emit_logging_msg: bool = True) -> bool:
     """
     Checks if a string is a unit that can be recognised by pint.
     :param input: The units string.
+    :param emit_logging_msg: A bool indicating whether the logging message should be emitted. Sometimes false because
+        the function calling `units_are_recognised_by_pint` may have a more detailed logging message it produces when
+        `units_are_recognised_by_pint` returns false.
     :return: True if the unit is contained in the pint registry, False otherwise.
     """
     try:
@@ -19,12 +24,16 @@ def units_are_recognised_by_pint(input: str) -> bool:
         AttributeError,
         pint.compat.tokenize.TokenError,
     ):
+        if emit_logging_msg:
+            logging.info(f"Unit input {input} is not recognised.")
         return False
 
     return True
 
 
-def units_are_expected_type(input: str, expected_unit_type: str) -> bool:
+def units_are_expected_type(
+    input: str, expected_unit_type: str, emit_logging_msg=True
+) -> bool:
     """
     Checks if a unit is the expected type by trying to convert it.
     :param input: The units string.
@@ -33,6 +42,10 @@ def units_are_expected_type(input: str, expected_unit_type: str) -> bool:
     try:
         ureg(input).to(expected_unit_type)
     except (pint.errors.DimensionalityError, ValueError, AttributeError):
+        if emit_logging_msg:
+            logging.info(
+                f"Unit input {input} has wrong type. Expected something that could be converted to {expected_unit_type}."
+            )
         return False
 
     return True
