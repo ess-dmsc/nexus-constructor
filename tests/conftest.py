@@ -1,4 +1,8 @@
 from tests.chopper_test_helpers import chopper_details  # noqa: F401
-
-# Share the fixtures contained in ui_test_utils with all tests
-pytest_plugins = ["tests.ui_tests.ui_test_utils"]
+from tests.ui_tests.ui_test_utils import (
+    template,
+    nexus_wrapper,
+    instrument,
+    add_component_dialog,
+    mock_pixel_options,
+)  # noqa: F401
