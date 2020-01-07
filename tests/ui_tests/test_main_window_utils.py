@@ -2,37 +2,17 @@ from unittest.mock import Mock
 
 import pytest
 from PySide2.QtCore import QPoint, QModelIndex
-from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QDialog
+from PySide2.QtWidgets import QToolBar, QWidget, QTreeView
 
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window_utils import (
     create_and_add_toolbar_action,
     set_button_state,
     expand_transformation_list,
     add_transformation,
 )
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.transformation_types import TransformationType
-from tests.test_utils import DEFINITIONS_DIR
-
-
-@pytest.fixture(scope="function")
-def template(qtbot) -> QDialog:
-    return QDialog()
-
-
-@pytest.fixture(scope="function")
-def nexus_wrapper() -> NexusWrapper:
-    nexus_wrapper = NexusWrapper("test")
-    yield nexus_wrapper
-    nexus_wrapper.nexus_file.close()
-
-
-@pytest.fixture(scope="function")
-def instrument(nexus_wrapper) -> Instrument:
-    return Instrument(nexus_wrapper, DEFINITIONS_DIR)
 
 
 @pytest.fixture
