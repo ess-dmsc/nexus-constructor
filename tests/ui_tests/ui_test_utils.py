@@ -6,8 +6,6 @@ from PySide2.QtCore import QPoint, Qt
 from PySide2.QtWidgets import QAbstractButton, QDialog
 from pytestqt.qtbot import QtBot
 
-from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_options import PixelOptions
@@ -161,20 +159,6 @@ def nexus_wrapper() -> NexusWrapper:
 @pytest.fixture(scope="function")
 def instrument(nexus_wrapper) -> Instrument:
     return Instrument(nexus_wrapper, DEFINITIONS_DIR)
-
-
-@pytest.fixture(scope="function")
-def add_component_dialog(
-    qtbot, template, instrument, nexus_wrapper, mock_pixel_options
-):
-
-    component = ComponentTreeModel(instrument)
-    dialog = AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
-    template.ui = dialog
-    template.ui.setupUi(template, mock_pixel_options)
-    qtbot.addWidget(template)
-
-    return dialog
 
 
 @pytest.fixture(scope="function")

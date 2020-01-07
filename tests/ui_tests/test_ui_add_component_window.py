@@ -126,6 +126,20 @@ def parent_mock():
 
 
 @pytest.fixture(scope="function")
+def add_component_dialog(
+    qtbot, template, instrument, nexus_wrapper, mock_pixel_options
+):
+
+    component = ComponentTreeModel(instrument)
+    dialog = AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
+    template.ui = dialog
+    template.ui.setupUi(template, mock_pixel_options)
+    qtbot.addWidget(template)
+
+    return dialog
+
+
+@pytest.fixture(scope="function")
 def edit_component_dialog(
     qtbot,
     nexus_wrapper,
