@@ -205,33 +205,30 @@ def get_transformation_or_link_index(
     return component_model.index(0, 0, transformation_list_index)
 
 
-@pytest.mark.parametrize("set_enabled", [True, False])
-def test_GIVEN_action_properties_WHEN_creating_action_THEN_action_has_expected_attributes(
-    icon_path,
-    mouse_over_text,
-    trigger_method_mock,
-    tool_bar,
-    tree_view_tab,
-    set_enabled,
+def test_GIVEN_action_properties_WHEN_creating_disabled_action_THEN_action_has_expected_attributes(
+    icon_path, mouse_over_text, trigger_method_mock, tool_bar, tree_view_tab
 ):
-    if not set_enabled:
-        action = create_and_add_toolbar_action(
-            icon_path, mouse_over_text, trigger_method_mock, tool_bar, tree_view_tab
-        )
-    else:
-        action = create_and_add_toolbar_action(
-            icon_path,
-            mouse_over_text,
-            trigger_method_mock,
-            tool_bar,
-            tree_view_tab,
-            set_enabled,
-        )
+    action = create_and_add_toolbar_action(
+        icon_path, mouse_over_text, trigger_method_mock, tool_bar, tree_view_tab
+    )
 
     assert action.toolTip() == mouse_over_text
     assert action.parent() is tree_view_tab
     assert not action.icon().isNull()
-    assert action.isEnabled() == set_enabled
+    assert not action.isEnabled()
+
+
+def test_GIVEN_action_properties_WHEN_creating_enabled_action_THEN_action_has_expected_attributes(
+    icon_path, mouse_over_text, trigger_method_mock, tool_bar, tree_view_tab
+):
+    action = create_and_add_toolbar_action(
+        icon_path, mouse_over_text, trigger_method_mock, tool_bar, tree_view_tab, True
+    )
+
+    assert action.toolTip() == mouse_over_text
+    assert action.parent() is tree_view_tab
+    assert not action.icon().isNull()
+    assert action.isEnabled()
 
 
 def test_GIVEN_action_is_triggered_THEN_expected_trigger_method_is_called(
