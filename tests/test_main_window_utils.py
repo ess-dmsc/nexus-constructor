@@ -13,6 +13,7 @@ from nexus_constructor.main_window_utils import (
     expand_transformation_list,
     add_transformation,
 )
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.transformation_types import TransformationType
 from tests.test_utils import DEFINITIONS_DIR
 
@@ -20,6 +21,13 @@ from tests.test_utils import DEFINITIONS_DIR
 @pytest.fixture(scope="function")
 def template(qtbot) -> QDialog:
     return QDialog()
+
+
+@pytest.fixture(scope="function")
+def nexus_wrapper() -> NexusWrapper:
+    nexus_wrapper = NexusWrapper("test")
+    yield nexus_wrapper
+    nexus_wrapper.nexus_file.close()
 
 
 @pytest.fixture(scope="function")
