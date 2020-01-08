@@ -8,7 +8,7 @@ from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.main_window_utils import (
     create_and_add_toolbar_action,
-    set_button_state,
+    set_button_states,
     expand_transformation_list,
     add_transformation,
 )
@@ -263,7 +263,7 @@ def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_ex
     for action in actions:
         action.setEnabled(True)
 
-    set_button_state(
+    set_button_states(
         component_tree_view,
         delete_action,
         duplicate_action,
@@ -291,7 +291,7 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons
     sample_index = get_sample_index(component_tree_view)
     component_tree_view.setCurrentIndex(sample_index)
 
-    set_button_state(
+    set_button_states(
         component_tree_view,
         delete_action,
         duplicate_action,
@@ -330,7 +330,7 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     )
     component_tree_view.setCurrentIndex(transformation_index)
 
-    set_button_state(
+    set_button_states(
         component_tree_view,
         delete_action,
         duplicate_action,
@@ -381,7 +381,7 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     )
     component_tree_view.setCurrentIndex(link_index)
 
-    set_button_state(
+    set_button_states(
         component_tree_view,
         delete_action,
         duplicate_action,
@@ -419,7 +419,7 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
     add_link_at_index(component_model, component_tree_view, sample_component_index)
     component_tree_view.setCurrentIndex(sample_component_index)
 
-    set_button_state(
+    set_button_states(
         component_tree_view,
         delete_action,
         duplicate_action,
@@ -457,7 +457,7 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_T
     )
     component_tree_view.setCurrentIndex(transformation_list_index)
 
-    set_button_state(
+    set_button_states(
         component_tree_view,
         delete_action,
         duplicate_action,
@@ -494,7 +494,7 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
     )
     component_tree_view.setCurrentIndex(transformation_list_index)
 
-    set_button_state(
+    set_button_states(
         component_tree_view,
         delete_action,
         duplicate_action,

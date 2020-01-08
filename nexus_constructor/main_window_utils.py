@@ -40,7 +40,7 @@ def create_and_add_toolbar_action(
     return toolbar_action
 
 
-def set_button_state(
+def set_button_states(
     component_tree_view: QTreeView,
     delete_action: QAction,
     duplicate_action: QAction,

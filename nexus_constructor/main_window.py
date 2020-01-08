@@ -18,7 +18,7 @@ from nexus_constructor.filewriter_command_dialog import FilewriterCommandDialog
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.main_window_utils import (
     create_and_add_toolbar_action,
-    set_button_state,
+    set_button_states,
     expand_transformation_list,
     add_transformation,
 )
@@ -210,7 +210,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.entries_dialog.show()
 
     def _set_button_state(self):
-        set_button_state(
+        set_button_states(
             self.component_tree_view,
             self.delete_action,
             self.duplicate_action,
