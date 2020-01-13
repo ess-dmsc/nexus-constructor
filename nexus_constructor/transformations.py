@@ -118,6 +118,7 @@ class Transformation:
 
         del self.file.nexus_file[dataset_name]
         self.file.nexus_file[dataset_name] = new_dataset[...]
+        self.dataset = self.file.nexus_file[dataset_name]
         for k, v in old_attrs.items():
             self.dataset.attrs[k] = v
 
