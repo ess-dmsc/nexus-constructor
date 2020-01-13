@@ -74,24 +74,31 @@ class Ui_Transformation(object):
 
         self.x_layout = QFormLayout()
         self.x_spinbox = QDoubleSpinBox(Transformation)
-        self.x_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
-        self.x_spinbox.setDecimals(PRECISION)
+
         self.x_layout.addRow("x:", self.x_spinbox)
         self.vector_layout.addLayout(self.x_layout)
 
         self.y_layout = QFormLayout()
         self.y_spinbox = QDoubleSpinBox(Transformation)
-        self.y_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
-        self.y_spinbox.setDecimals(PRECISION)
+
         self.y_layout.addRow("y:", self.y_spinbox)
         self.vector_layout.addLayout(self.y_layout)
 
         self.z_layout = QFormLayout()
         self.z_spinbox = QDoubleSpinBox(Transformation)
-        self.z_spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
-        self.z_spinbox.setDecimals(PRECISION)
+
         self.z_layout.addRow("z:", self.z_spinbox)
         self.vector_layout.addLayout(self.z_layout)
+
+        self.spinboxes = [
+            self.x_spinbox,
+            self.y_spinbox,
+            self.z_spinbox,
+            self.value_spinbox,
+        ]
+        for spinbox in self.spinboxes[:-1]:
+            spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
+            spinbox.setDecimals(PRECISION)
 
         self.main_layout.addLayout(self.vector_layout)
 
