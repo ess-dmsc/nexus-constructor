@@ -1,4 +1,5 @@
 import logging
+import uuid
 from functools import partial
 
 import h5py
@@ -92,6 +93,8 @@ class FieldWidget(QFrame):
         self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
         self.hide_name_field = hide_name_field
+        if hide_name_field:
+            self.name = str(uuid.uuid4())
 
         self.streams_widget = StreamFieldsWidget(self.edit_dialog)
 

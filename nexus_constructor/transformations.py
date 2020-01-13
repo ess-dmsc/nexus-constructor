@@ -106,6 +106,20 @@ class Transformation:
         self.dataset[...] = new_value
 
     @property
+    def data(self) -> h5py.Dataset:
+        return self.dataset
+
+    @data.setter
+    def data(self, new_dataset):
+        old_attrs = {}
+        for k, v in self.dataset.attrs.items():
+            old_attrs[k] = v
+
+        self.file.nexus_file[self.dataset.name] = new_dataset
+        for k, v in old_attrs:
+            self.dataset.attrs[k] = v
+
+    @property
     def depends_on(self) -> "Transformation":
         depends_on_path = self.file.get_attribute_value(self.dataset, "depends_on")
         if depends_on_path is not None:

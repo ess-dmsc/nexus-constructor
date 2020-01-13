@@ -44,6 +44,7 @@ class EditTransformation(QGroupBox):
             spinbox.setEnabled(True)
 
     def saveChanges(self):
+        self.transformation.data = self.transformation_frame.distance_widget.value
         self.transformation.name = self.transformation_frame.name_line_edit.text()
         self.transformation.vector = QVector3D(
             self.transformation_frame.x_spinbox.value(),
