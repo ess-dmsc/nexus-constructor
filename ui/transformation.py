@@ -38,10 +38,10 @@ class Ui_Transformation(object):
 
         self.main_layout.addWidget(self.vector_label)
 
-        self.line_3 = QFrame(Transformation)
-        self.line_3.setFrameShape(QFrame.HLine)
-        self.line_3.setFrameShadow(QFrame.Sunken)
-        self.main_layout.addWidget(self.line_3)
+        self.line_2 = QFrame(Transformation)
+        self.line_2.setFrameShape(QFrame.HLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
+        self.main_layout.addWidget(self.line_2)
         self.length_layout = QHBoxLayout()
         self.length_layout.setSpacing(-1)
         self.valueLabel = QLabel("Length", Transformation)
@@ -66,26 +66,20 @@ class Ui_Transformation(object):
         QMetaObject.connectSlotsByName(Transformation)
 
     def _set_up_vector_box(self, Transformation):
-        XYZ_MINIMUM = 0
-        XYZ_MAXIMUM = 1000000
-        PRECISION = 5
         self.vector_layout = QHBoxLayout()
 
         self.x_layout = QFormLayout()
         self.x_spinbox = QDoubleSpinBox(Transformation)
-
         self.x_layout.addRow("x:", self.x_spinbox)
         self.vector_layout.addLayout(self.x_layout)
 
         self.y_layout = QFormLayout()
         self.y_spinbox = QDoubleSpinBox(Transformation)
-
         self.y_layout.addRow("y:", self.y_spinbox)
         self.vector_layout.addLayout(self.y_layout)
 
         self.z_layout = QFormLayout()
         self.z_spinbox = QDoubleSpinBox(Transformation)
-
         self.z_layout.addRow("z:", self.z_spinbox)
         self.vector_layout.addLayout(self.z_layout)
 
@@ -96,8 +90,8 @@ class Ui_Transformation(object):
             self.value_spinbox,
         ]
         for spinbox in self.spinboxes[:-1]:
-            spinbox.setRange(XYZ_MINIMUM, XYZ_MAXIMUM)
-            spinbox.setDecimals(PRECISION)
+            spinbox.setRange(0, 1000000)
+            spinbox.setDecimals(5)
 
         self.main_layout.addLayout(self.vector_layout)
 
