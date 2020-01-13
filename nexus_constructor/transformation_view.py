@@ -53,6 +53,9 @@ class EditTransformation(QGroupBox):
             self.transformation_frame.y_spinbox.value(),
             self.transformation_frame.z_spinbox.value(),
         )
+        self.transformation.ui_placeholder_value = (
+            self.transformation_frame.value_spinbox.value()
+        )
         # self.transformation.value = self.transformation_frame.value_spinbox.value()
         self.instrument.nexus.transformation_changed.emit()
 

@@ -20,6 +20,7 @@ class Transformation:
     def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
         self.file = nexus_file
         self.dataset = dataset
+        self.ui_value = 0
 
     def __eq__(self, other):
         try:
@@ -42,10 +43,10 @@ class Transformation:
         """
         transform = Qt3DCore.QTransform()
         if self.type.lower() == "rotation":
-            quaternion = transform.fromAxisAndAngle(self.vector, self.value)
+            quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
             transform.setRotation(quaternion)
         elif self.type.lower() == "translation":
-            transform.setTranslation(self.vector.normalized() * self.value)
+            transform.setTranslation(self.vector.normalized() * self.ui_value)
         else:
             raise (
                 RuntimeError('Unknown transformation of type "{}".'.format(self.type))
@@ -121,17 +122,19 @@ class Transformation:
             self.file.nexus_file[dataset_name] = new_dataset[()]
         else:
             # group, stream, link etc
-            self.file.nexus_file.copy(source=new_dataset, dest=dataset_name)
+            self.file.nexus_file.copy(
+                source=new_dataset, dest=dataset_name, expand_soft=True
+            )
         self.dataset = self.file.nexus_file[dataset_name]
         for k, v in old_attrs.items():
             self.dataset.attrs[k] = v
 
     @property
-    def ui_placeholder_value(self) -> int:
+    def ui_placeholder_value(self) -> float:
         return self.ui_value
 
     @ui_placeholder_value.setter
-    def ui_placeholder_value(self, new_value: int):
+    def ui_placeholder_value(self, new_value: float):
         self.ui_value = new_value
 
     @property
