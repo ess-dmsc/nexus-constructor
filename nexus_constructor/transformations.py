@@ -117,10 +117,22 @@ class Transformation:
         dataset_name = self.dataset.name
 
         del self.file.nexus_file[dataset_name]
-        self.file.nexus_file[dataset_name] = new_dataset[...]
+        if isinstance(new_dataset, h5py.Dataset):
+            self.file.nexus_file[dataset_name] = new_dataset[()]
+        else:
+            # group, stream, link etc
+            self.file.nexus_file.copy(source=new_dataset, dest=dataset_name)
         self.dataset = self.file.nexus_file[dataset_name]
         for k, v in old_attrs.items():
             self.dataset.attrs[k] = v
+
+    @property
+    def ui_placeholder_value(self) -> int:
+        return self.ui_value
+
+    @ui_placeholder_value.setter
+    def ui_placeholder_value(self, new_value: int):
+        self.ui_value = new_value
 
     @property
     def depends_on(self) -> "Transformation":

@@ -6,6 +6,7 @@ from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.component_tree_model import LinkTransformation
 from nexus_constructor.component.component import Component
+import numpy as np
 
 
 class EditTransformation(QGroupBox):
@@ -29,7 +30,8 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
-        self.transformation_frame.value_spinbox.setValue(self.transformation.value)
+        if np.isscalar(self.transformation.data):
+            self.transformation_frame.value_spinbox.setValue(self.transformation.value)
 
     def disable(self):
         for spinbox in self.transformation_frame.spinboxes + [
