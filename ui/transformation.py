@@ -38,8 +38,6 @@ class Ui_Transformation(object):
 
         self.main_layout.addWidget(self.vector_label)
 
-        self._set_up_vector_box(Transformation)
-
         self.line_3 = QFrame(Transformation)
         self.line_3.setFrameShape(QFrame.HLine)
         self.line_3.setFrameShadow(QFrame.Sunken)
@@ -56,6 +54,7 @@ class Ui_Transformation(object):
         self.value_spinbox.setDecimals(8)
         self.value_spinbox.setMaximumSize(QSize(100, 16777215))
         self.length_layout.addWidget(self.value_spinbox)
+        self._set_up_vector_box(Transformation)
 
         # TODO: move this somewhere else as none of the validators work without instrument
         self.distance_widget = FieldWidget(hide_name_field=True)

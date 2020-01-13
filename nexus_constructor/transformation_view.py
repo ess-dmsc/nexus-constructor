@@ -19,7 +19,7 @@ class EditTransformation(QGroupBox):
         self.transformation = transformation
         current_vector = self.transformation.vector
         for spinbox in self.transformation_frame.spinboxes:
-            spinbox.setRange((-10000000, 10000000))
+            spinbox.setRange(-10000000, 10000000)
 
         self._fill_in_existing_fields(current_vector)
         self.disable()
@@ -32,17 +32,15 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.value_spinbox.setValue(self.transformation.value)
 
     def disable(self):
-        for spinbox in (
-            self.transformation_frame.spinboxes
-            + self.transformation_frame.name_line_edit
-        ):
+        for spinbox in self.transformation_frame.spinboxes + [
+            self.transformation_frame.name_line_edit
+        ]:
             spinbox.setEnabled(False)
 
     def enable(self):
-        for spinbox in (
-            self.transformation_frame.spinboxes
-            + self.transformation_frame.name_line_edit
-        ):
+        for spinbox in self.transformation_frame.spinboxes + [
+            self.transformation_frame.name_line_edit
+        ]:
             spinbox.setEnabled(True)
 
     def saveChanges(self):
