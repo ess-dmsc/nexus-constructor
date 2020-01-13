@@ -96,45 +96,45 @@ class EditTransformationLink(QFrame):
         self.populate_combo_box()
 
     def populate_combo_box(self):
-        self.link_frame.TransformationsComboBox.blockSignals(True)
+        self.link_frame.transformations_combo_box.blockSignals(True)
 
-        self.link_frame.TransformationsComboBox.clear()
-        self.link_frame.TransformationsComboBox.addItem("(None)", userData=None)
-        self.link_frame.TransformationsComboBox.setCurrentIndex(0)
+        self.link_frame.transformations_combo_box.clear()
+        self.link_frame.transformations_combo_box.addItem("(None)", userData=None)
+        self.link_frame.transformations_combo_box.setCurrentIndex(0)
         components = self.instrument.get_component_list()
         for current_component in components:
             transformations = current_component.transforms
-            self.link_frame.TransformationsComboBox.addItem(
+            self.link_frame.transformations_combo_box.addItem(
                 current_component.name, userData=current_component
             )
-            last_index = self.link_frame.TransformationsComboBox.count() - 1
+            last_index = self.link_frame.transformations_combo_box.count() - 1
             if links_back_to_component(
                 self.link.parent.parent_component, current_component
             ):
-                self.link_frame.TransformationsComboBox.model().item(
+                self.link_frame.transformations_combo_box.model().item(
                     last_index
                 ).setEnabled(False)
             if len(transformations) == 0:
-                self.link_frame.TransformationsComboBox.model().item(
+                self.link_frame.transformations_combo_box.model().item(
                     last_index
                 ).setEnabled(False)
             if (
                 self.link.linked_component is not None
                 and self.link.linked_component == current_component
             ):
-                self.link_frame.TransformationsComboBox.setCurrentIndex(
-                    self.link_frame.TransformationsComboBox.count() - 1
+                self.link_frame.transformations_combo_box.setCurrentIndex(
+                    self.link_frame.transformations_combo_box.count() - 1
                 )
-        self.link_frame.TransformationsComboBox.currentIndexChanged.connect(
+        self.link_frame.transformations_combo_box.currentIndexChanged.connect(
             self.set_new_index
         )
-        self.link_frame.TransformationsComboBox.blockSignals(False)
+        self.link_frame.transformations_combo_box.blockSignals(False)
 
     def set_new_index(self, new_index):
         if new_index == -1:
             return
         self.link.linked_component = (
-            self.link_frame.TransformationsComboBox.currentData()
+            self.link_frame.transformations_combo_box.currentData()
         )
 
     def enable(self):
