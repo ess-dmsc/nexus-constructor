@@ -65,7 +65,6 @@ class FieldNameLineEdit(QLineEdit):
 
 
 class FieldWidget(QFrame):
-
     # Used for deletion of field
     something_clicked = Signal()
 
@@ -76,11 +75,15 @@ class FieldWidget(QFrame):
 
     def __init__(
         self,
-        possible_field_names: List[str],
+        possible_field_names=None,
         parent: QListWidget = None,
         instrument: Instrument = None,
+        hide_name_field: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
+
+        if possible_field_names is None:
+            possible_field_names = []
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
@@ -88,6 +91,7 @@ class FieldWidget(QFrame):
 
         self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
+        self.hide_name_field = hide_name_field
 
         self.streams_widget = StreamFieldsWidget(self.edit_dialog)
 
@@ -140,7 +144,7 @@ class FieldWidget(QFrame):
         self.field_name_edit.installEventFilter(self)
         if parent is not None:
             self._set_up_name_validator()
-        self.field_name_edit.validator().is_valid.emit(False)
+            self.field_name_edit.validator().is_valid.emit(False)
 
         self.value_line_edit.installEventFilter(self)
         self.nx_class_combo.installEventFilter(self)
@@ -320,7 +324,9 @@ class FieldWidget(QFrame):
         self.nx_class_combo.setVisible(show_nx_class_combo)
         self.edit_button.setVisible(show_edit_button)
         self.value_type_combo.setVisible(show_value_type_combo)
-        self.field_name_edit.setVisible(show_name_line_edit)
+        self.field_name_edit.setVisible(
+            show_name_line_edit and not self.hide_name_field
+        )
 
     def show_edit_dialog(self):
         if self.field_type_combo.currentText() == FieldType.array_dataset.value:

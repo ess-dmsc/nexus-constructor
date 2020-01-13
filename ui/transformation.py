@@ -10,6 +10,8 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
+from nexus_constructor.component_fields import FieldWidget
+
 
 class Ui_Transformation(object):
     def setupUi(self, Transformation):
@@ -46,12 +48,19 @@ class Ui_Transformation(object):
         self.length_layout.setSpacing(-1)
         self.valueLabel = QLabel("Length", Transformation)
         self.length_layout.addWidget(self.valueLabel)
+
+        self.ui_placeholder_label = QLabel("UI placeholder:")
+        self.length_layout.addWidget(self.ui_placeholder_label)
+
         self.value_spinbox = QDoubleSpinBox(Transformation)
         self.value_spinbox.setDecimals(8)
         self.value_spinbox.setMaximumSize(QSize(100, 16777215))
         self.length_layout.addWidget(self.value_spinbox)
 
+        # TODO: move this somewhere else as none of the validators work without instrument
+        self.distance_widget = FieldWidget(hide_name_field=True)
         self.main_layout.addLayout(self.length_layout)
+        self.main_layout.addWidget(self.distance_widget)
         self.frame_layout.addLayout(self.main_layout)
 
         self.retranslateUi(Transformation)
