@@ -138,8 +138,8 @@ class FieldWidget(QFrame):
 
         # Allow selecting this field widget in a list by clicking on it's contents
         self.field_name_edit.installEventFilter(self)
-
-        self._set_up_name_validator(parent)
+        if parent is not None:
+            self._set_up_name_validator()
         self.field_name_edit.validator().is_valid.emit(False)
 
         self.value_line_edit.installEventFilter(self)
@@ -153,10 +153,10 @@ class FieldWidget(QFrame):
         # Set the layout for the default field type
         self.field_type_changed()
 
-    def _set_up_name_validator(self, parent):
+    def _set_up_name_validator(self):
         field_widgets = []
-        for i in range(parent.count()):
-            field_widgets.append(parent.itemWidget(parent.item(i)))
+        for i in range(self.parent().count()):
+            field_widgets.append(self.parent().itemWidget(self.parent().item(i)))
 
         self.field_name_edit.setValidator(
             NameValidator(field_widgets, invalid_names=INVALID_FIELD_NAMES)
