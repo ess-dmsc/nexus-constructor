@@ -57,7 +57,6 @@ class Ui_Transformation(object):
         self.length_layout.addWidget(self.value_spinbox)
         self._set_up_vector_box(Transformation)
 
-        # TODO: move this somewhere else as none of the validators work without instrument
         self.distance_widget = FieldWidget(hide_name_field=True, instrument=instrument )
         self.main_layout.addLayout(self.length_layout)
         self.main_layout.addWidget(self.distance_widget)

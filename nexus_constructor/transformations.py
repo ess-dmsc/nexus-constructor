@@ -20,7 +20,7 @@ class Transformation:
     def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
         self.file = nexus_file
         self.dataset = dataset
-        self.ui_value = 0
+        self.ui_placeholder_value = dataset
 
     def __eq__(self, other):
         try:
@@ -43,10 +43,14 @@ class Transformation:
         """
         transform = Qt3DCore.QTransform()
         if self.type.lower() == "rotation":
-            quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
+            quaternion = transform.fromAxisAndAngle(
+                self.vector, self.ui_placeholder_value
+            )
             transform.setRotation(quaternion)
         elif self.type.lower() == "translation":
-            transform.setTranslation(self.vector.normalized() * self.ui_value)
+            transform.setTranslation(
+                self.vector.normalized() * self.ui_placeholder_value
+            )
         else:
             raise (
                 RuntimeError('Unknown transformation of type "{}".'.format(self.type))
@@ -124,6 +128,7 @@ class Transformation:
         del self.file.nexus_file[dataset_name]
         if isinstance(new_data, h5py.Dataset):
             self.file.nexus_file[dataset_name] = new_data[()]
+            self.ui_placeholder_value = new_data[...]
         else:
             if isinstance(new_data, h5py.SoftLink):
                 self.file.nexus_file[dataset_name] = h5py.SoftLink(new_data.path)
@@ -137,11 +142,13 @@ class Transformation:
 
     @property
     def ui_placeholder_value(self) -> float:
-        return self.ui_value
+        if np.isscalar(self.value):
+            return self.value
+        return self._ui_value[...]
 
     @ui_placeholder_value.setter
     def ui_placeholder_value(self, new_value: float):
-        self.ui_value = new_value
+        self._ui_value = new_value
 
     @property
     def depends_on(self) -> "Transformation":
