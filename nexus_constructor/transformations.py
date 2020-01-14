@@ -7,6 +7,8 @@ import h5py
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar
 
+from nexus_constructor.nexus.nexus_wrapper import h5Node
+
 TransformationOrComponent = TypeVar(
     "TransformationOrComponent", "Transformation", "Component"
 )
@@ -111,7 +113,7 @@ class Transformation:
         self.dataset[...] = new_value
 
     @property
-    def data(self) -> h5py.HLObject:
+    def data(self) -> h5Node:
         return self.dataset
 
     @data.setter
