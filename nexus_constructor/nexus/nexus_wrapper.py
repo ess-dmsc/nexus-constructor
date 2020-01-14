@@ -7,6 +7,7 @@ from typing import Any, TypeVar, Optional, List
 import numpy as np
 
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.validators import FieldType
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
@@ -67,22 +68,38 @@ def get_fields(
     stream_fields = []
     link_fields = []
     for item in group.values():
-        if (
-            isinstance(item, h5py.Dataset)
-            and item.name.split("/")[-1] not in INVALID_FIELD_NAMES
-        ):
-            if np.isscalar(item[()]):
-                scalar_fields.append(item)
-                continue
+        item, field_type = find_field_type(item)
+        if field_type == FieldType.scalar_dataset:
+            scalar_fields.append(item)
+        elif field_type == FieldType.array_dataset:
             array_fields.append(item)
-        elif isinstance(item, h5py.Group):
-            if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
-                link_fields.append(item)
-            elif (
-                "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream"
-            ):
-                stream_fields.append(item)
+        elif field_type == FieldType.link:
+            link_fields.append(item)
+        elif field_type == FieldType.kafka_stream:
+            stream_fields.append(item)
+
     return scalar_fields, array_fields, stream_fields, link_fields
+
+
+def find_field_type(item):
+    if (
+        isinstance(item, h5py.Dataset)
+        and get_name_of_node(item) not in INVALID_FIELD_NAMES
+    ):
+        if np.isscalar(item[()]):
+            return item, FieldType.scalar_dataset
+        else:
+            return item, FieldType.array_dataset
+
+    elif isinstance(item, h5py.Group):
+        if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
+            return item, FieldType.link
+        elif "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream":
+            return item, FieldType.kafka_stream
+    logging.debug(
+        f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"
+    )
+    return item, None
 
 
 class NexusWrapper(QObject):

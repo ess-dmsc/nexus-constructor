@@ -57,9 +57,9 @@ class Ui_Transformation(object):
         self.length_layout.addWidget(self.value_spinbox)
         self._set_up_vector_box(Transformation)
 
-        self.distance_widget = FieldWidget(hide_name_field=True, instrument=instrument )
+        self.magnitude_widget = FieldWidget(hide_name_field=True, instrument=instrument)
         self.main_layout.addLayout(self.length_layout)
-        self.main_layout.addWidget(self.distance_widget)
+        self.main_layout.addWidget(self.magnitude_widget)
         self.frame_layout.addLayout(self.main_layout)
 
         self.retranslateUi(Transformation)

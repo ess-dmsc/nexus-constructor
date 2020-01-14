@@ -111,7 +111,7 @@ class Transformation:
         self.dataset[...] = new_value
 
     @property
-    def data(self) -> h5py.Dataset:
+    def data(self) -> h5py.HLObject:
         return self.dataset
 
     @data.setter

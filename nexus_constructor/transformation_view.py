@@ -1,3 +1,5 @@
+from nexus_constructor.component_fields import handle_fields
+from nexus_constructor.nexus.nexus_wrapper import get_fields
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
 from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
@@ -30,6 +32,8 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
+        handle_fields(get_fields(self.transformation.data))
+
         if np.isscalar(self.transformation.data):
             self.transformation_frame.value_spinbox.setValue(self.transformation.value)
 
@@ -46,7 +50,7 @@ class EditTransformation(QGroupBox):
             spinbox.setEnabled(True)
 
     def saveChanges(self):
-        self.transformation.data = self.transformation_frame.distance_widget.value
+        self.transformation.data = self.transformation_frame.magnitude_widget.value
         self.transformation.name = self.transformation_frame.name_line_edit.text()
         self.transformation.vector = QVector3D(
             self.transformation_frame.x_spinbox.value(),
