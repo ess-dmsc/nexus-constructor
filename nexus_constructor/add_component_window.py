@@ -12,11 +12,7 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.component_fields import (
-    FieldWidget,
-    add_fields_to_component,
-    handle_fields,
-)
+from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     UserDefinedChopperChecker,
@@ -43,7 +39,11 @@ from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
-from nexus_constructor.component.component import Component
+from nexus_constructor.component.component import (
+    Component,
+    add_fields_to_component,
+    get_fields_and_update_functions_for_component,
+)
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
@@ -259,10 +259,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
 
-        update_methods = handle_fields(self.component_to_edit)
+        items_and_update_methods = get_fields_and_update_functions_for_component(
+            self.component_to_edit
+        )
 
-        for fields, update_method in update_methods:
-            for field in fields:
+        for field, update_method in items_and_update_methods.items():
+            if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
                 new_ui_field.attrs = field

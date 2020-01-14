@@ -1,5 +1,4 @@
-from nexus_constructor.component_fields import handle_fields
-from nexus_constructor.nexus.nexus_wrapper import get_fields
+from nexus_constructor.field_utils import find_field_type
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
 from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
@@ -32,7 +31,8 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
-        handle_fields(get_fields(self.transformation.data))
+        item, update_function = find_field_type(self.transformation.data)
+        update_function(item, self.transformation_frame.magnitude_widget)
 
         if np.isscalar(self.transformation.data):
             self.transformation_frame.value_spinbox.setValue(self.transformation.value)

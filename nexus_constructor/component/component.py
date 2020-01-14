@@ -2,11 +2,13 @@ import h5py
 from typing import Any, List, Optional, Union, Tuple
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
+from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_fields
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_x_offsets_from_pixel_grid,
@@ -17,7 +19,11 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     PIXEL_FIELDS,
 )
 from nexus_constructor.transformations import Transformation
-from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
+from nexus_constructor.ui_utils import (
+    qvector3d_to_numpy_array,
+    generate_unique_name,
+    show_warning_dialog,
+)
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
     calculate_vertices,
@@ -119,9 +125,6 @@ class Component:
 
     def delete_field(self, name: str):
         self.file.delete_field_value(self.group, name)
-
-    def get_fields(self):
-        return get_fields(self.group)
 
     @property
     def nx_class(self):
@@ -445,3 +448,28 @@ class Component:
         """
         for field in PIXEL_FIELDS:
             self.delete_field(field)
+
+
+def add_fields_to_component(component: Component, fields_widget: QListWidget):
+    """
+    Adds fields from a list widget to a component.
+    :param component: Component to add the field to.
+    :param fields_widget: The field list widget to extract field information such the name and value of each field.
+    """
+    for i in range(fields_widget.count()):
+        widget = fields_widget.itemWidget(fields_widget.item(i))
+        try:
+            component.set_field(
+                name=widget.name, value=widget.value, dtype=widget.dtype
+            )
+        except ValueError as error:
+            show_warning_dialog(
+                f"Warning: field {widget.name} not added",
+                title="Field invalid",
+                additional_info=str(error),
+                parent=fields_widget.parent().parent(),
+            )
+
+
+def get_fields_and_update_functions_for_component(component: Component):
+    return get_fields_with_update_functions(component.group)

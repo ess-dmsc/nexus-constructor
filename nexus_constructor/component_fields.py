@@ -16,15 +16,14 @@ from PySide2.QtWidgets import (
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List, Union
-from nexus_constructor.component.component import Component
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
-from nexus_constructor.instrument import Instrument
-from nexus_constructor.ui_utils import validate_line_edit, show_warning_dialog
+
+from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
     FieldValueValidator,
     FieldType,
@@ -78,7 +77,7 @@ class FieldWidget(QFrame):
         self,
         possible_field_names=None,
         parent: QListWidget = None,
-        instrument: Instrument = None,
+        instrument=None,
         hide_name_field: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
@@ -351,82 +350,3 @@ class FieldWidget(QFrame):
 
     def show_attrs_dialog(self):
         self.attrs_dialog.show()
-
-
-def add_fields_to_component(component: Component, fields_widget: QListWidget):
-    """
-    Adds fields from a list widget to a component.
-    :param component: Component to add the field to.
-    :param fields_widget: The field list widget to extract field information such the name and value of each field.
-    """
-    for i in range(fields_widget.count()):
-        widget = fields_widget.itemWidget(fields_widget.item(i))
-        try:
-            component.set_field(
-                name=widget.name, value=widget.value, dtype=widget.dtype
-            )
-        except ValueError as error:
-            show_warning_dialog(
-                f"Warning: field {widget.name} not added",
-                title="Field invalid",
-                additional_info=str(error),
-                parent=fields_widget.parent().parent(),
-            )
-
-
-def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
-    """
-    Fill in a UI link field for an existing link in the component
-    :param field: The link field in the component group
-    :param new_ui_field: The new UI field to fill in with existing data
-    """
-    new_ui_field.field_type = FieldType.link.value
-    new_ui_field.value = field.parent.get(field.name, getlink=True).path
-
-
-def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
-    """
-    Fill in a UI array field for an existing array field in the component group
-    :param value: The array dataset's value to copy to the UI fields list model
-    :param new_ui_field: The new UI field to fill in with existing data
-    """
-    new_ui_field.dtype = field.dtype
-    new_ui_field.field_type = FieldType.array_dataset.value
-    new_ui_field.value = field[()]
-
-
-def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget):
-    """
-    Fill in a UI scalar field for an existing scalar field in the component group
-    :param field: The dataset to copy into the value line edit
-    :param new_ui_field: The new UI field to fill in with existing data
-    """
-    dtype = field.dtype
-    if "S" in str(dtype):
-        dtype = h5py.special_dtype(vlen=str)
-        new_ui_field.value = field[()]
-    else:
-        new_ui_field.value = field[()]
-    new_ui_field.dtype = dtype
-    new_ui_field.field_type = FieldType.scalar_dataset.value
-
-
-def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget):
-    """
-    Fill in a UI stream field for an existing stream field in the component group
-    :param field: The dataset to copy into the value line edit
-    :param new_ui_field: The new UI field to fill in with existing data
-    """
-    new_ui_field.field_type = FieldType.kafka_stream.value
-    new_ui_field.streams_widget.update_existing_stream_info(field)
-
-
-def handle_fields(component):
-    scalar_fields, array_fields, stream_fields, link_fields = component.get_fields()
-    update_methods = [
-        (scalar_fields, update_existing_scalar_field),
-        (array_fields, update_existing_array_field),
-        (stream_fields, update_existing_stream_field),
-        (link_fields, update_existing_link_field),
-    ]
-    return update_methods
