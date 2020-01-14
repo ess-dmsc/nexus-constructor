@@ -14,7 +14,7 @@ from nexus_constructor.component_fields import FieldWidget
 
 
 class Ui_Transformation(object):
-    def setupUi(self, Transformation):
+    def setupUi(self, Transformation, instrument):
         Transformation.setObjectName("Transformation")
         Transformation.resize(361, 171)
         self.frame_layout = QVBoxLayout(Transformation)
@@ -58,7 +58,7 @@ class Ui_Transformation(object):
         self._set_up_vector_box(Transformation)
 
         # TODO: move this somewhere else as none of the validators work without instrument
-        self.distance_widget = FieldWidget(hide_name_field=True)
+        self.distance_widget = FieldWidget(hide_name_field=True, instrument=instrument )
         self.main_layout.addLayout(self.length_layout)
         self.main_layout.addWidget(self.distance_widget)
         self.frame_layout.addLayout(self.main_layout)

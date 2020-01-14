@@ -111,20 +111,26 @@ class Transformation:
         return self.dataset
 
     @data.setter
-    def data(self, new_dataset):
+    def data(self, new_data):
+        """
+        Used for setting the transformation dataset to a stream group, link or scalar/array field
+        :param new_data: the new data being set
+        """
         old_attrs = {}
         for k, v in self.dataset.attrs.items():
             old_attrs[k] = v
         dataset_name = self.dataset.name
 
         del self.file.nexus_file[dataset_name]
-        if isinstance(new_dataset, h5py.Dataset):
-            self.file.nexus_file[dataset_name] = new_dataset[()]
+        if isinstance(new_data, h5py.Dataset):
+            self.file.nexus_file[dataset_name] = new_data[()]
         else:
-            # group, stream, link etc
-            self.file.nexus_file.copy(
-                source=new_dataset, dest=dataset_name, expand_soft=True
-            )
+            if isinstance(new_data, h5py.SoftLink):
+                self.file.nexus_file[dataset_name] = h5py.SoftLink(new_data.path)
+            else:
+                self.file.nexus_file.copy(
+                    source=new_data, dest=dataset_name, expand_soft=True
+                )
         self.dataset = self.file.nexus_file[dataset_name]
         for k, v in old_attrs.items():
             self.dataset.attrs[k] = v

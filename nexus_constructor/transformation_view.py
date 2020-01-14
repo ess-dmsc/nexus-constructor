@@ -16,7 +16,7 @@ class EditTransformation(QGroupBox):
         super().__init__(parent)
         self.instrument = instrument
         self.transformation_frame = Ui_Transformation()
-        self.transformation_frame.setupUi(self)
+        self.transformation_frame.setupUi(self, instrument)
         self.transformation = transformation
         current_vector = self.transformation.vector
         for spinbox in self.transformation_frame.spinboxes:
