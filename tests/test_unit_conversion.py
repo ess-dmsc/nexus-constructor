@@ -1,4 +1,4 @@
-from nexus_constructor.unit_converter import calculate_unit_conversion_factor
+from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 from pytest import approx
 
 
@@ -9,4 +9,4 @@ def test_unit_conversion_factor():
 
     # Check that the unit conversion factor can correctly find the unit in terms of meters
     for unit in units:
-        assert approx(calculate_unit_conversion_factor(unit[0])) == unit[1]
+        assert approx(calculate_unit_conversion_factor(unit[0], METRES)) == unit[1]

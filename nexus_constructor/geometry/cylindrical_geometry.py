@@ -4,7 +4,7 @@ from nexus_constructor.pixel_data import PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
 )
-from nexus_constructor.unit_converter import calculate_unit_conversion_factor
+from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 from math import sin, cos, pi, acos, degrees
 import h5py
 import numpy as np
@@ -138,7 +138,7 @@ class CylindricalGeometry:
 
     @property
     def off_geometry(self, steps: int = 20) -> OFFGeometry:
-        unit_conversion_factor = calculate_unit_conversion_factor(self.units)
+        unit_conversion_factor = calculate_unit_conversion_factor(self.units, METRES)
 
         # A list of vertices describing the circle at the bottom of the cylinder
         bottom_circle = [
