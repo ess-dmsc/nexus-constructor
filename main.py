@@ -7,6 +7,10 @@ import sys
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QMainWindow
 from PySide2 import QtCore
+
+from nexus_constructor.component.component_type import (
+    make_dictionary_of_class_definitions,
+)
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.instrument import Instrument
@@ -24,8 +28,9 @@ if __name__ == "__main__":
     window = QMainWindow()
     nexus_wrapper = NexusWrapper()
     definitions_dir = os.path.abspath(os.path.join(os.getcwd(), "definitions"))
-    instrument = Instrument(nexus_wrapper, definitions_dir)
-    ui = MainWindow(instrument, definitions_dir)
+    _, nx_component_classes = make_dictionary_of_class_definitions(definitions_dir)
+    instrument = Instrument(nexus_wrapper, nx_component_classes)
+    ui = MainWindow(instrument, nx_component_classes)
     ui.setupUi(window)
     window.show()
     sys.exit(app.exec_())

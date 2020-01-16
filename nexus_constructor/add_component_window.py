@@ -14,10 +14,7 @@ from nexus_constructor.geometry import (
 from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from ui.add_component import Ui_AddComponentDialog
-from nexus_constructor.component.component_type import (
-    make_dictionary_of_class_definitions,
-    PIXEL_COMPONENT_TYPES,
-)
+from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import (
     UnitValidator,
@@ -49,20 +46,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         instrument: Instrument,
         component_model: ComponentTreeModel,
         component_to_edit: Component = None,
-        definitions_dir: str = "",
+        nx_classes=None,
         parent=None,
     ):
         super(AddComponentDialog, self).__init__()
+        if nx_classes is None:
+            nx_classes = {}
         if parent:
             self.setParent(parent)
         self.instrument = instrument
         self.component_model = component_model
-        _, self.nx_component_classes = make_dictionary_of_class_definitions(
-            definitions_dir
-        )
-        self.nx_component_classes = OrderedDict(
-            sorted(self.nx_component_classes.items())
-        )
+        self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
 
         self.cad_file_name = None
         self.possible_fields = []

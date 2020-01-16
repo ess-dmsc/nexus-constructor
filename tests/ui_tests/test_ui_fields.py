@@ -5,7 +5,7 @@ from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_fields import FieldWidget
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
-from tests.test_utils import DEFINITIONS_DIR
+from tests.test_utils import NX_CLASS_DEFINITIONS
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def stream_fields_widget(qtbot, instrument, template):
             return "test"
 
     add_component_dialog = AddComponentDialog(
-        instrument, ComponentTreeModel(instrument), definitions_dir=DEFINITIONS_DIR
+        instrument, ComponentTreeModel(instrument), nx_classes=NX_CLASS_DEFINITIONS
     )
     add_component_dialog.setupUi(template)
     field = add_component_dialog.create_new_ui_field(DummyField())

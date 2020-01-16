@@ -1,9 +1,6 @@
 from typing import List
 
 import h5py
-from nexus_constructor.component.component_type import (
-    make_dictionary_of_class_definitions,
-)
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.component.component import Component
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
@@ -26,11 +23,9 @@ class Instrument:
     for example between component and NexusWrapper
     """
 
-    def __init__(self, nexus_file: nx.NexusWrapper, definitions_dir):
+    def __init__(self, nexus_file: nx.NexusWrapper, nx_classes):
         self.nexus = nexus_file
-        _, self.nx_component_classes = make_dictionary_of_class_definitions(
-            definitions_dir
-        )
+        self.nx_component_classes = nx_classes
         self._generate_transform_dependency_lists()
 
     def _generate_transform_dependency_lists(self):
