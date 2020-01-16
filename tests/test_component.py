@@ -739,3 +739,18 @@ def test_GIVEN_component_with_pixel_grid_WHEN_removing_pixel_data_THEN_pixel_gri
     assert component.get_field("x_pixel_offset") is None
     assert component.get_field("y_pixel_offset") is None
     assert component.get_field("z_pixel_offset") is None
+
+
+def test_GIVEN_cylinder_with_height_of_zero_WHEN_getting_axis_direction_THEN_default_value_is_returned(
+    component, nexus_wrapper
+):
+
+    axis_x = 1.0
+    axis_y = 0.0
+    axis_z = 0.0
+    axis = QVector3D(axis_x, axis_y, axis_z)
+    height = 0
+    radius = 37.0
+
+    component.set_cylinder_shape(axis, height, radius)
+    assert component.shape[0].axis_direction == QVector3D(0, 0, 1)

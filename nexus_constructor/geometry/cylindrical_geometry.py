@@ -132,9 +132,17 @@ class CylindricalGeometry:
 
     @property
     def axis_direction(self) -> QVector3D:
-        base_centre, _, top_centre = self._get_cylinder_vertices()
-        cylinder_axis = top_centre - base_centre
-        return cylinder_axis.normalized()
+        """
+        Finds the axis direction using the base centre and top centre if the height is non-zero, otherwise it just
+        returns a default value of (0,0,1).
+        :return: The axis direction vector.
+        """
+        if self.height != 0:
+            base_centre, _, top_centre = self._get_cylinder_vertices()
+            cylinder_axis = top_centre - base_centre
+            return cylinder_axis.normalized()
+
+        return QVector3D(0, 0, 1)
 
     @property
     def off_geometry(self, steps: int = 20) -> OFFGeometry:
