@@ -70,12 +70,6 @@ def _generate_incremental_name(base_name, group: h5py.Group):
     return f"{base_name}_{number}"
 
 
-def _transforms_are_equivalent(
-    transform_1: Transformation, transform_2: Transformation
-):
-    return transform_1.absolute_path == transform_2.absolute_path
-
-
 class Component:
     """
     Provides an interface to an existing component group in a NeXus file

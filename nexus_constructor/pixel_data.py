@@ -67,10 +67,3 @@ class PixelMapping(PixelData):
     """
 
     pixel_ids = attr.ib(list)
-
-
-@attr.s
-class SinglePixelId(PixelData):
-    """Pixel data for components that only have a single detector ID"""
-
-    pixel_id = attr.ib(int)
