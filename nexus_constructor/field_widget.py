@@ -1,8 +1,8 @@
 import logging
 import uuid
-from functools import partial
-
+import numpy as np
 import h5py
+from functools import partial
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
@@ -16,13 +16,11 @@ from PySide2.QtWidgets import (
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List, Union
-
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
-
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
     FieldValueValidator,
@@ -31,7 +29,6 @@ from nexus_constructor.validators import (
     NameValidator,
     HDFLocationExistsValidator,
 )
-import numpy as np
 
 
 class FieldNameLineEdit(QLineEdit):

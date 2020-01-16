@@ -388,7 +388,7 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
     component1.depends_on = transform
     component2.depends_on = transform
     dependee_of = "dependee_of"
-    del transform.dataset.attrs[dependee_of]
+    del transform._dataset.attrs[dependee_of]
 
     nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
     new_transform_group = nexus_wrapper.nexus_file[transform_name]
@@ -409,7 +409,7 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
     component1 = add_component_to_file(nexus_wrapper, component_name=component1_name)
     component1.depends_on = transform
     dependee_of = "dependee_of"
-    del transform.dataset.attrs[dependee_of]
+    del transform._dataset.attrs[dependee_of]
 
     nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
     new_transform_group = nexus_wrapper.nexus_file[transform_name]

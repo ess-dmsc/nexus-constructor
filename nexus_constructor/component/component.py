@@ -271,7 +271,7 @@ class Component:
         return rotation_transform
 
     def _transform_is_in_this_component(self, transform: Transformation) -> bool:
-        return transform.dataset.parent.parent.name == self.absolute_path
+        return transform._dataset.parent.parent.name == self.absolute_path
 
     def remove_transformation(self, transform: Transformation):
         if not self._transform_is_in_this_component(transform):
@@ -286,11 +286,11 @@ class Component:
             )
 
         # Remove whole transformations group if this is the only transformation in it
-        if len(transform.dataset.parent.keys()) == 1:
-            self.file.delete_node(transform.dataset.parent)
+        if len(transform._dataset.parent.keys()) == 1:
+            self.file.delete_node(transform._dataset.parent)
         # Otherwise just remove the transformation from the group
         else:
-            self.file.delete_node(transform.dataset)
+            self.file.delete_node(transform._dataset)
 
     @property
     def depends_on(self):

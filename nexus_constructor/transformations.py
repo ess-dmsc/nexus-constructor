@@ -22,8 +22,7 @@ class Transformation:
 
     def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
         self.file = nexus_file
-        self.dataset = dataset
-        self._ui_value = 0
+        self._dataset = dataset
         self.value = dataset
 
     def __eq__(self, other):
@@ -34,11 +33,11 @@ class Transformation:
 
     @property
     def name(self):
-        return nx.get_name_of_node(self.dataset)
+        return nx.get_name_of_node(self._dataset)
 
     @name.setter
     def name(self, new_name: str):
-        self.file.rename_node(self.dataset, new_name)
+        self.file.rename_node(self._dataset, new_name)
 
     @property
     def qmatrix(self) -> QMatrix4x4:
@@ -64,28 +63,28 @@ class Transformation:
         this is guaranteed to be unique so it can be used as an ID for this Transformation
         :return: absolute path of the transform dataset in the NeXus file,
         """
-        return self.dataset.name
+        return self._dataset.name
 
     @property
     def type(self):
         """
         Get transformation type, should be "Translation" or "Rotation"
         """
-        return self.file.get_attribute_value(self.dataset, "transformation_type")
+        return self.file.get_attribute_value(self._dataset, "transformation_type")
 
     @type.setter
     def type(self, new_type: str):
         """
         Set transformation type, should be "Translation" or "Rotation"
         """
-        self.file.set_attribute_value(self.dataset, "transformation_type", new_type)
+        self.file.set_attribute_value(self._dataset, "transformation_type", new_type)
 
     @property
     def vector(self):
         """
         Returns rotation axis or translation direction as a QVector3D
         """
-        vector_as_np_array = self.file.get_attribute_value(self.dataset, "vector")
+        vector_as_np_array = self.file.get_attribute_value(self._dataset, "vector")
         return QVector3D(
             vector_as_np_array[0], vector_as_np_array[1], vector_as_np_array[2]
         )
@@ -93,22 +92,22 @@ class Transformation:
     @vector.setter
     def vector(self, new_vector: QVector3D):
         vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
-        self.file.set_attribute_value(self.dataset, "vector", vector_as_np_array)
+        self.file.set_attribute_value(self._dataset, "vector", vector_as_np_array)
 
     @property
-    def data(self) -> h5Node:
-        return self.dataset
+    def dataset(self) -> h5Node:
+        return self._dataset
 
-    @data.setter
-    def data(self, new_data):
+    @dataset.setter
+    def dataset(self, new_data):
         """
         Used for setting the transformation dataset to a stream group, link or scalar/array field
         :param new_data: the new data being set
         """
         old_attrs = {}
-        for k, v in self.dataset.attrs.items():
+        for k, v in self._dataset.attrs.items():
             old_attrs[k] = v
-        dataset_name = self.dataset.name
+        dataset_name = self._dataset.name
 
         del self.file.nexus_file[dataset_name]
         if isinstance(new_data, h5py.Dataset):
@@ -121,26 +120,28 @@ class Transformation:
                 self.file.nexus_file.copy(
                     source=new_data, dest=dataset_name, expand_soft=True
                 )
-        self.dataset = self.file.nexus_file[dataset_name]
+        self._dataset = self.file.nexus_file[dataset_name]
         for k, v in old_attrs.items():
-            self.dataset.attrs[k] = v
+            self._dataset.attrs[k] = v
 
     @property
     def value(self) -> float:
-        if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset):
-            return self.dataset[()]
+        if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset[()]):
+            return self._dataset[()]
         return self._ui_value
 
     @value.setter
     def value(self, new_value: Union[float, h5py.Dataset]):
         if isinstance(new_value, h5py.Dataset) and np.isscalar(new_value[()]):
             self._ui_value = new_value[()]
-        else:
+        elif isinstance(new_value, float):
             self._ui_value = new_value
+        else:
+            self._ui_value = 0
 
     @property
     def depends_on(self) -> "Transformation":
-        depends_on_path = self.file.get_attribute_value(self.dataset, "depends_on")
+        depends_on_path = self.file.get_attribute_value(self._dataset, "depends_on")
         if depends_on_path is not None:
             return Transformation(self.file, self.file.nexus_file[depends_on_path])
 
@@ -150,17 +151,17 @@ class Transformation:
         Note, until Python 4.0 (or 3.7 with from __future__ import annotations) have
         to use string for depends_on type here, because the current class is not defined yet
         """
-        existing_depends_on = self.file.get_attribute_value(self.dataset, "depends_on")
+        existing_depends_on = self.file.get_attribute_value(self._dataset, "depends_on")
         if existing_depends_on is not None:
             Transformation(
                 self.file, self.file.nexus_file[existing_depends_on]
             ).deregister_dependent(self)
 
         if depends_on is None:
-            self.file.set_attribute_value(self.dataset, "depends_on", ".")
+            self.file.set_attribute_value(self._dataset, "depends_on", ".")
         else:
             self.file.set_attribute_value(
-                self.dataset, "depends_on", depends_on.absolute_path
+                self._dataset, "depends_on", depends_on.absolute_path
             )
             depends_on.register_dependent(self)
 
@@ -171,13 +172,13 @@ class Transformation:
         :param dependent: transform or component that depends on this one
         """
 
-        if "dependee_of" not in self.dataset.attrs.keys():
+        if "dependee_of" not in self._dataset.attrs.keys():
             self.file.set_attribute_value(
-                self.dataset, "dependee_of", dependent.absolute_path
+                self._dataset, "dependee_of", dependent.absolute_path
             )
         else:
             dependee_of_list = self.file.get_attribute_value(
-                self.dataset, "dependee_of"
+                self._dataset, "dependee_of"
             )
             if not isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = np.array([dependee_of_list])
@@ -187,7 +188,7 @@ class Transformation:
                     dependee_of_list, np.array([dependent.absolute_path])
                 )
                 self.file.set_attribute_value(
-                    self.dataset, "dependee_of", dependee_of_list
+                    self._dataset, "dependee_of", dependee_of_list
                 )
 
     def deregister_dependent(self, former_dependent: TransformationOrComponent):
@@ -196,22 +197,22 @@ class Transformation:
         Note, "dependee_of" attribute is not part of the NeXus format
         :param former_dependent: transform or component that used to depend on this one
         """
-        if "dependee_of" in self.dataset.attrs.keys():
+        if "dependee_of" in self._dataset.attrs.keys():
             dependee_of_list = self.file.get_attribute_value(
-                self.dataset, "dependee_of"
+                self._dataset, "dependee_of"
             )
             if (
                 not isinstance(dependee_of_list, np.ndarray)
                 and dependee_of_list == former_dependent.absolute_path
             ):
                 # Must be a single string rather than a list, so simply delete it
-                self.file.delete_attribute(self.dataset, "dependee_of")
+                self.file.delete_attribute(self._dataset, "dependee_of")
             elif isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = dependee_of_list[
                     dependee_of_list != former_dependent.absolute_path
                 ]
                 self.file.set_attribute_value(
-                    self.dataset, "dependee_of", dependee_of_list
+                    self._dataset, "dependee_of", dependee_of_list
                 )
             else:
                 logging.warning(
@@ -221,9 +222,9 @@ class Transformation:
     def get_dependents(self):
         import nexus_constructor.component.component as comp
 
-        if "dependee_of" in self.dataset.attrs.keys():
+        if "dependee_of" in self._dataset.attrs.keys():
             return_dependents = []
-            dependents = self.file.get_attribute_value(self.dataset, "dependee_of")
+            dependents = self.file.get_attribute_value(self._dataset, "dependee_of")
             if not isinstance(dependents, np.ndarray):
                 dependents = [dependents]
             for path in dependents:
