@@ -11,7 +11,7 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.component_fields import FieldWidget
+from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES

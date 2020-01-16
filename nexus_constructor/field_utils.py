@@ -4,7 +4,7 @@ from typing import List
 import h5py
 import numpy as np
 
-from nexus_constructor.component_fields import FieldWidget
+from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import FieldType

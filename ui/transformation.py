@@ -10,7 +10,7 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from nexus_constructor.component_fields import FieldWidget
+from nexus_constructor.field_widget import FieldWidget
 
 
 class Ui_Transformation(object):
