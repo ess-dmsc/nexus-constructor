@@ -125,7 +125,9 @@ class ArrayDatasetTableModel(QAbstractTableModel):
 
     def data(self, index: QModelIndex, role: int = ...) -> str:
         if role == Qt.DisplayRole or role == Qt.EditRole:
-            value = self.array[index.row()][index.column()]
+            value = self.array[index.row()]
+            if not np.isscalar(value):
+                value = value[index.column()]
             return str(value)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:

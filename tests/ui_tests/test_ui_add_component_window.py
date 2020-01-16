@@ -18,6 +18,8 @@ from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.field_attrs import FieldAttrFrame
+from nexus_constructor.geometry import NoShapeGeometry
 from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
     CylindricalGeometry,
@@ -319,15 +321,17 @@ def enter_disk_chopper_fields(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
     template: PySide2.QtWidgets.QDialog,
+    component_name: str = "ThisIsADiskChopper",
 ):
     """
-    Mimics a user creating an NXdisk_chopper by filling in the related fields.
+    Mimics a user creating an NXdisk_chopper by filling in the related fields/attributes.
     :param qtbot: The qtbot testing tool.
     :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
+    :param component_name: The name of the Disk Chopper.
     """
     # Set the name and NXclass of the component
-    qtbot.keyClicks(dialog.nameLineEdit, "ThisIsADiskChopper")
+    qtbot.keyClicks(dialog.nameLineEdit, component_name)
     dialog.componentTypeComboBox.setCurrentIndex(ALL_COMPONENT_TYPES["NXdisk_chopper"])
 
     # Press the Add Field button four times and create a list of fields widgets
@@ -370,6 +374,23 @@ def enter_disk_chopper_fields(
     fields_widgets[1].table_view.model.array = np.array(
         [[(i * 10.0)] for i in range(12)]
     )
+
+    # Set the units attributes
+    slit_edges_attribute_frame = FieldAttrFrame()
+    slit_edges_attribute_frame.attr_dtype_combo.setCurrentText("String")
+    slit_edges_attribute_frame.value = ("units", "deg")
+
+    radius_attribute_frame = FieldAttrFrame()
+    radius_attribute_frame.attr_dtype_combo.setCurrentText("String")
+    radius_attribute_frame.value = ("units", "mm")
+
+    slit_height_attribute_frame = FieldAttrFrame()
+    slit_height_attribute_frame.attr_dtype_combo.setCurrentText("String")
+    slit_height_attribute_frame.value = ("units", "mm")
+
+    fields_widgets[1].attrs_dialog._add_attr(slit_edges_attribute_frame)
+    fields_widgets[2].attrs_dialog._add_attr(radius_attribute_frame)
+    fields_widgets[3].attrs_dialog._add_attr(slit_height_attribute_frame)
 
     show_and_close_window(qtbot, template)
 
@@ -2041,24 +2062,26 @@ def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
     assert field.value.path == h5py.SoftLink(field_target).path
 
 
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_geometry_is_created(
+def test_UI_GIVEN_valid_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_creator_is_called(
     qtbot, add_component_dialog, template
 ):
-
     enter_disk_chopper_fields(qtbot, add_component_dialog, template)
 
     with patch(
-        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+        "nexus_constructor.component.chopper_shape.DiskChopperGeometryCreator.create_disk_chopper_geometry"
     ) as chopper_creator:
+        chopper_creator.return_value = (NoShapeGeometry(), None)
         add_component_dialog.on_ok()
         chopper_creator.assert_called_once()
 
 
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_chopper_geometry_is_not_created(
-    qtbot, add_component_dialog, template
+@pytest.mark.parametrize("geometry_type", ["Cylinder", "Mesh"])
+def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_or_cylinder_shape_THEN_chopper_creator_is_not_called(
+    qtbot, add_component_dialog, template, geometry_type
 ):
-
-    systematic_button_press(qtbot, template, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, template, get_shape_type_button(add_component_dialog, geometry_type)
+    )
     enter_file_path(
         qtbot,
         add_component_dialog,
@@ -2067,11 +2090,10 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_shape_THEN_
         VALID_CUBE_OFF_FILE,
     )
     show_and_close_window(qtbot, template)
-
     enter_disk_chopper_fields(qtbot, add_component_dialog, template)
 
     with patch(
-        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
+        "nexus_constructor.component.chopper_shape.DiskChopperGeometryCreator.create_disk_chopper_geometry"
     ) as chopper_creator:
         add_component_dialog.on_ok()
         chopper_creator.assert_not_called()
@@ -2316,22 +2338,6 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     assert "array_size" in group
 
     assert group["array_size"][()] == array_size
-
-
-def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_cylinder_shape_THEN_chopper_geometry_is_not_created(
-    qtbot, add_component_dialog, template
-):
-
-    systematic_button_press(qtbot, template, add_component_dialog.CylinderRadioButton)
-    show_and_close_window(qtbot, template)
-
-    enter_disk_chopper_fields(qtbot, add_component_dialog, template)
-
-    with patch(
-        "nexus_constructor.add_component_window.DiskChopperGeometryCreator"
-    ) as chopper_creator:
-        add_component_dialog.on_ok()
-        chopper_creator.assert_not_called()
 
 
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
@@ -2935,3 +2941,35 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_no_pixel_da
     assert component_to_edit.get_field("detector_number") == detector_number
 
     assert isinstance(shape, expected_geometry)
+
+
+def test_UI_GIVEN_changing_fields_WHEN_editing_a_component_with_a_chopper_mesh_THEN_previous_chopper_mesh_is_removed_from_instrument_view(
+    qtbot, template, add_component_dialog, parent_mock
+):
+
+    component_name = "DiskChopper"
+    enter_disk_chopper_fields(qtbot, add_component_dialog, template, component_name)
+    add_component_dialog.on_ok()
+
+    disk_chopper_component = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    add_component_dialog.component_to_edit = disk_chopper_component
+    add_component_dialog.parent = Mock(return_value=parent_mock)
+
+    widget = None
+    for i in range(4):
+        widget = add_component_dialog.fieldsListWidget.itemWidget(
+            add_component_dialog.fieldsListWidget.item(i)
+        )
+        if widget.name == "radius":
+            break
+
+    assert widget is not None
+    prev_value = widget.value[()]
+    widget.value = prev_value + 50
+
+    add_component_dialog.on_ok()
+
+    parent_mock.sceneWidget.delete_component.assert_called_once_with(component_name)
