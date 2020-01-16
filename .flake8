@@ -9,3 +9,4 @@ per-file-ignores =
     tests/test_json_writer.py:F811
     tests/ui_tests/test_stream_fields_widget.py:F811
     tests/ui_tests/test_ui_field_attrs.py:F811
+    tests/ui_tests/test_ui_fields.py:F811,F401

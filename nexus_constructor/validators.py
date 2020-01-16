@@ -11,6 +11,12 @@ from PySide2.QtWidgets import QComboBox, QWidget, QRadioButton
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
+from nexus_constructor.unit_utils import (
+    units_are_recognised_by_pint,
+    units_are_expected_type,
+    units_have_magnitude_of_one,
+    METRES,
+)
 
 HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 
@@ -45,26 +51,11 @@ class UnitValidator(QValidator):
 
     def validate(self, input: str, pos: int):
 
-        # Attempt to convert the string argument to a unit
-        try:
-            unit = self.ureg(input)
-        except (
-            pint.errors.UndefinedUnitError,
-            AttributeError,
-            pint.compat.tokenize.TokenError,
+        if not (
+            units_are_recognised_by_pint(input)
+            and units_are_expected_type(input, METRES)
+            and units_have_magnitude_of_one(input)
         ):
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
-
-        # Attempt to find 1 metre in terms of the unit. This will ensure that it's a length.
-        try:
-            self.ureg.metre.from_(unit)
-        except (pint.errors.DimensionalityError, ValueError):
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
-
-        # Reject input in the form of "2 metres," "40 cm," etc
-        if unit.magnitude != 1:
             self.is_valid.emit(False)
             return QValidator.Intermediate
 

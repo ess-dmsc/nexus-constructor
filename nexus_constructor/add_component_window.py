@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from enum import Enum
 
 import h5py
 from PySide2.QtGui import QVector3D
@@ -8,7 +7,6 @@ from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.geometry import (
-    OFFGeometry,
     OFFGeometryNoNexus,
     NoShapeGeometry,
     CylindricalGeometry,
@@ -16,17 +14,10 @@ from nexus_constructor.geometry import (
 )
 from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
-    UserDefinedChopperChecker,
-)
-from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
-    DiskChopperGeometryCreator,
-)
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import (
     make_dictionary_of_class_definitions,
     PIXEL_COMPONENT_TYPES,
-    CHOPPER_CLASS_NAME,
 )
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import (
@@ -46,12 +37,6 @@ from nexus_constructor.component.component import Component
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
-
-
-class GeometryType(Enum):
-    NONE = 1
-    CYLINDER = 2
-    MESH = 3
 
 
 def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
@@ -117,7 +102,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.setParent(parent)
         self.instrument = instrument
         self.component_model = component_model
-        self.geometry_model = None
         _, self.nx_component_classes = make_dictionary_of_class_definitions(
             definitions_dir
         )
@@ -402,7 +386,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None
-    ) -> OFFGeometry:
+    ):
         """
         Generates a geometry model depending on the type of geometry selected and the current values
         of the line edits that apply to the particular geometry type.
@@ -410,7 +394,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         if self.CylinderRadioButton.isChecked():
 
-            geometry_model = component.set_cylinder_shape(
+            component.set_cylinder_shape(
                 QVector3D(
                     self.cylinderXLineEdit.value(),
                     self.cylinderYLineEdit.value(),
@@ -438,20 +422,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 filename=self.fileLineEdit.text(),
                 pixel_data=pixel_data,
             )
-        else:
-            chopper_checker = UserDefinedChopperChecker(self.fieldsListWidget)
-            if (
-                component.nx_class == CHOPPER_CLASS_NAME
-                and chopper_checker.validate_chopper()
-            ):
-                geometry_model = DiskChopperGeometryCreator(
-                    chopper_checker.chopper_details
-                ).create_disk_chopper_geometry()
-            else:
-                geometry_model = NoShapeGeometry()
-                component.remove_shape()
-
-        return geometry_model
 
     def get_pixel_visibility_condition(self) -> bool:
         """
@@ -537,14 +507,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :param pixel_data: The component PixelData. Can be None.
         :return: The geometry object.
         """
+        # remove the previous object from the qt3d view
+        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
         # remove previous fields
         for field_group in self.component_to_edit.group.values():
             if field_group.name.split("/")[-1] not in INVALID_FIELD_NAMES:
                 del self.instrument.nexus.nexus_file[field_group.name]
-
-        # remove the previous shape from the qt3d view
-        if not isinstance(self.component_to_edit.shape[0], NoShapeGeometry):
-            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         self.component_to_edit.name = component_name
         self.component_to_edit.nx_class = nx_class
