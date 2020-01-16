@@ -1,3 +1,4 @@
+from nexus_constructor.transformation_types import TransformationType
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
 from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
@@ -60,7 +61,7 @@ class EditTranslation(EditTransformation):
     ):
         super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Distance (m)")
-        self.setTitle("Translation")
+        self.setTitle(TransformationType.TRANSLATION.value)
 
 
 class EditRotation(EditTransformation):

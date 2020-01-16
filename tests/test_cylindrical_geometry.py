@@ -5,17 +5,12 @@ import pytest
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.pixel_data import PixelMapping
-from .helpers import create_nexus_wrapper, add_component_to_file
+from .helpers import add_component_to_file
 from nexus_constructor.geometry.cylindrical_geometry import (
     calculate_vertices,
     CylindricalGeometry,
 )
 from nexus_constructor.ui_utils import numpy_array_to_qvector3d
-
-
-@pytest.fixture(scope="function")
-def nexus_wrapper():
-    return create_nexus_wrapper()
 
 
 @pytest.fixture
@@ -25,8 +20,7 @@ def nx_cylindrical_geometry(nexus_wrapper):
     )
 
 
-def test_cylinder_has_property_values_it_was_created_with():
-    nexus_wrapper = create_nexus_wrapper()
+def test_cylinder_has_property_values_it_was_created_with(nexus_wrapper):
     component = add_component_to_file(nexus_wrapper)
     height = 3
     radius = 4
@@ -41,8 +35,7 @@ def test_cylinder_has_property_values_it_was_created_with():
     assert cylinder.geometry_str == "Cylinder"
 
 
-def test_cylinder_units_returns_str_if_bytes_in_file():
-    nexus_wrapper = create_nexus_wrapper()
+def test_cylinder_units_returns_str_if_bytes_in_file(nexus_wrapper):
     component = add_component_to_file(nexus_wrapper)
     units_bytes = b"cubits"
     cylinder = component.set_cylinder_shape(
@@ -53,8 +46,7 @@ def test_cylinder_units_returns_str_if_bytes_in_file():
     assert cylinder.units == units_str
 
 
-def test_axis_direction_must_be_non_zero():
-    nexus_wrapper = create_nexus_wrapper()
+def test_axis_direction_must_be_non_zero(nexus_wrapper):
     component = add_component_to_file(nexus_wrapper)
     height = 3
     radius = 4
@@ -64,8 +56,9 @@ def test_axis_direction_must_be_non_zero():
         )
 
 
-def test_creating_cylinder_from_file_with_multiple_cylinders_in_single_group_ignores_all_but_the_first_cylinder():
-    nexus_wrapper = create_nexus_wrapper()
+def test_creating_cylinder_from_file_with_multiple_cylinders_in_single_group_ignores_all_but_the_first_cylinder(
+    nexus_wrapper
+):
     height_cyl_1 = 4.2
     radius_cyl_1 = 4.2
     height_cyl_2 = 3.5
@@ -93,8 +86,9 @@ def test_creating_cylinder_from_file_with_multiple_cylinders_in_single_group_ign
     assert cylinder.height == approx(height_cyl_1)
 
 
-def test_get_expected_height_and_radius_when_cylinder_vertices_are_out_of_order_in_nexus_file():
-    nexus_wrapper = create_nexus_wrapper()
+def test_get_expected_height_and_radius_when_cylinder_vertices_are_out_of_order_in_nexus_file(
+    nexus_wrapper
+):
     height_cyl = 4.2
     radius_cyl = 3.7
     cylinders_group = nexus_wrapper.create_nx_group(
