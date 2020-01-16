@@ -34,9 +34,9 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
         item, update_function = find_field_type(self.transformation.data)
         update_function(item, self.transformation_frame.magnitude_widget)
-
-        if np.isscalar(self.transformation.data):
-            self.transformation_frame.value_spinbox.setValue(self.transformation.value)
+        self.transformation_frame.value_spinbox.setValue(
+            self.transformation.ui_placeholder_value
+        )
 
     def disable(self):
         for spinbox in self.transformation_frame.spinboxes + [
@@ -61,7 +61,6 @@ class EditTransformation(QGroupBox):
         self.transformation.ui_placeholder_value = (
             self.transformation_frame.value_spinbox.value()
         )
-        # self.transformation.value = self.transformation_frame.value_spinbox.value()
         self.instrument.nexus.transformation_changed.emit()
 
 

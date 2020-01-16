@@ -23,7 +23,10 @@ class Transformation:
     def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
         self.file = nexus_file
         self.dataset = dataset
-        self.ui_placeholder_value = dataset
+        if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset):
+            self.ui_placeholder_value = self.value
+        else:
+            self.ui_placeholder_value = 0
 
     def __eq__(self, other):
         try:
@@ -131,7 +134,7 @@ class Transformation:
         del self.file.nexus_file[dataset_name]
         if isinstance(new_data, h5py.Dataset):
             self.file.nexus_file[dataset_name] = new_data[()]
-            self.ui_placeholder_value = new_data[...]
+            self._ui_value = new_data[()]
         else:
             if isinstance(new_data, h5py.SoftLink):
                 self.file.nexus_file[dataset_name] = h5py.SoftLink(new_data.path)
@@ -145,9 +148,9 @@ class Transformation:
 
     @property
     def ui_placeholder_value(self) -> float:
-        if np.isscalar(self.value):
+        if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset):
             return self.value
-        return self._ui_value[...]
+        return self._ui_value
 
     @ui_placeholder_value.setter
     def ui_placeholder_value(self, new_value: float):
