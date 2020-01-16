@@ -31,20 +31,14 @@ def find_forwarder_streams(root, provider_type: str, default_broker: str) -> Lis
                 stream_list.append(
                     {
                         "channel": pv_name,
-                        "converter": {
-                            "schema": writer_module,
-                            "topic": default_broker + node["topic"][()],
-                        },
+                        "converter": get_converter(node, writer_module),
                         "channel_provider_type": provider_type,
                     }
                 )
                 pv_names[pv_name] = len(stream_list)
             else:
                 duplicated_stream = stream_list[pv_names[pv_name] - 1]
-                new_stream_converter = {
-                    "schema": writer_module,
-                    "topic": default_broker + node["topic"][()],
-                }
+                new_stream_converter = get_converter(node, writer_module)
                 if isinstance(duplicated_stream["converter"], list):
                     duplicated_stream["converter"].append(new_stream_converter)
                 elif isinstance(duplicated_stream["converter"], dict):
@@ -52,6 +46,18 @@ def find_forwarder_streams(root, provider_type: str, default_broker: str) -> Lis
                         duplicated_stream["converter"],
                         new_stream_converter,
                     ]
+
+    def get_converter(node, writer_module):
+        return {"schema": writer_module, "topic": get_topic(node)}
+
+    def get_topic(node):
+        uri = node["topic"][()]
+        uri_split = uri.split("/")
+        if len(uri_split) == 1:
+            # Broker is not already included in the topic string, so add the default broker
+            broker = f"{default_broker}/" if default_broker else ""
+            return f"{broker}{uri}"
+        return uri
 
     root.visititems(find_streams)
     return stream_list
@@ -67,6 +73,4 @@ def generate_forwarder_command(
     :param provider_type: whether to use channel access or pv access protocol
     """
     tree_dict = {"streams": find_forwarder_streams(root, provider_type, default_broker)}
-    if default_broker:
-        tree_dict["broker"] = default_broker
     object_to_json_file(tree_dict, output_file)
