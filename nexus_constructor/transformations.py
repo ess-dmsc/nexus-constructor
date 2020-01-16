@@ -5,7 +5,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
 import h5py
 from nexus_constructor.nexus import nexus_wrapper as nx
-from typing import TypeVar
+from typing import TypeVar, Union
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 from nexus_constructor.transformation_types import TransformationType
@@ -132,7 +132,7 @@ class Transformation:
         return self._ui_value
 
     @value.setter
-    def value(self, new_value: float):
+    def value(self, new_value: Union[float, h5py.Dataset]):
         if isinstance(new_value, h5py.Dataset) and np.isscalar(new_value[()]):
             self._ui_value = new_value[()]
         else:
