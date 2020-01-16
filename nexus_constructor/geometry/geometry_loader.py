@@ -2,7 +2,7 @@ import logging
 
 from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus
 from nexusutils.readwriteoff import parse_off_file
-from nexus_constructor.unit_converter import calculate_unit_conversion_factor
+from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 from stl import mesh
 from PySide2.QtGui import QVector3D
 from io import StringIO
@@ -54,7 +54,7 @@ def load_geometry_from_file_object(
     unsupported.
     """
 
-    mult_factor = calculate_unit_conversion_factor(units)
+    mult_factor = calculate_unit_conversion_factor(units, METRES)
 
     if extension == ".off":
         _load_off_geometry(file, mult_factor, geometry)

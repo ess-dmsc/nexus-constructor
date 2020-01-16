@@ -166,7 +166,7 @@ class OFFGeometryNexus(OFFGeometry):
     def detector_faces(self, detector_faces: List[Tuple[int, int]]):
         """
         Records the detector faces in the NXoff_geometry.
-        :param pixel_data: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
+        :param detector_faces: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
         self.file.set_field_value(self.group, "detector_faces", detector_faces)
 

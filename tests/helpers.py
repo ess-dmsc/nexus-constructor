@@ -2,17 +2,12 @@ import pytest
 
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.component.component import Component
-from uuid import uuid1
 import h5py
 from typing import Any
 
 
 def create_in_memory_file(filename):
     return h5py.File(filename, mode="x", driver="core", backing_store=False)
-
-
-def create_nexus_wrapper() -> NexusWrapper:
-    return NexusWrapper(str(uuid1()))
 
 
 def add_component_to_file(

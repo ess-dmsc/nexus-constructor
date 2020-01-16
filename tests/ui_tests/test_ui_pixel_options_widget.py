@@ -4,7 +4,6 @@ from unittest.mock import mock_open
 import pytest
 import numpy as np
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QWidget
 from mock import patch
 
 from nexus_constructor.component.component import Component
@@ -18,13 +17,12 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
 )
 from nexus_constructor.pixel_options import (
     PixelOptions,
-    check_data_is_an_array,
+    data_is_an_array_with_more_than_one_element,
     INITIAL_COUNT_CORNER,
     COUNT_DIRECTION,
     PIXEL_GRID_STACK_INDEX,
     PIXEL_MAPPING_STACK_INDEX,
 )
-from tests.helpers import create_nexus_wrapper
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
     show_and_close_window,
@@ -33,12 +31,6 @@ from tests.ui_tests.ui_test_utils import (
     VALID_OCTA_OFF_FILE,
     CORRECT_OCTA_FACES,
 )
-
-
-@pytest.fixture(scope="function")
-def template(qtbot):
-    template = QWidget()
-    return template
 
 
 @pytest.fixture(scope="function")
@@ -63,11 +55,6 @@ def pixel_grid():
     pixel_grid.initial_count_corner = Corner.BOTTOM_LEFT
 
     return pixel_grid
-
-
-@pytest.fixture(scope="function")
-def nexus_wrapper():
-    return create_nexus_wrapper()
 
 
 @pytest.fixture(scope="function")
@@ -591,19 +578,19 @@ def test_UI_GIVEN_no_pixels_button_is_pressed_WHEN_entering_pixel_data_THEN_call
 def test_GIVEN_scalar_value_WHEN_calling_check_data_is_an_array_THEN_returns_false():
 
     data = 3.5
-    assert not check_data_is_an_array(data)
+    assert not data_is_an_array_with_more_than_one_element(data)
 
 
 def test_GIVEN_array_with_single_element_WHEN_calling_check_data_is_an_array_THEN_returns_false():
 
     data = np.array([3.5])
-    assert not check_data_is_an_array(data)
+    assert not data_is_an_array_with_more_than_one_element(data)
 
 
 def test_GIVEN_array_with_multiple_elements_WHEN_calling_check_data_is_an_array_THEN_returns_true():
 
     data = np.arange(5)
-    assert check_data_is_an_array(data)
+    assert data_is_an_array_with_more_than_one_element(data)
 
 
 def test_GIVEN_array_of_pixel_offsets_WHEN_finding_row_properties_THEN_expected_values_are_returned(
