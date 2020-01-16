@@ -284,7 +284,7 @@ class StreamFieldsWidget(QDialog):
         """
 
         temp_file = h5py.File(
-            name=str(uuid.uuid4()), driver="core", backing_store=False
+            name=str(uuid.uuid4()), driver="core", backing_store=False, mode="x"
         )
         group = temp_file.create_group("children")
         group.create_dataset(name="type", dtype=STRING_DTYPE, data="stream")
@@ -348,7 +348,7 @@ class StreamFieldsWidget(QDialog):
         stream_group: h5py.Group, nexus_to_spinner_dict: Dict[str, QSpinBox]
     ):
         for (nexus_string, ui_element) in nexus_to_spinner_dict.items():
-            if ui_element.value > 0:
+            if ui_element.value() > 0:
                 stream_group.create_dataset(
                     nexus_string, dtype=int, data=ui_element.value()
                 )
