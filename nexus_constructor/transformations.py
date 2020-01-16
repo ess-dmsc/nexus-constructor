@@ -23,10 +23,8 @@ class Transformation:
     def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
         self.file = nexus_file
         self.dataset = dataset
-        if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset):
-            self.ui_placeholder_value = self.value
-        else:
-            self.ui_placeholder_value = 0
+        self._ui_value = 0
+        self.value = dataset
 
     def __eq__(self, other):
         try:
@@ -49,14 +47,10 @@ class Transformation:
         """
         transform = Qt3DCore.QTransform()
         if self.type == TransformationType.ROTATION.value:
-            quaternion = transform.fromAxisAndAngle(
-                self.vector, self.ui_placeholder_value
-            )
+            quaternion = transform.fromAxisAndAngle(self.vector, self.value)
             transform.setRotation(quaternion)
         elif self.type == TransformationType.TRANSLATION.value:
-            transform.setTranslation(
-                self.vector.normalized() * self.ui_placeholder_value
-            )
+            transform.setTranslation(self.vector.normalized() * self.value)
         else:
             raise (
                 RuntimeError('Unknown transformation of type "{}".'.format(self.type))
@@ -102,21 +96,6 @@ class Transformation:
         self.file.set_attribute_value(self.dataset, "vector", vector_as_np_array)
 
     @property
-    def value(self):
-        """
-        Get the magnitude of the transformation
-        :return: distance or rotation angle
-        """
-        return self.dataset[...]
-
-    @value.setter
-    def value(self, new_value: float):
-        """
-        Set the magnitude of the transformation: distance or rotation angle
-        """
-        self.dataset[...] = new_value
-
-    @property
     def data(self) -> h5Node:
         return self.dataset
 
@@ -147,14 +126,17 @@ class Transformation:
             self.dataset.attrs[k] = v
 
     @property
-    def ui_placeholder_value(self) -> float:
+    def value(self) -> float:
         if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset):
-            return self.value
+            return self.dataset[()]
         return self._ui_value
 
-    @ui_placeholder_value.setter
-    def ui_placeholder_value(self, new_value: float):
-        self._ui_value = new_value
+    @value.setter
+    def value(self, new_value: float):
+        if isinstance(new_value, h5py.Dataset) and np.isscalar(new_value[()]):
+            self._ui_value = new_value[()]
+        else:
+            self._ui_value = new_value
 
     @property
     def depends_on(self) -> "Transformation":

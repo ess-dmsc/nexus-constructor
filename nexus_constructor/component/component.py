@@ -56,7 +56,7 @@ class DependencyError(Exception):
     pass
 
 
-def _normalise(input_vector: QVector3D):
+def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
     """
     Normalise to unit vector
 
