@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QListWidget
-from PySide2.QtWidgets import QDialog
 
 from nexus_constructor.field_attrs import FieldAttrsDialog, FieldAttrFrame
 import numpy as np
@@ -25,11 +24,6 @@ def add_array_attribute(field_attributes_dialog, qtbot):
     widget = get_attribute_widget(0, field_attributes_dialog.list_widget)
     widget.array_or_scalar_combo.setCurrentText("Array")
     return widget
-
-
-@pytest.fixture(scope="function")
-def template(qtbot):
-    return QDialog()
 
 
 @pytest.fixture(scope="function")

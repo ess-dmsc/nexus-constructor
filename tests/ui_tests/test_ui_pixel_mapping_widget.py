@@ -1,17 +1,10 @@
 import pytest
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QWidget
 
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 
 CYLINDER_TEXT = "cylinder"
 ID_NO = 3
-
-
-@pytest.fixture(scope="function")
-def template(qtbot):
-    template = QWidget()
-    return template
 
 
 @pytest.fixture(scope="function")

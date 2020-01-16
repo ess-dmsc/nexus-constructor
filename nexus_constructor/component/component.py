@@ -16,6 +16,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
     PIXEL_FIELDS,
 )
+from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
@@ -218,14 +219,18 @@ class Component:
             self.group
         )
         if name is None:
-            name = _generate_incremental_name("translation", transforms_group)
+            name = _generate_incremental_name(
+                TransformationType.TRANSLATION.value, transforms_group
+            )
         unit_vector, magnitude = _normalise(vector)
         field = self.file.set_field_value(transforms_group, name, magnitude, float)
         self.file.set_attribute_value(field, "units", "m")
         self.file.set_attribute_value(
             field, "vector", qvector3d_to_numpy_array(unit_vector)
         )
-        self.file.set_attribute_value(field, "transformation_type", "Translation")
+        self.file.set_attribute_value(
+            field, "transformation_type", TransformationType.TRANSLATION.value
+        )
 
         translation_transform = Transformation(self.file, field)
         translation_transform.depends_on = depends_on
@@ -249,7 +254,9 @@ class Component:
             self.group
         )
         if name is None:
-            name = _generate_incremental_name("rotation", transforms_group)
+            name = _generate_incremental_name(
+                TransformationType.ROTATION.value, transforms_group
+            )
         field = self.file.set_field_value(transforms_group, name, angle, float)
         self.file.set_attribute_value(field, "units", "degrees")
         self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))

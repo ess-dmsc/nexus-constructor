@@ -33,7 +33,6 @@ from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
-from tests.helpers import create_nexus_wrapper
 from tests.test_utils import DEFINITIONS_DIR
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
@@ -106,54 +105,7 @@ FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 
 @pytest.fixture(scope="function")
-def template(qtbot):
-    return QDialog()
-
-
-@pytest.fixture(scope="function")
-def mock_pixel_options():
-    """
-    Creates a mock of the PixelOptions widget. Used for some basic testing of AddComponentDialog behaviour that requires
-    interaction with the PixelOptions. Testing of the PixelOptions behaviour takes place in a dedicated file.
-    """
-    pixel_options = Mock(spec=PixelOptions)
-    pixel_options.validator = Mock(spec=PixelValidator)
-    pixel_options.validator.unacceptable_pixel_states = Mock(return_value=[])
-
-    # When the method for creating a pixel mapping is called in PixelOptions, it causes the current mapping filename
-    # stored in PixelOptions to change. This behaviour is going to be mimicked with a side effect mock.
-    def change_mapping_filename(filename):
-        pixel_options.get_current_mapping_filename = Mock(return_value=filename)
-
-    pixel_options.populate_pixel_mapping_list_with_mesh = Mock(
-        side_effect=change_mapping_filename
-    )
-
-    # Make the filename in PixelOptions start as None as this is what the PixelOptions has after its been initialised.
-    change_mapping_filename(None)
-
-    return pixel_options
-
-
-@pytest.fixture(scope="function")
-def add_component_dialog(qtbot, template, mock_pixel_options):
-
-    instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
-    component = ComponentTreeModel(instrument)
-    dialog = AddComponentDialog(instrument, component, definitions_dir=DEFINITIONS_DIR)
-    template.ui = dialog
-    template.ui.setupUi(template, mock_pixel_options)
-    qtbot.addWidget(template)
-
-    yield dialog
-
-    # Close the file to avoid an error
-    instrument.nexus.nexus_file.close()
-
-
-@pytest.fixture(scope="function")
-def component_with_cylindrical_geometry():
-    nexus_wrapper = create_nexus_wrapper()
+def component_with_cylindrical_geometry(nexus_wrapper):
     shape_group = nexus_wrapper.create_nx_group(
         "shape", "NXcylindrical_geometry", nexus_wrapper.instrument
     )
@@ -176,15 +128,29 @@ def parent_mock():
 
 
 @pytest.fixture(scope="function")
+def add_component_dialog(qtbot, template, instrument, mock_pixel_options):
+
+    dialog = AddComponentDialog(
+        instrument, ComponentTreeModel(instrument), definitions_dir=DEFINITIONS_DIR
+    )
+    template.ui = dialog
+    template.ui.setupUi(template, mock_pixel_options)
+    qtbot.addWidget(template)
+
+    return dialog
+
+
+@pytest.fixture(scope="function")
 def edit_component_dialog(
     qtbot,
+    nexus_wrapper,
     template,
     component_with_cylindrical_geometry,
     mock_pixel_options,
     parent_mock,
 ):
 
-    instrument = Instrument(NexusWrapper("test"), DEFINITIONS_DIR)
+    instrument = Instrument(nexus_wrapper, DEFINITIONS_DIR)
     instrument.nexus = component_with_cylindrical_geometry.file
     component_tree = ComponentTreeModel(instrument)
     dialog = AddComponentDialog(
@@ -199,10 +165,7 @@ def edit_component_dialog(
 
     dialog.parent = Mock(return_value=parent_mock)
 
-    yield dialog
-
-    # Close the file to avoid an error
-    instrument.nexus.nexus_file.close()
+    return dialog
 
 
 @pytest.fixture(scope="function")
@@ -454,13 +417,17 @@ def enter_component_with_pixel_fields(
     pixel_data: PixelData,
 ):
     """
+    Mimics the user entering a component with pixel data by having the pixel options appear and then instructing it to
+    return pixel data.
     :param add_component_dialog: The AddComponentDialog.
-    :param component_name: The name of the component.
-    :param button: The button that is selected (Mesh or Cylinder) when creating the component with Pixel Data.
-    :param mock_pixel_options: A mock of the PixelOptions that will be instructed to return a PixelGrid, a PixelMapping,
-        or None.
+    :param button: The shape type button that is pressed in order to make the PixelOptions appear. Can be either mesh or
+        cylinder.
+    :param component_name: The component name.
+    :param mock_pixel_options: A mock of the PixelOptions widget that returns fake pixel data when the OK button is
+        pressed.
     :param qtbot: The QtBot testing tool.
-    :param template: The QDialog that stores the Add Component widget.
+    :param template: The window/widget that holds the AddComponentDialog.
+    :param pixel_data: The pixel data that is returned by the mock PixelOptions.
     """
     make_pixel_options_appear(qtbot, button, add_component_dialog, template)
     enter_component_name(qtbot, template, add_component_dialog, component_name)
@@ -477,15 +444,17 @@ def enter_and_create_component_with_pixel_data(
     pixel_data: PixelData = None,
 ):
     """
-    Mimics the user creating a component with PixelData and then pressing the "Add Component" button. Used for testing
-    pixel data editing.
+    Mimics the user entering the details of a component with pixel data and pressing OK.
     :param add_component_dialog: The AddComponentDialog.
-    :param cylinders: A bool that decides if the shape is a Cylinder or an OFF Mesh. Determines which button is pressed.
-    :param mock_pixel_options: Mock Pixel Options that return Pixel Data.
-    :param qtbot: The qtbot testing tool.
-    :param template: The QDialog that stores the Add Component widget.
-    :param pixel_data: The PixelData returned by the mock Pixel Options when the "Add Component" button is pressed.
+    :param component_name: The component name.
+    :param cylinders: A bool indicating whether the component has a Cylinder or a Mesh shape.
+    :param mock_pixel_options: A mock of the PixelOptions object.
+    :param qtbot: The QtBot testing tool.
+    :param template: The widget/window that contains the AddComponentDialog.
+    :param pixel_data: The mock pixel data that is returned when the OK button is pressed.
+    :return The expected geometry type of the new component.
     """
+
     if cylinders:
         button = add_component_dialog.CylinderRadioButton
         expected_geometry = CylindricalGeometry
@@ -518,25 +487,24 @@ def edit_component_with_pixel_fields(
     add_component_dialog: AddComponentDialog,
     component_to_edit: Component,
     parent_mock: Mock,
-    mock_pixel_options: Mock = None,
-    pixel_data: PixelData = None,
+    mock_pixel_options: Mock,
+    new_pixel_data: PixelData = None,
 ):
     """
-    Mimics a component with PixelData being edited.
+    Mimics a user editing the pixel data of an existing component and pressing OK.
     :param add_component_dialog: The AddComponentDialog.
-    :param component_to_edit: The component being edited.
-    :param parent_mock: A mock of the AddComponentDialog parent.
-    :param mock_pixel_options: A PixelOptions mock that will generate new, different Pixel Data when the
-        "Edit Component" button is pressed.
-    :param pixel_data: The PixelData that is "generated" by the PixelOptions mock.
+    :param component_to_edit: The component to edit.
+    :param parent_mock: A mock of the AddComponentDialog parent. Required only when editing components.
+    :param mock_pixel_options: A mock of the PixelOptions object.
+    :param new_pixel_data: The new pixel data that will be generated when the OK button is pressed. None is used when
+        testing the scenario in which a user removes the existing pixel data.
     """
     # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
     add_component_dialog.component_to_edit = component_to_edit
     add_component_dialog.parent = Mock(return_value=parent_mock)
 
     # Instruct the pixel options mock to generate different pixel data
-    if mock_pixel_options is not None:
-        mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_data)
+    mock_pixel_options.generate_pixel_data = Mock(return_value=new_pixel_data)
 
     add_component_dialog.on_ok()
 
@@ -2379,9 +2347,8 @@ def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_
     mock_pixel_options.fill_existing_entries.assert_called_once()
 
 
-@pytest.mark.parametrize("cylinders", [True, False])
-def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_grid_is_written(
-    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
+def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_grid_THEN_new_pixel_grid_is_written(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
     prev_pixel_grid_size = 5
     new_pixel_grid_size = 3
@@ -2391,7 +2358,7 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_gri
     expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
         component_name,
-        cylinders,
+        False,
         mock_pixel_options,
         qtbot,
         template,
@@ -2422,9 +2389,50 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_grid_THEN_new_pixel_gri
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
 
-@pytest.mark.parametrize("cylinders", [True, False])
-def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pixel_mapping_is_written(
-    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
+def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_grid_THEN_new_pixel_grid_is_written(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    prev_pixel_grid_size = 5
+    new_pixel_grid_size = 3
+
+    # Create a component with a pixel grid
+    component_name = "ComponentWithGrid"
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        True,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelGrid(rows=prev_pixel_grid_size, columns=prev_pixel_grid_size),
+    )
+
+    # Retrieve the newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    edit_component_with_pixel_fields(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelGrid(rows=new_pixel_grid_size, columns=new_pixel_grid_size),
+    )
+
+    # Check that the change in pixel data is now stored in the component
+    for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
+        assert component_to_edit.get_field(field).shape == (
+            new_pixel_grid_size,
+            new_pixel_grid_size,
+        )
+
+    assert isinstance(component_to_edit.shape[0], expected_geometry)
+
+
+def test_UI_GIVEN_pixel_mapping_WHEN_mesh_editing_component_with_mapping_THEN_new_pixel_mapping_is_written(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
     prev_detector_numbers = [5]
     new_detector_numbers = [6]
@@ -2434,7 +2442,7 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
     expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
         component_name,
-        cylinders,
+        False,
         mock_pixel_options,
         qtbot,
         template,
@@ -2461,20 +2469,57 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_mapping_THEN_new_pix
     assert component_to_edit.get_field("detector_number") == new_detector_numbers
     assert isinstance(shape, expected_geometry)
 
-    if not cylinders:
-        assert shape.detector_faces[1] == new_detector_numbers[0]
+    assert shape.detector_faces[1] == new_detector_numbers[0]
 
 
-@pytest.mark.parametrize("cylinders", [True, False])
-def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapping_replaces_grid(
-    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_mapping_THEN_new_pixel_mapping_is_written(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    prev_detector_numbers = [5]
+    new_detector_numbers = [6]
+
+    # Create a component with a pixel mapping
+    component_name = "ComponentWithMapping"
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        True,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelMapping(prev_detector_numbers),
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    edit_component_with_pixel_fields(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelMapping(new_detector_numbers),
+    )
+
+    shape = component_to_edit.shape[0]
+
+    # Check that the change in pixel mapping is now stored in the component
+    assert component_to_edit.get_field("detector_number") == new_detector_numbers
+    assert isinstance(shape, expected_geometry)
+
+
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_pixel_grid_THEN_mapping_replaces_grid(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
     # Create a component with a pixel grid
     component_name = "GridToMapping"
     expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
         component_name,
-        cylinders,
+        False,
         mock_pixel_options,
         qtbot,
         template,
@@ -2509,20 +2554,62 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_pixel_grid_THEN_mapp
     assert isinstance(component_to_edit._shape, ComponentShape)
     assert isinstance(shape, expected_geometry)
 
-    if not cylinders:
-        assert shape.detector_faces[1] == detector_number[0]
+    assert shape.detector_faces[1] == detector_number[0]
 
 
-@pytest.mark.parametrize("cylinders", [True, False])
-def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_grid_is_erased(
-    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinders_component_with_pixel_grid_THEN_mapping_replaces_grid(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    # Create a component with a pixel grid
+    component_name = "GridToMapping"
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        True,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelGrid(),
+    )
+
+    # Retrieve the newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    detector_number = [3]
+    edit_component_with_pixel_fields(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelMapping(detector_number),
+    )
+
+    # Check that the pixel grid values no longer exist
+    for field in PIXEL_GRID_FIELDS:
+        assert component_to_edit.get_field(field) is None
+
+    # Check that the detector numbers field has the information from the Pixel Mapping
+    assert component_to_edit.get_field("detector_number") == detector_number
+
+    shape = component_to_edit.shape[0]
+
+    # Check that _shape is a ComponentShape
+    assert isinstance(component_to_edit._shape, ComponentShape)
+    assert isinstance(shape, expected_geometry)
+
+
+def test_UI_GIVEN_no_pixels_WHEN_editing_mesh_component_with_pixel_grid_THEN_pixel_grid_is_erased(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
     # Create a component with a pixel grid
     component_name = "GridToNoPixels"
     expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
         component_name,
-        cylinders,
+        False,
         mock_pixel_options,
         qtbot,
         template,
@@ -2546,16 +2633,47 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_grid_THEN_pixel_gr
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
 
-@pytest.mark.parametrize("cylinders", [True, False])
-def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_grid_replaces_mapping(
-    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
+def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_grid_THEN_pixel_grid_is_erased(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    # Create a component with a pixel grid
+    component_name = "GridToNoPixels"
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        True,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelGrid(),
+    )
+
+    # Retrieve the newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    edit_component_with_pixel_fields(
+        add_component_dialog, component_to_edit, parent_mock, mock_pixel_options, None
+    )
+
+    # Check that all pixel data values no longer exist
+    for field in PIXEL_FIELDS + ["pixel_shape"]:
+        assert component_to_edit.get_field(field) is None
+
+    assert isinstance(component_to_edit.shape[0], expected_geometry)
+
+
+def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_pixel_mapping_THEN_grid_replaces_mapping(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
     # Create a component with a pixel mapping
     component_name = "MappingToGrid"
     expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
         component_name,
-        cylinders,
+        False,
         mock_pixel_options,
         qtbot,
         template,
@@ -2583,24 +2701,63 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_pixel_mapping_THEN_grid
 
     shape = component_to_edit.shape[0]
 
-    if not cylinders:
-        assert shape.detector_faces is None
+    assert shape.detector_faces is None
 
     # Check that _shape is a PixelShape
     assert isinstance(component_to_edit._shape, PixelShape)
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.parametrize("cylinders", [True, False])
-def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_mapping_THEN_mapping_is_erased(
-    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
+def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_pixel_mapping_THEN_grid_replaces_mapping(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    # Create a component with a pixel mapping
+    component_name = "MappingToGrid"
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        True,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelMapping([5]),
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    grid_size = 5
+    edit_component_with_pixel_fields(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelGrid(rows=grid_size, columns=grid_size),
+    )
+
+    # Check that the change in pixel data is now stored in the component
+    for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
+        assert component_to_edit.get_field(field).shape == (grid_size, grid_size)
+
+    shape = component_to_edit.shape[0]
+
+    # Check that _shape is a PixelShape
+    assert isinstance(component_to_edit._shape, PixelShape)
+    assert isinstance(shape, expected_geometry)
+
+
+def test_UI_GIVEN_no_pixels_WHEN_editing_mesh_component_with_pixel_mapping_THEN_mapping_is_erased(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
     # Create a component with a pixel mapping
     component_name = "MappingToNoPixels"
     expected_geometry = enter_and_create_component_with_pixel_data(
         add_component_dialog,
         component_name,
-        cylinders,
+        False,
         mock_pixel_options,
         qtbot,
         template,
@@ -2621,25 +2778,51 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_component_with_pixel_mapping_THEN_mappi
 
     # Check that the pixel mapping data has been cleared
     assert component_to_edit.get_field("detector_number") is None
-    if not cylinders:
-        assert shape.detector_faces is None
+    assert shape.detector_faces is None
 
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.parametrize("cylinders", [True, False])
-def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_no_pixel_data_THEN_pixel_grid_is_created(
-    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
+def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_mapping_THEN_mapping_is_erased(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    # Create a component with a pixel mapping
+    component_name = "MappingToNoPixels"
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog,
+        component_name,
+        True,
+        mock_pixel_options,
+        qtbot,
+        template,
+        PixelMapping([5]),
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    edit_component_with_pixel_fields(
+        add_component_dialog, component_to_edit, parent_mock, mock_pixel_options, None
+    )
+
+    shape = component_to_edit.shape[0]
+
+    # Check that the pixel mapping data has been cleared
+    assert component_to_edit.get_field("detector_number") is None
+
+    assert isinstance(shape, expected_geometry)
+
+
+def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_no_pixel_data_THEN_pixel_grid_is_created(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
     # Create a component with no pixel data
     component_name = "NoPixelsToGrid"
     expected_geometry = enter_and_create_component_with_pixel_data(
-        add_component_dialog,
-        component_name,
-        cylinders,
-        mock_pixel_options,
-        qtbot,
-        template,
+        add_component_dialog, component_name, False, mock_pixel_options, qtbot, template
     )
 
     # Retrieve newly created component
@@ -2664,19 +2847,44 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_component_with_no_pixel_data_THEN_pixe
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
 
-@pytest.mark.parametrize("cylinders", [True, False])
-def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_no_pixel_data_THEN_pixel_mapping_is_created(
-    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock, cylinders
+def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_no_pixel_data_THEN_pixel_grid_is_created(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    # Create a component with no pixel data
+    component_name = "NoPixelsToGrid"
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog, component_name, True, mock_pixel_options, qtbot, template
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog
+    grid_size = 6
+    edit_component_with_pixel_fields(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelGrid(rows=grid_size, columns=grid_size),
+    )
+
+    # Check that the change in pixel data is now stored in the component
+    for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
+        assert component_to_edit.get_field(field).shape == (grid_size, grid_size)
+
+    assert isinstance(component_to_edit.shape[0], expected_geometry)
+
+
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_no_pixel_data_THEN_pixel_mapping_is_created(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
     # Create a component with no pixel data
     component_name = "NoPixelsToMapping"
     expected_geometry = enter_and_create_component_with_pixel_data(
-        add_component_dialog,
-        component_name,
-        cylinders,
-        mock_pixel_options,
-        qtbot,
-        template,
+        add_component_dialog, component_name, False, mock_pixel_options, qtbot, template
     )
 
     # Retrieve newly created component
@@ -2698,8 +2906,39 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_component_with_no_pixel_data_THEN_p
 
     # Check that the change in pixel data is now stored in the component
     assert component_to_edit.get_field("detector_number") == detector_number
-    if not cylinders:
-        assert shape.detector_faces[1] == detector_number[0]
+    assert shape.detector_faces[1] == detector_number[0]
+
+    assert isinstance(shape, expected_geometry)
+
+
+def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_no_pixel_data_THEN_pixel_mapping_is_created(
+    qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
+):
+    # Create a component with no pixel data
+    component_name = "NoPixelsToMapping"
+    expected_geometry = enter_and_create_component_with_pixel_data(
+        add_component_dialog, component_name, True, mock_pixel_options, qtbot, template
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog, component_name
+    )
+
+    # Make the Add Component dialog behave like an Edit Component dialog and create a pixel mapping
+    detector_number = [4]
+    edit_component_with_pixel_fields(
+        add_component_dialog,
+        component_to_edit,
+        parent_mock,
+        mock_pixel_options,
+        PixelMapping(detector_number),
+    )
+
+    shape = component_to_edit.shape[0]
+
+    # Check that the change in pixel data is now stored in the component
+    assert component_to_edit.get_field("detector_number") == detector_number
 
     assert isinstance(shape, expected_geometry)
 
