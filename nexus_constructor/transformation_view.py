@@ -8,7 +8,6 @@ from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.component_tree_model import LinkTransformation
 from nexus_constructor.component.component import Component
-import numpy as np
 
 
 class EditTransformation(QGroupBox):
