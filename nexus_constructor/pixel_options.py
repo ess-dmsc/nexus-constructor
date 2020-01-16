@@ -40,7 +40,7 @@ COLUMNS_TEXT = "Columns"
 COUNT_DIRECTION = {ROWS_TEXT: CountDirection.ROW, COLUMNS_TEXT: CountDirection.COLUMN}
 
 
-def check_data_is_an_array(data) -> bool:
+def data_is_an_array_with_more_than_one_element(data) -> bool:
     """
     At the moment it appears as though a scalar can still be returned as an array when using `get_field_value` (though
     it could just be me doing the wrong thing). This function checks if an array contains more than one value so that
@@ -124,7 +124,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         detector_numbers = component_to_edit.get_field("detector_number")
 
         # Check that x offset is more than one value
-        if check_data_is_an_array(x_pixel_offset):
+        if data_is_an_array_with_more_than_one_element(x_pixel_offset):
 
             # Set the number of rows and the row height
             n_rows, row_height = self._get_row_information(y_pixel_offset)

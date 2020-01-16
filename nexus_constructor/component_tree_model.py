@@ -6,6 +6,7 @@ from PySide2.QtWidgets import QMessageBox
 from nexus_constructor.component.component import Component
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component.link_transformation import LinkTransformation
+from nexus_constructor.transformation_types import TransformationType
 
 from nexus_constructor.transformations import Transformation
 import logging
@@ -163,7 +164,9 @@ class ComponentTreeModel(QAbstractItemModel):
         elif isinstance(node_object, Transformation):
             raise NotImplementedError("Duplication of transformations not implemented")
 
-    def add_transformation(self, parent_index: QModelIndex, transformation_type: str):
+    def add_transformation(
+        self, parent_index: QModelIndex, transformation_type: TransformationType
+    ):
         parent_item = parent_index.internalPointer()
         transformation_list = None
         parent_component = None
@@ -186,12 +189,14 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_component = transformation_list.parent_component
             target_pos = transformation_list.index(parent_item) + 1
             target_index = self.parent(parent_index)
-        if transformation_type == "translation":
+        if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
-                name=generate_unique_name("Translation", transformation_list),
+                name=generate_unique_name(
+                    TransformationType.TRANSLATION.value, transformation_list
+                ),
                 vector=QVector3D(1.0, 0, 0),
             )
-        elif transformation_type == "rotation":
+        elif transformation_type == TransformationType.ROTATION:
             new_transformation = parent_component.add_rotation(
                 name=generate_unique_name("Rotation", transformation_list),
                 axis=QVector3D(1.0, 0, 0),
@@ -218,10 +223,10 @@ class ComponentTreeModel(QAbstractItemModel):
         self.instrument.nexus.transformation_changed.emit()
 
     def add_translation(self, parent_index: QModelIndex):
-        self.add_transformation(parent_index, "translation")
+        self.add_transformation(parent_index, TransformationType.TRANSLATION)
 
     def add_rotation(self, parent_index: QModelIndex):
-        self.add_transformation(parent_index, "rotation")
+        self.add_transformation(parent_index, TransformationType.ROTATION)
 
     def headerData(self, section, orientation, role):
         return None

@@ -8,6 +8,7 @@ from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node
+from nexus_constructor.transformation_types import TransformationType
 
 TransformationOrComponent = TypeVar(
     "TransformationOrComponent", "Transformation", "Component"
@@ -44,12 +45,12 @@ class Transformation:
         Get a Qt3DCore.QTransform describing the transformation
         """
         transform = Qt3DCore.QTransform()
-        if self.type.lower() == "rotation":
+        if self.type == TransformationType.ROTATION.value:
             quaternion = transform.fromAxisAndAngle(
                 self.vector, self.ui_placeholder_value
             )
             transform.setRotation(quaternion)
-        elif self.type.lower() == "translation":
+        elif self.type == TransformationType.TRANSLATION.value:
             transform.setTranslation(
                 self.vector.normalized() * self.ui_placeholder_value
             )

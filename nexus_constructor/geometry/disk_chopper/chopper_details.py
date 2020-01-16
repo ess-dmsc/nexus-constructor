@@ -1,6 +1,10 @@
 import numpy as np
 
-from nexus_constructor.unit_converter import calculate_unit_conversion_factor
+from nexus_constructor.unit_utils import (
+    calculate_unit_conversion_factor,
+    RADIANS,
+    METRES,
+)
 
 TWO_PI = np.pi * 2
 
@@ -22,9 +26,7 @@ class ChopperDetails:
         :param slit_edges: The list of slit edge angles in the disk chopper.
         :param radius: The radius of the slit chopper.
         :param slit_height: The slit height.
-        :param angle_units: The units of the slit edges. At the moment all slit edges provided are assumed to be degrees
-            because the faculty for specifying attributes of fields hasn't yet been implemented in the Add Component
-            Dialog.
+        :param angle_units: The units of the slit edges.
         :param slit_height_units: The units for the slit length.
         :param radius_units: The units for the radius.
         """
@@ -32,22 +34,12 @@ class ChopperDetails:
         self._radius = radius
         self._slit_height = slit_height
 
-        # Convert the angles to radians (if necessary) and make sure they are all less then two pi
-        if angle_units == "deg":
-            self._slit_edges = [np.deg2rad(edge) % TWO_PI for edge in slit_edges]
-        else:
-            self._slit_edges = [edge % TWO_PI for edge in slit_edges]
+        # Convert the angles to radians and make sure they are all less then two pi
+        slit_edges_factor = calculate_unit_conversion_factor(angle_units, RADIANS)
+        self._slit_edges = [(edge * slit_edges_factor) % TWO_PI for edge in slit_edges]
 
-        # Something should check that the units a valid before we get to this point
-        if slit_height_units != "m":
-
-            factor = calculate_unit_conversion_factor(slit_height_units)
-            self._slit_height *= factor
-
-        if radius_units != "m":
-
-            factor = calculate_unit_conversion_factor(radius_units)
-            self._radius *= factor
+        self._slit_height *= calculate_unit_conversion_factor(slit_height_units, METRES)
+        self._radius *= calculate_unit_conversion_factor(radius_units, METRES)
 
     @property
     def slits(self):

@@ -6,6 +6,7 @@ from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar, Optional
 import numpy as np
 
+
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 

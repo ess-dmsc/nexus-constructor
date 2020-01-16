@@ -4,7 +4,7 @@ from nexus_constructor.pixel_data import PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
 )
-from nexus_constructor.unit_converter import calculate_unit_conversion_factor
+from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 from math import sin, cos, pi, acos, degrees
 import h5py
 import numpy as np
@@ -132,13 +132,21 @@ class CylindricalGeometry:
 
     @property
     def axis_direction(self) -> QVector3D:
-        base_centre, _, top_centre = self._get_cylinder_vertices()
-        cylinder_axis = top_centre - base_centre
-        return cylinder_axis.normalized()
+        """
+        Finds the axis direction using the base centre and top centre if the height is non-zero, otherwise it just
+        returns a default value of (0,0,1).
+        :return: The axis direction vector.
+        """
+        if self.height != 0:
+            base_centre, _, top_centre = self._get_cylinder_vertices()
+            cylinder_axis = top_centre - base_centre
+            return cylinder_axis.normalized()
+
+        return QVector3D(0, 0, 1)
 
     @property
     def off_geometry(self, steps: int = 20) -> OFFGeometry:
-        unit_conversion_factor = calculate_unit_conversion_factor(self.units)
+        unit_conversion_factor = calculate_unit_conversion_factor(self.units, METRES)
 
         # A list of vertices describing the circle at the bottom of the cylinder
         bottom_circle = [
