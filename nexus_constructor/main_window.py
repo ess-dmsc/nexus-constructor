@@ -281,8 +281,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     file,
                     nexus_file_name=nexus_file_name,
                     broker=broker,
-                    streams=self.instrument.get_streams(),
-                    links=self.instrument.get_links(),
                     start_time=start_time,
                     stop_time=stop_time,
                     service_id=service_id,
@@ -304,9 +302,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             if ok_pressed:
                 with open(filename, "w") as file:
                     nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
-                        file,
-                        streams=self.instrument.get_streams(),
-                        provider_type=provider_type,
+                        file, self.instrument.nexus.entry, provider_type=provider_type
                     )
 
     def open_nexus_file(self):

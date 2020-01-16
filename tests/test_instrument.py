@@ -70,41 +70,6 @@ def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_componen
     )
 
 
-def test_GIVEN_instrument_with_one_stream_WHEN_finding_streams_THEN_streams_dictionary_is_populated():
-    wrapper = NexusWrapper("test_streams")
-    instrument = Instrument(wrapper, DEFINITIONS_DIR)
-
-    component_type = "NCstream"
-    name = "test_crystal"
-    description = "shiny"
-    test_component = instrument.create_component(name, component_type, description)
-
-    topic_field_name = "topic"
-    topic_name = "something"
-
-    test_component.group.create_dataset(name=topic_field_name, data=topic_name)
-    streams_dict = instrument.get_streams()
-
-    assert streams_dict[test_component.absolute_path][topic_field_name] == topic_name
-
-
-def test_GIVEN_instrument_with_stream_with_incorrect_nx_class_for_stream_WHEN_finding_streams_THEN_streams_dictionary_is_empty():
-    wrapper = NexusWrapper("test_streams_none")
-    instrument = Instrument(wrapper, DEFINITIONS_DIR)
-
-    component_type = "NXcrystal"
-    name = "test_crystal"
-    description = "shiny"
-    test_component = instrument.create_component(name, component_type, description)
-
-    topic_field_name = "topic"
-    topic_name = "something"
-
-    test_component.group.create_dataset(name=topic_field_name, data=topic_name)
-    streams_dict = instrument.get_streams()
-    assert not streams_dict
-
-
 def test_dependents_list_is_created_by_instrument():
     """
     The dependents list for transforms is stored in the "dependent_of" attribute,
@@ -144,47 +109,3 @@ def test_dependents_list_is_created_by_instrument():
     assert (
         len(transform_2_loaded.get_dependents()) == 2
     ), "Expected transform 2 to have 2 registered dependents (transforms 3 and 4)"
-
-
-def test_GIVEN_dot_separated_field_name_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
-    wrapper = NexusWrapper("test_streams_dict")
-    inst = Instrument(wrapper, DEFINITIONS_DIR)
-
-    streams_group = wrapper.entry.create_group("streams")
-    streams_group.attrs["NX_class"] = "NCstream"
-
-    name = "nexus.indices.index_every_mb"
-    val = 1000
-
-    streams_group.create_dataset(name=name, dtype=int, data=val)
-
-    streams = inst.get_streams()
-
-    assert "nexus" in streams["/entry/streams"]
-    assert "indices" in streams["/entry/streams"]["nexus"]
-    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_mb"] == val
-
-
-def test_GIVEN_several_dot_separated_field_names_with_similar_prefixes_WHEN_getting_streams_THEN_dict_is_returned_with_correct_structure():
-    wrapper = NexusWrapper("test_streams_dict_multiple")
-    inst = Instrument(wrapper, DEFINITIONS_DIR)
-
-    streams_group = wrapper.entry.create_group("streams")
-    streams_group.attrs["NX_class"] = "NCstream"
-
-    name = "nexus.indices.index_every_mb"
-    val = 1000
-
-    streams_group.create_dataset(name=name, dtype=int, data=val)
-
-    name2 = "nexus.indices.index_every_kb"
-    val2 = 2000
-
-    streams_group.create_dataset(name=name2, dtype=int, data=val2)
-
-    streams = inst.get_streams()
-
-    assert "nexus" in streams["/entry/streams"]
-    assert "indices" in streams["/entry/streams"]["nexus"]
-    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_mb"] == val
-    assert streams["/entry/streams"]["nexus"]["indices"]["index_every_kb"] == val2

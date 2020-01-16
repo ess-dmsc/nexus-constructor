@@ -8,6 +8,7 @@ import numpy as np
 
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 
+
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
