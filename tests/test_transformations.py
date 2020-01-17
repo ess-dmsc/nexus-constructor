@@ -343,7 +343,6 @@ def test_can_get_translation_as_4_by_4_matrix():
         nexus_wrapper, "test_transform", test_value, test_vector, test_type
     )
     transformation = Transformation(nexus_wrapper, dataset)
-    transformation.ui_placeholder_value = dataset[...]
 
     test_matrix = transformation.qmatrix
     expected_matrix = np.array(
@@ -362,7 +361,6 @@ def test_can_get_rotation_as_4_by_4_matrix():
         nexus_wrapper, "test_transform", test_value, test_vector, test_type
     )
     transformation = Transformation(nexus_wrapper, dataset)
-    transformation.ui_placeholder_value = dataset[...]
 
     test_matrix = transformation.qmatrix
     # for a rotation around the y-axis:

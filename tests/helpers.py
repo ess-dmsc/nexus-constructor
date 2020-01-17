@@ -1,16 +1,8 @@
-import uuid
-
-import pytest
-
-from nexus_constructor.instrument import Instrument
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.component.component import Component
 import h5py
+import pytest
 from typing import Any
-
-
-def create_in_memory_file(filename):
-    return h5py.File(filename, mode="x", driver="core", backing_store=False)
+from nexus_constructor.component.component import Component
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 
 def add_component_to_file(
@@ -42,21 +34,3 @@ class InMemoryFile(object):
 def file():
     with InMemoryFile("test_file") as file:
         yield file
-
-
-class TempInstrument(object):
-    def __init__(self):
-        self.wrapper = NexusWrapper(filename=str(uuid.uuid4()))
-        self.instrument = Instrument(nexus_file=self.wrapper, definitions_dir="")
-
-    def __enter__(self):
-        return self.instrument
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.wrapper.nexus_file.close()
-
-
-@pytest.fixture
-def instrument():
-    with TempInstrument() as wrapper:
-        yield wrapper

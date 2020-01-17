@@ -23,7 +23,6 @@ class Transformation:
     def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
         self.file = nexus_file
         self._dataset = dataset
-        self._ui_value = 0
 
     def __eq__(self, other):
         try:
@@ -116,7 +115,6 @@ class Transformation:
         del self.file.nexus_file[dataset_name]
         if isinstance(new_data, h5py.Dataset):
             self.file.nexus_file[dataset_name] = new_data[()]
-            self._ui_value = new_data[()]
         else:
             if isinstance(new_data, h5py.SoftLink):
                 self.file.nexus_file[dataset_name] = h5py.SoftLink(new_data.path)
