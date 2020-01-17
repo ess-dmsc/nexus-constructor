@@ -1,4 +1,6 @@
 import numpy as np
+import pytest
+
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
@@ -50,6 +52,19 @@ def test_can_get_transform_properties():
     assert (
         transform.type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
+
+
+@pytest.mark.parametrize("test_input", ["translation", "Translation", "TRANSLATION"])
+def test_transform_type_is_capitalised(test_input):
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    test_name = "slartibartfast"
+    test_value = 42
+    test_vector = QVector3D(1.0, 0.0, 0.0)
+    transform_dataset = _add_transform_to_file(
+        nexus_wrapper, test_name, test_value, test_vector, test_input
+    )
+    transform = Transformation(nexus_wrapper, transform_dataset)
+    assert transform.type == "Translation"
 
 
 def create_transform(nexus_file, name):
