@@ -134,9 +134,11 @@ class Transformation:
     def value(self, new_value: Union[float, h5py.Dataset]):
         if isinstance(new_value, h5py.Dataset) and np.isscalar(new_value[()]):
             self._ui_value = new_value[()]
-        elif isinstance(new_value, float):
+        elif isinstance(new_value, float) or isinstance(new_value, int):
             self._ui_value = new_value
+            self._dataset[...] = new_value
         else:
+            self._dataset[...] = 0
             self._ui_value = 0
 
     @property
