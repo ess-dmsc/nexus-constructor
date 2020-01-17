@@ -246,7 +246,7 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
     converter = NexusToDictConverter()
     root_dict = converter.convert(file)
 
-    assert len(root_dict["children"]) == 1
+    assert len(root_dict["children"]) == 1, "The stream group has been omitted"
     assert group_name == root_dict["children"][0]["name"]
     assert group_contents == root_dict["children"][0]["children"][0]["stream"]
     assert "attributes" not in root_dict["children"][0]
@@ -268,7 +268,7 @@ def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_
     converter = NexusToDictConverter()
     root_dict = converter.convert(file)
 
-    assert len(root_dict["children"]) == 1
+    assert len(root_dict["children"]) == 1, "The link group has been omitted"
     assert root_dict["children"][0]["children"][0]["type"] == "link"
     assert (
         root_group[group_name].name.split("/")[-1]
