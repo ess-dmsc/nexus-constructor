@@ -44,7 +44,7 @@ def test_can_get_transform_properties():
         transform.name == test_name
     ), "Expected the transform name to match what was in the NeXus file"
     assert (
-        transform.value == test_value
+        transform.ui_value == test_value
     ), "Expected the transform value to match what was in the NeXus file"
     assert (
         transform.vector == test_vector
@@ -85,7 +85,7 @@ def test_can_set_transform_properties():
     transform = create_transform(nexus_wrapper, initial_name)
 
     test_name = "beeblebrox"
-    test_value = 34
+    test_value = 34.0
     test_vector = QVector3D(0.0, 0.0, 1.0)
     test_type = "Rotation"
 

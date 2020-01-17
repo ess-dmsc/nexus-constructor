@@ -236,7 +236,7 @@ class Component:
         )
 
         translation_transform = Transformation(self.file, field)
-        translation_transform.ui_placeholder_value = magnitude
+        translation_transform.ui_value = magnitude
         translation_transform.depends_on = depends_on
         return translation_transform
 
@@ -269,7 +269,7 @@ class Component:
         )
         rotation_transform = Transformation(self.file, field)
         rotation_transform.depends_on = depends_on
-        rotation_transform.ui_placeholder_value = angle
+        rotation_transform.ui_value = angle
         return rotation_transform
 
     def _transform_is_in_this_component(self, transform: Transformation) -> bool:

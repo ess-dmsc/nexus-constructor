@@ -24,14 +24,13 @@ class EditTransformation(QGroupBox):
         self.disable()
 
     def _fill_in_existing_fields(self, current_vector):
+        self.transformation_frame.name_line_edit.setText(self.transformation.name)
         self.transformation_frame.x_spinbox.setValue(current_vector.x())
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
-        self.transformation_frame.name_line_edit.setText(self.transformation.name)
         item, update_function = find_field_type(self.transformation.dataset)
         update_function(item, self.transformation_frame.magnitude_widget)
-        self.transformation_frame.value_spinbox.setValue(self.transformation.value)
-        self.instrument.nexus.transformation_changed.emit()
+        self.transformation_frame.value_spinbox.setValue(self.transformation.ui_value)
 
     def disable(self):
         for spinbox in self.transformation_frame.spinboxes + [
@@ -46,12 +45,13 @@ class EditTransformation(QGroupBox):
             spinbox.setEnabled(True)
 
     def saveChanges(self):
+        print(f"changes saved, value is: {self.transformation_frame.value_spinbox.value()}")
+        self.transformation.ui_value = self.transformation_frame.value_spinbox.value()
         self.transformation.dataset = self.transformation_frame.magnitude_widget.value
         self.transformation.name = self.transformation_frame.name_line_edit.text()
         self.transformation.vector = QVector3D(
             *[spinbox.value() for spinbox in self.transformation_frame.spinboxes[:-1]]
         )
-        self.transformation.value = self.transformation_frame.value_spinbox.value()
         self.instrument.nexus.transformation_changed.emit()
 
 

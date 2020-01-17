@@ -23,7 +23,7 @@ class Transformation:
     def __init__(self, nexus_file: nx.NexusWrapper, dataset: h5py.Dataset):
         self.file = nexus_file
         self._dataset = dataset
-        self.value = dataset
+        self._ui_value = 0
 
     def __eq__(self, other):
         try:
@@ -46,14 +46,15 @@ class Transformation:
         """
         transform = Qt3DCore.QTransform()
         if self.type == TransformationType.ROTATION.value:
-            quaternion = transform.fromAxisAndAngle(self.vector, self.value)
+            quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
             transform.setRotation(quaternion)
         elif self.type == TransformationType.TRANSLATION.value:
-            transform.setTranslation(self.vector.normalized() * self.value)
+            transform.setTranslation(self.vector.normalized() * self.ui_value)
         else:
             raise (
                 RuntimeError('Unknown transformation of type "{}".'.format(self.type))
             )
+        print(self.ui_value)
         return transform.matrix()
 
     @property
@@ -129,20 +130,22 @@ class Transformation:
             self._dataset.attrs[k] = v
 
     @property
-    def value(self) -> float:
+    def ui_value(self) -> float:
+        """
+        Used for getting the 3d view magnitude (as a placeholder or if the dataset is scalar)
+        :return:
+        """
         if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset[()]):
             return self._dataset[()]
         return self._ui_value
 
-    @value.setter
-    def value(self, new_value: Union[float, h5py.Dataset]):
-        if isinstance(new_value, h5py.Dataset) and np.isscalar(new_value[()]):
-            self._ui_value = new_value[()]
-        elif isinstance(new_value, float) or isinstance(new_value, int):
-            self._ui_value = new_value
-            self._dataset[...] = new_value
-        else:
-            self._ui_value = 0
+    @ui_value.setter
+    def ui_value(self, new_value: float):
+        """
+        Used for setting the magnitude of the transformation in the 3d view
+        :param new_value: the placeholder magnitude for the 3d view
+        """
+        self._ui_value = new_value
 
     @property
     def depends_on(self) -> "Transformation":
