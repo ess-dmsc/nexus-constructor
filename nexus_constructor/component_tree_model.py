@@ -198,7 +198,9 @@ class ComponentTreeModel(QAbstractItemModel):
             )
         elif transformation_type == TransformationType.ROTATION:
             new_transformation = parent_component.add_rotation(
-                name=generate_unique_name("Rotation", transformation_list),
+                name=generate_unique_name(
+                    TransformationType.ROTATION.value, transformation_list
+                ),
                 axis=QVector3D(1.0, 0, 0),
                 angle=0.0,
             )

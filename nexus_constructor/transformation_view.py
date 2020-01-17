@@ -75,7 +75,7 @@ class EditRotation(EditTransformation):
     ):
         super().__init__(parent, transformation, instrument)
         self.transformation_frame.valueLabel.setText("Angle (°)")
-        self.setTitle("Rotation")
+        self.setTitle(TransformationType.ROTATION.value)
 
 
 def links_back_to_component(reference: Component, comparison: Component):

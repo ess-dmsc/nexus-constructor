@@ -264,7 +264,9 @@ class Component:
         field = self.file.set_field_value(transforms_group, name, angle, float)
         self.file.set_attribute_value(field, "units", "degrees")
         self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))
-        self.file.set_attribute_value(field, "transformation_type", "Rotation")
+        self.file.set_attribute_value(
+            field, "transformation_type", TransformationType.ROTATION.value
+        )
         rotation_transform = Transformation(self.file, field)
         rotation_transform.depends_on = depends_on
         rotation_transform.ui_placeholder_value = angle
