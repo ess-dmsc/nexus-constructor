@@ -1,5 +1,7 @@
 import h5py
 from PySide2.QtGui import QVector3D
+from mock import Mock
+
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
@@ -164,3 +166,111 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     assert view.transformation_frame.value_spinbox.value() == 0.0
     assert view.transformation_frame.magnitude_widget.field_type == FieldType.link
     assert view.transformation_frame.magnitude_widget.value.path == path
+
+
+def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(qtbot):
+    wrapper = NexusWrapper()
+    instrument = Instrument(wrapper, {})
+
+    component = instrument.create_component("test", "NXaperture", "")
+
+    x = 1
+    y = 2
+    z = 3
+    angle = 90
+
+    transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+
+    view = EditRotation(parent=None, transformation=transform, instrument=instrument)
+    qtbot.addWidget(view)
+
+    new_x = 4
+    new_y = 5
+    new_z = 6
+
+    view.transformation_frame.x_spinbox.setValue(new_x)
+    view.transformation_frame.y_spinbox.setValue(new_y)
+    view.transformation_frame.z_spinbox.setValue(new_z)
+
+    view.saveChanges()
+
+    assert transform.vector == QVector3D(new_x, new_y, new_z)
+
+
+def test_UI_GIVEN_view_gains_focus_WHEN_transformation_view_exists_THEN_spinboxes_are_enabled(
+    qtbot
+):
+    wrapper = NexusWrapper()
+    instrument = Instrument(wrapper, {})
+
+    component = instrument.create_component("test", "NXaperture", "")
+
+    x = 1
+    y = 2
+    z = 3
+    angle = 90
+
+    transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+
+    view = EditRotation(parent=None, transformation=transform, instrument=instrument)
+    qtbot.addWidget(view)
+
+    view.enable()
+
+    assert view.transformation_frame.x_spinbox.isEnabled()
+    assert view.transformation_frame.y_spinbox.isEnabled()
+    assert view.transformation_frame.z_spinbox.isEnabled()
+    assert view.transformation_frame.name_line_edit.isEnabled()
+
+
+def test_UI_GIVEN_view_loses_focus_WHEN_transformation_view_exists_THEN_spinboxes_are_disabled(
+    qtbot
+):
+    wrapper = NexusWrapper()
+    instrument = Instrument(wrapper, {})
+
+    component = instrument.create_component("test", "NXaperture", "")
+
+    x = 1
+    y = 2
+    z = 3
+    angle = 90
+
+    transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+
+    view = EditRotation(parent=None, transformation=transform, instrument=instrument)
+    qtbot.addWidget(view)
+
+    view.disable()
+
+    assert not view.transformation_frame.x_spinbox.isEnabled()
+    assert not view.transformation_frame.y_spinbox.isEnabled()
+    assert not view.transformation_frame.z_spinbox.isEnabled()
+    assert not view.transformation_frame.name_line_edit.isEnabled()
+
+
+def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_transformation_changed_signal_is_called_to_update_3d_view(
+    qtbot
+):
+    wrapper = NexusWrapper()
+    instrument = Instrument(wrapper, {})
+
+    component = instrument.create_component("test", "NXaperture", "")
+
+    x = 1
+    y = 2
+    z = 3
+    angle = 90
+
+    transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+
+    view = EditRotation(parent=None, transformation=transform, instrument=instrument)
+    instrument.nexus.transformation_changed = Mock()
+    qtbot.addWidget(view)
+
+    new_x = 4
+
+    view.transformation_frame.x_spinbox.setValue(new_x)
+    view.saveChanges()
+    instrument.nexus.transformation_changed.emit.assert_called_once()
+    assert transform.vector == QVector3D(new_x, y, z)
