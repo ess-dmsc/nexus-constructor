@@ -70,14 +70,14 @@ class Transformation:
         """
         Get transformation type, should be "Translation" or "Rotation"
         """
-        return self.file.get_attribute_value(self._dataset, "transformation_type")
+        return self.file.get_attribute_value(self._dataset, "transformation_type").capitalize()
 
     @type.setter
     def type(self, new_type: str):
         """
         Set transformation type, should be "Translation" or "Rotation"
         """
-        self.file.set_attribute_value(self._dataset, "transformation_type", new_type)
+        self.file.set_attribute_value(self._dataset, "transformation_type", new_type.capitalize())
 
     @property
     def vector(self):
