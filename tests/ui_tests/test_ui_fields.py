@@ -1,5 +1,6 @@
 from PySide2.QtWidgets import QListWidget
 import pytest
+from mock import Mock
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.field_widget import FieldWidget
@@ -40,6 +41,48 @@ def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_combo_is_changed_THEN_value
 
     assert stream_fields_widget.value_units_edit.isEnabled()
     assert stream_fields_widget.value_units_label.isEnabled()
+
+
+def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_advanced_options_are_clicked_THEN_f142_group_box_is_shown(
+    qtbot
+):
+    listwidget = QListWidget()
+    field = FieldWidget(["test"], listwidget)
+    field_name = "test"
+    field.name = field_name
+
+    stream_fields_widget = StreamFieldsWidget(field)
+    stream_fields_widget.schema_combo.setCurrentText("f142")
+
+    qtbot.addWidget(stream_fields_widget)
+
+    stream_fields_widget.f142_advanced_group_box.setVisible = Mock()
+    stream_fields_widget._show_advanced_options()
+
+    stream_fields_widget.f142_advanced_group_box.setVisible.assert_called_once_with(
+        True
+    )
+
+
+def test_ui_stream_field_GIVEN_ev42_is_selected_WHEN_advanced_options_are_clicked_THEN_ev42_group_box_is_shown(
+    qtbot
+):
+    listwidget = QListWidget()
+    field = FieldWidget(["test"], listwidget)
+    field_name = "test"
+    field.name = field_name
+
+    stream_fields_widget = StreamFieldsWidget(field)
+    stream_fields_widget.schema_combo.setCurrentText("ev42")
+
+    qtbot.addWidget(stream_fields_widget)
+
+    stream_fields_widget.ev42_advanced_group_box.setVisible = Mock()
+    stream_fields_widget._show_advanced_options()
+
+    stream_fields_widget.ev42_advanced_group_box.setVisible.assert_called_once_with(
+        True
+    )
 
 
 def test_ui_stream_field_GIVEN_value_units_is_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_appears_as_field(
