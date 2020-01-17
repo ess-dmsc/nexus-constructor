@@ -20,9 +20,6 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.setupUi(self, instrument)
         self.transformation = transformation
         current_vector = self.transformation.vector
-        for spinbox in self.transformation_frame.spinboxes:
-            spinbox.setRange(-10000000, 10000000)
-
         self._fill_in_existing_fields(current_vector)
         self.disable()
 
@@ -52,9 +49,7 @@ class EditTransformation(QGroupBox):
         self.transformation.dataset = self.transformation_frame.magnitude_widget.value
         self.transformation.name = self.transformation_frame.name_line_edit.text()
         self.transformation.vector = QVector3D(
-            self.transformation_frame.x_spinbox.value(),
-            self.transformation_frame.y_spinbox.value(),
-            self.transformation_frame.z_spinbox.value(),
+            *[spinbox.value() for spinbox in self.transformation_frame.spinboxes[:-1]]
         )
         self.transformation.value = self.transformation_frame.value_spinbox.value()
         self.instrument.nexus.transformation_changed.emit()

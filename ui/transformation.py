@@ -90,7 +90,7 @@ class Ui_Transformation(object):
             self.value_spinbox,
         ]
         for spinbox in self.spinboxes[:-1]:
-            spinbox.setRange(0, 1000000)
+            spinbox.setRange(-10000000, 10000000)
             spinbox.setDecimals(5)
 
         self.main_layout.addLayout(self.vector_layout)
