@@ -66,7 +66,7 @@ def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_cor
 
 
 def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_is_filled_correctly(
-    qtbot
+    qtbot, file  # noqa:F811
 ):
     wrapper = NexusWrapper()
     instrument = Instrument(wrapper, {})
@@ -80,7 +80,7 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
     z = 0
     transform = component.add_translation(QVector3D(x, y, z), name="test")
 
-    transform.value = array
+    transform.dataset = file.create_dataset("test", data=array)
 
     view = EditTranslation(parent=None, transformation=transform, instrument=instrument)
     qtbot.addWidget(view)
@@ -88,7 +88,6 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
     assert view.transformation_frame.x_spinbox.value() == x
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
-    assert view.transformation_frame.value_spinbox.value() == 0.0
     assert np.allclose(view.transformation.dataset[...], array)
     assert (
         view.transformation_frame.magnitude_widget.field_type == FieldType.array_dataset
@@ -141,7 +140,7 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
 def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
     qtbot
 ):
-    wrapper = NexusWrapper(filename="test")
+    wrapper = NexusWrapper(filename="asdfgsdfh")
     instrument = Instrument(wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")

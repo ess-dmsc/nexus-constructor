@@ -5,7 +5,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
 import h5py
 from nexus_constructor.nexus import nexus_wrapper as nx
-from typing import TypeVar, Union
+from typing import TypeVar
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 from nexus_constructor.transformation_types import TransformationType
@@ -54,7 +54,6 @@ class Transformation:
             raise (
                 RuntimeError('Unknown transformation of type "{}".'.format(self.type))
             )
-        print(self.ui_value)
         return transform.matrix()
 
     @property
@@ -137,7 +136,7 @@ class Transformation:
         """
         if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset[()]):
             return self._dataset[()]
-        return self._ui_value
+        return self.file.get_attribute_value(self._dataset, "ui_value")[()]
 
     @ui_value.setter
     def ui_value(self, new_value: float):
@@ -145,7 +144,7 @@ class Transformation:
         Used for setting the magnitude of the transformation in the 3d view
         :param new_value: the placeholder magnitude for the 3d view
         """
-        self._ui_value = new_value
+        self.file.set_attribute_value(self._dataset, "ui_value", new_value)
 
     @property
     def depends_on(self) -> "Transformation":

@@ -45,7 +45,6 @@ class EditTransformation(QGroupBox):
             spinbox.setEnabled(True)
 
     def saveChanges(self):
-        print(f"changes saved, value is: {self.transformation_frame.value_spinbox.value()}")
         self.transformation.ui_value = self.transformation_frame.value_spinbox.value()
         self.transformation.dataset = self.transformation_frame.magnitude_widget.value
         self.transformation.name = self.transformation_frame.name_line_edit.text()
