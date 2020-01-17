@@ -303,8 +303,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             default_broker, ok_pressed = QInputDialog.getText(
                 None,
                 "Default broker",
-                "broker:",
-                text="//broker:port/",
+                "Default Broker: (This will only be used for streams that do not already have a broker)",
+                text="//broker:port",
                 echo=QLineEdit.Normal,
             )
             if ok_pressed:
