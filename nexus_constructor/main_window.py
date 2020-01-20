@@ -304,7 +304,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 None,
                 "Default broker",
                 "Default Broker: (This will only be used for streams that do not already have a broker)",
-                text="//broker:port",
+                text="broker:port",
                 echo=QLineEdit.Normal,
             )
             if ok_pressed:
