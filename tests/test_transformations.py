@@ -6,7 +6,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 from uuid import uuid1
-from tests.helpers import add_component_to_file
+from tests.helpers import add_component_to_file, file
 
 transform_type = "Transformation"
 rotation_type = "Rotation"
@@ -429,3 +429,17 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
 
     assert dependee_of in new_transform_group.attrs
     assert new_transform_group.attrs[dependee_of] == "/" + component1_name
+
+
+def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN_getting_ui_value_THEN_ui_placeholder_value_is_returned_instead(
+    file
+):
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    transform_name = "transform_1"
+    transform = create_transform(nexus_wrapper, transform_name)
+
+    str_value = "sdfji"
+    transform.dataset = file.create_dataset("test", data=str_value)
+
+    assert transform.ui_value != str_value
+    assert transform.ui_value == 0

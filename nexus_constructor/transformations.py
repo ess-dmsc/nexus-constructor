@@ -126,6 +126,9 @@ class Transformation:
         for k, v in old_attrs.items():
             self._dataset.attrs[k] = v
 
+        if "ui_value" not in self._dataset.attrs:
+            self._dataset.attrs["ui_value"] = 0
+
     @property
     def ui_value(self) -> float:
         """
