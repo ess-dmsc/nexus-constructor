@@ -432,7 +432,7 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
 
 
 def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN_getting_ui_value_THEN_ui_placeholder_value_is_returned_instead(
-    file  # noqa: F811
+    file,  # noqa: F811
 ):
     nexus_wrapper = NexusWrapper(str(uuid1()))
     transform_name = "transform_1"
