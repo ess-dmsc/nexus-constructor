@@ -1,9 +1,15 @@
+import h5py
 from PySide2.QtWidgets import QSpinBox
 
+from nexus_constructor.field_utils import update_existing_stream_field
+from nexus_constructor.field_widget import FieldWidget
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.stream_fields_widget import (
     fill_in_advanced_options,
     check_if_advanced_options_should_be_enabled,
     StreamFieldsWidget,
+    ADC_PULSE_DEBUG,
 )
 from tests.helpers import file  # noqa: F401
 
@@ -86,3 +92,54 @@ def test_GIVEN_element_that_has_been_filled_in_WHEN_creating_dataset_from_spinne
     StreamFieldsWidget._create_dataset_from_spinner(file, {nexus_string: spinner})
 
     assert nexus_string in file
+
+
+def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existing_field_widget_THEN_f142_group_box_is_shown(
+    file, qtbot
+):
+    group = file.create_group("stream1")
+    group.attrs["NX_class"] = "NCstream"
+
+    vlen_str = h5py.special_dtype(vlen=str)
+    group.create_dataset("writer_module", dtype=vlen_str, data="f142")
+    group.create_dataset("type", dtype=vlen_str, data="bool")
+    group.create_dataset("topic", dtype=vlen_str, data="topic1")
+    group.create_dataset("source", dtype=vlen_str, data="source1")
+    group.create_dataset(ADC_PULSE_DEBUG, dtype=bool, data=True)
+
+    wrapper = NexusWrapper()
+    wrapper.load_file(file, file)
+
+    instrument = Instrument(wrapper, {})
+
+    widget = FieldWidget(instrument=instrument)
+    qtbot.addWidget(widget)
+
+    update_existing_stream_field(group, widget)
+
+    assert widget.streams_widget.f142_advanced_group_box.isEnabled()
+
+
+def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existing_field_widget_THEN_f142_group_box_is_shown(
+    file, qtbot
+):
+    group = file.create_group("stream1")
+    group.attrs["NX_class"] = "NCstream"
+
+    vlen_str = h5py.special_dtype(vlen=str)
+    group.create_dataset("writer_module", dtype=vlen_str, data="ev42")
+    group.create_dataset("topic", dtype=vlen_str, data="topic1")
+    group.create_dataset("source", dtype=vlen_str, data="source1")
+    group.create_dataset(ADC_PULSE_DEBUG, dtype=bool, data=True)
+
+    wrapper = NexusWrapper()
+    wrapper.load_file(file, file)
+
+    instrument = Instrument(wrapper, {})
+
+    widget = FieldWidget(instrument=instrument)
+    qtbot.addWidget(widget)
+
+    update_existing_stream_field(group, widget)
+
+    assert widget.streams_widget.ev42_advanced_group_box.isEnabled()
