@@ -271,3 +271,45 @@ def test_GIVEN_stream_group_that_has_ev42_advanced_option_WHEN_filling_in_existi
     assert generated_group["topic"][()] == group["topic"][()]
     assert generated_group["source"][()] == group["source"][()]
     assert generated_group[ADC_PULSE_DEBUG][()] == group[ADC_PULSE_DEBUG][()]
+
+
+def test_GIVEN_advanced_option_in_field_WHEN_filling_in_advanced_options_THEN_spinbox_is_created(
+    qtbot, file
+):
+    group = file.create_group("group")
+    field_name = "test"
+
+    advanced_options = [field_name]
+    spinner = QSpinBox()
+
+    items = {advanced_options[0]: spinner}.items()
+    value = 4
+
+    group.create_dataset(name=field_name, data=value)
+
+    fill_in_advanced_options(items, group)
+
+    assert spinner.value() == value
+
+
+def test_GIVEN_field_with_advanced_option_WHEN_checking_if_advanced_options_should_be_enabled_THEN_returns_true(
+    file,
+):
+
+    group = file.create_group("group")
+
+    field_name = "test"
+    advanced_options = [field_name]
+    group.create_dataset(name=field_name, data=1)
+    assert check_if_advanced_options_should_be_enabled(advanced_options, group)
+
+
+def test_GIVEN_field_without_advanced_option_WHEN_checking_if_advanced_options_should_be_enabled_THEN_returns_false(
+    file,
+):
+    group = file.create_group("group")
+
+    field_name = "test"
+    advanced_options = ["not_test"]
+    group.create_dataset(name=field_name, data=1)
+    assert not check_if_advanced_options_should_be_enabled(advanced_options, group)

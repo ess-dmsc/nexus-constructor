@@ -157,6 +157,7 @@ class NexusToDictConverter:
         # Add the entries
         if get_nx_class(root) == "NCstream":
             self._handle_stream(root, root_dict)
+            return root_dict
 
         for entry in root.values():
             # Check if there are SoftLinks in the group
