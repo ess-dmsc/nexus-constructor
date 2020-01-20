@@ -10,7 +10,7 @@ git+https://github.com/anthony-tuininga/cx_Freeze@7566412ec2f1a6bf35312439cb1eca
 jsonschema==2.6.0
 
 # Formatting/linting
-black==19.3b0
+black==19.10b0
 pre-commit
 flake8
 

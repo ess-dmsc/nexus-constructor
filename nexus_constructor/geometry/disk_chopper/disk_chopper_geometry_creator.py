@@ -183,7 +183,12 @@ class DiskChopperGeometryCreator:
         centre_to_slit_bottom = self._radius - self._slit_height
 
         # Create four points for the first slit in the chopper data
-        prev_upper_front, prev_upper_back, prev_lower_front, prev_lower_back = self.create_and_add_point_set(
+        (
+            prev_upper_front,
+            prev_upper_back,
+            prev_lower_front,
+            prev_lower_back,
+        ) = self.create_and_add_point_set(
             self._radius, centre_to_slit_bottom, self._slit_edges[0], False
         )
 
@@ -196,7 +201,12 @@ class DiskChopperGeometryCreator:
         for i in range(1, len(self._slit_edges)):
 
             # Create four points for the current slit edge
-            current_upper_front, current_upper_back, current_lower_front, current_lower_back = self.create_and_add_point_set(
+            (
+                current_upper_front,
+                current_upper_back,
+                current_lower_front,
+                current_lower_back,
+            ) = self.create_and_add_point_set(
                 self._radius, centre_to_slit_bottom, self._slit_edges[i], bool(i % 2)
             )
 

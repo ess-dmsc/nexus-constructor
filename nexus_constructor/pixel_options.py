@@ -137,9 +137,11 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             self.column_width_spin_box.setValue(col_width)
 
             # Set the first ID, start counting option, and the count direction option
-            first_id, start_counting_text, count_along_text = self._get_detector_number_information(
-                detector_numbers
-            )
+            (
+                first_id,
+                start_counting_text,
+                count_along_text,
+            ) = self._get_detector_number_information(detector_numbers)
             self.first_id_spin_box.setValue(first_id)
             self.start_counting_combo_box.setCurrentText(start_counting_text)
             self.count_first_combo_box.setCurrentText(count_along_text)
@@ -164,7 +166,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     @staticmethod
     def _get_column_information(
-        x_pixel_offset: np.ndarray
+        x_pixel_offset: np.ndarray,
     ) -> Tuple[int, Optional[float]]:
         """
         Determine the number of columns and the column width from a component that's being edited.
@@ -181,7 +183,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     @staticmethod
     def _get_detector_number_information(
-        detector_numbers: np.ndarray
+        detector_numbers: np.ndarray,
     ) -> Tuple[int, str, str]:
         """
         Determine the first pixel ID, the count direction, and the location of the first pixel from a component that's
@@ -274,7 +276,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     @staticmethod
     def _get_detector_face_information(
-        shape: OFFGeometryNexus
+        shape: OFFGeometryNexus,
     ) -> Tuple[int, np.ndarray]:
         return len(shape.faces), shape.detector_faces
 

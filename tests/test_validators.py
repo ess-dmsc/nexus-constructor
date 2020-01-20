@@ -14,7 +14,7 @@ from nexus_constructor.validators import (
     NullableIntValidator,
     NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
-    CommandDialogOKButtonValidator,
+    CommandDialogFileNameValidator,
 )
 import attr
 from PySide2.QtGui import QValidator
@@ -282,7 +282,7 @@ def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_accep
 
 @pytest.mark.parametrize("invalid_input", ["fff", "!", "       "])
 def test_GIVEN_nonemptry_string_WHEN_using_nullable_int_validator_THEN_returns_invalid(
-    invalid_input
+    invalid_input,
 ):
 
     validator = NullableIntValidator()
@@ -490,6 +490,6 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
 def test_GIVEN_valid_file_extensions_WHEN_validating_nexus_filename_for_filewriter_options_THEN_validator_emits_true(
     test_input, expected
 ):
-    validator = CommandDialogOKButtonValidator()
+    validator = CommandDialogFileNameValidator()
     validator.is_valid = Mock()
     assert validator.validate(test_input, 0) == expected

@@ -311,9 +311,10 @@ def _test_position_with_single_translation_helper(translation):
 
 
 def test_WHEN_generate_off_mesh_with_single_x_position_THEN_second_shape_just_translation_of_first():
-    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
-        QVector3D(1, 0, 0)
-    )
+    (
+        original_vertices,
+        second_shape_vertices,
+    ) = _test_position_with_single_translation_helper(QVector3D(1, 0, 0))
 
     # Vertices will be the same by shifted by 1
     for vertex in second_shape_vertices:
@@ -323,9 +324,10 @@ def test_WHEN_generate_off_mesh_with_single_x_position_THEN_second_shape_just_tr
 
 
 def test_WHEN_generate_off_mesh_with_single_y_position_THEN_second_shape_just_translation_of_first():
-    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
-        QVector3D(0, 1, 0)
-    )
+    (
+        original_vertices,
+        second_shape_vertices,
+    ) = _test_position_with_single_translation_helper(QVector3D(0, 1, 0))
 
     # Vertices will be the same by shifted by 1
     for vertex in second_shape_vertices:
@@ -335,9 +337,10 @@ def test_WHEN_generate_off_mesh_with_single_y_position_THEN_second_shape_just_tr
 
 
 def test_WHEN_generate_off_mesh_with_single_negative_z_position_THEN_second_shape_just_translation_of_first():
-    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
-        QVector3D(0, 0, -1)
-    )
+    (
+        original_vertices,
+        second_shape_vertices,
+    ) = _test_position_with_single_translation_helper(QVector3D(0, 0, -1))
 
     # Vertices will be the same by shifted by 1
     for vertex in second_shape_vertices:
@@ -347,9 +350,10 @@ def test_WHEN_generate_off_mesh_with_single_negative_z_position_THEN_second_shap
 
 
 def test_WHEN_generate_off_mesh_with_single_diagonal_position_THEN_second_shape_just_translation_of_first():
-    original_vertices, second_shape_vertices = _test_position_with_single_translation_helper(
-        QVector3D(0, 1, -1)
-    )
+    (
+        original_vertices,
+        second_shape_vertices,
+    ) = _test_position_with_single_translation_helper(QVector3D(0, 1, -1))
 
     for vertex in second_shape_vertices:
         vertex.setZ(vertex.z() + 1)

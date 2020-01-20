@@ -13,8 +13,10 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
-    CommandDialogOKButtonValidator,
+    CommandDialogFileNameValidator,
     HDF_FILE_EXTENSIONS,
+    NameValidator,
+    CommandDialogOKValidator,
 )
 
 TIME_FORMAT = "yyyy MM dd hh:mm:ss"
@@ -31,16 +33,39 @@ class FilewriterCommandDialog(QDialog):
         self.setLayout(QFormLayout())
 
         self.nexus_file_name_edit = QLineEdit()
-        filename_validator = CommandDialogOKButtonValidator()
-        self.nexus_file_name_edit.setValidator(filename_validator)
-        filename_validator.is_valid.connect(self.validate)
+
         self.ok_button = QPushButton("Ok")
         self.ok_button.clicked.connect(self.close)
 
         self.broker_line_edit = QLineEdit()
-        self.broker_line_edit.setPlaceholderText("(broker:port)")
+        self.broker_line_edit.setPlaceholderText("broker:port")
 
-        self.validate(False)
+        self.ok_validator = CommandDialogOKValidator()
+        self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
+
+        filename_validator = CommandDialogFileNameValidator()
+        self.nexus_file_name_edit.setValidator(filename_validator)
+        filename_validator.is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.nexus_file_name_edit,
+                tooltip_on_reject=f"Invalid NeXus file name - Should end with {HDF_FILE_EXTENSIONS}",
+            )
+        )
+        filename_validator.is_valid.connect(self.ok_validator.set_filename_valid)
+        filename_validator.is_valid.emit(False)
+
+        broker_validator = NameValidator([])
+        self.broker_line_edit.setValidator(broker_validator)
+        broker_validator.is_valid.connect(
+            partial(
+                validate_line_edit,
+                self.broker_line_edit,
+                tooltip_on_reject="Broker is required",
+            )
+        )
+        broker_validator.is_valid.connect(self.ok_validator.set_broker_valid)
+        broker_validator.is_valid.emit(False)
 
         self.start_time_enabled = QCheckBox()
         self.start_time_picker = QDateTimeEdit(QDateTime.currentDateTime())
@@ -73,14 +98,6 @@ class FilewriterCommandDialog(QDialog):
         self.layout().addRow("use_hdf_swmr", self.use_swmr_checkbox)
         self.layout().addRow(self.ok_button)
 
-    def validate(self, is_valid: bool):
-        self.ok_button.setEnabled(is_valid)
-        validate_line_edit(
-            self.nexus_file_name_edit,
-            is_valid,
-            tooltip_on_reject=f"Invalid NeXus file name - Should end with {HDF_FILE_EXTENSIONS}",
-        )
-
     def state_changed(self, is_start_time: bool, state: Qt.CheckState):
         if state != Qt.CheckState.Checked:
             self.start_time_picker.setEnabled(
@@ -92,7 +109,7 @@ class FilewriterCommandDialog(QDialog):
             ) if is_start_time else self.stop_time_picker.setEnabled(True)
 
     def get_arguments(
-        self
+        self,
     ) -> Tuple[str, str, Union[str, None], Union[str, None], str, bool, bool]:
         """
         gets the arguments of required and optional fields for the filewriter command.

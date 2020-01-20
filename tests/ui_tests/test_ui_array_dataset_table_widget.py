@@ -61,7 +61,7 @@ def test_UI_GIVEN_data_type_WHEN_changing_data_type_THEN_change_is_successful(
 
 
 def test_GIVEN_string_array_WHEN_changing_data_type_to_int_THEN_array_rests(
-    array_dataset_table_widget
+    array_dataset_table_widget,
 ):
     array = np.array(["hello" for _ in range(10)])
     array_dataset_table_widget.model.array = array
@@ -71,7 +71,7 @@ def test_GIVEN_string_array_WHEN_changing_data_type_to_int_THEN_array_rests(
 
 
 def test_UI_GIVEN_add_row_button_pressed_THEN_array_size_changes(
-    array_dataset_table_widget
+    array_dataset_table_widget,
 ):
 
     array_dataset_table_widget.add_row_button.trigger()
@@ -79,7 +79,7 @@ def test_UI_GIVEN_add_row_button_pressed_THEN_array_size_changes(
 
 
 def test_UI_GIVEN_add_column_button_pressed_THEN_array_size_changes(
-    array_dataset_table_widget
+    array_dataset_table_widget,
 ):
 
     array_dataset_table_widget.add_column_button.trigger()
@@ -87,7 +87,7 @@ def test_UI_GIVEN_add_column_button_pressed_THEN_array_size_changes(
 
 
 def test_UI_GIVEN_remove_row_button_pressed_WHEN_table_has_more_than_one_row_THEN_array_size_changes(
-    array_dataset_table_widget
+    array_dataset_table_widget,
 ):
 
     array_dataset_table_widget.add_row_button.trigger()
@@ -114,7 +114,7 @@ def test_UI_GIVEN_remove_column_button_pressed_WHEN_table_has_more_than_one_colu
 
 
 def test_UI_GIVEN_remove_row_button_pressed_WHEN_table_has_one_row_THEN_array_size_is_unchanged(
-    array_dataset_table_widget
+    array_dataset_table_widget,
 ):
     selection_index = array_dataset_table_widget.model.index(0, 0)
     array_dataset_table_widget.view.selectionModel().select(
@@ -126,7 +126,7 @@ def test_UI_GIVEN_remove_row_button_pressed_WHEN_table_has_one_row_THEN_array_si
 
 
 def test_UI_GIVEN_remove_column_button_pressed_WHEN_table_has_one_column_THEN_array_size_is_unchanged(
-    array_dataset_table_widget
+    array_dataset_table_widget,
 ):
     selection_index = array_dataset_table_widget.model.index(0, 0)
     array_dataset_table_widget.view.selectionModel().select(
@@ -138,7 +138,7 @@ def test_UI_GIVEN_remove_column_button_pressed_WHEN_table_has_one_column_THEN_ar
 
 
 def test_UI_GIVEN_data_is_entered_WHEN_data_and_index_are_valid_THEN_array_changes(
-    array_dataset_table_widget
+    array_dataset_table_widget,
 ):
 
     selection_index = array_dataset_table_widget.model.index(0, 0)
@@ -148,7 +148,7 @@ def test_UI_GIVEN_data_is_entered_WHEN_data_and_index_are_valid_THEN_array_chang
 
 
 def test_UI_GIVEN_data_is_entered_WHEN_data_index_is_invalid_THEN_set_data_returns_false(
-    array_dataset_table_widget
+    array_dataset_table_widget,
 ):
 
     selection_index = array_dataset_table_widget.model.index(5, 5)

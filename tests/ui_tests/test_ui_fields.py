@@ -26,7 +26,7 @@ def stream_fields_widget(qtbot, instrument, template):
 
 
 def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_combo_is_changed_THEN_value_units_edit_is_shown(
-    qtbot
+    qtbot,
 ):
     listwidget = QListWidget()
     field = FieldWidget(["test"], listwidget)
@@ -43,7 +43,7 @@ def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_combo_is_changed_THEN_value
 
 
 def test_ui_stream_field_GIVEN_value_units_is_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_appears_as_field(
-    stream_fields_widget
+    stream_fields_widget,
 ):
     value = "cubits"
 
@@ -56,7 +56,7 @@ def test_ui_stream_field_GIVEN_value_units_is_specified_WHEN_getting_stream_grou
 
 
 def test_ui_stream_field_GIVEN_value_units_is_not_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_does_not_appear_as_field(
-    stream_fields_widget
+    stream_fields_widget,
 ):
     stream_fields_widget.schema_combo.setCurrentText("f142")
     stream_fields_widget.schema_combo.currentTextChanged.emit("f142")
