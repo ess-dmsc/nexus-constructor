@@ -15,6 +15,7 @@ from nexus_constructor.validators import (
     NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
     CommandDialogFileNameValidator,
+    CommandDialogOKValidator,
 )
 import attr
 from PySide2.QtGui import QValidator
@@ -485,6 +486,7 @@ def test_GIVEN_blank_OFF_file_WHEN_validating_geometry_THEN_validity_signal_is_e
         ("file.hdf", QValidator.Acceptable),
         ("file.json", QValidator.Intermediate),
         ("", QValidator.Intermediate),
+        ("file", QValidator.Intermediate),
     ],
 )
 def test_GIVEN_valid_file_extensions_WHEN_validating_nexus_filename_for_filewriter_options_THEN_validator_emits_true(
@@ -493,3 +495,25 @@ def test_GIVEN_valid_file_extensions_WHEN_validating_nexus_filename_for_filewrit
     validator = CommandDialogFileNameValidator()
     validator.is_valid = Mock()
     assert validator.validate(test_input, 0) == expected
+
+
+@pytest.mark.parametrize(
+    "broker_valid,file_valid,expected",
+    [
+        (True, True, True),
+        (True, False, False),
+        (False, True, False),
+        (False, False, False),
+    ],
+)
+def test_GIVEN_valid_broker_and_filename_WHEN_validating_ok_button_for_command_dialog_THEN_validator_emits_true(
+    broker_valid, file_valid, expected
+):
+
+    validator = CommandDialogOKValidator()
+    validator.is_valid = Mock()
+
+    validator.set_broker_valid(broker_valid)
+    validator.set_filename_valid(file_valid)
+
+    validator.is_valid.emit.assert_called_with(expected)
