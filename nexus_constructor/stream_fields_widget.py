@@ -1,4 +1,3 @@
-from enum import Enum
 from functools import partial
 from typing import List, ItemsView, Dict
 
@@ -20,6 +19,7 @@ from PySide2.QtWidgets import (
 import numpy as np
 
 from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
+from nexus_constructor.writer_modules import WriterModules
 
 F142_TYPES = [
     "byte",
@@ -60,15 +60,6 @@ def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Gro
     for nxs_string, spinner in elements:
         if nxs_string in field.keys():
             spinner.setValue(field[nxs_string][()])
-
-
-class WriterModules(Enum):
-    F142 = "f142"
-    EV42 = "ev42"
-    TDCTIME = "TdcTime"
-    NS10 = "ns10"
-    HS00 = "hs00"
-    SENV = "senv"
 
 
 class StreamFieldsWidget(QDialog):
