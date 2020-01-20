@@ -57,7 +57,7 @@ def test_axis_direction_must_be_non_zero(nexus_wrapper):
 
 
 def test_creating_cylinder_from_file_with_multiple_cylinders_in_single_group_ignores_all_but_the_first_cylinder(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     height_cyl_1 = 4.2
     radius_cyl_1 = 4.2
@@ -87,7 +87,7 @@ def test_creating_cylinder_from_file_with_multiple_cylinders_in_single_group_ign
 
 
 def test_get_expected_height_and_radius_when_cylinder_vertices_are_out_of_order_in_nexus_file(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     height_cyl = 4.2
     radius_cyl = 3.7

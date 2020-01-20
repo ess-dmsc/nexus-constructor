@@ -85,6 +85,7 @@ class StreamFieldsWidget(QDialog):
 
         self.topic_label = QLabel("Topic: ")
         self.topic_line_edit = QLineEdit()
+        self.topic_line_edit.setPlaceholderText("[broker][:port, default=9092]/topic")
 
         self.source_label = QLabel("Source: ")
         self.source_line_edit = QLineEdit()

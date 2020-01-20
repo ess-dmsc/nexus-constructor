@@ -56,7 +56,7 @@ def create_temporary_in_memory_file() -> h5py.File:
 
 
 def get_fields(
-    group: h5py.Group
+    group: h5py.Group,
 ) -> (List[h5py.Dataset], List[h5py.Dataset], List[h5py.Group], List[h5py.Group]):
     """
     Return a list of fields in a given component group.

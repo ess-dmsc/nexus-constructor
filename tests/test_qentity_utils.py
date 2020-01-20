@@ -5,7 +5,7 @@ from nexus_constructor.qentity_utils import create_material, create_qentity
 
 @patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
 def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_properties_set(
-    mock
+    mock,
 ):
 
     ambient = Mock()
@@ -21,7 +21,7 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
 
 @patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongAlphaMaterial", return_value=Mock())
 def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_THEN_properties_set(
-    mock
+    mock,
 ):
 
     ambient = Mock()
@@ -38,7 +38,7 @@ def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_TH
 
 @patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
 def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shininess_set_to_zero(
-    mock
+    mock,
 ):
 
     ambient = Mock()
@@ -54,7 +54,7 @@ def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shin
 
 @patch("PySide2.Qt3DCore.Qt3DCore.QEntity", return_value=Mock())
 def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_added(
-    mock
+    mock,
 ):
 
     mock_parent = Mock()

@@ -52,7 +52,7 @@ class FilewriterCommandDialog(QDialog):
         self.stop_time_picker = QDateTimeEdit(QDateTime.currentDateTime())
         self.stop_time_picker.setDisplayFormat(TIME_FORMAT)
         self.stop_time_enabled.stateChanged.connect(partial(self.state_changed, False))
-        self.stop_time_enabled.setChecked(True)
+        self.stop_time_enabled.setChecked(False)
 
         self.service_id_lineedit = QLineEdit()
         self.service_id_lineedit.setPlaceholderText("(Optional)")
@@ -92,7 +92,7 @@ class FilewriterCommandDialog(QDialog):
             ) if is_start_time else self.stop_time_picker.setEnabled(True)
 
     def get_arguments(
-        self
+        self,
     ) -> Tuple[str, str, Union[str, None], Union[str, None], str, bool, bool]:
         """
         gets the arguments of required and optional fields for the filewriter command.

@@ -5,6 +5,7 @@ from PySide2.QtWidgets import (
     QMainWindow,
     QApplication,
     QInputDialog,
+    QLineEdit,
 )
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 
@@ -272,9 +273,15 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if filename:
             dialog = FilewriterCommandDialog()
             dialog.exec_()
-            nexus_file_name, broker, start_time, stop_time, service_id, abort_on_uninitialised_stream, use_swmr = (
-                dialog.get_arguments()
-            )
+            (
+                nexus_file_name,
+                broker,
+                start_time,
+                stop_time,
+                service_id,
+                abort_on_uninitialised_stream,
+                use_swmr,
+            ) = dialog.get_arguments()
             with open(filename, "w") as file:
                 filewriter_json_writer.generate_json(
                     self.instrument,
@@ -299,10 +306,20 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 0,
                 False,
             )
+            default_broker, ok_pressed = QInputDialog.getText(
+                None,
+                "Default broker",
+                "Default Broker: (This will only be used for streams that do not already have a broker)",
+                text="broker:port",
+                echo=QLineEdit.Normal,
+            )
             if ok_pressed:
                 with open(filename, "w") as file:
                     nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
-                        file, self.instrument.nexus.entry, provider_type=provider_type
+                        file,
+                        self.instrument.nexus.entry,
+                        provider_type=provider_type,
+                        default_broker=default_broker,
                     )
 
     def open_nexus_file(self):

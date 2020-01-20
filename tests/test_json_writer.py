@@ -22,7 +22,7 @@ from tests.test_utils import DEFINITIONS_DIR
 
 
 def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype(
-    file
+    file,
 ):
     expected_dtype = "float"
     expected_size = 1
@@ -38,7 +38,7 @@ def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct
 
 
 def test_GIVEN_float64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype(
-    file
+    file,
 ):
     expected_dtype = "double"
     expected_size = 1
@@ -54,7 +54,7 @@ def test_GIVEN_float64_WHEN_getting_data_and_dtype_THEN_function_returns_correct
 
 
 def test_GIVEN_int32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype(
-    file
+    file,
 ):
     expected_dtype = "int32"
     expected_size = 1
@@ -70,7 +70,7 @@ def test_GIVEN_int32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_f
 
 
 def test_GIVEN_int64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype(
-    file
+    file,
 ):
     expected_dtype = "int64"
     expected_size = 1
@@ -86,7 +86,7 @@ def test_GIVEN_int64_WHEN_getting_data_and_dtype_THEN_function_returns_correct_f
 
 
 def test_GIVEN_single_string_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype(
-    file
+    file,
 ):
     expected_dtype = "string"
     expected_size = 1
@@ -102,7 +102,7 @@ def test_GIVEN_single_string_WHEN_getting_data_and_dtype_THEN_function_returns_c
 
 
 def test_GIVEN_array_WHEN_getting_data_and_dtype_THEN_function_returns_correcte_fw_json_dtype_and_values(
-    file
+    file,
 ):
     expected_dtype = "float"
     expected_values = [1.1, 1.2, 1.3]
@@ -116,7 +116,7 @@ def test_GIVEN_array_WHEN_getting_data_and_dtype_THEN_function_returns_correcte_
 
 
 def test_GIVEN_nx_class_and_attributes_are_bytes_WHEN_output_to_json_THEN_they_are_written_as_utf8(
-    file
+    file,
 ):
     dataset_name = "test_ds"
     dataset_value = 1
@@ -184,7 +184,7 @@ def test_GIVEN_dataset_with_an_array_attribute_WHEN_output_to_json_THEN_attribut
 
 
 def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist_in_root_dict(
-    file
+    file,
 ):
     dataset_name = "test_ds"
     dataset_value = 1.1
@@ -205,7 +205,7 @@ def test_GIVEN_single_value_WHEN_handling_dataset_THEN_size_field_does_not_exist
 
 
 def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_in_root_dict(
-    file
+    file,
 ):
     dataset_name = "test_ds"
     dataset_value = [1.1, 1.2, 1.3]
@@ -225,7 +225,7 @@ def test_GIVEN_multiple_values_WHEN_handling_dataset_THEN_size_field_does_exist_
 
 
 def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appended_to_children(
-    file
+    file,
 ):
     group_name = "test_group"
     group = file.create_group(group_name)
@@ -253,7 +253,7 @@ def test_GIVEN_stream_in_group_children_WHEN_handling_group_THEN_stream_is_appen
 
 
 def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_to_children(
-    file
+    file,
 ):
     root_group = file.create_group("root")
 
@@ -278,7 +278,7 @@ def test_GIVEN_link_in_group_children_WHEN_handling_group_THEN_link_is_appended_
 
 
 def test_GIVEN_link_in_group_children_that_is_a_dataset_WHEN_handling_group_THEN_link_is_appended_to_children(
-    file
+    file,
 ):
     root_group = file.create_group("root")
     ds_to_be_linked_name = "test_linked_dataset"
@@ -303,7 +303,7 @@ def test_GIVEN_link_in_group_children_that_is_a_dataset_WHEN_handling_group_THEN
 
 
 def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN_attributes_end_up_in_file(
-    file
+    file,
 ):
     group_name = "test_group"
     group = file.create_group(group_name)
@@ -474,7 +474,7 @@ def test_GIVEN_string_list_WHEN_getting_data_and_type_THEN_returns_correct_dtype
 
 
 def test_GIVEN_stream_with_no_forwarder_streams_WHEN_generating_forwarder_command_THEN_output_does_not_contain_any_pvs(
-    file
+    file,
 ):
     group_name = "test_group"
     group = file.create_group(group_name)
@@ -485,13 +485,14 @@ def test_GIVEN_stream_with_no_forwarder_streams_WHEN_generating_forwarder_comman
     group.create_dataset("topic", data="topic1")
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, file, "ca")
+
+    generate_forwarder_command(dummy_file, file, "ca", "")
 
     assert not literal_eval(dummy_file.getvalue())["streams"]
 
 
 def test_GIVEN_stream_with_f142_command_WHEN_generating_forwarder_command_THEN_output_contains_pv(
-    file
+    file,
 ):
     pv_name = "pv1"
     topic = "someTopic"
@@ -505,7 +506,8 @@ def test_GIVEN_stream_with_f142_command_WHEN_generating_forwarder_command_THEN_o
     group.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, file, "ca")
+
+    generate_forwarder_command(dummy_file, file, "ca", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1
@@ -515,7 +517,7 @@ def test_GIVEN_stream_with_f142_command_WHEN_generating_forwarder_command_THEN_o
 
 
 def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142_is_contained(
-    file
+    file,
 ):
 
     group = file.create_group("test_group")
@@ -536,7 +538,8 @@ def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142
     group2.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, file, "ca")
+
+    generate_forwarder_command(dummy_file, file, "ca", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1
@@ -546,7 +549,7 @@ def test_GIVEN_stream_with_f142_command_and_non_forwarder_modules_THEN_only_f142
 
 
 def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_output_contains_pv(
-    file
+    file,
 ):
     pv_name = "tdcpv1"
     topic = "localhost:9092/someOtherTopic"
@@ -561,7 +564,8 @@ def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_ou
     group.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, file, "pva")
+
+    generate_forwarder_command(dummy_file, file, "pva", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
     assert len(streams_) == 1
@@ -571,7 +575,7 @@ def test_GIVEN_stream_with_tdc_command_WHEN_generating_forwarder_command_THEN_ou
 
 
 def test_GIVEN_stream_with_one_pv_with_two_topics_WHEN_generating_forwarder_command_THEN_contains_one_converter_with_list(
-    file
+    file,
 ):
     pv_name = "testPV"
 
@@ -593,7 +597,8 @@ def test_GIVEN_stream_with_one_pv_with_two_topics_WHEN_generating_forwarder_comm
     group2.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, file, "ca")
+
+    generate_forwarder_command(dummy_file, file, "ca", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
 
@@ -606,7 +611,7 @@ def test_GIVEN_stream_with_one_pv_with_two_topics_WHEN_generating_forwarder_comm
 
 
 def test_GIVEN_stream_with_pv_forwarding_to_three_topics_WHEN_generating_forwarder_command_THEN_stream_is_added_to_converters(
-    file
+    file,
 ):
     pv_name = "testPV"
 
@@ -635,7 +640,8 @@ def test_GIVEN_stream_with_pv_forwarding_to_three_topics_WHEN_generating_forward
     group3.create_dataset("source", data=pv_name)
 
     dummy_file = io.StringIO()
-    generate_forwarder_command(dummy_file, file, "pva")
+
+    generate_forwarder_command(dummy_file, file, "pva", "")
 
     streams_ = literal_eval(dummy_file.getvalue())["streams"]
 
@@ -646,6 +652,85 @@ def test_GIVEN_stream_with_pv_forwarding_to_three_topics_WHEN_generating_forward
     assert streams_[0]["converter"][0]["topic"] == topic1
     assert streams_[0]["converter"][1]["topic"] == topic2
     assert streams_[0]["converter"][2]["topic"] == topic3
+
+
+def test_GIVEN_stream_with_topic_that_includes_broker_and_default_broker_provided_WHEN_generating_forwarder_command_THEN_default_broker_not_included(
+    file,
+):
+    pv_name = "testPV"
+
+    topic = "broker:9092/topic"
+    writer_module = "f142"
+
+    group = file.create_group("test_group")
+    group.attrs["NX_class"] = "NCstream"
+    group.create_dataset("writer_module", data=writer_module)
+    group.create_dataset("source", data=pv_name)
+    group.create_dataset("topic", data=topic)
+
+    default_broker = "somedefaultbroker"
+
+    dummy_file = io.StringIO()
+
+    generate_forwarder_command(dummy_file, file, "pva", default_broker)
+
+    streams_ = literal_eval(dummy_file.getvalue())["streams"]
+
+    assert len(streams_) == 1
+    assert streams_[0]["converter"]["topic"] == topic
+    assert default_broker not in streams_[0]["converter"]["topic"]
+
+
+def test_GIVEN_stream_with_topic_not_including_broker_and_default_broker_provided_WHEN_generating_forwarder_command_THEN_default_broker_is_included(
+    file,
+):
+    pv_name = "testPV"
+
+    topic = "topic1"
+    writer_module = "f142"
+
+    group = file.create_group("test_group")
+    group.attrs["NX_class"] = "NCstream"
+    group.create_dataset("writer_module", data=writer_module)
+    group.create_dataset("source", data=pv_name)
+    group.create_dataset("topic", data=topic)
+
+    default_broker = "somedefaultbroker"
+
+    dummy_file = io.StringIO()
+
+    generate_forwarder_command(dummy_file, file, "pva", default_broker)
+
+    streams_ = literal_eval(dummy_file.getvalue())["streams"]
+
+    assert len(streams_) == 1
+    assert default_broker in streams_[0]["converter"]["topic"]
+    assert streams_[0]["converter"]["topic"] == default_broker + "/" + topic
+
+
+def test_GIVEN_stream_with_topic_not_including_broker_and_default_broker_not_provided_WHEN_generating_forwarder_command_THEN_topic_does_not_include_broker(
+    file,
+):
+    pv_name = "testPV"
+
+    topic = "topic1"
+    writer_module = "f142"
+
+    group = file.create_group("test_group")
+    group.attrs["NX_class"] = "NCstream"
+    group.create_dataset("writer_module", data=writer_module)
+    group.create_dataset("source", data=pv_name)
+    group.create_dataset("topic", data=topic)
+
+    dummy_file = io.StringIO()
+
+    generate_forwarder_command(dummy_file, file, "pva", "")
+
+    streams_ = literal_eval(dummy_file.getvalue())["streams"]
+
+    assert len(streams_) == 1
+
+    assert streams_[0]["converter"]["topic"] == topic
 
 
 def test_GIVEN_blank_service_id_WHEN_generating_start_and_stop_commands_THEN_service_id_not_in_write_or_stop_command():
