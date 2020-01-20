@@ -332,7 +332,7 @@ class StreamFieldsWidget(QDialog):
                     dtype=bool,
                     data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
                 )
-            self.__create_dataset_from_spinner(
+            self._create_dataset_from_spinner(
                 stream_group, self.ev42_nexus_to_spinner_ui_element
             )
 
@@ -353,12 +353,12 @@ class StreamFieldsWidget(QDialog):
                 "value_units", data=self.value_units_edit.text()
             )
         if self.advanced_options_enabled:
-            self.__create_dataset_from_spinner(
+            self._create_dataset_from_spinner(
                 stream_group, self.f142_nexus_to_spinner_ui_element
             )
 
     @staticmethod
-    def __create_dataset_from_spinner(
+    def _create_dataset_from_spinner(
         stream_group: h5py.Group, nexus_to_spinner_dict: Dict[str, QSpinBox]
     ):
         for (nexus_string, ui_element) in nexus_to_spinner_dict.items():
