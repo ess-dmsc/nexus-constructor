@@ -12,7 +12,7 @@ from tests.helpers import file  # noqa: F401
 
 
 def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled_correctly(
-    qtbot
+    qtbot,
 ):
     wrapper = NexusWrapper()
     instrument = Instrument(wrapper, {})
@@ -39,7 +39,7 @@ def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled
 
 
 def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
-    qtbot
+    qtbot,
 ):
     wrapper = NexusWrapper()
     instrument = Instrument(wrapper, {})
@@ -140,7 +140,7 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
 
 
 def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
-    qtbot
+    qtbot,
 ):
     wrapper = NexusWrapper(filename="asdfgsdfh")
     instrument = Instrument(wrapper, {})
@@ -198,7 +198,7 @@ def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
 
 
 def test_UI_GIVEN_view_gains_focus_WHEN_transformation_view_exists_THEN_spinboxes_are_enabled(
-    qtbot
+    qtbot,
 ):
     wrapper = NexusWrapper()
     instrument = Instrument(wrapper, {})
@@ -224,7 +224,7 @@ def test_UI_GIVEN_view_gains_focus_WHEN_transformation_view_exists_THEN_spinboxe
 
 
 def test_UI_GIVEN_view_loses_focus_WHEN_transformation_view_exists_THEN_spinboxes_are_disabled(
-    qtbot
+    qtbot,
 ):
     wrapper = NexusWrapper()
     instrument = Instrument(wrapper, {})
@@ -250,7 +250,7 @@ def test_UI_GIVEN_view_loses_focus_WHEN_transformation_view_exists_THEN_spinboxe
 
 
 def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_transformation_changed_signal_is_called_to_update_3d_view(
-    qtbot
+    qtbot,
 ):
     wrapper = NexusWrapper()
     instrument = Instrument(wrapper, {})

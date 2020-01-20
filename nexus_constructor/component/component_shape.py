@@ -34,7 +34,7 @@ class ComponentShape:
         self.component_group = component_group
 
     def get_shape(
-        self
+        self,
     ) -> Tuple[
         Optional[Union[OFFGeometry, CylindricalGeometry, NoShapeGeometry]],
         Optional[List[QVector3D]],

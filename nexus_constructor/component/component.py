@@ -397,7 +397,7 @@ class Component:
 
     @property
     def shape(
-        self
+        self,
     ) -> Tuple[
         Optional[Union[OFFGeometry, CylindricalGeometry]], Optional[List[QVector3D]]
     ]:

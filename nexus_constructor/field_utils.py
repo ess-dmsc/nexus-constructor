@@ -58,7 +58,7 @@ def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget)
 
 
 def get_fields_with_update_functions(
-    group: h5py.Group
+    group: h5py.Group,
 ) -> (List[h5py.Dataset], List[h5py.Dataset], List[h5py.Group], List[h5py.Group]):
     """
     Return a list of fields in a given component group.

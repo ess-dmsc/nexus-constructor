@@ -1,3 +1,4 @@
+from enum import Enum
 from functools import partial
 from typing import List, ItemsView, Dict
 
@@ -20,7 +21,6 @@ import numpy as np
 
 from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
 
-SCHEMAS = ["ev42", "f142", "hs00", "ns10", "TdcTime", "senv"]
 F142_TYPES = [
     "byte",
     "ubyte",
@@ -62,6 +62,15 @@ def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Gro
             spinner.setValue(field[nxs_string][()])
 
 
+class WriterModules(Enum):
+    F142 = "f142"
+    EV42 = "ev42"
+    TDCTIME = "TdcTime"
+    NS10 = "ns10"
+    HS00 = "hs00"
+    SENV = "senv"
+
+
 class StreamFieldsWidget(QDialog):
     """
     A stream widget containing schema-specific properties.
@@ -75,6 +84,7 @@ class StreamFieldsWidget(QDialog):
         self.setModal(True)
         self.minimum_spinbox_value = 0
         self.maximum_spinbox_value = 100_000_000
+        self.advanced_options_enabled = False
 
         self.hs00_unimplemented_label = QLabel(
             "hs00 (Event histograms) has not yet been fully implemented."
@@ -104,7 +114,9 @@ class StreamFieldsWidget(QDialog):
             text="Show/hide advanced options"
         )
         self.show_advanced_options_button.setCheckable(True)
-        self.show_advanced_options_button.clicked.connect(self._show_advanced_options)
+        self.show_advanced_options_button.clicked.connect(
+            self.advanced_options_button_clicked
+        )
 
         self._set_up_f142_group_box()
         self._set_up_ev42_group_box()
@@ -118,12 +130,10 @@ class StreamFieldsWidget(QDialog):
         self.array_radio.clicked.connect(partial(self._show_array_size, True))
 
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
-        self.schema_combo.addItems(SCHEMAS)
+        self.schema_combo.addItems([e.value for e in WriterModules])
 
         self.ok_button = QPushButton("OK")
         self.ok_button.clicked.connect(self.parent().close)
-
-        self.set_advanced_options_state()
 
         self.layout().addWidget(self.schema_label, 0, 0)
         self.layout().addWidget(self.schema_combo, 0, 1)
@@ -159,6 +169,9 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.ok_button, 11, 0, 1, 2)
 
         self._schema_type_changed(self.schema_combo.currentText())
+
+    def advanced_options_button_clicked(self):
+        self._show_advanced_options(show=self.show_advanced_options_button.isChecked())
 
     def _set_up_ev42_group_box(self):
         """
@@ -225,25 +238,13 @@ class StreamFieldsWidget(QDialog):
             self.f142_nexus_to_spinner_ui_element,
         )
 
-    def _show_advanced_options(self):
+    def _show_advanced_options(self, show):
         schema = self.schema_combo.currentText()
-        if schema == "f142":
-            self.f142_advanced_group_box.setVisible(
-                not self.f142_advanced_group_box.isVisible()
-            )
-        elif schema == "ev42":
-            self.ev42_advanced_group_box.setVisible(
-                not self.ev42_advanced_group_box.isVisible()
-            )
-
-        self.set_advanced_options_state()
-
-    def set_advanced_options_state(self):
-        """Used for getting the stream options when the dialog is closed."""
-        self.advanced_options_enabled = (
-            self.ev42_advanced_group_box.isVisible()
-            or self.f142_advanced_group_box.isVisible()
-        )
+        if schema == WriterModules.F142.value:
+            self.f142_advanced_group_box.setVisible(show)
+        elif schema == WriterModules.EV42.value:
+            self.ev42_advanced_group_box.setVisible(show)
+        self.advanced_options_enabled = show
 
     def _show_array_size(self, show: bool):
         self.array_size_spinbox.setVisible(show)
@@ -258,23 +259,24 @@ class StreamFieldsWidget(QDialog):
         self.show_advanced_options_button.setChecked(False)
         self.value_units_label.setVisible(False)
         self.value_units_edit.setVisible(False)
-        self.set_advanced_options_state()
-        if schema == "f142":
+        if schema == WriterModules.F142.value:
             self.value_units_label.setVisible(True)
             self.value_units_edit.setVisible(True)
             self._set_edits_visible(True, True)
             self.show_advanced_options_button.setVisible(True)
             self.f142_advanced_group_box.setVisible(False)
-        elif schema == "ev42":
+        elif schema == WriterModules.EV42.value:
             self._set_edits_visible(True, False)
             self.show_advanced_options_button.setVisible(True)
             self.ev42_advanced_group_box.setVisible(False)
-        elif schema == "hs00":
+        elif schema == WriterModules.HS00.value:
             self._set_edits_visible(True, False)
             self.hs00_unimplemented_label.setVisible(True)
-        elif schema == "ns10":
+        elif schema == WriterModules.NS10.value:
             self._set_edits_visible(True, False, "nicos/<device>/<parameter>")
-        elif schema == "TdcTime" or schema == "senv":
+        elif (
+            schema == WriterModules.TDCTIME.value or schema == WriterModules.SENV.value
+        ):
             self._set_edits_visible(True, False)
 
     def _set_edits_visible(self, source: bool, type: bool, source_hint=None):
@@ -313,10 +315,10 @@ class StreamFieldsWidget(QDialog):
         stream_group.create_dataset(
             "source", dtype=STRING_DTYPE, data=self.source_line_edit.text()
         )
-        if schema == "f142":
-            self._create_f142_fields(stream_group)
 
-        elif schema == "ev42":
+        if schema == WriterModules.F142.value:
+            self._create_f142_fields(stream_group)
+        elif schema == WriterModules.EV42.value:
             self._create_ev42_fields(stream_group)
         return stream_group
 
@@ -376,20 +378,16 @@ class StreamFieldsWidget(QDialog):
         all_ev42_elements = list(self.ev42_nexus_elements)
         all_ev42_elements.append(ADC_PULSE_DEBUG)
 
-        advanced_options = check_if_advanced_options_should_be_enabled(
-            all_ev42_elements, field
-        )
+        if check_if_advanced_options_should_be_enabled(all_ev42_elements, field):
+            self._show_advanced_options(True)
+            if ADC_PULSE_DEBUG in field.keys():
+                self.ev42_adc_pulse_debug_checkbox.setChecked(
+                    bool(field[ADC_PULSE_DEBUG][()])
+                )
 
-        if advanced_options:
-            self.ev42_advanced_group_box.setEnabled(True)
-            self.set_advanced_options_state()
-
-        if ADC_PULSE_DEBUG in field.keys():
-            self.ev42_adc_pulse_debug_checkbox.setChecked(
-                bool(field[ADC_PULSE_DEBUG][()])
+            fill_in_advanced_options(
+                self.ev42_nexus_to_spinner_ui_element.items(), field
             )
-
-        fill_in_advanced_options(self.ev42_nexus_to_spinner_ui_element.items(), field)
 
     def fill_in_existing_f142_fields(self, field: h5py.Group):
         """
@@ -406,15 +404,11 @@ class StreamFieldsWidget(QDialog):
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
 
-        advanced_options = check_if_advanced_options_should_be_enabled(
-            self.f142_nexus_elements, field
-        )
-
-        if advanced_options:
-            self.f142_advanced_group_box.setEnabled(True)
-            self.set_advanced_options_state()
-
-        fill_in_advanced_options(self.f142_nexus_to_spinner_ui_element.items(), field)
+        if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
+            self._show_advanced_options(True)
+            fill_in_advanced_options(
+                self.f142_nexus_to_spinner_ui_element.items(), field
+            )
 
     def update_existing_stream_info(self, field: h5py.Group):
         """
@@ -426,7 +420,7 @@ class StreamFieldsWidget(QDialog):
         self.schema_combo.setCurrentText(str(schema))
         self.topic_line_edit.setText(str(field["topic"][()]))
         self.source_line_edit.setText(str(field["source"][()]))
-        if schema == "f142":
+        if schema == WriterModules.F142.value:
             self.fill_in_existing_f142_fields(field)
-        if schema == "ev42":
+        if schema == WriterModules.EV42.value:
             self.fill_in_existing_ev42_fields(field)

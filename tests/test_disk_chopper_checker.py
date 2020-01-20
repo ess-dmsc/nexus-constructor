@@ -88,19 +88,19 @@ def nexus_defined_chopper_checker(nexus_disk_chopper):
 
 
 def test_GIVEN_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_true(
-    nexus_disk_chopper
+    nexus_disk_chopper,
 ):
     assert _check_data_type(nexus_disk_chopper[SLIT_EDGES_NAME][()], FLOAT_TYPES)
 
 
 def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_false(
-    nexus_disk_chopper
+    nexus_disk_chopper,
 ):
     assert not _check_data_type(nexus_disk_chopper[SLIT_EDGES_NAME][()], INT_TYPES)
 
 
 def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned(
-    fields_dict
+    fields_dict,
 ):
     field_dict = {RADIUS_NAME: "string"}
     error_message = _incorrect_data_type_message(field_dict, RADIUS_NAME, "float")
@@ -134,7 +134,7 @@ def test_GIVEN_invalid_field_type_WHEN_validating_disk_chopper_THEN_fields_have_
 
 
 def test_GIVEN_edges_array_with_two_dimensions_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_false(
-    nexus_defined_chopper_checker
+    nexus_defined_chopper_checker,
 ):
     two_dim_array = np.ones(shape=(5, 5))
     assert not nexus_defined_chopper_checker.edges_array_has_correct_shape(
@@ -143,7 +143,7 @@ def test_GIVEN_edges_array_with_two_dimensions_WHEN_validating_disk_chopper_THEN
 
 
 def test_GIVEN_column_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true(
-    nexus_defined_chopper_checker
+    nexus_defined_chopper_checker,
 ):
     column_array = np.ones(shape=(5, 1))
     assert nexus_defined_chopper_checker.edges_array_has_correct_shape(
@@ -152,7 +152,7 @@ def test_GIVEN_column_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges
 
 
 def test_GIVEN_row_shaped_edges_array_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true(
-    nexus_defined_chopper_checker
+    nexus_defined_chopper_checker,
 ):
     row_array = np.ones(shape=(1, 5))
     assert nexus_defined_chopper_checker.edges_array_has_correct_shape(
@@ -312,7 +312,7 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
 
 
 def test_GIVEN_valid_nexus_disk_chopper_WHEN_validating_disk_chopper_THEN_validate_chopper_returns_true(
-    nexus_defined_chopper_checker
+    nexus_defined_chopper_checker,
 ):
     assert nexus_defined_chopper_checker.validate_chopper()
 

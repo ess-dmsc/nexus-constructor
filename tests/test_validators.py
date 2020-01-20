@@ -282,7 +282,7 @@ def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_accep
 
 @pytest.mark.parametrize("invalid_input", ["fff", "!", "       "])
 def test_GIVEN_nonemptry_string_WHEN_using_nullable_int_validator_THEN_returns_invalid(
-    invalid_input
+    invalid_input,
 ):
 
     validator = NullableIntValidator()

@@ -4,12 +4,13 @@ from PySide2.QtWidgets import QSpinBox
 from nexus_constructor.field_utils import update_existing_stream_field
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper, get_name_of_node
 from nexus_constructor.stream_fields_widget import (
     fill_in_advanced_options,
     check_if_advanced_options_should_be_enabled,
     StreamFieldsWidget,
     ADC_PULSE_DEBUG,
+    NEXUS_INDICES_INDEX_EVERY_MB,
 )
 from tests.helpers import file  # noqa: F401
 
@@ -34,7 +35,7 @@ def test_GIVEN_advanced_option_in_field_WHEN_filling_in_advanced_options_THEN_sp
 
 
 def test_GIVEN_field_with_advanced_option_WHEN_checking_if_advanced_options_should_be_enabled_THEN_returns_true(
-    file
+    file,
 ):
 
     group = file.create_group("group")
@@ -46,7 +47,7 @@ def test_GIVEN_field_with_advanced_option_WHEN_checking_if_advanced_options_shou
 
 
 def test_GIVEN_field_without_advanced_option_WHEN_checking_if_advanced_options_should_be_enabled_THEN_returns_false(
-    file
+    file,
 ):
     group = file.create_group("group")
 
@@ -102,10 +103,10 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
 
     vlen_str = h5py.special_dtype(vlen=str)
     group.create_dataset("writer_module", dtype=vlen_str, data="f142")
-    group.create_dataset("type", dtype=vlen_str, data="bool")
+    group.create_dataset("type", dtype=vlen_str, data="byte")
     group.create_dataset("topic", dtype=vlen_str, data="topic1")
     group.create_dataset("source", dtype=vlen_str, data="source1")
-    group.create_dataset(ADC_PULSE_DEBUG, dtype=bool, data=True)
+    group.create_dataset(NEXUS_INDICES_INDEX_EVERY_MB, dtype=int, data=1)
 
     wrapper = NexusWrapper()
     wrapper.load_file(file, file)
@@ -117,13 +118,26 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
 
     update_existing_stream_field(group, widget)
 
+    # this would usually be done outside of the update_existing_stream_field
+    widget.name = get_name_of_node(group)
+
     assert widget.streams_widget.f142_advanced_group_box.isEnabled()
 
+    generated_group = widget.streams_widget.get_stream_group()
+    assert generated_group["writer_module"][()] == group["writer_module"][()]
+    assert generated_group["topic"][()] == group["topic"][()]
+    assert generated_group["type"][()] == group["type"][()]
+    assert generated_group["source"][()] == group["source"][()]
+    assert (
+        generated_group[NEXUS_INDICES_INDEX_EVERY_MB][()]
+        == group[NEXUS_INDICES_INDEX_EVERY_MB][()]
+    )
 
-def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existing_field_widget_THEN_f142_group_box_is_shown(
+
+def test_GIVEN_stream_group_that_has_ev42_advanced_option_WHEN_filling_in_existing_field_widget_THEN_ev42_group_box_is_shown(
     file, qtbot
 ):
-    group = file.create_group("stream1")
+    group = file.create_group("stream2")
     group.attrs["NX_class"] = "NCstream"
 
     vlen_str = h5py.special_dtype(vlen=str)
@@ -142,4 +156,13 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
 
     update_existing_stream_field(group, widget)
 
+    # this would usually be done outside of the update_existing_stream_field
+    widget.name = get_name_of_node(group)
+
     assert widget.streams_widget.ev42_advanced_group_box.isEnabled()
+
+    generated_group = widget.streams_widget.get_stream_group()
+    assert generated_group["writer_module"][()] == group["writer_module"][()]
+    assert generated_group["topic"][()] == group["topic"][()]
+    assert generated_group["source"][()] == group["source"][()]
+    assert generated_group[ADC_PULSE_DEBUG][()] == group[ADC_PULSE_DEBUG][()]

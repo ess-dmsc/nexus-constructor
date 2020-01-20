@@ -13,7 +13,7 @@ PIXEL_FIELDS = [
 
 
 def get_detector_faces_from_pixel_mapping(
-    mapping: PixelMapping
+    mapping: PixelMapping,
 ) -> Union[List[Tuple[int, int]], Tuple[int, int]]:
     """
     Returns a list of tuples. Each tuple contains a face ID followed by the face's detector ID.
@@ -26,7 +26,7 @@ def get_detector_faces_from_pixel_mapping(
 
 
 def get_detector_number_from_pixel_mapping(
-    mapping: PixelMapping
+    mapping: PixelMapping,
 ) -> Union[List[int], int]:
     """
     Returns a list of pixel IDs. Used for writing information to the detector_number field in NXdetector and
@@ -103,7 +103,7 @@ def get_detector_ids_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, int]:
 
 
 def convert_to_scalar_if_array_has_one_element(
-    value_array: np.ndarray
+    value_array: np.ndarray,
 ) -> Union[np.ndarray, float]:
     """
     Prevents a single value from being returned as an array.
@@ -117,7 +117,7 @@ def convert_to_scalar_if_array_has_one_element(
 
 
 def convert_to_scalar_if_list_has_one_element(
-    value_list: List
+    value_list: List,
 ) -> Union[List[int], int, List[Tuple[int, int]], Tuple[int, int]]:
     """
     Prevents a single value from being returned as a list.

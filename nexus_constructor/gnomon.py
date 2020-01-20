@@ -169,7 +169,11 @@ class Gnomon:
         # Pass "green" rather than the Y axis enum value because otherwise the text is too bright
         self.set_axis_label_text(y_axis_text, "Y", QColor("green"))
         self.set_axis_label_text(z_axis_text, "Z", AxisColors.Z.value)
-        x_label_matrix, y_label_matrix, z_label_matrix = self.create_axis_label_matrices(
+        (
+            x_label_matrix,
+            y_label_matrix,
+            z_label_matrix,
+        ) = self.create_axis_label_matrices(
             [self.x_text_vector, self.y_text_vector, self.z_text_vector]
         )
 
