@@ -92,7 +92,7 @@ class FilewriterCommandDialog(QDialog):
             ) if is_start_time else self.stop_time_picker.setEnabled(True)
 
     def get_arguments(
-        self
+        self,
     ) -> Tuple[str, str, Union[str, None], Union[str, None], str, bool, bool]:
         """
         gets the arguments of required and optional fields for the filewriter command.

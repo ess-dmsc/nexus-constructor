@@ -296,9 +296,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
 
-        scalar_fields, array_fields, stream_fields, link_fields = (
-            self.component_to_edit.get_fields()
-        )
+        (
+            scalar_fields,
+            array_fields,
+            stream_fields,
+            link_fields,
+        ) = self.component_to_edit.get_fields()
 
         update_methods = [
             (scalar_fields, update_existing_scalar_field),

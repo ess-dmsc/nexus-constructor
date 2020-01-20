@@ -121,7 +121,7 @@ def test_type_of_field_can_be_changed(nexus_wrapper):
 
 
 def test_GIVEN_new_component_WHEN_get_transforms_for_component_THEN_transforms_list_is_empty(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
     assert (
@@ -130,7 +130,7 @@ def test_GIVEN_new_component_WHEN_get_transforms_for_component_THEN_transforms_l
 
 
 def test_GIVEN_component_with_a_transform_added_WHEN_get_transforms_for_component_THEN_transforms_list_contains_transform(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
@@ -143,7 +143,7 @@ def test_GIVEN_component_with_a_transform_added_WHEN_get_transforms_for_componen
 
 
 def test_GIVEN_component_with_a_transform_added_WHEN_transform_is_deleted_THEN_transforms_list_is_empty(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
@@ -157,7 +157,7 @@ def test_GIVEN_component_with_a_transform_added_WHEN_transform_is_deleted_THEN_t
 
 
 def test_GIVEN_a_component_with_a_transform_dependency_WHEN_get_depends_on_THEN_transform_dependency_is_returned(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
@@ -170,7 +170,7 @@ def test_GIVEN_a_component_with_a_transform_dependency_WHEN_get_depends_on_THEN_
 
 
 def test_deleting_a_transformation_from_a_different_component_is_not_allowed(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     first_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
@@ -188,7 +188,7 @@ def test_deleting_a_transformation_from_a_different_component_is_not_allowed(
 
 
 def test_deleting_a_transformation_which_the_component_directly_depends_on_is_not_allowed(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
     transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
@@ -201,7 +201,7 @@ def test_deleting_a_transformation_which_the_component_directly_depends_on_is_no
 
 
 def test_deleting_a_transformation_which_the_component_indirectly_depends_on_is_not_allowed(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
     first_transform = component.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
@@ -217,7 +217,7 @@ def test_deleting_a_transformation_which_the_component_indirectly_depends_on_is_
 
 
 def test_transforms_contains_only_local_transforms_not_full_depends_on_chain(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     first_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
@@ -321,7 +321,7 @@ def test_transforms_has_no_link(nexus_wrapper):
 
 
 def test_removing_transformation_which_has_a_dependent_transform_in_another_component_is_not_allowed(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     first_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
@@ -344,7 +344,7 @@ def test_removing_transformation_which_has_a_dependent_transform_in_another_comp
 
 
 def test_removing_transformation_which_no_longer_has_a_dependent_transform_in_another_component_is_allowed(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     first_component = add_component_to_file(
         nexus_wrapper, "some_field", 42, "component_name"
@@ -372,7 +372,7 @@ def test_removing_transformation_which_no_longer_has_a_dependent_transform_in_an
 
 
 def test_removing_transformation_which_still_has_one_dependent_transform_is_not_allowed(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
@@ -393,7 +393,7 @@ def test_removing_transformation_which_still_has_one_dependent_transform_is_not_
 
 
 def test_can_add_cylinder_shape_to_and_component_and_get_the_same_shape_back(
-    nexus_wrapper
+    nexus_wrapper,
 ):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
 
@@ -457,7 +457,7 @@ def test_can_override_existing_shape(nexus_wrapper):
 
 
 def test_GIVEN_pixel_grid_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_data_in_nexus_file_matches_pixel_data_in_pixel_grid_object(
-    component
+    component,
 ):
     pixel_grid = PixelGrid(
         rows=5,
@@ -487,7 +487,7 @@ def test_GIVEN_pixel_grid_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_dat
 
 
 def test_GIVEN_pixel_mapping_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_ids_in_nexus_file_match_pixel_ids_in_mapping_object(
-    component
+    component,
 ):
     pixel_id_list = [i for i in range(5)]
     pixel_mapping = PixelMapping(pixel_id_list)
@@ -499,7 +499,7 @@ def test_GIVEN_pixel_mapping_WHEN_recording_pixel_data_to_nxdetector_THEN_pixel_
 
 
 def test_GIVEN_pixel_mapping_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_is_called_with_pixel_data(
-    component
+    component,
 ):
     pixel_mapping = PixelMapping()
 
@@ -513,7 +513,7 @@ def test_GIVEN_pixel_mapping_WHEN_setting_cylinder_shape_THEN_cylindrical_geomet
 
 
 def test_GIVEN_pixel_mapping_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_called_with_pixel_data(
-    component
+    component,
 ):
     pixel_mapping = PixelMapping()
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
@@ -540,7 +540,7 @@ def test_GIVEN_pixel_mapping_WHEN_setting_off_geometry_shape_THEN_off_geometry_i
 
 
 def test_GIVEN_no_pixel_data_WHEN_setting_cylinder_shape_THEN_shape_group_has_name_shape(
-    component
+    component,
 ):
     with patch(
         "nexus_constructor.component.component.CylindricalGeometry"
@@ -552,7 +552,7 @@ def test_GIVEN_no_pixel_data_WHEN_setting_cylinder_shape_THEN_shape_group_has_na
 
 
 def test_GIVEN_no_pixel_data_WHEN_setting_off_geometry_shape_THEN_shape_group_has_name_shape(
-    component
+    component,
 ):
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
     units = "m"
@@ -574,7 +574,7 @@ def test_GIVEN_no_pixel_data_WHEN_setting_off_geometry_shape_THEN_shape_group_ha
 
 
 def test_GIVEN_pixel_grid_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_is_not_called_with_pixel_data(
-    component
+    component,
 ):
     pixel_grid = PixelGrid()
 
@@ -588,7 +588,7 @@ def test_GIVEN_pixel_grid_WHEN_setting_cylinder_shape_THEN_cylindrical_geometry_
 
 
 def test_GIVEN_pixel_grid_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_not_called_with_pixel_data(
-    component
+    component,
 ):
     pixel_grid = PixelGrid()
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
@@ -615,7 +615,7 @@ def test_GIVEN_pixel_grid_WHEN_setting_off_geometry_shape_THEN_off_geometry_is_n
 
 
 def test_GIVEN_cylinder_properties_WHEN_setting_cylindrical_geometry_shape_THEN_shape_group_has_class_nxcylindrical_geometry(
-    component
+    component,
 ):
     component.set_cylinder_shape()
     assert (
@@ -625,7 +625,7 @@ def test_GIVEN_cylinder_properties_WHEN_setting_cylindrical_geometry_shape_THEN_
 
 
 def test_GIVEN_off_properties_WHEN_setting_off_geometry_shape_THEN_shape_group_has_class_nxoff_geometry(
-    component
+    component,
 ):
     off_geometry = OFFGeometryNoNexus(vertices=[], faces=[])
 
@@ -638,19 +638,19 @@ def test_GIVEN_off_properties_WHEN_setting_off_geometry_shape_THEN_shape_group_h
 
 
 def test_GIVEN_component_with_no_shape_information_WHEN_shape_is_requested_THEN_returns_NoShapeGeometry(
-    component
+    component,
 ):
     assert isinstance(component.shape[0], NoShapeGeometry)
 
 
 def test_GIVEN_component_with_no_depends_on_field_WHEN_get_transformation_THEN_returns_identity_matrix(
-    component
+    component,
 ):
     assert component.transform.matrix().isIdentity()
 
 
 def test_GIVEN_component_with_single_translation_WHEN_get_transformation_THEN_returns_the_translation(
-    component
+    component,
 ):
     translation_vector = QVector3D(0.42, -0.17, 3.0)
     translation = component.add_translation(translation_vector, "test_translation")
@@ -680,7 +680,7 @@ def test_GIVEN_component_with_single_translation_WHEN_get_transformation_THEN_re
 
 
 def test_GIVEN_component_with_two_translations_WHEN_get_transformation_THEN_returns_composite_translation(
-    component
+    component,
 ):
     first_translation_vector = QVector3D(0.42, -0.17, 3.0)
     first_translation = component.add_translation(
@@ -717,7 +717,7 @@ def test_GIVEN_component_with_two_translations_WHEN_get_transformation_THEN_retu
 
 
 def test_GIVEN_component_with_pixel_mapping_WHEN_removing_pixel_data_THEN_pixel_mapping_is_cleared(
-    component
+    component,
 ):
 
     pixel_mapping = PixelMapping([i for i in range(6)])
@@ -728,7 +728,7 @@ def test_GIVEN_component_with_pixel_mapping_WHEN_removing_pixel_data_THEN_pixel_
 
 
 def test_GIVEN_component_with_pixel_grid_WHEN_removing_pixel_data_THEN_pixel_grid_is_cleared(
-    component
+    component,
 ):
 
     pixel_grid = PixelGrid()

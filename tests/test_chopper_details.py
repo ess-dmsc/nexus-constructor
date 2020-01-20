@@ -12,7 +12,7 @@ from tests.chopper_test_helpers import (
 
 
 def test_GIVEN_initialised_chopper_details_WHEN_getting_properties_THEN_values_returned_match_original_constructor_input(
-    chopper_details
+    chopper_details,
 ):
     # ChopperDetails is constructed in the test fixture
     assert chopper_details.slits == N_SLITS

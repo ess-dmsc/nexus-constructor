@@ -511,7 +511,7 @@ def edit_component_with_pixel_fields(
 
 @pytest.mark.skip(reason="This test causes seg faults at the moment.")
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
-    qtbot
+    qtbot,
 ):
 
     template = QMainWindow()
@@ -1623,7 +1623,7 @@ def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 
 
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
-    qtbot
+    qtbot,
 ):
     instrument = Instrument(
         NexusWrapper("test_component_editing_name"), DEFINITIONS_DIR
@@ -1664,7 +1664,7 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
 
 
 def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_radio_is_checked(
-    qtbot
+    qtbot,
 ):
     component, instrument, model = create_group_with_component(
         "test", "test_component_editing_no_shape"
@@ -1692,7 +1692,7 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
 
 
 def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
-    qtbot
+    qtbot,
 ):
     instrument = Instrument(
         NexusWrapper("test_component_editing_cylinder"), DEFINITIONS_DIR
@@ -1726,7 +1726,7 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
 
 
 def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
-    qtbot
+    qtbot,
 ):
 
     component, instrument, model = create_group_with_component(
@@ -1765,7 +1765,7 @@ def create_group_with_component(component_name: str, file_name: str):
 
 
 def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
-    qtbot
+    qtbot,
 ):
     component, instrument, model = create_group_with_component(
         "chopper1", "test_component_editing_array_field"
@@ -1791,7 +1791,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
 
 
 def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_target(
-    qtbot
+    qtbot,
 ):
     component, instrument, model = create_group_with_component(
         "chopper1", "test_component_editing_link_field"
@@ -1820,7 +1820,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
 
 
 def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
-    qtbot
+    qtbot,
 ):
     component, instrument, model = create_group_with_component(
         "chopper1", "test_component_editing_multiple_fields"
@@ -1855,7 +1855,7 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
 
 
 def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
-    qtbot
+    qtbot,
 ):
     component, instrument, model = create_group_with_component(
         "chopper1", "test_component_editing_f142_stream_field"
@@ -1906,7 +1906,7 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
-    qtbot
+    qtbot,
 ):
     instrument = Instrument(NexusWrapper("test_component_editing_off"), DEFINITIONS_DIR)
     component_model = ComponentTreeModel(instrument)
@@ -1945,7 +1945,7 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data_is_in_line_edits(
-    qtbot
+    qtbot,
 ):
     instrument = Instrument(
         NexusWrapper("test_component_editing_off_filepath"), DEFINITIONS_DIR

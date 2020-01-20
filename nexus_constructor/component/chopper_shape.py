@@ -15,7 +15,7 @@ from PySide2.QtGui import QVector3D
 
 class ChopperShape(ComponentShape):
     def get_shape(
-        self
+        self,
     ) -> Tuple[
         Optional[Union[OFFGeometry, CylindricalGeometry, NoShapeGeometry]],
         Optional[List[QVector3D]],

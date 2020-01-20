@@ -273,9 +273,15 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if filename:
             dialog = FilewriterCommandDialog()
             dialog.exec_()
-            nexus_file_name, broker, start_time, stop_time, service_id, abort_on_uninitialised_stream, use_swmr = (
-                dialog.get_arguments()
-            )
+            (
+                nexus_file_name,
+                broker,
+                start_time,
+                stop_time,
+                service_id,
+                abort_on_uninitialised_stream,
+                use_swmr,
+            ) = dialog.get_arguments()
             with open(filename, "w") as file:
                 filewriter_json_writer.generate_json(
                     self.instrument,

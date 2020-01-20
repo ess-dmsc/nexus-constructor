@@ -38,7 +38,7 @@ def _create_transformation_vectors_for_pixel_offsets(
 
 class PixelShape(ComponentShape):
     def get_shape(
-        self
+        self,
     ) -> Tuple[
         Optional[Union[OFFGeometry, CylindricalGeometry, NoShapeGeometry]],
         Optional[List[QVector3D]],
