@@ -133,7 +133,13 @@ class Transformation:
         :return:
         """
         if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset[()]):
-            return self._dataset[()]
+            try:
+                int(self._dataset[()])
+                return self._dataset[()]
+            except ValueError:
+                logging.debug(
+                    "transformation value is not cast-able to int, using UI placeholder value instead."
+                )
         return self.file.get_attribute_value(self._dataset, "ui_value")[()]
 
     @ui_value.setter
