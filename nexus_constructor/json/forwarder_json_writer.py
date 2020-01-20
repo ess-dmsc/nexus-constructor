@@ -6,7 +6,7 @@ from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.writer_modules import WriterModules
 
-FORWARDER_SCHEMAS = [WriterModules.F142, WriterModules.TDCTIME]
+FORWARDER_SCHEMAS = [WriterModules.F142.value, WriterModules.TDCTIME.value]
 
 
 def find_forwarder_streams(root, provider_type: str) -> List:
