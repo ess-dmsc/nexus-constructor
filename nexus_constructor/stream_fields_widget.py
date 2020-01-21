@@ -414,5 +414,5 @@ class StreamFieldsWidget(QDialog):
         self.source_line_edit.setText(str(field["source"][()]))
         if schema == WriterModules.F142.value:
             self.fill_in_existing_f142_fields(field)
-        if schema == WriterModules.EV42.value:
+        elif schema == WriterModules.EV42.value:
             self.fill_in_existing_ev42_fields(field)
