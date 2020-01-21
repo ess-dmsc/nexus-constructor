@@ -429,5 +429,5 @@ class StreamFieldsWidget(QDialog):
         self.source_line_edit.setText(str(field["source"][()]))
         if schema == "f142":
             self.fill_in_existing_f142_fields(field)
-        if schema == "ev42":
+        elif schema == "ev42":
             self.fill_in_existing_ev42_fields(field)

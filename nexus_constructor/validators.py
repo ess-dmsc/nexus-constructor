@@ -409,7 +409,7 @@ class HDFLocationExistsValidator(QValidator):
     is_valid = Signal(bool)
 
 
-class CommandDialogOKButtonValidator(QValidator):
+class CommandDialogFileNameValidator(QValidator):
     """
     Validator to ensure item names are unique within a model that has a 'name' property
 
@@ -426,5 +426,25 @@ class CommandDialogOKButtonValidator(QValidator):
 
         self.is_valid.emit(True)
         return QValidator.Acceptable
+
+    is_valid = Signal(bool)
+
+
+class CommandDialogOKValidator(QObject):
+    def __init__(self):
+        super().__init__()
+        self.filename_valid = False
+        self.broker_valid = False
+
+    def set_filename_valid(self, is_valid: bool):
+        self.filename_valid = is_valid
+        self.validate_ok()
+
+    def set_broker_valid(self, is_valid: bool):
+        self.broker_valid = is_valid
+        self.validate_ok()
+
+    def validate_ok(self):
+        self.is_valid.emit(not any([not self.broker_valid, not self.filename_valid]))
 
     is_valid = Signal(bool)
