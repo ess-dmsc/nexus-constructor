@@ -61,7 +61,8 @@ class EditTranslation(EditTransformation):
         self, parent: QWidget, transformation: Transformation, instrument: Instrument
     ):
         super().__init__(parent, transformation, instrument)
-        self.transformation_frame.valueLabel.setText("Distance (m)")
+        self.transformation_frame.vector_label.setText("Direction")
+        self.transformation_frame.value_label.setText("Distance (m)")
         self.setTitle(TransformationType.TRANSLATION.value)
 
 
@@ -70,7 +71,8 @@ class EditRotation(EditTransformation):
         self, parent: QWidget, transformation: Transformation, instrument: Instrument
     ):
         super().__init__(parent, transformation, instrument)
-        self.transformation_frame.valueLabel.setText("Angle (°)")
+        self.transformation_frame.vector_label.setText("Rotation Axis")
+        self.transformation_frame.value_label.setText("Angle (°)")
         self.setTitle(TransformationType.ROTATION.value)
 
 
