@@ -46,11 +46,11 @@ class Ui_Transformation(object):
         self.valueLabel = QLabel("Length", Transformation)
         self.length_layout.addWidget(self.valueLabel)
 
-        self.ui_placeholder_label = QLabel("Value to use in 3d view:")
+        self.ui_placeholder_label = QLabel("Value to use in 3D view:")
         self.length_layout.addWidget(self.ui_placeholder_label)
 
         self.value_spinbox = QDoubleSpinBox(Transformation)
-        self.value_spinbox.setToolTip("Placeholder value for 3d view to use")
+        self.value_spinbox.setToolTip("Placeholder value for 3D view to use")
         self.value_spinbox.setDecimals(8)
         self.value_spinbox.setMaximumSize(QSize(100, 16777215))
 

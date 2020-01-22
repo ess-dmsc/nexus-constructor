@@ -137,7 +137,7 @@ class Transformation:
         """
         if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset[()]):
             try:
-                int(self._dataset[()])
+                float(self._dataset[()])
                 return self._dataset[()]
             except ValueError:
                 logging.debug(
