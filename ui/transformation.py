@@ -48,6 +48,10 @@ class Ui_Transformation(object):
         self._make_text_bold(self.value_label)
         self.main_layout.addWidget(self.value_label)
 
+        self.magnitude_widget = FieldWidget(hide_name_field=True, instrument=instrument)
+        self.magnitude_widget.setFrameShape(QFrame.NoFrame)
+        self.main_layout.addWidget(self.magnitude_widget)
+
         self.ui_placeholder_layout = QFormLayout()
         self.value_spinbox = QDoubleSpinBox(Transformation)
         self.value_spinbox.setToolTip("Placeholder value for 3D view to use")
@@ -58,10 +62,6 @@ class Ui_Transformation(object):
         )
 
         self.main_layout.addLayout(self.ui_placeholder_layout)
-
-        self.magnitude_widget = FieldWidget(hide_name_field=True, instrument=instrument)
-        self.magnitude_widget.setFrameShape(QFrame.NoFrame)
-        self.main_layout.addWidget(self.magnitude_widget)
 
         self.set_spinbox_ranges()
 
