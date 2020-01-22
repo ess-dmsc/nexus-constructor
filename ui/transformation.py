@@ -24,6 +24,8 @@ class Ui_Transformation(object):
         self.name_layout = QHBoxLayout()
         self.name_layout.setSpacing(-1)
         self.name_label = QLabel("Name", Transformation)
+        self._make_text_bold(self.name_label)
+
         self.name_layout.addWidget(self.name_label)
         self.name_line_edit = QLineEdit(Transformation)
 
@@ -35,13 +37,10 @@ class Ui_Transformation(object):
         self.main_layout.addWidget(self.line_1)
 
         self.vector_label = QLabel("Vector", Transformation)
+        self._make_text_bold(self.vector_label)
 
         self.main_layout.addWidget(self.vector_label)
 
-        self.line_2 = QFrame(Transformation)
-        self.line_2.setFrameShape(QFrame.HLine)
-        self.line_2.setFrameShadow(QFrame.Sunken)
-        self.main_layout.addWidget(self.line_2)
         self.length_layout = QHBoxLayout()
         self.length_layout.setSpacing(-1)
         self.valueLabel = QLabel("Length", Transformation)
@@ -54,16 +53,25 @@ class Ui_Transformation(object):
         self.value_spinbox.setToolTip("Placeholder value for 3d view to use")
         self.value_spinbox.setDecimals(8)
         self.value_spinbox.setMaximumSize(QSize(100, 16777215))
+
+        self.ui_placeholder_label.setBuddy(self.value_spinbox)
         self.length_layout.addWidget(self.value_spinbox)
         self._set_up_vector_box(Transformation)
 
         self.magnitude_widget = FieldWidget(hide_name_field=True, instrument=instrument)
+        self.magnitude_widget.setFrameShape(QFrame.NoFrame)
         self.main_layout.addLayout(self.length_layout)
         self.main_layout.addWidget(self.magnitude_widget)
         self.frame_layout.addLayout(self.main_layout)
 
         self.retranslateUi(Transformation)
         QMetaObject.connectSlotsByName(Transformation)
+
+    @staticmethod
+    def _make_text_bold(label: QLabel):
+        font = label.font()
+        font.setBold(True)
+        label.setFont(font)
 
     def _set_up_vector_box(self, Transformation):
         self.vector_layout = QHBoxLayout()
