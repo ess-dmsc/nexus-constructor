@@ -1,14 +1,13 @@
 from unittest.mock import Mock
 import pytest
 from PySide2.QtCore import QPoint, QModelIndex
-from PySide2.QtGui import QVector3D, QPainter, QColor, QPalette
+from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import (
     QToolBar,
     QWidget,
     QTreeView,
     QFrame,
     QVBoxLayout,
-    QStyleOptionViewItem,
 )
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
@@ -19,7 +18,6 @@ from nexus_constructor.treeview_utils import (
     expand_transformation_list,
     add_transformation,
     get_transformation_frame,
-    fill_selection,
 )
 from nexus_constructor.transformation_types import TransformationType
 
