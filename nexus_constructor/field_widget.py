@@ -310,6 +310,7 @@ class FieldWidget(QFrame):
                 tooltip_on_reject=tooltip_on_reject,
             )
         )
+        self.value_line_edit.validator().validate(self.value_line_edit.text(), None)
 
     def set_visibility(
         self,
