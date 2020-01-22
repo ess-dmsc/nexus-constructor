@@ -30,7 +30,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         super().__init__(parent)
         self.instrument = instrument
 
-    def getFrame(
+    def get_frame(
         self,
         value: Union[
             Component,
@@ -45,50 +45,65 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         SizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         SizePolicy.setHorizontalStretch(0)
         SizePolicy.setVerticalStretch(0)
-
-        AltSizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        AltSizePolicy.setVerticalStretch(0)
-
         frame.setSizePolicy(SizePolicy)
         frame.layout = QVBoxLayout()
         frame.layout.setContentsMargins(0, 0, 0, 0)
         frame.setLayout(frame.layout)
+
         if isinstance(value, Component):
-            frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
-            frame.layout.addWidget(frame.label)
+            ComponentEditorDelegate.get_component_frame(frame, value)
         elif isinstance(value, TransformationsList):
-            frame.label = QLabel("Transformations", frame)
-            frame.layout.addWidget(frame.label)
+            ComponentEditorDelegate.get_transformations_list_frame(frame)
         elif isinstance(value, ComponentInfo):
-            frame.label = QLabel("(Place holder)", frame)
-            frame.layout.addWidget(frame.label)
+            ComponentEditorDelegate.get_component_info_frame(frame)
         elif isinstance(value, Transformation):
-            if value.type == TransformationType.TRANSLATION.value:
-                frame.transformation_frame = EditTranslation(
-                    frame, value, self.instrument
-                )
-            elif value.type == TransformationType.ROTATION.value:
-                frame.transformation_frame = EditRotation(frame, value, self.instrument)
-            else:
-                raise (
-                    RuntimeError(
-                        'Transformation type "{}" is unknown.'.format(value.type)
-                    )
-                )
-            frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
-        elif isinstance(value, LinkTransformation):
-            frame.transformation_frame = EditTransformationLink(
-                frame, value, self.instrument
+            ComponentEditorDelegate.get_transformation_frame(
+                frame, self.instrument, value
             )
-            frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
+        elif isinstance(value, LinkTransformation):
+            ComponentEditorDelegate.get_link_transformation_frame(
+                frame, self.instrument, value
+            )
         return frame
+
+    @staticmethod
+    def get_link_transformation_frame(frame, instrument, value):
+        frame.transformation_frame = EditTransformationLink(frame, value, instrument)
+        frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
+
+    @staticmethod
+    def get_transformation_frame(frame, instrument, value):
+        if value.type == TransformationType.TRANSLATION.value:
+            frame.transformation_frame = EditTranslation(frame, value, instrument)
+        elif value.type == TransformationType.ROTATION.value:
+            frame.transformation_frame = EditRotation(frame, value, instrument)
+        else:
+            raise (
+                RuntimeError('Transformation type "{}" is unknown.'.format(value.type))
+            )
+        frame.layout.addWidget(frame.transformation_frame, Qt.AlignTop)
+
+    @staticmethod
+    def get_component_info_frame(frame):
+        frame.label = QLabel("(Place holder)", frame)
+        frame.layout.addWidget(frame.label)
+
+    @staticmethod
+    def get_transformations_list_frame(frame):
+        frame.label = QLabel("Transformations", frame)
+        frame.layout.addWidget(frame.label)
+
+    @staticmethod
+    def get_component_frame(frame, value):
+        frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
+        frame.layout.addWidget(frame.label)
 
     def paint(
         self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex
     ):
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
-        frame = self.getFrame(value)
+        frame = self.get_frame(value)
         frame.setFixedSize(option.rect.size())
         ratio = self.parent().devicePixelRatioF()
         pixmap = QPixmap(frame.size() * ratio)
@@ -96,16 +111,20 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.render(pixmap, QPoint(), QRegion())
         painter.drawPixmap(option.rect, pixmap)
         if index in self.parent().selectedIndexes():
-            colour = QColor("lightblue")
-            colour.setAlpha(100)
-            painter.fillRect(option.rect, colour)
+            self._fill_selection(option, painter)
+
+    @staticmethod
+    def _fill_selection(option, painter):
+        colour = QColor("lightblue")
+        colour.setAlpha(100)
+        painter.fillRect(option.rect, colour)
 
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
     ) -> QWidget:
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
-        frame = self.getFrame(value)
+        frame = self.get_frame(value)
         frame.transformation_frame.enable()
         frame.setParent(parent)
         self.frameSize = frame.sizeHint()
@@ -119,7 +138,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
-        frame = self.getFrame(value)
+        frame = self.get_frame(value)
         return frame.sizeHint()
 
     def updateEditorGeometry(
