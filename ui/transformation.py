@@ -47,7 +47,7 @@ class Ui_Transformation(object):
         self.valueLabel = QLabel("Length", Transformation)
         self.length_layout.addWidget(self.valueLabel)
 
-        self.ui_placeholder_label = QLabel("UI placeholder:")
+        self.ui_placeholder_label = QLabel("Value to use in 3d view:")
         self.length_layout.addWidget(self.ui_placeholder_label)
 
         self.value_spinbox = QDoubleSpinBox(Transformation)
