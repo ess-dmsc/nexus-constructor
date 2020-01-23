@@ -59,7 +59,7 @@ def cast_to_int(data):
         return int(data)
 
 
-ATTR_NAME_BLACKLIST = ["dependee_of"]
+ATTR_NAME_BLACKLIST = ["dependee_of", "ui_value"]
 NX_CLASS_BLACKLIST = ["NXgroup", "NCstream"]
 
 

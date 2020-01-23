@@ -1,6 +1,5 @@
 from collections import OrderedDict
 
-import h5py
 from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
@@ -12,13 +11,10 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.component_fields import FieldWidget, add_fields_to_component
+from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from ui.add_component import Ui_AddComponentDialog
-from nexus_constructor.component.component_type import (
-    make_dictionary_of_class_definitions,
-    PIXEL_COMPONENT_TYPES,
-)
+from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import (
     UnitValidator,
@@ -26,64 +22,20 @@ from nexus_constructor.validators import (
     GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
     OkValidator,
-    FieldType,
 )
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
-from nexus_constructor.component.component import Component
+from nexus_constructor.component.component import (
+    Component,
+    add_fields_to_component,
+    get_fields_and_update_functions_for_component,
+)
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
-
-
-def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
-    """
-    Fill in a UI link field for an existing link in the component
-    :param field: The link field in the component group
-    :param new_ui_field: The new UI field to fill in with existing data
-    """
-    new_ui_field.field_type = FieldType.link.value
-    new_ui_field.value = field.parent.get(field.name, getlink=True).path
-
-
-def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
-    """
-    Fill in a UI array field for an existing array field in the component group
-    :param value: The array dataset's value to copy to the UI fields list model
-    :param new_ui_field: The new UI field to fill in with existing data
-    """
-    new_ui_field.dtype = field.dtype
-    new_ui_field.field_type = FieldType.array_dataset.value
-    new_ui_field.value = field[()]
-
-
-def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget):
-    """
-    Fill in a UI scalar field for an existing scalar field in the component group
-    :param field: The dataset to copy into the value line edit
-    :param new_ui_field: The new UI field to fill in with existing data
-    """
-    dtype = field.dtype
-    if "S" in str(dtype):
-        dtype = h5py.special_dtype(vlen=str)
-        new_ui_field.value = field[()]
-    else:
-        new_ui_field.value = field[()]
-    new_ui_field.dtype = dtype
-    new_ui_field.field_type = FieldType.scalar_dataset.value
-
-
-def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget):
-    """
-    Fill in a UI stream field for an existing stream field in the component group
-    :param field: The dataset to copy into the value line edit
-    :param new_ui_field: The new UI field to fill in with existing data
-    """
-    new_ui_field.field_type = FieldType.kafka_stream.value
-    new_ui_field.streams_widget.update_existing_stream_info(field)
 
 
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
@@ -94,20 +46,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         instrument: Instrument,
         component_model: ComponentTreeModel,
         component_to_edit: Component = None,
-        definitions_dir: str = "",
+        nx_classes=None,
         parent=None,
     ):
         super(AddComponentDialog, self).__init__()
+        if nx_classes is None:
+            nx_classes = {}
         if parent:
             self.setParent(parent)
         self.instrument = instrument
         self.component_model = component_model
-        _, self.nx_component_classes = make_dictionary_of_class_definitions(
-            definitions_dir
-        )
-        self.nx_component_classes = OrderedDict(
-            sorted(self.nx_component_classes.items())
-        )
+        self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
 
         self.cad_file_name = None
         self.possible_fields = []
@@ -296,22 +245,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
 
-        (
-            scalar_fields,
-            array_fields,
-            stream_fields,
-            link_fields,
-        ) = self.component_to_edit.get_fields()
+        items_and_update_methods = get_fields_and_update_functions_for_component(
+            self.component_to_edit
+        )
 
-        update_methods = [
-            (scalar_fields, update_existing_scalar_field),
-            (array_fields, update_existing_array_field),
-            (stream_fields, update_existing_stream_field),
-            (link_fields, update_existing_link_field),
-        ]
-
-        for fields, update_method in update_methods:
-            for field in fields:
+        for field, update_method in items_and_update_methods.items():
+            if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
                 new_ui_field.attrs = field

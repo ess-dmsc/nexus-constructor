@@ -1,7 +1,8 @@
 import logging
-from functools import partial
-
+import uuid
+import numpy as np
 import h5py
+from functools import partial
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
@@ -15,15 +16,12 @@ from PySide2.QtWidgets import (
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List, Union
-from nexus_constructor.component.component import Component
-
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
-from nexus_constructor.instrument import Instrument
-from nexus_constructor.ui_utils import validate_line_edit, show_warning_dialog
+from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
     FieldValueValidator,
     FieldType,
@@ -31,7 +29,6 @@ from nexus_constructor.validators import (
     NameValidator,
     HDFLocationExistsValidator,
 )
-import numpy as np
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -65,7 +62,6 @@ class FieldNameLineEdit(QLineEdit):
 
 
 class FieldWidget(QFrame):
-
     # Used for deletion of field
     something_clicked = Signal()
 
@@ -76,11 +72,15 @@ class FieldWidget(QFrame):
 
     def __init__(
         self,
-        possible_field_names: List[str],
+        possible_field_names=None,
         parent: QListWidget = None,
-        instrument: Instrument = None,
+        instrument=None,
+        hide_name_field: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
+
+        if possible_field_names is None:
+            possible_field_names = []
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
@@ -88,6 +88,9 @@ class FieldWidget(QFrame):
 
         self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
+        self.hide_name_field = hide_name_field
+        if hide_name_field:
+            self.name = str(uuid.uuid4())
 
         self.streams_widget = StreamFieldsWidget(self.edit_dialog)
 
@@ -138,9 +141,9 @@ class FieldWidget(QFrame):
 
         # Allow selecting this field widget in a list by clicking on it's contents
         self.field_name_edit.installEventFilter(self)
-
-        self._set_up_name_validator(parent)
-        self.field_name_edit.validator().is_valid.emit(False)
+        if parent is not None:
+            self._set_up_name_validator()
+            self.field_name_edit.validator().is_valid.emit(False)
 
         self.value_line_edit.installEventFilter(self)
         self.nx_class_combo.installEventFilter(self)
@@ -153,10 +156,10 @@ class FieldWidget(QFrame):
         # Set the layout for the default field type
         self.field_type_changed()
 
-    def _set_up_name_validator(self, parent):
+    def _set_up_name_validator(self):
         field_widgets = []
-        for i in range(parent.count()):
-            field_widgets.append(parent.itemWidget(parent.item(i)))
+        for i in range(self.parent().count()):
+            field_widgets.append(self.parent().itemWidget(self.parent().item(i)))
 
         self.field_name_edit.setValidator(
             NameValidator(field_widgets, invalid_names=INVALID_FIELD_NAMES)
@@ -307,6 +310,7 @@ class FieldWidget(QFrame):
                 tooltip_on_reject=tooltip_on_reject,
             )
         )
+        self.value_line_edit.validator().validate(self.value_line_edit.text(), None)
 
     def set_visibility(
         self,
@@ -320,7 +324,9 @@ class FieldWidget(QFrame):
         self.nx_class_combo.setVisible(show_nx_class_combo)
         self.edit_button.setVisible(show_edit_button)
         self.value_type_combo.setVisible(show_value_type_combo)
-        self.field_name_edit.setVisible(show_name_line_edit)
+        self.field_name_edit.setVisible(
+            show_name_line_edit and not self.hide_name_field
+        )
 
     def show_edit_dialog(self):
         if self.field_type_combo.currentText() == FieldType.array_dataset.value:
@@ -342,24 +348,3 @@ class FieldWidget(QFrame):
 
     def show_attrs_dialog(self):
         self.attrs_dialog.show()
-
-
-def add_fields_to_component(component: Component, fields_widget: QListWidget):
-    """
-    Adds fields from a list widget to a component.
-    :param component: Component to add the field to.
-    :param fields_widget: The field list widget to extract field information such the name and value of each field.
-    """
-    for i in range(fields_widget.count()):
-        widget = fields_widget.itemWidget(fields_widget.item(i))
-        try:
-            component.set_field(
-                name=widget.name, value=widget.value, dtype=widget.dtype
-            )
-        except ValueError as error:
-            show_warning_dialog(
-                f"Warning: field {widget.name} not added",
-                title="Field invalid",
-                additional_info=str(error),
-                parent=fields_widget.parent().parent(),
-            )

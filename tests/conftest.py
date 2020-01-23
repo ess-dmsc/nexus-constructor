@@ -8,7 +8,7 @@ from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import PixelValidator
 from tests.chopper_test_helpers import chopper_details  # noqa: F401
-from tests.test_utils import DEFINITIONS_DIR
+from tests.test_utils import NX_CLASS_DEFINITIONS
 
 
 @pytest.fixture(scope="function")
@@ -25,7 +25,7 @@ def nexus_wrapper() -> NexusWrapper:
 
 @pytest.fixture(scope="function")
 def instrument(nexus_wrapper) -> Instrument:
-    return Instrument(nexus_wrapper, DEFINITIONS_DIR)
+    return Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
 
 @pytest.fixture(scope="function")

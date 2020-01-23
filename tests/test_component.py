@@ -166,7 +166,7 @@ def test_GIVEN_a_component_with_a_transform_dependency_WHEN_get_depends_on_THEN_
 
     returned_transform = component.depends_on
 
-    assert returned_transform.dataset.name == input_transform.dataset.name
+    assert returned_transform.dataset.name == input_transform._dataset.name
 
 
 def test_deleting_a_transformation_from_a_different_component_is_not_allowed(

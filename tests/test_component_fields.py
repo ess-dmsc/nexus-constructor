@@ -1,6 +1,5 @@
-from nexus_constructor.component_fields import add_fields_to_component
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.component.component import Component
+from nexus_constructor.component.component import Component, add_fields_to_component
 import numpy as np
 
 

@@ -1,13 +1,8 @@
-import pytest
-
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.component.component import Component
 import h5py
+import pytest
 from typing import Any
-
-
-def create_in_memory_file(filename):
-    return h5py.File(filename, mode="x", driver="core", backing_store=False)
+from nexus_constructor.component.component import Component
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 
 def add_component_to_file(
