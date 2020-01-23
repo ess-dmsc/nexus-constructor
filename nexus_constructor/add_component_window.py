@@ -120,10 +120,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         super().setupUi(parent_dialog)
 
         # Connect the button calls with functions
-        self.buttonBox.clicked.connect(self.on_ok)
+        self.ok_button.clicked.connect(self.on_ok)
 
         # Disable by default as component name will be missing at the very least.
-        self.buttonBox.setEnabled(False)
+        self.ok_button.setEnabled(False)
 
         # Set default URL to nexus base classes in web view
         self.webEngineView.setUrl(
@@ -198,6 +198,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             parent_dialog.setWindowTitle(
                 f"Edit Component: {get_name_of_node(self.component_to_edit.group)}"
             )
+            self.ok_button.setText("Edit Component")
             self._fill_existing_entries()
             if self.get_pixel_visibility_condition():
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
@@ -205,7 +206,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.ok_validator = OkValidator(
             self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
         )
-        self.ok_validator.is_valid.connect(self.buttonBox.setEnabled)
+        self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
 
         self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
 
@@ -380,7 +381,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
-            self.buttonBox.setEnabled(True)
+            self.ok_button.setEnabled(True)
 
     def show_mesh_fields(self):
         self.shapeOptionsBox.setVisible(True)

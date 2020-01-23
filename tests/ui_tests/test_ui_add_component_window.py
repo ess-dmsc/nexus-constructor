@@ -548,7 +548,7 @@ def test_UI_GIVEN_nothing_WHEN_changing_component_shape_type_THEN_add_component_
         qtbot, template, get_shape_type_button(add_component_dialog, shape_button_name)
     )
 
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_nothing_WHEN_selecting_cylinder_type_THEN_relevant_fields_are_shown(
@@ -858,7 +858,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_shape_THEN_add_com
     )
 
     # Mimic the user pressing the Add Component button
-    qtbot.mouseClick(add_component_dialog.buttonBox, Qt.LeftButton)
+    qtbot.mouseClick(add_component_dialog.ok_button, Qt.LeftButton)
 
     # The window won't close because the button is disabled
     assert template.isVisible()
@@ -872,7 +872,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
     enter_component_name(qtbot, template, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user pressing the Add Component button
-    qtbot.mouseClick(add_component_dialog.buttonBox, Qt.LeftButton)
+    qtbot.mouseClick(add_component_dialog.ok_button, Qt.LeftButton)
 
     # The window will close because the input is valid and the button is enabled
     assert not template.isVisible()
@@ -901,7 +901,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_com
     enter_units(qtbot, add_component_dialog, VALID_UNITS)
 
     # Mimic the user pressing the Add Component button
-    qtbot.mouseClick(add_component_dialog.buttonBox, Qt.LeftButton)
+    qtbot.mouseClick(add_component_dialog.ok_button, Qt.LeftButton)
 
     # The window will close because the input is valid and the button is enabled
     assert not template.isVisible()
@@ -920,7 +920,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_shape_THEN_add
     enter_units(qtbot, add_component_dialog, VALID_UNITS)
 
     # Mimic the user pressing the Add Component button
-    qtbot.mouseClick(add_component_dialog.buttonBox, Qt.LeftButton)
+    qtbot.mouseClick(add_component_dialog.ok_button, Qt.LeftButton)
 
     # The window will close because the input is valid and the button is enabled
     assert not template.isVisible()
@@ -939,7 +939,7 @@ def test_UI_GIVEN_invalid_input_WHEN_adding_component_with_no_shape_THEN_add_com
     )
 
     # The Add Component button is disabled
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_no_input_WHEN_adding_component_with_no_shape_THEN_add_component_button_is_disabled(
@@ -947,7 +947,7 @@ def test_UI_GIVEN_no_input_WHEN_adding_component_with_no_shape_THEN_add_componen
 ):
 
     # The Add Component button is disabled because no input was given
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_component_button_is_enabled(
@@ -959,7 +959,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
 
     # The Add Component button is enabled because all the information required to create a no shape component is
     # there
-    assert add_component_dialog.buttonBox.isEnabled()
+    assert add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_file_path_box_has_red_background(
@@ -1037,7 +1037,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_add
         VALID_CUBE_OFF_FILE,
     )
 
-    assert add_component_dialog.buttonBox.isEnabled()
+    assert add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
@@ -1050,7 +1050,7 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_co
     enter_component_name(qtbot, template, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Although the component name is valid, no file path has been given so the button should be disabled
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
@@ -1072,7 +1072,7 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_shape_TH
         VALID_CUBE_OFF_FILE,
     )
 
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
@@ -1094,7 +1094,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
         VALID_CUBE_OFF_FILE,
     )
 
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_has_red_background(
@@ -1160,7 +1160,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_com
     # Mimic the user giving valid units
     enter_units(qtbot, add_component_dialog, VALID_UNITS)
 
-    assert add_component_dialog.buttonBox.isEnabled()
+    assert add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
@@ -1185,7 +1185,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_add_compon
     # Mimic the user clearing the units box
     enter_units(qtbot, add_component_dialog, "")
 
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
@@ -1210,7 +1210,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_c
     # Mimic the user giving invalid units input
     enter_units(qtbot, add_component_dialog, INVALID_UNITS)
 
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_nonunique_name_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
@@ -1234,7 +1234,7 @@ def test_UI_GIVEN_nonunique_name_WHEN_adding_component_with_mesh_shape_THEN_add_
         VALID_CUBE_OFF_FILE,
     )
 
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_cylinder_shape_THEN_add_component_button_is_disabled(
@@ -1250,7 +1250,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_cylinder_shape_THEN_a
     # Mimic the user giving invalid units input
     enter_units(qtbot, add_component_dialog, INVALID_UNITS)
 
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_invalid_name_WHEN_adding_component_with_cylinder_shape_THEN_add_component_button_is_disabled(
@@ -1268,7 +1268,7 @@ def test_UI_GIVEN_invalid_name_WHEN_adding_component_with_cylinder_shape_THEN_ad
         qtbot, template, add_component_dialog, NONUNIQUE_COMPONENT_NAME
     )
 
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_mesh_shape_selected_WHEN_choosing_shape_THEN_relevant_fields_are_visible(
@@ -1405,7 +1405,7 @@ def test_UI_GIVEN_user_provides_valid_pixel_configuration_WHEN_entering_pixel_da
     )
 
     # Check that the add component button is enabled
-    assert add_component_dialog.buttonBox.isEnabled()
+    assert add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_user_provides_invalid_pixel_grid_WHEN_entering_pixel_data_THEN_add_component_button_is_disabled(
@@ -1431,7 +1431,7 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_WHEN_entering_pixel_data_THEN
     )
 
     # Check that the add component button is disabled despite the valid name and file path
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_user_provides_invalid_pixel_mapping_WHEN_entering_pixel_data_THEN_add_component_button_is_disabled(
@@ -1457,7 +1457,7 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_WHEN_entering_pixel_data_T
     )
 
     # Check that the add component button is disabled despite the valid name and file path
-    assert not add_component_dialog.buttonBox.isEnabled()
+    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_been_generated_THEN_new_pixel_mapping_list_is_generated(
