@@ -1,9 +1,8 @@
-import h5py
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import _convert_name_with_spaces, Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from tests.test_utils import NX_CLASS_DEFINITIONS
-from tests.helpers import file
+from tests.helpers import file  # noqa: F401
 
 
 def test_GIVEN_name_with_spaces_WHEN_converting_name_with_spaces_THEN_converts_spaces_in_name_to_underscores():
@@ -71,7 +70,7 @@ def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_componen
     )
 
 
-def test_dependents_list_is_created_by_instrument(file):
+def test_dependents_list_is_created_by_instrument(file):  # noqa: F811
     """
     The dependents list for transforms is stored in the "dependent_of" attribute,
     which is not part of the NeXus standard,
@@ -109,7 +108,9 @@ def test_dependents_list_is_created_by_instrument(file):
     ), "Expected transform 2 to have 2 registered dependents (transforms 3 and 4)"
 
 
-def test_dependent_is_created_by_instrument_if_depends_on_is_relative(file):
+def test_dependent_is_created_by_instrument_if_depends_on_is_relative(
+    file,  # noqa: F811
+):
     entry_group = file.create_group("entry")
     entry_group.attrs["NX_class"] = "NXentry"
     monitor_group = entry_group.create_group("monitor1")
@@ -126,7 +127,4 @@ def test_dependent_is_created_by_instrument_if_depends_on_is_relative(file):
     Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)
-    assert (
-        transform_1_loaded.dataset.attrs["dependee_of"][0]
-        == "/entry/monitor1"
-    )
+    assert transform_1_loaded.dataset.attrs["dependee_of"][0] == "/entry/monitor1"
