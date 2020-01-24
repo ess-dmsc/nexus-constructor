@@ -205,10 +205,18 @@ class NexusWrapper(QObject):
             transforms_dependee_of[depends_on_transform].append(group_name)
 
         for transform, dependee_of in transforms_dependee_of.items():
-            # numpy should cast to a scalar value if there is just one item.
-            self.nexus_file[transform].attrs["dependee_of"] = np.array(
-                dependee_of, dtype=h5py.special_dtype(vlen=str)
-            )
+            try:
+                # numpy should cast to a scalar value if there is just one item.
+                # try and use an absolute path
+                self.nexus_file[transform].attrs["dependee_of"] = np.array(
+                    dependee_of, dtype=h5py.special_dtype(vlen=str)
+                )
+            except KeyError:
+                # try and use a relative path instead
+                path = f"{dependee_of[0]}/{transform.decode('UTF-8')}"
+                self.nexus_file[path].attrs["dependee_of"] = np.array(
+                    dependee_of, dtype=h5py.special_dtype(vlen=str)
+                )
 
     def duplicate_nx_group(
         self, group_to_duplicate: h5py.Group, new_group_name: str
