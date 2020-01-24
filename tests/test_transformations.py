@@ -1,10 +1,12 @@
 import numpy as np
+import pytest
+
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 from uuid import uuid1
-from tests.helpers import add_component_to_file
+from tests.helpers import add_component_to_file, file  # noqa:F401
 
 transform_type = "Transformation"
 rotation_type = "Rotation"
@@ -42,7 +44,7 @@ def test_can_get_transform_properties():
         transform.name == test_name
     ), "Expected the transform name to match what was in the NeXus file"
     assert (
-        transform.value == test_value
+        transform.ui_value == test_value
     ), "Expected the transform value to match what was in the NeXus file"
     assert (
         transform.vector == test_vector
@@ -50,6 +52,19 @@ def test_can_get_transform_properties():
     assert (
         transform.type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
+
+
+@pytest.mark.parametrize("test_input", ["translation", "Translation", "TRANSLATION"])
+def test_transform_type_is_capitalised(test_input):
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    test_name = "slartibartfast"
+    test_value = 42
+    test_vector = QVector3D(1.0, 0.0, 0.0)
+    transform_dataset = _add_transform_to_file(
+        nexus_wrapper, test_name, test_value, test_vector, test_input
+    )
+    transform = Transformation(nexus_wrapper, transform_dataset)
+    assert transform.type == "Translation"
 
 
 def create_transform(nexus_file, name):
@@ -70,7 +85,7 @@ def test_can_set_transform_properties():
     transform = create_transform(nexus_wrapper, initial_name)
 
     test_name = "beeblebrox"
-    test_value = 34
+    test_value = 34.0
     test_vector = QVector3D(0.0, 0.0, 1.0)
     test_type = "Rotation"
 
@@ -386,7 +401,7 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
     component1.depends_on = transform
     component2.depends_on = transform
     dependee_of = "dependee_of"
-    del transform.dataset.attrs[dependee_of]
+    del transform._dataset.attrs[dependee_of]
 
     nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
     new_transform_group = nexus_wrapper.nexus_file[transform_name]
@@ -407,10 +422,24 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
     component1 = add_component_to_file(nexus_wrapper, component_name=component1_name)
     component1.depends_on = transform
     dependee_of = "dependee_of"
-    del transform.dataset.attrs[dependee_of]
+    del transform._dataset.attrs[dependee_of]
 
     nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
     new_transform_group = nexus_wrapper.nexus_file[transform_name]
 
     assert dependee_of in new_transform_group.attrs
     assert new_transform_group.attrs[dependee_of] == "/" + component1_name
+
+
+def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN_getting_ui_value_THEN_ui_placeholder_value_is_returned_instead(
+    file,  # noqa: F811
+):
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    transform_name = "transform_1"
+    transform = create_transform(nexus_wrapper, transform_name)
+
+    str_value = "sdfji"
+    transform.dataset = file.create_dataset("test", data=str_value)
+
+    assert transform.ui_value != str_value
+    assert transform.ui_value == 0

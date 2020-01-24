@@ -2,7 +2,7 @@ import h5py
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import _convert_name_with_spaces, Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from tests.test_utils import DEFINITIONS_DIR
+from tests.test_utils import NX_CLASS_DEFINITIONS
 
 
 def test_GIVEN_name_with_spaces_WHEN_converting_name_with_spaces_THEN_converts_spaces_in_name_to_underscores():
@@ -17,7 +17,7 @@ def test_GIVEN_name_without_spaces_WHEN_converting_name_with_spaces_THEN_name_do
 
 def test_GIVEN_nothing_WHEN_getting_components_list_THEN_list_contains_sample_and_no_components():
     wrapper = NexusWrapper("component_list_with_sample")
-    instrument = Instrument(wrapper, DEFINITIONS_DIR)
+    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
     assert len(instrument.get_component_list()) == 1
 
 
@@ -36,7 +36,7 @@ def check_if_component_is_in_component_list(
 
 def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_added_component():
     wrapper = NexusWrapper("test_components_list")
-    instrument = Instrument(wrapper, DEFINITIONS_DIR)
+    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
 
     component_type = "NXcrystal"
     name = "test_crystal"
@@ -50,7 +50,7 @@ def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_add
 
 def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_components_list_does_not_contain_component():
     wrapper = NexusWrapper("test_components_list")
-    instrument = Instrument(wrapper, DEFINITIONS_DIR)
+    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
 
     component_type = "NXcrystal"
     name = "test_crystal"
@@ -98,7 +98,7 @@ def test_dependents_list_is_created_by_instrument():
 
     nexus_wrapper = NexusWrapper("test_file_with_transforms")
     nexus_wrapper.load_file(entry_group, in_memory_test_file)
-    Instrument(nexus_wrapper, DEFINITIONS_DIR)
+    Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)
     assert (

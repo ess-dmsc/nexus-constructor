@@ -1,10 +1,8 @@
+from typing import Dict
 from PySide2.QtWidgets import QMainWindow, QApplication, QInputDialog, QLineEdit
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
-
 import silx.gui.hdf5
-import os
 import h5py
-
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.filewriter_command_dialog import FilewriterCommandDialog
@@ -12,8 +10,6 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
 from nexus_constructor.component.component import Component
-
-
 from nexus_constructor.json import filewriter_json_writer
 from nexus_constructor.json.filewriter_json_reader import json_to_nexus
 
@@ -22,10 +18,10 @@ JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
-    def __init__(self, instrument: Instrument, definitions_dir: str):
+    def __init__(self, instrument: Instrument, nx_classes: Dict):
         super().__init__()
         self.instrument = instrument
-        self.definitions_dir = definitions_dir
+        self.nx_classes = nx_classes
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
@@ -67,7 +63,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
 
         self.widget.setVisible(True)
-        self.set_up_warning_window()
+        self._set_up_tree_view()
 
     def show_edit_component_dialog(self):
         selected_component = self.component_tree_view_tab.component_tree_view.selectedIndexes()[
@@ -111,23 +107,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.entries_dialog.layout().addWidget(combo)
         self.entries_dialog.layout().addWidget(ok_button)
         self.entries_dialog.show()
-
-    def set_up_warning_window(self):
-        """
-        Sets up the warning dialog that is shown when the definitions submodule has not been cloned.
-        :return:
-        """
-
-        # Will contain .git even if missing so check that it does not contain just that file.
-        if (
-            not os.path.exists(self.definitions_dir)
-            or len(os.listdir(self.definitions_dir)) <= 1
-        ):
-            show_warning_dialog(
-                "Warning: NeXus definitions are missing. Did you forget to clone the submodules?\n run git submodule update --init ",
-                title="NeXus definitions missing",
-                parent=self,
-            )
 
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
@@ -244,7 +223,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.instrument,
             self.component_tree_view_tab.component_model,
             component,
-            definitions_dir=self.definitions_dir,
+            nx_classes=self.nx_classes,
             parent=self,
         )
         self.add_component_window.ui.setupUi(self.add_component_window)

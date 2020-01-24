@@ -55,7 +55,7 @@ class ComponentTreeModel(QAbstractItemModel):
         parent_item = node.internalPointer()
 
         target_index, transformation_list = self._get_transformation_list(
-            node, parent_item,
+            node, parent_item
         )
         if transformation_list.has_link:
             return
@@ -190,6 +190,7 @@ class ComponentTreeModel(QAbstractItemModel):
         new_transformation = self._create_new_transformation(
             parent_component, transformation_list, transformation_type
         )
+
         new_transformation.parent = transformation_list
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
@@ -215,7 +216,7 @@ class ComponentTreeModel(QAbstractItemModel):
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
                 name=generate_unique_name(
-                    TransformationType.TRANSLATION.value, transformation_list
+                    TransformationType.TRANSLATION, transformation_list
                 ),
                 vector=QVector3D(1.0, 0, 0),
             )

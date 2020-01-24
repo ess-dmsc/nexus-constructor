@@ -188,9 +188,9 @@ def get_link_transformation_frame(frame, instrument, value):
 
 
 def get_transformation_frame(frame, instrument, value):
-    if value.type == TransformationType.TRANSLATION.value:
+    if value.type == TransformationType.TRANSLATION:
         frame.transformation_frame = EditTranslation(frame, value, instrument)
-    elif value.type == TransformationType.ROTATION.value:
+    elif value.type == TransformationType.ROTATION:
         frame.transformation_frame = EditRotation(frame, value, instrument)
     else:
         raise (RuntimeError('Transformation type "{}" is unknown.'.format(value.type)))

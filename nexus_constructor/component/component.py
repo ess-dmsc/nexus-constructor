@@ -2,11 +2,13 @@ import h5py
 from typing import Any, List, Optional, Union, Tuple
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
+from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_fields
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_x_offsets_from_pixel_grid,
@@ -18,7 +20,11 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
 )
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.transformations import Transformation
-from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
+from nexus_constructor.ui_utils import (
+    qvector3d_to_numpy_array,
+    generate_unique_name,
+    show_warning_dialog,
+)
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
     calculate_vertices,
@@ -50,7 +56,7 @@ class DependencyError(Exception):
     pass
 
 
-def _normalise(input_vector: QVector3D):
+def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
     """
     Normalise to unit vector
 
@@ -120,9 +126,6 @@ class Component:
 
     def delete_field(self, name: str):
         self.file.delete_field_value(self.group, name)
-
-    def get_fields(self):
-        return get_fields(self.group)
 
     @property
     def nx_class(self):
@@ -220,7 +223,7 @@ class Component:
         )
         if name is None:
             name = _generate_incremental_name(
-                TransformationType.TRANSLATION.value, transforms_group
+                TransformationType.TRANSLATION, transforms_group
             )
         unit_vector, magnitude = _normalise(vector)
         field = self.file.set_field_value(transforms_group, name, magnitude, float)
@@ -229,10 +232,11 @@ class Component:
             field, "vector", qvector3d_to_numpy_array(unit_vector)
         )
         self.file.set_attribute_value(
-            field, "transformation_type", TransformationType.TRANSLATION.value
+            field, "transformation_type", TransformationType.TRANSLATION
         )
 
         translation_transform = Transformation(self.file, field)
+        translation_transform.ui_value = magnitude
         translation_transform.depends_on = depends_on
         return translation_transform
 
@@ -255,18 +259,21 @@ class Component:
         )
         if name is None:
             name = _generate_incremental_name(
-                TransformationType.ROTATION.value, transforms_group
+                TransformationType.ROTATION, transforms_group
             )
         field = self.file.set_field_value(transforms_group, name, angle, float)
         self.file.set_attribute_value(field, "units", "degrees")
         self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))
-        self.file.set_attribute_value(field, "transformation_type", "Rotation")
+        self.file.set_attribute_value(
+            field, "transformation_type", TransformationType.ROTATION
+        )
         rotation_transform = Transformation(self.file, field)
         rotation_transform.depends_on = depends_on
+        rotation_transform.ui_value = angle
         return rotation_transform
 
     def _transform_is_in_this_component(self, transform: Transformation) -> bool:
-        return transform.dataset.parent.parent.name == self.absolute_path
+        return transform._dataset.parent.parent.name == self.absolute_path
 
     def remove_transformation(self, transform: Transformation):
         if not self._transform_is_in_this_component(transform):
@@ -281,11 +288,11 @@ class Component:
             )
 
         # Remove whole transformations group if this is the only transformation in it
-        if len(transform.dataset.parent.keys()) == 1:
-            self.file.delete_node(transform.dataset.parent)
+        if len(transform._dataset.parent.keys()) == 1:
+            self.file.delete_node(transform._dataset.parent)
         # Otherwise just remove the transformation from the group
         else:
-            self.file.delete_node(transform.dataset)
+            self.file.delete_node(transform._dataset)
 
     @property
     def depends_on(self):
@@ -450,3 +457,28 @@ class Component:
         """
         for field in PIXEL_FIELDS:
             self.delete_field(field)
+
+
+def add_fields_to_component(component: Component, fields_widget: QListWidget):
+    """
+    Adds fields from a list widget to a component.
+    :param component: Component to add the field to.
+    :param fields_widget: The field list widget to extract field information such the name and value of each field.
+    """
+    for i in range(fields_widget.count()):
+        widget = fields_widget.itemWidget(fields_widget.item(i))
+        try:
+            component.set_field(
+                name=widget.name, value=widget.value, dtype=widget.dtype
+            )
+        except ValueError as error:
+            show_warning_dialog(
+                f"Warning: field {widget.name} not added",
+                title="Field invalid",
+                additional_info=str(error),
+                parent=fields_widget.parent().parent(),
+            )
+
+
+def get_fields_and_update_functions_for_component(component: Component):
+    return get_fields_with_update_functions(component.group)
