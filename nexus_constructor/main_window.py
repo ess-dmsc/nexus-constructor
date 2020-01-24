@@ -63,7 +63,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
 
         self.widget.setVisible(True)
-        self._set_up_tree_view()
 
     def show_edit_component_dialog(self):
         selected_component = self.component_tree_view_tab.component_tree_view.selectedIndexes()[
