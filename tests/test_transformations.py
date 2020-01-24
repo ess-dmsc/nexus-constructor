@@ -401,16 +401,20 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
     component2 = add_component_to_file(nexus_wrapper, component_name=component2_name)
     component1.depends_on = transform
     component2.depends_on = transform
-    dependee_of = "dependee_of"
-    del transform._dataset.attrs[dependee_of]
+
+    del transform._dataset.attrs[CommonAttrs.DEPENDEE_OF]
 
     nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
     new_transform_group = nexus_wrapper.nexus_file[transform_name]
 
-    assert dependee_of in new_transform_group.attrs
-    assert len(new_transform_group.attrs[dependee_of]) == 2
-    assert new_transform_group.attrs[dependee_of][0] == "/" + component1_name
-    assert new_transform_group.attrs[dependee_of][1] == "/" + component2_name
+    assert CommonAttrs.DEPENDEE_OF in new_transform_group.attrs
+    assert len(new_transform_group.attrs[CommonAttrs.DEPENDEE_OF]) == 2
+    assert (
+        new_transform_group.attrs[CommonAttrs.DEPENDEE_OF][0] == "/" + component1_name
+    )
+    assert (
+        new_transform_group.attrs[CommonAttrs.DEPENDEE_OF][1] == "/" + component2_name
+    )
 
 
 def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_attr_WHEN_opening_nexus_file_THEN_component_linked_contains_dependee_of_attribute():
@@ -422,14 +426,13 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
 
     component1 = add_component_to_file(nexus_wrapper, component_name=component1_name)
     component1.depends_on = transform
-    dependee_of = "dependee_of"
-    del transform._dataset.attrs[dependee_of]
+    del transform._dataset.attrs[CommonAttrs.DEPENDEE_OF]
 
     nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
     new_transform_group = nexus_wrapper.nexus_file[transform_name]
 
-    assert dependee_of in new_transform_group.attrs
-    assert new_transform_group.attrs[dependee_of] == "/" + component1_name
+    assert CommonAttrs.DEPENDEE_OF in new_transform_group.attrs
+    assert new_transform_group.attrs[CommonAttrs.DEPENDEE_OF] == "/" + component1_name
 
 
 def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN_getting_ui_value_THEN_ui_placeholder_value_is_returned_instead(

@@ -4,8 +4,8 @@ class CommonAttrs:
     """
 
     NX_CLASS = "NX_class"
-    DEPENDEE_OF = "dependee_of"
-    UI_VALUE = "ui_value"
+    DEPENDEE_OF = "NCdependee_of"
+    UI_VALUE = "NCui_value"
     DEPENDS_ON = "depends_on"
     TRANSFORMATION_TYPE = "transformation_type"
     VECTOR = "vector"
