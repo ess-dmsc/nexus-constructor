@@ -61,13 +61,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.instrument.nexus.component_removed.connect(
             self.sceneWidget.delete_component
         )
+        self.component_tree_view_tab.set_up_model(self.instrument)
         self.instrument.nexus.transformation_changed.connect(
             self._update_transformations_3d_view
         )
 
         self.widget.setVisible(True)
-        self.component_tree_view_tab.set_up_model(self.instrument)
-
         self.set_up_warning_window()
 
     def show_edit_component_dialog(self):
@@ -230,8 +229,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _update_views(self):
         self.sceneWidget.clear_all_transformations()
         self.sceneWidget.clear_all_components()
+        self.component_tree_view_tab.set_up_model(self.instrument)
         self._update_3d_view_with_component_shapes()
-        self._set_up_component_model()
 
     def _update_3d_view_with_component_shapes(self):
         for component in self.instrument.get_component_list():
