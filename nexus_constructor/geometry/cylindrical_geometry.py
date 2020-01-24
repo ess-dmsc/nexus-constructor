@@ -1,5 +1,6 @@
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.pixel_data import PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
@@ -80,7 +81,9 @@ class CylindricalGeometry:
             "NXcylindrical_geometry",
             (
                 ValidateDataset(
-                    "vertices", shape=(None, 3), attributes={"units": None}
+                    CommonAttrs.VERTICES,
+                    shape=(None, 3),
+                    attributes={CommonAttrs.UNITS: None},
                 ),
                 ValidateDataset("cylinders"),
             ),
@@ -98,7 +101,9 @@ class CylindricalGeometry:
 
     @property
     def units(self) -> str:
-        return self.file.get_attribute_value(self.group["vertices"], "units")
+        return self.file.get_attribute_value(
+            self.group[CommonAttrs.VERTICES], CommonAttrs.UNITS
+        )
 
     @property
     def height(self) -> float:
@@ -115,7 +120,7 @@ class CylindricalGeometry:
         # flatten cylinders in case there are multiple cylinders defined, we'll take the first three elements,
         # so effectively any cylinder after the first one is ignored
         cylinders = self.cylinders.flatten()
-        vertices = self.file.get_field_value(self.group, "vertices")
+        vertices = self.file.get_field_value(self.group, CommonAttrs.VERTICES)
         return tuple(
             numpy_array_to_qvector3d(vertices[cylinders[i], :]) for i in range(3)
         )

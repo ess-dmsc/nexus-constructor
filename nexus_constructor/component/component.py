@@ -4,6 +4,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtWidgets import QListWidget
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
@@ -44,8 +45,6 @@ from nexus_constructor.component.component_shape import (
     ComponentShape,
 )
 import numpy as np
-
-DEPENDS_ON_STR = "depends_on"
 
 
 class DependencyError(Exception):
@@ -151,7 +150,7 @@ class Component:
         :return: List of transforms
         """
         transforms = TransformationsList(self)
-        depends_on = self.get_field(DEPENDS_ON_STR)
+        depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
         self._get_transform(depends_on, transforms)
         return transforms
 
@@ -178,9 +177,11 @@ class Component:
             new_transform = Transformation(self.file, transform_dataset)
             new_transform.parent = transforms
             transforms.append(new_transform)
-            if DEPENDS_ON_STR in transform_dataset.attrs.keys():
+            if CommonAttrs.DEPENDS_ON in transform_dataset.attrs.keys():
                 self._get_transform(
-                    self.file.get_attribute_value(transform_dataset, DEPENDS_ON_STR),
+                    self.file.get_attribute_value(
+                        transform_dataset, CommonAttrs.DEPENDS_ON
+                    ),
                     transforms,
                     local_only,
                 )
@@ -205,7 +206,7 @@ class Component:
         :return:
         """
         transforms = TransformationsList(self)
-        depends_on = self.get_field(DEPENDS_ON_STR)
+        depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
         self._get_transform(depends_on, transforms, local_only=True)
         return transforms
 
@@ -227,12 +228,12 @@ class Component:
             )
         unit_vector, magnitude = _normalise(vector)
         field = self.file.set_field_value(transforms_group, name, magnitude, float)
-        self.file.set_attribute_value(field, "units", "m")
+        self.file.set_attribute_value(field, CommonAttrs.UNITS, "m")
         self.file.set_attribute_value(
-            field, "vector", qvector3d_to_numpy_array(unit_vector)
+            field, CommonAttrs.VECTOR, qvector3d_to_numpy_array(unit_vector)
         )
         self.file.set_attribute_value(
-            field, "transformation_type", TransformationType.TRANSLATION.value
+            field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.TRANSLATION.value
         )
 
         translation_transform = Transformation(self.file, field)
@@ -262,10 +263,12 @@ class Component:
                 TransformationType.ROTATION.value, transforms_group
             )
         field = self.file.set_field_value(transforms_group, name, angle, float)
-        self.file.set_attribute_value(field, "units", "degrees")
-        self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))
+        self.file.set_attribute_value(field, CommonAttrs.UNITS, "degrees")
         self.file.set_attribute_value(
-            field, "transformation_type", TransformationType.ROTATION.value
+            field, CommonAttrs.VECTOR, qvector3d_to_numpy_array(axis)
+        )
+        self.file.set_attribute_value(
+            field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.ROTATION.value
         )
         rotation_transform = Transformation(self.file, field)
         rotation_transform.depends_on = depends_on
@@ -296,24 +299,26 @@ class Component:
 
     @property
     def depends_on(self):
-        depends_on_path = self.file.get_field_value(self.group, DEPENDS_ON_STR)
+        depends_on_path = self.file.get_field_value(self.group, CommonAttrs.DEPENDS_ON)
         if depends_on_path is None:
             return None
         return Transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
     def depends_on(self, transformation: Transformation):
-        existing_depends_on = self.file.get_attribute_value(self.group, DEPENDS_ON_STR)
+        existing_depends_on = self.file.get_attribute_value(
+            self.group, CommonAttrs.DEPENDS_ON
+        )
         if existing_depends_on is not None:
             Transformation(
                 self.file, self.file[existing_depends_on]
             ).deregister_dependent(self)
 
         if transformation is None:
-            self.file.set_field_value(self.group, DEPENDS_ON_STR, ".", str)
+            self.file.set_field_value(self.group, CommonAttrs.DEPENDS_ON, ".", str)
         else:
             self.file.set_field_value(
-                self.group, DEPENDS_ON_STR, transformation.absolute_path, str
+                self.group, CommonAttrs.DEPENDS_ON, transformation.absolute_path, str
             )
             transformation.register_dependent(self)
 
@@ -341,10 +346,12 @@ class Component:
             pixel_mapping = pixel_data
 
         vertices = calculate_vertices(axis_direction, height, radius)
-        vertices_field = self.file.set_field_value(shape_group, "vertices", vertices)
+        vertices_field = self.file.set_field_value(
+            shape_group, CommonAttrs.VERTICES, vertices
+        )
         # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
         self.file.set_field_value(shape_group, "cylinders", np.array([0, 1, 2]))
-        self.file.set_attribute_value(vertices_field, "units", units)
+        self.file.set_attribute_value(vertices_field, CommonAttrs.UNITS, units)
         return CylindricalGeometry(self.file, shape_group, pixel_mapping)
 
     def set_off_shape(

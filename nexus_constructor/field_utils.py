@@ -4,6 +4,7 @@ from typing import List
 import h5py
 import numpy as np
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
@@ -85,7 +86,10 @@ def find_field_type(item):
     elif isinstance(item, h5py.Group):
         if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
             return item, update_existing_link_field
-        elif "NX_class" in item.attrs.keys() and item.attrs["NX_class"] == "NCstream":
+        elif (
+            CommonAttrs.NX_CLASS in item.attrs.keys()
+            and item.attrs[CommonAttrs.NX_CLASS] == "NCstream"
+        ):
             return item, update_existing_stream_field
     logging.debug(
         f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"

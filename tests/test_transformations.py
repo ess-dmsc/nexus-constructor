@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
@@ -21,8 +22,8 @@ def _add_transform_to_file(
     transform_type: str,
 ):
     transform_dataset = nexus_wrapper.nexus_file.create_dataset(name, data=value)
-    transform_dataset.attrs["vector"] = qvector3d_to_numpy_array(vector)
-    transform_dataset.attrs["transformation_type"] = transform_type
+    transform_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(vector)
+    transform_dataset.attrs[CommonAttrs.TRANSFORMATION_TYPE] = transform_type
     return transform_dataset
 
 
