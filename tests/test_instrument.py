@@ -3,6 +3,7 @@ from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import _convert_name_with_spaces, Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from tests.test_utils import NX_CLASS_DEFINITIONS
+from tests.helpers import file
 
 
 def test_GIVEN_name_with_spaces_WHEN_converting_name_with_spaces_THEN_converts_spaces_in_name_to_underscores():
@@ -70,7 +71,7 @@ def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_componen
     )
 
 
-def test_dependents_list_is_created_by_instrument():
+def test_dependents_list_is_created_by_instrument(file):
     """
     The dependents list for transforms is stored in the "dependent_of" attribute,
     which is not part of the NeXus standard,
@@ -79,10 +80,7 @@ def test_dependents_list_is_created_by_instrument():
     """
 
     # Create minimal test file with some transformations but no "dependent_of" attributes
-    in_memory_test_file = h5py.File(
-        "test_file", mode="x", driver="core", backing_store=False
-    )
-    entry_group = in_memory_test_file.create_group("entry")
+    entry_group = file.create_group("entry")
     entry_group.attrs["NX_class"] = "NXentry"
     instrument_group = entry_group.create_group("instrument")
     instrument_group.attrs["NX_class"] = "NXinstrument"
@@ -97,7 +95,7 @@ def test_dependents_list_is_created_by_instrument():
     transform_4.attrs["depends_on"] = transform_2.name
 
     nexus_wrapper = NexusWrapper("test_file_with_transforms")
-    nexus_wrapper.load_file(entry_group, in_memory_test_file)
+    nexus_wrapper.load_file(entry_group, file)
     Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)
@@ -109,3 +107,26 @@ def test_dependents_list_is_created_by_instrument():
     assert (
         len(transform_2_loaded.get_dependents()) == 2
     ), "Expected transform 2 to have 2 registered dependents (transforms 3 and 4)"
+
+
+def test_dependent_is_created_by_instrument_if_depends_on_is_relative(file):
+    entry_group = file.create_group("entry")
+    entry_group.attrs["NX_class"] = "NXentry"
+    monitor_group = entry_group.create_group("monitor1")
+    monitor_group.attrs["NX_class"] = "NXmonitor"
+
+    monitor_group.create_dataset("depends_on", data=b"transformations/translation1")
+
+    transformations_group = monitor_group.create_group("transformations")
+    transformations_group.attrs["NX_class"] = "NXtransformations"
+    transform_1 = transformations_group.create_dataset("translation1", data=1)
+
+    nexus_wrapper = NexusWrapper("test_file_with_transforms")
+    nexus_wrapper.load_file(entry_group, file)
+    Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
+
+    transform_1_loaded = Transformation(nexus_wrapper, transform_1)
+    assert (
+        transform_1_loaded.dataset.attrs["dependee_of"][0]
+        == "/entry/monitor1"
+    )
