@@ -223,7 +223,7 @@ class Component:
         )
         if name is None:
             name = _generate_incremental_name(
-                TransformationType.TRANSLATION.value, transforms_group
+                TransformationType.TRANSLATION, transforms_group
             )
         unit_vector, magnitude = _normalise(vector)
         field = self.file.set_field_value(transforms_group, name, magnitude, float)
@@ -232,7 +232,7 @@ class Component:
             field, "vector", qvector3d_to_numpy_array(unit_vector)
         )
         self.file.set_attribute_value(
-            field, "transformation_type", TransformationType.TRANSLATION.value
+            field, "transformation_type", TransformationType.TRANSLATION
         )
 
         translation_transform = Transformation(self.file, field)
@@ -259,13 +259,13 @@ class Component:
         )
         if name is None:
             name = _generate_incremental_name(
-                TransformationType.ROTATION.value, transforms_group
+                TransformationType.ROTATION, transforms_group
             )
         field = self.file.set_field_value(transforms_group, name, angle, float)
         self.file.set_attribute_value(field, "units", "degrees")
         self.file.set_attribute_value(field, "vector", qvector3d_to_numpy_array(axis))
         self.file.set_attribute_value(
-            field, "transformation_type", TransformationType.ROTATION.value
+            field, "transformation_type", TransformationType.ROTATION
         )
         rotation_transform = Transformation(self.file, field)
         rotation_transform.depends_on = depends_on

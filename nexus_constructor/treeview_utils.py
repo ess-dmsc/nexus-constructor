@@ -1,14 +1,19 @@
 import os
 
-from PySide2.QtCore import QModelIndex
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView
+from PySide2.QtCore import QModelIndex, Qt
+from PySide2.QtGui import QIcon, QColor
+from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel
 
 from nexus_constructor.component.component import Component
 from nexus_constructor.component.link_transformation import LinkTransformation
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.transformation_view import (
+    EditTransformationLink,
+    EditTranslation,
+    EditRotation,
+)
 from nexus_constructor.transformations import Transformation
 
 
@@ -169,3 +174,39 @@ def add_transformation(
         else:
             raise ValueError(f"Unknown transformation type: {transformation_type}")
         expand_transformation_list(current_index, component_tree_view, component_model)
+
+
+def fill_selection(option, painter):
+    colour = QColor("lightblue")
+    colour.setAlpha(100)
+    painter.fillRect(option.rect, colour)
+
+
+def get_link_transformation_frame(frame, instrument, value):
+    frame.transformation_frame = EditTransformationLink(frame, value, instrument)
+    frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
+
+
+def get_transformation_frame(frame, instrument, value):
+    if value.type == TransformationType.TRANSLATION:
+        frame.transformation_frame = EditTranslation(frame, value, instrument)
+    elif value.type == TransformationType.ROTATION:
+        frame.transformation_frame = EditRotation(frame, value, instrument)
+    else:
+        raise (RuntimeError('Transformation type "{}" is unknown.'.format(value.type)))
+    frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
+
+
+def get_component_info_frame(frame):
+    frame.label = QLabel("(Place holder)", frame)
+    frame.layout().addWidget(frame.label)
+
+
+def get_transformations_list_frame(frame):
+    frame.label = QLabel("Transformations", frame)
+    frame.layout().addWidget(frame.label)
+
+
+def get_component_frame(frame, value):
+    frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
+    frame.layout().addWidget(frame.label)

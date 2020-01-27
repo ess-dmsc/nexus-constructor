@@ -9,4 +9,5 @@ INVALID_FIELD_NAMES = [
     "shape",
     "depends_on",
     "pixel_shape",
+    "transformations",
 ] + PIXEL_FIELDS

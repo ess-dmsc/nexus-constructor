@@ -44,10 +44,10 @@ class Transformation:
         Get a Qt3DCore.QTransform describing the transformation
         """
         transform = Qt3DCore.QTransform()
-        if self.type == TransformationType.ROTATION.value:
+        if self.type == TransformationType.ROTATION:
             quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
             transform.setRotation(quaternion)
-        elif self.type == TransformationType.TRANSLATION.value:
+        elif self.type == TransformationType.TRANSLATION:
             transform.setTranslation(self.vector.normalized() * self.ui_value)
         else:
             raise (
