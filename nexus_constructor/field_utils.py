@@ -88,7 +88,7 @@ def find_field_type(item):
             return item, update_existing_link_field
         elif (
             CommonAttrs.NX_CLASS in item.attrs.keys()
-            and item.attrs[CommonAttrs.NX_CLASS] == "NCstream"
+            and item.attrs[CommonAttrs.NX_CLASS] == CommonAttrs.NC_STREAM
         ):
             return item, update_existing_stream_field
     logging.debug(

@@ -294,7 +294,7 @@ class StreamFieldsWidget(QDialog):
         group = temp_file.create_group("children")
         group.create_dataset(name="type", dtype=STRING_DTYPE, data="stream")
         stream_group = group.create_group(self.parent().parent().field_name_edit.text())
-        stream_group.attrs[CommonAttrs.NX_CLASS] = "NCstream"
+        stream_group.attrs[CommonAttrs.NX_CLASS] = CommonAttrs.NC_STREAM
         stream_group.create_dataset(
             name="topic", dtype=STRING_DTYPE, data=self.topic_line_edit.text()
         )

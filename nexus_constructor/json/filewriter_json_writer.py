@@ -61,7 +61,7 @@ def cast_to_int(data):
 
 
 ATTR_NAME_BLACKLIST = [CommonAttrs.DEPENDEE_OF, CommonAttrs.UI_VALUE]
-NX_CLASS_BLACKLIST = ["NXgroup", "NCstream"]
+NX_CLASS_BLACKLIST = ["NXgroup", CommonAttrs.NC_STREAM]
 
 
 def _add_attributes(root: NexusObject, root_dict: dict):
@@ -156,7 +156,7 @@ class NexusToDictConverter:
         """
         root_dict = {"type": "group", "name": get_name_of_node(root), "children": []}
         # Add the entries
-        if get_nx_class(root) == "NCstream":
+        if get_nx_class(root) == CommonAttrs.NC_STREAM:
             self._handle_stream(root, root_dict)
             return root_dict
 

@@ -11,3 +11,4 @@ class CommonAttrs:
     VECTOR = "vector"
     UNITS = "units"
     VERTICES = "vertices"
+    NC_STREAM = "NCstream"
