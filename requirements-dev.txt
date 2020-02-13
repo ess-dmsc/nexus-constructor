@@ -1,0 +1,21 @@
+# Development requirements
+
+# Mirror the basic requirements
+-r requirements.txt
+
+# Packaging
+cx-Freeze==6.1
+
+# newer versions of jsonschema don't work with the executables built by cx_Freeze
+jsonschema==2.6.0
+
+# Formatting/linting
+black==19.10b0
+pre-commit
+flake8
+
+# Testing
+pytest
+pytest-cov
+pytest-qt
+mock

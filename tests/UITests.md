@@ -17,12 +17,26 @@ Run the application (`python main.py` in the root directory).
 - In the center should be an animated neutron beam, pointing into a red cube.
 - To the right should be a scrollable JSON area.
 
+## Main Window
+
+Increase the width of the window.
+* This should cause only the (center) Instrument View to increase in width while the other components retain a fixed width.
+
+Increase the height of the window.
+* This should cause all elements in the Main Window to expand in height.
+
+Decrease the width of the window as much as possible.
+* This should only affect the width of the Instrument View area while the other components retain a fixed width. It should also be noticed that the Instrument View area cannot become any narrower than 300 pixels.
+
+Decrease the height of the window as much as possible.
+* This should cause all components beneath the menu bar to reach a minimum height of 100 pixels.
+
 ## JSON Display
 
 With the application open, click on the 'Sample' box in the 'Components' pane.
 - It should expand, showing a text field to edit the name.
 
-Change the value of the name field, and tab out of the text field.
+Change the value of the name field, and press enter.
 - The JSON display should automatically update to show the name value on the relevant line.
 
 Open the 'JSON' menu at the top of the application window, and click the "Show Nexus Constructor
@@ -53,10 +67,10 @@ Reset the sample's name to 'Sample'.
 
 ## Adding components and transforms
 
-Press the 'add component' button.
+Press the 'Add component' button.
 - The "Add component" window should appear.
 - It should contain a selector for component type.
-- It should contain a pair of radio buttons for component geometry, 'Mesh' and 'Cylinder'.
+- It should contain the following radio buttons for component geometry: 'Mesh', 'Cylinder' and 'None'.
 - It should contain a set of radio buttons for pixel layout, 'Single ID', 'Repeatable grid', 'Face
 mapped mesh' and 'None'.
 - It should contain a 'Continue' button at the bottom.
@@ -70,8 +84,8 @@ Select 'Cylinder' as the geometry type.
 Select 'Monitor' as the component type.
 - Regardless of selected geometry type, only 'Single ID' can be selected as pixel type.
 
-Select any other component type.
-- Regardless of selected geometry type, only 'None' can be selected as pixel type.
+Select any other component type (except 'Monitor').
+- Regardless of selected geometry type (except 'None'), only 'None' can be selected as pixel type.
 
 Select 'Detector', 'Mesh', and 'Face mapped mesh'. Click 'Continue'.
 - The window should show controls for editing the properties of this new detector.
@@ -82,7 +96,7 @@ Open cube.stl from the repo's `~/tests` directory.
 - The 'Pixel mapping' area should populate with 12 empty numbered textboxes in a scrollable list.
 
 Enter '1' into the first such box. Click again on the 'Choose file' button, and open cube.off from
-the repo's `~/tests` directory.
+the repo's `~/tests` directory. When prompted, select "cm" as unit.
 - The 'Pixel mapping' area should re-populate with 6 empty numbered textboxes in a scrollable list.
 
 Click the 'add translation' button in the 'Transform:' section.
@@ -106,7 +120,7 @@ Click 'Continue'.
 - It should contain textboxes for height, radius, and x, y, z components of axis direction.
 - A 'pixel data' section should contain a single textbox for detector id.
 
-Set the cylinders axis direction to (x=1, y=1, z=0), its height to 3, and its radius to 1.
+Set the cylinders axis direction to (x=1, y=1, z=0), its height to 3, its radius to 1 and unit to "cm".
 Add a translation with values (x=-2.5, y=0.5, z=-0.5).
 Add a rotation, of 315 degrees around axis (x=0, y=0, z=1).
 Set the 'Transform parent' dropdowns to 'Cube Detector' and 'cube transform'.
@@ -117,6 +131,59 @@ the red sample cube, with center in the rear upper corner.
 - The other face should be flush with the right most side of the green detector cube.
 - The cylinders radius should intersect the upper edges of the cubes front faces, and the rear edges
 of the cubes bottom faces.
+
+## Validating Component Names
+
+Click the 'Add component' button.  
+Select a Cylinder geometry and leave the other options untouched.  
+Try to name this new component "Sample".
+- The text field will accept the name "Sampl"  
+- Once you try to type in the remaining "e" a red cross will appear.
+- Placing your mouse over the cross will show a message saying that component names must be unique.
+
+Remove focus from the text field by selecting a different field or by moving the mouse out of the window.
+- The red cross disappear and the message will no longer be accessible.
+- The component name will still be "Sampl".
+
+Change the name back to its default and click "Add" without changing any of the other options.  
+Expand the component details box in the left-hand-side of the main window.  
+- Repeat the steps above and you should observe the same behaviour.
+
+Change the name back to its default again.  
+Expand the component details box.  
+Click the 'Full editor' button.  
+- Repeat the steps above and you should observe the same behaviour.
+
+## Validating Units 
+
+Click the 'Add component' button.  
+Press 'Continue' without changing any of the other options.  
+Click the 'Choose file' button next to the 'Geometry file:' textbox.  
+Open cube.stl from the repo's `~/tests` directory.  
+- The 'OK' button on the 'Select Units' window will start out enabled because the default units are valid.
+
+Enter gibberish into the unit text field.
+- A red cross will appear next to the text field.
+- The 'OK' button will be disabled.
+- Placing your mouse over the red cross will cause an invalid units message to appear.
+
+Replace the gibberish with some valid units.
+- The red cross will disappear and the mouse-over message will no longer be accessible.
+- The 'OK' button will become enabled again.
+
+Close the 'Select Units' and 'Add Detector' windows.  
+Click 'Add component' again.  
+Select Cylinder geometry and click 'Continue'. The other options can be left as their defaults.
+- The 'Add' button will start out enabled because the default units are valid.
+
+Enter gibberish into the unit text field.
+- A red cross will appear next to the text field.
+- The 'Add' button will be disabled.
+- Placing your mouse over the red cross will cause an invalid units message to appear.
+
+Replace the gibberish with some valid units.
+- The red cross will disappear and the mouse-over message will no longer be accessible.
+- The 'Add' button will become enabled again.
 
 ## Transform ordering
 
@@ -138,7 +205,7 @@ Rename the transform in 'Cube detector' to just 'translate'.
 - The name change should be reflected in 'Monitor's second transform parent dropdown.
 
 Set the monitors 'transform parent' to 'Sample'.
-- The graphic of the cylinder should allign its right face with the right face of the sample cube.
+- The graphic of the cylinder should align its right face with the right face of the sample cube.
 - The delete buttons of 'Cube detector' and its transform should no longer be greyed out or show
 tooltips on hover.
 
@@ -182,12 +249,6 @@ Click the new rotations delete button in the main window.
 Set the radius of the cylinder to 2.
 - The cylinder's visualisation in the main window should double in radius.
 
-Attempt to set the components name to 'Sample'.
-- It should not be possible to enter the final character.
-- A tooltip should appear saying that names must be unique.
-
-Reset its name to 'Monitor'.
-
 ## Saving to file
 
 Close the editor window.
@@ -223,7 +284,7 @@ Set Monitor's transform parent to 'Cube Detector'.
 - Cube Detector's delete button should grey out, and clicking it result in nothing.
 
 Click Monitor's delete button.
-- Monitor should vanish from the componets list.
+- Monitor should vanish from the components list.
 - The cylinder in the 3D view should vanish too.
 - Cube Detector's delete button should be enabled.
 
