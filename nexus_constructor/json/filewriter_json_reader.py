@@ -4,6 +4,8 @@ import numpy as np
 import uuid
 from typing import Union, List
 
+from nexus_constructor.common_attrs import CommonAttrs
+
 """
 Read the JSON and construct an in-memory NeXus file from the nexus_structure field
 """
@@ -39,7 +41,7 @@ def _add_to_nexus(children: List[dict], current_group: h5py.Group):
 
 
 def _add_stream(json_object: dict, current_group: h5py.Group):
-    current_group.attrs["NX_class"] = "NCstream"
+    current_group.attrs[CommonAttrs.NX_CLASS] = CommonAttrs.NC_STREAM
     add_datasets(json_object["stream"], current_group)
 
 

@@ -5,6 +5,8 @@ from PySide2.QtCore import Signal, QObject
 from typing import Any, TypeVar, Optional
 import numpy as np
 
+from nexus_constructor.common_attrs import CommonAttrs
+
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
 
 
@@ -29,10 +31,10 @@ def get_name_of_node(node: h5Node) -> str:
 
 
 def get_nx_class(group: h5py.Group) -> Optional[str]:
-    if "NX_class" not in group.attrs.keys():
+    if CommonAttrs.NX_CLASS not in group.attrs.keys():
         return None
 
-    nx_class = group.attrs["NX_class"]
+    nx_class = group.attrs[CommonAttrs.NX_CLASS]
     return decode_bytes_string(nx_class)
 
 
@@ -134,10 +136,10 @@ class NexusWrapper(QObject):
 
         def append_nx_entries_to_list(name, node):
             if isinstance(node, h5py.Group):
-                if "NX_class" in node.attrs.keys():
+                if CommonAttrs.NX_CLASS in node.attrs.keys():
                     if (
-                        node.attrs["NX_class"] == b"NXentry"
-                        or node.attrs["NX_class"] == "NXentry"
+                        node.attrs[CommonAttrs.NX_CLASS] == b"NXentry"
+                        or node.attrs[CommonAttrs.NX_CLASS] == "NXentry"
                     ):
                         entries_in_root[name] = node
 
@@ -181,7 +183,7 @@ class NexusWrapper(QObject):
         :return: A reference to the created group in the in-memory NeXus file.
         """
         group = parent.create_group(name)
-        group.attrs["NX_class"] = nx_class
+        group.attrs[CommonAttrs.NX_CLASS] = nx_class
         self._emit_file()
         return group
 
@@ -193,8 +195,8 @@ class NexusWrapper(QObject):
 
         def find_depends_on_for_components(_, node):
             if isinstance(node, h5py.Group):
-                if "depends_on" in node.keys():
-                    component_depends_on[node.name] = node["depends_on"][()]
+                if CommonAttrs.DEPENDS_ON in node.keys():
+                    component_depends_on[node.name] = node[CommonAttrs.DEPENDS_ON][()]
 
         self.nexus_file["/"].visititems(find_depends_on_for_components)
 
@@ -206,7 +208,7 @@ class NexusWrapper(QObject):
 
         for transform, dependee_of in transforms_dependee_of.items():
             # numpy should cast to a scalar value if there is just one item.
-            self.nexus_file[transform].attrs["dependee_of"] = np.array(
+            self.nexus_file[transform].attrs[CommonAttrs.DEPENDEE_OF] = np.array(
                 dependee_of, dtype=h5py.special_dtype(vlen=str)
             )
 
@@ -223,7 +225,7 @@ class NexusWrapper(QObject):
         return group_to_duplicate.parent[new_group_name]
 
     def set_nx_class(self, group: h5py.Group, nx_class: str):
-        group.attrs["NX_class"] = nx_class
+        group.attrs[CommonAttrs.NX_CLASS] = nx_class
         self._emit_file()
 
     @staticmethod
@@ -334,8 +336,11 @@ class NexusWrapper(QObject):
 
     def create_transformations_group_if_does_not_exist(self, parent_group: h5Node):
         for child in parent_group:
-            if "NX_class" in parent_group[child].attrs.keys():
-                if parent_group[child].attrs["NX_class"] == "NXtransformations":
+            if CommonAttrs.NX_CLASS in parent_group[child].attrs.keys():
+                if (
+                    parent_group[child].attrs[CommonAttrs.NX_CLASS]
+                    == "NXtransformations"
+                ):
                     return parent_group[child]
         return self.create_nx_group(
             "transformations", "NXtransformations", parent_group
@@ -350,6 +355,9 @@ class NexusWrapper(QObject):
         """
         for node in entry.values():
             if isinstance(node, h5py.Group):
-                if "NX_class" in node.attrs.keys():
-                    if node.attrs["NX_class"] in ["NXinstrument", b"NXinstrument"]:
+                if CommonAttrs.NX_CLASS in node.attrs.keys():
+                    if node.attrs[CommonAttrs.NX_CLASS] in [
+                        "NXinstrument",
+                        b"NXinstrument",
+                    ]:
                         return node

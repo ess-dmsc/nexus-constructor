@@ -4,6 +4,7 @@ from typing import Sequence, Dict
 import numpy as np
 from h5py import Group
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
@@ -101,7 +102,7 @@ class NexusDefinedChopperChecker:
 
         for field in UNITS_REQUIRED:
             try:
-                units = self._disk_chopper[field].attrs["units"]
+                units = self._disk_chopper[field].attrs[CommonAttrs.UNITS]
                 self.units_dict[field] = units
                 if isinstance(units, bytes):
                     self.units_dict[field] = units.decode()

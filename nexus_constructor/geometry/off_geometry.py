@@ -1,6 +1,8 @@
 from typing import List, Tuple
 from PySide2.QtGui import QVector3D
 from abc import ABC, abstractmethod
+
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
 import h5py
 
@@ -149,7 +151,9 @@ class OFFGeometryNexus(OFFGeometry):
             "NXoff_geometry",
             (
                 ValidateDataset(
-                    "vertices", shape=(None, 3), attributes={"units": None}
+                    CommonAttrs.VERTICES,
+                    shape=(None, 3),
+                    attributes={CommonAttrs.UNITS: None},
                 ),
                 ValidateDataset("winding_order"),
                 ValidateDataset("faces"),
@@ -185,7 +189,7 @@ class OFFGeometryNexus(OFFGeometry):
 
     @property
     def vertices(self) -> List[QVector3D]:
-        vertices_from_file = self.group["vertices"]
+        vertices_from_file = self.group[CommonAttrs.VERTICES]
         number_of_vertices = vertices_from_file.shape[0]
         return [
             numpy_array_to_qvector3d(vertices_from_file[vertex_number][:])
@@ -277,5 +281,5 @@ def record_vertices_in_file(
     :param new_vertices: The new vertices data, list of cartesian coords for each vertex
     """
     vertices = [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
-    vertices_node = nexus_wrapper.set_field_value(group, "vertices", vertices)
-    nexus_wrapper.set_attribute_value(vertices_node, "units", "m")
+    vertices_node = nexus_wrapper.set_field_value(group, CommonAttrs.VERTICES, vertices)
+    nexus_wrapper.set_attribute_value(vertices_node, CommonAttrs.UNITS, "m")
