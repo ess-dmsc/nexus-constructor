@@ -200,6 +200,9 @@ class NexusWrapper(QObject):
 
         transforms_dependee_of = {}
         for group_name, depends_on_transform in component_depends_on.items():
+            if f"{group_name}/{depends_on_transform}" in self.nexus_file:
+                # depends_on is relative, change to an absolute path
+                depends_on_transform = f"{group_name}/{depends_on_transform}"
             if depends_on_transform not in transforms_dependee_of.keys():
                 transforms_dependee_of[depends_on_transform] = []
             transforms_dependee_of[depends_on_transform].append(group_name)
