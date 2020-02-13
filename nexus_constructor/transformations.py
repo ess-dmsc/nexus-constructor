@@ -4,6 +4,8 @@ import numpy as np
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
 import h5py
+
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar
 
@@ -44,10 +46,10 @@ class Transformation:
         Get a Qt3DCore.QTransform describing the transformation
         """
         transform = Qt3DCore.QTransform()
-        if self.type == TransformationType.ROTATION.value:
+        if self.type == TransformationType.ROTATION:
             quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
             transform.setRotation(quaternion)
-        elif self.type == TransformationType.TRANSLATION.value:
+        elif self.type == TransformationType.TRANSLATION:
             transform.setTranslation(self.vector.normalized() * self.ui_value)
         else:
             raise (
@@ -70,7 +72,7 @@ class Transformation:
         Get transformation type, should be "Translation" or "Rotation"
         """
         return self.file.get_attribute_value(
-            self._dataset, "transformation_type"
+            self._dataset, CommonAttrs.TRANSFORMATION_TYPE
         ).capitalize()
 
     @type.setter
@@ -79,7 +81,7 @@ class Transformation:
         Set transformation type, should be "Translation" or "Rotation"
         """
         self.file.set_attribute_value(
-            self._dataset, "transformation_type", new_type.capitalize()
+            self._dataset, CommonAttrs.TRANSFORMATION_TYPE, new_type.capitalize()
         )
 
     @property
@@ -87,7 +89,9 @@ class Transformation:
         """
         Returns rotation axis or translation direction as a QVector3D
         """
-        vector_as_np_array = self.file.get_attribute_value(self._dataset, "vector")
+        vector_as_np_array = self.file.get_attribute_value(
+            self._dataset, CommonAttrs.VECTOR
+        )
         return QVector3D(
             vector_as_np_array[0], vector_as_np_array[1], vector_as_np_array[2]
         )
@@ -95,7 +99,9 @@ class Transformation:
     @vector.setter
     def vector(self, new_vector: QVector3D):
         vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
-        self.file.set_attribute_value(self._dataset, "vector", vector_as_np_array)
+        self.file.set_attribute_value(
+            self._dataset, CommonAttrs.VECTOR, vector_as_np_array
+        )
 
     @property
     def dataset(self) -> h5Node:
@@ -126,8 +132,8 @@ class Transformation:
         for k, v in old_attrs.items():
             self._dataset.attrs[k] = v
 
-        if "ui_value" not in self._dataset.attrs:
-            self._dataset.attrs["ui_value"] = 0
+        if CommonAttrs.UI_VALUE not in self._dataset.attrs:
+            self._dataset.attrs[CommonAttrs.UI_VALUE] = 0
 
     @property
     def ui_value(self) -> float:
@@ -143,7 +149,7 @@ class Transformation:
                 logging.debug(
                     "transformation value is not cast-able to int, using UI placeholder value instead."
                 )
-        return self.file.get_attribute_value(self._dataset, "ui_value")[()]
+        return self.file.get_attribute_value(self._dataset, CommonAttrs.UI_VALUE)[()]
 
     @ui_value.setter
     def ui_value(self, new_value: float):
@@ -151,11 +157,13 @@ class Transformation:
         Used for setting the magnitude of the transformation in the 3d view
         :param new_value: the placeholder magnitude for the 3d view
         """
-        self.file.set_attribute_value(self._dataset, "ui_value", new_value)
+        self.file.set_attribute_value(self._dataset, CommonAttrs.UI_VALUE, new_value)
 
     @property
     def depends_on(self) -> "Transformation":
-        depends_on_path = self.file.get_attribute_value(self._dataset, "depends_on")
+        depends_on_path = self.file.get_attribute_value(
+            self._dataset, CommonAttrs.DEPENDS_ON
+        )
         if depends_on_path is not None:
             return Transformation(self.file, self.file.nexus_file[depends_on_path])
 
@@ -165,17 +173,19 @@ class Transformation:
         Note, until Python 4.0 (or 3.7 with from __future__ import annotations) have
         to use string for depends_on type here, because the current class is not defined yet
         """
-        existing_depends_on = self.file.get_attribute_value(self._dataset, "depends_on")
+        existing_depends_on = self.file.get_attribute_value(
+            self._dataset, CommonAttrs.DEPENDS_ON
+        )
         if existing_depends_on is not None:
             Transformation(
                 self.file, self.file.nexus_file[existing_depends_on]
             ).deregister_dependent(self)
 
         if depends_on is None:
-            self.file.set_attribute_value(self._dataset, "depends_on", ".")
+            self.file.set_attribute_value(self._dataset, CommonAttrs.DEPENDS_ON, ".")
         else:
             self.file.set_attribute_value(
-                self._dataset, "depends_on", depends_on.absolute_path
+                self._dataset, CommonAttrs.DEPENDS_ON, depends_on.absolute_path
             )
             depends_on.register_dependent(self)
 
@@ -186,13 +196,13 @@ class Transformation:
         :param dependent: transform or component that depends on this one
         """
 
-        if "dependee_of" not in self._dataset.attrs.keys():
+        if CommonAttrs.DEPENDEE_OF not in self._dataset.attrs.keys():
             self.file.set_attribute_value(
-                self._dataset, "dependee_of", dependent.absolute_path
+                self._dataset, CommonAttrs.DEPENDEE_OF, dependent.absolute_path
             )
         else:
             dependee_of_list = self.file.get_attribute_value(
-                self._dataset, "dependee_of"
+                self._dataset, CommonAttrs.DEPENDEE_OF
             )
             if not isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = np.array([dependee_of_list])
@@ -202,7 +212,7 @@ class Transformation:
                     dependee_of_list, np.array([dependent.absolute_path])
                 )
                 self.file.set_attribute_value(
-                    self._dataset, "dependee_of", dependee_of_list
+                    self._dataset, CommonAttrs.DEPENDEE_OF, dependee_of_list
                 )
 
     def deregister_dependent(self, former_dependent: TransformationOrComponent):
@@ -211,22 +221,22 @@ class Transformation:
         Note, "dependee_of" attribute is not part of the NeXus format
         :param former_dependent: transform or component that used to depend on this one
         """
-        if "dependee_of" in self._dataset.attrs.keys():
+        if CommonAttrs.DEPENDEE_OF in self._dataset.attrs.keys():
             dependee_of_list = self.file.get_attribute_value(
-                self._dataset, "dependee_of"
+                self._dataset, CommonAttrs.DEPENDEE_OF
             )
             if (
                 not isinstance(dependee_of_list, np.ndarray)
                 and dependee_of_list == former_dependent.absolute_path
             ):
                 # Must be a single string rather than a list, so simply delete it
-                self.file.delete_attribute(self._dataset, "dependee_of")
+                self.file.delete_attribute(self._dataset, CommonAttrs.DEPENDEE_OF)
             elif isinstance(dependee_of_list, np.ndarray):
                 dependee_of_list = dependee_of_list[
                     dependee_of_list != former_dependent.absolute_path
                 ]
                 self.file.set_attribute_value(
-                    self._dataset, "dependee_of", dependee_of_list
+                    self._dataset, CommonAttrs.DEPENDEE_OF, dependee_of_list
                 )
             else:
                 logging.warning(
@@ -236,9 +246,11 @@ class Transformation:
     def get_dependents(self):
         import nexus_constructor.component.component as comp
 
-        if "dependee_of" in self._dataset.attrs.keys():
+        if CommonAttrs.DEPENDEE_OF in self._dataset.attrs.keys():
             return_dependents = []
-            dependents = self.file.get_attribute_value(self._dataset, "dependee_of")
+            dependents = self.file.get_attribute_value(
+                self._dataset, CommonAttrs.DEPENDEE_OF
+            )
             if not isinstance(dependents, np.ndarray):
                 dependents = [dependents]
             for path in dependents:

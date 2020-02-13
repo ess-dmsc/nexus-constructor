@@ -2,6 +2,7 @@ from typing import List, TextIO
 
 import h5py
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.writer_modules import WriterModules
@@ -22,7 +23,7 @@ def find_forwarder_streams(root, provider_type: str, default_broker: str) -> Lis
         nonlocal stream_list
         if (
             isinstance(node, h5py.Group)
-            and get_nx_class(node) == "NCstream"
+            and get_nx_class(node) == CommonAttrs.NC_STREAM
             and node["writer_module"][()] in FORWARDER_SCHEMAS
         ):
             writer_module = node["writer_module"][()]

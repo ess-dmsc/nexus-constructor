@@ -1,16 +1,20 @@
+import uuid
 from unittest.mock import Mock
-
 import pytest
 from PySide2.QtCore import QPoint, QModelIndex
-from PySide2.QtWidgets import QToolBar, QWidget, QTreeView
-
+from PySide2.QtGui import QVector3D
+from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QFrame, QVBoxLayout
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.main_window_utils import (
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.transformation_view import EditRotation, EditTranslation
+from nexus_constructor.transformations import Transformation
+from nexus_constructor.treeview_utils import (
     create_and_add_toolbar_action,
     set_button_states,
     expand_transformation_list,
     add_transformation,
+    get_transformation_frame,
 )
 from nexus_constructor.transformation_types import TransformationType
 
@@ -599,3 +603,45 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
         add_transformation(
             "NotAKnownTransformation", component_tree_view, component_model
         )
+
+
+def create_transformation(trans_type: TransformationType):
+    file = NexusWrapper(str(uuid.uuid4()))
+    ds = file.nexus_file.create_dataset("transform", data=8)
+    t = Transformation(file, ds)
+    t.type = trans_type
+    t.vector = QVector3D(1, 0, 0)
+    return t
+
+
+def test_GIVEN_rotation_WHEN_getting_transformation_frame_THEN_frame_type_is_edit_rotation(
+    qtbot,
+):
+    frame = QFrame()
+    frame.setLayout(QVBoxLayout())
+    value = create_transformation(TransformationType.ROTATION)
+    qtbot.addWidget(frame)
+    get_transformation_frame(frame, None, value)
+    assert isinstance(frame.transformation_frame, EditRotation)
+
+
+def test_GIVEN_translation_WHEN_getting_transformation_frame_THEN_frame_type_is_edit_translation(
+    qtbot,
+):
+    frame = QFrame()
+    frame.setLayout(QVBoxLayout())
+    value = create_transformation(TransformationType.TRANSLATION)
+    qtbot.addWidget(frame)
+    get_transformation_frame(frame, None, value)
+    assert isinstance(frame.transformation_frame, EditTranslation)
+
+
+def test_GIVEN_invalid_transformation_type_WHEN_getting_transformation_frame_THEN_runtime_error_is_thrown(
+    qtbot,
+):
+    frame = QFrame()
+    frame.setLayout(QVBoxLayout())
+    value = create_transformation("asdf")
+    qtbot.addWidget(frame)
+    with pytest.raises(RuntimeError):
+        get_transformation_frame(frame, None, value)

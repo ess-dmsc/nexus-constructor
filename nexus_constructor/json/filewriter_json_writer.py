@@ -4,6 +4,7 @@ import uuid
 import logging
 from typing import Union, Dict, Any, List, Tuple
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
@@ -59,14 +60,14 @@ def cast_to_int(data):
         return int(data)
 
 
-ATTR_NAME_BLACKLIST = ["dependee_of", "ui_value"]
-NX_CLASS_BLACKLIST = ["NXgroup", "NCstream"]
+ATTR_NAME_BLACKLIST = [CommonAttrs.DEPENDEE_OF, CommonAttrs.UI_VALUE]
+NX_CLASS_BLACKLIST = ["NXgroup", CommonAttrs.NC_STREAM]
 
 
 def _add_attributes(root: NexusObject, root_dict: dict):
     attrs = []
     for attr_name, attr in root.attrs.items():
-        if attr_name == "NX_class" and attr in NX_CLASS_BLACKLIST:
+        if attr_name == CommonAttrs.NX_CLASS and attr in NX_CLASS_BLACKLIST:
             break
         if attr_name not in ATTR_NAME_BLACKLIST:
             if isinstance(attr, bytes):
@@ -155,7 +156,7 @@ class NexusToDictConverter:
         """
         root_dict = {"type": "group", "name": get_name_of_node(root), "children": []}
         # Add the entries
-        if get_nx_class(root) == "NCstream":
+        if get_nx_class(root) == CommonAttrs.NC_STREAM:
             self._handle_stream(root, root_dict)
             return root_dict
 

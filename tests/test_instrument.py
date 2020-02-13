@@ -127,7 +127,7 @@ def test_dependent_is_created_by_instrument_if_depends_on_is_relative(
     Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)
-    assert transform_1_loaded.dataset.attrs["dependee_of"][0] == "/entry/monitor1"
+    assert transform_1_loaded.dataset.attrs["NCdependee_of"][0] == "/entry/monitor1"
 
 
 def test_dependee_of_contains_both_components_when_generating_dependee_of_chain_with_mixture_of_absolute_and_relative_paths(
@@ -158,5 +158,5 @@ def test_dependee_of_contains_both_components_when_generating_dependee_of_chain_
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)
 
     # Check both relative and absolute are in dependee_of list
-    assert component_a.name in transform_1_loaded.dataset.attrs["dependee_of"]
-    assert component_b.name in transform_1_loaded.dataset.attrs["dependee_of"]
+    assert component_a.name in transform_1_loaded.dataset.attrs["NCdependee_of"]
+    assert component_b.name in transform_1_loaded.dataset.attrs["NCdependee_of"]
