@@ -128,3 +128,31 @@ def test_dependent_is_created_by_instrument_if_depends_on_is_relative(
 
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)
     assert transform_1_loaded.dataset.attrs["dependee_of"][0] == "/entry/monitor1"
+
+
+def test_GIVEN_transformation_is_dependee_of_multiple_components_WHEN_one_depends_on_is_relative_and_another_is_absolute_THEN_dependee_of_contains_both_components(
+    file,  # noqa: F811
+):
+    entry_group = file.create_group("entry")
+    entry_group.attrs["NX_class"] = "NXentry"
+    instrument_group = entry_group.create_group("instrument")
+    instrument_group.attrs["NX_class"] = "NXinstrument"
+
+    component_a = instrument_group.create_group("a")
+    component_a.attrs["NX_class"] = "NXaperture"
+    transforms_group = component_a.create_group("Transforms1")
+    transform_1 = transforms_group.create_dataset("transform1", data=1.0)
+    component_a.create_dataset("depends_on", data="Transforms1/transform1")
+
+    component_b = instrument_group.create_group("b")
+    component_b.attrs["NX_class"] = "NXaperture"
+    component_b.create_dataset(
+        "depends_on", data="/entry/instrument/a/Transforms1/transform1"
+    )
+
+    nexus_wrapper = NexusWrapper("test_dependent_transforms_1")
+    nexus_wrapper.load_file(entry_group, file)
+    Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
+    transform_1_loaded = Transformation(nexus_wrapper, transform_1)
+    assert component_a.name in transform_1_loaded.dataset.attrs["dependee_of"]
+    assert component_b.name in transform_1_loaded.dataset.attrs["dependee_of"]

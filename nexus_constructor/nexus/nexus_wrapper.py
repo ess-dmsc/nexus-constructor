@@ -211,12 +211,18 @@ class NexusWrapper(QObject):
 
         for transform, dependee_of in transforms_dependee_of.items():
             try:
+                transform = transform.decode(
+                    "UTF-8"
+                )  # transform name is byte-string, so decode
+            except AttributeError:
+                pass  # transform name is already a string
+            try:
                 # numpy should cast to a scalar value if there is just one item.
                 # try and use an absolute path
                 set_dependee_of_attr(transform, dependee_of)
             except KeyError:
                 # try and use a relative path instead
-                path = f"{dependee_of[0]}/{transform.decode('UTF-8')}"
+                path = f"{dependee_of[0]}/{transform}"
                 set_dependee_of_attr(path, dependee_of)
 
     def duplicate_nx_group(
