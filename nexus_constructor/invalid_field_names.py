@@ -10,4 +10,5 @@ INVALID_FIELD_NAMES = [
     "shape",
     CommonAttrs.DEPENDS_ON,
     "pixel_shape",
+    "transformations",
 ] + PIXEL_FIELDS

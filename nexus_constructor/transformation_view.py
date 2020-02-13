@@ -63,7 +63,7 @@ class EditTranslation(EditTransformation):
         super().__init__(parent, transformation, instrument)
         self.transformation_frame.vector_label.setText("Direction")
         self.transformation_frame.value_label.setText("Distance (m)")
-        self.setTitle(TransformationType.TRANSLATION.value)
+        self.setTitle(TransformationType.TRANSLATION)
 
 
 class EditRotation(EditTransformation):
@@ -73,7 +73,7 @@ class EditRotation(EditTransformation):
         super().__init__(parent, transformation, instrument)
         self.transformation_frame.vector_label.setText("Rotation Axis")
         self.transformation_frame.value_label.setText("Angle (°)")
-        self.setTitle(TransformationType.ROTATION.value)
+        self.setTitle(TransformationType.ROTATION)
 
 
 def links_back_to_component(reference: Component, comparison: Component):
