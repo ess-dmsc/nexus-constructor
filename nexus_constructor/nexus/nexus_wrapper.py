@@ -2,7 +2,7 @@ import logging
 import uuid
 import h5py
 from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar, Optional, List
+from typing import Any, TypeVar, Optional
 import numpy as np
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
@@ -200,6 +200,12 @@ class NexusWrapper(QObject):
 
         transforms_dependee_of = {}
         for group_name, depends_on_transform in component_depends_on.items():
+            try:
+                depends_on_transform = depends_on_transform.decode(
+                    "UTF-8"
+                )  # transform name is byte-string, so decode
+            except AttributeError:
+                pass  # transform name is already a string
             if f"{group_name}/{depends_on_transform}" in self.nexus_file:
                 # depends_on is relative, change to an absolute path
                 depends_on_transform = f"{group_name}/{depends_on_transform}"
@@ -207,26 +213,10 @@ class NexusWrapper(QObject):
                 transforms_dependee_of[depends_on_transform] = []
             transforms_dependee_of[depends_on_transform].append(group_name)
 
-        def set_dependee_of_attr(path: str, dependee_of: List[str]):
-            self.nexus_file[path].attrs["dependee_of"] = np.array(
+        for transform, dependee_of in transforms_dependee_of.items():
+            self.nexus_file[transform].attrs["dependee_of"] = np.array(
                 dependee_of, dtype=h5py.special_dtype(vlen=str)
             )
-
-        for transform, dependee_of in transforms_dependee_of.items():
-            try:
-                transform = transform.decode(
-                    "UTF-8"
-                )  # transform name is byte-string, so decode
-            except AttributeError:
-                pass  # transform name is already a string
-            try:
-                # numpy should cast to a scalar value if there is just one item.
-                # try and use an absolute path
-                set_dependee_of_attr(transform, dependee_of)
-            except KeyError:
-                # try and use a relative path instead
-                path = f"{dependee_of[0]}/{transform}"
-                set_dependee_of_attr(path, dependee_of)
 
     def duplicate_nx_group(
         self, group_to_duplicate: h5py.Group, new_group_name: str
