@@ -242,7 +242,7 @@ class InstrumentView(QWidget):
         """
         try:
             self.component_entities[name].setParent(None)
-            del self.component_entities[name]
+            self.component_entities.pop(name)
         except KeyError:
             logging.error(
                 f"Unable to delete component {name} because it doesn't exist."

@@ -160,8 +160,11 @@ class ComponentTreeModel(QAbstractItemModel):
     def duplicate_node(self, node: QModelIndex):
         node_object = node.internalPointer()
         if isinstance(node_object, Component):
-            self.add_component(
-                node_object.duplicate(self.instrument.get_component_list())
+            new_component = node_object.duplicate(self.instrument.get_component_list())
+            self.add_component(new_component)
+            shape, positions = new_component.shape
+            self.instrument.nexus.component_added.emit(
+                new_component.name, shape, positions
             )
         elif isinstance(node_object, Transformation):
             raise NotImplementedError("Duplication of transformations not implemented")
