@@ -202,12 +202,20 @@ class NexusWrapper(QObject):
 
         transforms_dependee_of = {}
         for group_name, depends_on_transform in component_depends_on.items():
+            try:
+                depends_on_transform = depends_on_transform.decode(
+                    "UTF-8"
+                )  # transform name is byte-string, so decode
+            except AttributeError:
+                pass  # transform name is already a string
+            if f"{group_name}/{depends_on_transform}" in self.nexus_file:
+                # depends_on is relative, change to an absolute path
+                depends_on_transform = f"{group_name}/{depends_on_transform}"
             if depends_on_transform not in transforms_dependee_of.keys():
                 transforms_dependee_of[depends_on_transform] = []
             transforms_dependee_of[depends_on_transform].append(group_name)
 
         for transform, dependee_of in transforms_dependee_of.items():
-            # numpy should cast to a scalar value if there is just one item.
             self.nexus_file[transform].attrs[CommonAttrs.DEPENDEE_OF] = np.array(
                 dependee_of, dtype=h5py.special_dtype(vlen=str)
             )
