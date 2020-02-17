@@ -33,8 +33,6 @@ pre-commit install
 ```
 to activate the pre-commit check.
 
-Submodules should be cloned by running `git submodule update --init`
-
 ## Running the application
 
 Run the python script `main.py` located in the root of the repository.
