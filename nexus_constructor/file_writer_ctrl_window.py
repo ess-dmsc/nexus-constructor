@@ -53,23 +53,23 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def setupUi(self):
         super().setupUi(self)
         self.statusBrokerLed = Led(self)
-        self.statusTopicLayout.addWidget(self.statusBrokerLed)
+        self.status_topic_layout.addWidget(self.statusBrokerLed)
         self.statusBrokerLed.turn_on(False)
 
         validator = BrokerAndTopicValidator()
-        self.statusBrokerEdit.setValidator(validator)
-        validator.is_valid.connect(partial(validate_line_edit, self.statusBrokerEdit))
+        self.status_broker_edit.setValidator(validator)
+        validator.is_valid.connect(partial(validate_line_edit, self.status_broker_edit))
 
-        self.statusBrokerEdit.textChanged.connect(self.onTextChanged)
+        self.status_broker_edit.textChanged.connect(self.onTextChanged)
         self.statusBrokerChangeTimer = QTimer()
         self.statusBrokerChangeTimer.setSingleShot(True)
         self.statusBrokerChangeTimer.timeout.connect(self.onTextChangedTimer)
         self.status_consumer = None
 
         self.commandBrokerLed = Led(self)
-        self.commandBrokerLayout.addWidget(self.commandBrokerLed)
+        self.command_broker_layout.addWidget(self.commandBrokerLed)
         self.commandBrokerLed.turn_on(False)
-        self.commandBrokerEdit.textChanged.connect(self.onCommandBrokerTextChanged)
+        self.command_broker_edit.textChanged.connect(self.onCommandBrokerTextChanged)
         self.commandBrokerChangeTimer = QTimer()
         self.commandBrokerChangeTimer.setSingleShot(True)
         self.commandBrokerChangeTimer.timeout.connect(
@@ -83,20 +83,20 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.updateStatusTimer.timeout.connect(self.onCheckConnectionStatus)
         self.updateStatusTimer.start(500)
 
-        self.filesList.clicked.connect(self.onClickedFileList)
-        self.stopFileWritingButton.clicked.connect(self.onStopFileWriting)
+        self.files_list.clicked.connect(self.onClickedFileList)
+        self.stop_file_writing_button.clicked.connect(self.onStopFileWriting)
 
         self.model = QStandardItemModel(0, 2, self)
         self.model.setHeaderData(0, QtCore.Qt.Horizontal, "File writer")
         self.model.setHeaderData(1, QtCore.Qt.Horizontal, "Last seen")
-        self.fileWritersList.setModel(self.model)
-        self.fileWritersList.setColumnWidth(0, 320)
+        self.file_writers_list.setModel(self.model)
+        self.file_writers_list.setColumnWidth(0, 320)
 
         self.fileModel = QStandardItemModel(0, 3, self)
         self.fileModel.setHeaderData(0, QtCore.Qt.Horizontal, "File name")
         self.fileModel.setHeaderData(1, QtCore.Qt.Horizontal, "Last seen")
         self.fileModel.setHeaderData(2, QtCore.Qt.Horizontal, "File writer")
-        self.filesList.setModel(self.fileModel)
+        self.files_list.setModel(self.fileModel)
 
         self.known_writers = {}
         self.known_files = {}
@@ -123,7 +123,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.statusBrokerChangeTimer.start(1000)
 
     def onTextChangedTimer(self):
-        result = extract_addr_and_topic(self.statusBrokerEdit.text())
+        result = extract_addr_and_topic(self.status_broker_edit.text())
         if result is not None:
             if self.status_consumer is not None:
                 self.status_consumer.__del__()
@@ -133,7 +133,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.commandBrokerChangeTimer.start(1000)
 
     def onCommandBrokerTextChangeTimer(self):
-        result = extract_addr_and_topic(self.commandBrokerEdit.text())
+        result = extract_addr_and_topic(self.command_broker_edit.text())
         if result is not None:
             self.brokerLineEdit.setPlaceholderText(result[0])
             if self.command_producer is not None:
@@ -214,16 +214,16 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.sendCommandButton.setEnabled(False)
 
     def onClickedFileList(self):
-        if len(self.filesList.selectedIndexes()) > 0:
-            self.stopFileWritingButton.setEnabled(True)
+        if len(self.files_list.selectedIndexes()) > 0:
+            self.stop_file_writing_button.setEnabled(True)
         else:
-            self.stopFileWritingButton.setEnabled(False)
+            self.stop_file_writing_button.setEnabled(False)
 
     def onStopFileWriting(self):
         stopWritingMsgTemplate = (
             """ "cmd": "FileWriter_stop", "job_id": "{}", "service_id": "{}" """
         )
-        selected_files = self.filesList.selectedIndexes()
+        selected_files = self.files_list.selectedIndexes()
         for indice in selected_files:
             for fileKey in self.known_files:
                 cFile = self.known_files[fileKey]
