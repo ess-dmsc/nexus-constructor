@@ -1,5 +1,11 @@
 from typing import Dict
-from PySide2.QtWidgets import QMainWindow, QApplication, QInputDialog, QLineEdit
+from PySide2.QtWidgets import (
+    QMainWindow,
+    QApplication,
+    QInputDialog,
+    QLineEdit,
+    QAction,
+)
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 import silx.gui.hdf5
 import h5py
@@ -63,6 +69,30 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
 
         self.widget.setVisible(True)
+
+        self._set_up_file_writer_control_window(main_window)
+        self.file_writer_control_window = None
+
+    def _set_up_file_writer_control_window(self, main_window):
+        try:
+            import kafka  # noqa: F401
+
+            self.control_file_writer_action = QAction(main_window)
+            self.control_file_writer_action.setText("Control file-writer")
+            self.file_menu.addAction(self.control_file_writer_action)
+            self.control_file_writer_action.triggered.connect(
+                self.show_control_file_writer_window
+            )
+        except ImportError:
+            pass
+
+    def show_control_file_writer_window(self):
+        if self.file_writer_control_window is None:
+            from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
+
+            self.file_writer_ctrl_window = FileWriterCtrl(self.instrument)
+            self.file_writer_ctrl_window.show()
+            self.file_writer_ctrl_window.raise_()
 
     def show_edit_component_dialog(self):
         selected_component = self.component_tree_view_tab.component_tree_view.selectedIndexes()[
