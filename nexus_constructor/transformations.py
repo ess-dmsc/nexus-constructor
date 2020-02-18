@@ -39,6 +39,17 @@ class Transformation:
     @name.setter
     def name(self, new_name: str):
         self.file.rename_node(self._dataset, new_name)
+        self._update_dependent_depends_on()
+
+    def _update_dependent_depends_on(self):
+        """
+        Updates all of the dependent "depends_on" fields for this transformation.
+        """
+        for dependent in self.get_dependents():
+            del dependent.group[CommonAttrs.DEPENDS_ON]
+            dependent.group.create_dataset(
+                CommonAttrs.DEPENDS_ON, data=self._dataset.name
+            )
 
     @property
     def qmatrix(self) -> QMatrix4x4:
@@ -246,8 +257,9 @@ class Transformation:
     def get_dependents(self):
         import nexus_constructor.component.component as comp
 
+        return_dependents = []
+
         if CommonAttrs.DEPENDEE_OF in self._dataset.attrs.keys():
-            return_dependents = []
             dependents = self.file.get_attribute_value(
                 self._dataset, CommonAttrs.DEPENDEE_OF
             )
@@ -261,7 +273,7 @@ class Transformation:
                     return_dependents.append(Transformation(self.file, node))
                 else:
                     raise RuntimeError("Unknown type of node.")
-            return return_dependents
+        return return_dependents
 
     def remove_from_dependee_chain(self):
         all_dependees = self.get_dependents()
