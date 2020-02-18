@@ -1,8 +1,12 @@
+from functools import partial
+
+from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.Led import Led
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
-from PySide2.QtWidgets import QMainWindow, QApplication, QWidget
+from PySide2.QtWidgets import QMainWindow, QApplication
 from PySide2.QtCore import QTimer, QDateTime
-from PySide2.QtGui import QStandardItemModel, QColor
+from PySide2.QtGui import QStandardItemModel
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
 import re
@@ -12,34 +16,6 @@ from PySide2.QtCore import QSettings
 import time
 from nexus_constructor.json.filewriter_json_writer import generate_json
 import io
-
-
-def validate_line_edit(
-    line_edit: QWidget,
-    is_valid: bool,
-    tooltip_on_reject="",
-    tooltip_on_accept="",
-    suggestion_callable=None,
-):
-    """
-    Sets the line edit colour to red if field is invalid or white if valid. Also sets the tooltips if provided.
-    :param line_edit: The line edit object to apply the validation to.
-    :param is_valid: Whether the line edit field contains valid text
-    :param suggestion_callable: A callable that returns the suggested alternative if not valid.
-    :param tooltip_on_accept: Tooltip to display if line edit is valid.
-    :param tooltip_on_reject: Tooltip to display if line edit is invalid.
-    :return: None.
-    """
-    colour = "white" if is_valid else "red"
-    palette = line_edit.palette()
-    palette.setColor(line_edit.backgroundRole(), QColor(colour))
-    line_edit.setPalette(palette)
-    line_edit.setAutoFillBackground(True)
-    if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):
-        tooltip_on_reject += suggestion_callable()
-    line_edit.setToolTip(tooltip_on_accept) if is_valid else line_edit.setToolTip(
-        tooltip_on_reject
-    )
 
 
 def extract_addr_and_topic(in_string):
@@ -81,6 +57,10 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.statusBrokerLed = Led(self)
         self.statusTopicLayout.addWidget(self.statusBrokerLed)
         self.statusBrokerLed.turn_on(False)
+
+        validator = BrokerAndTopicValidator()
+        self.statusBrokerEdit.setValidator(validator)
+        validator.is_valid.connect(partial(validate_line_edit, self.statusBrokerEdit))
 
         self.statusBrokerEdit.textChanged.connect(self.onTextChanged)
         self.statusBrokerChangeTimer = QTimer()
@@ -303,8 +283,6 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             generate_json(
                 data=self.instrument,
                 file=in_memory_file,
-                streams=self.instrument.get_streams(),
-                links=self.instrument.get_links(),
                 nexus_file_name=file_name,
                 broker=broker,
                 start_time=start_time,
