@@ -4,15 +4,14 @@ from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.Led import Led
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
-from PySide2.QtWidgets import QMainWindow, QApplication
-from PySide2.QtCore import QTimer, QDateTime
+from PySide2.QtWidgets import QMainWindow
+from PySide2.QtCore import QTimer
 from PySide2.QtGui import QStandardItemModel
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
 import re
 from nexus_constructor.StatusConsumer import StatusConsumer
 from nexus_constructor.CommandProducer import CommandProducer
-from PySide2.QtCore import QSettings
 import time
 from nexus_constructor.json.filewriter_json_writer import generate_json
 import io
@@ -47,10 +46,9 @@ class File:
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def __init__(self, instrument: Instrument):
         super().__init__()
-        self.settings = QSettings("ess", "nexus-constructor")
+        # self.settings = QSettings("ess", "nexus-constructor")
         self.instrument = instrument
         self.setupUi()
-        self.updateFileNamePlaceholder()
 
     def setupUi(self):
         super().setupUi(self)
@@ -79,17 +77,11 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         )
         self.command_producer = None
 
-        self.fileNameLineEdit.textChanged.connect(self.onFileNameChange)
-        self.sendCommandButton.clicked.connect(self.onSendCommand)
+        self.command_widget.ok_button.clicked.connect(self.onSendCommand)
 
         self.updateStatusTimer = QTimer()
         self.updateStatusTimer.timeout.connect(self.onCheckConnectionStatus)
         self.updateStatusTimer.start(500)
-        self.startDateTime.setDateTime(QDateTime.currentDateTime())
-        self.stopDateTime.setDateTime(QDateTime.currentDateTime())
-
-        self.useStartTimeCheckBox.stateChanged.connect(self.onClickStartTimeCheckBox)
-        self.useStopTimeCheckBox.stateChanged.connect(self.onClickStopTimeCheckBox)
 
         self.filesList.clicked.connect(self.onClickedFileList)
         self.stopFileWritingButton.clicked.connect(self.onStopFileWriting)
@@ -108,35 +100,8 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
 
         self.known_writers = {}
         self.known_files = {}
-        self.restore_settings()
-
-        QApplication.instance().aboutToQuit.connect(self.doCleanup)
-
-    def updateFileNamePlaceholder(self):
-        placeholder_file_name = time.strftime(
-            "Data_%Y%m%d_%H%M%S.nxs", time.localtime()
-        )
-        self.fileNameLineEdit.setPlaceholderText(placeholder_file_name)
-
-    def restore_settings(self):
-        self.statusBrokerEdit.setText(self.settings.value("status_broker_addr"))
-        self.commandBrokerEdit.setText(self.settings.value("command_broker_addr"))
-        temp = self.settings.value("use_swmr", False)
-        if type(temp) == str:
-            temp = temp == "True"
-        self.useSWMRCheckBox.setChecked(bool(temp))
-        temp = self.settings.value("use_start_time", False)
-        if type(temp) == str:
-            temp = temp == "True"
-        self.useStartTimeCheckBox.setChecked(temp)
-        temp = self.settings.value("use_stop_time", False)
-        if type(temp) == str:
-            temp = temp == "True"
-        self.useStopTimeCheckBox.setChecked(temp)
-        self.fileNameLineEdit.setText(self.settings.value("file_name"))
 
     def onCheckConnectionStatus(self):
-        self.updateFileNamePlaceholder()
         if self.status_consumer is None:
             self.statusBrokerLed.turn_on(False)
         else:
@@ -149,9 +114,10 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
 
         if self.command_producer is None:
             self.commandBrokerLed.turn_on(False)
+            pass
         else:
             self.commandBrokerLed.turn_on(self.command_producer.isConnected())
-        self.updateCommandPossible()
+            pass
 
     def onTextChanged(self):
         self.statusBrokerChangeTimer.start(1000)
@@ -175,53 +141,6 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.command_producer = CommandProducer(*result)
         else:
             self.brokerLineEdit.setPlaceholderText("address:port")
-
-    def onClickStartTimeCheckBox(self):
-        self.startDateTime.setEnabled(self.useStartTimeCheckBox.isChecked())
-
-    def onClickStopTimeCheckBox(self):
-        self.stopDateTime.setEnabled(self.useStopTimeCheckBox.isChecked())
-
-    def doCleanup(self):
-        self.settings.setValue("status_broker_addr", self.statusBrokerEdit.text())
-        self.settings.setValue("command_broker_addr", self.commandBrokerEdit.text())
-        self.settings.setValue("use_swmr", self.useSWMRCheckBox.isChecked())
-        self.settings.setValue("use_start_time", self.useStartTimeCheckBox.isChecked())
-        self.settings.setValue("use_stop_time", self.useStopTimeCheckBox.isChecked())
-        self.settings.setValue("file_name", self.fileNameLineEdit.text())
-        if self.status_consumer is not None:
-            self.status_consumer.__del__()
-        if self.command_producer is not None:
-            self.command_producer.__del__()
-
-    def updateCommandPossible(self):
-        start_stop_is_ok = not (
-            self.useStopTimeCheckBox.isChecked()
-            and self.useStartTimeCheckBox.isChecked()
-            and self.startDateTime.dateTime() > self.stopDateTime.dateTime()
-        )
-        validate_line_edit(
-            self.startDateTime,
-            start_stop_is_ok,
-            "Start time occurs later than stop time.",
-            "Start time",
-        )
-        validate_line_edit(
-            self.stopDateTime,
-            start_stop_is_ok,
-            "Start time occurs later than stop time.",
-            "Stop time",
-        )
-
-        if (
-            self.command_producer is not None
-            and self.command_producer.isConnected()
-            and not self.command_producer.hasUnsentMessages()
-            and start_stop_is_ok
-        ):
-            self.sendCommandButton.setEnabled(True)
-        else:
-            self.sendCommandButton.setEnabled(False)
 
     def updateWriterList(self, updated_list):
         for key in updated_list:
@@ -268,22 +187,21 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def onSendCommand(self):
         if self.command_producer is not None:
             in_memory_file = io.StringIO()
-            broker = self.brokerLineEdit.text()
-            if len(broker) == 0:
-                broker = self.brokerLineEdit.placeholderText()
-            start_time = None
-            if self.useStartTimeCheckBox.isChecked():
-                start_time = self.startDateTime.dateTime().toMSecsSinceEpoch()
-            stop_time = None
-            if self.useStopTimeCheckBox.isChecked():
-                stop_time = self.stopDateTime.dateTime().toMSecsSinceEpoch()
-            file_name = self.fileNameLineEdit.text()
-            if len(file_name) == 0:
-                file_name = self.fileNameLineEdit.placeholderText()
+
+            (
+                nexus_file_name,
+                broker,
+                start_time,
+                stop_time,
+                service_id,
+                abort_on_uninitialised_stream,
+                use_swmr,
+            ) = self.command_widget.get_arguments()
+
             generate_json(
                 data=self.instrument,
                 file=in_memory_file,
-                nexus_file_name=file_name,
+                nexus_file_name=nexus_file_name,
                 broker=broker,
                 start_time=start_time,
                 stop_time=stop_time,

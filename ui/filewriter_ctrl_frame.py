@@ -74,6 +74,7 @@ class Ui_FilewriterCtrl(object):
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.horizontalLayout.addWidget(self.line)
+
         self.commandLayout = QtWidgets.QVBoxLayout()
         self.commandLayout.setContentsMargins(-1, 0, -1, 0)
         self.commandBrokerLayout = QtWidgets.QHBoxLayout()
@@ -82,91 +83,11 @@ class Ui_FilewriterCtrl(object):
         self.commandBrokerEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.commandBrokerLayout.addWidget(self.commandBrokerEdit)
         self.commandLayout.addLayout(self.commandBrokerLayout)
-        self.line_3 = QtWidgets.QFrame(self.centralwidget)
-        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.commandLayout.addWidget(self.line_3)
-        self.commandFormLayout = QtWidgets.QFormLayout()
-        self.commandFormLayout.setFieldGrowthPolicy(
-            QtWidgets.QFormLayout.ExpandingFieldsGrow
-        )
-        self.commandFormLayout.setLabelAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.commandFormLayout.setFormAlignment(
-            QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop
-        )
-        self.fileNameLabel = QtWidgets.QLabel(self.centralwidget)
-        self.commandFormLayout.setWidget(
-            0, QtWidgets.QFormLayout.LabelRole, self.fileNameLabel
-        )
-        self.fileNameLineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.commandFormLayout.setWidget(
-            0, QtWidgets.QFormLayout.FieldRole, self.fileNameLineEdit
-        )
-        self.brokerLineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.commandFormLayout.setWidget(
-            1, QtWidgets.QFormLayout.FieldRole, self.brokerLineEdit
-        )
-        self.brokerLabel = QtWidgets.QLabel(self.centralwidget)
-        self.commandFormLayout.setWidget(
-            1, QtWidgets.QFormLayout.LabelRole, self.brokerLabel
-        )
-        self.startTimeLayout = QtWidgets.QHBoxLayout()
-        self.useStartTimeCheckBox = QtWidgets.QCheckBox(self.centralwidget)
-        self.useStartTimeCheckBox.setText("")
-        self.startTimeLayout.addWidget(self.useStartTimeCheckBox)
-        self.startDateTime = QtWidgets.QDateTimeEdit(self.centralwidget)
-        self.startDateTime.setEnabled(False)
-        self.startTimeLayout.addWidget(self.startDateTime)
-        self.commandFormLayout.setLayout(
-            2, QtWidgets.QFormLayout.FieldRole, self.startTimeLayout
-        )
-        self.startTimeLabel = QtWidgets.QLabel(self.centralwidget)
-        self.commandFormLayout.setWidget(
-            2, QtWidgets.QFormLayout.LabelRole, self.startTimeLabel
-        )
-        self.stopTimeLayout = QtWidgets.QHBoxLayout()
-        self.useStopTimeCheckBox = QtWidgets.QCheckBox(self.centralwidget)
-        self.useStopTimeCheckBox.setText("")
-        self.stopTimeLayout.addWidget(self.useStopTimeCheckBox)
-        self.stopDateTime = QtWidgets.QDateTimeEdit(self.centralwidget)
-        self.stopDateTime.setEnabled(False)
-        self.stopTimeLayout.addWidget(self.stopDateTime)
-        self.commandFormLayout.setLayout(
-            3, QtWidgets.QFormLayout.FieldRole, self.stopTimeLayout
-        )
-        self.stopTimeLabel = QtWidgets.QLabel(self.centralwidget)
-        self.commandFormLayout.setWidget(
-            3, QtWidgets.QFormLayout.LabelRole, self.stopTimeLabel
-        )
-        self.useSWMRCheckBox = QtWidgets.QCheckBox(self.centralwidget)
-        self.useSWMRCheckBox.setText("")
-        self.commandFormLayout.setWidget(
-            4, QtWidgets.QFormLayout.FieldRole, self.useSWMRCheckBox
-        )
-        self.swmrLabel = QtWidgets.QLabel(self.centralwidget)
-        self.commandFormLayout.setWidget(
-            4, QtWidgets.QFormLayout.LabelRole, self.swmrLabel
-        )
-        self.commandLayout.addLayout(self.commandFormLayout)
-        spacerItem1 = QtWidgets.QSpacerItem(
-            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
-        )
-        self.commandLayout.addItem(spacerItem1)
-        self.sendCommandLayout = QtWidgets.QHBoxLayout()
-        spacerItem2 = QtWidgets.QSpacerItem(
-            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
-        )
-        self.sendCommandLayout.addItem(spacerItem2)
-
-        self.sendCommandButton = QtWidgets.QPushButton(self.centralwidget)
-        self.sendCommandButton.setEnabled(False)
-        self.sendCommandLayout.addWidget(self.sendCommandButton)
-        self.commandLayout.addLayout(self.sendCommandLayout)
 
         self.command_widget = FilewriterCommandWidget()
-        self.horizontalLayout.addWidget(self.command_widget)
+        self.commandLayout.addWidget(self.command_widget)
+
+        self.horizontalLayout.addLayout(self.commandLayout)
 
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.verticalLayout_2.addLayout(self.verticalLayout)
@@ -179,12 +100,5 @@ class Ui_FilewriterCtrl(object):
         self.stopFileWritingButton.setText("Stop file-writing")
         self.commandBrokerLabel.setText("Command broker")
         self.commandBrokerEdit.setPlaceholderText("address:port/topic")
-        self.fileNameLabel.setText("File name")
-        self.brokerLineEdit.setPlaceholderText("address:port")
-        self.brokerLabel.setText("Broker")
-        self.startTimeLabel.setText("Start time")
-        self.stopTimeLabel.setText("Stop time")
-        self.swmrLabel.setText("Use SWMR")
-        self.sendCommandButton.setText("Send command")
 
         QtCore.QMetaObject.connectSlotsByName(FilewriterCtrl)
