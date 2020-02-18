@@ -37,6 +37,41 @@ def stream_fields_widget(qtbot, instrument, template):
     return widget
 
 
+def test_ui_field_GIVEN_field_has_units_filled_in_ui_WHEN_getting_field_group_THEN_units_are_stored_in_attrs(
+    qtbot,
+):
+    nexus_wrapper = NexusWrapper("test_ui_fields_units")
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
+
+    listwidget = QListWidget()
+    field = FieldWidget(["test"], listwidget, instrument=instrument)
+    field_name = "test"
+    field.name = field_name
+    field.value_line_edit.setText("1")
+    qtbot.addWidget(field)
+    units = "m"
+    field.units = units
+    group = field.value
+
+    assert "units" in group.attrs
+    assert group.attrs["units"] == units
+
+
+def test_ui_field_GIVEN_field_does_not_have_units_filled_in_ui_WHEN_getting_field_group_THEN_units_are_not_saved(
+    qtbot,
+):
+    listwidget = QListWidget()
+    field = FieldWidget(["test"], listwidget)
+    field_name = "test"
+    field.name = field_name
+    field.value_line_edit.setText("1")
+    qtbot.addWidget(field)
+
+    group = field.value
+
+    assert "units" not in group.attrs
+
+
 def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_combo_is_changed_THEN_value_units_edit_is_shown(
     qtbot,
 ):
