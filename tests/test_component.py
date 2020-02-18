@@ -13,6 +13,7 @@ import pytest
 from pytest import approx
 import numpy as np
 
+from nexus_constructor.nexus.validation import NexusFormatError
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_x_offsets_from_pixel_grid,
@@ -437,6 +438,129 @@ def test_can_add_mesh_shape_to_and_component_and_get_the_same_shape_back(nexus_w
     assert output_mesh.vertices[2].x() == approx(vertex_2_x)
     assert output_mesh.vertices[2].y() == approx(vertex_2_y)
     assert output_mesh.vertices[2].z() == approx(vertex_2_z)
+
+
+def test_can_get_cad_file_units_from_file(nexus_wrapper):
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    vertex_2_x = 0.5
+    vertex_2_y = -0.5
+    vertex_2_z = 0
+    vertices = [
+        QVector3D(-0.5, -0.5, 0),
+        QVector3D(0, 0.5, 0),
+        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+    ]
+    triangle = [0, 1, 2]
+    faces = [triangle]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+
+    output_mesh, _ = component.shape
+    units = "m"
+    output_mesh.units = units
+
+    assert isinstance(output_mesh, OFFGeometryNexus)
+    assert output_mesh.units == units
+    assert output_mesh.group["cad_file_units"][()] == units
+
+
+def test_can_get_cad_file_units_from_file_when_already_in_file(nexus_wrapper):
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    vertex_2_x = 0.5
+    vertex_2_y = -0.5
+    vertex_2_z = 0
+    vertices = [
+        QVector3D(-0.5, -0.5, 0),
+        QVector3D(0, 0.5, 0),
+        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+    ]
+    triangle = [0, 1, 2]
+    faces = [triangle]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+
+    units = "m"
+    component.group["shape"]["cad_file_units"] = units
+
+    output_mesh, _ = component.shape
+    assert isinstance(output_mesh, OFFGeometryNexus)
+    assert output_mesh.units == units
+    assert output_mesh.group["cad_file_units"][()] == units
+
+
+def test_missing_cad_fields_throws_nexus_format_error_when_constructing_off_geometry(
+    nexus_wrapper,
+):
+    with pytest.raises(NexusFormatError,):
+        OFFGeometryNexus(nexus_wrapper, nexus_wrapper.instrument)
+
+
+def test_no_cad_path_returns_none_when_getting_cad_path_from_off_geometry(
+    nexus_wrapper,
+):
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    vertex_2_x = 0.5
+    vertex_2_y = -0.5
+    vertex_2_z = 0
+    vertices = [
+        QVector3D(-0.5, -0.5, 0),
+        QVector3D(0, 0.5, 0),
+        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+    ]
+    triangle = [0, 1, 2]
+    faces = [triangle]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+
+    output_mesh, _ = component.shape
+    assert output_mesh.file_path is None
+
+
+def test_getting_cad_path_from_file(nexus_wrapper):
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    vertex_2_x = 0.5
+    vertex_2_y = -0.5
+    vertex_2_z = 0
+    vertices = [
+        QVector3D(-0.5, -0.5, 0),
+        QVector3D(0, 0.5, 0),
+        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+    ]
+    triangle = [0, 1, 2]
+    faces = [triangle]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+    filepath = "/home/asdf/teapot.off"
+    component.group["shape"]["cad_file_path"] = filepath
+
+    output_mesh, _ = component.shape
+    assert output_mesh.file_path == filepath
+
+
+def test_setting_cad_path_through_shape_persists_in_file(nexus_wrapper):
+    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
+
+    vertex_2_x = 0.5
+    vertex_2_y = -0.5
+    vertex_2_z = 0
+    vertices = [
+        QVector3D(-0.5, -0.5, 0),
+        QVector3D(0, 0.5, 0),
+        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+    ]
+    triangle = [0, 1, 2]
+    faces = [triangle]
+    input_mesh = OFFGeometryNoNexus(vertices, faces)
+    component.set_off_shape(input_mesh)
+    filepath = "/home/asdf/teapot.off"
+
+    output_mesh, _ = component.shape
+    output_mesh.file_path = filepath
+    assert component.group["shape"]["cad_file_path"][()] == filepath
 
 
 def test_can_override_existing_shape(nexus_wrapper):
