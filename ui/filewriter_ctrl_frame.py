@@ -1,6 +1,8 @@
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtWidgets import QLineEdit
 
+from nexus_constructor.filewriter_command_dialog import FilewriterCommandWidget
+
 
 class Ui_FilewriterCtrl(object):
     def setupUi(self, FilewriterCtrl):
@@ -157,11 +159,15 @@ class Ui_FilewriterCtrl(object):
             40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
         self.sendCommandLayout.addItem(spacerItem2)
+
         self.sendCommandButton = QtWidgets.QPushButton(self.centralwidget)
         self.sendCommandButton.setEnabled(False)
         self.sendCommandLayout.addWidget(self.sendCommandButton)
         self.commandLayout.addLayout(self.sendCommandLayout)
-        self.horizontalLayout.addLayout(self.commandLayout)
+
+        self.command_widget = FilewriterCommandWidget()
+        self.horizontalLayout.addWidget(self.command_widget)
+
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.verticalLayout_2.addLayout(self.verticalLayout)
         FilewriterCtrl.setCentralWidget(self.centralwidget)
