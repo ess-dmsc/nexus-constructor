@@ -1,4 +1,4 @@
-from nexus_constructor.filewriter_command_dialog import FilewriterCommandWidget
+from nexus_constructor.filewriter_command_widget import FilewriterCommandWidget
 
 
 def test_UI_GIVEN_user_presses_disable_start_time_THEN_start_time_line_edit_is_disabled(

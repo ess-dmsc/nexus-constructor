@@ -11,7 +11,7 @@ import silx.gui.hdf5
 import h5py
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.filewriter_command_dialog import FilewriterCommandWidget
+from nexus_constructor.filewriter_command_widget import FilewriterCommandWidget
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow

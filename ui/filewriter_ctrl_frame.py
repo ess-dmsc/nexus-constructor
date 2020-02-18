@@ -1,7 +1,7 @@
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtWidgets import QLineEdit
 
-from nexus_constructor.filewriter_command_dialog import FilewriterCommandWidget
+from nexus_constructor.filewriter_command_widget import FilewriterCommandWidget
 
 
 class Ui_FilewriterCtrl(object):
