@@ -1,5 +1,4 @@
 from kafka import KafkaConsumer, TopicPartition
-import threading
 from copy import copy
 import time
 from kafka.errors import NoBrokersAvailable
@@ -12,16 +11,10 @@ class StatusConsumer(KafkaInterface):
     def __init__(self, broker, topic):
         self.broker = broker
         self.topic = topic
-        self.connected = False
         self.filewriters = {}
         self.files = {}
         self.run_thread = True
-        self.thread = threading.Thread(target=self.status_thread)
         self.thread.start()
-
-    def __del__(self):
-        self.run_thread = False
-        self.thread.join()
 
     @property
     def file_writers(self):
@@ -49,7 +42,7 @@ class StatusConsumer(KafkaInterface):
         self.files = copy(updated_map)
         self.lock.release()
 
-    def status_thread(self):
+    def thread_target(self):
         consumer = None
         while True:
             if not self.run_thread:

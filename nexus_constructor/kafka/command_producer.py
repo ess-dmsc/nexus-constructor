@@ -1,6 +1,5 @@
 from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
-import threading
 import time
 from queue import Queue
 
@@ -11,20 +10,14 @@ class CommandProducer(KafkaInterface):
     def __init__(self, address, topic):
         self.address = address
         self.topic = topic
-        self.run_thread = True
-        self.connected = False
-        self.thread = threading.Thread(target=self.produce_thread)
         self.msg_queue = Queue()
+        self.run_thread = True
         self.thread.start()
-
-    def __del__(self):
-        self.run_thread = False
-        self.thread.join()
 
     def send_command(self, message):
         self.msg_queue.put(message, block=True)
 
-    def produce_thread(self):
+    def thread_target(self):
         producer = None
         while True:
             if not self.run_thread:
