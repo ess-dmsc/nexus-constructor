@@ -9,8 +9,8 @@ from PySide2.QtCore import QTimer
 from PySide2.QtGui import QStandardItemModel
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.StatusConsumer import StatusConsumer
-from nexus_constructor.CommandProducer import CommandProducer
+from nexus_constructor.kafka.status_consumer import StatusConsumer
+from nexus_constructor.kafka.command_producer import CommandProducer
 import time
 from nexus_constructor.json.filewriter_json_writer import generate_json
 import io
@@ -96,17 +96,17 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         if self.status_consumer is None:
             self.status_broker_led.turn_on(False)
         else:
-            connection_ok = self.status_consumer.isConnected()
+            connection_ok = self.status_consumer.connected
             self.status_broker_led.turn_on(connection_ok)
             if connection_ok:
-                current_writers = self.status_consumer.getFilewriters()
+                current_writers = self.status_consumer.file_writers
                 self._update_writer_list(current_writers)
-                self._update_files_list(self.status_consumer.getFiles())
+                self._update_files_list(self.status_consumer.files)
 
         if self.command_producer is None:
             self.command_broker_led.turn_on(False)
         else:
-            self.command_broker_led.turn_on(self.command_producer.isConnected())
+            self.command_broker_led.turn_on(self.command_producer.connected)
 
     def _text_changed_timer(self):
         result = BrokerAndTopicValidator.extract_addr_and_topic(
@@ -205,7 +205,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             )
             in_memory_file.seek(0)
             send_msg = in_memory_file.read()
-            self.command_producer.sendCommand(send_msg)
+            self.command_producer.send_command(send_msg)
             self.command_widget.ok_button.setEnabled(False)
 
     def file_list_clicked(self):
@@ -221,7 +221,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 cFile = self.known_files[fileKey]
                 if index.row() == cFile.row:
                     send_msg = f' "cmd": "FileWriter_stop", "job_id": "{cFile.job_id}", "service_id": "{cFile.writer_id}" '
-                    self.command_producer.sendCommand(
+                    self.command_producer.send_command(
                         f'{{"{send_msg}"}}'.encode("utf-8")
                     )
                     break

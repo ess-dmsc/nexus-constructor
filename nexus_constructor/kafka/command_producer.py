@@ -3,16 +3,16 @@ from kafka.errors import NoBrokersAvailable
 import threading
 import time
 from queue import Queue
-from copy import copy
+
+from nexus_constructor.kafka.kafka_interface import KafkaInterface
 
 
-class CommandProducer:
+class CommandProducer(KafkaInterface):
     def __init__(self, address, topic):
         self.address = address
         self.topic = topic
         self.run_thread = True
         self.connected = False
-        self.command_lock = threading.Lock()
         self.thread = threading.Thread(target=self.produce_thread)
         self.msg_queue = Queue()
         self.thread.start()
@@ -21,22 +21,8 @@ class CommandProducer:
         self.run_thread = False
         self.thread.join()
 
-    def hasUnsentMessages(self):
-        return not self.msg_queue.empty()
-
-    def isConnected(self):
-        self.command_lock.acquire()
-        return_status = copy(self.connected)
-        self.command_lock.release()
-        return return_status
-
-    def sendCommand(self, message):
+    def send_command(self, message):
         self.msg_queue.put(message, block=True)
-
-    def _setConnected(self, is_connected):
-        self.command_lock.acquire()
-        self.connected = is_connected
-        self.command_lock.release()
 
     def produce_thread(self):
         producer = None
@@ -56,7 +42,7 @@ class CommandProducer:
             time.sleep(0.5)
             if not self.run_thread:
                 return
-        self._setConnected(True)
+        self.connected = True
         while self.run_thread:
             if not self.msg_queue.empty():
                 send_msg = self.msg_queue.get(block=False)

@@ -5,17 +5,17 @@ import time
 from kafka.errors import NoBrokersAvailable
 import json
 
+from nexus_constructor.kafka.kafka_interface import KafkaInterface
 
-class StatusConsumer:
+
+class StatusConsumer(KafkaInterface):
     def __init__(self, broker, topic):
         self.broker = broker
         self.topic = topic
         self.connected = False
         self.filewriters = {}
         self.files = {}
-        self.status_lock = threading.Lock()
         self.run_thread = True
-
         self.thread = threading.Thread(target=self.status_thread)
         self.thread.start()
 
@@ -23,38 +23,31 @@ class StatusConsumer:
         self.run_thread = False
         self.thread.join()
 
-    def isConnected(self):
-        self.status_lock.acquire()
-        return_status = copy(self.connected)
-        self.status_lock.release()
-        return return_status
-
-    def getFilewriters(self):
-        self.status_lock.acquire()
+    @property
+    def file_writers(self):
+        self.lock.acquire()
         return_filewriters = copy(self.filewriters)
-        self.status_lock.release()
+        self.lock.release()
         return return_filewriters
 
-    def getFiles(self):
-        self.status_lock.acquire()
+    @file_writers.setter
+    def file_writers(self, updated_map):
+        self.lock.acquire()
+        self.filewriters = copy(updated_map)
+        self.lock.release()
+
+    @property
+    def files(self):
+        self.lock.acquire()
         return_files = copy(self.files)
-        self.status_lock.release()
+        self.lock.release()
         return return_files
 
-    def _setConnected(self, is_connected):
-        self.status_lock.acquire()
-        self.connected = is_connected
-        self.status_lock.release()
-
-    def _setFilewriters(self, updated_map):
-        self.status_lock.acquire()
-        self.filewriters = copy(updated_map)
-        self.status_lock.release()
-
-    def _setFiles(self, updated_map):
-        self.status_lock.acquire()
+    @files.setter
+    def files(self, updated_map):
+        self.lock.acquire()
         self.files = copy(updated_map)
-        self.status_lock.release()
+        self.lock.release()
 
     def status_thread(self):
         consumer = None
@@ -81,7 +74,7 @@ class StatusConsumer:
         topic = TopicPartition(self.topic, 0)
         consumer.assign([topic])
         consumer.seek_to_end(topic)
-        self._setConnected(True)
+        self.connected = True
         known_writers = {}
         known_files = {}
         while self.run_thread:
@@ -107,5 +100,5 @@ class StatusConsumer:
                                 }
                             known_files[file_name]["last_seen"] = msg.timestamp
             if had_updates:
-                self._setFilewriters(known_writers)
-                self._setFiles(known_files)
+                self.file_writers = known_writers
+                self.files = known_files
