@@ -32,5 +32,5 @@ if __name__ == "__main__":
     instrument = Instrument(nexus_wrapper, nx_component_classes)
     ui = MainWindow(instrument, nx_component_classes)
     ui.setupUi(window)
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec_())
