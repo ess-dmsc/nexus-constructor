@@ -16,6 +16,7 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     CommandDialogFileNameValidator,
     CommandDialogOKValidator,
+    BrokerAndTopicValidator,
 )
 import attr
 from PySide2.QtGui import QValidator
@@ -517,3 +518,23 @@ def test_GIVEN_valid_broker_and_filename_WHEN_validating_ok_button_for_command_d
     validator.set_filename_valid(file_valid)
 
     validator.is_valid.emit.assert_called_with(expected)
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        ("broker:9092/topic1", QValidator.Acceptable),
+        ("broker/topic", QValidator.Acceptable),
+        ("broker.io:9092/topic_1", QValidator.Acceptable),
+        ("broker:9092", QValidator.Intermediate),
+        ("b/t", QValidator.Acceptable),
+        ("broker", QValidator.Intermediate),
+        ("/topic", QValidator.Intermediate),
+    ],
+)
+def test_GIVEN_valid_broker_and_topic_WHEN_validating_broker_topic_edit_THEN_validator_emits_correctly(
+    test_input, expected
+):
+    validator = BrokerAndTopicValidator()
+    validator.is_valid = Mock()
+    assert validator.validate(test_input, 0) == expected
