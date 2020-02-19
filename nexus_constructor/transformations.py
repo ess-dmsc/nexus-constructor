@@ -46,10 +46,13 @@ class Transformation:
         Updates all of the dependent "depends_on" fields for this transformation.
         """
         for dependent in self.get_dependents():
-            del dependent.group[CommonAttrs.DEPENDS_ON]
-            dependent.group.create_dataset(
-                CommonAttrs.DEPENDS_ON, data=self._dataset.name
-            )
+            if isinstance(dependent, Transformation):
+                dependent.depends_on = self._dataset.name
+            else:
+                del dependent.group[CommonAttrs.DEPENDS_ON]
+                dependent.group.create_dataset(
+                    CommonAttrs.DEPENDS_ON, data=self._dataset.name
+                )
 
     @property
     def qmatrix(self) -> QMatrix4x4:
