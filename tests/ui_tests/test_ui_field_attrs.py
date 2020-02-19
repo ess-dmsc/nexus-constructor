@@ -37,7 +37,7 @@ def field_attributes_dialog(qtbot, template):
 def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_and_attrs_are_filled_in_correctly(
     qtbot, file, attr_val, field_attributes_dialog
 ):
-    attr_key = "units"
+    attr_key = "testattr"
 
     ds = file.create_dataset(name="test", data=123)
     ds.attrs[attr_key] = attr_val
@@ -46,6 +46,20 @@ def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_a
 
     assert len(field_attributes_dialog.get_attrs()) == 1
     assert field_attributes_dialog.get_attrs()[attr_key] == attr_val
+
+
+def test_GIVEN_existing_field_with_attr_which_is_in_blacklist_WHEN_editing_component_THEN_attr_is_not_filled_in(
+    qtbot, file, field_attributes_dialog
+):
+    attr_key = "units"
+    attr_val = "m"
+
+    ds = file.create_dataset(name="test", data=123)
+    ds.attrs[attr_key] = attr_val
+
+    field_attributes_dialog.fill_existing_attrs(ds)
+
+    assert len(field_attributes_dialog.get_attrs()) == 0
 
 
 def test_GIVEN_add_attribute_button_pressed_WHEN_changing_attributes_THEN_new_attribute_is_created(
@@ -141,7 +155,7 @@ def test_GIVEN_attribute_value_is_byte_string_WHEN_filling_existing_values_THEN_
     attribute_value_string = "yards"
 
     ds = file.create_dataset(name="test", data=123)
-    ds.attrs["units"] = attribute_value_string.encode("utf-8")
+    ds.attrs["testattr"] = attribute_value_string.encode("utf-8")
 
     field_attributes_dialog.fill_existing_attrs(ds)
     assert (
