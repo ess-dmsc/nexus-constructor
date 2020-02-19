@@ -151,7 +151,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                     self.model.index(number_of_filewriter_rows, 1), time_str
                 )
             cFilewriter = self.known_writers[key]
-            if current_time != self.known_writers[key].last_time:
+            if current_time != cFilewriter.last_time:
                 self.model.setData(self.model.index(cFilewriter.row, 1), time_str)
                 cFilewriter.last_time = current_time
 
@@ -180,7 +180,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                     new_file.writer_id,
                 )
             cFile = self.known_files[key]
-            if current_time != self.known_files[key].last_time:
+            if current_time != cFile.last_time:
                 self.file_list_model.setData(
                     self.file_list_model.index(cFile.row, 1), time_str
                 )
@@ -222,18 +222,13 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.stop_file_writing_button.setEnabled(False)
 
     def stop_file_writing_clicked(self):
-        stop_message_template = (
-            """ "cmd": "FileWriter_stop", "job_id": "{}", "service_id": "{}" """
-        )
         selected_files = self.files_list.selectedIndexes()
         for index in selected_files:
             for fileKey in self.known_files:
                 cFile = self.known_files[fileKey]
                 if index.row() == cFile.row:
-                    send_msg = stop_message_template.format(
-                        cFile.job_id, cFile.writer_id
-                    )
+                    send_msg = f' "cmd": "FileWriter_stop", "job_id": "{cFile.job_id}", "service_id": "{cFile.writer_id}" '
                     self.command_producer.sendCommand(
-                        ("{" + send_msg + "}").encode("utf-8")
+                        f'{{"{send_msg}"}}'.encode("utf-8")
                     )
                     break
