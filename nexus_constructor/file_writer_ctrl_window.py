@@ -1,12 +1,12 @@
 from functools import partial
-from typing import Callable, Dict
+from typing import Callable, Dict, Union
 
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.led import Led
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
 from PySide2.QtWidgets import QMainWindow, QLineEdit
-from PySide2.QtCore import QTimer, QAbstractItemModel, QModelIndex
+from PySide2.QtCore import QTimer, QAbstractItemModel
 from PySide2.QtGui import QStandardItemModel
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
@@ -186,7 +186,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     @staticmethod
     def _set_time(
         model: QAbstractItemModel,
-        current_index: QModelIndex,
+        current_index: Union[File, FileWriter],
         current_time: str,
         time_str: str,
     ):
