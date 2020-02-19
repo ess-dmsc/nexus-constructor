@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QPushButton, QDesktopWidget
+from PySide2.QtWidgets import QPushButton, QApplication
 from PySide2.QtCore import QSize
 import numpy as np
 
@@ -43,7 +43,7 @@ class Led(QPushButton):
         self.set_status(False)
 
     def sizeHint(self):
-        screenSize = QDesktopWidget().screenGeometry(-1)
+        screenSize = QApplication.primaryScreen().geometry()
         base_w = 20
         base_h = 20
         width = int(base_w * screenSize.height() / 1080)
