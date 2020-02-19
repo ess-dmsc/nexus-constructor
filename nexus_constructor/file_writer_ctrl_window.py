@@ -50,7 +50,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.status_broker_led,
             self.status_broker_edit,
             self.status_broker_change_timer,
-            self._text_changed_timer,
+            self.status_broker_changed_timer,
         )
         self.status_consumer = None
 
@@ -111,7 +111,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         else:
             self.command_broker_led.turn_on(self.command_producer.connected)
 
-    def _text_changed_timer(self):
+    def status_broker_changed_timer(self):
         result = BrokerAndTopicValidator.extract_addr_and_topic(
             self.status_broker_edit.text()
         )
