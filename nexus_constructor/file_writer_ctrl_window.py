@@ -42,10 +42,30 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
 
     def setupUi(self):
         super().setupUi(self)
-        self._set_up_status_broker_fields()
-        self._set_up_command_broker_fields()
-        self.command_widget.ok_button.clicked.connect(self.send_command)
 
+        self.status_broker_led = Led(self)
+        self.status_topic_layout.addWidget(self.status_broker_led)
+        self.status_broker_change_timer = QTimer()
+        self._set_up_broker_fields(
+            self.status_broker_led,
+            self.status_broker_edit,
+            self.status_broker_change_timer,
+            self._text_changed_timer,
+        )
+        self.status_consumer = None
+
+        self.command_broker_led = Led(self)
+        self.command_broker_layout.addWidget(self.command_broker_led)
+        self.command_broker_change_timer = QTimer()
+        self._set_up_broker_fields(
+            self.command_broker_led,
+            self.command_broker_edit,
+            self.command_broker_change_timer,
+            self.command_broker_timer_changed,
+        )
+        self.command_producer = None
+
+        self.command_widget.ok_button.clicked.connect(self.send_command)
         self.update_status_timer = QTimer()
         self.update_status_timer.timeout.connect(self._check_connection_status)
         self.update_status_timer.start(500)
@@ -65,41 +85,14 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.file_list_model.setHeaderData(2, QtCore.Qt.Horizontal, "File writer")
         self.files_list.setModel(self.file_list_model)
 
-    def _set_up_status_broker_fields(self):
-        self.status_broker_led = Led(self)
-        self.status_topic_layout.addWidget(self.status_broker_led)
-        self.status_broker_led.turn_on(False)
-        status_validator = BrokerAndTopicValidator()
-        self.status_broker_edit.setValidator(status_validator)
-        status_validator.is_valid.connect(
-            partial(validate_line_edit, self.status_broker_edit)
-        )
-        self.status_broker_edit.textChanged.connect(
-            lambda: self.status_broker_change_timer.start(1000)
-        )
-        self.status_broker_change_timer = QTimer()
-        self.status_broker_change_timer.setSingleShot(True)
-        self.status_broker_change_timer.timeout.connect(self._text_changed_timer)
-        self.status_consumer = None
-
-    def _set_up_command_broker_fields(self):
-        self.command_broker_led = Led(self)
-        self.command_broker_layout.addWidget(self.command_broker_led)
-        self.command_broker_led.turn_on(False)
-        command_validator = BrokerAndTopicValidator()
-        self.command_broker_edit.setValidator(command_validator)
-        command_validator.is_valid.connect(
-            partial(validate_line_edit, self.command_broker_edit)
-        )
-        self.command_broker_edit.textChanged.connect(
-            lambda: self.command_broker_change_timer.start(1000)
-        )
-        self.command_broker_change_timer = QTimer()
-        self.command_broker_change_timer.setSingleShot(True)
-        self.command_broker_change_timer.timeout.connect(
-            self.command_broker_timer_changed
-        )
-        self.command_producer = None
+    def _set_up_broker_fields(self, led, edit, timer, timer_callback):
+        led.turn_off()
+        validator = BrokerAndTopicValidator()
+        edit.setValidator(validator)
+        validator.is_valid.connect(partial(validate_line_edit, edit))
+        edit.textChanged.connect(lambda: timer.start(1000))
+        timer.setSingleShot(True)
+        timer.timeout.connect(timer_callback)
 
     def _check_connection_status(self):
         if self.status_consumer is None:
