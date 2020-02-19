@@ -96,7 +96,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
 
     def _check_connection_status(self):
         if self.status_consumer is None:
-            self.status_broker_led.turn_on(False)
+            self.status_broker_led.turn_off()
         else:
             connection_ok = self.status_consumer.connected
             self.status_broker_led.turn_on(connection_ok)
@@ -106,7 +106,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 self._update_files_list(self.status_consumer.files)
 
         if self.command_producer is None:
-            self.command_broker_led.turn_on(False)
+            self.command_broker_led.turn_off()
         else:
             self.command_broker_led.turn_on(self.command_producer.connected)
 
