@@ -440,41 +440,12 @@ def test_can_add_mesh_shape_to_and_component_and_get_the_same_shape_back(nexus_w
     assert output_mesh.vertices[2].z() == approx(vertex_2_z)
 
 
-def test_can_get_cad_file_units_from_file(nexus_wrapper):
+def test_can_get_cad_file_units_from_model_when_already_in_model(nexus_wrapper):
     component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
-
-    vertex_2_x = 0.5
-    vertex_2_y = -0.5
-    vertex_2_z = 0
     vertices = [
         QVector3D(-0.5, -0.5, 0),
         QVector3D(0, 0.5, 0),
-        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
-    ]
-    triangle = [0, 1, 2]
-    faces = [triangle]
-    input_mesh = OFFGeometryNoNexus(vertices, faces)
-    component.set_off_shape(input_mesh)
-
-    output_mesh, _ = component.shape
-    units = "m"
-    output_mesh.units = units
-
-    assert isinstance(output_mesh, OFFGeometryNexus)
-    assert output_mesh.units == units
-    assert output_mesh.group["cad_file_units"][()] == units
-
-
-def test_can_get_cad_file_units_from_file_when_already_in_file(nexus_wrapper):
-    component = add_component_to_file(nexus_wrapper, "some_field", 42, "component_name")
-
-    vertex_2_x = 0.5
-    vertex_2_y = -0.5
-    vertex_2_z = 0
-    vertices = [
-        QVector3D(-0.5, -0.5, 0),
-        QVector3D(0, 0.5, 0),
-        QVector3D(vertex_2_x, vertex_2_y, vertex_2_z),
+        QVector3D(0.5, -0.05, 0),
     ]
     triangle = [0, 1, 2]
     faces = [triangle]
