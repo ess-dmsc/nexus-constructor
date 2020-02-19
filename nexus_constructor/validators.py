@@ -456,12 +456,18 @@ class BrokerAndTopicValidator(QValidator):
     def __init__(self):
         super().__init__()
 
-    def validate(self, input: str, pos: int) -> QValidator.State:
+    @staticmethod
+    def extract_addr_and_topic(in_string):
         correct_string_re = re.compile(
-            """(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"""
+            "(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"
         )  # noqa: W605
+        match_res = re.match(correct_string_re, in_string)
+        if match_res is not None:
+            return match_res.group(2), match_res.group(7)
+        return None
 
-        if re.match(correct_string_re, input) is not None:
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if self.extract_addr_and_topic(input) is not None:
             self.is_valid.emit(True)
             return QValidator.Acceptable
         self.is_valid.emit(False)

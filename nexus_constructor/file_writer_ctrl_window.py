@@ -9,22 +9,11 @@ from PySide2.QtCore import QTimer
 from PySide2.QtGui import QStandardItemModel
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
-import re
 from nexus_constructor.StatusConsumer import StatusConsumer
 from nexus_constructor.CommandProducer import CommandProducer
 import time
 from nexus_constructor.json.filewriter_json_writer import generate_json
 import io
-
-
-def extract_addr_and_topic(in_string):
-    correct_string_re = re.compile(
-        "(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"
-    )  # noqa: W605
-    match_res = re.match(correct_string_re, in_string)
-    if match_res is not None:
-        return match_res.group(2), match_res.group(7)
-    return None
 
 
 class FileWriter:
@@ -120,14 +109,18 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.command_broker_led.turn_on(self.command_producer.isConnected())
 
     def _text_changed_timer(self):
-        result = extract_addr_and_topic(self.status_broker_edit.text())
+        result = BrokerAndTopicValidator.extract_addr_and_topic(
+            self.status_broker_edit.text()
+        )
         if result is not None:
             if self.status_consumer is not None:
                 self.status_consumer.__del__()
             self.status_consumer = StatusConsumer(*result)
 
     def command_broker_timer_changed(self):
-        result = extract_addr_and_topic(self.command_broker_edit.text())
+        result = BrokerAndTopicValidator.extract_addr_and_topic(
+            self.command_broker_edit.text()
+        )
         if result is not None:
             self.command_broker_edit.setPlaceholderText(result[0])
             if self.command_producer is not None:
