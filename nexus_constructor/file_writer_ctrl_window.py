@@ -1,11 +1,12 @@
 from functools import partial
+from typing import Callable, Dict
 
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.led import Led
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
-from PySide2.QtWidgets import QMainWindow
-from PySide2.QtCore import QTimer
+from PySide2.QtWidgets import QMainWindow, QLineEdit
+from PySide2.QtCore import QTimer, QAbstractItemModel, QModelIndex
 from PySide2.QtGui import QStandardItemModel
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
@@ -86,7 +87,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.files_list.setModel(self.file_list_model)
 
     @staticmethod
-    def _set_up_broker_fields(led, edit, timer, timer_callback):
+    def _set_up_broker_fields(
+        led: Led, edit: QLineEdit, timer: QTimer, timer_callback: Callable
+    ):
         led.turn_off()
         validator = BrokerAndTopicValidator()
         edit.setValidator(validator)
@@ -132,7 +135,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         else:
             self.command_broker_edit.setPlaceholderText("address:port")
 
-    def _update_writer_list(self, updated_list):
+    def _update_writer_list(self, updated_list: Dict[str, Dict]):
         for key in updated_list:
             current_time = updated_list[key]["last_seen"]
             time_struct = time.localtime(current_time / 1000)
@@ -150,7 +153,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             if current_time != current_file_writer.last_time:
                 self._set_time(self.model, current_file_writer, current_time, time_str)
 
-    def _update_files_list(self, updated_list):
+    def _update_files_list(self, updated_list: Dict[str, Dict]):
         for key in updated_list:
             current_time = updated_list[key]["last_seen"]
             time_struct = time.localtime(current_time / 1000)
@@ -181,7 +184,12 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 )
 
     @staticmethod
-    def _set_time(model, current_index, current_time, time_str):
+    def _set_time(
+        model: QAbstractItemModel,
+        current_index: QModelIndex,
+        current_time: str,
+        time_str: str,
+    ):
         model.setData(model.index(current_index.row, 1), time_str)
         current_index.last_time = current_time
 
