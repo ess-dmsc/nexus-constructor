@@ -7,7 +7,7 @@ import h5py
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
-from typing import TypeVar
+from typing import TypeVar, Union, List
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 from nexus_constructor.transformation_types import TransformationType
@@ -46,13 +46,7 @@ class Transformation:
         Updates all of the dependent "depends_on" fields for this transformation.
         """
         for dependent in self.get_dependents():
-            if isinstance(dependent, Transformation):
-                dependent.depends_on = self._dataset.name
-            else:
-                del dependent.group[CommonAttrs.DEPENDS_ON]
-                dependent.group.create_dataset(
-                    CommonAttrs.DEPENDS_ON, data=self._dataset.name
-                )
+            dependent.depends_on = self._dataset.name
 
     @property
     def qmatrix(self) -> QMatrix4x4:
@@ -257,7 +251,7 @@ class Transformation:
                     f"Unable to de-register dependent {former_dependent.absolute_path} from {self.absolute_path} due to it not being registered."
                 )
 
-    def get_dependents(self):
+    def get_dependents(self) -> List[Union["Component", "Transformation"]]:
         import nexus_constructor.component.component as comp
 
         return_dependents = []
