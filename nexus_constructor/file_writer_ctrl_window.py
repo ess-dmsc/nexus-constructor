@@ -208,7 +208,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 start_time=start_time,
                 stop_time=stop_time,
                 service_id=None,
-                use_swmr=self.useSWMRCheckBox.isChecked(),
+                use_swmr=use_swmr,
             )
             in_memory_file.seek(0)
             send_msg = in_memory_file.read()
