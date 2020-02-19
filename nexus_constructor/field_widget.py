@@ -29,6 +29,7 @@ from nexus_constructor.validators import (
     DATASET_TYPE,
     NameValidator,
     HDFLocationExistsValidator,
+    UnitValidator,
 )
 
 
@@ -94,6 +95,12 @@ class FieldWidget(QFrame):
             self.name = str(uuid.uuid4())
 
         self.units_line_edit = QLineEdit()
+        self.unit_validator = UnitValidator()
+        self.units_line_edit.setValidator(self.unit_validator)
+
+        self.unit_validator.is_valid.connect(
+            partial(validate_line_edit, self.units_line_edit)
+        )
         self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
 
         self.streams_widget = StreamFieldsWidget(self.edit_dialog)
