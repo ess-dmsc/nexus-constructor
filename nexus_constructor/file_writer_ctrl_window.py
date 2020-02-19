@@ -207,7 +207,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 broker=broker,
                 start_time=start_time,
                 stop_time=stop_time,
-                service_id=None,
+                service_id=service_id,
                 use_swmr=use_swmr,
             )
             in_memory_file.seek(0)
