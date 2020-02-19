@@ -137,9 +137,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
 
     def _update_writer_list(self, updated_list: Dict[str, Dict]):
         for key in updated_list:
-            current_time = updated_list[key]["last_seen"]
-            time_struct = time.localtime(current_time / 1000)
-            time_str = time.strftime("%Y-%m-%d %H:%M:%S%Z", time_struct)
+            current_time, time_str = self.get_time(key, updated_list)
             if key not in self.known_writers:
                 number_of_filewriter_rows = self.model.rowCount(QtCore.QModelIndex())
                 new_file_writer = FileWriter(key, number_of_filewriter_rows)
@@ -155,9 +153,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
 
     def _update_files_list(self, updated_list: Dict[str, Dict]):
         for key in updated_list:
-            current_time = updated_list[key]["last_seen"]
-            time_struct = time.localtime(current_time / 1000)
-            time_str = time.strftime("%Y-%m-%d %H:%M:%S%Z", time_struct)
+            current_time, time_str = self.get_time(key, updated_list)
             if key not in self.known_files:
                 number_of_file_rows = self.file_list_model.rowCount(
                     QtCore.QModelIndex()
@@ -182,6 +178,13 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 self._set_time(
                     self.file_list_model, current_file, current_time, time_str
                 )
+
+    @staticmethod
+    def get_time(key, updated_list):
+        current_time = updated_list[key]["last_seen"]
+        time_struct = time.localtime(current_time / 1000)
+        time_str = time.strftime("%Y-%m-%d %H:%M:%S%Z", time_struct)
+        return current_time, time_str
 
     @staticmethod
     def _set_time(
