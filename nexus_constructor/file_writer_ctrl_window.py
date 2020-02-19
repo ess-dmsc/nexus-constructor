@@ -100,7 +100,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.status_broker_led.turn_off()
         else:
             connection_ok = self.status_consumer.connected
-            self.status_broker_led.turn_on(connection_ok)
+            self.status_broker_led.set_status(connection_ok)
             if connection_ok:
                 current_writers = self.status_consumer.file_writers
                 self._update_writer_list(current_writers)
@@ -109,7 +109,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         if self.command_producer is None:
             self.command_broker_led.turn_off()
         else:
-            self.command_broker_led.turn_on(self.command_producer.connected)
+            self.command_broker_led.set_status(self.command_producer.connected)
 
     def status_broker_changed_timer(self):
         result = BrokerAndTopicValidator.extract_addr_and_topic(
@@ -117,7 +117,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         )
         if result is not None:
             if self.status_consumer is not None:
-                self.status_consumer.__del__()
+                del self.status_consumer
             self.status_consumer = StatusConsumer(*result)
 
     def command_broker_timer_changed(self):
