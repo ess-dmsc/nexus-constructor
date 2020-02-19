@@ -85,7 +85,8 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.file_list_model.setHeaderData(2, QtCore.Qt.Horizontal, "File writer")
         self.files_list.setModel(self.file_list_model)
 
-    def _set_up_broker_fields(self, led, edit, timer, timer_callback):
+    @staticmethod
+    def _set_up_broker_fields(led, edit, timer, timer_callback):
         led.turn_off()
         validator = BrokerAndTopicValidator()
         edit.setValidator(validator)
@@ -145,10 +146,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 self.model.setData(
                     self.model.index(number_of_filewriter_rows, 1), time_str
                 )
-            cFilewriter = self.known_writers[key]
-            if current_time != cFilewriter.last_time:
-                self.model.setData(self.model.index(cFilewriter.row, 1), time_str)
-                cFilewriter.last_time = current_time
+            current_file_writer = self.known_writers[key]
+            if current_time != current_file_writer.last_time:
+                self._set_time(self.model, current_file_writer, current_time, time_str)
 
     def _update_files_list(self, updated_list):
         for key in updated_list:
@@ -174,17 +174,19 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                     self.file_list_model.index(number_of_file_rows, 2),
                     new_file.writer_id,
                 )
-            cFile = self.known_files[key]
-            if current_time != cFile.last_time:
-                self.file_list_model.setData(
-                    self.file_list_model.index(cFile.row, 1), time_str
+            current_file = self.known_files[key]
+            if current_time != current_file.last_time:
+                self._set_time(
+                    self.file_list_model, current_file, current_time, time_str
                 )
-                cFile.last_time = current_time
+
+    @staticmethod
+    def _set_time(model, current_index, current_time, time_str):
+        model.setData(model.index(current_index.row, 1), time_str)
+        current_index.last_time = current_time
 
     def send_command(self):
         if self.command_producer is not None:
-            in_memory_file = io.StringIO()
-
             (
                 nexus_file_name,
                 broker,
@@ -194,7 +196,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 abort_on_uninitialised_stream,
                 use_swmr,
             ) = self.command_widget.get_arguments()
-
+            in_memory_file = io.StringIO()
             generate_json(
                 data=self.instrument,
                 file=in_memory_file,
@@ -206,8 +208,8 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 use_swmr=use_swmr,
             )
             in_memory_file.seek(0)
-            send_msg = in_memory_file.read()
-            self.command_producer.send_command(send_msg)
+            msg_to_send = in_memory_file.read()
+            self.command_producer.send_command(msg_to_send)
             self.command_widget.ok_button.setEnabled(False)
 
     def file_list_clicked(self):
@@ -220,9 +222,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         selected_files = self.files_list.selectedIndexes()
         for index in selected_files:
             for fileKey in self.known_files:
-                cFile = self.known_files[fileKey]
-                if index.row() == cFile.row:
-                    send_msg = f' "cmd": "FileWriter_stop", "job_id": "{cFile.job_id}", "service_id": "{cFile.writer_id}" '
+                current_file = self.known_files[fileKey]
+                if index.row() == current_file.row:
+                    send_msg = f' "cmd": "FileWriter_stop", "job_id": "{current_file.job_id}", "service_id": "{current_file.writer_id}" '
                     self.command_producer.send_command(
                         f'{{"{send_msg}"}}'.encode("utf-8")
                     )
