@@ -16,8 +16,11 @@ from PySide2.QtWidgets import (
 import numpy as np
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import DATASET_TYPE, FieldValueValidator
+
+ATTRS_BLACKLIST = [CommonAttrs.UNITS]
 
 
 class FieldAttrsDialog(QDialog):
@@ -39,8 +42,9 @@ class FieldAttrsDialog(QDialog):
 
     def fill_existing_attrs(self, existing_dataset: h5py.Dataset):
         for name, value in existing_dataset.attrs.items():
-            frame = FieldAttrFrame(name, value)
-            self._add_attr(existing_frame=frame)
+            if name not in ATTRS_BLACKLIST:
+                frame = FieldAttrFrame(name, value)
+                self._add_attr(existing_frame=frame)
 
     def __add_attr(self):
         """

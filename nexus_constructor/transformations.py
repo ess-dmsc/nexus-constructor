@@ -93,6 +93,14 @@ class Transformation:
         )
 
     @property
+    def units(self):
+        self.file.get_attribute_value(self._dataset, CommonAttrs.UNITS)
+
+    @units.setter
+    def units(self, new_units):
+        self.file.set_attribute_value(self._dataset, CommonAttrs.UNITS, new_units)
+
+    @property
     def vector(self):
         """
         Returns rotation axis or translation direction as a QVector3D

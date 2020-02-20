@@ -4,6 +4,7 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
@@ -225,6 +226,25 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nameLineEdit.setText(self.component_to_edit.name)
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
+        self.__fill_existing_shape_info()
+        self.__fill_existing_fields()
+
+    def __fill_existing_fields(self):
+        items_and_update_methods = get_fields_and_update_functions_for_component(
+            self.component_to_edit
+        )
+        for field, update_method in items_and_update_methods.items():
+            if update_method is not None:
+                new_ui_field = self.create_new_ui_field(field)
+                update_method(field, new_ui_field)
+                new_ui_field.units = (
+                    field.attrs[CommonAttrs.UNITS]
+                    if CommonAttrs.UNITS in field.attrs
+                    else ""
+                )
+                new_ui_field.attrs = field
+
+    def __fill_existing_shape_info(self):
         component_shape, _ = self.component_to_edit.shape
         if not component_shape or isinstance(component_shape, NoShapeGeometry):
             self.noShapeRadioButton.setChecked(True)
@@ -246,19 +266,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
 
-        items_and_update_methods = get_fields_and_update_functions_for_component(
-            self.component_to_edit
-        )
-
-        for field, update_method in items_and_update_methods.items():
-            if update_method is not None:
-                new_ui_field = self.create_new_ui_field(field)
-                update_method(field, new_ui_field)
-                new_ui_field.attrs = field
-
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
-        new_ui_field.name = field.name.split("/")[-1]
+        new_ui_field.name = get_name_of_node(field)
         return new_ui_field
 
     def add_field(self) -> FieldWidget:

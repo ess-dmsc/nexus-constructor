@@ -30,6 +30,7 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
         item, update_function = find_field_type(self.transformation.dataset)
         update_function(item, self.transformation_frame.magnitude_widget)
+        self.transformation_frame.magnitude_widget.units = self.transformation.units
         self.transformation_frame.value_spinbox.setValue(self.transformation.ui_value)
 
     def disable(self):
@@ -54,6 +55,7 @@ class EditTransformation(QGroupBox):
         self.transformation.vector = QVector3D(
             *[spinbox.value() for spinbox in self.transformation_frame.spinboxes[:-1]]
         )
+        self.transformation.units = self.transformation_frame.magnitude_widget.units
         self.instrument.nexus.transformation_changed.emit()
 
 
