@@ -177,6 +177,9 @@ def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_TH
 
 
 class DummyInterface(KafkaInterface):
+    thread = None
+    lock = None
+
     def thread_target(self):
         pass
 
