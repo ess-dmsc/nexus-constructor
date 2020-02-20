@@ -156,6 +156,7 @@ class DummyInterface:
         self.topic = topic
 
 
+@pytest.mark.skip(reason="qtbot interferes with other tests")
 def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THEN_nothing_happens(
     qtbot, instrument
 ):
@@ -168,6 +169,7 @@ def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THE
     assert window.status_consumer is None
 
 
+@pytest.mark.skip(reason="qtbot interferes with other tests")
 def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_THEN_nothing_happens(
     qtbot, instrument
 ):
@@ -180,6 +182,7 @@ def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_TH
     assert window.command_producer is None
 
 
+@pytest.mark.skip(reason="qtbot interferes with other tests")
 def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN_producer_is_created(
     qtbot, instrument
 ):
@@ -195,6 +198,7 @@ def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN
     assert isinstance(window.command_producer, DummyInterface)
 
 
+@pytest.mark.skip(reason="qtbot interferes with other tests")
 def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_consumer_is_created(
     qtbot, instrument
 ):
