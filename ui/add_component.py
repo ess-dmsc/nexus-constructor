@@ -1,20 +1,11 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'add_component.ui',
-# licensing of 'add_component.ui' applies.
-#
-# Created: Mon Sep 30 11:55:40 2019
-#      by: pyside2-uic  running on PySide2 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
-
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
+from PySide2.QtWebEngineWidgets import QWebEngineView
 
 
 class Ui_AddComponentDialog(object):
     def setupUi(self, AddComponentDialog):
         AddComponentDialog.setObjectName("AddComponentDialog")
-        AddComponentDialog.resize(1177, 919)
+        AddComponentDialog.resize(1600, 900)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
@@ -338,6 +329,3 @@ class Ui_AddComponentDialog(object):
                 "AddComponentDialog", "Remove field", None, -1
             )
         )
-
-
-from PySide2.QtWebEngineWidgets import QWebEngineView

@@ -17,6 +17,7 @@ from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from typing import List, Union
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
@@ -28,6 +29,7 @@ from nexus_constructor.validators import (
     DATASET_TYPE,
     NameValidator,
     HDFLocationExistsValidator,
+    UnitValidator,
 )
 
 
@@ -74,7 +76,7 @@ class FieldWidget(QFrame):
         self,
         possible_field_names=None,
         parent: QListWidget = None,
-        instrument=None,
+        instrument: "Instrument" = None,  # noqa: F821
         hide_name_field: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
@@ -92,6 +94,15 @@ class FieldWidget(QFrame):
         if hide_name_field:
             self.name = str(uuid.uuid4())
 
+        self.units_line_edit = QLineEdit()
+        self.unit_validator = UnitValidator()
+        self.units_line_edit.setValidator(self.unit_validator)
+
+        self.unit_validator.is_valid.connect(
+            partial(validate_line_edit, self.units_line_edit)
+        )
+        self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
+
         self.streams_widget = StreamFieldsWidget(self.edit_dialog)
 
         self.field_type_combo = QComboBox()
@@ -107,6 +118,7 @@ class FieldWidget(QFrame):
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit = QLineEdit()
+        self.value_line_edit.setPlaceholderText("value")
 
         self._set_up_value_validator(False)
         self.dataset_type_changed(0)
@@ -131,6 +143,7 @@ class FieldWidget(QFrame):
         self.layout.addWidget(self.nx_class_combo)
         self.layout.addWidget(self.edit_button)
         self.layout.addWidget(self.value_type_combo)
+        self.layout.addWidget(self.units_line_edit)
         self.layout.addWidget(self.attrs_button)
 
         self.layout.setAlignment(Qt.AlignLeft)
@@ -247,7 +260,13 @@ class FieldWidget(QFrame):
             logging.error(f"unknown field type: {self.name}")
         if self.field_type != FieldType.link:
             for attr_name, attr_value in self.attrs_dialog.get_attrs().items():
-                return_object.attrs[attr_name] = attr_value
+                self.instrument.nexus.set_attribute_value(
+                    return_object, attr_name, attr_value
+                )
+            if self.units and self.units is not None:
+                self.instrument.nexus.set_attribute_value(
+                    return_object, CommonAttrs.UNITS, self.units
+                )
         return return_object
 
     @value.setter
@@ -258,6 +277,14 @@ class FieldWidget(QFrame):
             self.table_view.model.array = value
         elif self.field_type == FieldType.link:
             self.value_line_edit.setText(value)
+
+    @property
+    def units(self):
+        return self.units_line_edit.text()
+
+    @units.setter
+    def units(self, new_units):
+        self.units_line_edit.setText(new_units)
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
