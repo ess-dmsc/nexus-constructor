@@ -10,7 +10,6 @@ def test_UI_GIVEN_nothing_WHEN_creating_filewriter_control_window_THEN_broker_fi
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
-
     qtbot.addWidget(window)
 
     assert not window.command_broker_edit.text()
@@ -26,7 +25,6 @@ def test_UI_GIVEN_nothing_WHEN_creating_filewriter_control_window_THEN_broker_va
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
-
     qtbot.addWidget(window)
 
     assert isinstance(window.status_broker_edit.validator(), BrokerAndTopicValidator)
@@ -39,8 +37,11 @@ def test_UI_GIVEN_nothing_WHEN_creating_filewriter_control_window_THEN_broker_va
 @pytest.mark.parametrize(
     "test_input", [FileWriter("test", 0), File("test", 0, "123", "321")]
 )
-def test_UI_GIVEN_time_string_WHEN_setting_time_THEN_last_time_is_stored(test_input):
+def test_UI_GIVEN_time_string_WHEN_setting_time_THEN_last_time_is_stored(
+    test_input, qtbot
+):
     model = QStandardItemModel()
+    qtbot.addWidget(model)
     current_time = "12345678"
     new_time = "23456789"
     FileWriterCtrl._set_time(model, test_input, current_time, new_time)
@@ -111,9 +112,9 @@ def test_UI_GIVEN_no_status_consumer_and_no_command_producer_WHEN_checking_statu
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
     window.status_consumer = None
     window.command_producer = None
-    qtbot.addWidget(window)
 
     window._check_connection_status()
 
@@ -125,12 +126,12 @@ def test_UI_GIVEN_status_consumer_but_no_command_producer_WHEN_checking_status_c
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
     window.command_producer = None
     window.status_consumer = Mock()
     window.status_consumer.connected = True
     window.status_consumer.files = []
     window.status_consumer.file_writers = []
-    qtbot.addWidget(window)
 
     window._check_connection_status()
     assert window.status_broker_led.is_on()
@@ -140,13 +141,19 @@ def test_UI_GIVEN_command_producer_WHEN_checking_connection_status_THEN_command_
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
     window.command_producer = Mock()
     window.status_consumer = None
     window.command_producer.connected = True
-    qtbot.addWidget(window)
 
     window._check_connection_status()
     assert window.command_broker_led.is_on()
+
+
+class DummyInterface:
+    def __init__(self, address, topic):
+        self.address = address
+        self.topic = topic
 
 
 def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THEN_nothing_happens(
@@ -157,8 +164,7 @@ def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THE
     window.status_consumer = None
     window.status_broker_edit.setText("invalid")
 
-    window.status_broker_changed_timer(tuple)
-
+    window.status_broker_changed_timer(DummyInterface)
     assert window.status_consumer is None
 
 
@@ -166,32 +172,26 @@ def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_TH
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
     window.command_producer = None
     window.command_broker_edit.setText("invalid")
-    qtbot.addWidget(window)
 
-    window.command_broker_timer_changed(tuple)
-
+    window.command_broker_timer_changed(DummyInterface)
     assert window.command_producer is None
-
-
-class DummyInterface:
-    def __init__(self, address, topic):
-        self.address = address
-        self.topic = topic
 
 
 def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN_producer_is_created(
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
+    window.command_broker_change_timer.stop()
+    window.status_broker_change_timer.stop()
+
     window.command_producer = 1  # anything that's not None
     window.command_broker_edit.setText("valid:9092/topic1")
-    qtbot.addWidget(window)
-    qtbot.addWidget(window.command_broker_edit)
 
     window.command_broker_timer_changed(DummyInterface)
-
     assert isinstance(window.command_producer, DummyInterface)
 
 
@@ -199,10 +199,12 @@ def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
+    window.command_broker_change_timer.stop()
+    window.status_broker_change_timer.stop()
+
     window.status_consumer = 1  # anything that's not None
     window.status_broker_edit.setText("valid:9092/topic1")
-    qtbot.addWidget(window)
 
     window.status_broker_changed_timer(DummyInterface)
-
     assert isinstance(window.status_consumer, DummyInterface)
