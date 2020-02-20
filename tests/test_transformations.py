@@ -82,7 +82,7 @@ def test_transform_dependents_depends_on_are_updated_when_transformation_name_is
     transform.name = new_name
 
     assert transform.name == new_name
-    assert component["depends_on"][()] == transform.dataset.name
+    assert str(component["depends_on"][()], encoding="UTF-8") == transform.dataset.name
 
 
 @pytest.mark.parametrize("test_input", ["translation", "Translation", "TRANSLATION"])

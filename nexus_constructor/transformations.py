@@ -189,14 +189,17 @@ class Transformation:
         Note, until Python 4.0 (or 3.7 with from __future__ import annotations) have
         to use string for depends_on type here, because the current class is not defined yet
         """
-        # existing_depends_on = self.file.get_attribute_value(
-        #     self._dataset, CommonAttrs.DEPENDS_ON
-        # )
-        # if existing_depends_on is not None:
-        #     Transformation(
-        #         self.file, self.file.nexus_file[existing_depends_on]
-        #     ).deregister_dependent(self)
-        # TODO: investigate whether this fixes the issue
+        existing_depends_on = self.file.get_attribute_value(
+            self._dataset, CommonAttrs.DEPENDS_ON
+        )
+
+        if (
+            existing_depends_on is not None
+            and existing_depends_on in self.file.nexus_file
+        ):
+            Transformation(
+                self.file, self.file.nexus_file[existing_depends_on]
+            ).deregister_dependent(self)
 
         if depends_on is None:
             self.file.set_attribute_value(self._dataset, CommonAttrs.DEPENDS_ON, ".")
