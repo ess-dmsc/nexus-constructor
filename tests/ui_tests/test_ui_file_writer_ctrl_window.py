@@ -1,6 +1,7 @@
+import json
 import pytest
 from PySide2.QtGui import QStandardItemModel
-
+from mock import Mock
 from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl, File, FileWriter
 from nexus_constructor.validators import BrokerAndTopicValidator
 
@@ -58,7 +59,7 @@ def test_UI_GIVEN_no_files_WHEN_stop_file_writing_is_clicked_THEN_button_is_disa
     assert not window.stop_file_writing_button.isEnabled()
 
 
-def UI_GIVEN_files_WHEN_stop_file_writing_is_clicked_THEN_button_is_enabled(
+def test_UI_GIVEN_files_WHEN_stop_file_writing_is_clicked_THEN_button_is_enabled(
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
@@ -72,3 +73,77 @@ def UI_GIVEN_files_WHEN_stop_file_writing_is_clicked_THEN_button_is_enabled(
     window.file_list_clicked()
 
     assert window.stop_file_writing_button.isEnabled()
+
+
+def test_UI_GIVEN_valid_command_WHEN_sending_command_THEN_command_producer_sends_command(
+    qtbot, instrument
+):
+
+    window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
+    window.command_producer = Mock()
+
+    broker = "broker1:9092/topic1"
+    service_id = "12345678"
+
+    window.command_widget.broker_line_edit.setText(broker)
+    window.command_widget.start_time_enabled.setChecked(False)
+    window.command_widget.stop_time_enabled.setChecked(False)
+    window.command_widget.service_id_lineedit.setText(service_id)
+
+    window.send_command()
+
+    window.command_producer.send_command.assert_called_once()
+
+    sent_msg = window.command_producer.send_command.call_args_list[0][0][0]
+
+    res = json.loads(sent_msg)
+
+    assert res["cmd"] == "FileWriter_new"
+    assert res["nexus_structure"]
+    assert res["nexus_structure"]["children"]
+    assert res["broker"] == broker
+    assert res["service_id"] == service_id
+    assert not window.command_widget.ok_button.isEnabled()
+
+
+def test_UI_GIVEN_no_status_consumer_and_no_command_producer_WHEN_checking_status_connection_THEN_both_leds_are_turned_off(
+    qtbot, instrument
+):
+    window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
+    window.status_consumer = None
+    window.command_producer = None
+
+    window._check_connection_status()
+
+    assert window.status_broker_led.is_off()
+    assert window.command_broker_led.is_off()
+
+
+def test_UI_GIVEN_status_consumer_but_no_command_producer_WHEN_checking_status_connection_THEN_status_led_is_turned_on(
+    qtbot, instrument
+):
+    window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
+    window.command_producer = None
+    window.status_consumer = Mock()
+    window.status_consumer.connected = True
+    window.status_consumer.files = []
+    window.status_consumer.file_writers = []
+
+    window._check_connection_status()
+    assert window.status_broker_led.is_on()
+
+
+def test_UI_GIVEN_command_producer_WHEN_checking_connection_status_THEN_command_led_is_turned_on(
+    qtbot, instrument
+):
+    window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
+    window.command_producer = Mock()
+    window.status_consumer = None
+    window.command_producer.connected = True
+
+    window._check_connection_status()
+    assert window.command_broker_led.is_on()
