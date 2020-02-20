@@ -180,6 +180,9 @@ class DummyInterface(KafkaInterface):
     def thread_target(self):
         pass
 
+    def __del__(self):
+        pass
+
     def __init__(self, address, topic):
         self.address = address
         self.topic = topic
