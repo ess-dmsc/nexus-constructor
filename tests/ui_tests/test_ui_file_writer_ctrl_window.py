@@ -149,16 +149,6 @@ def test_UI_GIVEN_command_producer_WHEN_checking_connection_status_THEN_command_
     assert window.command_broker_led.is_on()
 
 
-def test_GIVEN_dict_containing_time_string_WHEN_getting_time_THEN_time_is_converted_to_time_object():
-    key = "test_filewriter_id"
-    timestamp = 1582195617
-    updated_list = {key: {"last_seen": timestamp}}
-    current_time, time_str = FileWriterCtrl.get_time(key, updated_list)
-
-    assert current_time == timestamp
-    assert time_str == "1970-01-19 08:29:55BST"
-
-
 def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THEN_nothing_happens(
     qtbot, instrument
 ):
