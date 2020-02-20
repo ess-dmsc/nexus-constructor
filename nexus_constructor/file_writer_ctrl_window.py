@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Callable, Dict, Union, Tuple
 
+from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.led import Led
@@ -52,6 +53,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.status_broker_edit,
             self.status_broker_change_timer,
             self.status_broker_changed_timer,
+            StatusConsumer,
         )
         self.status_consumer = None
 
@@ -63,6 +65,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.command_broker_edit,
             self.command_broker_change_timer,
             self.command_broker_timer_changed,
+            CommandProducer,
         )
         self.command_producer = None
 
@@ -88,7 +91,11 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
 
     @staticmethod
     def _set_up_broker_fields(
-        led: Led, edit: QLineEdit, timer: QTimer, timer_callback: Callable
+        led: Led,
+        edit: QLineEdit,
+        timer: QTimer,
+        timer_callback: Callable,
+        kafka_obj_type: KafkaInterface,
     ):
         led.turn_off()
         validator = BrokerAndTopicValidator()
@@ -96,7 +103,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         validator.is_valid.connect(partial(validate_line_edit, edit))
         edit.textChanged.connect(lambda: timer.start(1000))
         timer.setSingleShot(True)
-        timer.timeout.connect(timer_callback)
+        timer.timeout.connect(partial(timer_callback, kafka_obj_type))
 
     def _check_connection_status(self):
         if self.status_consumer is None:
@@ -114,23 +121,23 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         else:
             self.command_broker_led.set_status(self.command_producer.connected)
 
-    def status_broker_changed_timer(self):
+    def status_broker_changed_timer(self, kafka_obj_type: KafkaInterface):
         result = BrokerAndTopicValidator.extract_addr_and_topic(
             self.status_broker_edit.text()
         )
         if result is not None:
             if self.status_consumer is not None:
                 del self.status_consumer
-            self.status_consumer = StatusConsumer(*result)
+            self.status_consumer = kafka_obj_type(*result)
 
-    def command_broker_timer_changed(self):
+    def command_broker_timer_changed(self, kafka_obj_type: KafkaInterface):
         result = BrokerAndTopicValidator.extract_addr_and_topic(
             self.command_broker_edit.text()
         )
         if result is not None:
             if self.command_producer is not None:
                 del self.command_producer
-            self.command_producer = CommandProducer(*result)
+            self.command_producer = kafka_obj_type(*result)
 
     def _update_writer_list(self, updated_list: Dict[str, Dict]):
         for key in updated_list:

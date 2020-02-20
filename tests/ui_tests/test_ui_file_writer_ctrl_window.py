@@ -3,6 +3,7 @@ import pytest
 from PySide2.QtGui import QStandardItemModel
 from mock import Mock
 from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl, File, FileWriter
+from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.validators import BrokerAndTopicValidator
 
 
@@ -157,7 +158,7 @@ def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THE
     window.status_consumer = None
     window.status_broker_edit.setText("invalid")
 
-    window.status_broker_changed_timer()
+    window.status_broker_changed_timer(tuple)
 
     assert window.status_consumer is None
 
@@ -170,6 +171,41 @@ def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_TH
     window.command_producer = None
     window.command_broker_edit.setText("invalid")
 
-    window.status_broker_changed_timer()
+    window.command_broker_timer_changed(tuple)
 
     assert window.command_producer is None
+
+
+class DummyInterface(KafkaInterface):
+    def thread_target(self):
+        pass
+
+    def __init__(self, address, topic):
+        self.address = address
+        self.topic = topic
+
+
+def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN_producer_is_created(
+    qtbot, instrument
+):
+    window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
+    window.command_producer = 1  # anything that's not None
+    window.command_broker_edit.setText("valid:9092/topic1")
+
+    window.command_broker_timer_changed(DummyInterface)
+
+    assert isinstance(window.command_producer, DummyInterface)
+
+
+def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_consumer_is_created(
+    qtbot, instrument
+):
+    window = FileWriterCtrl(instrument)
+    qtbot.addWidget(window)
+    window.status_consumer = 1  # anything that's not None
+    window.status_broker_edit.setText("valid:9092/topic1")
+
+    window.status_broker_changed_timer(DummyInterface)
+
+    assert isinstance(window.status_consumer, DummyInterface)
