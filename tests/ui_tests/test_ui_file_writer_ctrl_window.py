@@ -164,7 +164,7 @@ def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THE
     window.status_consumer = None
     window.status_broker_edit.setText("invalid")
 
-    window.status_broker_changed_timer(DummyInterface)
+    window.status_broker_timer_changed(DummyInterface)
     assert window.status_consumer is None
 
 
@@ -206,5 +206,5 @@ def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_
     window.status_consumer = 1  # anything that's not None
     window.status_broker_edit.setText("valid:9092/topic1")
 
-    window.status_broker_changed_timer(DummyInterface)
+    window.status_broker_timer_changed(DummyInterface)
     assert isinstance(window.status_consumer, DummyInterface)

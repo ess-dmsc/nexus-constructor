@@ -8,11 +8,12 @@ class KafkaInterface(ABC):
     run_thread = False
     _connected = False
 
+    def __init__(self):
+        self.thread = threading.Thread(target=self.thread_target)
+
     @abstractmethod
     def thread_target(self):
         pass
-
-    thread = threading.Thread(target=thread_target)
 
     @property
     def connected(self):

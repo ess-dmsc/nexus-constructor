@@ -9,6 +9,7 @@ from nexus_constructor.kafka.kafka_interface import KafkaInterface
 
 class StatusConsumer(KafkaInterface):
     def __init__(self, broker, topic):
+        super().__init__()
         self.broker = broker
         self.topic = topic
         self.filewriters = {}

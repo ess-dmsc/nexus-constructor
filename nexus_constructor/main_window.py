@@ -92,7 +92,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
             self.file_writer_ctrl_window = FileWriterCtrl(self.instrument)
             self.file_writer_ctrl_window.show()
-            self.file_writer_ctrl_window.raise_()
 
     def show_edit_component_dialog(self):
         selected_component = self.component_tree_view_tab.component_tree_view.selectedIndexes()[

@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable, Dict, Union, Tuple
+from typing import Callable, Dict, Union, Tuple, Type
 
 from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.ui_utils import validate_line_edit
@@ -45,6 +45,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def setupUi(self):
         super().setupUi(self)
 
+        self.status_consumer = None
         self.status_broker_led = Led(self)
         self.status_topic_layout.addWidget(self.status_broker_led)
         self.status_broker_change_timer = QTimer()
@@ -52,10 +53,11 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.status_broker_led,
             self.status_broker_edit,
             self.status_broker_change_timer,
-            self.status_broker_changed_timer,
+            self.status_broker_timer_changed,
             StatusConsumer,
         )
-        self.status_consumer = None
+
+        self.command_producer = None
 
         self.command_broker_led = Led(self)
         self.command_broker_layout.addWidget(self.command_broker_led)
@@ -67,7 +69,6 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.command_broker_timer_changed,
             CommandProducer,
         )
-        self.command_producer = None
 
         self.command_widget.ok_button.clicked.connect(self.send_command)
         self.update_status_timer = QTimer()
@@ -95,7 +96,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         edit: QLineEdit,
         timer: QTimer,
         timer_callback: Callable,
-        kafka_obj_type: KafkaInterface,
+        kafka_obj_type: Type[KafkaInterface],
     ):
         led.turn_off()
         validator = BrokerAndTopicValidator()
@@ -121,7 +122,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         else:
             self.command_broker_led.set_status(self.command_producer.connected)
 
-    def status_broker_changed_timer(self, kafka_obj_type: KafkaInterface):
+    def status_broker_timer_changed(self, kafka_obj_type: KafkaInterface):
         result = BrokerAndTopicValidator.extract_addr_and_topic(
             self.status_broker_edit.text()
         )

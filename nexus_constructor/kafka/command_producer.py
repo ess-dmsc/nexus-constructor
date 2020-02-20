@@ -8,6 +8,7 @@ from nexus_constructor.kafka.kafka_interface import KafkaInterface
 
 class CommandProducer(KafkaInterface):
     def __init__(self, address, topic):
+        super().__init__()
         self.address = address
         self.topic = topic
         self.msg_queue = Queue()
