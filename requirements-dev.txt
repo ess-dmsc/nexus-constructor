@@ -17,5 +17,5 @@ flake8
 # Testing
 pytest
 pytest-cov
-pytest-qt
+pytest-qt==3.3.0
 mock

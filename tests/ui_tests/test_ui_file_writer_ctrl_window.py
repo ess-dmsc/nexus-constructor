@@ -3,7 +3,6 @@ import pytest
 from PySide2.QtGui import QStandardItemModel
 from mock import Mock
 from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl, File, FileWriter
-from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.validators import BrokerAndTopicValidator
 
 
@@ -112,9 +111,9 @@ def test_UI_GIVEN_no_status_consumer_and_no_command_producer_WHEN_checking_statu
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
-    qtbot.addWidget(window)
     window.status_consumer = None
     window.command_producer = None
+    qtbot.addWidget(window)
 
     window._check_connection_status()
 
@@ -126,12 +125,12 @@ def test_UI_GIVEN_status_consumer_but_no_command_producer_WHEN_checking_status_c
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
-    qtbot.addWidget(window)
     window.command_producer = None
     window.status_consumer = Mock()
     window.status_consumer.connected = True
     window.status_consumer.files = []
     window.status_consumer.file_writers = []
+    qtbot.addWidget(window)
 
     window._check_connection_status()
     assert window.status_broker_led.is_on()
@@ -141,10 +140,10 @@ def test_UI_GIVEN_command_producer_WHEN_checking_connection_status_THEN_command_
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
-    qtbot.addWidget(window)
     window.command_producer = Mock()
     window.status_consumer = None
     window.command_producer.connected = True
+    qtbot.addWidget(window)
 
     window._check_connection_status()
     assert window.command_broker_led.is_on()
@@ -167,25 +166,16 @@ def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_TH
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
-    qtbot.addWidget(window)
     window.command_producer = None
     window.command_broker_edit.setText("invalid")
+    qtbot.addWidget(window)
 
     window.command_broker_timer_changed(tuple)
 
     assert window.command_producer is None
 
 
-class DummyInterface(KafkaInterface):
-    thread = None
-    lock = None
-
-    def thread_target(self):
-        pass
-
-    def __del__(self):
-        pass
-
+class DummyInterface:
     def __init__(self, address, topic):
         self.address = address
         self.topic = topic
@@ -195,9 +185,10 @@ def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
-    qtbot.addWidget(window)
     window.command_producer = 1  # anything that's not None
     window.command_broker_edit.setText("valid:9092/topic1")
+    qtbot.addWidget(window)
+    qtbot.addWidget(window.command_broker_edit)
 
     window.command_broker_timer_changed(DummyInterface)
 
@@ -208,9 +199,9 @@ def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_
     qtbot, instrument
 ):
     window = FileWriterCtrl(instrument)
-    qtbot.addWidget(window)
     window.status_consumer = 1  # anything that's not None
     window.status_broker_edit.setText("valid:9092/topic1")
+    qtbot.addWidget(window)
 
     window.status_broker_changed_timer(DummyInterface)
 
