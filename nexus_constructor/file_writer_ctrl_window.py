@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable, Dict, Union
+from typing import Callable, Dict, Union, Tuple
 
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
@@ -128,12 +128,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.command_broker_edit.text()
         )
         if result is not None:
-            self.command_broker_edit.setPlaceholderText(result[0])
             if self.command_producer is not None:
                 del self.command_producer
             self.command_producer = CommandProducer(*result)
-        else:
-            self.command_broker_edit.setPlaceholderText("address:port")
 
     def _update_writer_list(self, updated_list: Dict[str, Dict]):
         for key in updated_list:
@@ -180,7 +177,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 )
 
     @staticmethod
-    def get_time(key, updated_list):
+    def get_time(key: str, updated_list: Dict[str, Dict]) -> Tuple[int, str]:
         current_time = updated_list[key]["last_seen"]
         time_struct = time.localtime(current_time / 1000)
         time_str = time.strftime("%Y-%m-%d %H:%M:%S%Z", time_struct)
