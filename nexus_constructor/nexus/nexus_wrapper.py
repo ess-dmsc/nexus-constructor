@@ -222,7 +222,10 @@ class NexusWrapper(QObject):
             )
 
     def _generate_ui_placeholder_values(self):
-        pass
+        def find_transformations(_, node):
+            pass
+
+        self.nexus_file["/"].visititems(find_transformations)
 
     def duplicate_nx_group(
         self, group_to_duplicate: h5py.Group, new_group_name: str
