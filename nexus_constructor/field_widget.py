@@ -88,7 +88,6 @@ class FieldWidget(QFrame):
         self.attrs_dialog = FieldAttrsDialog(parent=self)
         self.instrument = instrument
 
-        self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
         self.hide_name_field = hide_name_field
         if hide_name_field:
@@ -102,8 +101,6 @@ class FieldWidget(QFrame):
             partial(validate_line_edit, self.units_line_edit)
         )
         self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
-
-        self.streams_widget = StreamFieldsWidget(self.edit_dialog)
 
         self.field_type_combo = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
@@ -294,17 +291,20 @@ class FieldWidget(QFrame):
             return False
 
     def field_type_changed(self):
+        self.edit_dialog = QDialog(parent=self)
         self._set_up_value_validator(False)
-        if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
+        if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)
-        elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
+        elif self.field_type == FieldType.array_dataset:
             self.set_visibility(False, False, True, True)
-        elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
+            self.table_view = ArrayDatasetTableWidget()
+        elif self.field_type == FieldType.kafka_stream:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
-        elif self.field_type_combo.currentText() == FieldType.link.value:
+            self.streams_widget = StreamFieldsWidget(self.edit_dialog)
+        elif self.field_type == FieldType.link:
             self.set_visibility(True, False, False, False)
             self._set_up_value_validator(True)
-        elif self.field_type_combo.currentText() == FieldType.nx_class.value:
+        elif self.field_type == FieldType.nx_class:
             self.set_visibility(False, True, False, False)
 
     def _set_up_value_validator(self, is_link: bool):
@@ -356,7 +356,7 @@ class FieldWidget(QFrame):
         )
 
     def show_edit_dialog(self):
-        if self.field_type_combo.currentText() == FieldType.array_dataset.value:
+        if self.field_type == FieldType.array_dataset:
             self.edit_dialog.setLayout(QGridLayout())
             self.table_view.model.update_array_dtype(
                 DATASET_TYPE[self.value_type_combo.currentText()]
@@ -365,10 +365,10 @@ class FieldWidget(QFrame):
             self.edit_dialog.setWindowTitle(
                 f"Edit {self.value_type_combo.currentText()} Array field"
             )
-        elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
+        elif self.field_type == FieldType.kafka_stream:
             self.edit_dialog.setLayout(QFormLayout())
             self.edit_dialog.layout().addWidget(self.streams_widget)
-        elif self.field_type_combo.currentText() == FieldType.nx_class.value:
+        elif self.field_type.currentText() == FieldType.nx_class:
             # TODO: show nx class panels
             pass
         self.edit_dialog.show()
