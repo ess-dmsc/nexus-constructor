@@ -27,8 +27,8 @@ def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
     :param value: The array dataset's value to copy to the UI fields list model
     :param new_ui_field: The new UI field to fill in with existing data
     """
-    new_ui_field.dtype = field.dtype
     new_ui_field.field_type = FieldType.array_dataset.value
+    new_ui_field.dtype = field.dtype
     new_ui_field.value = field[()]
 
 
@@ -38,6 +38,7 @@ def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget)
     :param field: The dataset to copy into the value line edit
     :param new_ui_field: The new UI field to fill in with existing data
     """
+    new_ui_field.field_type = FieldType.scalar_dataset.value
     dtype = field.dtype
     if "S" in str(dtype):
         dtype = h5py.special_dtype(vlen=str)
@@ -45,7 +46,6 @@ def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget)
     else:
         new_ui_field.value = field[()]
     new_ui_field.dtype = dtype
-    new_ui_field.field_type = FieldType.scalar_dataset.value
 
 
 def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget):

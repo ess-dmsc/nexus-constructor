@@ -291,21 +291,20 @@ class FieldWidget(QFrame):
             return False
 
     def field_type_changed(self):
-        self.edit_dialog = QDialog()
+        self.edit_dialog = QDialog(parent=self)
         self._set_up_value_validator(False)
-        if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
+        if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)
-        elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
+        elif self.field_type == FieldType.array_dataset:
             self.set_visibility(False, False, True, True)
             self.table_view = ArrayDatasetTableWidget()
-
-        elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
+        elif self.field_type == FieldType.kafka_stream:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
             self.streams_widget = StreamFieldsWidget(self.edit_dialog)
-        elif self.field_type_combo.currentText() == FieldType.link.value:
+        elif self.field_type == FieldType.link:
             self.set_visibility(True, False, False, False)
             self._set_up_value_validator(True)
-        elif self.field_type_combo.currentText() == FieldType.nx_class.value:
+        elif self.field_type == FieldType.nx_class:
             self.set_visibility(False, True, False, False)
 
     def _set_up_value_validator(self, is_link: bool):
