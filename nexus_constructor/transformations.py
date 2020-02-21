@@ -161,6 +161,7 @@ class Transformation:
             if np.isscalar(self.dataset[()]):
                 try:
                     float(self._dataset[()])
+                    self.ui_value = float(self._dataset[()])
                     return self._dataset[()]
                 except ValueError:
                     logging.debug(
@@ -169,6 +170,7 @@ class Transformation:
             else:
                 # dataset value is array
                 try:
+                    self.ui_value = int(self._dataset[...][0])
                     return int(self._dataset[...][0])
                 except ValueError:
                     # not int-type
@@ -176,6 +178,7 @@ class Transformation:
 
         if CommonAttrs.UI_VALUE not in self._dataset.attrs:
             # Link or stream
+            self.ui_value = 0
             return 0
 
         return self.file.get_attribute_value(self._dataset, CommonAttrs.UI_VALUE)[()]
