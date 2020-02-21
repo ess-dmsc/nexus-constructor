@@ -88,7 +88,6 @@ class FieldWidget(QFrame):
         self.attrs_dialog = FieldAttrsDialog(parent=self)
         self.instrument = instrument
 
-        self.table_view = ArrayDatasetTableWidget()
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
         self.hide_name_field = hide_name_field
         if hide_name_field:
@@ -102,8 +101,6 @@ class FieldWidget(QFrame):
             partial(validate_line_edit, self.units_line_edit)
         )
         self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
-
-        self.streams_widget = StreamFieldsWidget(self.edit_dialog)
 
         self.field_type_combo = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
@@ -294,13 +291,17 @@ class FieldWidget(QFrame):
             return False
 
     def field_type_changed(self):
+        self.edit_dialog = QDialog()
         self._set_up_value_validator(False)
         if self.field_type_combo.currentText() == FieldType.scalar_dataset.value:
             self.set_visibility(True, False, False, True)
         elif self.field_type_combo.currentText() == FieldType.array_dataset.value:
             self.set_visibility(False, False, True, True)
+            self.table_view = ArrayDatasetTableWidget()
+
         elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
+            self.streams_widget = StreamFieldsWidget(self.edit_dialog)
         elif self.field_type_combo.currentText() == FieldType.link.value:
             self.set_visibility(True, False, False, False)
             self._set_up_value_validator(True)
