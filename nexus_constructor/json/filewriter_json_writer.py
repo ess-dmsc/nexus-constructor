@@ -1,6 +1,5 @@
 import h5py
 import numpy as np
-import uuid
 import logging
 from typing import Union, Dict, Any, List, Tuple
 
@@ -244,18 +243,21 @@ def create_writer_commands(
     :param use_hdf_swmr: Whether to use HDF5's Single Writer Multiple Reader (SWMR) capabilities. Default is true in the filewriter
     :return: A write command and stop command with specified job_id.
     """
-    if not job_id:
-        job_id = str(uuid.uuid1())
 
-    write_cmd = {
-        "cmd": "FileWriter_new",
-        "broker": broker,
-        "job_id": job_id,
-        "file_attributes": {"file_name": output_filename},
-        "nexus_structure": nexus_structure,
-    }
+    write_cmd = {"nexus_structure": nexus_structure}
+
+    if output_filename:
+        write_cmd["file_attributes"] = {"file_name": output_filename}
+
+    if broker:
+        write_cmd["broker"] = broker
+
+    if job_id:
+        write_cmd["job_id"] = job_id
+
     if start_time is not None:
         write_cmd["start_time"] = start_time
+
     if not use_hdf_swmr:
         write_cmd["use_hdf_swmr"] = use_hdf_swmr
 
