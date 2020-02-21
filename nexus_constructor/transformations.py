@@ -7,7 +7,7 @@ import h5py
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
-from typing import TypeVar
+from typing import TypeVar, Union, List
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 from nexus_constructor.transformation_types import TransformationType
@@ -39,6 +39,14 @@ class Transformation:
     @name.setter
     def name(self, new_name: str):
         self.file.rename_node(self._dataset, new_name)
+        self._update_dependent_depends_on()
+
+    def _update_dependent_depends_on(self):
+        """
+        Updates all of the directly dependent "depends_on" fields for this transformation.
+        """
+        for dependent in self.get_dependents():
+            dependent.depends_on = self
 
     @property
     def qmatrix(self) -> QMatrix4x4:
@@ -184,7 +192,11 @@ class Transformation:
         existing_depends_on = self.file.get_attribute_value(
             self._dataset, CommonAttrs.DEPENDS_ON
         )
-        if existing_depends_on is not None:
+
+        if (
+            existing_depends_on is not None
+            and existing_depends_on in self.file.nexus_file
+        ):
             Transformation(
                 self.file, self.file.nexus_file[existing_depends_on]
             ).deregister_dependent(self)
@@ -251,11 +263,15 @@ class Transformation:
                     f"Unable to de-register dependent {former_dependent.absolute_path} from {self.absolute_path} due to it not being registered."
                 )
 
-    def get_dependents(self):
+    def get_dependents(self) -> List[Union["Component", "Transformation"]]:
+        """
+        Returns the direct dependents of a transform, i.e. anything that has depends_on pointing to this transformation.
+        """
         import nexus_constructor.component.component as comp
 
+        return_dependents = []
+
         if CommonAttrs.DEPENDEE_OF in self._dataset.attrs.keys():
-            return_dependents = []
             dependents = self.file.get_attribute_value(
                 self._dataset, CommonAttrs.DEPENDEE_OF
             )
@@ -269,7 +285,7 @@ class Transformation:
                     return_dependents.append(Transformation(self.file, node))
                 else:
                     raise RuntimeError("Unknown type of node.")
-            return return_dependents
+        return return_dependents
 
     def remove_from_dependee_chain(self):
         all_dependees = self.get_dependents()
