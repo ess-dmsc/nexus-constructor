@@ -43,7 +43,7 @@ class Transformation:
 
     def _update_dependent_depends_on(self):
         """
-        Updates all of the dependent "depends_on" fields for this transformation.
+        Updates all of the directly dependent "depends_on" fields for this transformation.
         """
         for dependent in self.get_dependents():
             dependent.depends_on = self
@@ -264,6 +264,9 @@ class Transformation:
                 )
 
     def get_dependents(self) -> List[Union["Component", "Transformation"]]:
+        """
+        Returns the direct dependents of a transform, i.e. anything that has depends_on pointing to this transformation.
+        """
         import nexus_constructor.component.component as comp
 
         return_dependents = []
