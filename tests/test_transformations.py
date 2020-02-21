@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.component.component import Component
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
@@ -53,6 +54,35 @@ def test_can_get_transform_properties():
     assert (
         transform.type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
+
+
+def test_transform_dependents_depends_on_are_updated_when_transformation_name_is_changed():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+
+    test_name = "slartibartfast"
+    test_value = 42
+    test_vector = QVector3D(1.0, 0.0, 0.0)
+    test_type = "Translation"
+
+    transform_dataset = _add_transform_to_file(
+        nexus_wrapper, test_name, test_value, test_vector, test_type
+    )
+
+    component = nexus_wrapper.create_nx_group(
+        "test", "NXaperture", nexus_wrapper.nexus_file
+    )
+
+    component.create_dataset("depends_on", data=transform_dataset.name)
+
+    transform = Transformation(nexus_wrapper, transform_dataset)
+    transform.register_dependent(Component(nexus_wrapper, component))
+
+    new_name = test_name + "1"
+
+    transform.name = new_name
+
+    assert transform.name == new_name
+    assert str(component["depends_on"][()], encoding="UTF-8") == transform.dataset.name
 
 
 @pytest.mark.parametrize("test_input", ["translation", "Translation", "TRANSLATION"])
@@ -178,7 +208,7 @@ def test_deregister_dependent():
 
     set_dependents = transform1.get_dependents()
 
-    assert set_dependents is None
+    assert not set_dependents
 
 
 def test_deregister_unregistered_dependent_alt1():
@@ -189,7 +219,7 @@ def test_deregister_unregistered_dependent_alt1():
 
     transform1.deregister_dependent(transform2)
 
-    assert transform1.get_dependents() is None
+    assert not transform1.get_dependents()
 
 
 def test_deregister_unregistered_dependent_alt2():
