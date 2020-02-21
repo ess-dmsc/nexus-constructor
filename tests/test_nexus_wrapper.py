@@ -85,7 +85,7 @@ def test_GIVEN_transform_with_no_placeholder_value_but_array_magnitude_WHEN_load
         transforms_group = comp.create_group("transformations")
         transforms_group.attrs["NX_class"] = "NXtransformations"
 
-        value = np.asarray([0,1,2,3])
+        value = np.asarray([0, 1, 2, 3])
         position = transforms_group.create_dataset("position", data=value)
         position.attrs["depends_on"] = "."
         position.attrs["transformation_type"] = "translation"
@@ -98,7 +98,7 @@ def test_GIVEN_transform_with_no_placeholder_value_but_array_magnitude_WHEN_load
         assert position[CommonAttrs.UI_VALUE] == 0
 
 
-def test_GIVEN_transform_with_no_placeholder_value_but_array_magnitude_WHEN_loading_file_THEN_placeholder_is_filled_in():
+def test_GIVEN_transform_with_no_placeholder_value_but_stream_group_magnitude_WHEN_loading_file_THEN_placeholder_is_filled_in():
     with InMemoryFile("test_file") as file:
         entry = file.create_group("entry")
         entry.attrs["NX_class"] = "NXentry"
@@ -115,20 +115,17 @@ def test_GIVEN_transform_with_no_placeholder_value_but_array_magnitude_WHEN_load
 
         transforms_group = comp.create_group("transformations")
         transforms_group.attrs["NX_class"] = "NXtransformations"
-
-        value = np.asarray([0,1,2,3])
-        position = transforms_group.create_dataset("position", data=value)
-        position.attrs["depends_on"] = "."
+        position = transforms_group.group("position")
         position.attrs["transformation_type"] = "translation"
-        position.attrs["units"] = "m"
-        position.attrs["vector"] = np.asarray([0.0, 0.0, 1.0])
+        position.attrs["NX_class"] = CommonAttrs.NC_STREAM
+        position.create_dataset("topic", data="t1")
+        position.create_dataset("writer_module", data="ns10")
 
         wrapper = NexusWrapper(filename="test_ui_placeholder_scalar")
         wrapper.load_file(entry, file)
 
         assert position[CommonAttrs.UI_VALUE] == 0
 
-#TODO: add stream etc.
 
 def test_GIVEN_entry_group_with_one_instrument_group_WHEN_getting_instrument_group_from_entry_THEN_group_is_returned():
     with InMemoryFile("test_file") as file:
