@@ -356,7 +356,7 @@ class FieldWidget(QFrame):
         )
 
     def show_edit_dialog(self):
-        if self.field_type_combo.currentText() == FieldType.array_dataset.value:
+        if self.field_type == FieldType.array_dataset:
             self.edit_dialog.setLayout(QGridLayout())
             self.table_view.model.update_array_dtype(
                 DATASET_TYPE[self.value_type_combo.currentText()]
@@ -365,10 +365,10 @@ class FieldWidget(QFrame):
             self.edit_dialog.setWindowTitle(
                 f"Edit {self.value_type_combo.currentText()} Array field"
             )
-        elif self.field_type_combo.currentText() == FieldType.kafka_stream.value:
+        elif self.field_type == FieldType.kafka_stream:
             self.edit_dialog.setLayout(QFormLayout())
             self.edit_dialog.layout().addWidget(self.streams_widget)
-        elif self.field_type_combo.currentText() == FieldType.nx_class.value:
+        elif self.field_type.currentText() == FieldType.nx_class:
             # TODO: show nx class panels
             pass
         self.edit_dialog.show()
