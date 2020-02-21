@@ -34,6 +34,18 @@ def test_nxs_not_appended_to_filename_if_already_present():
     assert append_nxs_extension(test_filename) == f"{test_filename}"
 
 
+def test_GIVEN_transform_with_no_placeholder_value_WHEN_loading_file_THEN_placeholder_is_filled_in():
+    with InMemoryFile("test_file") as file:
+        entry = file.create_group("entry")
+        entry.attrs["NX_class"] = "NXentry"
+
+        inst_group = entry.create_group("instrument")
+        inst_group.attrs["NX_class"] = "NXinstrument"
+
+        comp = inst_group.create_group("comp1")
+        # TODO: finish this: add transform then load the file.
+
+
 def test_GIVEN_entry_group_with_one_instrument_group_WHEN_getting_instrument_group_from_entry_THEN_group_is_returned():
     with InMemoryFile("test_file") as file:
         entry = file.create_group("entry")
