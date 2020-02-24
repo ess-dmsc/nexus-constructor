@@ -300,3 +300,23 @@ class Transformation:
             dependee.depends_on = new_depends_on
             self.deregister_dependent(dependee)
         self.depends_on = None
+
+
+class NXLogTransformation(Transformation):
+    @property
+    def ui_value(self) -> float:
+        if "value" not in self._dataset.keys():
+            return 0
+        value_group = self._dataset["value"]
+        if np.isscalar(value_group):
+            return value_group[()]
+        else:
+            return float(value_group[0][()])
+
+    @property
+    def units(self) -> str:
+        self.file.get_attribute_value(self._dataset["value"], "units")
+
+    @units.setter
+    def units(self, new_units: str):
+        self.file.set_attribute_value(self._dataset["value"], "units", new_units)
