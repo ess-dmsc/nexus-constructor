@@ -164,7 +164,7 @@ class Transformation:
                     return float(self._dataset[()])
                 except ValueError:
                     logging.debug(
-                        "transformation value is not cast-able to int, using UI placeholder value instead."
+                        "transformation value is not cast-able to float/int, using UI placeholder value instead."
                     )
             else:
                 # dataset value is array
