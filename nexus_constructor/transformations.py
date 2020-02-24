@@ -160,9 +160,8 @@ class Transformation:
         if isinstance(self.dataset, h5py.Dataset):
             if np.isscalar(self.dataset[()]):
                 try:
-                    float(self._dataset[()])
-                    self.ui_value = float(self._dataset[()])
-                    return self._dataset[()]
+                    self.ui_value = int(self._dataset[()])
+                    return int(self._dataset[()])
                 except ValueError:
                     logging.debug(
                         "transformation value is not cast-able to int, using UI placeholder value instead."
