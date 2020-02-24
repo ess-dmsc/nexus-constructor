@@ -343,3 +343,16 @@ class NXLogTransformation(Transformation):
     @units.setter
     def units(self, new_units: str):
         self.file.set_attribute_value(self._dataset["value"], "units", new_units)
+
+
+def create_transformation(wrapper: nx.NexusWrapper, node: h5Node):
+    """
+    Factory for creating different types of transform.
+    If it is an NXlog group then the magnitude and units fields will be different to a normal transformation dataset.
+    """
+    if (
+        CommonAttrs.NX_CLASS in node.attrs
+        and str(node.attrs[CommonAttrs.NX_CLASS], encoding="utf-8") == "NXlog"
+    ):
+        return NXLogTransformation(wrapper, node)
+    return Transformation(wrapper, node)
