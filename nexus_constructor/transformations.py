@@ -196,6 +196,14 @@ class Transformation:
             self._dataset, CommonAttrs.DEPENDS_ON
         )
         if depends_on_path is not None:
+            if f"{self._dataset.parent.name}/{depends_on_path}" in self.file.nexus_file:
+                # depends_on is relative
+                return Transformation(
+                    self.file,
+                    self.file.nexus_file[
+                        f"{self._dataset.parent.name}/{depends_on_path}"
+                    ],
+                )
             return Transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter

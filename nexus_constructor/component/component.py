@@ -167,7 +167,26 @@ class Component:
         :param local_only: If True then only add transformations which are stored within this component
         """
         if depends_on is not None and depends_on != ".":
-            transform_dataset = self.file.nexus_file[depends_on]
+            if (
+                len(transforms) >= 1
+                and depends_on
+                == str(
+                    transforms[-1].dataset.attrs[CommonAttrs.DEPENDS_ON],
+                    encoding="utf-8",
+                )
+                and depends_on
+                in [x.split("/")[-1] for x in transforms[-1].dataset.parent.keys()]
+            ):
+                # depends_on is recursive, ie one transformation in this group depends on another transformation in the group, and it is also relative
+                transform_dataset = self.file.nexus_file[
+                    f"{transforms[-1].dataset.parent.name}/{depends_on}"
+                ]
+            elif f"{self.group.name}/{depends_on}" in self.file.nexus_file:
+                transform_dataset = self.file.nexus_file[
+                    f"{self.group.name}/{depends_on}"
+                ]
+            else:
+                transform_dataset = self.file.nexus_file[depends_on]
             if (
                 local_only
                 and transform_dataset.parent.parent.name != self.absolute_path
