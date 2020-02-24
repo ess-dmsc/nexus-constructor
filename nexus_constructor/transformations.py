@@ -157,14 +157,29 @@ class Transformation:
         Used for getting the 3d view magnitude (as a placeholder or if the dataset is scalar)
         :return:
         """
-        if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset[()]):
-            try:
-                float(self._dataset[()])
-                return self._dataset[()]
-            except ValueError:
-                logging.debug(
-                    "transformation value is not cast-able to int, using UI placeholder value instead."
-                )
+        if isinstance(self.dataset, h5py.Dataset):
+            if np.isscalar(self.dataset[()]):
+                try:
+                    self.ui_value = float(self._dataset[()])
+                    return float(self._dataset[()])
+                except ValueError:
+                    logging.debug(
+                        "transformation value is not cast-able to float/int, using UI placeholder value instead."
+                    )
+            else:
+                # dataset value is array
+                try:
+                    self.ui_value = int(self._dataset[...][0])
+                    return int(self._dataset[...][0])
+                except ValueError:
+                    # not int-type
+                    pass
+
+        if CommonAttrs.UI_VALUE not in self._dataset.attrs:
+            # Link or stream
+            self.ui_value = 0
+            return 0
+
         return self.file.get_attribute_value(self._dataset, CommonAttrs.UI_VALUE)[()]
 
     @ui_value.setter

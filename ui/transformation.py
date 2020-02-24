@@ -109,7 +109,7 @@ class Ui_Transformation(object):
             self.z_spinbox,
             self.value_spinbox,
         ]
-        for spinbox in self.spinboxes[:-1]:
+        for spinbox in self.spinboxes:
             spinbox.setRange(-10000000, 10000000)
             spinbox.setDecimals(5)
 
