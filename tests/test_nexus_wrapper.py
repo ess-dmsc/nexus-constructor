@@ -1,8 +1,5 @@
 import h5py
-from flatbuffers.encode import np
 from mock import Mock
-
-from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus.nexus_wrapper import (
     NexusWrapper,
     append_nxs_extension,
@@ -34,97 +31,6 @@ def test_nxs_is_appended_to_filename():
 def test_nxs_not_appended_to_filename_if_already_present():
     test_filename = "banana.nxs"
     assert append_nxs_extension(test_filename) == f"{test_filename}"
-
-
-def test_GIVEN_transform_with_no_placeholder_value_but_scalar_magnitude_WHEN_loading_file_THEN_placeholder_is_filled_in():
-    with InMemoryFile("test_file") as file:
-        entry = file.create_group("entry")
-        entry.attrs["NX_class"] = "NXentry"
-
-        inst_group = entry.create_group("instrument")
-        inst_group.attrs["NX_class"] = "NXinstrument"
-
-        comp = inst_group.create_group("comp1")
-        comp.attrs["NX_class"] = "NXaperture"
-
-        comp.create_dataset(
-            "depends_on", data="/entry/instrument/comp1/transformations/position"
-        )
-
-        transforms_group = comp.create_group("transformations")
-        transforms_group.attrs["NX_class"] = "NXtransformations"
-
-        value = 5.5
-        position = transforms_group.create_dataset("position", data=value)
-        position.attrs["depends_on"] = "."
-        position.attrs["transformation_type"] = "translation"
-        position.attrs["units"] = "m"
-        position.attrs["vector"] = np.asarray([0.0, 0.0, 1.0])
-
-        wrapper = NexusWrapper(filename="test_ui_placeholder_scalar")
-        wrapper.load_file(entry, file)
-
-        assert position[CommonAttrs.UI_VALUE] == value
-
-
-def test_GIVEN_transform_with_no_placeholder_value_but_array_magnitude_WHEN_loading_file_THEN_placeholder_is_filled_in():
-    with InMemoryFile("test_file") as file:
-        entry = file.create_group("entry")
-        entry.attrs["NX_class"] = "NXentry"
-
-        inst_group = entry.create_group("instrument")
-        inst_group.attrs["NX_class"] = "NXinstrument"
-
-        comp = inst_group.create_group("comp1")
-        comp.attrs["NX_class"] = "NXaperture"
-
-        comp.create_dataset(
-            "depends_on", data="/entry/instrument/comp1/transformations/position"
-        )
-
-        transforms_group = comp.create_group("transformations")
-        transforms_group.attrs["NX_class"] = "NXtransformations"
-
-        value = np.asarray([0, 1, 2, 3])
-        position = transforms_group.create_dataset("position", data=value)
-        position.attrs["depends_on"] = "."
-        position.attrs["transformation_type"] = "translation"
-        position.attrs["units"] = "m"
-        position.attrs["vector"] = np.asarray([0.0, 0.0, 1.0])
-
-        wrapper = NexusWrapper(filename="test_ui_placeholder_array")
-        wrapper.load_file(entry, file)
-
-        assert position[CommonAttrs.UI_VALUE] == 0
-
-
-def test_GIVEN_transform_with_no_placeholder_value_but_stream_group_magnitude_WHEN_loading_file_THEN_placeholder_is_filled_in():
-    with InMemoryFile("test_file") as file:
-        entry = file.create_group("entry")
-        entry.attrs["NX_class"] = "NXentry"
-
-        inst_group = entry.create_group("instrument")
-        inst_group.attrs["NX_class"] = "NXinstrument"
-
-        comp = inst_group.create_group("comp1")
-        comp.attrs["NX_class"] = "NXaperture"
-
-        comp.create_dataset(
-            "depends_on", data="/entry/instrument/comp1/transformations/position"
-        )
-
-        transforms_group = comp.create_group("transformations")
-        transforms_group.attrs["NX_class"] = "NXtransformations"
-        position = transforms_group.group("position")
-        position.attrs["transformation_type"] = "translation"
-        position.attrs["NX_class"] = CommonAttrs.NC_STREAM
-        position.create_dataset("topic", data="t1")
-        position.create_dataset("writer_module", data="ns10")
-
-        wrapper = NexusWrapper(filename="test_ui_placeholder_scalar")
-        wrapper.load_file(entry, file)
-
-        assert position[CommonAttrs.UI_VALUE] == 0
 
 
 def test_GIVEN_entry_group_with_one_instrument_group_WHEN_getting_instrument_group_from_entry_THEN_group_is_returned():

@@ -161,7 +161,6 @@ class NexusWrapper(QObject):
         self.instrument = self.get_instrument_group_from_entry(self.entry)
         self.nexus_file = nexus_file
         self._generate_dependee_of_attributes()
-        self._generate_ui_placeholder_values()
         logging.info("NeXus file loaded")
         self._emit_file()
 
@@ -220,12 +219,6 @@ class NexusWrapper(QObject):
             self.nexus_file[transform].attrs[CommonAttrs.DEPENDEE_OF] = np.array(
                 dependee_of, dtype=h5py.special_dtype(vlen=str)
             )
-
-    def _generate_ui_placeholder_values(self):
-        def find_transformations(_, node):
-            pass
-
-        self.nexus_file["/"].visititems(find_transformations)
 
     def duplicate_nx_group(
         self, group_to_duplicate: h5py.Group, new_group_name: str
