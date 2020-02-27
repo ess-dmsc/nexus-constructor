@@ -167,10 +167,10 @@ class Transformation:
                         "transformation value is not cast-able to float/int, using UI placeholder value instead."
                     )
             else:
-                # dataset value is array
+                # Dataset value is array - use the first value of the array as the UI value
                 try:
-                    self.ui_value = int(self._dataset[...][0])
-                    return int(self._dataset[...][0])
+                    self.ui_value = float(self._dataset[...][0])
+                    return float(self._dataset[...][0])
                 except ValueError:
                     # not int-type
                     pass
