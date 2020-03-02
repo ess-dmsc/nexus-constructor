@@ -23,7 +23,7 @@ class CommandProducer(KafkaInterface):
         while not self._cancelled:
             self._producer.poll(0.5)
 
-    def produce(self, payload: bytes):
+    def send_command(self, payload: bytes):
         def ack(err, msg):
             if err:
                 logging.debug(f"Message failed delivery: {err}")

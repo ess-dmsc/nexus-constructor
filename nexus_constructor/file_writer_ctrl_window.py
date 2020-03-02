@@ -16,22 +16,23 @@ from nexus_constructor.kafka.command_producer import CommandProducer
 import time
 from nexus_constructor.json.filewriter_json_writer import generate_json
 import io
+import attr
 
 
+@attr.s
 class FileWriter:
-    def __init__(self, name, row):
-        self.name = name
-        self.row = row
-        self.last_time = 0
+    name = attr.ib(type=str)
+    row = attr.ib()
+    last_time = attr.ib(default=0)
 
 
+@attr.s
 class File:
-    def __init__(self, name, row, writer_id, job_id):
-        self.name = name
-        self.row = row
-        self.writer_id = writer_id
-        self.job_id = job_id
-        self.last_time = 0
+    name = attr.ib(type=str)
+    row = attr.ib()
+    job_id = attr.ib(type=str, default="Unknown")
+    writer_id = attr.ib(type=str, default="Unknown")
+    last_time = attr.ib(default=0)
 
 
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
@@ -163,9 +164,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 number_of_file_rows = self.file_list_model.rowCount(
                     QtCore.QModelIndex()
                 )
-                writer_id = updated_list[key]["writer_id"]
-                file_id = updated_list[key]["file_id"]
-                new_file = File(key, number_of_file_rows, writer_id, file_id)
+                new_file = File(key, row=number_of_file_rows)
                 self.known_files[key] = new_file
                 self.file_list_model.insertRow(number_of_file_rows)
                 self.file_list_model.setData(

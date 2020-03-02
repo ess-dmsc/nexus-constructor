@@ -74,15 +74,16 @@ class StatusConsumer(KafkaInterface):
                     writer_id = msg_obj["service_id"]
                     if writer_id not in known_writers:
                         known_writers[writer_id] = {"last_seen": 0}
-                    known_writers[writer_id]["last_seen"] = msg.timestamp()
+                    known_writers[writer_id]["last_seen"] = msg.timestamp()[1]
+                    # msg.timestamp()[0] is the timestamp type
                 if "file_being_written" in msg_obj:
                     file_name = msg_obj["file_being_written"]
-                    if file_name not in known_files:
+                    if file_name is not None and file_name not in known_files:
                         known_files[file_name] = {
                             "file_name": file_name,
                             "last_seen": 0,
                         }
-                    known_files[file_name]["last_seen"] = msg.timestamp()
+                    known_files[file_name]["last_seen"] = msg.timestamp()[1]
                     self.file_writers = known_writers
                     self.files = known_files
 
