@@ -50,7 +50,8 @@ class EditTransformation(QGroupBox):
     def saveChanges(self):
         self.transformation.ui_value = self.transformation_frame.value_spinbox.value()
         self.transformation.dataset = self.transformation_frame.magnitude_widget.value
-        self.transformation.name = self.transformation_frame.name_line_edit.text()
+        if self.transformation_frame.name_line_edit.text() != self.transformation.name:
+            self.transformation.name = self.transformation_frame.name_line_edit.text()
         self.transformation.vector = QVector3D(
             *[spinbox.value() for spinbox in self.transformation_frame.spinboxes[:-1]]
         )
