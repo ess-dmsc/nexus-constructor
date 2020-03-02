@@ -167,18 +167,19 @@ class Transformation:
                         "transformation value is not cast-able to float/int, using UI placeholder value instead."
                     )
             else:
-                # Dataset value is array - use the first value of the array as the UI value
+                # Dataset value is array - try to use the first value of the array as the UI value
                 try:
                     self.ui_value = float(self._dataset[...][0])
                     return float(self._dataset[...][0])
                 except ValueError:
-                    # not int-type
+                    # Not castable to float - either return the UI value if present in the group or the default value if not.
                     pass
 
         if CommonAttrs.UI_VALUE not in self._dataset.attrs:
             # Link or stream
-            self.ui_value = 0
-            return 0
+            default_value = 0.0
+            self.ui_value = default_value
+            return default_value
 
         return self.file.get_attribute_value(self._dataset, CommonAttrs.UI_VALUE)[()]
 
