@@ -79,6 +79,7 @@ class FilewriterCommandWidget(QWidget):
         self.stop_time_picker.setDisplayFormat(TIME_FORMAT)
         self.stop_time_enabled.stateChanged.connect(partial(self.state_changed, False))
         self.stop_time_enabled.setChecked(False)
+        self.state_changed(False, Qt.CheckState.Unchecked)
 
         self.service_id_lineedit = QLineEdit()
         self.service_id_lineedit.setPlaceholderText("(Optional)")
