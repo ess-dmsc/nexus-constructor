@@ -75,7 +75,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def _set_up_file_writer_control_window(self, main_window):
         try:
-            import kafka  # noqa: F401
+            import confluent_kafka  # noqa: F401
 
             self.control_file_writer_action = QAction(main_window)
             self.control_file_writer_action.setText("Control file-writer")
