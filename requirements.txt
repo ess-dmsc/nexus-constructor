@@ -9,7 +9,7 @@ silx
 xmltodict
 numpy
 pytest-qt
-kafka-python
+confluent-kafka
 
 # PySide2 has had some issues with new versions and packaging so we will pin it
 PySide2==5.13.0

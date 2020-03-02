@@ -1,33 +1,33 @@
-import threading
 from abc import ABC, abstractmethod
 from copy import copy
+import asyncio
+import threading
 
 
 class KafkaInterface(ABC):
-    lock = threading.Lock()
-    run_thread = False
-    _connected = False
-
     def __init__(self):
-        self.thread = threading.Thread(target=self.thread_target)
+        self._loop = asyncio.get_event_loop()
+        self._cancelled = False
+        self._poll_thread = threading.Thread(target=self._poll_loop)
+        self._is_connected = False
+        self._lock = threading.Lock()
+        # Call self._poll_thread.start() in child constructor
 
     @abstractmethod
-    def thread_target(self):
+    def _poll_loop(self):
         pass
 
     @property
     def connected(self):
-        self.lock.acquire()
-        return_status = copy(self._connected)
-        self.lock.release()
+        with self._lock:
+            return_status = copy(self._is_connected)
         return return_status
 
     @connected.setter
     def connected(self, is_connected):
-        self.lock.acquire()
-        self._connected = is_connected
-        self.lock.release()
+        with self._lock:
+            self._is_connected = is_connected
 
     def __del__(self):
-        self.run_thread = False
-        self.thread.join()
+        self._cancelled = True
+        self._poll_thread.join()
