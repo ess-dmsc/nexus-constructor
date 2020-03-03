@@ -46,11 +46,7 @@ class Instrument:
                 if CommonAttrs.NX_CLASS in node.attrs.keys():
                     if node.attrs[CommonAttrs.NX_CLASS] == "NXtransformations":
                         for transformation_name, transformation_node in node.items():
-                            if (
-                                CommonAttrs.NX_CLASS in transformation_node.attrs
-                                and transformation_node.attrs[CommonAttrs.NX_CLASS]
-                                == "NXlog"
-                            ):
+                            if get_nx_class(transformation_node) == "NXlog":
                                 transform = NXLogTransformation(
                                     self.nexus, node[transformation_name]
                                 )
