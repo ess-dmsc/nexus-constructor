@@ -8,7 +8,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class, decode_bytes_string
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -168,11 +168,10 @@ class Component:
         """
         if depends_on is not None and depends_on != ".":
             if (
-                len(transforms) >= 1
+                transforms
                 and depends_on
-                == str(
-                    transforms[-1].dataset.attrs[CommonAttrs.DEPENDS_ON],
-                    encoding="utf-8",
+                == decode_bytes_string(
+                    transforms[-1].dataset.attrs[CommonAttrs.DEPENDS_ON]
                 )
                 and depends_on
                 in [x.split("/")[-1] for x in transforms[-1].dataset.parent.keys()]
