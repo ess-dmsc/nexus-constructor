@@ -9,7 +9,7 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.json.filewriter_json_writer import (
     NexusToDictConverter,
-    generate_json,
+    write_nexus_structure_to_json,
     _add_attributes,
     ATTR_NAME_BLACKLIST,
     get_data_and_type,
@@ -376,7 +376,7 @@ def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is
     component = data.create_component(component_name, component_nx_class, "")
     component.set_field(dataset_name, value=dataset_value, dtype=str)
 
-    generate_json(data, file)
+    write_nexus_structure_to_json(data, file)
 
     output_file_dict = json.loads(file.getvalue())
 

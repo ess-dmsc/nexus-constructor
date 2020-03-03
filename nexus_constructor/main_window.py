@@ -118,7 +118,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
         if filename:
             with open(filename, "w") as file:
-                filewriter_json_writer.generate_json(self.instrument, file)
+                filewriter_json_writer.write_nexus_structure_to_json(
+                    self.instrument, file
+                )
 
     def save_to_forwarder_json(self):
         filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)

@@ -11,21 +11,22 @@ from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
 NexusObject = Union[h5py.Group, h5py.Dataset, h5py.SoftLink]
 
 
-def generate_json(data: Instrument, file):
+def write_nexus_structure_to_json(data: Instrument, file):
     """
-    Returns a formatted json string built from a given Instrument
+    Generates and writes the nexus structure to a given JSON file object.
     The json description can be used by the file writer (github.com/ess-dmsc/kafka-to-nexus) to create a NeXus file
 
     :param data: The full description of the beamline and data
     :param file: the file object to output the JSON to.
-    :param streams: dict of streams in nexus file.
-    :param links: dict of links in nexus file with name and target as value fields.
-    :param nexus_file_name: The NeXus file name in the write command for the filewriter.
     """
     converter = NexusToDictConverter()
-    object_to_json_file(
-        {"nexus_structure": converter.convert(data.nexus.nexus_file)}, file
-    )
+    object_to_json_file(generate_nexus_structure(converter, data), file)
+
+
+def generate_nexus_structure(
+    converter: "NexusToDictConverter", instrument: Instrument
+) -> Dict[str, Dict]:
+    return {"nexus_structure": converter.convert(instrument.nexus.nexus_file)}
 
 
 def cast_to_int(data):
