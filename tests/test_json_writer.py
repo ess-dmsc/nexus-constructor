@@ -9,7 +9,6 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.json.filewriter_json_writer import (
     NexusToDictConverter,
-    create_writer_commands,
     generate_json,
     _add_attributes,
     ATTR_NAME_BLACKLIST,
@@ -353,44 +352,6 @@ def test_GIVEN_group_with_multiple_attributes_WHEN_converting_nexus_to_dict_THEN
     assert field2value == root_dict["children"][0]["children"][1]["values"]
 
 
-def test_GIVEN_start_time_WHEN_creating_writercommands_THEN_start_time_is_included_in_command():
-    start_time = 123_413_425
-    start_cmd, _ = create_writer_commands({}, "", start_time=start_time, broker="")
-    assert start_cmd["start_time"] == start_time
-
-
-def test_GIVEN_stop_time_WHEN_creating_writer_commands_THEN_stop_time_is_included_in_command():
-    stop_time = 123_231_412
-    _, stop_cmd = create_writer_commands({}, "", stop_time=stop_time, broker="")
-    assert stop_cmd["stop_time"] == stop_time
-
-
-def test_GIVEN_no_job_id_WHEN_creating_writer_commands_THEN_job_id_is_auto_generated():
-    start_cmd, stop_cmd = create_writer_commands({}, "", broker="")
-    assert start_cmd["job_id"]
-    assert stop_cmd["job_id"]
-
-
-def test_GIVEN_job_id_WHEN_creating_writer_commands_THEN_job_id_is_present_in_commands():
-    job_id = "something"
-    start_cmd, stop_cmd = create_writer_commands({}, "", job_id=job_id, broker="")
-    assert start_cmd["job_id"] == job_id
-    assert stop_cmd["job_id"] == job_id
-
-
-def test_GIVEN_output_file_WHEN_creating_writer_commands_THEN_output_file_is_present_in_write_command():
-    filename = "test.nxs"
-    start_cmd, _ = create_writer_commands({}, output_filename=filename, broker="")
-
-    assert start_cmd["file_attributes"]["file_name"] == filename
-
-
-def test_GIVEN_broker_WHEN_creting_writer_commands_THEN_broker_is_present_in_write_command():
-    broker = "test:9092"
-    start_cmd, _ = create_writer_commands({}, output_filename="", broker=broker)
-    assert start_cmd["broker"] == broker
-
-
 def test_GIVEN_nexus_object_and_fake_fileIO_WHEN_calling_object_to_json_file_THEN_fileIO_contains_nexus_object_attributes():
     file = io.StringIO(newline=None)
 
@@ -415,9 +376,7 @@ def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is
     component = data.create_component(component_name, component_nx_class, "")
     component.set_field(dataset_name, value=dataset_value, dtype=str)
 
-    nexus_file_name = "test.nxs"
-
-    generate_json(data, file, nexus_file_name=nexus_file_name)
+    generate_json(data, file)
 
     output_file_dict = json.loads(file.getvalue())
 
@@ -731,41 +690,6 @@ def test_GIVEN_stream_with_topic_not_including_broker_and_default_broker_not_pro
     assert len(streams_) == 1
 
     assert streams_[0]["converter"]["topic"] == topic
-
-
-def test_GIVEN_blank_service_id_WHEN_generating_start_and_stop_commands_THEN_service_id_not_in_write_or_stop_command():
-    start_cmd, stop_cmd = create_writer_commands(
-        {}, output_filename="file.nxs", broker="broker", job_id="123", service_id=""
-    )
-    assert "service_id" not in start_cmd.keys()
-    assert "service_id" not in stop_cmd.keys()
-
-
-def test_GIVEN_disable_hdf_swmr_WHEN_writing_start_command_THEN_disable_hdf_swmr_in_write_cmd():
-    start_cmd, _ = create_writer_commands(
-        {}, output_filename="file.nxs", broker="broker", use_hdf_swmr=False
-    )
-    assert "use_hdf_swmr" in start_cmd.keys()
-    assert not start_cmd["use_hdf_swmr"]
-
-
-def test_GIVEN_abort_uninitialised_stream_WHEN_writing_start_command_THEN_abort_uninitialised_stream_is_in_start_cmd():
-    start_cmd, _ = create_writer_commands(
-        {},
-        output_filename="file.nxs",
-        broker="broker",
-        abort_on_uninitialised_stream=True,
-    )
-    assert "abort_on_uninitialised_stream" in start_cmd.keys()
-    assert start_cmd["abort_on_uninitialised_stream"]
-
-
-def test_GIVEN_none_as_service_id_WHEN_generating_writer_commands_THEN_service_id_is_not_in_commands():
-    start_cmd, stop_cmd = create_writer_commands(
-        {}, output_filename="file.nxs", broker="broker", job_id="123", service_id=None
-    )
-    assert "service_id" not in start_cmd.keys()
-    assert "service_id" not in stop_cmd.keys()
 
 
 def test_GIVEN_no_attributes_WHEN_adding_attributes_THEN_root_dict_is_not_changed(file):

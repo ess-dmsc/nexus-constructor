@@ -11,17 +11,7 @@ from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
 NexusObject = Union[h5py.Group, h5py.Dataset, h5py.SoftLink]
 
 
-def generate_json(
-    data: Instrument,
-    file,
-    nexus_file_name: str = "",
-    broker: str = "",
-    start_time: str = None,
-    stop_time: str = None,
-    service_id: str = None,
-    abort_uninitialised: bool = False,
-    use_swmr: bool = True,
-):
+def generate_json(data: Instrument, file):
     """
     Returns a formatted json string built from a given Instrument
     The json description can be used by the file writer (github.com/ess-dmsc/kafka-to-nexus) to create a NeXus file
@@ -32,20 +22,10 @@ def generate_json(
     :param links: dict of links in nexus file with name and target as value fields.
     :param nexus_file_name: The NeXus file name in the write command for the filewriter.
     """
-
     converter = NexusToDictConverter()
-    tree = converter.convert(data.nexus.nexus_file)
-    write_command, _ = create_writer_commands(
-        tree,
-        nexus_file_name,
-        broker=broker,
-        start_time=start_time,
-        stop_time=stop_time,
-        service_id=service_id,
-        abort_on_uninitialised_stream=abort_uninitialised,
-        use_hdf_swmr=use_swmr,
+    object_to_json_file(
+        {"nexus_structure": converter.convert(data.nexus.nexus_file)}, file
     )
-    object_to_json_file(write_command, file)
 
 
 def cast_to_int(data):
@@ -218,62 +198,6 @@ class NexusToDictConverter:
             root_dict["dataset"]["size"] = size
 
         return root_dict
-
-
-def create_writer_commands(
-    nexus_structure,
-    output_filename,
-    broker,
-    job_id="",
-    start_time=None,
-    stop_time=None,
-    use_hdf_swmr=True,
-    service_id=None,
-    abort_on_uninitialised_stream=False,
-):
-    """
-    :param nexus_structure: dictionary containing nexus file structure
-    :param output_filename: the nexus file output filename
-    :param broker: default broker to consume from
-    :param job_id: filewriter job_id
-    :param start_time: ms from unix epoch
-    :param stop_time: ms from unix epoch
-    :param abort_on_uninitialised_stream: Whether to abort if the stream cannot be initialised
-    :param service_id: The identifier for the instance of the file-writer that should handle this command. Only needed if multiple file-writers present
-    :param use_hdf_swmr: Whether to use HDF5's Single Writer Multiple Reader (SWMR) capabilities. Default is true in the filewriter
-    :return: A write command and stop command with specified job_id.
-    """
-
-    write_cmd = {"nexus_structure": nexus_structure}
-
-    if output_filename:
-        write_cmd["file_attributes"] = {"file_name": output_filename}
-
-    if broker:
-        write_cmd["broker"] = broker
-
-    if job_id:
-        write_cmd["job_id"] = job_id
-
-    if start_time is not None:
-        write_cmd["start_time"] = start_time
-
-    if not use_hdf_swmr:
-        write_cmd["use_hdf_swmr"] = use_hdf_swmr
-
-    if abort_on_uninitialised_stream:
-        write_cmd["abort_on_uninitialised_stream"] = abort_on_uninitialised_stream
-
-    stop_cmd = {"cmd": "FileWriter_stop", "job_id": job_id}
-    if stop_time is not None:
-        write_cmd["stop_time"] = stop_time
-        stop_cmd["stop_time"] = stop_time
-
-    if service_id is not None and service_id:
-        write_cmd["service_id"] = service_id
-        stop_cmd["service_id"] = service_id
-
-    return write_cmd, stop_cmd
 
 
 def _separate_dot_field_group_hierarchy(
