@@ -9,7 +9,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar, Union, List
 
-from nexus_constructor.nexus.nexus_wrapper import h5Node
+from nexus_constructor.nexus.nexus_wrapper import h5Node, decode_bytes_string
 from nexus_constructor.transformation_types import TransformationType
 
 TransformationOrComponent = TypeVar(
@@ -199,13 +199,15 @@ class Transformation:
         if depends_on_path is not None:
             if f"{self._dataset.parent.name}/{depends_on_path}" in self.file.nexus_file:
                 # depends_on is relative
-                return Transformation(
+                return create_transformation(
                     self.file,
                     self.file.nexus_file[
                         f"{self._dataset.parent.name}/{depends_on_path}"
                     ],
                 )
-            return Transformation(self.file, self.file.nexus_file[depends_on_path])
+            return create_transformation(
+                self.file, self.file.nexus_file[depends_on_path]
+            )
 
     @depends_on.setter
     def depends_on(self, depends_on: "Transformation"):
@@ -221,7 +223,7 @@ class Transformation:
             existing_depends_on is not None
             and existing_depends_on in self.file.nexus_file
         ):
-            Transformation(
+            create_transformation(
                 self.file, self.file.nexus_file[existing_depends_on]
             ).deregister_dependent(self)
 
@@ -306,7 +308,7 @@ class Transformation:
                 if isinstance(node, h5py.Group):
                     return_dependents.append(comp.Component(self.file, node))
                 elif isinstance(node, h5py.Dataset):
-                    return_dependents.append(Transformation(self.file, node))
+                    return_dependents.append(create_transformation(self.file, node))
                 else:
                     raise RuntimeError("Unknown type of node.")
         return return_dependents
@@ -353,7 +355,7 @@ def create_transformation(wrapper: nx.NexusWrapper, node: h5Node):
     """
     if (
         CommonAttrs.NX_CLASS in node.attrs
-        and str(node.attrs[CommonAttrs.NX_CLASS], encoding="utf-8") == "NXlog"
+        and decode_bytes_string(node.attrs[CommonAttrs.NX_CLASS]) == "NXlog"
     ):
         return NXLogTransformation(wrapper, node)
     return Transformation(wrapper, node)

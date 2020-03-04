@@ -254,7 +254,7 @@ class Component:
             field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.TRANSLATION
         )
 
-        translation_transform = Transformation(self.file, field)
+        translation_transform = create_transformation(self.file, field)
         translation_transform.ui_value = magnitude
         translation_transform.depends_on = depends_on
         return translation_transform
@@ -288,7 +288,7 @@ class Component:
         self.file.set_attribute_value(
             field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.ROTATION
         )
-        rotation_transform = Transformation(self.file, field)
+        rotation_transform = create_transformation(self.file, field)
         rotation_transform.depends_on = depends_on
         rotation_transform.ui_value = angle
         return rotation_transform
@@ -320,7 +320,7 @@ class Component:
         depends_on_path = self.file.get_field_value(self.group, CommonAttrs.DEPENDS_ON)
         if depends_on_path is None:
             return None
-        return Transformation(self.file, self.file.nexus_file[depends_on_path])
+        return create_transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
     def depends_on(self, transformation: Transformation):
@@ -328,7 +328,7 @@ class Component:
             self.group, CommonAttrs.DEPENDS_ON
         )
         if existing_depends_on is not None:
-            Transformation(
+            create_transformation(
                 self.file, self.file[existing_depends_on]
             ).deregister_dependent(self)
 

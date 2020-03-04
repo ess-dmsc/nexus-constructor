@@ -6,7 +6,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.component.component import Component
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
-from nexus_constructor.transformations import Transformation, NXLogTransformation
+from nexus_constructor.transformations import NXLogTransformation, create_transformation
 from nexus_constructor.component.component_factory import create_component
 
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
@@ -51,7 +51,7 @@ class Instrument:
                                     self.nexus, node[transformation_name]
                                 )
                             else:
-                                transform = Transformation(
+                                transform = create_transformation(
                                     self.nexus, node[transformation_name]
                                 )
                             transform.depends_on = transform.depends_on
