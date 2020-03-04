@@ -1,8 +1,10 @@
+import h5py
 import numpy as np
 import pytest
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.component import Component
+from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
@@ -106,6 +108,42 @@ def create_transform(nexus_file, name):
         nexus_file, name, initial_value, initial_vector, initial_type
     )
     return Transformation(nexus_file, dataset)
+
+
+def test_ui_value_for_transform_with_array_magnitude_returns_first_value():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    transform_name = "transform1"
+    array = [1.1, 2.2, 3.3]
+    transform_value = np.asarray(array, dtype=float)
+
+    transform_dataset = _add_transform_to_file(
+        nexus_wrapper,
+        transform_name,
+        transform_value,
+        QVector3D(1, 0, 0),
+        TransformationType.TRANSLATION,
+    )
+
+    transformation = Transformation(nexus_wrapper, transform_dataset)
+    assert transformation.ui_value == array[0]
+
+
+def test_ui_value_for_transform_with_array_magnitude_of_strings_returns_zero():
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    transform_name = "transform1"
+    array = ["a1", "b1", "c1"]
+    transform_value = np.asarray(array, dtype=h5py.special_dtype(vlen=str))
+
+    transform_dataset = _add_transform_to_file(
+        nexus_wrapper,
+        transform_name,
+        transform_value,
+        QVector3D(1, 0, 0),
+        TransformationType.TRANSLATION,
+    )
+
+    transformation = Transformation(nexus_wrapper, transform_dataset)
+    assert transformation.ui_value == 0
 
 
 def test_can_set_transform_properties():
