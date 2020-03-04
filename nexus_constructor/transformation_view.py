@@ -4,7 +4,7 @@ from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
 from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
 from PySide2.QtGui import QVector3D
-from nexus_constructor.transformations import Transformation
+from nexus_constructor.transformations import Transformation, NXLogTransformation
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.component_tree_model import LinkTransformation
 from nexus_constructor.component.component import Component
@@ -28,8 +28,9 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.x_spinbox.setValue(current_vector.x())
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
-        item, update_function = find_field_type(self.transformation.dataset)
-        update_function(item, self.transformation_frame.magnitude_widget)
+        if not isinstance(self.transformation, NXLogTransformation):
+            item, update_function = find_field_type(self.transformation.dataset)
+            update_function(item, self.transformation_frame.magnitude_widget)
         self.transformation_frame.magnitude_widget.units = self.transformation.units
         self.transformation_frame.value_spinbox.setValue(self.transformation.ui_value)
 

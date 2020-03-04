@@ -20,7 +20,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     PIXEL_FIELDS,
 )
 from nexus_constructor.transformation_types import TransformationType
-from nexus_constructor.transformations import Transformation
+from nexus_constructor.transformations import Transformation, create_transformation
 from nexus_constructor.ui_utils import (
     qvector3d_to_numpy_array,
     generate_unique_name,
@@ -192,7 +192,7 @@ class Component:
             ):
                 # We're done, the next transformation is not stored in this component
                 return
-            new_transform = Transformation(self.file, transform_dataset)
+            new_transform = create_transformation(self.file, transform_dataset)
             new_transform.parent = transforms
             transforms.append(new_transform)
             if CommonAttrs.DEPENDS_ON in transform_dataset.attrs.keys():
