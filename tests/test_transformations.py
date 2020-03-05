@@ -556,3 +556,31 @@ def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dep
         Transformation(nexus_wrapper, transform1_dataset).depends_on.dataset.name
         == transform2_dataset.name
     )
+
+
+def test_transforms_with_no_dependees_are_not_treated_as_having_relative_dependees(
+    file,
+):
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    component_name = "component_1"
+
+    component1 = add_component_to_file(nexus_wrapper, component_name=component_name)
+    # make depends_on point to relative transformations group
+    component1.group["depends_on"] = "transformations/transform1"
+
+    transformations_group = component1.group.create_group("transformations")
+
+    transform1_name = "transform1"
+    transform1_dataset = transformations_group.create_dataset(transform1_name, data=1)
+    transform1_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(
+        QVector3D(1, 0, 0)
+    )
+    transform1_dataset.attrs[
+        CommonAttrs.TRANSFORMATION_TYPE
+    ] = TransformationType.TRANSLATION
+
+    transform1_dataset.attrs["depends_on"] = "."
+
+    transformation = Transformation(nexus_wrapper, transform1_dataset)
+
+    assert not transformation.depends_on.name
