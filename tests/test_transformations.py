@@ -559,7 +559,7 @@ def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dep
 
 
 def test_transforms_with_no_dependees_are_not_treated_as_having_relative_dependees(
-    file,
+    file,  # noqa: F811
 ):
     nexus_wrapper = NexusWrapper(str(uuid1()))
     component_name = "component_1"
