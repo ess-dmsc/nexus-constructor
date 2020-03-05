@@ -94,7 +94,7 @@ class Transformation:
 
     @property
     def units(self):
-        self.file.get_attribute_value(self._dataset, CommonAttrs.UNITS)
+        return self.file.get_attribute_value(self._dataset, CommonAttrs.UNITS)
 
     @units.setter
     def units(self, new_units):
