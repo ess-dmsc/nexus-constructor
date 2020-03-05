@@ -28,6 +28,6 @@ class KafkaInterface(ABC):
         with self._lock:
             self._is_connected = is_connected
 
-    def __del__(self):
+    def close(self):
         self._cancelled = True
         self._poll_thread.join()

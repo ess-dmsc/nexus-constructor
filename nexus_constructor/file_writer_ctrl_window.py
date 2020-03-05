@@ -8,7 +8,7 @@ from ui.led import Led
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
 from PySide2.QtWidgets import QMainWindow, QLineEdit
 from PySide2.QtCore import QTimer, QAbstractItemModel
-from PySide2.QtGui import QStandardItemModel
+from PySide2.QtGui import QStandardItemModel, QCloseEvent
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.kafka.status_consumer import StatusConsumer
@@ -42,6 +42,8 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.setupUi()
         self.known_writers = {}
         self.known_files = {}
+        self.status_consumer = None
+        self.command_producer = None
 
     def setupUi(self):
         super().setupUi(self)
@@ -129,7 +131,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         )
         if result is not None:
             if self.status_consumer is not None:
-                del self.status_consumer
+                self.status_consumer.close()
             self.status_consumer = kafka_obj_type(*result)
 
     def command_broker_timer_changed(self, kafka_obj_type: KafkaInterface):
@@ -138,7 +140,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         )
         if result is not None:
             if self.command_producer is not None:
-                del self.command_producer
+                self.command_producer.close()
             self.command_producer = kafka_obj_type(*result)
 
     def _update_writer_list(self, updated_list: Dict[str, Dict]):
@@ -244,3 +246,9 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                         f'{{"{send_msg}"}}'.encode("utf-8")
                     )
                     break
+
+    def closeEvent(self, event: QCloseEvent):
+        if self.status_consumer is not None:
+            self.status_consumer.close()
+        if self.command_producer is not None:
+            self.command_producer.close()

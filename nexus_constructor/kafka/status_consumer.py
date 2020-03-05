@@ -52,8 +52,8 @@ class StatusConsumer(KafkaInterface):
             return
 
         while self._topic not in metadata.topics.keys():
-            time.sleep(0.5)
             metadata = self._consumer.list_topics()
+            time.sleep(0.5)
             if self._cancelled:
                 return
 
@@ -63,7 +63,11 @@ class StatusConsumer(KafkaInterface):
         known_writers = {}
         known_files = {}
         while not self._cancelled:
-            msg = self._consumer.poll(0.5)
+            try:
+                msg = self._consumer.poll(0.5)
+            except RuntimeError:
+                self.connected = False
+                break
             if msg is None:
                 continue
             if msg.error():
@@ -87,6 +91,7 @@ class StatusConsumer(KafkaInterface):
                     self.file_writers = known_writers
                     self.files = known_files
 
-    def __del__(self):
+    def close(self):
+        self._cancelled = True
         self._consumer.close()
-        super().__del__()
+        self._poll_thread.join()
