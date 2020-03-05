@@ -5,10 +5,13 @@ from PySide2.QtWidgets import (
     QInputDialog,
     QLineEdit,
     QAction,
+    QMessageBox,
 )
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 import silx.gui.hdf5
 import h5py
+from nexusutils.nexusbuilder import NexusBuilder
+
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.filewriter_command_widget import FilewriterCommandWidget
@@ -35,6 +38,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.export_to_nexus_file_action.triggered.connect(self.save_to_nexus_file)
         self.open_nexus_file_action.triggered.connect(self.open_nexus_file)
         self.open_json_file_action.triggered.connect(self.open_json_file)
+        self.open_idf_file_action.triggered.connect(self.open_idf_file)
         self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_filewriter_json
         )
@@ -143,6 +147,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
         self.instrument.nexus.save_file(filename)
+
+    def open_idf_file(self):
+        filename = file_dialog(False, "Open IDF file", {"IDF files": ["xml"]})
+        with open(filename) as idf_file:
+            pass
+        QMessageBox.warning(
+            self,
+            "Mantid IDF loaded",
+            "Please manually check the instrument for accuracy.",
+        )
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
