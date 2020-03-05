@@ -1,6 +1,5 @@
 import h5py
 from mock import Mock
-
 from nexus_constructor.nexus.nexus_wrapper import (
     NexusWrapper,
     append_nxs_extension,

@@ -1,3 +1,5 @@
+import re
+
 import h5py
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator
@@ -446,5 +448,29 @@ class CommandDialogOKValidator(QObject):
 
     def validate_ok(self):
         self.is_valid.emit(not any([not self.broker_valid, not self.filename_valid]))
+
+    is_valid = Signal(bool)
+
+
+class BrokerAndTopicValidator(QValidator):
+    def __init__(self):
+        super().__init__()
+
+    @staticmethod
+    def extract_addr_and_topic(in_string):
+        correct_string_re = re.compile(
+            "(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"
+        )  # noqa: W605
+        match_res = re.match(correct_string_re, in_string)
+        if match_res is not None:
+            return match_res.group(2), match_res.group(7)
+        return None
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if self.extract_addr_and_topic(input) is not None:
+            self.is_valid.emit(True)
+            return QValidator.Acceptable
+        self.is_valid.emit(False)
+        return QValidator.Intermediate
 
     is_valid = Signal(bool)

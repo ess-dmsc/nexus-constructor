@@ -7,7 +7,7 @@ import h5py
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
-from typing import TypeVar
+from typing import TypeVar, Union, List
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 from nexus_constructor.transformation_types import TransformationType
@@ -39,6 +39,14 @@ class Transformation:
     @name.setter
     def name(self, new_name: str):
         self.file.rename_node(self._dataset, new_name)
+        self._update_dependent_depends_on()
+
+    def _update_dependent_depends_on(self):
+        """
+        Updates all of the directly dependent "depends_on" fields for this transformation.
+        """
+        for dependent in self.get_dependents():
+            dependent.depends_on = self
 
     @property
     def qmatrix(self) -> QMatrix4x4:
@@ -86,7 +94,7 @@ class Transformation:
 
     @property
     def units(self):
-        self.file.get_attribute_value(self._dataset, CommonAttrs.UNITS)
+        return self.file.get_attribute_value(self._dataset, CommonAttrs.UNITS)
 
     @units.setter
     def units(self, new_units):
@@ -149,14 +157,30 @@ class Transformation:
         Used for getting the 3d view magnitude (as a placeholder or if the dataset is scalar)
         :return:
         """
-        if isinstance(self.dataset, h5py.Dataset) and np.isscalar(self.dataset[()]):
-            try:
-                float(self._dataset[()])
-                return self._dataset[()]
-            except ValueError:
-                logging.debug(
-                    "transformation value is not cast-able to int, using UI placeholder value instead."
-                )
+        if isinstance(self.dataset, h5py.Dataset):
+            if np.isscalar(self.dataset[()]):
+                try:
+                    self.ui_value = float(self._dataset[()])
+                    return float(self._dataset[()])
+                except ValueError:
+                    logging.debug(
+                        "transformation value is not cast-able to float/int, using UI placeholder value instead."
+                    )
+            else:
+                # Dataset value is array - try to use the first value of the array as the UI value
+                try:
+                    self.ui_value = float(self._dataset[...][0])
+                    return float(self._dataset[...][0])
+                except ValueError:
+                    # Not castable to float - either return the UI value if present in the group or the default value if not.
+                    pass
+
+        if CommonAttrs.UI_VALUE not in self._dataset.attrs:
+            # Link or stream
+            default_value = 0.0
+            self.ui_value = default_value
+            return default_value
+
         return self.file.get_attribute_value(self._dataset, CommonAttrs.UI_VALUE)[()]
 
     @ui_value.setter
@@ -184,7 +208,11 @@ class Transformation:
         existing_depends_on = self.file.get_attribute_value(
             self._dataset, CommonAttrs.DEPENDS_ON
         )
-        if existing_depends_on is not None:
+
+        if (
+            existing_depends_on is not None
+            and existing_depends_on in self.file.nexus_file
+        ):
             Transformation(
                 self.file, self.file.nexus_file[existing_depends_on]
             ).deregister_dependent(self)
@@ -251,11 +279,15 @@ class Transformation:
                     f"Unable to de-register dependent {former_dependent.absolute_path} from {self.absolute_path} due to it not being registered."
                 )
 
-    def get_dependents(self):
+    def get_dependents(self) -> List[Union["Component", "Transformation"]]:
+        """
+        Returns the direct dependents of a transform, i.e. anything that has depends_on pointing to this transformation.
+        """
         import nexus_constructor.component.component as comp
 
+        return_dependents = []
+
         if CommonAttrs.DEPENDEE_OF in self._dataset.attrs.keys():
-            return_dependents = []
             dependents = self.file.get_attribute_value(
                 self._dataset, CommonAttrs.DEPENDEE_OF
             )
@@ -269,7 +301,7 @@ class Transformation:
                     return_dependents.append(Transformation(self.file, node))
                 else:
                     raise RuntimeError("Unknown type of node.")
-            return return_dependents
+        return return_dependents
 
     def remove_from_dependee_chain(self):
         all_dependees = self.get_dependents()

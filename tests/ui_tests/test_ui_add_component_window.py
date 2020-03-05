@@ -1363,7 +1363,7 @@ def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_
     field = add_component_dialog.fieldsListWidget.itemWidget(
         add_component_dialog.fieldsListWidget.item(0)
     )
-    field.field_type_combo.setCurrentIndex(2)
+    field.field_type_combo.setCurrentIndex(1)
     qtbot.addWidget(field)
     qtbot.mouseClick(field.edit_button, Qt.LeftButton)
     assert field.edit_dialog.isEnabled()
@@ -1376,10 +1376,40 @@ def test_UI_GIVEN_array_field_selected_and_edit_button_pressed_THEN_edit_dialog_
     field = add_component_dialog.fieldsListWidget.itemWidget(
         add_component_dialog.fieldsListWidget.item(0)
     )
-    field.field_type_combo.setCurrentIndex(2)
+    field.field_type_combo.setCurrentIndex(1)
+    field.field_type_changed()
+
     qtbot.addWidget(field)
     qtbot.mouseClick(field.edit_button, Qt.LeftButton)
     assert field.table_view.isEnabled()
+
+
+def test_UI_GIVEN_stream_field_selected_and_edit_button_pressed_THEN_edit_dialog_is_shown(
+    qtbot, template, add_component_dialog
+):
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
+    field.field_type_combo.setCurrentIndex(2)
+    qtbot.addWidget(field)
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+    assert field.edit_dialog.isEnabled()
+
+
+def test_UI_GIVEN_stream_field_selected_and_edit_button_pressed_THEN_edit_dialog_stream_widget_is_shown(
+    qtbot, template, add_component_dialog
+):
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
+    field.field_type_combo.setCurrentIndex(2)
+    field.field_type_changed()
+
+    qtbot.addWidget(field)
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+    assert field.streams_widget.isEnabled()
 
 
 def test_UI_GIVEN_user_provides_valid_pixel_configuration_WHEN_entering_pixel_data_THEN_add_component_button_is_enabled(
