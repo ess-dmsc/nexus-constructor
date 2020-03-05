@@ -234,6 +234,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             for fileKey in self.known_files:
                 current_file = self.known_files[fileKey]
                 if index.row() == current_file.row:
+                    # TODO: create flatbuffers blob here
                     send_msg = f' "cmd": "FileWriter_stop", "job_id": "{current_file.job_id}", "service_id": "{current_file.writer_id}" '
                     self.command_producer.send_command(
                         f'{{"{send_msg}"}}'.encode("utf-8")
