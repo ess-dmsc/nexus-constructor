@@ -3,12 +3,12 @@ from typing import Union, Tuple
 
 from PySide2.QtCore import QDateTime, Qt
 from PySide2.QtWidgets import (
-    QDialog,
     QFormLayout,
     QDateTimeEdit,
     QLineEdit,
     QCheckBox,
     QPushButton,
+    QWidget,
 )
 
 from nexus_constructor.ui_utils import validate_line_edit
@@ -22,20 +22,21 @@ from nexus_constructor.validators import (
 TIME_FORMAT = "yyyy MM dd hh:mm:ss"
 
 
-class FilewriterCommandDialog(QDialog):
+class FilewriterCommandWidget(QWidget):
     """
     Used for the required and optional fields when saving a filewriter command JSON file.
     """
 
-    def __init__(self):
-        super(FilewriterCommandDialog, self).__init__()
-        self.setModal(True)
+    def __init__(self, parent=None):
+        super(FilewriterCommandWidget, self).__init__()
+        self.setParent(parent)
         self.setLayout(QFormLayout())
 
         self.nexus_file_name_edit = QLineEdit()
 
         self.ok_button = QPushButton("Ok")
-        self.ok_button.clicked.connect(self.close)
+        if parent is not None:
+            self.ok_button.clicked.connect(parent.close)
 
         self.broker_line_edit = QLineEdit()
         self.broker_line_edit.setPlaceholderText("broker:port")
@@ -78,6 +79,7 @@ class FilewriterCommandDialog(QDialog):
         self.stop_time_picker.setDisplayFormat(TIME_FORMAT)
         self.stop_time_enabled.stateChanged.connect(partial(self.state_changed, False))
         self.stop_time_enabled.setChecked(False)
+        self.state_changed(False, Qt.CheckState.Unchecked)
 
         self.service_id_lineedit = QLineEdit()
         self.service_id_lineedit.setPlaceholderText("(Optional)")

@@ -1,11 +1,17 @@
 from typing import Dict
-from PySide2.QtWidgets import QMainWindow, QApplication, QInputDialog, QLineEdit
+from PySide2.QtWidgets import (
+    QMainWindow,
+    QApplication,
+    QInputDialog,
+    QLineEdit,
+    QAction,
+)
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 import silx.gui.hdf5
 import h5py
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.filewriter_command_dialog import FilewriterCommandDialog
+from nexus_constructor.filewriter_command_widget import FilewriterCommandWidget
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
@@ -64,6 +70,29 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         self.widget.setVisible(True)
 
+        self._set_up_file_writer_control_window(main_window)
+        self.file_writer_control_window = None
+
+    def _set_up_file_writer_control_window(self, main_window):
+        try:
+            import confluent_kafka  # noqa: F401
+
+            self.control_file_writer_action = QAction(main_window)
+            self.control_file_writer_action.setText("Control file-writer")
+            self.file_menu.addAction(self.control_file_writer_action)
+            self.control_file_writer_action.triggered.connect(
+                self.show_control_file_writer_window
+            )
+        except ImportError:
+            pass
+
+    def show_control_file_writer_window(self):
+        if self.file_writer_control_window is None:
+            from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
+
+            self.file_writer_ctrl_window = FileWriterCtrl(self.instrument)
+            self.file_writer_ctrl_window.show()
+
     def show_edit_component_dialog(self):
         selected_component = self.component_tree_view_tab.component_tree_view.selectedIndexes()[
             0
@@ -118,7 +147,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
         if filename:
-            dialog = FilewriterCommandDialog()
+            dialog = QDialog()
+            dialog.setModal(True)
+            dialog.setLayout(QGridLayout())
+            command_widget = FilewriterCommandWidget()
+            dialog.layout().addWidget(command_widget)
+
             dialog.exec_()
             (
                 nexus_file_name,
@@ -128,7 +162,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 service_id,
                 abort_on_uninitialised_stream,
                 use_swmr,
-            ) = dialog.get_arguments()
+            ) = command_widget.get_arguments()
             with open(filename, "w") as file:
                 filewriter_json_writer.generate_json(
                     self.instrument,
