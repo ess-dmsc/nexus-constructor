@@ -1,3 +1,4 @@
+import uuid
 from typing import Dict
 from PySide2.QtWidgets import (
     QMainWindow,
@@ -150,8 +151,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def open_idf_file(self):
         filename = file_dialog(False, "Open IDF file", {"IDF files": ["xml"]})
-        with open(filename) as idf_file:
-            pass
+        builder = NexusBuilder(
+            str(uuid.uuid4()), idf_file=filename, file_in_memory=True
+        )
+        builder.add_instrument_geometry_from_idf()
+        builder.add_monitors_from_idf()
+        builder.add_detectors_from_idf()
+        self.instrument.nexus.load_nexus_file(builder.target_file)
+        self._update_views()
         QMessageBox.warning(
             self,
             "Mantid IDF loaded",
