@@ -335,12 +335,18 @@ class NXLogTransformation(Transformation):
     @property
     def ui_value(self) -> float:
         if "value" not in self._dataset.keys():
-            return 0
+            if CommonAttrs.UI_VALUE not in self._dataset.attrs:
+                self.ui_value = 0
+            return self.file.get_attribute_value(self._dataset, CommonAttrs.UI_VALUE)
         value_group = self._dataset["value"]
         if np.isscalar(value_group):
             return value_group[()]
         else:
             return float(value_group[0][()])
+
+    @ui_value.setter
+    def ui_value(self, new_value):
+        self.file.set_attribute_value(self._dataset, CommonAttrs.UI_VALUE, new_value)
 
     @property
     def units(self) -> str:
