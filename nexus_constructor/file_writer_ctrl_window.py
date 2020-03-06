@@ -7,8 +7,8 @@ from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.led import Led
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
-from PySide2.QtWidgets import QMainWindow, QLineEdit
-from PySide2.QtCore import QTimer, QAbstractItemModel
+from PySide2.QtWidgets import QMainWindow, QLineEdit, QApplication
+from PySide2.QtCore import QTimer, QAbstractItemModel, QSettings
 from PySide2.QtGui import QStandardItemModel, QCloseEvent
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
@@ -42,12 +42,38 @@ class File:
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def __init__(self, instrument: Instrument):
         super().__init__()
+        self.settings = QSettings("ess", "nexus-constructor")
         self.instrument = instrument
         self.setupUi()
         self.known_writers = {}
         self.known_files = {}
         self.status_consumer = None
         self.command_producer = None
+
+    def _restore_settings(self):
+        self.status_broker_edit.setText(self.settings.value("status_broker_addr"))
+        self.command_broker_edit.setText(self.settings.value("command_broker_addr"))
+        self.command_widget.use_swmr_checkbox.setChecked(
+            self._extract_bool_from_qsettings(self.settings.value("use_swmr", False))
+        )
+        self.command_widget.start_time_enabled.setChecked(
+            self._extract_bool_from_qsettings(
+                self.settings.value("use_start_time", False)
+            )
+        )
+        self.command_widget.stop_time_enabled.setChecked(
+            self._extract_bool_from_qsettings(
+                self.settings.value("use_stop_time", False)
+            )
+        )
+        self.command_widget.nexus_file_name_edit.setText(
+            self.settings.value("file_name")
+        )
+
+    def _extract_bool_from_qsettings(self, temp):
+        if type(temp) == str:
+            temp = temp == "True"
+        return temp
 
     def setupUi(self):
         super().setupUi(self)
@@ -96,6 +122,24 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.file_list_model.setHeaderData(1, QtCore.Qt.Horizontal, "Last seen")
         self.file_list_model.setHeaderData(2, QtCore.Qt.Horizontal, "File writer")
         self.files_list.setModel(self.file_list_model)
+        self._restore_settings()
+        QApplication.instance().aboutToQuit.connect(self.doCleanup)
+
+    def doCleanup(self):
+        self.settings.setValue("status_broker_addr", self.status_broker_edit.text())
+        self.settings.setValue("command_broker_addr", self.command_broker_edit.text())
+        self.settings.setValue(
+            "use_swmr", self.command_widget.use_swmr_checkbox.isChecked()
+        )
+        self.settings.setValue(
+            "use_start_time", self.command_widget.start_time_enabled.isChecked()
+        )
+        self.settings.setValue(
+            "use_stop_time", self.command_widget.stop_time_enabled.isChecked()
+        )
+        self.settings.setValue(
+            "file_name", self.command_widget.nexus_file_name_edit.text()
+        )
 
     @staticmethod
     def _set_up_broker_fields(
