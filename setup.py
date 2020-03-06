@@ -33,8 +33,6 @@ build_exe_options = {
         "pandas",
         "netCDF4",
         "matplotlib",
-        "tables",
-        "lxml",
         "fabio",
         "mpl_toolkits",
         "pytz",
