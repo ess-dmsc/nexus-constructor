@@ -16,8 +16,8 @@ from nexus_constructor.kafka.status_consumer import StatusConsumer
 from nexus_constructor.kafka.command_producer import CommandProducer
 import time
 from nexus_constructor.json.filewriter_json_writer import (
-    generate_nexus_structure,
     NexusToDictConverter,
+    generate_nexus_string,
 )
 import attr
 from streaming_data_types import run_start_pl72, run_stop_6s4t
@@ -225,10 +225,8 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                         start_time=start_time,
                         stop_time=stop_time,
                         broker=broker,
-                        nexus_structure=str(
-                            generate_nexus_structure(
-                                NexusToDictConverter(), self.instrument
-                            )
+                        nexus_structure=generate_nexus_string(
+                            NexusToDictConverter(), self.instrument
                         ),
                         service_id=service_id,
                     )
