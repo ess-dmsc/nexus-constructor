@@ -1,7 +1,7 @@
 # In general libraries should not be pinned to specific versions
 attrs
 h5py
-git+https://github.com/ess-dmsc/python-nexus-utilities@6f5d2c7f1ca66063227aad2a111a2cc567d573f6#egg=nexusutils
+git+https://github.com/ess-dmsc/python-nexus-utilities@b89304daa55b7146f57ba192fa48f3ed3d1f24ba#egg=nexusutils
 git+https://github.com/ess-dmsc/nexus-json#egg=nexusjson
 numpy-stl
 pint
