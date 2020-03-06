@@ -7,9 +7,9 @@ import h5py
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
-from typing import TypeVar, Union, List
+from typing import TypeVar, Union, List, Optional
 
-from nexus_constructor.nexus.nexus_wrapper import h5Node
+from nexus_constructor.nexus.nexus_wrapper import h5Node, decode_bytes_string
 from nexus_constructor.transformation_types import TransformationType
 
 TransformationOrComponent = TypeVar(
@@ -192,12 +192,22 @@ class Transformation:
         self.file.set_attribute_value(self._dataset, CommonAttrs.UI_VALUE, new_value)
 
     @property
-    def depends_on(self) -> "Transformation":
+    def depends_on(self) -> Optional["Transformation"]:
         depends_on_path = self.file.get_attribute_value(
             self._dataset, CommonAttrs.DEPENDS_ON
         )
-        if depends_on_path is not None:
-            return Transformation(self.file, self.file.nexus_file[depends_on_path])
+        if depends_on_path not in (None, "."):
+            if f"{self._dataset.parent.name}/{depends_on_path}" in self.file.nexus_file:
+                # depends_on is relative
+                return create_transformation(
+                    self.file,
+                    self.file.nexus_file[
+                        f"{self._dataset.parent.name}/{depends_on_path}"
+                    ],
+                )
+            return create_transformation(
+                self.file, self.file.nexus_file[depends_on_path]
+            )
 
     @depends_on.setter
     def depends_on(self, depends_on: "Transformation"):
@@ -213,7 +223,7 @@ class Transformation:
             existing_depends_on is not None
             and existing_depends_on in self.file.nexus_file
         ):
-            Transformation(
+            create_transformation(
                 self.file, self.file.nexus_file[existing_depends_on]
             ).deregister_dependent(self)
 
@@ -298,7 +308,7 @@ class Transformation:
                 if isinstance(node, h5py.Group):
                     return_dependents.append(comp.Component(self.file, node))
                 elif isinstance(node, h5py.Dataset):
-                    return_dependents.append(Transformation(self.file, node))
+                    return_dependents.append(create_transformation(self.file, node))
                 else:
                     raise RuntimeError("Unknown type of node.")
         return return_dependents
@@ -306,7 +316,7 @@ class Transformation:
     def remove_from_dependee_chain(self):
         all_dependees = self.get_dependents()
         new_depends_on = self.depends_on
-        if self.depends_on.absolute_path == "/":
+        if self.depends_on is not None and self.depends_on.absolute_path == "/":
             new_depends_on = None
         else:
             for dependee in all_dependees:
@@ -316,3 +326,50 @@ class Transformation:
             dependee.depends_on = new_depends_on
             self.deregister_dependent(dependee)
         self.depends_on = None
+
+
+class NXLogTransformation(Transformation):
+    @property
+    def ui_value(self) -> float:
+        if "value" not in self._dataset.keys():
+            if CommonAttrs.UI_VALUE not in self._dataset.attrs:
+                self.ui_value = 0
+            return self.file.get_attribute_value(self._dataset, CommonAttrs.UI_VALUE)
+        value_group = self._dataset["value"]
+        if np.isscalar(value_group):
+            return value_group[()]
+        else:
+            return float(value_group[0][()])
+
+    @ui_value.setter
+    def ui_value(self, new_value):
+        self.file.set_attribute_value(self._dataset, CommonAttrs.UI_VALUE, new_value)
+
+    @property
+    def units(self) -> str:
+        self.file.get_attribute_value(self._dataset["value"], "units")
+
+    @units.setter
+    def units(self, new_units: str):
+        self.file.set_attribute_value(self._dataset["value"], "units", new_units)
+
+    @property
+    def dataset(self) -> h5Node:
+        return self._dataset
+
+    @dataset.setter
+    def dataset(self, new_dataset):
+        pass
+
+
+def create_transformation(wrapper: nx.NexusWrapper, node: h5Node) -> Transformation:
+    """
+    Factory for creating different types of transform.
+    If it is an NXlog group then the magnitude and units fields will be different to a normal transformation dataset.
+    """
+    if (
+        CommonAttrs.NX_CLASS in node.attrs
+        and decode_bytes_string(node.attrs[CommonAttrs.NX_CLASS]) == "NXlog"
+    ):
+        return NXLogTransformation(wrapper, node)
+    return Transformation(wrapper, node)

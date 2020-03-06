@@ -8,7 +8,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class, decode_bytes_string
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -20,7 +20,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     PIXEL_FIELDS,
 )
 from nexus_constructor.transformation_types import TransformationType
-from nexus_constructor.transformations import Transformation
+from nexus_constructor.transformations import Transformation, create_transformation
 from nexus_constructor.ui_utils import (
     qvector3d_to_numpy_array,
     generate_unique_name,
@@ -167,14 +167,32 @@ class Component:
         :param local_only: If True then only add transformations which are stored within this component
         """
         if depends_on is not None and depends_on != ".":
-            transform_dataset = self.file.nexus_file[depends_on]
+            if (
+                transforms
+                and depends_on
+                == decode_bytes_string(
+                    transforms[-1].dataset.attrs[CommonAttrs.DEPENDS_ON]
+                )
+                and depends_on
+                in [x.split("/")[-1] for x in transforms[-1].dataset.parent.keys()]
+            ):
+                # depends_on is recursive, ie one transformation in this group depends on another transformation in the group, and it is also relative
+                transform_dataset = self.file.nexus_file[
+                    f"{transforms[-1].dataset.parent.name}/{depends_on}"
+                ]
+            elif f"{self.group.name}/{depends_on}" in self.file.nexus_file:
+                transform_dataset = self.file.nexus_file[
+                    f"{self.group.name}/{depends_on}"
+                ]
+            else:
+                transform_dataset = self.file.nexus_file[depends_on]
             if (
                 local_only
                 and transform_dataset.parent.parent.name != self.absolute_path
             ):
                 # We're done, the next transformation is not stored in this component
                 return
-            new_transform = Transformation(self.file, transform_dataset)
+            new_transform = create_transformation(self.file, transform_dataset)
             new_transform.parent = transforms
             transforms.append(new_transform)
             if CommonAttrs.DEPENDS_ON in transform_dataset.attrs.keys():
@@ -236,7 +254,7 @@ class Component:
             field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.TRANSLATION
         )
 
-        translation_transform = Transformation(self.file, field)
+        translation_transform = create_transformation(self.file, field)
         translation_transform.ui_value = magnitude
         translation_transform.depends_on = depends_on
         return translation_transform
@@ -270,7 +288,7 @@ class Component:
         self.file.set_attribute_value(
             field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.ROTATION
         )
-        rotation_transform = Transformation(self.file, field)
+        rotation_transform = create_transformation(self.file, field)
         rotation_transform.depends_on = depends_on
         rotation_transform.ui_value = angle
         return rotation_transform
@@ -298,11 +316,11 @@ class Component:
             self.file.delete_node(transform._dataset)
 
     @property
-    def depends_on(self):
+    def depends_on(self) -> Optional[Transformation]:
         depends_on_path = self.file.get_field_value(self.group, CommonAttrs.DEPENDS_ON)
         if depends_on_path is None:
             return None
-        return Transformation(self.file, self.file.nexus_file[depends_on_path])
+        return create_transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
     def depends_on(self, transformation: Transformation):
@@ -310,7 +328,7 @@ class Component:
             self.group, CommonAttrs.DEPENDS_ON
         )
         if existing_depends_on is not None:
-            Transformation(
+            create_transformation(
                 self.file, self.file[existing_depends_on]
             ).deregister_dependent(self)
 
