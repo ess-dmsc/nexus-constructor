@@ -217,19 +217,23 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 abort_on_uninitialised_stream,
                 use_swmr,
             ) = self.command_widget.get_arguments()
-            nexus_structure = generate_nexus_structure(
-                NexusToDictConverter(), self.instrument
+            self.command_producer.send_command(
+                bytes(
+                    run_start_pl72.serialise_pl72(
+                        job_id=str(uuid.uuid4()),
+                        filename=nexus_file_name,
+                        start_time=start_time,
+                        stop_time=stop_time,
+                        broker=broker,
+                        nexus_structure=str(
+                            generate_nexus_structure(
+                                NexusToDictConverter(), self.instrument
+                            )
+                        ),
+                        service_id=service_id,
+                    )
+                )
             )
-            buffer = run_start_pl72.serialise_pl72(
-                job_id=str(uuid.uuid4()),
-                filename=nexus_file_name,
-                start_time=start_time,
-                stop_time=stop_time,
-                broker=broker,
-                nexus_structure=str(nexus_structure),
-                service_id=service_id,
-            )
-            self.command_producer.send_command(buffer)
             self.command_widget.ok_button.setEnabled(False)
 
     def file_list_clicked(self):
@@ -244,10 +248,14 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             for fileKey in self.known_files:
                 current_file = self.known_files[fileKey]
                 if index.row() == current_file.row:
-                    buffer = run_stop_6s4t.serialise_6s4t(
-                        job_id=current_file.job_id, service_id=current_file.writer_id
+                    self.command_producer.send_command(
+                        bytes(
+                            run_stop_6s4t.serialise_6s4t(
+                                job_id=current_file.job_id,
+                                service_id=current_file.writer_id,
+                            )
+                        )
                     )
-                    self.command_producer.send_command(buffer)
                     break
 
     def closeEvent(self, event: QCloseEvent):
