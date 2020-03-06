@@ -152,23 +152,26 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def open_idf_file(self):
         filename = file_dialog(False, "Open IDF file", {"IDF files": ["xml"]})
         self._load_idf(filename)
-        self._update_views()
-        QMessageBox.warning(
-            self,
-            "Mantid IDF loaded",
-            "Please manually check the instrument for accuracy.",
-        )
 
     def _load_idf(self, filename):
-        builder = NexusBuilder(
-            str(uuid.uuid4()),
-            idf_file=filename,
-            file_in_memory=True,
-            compress_type="gzip",
-            compress_opts=1,
-        )
-        builder.add_instrument_geometry_from_idf()
-        self.instrument.nexus.load_nexus_file(builder.target_file)
+        try:
+            builder = NexusBuilder(
+                str(uuid.uuid4()),
+                idf_file=filename,
+                file_in_memory=True,
+                compress_type="gzip",
+                compress_opts=1,
+            )
+            builder.add_instrument_geometry_from_idf()
+            self.instrument.nexus.load_nexus_file(builder.target_file)
+            self._update_views()
+            QMessageBox.warning(
+                self,
+                "Mantid IDF loaded",
+                "Please manually check the instrument for accuracy.",
+            )
+        except Exception:
+            QMessageBox.critical(self, "IDF Error", "Error whilst loading IDF file")
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
