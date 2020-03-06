@@ -25,8 +25,8 @@ def write_nexus_structure_to_json(data: Instrument, file):
 
 def generate_nexus_structure(
     converter: "NexusToDictConverter", instrument: Instrument
-) -> Dict[str, Dict]:
-    return {"nexus_structure": converter.convert(instrument.nexus.nexus_file)}
+) -> Dict[str, List[dict]]:
+    return converter.convert(instrument.nexus.nexus_file)
 
 
 def cast_to_int(data):

@@ -24,7 +24,7 @@ def test_GIVEN_json_containing_group_WHEN_json_to_nexus_called_THEN_group_create
     group_name = "test_group"
     test_json = f"""
     {{
-      "nexus_structure": {{
+
         "children": [
           {{
             "type": "group",
@@ -32,7 +32,6 @@ def test_GIVEN_json_containing_group_WHEN_json_to_nexus_called_THEN_group_create
             "children": []
           }}
         ]
-      }}
     }}
     """
     nexus_file = json_to_nexus(test_json)
@@ -43,7 +42,6 @@ def test_GIVEN_json_containing_group_WHEN_json_to_nexus_called_THEN_group_create
 def test_GIVEN_json_containing_entry_group_WHEN_json_to_nexus_called_THEN_entry_created_in_NeXus():
     test_json = """
     {
-      "nexus_structure": {
         "children": [
           {
             "type": "group",
@@ -57,7 +55,6 @@ def test_GIVEN_json_containing_entry_group_WHEN_json_to_nexus_called_THEN_entry_
             ]
           }
         ]
-      }
     }
     """
     nexus_file = json_to_nexus(test_json)
@@ -72,7 +69,6 @@ def test_GIVEN_json_containing_dataset_WHEN_json_to_nexus_called_THEN_dataset_cr
     attribute_value = 42
     test_json = f"""
     {{
-      "nexus_structure": {{
         "children": [
           {{
             "type": "dataset",
@@ -90,7 +86,6 @@ def test_GIVEN_json_containing_dataset_WHEN_json_to_nexus_called_THEN_dataset_cr
             "values": [{dataset_value}]
           }}
         ]
-      }}
     }}
     """
     nexus_file = json_to_nexus(test_json)
@@ -109,7 +104,6 @@ def test_GIVEN_json_containing_string_dataset_and_attribute_WHEN_json_to_nexus_c
     attribute_value = "forty-two"
     test_json = f"""
     {{
-      "nexus_structure": {{
         "children": [
           {{
             "type": "dataset",
@@ -127,7 +121,6 @@ def test_GIVEN_json_containing_string_dataset_and_attribute_WHEN_json_to_nexus_c
             "values": ["{dataset_value}"]
           }}
         ]
-      }}
     }}
     """
     nexus_file = json_to_nexus(test_json)
@@ -146,7 +139,6 @@ def test_GIVEN_json_containing_stream_WHEN_json_to_nexus_called_THEN_stream_crea
     type = "double"
     test_json = f"""
     {{
-      "nexus_structure": {{
         "children": [
           {{
             "type": "group",
@@ -164,7 +156,6 @@ def test_GIVEN_json_containing_stream_WHEN_json_to_nexus_called_THEN_stream_crea
             ]
           }}
         ]
-      }}
     }}
     """
     nexus_file = json_to_nexus(test_json)
@@ -181,7 +172,6 @@ def test_GIVEN_json_containing_link_WHEN_json_to_nexus_called_THEN_link_created_
     link_name = "test_link"
     test_json = f"""
        {{
-         "nexus_structure": {{
            "children": [
              {{
                "type": "dataset",
@@ -198,7 +188,6 @@ def test_GIVEN_json_containing_link_WHEN_json_to_nexus_called_THEN_link_created_
                 "target": "/dataset_name"
              }}
            ]
-         }}
        }}
        """
     nexus_file = json_to_nexus(test_json)

@@ -380,9 +380,7 @@ def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is
 
     output_file_dict = json.loads(file.getvalue())
 
-    component = output_file_dict["nexus_structure"]["children"][0]["children"][0][
-        "children"
-    ][0]
+    component = output_file_dict["children"][0]["children"][0]["children"][0]
 
     assert component["name"].lstrip("/entry/instrument/") == component_name
     assert (
