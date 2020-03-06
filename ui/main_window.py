@@ -38,8 +38,6 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.central_widget)
 
         self._set_up_menus(MainWindow)
-
-        self.retranslateUi(MainWindow)
         self.tab_widget.setCurrentIndex(0)
         QMetaObject.connectSlotsByName(MainWindow)
         self.splitter.setStretchFactor(0, 0)
@@ -79,8 +77,9 @@ class Ui_MainWindow(object):
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
         self.file_menu.addAction(self.export_to_forwarder_JSON_action)
         self.menu_bar.addAction(self.file_menu.menuAction())
+        self._set_up_titles(MainWindow)
 
-    def retranslateUi(self, MainWindow):
+    def _set_up_titles(self, MainWindow):
         MainWindow.setWindowTitle("NeXus Constructor")
         self.tab_widget.setTabText(
             self.tab_widget.indexOf(self.component_tree_view_tab), "Components"
