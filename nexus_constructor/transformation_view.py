@@ -36,7 +36,7 @@ class EditTransformation(QGroupBox):
         if isinstance(self.transformation, NXLogTransformation):
             self.transformation_frame.main_layout.addWidget(
                 QLabel(
-                    "Transformation is an NXlog - currently these are supported but not editable. "
+                    "Transformation is an NXlog - currently these are not editable. "
                 )
             )
             self.transformation_frame.magnitude_widget.setVisible(False)
