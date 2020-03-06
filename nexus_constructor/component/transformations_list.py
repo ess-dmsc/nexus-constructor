@@ -26,6 +26,8 @@ class TransformationsList(list):
         )
 
     def _transform_has_external_link(self, transformation: Transformation) -> bool:
+        if transformation.depends_on is None:
+            return False
         return (
             TRANSFORM_STR in transformation.depends_on.absolute_path
             and (self.parent_component.absolute_path + TRANSFORM_STR)
