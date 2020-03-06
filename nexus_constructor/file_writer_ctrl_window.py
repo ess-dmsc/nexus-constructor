@@ -1,3 +1,4 @@
+import uuid
 from functools import partial
 from typing import Callable, Dict, Union, Tuple, Type
 
@@ -19,6 +20,7 @@ from nexus_constructor.json.filewriter_json_writer import (
     NexusToDictConverter,
 )
 import attr
+from streaming_data_types import run_start_pl72, run_stop_6s4t
 
 
 @attr.s
@@ -218,8 +220,16 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             nexus_structure = generate_nexus_structure(
                 NexusToDictConverter(), self.instrument
             )
-            msg_to_send = nexus_structure  # TODO: construct flatbuffers object here
-            self.command_producer.send_command(msg_to_send)
+            buffer = run_start_pl72.serialise_pl72(
+                job_id=str(uuid.uuid4()),
+                filename=nexus_file_name,
+                start_time=start_time,
+                stop_time=stop_time,
+                broker=broker,
+                nexus_structure=str(nexus_structure),
+                service_id=service_id,
+            )
+            self.command_producer.send_command(buffer)
             self.command_widget.ok_button.setEnabled(False)
 
     def file_list_clicked(self):
@@ -234,11 +244,10 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             for fileKey in self.known_files:
                 current_file = self.known_files[fileKey]
                 if index.row() == current_file.row:
-                    # TODO: create flatbuffers blob here
-                    send_msg = f' "cmd": "FileWriter_stop", "job_id": "{current_file.job_id}", "service_id": "{current_file.writer_id}" '
-                    self.command_producer.send_command(
-                        f'{{"{send_msg}"}}'.encode("utf-8")
+                    buffer = run_stop_6s4t.serialise_6s4t(
+                        job_id=current_file.job_id, service_id=current_file.writer_id
                     )
+                    self.command_producer.send_command(buffer)
                     break
 
     def closeEvent(self, event: QCloseEvent):
