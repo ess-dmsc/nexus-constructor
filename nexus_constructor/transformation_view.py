@@ -29,8 +29,10 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
         if not isinstance(self.transformation, NXLogTransformation):
-            item, update_function = find_field_type(self.transformation.dataset)
-            update_function(item, self.transformation_frame.magnitude_widget)
+            update_function = find_field_type(self.transformation.dataset)
+            update_function(
+                self.transformation.dataset, self.transformation_frame.magnitude_widget
+            )
         self.transformation_frame.magnitude_widget.units = self.transformation.units
         self.transformation_frame.value_spinbox.setValue(self.transformation.ui_value)
 

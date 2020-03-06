@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Callable
 
 import h5py
 import numpy as np
@@ -9,6 +9,7 @@ from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import FieldType
+from nexus_constructor.nexus.nexus_wrapper import h5Node
 
 
 def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
@@ -68,30 +69,29 @@ def get_fields_with_update_functions(
     """
     items_with_update_functions = {}
     for item in group.values():
-        item, update_function = find_field_type(item)
+        update_function = find_field_type(item)
         items_with_update_functions[item] = update_function
     return items_with_update_functions
 
 
-def find_field_type(item):
+def find_field_type(item: h5Node) -> Callable:
     if (
         isinstance(item, h5py.Dataset)
         and get_name_of_node(item) not in INVALID_FIELD_NAMES
     ):
         if np.isscalar(item[()]):
-            return item, update_existing_scalar_field
+            return update_existing_scalar_field
         else:
-            return item, update_existing_array_field
+            return update_existing_array_field
 
     elif isinstance(item, h5py.Group):
         if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
-            return item, update_existing_link_field
+            return update_existing_link_field
         elif (
             CommonAttrs.NX_CLASS in item.attrs.keys()
             and item.attrs[CommonAttrs.NX_CLASS] == CommonAttrs.NC_STREAM
         ):
-            return item, update_existing_stream_field
+            return update_existing_stream_field
     logging.debug(
         f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"
     )
-    return item, None
