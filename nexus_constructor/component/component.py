@@ -316,7 +316,7 @@ class Component:
             self.file.delete_node(transform._dataset)
 
     @property
-    def depends_on(self):
+    def depends_on(self) -> Optional[Transformation]:
         depends_on_path = self.file.get_field_value(self.group, CommonAttrs.DEPENDS_ON)
         if depends_on_path is None:
             return None

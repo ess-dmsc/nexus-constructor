@@ -196,11 +196,8 @@ class Transformation:
         depends_on_path = self.file.get_attribute_value(
             self._dataset, CommonAttrs.DEPENDS_ON
         )
-        if depends_on_path is not None:
-            if (
-                f"{self._dataset.parent.name}/{depends_on_path}" in self.file.nexus_file
-                and depends_on_path != "."
-            ):
+        if depends_on_path not in (None, "."):
+            if f"{self._dataset.parent.name}/{depends_on_path}" in self.file.nexus_file:
                 # depends_on is relative
                 return create_transformation(
                     self.file,
@@ -319,7 +316,7 @@ class Transformation:
     def remove_from_dependee_chain(self):
         all_dependees = self.get_dependents()
         new_depends_on = self.depends_on
-        if self.depends_on.absolute_path == "/":
+        if self.depends_on is not None and self.depends_on.absolute_path == "/":
             new_depends_on = None
         else:
             for dependee in all_dependees:
@@ -365,7 +362,7 @@ class NXLogTransformation(Transformation):
         pass
 
 
-def create_transformation(wrapper: nx.NexusWrapper, node: h5Node):
+def create_transformation(wrapper: nx.NexusWrapper, node: h5Node) -> Transformation:
     """
     Factory for creating different types of transform.
     If it is an NXlog group then the magnitude and units fields will be different to a normal transformation dataset.

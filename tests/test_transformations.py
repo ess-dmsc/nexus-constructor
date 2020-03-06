@@ -558,9 +558,7 @@ def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dep
     )
 
 
-def test_transforms_with_no_dependees_are_not_treated_as_having_relative_dependees(
-    file,  # noqa: F811
-):
+def test_transforms_with_no_dependees_return_None_for_depends_on(file,):  # noqa: F811
     nexus_wrapper = NexusWrapper(str(uuid1()))
     component_name = "component_1"
 
@@ -580,7 +578,6 @@ def test_transforms_with_no_dependees_are_not_treated_as_having_relative_depende
     ] = TransformationType.TRANSLATION
 
     transform1_dataset.attrs["depends_on"] = "."
-
     transformation = Transformation(nexus_wrapper, transform1_dataset)
 
-    assert not transformation.depends_on.name
+    assert not transformation.depends_on

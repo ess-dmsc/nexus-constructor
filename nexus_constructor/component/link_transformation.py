@@ -1,5 +1,6 @@
 from nexus_constructor.component.component import Component
 from nexus_constructor.component.transformations_list import TransformationsList
+from typing import Optional
 
 TRANSFORM_STR = "/transformations/"
 
@@ -14,7 +15,7 @@ class LinkTransformation:
         super().__init__()
         self.parent = parent
 
-    def _find_linked_component(self) -> Component:
+    def _find_linked_component(self) -> Optional[Component]:
         for transformation in self.parent:
             if self.parent._transform_has_external_link(transformation):
                 component_path = transformation.depends_on.absolute_path[
@@ -30,7 +31,7 @@ class LinkTransformation:
         return self.parent._has_direct_link()
 
     @property
-    def linked_component(self) -> Component:
+    def linked_component(self) -> Optional[Component]:
         if not self.parent.has_link:
             return None
         if self._has_direct_component_link():
@@ -54,7 +55,8 @@ class LinkTransformation:
         else:
             for c_transform in parent_component.transforms:
                 if (
-                    parent_component.absolute_path + TRANSFORM_STR
+                    c_transform.depends_on is None
+                    or parent_component.absolute_path + TRANSFORM_STR
                     not in c_transform.depends_on.absolute_path
                 ):
                     target = c_transform
