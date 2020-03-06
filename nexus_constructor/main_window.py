@@ -11,7 +11,6 @@ import silx.gui.hdf5
 import h5py
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.filewriter_command_widget import FilewriterCommandWidget
 from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
@@ -147,33 +146,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
         if filename:
-            dialog = QDialog()
-            dialog.setModal(True)
-            dialog.setLayout(QGridLayout())
-            command_widget = FilewriterCommandWidget()
-            dialog.layout().addWidget(command_widget)
-
-            dialog.exec_()
-            (
-                nexus_file_name,
-                broker,
-                start_time,
-                stop_time,
-                service_id,
-                abort_on_uninitialised_stream,
-                use_swmr,
-            ) = command_widget.get_arguments()
             with open(filename, "w") as file:
-                filewriter_json_writer.generate_json(
-                    self.instrument,
-                    file,
-                    nexus_file_name=nexus_file_name,
-                    broker=broker,
-                    start_time=start_time,
-                    stop_time=stop_time,
-                    service_id=service_id,
-                    abort_uninitialised=abort_on_uninitialised_stream,
-                    use_swmr=use_swmr,
+                filewriter_json_writer.write_nexus_structure_to_json(
+                    self.instrument, file
                 )
 
     def save_to_forwarder_json(self):
