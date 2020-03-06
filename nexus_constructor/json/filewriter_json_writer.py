@@ -7,7 +7,7 @@ from typing import Union, Dict, Any, List, Tuple
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.json.helpers import object_to_json_file
+from nexus_constructor.json.helpers import object_to_json_file, handle_non_std_types
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
 
 NexusObject = Union[h5py.Group, h5py.Dataset, h5py.SoftLink]
@@ -31,7 +31,11 @@ def generate_nexus_string(
     """
     Generates the nexus structure in a json string format for use with constructing file writer run start commands.
     """
-    return json.dumps(generate_nexus_structure(converter, instrument))
+    return json.dumps(
+        generate_nexus_structure(converter, instrument),
+        sort_keys=False,
+        default=handle_non_std_types,
+    )
 
 
 def generate_nexus_structure(
