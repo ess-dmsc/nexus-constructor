@@ -356,6 +356,14 @@ class NXLogTransformation(Transformation):
     def units(self, new_units: str):
         self.file.set_attribute_value(self._dataset["value"], "units", new_units)
 
+    @property
+    def dataset(self) -> h5Node:
+        return self._dataset
+
+    @dataset.setter
+    def dataset(self, new_dataset):
+        pass
+
 
 def create_transformation(wrapper: nx.NexusWrapper, node: h5Node):
     """

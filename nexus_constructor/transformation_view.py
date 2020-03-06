@@ -2,7 +2,7 @@ from nexus_constructor.field_utils import find_field_type
 from nexus_constructor.transformation_types import TransformationType
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
-from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
+from PySide2.QtWidgets import QGroupBox, QFrame, QWidget, QLabel
 from PySide2.QtGui import QVector3D
 from nexus_constructor.transformations import Transformation, NXLogTransformation
 from nexus_constructor.instrument import Instrument
@@ -28,11 +28,18 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.x_spinbox.setValue(current_vector.x())
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
-        if not isinstance(self.transformation, NXLogTransformation):
-            update_function = find_field_type(self.transformation.dataset)
+        update_function = find_field_type(self.transformation.dataset)
+        if update_function is not None:
             update_function(
                 self.transformation.dataset, self.transformation_frame.magnitude_widget
             )
+        if isinstance(self.transformation, NXLogTransformation):
+            self.transformation_frame.main_layout.addWidget(
+                QLabel(
+                    "Transformation is an NXlog - currently these are supported but not editable. "
+                )
+            )
+            self.transformation_frame.magnitude_widget.setVisible(False)
         self.transformation_frame.magnitude_widget.units = self.transformation.units
         self.transformation_frame.value_spinbox.setValue(self.transformation.ui_value)
 
