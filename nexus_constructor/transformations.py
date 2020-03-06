@@ -7,7 +7,7 @@ import h5py
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
-from typing import TypeVar, Union, List
+from typing import TypeVar, Union, List, Optional
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node, decode_bytes_string
 from nexus_constructor.transformation_types import TransformationType
@@ -192,7 +192,7 @@ class Transformation:
         self.file.set_attribute_value(self._dataset, CommonAttrs.UI_VALUE, new_value)
 
     @property
-    def depends_on(self) -> "Transformation":
+    def depends_on(self) -> Optional["Transformation"]:
         depends_on_path = self.file.get_attribute_value(
             self._dataset, CommonAttrs.DEPENDS_ON
         )
