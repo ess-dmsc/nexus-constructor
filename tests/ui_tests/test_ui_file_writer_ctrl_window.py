@@ -1,7 +1,7 @@
-import json
 import pytest
 from PySide2.QtGui import QStandardItemModel
 from mock import Mock
+from streaming_data_types import run_start_pl72
 from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl, File, FileWriter
 from nexus_constructor.validators import BrokerAndTopicValidator
 
@@ -98,13 +98,12 @@ def test_UI_GIVEN_valid_command_WHEN_sending_command_THEN_command_producer_sends
 
     sent_msg = window.command_producer.send_command.call_args_list[0][0][0]
 
-    res = json.loads(sent_msg)
+    res = run_start_pl72.deserialise_pl72(sent_msg)
 
-    assert res["cmd"] == "FileWriter_new"
-    assert res["nexus_structure"]
-    assert res["nexus_structure"]["children"]
-    assert res["broker"] == broker
-    assert res["service_id"] == service_id
+    assert res.nexus_structure
+    assert "children" in res.nexus_structure
+    assert res.broker == broker
+    assert res.service_id == service_id
     assert not window.command_widget.ok_button.isEnabled()
 
 

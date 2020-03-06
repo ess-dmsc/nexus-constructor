@@ -1,3 +1,4 @@
+import uuid
 from functools import partial
 from typing import Callable, Dict, Union, Tuple, Type
 
@@ -14,9 +15,12 @@ from nexus_constructor.instrument import Instrument
 from nexus_constructor.kafka.status_consumer import StatusConsumer
 from nexus_constructor.kafka.command_producer import CommandProducer
 import time
-from nexus_constructor.json.filewriter_json_writer import generate_json
-import io
+from nexus_constructor.json.filewriter_json_writer import (
+    NexusToDictConverter,
+    generate_nexus_string,
+)
 import attr
+from streaming_data_types import run_start_pl72, run_stop_6s4t
 
 
 @attr.s
@@ -213,20 +217,21 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 abort_on_uninitialised_stream,
                 use_swmr,
             ) = self.command_widget.get_arguments()
-            in_memory_file = io.StringIO()
-            generate_json(
-                data=self.instrument,
-                file=in_memory_file,
-                nexus_file_name=nexus_file_name,
-                broker=broker,
-                start_time=start_time,
-                stop_time=stop_time,
-                service_id=service_id,
-                use_swmr=use_swmr,
+            self.command_producer.send_command(
+                bytes(
+                    run_start_pl72.serialise_pl72(
+                        job_id=str(uuid.uuid4()),
+                        filename=nexus_file_name,
+                        start_time=start_time,
+                        stop_time=stop_time,
+                        broker=broker,
+                        nexus_structure=generate_nexus_string(
+                            NexusToDictConverter(), self.instrument
+                        ),
+                        service_id=service_id,
+                    )
+                )
             )
-            in_memory_file.seek(0)
-            msg_to_send = in_memory_file.read()
-            self.command_producer.send_command(msg_to_send)
             self.command_widget.ok_button.setEnabled(False)
 
     def file_list_clicked(self):
@@ -241,9 +246,13 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             for fileKey in self.known_files:
                 current_file = self.known_files[fileKey]
                 if index.row() == current_file.row:
-                    send_msg = f' "cmd": "FileWriter_stop", "job_id": "{current_file.job_id}", "service_id": "{current_file.writer_id}" '
                     self.command_producer.send_command(
-                        f'{{"{send_msg}"}}'.encode("utf-8")
+                        bytes(
+                            run_stop_6s4t.serialise_6s4t(
+                                job_id=current_file.job_id,
+                                service_id=current_file.writer_id,
+                            )
+                        )
                     )
                     break
 

@@ -99,7 +99,6 @@ def json_to_nexus(json_input: str) -> h5py.File:
     json_data = json.loads(json_input)
     nexus_file = _create_in_memory_file(str(uuid.uuid4()))
 
-    nexus_structure = json_data["nexus_structure"]
-    _add_to_nexus(nexus_structure["children"], nexus_file)
+    _add_to_nexus(json_data["children"], nexus_file)
 
     return nexus_file
