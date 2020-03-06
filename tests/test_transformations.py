@@ -515,3 +515,69 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
     assert transform.ui_value != str_value
     assert transform.ui_value == 0
+
+
+def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dependee_of_field(
+    file,  # noqa: F811
+):
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    component_name = "component_1"
+
+    component1 = add_component_to_file(nexus_wrapper, component_name=component_name)
+    # make depends_on point to relative transformations group
+    component1.group["depends_on"] = "transformations/transform1"
+
+    transformations_group = component1.group.create_group("transformations")
+
+    transform1_name = "transform1"
+    transform1_dataset = transformations_group.create_dataset(transform1_name, data=1)
+    transform1_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(
+        QVector3D(1, 0, 0)
+    )
+    transform1_dataset.attrs[
+        CommonAttrs.TRANSFORMATION_TYPE
+    ] = TransformationType.TRANSLATION
+
+    transform2_name = "transform2"
+
+    # make transform1 depends_on point to relative transform in same directory
+    transform1_dataset.attrs["depends_on"] = transform2_name
+
+    transform2_dataset = transformations_group.create_dataset(transform2_name, data=2)
+    transform2_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(
+        QVector3D(1, 1, 0)
+    )
+    transform2_dataset.attrs[
+        CommonAttrs.TRANSFORMATION_TYPE
+    ] = TransformationType.TRANSLATION
+
+    # make sure the depends_on points to the absolute path of the transform it depends on in the file
+    assert (
+        Transformation(nexus_wrapper, transform1_dataset).depends_on.dataset.name
+        == transform2_dataset.name
+    )
+
+
+def test_transforms_with_no_dependees_return_None_for_depends_on(file,):  # noqa: F811
+    nexus_wrapper = NexusWrapper(str(uuid1()))
+    component_name = "component_1"
+
+    component1 = add_component_to_file(nexus_wrapper, component_name=component_name)
+    # make depends_on point to relative transformations group
+    component1.group["depends_on"] = "transformations/transform1"
+
+    transformations_group = component1.group.create_group("transformations")
+
+    transform1_name = "transform1"
+    transform1_dataset = transformations_group.create_dataset(transform1_name, data=1)
+    transform1_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(
+        QVector3D(1, 0, 0)
+    )
+    transform1_dataset.attrs[
+        CommonAttrs.TRANSFORMATION_TYPE
+    ] = TransformationType.TRANSLATION
+
+    transform1_dataset.attrs["depends_on"] = "."
+    transformation = Transformation(nexus_wrapper, transform1_dataset)
+
+    assert not transformation.depends_on
