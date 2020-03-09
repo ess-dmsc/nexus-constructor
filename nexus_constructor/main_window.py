@@ -158,8 +158,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 str(uuid.uuid4()),
                 idf_file=filename,
                 file_in_memory=True,
-                compress_type="gzip",
-                compress_opts=1,
+                nx_entry_name="entry",
             )
             builder.add_instrument_geometry_from_idf()
             self.instrument.nexus.load_nexus_file(builder.target_file)
