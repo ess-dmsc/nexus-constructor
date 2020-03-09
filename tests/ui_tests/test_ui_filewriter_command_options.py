@@ -112,10 +112,9 @@ def test_UI_stored_settings_are_shown_in_window(qtbot, settings):
 
     nexus_wrapper = NexusWrapper(str(uuid.uuid4()))
     instrument = Instrument(nexus_wrapper, {})
+    # _restore_settings should be called on construction
     window = FileWriterCtrl(instrument, settings)
     qtbot.addWidget(window)
-
-    window._restore_settings()
 
     assert window.status_broker_edit.text() == status_broker
     assert window.command_broker_edit.text() == command_broker
