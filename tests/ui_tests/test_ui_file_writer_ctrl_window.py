@@ -233,6 +233,7 @@ def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_
     assert isinstance(window.status_consumer, DummyInterface)
 
 
+@pytest.mark.skip(reason="qtbot interferes with other tests")
 def test_UI_settings_are_saved_when_store_settings_is_called(
     qtbot, instrument, settings
 ):
@@ -273,6 +274,7 @@ def test_UI_settings_are_saved_when_store_settings_is_called(
     assert settings.value(FileWriterSettings.FILE_NAME) == filename
 
 
+@pytest.mark.skip(reason="qtbot interferes with other tests")
 def test_UI_stored_settings_are_shown_in_window(qtbot, instrument, settings):
     command_broker = "broker:9092/topic2"
     status_broker = "broker2:9092/topic3"
