@@ -84,8 +84,6 @@ class FilewriterCommandWidget(QWidget):
         self.service_id_lineedit = QLineEdit()
         self.service_id_lineedit.setPlaceholderText("(Optional)")
         self.abort_on_uninitialised_stream_checkbox = QCheckBox()
-        self.use_swmr_checkbox = QCheckBox()
-        self.use_swmr_checkbox.setChecked(True)
 
         self.layout().addRow("nexus_file_name", self.nexus_file_name_edit)
         self.layout().addRow("broker", self.broker_line_edit)
@@ -97,7 +95,6 @@ class FilewriterCommandWidget(QWidget):
         self.layout().addRow(
             "abort_on_uninitialised_stream", self.abort_on_uninitialised_stream_checkbox
         )
-        self.layout().addRow("use_hdf_swmr", self.use_swmr_checkbox)
         self.layout().addRow(self.ok_button)
 
     def state_changed(self, is_start_time: bool, state: Qt.CheckState):
@@ -112,7 +109,7 @@ class FilewriterCommandWidget(QWidget):
 
     def get_arguments(
         self,
-    ) -> Tuple[str, str, Union[str, None], Union[str, None], str, bool, bool]:
+    ) -> Tuple[str, str, Union[str, None], Union[str, None], str, bool]:
         """
         gets the arguments of required and optional fields for the filewriter command.
         :return: Tuple containing all of the fields.
@@ -129,5 +126,4 @@ class FilewriterCommandWidget(QWidget):
             self.service_id_lineedit.text(),
             self.abort_on_uninitialised_stream_checkbox.checkState()
             == Qt.CheckState.Checked,
-            self.use_swmr_checkbox.checkState() == Qt.CheckState.Checked,
         )

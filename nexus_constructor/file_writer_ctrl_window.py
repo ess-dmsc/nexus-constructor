@@ -53,9 +53,6 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def _restore_settings(self):
         self.status_broker_edit.setText(self.settings.value("status_broker_addr"))
         self.command_broker_edit.setText(self.settings.value("command_broker_addr"))
-        self.command_widget.use_swmr_checkbox.setChecked(
-            self._extract_bool_from_qsettings(self.settings.value("use_swmr", False))
-        )
         self.command_widget.start_time_enabled.setChecked(
             self._extract_bool_from_qsettings(
                 self.settings.value("use_start_time", False)
@@ -128,9 +125,6 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def doCleanup(self):
         self.settings.setValue("status_broker_addr", self.status_broker_edit.text())
         self.settings.setValue("command_broker_addr", self.command_broker_edit.text())
-        self.settings.setValue(
-            "use_swmr", self.command_widget.use_swmr_checkbox.isChecked()
-        )
         self.settings.setValue(
             "use_start_time", self.command_widget.start_time_enabled.isChecked()
         )
@@ -259,7 +253,6 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 stop_time,
                 service_id,
                 abort_on_uninitialised_stream,
-                use_swmr,
             ) = self.command_widget.get_arguments()
             self.command_producer.send_command(
                 bytes(
