@@ -1,4 +1,13 @@
+import pytest
+from PySide2.QtCore import QSettings
 from nexus_constructor.filewriter_command_widget import FilewriterCommandWidget
+from nexus_constructor.file_writer_ctrl_window import (
+    FileWriterCtrl,
+    FileWriterSettings,
+    extract_bool_from_qsettings,
+)
+from nexus_constructor.instrument import Instrument
+from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 
 def test_UI_GIVEN_user_presses_disable_start_time_THEN_start_time_line_edit_is_disabled(
@@ -29,3 +38,56 @@ def test_UI_GIVEN_user_presses_enable_stop_time_THEN_stop_time_picker_is_enabled
     assert not dialog.stop_time_picker.isEnabled()
     dialog.stop_time_enabled.setChecked(True)
     assert dialog.stop_time_picker.isEnabled()
+
+
+@pytest.fixture()
+def settings():
+    settings = QSettings("testing", "NCui_tests")
+    yield settings
+    settings.setValue(FileWriterSettings.STATUS_BROKER_ADDR, "")
+    settings.setValue(FileWriterSettings.COMMAND_BROKER_ADDR, "")
+    settings.setValue(FileWriterSettings.FILE_NAME, "")
+    settings.setValue(FileWriterSettings.USE_START_TIME, False)
+    settings.setValue(FileWriterSettings.USE_STOP_TIME, False)
+    settings.setValue(FileWriterSettings.FILE_BROKER_ADDR, "")
+
+
+def test_UI_settings_are_saved_when_store_settings_is_called(qtbot, settings):
+    nexus_wrapper = NexusWrapper()
+    instrument = Instrument(nexus_wrapper, {})
+    window = FileWriterCtrl(instrument, settings)
+    qtbot.addWidget(window)
+
+    command_broker = "broker:9092/topic1"
+    window.command_broker_edit.setText(command_broker)
+
+    status_broker = "broker2:9092/topic2"
+    window.status_broker_edit.setText(status_broker)
+
+    file_broker = "broker3:9092/topic3"
+    window.command_widget.broker_line_edit.setText(file_broker)
+
+    use_start_time = True
+    window.command_widget.start_time_enabled.setChecked(use_start_time)
+
+    use_stop_time = True
+    window.command_widget.stop_time_enabled.setChecked(use_stop_time)
+
+    filename = "test.nxs"
+    window.command_widget.nexus_file_name_edit.setText(filename)
+
+    window._store_settings()
+    window.close()
+
+    assert settings.value(FileWriterSettings.COMMAND_BROKER_ADDR) == command_broker
+    assert settings.value(FileWriterSettings.STATUS_BROKER_ADDR) == status_broker
+    assert settings.value(FileWriterSettings.FILE_BROKER_ADDR) == file_broker
+    assert (
+        extract_bool_from_qsettings(settings.value(FileWriterSettings.USE_START_TIME))
+        == use_start_time
+    )
+    assert (
+        extract_bool_from_qsettings(settings.value(FileWriterSettings.USE_STOP_TIME))
+        == use_stop_time
+    )
+    assert settings.value(FileWriterSettings.FILE_NAME) == filename

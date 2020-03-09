@@ -75,7 +75,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.command_broker_edit.setText(
             self.settings.value(FileWriterSettings.COMMAND_BROKER_ADDR)
         )
-        self.command_widget.nexus_file_name_edit.setText(
+        self.command_widget.broker_line_edit.setText(
             self.settings.value(FileWriterSettings.FILE_BROKER_ADDR)
         )
         self.command_widget.start_time_enabled.setChecked(
@@ -104,7 +104,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         )
         self.settings.setValue(
             FileWriterSettings.FILE_BROKER_ADDR,
-            self.command_widget.nexus_file_name_edit.text(),
+            self.command_widget.broker_line_edit.text(),
         )
         self.settings.setValue(
             FileWriterSettings.USE_START_TIME,
