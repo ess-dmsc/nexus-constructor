@@ -100,7 +100,7 @@ class FieldAttrFrame(QFrame):
 
         self.type_changed("Scalar")
 
-        if name and value:
+        if name is not None and value is not None:
             self.value = (name, value)
 
     def type_changed(self, item: str):
