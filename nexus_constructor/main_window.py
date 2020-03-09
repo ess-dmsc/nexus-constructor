@@ -155,7 +155,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _load_idf(self, filename):
         try:
             builder = NexusBuilder(
-                str(uuid.uuid4()),
+                filename.rstrip(".xml"),
                 idf_file=filename,
                 file_in_memory=True,
                 nx_entry_name="entry",
