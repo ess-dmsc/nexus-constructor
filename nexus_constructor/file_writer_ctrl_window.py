@@ -39,10 +39,25 @@ class File:
     last_time = attr.ib(default=0)
 
 
+class FileWriterSettings:
+    STATUS_BROKER_ADDR = "status_broker_addr"
+    COMMAND_BROKER_ADDR = "command_broker_addr"
+    FILE_BROKER_ADDR = "file_broker_addr"
+    USE_START_TIME = "use_start_time"
+    USE_STOP_TIME = "use_stop_time"
+    FILE_NAME = "file_name"
+
+
+def extract_bool_from_qsettings(setting: Union[str, bool]):
+    if type(setting) == str:
+        setting = setting == "True"
+    return setting
+
+
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
-    def __init__(self, instrument: Instrument):
+    def __init__(self, instrument: Instrument, settings: QSettings):
         super().__init__()
-        self.settings = QSettings("ess", "nexus-constructor")
+        self.settings = settings
         self.instrument = instrument
         self.setupUi()
         self.known_writers = {}
@@ -51,26 +66,58 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.command_producer = None
 
     def _restore_settings(self):
-        self.status_broker_edit.setText(self.settings.value("status_broker_addr"))
-        self.command_broker_edit.setText(self.settings.value("command_broker_addr"))
+        """
+        Restore persistent broker config settings from file.
+        """
+        self.status_broker_edit.setText(
+            self.settings.value(FileWriterSettings.STATUS_BROKER_ADDR)
+        )
+        self.command_broker_edit.setText(
+            self.settings.value(FileWriterSettings.COMMAND_BROKER_ADDR)
+        )
+        self.command_widget.nexus_file_name_edit.setText(
+            self.settings.value(FileWriterSettings.FILE_BROKER_ADDR)
+        )
         self.command_widget.start_time_enabled.setChecked(
-            self._extract_bool_from_qsettings(
-                self.settings.value("use_start_time", False)
+            extract_bool_from_qsettings(
+                self.settings.value(FileWriterSettings.USE_START_TIME, False)
             )
         )
         self.command_widget.stop_time_enabled.setChecked(
-            self._extract_bool_from_qsettings(
-                self.settings.value("use_stop_time", False)
+            extract_bool_from_qsettings(
+                self.settings.value(FileWriterSettings.USE_STOP_TIME, False)
             )
         )
         self.command_widget.nexus_file_name_edit.setText(
-            self.settings.value("file_name")
+            self.settings.value(FileWriterSettings.FILE_NAME)
         )
 
-    def _extract_bool_from_qsettings(self, temp):
-        if type(temp) == str:
-            temp = temp == "True"
-        return temp
+    def _store_settings(self):
+        """
+        Store persistent broker config settings to file.
+        """
+        self.settings.setValue(
+            FileWriterSettings.STATUS_BROKER_ADDR, self.status_broker_edit.text()
+        )
+        self.settings.setValue(
+            FileWriterSettings.COMMAND_BROKER_ADDR, self.command_broker_edit.text()
+        )
+        self.settings.setValue(
+            FileWriterSettings.FILE_BROKER_ADDR,
+            self.command_widget.nexus_file_name_edit.text(),
+        )
+        self.settings.setValue(
+            FileWriterSettings.USE_START_TIME,
+            self.command_widget.start_time_enabled.isChecked(),
+        )
+        self.settings.setValue(
+            FileWriterSettings.USE_STOP_TIME,
+            self.command_widget.stop_time_enabled.isChecked(),
+        )
+        self.settings.setValue(
+            FileWriterSettings.FILE_NAME,
+            self.command_widget.nexus_file_name_edit.text(),
+        )
 
     def setupUi(self):
         super().setupUi(self)
@@ -120,20 +167,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.file_list_model.setHeaderData(2, QtCore.Qt.Horizontal, "File writer")
         self.files_list.setModel(self.file_list_model)
         self._restore_settings()
-        QApplication.instance().aboutToQuit.connect(self.doCleanup)
-
-    def doCleanup(self):
-        self.settings.setValue("status_broker_addr", self.status_broker_edit.text())
-        self.settings.setValue("command_broker_addr", self.command_broker_edit.text())
-        self.settings.setValue(
-            "use_start_time", self.command_widget.start_time_enabled.isChecked()
-        )
-        self.settings.setValue(
-            "use_stop_time", self.command_widget.stop_time_enabled.isChecked()
-        )
-        self.settings.setValue(
-            "file_name", self.command_widget.nexus_file_name_edit.text()
-        )
+        QApplication.instance().aboutToQuit.connect(self._store_settings)
 
     @staticmethod
     def _set_up_broker_fields(
