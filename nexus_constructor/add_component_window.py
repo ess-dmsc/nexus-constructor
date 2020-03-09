@@ -16,7 +16,7 @@ from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
-from nexus_constructor.nexus.nexus_wrapper import get_name_of_node, decode_bytes_string
+from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import (
     UnitValidator,
     NameValidator,
@@ -237,9 +237,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
-                new_ui_field.units = decode_bytes_string(
-                    field.attrs[CommonAttrs.UNITS]
-                    if CommonAttrs.UNITS in field.attrs
+                new_ui_field.units = (
+                    self.instrument.nexus.get_attribute_value(field, CommonAttrs.UNITS)
+                    if not None
                     else ""
                 )
                 new_ui_field.attrs = field
