@@ -1,3 +1,4 @@
+import uuid
 from typing import Dict
 from PySide2.QtWidgets import (
     QMainWindow,
@@ -5,10 +6,13 @@ from PySide2.QtWidgets import (
     QInputDialog,
     QLineEdit,
     QAction,
+    QMessageBox,
 )
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 import silx.gui.hdf5
 import h5py
+from nexusutils.nexusbuilder import NexusBuilder
+
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.instrument import Instrument
@@ -34,6 +38,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.export_to_nexus_file_action.triggered.connect(self.save_to_nexus_file)
         self.open_nexus_file_action.triggered.connect(self.open_nexus_file)
         self.open_json_file_action.triggered.connect(self.open_json_file)
+        self.open_idf_file_action.triggered.connect(self.open_idf_file)
         self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_filewriter_json
         )
@@ -142,6 +147,29 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
         self.instrument.nexus.save_file(filename)
+
+    def open_idf_file(self):
+        filename = file_dialog(False, "Open IDF file", {"IDF files": ["xml"]})
+        self._load_idf(filename)
+
+    def _load_idf(self, filename):
+        try:
+            builder = NexusBuilder(
+                str(uuid.uuid4()),
+                idf_file=filename,
+                file_in_memory=True,
+                nx_entry_name="entry",
+            )
+            builder.add_instrument_geometry_from_idf()
+            self.instrument.nexus.load_nexus_file(builder.target_file)
+            self._update_views()
+            QMessageBox.warning(
+                self,
+                "Mantid IDF loaded",
+                "Please manually check the instrument for accuracy.",
+            )
+        except Exception:
+            QMessageBox.critical(self, "IDF Error", "Error whilst loading IDF file")
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)

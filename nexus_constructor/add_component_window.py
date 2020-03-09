@@ -238,8 +238,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
                 new_ui_field.units = (
-                    field.attrs[CommonAttrs.UNITS]
-                    if CommonAttrs.UNITS in field.attrs
+                    self.instrument.nexus.get_attribute_value(field, CommonAttrs.UNITS)
+                    if not None
                     else ""
                 )
                 new_ui_field.attrs = field
