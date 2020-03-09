@@ -122,3 +122,13 @@ def test_UI_stored_settings_are_shown_in_window(qtbot, settings):
     assert use_stop_time == window.command_widget.stop_time_enabled.isChecked()
     assert filename == window.command_widget.nexus_file_name_edit.text()
     assert file_broker == window.command_widget.broker_line_edit.text()
+
+
+def test_UI_disable_stop_button_when_no_files_are_selected(qtbot, settings):
+    nexus_wrapper = NexusWrapper(str(uuid.uuid4()))
+    instrument = Instrument(nexus_wrapper, {})
+    window = FileWriterCtrl(instrument, settings)
+    qtbot.addWidget(window)
+
+    assert not window.files_list.selectedIndexes()
+    assert not window.stop_file_writing_button.isEnabled()
