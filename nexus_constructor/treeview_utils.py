@@ -198,7 +198,7 @@ def get_transformation_frame(frame, instrument, value):
 
 
 def get_component_info_frame(frame):
-    frame.label = QLabel("(Place holder)", frame)
+    frame.label = QLabel("", frame)
     frame.layout().addWidget(frame.label)
 
 
