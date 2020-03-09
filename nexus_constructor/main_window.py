@@ -1,4 +1,3 @@
-import uuid
 from typing import Dict
 from PySide2.QtWidgets import (
     QMainWindow,
