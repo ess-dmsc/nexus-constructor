@@ -58,3 +58,19 @@ def test_remove_from_middle(nexus_wrapper):
     assert component1.transforms.link.linked_component == component3
     assert rot1 in rot3.get_dependents()
     assert component3 in rot3.get_dependents()
+
+
+def test_remove_from_end(nexus_wrapper):
+    component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
+    rot1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    rot2 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=rot1)
+    rot3 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=rot2)
+
+    component1.depends_on = rot3
+    rot3.remove_from_dependee_chain()
+
+    assert rot3.depends_on is None
+    assert not rot3.get_dependents()
+
+    assert rot2.get_dependents() == [component1]
+    assert len(component1.transforms) == 2
