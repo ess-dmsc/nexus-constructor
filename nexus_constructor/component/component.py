@@ -307,19 +307,18 @@ class Component:
             raise PermissionError(
                 "Transform is not in this component, do not have permission to delete"
             )
-
-        dependents = transform.get_dependents()
+        dependents = transform.dependents
         if dependents:
             raise DependencyError(
                 f"Cannot delete transformation, it is a dependency of {dependents}"
             )
 
         # Remove whole transformations group if this is the only transformation in it
-        if len(transform._dataset.parent.keys()) == 1:
-            self.file.delete_node(transform._dataset.parent)
+        if len(transform.dataset.parent.keys()) == 1:
+            self.file.delete_node(transform.dataset.parent)
         # Otherwise just remove the transformation from the group
         else:
-            self.file.delete_node(transform._dataset)
+            self.file.delete_node(transform.dataset)
 
     @property
     def depends_on(self) -> Optional[Transformation]:

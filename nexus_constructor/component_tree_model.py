@@ -129,7 +129,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def _remove_component(self, index: QModelIndex):
         component = index.internalPointer()
         transforms = component.transforms
-        if transforms and transforms[0].get_dependents():
+        if transforms and transforms[0].dependents():
             reply = QMessageBox.question(
                 None,
                 "Delete component?",
