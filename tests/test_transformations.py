@@ -488,7 +488,7 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
 
 
 def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN_getting_ui_value_THEN_ui_placeholder_value_is_returned_instead(
-    file, nexus_wrapper  # noqa: F811
+    file, nexus_wrapper
 ):
     transform_name = "transform_1"
     transform = create_transform(nexus_wrapper, transform_name)
@@ -501,7 +501,7 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
 
 def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dependee_of_field(
-    file, nexus_wrapper  # noqa: F811
+    file, nexus_wrapper
 ):
     component_name = "component_1"
 
@@ -540,9 +540,7 @@ def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dep
     )
 
 
-def test_transforms_with_no_dependees_return_None_for_depends_on(
-    file, nexus_wrapper
-):  # noqa: F811
+def test_transforms_with_no_dependees_return_None_for_depends_on(file, nexus_wrapper):
     component_name = "component_1"
 
     component1 = add_component_to_file(nexus_wrapper, component_name=component_name)

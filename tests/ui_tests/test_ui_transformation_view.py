@@ -66,7 +66,7 @@ def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_cor
 
 
 def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_is_filled_correctly(
-    qtbot, file, nexus_wrapper  # noqa:F811
+    qtbot, file, nexus_wrapper
 ):
     instrument = Instrument(nexus_wrapper, {})
 
@@ -94,7 +94,7 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
 
 
 def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled_correctly(
-    qtbot, file, nexus_wrapper  # noqa:F811
+    qtbot, file, nexus_wrapper
 ):
     instrument = Instrument(nexus_wrapper, {})
 

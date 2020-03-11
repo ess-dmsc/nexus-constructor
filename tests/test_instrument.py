@@ -71,7 +71,7 @@ def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_componen
     )
 
 
-def test_dependents_list_is_created_by_instrument(file, nexus_wrapper):  # noqa: F811
+def test_dependents_list_is_created_by_instrument(file, nexus_wrapper):
     """
     The dependents list for transforms is stored in the "dependent_of" attribute,
     which is not part of the NeXus standard,
@@ -109,7 +109,7 @@ def test_dependents_list_is_created_by_instrument(file, nexus_wrapper):  # noqa:
 
 
 def test_dependent_is_created_by_instrument_if_depends_on_is_relative(
-    file, nexus_wrapper  # noqa: F811
+    file, nexus_wrapper
 ):
     entry_group = file.create_group("entry")
     entry_group.attrs["NX_class"] = "NXentry"
@@ -130,7 +130,7 @@ def test_dependent_is_created_by_instrument_if_depends_on_is_relative(
 
 
 def test_dependee_of_contains_both_components_when_generating_dependee_of_chain_with_mixture_of_absolute_and_relative_paths(
-    file, nexus_wrapper  # noqa: F811
+    file, nexus_wrapper
 ):
     entry_group = file.create_group("entry")
     entry_group.attrs["NX_class"] = "NXentry"
