@@ -270,7 +270,7 @@ class FieldWidget(QFrame):
     def _scalar_value_to_string(input_value: Any):
         """
         converts a scalar numpy value to string.
-        NB: this is different to decode_nexus_string() as numpy objects are cast-able to
+        NB: this is different to decode_bytes_string() as numpy objects are cast-able to
         string already unless they are bytes.
         """
         if isinstance(input_value, bytes):
