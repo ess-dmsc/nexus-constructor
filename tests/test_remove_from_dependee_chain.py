@@ -66,6 +66,8 @@ def test_remove_from_end(nexus_wrapper):
     rot2 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=rot1)
     rot3 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=rot2)
 
+    component1.depends_on = rot3
+
     rot1.remove_from_dependee_chain()
 
     assert rot1.depends_on is None

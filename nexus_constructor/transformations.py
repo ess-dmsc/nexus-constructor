@@ -332,8 +332,8 @@ class Transformation:
                     # If a dependee is a transformation, register the dependee of this transform as a dependee to this
                     # transform's depends_on
                     self.depends_on.register_dependent(dependee)
-                # Update the dependee to point to this transformation's depends_on
-                dependee.depends_on = self.depends_on
+            # Update the dependee to point to this transformation's depends_on
+            dependee.depends_on = self.depends_on
             # Regardless of if this transformation has a depends_on field, deregister it from any dependees.
             self.deregister_dependent(dependee)
         # Set this transformation's depends_on to None to remove it from the chain.

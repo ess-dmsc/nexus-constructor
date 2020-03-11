@@ -325,7 +325,7 @@ class Component:
     @property
     def depends_on(self) -> Optional[Transformation]:
         depends_on_path = self.file.get_field_value(self.group, CommonAttrs.DEPENDS_ON)
-        if depends_on_path is None:
+        if depends_on_path in [None, "."]:
             return None
         return create_transformation(self.file, self.file.nexus_file[depends_on_path])
 
