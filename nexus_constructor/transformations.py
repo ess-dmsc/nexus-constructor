@@ -9,7 +9,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar, Union, List, Optional
 
-from nexus_constructor.nexus.nexus_wrapper import h5Node, decode_bytes_string
+from nexus_constructor.nexus.nexus_wrapper import h5Node
 from nexus_constructor.transformation_types import TransformationType
 
 TransformationOrComponent = TypeVar(
@@ -124,15 +124,15 @@ class Transformation:
         return self._dataset
 
     @dataset.setter
-    def dataset(self, new_data):
+    def dataset(self, new_data: h5Node):
         """
         Used for setting the transformation dataset to a stream group, link or scalar/array field
         :param new_data: the new data being set
         """
         old_attrs = {}
-        for k, v in self._dataset.attrs.items():
+        for k, v in self.dataset.attrs.items():
             old_attrs[k] = v
-        dataset_name = self._dataset.name
+        dataset_name = self.dataset.name
 
         del self.file.nexus_file[dataset_name]
         if isinstance(new_data, h5py.Dataset):
@@ -146,10 +146,10 @@ class Transformation:
                 )
         self._dataset = self.file.nexus_file[dataset_name]
         for k, v in old_attrs.items():
-            self._dataset.attrs[k] = v
+            self.file.set_attribute_value(self.dataset, k, v)
 
-        if CommonAttrs.UI_VALUE not in self._dataset.attrs:
-            self._dataset.attrs[CommonAttrs.UI_VALUE] = 0
+        if self.file.get_attribute_value(self.dataset, CommonAttrs.UI_VALUE) is None:
+            self.file.set_attribute_value(self.dataset, CommonAttrs.UI_VALUE, 0)
 
     @property
     def ui_value(self) -> float:
@@ -172,10 +172,10 @@ class Transformation:
                     self.ui_value = float(self._dataset[...][0])
                     return float(self._dataset[...][0])
                 except ValueError:
-                    # Not castable to float - either return the UI value if present in the group or the default value if not.
+                    # Not cast-able to float - either return the UI value if it's present in the group or the default
+                    # value if not.
                     pass
-
-        if CommonAttrs.UI_VALUE not in self._dataset.attrs:
+        if self.file.get_attribute_value(self.dataset, CommonAttrs.UI_VALUE) is None:
             # Link or stream
             default_value = 0.0
             self.ui_value = default_value
@@ -242,7 +242,7 @@ class Transformation:
         :param dependent: transform or component that depends on this one
         """
 
-        if CommonAttrs.DEPENDEE_OF not in self._dataset.attrs.keys():
+        if self.file.get_attribute_value(self.dataset, CommonAttrs.DEPENDEE_OF) is None:
             self.file.set_attribute_value(
                 self._dataset, CommonAttrs.DEPENDEE_OF, dependent.absolute_path
             )
@@ -267,7 +267,10 @@ class Transformation:
         Note, "dependee_of" attribute is not part of the NeXus format
         :param former_dependent: transform or component that used to depend on this one
         """
-        if CommonAttrs.DEPENDEE_OF in self._dataset.attrs.keys():
+        if (
+            self.file.get_attribute_value(self.dataset, CommonAttrs.DEPENDEE_OF)
+            is not None
+        ):
             dependee_of_list = self.file.get_attribute_value(
                 self._dataset, CommonAttrs.DEPENDEE_OF
             )
@@ -297,7 +300,10 @@ class Transformation:
 
         return_dependents = []
 
-        if CommonAttrs.DEPENDEE_OF in self._dataset.attrs.keys():
+        if (
+            self.file.get_attribute_value(self.dataset, CommonAttrs.DEPENDEE_OF)
+            is not None
+        ):
             dependents = self.file.get_attribute_value(
                 self._dataset, CommonAttrs.DEPENDEE_OF
             )
@@ -314,17 +320,22 @@ class Transformation:
         return return_dependents
 
     def remove_from_dependee_chain(self):
-        all_dependees = self.get_dependents()
-        new_depends_on = self.depends_on
-        if self.depends_on is not None and self.depends_on.absolute_path == "/":
-            new_depends_on = None
-        else:
-            for dependee in all_dependees:
+        """
+        Remove this transformation from the depends_on chain by pointing any dependees to this components depends_on.
+        If this component either has no depends_on or points to itself, just deregister it as a dependent.
+        """
+        for dependee in self.get_dependents():
+            if self.depends_on not in [None, "."]:
+                # This transformation has a depends_on, so update the dependee to point to that instead
                 if isinstance(dependee, Transformation):
-                    new_depends_on.register_dependent(dependee)
-        for dependee in all_dependees:
-            dependee.depends_on = new_depends_on
+                    # If a dependee is a transformation, register the dependee of this transform as a dependee to this
+                    # transform's depends_on
+                    self.depends_on.register_dependent(dependee)
+                # Update the dependee to point to this transformation's depends_on
+                dependee.depends_on = self.depends_on
+            # Regardless of if this transformation has depends_on, deregister it from any dependees.
             self.deregister_dependent(dependee)
+        # Set this transformation's depends_on to None to remove it from the chain.
         self.depends_on = None
 
 
@@ -332,7 +343,10 @@ class NXLogTransformation(Transformation):
     @property
     def ui_value(self) -> float:
         if "value" not in self._dataset.keys():
-            if CommonAttrs.UI_VALUE not in self._dataset.attrs:
+            if (
+                self.file.get_attribute_value(self.dataset, CommonAttrs.UI_VALUE)
+                is None
+            ):
                 self.ui_value = 0
             return self.file.get_attribute_value(self._dataset, CommonAttrs.UI_VALUE)
         value_group = self._dataset["value"]
@@ -367,9 +381,6 @@ def create_transformation(wrapper: nx.NexusWrapper, node: h5Node) -> Transformat
     Factory for creating different types of transform.
     If it is an NXlog group then the magnitude and units fields will be different to a normal transformation dataset.
     """
-    if (
-        CommonAttrs.NX_CLASS in node.attrs
-        and decode_bytes_string(node.attrs[CommonAttrs.NX_CLASS]) == "NXlog"
-    ):
+    if wrapper.get_attribute_value(node, CommonAttrs.NX_CLASS) == "NXlog":
         return NXLogTransformation(wrapper, node)
     return Transformation(wrapper, node)
