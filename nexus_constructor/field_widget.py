@@ -15,12 +15,15 @@ from PySide2.QtWidgets import (
 )
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
-from typing import List, Union, Any
+from typing import List, Union
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
+from nexus_constructor.nexus.nexus_wrapper import (
+    create_temporary_in_memory_file,
+    to_string,
+)
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -266,21 +269,10 @@ class FieldWidget(QFrame):
                 )
         return return_object
 
-    @staticmethod
-    def _scalar_value_to_string(input_value: Any):
-        """
-        converts a scalar numpy value to string.
-        NB: this is different to decode_bytes_string() as numpy objects are cast-able to
-        string already unless they are bytes.
-        """
-        if isinstance(input_value, bytes):
-            return input_value.decode("utf-8")
-        return str(input_value)
-
     @value.setter
     def value(self, value):
         if self.field_type == FieldType.scalar_dataset:
-            self.value_line_edit.setText(self._scalar_value_to_string(value))
+            self.value_line_edit.setText(to_string(value))
         elif self.field_type == FieldType.array_dataset:
             self.table_view.model.array = value
         elif self.field_type == FieldType.link:

@@ -9,7 +9,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar, Union, List, Optional
 
-from nexus_constructor.nexus.nexus_wrapper import h5Node, decode_bytes_string
+from nexus_constructor.nexus.nexus_wrapper import h5Node, to_string
 from nexus_constructor.transformation_types import TransformationType
 
 TransformationOrComponent = TypeVar(
@@ -369,7 +369,7 @@ def create_transformation(wrapper: nx.NexusWrapper, node: h5Node) -> Transformat
     """
     if (
         CommonAttrs.NX_CLASS in node.attrs
-        and decode_bytes_string(node.attrs[CommonAttrs.NX_CLASS]) == "NXlog"
+        and to_string(node.attrs[CommonAttrs.NX_CLASS]) == "NXlog"
     ):
         return NXLogTransformation(wrapper, node)
     return Transformation(wrapper, node)
