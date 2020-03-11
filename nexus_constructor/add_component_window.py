@@ -14,6 +14,7 @@ from nexus_constructor.geometry import (
 )
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.unit_utils import METRES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
@@ -120,7 +121,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         validate_line_edit(self.fileLineEdit, False)
 
-        self.unitsLineEdit.setValidator(UnitValidator())
+        self.unitsLineEdit.setValidator(UnitValidator(expected_type=METRES))
         self.unitsLineEdit.validator().is_valid.connect(
             partial(
                 validate_line_edit,

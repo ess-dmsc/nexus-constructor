@@ -17,7 +17,6 @@ from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_are_expected_type,
     units_have_magnitude_of_one,
-    METRES,
 )
 
 HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
@@ -47,15 +46,16 @@ class UnitValidator(QValidator):
     Validator to ensure the the text entered is a valid unit of length.
     """
 
-    def __init__(self):
+    def __init__(self, expected_type=None):
         super().__init__()
         self.ureg = pint.UnitRegistry()
+        self.expected_type = expected_type
 
     def validate(self, input: str, pos: int):
 
         if not (
             units_are_recognised_by_pint(input)
-            and units_are_expected_type(input, METRES)
+            and self._is_expected_type(input)
             and units_have_magnitude_of_one(input)
         ):
             self.is_valid.emit(False)
@@ -63,6 +63,11 @@ class UnitValidator(QValidator):
 
         self.is_valid.emit(True)
         return QValidator.Acceptable
+
+    def _is_expected_type(self, input: str):
+        if self.expected_type is not None:
+            return units_are_expected_type(input, self.expected_type)
+        return True
 
     is_valid = Signal(bool)
 
