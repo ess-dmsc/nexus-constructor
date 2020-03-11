@@ -243,27 +243,15 @@ class Component:
         :param name: name of the translation group (Optional)
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         """
-        transforms_group = self.file.create_transformations_group_if_does_not_exist(
-            self.group
-        )
-        if name is None:
-            name = _generate_incremental_name(
-                TransformationType.TRANSLATION, transforms_group
-            )
         unit_vector, magnitude = _normalise(vector)
-        field = self.file.set_field_value(transforms_group, name, magnitude, float)
-        self.file.set_attribute_value(field, CommonAttrs.UNITS, "m")
-        self.file.set_attribute_value(
-            field, CommonAttrs.VECTOR, qvector3d_to_numpy_array(unit_vector)
+        return self._create_transform(
+            name,
+            TransformationType.TRANSLATION,
+            magnitude,
+            "m",
+            unit_vector,
+            depends_on,
         )
-        self.file.set_attribute_value(
-            field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.TRANSLATION
-        )
-
-        translation_transform = create_transformation(self.file, field)
-        translation_transform.ui_value = magnitude
-        translation_transform.depends_on = depends_on
-        return translation_transform
 
     def add_rotation(
         self,
@@ -279,25 +267,39 @@ class Component:
         :param name: Name of the rotation group (Optional)
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         """
+        return self._create_transform(
+            name, TransformationType.ROTATION, angle, "degrees", axis, depends_on
+        )
+
+    def _create_transform(
+        self,
+        name: str,
+        transformation_type: TransformationType,
+        angle_or_magnitude: float,
+        units: str,
+        vector: QVector3D,
+        depends_on: Transformation,
+    ):
         transforms_group = self.file.create_transformations_group_if_does_not_exist(
             self.group
         )
         if name is None:
-            name = _generate_incremental_name(
-                TransformationType.ROTATION, transforms_group
-            )
-        field = self.file.set_field_value(transforms_group, name, angle, float)
-        self.file.set_attribute_value(field, CommonAttrs.UNITS, "degrees")
+            name = _generate_incremental_name(transformation_type, transforms_group)
+
+        field = self.file.set_field_value(
+            transforms_group, name, angle_or_magnitude, float
+        )
+        self.file.set_attribute_value(field, CommonAttrs.UNITS, units)
         self.file.set_attribute_value(
-            field, CommonAttrs.VECTOR, qvector3d_to_numpy_array(axis)
+            field, CommonAttrs.VECTOR, qvector3d_to_numpy_array(vector)
         )
         self.file.set_attribute_value(
-            field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.ROTATION
+            field, CommonAttrs.TRANSFORMATION_TYPE, transformation_type
         )
-        rotation_transform = create_transformation(self.file, field)
-        rotation_transform.depends_on = depends_on
-        rotation_transform.ui_value = angle
-        return rotation_transform
+        transform = create_transformation(self.file, field)
+        transform.ui_value = angle_or_magnitude
+        transform.depends_on = depends_on
+        return transform
 
     def _transform_is_in_this_component(self, transform: Transformation) -> bool:
         return transform._dataset.parent.parent.name == self.absolute_path
