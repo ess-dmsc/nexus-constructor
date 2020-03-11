@@ -20,7 +20,10 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
+from nexus_constructor.nexus.nexus_wrapper import (
+    create_temporary_in_memory_file,
+    decode_bytes_string,
+)
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -269,7 +272,7 @@ class FieldWidget(QFrame):
     @value.setter
     def value(self, value):
         if self.field_type == FieldType.scalar_dataset:
-            self.value_line_edit.setText(str(value))
+            self.value_line_edit.setText(decode_bytes_string(value))
         elif self.field_type == FieldType.array_dataset:
             self.table_view.model.array = value
         elif self.field_type == FieldType.link:
