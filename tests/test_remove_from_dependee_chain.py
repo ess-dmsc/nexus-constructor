@@ -8,7 +8,7 @@ def test_remove_from_beginning_1(nexus_wrapper):
     component1.depends_on = rot
     assert len(rot.dependents) == 1
     rot.remove_from_dependee_chain()
-    assert component1.depends_on.absolute_path == "/"
+    assert component1.depends_on is None
 
 
 def test_remove_from_beginning_2(nexus_wrapper):
@@ -66,11 +66,12 @@ def test_remove_from_end(nexus_wrapper):
     rot2 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=rot1)
     rot3 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=rot2)
 
-    component1.depends_on = rot3
-    rot3.remove_from_dependee_chain()
+    rot1.remove_from_dependee_chain()
 
-    assert rot3.depends_on is None
-    assert not rot3.dependents
+    assert rot1.depends_on is None
+    assert not rot1.dependents
 
-    assert rot2.dependents == [component1]
+    assert component1.depends_on.absolute_path == rot3.absolute_path
+
+    assert rot2.dependents[0].absolute_path == rot3.absolute_path
     assert len(component1.transforms) == 2
