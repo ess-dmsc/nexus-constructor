@@ -333,7 +333,7 @@ class Transformation:
                     self.depends_on.register_dependent(dependee)
                 # Update the dependee to point to this transformation's depends_on
                 dependee.depends_on = self.depends_on
-            # Regardless of if this transformation has depends_on, deregister it from any dependees.
+            # Regardless of if this transformation has a depends_on field, deregister it from any dependees.
             self.deregister_dependent(dependee)
         # Set this transformation's depends_on to None to remove it from the chain.
         self.depends_on = None
