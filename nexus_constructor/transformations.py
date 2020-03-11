@@ -9,7 +9,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import TypeVar, Union, List, Optional
 
-from nexus_constructor.nexus.nexus_wrapper import h5Node
+from nexus_constructor.nexus.nexus_wrapper import h5Node, get_nx_class
 from nexus_constructor.transformation_types import TransformationType
 
 TransformationOrComponent = TypeVar(
@@ -360,12 +360,14 @@ class NXLogTransformation(Transformation):
         self.file.set_attribute_value(self._dataset, CommonAttrs.UI_VALUE, new_value)
 
     @property
-    def units(self) -> str:
-        self.file.get_attribute_value(self._dataset["value"], "units")
+    def units(self) -> Optional[str]:
+        self.file.get_attribute_value(self._dataset["value"], CommonAttrs.UNITS)
 
     @units.setter
     def units(self, new_units: str):
-        self.file.set_attribute_value(self._dataset["value"], "units", new_units)
+        self.file.set_attribute_value(
+            self._dataset["value"], CommonAttrs.UNITS, new_units
+        )
 
     @property
     def dataset(self) -> h5Node:
@@ -381,6 +383,6 @@ def create_transformation(wrapper: nx.NexusWrapper, node: h5Node) -> Transformat
     Factory for creating different types of transform.
     If it is an NXlog group then the magnitude and units fields will be different to a normal transformation dataset.
     """
-    if wrapper.get_attribute_value(node, CommonAttrs.NX_CLASS) == "NXlog":
+    if get_nx_class(node) == "NXlog":
         return NXLogTransformation(wrapper, node)
     return Transformation(wrapper, node)

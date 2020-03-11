@@ -136,12 +136,8 @@ class NexusWrapper(QObject):
 
         def append_nx_entries_to_list(name, node):
             if isinstance(node, h5py.Group):
-                if CommonAttrs.NX_CLASS in node.attrs.keys():
-                    if (
-                        node.attrs[CommonAttrs.NX_CLASS] == b"NXentry"
-                        or node.attrs[CommonAttrs.NX_CLASS] == "NXentry"
-                    ):
-                        entries_in_root[name] = node
+                if get_nx_class(node) == "NXentry":
+                    entries_in_root[name] = node
 
         nexus_file["/"].visititems(append_nx_entries_to_list)
         if len(entries_in_root.keys()) > 1:
@@ -344,12 +340,8 @@ class NexusWrapper(QObject):
 
     def create_transformations_group_if_does_not_exist(self, parent_group: h5Node):
         for child in parent_group:
-            if CommonAttrs.NX_CLASS in parent_group[child].attrs.keys():
-                if (
-                    parent_group[child].attrs[CommonAttrs.NX_CLASS]
-                    == "NXtransformations"
-                ):
-                    return parent_group[child]
+            if get_nx_class(parent_group[child]) == "NXtransformations":
+                return parent_group[child]
         return self.create_nx_group(
             "transformations", "NXtransformations", parent_group
         )
@@ -362,10 +354,5 @@ class NexusWrapper(QObject):
         :return: the instrument group object.
         """
         for node in entry.values():
-            if isinstance(node, h5py.Group):
-                if CommonAttrs.NX_CLASS in node.attrs.keys():
-                    if node.attrs[CommonAttrs.NX_CLASS] in [
-                        "NXinstrument",
-                        b"NXinstrument",
-                    ]:
-                        return node
+            if isinstance(node, h5py.Group) and get_nx_class(node) == "NXinstrument":
+                return node
