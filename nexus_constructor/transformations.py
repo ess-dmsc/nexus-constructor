@@ -372,7 +372,7 @@ class NXLogTransformation(Transformation):
 
     @property
     def dataset(self) -> h5Node:
-        return self.dataset
+        return self._dataset
 
     @dataset.setter
     def dataset(self, new_dataset):
