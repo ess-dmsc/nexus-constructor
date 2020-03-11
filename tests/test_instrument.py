@@ -1,8 +1,6 @@
 from nexus_constructor.transformations import Transformation
 from nexus_constructor.instrument import _convert_name_with_spaces, Instrument
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from tests.test_utils import NX_CLASS_DEFINITIONS
-from tests.helpers import file  # noqa: F401
 
 
 def test_GIVEN_name_with_spaces_WHEN_converting_name_with_spaces_THEN_converts_spaces_in_name_to_underscores():
@@ -15,9 +13,10 @@ def test_GIVEN_name_without_spaces_WHEN_converting_name_with_spaces_THEN_name_do
     assert _convert_name_with_spaces(name) == name
 
 
-def test_GIVEN_nothing_WHEN_getting_components_list_THEN_list_contains_sample_and_no_components():
-    wrapper = NexusWrapper("component_list_with_sample")
-    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+def test_GIVEN_nothing_WHEN_getting_components_list_THEN_list_contains_sample_and_no_components(
+    nexus_wrapper,
+):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
     assert len(instrument.get_component_list()) == 1
 
 
@@ -34,9 +33,10 @@ def check_if_component_is_in_component_list(
     assert found_component == expect_component_present
 
 
-def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_added_component():
-    wrapper = NexusWrapper("test_components_list")
-    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_added_component(
+    nexus_wrapper,
+):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     component_type = "NXcrystal"
     name = "test_crystal"
@@ -48,9 +48,10 @@ def test_GIVEN_component_WHEN_adding_component_THEN_components_list_contains_add
     )
 
 
-def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_components_list_does_not_contain_component():
-    wrapper = NexusWrapper("test_components_list")
-    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_components_list_does_not_contain_component(
+    nexus_wrapper,
+):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     component_type = "NXcrystal"
     name = "test_crystal"
@@ -70,7 +71,7 @@ def test_GIVEN_instrument_with_component_WHEN_component_is_removed_THEN_componen
     )
 
 
-def test_dependents_list_is_created_by_instrument(file):  # noqa: F811
+def test_dependents_list_is_created_by_instrument(file, nexus_wrapper):  # noqa: F811
     """
     The dependents list for transforms is stored in the "dependent_of" attribute,
     which is not part of the NeXus standard,
@@ -93,7 +94,6 @@ def test_dependents_list_is_created_by_instrument(file):  # noqa: F811
     transform_3.attrs["depends_on"] = transform_2.name
     transform_4.attrs["depends_on"] = transform_2.name
 
-    nexus_wrapper = NexusWrapper("test_file_with_transforms")
     nexus_wrapper.load_file(entry_group, file)
     Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
@@ -109,7 +109,7 @@ def test_dependents_list_is_created_by_instrument(file):  # noqa: F811
 
 
 def test_dependent_is_created_by_instrument_if_depends_on_is_relative(
-    file,  # noqa: F811
+    file, nexus_wrapper  # noqa: F811
 ):
     entry_group = file.create_group("entry")
     entry_group.attrs["NX_class"] = "NXentry"
@@ -122,7 +122,6 @@ def test_dependent_is_created_by_instrument_if_depends_on_is_relative(
     transformations_group.attrs["NX_class"] = "NXtransformations"
     transform_1 = transformations_group.create_dataset("translation1", data=1)
 
-    nexus_wrapper = NexusWrapper("test_file_with_transforms")
     nexus_wrapper.load_file(entry_group, file)
     Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
@@ -131,7 +130,7 @@ def test_dependent_is_created_by_instrument_if_depends_on_is_relative(
 
 
 def test_dependee_of_contains_both_components_when_generating_dependee_of_chain_with_mixture_of_absolute_and_relative_paths(
-    file,  # noqa: F811
+    file, nexus_wrapper  # noqa: F811
 ):
     entry_group = file.create_group("entry")
     entry_group.attrs["NX_class"] = "NXentry"
@@ -152,7 +151,6 @@ def test_dependee_of_contains_both_components_when_generating_dependee_of_chain_
         "depends_on", data="/entry/instrument/a/Transforms1/transform1"
     )
 
-    nexus_wrapper = NexusWrapper("test_dependent_transforms_1")
     nexus_wrapper.load_file(entry_group, file)
     Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)

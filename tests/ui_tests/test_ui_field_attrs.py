@@ -6,7 +6,6 @@ from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.field_attrs import FieldAttrsDialog, FieldAttrFrame
 import numpy as np
-from tests.helpers import file  # noqa: F401
 from tests.ui_tests.ui_test_utils import show_and_close_window
 
 

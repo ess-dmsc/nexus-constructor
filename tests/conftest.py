@@ -1,5 +1,7 @@
+import uuid
 from unittest.mock import Mock
 
+import h5py
 import pytest
 from PySide2.QtWidgets import QDialog
 
@@ -18,7 +20,7 @@ def template(qtbot) -> QDialog:
 
 @pytest.fixture(scope="function")
 def nexus_wrapper() -> NexusWrapper:
-    nexus_wrapper = NexusWrapper("test")
+    nexus_wrapper = NexusWrapper(str(uuid.uuid4()))
     yield nexus_wrapper
     nexus_wrapper.nexus_file.close()
 
@@ -51,3 +53,22 @@ def mock_pixel_options():
     change_mapping_filename(None)
 
     return pixel_options
+
+
+class InMemoryFile(object):
+    def __init__(self, filename):
+        self.file_obj = h5py.File(
+            filename, mode="x", driver="core", backing_store=False
+        )
+
+    def __enter__(self):
+        return self.file_obj
+
+    def __exit__(self, type, value, traceback):
+        self.file_obj.close()
+
+
+@pytest.fixture
+def file():
+    with InMemoryFile("test_file") as file:
+        yield file
