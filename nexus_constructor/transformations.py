@@ -322,8 +322,8 @@ class Transformation:
 
     def remove_from_dependee_chain(self):
         """
-        Remove this transformation from the depends_on chain by pointing any dependees to this components depends_on.
-        If this component either has no depends_on or points to itself, just deregister it as a dependent.
+        Remove this transformation from the depends_on chain by pointing any dependees to this transformation's depends_on.
+        If this transformation either has no depends_on or points to itself, just deregister it as a dependent.
         """
         for dependee in self.dependents:
             if self.depends_on not in [None, "."]:
