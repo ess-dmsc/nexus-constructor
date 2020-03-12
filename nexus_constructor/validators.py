@@ -15,7 +15,7 @@ from stl import mesh
 
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
-    units_are_expected_type,
+    units_are_expected_dimensionality,
     units_have_magnitude_of_one,
 )
 
@@ -46,16 +46,22 @@ class UnitValidator(QValidator):
     Validator to ensure the the text entered is a valid unit of length.
     """
 
-    def __init__(self, expected_type=None):
+    def __init__(self, expected_dimensionality=None):
         super().__init__()
         self.ureg = pint.UnitRegistry()
-        self.expected_type = expected_type
+        self.expected_dimensionality = expected_dimensionality
 
     def validate(self, input: str, pos: int):
 
         if not (
             units_are_recognised_by_pint(input)
-            and self._is_expected_type(input)
+            and (
+                True
+                if self.expected_dimensionality is None
+                else units_are_expected_dimensionality(
+                    input, self.expected_dimensionality
+                )
+            )
             and units_have_magnitude_of_one(input)
         ):
             self.is_valid.emit(False)
@@ -63,11 +69,6 @@ class UnitValidator(QValidator):
 
         self.is_valid.emit(True)
         return QValidator.Acceptable
-
-    def _is_expected_type(self, input: str):
-        if self.expected_type is not None:
-            return units_are_expected_type(input, self.expected_type)
-        return True
 
     is_valid = Signal(bool)
 

@@ -121,7 +121,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         validate_line_edit(self.fileLineEdit, False)
 
-        self.unitsLineEdit.setValidator(UnitValidator(expected_type=METRES))
+        self.unitsLineEdit.setValidator(UnitValidator(expected_dimensionality=METRES))
         self.unitsLineEdit.validator().is_valid.connect(
             partial(
                 validate_line_edit,

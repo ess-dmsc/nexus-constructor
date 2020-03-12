@@ -100,7 +100,7 @@ def test_name_validator_set_to_duplicate_name():
 
 
 def test_unit_validator_with_metres_set_as_expected_type():
-    validator = UnitValidator(expected_type=METRES)
+    validator = UnitValidator(expected_dimensionality=METRES)
 
     lengths = ["mile", "cm", "centimetre", "yard", "km"]
     not_lengths = [
