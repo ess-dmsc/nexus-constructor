@@ -35,8 +35,6 @@ class FilewriterCommandWidget(QWidget):
         self.nexus_file_name_edit = QLineEdit()
 
         self.ok_button = QPushButton("Ok")
-        if parent is not None:
-            self.ok_button.clicked.connect(parent.close)
 
         self.broker_line_edit = QLineEdit()
         self.broker_line_edit.setPlaceholderText("broker:port")
