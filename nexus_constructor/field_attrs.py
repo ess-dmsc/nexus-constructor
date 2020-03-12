@@ -75,7 +75,6 @@ class FieldAttrsDialog(QDialog):
 class FieldAttrFrame(QFrame):
     def __init__(self, name=None, value=None, parent=None):
         super().__init__(parent)
-        self.array = None
         self.setMinimumHeight(40)
         self.setLayout(QHBoxLayout())
         self.attr_name_lineedit = QLineEdit()
@@ -91,6 +90,7 @@ class FieldAttrFrame(QFrame):
         self.attr_dtype_combo.addItems([*DATASET_TYPE.keys()])
         self.attr_dtype_combo.currentTextChanged.connect(self.dtype_changed)
         self.dtype_changed(self.attr_dtype_combo.currentText())
+        self.dialog = ArrayDatasetTableWidget(self.dtype)
 
         self.layout().addWidget(self.attr_name_lineedit)
         self.layout().addWidget(self.array_or_scalar_combo)
@@ -102,6 +102,7 @@ class FieldAttrFrame(QFrame):
 
         if name is not None and value is not None:
             self.value = (name, value)
+            self.dtype_changed("")
 
     def type_changed(self, item: str):
         self.attr_value_lineedit.setVisible(item == "Scalar")
@@ -132,7 +133,6 @@ class FieldAttrFrame(QFrame):
         return self.array_or_scalar_combo.currentText() == "Scalar"
 
     def show_edit_array_dialog(self, _):
-        self.dialog = ArrayDatasetTableWidget(self.dtype)
         self.dialog.show()
 
     @property
@@ -169,4 +169,4 @@ class FieldAttrFrame(QFrame):
             self.attr_value_lineedit.setText(str(new_value))
         else:
             self.type_changed("Array")
-            self.array = new_value.data
+            self.dialog.model.array = new_value.data[...]
