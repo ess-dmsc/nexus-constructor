@@ -2,7 +2,11 @@ import pytest
 from PySide2.QtGui import QStandardItemModel
 from mock import Mock
 from streaming_data_types import run_start_pl72
-from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl, add_to_model
+from nexus_constructor.file_writer_ctrl_window import (
+    FileWriterCtrl,
+    add_to_model,
+    set_time,
+)
 from nexus_constructor.kafka.kafka_interface import FileWriter, File
 from nexus_constructor.validators import BrokerAndTopicValidator
 
@@ -46,7 +50,7 @@ def test_UI_GIVEN_time_string_WHEN_setting_time_THEN_last_time_is_stored(
     add_to_model(model, test_input)
     current_time = "12345678"
     new_time = "23456789"
-    FileWriterCtrl._set_time(model, test_input, current_time, new_time)
+    set_time(model, test_input, current_time, new_time)
     assert test_input.last_time == current_time
 
 
