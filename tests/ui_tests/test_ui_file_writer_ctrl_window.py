@@ -175,7 +175,9 @@ class DummyInterface:
         self.topic = topic
 
 
-@pytest.mark.skip(reason="qtbot interferes with other tests")
+@pytest.mark.skip(
+    reason="this test passes, but qtbot unexpectedly interferes with other tests after it has run"
+)
 def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THEN_nothing_happens(
     qtbot, instrument, settings
 ):
@@ -188,7 +190,9 @@ def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THE
     assert window.status_consumer is None
 
 
-@pytest.mark.skip(reason="qtbot interferes with other tests")
+@pytest.mark.skip(
+    reason="this test passes, but qtbot unexpectedly interferes with other tests after it has run"
+)
 def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_THEN_nothing_happens(
     qtbot, instrument, settings
 ):
@@ -201,7 +205,9 @@ def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_TH
     assert window.command_producer is None
 
 
-@pytest.mark.skip(reason="qtbot interferes with other tests")
+@pytest.mark.skip(
+    reason="this test passes, but qtbot unexpectedly interferes with other tests after it has run"
+)
 def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN_producer_is_created(
     qtbot, instrument, settings
 ):
@@ -217,7 +223,9 @@ def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN
     assert isinstance(window.command_producer, DummyInterface)
 
 
-@pytest.mark.skip(reason="qtbot interferes with other tests")
+@pytest.mark.skip(
+    reason="this test passes, but qtbot unexpectedly interferes with other tests after it has run"
+)
 def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_consumer_is_created(
     qtbot, instrument, settings
 ):
@@ -233,7 +241,9 @@ def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_
     assert isinstance(window.status_consumer, DummyInterface)
 
 
-@pytest.mark.skip(reason="qtbot interferes with other tests")
+@pytest.mark.skip(
+    reason="this test passes, but qtbot unexpectedly interferes with other tests after it has run"
+)
 def test_UI_settings_are_saved_when_store_settings_is_called(
     qtbot, instrument, settings
 ):
@@ -274,7 +284,9 @@ def test_UI_settings_are_saved_when_store_settings_is_called(
     assert settings.value(FileWriterSettings.FILE_NAME) == filename
 
 
-@pytest.mark.skip(reason="qtbot interferes with other tests")
+@pytest.mark.skip(
+    reason="this test passes, but qtbot unexpectedly interferes with other tests after it has run"
+)
 def test_UI_stored_settings_are_shown_in_window(qtbot, instrument, settings):
     command_broker = "broker:9092/topic2"
     status_broker = "broker2:9092/topic3"
