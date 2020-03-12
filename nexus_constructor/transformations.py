@@ -362,7 +362,7 @@ class NXLogTransformation(Transformation):
 
     @property
     def units(self) -> Optional[str]:
-        self.file.get_attribute_value(self.dataset["value"], CommonAttrs.UNITS)
+        return self.file.get_attribute_value(self.dataset["value"], CommonAttrs.UNITS)
 
     @units.setter
     def units(self, new_units: str):
