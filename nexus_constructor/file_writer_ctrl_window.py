@@ -2,7 +2,7 @@ import uuid
 from functools import partial
 from typing import Callable, Dict, Union, Tuple, Type
 
-from nexus_constructor.kafka.kafka_interface import KafkaInterface
+from nexus_constructor.kafka.kafka_interface import KafkaInterface, FileWriter, File
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.led import Led
@@ -19,24 +19,7 @@ from nexus_constructor.json.filewriter_json_writer import (
     NexusToDictConverter,
     generate_nexus_string,
 )
-import attr
 from streaming_data_types import run_start_pl72, run_stop_6s4t
-
-
-@attr.s
-class FileWriter:
-    name = attr.ib(type=str)
-    row = attr.ib()
-    last_time = attr.ib(default=0)
-
-
-@attr.s
-class File:
-    name = attr.ib(type=str)
-    row = attr.ib()
-    job_id = attr.ib(type=str, default="Unknown")
-    writer_id = attr.ib(type=str, default="Unknown")
-    last_time = attr.ib(default=0)
 
 
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
@@ -91,10 +74,12 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.file_writers_list.setModel(self.model)
         self.file_writers_list.setColumnWidth(0, 320)
 
-        self.file_list_model = QStandardItemModel(0, 3, self)
+        self.file_list_model = QStandardItemModel(0, 5, self)
         self.file_list_model.setHeaderData(0, QtCore.Qt.Horizontal, "File name")
-        self.file_list_model.setHeaderData(1, QtCore.Qt.Horizontal, "Last seen")
-        self.file_list_model.setHeaderData(2, QtCore.Qt.Horizontal, "File writer")
+        self.file_list_model.setHeaderData(1, QtCore.Qt.Horizontal, "Job ID")
+        self.file_list_model.setHeaderData(2, QtCore.Qt.Horizontal, "Start Time")
+        self.file_list_model.setHeaderData(3, QtCore.Qt.Horizontal, "Stop Time")
+        self.file_list_model.setHeaderData(4, QtCore.Qt.Horizontal, "File writer")
         self.files_list.setModel(self.file_list_model)
 
     @staticmethod
@@ -147,51 +132,55 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 self.command_producer.close()
             self.command_producer = kafka_obj_type(*result)
 
-    def _update_writer_list(self, updated_list: Dict[str, Dict]):
-        for key in updated_list:
-            current_time, time_str = self.get_time(key, updated_list)
-            if key not in self.known_writers:
+    def _update_writer_list(self, updated_list: Dict[str, FileWriter]):
+        for file_writer_id, file_writer in updated_list:
+            current_time, time_str = self.get_time(file_writer)
+            if file_writer_id not in self.known_writers:
                 number_of_filewriter_rows = self.model.rowCount(QtCore.QModelIndex())
-                new_file_writer = FileWriter(key, number_of_filewriter_rows)
-                self.known_writers[key] = new_file_writer
                 self.model.insertRow(number_of_filewriter_rows)
-                self.model.setData(self.model.index(number_of_filewriter_rows, 0), key)
                 self.model.setData(
-                    self.model.index(number_of_filewriter_rows, 1), time_str
+                    self.model.index(number_of_filewriter_rows, 0), file_writer_id
                 )
-            current_file_writer = self.known_writers[key]
-            if current_time != current_file_writer.last_time:
-                self._set_time(self.model, current_file_writer, current_time, time_str)
+                self.model.setData(
+                    self.model.index(number_of_filewriter_rows, 1),
+                    file_writer.last_time,
+                )
+            if current_time != file_writer.last_time:
+                self._set_time(self.model, file_writer, current_time, time_str)
 
-    def _update_files_list(self, updated_list: Dict[str, Dict]):
-        for key in updated_list:
-            current_time, time_str = self.get_time(key, updated_list)
-            if key not in self.known_files:
+    def _update_files_list(self, updated_list: Dict[str, File]):
+        for file_name, file_obj in updated_list.items():
+            current_time, time_str = self.get_time(file_obj)
+            if file_name not in self.known_files:
                 number_of_file_rows = self.file_list_model.rowCount(
                     QtCore.QModelIndex()
                 )
-                new_file = File(key, row=number_of_file_rows)
-                self.known_files[key] = new_file
                 self.file_list_model.insertRow(number_of_file_rows)
                 self.file_list_model.setData(
-                    self.file_list_model.index(number_of_file_rows, 0), key
+                    self.file_list_model.index(number_of_file_rows, 0), file_obj.name
                 )
                 self.file_list_model.setData(
-                    self.file_list_model.index(number_of_file_rows, 1), time_str
+                    self.file_list_model.index(number_of_file_rows, 1), file_obj.job_id
                 )
                 self.file_list_model.setData(
                     self.file_list_model.index(number_of_file_rows, 2),
-                    new_file.writer_id,
+                    file_obj.start_time,
                 )
-            current_file = self.known_files[key]
-            if current_time != current_file.last_time:
-                self._set_time(
-                    self.file_list_model, current_file, current_time, time_str
+                self.file_list_model.setData(
+                    self.file_list_model.index(number_of_file_rows, 3),
+                    file_obj.stop_time,
+                )
+                self.file_list_model.setData(
+                    self.file_list_model.index(number_of_file_rows, 3),
+                    file_obj.writer_id,
                 )
 
+            if current_time != file_obj.last_time:
+                self._set_time(self.file_list_model, file_obj, current_time, time_str)
+
     @staticmethod
-    def get_time(key: str, updated_list: Dict[str, Dict]) -> Tuple[int, str]:
-        current_time = updated_list[key]["last_seen"]
+    def get_time(file: Union[File, FileWriter]) -> Tuple[str, str]:
+        current_time = file.last_time
         time_struct = time.localtime(current_time / 1000)
         time_str = time.strftime("%Y-%m-%d %H:%M:%S%Z", time_struct)
         return current_time, time_str
@@ -243,18 +232,14 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def stop_file_writing_clicked(self):
         selected_files = self.files_list.selectedIndexes()
         for index in selected_files:
-            for fileKey in self.known_files:
-                current_file = self.known_files[fileKey]
-                if index.row() == current_file.row:
-                    self.command_producer.send_command(
-                        bytes(
-                            run_stop_6s4t.serialise_6s4t(
-                                job_id=current_file.job_id,
-                                service_id=current_file.writer_id,
-                            )
-                        )
+            current_file = index.internalData()
+            self.command_producer.send_command(
+                bytes(
+                    run_stop_6s4t.serialise_6s4t(
+                        job_id=current_file.job_id, service_id=current_file.writer_id,
                     )
-                    break
+                )
+            )
 
     def closeEvent(self, event: QCloseEvent):
         if self.status_consumer is not None:

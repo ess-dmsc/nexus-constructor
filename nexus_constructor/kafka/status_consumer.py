@@ -5,7 +5,7 @@ import logging
 import confluent_kafka
 from uuid import uuid1
 
-from nexus_constructor.kafka.kafka_interface import KafkaInterface
+from nexus_constructor.kafka.kafka_interface import KafkaInterface, FileWriter, File
 
 
 class StatusConsumer(KafkaInterface):
@@ -77,17 +77,20 @@ class StatusConsumer(KafkaInterface):
                 if "service_id" in msg_obj:
                     writer_id = msg_obj["service_id"]
                     if writer_id not in known_writers:
-                        known_writers[writer_id] = {"last_seen": 0}
-                    known_writers[writer_id]["last_seen"] = msg.timestamp()[1]
+                        known_writers[writer_id] = FileWriter(writer_id, 0)
                     # msg.timestamp()[0] is the timestamp type
+                    known_writers[writer_id].last_time = msg.timestamp()[1]
                 if "file_being_written" in msg_obj:
                     file_name = msg_obj["file_being_written"]
                     if file_name is not None and file_name not in known_files:
-                        known_files[file_name] = {
-                            "file_name": file_name,
-                            "last_seen": 0,
-                        }
-                    known_files[file_name]["last_seen"] = msg.timestamp()[1]
+                        start_time = msg_obj["start_time"]
+                        stop_time = msg_obj["stop_time"]
+                        job_id = msg_obj["job_id"]
+                        # writer_id = msg_obj["writer_id"]
+                        known_files[file_name] = File(
+                            file_name, start_time, stop_time, job_id
+                        )
+                    known_files[file_name].last_time = msg.timestamp()[1]
                     self.file_writers = known_writers
                     self.files = known_files
 

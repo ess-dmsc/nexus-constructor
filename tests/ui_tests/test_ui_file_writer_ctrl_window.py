@@ -2,7 +2,8 @@ import pytest
 from PySide2.QtGui import QStandardItemModel
 from mock import Mock
 from streaming_data_types import run_start_pl72
-from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl, File, FileWriter
+from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
+from nexus_constructor.kafka.kafka_interface import FileWriter, File
 from nexus_constructor.validators import BrokerAndTopicValidator
 
 

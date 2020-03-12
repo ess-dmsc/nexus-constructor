@@ -3,6 +3,8 @@ from copy import copy
 import asyncio
 import threading
 
+import attr
+
 
 class KafkaInterface(ABC):
     def __init__(self):
@@ -31,3 +33,21 @@ class KafkaInterface(ABC):
     def close(self):
         self._cancelled = True
         self._poll_thread.join()
+
+
+@attr.s
+class FileWriter:
+    name = attr.ib(type=str)
+    # row = attr.ib()
+    last_time = attr.ib(default=0)
+
+
+@attr.s
+class File:
+    name = attr.ib(type=str)
+    # row = attr.ib()
+    start_time = attr.ib(type=str)
+    stop_time = attr.ib(type=str)
+    job_id = attr.ib(type=str, default="Unknown")
+    writer_id = attr.ib(type=str, default="Unknown")
+    last_time = attr.ib(default=0)
