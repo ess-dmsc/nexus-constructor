@@ -52,9 +52,10 @@ def test_GIVEN_a_square_WHEN_creating_vertex_buffer_THEN_length_is_correct():
         QVector3D(0, 1, 0),
         QVector3D(1, 1, 0),
     ]
-    faces = [[0, 1, 2, 3]]
+    # 2 triangles make up the square
+    triangles = [[0, 1, 2], [2, 3, 0]]
 
-    vertex_buffer = create_vertex_buffer(vertices, faces)
+    vertex_buffer = create_vertex_buffer(vertices, triangles)
 
     assert (
         len(list(vertex_buffer))
@@ -80,9 +81,10 @@ def test_GIVEN_a_square_face_WHEN_creating_normal_buffer_THEN_output_is_correct(
         QVector3D(1, 1, 0),
         QVector3D(1, 0, 0),
     ]
-    faces = [[0, 1, 2, 3]]
+    # 2 triangles make up the square
+    triangles = [[0, 1, 2], [2, 3, 0]]
 
-    normal = create_normal_buffer(vertices, faces)
+    normal = create_normal_buffer(vertices, triangles)
 
     expected_output = [0.0, 0.0, -1.0] * TRIANGLES_IN_SQUARE * VERTICES_IN_TRIANGLE
 

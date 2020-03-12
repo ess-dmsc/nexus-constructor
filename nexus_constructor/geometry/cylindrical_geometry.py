@@ -150,7 +150,7 @@ class CylindricalGeometry:
         return QVector3D(0, 0, 1)
 
     @property
-    def off_geometry(self, steps: int = 20) -> OFFGeometry:
+    def off_geometry(self, steps: int = 10) -> OFFGeometry:
         unit_conversion_factor = calculate_unit_conversion_factor(self.units, METRES)
 
         # A list of vertices describing the circle at the bottom of the cylinder
