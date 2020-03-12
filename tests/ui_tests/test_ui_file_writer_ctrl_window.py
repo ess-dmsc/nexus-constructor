@@ -2,7 +2,7 @@ import pytest
 from PySide2.QtGui import QStandardItemModel
 from mock import Mock
 from streaming_data_types import run_start_pl72
-from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
+from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl, add_to_model
 from nexus_constructor.kafka.kafka_interface import FileWriter, File
 from nexus_constructor.validators import BrokerAndTopicValidator
 
@@ -43,6 +43,7 @@ def test_UI_GIVEN_time_string_WHEN_setting_time_THEN_last_time_is_stored(
 ):
     model = QStandardItemModel()
     qtbot.addWidget(model)
+    add_to_model(model, test_input)
     current_time = "12345678"
     new_time = "23456789"
     FileWriterCtrl._set_time(model, test_input, current_time, new_time)
@@ -130,8 +131,8 @@ def test_UI_GIVEN_status_consumer_but_no_command_producer_WHEN_checking_status_c
     window.command_producer = None
     window.status_consumer = Mock()
     window.status_consumer.connected = True
-    window.status_consumer.files = []
-    window.status_consumer.file_writers = []
+    window.status_consumer.files = {}
+    window.status_consumer.file_writers = {}
 
     window._check_connection_status()
     assert window.status_broker_led.is_on()

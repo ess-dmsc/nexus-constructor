@@ -38,14 +38,14 @@ class KafkaInterface(ABC):
 @attr.s
 class FileWriter:
     name = attr.ib(type=str)
-    # row = attr.ib()
+    row = attr.ib()
     last_time = attr.ib(default=0)
 
 
 @attr.s
 class File:
     name = attr.ib(type=str)
-    # row = attr.ib()
+    row = attr.ib()
     start_time = attr.ib(type=str)
     stop_time = attr.ib(type=str)
     job_id = attr.ib(type=str, default="Unknown")
