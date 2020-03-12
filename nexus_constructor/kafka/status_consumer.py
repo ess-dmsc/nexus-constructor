@@ -86,9 +86,13 @@ class StatusConsumer(KafkaInterface):
                         start_time = msg_obj["start_time"]
                         stop_time = msg_obj["stop_time"]
                         job_id = msg_obj["job_id"]
-                        # writer_id = msg_obj["writer_id"]
+                        writer_id = msg_obj["service_id"]
                         known_files[file_name] = File(
-                            file_name, start_time, stop_time, job_id
+                            file_name,
+                            start_time,
+                            stop_time,
+                            job_id,
+                            writer_id=writer_id,
                         )
                     known_files[file_name].last_time = msg.timestamp()[1]
                     self.file_writers = known_writers
