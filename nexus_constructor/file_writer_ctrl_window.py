@@ -38,6 +38,37 @@ def add_to_model(model: QAbstractItemModel, file_obj: Union[File, FileWriter]):
         model.setData(model.index(number_of_file_rows, 5), file_obj.writer_id)
 
 
+def set_time(
+    model: QAbstractItemModel,
+    current_index: Union[File, FileWriter],
+    current_time: str,
+    time_str: str,
+):
+    model.setData(model.index(current_index.row, 1), time_str)
+    current_index.last_time = current_time
+
+
+def get_time(file: Union[File, FileWriter]) -> Tuple[str, str]:
+    current_time = file.last_time
+    time_struct = time.localtime(current_time / 1000)
+    time_str = time.strftime("%Y-%m-%d %H:%M:%S%Z", time_struct)
+    return current_time, time_str
+
+
+def handle_kafka_update(
+    updated_list: Dict[str, Union[File, FileWriter]],
+    known_list: Dict[str, Union[File, FileWriter]],
+    model: QAbstractItemModel,
+):
+    for file_name, file_obj in updated_list.items():
+        current_time, time_str = get_time(file_obj)
+        if file_name not in known_list:
+            known_list[file_name] = file_obj
+            add_to_model(model, file_obj)
+        if current_time != file_obj.last_time:
+            set_time(model, file_obj, current_time, time_str)
+
+
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def __init__(self, instrument: Instrument):
         super().__init__()
@@ -150,42 +181,10 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.command_producer = kafka_obj_type(*result)
 
     def _update_writer_list(self, updated_list: Dict[str, FileWriter]):
-        self.__handle_kafka_update(
-            updated_list, self.known_writers, self.file_writers_model
-        )
+        handle_kafka_update(updated_list, self.known_writers, self.file_writers_model)
 
     def _update_files_list(self, updated_list: Dict[str, File]):
-        self.__handle_kafka_update(updated_list, self.known_files, self.file_list_model)
-
-    def __handle_kafka_update(
-        self,
-        updated_list: Dict[str, Union[File, FileWriter]],
-        known_list: Dict,
-        model: QAbstractItemModel,
-    ):
-        for file_name, file_obj in updated_list.items():
-            current_time, time_str = self.get_time(file_obj)
-            if file_name not in known_list:
-                add_to_model(model, file_obj)
-            if current_time != file_obj.last_time:
-                self._set_time(model, file_obj, current_time, time_str)
-
-    @staticmethod
-    def get_time(file: Union[File, FileWriter]) -> Tuple[str, str]:
-        current_time = file.last_time
-        time_struct = time.localtime(current_time / 1000)
-        time_str = time.strftime("%Y-%m-%d %H:%M:%S%Z", time_struct)
-        return current_time, time_str
-
-    @staticmethod
-    def _set_time(
-        model: QAbstractItemModel,
-        current_index: Union[File, FileWriter],
-        current_time: str,
-        time_str: str,
-    ):
-        model.setData(model.index(current_index.row, 1), time_str)
-        current_index.last_time = current_time
+        handle_kafka_update(updated_list, self.known_files, self.file_list_model)
 
     def send_command(self):
         if self.command_producer is not None:
