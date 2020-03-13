@@ -17,7 +17,6 @@ from nexus_constructor.stream_fields_widget import (
     ADC_PULSE_DEBUG,
     NEXUS_INDICES_INDEX_EVERY_MB,
 )
-from tests.helpers import file  # noqa: F401
 
 
 @pytest.fixture
@@ -236,7 +235,7 @@ def test_GIVEN_element_that_has_been_filled_in_WHEN_creating_dataset_from_spinne
 
 
 def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existing_field_widget_THEN_f142_group_box_is_shown(
-    file, qtbot
+    file, qtbot, nexus_wrapper
 ):
     group = file.create_group("stream1")
     group.attrs["NX_class"] = "NCstream"
@@ -248,7 +247,7 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
     group.create_dataset("source", dtype=vlen_str, data="source1")
     group.create_dataset(NEXUS_INDICES_INDEX_EVERY_MB, dtype=int, data=1)
 
-    wrapper = NexusWrapper()
+    wrapper = nexus_wrapper
     wrapper.load_file(file, file)
 
     instrument = Instrument(wrapper, {})
@@ -275,7 +274,7 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
 
 
 def test_GIVEN_stream_group_that_has_ev42_advanced_option_WHEN_filling_in_existing_field_widget_THEN_ev42_group_box_is_shown(
-    file, qtbot
+    file, qtbot, nexus_wrapper
 ):
     group = file.create_group("stream2")
     group.attrs["NX_class"] = "NCstream"
@@ -286,7 +285,7 @@ def test_GIVEN_stream_group_that_has_ev42_advanced_option_WHEN_filling_in_existi
     group.create_dataset("source", dtype=vlen_str, data="source1")
     group.create_dataset(ADC_PULSE_DEBUG, dtype=bool, data=True)
 
-    wrapper = NexusWrapper()
+    wrapper = nexus_wrapper
     wrapper.load_file(file, file)
 
     instrument = Instrument(wrapper, {})

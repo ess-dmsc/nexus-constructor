@@ -1,15 +1,15 @@
 from nexus_constructor.component.pixel_shape import PixelShape
-from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 import numpy as np
 
 
-def test_GIVEN_a_PixelShape_WHEN_calling_get_shape_THEN_shape_and_transformations_are_returned():
-    wrapper = nx.NexusWrapper("file_with_detector")
-    detector_group = wrapper.create_nx_group(
-        "detector", "NXdetector", wrapper.instrument
+def test_GIVEN_a_PixelShape_WHEN_calling_get_shape_THEN_shape_and_transformations_are_returned(
+    nexus_wrapper,
+):
+    detector_group = nexus_wrapper.create_nx_group(
+        "detector", "NXdetector", nexus_wrapper.instrument
     )
-    shape_group = wrapper.create_nx_group(
+    shape_group = nexus_wrapper.create_nx_group(
         "pixel_shape", "NXoff_geometry", detector_group
     )
 
@@ -23,19 +23,19 @@ def test_GIVEN_a_PixelShape_WHEN_calling_get_shape_THEN_shape_and_transformation
     faces = [0]
     winding_order = [0, 1, 2, 3]
 
-    vertices_field = wrapper.set_field_value(shape_group, "vertices", vertices)
-    wrapper.set_attribute_value(vertices_field, "units", "m")
-    wrapper.set_field_value(shape_group, "winding_order", winding_order)
-    wrapper.set_field_value(shape_group, "faces", faces)
+    vertices_field = nexus_wrapper.set_field_value(shape_group, "vertices", vertices)
+    nexus_wrapper.set_attribute_value(vertices_field, "units", "m")
+    nexus_wrapper.set_field_value(shape_group, "winding_order", winding_order)
+    nexus_wrapper.set_field_value(shape_group, "faces", faces)
 
     # Add pixel offsets to detector group
     x_offsets = np.array([[-0.05, 0.05], [-0.05, 0.05]])
     y_offsets = np.array([[-0.05, -0.05], [0.05, 0.05]])
 
-    wrapper.set_field_value(detector_group, "x_pixel_offset", x_offsets)
-    wrapper.set_field_value(detector_group, "y_pixel_offset", y_offsets)
+    nexus_wrapper.set_field_value(detector_group, "x_pixel_offset", x_offsets)
+    nexus_wrapper.set_field_value(detector_group, "y_pixel_offset", y_offsets)
 
-    pixel_shape = PixelShape(wrapper, detector_group)
+    pixel_shape = PixelShape(nexus_wrapper, detector_group)
     assert isinstance(pixel_shape, PixelShape)
     shape, transformations = pixel_shape.get_shape()
 

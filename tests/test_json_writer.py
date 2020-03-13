@@ -16,7 +16,6 @@ from nexus_constructor.json.filewriter_json_writer import (
 )
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
-from tests.helpers import file  # noqa: F401
 from tests.test_utils import NX_CLASS_DEFINITIONS
 
 
