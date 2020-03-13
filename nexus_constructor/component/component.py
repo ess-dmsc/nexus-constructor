@@ -8,7 +8,11 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class, to_string
+
+from nexus_constructor.nexus.nexus_wrapper import (
+    get_nx_class,
+    get_name_of_node,
+)
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -170,9 +174,11 @@ class Component:
             if (
                 transforms
                 and depends_on
-                == to_string(transforms[-1].dataset.attrs[CommonAttrs.DEPENDS_ON])
+                == self.file.get_attribute_value(
+                    transforms[-1].dataset, CommonAttrs.DEPENDS_ON
+                )
                 and depends_on
-                in [x.split("/")[-1] for x in transforms[-1].dataset.parent.keys()]
+                in [get_name_of_node(x) for x in transforms[-1].dataset.parent.values()]
             ):
                 # depends_on is recursive, ie one transformation in this group depends on another transformation in the group, and it is also relative
                 transform_dataset = self.file.nexus_file[
@@ -193,7 +199,10 @@ class Component:
             new_transform = create_transformation(self.file, transform_dataset)
             new_transform.parent = transforms
             transforms.append(new_transform)
-            if CommonAttrs.DEPENDS_ON in transform_dataset.attrs.keys():
+            if (
+                self.file.get_attribute_value(transform_dataset, CommonAttrs.DEPENDS_ON)
+                is not None
+            ):
                 self._get_transform(
                     self.file.get_attribute_value(
                         transform_dataset, CommonAttrs.DEPENDS_ON
@@ -235,27 +244,15 @@ class Component:
         :param name: name of the translation group (Optional)
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         """
-        transforms_group = self.file.create_transformations_group_if_does_not_exist(
-            self.group
-        )
-        if name is None:
-            name = _generate_incremental_name(
-                TransformationType.TRANSLATION, transforms_group
-            )
         unit_vector, magnitude = _normalise(vector)
-        field = self.file.set_field_value(transforms_group, name, magnitude, float)
-        self.file.set_attribute_value(field, CommonAttrs.UNITS, "m")
-        self.file.set_attribute_value(
-            field, CommonAttrs.VECTOR, qvector3d_to_numpy_array(unit_vector)
+        return self._create_transform(
+            name,
+            TransformationType.TRANSLATION,
+            magnitude,
+            "m",
+            unit_vector,
+            depends_on,
         )
-        self.file.set_attribute_value(
-            field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.TRANSLATION
-        )
-
-        translation_transform = create_transformation(self.file, field)
-        translation_transform.ui_value = magnitude
-        translation_transform.depends_on = depends_on
-        return translation_transform
 
     def add_rotation(
         self,
@@ -271,25 +268,39 @@ class Component:
         :param name: Name of the rotation group (Optional)
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         """
+        return self._create_transform(
+            name, TransformationType.ROTATION, angle, "degrees", axis, depends_on
+        )
+
+    def _create_transform(
+        self,
+        name: str,
+        transformation_type: TransformationType,
+        angle_or_magnitude: float,
+        units: str,
+        vector: QVector3D,
+        depends_on: Transformation,
+    ):
         transforms_group = self.file.create_transformations_group_if_does_not_exist(
             self.group
         )
         if name is None:
-            name = _generate_incremental_name(
-                TransformationType.ROTATION, transforms_group
-            )
-        field = self.file.set_field_value(transforms_group, name, angle, float)
-        self.file.set_attribute_value(field, CommonAttrs.UNITS, "degrees")
+            name = _generate_incremental_name(transformation_type, transforms_group)
+
+        field = self.file.set_field_value(
+            transforms_group, name, angle_or_magnitude, float
+        )
+        self.file.set_attribute_value(field, CommonAttrs.UNITS, units)
         self.file.set_attribute_value(
-            field, CommonAttrs.VECTOR, qvector3d_to_numpy_array(axis)
+            field, CommonAttrs.VECTOR, qvector3d_to_numpy_array(vector)
         )
         self.file.set_attribute_value(
-            field, CommonAttrs.TRANSFORMATION_TYPE, TransformationType.ROTATION
+            field, CommonAttrs.TRANSFORMATION_TYPE, transformation_type
         )
-        rotation_transform = create_transformation(self.file, field)
-        rotation_transform.depends_on = depends_on
-        rotation_transform.ui_value = angle
-        return rotation_transform
+        transform = create_transformation(self.file, field)
+        transform.ui_value = angle_or_magnitude
+        transform.depends_on = depends_on
+        return transform
 
     def _transform_is_in_this_component(self, transform: Transformation) -> bool:
         return transform._dataset.parent.parent.name == self.absolute_path
@@ -299,24 +310,23 @@ class Component:
             raise PermissionError(
                 "Transform is not in this component, do not have permission to delete"
             )
-
-        dependents = transform.get_dependents()
+        dependents = transform.dependents
         if dependents:
             raise DependencyError(
                 f"Cannot delete transformation, it is a dependency of {dependents}"
             )
 
         # Remove whole transformations group if this is the only transformation in it
-        if len(transform._dataset.parent.keys()) == 1:
-            self.file.delete_node(transform._dataset.parent)
+        if len(transform.dataset.parent.keys()) == 1:
+            self.file.delete_node(transform.dataset.parent)
         # Otherwise just remove the transformation from the group
         else:
-            self.file.delete_node(transform._dataset)
+            self.file.delete_node(transform.dataset)
 
     @property
     def depends_on(self) -> Optional[Transformation]:
         depends_on_path = self.file.get_field_value(self.group, CommonAttrs.DEPENDS_ON)
-        if depends_on_path is None:
+        if depends_on_path in [None, "."]:
             return None
         return create_transformation(self.file, self.file.nexus_file[depends_on_path])
 

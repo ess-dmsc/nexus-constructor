@@ -99,12 +99,12 @@ def test_dependents_list_is_created_by_instrument(file, nexus_wrapper):
 
     transform_1_loaded = Transformation(nexus_wrapper, transform_1)
     assert (
-        len(transform_1_loaded.get_dependents()) == 1
+        len(transform_1_loaded.dependents) == 1
     ), "Expected transform 1 to have a registered dependent (transform 2)"
 
     transform_2_loaded = Transformation(nexus_wrapper, transform_2)
     assert (
-        len(transform_2_loaded.get_dependents()) == 2
+        len(transform_2_loaded.dependents) == 2
     ), "Expected transform 2 to have 2 registered dependents (transforms 3 and 4)"
 
 

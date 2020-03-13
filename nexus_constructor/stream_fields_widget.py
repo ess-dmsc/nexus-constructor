@@ -99,6 +99,7 @@ class StreamFieldsWidget(QDialog):
         self.type_label = QLabel("Type: ")
         self.type_combo = QComboBox()
         self.type_combo.addItems(F142_TYPES)
+        self.type_combo.setCurrentText("double")
 
         self.value_units_edit = QLineEdit()
         self.value_units_label = QLabel("Value Units:")

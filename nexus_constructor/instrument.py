@@ -1,8 +1,5 @@
 from typing import List
-
 import h5py
-
-from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
 from nexus_constructor.component.component import Component
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
@@ -12,7 +9,7 @@ from nexus_constructor.component.component_factory import create_component
 COMPONENTS_IN_ENTRY = ["NXmonitor", "NXsample"]
 
 
-def _convert_name_with_spaces(component_name):
+def _convert_name_with_spaces(component_name: str) -> str:
     return component_name.replace(" ", "_")
 
 
@@ -43,13 +40,12 @@ class Instrument:
             Refresh the depends_on attribute of each transformation, which also results in registering dependents
             """
             if isinstance(node, h5py.Group):
-                if CommonAttrs.NX_CLASS in node.attrs.keys():
-                    if node.attrs[CommonAttrs.NX_CLASS] == "NXtransformations":
-                        for transformation_name, transformation_node in node.items():
-                            transform = create_transformation(
-                                self.nexus, node[transformation_name]
-                            )
-                            transform.depends_on = transform.depends_on
+                if get_nx_class(node) == "NXtransformations":
+                    for transformation_name, transformation_node in node.items():
+                        transform = create_transformation(
+                            self.nexus, node[transformation_name]
+                        )
+                        transform.depends_on = transform.depends_on
 
         self.nexus.nexus_file.visititems(refresh_depends_on)
 
@@ -83,10 +79,8 @@ class Instrument:
 
         def find_components(_, node):
             if isinstance(node, h5py.Group):
-                if CommonAttrs.NX_CLASS in node.attrs.keys():
-                    nx_class = get_nx_class(node)
-                    if nx_class and nx_class in self.nx_component_classes:
-                        component_list.append(create_component(self.nexus, node))
+                if get_nx_class(node) in self.nx_component_classes:
+                    component_list.append(create_component(self.nexus, node))
 
         self.nexus.entry.visititems(find_components)
         return component_list

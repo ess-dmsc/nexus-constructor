@@ -49,7 +49,7 @@ def convert_faces_into_triangles(faces):
     return triangles
 
 
-def create_vertex_buffer(vertices, faces):
+def create_vertex_buffer(vertices, triangles):
     """
     For each point in each triangle in each face, add its points to the vertices list.
     To do this we:
@@ -57,11 +57,9 @@ def create_vertex_buffer(vertices, faces):
     Get the vertices that are in the triangles
     Adding them into a flat list of points
     :param vertices: The vertices in the mesh
-    :param faces: The faces in the mesh
+    :param triangles: A list of the triangles that make up each face in the mesh
     :return: A list of the points in the faces
     """
-    triangles = convert_faces_into_triangles(faces)
-
     flattened_triangles = flatten(triangles)
 
     return flatten(
@@ -69,15 +67,14 @@ def create_vertex_buffer(vertices, faces):
     )
 
 
-def create_normal_buffer(vertices, faces):
+def create_normal_buffer(vertices, triangles):
     """
     Creates normal vectors for each vertex on the mesh.
     Qt requires each vertex to have it's own normal.
     :param vertices: The vertices for the mesh
-    :param faces: The faces in the mesh
+    :param triangles: A list of the triangles that make up each face in the mesh
     :return: A list of the normal points for the faces
     """
-    triangles = convert_faces_into_triangles(faces)
     normal_buffer_values = []
     for triangle in triangles:
         # Get the vertices of each triangle
@@ -131,8 +128,9 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
 
         faces, vertices = repeat_shape_over_positions(model, positions)
 
-        vertex_buffer_values = list(create_vertex_buffer(vertices, faces))
-        normal_buffer_values = create_normal_buffer(vertices, faces)
+        triangles = convert_faces_into_triangles(faces)
+        vertex_buffer_values = list(create_vertex_buffer(vertices, triangles))
+        normal_buffer_values = create_normal_buffer(vertices, triangles)
 
         positionAttribute = self.create_attribute(
             vertex_buffer_values, self.q_attribute.defaultPositionAttributeName()
