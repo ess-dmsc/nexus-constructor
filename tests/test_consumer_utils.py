@@ -77,14 +77,17 @@ def test_handle_consumer_message_works_with_no_service_id_but_returns_no_filewri
     assert file_name in known_files.keys()
     file = known_files[file_name]
 
+    writer_id = "Unknown"
+
     assert file.name == file_name
     assert file.last_time == last_seen
     assert file.start_time == start_time
     assert file.stop_time == stop_time
-    assert file.writer_id == "Unknown"
+    assert file.writer_id == writer_id
     assert file.row == 0
 
-    assert len(writers.keys()) == 0
+    assert known_writers[writer_id].name == writer_id
+    assert known_writers[writer_id].last_time == last_seen
 
 
 def test_when_handling_blank_status_message_no_files_are_added_to_list():

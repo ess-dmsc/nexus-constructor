@@ -41,10 +41,9 @@ def _construct_file(
 def _construct_filewriter(
     known_writers: Dict[str, FileWriter], msg_obj: Dict[str, str], timestamp: int
 ):
-    writer_id = msg_obj["service_id"] if "service_id" in msg_obj else None
-    if writer_id is not None:
-        if writer_id not in known_writers:
-            known_writers[writer_id] = FileWriter(writer_id, 0)
-        # msg.timestamp()[0] is the timestamp type
-        known_writers[writer_id].last_time = timestamp
+    writer_id = msg_obj["service_id"] if "service_id" in msg_obj else "Unknown"
+    if writer_id not in known_writers:
+        known_writers[writer_id] = FileWriter(writer_id, 0)
+    # msg.timestamp()[0] is the timestamp type
+    known_writers[writer_id].last_time = timestamp
     return writer_id
