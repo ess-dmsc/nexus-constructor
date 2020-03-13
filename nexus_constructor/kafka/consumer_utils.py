@@ -21,7 +21,7 @@ def handle_consumer_message(
 def _construct_file(
     known_files: Dict[str, File],
     msg_obj: Dict[str, str],
-    timestamp: str,
+    timestamp: int,
     writer_id: str,
 ):
     file_name = (
@@ -39,7 +39,7 @@ def _construct_file(
 
 
 def _construct_filewriter(
-    known_writers: Dict[str, FileWriter], msg_obj: Dict[str, str], timestamp: str
+    known_writers: Dict[str, FileWriter], msg_obj: Dict[str, str], timestamp: int
 ):
     writer_id = msg_obj["service_id"] if "service_id" in msg_obj else None
     if writer_id is not None:
