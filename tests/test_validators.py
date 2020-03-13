@@ -127,7 +127,7 @@ def test_unit_validator_with_metres_set_as_expected_type():
         assert validator.validate(unit, 0) == QValidator.Intermediate
 
 
-def test_unit_validator_with_no_expected_type():
+def test_unit_validator_with_no_expected_dimensionality():
     validator = UnitValidator()
 
     valid_units = ["deg", "m", "cm", "dm", "rad"]
