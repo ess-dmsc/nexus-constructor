@@ -96,6 +96,7 @@ class ComponentTreeModel(QAbstractItemModel):
         if len(transformation_list) > 0:
             parent_transform = transformation_list[len(transformation_list) - 1]
             parent_transform.depends_on = None
+        self.instrument.nexus.transformation_changed.emit()
 
     def __update_link_rows(self):
         nr_of_components = self.rowCount(QModelIndex())
