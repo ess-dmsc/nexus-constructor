@@ -8,6 +8,8 @@ import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs
 
 h5Node = TypeVar("h5Node", h5py.Group, h5py.Dataset)
+DEFAULT_INSTRUMENT = "instrument"
+DEFAULT_ENTRY = "entry"
 
 
 def set_up_in_memory_nexus_file(filename: str) -> h5py.File:
@@ -75,8 +77,8 @@ class NexusWrapper(QObject):
     def __init__(
         self,
         filename: str = "NeXus File",
-        entry_name: str = "entry",
-        instrument_name: str = "instrument",
+        entry_name: str = DEFAULT_ENTRY,
+        instrument_name: str = DEFAULT_INSTRUMENT,
     ):
         super().__init__()
         self.nexus_file = set_up_in_memory_nexus_file(filename)
@@ -131,7 +133,7 @@ class NexusWrapper(QObject):
         self.file_opened.emit(nexus_file)
         return entries
 
-    def find_entries_in_file(self, nexus_file: h5py.File):
+    def find_entries_in_file(self, nexus_file: h5py.File) -> bool:
         """
         Find the entry group in the specified nexus file. If there are multiple, emit the signal required to
         show the multiple entry selection dialog in the UI.
@@ -148,8 +150,12 @@ class NexusWrapper(QObject):
         if len(entries_in_root.keys()) > 1:
             self.show_entries_dialog.emit(entries_in_root, nexus_file)
             return False
-        else:
+        elif len(entries_in_root.keys()) == 1:
             self.load_file(list(entries_in_root.values())[0], nexus_file)
+            return True
+        else:
+            new_entry = self.create_nx_group(DEFAULT_ENTRY, "NXentry", nexus_file)
+            self.load_file(new_entry, nexus_file)
             return True
 
     def load_file(self, entry: h5py.Group, nexus_file: h5py.File):
@@ -351,13 +357,13 @@ class NexusWrapper(QObject):
             "transformations", "NXtransformations", parent_group
         )
 
-    @staticmethod
-    def get_instrument_group_from_entry(entry: h5py.Group) -> h5py.Group:
+    def get_instrument_group_from_entry(self, entry: h5py.Group) -> h5py.Group:
         """
-        Get the first NXinstrument object from an entry group.
+        Get the first NXinstrument object from an entry group, or create one if one doesn't exist
         :param entry: The entry group object to search for the instrument group in.
         :return: the instrument group object.
         """
         for node in entry.values():
             if isinstance(node, h5py.Group) and get_nx_class(node) == "NXinstrument":
                 return node
+        return self.create_nx_group(DEFAULT_INSTRUMENT, "NXinstrument", entry)
