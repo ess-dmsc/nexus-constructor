@@ -27,7 +27,7 @@ def _construct_file(
     file_name = (
         msg_obj["file_being_written"] if "file_being_written" in msg_obj else None
     )
-    if file_name is not None:
+    if file_name not in [None, ""]:
         if file_name not in known_files:
             start_time = msg_obj["start_time"]
             stop_time = msg_obj["stop_time"]

@@ -85,3 +85,24 @@ def test_handle_consumer_message_works_with_no_service_id_but_returns_no_filewri
     assert file.row == 0
 
     assert len(writers.keys()) == 0
+
+
+def test_when_handling_blank_status_message_no_files_are_added_to_list():
+    message = {
+        "file_being_written": "",
+        "job_id": "",
+        "start_time": "",
+        "stop_time": "",
+        "update_interval": 2000,
+    }
+
+    last_seen = 23458789
+    kafka_message = MockMessage(last_seen)
+
+    files = {}
+    writers = {}
+    known_writers, known_files = handle_consumer_message(
+        files, writers, kafka_message, message
+    )
+
+    assert len(known_files.keys()) == 0
