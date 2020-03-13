@@ -8,10 +8,10 @@ from nexus_constructor.kafka.kafka_interface import File, FileWriter
 def handle_consumer_message(
     known_files: Dict[str, File],
     known_writers: Dict[str, FileWriter],
-    msg: confluent_kafka.Message,
+    kafka_message: confluent_kafka.Message,
     msg_obj: Dict[str, str],
 ):
-    timestamp = msg.timestamp()[1]
+    timestamp = kafka_message.timestamp()[1]
 
     writer_id = _construct_filewriter(known_writers, msg_obj, timestamp)
     _construct_file(known_files, msg_obj, timestamp, writer_id)
@@ -32,7 +32,7 @@ def _construct_file(
             start_time = msg_obj["start_time"]
             stop_time = msg_obj["stop_time"]
             job_id = msg_obj["job_id"]
-            known_files[file_name] = File(file_name, start_time, stop_time, job_id)
+            known_files[file_name] = File(file_name, 0, start_time, stop_time, job_id)
             if writer_id is not None:
                 known_files[file_name].writer_id = writer_id
         known_files[file_name].last_time = timestamp
