@@ -93,7 +93,9 @@ setup(
     description="NeXus file constructor with 3D view for components",
     options={"build_exe": build_exe_options},
     executables=[
-        Executable("main.py", base=base, targetName="NexusConstructor" + extension)
+        Executable(
+            "nexus-constructor.py", base=base, targetName="NexusConstructor" + extension
+        )
     ],
 )
 
