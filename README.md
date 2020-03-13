@@ -35,7 +35,7 @@ to activate the pre-commit check.
 
 ## Running the application
 
-Run the python script `main.py` located in the root of the repository.
+Run the python script `nexus-constructor.py` located in the root of the repository.
 
 ## Developer Documentation
 
