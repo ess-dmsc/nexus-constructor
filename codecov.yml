@@ -3,7 +3,7 @@ ignore:
   - "**/*__init__.py"
   - "main.py"
   - "setup.py"
-  - "nexus_constructor/kafka/*"
+  - "nexus_constructor/kafka/kafka*"
 
 comment:
   layout: "header, diff, tree, changes, sunburst"
