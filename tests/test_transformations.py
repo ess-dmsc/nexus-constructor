@@ -186,7 +186,7 @@ def test_set_one_dependent():
 
     transform1.register_dependent(transform2)
 
-    set_dependents = transform1.get_dependents()
+    set_dependents = transform1.dependents
 
     assert len(set_dependents) == 1
     assert set_dependents[0] == transform2
@@ -204,7 +204,7 @@ def test_set_two_dependents():
     transform1.register_dependent(transform2)
     transform1.register_dependent(transform3)
 
-    set_dependents = transform1.get_dependents()
+    set_dependents = transform1.dependents
 
     assert len(set_dependents) == 2
     assert set_dependents[0] == transform2
@@ -226,7 +226,7 @@ def test_set_three_dependents():
     transform1.register_dependent(transform3)
     transform1.register_dependent(transform4)
 
-    set_dependents = transform1.get_dependents()
+    set_dependents = transform1.dependents
 
     assert len(set_dependents) == 3
     assert set_dependents[0] == transform2
@@ -244,7 +244,7 @@ def test_deregister_dependent():
     transform1.register_dependent(transform2)
     transform1.deregister_dependent(transform2)
 
-    set_dependents = transform1.get_dependents()
+    set_dependents = transform1.dependents
 
     assert not set_dependents
 
@@ -257,7 +257,7 @@ def test_deregister_unregistered_dependent_alt1():
 
     transform1.deregister_dependent(transform2)
 
-    assert not transform1.get_dependents()
+    assert not transform1.dependents
 
 
 def test_deregister_unregistered_dependent_alt2():
@@ -270,8 +270,8 @@ def test_deregister_unregistered_dependent_alt2():
     transform1.register_dependent(transform3)
     transform1.deregister_dependent(transform2)
 
-    assert len(transform1.get_dependents()) == 1
-    assert transform1.get_dependents()[0] == transform3
+    assert len(transform1.dependents) == 1
+    assert transform1.dependents[0] == transform3
 
 
 def test_deregister_unregistered_dependent_alt3():
@@ -286,9 +286,9 @@ def test_deregister_unregistered_dependent_alt3():
     transform1.register_dependent(transform4)
     transform1.deregister_dependent(transform2)
 
-    assert len(transform1.get_dependents()) == 2
-    assert transform1.get_dependents()[0] == transform3
-    assert transform1.get_dependents()[1] == transform4
+    assert len(transform1.dependents) == 2
+    assert transform1.dependents[0] == transform3
+    assert transform1.dependents[1] == transform4
 
 
 def test_reregister_dependent():
@@ -304,7 +304,7 @@ def test_reregister_dependent():
     transform1.deregister_dependent(transform2)
     transform1.register_dependent(transform3)
 
-    set_dependents = transform1.get_dependents()
+    set_dependents = transform1.dependents
 
     assert len(set_dependents) == 1
     assert set_dependents[0] == transform3
@@ -319,7 +319,7 @@ def test_set_one_dependent_component():
 
     transform.register_dependent(component)
 
-    set_dependents = transform.get_dependents()
+    set_dependents = transform.dependents
 
     assert len(set_dependents) == 1
     assert set_dependents[0] == component
@@ -336,7 +336,7 @@ def test_set_two_dependent_components():
     transform.register_dependent(component1)
     transform.register_dependent(component2)
 
-    set_dependents = transform.get_dependents()
+    set_dependents = transform.dependents
 
     assert len(set_dependents) == 2
     assert set_dependents[0] == component1
@@ -356,7 +356,7 @@ def test_set_three_dependent_components():
     transform.register_dependent(component2)
     transform.register_dependent(component3)
 
-    set_dependents = transform.get_dependents()
+    set_dependents = transform.dependents
 
     assert len(set_dependents) == 3
     assert set_dependents[0] == component1
@@ -381,7 +381,7 @@ def test_deregister_three_dependent_components():
     transform.deregister_dependent(component2)
     transform.deregister_dependent(component3)
 
-    set_dependents = transform.get_dependents()
+    set_dependents = transform.dependents
 
     assert len(set_dependents) == 0
 
@@ -396,7 +396,7 @@ def test_register_dependent_twice():
     transform.register_dependent(component1)
     transform.register_dependent(component1)
 
-    set_dependents = transform.get_dependents()
+    set_dependents = transform.dependents
 
     assert len(set_dependents) == 1
 
