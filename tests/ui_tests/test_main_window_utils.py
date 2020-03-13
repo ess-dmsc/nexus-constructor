@@ -348,7 +348,6 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     transformation_selected_actions = {
         delete_action,
         duplicate_action,
-        edit_component_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,

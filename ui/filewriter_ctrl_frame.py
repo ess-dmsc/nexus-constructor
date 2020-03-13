@@ -91,7 +91,7 @@ class Ui_FilewriterCtrl(object):
         self.command_broker_edit.setPlaceholderText(broker_placeholder_text)
         self.command_broker_layout.addWidget(self.command_broker_edit)
         self.command_layout.addLayout(self.command_broker_layout)
-        self.command_widget = FilewriterCommandWidget()
+        self.command_widget = FilewriterCommandWidget(FilewriterCtrl)
         self.command_layout.addWidget(self.command_widget)
 
         self.horizontal_layout.addLayout(self.command_layout)

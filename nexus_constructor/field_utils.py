@@ -7,7 +7,10 @@ import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
+from nexus_constructor.nexus.nexus_wrapper import (
+    get_name_of_node,
+    get_nx_class,
+)
 from nexus_constructor.validators import FieldType
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 
@@ -87,10 +90,7 @@ def find_field_type(item: h5Node) -> Callable:
     elif isinstance(item, h5py.Group):
         if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
             return update_existing_link_field
-        elif (
-            CommonAttrs.NX_CLASS in item.attrs.keys()
-            and item.attrs[CommonAttrs.NX_CLASS] == CommonAttrs.NC_STREAM
-        ):
+        elif get_nx_class(item) == CommonAttrs.NC_STREAM:
             return update_existing_stream_field
     logging.debug(
         f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"

@@ -1,5 +1,7 @@
 import uuid
 from typing import Dict
+
+from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import (
     QMainWindow,
     QApplication,
@@ -94,7 +96,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if self.file_writer_control_window is None:
             from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
 
-            self.file_writer_ctrl_window = FileWriterCtrl(self.instrument)
+            self.file_writer_ctrl_window = FileWriterCtrl(
+                self.instrument, QSettings("ess", "nexus-constructor")
+            )
             self.file_writer_ctrl_window.show()
 
     def show_edit_component_dialog(self):

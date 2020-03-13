@@ -7,8 +7,8 @@ from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.led import Led
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
-from PySide2.QtWidgets import QMainWindow, QLineEdit
-from PySide2.QtCore import QTimer, QAbstractItemModel
+from PySide2.QtWidgets import QMainWindow, QLineEdit, QApplication
+from PySide2.QtCore import QTimer, QAbstractItemModel, QSettings
 from PySide2.QtGui import QStandardItemModel, QCloseEvent, Qt
 from PySide2 import QtCore
 from nexus_constructor.instrument import Instrument
@@ -69,15 +69,85 @@ def handle_kafka_update(
             set_time(model, file_obj, current_time, time_str)
 
 
+class FileWriterSettings:
+    STATUS_BROKER_ADDR = "status_broker_addr"
+    COMMAND_BROKER_ADDR = "command_broker_addr"
+    FILE_BROKER_ADDR = "file_broker_addr"
+    USE_START_TIME = "use_start_time"
+    USE_STOP_TIME = "use_stop_time"
+    FILE_NAME = "file_name"
+
+
+def extract_bool_from_qsettings(setting: Union[str, bool]):
+    if type(setting) == str:
+        setting = setting == "True"
+    return setting
+
+
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
-    def __init__(self, instrument: Instrument):
+    def __init__(self, instrument: Instrument, settings: QSettings):
         super().__init__()
+        self.settings = settings
         self.instrument = instrument
         self.setupUi()
         self.known_writers = {}
         self.known_files = {}
         self.status_consumer = None
         self.command_producer = None
+
+    def _restore_settings(self):
+        """
+        Restore persistent broker config settings from file.
+        """
+        self.status_broker_edit.setText(
+            self.settings.value(FileWriterSettings.STATUS_BROKER_ADDR)
+        )
+        self.command_broker_edit.setText(
+            self.settings.value(FileWriterSettings.COMMAND_BROKER_ADDR)
+        )
+        self.command_widget.broker_line_edit.setText(
+            self.settings.value(FileWriterSettings.FILE_BROKER_ADDR)
+        )
+        self.command_widget.start_time_enabled.setChecked(
+            extract_bool_from_qsettings(
+                self.settings.value(FileWriterSettings.USE_START_TIME, False)
+            )
+        )
+        self.command_widget.stop_time_enabled.setChecked(
+            extract_bool_from_qsettings(
+                self.settings.value(FileWriterSettings.USE_STOP_TIME, False)
+            )
+        )
+        self.command_widget.nexus_file_name_edit.setText(
+            self.settings.value(FileWriterSettings.FILE_NAME)
+        )
+
+    def _store_settings(self):
+        """
+        Store persistent broker config settings to file.
+        """
+        self.settings.setValue(
+            FileWriterSettings.STATUS_BROKER_ADDR, self.status_broker_edit.text()
+        )
+        self.settings.setValue(
+            FileWriterSettings.COMMAND_BROKER_ADDR, self.command_broker_edit.text()
+        )
+        self.settings.setValue(
+            FileWriterSettings.FILE_BROKER_ADDR,
+            self.command_widget.broker_line_edit.text(),
+        )
+        self.settings.setValue(
+            FileWriterSettings.USE_START_TIME,
+            self.command_widget.start_time_enabled.isChecked(),
+        )
+        self.settings.setValue(
+            FileWriterSettings.USE_STOP_TIME,
+            self.command_widget.stop_time_enabled.isChecked(),
+        )
+        self.settings.setValue(
+            FileWriterSettings.FILE_NAME,
+            self.command_widget.nexus_file_name_edit.text(),
+        )
 
     def setupUi(self):
         super().setupUi(self)
@@ -129,6 +199,8 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         self.file_list_model.setHeaderData(4, QtCore.Qt.Horizontal, "Stop Time")
         self.file_list_model.setHeaderData(5, QtCore.Qt.Horizontal, "File writer")
         self.files_list.setModel(self.file_list_model)
+        self._restore_settings()
+        QApplication.instance().aboutToQuit.connect(self._store_settings)
 
     @staticmethod
     def _set_up_broker_fields(
@@ -195,7 +267,6 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                 stop_time,
                 service_id,
                 abort_on_uninitialised_stream,
-                use_swmr,
             ) = self.command_widget.get_arguments()
             self.command_producer.send_command(
                 bytes(
