@@ -7,7 +7,6 @@ from typing import Dict
 import confluent_kafka
 from uuid import uuid1
 
-from kafka.structs import KafkaMessage
 
 from nexus_constructor.kafka.kafka_interface import KafkaInterface, FileWriter, File
 
@@ -15,7 +14,7 @@ from nexus_constructor.kafka.kafka_interface import KafkaInterface, FileWriter, 
 def handle_consumer_message(
     known_files: Dict[str, File],
     known_writers: Dict[str, FileWriter],
-    msg: KafkaMessage,
+    msg: confluent_kafka.Message,
     msg_obj: Dict[str, str],
 ):
     timestamp = msg.timestamp()[1]
