@@ -2,10 +2,59 @@ from copy import copy
 import time
 import json
 import logging
+from typing import Dict
+
 import confluent_kafka
 from uuid import uuid1
 
+from kafka.structs import KafkaMessage
+
 from nexus_constructor.kafka.kafka_interface import KafkaInterface, FileWriter, File
+
+
+def handle_consumer_message(
+    known_files: Dict[str, File],
+    known_writers: Dict[str, FileWriter],
+    msg: KafkaMessage,
+    msg_obj: Dict[str, str],
+):
+    timestamp = msg.timestamp()[1]
+
+    writer_id = _construct_filewriter(known_writers, msg_obj, timestamp)
+    _construct_file(known_files, msg_obj, timestamp, writer_id)
+    return known_writers, known_files
+
+
+def _construct_file(
+    known_files: Dict[str, File],
+    msg_obj: Dict[str, str],
+    timestamp: str,
+    writer_id: str,
+):
+    file_name = (
+        msg_obj["file_being_written"] if "file_being_written" in msg_obj else None
+    )
+    if file_name is not None:
+        if file_name not in known_files:
+            start_time = msg_obj["start_time"]
+            stop_time = msg_obj["stop_time"]
+            job_id = msg_obj["job_id"]
+            known_files[file_name] = File(file_name, start_time, stop_time, job_id,)
+            if writer_id is not None:
+                known_files[file_name].writer_id = writer_id
+        known_files[file_name].last_time = timestamp
+
+
+def _construct_filewriter(
+    known_writers: Dict[str, FileWriter], msg_obj: Dict[str, str], timestamp: str
+):
+    writer_id = msg_obj["service_id"] if "service_id" in msg_obj else None
+    if writer_id is not None:
+        if writer_id not in known_writers:
+            known_writers[writer_id] = FileWriter(writer_id, 0)
+        # msg.timestamp()[0] is the timestamp type
+        known_writers[writer_id].last_time = timestamp
+    return writer_id
 
 
 class StatusConsumer(KafkaInterface):
@@ -74,29 +123,9 @@ class StatusConsumer(KafkaInterface):
                 logging.error(msg.error())
             else:
                 msg_obj = json.loads(msg.value())
-                if "service_id" in msg_obj:
-                    writer_id = msg_obj["service_id"]
-                    if writer_id not in known_writers:
-                        known_writers[writer_id] = FileWriter(writer_id, 0)
-                    # msg.timestamp()[0] is the timestamp type
-                    known_writers[writer_id].last_time = msg.timestamp()[1]
-                if "file_being_written" in msg_obj:
-                    file_name = msg_obj["file_being_written"]
-                    if file_name is not None and file_name not in known_files:
-                        start_time = msg_obj["start_time"]
-                        stop_time = msg_obj["stop_time"]
-                        job_id = msg_obj["job_id"]
-                        writer_id = msg_obj["service_id"]
-                        known_files[file_name] = File(
-                            file_name,
-                            start_time,
-                            stop_time,
-                            job_id,
-                            writer_id=writer_id,
-                        )
-                    known_files[file_name].last_time = msg.timestamp()[1]
-                    self.file_writers = known_writers
-                    self.files = known_files
+                self.file_writers, self.files = handle_consumer_message(
+                    known_files, known_writers, msg, msg_obj
+                )
 
     def close(self):
         self._cancelled = True
