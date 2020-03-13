@@ -1,5 +1,6 @@
 from nexus_constructor.field_utils import find_field_type
 from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.unit_utils import METRES, RADIANS
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
 from PySide2.QtWidgets import QGroupBox, QFrame, QWidget, QLabel
@@ -74,6 +75,9 @@ class EditTranslation(EditTransformation):
         self, parent: QWidget, transformation: Transformation, instrument: Instrument
     ):
         super().__init__(parent, transformation, instrument)
+        self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
+            METRES
+        )
         self.transformation_frame.vector_label.setText("Direction")
         self.transformation_frame.value_label.setText("Distance (m)")
         self.setTitle(TransformationType.TRANSLATION)
@@ -84,6 +88,9 @@ class EditRotation(EditTransformation):
         self, parent: QWidget, transformation: Transformation, instrument: Instrument
     ):
         super().__init__(parent, transformation, instrument)
+        self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
+            RADIANS
+        )
         self.transformation_frame.vector_label.setText("Rotation Axis")
         self.transformation_frame.value_label.setText("Angle (°)")
         self.setTitle(TransformationType.ROTATION)

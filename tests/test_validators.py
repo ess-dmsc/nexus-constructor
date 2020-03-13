@@ -4,6 +4,7 @@ from typing import List
 
 import pytest
 
+from nexus_constructor.unit_utils import METRES
 from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
@@ -98,8 +99,8 @@ def test_name_validator_set_to_duplicate_name():
     )
 
 
-def test_unit_validator():
-    validator = UnitValidator()
+def test_unit_validator_with_metres_set_as_expected_dimensionality():
+    validator = UnitValidator(expected_dimensionality=METRES)
 
     lengths = ["mile", "cm", "centimetre", "yard", "km"]
     not_lengths = [
@@ -123,6 +124,20 @@ def test_unit_validator():
         assert validator.validate(unit, 0) == QValidator.Acceptable
 
     for unit in not_lengths:
+        assert validator.validate(unit, 0) == QValidator.Intermediate
+
+
+def test_unit_validator_with_no_expected_dimensionality():
+    validator = UnitValidator()
+
+    valid_units = ["deg", "m", "cm", "dm", "rad"]
+
+    invalid_units = ["asdfghj", "degre", "2 degrees"]
+
+    for unit in valid_units:
+        assert validator.validate(unit, 0) == QValidator.Acceptable
+
+    for unit in invalid_units:
         assert validator.validate(unit, 0) == QValidator.Intermediate
 
 

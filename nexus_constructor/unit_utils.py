@@ -31,11 +31,11 @@ def units_are_recognised_by_pint(input: str, emit_logging_msg: bool = True) -> b
     return True
 
 
-def units_are_expected_type(
+def units_are_expected_dimensionality(
     input: str, expected_unit_type: str, emit_logging_msg=True
 ) -> bool:
     """
-    Checks if a unit is the expected type by trying to convert it.
+    Checks if a unit is the expected dimensionality by trying to convert it.
     :param input: The units string.
     :return: True if the conversion was successful, False otherwise.
     """
