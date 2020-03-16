@@ -130,18 +130,22 @@ class ComponentTreeModel(QAbstractItemModel):
     def _remove_component(self, index: QModelIndex):
         component = index.internalPointer()
         transforms = component.transforms
-        if transforms and transforms[0].dependents():
-            reply = QMessageBox.question(
-                None,
-                "Delete component?",
-                "this component has transformations that are depended on. Are you sure you want to delete it?",
-                QMessageBox.Yes,
-                QMessageBox.No,
+        if transforms:
+            has_dependents_other_than_the_component_being_deleted = (
+                len(transforms[0].dependents) > 1
             )
-            if reply == QMessageBox.Yes:
-                pass
-            elif reply == QMessageBox.No:
-                return
+            if has_dependents_other_than_the_component_being_deleted:
+                reply = QMessageBox.question(
+                    None,
+                    "Delete component?",
+                    "this component has transformations that are depended on. Are you sure you want to delete it?",
+                    QMessageBox.Yes,
+                    QMessageBox.No,
+                )
+                if reply == QMessageBox.Yes:
+                    pass
+                elif reply == QMessageBox.No:
+                    return
         remove_index = self.components.index(index.internalPointer())
         self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
         for transform in transforms:

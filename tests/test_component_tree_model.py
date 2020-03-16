@@ -509,6 +509,20 @@ def test_remove_component(nexus_wrapper):
     assert under_test.rowCount(QModelIndex()) == 0
 
 
+def test_remove_component_with_transformation(nexus_wrapper):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
+    under_test = ComponentTreeModel(instrument)
+    instrument.create_component("Some name", "some class", "desc")
+    component_index = under_test.index(0, 0, QModelIndex())
+    under_test.add_rotation(component_index)
+    assert under_test.rowCount(QModelIndex()) == 1
+    under_test.remove_node(component_index)
+    assert under_test.rowCount(QModelIndex()) == 0, (
+        "Expected component to be successfully deleted because it has "
+        "a transformation that only has it as a dependent"
+    )
+
+
 def test_remove_transformation(nexus_wrapper):
     instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
     under_test = ComponentTreeModel(instrument)
