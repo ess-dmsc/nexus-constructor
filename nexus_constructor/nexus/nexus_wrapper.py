@@ -35,14 +35,19 @@ def get_nx_class(group: h5py.Group) -> Optional[str]:
         return None
 
     nx_class = group.attrs[CommonAttrs.NX_CLASS]
-    return decode_bytes_string(nx_class)
+    return to_string(nx_class)
 
 
-def decode_bytes_string(nexus_string):
-    try:
-        return str(nexus_string, encoding="utf8")
-    except TypeError:
-        return nexus_string
+def to_string(input_to_convert: Any) -> str:
+    """
+    Converts to string, assumes utf-8 encoding for bytes
+    Input can be bytes, str, numpy array
+    :param input_to_convert: Dataset value to convert
+    :return: str
+    """
+    if isinstance(input_to_convert, bytes):
+        return input_to_convert.decode("utf-8")
+    return str(input_to_convert)
 
 
 def create_temporary_in_memory_file() -> h5py.File:

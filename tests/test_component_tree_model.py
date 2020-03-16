@@ -499,9 +499,8 @@ def test_duplicate_transform_fail():
     assert False  # Failure
 
 
-def test_remove_component():
-    wrapper = NexusWrapper("test_remove_component")
-    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+def test_remove_component(nexus_wrapper):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
     under_test = ComponentTreeModel(instrument)
     instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
@@ -510,9 +509,22 @@ def test_remove_component():
     assert under_test.rowCount(QModelIndex()) == 0
 
 
-def test_remove_transformation():
-    wrapper = NexusWrapper("test_remove_transformation")
-    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+def test_remove_component_with_transformation(nexus_wrapper):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
+    under_test = ComponentTreeModel(instrument)
+    instrument.create_component("Some name", "some class", "desc")
+    component_index = under_test.index(0, 0, QModelIndex())
+    under_test.add_rotation(component_index)
+    assert under_test.rowCount(QModelIndex()) == 1
+    under_test.remove_node(component_index)
+    assert under_test.rowCount(QModelIndex()) == 0, (
+        "Expected component to be successfully deleted because it has "
+        "a transformation that only has it as a dependent"
+    )
+
+
+def test_remove_transformation(nexus_wrapper):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
     under_test = ComponentTreeModel(instrument)
     instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
@@ -524,9 +536,8 @@ def test_remove_transformation():
     assert under_test.rowCount(transformation_list_index) == 0
 
 
-def test_remove_link():
-    wrapper = NexusWrapper("test_remove_link")
-    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+def test_remove_link(nexus_wrapper):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
     under_test = ComponentTreeModel(instrument)
     instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())
@@ -539,9 +550,11 @@ def test_remove_link():
     assert under_test.rowCount(transformation_list_index) == 0
 
 
-def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file():
-    wrapper = NexusWrapper("test_duplicate_cyl_shape")
-    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file(
+    nexus_wrapper,
+):
+
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     first_component_name = "component1"
     first_component_nx_class = "NXdetector"
@@ -571,9 +584,10 @@ def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_com
     assert second_shape.units == units
 
 
-def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file():
-    wrapper = NexusWrapper("test_duplicate_off_shape")
-    instrument = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file(
+    nexus_wrapper,
+):
+    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     first_component_name = "component1"
     first_component_nx_class = "NXdetector"

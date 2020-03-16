@@ -3,19 +3,17 @@ from PySide2.QtGui import QVector3D
 from mock import Mock
 
 from nexus_constructor.instrument import Instrument
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 import numpy as np
 from pytestqt.qtbot import QtBot  # noqa: F401
-from tests.helpers import file  # noqa: F401
 
 
 def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled_correctly(
-    qtbot,
+    qtbot, nexus_wrapper
 ):
-    wrapper = NexusWrapper()
-    instrument = Instrument(wrapper, {})
+
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 
@@ -39,10 +37,10 @@ def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled
 
 
 def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
-    qtbot,
+    qtbot, nexus_wrapper
 ):
-    wrapper = NexusWrapper()
-    instrument = Instrument(wrapper, {})
+
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 
@@ -68,10 +66,9 @@ def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_cor
 
 
 def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_is_filled_correctly(
-    qtbot, file  # noqa:F811
+    qtbot, file, nexus_wrapper
 ):
-    wrapper = NexusWrapper()
-    instrument = Instrument(wrapper, {})
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 
@@ -97,10 +94,9 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
 
 
 def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled_correctly(
-    qtbot, file  # noqa:F811
+    qtbot, file, nexus_wrapper
 ):
-    wrapper = NexusWrapper(filename="test")
-    instrument = Instrument(wrapper, {})
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 
@@ -140,10 +136,9 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
 
 
 def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
-    qtbot,
+    qtbot, nexus_wrapper
 ):
-    wrapper = NexusWrapper(filename="asdfgsdfh")
-    instrument = Instrument(wrapper, {})
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 
@@ -153,7 +148,7 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     path = "/entry"
 
     transform = component.add_rotation(QVector3D(x, y, z), 0, name="test")
-    link = wrapper.instrument["asdfgh"] = h5py.SoftLink(path)
+    link = nexus_wrapper.instrument["asdfgh"] = h5py.SoftLink(path)
 
     transform.dataset = link
 
@@ -168,9 +163,10 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     assert view.transformation_frame.magnitude_widget.value.path == path
 
 
-def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(qtbot):
-    wrapper = NexusWrapper()
-    instrument = Instrument(wrapper, {})
+def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
+    qtbot, nexus_wrapper
+):
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 
@@ -198,10 +194,9 @@ def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
 
 
 def test_UI_GIVEN_view_gains_focus_WHEN_transformation_view_exists_THEN_spinboxes_are_enabled(
-    qtbot,
+    qtbot, nexus_wrapper
 ):
-    wrapper = NexusWrapper()
-    instrument = Instrument(wrapper, {})
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 
@@ -224,10 +219,9 @@ def test_UI_GIVEN_view_gains_focus_WHEN_transformation_view_exists_THEN_spinboxe
 
 
 def test_UI_GIVEN_view_loses_focus_WHEN_transformation_view_exists_THEN_spinboxes_are_disabled(
-    qtbot,
+    qtbot, nexus_wrapper
 ):
-    wrapper = NexusWrapper()
-    instrument = Instrument(wrapper, {})
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 
@@ -250,10 +244,9 @@ def test_UI_GIVEN_view_loses_focus_WHEN_transformation_view_exists_THEN_spinboxe
 
 
 def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_transformation_changed_signal_is_called_to_update_3d_view(
-    qtbot,
+    qtbot, nexus_wrapper
 ):
-    wrapper = NexusWrapper()
-    instrument = Instrument(wrapper, {})
+    instrument = Instrument(nexus_wrapper, {})
 
     component = instrument.create_component("test", "NXaperture", "")
 

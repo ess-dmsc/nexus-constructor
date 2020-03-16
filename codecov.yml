@@ -1,7 +1,7 @@
 ignore:
   - "tests"
   - "**/*__init__.py"
-  - "main.py"
+  - "nexus-constructor.py"
   - "setup.py"
   - "nexus_constructor/kafka/kafka*"
 

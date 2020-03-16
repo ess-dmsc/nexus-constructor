@@ -22,7 +22,6 @@ from tests.chopper_test_helpers import (  # noqa: F401
     SLIT_HEIGHT_LENGTH,
     RADIANS_EDGES_ARR,
 )
-from tests.helpers import InMemoryFile
 
 IMPROPER_UNITS = {
     SLIT_EDGES_NAME: "lumen",
@@ -68,18 +67,17 @@ def fields_dict():
 
 
 @pytest.fixture(scope="function")
-def nexus_disk_chopper():
-    with InMemoryFile("test_disk_chopper") as nexus_file:
-        disk_chopper_group = nexus_file.create_group("Disk Chopper")
-        disk_chopper_group[NAME] = "abc"
-        disk_chopper_group[SLITS_NAME] = N_SLITS
-        disk_chopper_group[SLIT_EDGES_NAME] = RADIANS_EDGES_ARR
-        disk_chopper_group[RADIUS_NAME] = RADIUS_LENGTH
-        disk_chopper_group[SLIT_HEIGHT_NAME] = SLIT_HEIGHT_LENGTH
-        disk_chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
-        disk_chopper_group[RADIUS_NAME].attrs["units"] = str.encode("m")
-        disk_chopper_group[SLIT_HEIGHT_NAME].attrs["units"] = str.encode("m")
-        yield disk_chopper_group
+def nexus_disk_chopper(file):
+    disk_chopper_group = file.create_group("Disk Chopper")
+    disk_chopper_group[NAME] = "abc"
+    disk_chopper_group[SLITS_NAME] = N_SLITS
+    disk_chopper_group[SLIT_EDGES_NAME] = RADIANS_EDGES_ARR
+    disk_chopper_group[RADIUS_NAME] = RADIUS_LENGTH
+    disk_chopper_group[SLIT_HEIGHT_NAME] = SLIT_HEIGHT_LENGTH
+    disk_chopper_group[SLIT_EDGES_NAME].attrs["units"] = str.encode("rad")
+    disk_chopper_group[RADIUS_NAME].attrs["units"] = str.encode("m")
+    disk_chopper_group[SLIT_HEIGHT_NAME].attrs["units"] = str.encode("m")
+    yield disk_chopper_group
 
 
 @pytest.fixture(scope="function")
