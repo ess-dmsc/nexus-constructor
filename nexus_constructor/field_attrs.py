@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Union, Tuple
+from typing import Union
 
 import h5py
 from PySide2.QtWidgets import (
@@ -68,7 +68,7 @@ class FieldAttrsDialog(QDialog):
         for index in range(self.list_widget.count()):
             item = self.list_widget.item(index)
             widget = self.list_widget.itemWidget(item)
-            attrs_dict[widget.value[0]] = widget.value[1]
+            attrs_dict[widget.name] = widget.value
         return attrs_dict
 
 
@@ -101,12 +101,13 @@ class FieldAttrFrame(QFrame):
         self.type_changed("Scalar")
 
         if name is not None and value is not None:
-            self.value = (name, value)
-            self.dtype_changed("")
+            self.name = name
+            self.value = value
 
     def type_changed(self, item: str):
         self.attr_value_lineedit.setVisible(item == "Scalar")
         self.array_edit_button.setVisible(item == "Array")
+        self.array_or_scalar_combo.setCurrentText(item)
 
     def dtype_changed(self, _: str):
         self.attr_value_lineedit.setValidator(
@@ -136,27 +137,28 @@ class FieldAttrFrame(QFrame):
         self.dialog.show()
 
     @property
-    def value(self) -> Tuple[str, Union[np.generic, np.ndarray]]:
+    def name(self):
+        return self.attr_name_lineedit.text()
+
+    @name.setter
+    def name(self, new_name: str):
+        self.attr_name_lineedit.setText(new_name)
+
+    @property
+    def value(self) -> Union[np.generic, np.ndarray]:
 
         if self.is_scalar:
             if self.dtype == DATASET_TYPE["String"] or isinstance(self.dtype, str):
-                return self.attr_name_lineedit.text(), self.attr_value_lineedit.text()
-            return (
-                self.attr_name_lineedit.text(),
-                self.dtype(self.attr_value_lineedit.text()),
-            )
-        return self.attr_name_lineedit.text(), self.dialog.model.array
+                return self.attr_value_lineedit.text()
+            return self.dtype(self.attr_value_lineedit.text())
+        return self.dialog.model.array
 
     @value.setter
-    def value(self, name_and_value: Tuple[str, Union[np.generic, np.ndarray]]):
-        new_name = name_and_value[0]
-        new_value = name_and_value[1]
-
+    def value(self, new_value: Union[np.generic, np.ndarray]):
         # Decode the attribute value if it's in byte form
         if isinstance(new_value, bytes):
             new_value = new_value.decode("utf-8")
 
-        self.attr_name_lineedit.setText(new_name)
         self.attr_dtype_combo.setCurrentText(
             "String"
             if isinstance(new_value, str)
@@ -169,4 +171,5 @@ class FieldAttrFrame(QFrame):
             self.attr_value_lineedit.setText(str(new_value))
         else:
             self.type_changed("Array")
-            self.dialog.model.array = new_value.data[...]
+            self.dialog.model.array = new_value
+        self.dtype_changed(None)
