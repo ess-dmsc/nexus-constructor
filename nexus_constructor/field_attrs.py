@@ -151,7 +151,7 @@ class FieldAttrFrame(QFrame):
             if self.dtype == DATASET_TYPE["String"] or isinstance(self.dtype, str):
                 return self.attr_value_lineedit.text()
             return self.dtype(self.attr_value_lineedit.text())
-        return self.dialog.model.array
+        return np.squeeze(self.dialog.model.array)
 
     @value.setter
     def value(self, new_value: Union[np.generic, np.ndarray]):
@@ -172,4 +172,5 @@ class FieldAttrFrame(QFrame):
         else:
             self.type_changed("Array")
             self.dialog.model.array = new_value
+            self.dialog.model.update_array_dtype(new_value.dtype)
         self.dtype_changed(None)
