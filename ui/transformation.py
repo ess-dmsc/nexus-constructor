@@ -50,6 +50,7 @@ class Ui_Transformation(object):
 
         self.magnitude_widget = FieldWidget(hide_name_field=True, instrument=instrument)
         self.magnitude_widget.setFrameShape(QFrame.NoFrame)
+        self.magnitude_widget.setMinimumHeight(40)
         self.main_layout.addWidget(self.magnitude_widget)
 
         self.ui_placeholder_layout = QFormLayout()
