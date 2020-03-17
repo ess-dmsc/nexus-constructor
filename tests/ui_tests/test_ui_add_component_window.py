@@ -378,15 +378,18 @@ def enter_disk_chopper_fields(
     # Set the units attributes
     slit_edges_attribute_frame = FieldAttrFrame()
     slit_edges_attribute_frame.attr_dtype_combo.setCurrentText("String")
-    slit_edges_attribute_frame.value = ("units", "deg")
+    slit_edges_attribute_frame.name = "units"
+    slit_edges_attribute_frame.value = "deg"
 
     radius_attribute_frame = FieldAttrFrame()
     radius_attribute_frame.attr_dtype_combo.setCurrentText("String")
-    radius_attribute_frame.value = ("units", "mm")
+    radius_attribute_frame.name = "units"
+    radius_attribute_frame.value = "mm"
 
     slit_height_attribute_frame = FieldAttrFrame()
     slit_height_attribute_frame.attr_dtype_combo.setCurrentText("String")
-    slit_height_attribute_frame.value = ("units", "mm")
+    slit_height_attribute_frame.name = "units"
+    slit_height_attribute_frame.value = "mm"
 
     fields_widgets[1].attrs_dialog._add_attr(slit_edges_attribute_frame)
     fields_widgets[2].attrs_dialog._add_attr(radius_attribute_frame)
