@@ -1,6 +1,7 @@
 import attr
 
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.helpers import get_item, set_item
 
 
@@ -22,4 +23,8 @@ class Group:
 
     @nx_class.setter
     def nx_class(self, new_nx_class: str):
-        set_item(self.attributes, CommonAttrs.NX_CLASS, new_nx_class)
+        set_item(
+            self.attributes,
+            CommonAttrs.NX_CLASS,
+            FieldAttribute(CommonAttrs.NX_CLASS, new_nx_class),
+        )
