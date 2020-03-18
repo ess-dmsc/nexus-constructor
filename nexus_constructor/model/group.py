@@ -1,4 +1,3 @@
-from abc import ABC
 import attr
 
 from nexus_constructor.common_attrs import CommonAttrs
@@ -6,7 +5,7 @@ from nexus_constructor.model.helpers import get_item, set_item
 
 
 @attr.s
-class Group(ABC):
+class Group:
     name = attr.ib()
     attributes = attr.ib(default=[])
     children = attr.ib(default=[])

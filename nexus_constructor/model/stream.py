@@ -1,12 +1,10 @@
-from abc import ABC
-
 import attr
 
 from nexus_constructor.writer_modules import WriterModules
 
 
 @attr.s
-class Stream(ABC):
+class Stream:
     topic = attr.ib(str)
     source = attr.ib(str)
     writer_module = attr.ib(
