@@ -9,7 +9,7 @@ def find_item_index(list_to_look_in: List[Any], item_name: str):
     :return: The index of the object if any are found.
     """
 
-    found = [x.name == item_name for x in list_to_look_in]
+    found = [x for x in list_to_look_in if x.name == item_name]
     return list_to_look_in.index(found[0]) if found else None
 
 
