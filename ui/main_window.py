@@ -51,7 +51,7 @@ class Ui_MainWindow(object):
     def _set_up_silx_view(self):
         self.silx_tab = QWidget()
         self.silx_tab_layout = QGridLayout(self.silx_tab)
-        # self.tab_widget.addTab(self.silx_tab, "")
+        # self.tab_widget.addTab(self.silx_tab, "") Disabled while changing model
 
     def _set_up_component_tree_view(self):
         self.component_tree_view_tab = ComponentTreeViewTab(parent=self)
@@ -70,10 +70,10 @@ class Ui_MainWindow(object):
         self.export_to_nexus_file_action = QAction(MainWindow)
         self.export_to_filewriter_JSON_action = QAction(MainWindow)
         self.export_to_forwarder_JSON_action = QAction(MainWindow)
-        # self.file_menu.addAction(self.open_nexus_file_action)
+        # self.file_menu.addAction(self.open_nexus_file_action) Disabled while changing model
         self.file_menu.addAction(self.open_json_file_action)
-        # self.file_menu.addAction(self.open_idf_file_action)
-        # self.file_menu.addAction(self.export_to_nexus_file_action)
+        # self.file_menu.addAction(self.open_idf_file_action) Disabled while changing model
+        # self.file_menu.addAction(self.export_to_nexus_file_action) Disabled while changing model
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
         self.file_menu.addAction(self.export_to_forwarder_JSON_action)
         self.menu_bar.addAction(self.file_menu.menuAction())
