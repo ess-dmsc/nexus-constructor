@@ -1,7 +1,7 @@
 [![License (2-Clause BSD)](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)](https://github.com/ess-dmsc/nexus-constructor/blob/master/LICENSE) [![codecov](https://codecov.io/gh/ess-dmsc/nexus-constructor/branch/master/graph/badge.svg)](https://codecov.io/gh/ess-dmsc/nexus-constructor) [![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-constructor/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/nexus-constructor/job/master/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 
 # NeXus Constructor
-The NeXus Constructor is used for constructing [NeXus files](https://www.nexusformat.org/) with instrument geometry information using a GUI. It does this by treating everything with an `NX_class` as a component which can contain properties relevant to their respective devices, including position information and component-specific fields.
+The NeXus Constructor is used for constructing [NeXus files](https://www.nexusformat.org/) with instrument geometry information using a GUI.
 
 The Constructor can also be used to output and send run start and stop messages to the [File-Writer](https://github.com/ess-dmsc/kafka-to-nexus) to configure a template of the instrument information for data aggregation.
 
@@ -10,6 +10,7 @@ The file-writer uses streams from the [Apache Kafka](https://kafka.apache.org/) 
 ![NeXus Constructor](resources/images/nc_screenshot.png)
 
 Currently tested on Windows 10, Ubuntu 18.04/19.10 and CentOS 7, it should also work on other Linux distributions. Currently it does not work on Mac due to a bug in Qt, but we hope to resolve this soon.
+
 
 ## Installing dependencies
 
@@ -37,9 +38,14 @@ pre-commit install
 ```
 to activate the pre-commit check.
 
-## Running the application
+## Usage
 
 Run the python script `nexus-constructor.py` located in the root of the repository.
+
+The NeXus Constructor both constructs and identifies components as groups and determines the type of component by using the `NX_class` attribute. 
+
+Components with (or without) shape and position information are shown in the 3d view the Constructor offers, which aims to visualise how beamline instruments are/will be set up. Methods for adding and editing components and translations can be found in the toolbar above the treeview which displays them.
+
 
 ## Developer Documentation
 
