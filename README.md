@@ -7,6 +7,8 @@ The application can directly output a NeXus file, or create a [_NeXus structure_
 
 ![NeXus Constructor](resources/images/nc_screenshot.png)
 
+Although the application may be useful to other institutions using NeXus, the NeXus Constructor is being developed as part of the software suite for the [European Spallation Source (ESS)](https://europeanspallationsource.se/). Please see [this (open access) paper](https://iopscience.iop.org/article/10.1088/1748-0221/13/10/T10001) for more information on the ESS software.   
+
 Currently tested on Windows 10, Ubuntu 18.04/19.10 and CentOS 7, it should also work on other Linux distributions. Currently it does not work on Mac due to a bug in Qt, but we hope to resolve this soon.
 
 ## Installing dependencies
@@ -40,11 +42,6 @@ to activate the pre-commit check.
 ## Usage
 
 Run the python script `nexus-constructor.py` located in the root of the repository.
-
-The NeXus Constructor both constructs and identifies components as groups and determines the type of component by using the `NX_class` attribute. 
-
-Components with (or without) shape and position information are shown in the 3d view the Constructor offers, which aims to visualise how beamline instruments are/will be set up. Methods for adding and editing components and translations can be found in the toolbar above the treeview which displays them.
-
 
 ## Developer Documentation
 
