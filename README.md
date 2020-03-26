@@ -36,18 +36,18 @@ pip install -r requirements.txt
 
 ### Development dependencies
 
-Development dependencies (including all runtime dependencies) can be installed by using the following command: 
+Development dependencies (including all runtime dependencies) can be installed by using the following command
 
 ```
 pip install -r requirements-dev.txt
 ```
 
 The black pre-commit hook (installed by [pre-commit](https://pre-commit.com/)) requires Python 3.6 or above.
-You need to once run
+You need to run
 ```
 pre-commit install
 ```
-to activate the pre-commit check.
+once to activate the pre-commit check.
 
 ## Usage
 
