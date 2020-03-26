@@ -25,8 +25,7 @@ Currently it does not work on Mac due to a bug in Qt, but we hope to resolve thi
 
 Binary packages for release versions can be downloaded on the [releases page](https://github.com/ess-dmsc/nexus-constructor/releases), or to run the latest development version please follow the instructions below.
 
-This project is developed for Python 3.6, so an install of 3.6 or higher
-is required. https://www.python.org/downloads/
+Python 3.6 or greater is required. https://www.python.org/downloads/
 
 Runtime Python dependencies are listed in requirements.txt at the root of the
 repository. They can be installed from a terminal by running
