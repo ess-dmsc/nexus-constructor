@@ -52,6 +52,8 @@ once to activate the pre-commit check.
 
 Run the python script `nexus-constructor.py` located in the root of the repository.
 
+A guide for getting started with the nexus-constructor can be found [here](GETTING_STARTED.md)
+
 ## Developer Documentation
 
 See the [Wiki](https://github.com/ess-dmsc/nexus-constructor/wiki/Developer-Notes) for developer documentation.
