@@ -71,16 +71,35 @@ This is important because some detectors are made up of a grid of pixels, and th
 
 ![](resources/images/Add Component_010.png) 
 
-#### Loading shape from a CAD file
-Currently STL and OFF files are supported for mesh geometry. 
 #### Setting pixel data
+
+TODO 
+
+#### Loading shape from a CAD file
+Alternatively to cylinder shapes, mesh shapes can be used for components to describe their shape. Currently STL and OFF files are supported for mesh geometry. 
+
+To use a mesh file for geometry, select the "Mesh" geometry type. This will show an option to browse for a file. As well as this, units can also be set to change the scale of the geometry.
+To test this, there are OFF and STL files in the `tests/` folder.  
+TODO: insert a screenshot here
 
 ### Adding a chopper
 
+TODO
 
 ### Opening and saving file-writer commands 
 
+The constructor can output to a [file-writer command](https://github.com/ess-dmsc/kafka-to-nexus/blob/master/documentation/commands.md) in JSON format, and can also load from these files.
+To save to a JSON file, open the file menu and click "Save to filewriter JSON". This will bring up a file dialog in order to save the file. 
+
+TODO: screenshot? 
+
+To open a JSON file, open the file menu and click "Open from filewriter JSON". The constructor will then load in all components and their fields from a given file. 
+
 #### Sending a command to the file-writer
+
+As well as saving the NeXus structure to file, a run start message can be constructed and sent to an instance of the [file-writer]((https://github.com/ess-dmsc/kafka-to-nexus)
+
+TODO: Screenshot
 
 ### Opening and saving to NeXus File
 
