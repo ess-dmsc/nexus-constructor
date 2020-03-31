@@ -8,9 +8,9 @@ def find_item_index(list_to_look_in: List[Any], item_name: str):
     :param item_name:
     :return: The index of the object if any are found.
     """
-
-    found = [x for x in list_to_look_in if x.name == item_name]
-    return list_to_look_in.index(found[0]) if found else None
+    for count, element in enumerate(list_to_look_in):
+        if element.name == item_name:
+            return count
 
 
 def get_item(list_to_look_in: List[Any], item_name: str) -> Any:
