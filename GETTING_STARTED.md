@@ -71,25 +71,36 @@ You will notice after inputting values that the black cube moves behind the samp
 
 ### Adding a detector 
 
+*Detectors* are a key component of any beamline, as they detect the speed and intensity of neutrons/muons/photons after (or before) the beam has passed through the sample. We can use a grid of detectors to formulate an image of the scattered beam.  
+
 Detectors can be added in the same way as other components, but can contain *pixel data* in addition to their shape. When a detector or detector module component type is selected and shape information is inputted, the pixel data options will appear.
 This is important because some detectors are made up of a grid of pixels, and this needs to be portrayed in the constructor to show the position of each. In our case, we will set the shape type to cylinder and the outcome should look like this:
 
-![](resources/images/AddComponent_010.png) 
 
 #### Setting pixel data
 
-TODO 
+In this example we will say our detector is comprised of a 16x16 grid of "pixels" aka individual detectors. 
 
-#### Loading shape from a CAD file
+To replicate this in the NeXus Constructor, first create a component with `NXdetector` as it's component type. After this, select `Mesh` as the geometry type. This will show the pixel data edits like so:
+ 
+![](resources/images/AddComponent_010.png) 
+
+We will select the "repeated single pixel shape" here and enter the rows and columns as 16. The row and column heights can be left as their default values. 
+
+Next we need to select a shape file; 
+
+##### Loading shape from a CAD file
 Alternatively to cylinder shapes, mesh shapes can be used for components to describe their shape. Currently STL and OFF files are supported for mesh geometry. 
 
 To use a mesh file for geometry, select the "Mesh" geometry type. This will show an option to browse for a file. As well as this, units can also be set to change the scale of the geometry.
-To test this, there are OFF and STL files in the `tests/` folder.  
-TODO: insert a screenshot here
+To test this, there are OFF and STL files in the `tests/` folder. Let's use the "cube.off" file.   
 
-### Adding a chopper
+![](resources/images/AddComponent_011.png)
 
-TODO
+When hitting add, you will notice that the 3D view is updated should contain a grid of 16x16 cubes. We now just need to move it backwards from the sample by applying another transformation.
+
+![](resources/images/NeXusConstructor_012.png)
+
 
 ### Opening and saving file-writer commands 
 
