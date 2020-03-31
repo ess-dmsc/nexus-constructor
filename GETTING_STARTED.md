@@ -1,12 +1,18 @@
 # Getting started
+
+To introduce the main features of the NeXus Constructor we will create a NeXus file template describing a simple neutron beamline, comprising a neutron source, sample and detector.
+
 Firstly, either download the [latest release](https://github.com/ess-dmsc/nexus-constructor/releases) for your OS and run the executable from the root directory, or run the source (refer to the [README](README.md) for instructions on how to do this).
 
-You will be shown the main window of the application (pictured below) which contains both a list of components and a 3D view visualising the components listed with their respective shape and position. 
+You will be shown the main window of the application (pictured below) which contains a list of *components* which comprise the beamline, and a 3D view visualising the components listed with their respective shape and position.
+
+In the [NeXus Format](https://www.nexusformat.org/), a component is essentially a group that can contain *fields*(members of the component group) specific to the type of component. These components contain an attribute called `NX_class` which describes the type.
+ 
 The sample component is added by default, and is indicated by the red cube. You can move around the 3D view by using the arrow keys to move, click+drag to pan, and pgup/down to zoom.
 
 ![](resources/images/NeXusConstructor_001.png)
 
-By clicking the "Nexus File Layout" tab in the left pane of the window, the NeXus file layout can be shown in a tree structure.
+If you are familiar with the NeXus format it may be useful to view the layout of the resulting NeXus file as you modify the template by adding components and other information. You can do this by clicking the "Nexus File Layout" tab in the left pane of the main window.
 
 ![](resources/images/Selection_002.png)
 
