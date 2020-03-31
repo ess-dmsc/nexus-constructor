@@ -5,7 +5,7 @@ Firstly, start the application by running `python3 main.py`.
 You will be shown the main window of the application (pictured below) which contains both a list of components and a 3D view visualising the components listed with their respective shape and position. 
 The sample component is added by default, and is indicated by the red cube. You can move around the 3D view by using the arrow keys to move, click+drag to pan, and pgup/down to zoom.
 
-![](resources/images/NeXus Constructor_001.png)
+![](resources/images/NeXus%20Constructor_001.png)
 
 By clicking the "Nexus File Layout" tab in the left pane of the window, the NeXus file layout can be shown in a tree structure.
 
