@@ -11,7 +11,7 @@ from nexus_constructor.transformation_types import TransformationType
 
 class TransformationGroup(Group):
     def __init__(self):
-        self.nx_class = "NXTransformations"
+        self.nx_class = "NXtransformations"
 
 
 @attr.s
@@ -44,7 +44,7 @@ class Transformation:
     def ui_value(self):
         # TODO: get proper ui value
         get_item(self.attributes, CommonAttrs.UI_VALUE)
-        return None
+        return 0
 
     @property
     def qmatrix(self) -> QMatrix4x4:
