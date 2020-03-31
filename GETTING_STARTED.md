@@ -79,7 +79,7 @@ This is important because some detectors are made up of a grid of pixels, and th
 
 #### Setting pixel data
 
-In this example we will say our detector is comprised of a 16x16 grid of "pixels" aka individual detectors. 
+In this example we will say our detector is comprised of a 16x16 grid of "pixels" or individual detectors. 
 
 To replicate this in the NeXus Constructor, first create a component with `NXdetector` as it's component type. After this, select `Mesh` as the geometry type. This will show the pixel data edits like so:
  
