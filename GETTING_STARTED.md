@@ -56,7 +56,7 @@ In this case, we will add a translation, so we can move the source to it's corre
 
 You will see upon adding a new translation the black cube gets shifted to the right immediately. This is because of the default vector specified in the translation. By default the field is disabled, but to edit these fields simply click on it. When finished editing, clicking elsewhere in the list will save the changes. 
 
-![](resources/images/NeXus Constructor_008.png) 
+![](resources/images/NeXus%20Constructor_008.png) 
 
 As the source distance will be static and its position will likely not change throughout the experiment, we can set this to a scalar value. A realistic value would have a vector of (0,0,1) and the distance would be `-20m`. Distance units can be changed with the units field next to the value. For this value a float data type should be used, which is the default anyway. 
 
@@ -69,7 +69,7 @@ You will notice after inputting values that the black cube moves behind the samp
 Detectors can be added in the same way as other components, but can contain pixel data in addition to their shape. When a detector or detector module component type is selected and shape information is inputted, the pixel data options will appear.
 This is important because some detectors are made up of a grid of pixels, and this needs to be portrayed in the constructor to show the position of each. In our case, we will set the shape type to cylinder and the outcome should look like this:
 
-![](resources/images/Add Component_010.png) 
+![](resources/images/Add%20Component_010.png) 
 
 #### Setting pixel data
 
