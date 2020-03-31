@@ -3,7 +3,7 @@ from nexus_constructor.model.helpers import get_item, set_item, remove_item
 import pytest
 
 
-def test_get_item_works_as_expected_when_component_is_in_list():
+def test_get_item_returns_correct_component_when_given_component_is_in_list():
     name = "component1"
     test = Component(name)
 
@@ -11,7 +11,7 @@ def test_get_item_works_as_expected_when_component_is_in_list():
     assert get_item(list_of_components, name) == test
 
 
-def test_get_item_works_as_expected_when_component_is_not_in_list_then_works_when_item_is_set():
+def test_get_item_throws_error_when_component_is_not_in_list_then_works_when_item_is_set():
     name = "component1"
     test = Component(name)
 
