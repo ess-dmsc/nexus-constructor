@@ -5,7 +5,7 @@ Firstly, start the application by running `python3 main.py`.
 You will be shown the main window of the application (pictured below) which contains both a list of components and a 3D view visualising the components listed with their respective shape and position. 
 The sample component is added by default, and is indicated by the red cube. You can move around the 3D view by using the arrow keys to move, click+drag to pan, and pgup/down to zoom.
 
-![](resources/images/NeXus%20Constructor_001.png)
+![](resources/images/NeXusConstructor_001.png)
 
 By clicking the "Nexus File Layout" tab in the left pane of the window, the NeXus file layout can be shown in a tree structure.
 
@@ -21,7 +21,7 @@ The "add component" button, found in the layout above the list of components (pi
 In this screen, we are given options to set what type of component it is, its type of shape as well as being able to set arbitrary fields.
 As well as these options, the NeXus format documentation for the component type selected is shown on the right. This shows the required and optional fields for this type of component and what type of data the field should be.
 
-![](resources/images/Add%20Component_004.png)
+![](resources/images/AddComponent_004.png)
 
 
 ### Adding a source
@@ -43,7 +43,7 @@ When inputting the name of the field, in this case we'll add "type", you will se
 
 After this, We should set the data type of the field by selecting the type combo and selecting "String". Then, in the value edit, we will enter one of the options specified in the "type" field in the documentation on the right. In this case, lets use `Spallation Neutron Source`
 
-![](resources/images/Add%20Component_007.png)
+![](resources/images/AddComponent_007.png)
 
 When finished, hit the "add component" button to save it (Note: you can edit this component once saved by selecting it in the list and using the "edit component" button near to the add button). 
 You will notice in the 3d view there is a new square which has been added that is black. This would be incorrect in real life, as the source is likely not going to be hitting the sample straight away. To remedy this we should add a transformation to the newly added source component.
@@ -56,11 +56,11 @@ In this case, we will add a translation, so we can move the source to it's corre
 
 You will see upon adding a new translation the black cube gets shifted to the right immediately. This is because of the default vector specified in the translation. By default the field is disabled, but to edit these fields simply click on it. When finished editing, clicking elsewhere in the list will save the changes. 
 
-![](resources/images/NeXus%20Constructor_008.png) 
+![](resources/images/NeXusConstructor_008.png) 
 
 As the source distance will be static and its position will likely not change throughout the experiment, we can set this to a scalar value. A realistic value would have a vector of (0,0,1) and the distance would be `-20m`. Distance units can be changed with the units field next to the value. For this value a float data type should be used, which is the default anyway. 
 
-![](resources/images/NeXus%20Constructor_009.png)
+![](resources/images/NeXusConstructor_009.png)
 
 You will notice after inputting values that the black cube moves behind the sample cube. This is because it is now -20 metres behind it on the z-axis. 
 
@@ -69,7 +69,7 @@ You will notice after inputting values that the black cube moves behind the samp
 Detectors can be added in the same way as other components, but can contain pixel data in addition to their shape. When a detector or detector module component type is selected and shape information is inputted, the pixel data options will appear.
 This is important because some detectors are made up of a grid of pixels, and this needs to be portrayed in the constructor to show the position of each. In our case, we will set the shape type to cylinder and the outcome should look like this:
 
-![](resources/images/Add%20Component_010.png) 
+![](resources/images/AddComponent_010.png) 
 
 #### Setting pixel data
 
