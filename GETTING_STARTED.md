@@ -101,22 +101,25 @@ When hitting add, you will notice that the 3D view is updated should contain a g
 
 ![](resources/images/NeXusConstructor_012.png)
 
+We now have a very basic example of a beamline instrument visualised in 3D as well as the resulting NeXus file. The NeXus Constructor can output to a JSON as well, which is used by the file-writer to aggregate event data and other live-streamed data to the file. 
 
 ### Opening and saving file-writer commands 
 
 The constructor can output to a [file-writer command](https://github.com/ess-dmsc/kafka-to-nexus/blob/master/documentation/commands.md) in JSON format, and can also load from these files.
 To save to a JSON file, open the file menu and click "Save to filewriter JSON". This will bring up a file dialog in order to save the file. 
 
-TODO: screenshot? 
-
 To open a JSON file, open the file menu and click "Open from filewriter JSON". The constructor will then load in all components and their fields from a given file. 
 
 #### Sending a command to the file-writer
 
 As well as saving the NeXus structure to file, a run start message can be constructed and sent to an instance of the [file-writer]((https://github.com/ess-dmsc/kafka-to-nexus)
+To do this, open the file menu and select "Control file writer". This will bring up a dialog that enables a user to input [Kafka topic](https://kafka.apache.org/documentation/#intro_topics) URIs to look at the status of any active file-writers or to send a command to one. 
 
-TODO: Screenshot
+![](resources/images/nexus-constructor.py_013.png)
 
 ### Opening and saving to NeXus File
 
+As well as to and from JSON, a NeXus File can be saved to and loaded from into the NeXus Constructor. 
+
+Actions in the file menu can be used for this and components should be identified by the Constructor when loading other NeXus files. 
 
