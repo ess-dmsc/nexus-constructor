@@ -20,6 +20,7 @@ from nexus_constructor.filewriter_command_widget import FilewriterCommandWidget
 class Ui_FilewriterCtrl(object):
     def setupUi(self, FilewriterCtrl):
         FilewriterCtrl.resize(649, 450)
+        FilewriterCtrl.setWindowTitle("File Writer Control Window")
         broker_placeholder_text = "address:port/topic"
         self.central_widget = QWidget(FilewriterCtrl)
         self.vertical_layout_2 = QVBoxLayout(self.central_widget)
