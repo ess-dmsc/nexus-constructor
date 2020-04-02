@@ -35,7 +35,6 @@ To add a source, use the add component window and select "NXsource" from the dro
 
 This component will need a name, which correlates to the group name in the NeXus file. In this example, we will name it `source1`.
 
-A source has no geometry in real life as it is the neutron beam itself, so leave the radio button marked as "no shape" checked.
 
 As you can see highlighted in the documentation, we can add a field to describe the source. To do this, select the "add field" button. This will add a blank field in the list below it. 
 
