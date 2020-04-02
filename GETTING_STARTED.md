@@ -66,7 +66,6 @@ The beam direction is conventionally along the z-axis, so use a vector of (0,0,1
 
 ![](resources/images/NeXusConstructor_009.png)
 
-You will notice after inputting values that the black cube moves behind the sample cube. This is because it is now -20 metres behind it on the z-axis. 
 
 ### Adding a detector 
 
