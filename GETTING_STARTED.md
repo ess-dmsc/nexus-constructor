@@ -62,7 +62,7 @@ You will see upon adding a new translation the black cube gets shifted to the ri
 
 ![](resources/images/NeXusConstructor_008.png) 
 
-As the source distance will be static and its position will likely not change throughout the experiment, we can set this to a scalar value. A realistic value would have a vector of (0,0,1) and the distance would be `-20m`. Distance units can be changed with the units field next to the value. For this value a float data type should be used, which is the default anyway. 
+The beam direction is conventionally along the z-axis, so use a vector of (0,0,1) and the set a distance of `-20m`. Distance units can be changed with the units field next to the value.
 
 ![](resources/images/NeXusConstructor_009.png)
 
