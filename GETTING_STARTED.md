@@ -49,7 +49,7 @@ Set the data type of the field by selecting the type combo and selecting "String
 
 ![](resources/images/AddComponent_007.png)
 
-When finished, hit the "add component" button to save it (Note: you can edit this component once saved by selecting it in the list and using the "edit component" button near to the add button). 
+Hit the "Add component" button to save it (Note: you can edit this component once saved by selecting it in the list and using the "Edit component" button near to the add button). 
 You will notice in the 3d view there is a new square which has been added that is black. This would be incorrect in real life, as the source is likely not going to be hitting the sample straight away. To remedy this we should add a transformation to the newly added source component.
 
 #### Setting translation on the source
