@@ -47,7 +47,7 @@ As well as these options, the NeXus format documentation for the component type 
 
 In the add component window select "NXsource" from the drop-down containing all of the component types.
 
-This component will need a name, which correlates to the group name in the NeXus file. In this example, we will name it `source1`.
+Name the component as "source1".
 
 
 As you can see highlighted in the documentation, we can add a field to describe the source. To do this, select the "add field" button.
