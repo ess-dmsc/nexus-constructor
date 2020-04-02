@@ -1,7 +1,5 @@
-# Contents
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-- [Contents](#contents)
 - [Getting started](#getting-started)
 	- [Adding components](#adding-components)
 		- [Adding a source](#adding-a-source)
