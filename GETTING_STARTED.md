@@ -45,7 +45,7 @@ When inputting the name of the field, in this case we'll add "type", you will se
 ![](resources/images/Tooltip_006.png)
 
 
-After this, We should set the data type of the field by selecting the type combo and selecting "String". Then, in the value edit, we will enter one of the options specified in the "type" field in the documentation on the right. In this case, lets use `Spallation Neutron Source`
+Set the data type of the field by selecting the type combo and selecting "String". In the value edit, enter one of the options specified in the "type" field in the documentation on the right. In this case, let's use `Spallation Neutron Source`
 
 ![](resources/images/AddComponent_007.png)
 
