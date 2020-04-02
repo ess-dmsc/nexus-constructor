@@ -76,7 +76,6 @@ Detectors can be added in the same way as other components, but can contain *pix
 This is important because some detectors are made up of a grid of pixels, and this needs to be portrayed in the constructor to show the position of each. In our case, we will set the shape type to cylinder and the outcome should look like this:
 
 
-#### Setting pixel data
 
 In this example our detector is comprised of a 16x16 grid of pixels.
 
