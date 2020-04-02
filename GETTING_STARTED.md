@@ -85,7 +85,7 @@ The beam direction is conventionally along the z-axis, so use a vector of (0,0,1
 
 *Detectors* are a key component of any beamline. A detector comprised of an array of detecting pixels can be used to infer the angle that the neutrons/muons/photons scattered from the sample.
 
-Detectors can be added in the same way as other components, but can contain *pixel data* in addition to their shape. When a detector or detector module component type is selected and shape information is inputted, the pixel data options will appear.
+Enter the "Add component" dialog and select "NXdetector" as the component type. Notice pixel data options appear.
 This is important because some detectors are made up of a grid of pixels, and this needs to be portrayed in the constructor to show the position of each. In our case, we will set the shape type to cylinder and the outcome should look like this:
 
 
