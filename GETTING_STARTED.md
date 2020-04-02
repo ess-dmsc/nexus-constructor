@@ -31,7 +31,7 @@ As well as these options, the NeXus format documentation for the component type 
 
 ### Adding a source
 
-To add a source, use the add component window and select "NXsource" from the drop-down containing all of the component types. 
+In the add component window select "NXsource" from the drop-down containing all of the component types. 
 
 This component will need a name, which correlates to the group name in the NeXus file. In this example, we will name it `source1`.
 
