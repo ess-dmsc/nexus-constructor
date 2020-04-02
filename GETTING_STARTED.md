@@ -18,7 +18,7 @@ If you are familiar with the NeXus format it may be useful to view the layout of
 
 ## Adding components
 
-The "add component" button, found in the layout above the list of components (pictured) can be clicked to open a dialog containing possible fields and options a component may include.
+Click the "add component" button.
 
 ![](resources/images/Selection_003.png)
 
@@ -122,4 +122,3 @@ To do this, open the file menu and select "Control file writer". This will bring
 As well as to and from JSON, a NeXus File can be saved to and loaded from into the NeXus Constructor. 
 
 Actions in the file menu can be used for this and components should be identified by the Constructor when loading other NeXus files. 
-
