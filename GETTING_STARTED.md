@@ -36,7 +36,7 @@ To add a source, use the add component window and select "NXsource" from the dro
 This component will need a name, which correlates to the group name in the NeXus file. In this example, we will name it `source1`.
 
 
-As you can see highlighted in the documentation, we can add a field to describe the source. To do this, select the "add field" button. This will add a blank field in the list below it. 
+As you can see highlighted in the documentation, we can add a field to describe the source. To do this, select the "add field" button.
 
 ![](resources/images/Selection_005.png)
 
