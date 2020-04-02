@@ -56,7 +56,7 @@ You will notice in the 3d view there is a new cube which has been added that is 
 
 To the right of the "Add component" button in the main window toolbar, three additional controls can be used to add transformations to a component. Here we have the option to translate, rotate and link to another component's transformations. 
 
-In this case, we will add a translation, so we can move the source to it's correct position. To do this, first select the source component in the list by clicking it, then click the "add translation" button.
+Select the source component in the list by clicking it, then click the "add translation" button.
 
 You will see upon adding a new translation the black cube gets shifted to the right immediately. This is because of the default vector specified in the translation. By default the field is disabled, but to edit these fields simply click on it. When finished editing, clicking elsewhere in the list will save the changes. 
 
