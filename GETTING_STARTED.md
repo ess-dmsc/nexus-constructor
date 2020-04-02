@@ -40,7 +40,7 @@ As you can see highlighted in the documentation, we can add a field to describe 
 
 ![](resources/images/Selection_005.png)
 
-When inputting the name of the field, in this case we'll add "type", you will see that typing in the name edit will bring up an autocompleter with all of the possible field names. This corresponds to the documentation on the right.
+When inputting the name of the field, in this case we'll add "type", you will see that typing in the name edit will bring up an autocompleter with all of the documented field names.
 
 ![](resources/images/Tooltip_006.png)
 
