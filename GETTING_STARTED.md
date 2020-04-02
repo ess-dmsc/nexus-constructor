@@ -24,7 +24,7 @@ Click the "add component" button.
 
 
 In this screen, we are given options to set what type of component it is, its shape, as well as being able to add fields to describe it further.
-As well as these options, the NeXus format documentation for the component type selected is shown on the right. This shows the required and optional fields for this type of component and what type of data the field should be.
+As well as these options, the NeXus format documentation for the component type selected is shown on the right. This suggests what fields to add. You can add undocumented fields with additional information, but the ones in the documentation may be able to be used by other software which reads NeXus files.
 
 ![](resources/images/AddComponent_004.png)
 
