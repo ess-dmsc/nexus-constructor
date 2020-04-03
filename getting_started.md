@@ -94,9 +94,8 @@ Select "Cylinder" as the "Shape type" and set both the height and radius to 1, a
 We will select the "repeated single pixel shape" here and enter the rows and columns as 16. The row and column heights can be left as their default values.
 
 
-When hitting add, you will notice that the 3D view is updated should contain a grid of 16x16 cylinders. We now just need to move it backwards from the sample by applying another transformation.
+When hitting add, you will notice that the 3D view is updated should contain a grid of 16x16 cylinders. We now just need to move it backwards from the sample by applying another transformation of 5 metres along the z-axis.
 
-TODO: redo this with cylinders
 ![](resources/images/NeXusConstructor_012.png)
 
 ### Adding a Monitor
