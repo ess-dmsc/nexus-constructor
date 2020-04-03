@@ -1,5 +1,7 @@
 from typing import Any, List
 
+from nexus_constructor.model.attribute import FieldAttribute
+
 
 def find_item_index(list_to_look_in: List[Any], item_name: str):
     """
@@ -27,3 +29,15 @@ def set_item(list_to_look_in: List[Any], item_name: str, new_value: Any):
         list_to_look_in[index] = new_value
     else:
         list_to_look_in.append(new_value)
+
+
+def set_attribute_value(
+    attributes_list: List[FieldAttribute], attribute_name: str, attribute_value: Any
+):
+    set_item(
+        attributes_list, attribute_name, FieldAttribute(attribute_name, attribute_value)
+    )
+
+
+def get_attribute_value(attributes_list: List[FieldAttribute], attribute_name: str):
+    return get_item(attributes_list, attribute_name).values

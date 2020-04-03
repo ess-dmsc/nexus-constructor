@@ -1,8 +1,12 @@
 import attr
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.attribute import FieldAttribute
-from nexus_constructor.model.helpers import get_item, set_item
+from nexus_constructor.model.helpers import (
+    get_item,
+    set_item,
+    set_attribute_value,
+    get_attribute_value,
+)
 
 
 @attr.s
@@ -19,12 +23,10 @@ class Group:
 
     @property
     def nx_class(self):
-        return get_item(self.attributes, CommonAttrs.NX_CLASS)
+        return get_attribute_value(self.attributes, CommonAttrs.NX_CLASS)
 
     @nx_class.setter
     def nx_class(self, new_nx_class: str):
-        set_item(
-            self.attributes,
-            CommonAttrs.NX_CLASS,
-            FieldAttribute(CommonAttrs.NX_CLASS, new_nx_class),
+        set_attribute_value(
+            self.attributes, CommonAttrs.NX_CLASS, new_nx_class,
         )

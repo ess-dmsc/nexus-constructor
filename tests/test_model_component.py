@@ -10,7 +10,6 @@ def test_component_set_item_with_brackets_works_with_another_component():
     assert comp1[comp2.name] == comp2
 
 
-
 def test_component_set_item_with_brackets_throws_when_string_is_entered():
     comp1 = Component("comp1")
     some_field_value = "test"

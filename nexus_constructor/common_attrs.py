@@ -2,6 +2,7 @@ class CommonAttrs:
     """
     Commonly used attribute and field names, used to avoid typos.
     """
+
     DESCRIPTION = "description"
     NX_CLASS = "NX_class"
     DEPENDEE_OF = "NCdependee_of"

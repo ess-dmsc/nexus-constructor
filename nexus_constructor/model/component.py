@@ -13,4 +13,6 @@ class Component(Group):
 
     @description.setter
     def description(self, new_description: str):
-        self[CommonAttrs.DESCRIPTION] = FieldAttribute(CommonAttrs.DESCRIPTION, new_description)
+        self[CommonAttrs.DESCRIPTION] = FieldAttribute(
+            CommonAttrs.DESCRIPTION, new_description
+        )
