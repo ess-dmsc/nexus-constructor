@@ -85,17 +85,26 @@ The beam direction is conventionally along the z-axis, so use a vector of (0,0,1
 
 Enter the "Add component" dialog and select "NXdetector" as the component type. Notice pixel data options appear.
 
-
-
 In this example our detector is comprised of a 16x16 grid of pixels.
 
-To replicate this in the NeXus Constructor, first create a component with `NXdetector` as it's component type. After this, select `Mesh` as the geometry type. This will show the pixel data edits like so:
+Select "Cylinder" as the "Shape type" and set both the height and radius to 1, and leave the units as "m".
 
 ![](resources/images/AddComponent_010.png)
 
 We will select the "repeated single pixel shape" here and enter the rows and columns as 16. The row and column heights can be left as their default values.
 
-Next we need to select a shape file;
+
+When hitting add, you will notice that the 3D view is updated should contain a grid of 16x16 cylinders. We now just need to move it backwards from the sample by applying another transformation.
+
+TODO: redo this with cylinders
+![](resources/images/NeXusConstructor_012.png)
+
+### Adding a Monitor
+
+We will add a monitor with a mesh shape to the instrument in this example. To do this, add another component.
+When the Add component Dialog is shown, select "NXmonitor" as the component type.
+
+After this, select "Mesh" as the "Shape Type".
 
 ##### Loading shape from a CAD file
 Alternatively to cylinder shapes, mesh shapes can be used for components to describe their shape. Currently STL and OFF files are supported for mesh geometry.
@@ -103,11 +112,10 @@ Alternatively to cylinder shapes, mesh shapes can be used for components to desc
 To use a mesh file for geometry, select the "Mesh" geometry type. This will show an option to browse for a file. As well as this, units can also be set to change the scale of the geometry.
 To test this, there are OFF and STL files in the `tests/` folder. Let's use the "cube.off" file.   
 
+TODO: redo this screenshot with monitor instead
 ![](resources/images/AddComponent_011.png)
 
-When hitting add, you will notice that the 3D view is updated should contain a grid of 16x16 cubes. We now just need to move it backwards from the sample by applying another transformation.
-
-![](resources/images/NeXusConstructor_012.png)
+Again, this would need to be moved away from the sample if reflecting a real scenario. It may also need to be rotated. To add multiple transformations, select "Add rotation" or "Add translation" in the order you want them to be added.
 
 We now have a very basic example of a beamline instrument visualised in 3D as well as the resulting NeXus file. The NeXus Constructor can output to a JSON as well, which is used by the file-writer to aggregate event data and other live-streamed data to the file.
 
