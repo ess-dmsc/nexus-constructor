@@ -112,7 +112,6 @@ Alternatively to cylinder shapes, mesh shapes can be used for components to desc
 To use a mesh file for geometry, select the "Mesh" geometry type. This will show an option to browse for a file. As well as this, units can also be set to change the scale of the geometry.
 To test this, there are OFF and STL files in the `tests/` folder. Let's use the "cube.off" file.   
 
-TODO: redo this screenshot with monitor instead
 ![](resources/images/AddComponent_011.png)
 
 Again, this would need to be moved away from the sample if reflecting a real scenario. It may also need to be rotated. To add multiple transformations, select "Add rotation" or "Add translation" in the order you want them to be added.
