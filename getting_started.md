@@ -23,7 +23,7 @@ The sample component is added by default, and is indicated by the red cube. You 
 
 ![](resources/images/NeXusConstructor_001.png)
 
-If you are familiar with the [NeXus format](resources/NEXUS.md) it may be useful to view the layout of the resulting NeXus file as you modify the template by adding components and other information. You can do this by clicking the "Nexus File Layout" tab in the left pane of the main window.
+If you are familiar with the [NeXus format](resources/introduction_to_nexus.md) it may be useful to view the layout of the resulting NeXus file as you modify the template by adding components and other information. You can do this by clicking the "Nexus File Layout" tab in the left pane of the main window.
 
 ![](resources/images/Selection_002.png)
 
@@ -120,7 +120,7 @@ To open a JSON file, open the file menu and click "Open from filewriter JSON". T
 
 #### Sending a command to the file-writer
 
-As well as saving the NeXus structure to file, a run start message can be constructed and sent to an instance of the [file-writer]((https://github.com/ess-dmsc/kafka-to-nexus)
+As well as saving the NeXus structure to file, a run start message can be constructed and sent to an instance of the [file-writer](https://github.com/ess-dmsc/kafka-to-nexus)
 To do this, open the file menu and select "Control file writer". This will bring up a dialog that enables a user to input [Kafka topic](https://kafka.apache.org/documentation/#intro_topics) URIs to look at the status of any active file-writers or to send a command to one.
 
 ![](resources/images/nexus-constructor.py_013.png)

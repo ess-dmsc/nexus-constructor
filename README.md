@@ -52,7 +52,7 @@ once to activate the pre-commit check.
 
 Run the python script `nexus-constructor.py` located in the root of the repository.
 
-A guide for getting started with the nexus-constructor can be found [here](GETTING_STARTED.md)
+A guide for getting started with the nexus-constructor can be found [here](getting_started.md)
 
 ## Developer Documentation
 
