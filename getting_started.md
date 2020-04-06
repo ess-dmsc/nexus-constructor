@@ -103,7 +103,6 @@ When hitting add, you will notice that the 3D view is updated should contain a g
 We will add a monitor with a mesh shape to the instrument in this example. To do this, add another component.
 When the Add component Dialog is shown, select "NXmonitor" as the component type.
 
-After this, select "Mesh" as the "Shape Type".
 
 ##### Loading shape from a CAD file
 Alternatively to cylinder shapes, mesh shapes can be used for components to describe their shape. Currently STL and OFF files are supported for mesh geometry.
