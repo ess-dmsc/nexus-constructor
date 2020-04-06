@@ -11,6 +11,10 @@ from nexus_constructor.model.helpers import (
 
 @attr.s
 class Group:
+    """
+    Base class for any group which has a set of children and an nx_class attribute.
+    """
+
     name = attr.ib()
     attributes = attr.ib(default=[])
     children = attr.ib(default=[])

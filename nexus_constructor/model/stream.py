@@ -5,6 +5,8 @@ from nexus_constructor.writer_modules import WriterModules
 
 @attr.s
 class Stream:
+    """Base class for all stream objects"""
+
     topic = attr.ib(str)
     source = attr.ib(str)
     writer_module = attr.ib(

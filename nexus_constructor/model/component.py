@@ -35,6 +35,10 @@ def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
 
 @attr.s
 class Component(Group):
+    """
+    Base class for a component object. In the NeXus file this would translate to the component group.
+    """
+
     @property
     def description(self):
         return self[CommonAttrs.DESCRIPTION]

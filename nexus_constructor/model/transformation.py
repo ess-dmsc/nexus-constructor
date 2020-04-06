@@ -13,12 +13,20 @@ from nexus_constructor.transformation_types import TransformationType
 
 
 class TransformationGroup(Group):
+    """
+    Group containing transformations.
+    """
+
     def __init__(self):
         self.nx_class = "NXtransformations"
 
 
 @attr.s
 class Transformation:
+    """
+    Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
+    """
+
     name = attr.ib(type=str)
     value = attr.ib()
     attributes = attr.ib(default={})
