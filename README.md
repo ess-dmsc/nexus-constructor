@@ -8,7 +8,9 @@ The application can directly output a NeXus file, or create a
 [_NeXus structure_, JSON template](https://github.com/ess-dmsc/kafka-to-nexus/blob/master/documentation/commands.md#defining-a-nexus-structure)
 of the file to send to the [File Writer](https://github.com/ess-dmsc/kafka-to-nexus). The JSON template can
 include data stream details, such that the File Writer populates the NeXus file it creates with data acquired
-from the detector and other beamline apparatus during an experiment. 
+from the detector and other beamline apparatus during an experiment.
+
+There is a ["Getting Started" guide](getting_started.md) to help new users.
 
 ![NeXus Constructor](resources/images/nc_screenshot.png)
 
