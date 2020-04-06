@@ -23,4 +23,4 @@ def test_component_set_description_correctly_sets_description():
     description = "a component"
     comp.description = description
 
-    assert comp.description.values == description
+    assert comp.description == description

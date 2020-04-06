@@ -5,9 +5,12 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.helpers import get_item
+from nexus_constructor.model.helpers import (
+    get_item,
+    set_attribute_value,
+    get_attribute_value,
+)
 from nexus_constructor.model.transformation import Transformation, TransformationGroup
 from nexus_constructor.transformation_types import TransformationType
 
@@ -41,13 +44,11 @@ class Component(Group):
 
     @property
     def description(self):
-        return self[CommonAttrs.DESCRIPTION]
+        return get_attribute_value(self.children, CommonAttrs.DESCRIPTION)
 
     @description.setter
     def description(self, new_description: str):
-        self[CommonAttrs.DESCRIPTION] = FieldAttribute(
-            CommonAttrs.DESCRIPTION, new_description
-        )
+        set_attribute_value(self.children, CommonAttrs.DESCRIPTION, new_description)
 
     @property
     def transform(self):
