@@ -17,12 +17,13 @@ def find_item_index(list_to_look_in: List[Any], item_name: str):
 
 def get_item(list_to_look_in: List[Any], item_name: str) -> Any:
     """
-    Given an item name, search the given list and return the item.
+    Given an item name, search the given list and return the item if present. Otherwise return None.
     :param list_to_look_in: list containing elements that have a name attribute
     :param item_name: the name of the item
     :return: the item itself
     """
-    return list_to_look_in[find_item_index(list_to_look_in, item_name)]
+    index = find_item_index(list_to_look_in, item_name)
+    return list_to_look_in[index] if index is not None else None
 
 
 def remove_item(list_to_remove_from: List[Any], item_name: str):

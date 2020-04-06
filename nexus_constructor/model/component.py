@@ -7,14 +7,14 @@ from PySide2.QtGui import QMatrix4x4, QVector3D
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.group import Group
+from nexus_constructor.model.helpers import get_item
 from nexus_constructor.model.transformation import Transformation, TransformationGroup
 from nexus_constructor.transformation_types import TransformationType
 
 
 def _generate_incremental_name(base_name, group):
-    raise NotImplementedError
     number = 1
-    while f"{base_name}_{number}" in group:
+    while get_item(f"{base_name}_{number}", group.children) is not None:
         number += 1
     return f"{base_name}_{number}"
 
@@ -149,7 +149,7 @@ class Component(Group):
             if isinstance(item, TransformationGroup):
                 return item
         group = TransformationGroup()
-        self.children.append(group)
+        self.children.append(group, name="transformations")
         return group
 
     @property
