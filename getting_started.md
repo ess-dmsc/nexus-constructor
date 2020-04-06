@@ -13,7 +13,7 @@
 <!-- /TOC -->
 
 # Getting started
-To introduce the main features of the NeXus Constructor we will create a NeXus file template describing a simple neutron beamline, comprising a neutron source, sample and detector.
+To introduce the main features of the NeXus Constructor we will create a NeXus file template describing a simple neutron beamline, comprising a neutron source, sample, detector and monitor.
 
 Firstly, either download the [latest release](https://github.com/ess-dmsc/nexus-constructor/releases) for your OS and run the executable from the root directory, or run the source (refer to the [README](README.md) for instructions on how to do this).
 
@@ -114,11 +114,9 @@ To test this, there are OFF and STL files in the `tests/` folder. Let's use the 
 
 Again, this would need to be moved away from the sample if reflecting a real scenario. It may also need to be rotated. To add multiple transformations, select "Add rotation" or "Add translation" in the order you want them to be added.
 
-We now have a very basic example of a beamline instrument visualised in 3D as well as the resulting NeXus file. The NeXus Constructor can output to a JSON as well, which is used by the file-writer to aggregate event data and other live-streamed data to the file.
-
 ### Opening and saving file-writer commands
 
-The constructor can output to a [file-writer command](https://github.com/ess-dmsc/kafka-to-nexus/blob/master/documentation/commands.md) in JSON format, and can also load from these files.
+We now have a very basic example of a beamline instrument visualised in 3D as well as the resulting NeXus file. The constructor can output to a [file-writer command](https://github.com/ess-dmsc/kafka-to-nexus/blob/master/documentation/commands.md) in JSON format, and can also load from these files.
 To save to a JSON file, open the file menu and click "Save to filewriter JSON". This will bring up a file dialog in order to save the file.
 
 To open a JSON file, open the file menu and click "Open from filewriter JSON". The constructor will then load in all components and their fields from a given file.
@@ -132,6 +130,4 @@ To do this, open the file menu and select "Control file writer". This will bring
 
 ### Opening and saving to NeXus File
 
-As well as to and from JSON, a NeXus File can be saved to and loaded from into the NeXus Constructor.
-
-Actions in the file menu can be used for this and components should be identified by the Constructor when loading other NeXus files.
+The NeXus Constructor can also directly create a NeXus file. However, note that it will not populate the file with data from Kafka
