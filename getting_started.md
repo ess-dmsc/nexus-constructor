@@ -100,7 +100,7 @@ When hitting add, you will notice that the 3D view is updated should contain a g
 
 ### Adding a Monitor
 
-We will add a monitor with a mesh shape to the instrument in this example. To do this, add another component.
+We will add a monitor with a mesh shape to the instrument. To do this, add another component.
 When the Add component Dialog is shown, select "NXmonitor" as the component type.
 
 
