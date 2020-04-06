@@ -86,7 +86,7 @@ Enter the "Add component" dialog and select "NXdetector" as the component type. 
 
 In this example our detector is comprised of a 16x16 grid of pixels.
 
-Select "Cylinder" as the "Shape type" and set both the height and radius to 1, and leave the units as "m".
+Select "Cylinder" as the "Shape type" and set the height as 0.5 and radius as 0.3, and leave the units as "m".
 
 ![](resources/images/AddComponent_010.png)
 
