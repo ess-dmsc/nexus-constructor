@@ -1,16 +1,15 @@
-<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+<!-- TOC depthFrom:1 depthTo:8 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Getting started](#getting-started)
 	- [Adding components](#adding-components)
 		- [Adding a source](#adding-a-source)
 			- [Setting translation on the source](#setting-translation-on-the-source)
 		- [Adding a detector](#adding-a-detector)
+		- [Adding a Monitor](#adding-a-monitor)
 				- [Loading shape from a CAD file](#loading-shape-from-a-cad-file)
 		- [Opening and saving file-writer commands](#opening-and-saving-file-writer-commands)
 			- [Sending a command to the file-writer](#sending-a-command-to-the-file-writer)
 		- [Opening and saving to NeXus File](#opening-and-saving-to-nexus-file)
-
-<!-- /TOC -->
 
 # Getting started
 To introduce the main features of the NeXus Constructor we will create a NeXus file template describing a simple neutron beamline, comprising a neutron source, sample, detector and monitor.
