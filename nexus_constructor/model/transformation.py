@@ -77,3 +77,11 @@ class Transformation:
     @units.setter
     def units(self, new_units):
         set_attribute_value(self.attributes, CommonAttrs.UNITS, new_units)
+
+    @property
+    def depends_on(self):
+        raise NotImplementedError
+
+    @depends_on.setter
+    def depends_on(self, new_depends_on):
+        raise NotImplementedError

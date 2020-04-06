@@ -44,4 +44,4 @@ class HS00Stream(Stream):
     data_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
     error_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
     edge_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
-    shape = attr.ib(default=[])  # TODO: construct these objects
+    shape = attr.ib(default=NotImplemented)
