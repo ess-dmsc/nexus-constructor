@@ -87,9 +87,9 @@ class Transformation:
         set_attribute_value(self.attributes, CommonAttrs.UNITS, new_units)
 
     @property
-    def depends_on(self):
+    def depends_on(self) -> "Transformation":
         raise NotImplementedError
 
     @depends_on.setter
-    def depends_on(self, new_depends_on):
+    def depends_on(self, new_depends_on: "Transformation"):
         raise NotImplementedError
