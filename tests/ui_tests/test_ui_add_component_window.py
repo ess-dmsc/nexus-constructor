@@ -45,10 +45,10 @@ from tests.ui_tests.ui_test_utils import (
 
 MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("1", "")]
 
-WRONG_EXTENSION_FILE_PATH = os.path.join(os.getcwd(), "requirements.txt")
+WRONG_EXTENSION_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..", "requirements.txt")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
-VALID_CUBE_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "cube.off")
-VALID_OCTA_MESH_FILE_PATH = os.path.join(os.getcwd(), "tests", "octa.off")
+VALID_CUBE_MESH_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "cube.off")
+VALID_OCTA_MESH_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "octa.off")
 
 UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"

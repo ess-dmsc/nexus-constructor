@@ -117,5 +117,5 @@ def test_GIVEN_name_with_1_as_suffix_and_name_with_11_already_in_list_WHEN_gener
 
 
 NX_CLASS_DEFINITIONS = make_dictionary_of_class_definitions(
-    os.path.join(os.getcwd(), "definitions")
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "../definitions")
 )[1]
