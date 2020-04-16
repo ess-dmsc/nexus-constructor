@@ -1,5 +1,5 @@
 import os
-
+import sys
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QIcon, QColor
 from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel
@@ -16,7 +16,13 @@ from nexus_constructor.transformation_view import (
 )
 from nexus_constructor.transformations import Transformation
 
-root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+# We have to use this for cx freeze as __file__ does not work
+if getattr(sys, "frozen", False):
+    dir_ = os.path.dirname(sys.executable)
+else:
+    dir_ = os.path.dirname(os.path.realpath(__file__))
+
+root_dir = os.path.join(dir_, "..")
 
 
 def create_and_add_toolbar_action(
