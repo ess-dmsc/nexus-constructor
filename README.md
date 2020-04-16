@@ -29,7 +29,7 @@ Binary packages for release versions can be downloaded on the [releases page](ht
 
 Python 3.6 or greater is required. https://www.python.org/downloads/
 
-It is HIGHLY recommended that a virtual environment is created for running the nexus-constructor.
+It is **HIGHLY** recommended that a virtual environment is created for running the nexus-constructor.
 On a UNIX-like system using the systen installed version of Python, the commands required would be something like:
 ```
 python3 -m venv nc_env
