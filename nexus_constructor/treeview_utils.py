@@ -18,11 +18,11 @@ from nexus_constructor.transformations import Transformation
 
 # We have to use this for cx freeze as __file__ does not work
 if getattr(sys, "frozen", False):
-    dir_ = os.path.dirname(sys.executable)
+    current_file = os.path.dirname(sys.executable)
 else:
-    dir_ = os.path.dirname(os.path.realpath(__file__))
+    current_file = os.path.dirname(os.path.realpath(__file__))
 
-root_dir = os.path.join(dir_, "..")
+root_dir = os.path.join(current_file, "..")
 
 
 def create_and_add_toolbar_action(
