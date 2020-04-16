@@ -17,7 +17,7 @@ from nexus_constructor.transformation_types import TransformationType
 
 def _generate_incremental_name(base_name, group):
     number = 1
-    while get_item(f"{base_name}_{number}", group.children) is not None:
+    while get_item(group.children, f"{base_name}_{number}") is not None:
         number += 1
     return f"{base_name}_{number}"
 
