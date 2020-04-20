@@ -15,7 +15,7 @@ class Group:
     Base class for any group which has a set of children and an nx_class attribute.
     """
 
-    name = attr.ib()
+    name = attr.ib(type=str)
     attributes = attr.ib(default=[])
     children = attr.ib(default=[])
 
@@ -34,3 +34,13 @@ class Group:
         set_attribute_value(
             self.attributes, CommonAttrs.NX_CLASS, new_nx_class,
         )
+
+
+class Instrument(Group):
+    def __init__(self):
+        self.nx_class = "NXinstrument"
+
+
+class Entry(Group):
+    def __init__(self):
+        self.nx_class = "NXentry"

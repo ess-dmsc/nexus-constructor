@@ -1,5 +1,5 @@
 import attr
-
+import uuid
 from nexus_constructor.writer_modules import WriterModules
 
 
@@ -7,11 +7,12 @@ from nexus_constructor.writer_modules import WriterModules
 class Stream:
     """Base class for all stream objects"""
 
-    topic = attr.ib(str)
-    source = attr.ib(str)
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
     writer_module = attr.ib(
-        str, validator=attr.validators.in_([e.value for e in WriterModules])
+        type=str, validator=attr.validators.in_([e.value for e in WriterModules])
     )
+    name = attr.ib(type=str, default=str(uuid.uuid4()))
 
 
 class EV42Stream(Stream):
@@ -33,9 +34,9 @@ class TDCTStream(Stream):
 # TODO: optional fields
 class F142Stream(Stream):
     writer_module = WriterModules.F142.value
-    type = attr.ib()
-    value_units = attr.ib()
-    array_size = attr.ib(default=None)
+    type = attr.ib(type=str)
+    value_units = attr.ib(type=str)
+    array_size = attr.ib(type=float, default=None)
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]
