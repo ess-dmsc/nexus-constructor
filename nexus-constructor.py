@@ -17,6 +17,12 @@ from nexus_constructor.instrument import Instrument
 import os
 import argparse
 
+if getattr(sys, "frozen", False):
+    # frozen
+    root_dir = os.path.dirname(sys.executable)
+else:
+    root_dir = os.path.dirname(os.path.realpath(__file__))
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Nexus Constructor")
     if "help" in parser.parse_args():
@@ -27,7 +33,7 @@ if __name__ == "__main__":
     app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
     window = QMainWindow()
     nexus_wrapper = NexusWrapper()
-    definitions_dir = os.path.abspath(os.path.join(os.getcwd(), "definitions"))
+    definitions_dir = os.path.abspath(os.path.join(root_dir, "definitions"))
     _, nx_component_classes = make_dictionary_of_class_definitions(definitions_dir)
     instrument = Instrument(nexus_wrapper, nx_component_classes)
     ui = MainWindow(instrument, nx_component_classes)
