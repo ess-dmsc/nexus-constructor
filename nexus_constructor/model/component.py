@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 import attr
 from PySide2.Qt3DCore import Qt3DCore
@@ -41,6 +41,14 @@ class Component(Group):
     """
     Base class for a component object. In the NeXus file this would translate to the component group.
     """
+
+    def __init__(self, name, description, nx_class, pixel_data=None):
+        self.name = name
+        self.description = description
+        self.nx_class = nx_class
+
+        if pixel_data is not None:
+            raise NotImplementedError
 
     @property
     def description(self):
@@ -155,4 +163,22 @@ class Component(Group):
 
     @property
     def shape(self):
+        raise NotImplementedError
+
+    def remove_shape(self):
+        raise NotImplementedError
+
+    def set_off_shape(
+        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
+    ):
+        raise NotImplementedError
+
+    def set_cylinder_shape(
+        self,
+        axis_direction: QVector3D = QVector3D(0.0, 0.0, 1.0),
+        height: float = 1.0,
+        radius: float = 1.0,
+        units: Union[str, bytes] = "m",
+        pixel_data=None,
+    ):
         raise NotImplementedError
