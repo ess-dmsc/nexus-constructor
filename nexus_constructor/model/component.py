@@ -202,7 +202,7 @@ class Component(Group):
         detector_number = Dataset("detector_number", DatasetMetadata([1], "int64"))
         detector_number.values = get_detector_number_from_pixel_mapping(
             pixel_mapping
-        )  # TODO create a helper for setting dataset values
+        )  # TODO create a helper for setting dataset values, size should be derived from the inputted 'values'
 
     def clear_pixel_data(self):
         raise NotImplementedError
