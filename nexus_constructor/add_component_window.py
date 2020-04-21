@@ -440,7 +440,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Add shape information
         self.generate_geometry_model(component, pixel_data)
 
-        # self.write_pixel_data_to_component(component, nx_class, pixel_data) TODO
+        self.write_pixel_data_to_component(component, nx_class, pixel_data)
         add_fields_to_component(component, self.fieldsListWidget)
 
         self.component_model.add_component(component)

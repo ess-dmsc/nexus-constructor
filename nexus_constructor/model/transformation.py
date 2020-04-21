@@ -69,9 +69,7 @@ class Transformation(Dataset):
         elif self.type == TransformationType.TRANSLATION:
             transform.setTranslation(self.vector.normalized() * self.ui_value)
         else:
-            raise (
-                RuntimeError('Unknown transformation of type "{}".'.format(self.type))
-            )
+            raise (RuntimeError(f'Unknown transformation of type "{self.type}".'))
         return transform.matrix()
 
     @property

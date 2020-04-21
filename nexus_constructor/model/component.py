@@ -5,13 +5,17 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.group import Group
+from nexus_constructor.model.group import Group, Dataset, DatasetMetadata
 from nexus_constructor.model.helpers import (
     get_item,
     set_attribute_value,
     get_attribute_value,
 )
 from nexus_constructor.model.transformation import Transformation, TransformationGroup
+from nexus_constructor.pixel_data import PixelGrid, PixelMapping
+from nexus_constructor.pixel_data_to_nexus_utils import (
+    get_detector_number_from_pixel_mapping,
+)
 from nexus_constructor.transformation_types import TransformationType
 
 
@@ -181,4 +185,24 @@ class Component(Group):
         units: Union[str, bytes] = "m",
         pixel_data=None,
     ):
+        raise NotImplementedError
+
+    def record_pixel_grid(self, pixel_grid: PixelGrid):
+        """
+        Records the pixel grid data to the NeXus file.
+        :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
+        """
+        raise NotImplementedError
+
+    def record_pixel_mapping(self, pixel_mapping: PixelMapping):
+        """
+        Records the pixel mapping data to the NeXus file.
+        :param pixel_mapping: The PixelMapping created from the input provided to the Add/Edit Component Window.
+        """
+        detector_number = Dataset("detector_number", DatasetMetadata([1], "int64"))
+        detector_number.values = get_detector_number_from_pixel_mapping(
+            pixel_mapping
+        )  # TODO create a helper for setting dataset values
+
+    def clear_pixel_data(self):
         raise NotImplementedError
