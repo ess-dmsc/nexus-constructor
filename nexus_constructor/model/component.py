@@ -19,6 +19,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_y_offsets_from_pixel_grid,
     get_z_offsets_from_pixel_grid,
     get_detector_ids_from_pixel_grid,
+    PIXEL_FIELDS,
 )
 from nexus_constructor.transformation_types import TransformationType
 
@@ -192,7 +193,11 @@ class Component(Group):
         raise NotImplementedError
 
     def clear_pixel_data(self):
-        raise NotImplementedError
+        for field_name in PIXEL_FIELDS:
+            try:
+                del self[field_name]
+            except AttributeError:
+                pass
 
     def set_field(self, name, value, dtype):
         size = value.size if isinstance(value, (np.ndarray, np.generic)) else [1]
