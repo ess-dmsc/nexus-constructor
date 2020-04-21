@@ -15,6 +15,10 @@ from nexus_constructor.model.transformation import Transformation, Transformatio
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
+    get_x_offsets_from_pixel_grid,
+    get_y_offsets_from_pixel_grid,
+    get_z_offsets_from_pixel_grid,
+    get_detector_ids_from_pixel_grid,
 )
 from nexus_constructor.transformation_types import TransformationType
 
@@ -187,22 +191,40 @@ class Component(Group):
     ):
         raise NotImplementedError
 
+    def clear_pixel_data(self):
+        raise NotImplementedError
+
+    def set_field(self, name, value, dtype):
+        self[name] = Dataset(name, DatasetMetadata(value.size, dtype), value)
+
+    def get_field(self, name):
+        return self[name]
+
     def record_pixel_grid(self, pixel_grid: PixelGrid):
         """
         Records the pixel grid data to the NeXus file.
         :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
         """
-        raise NotImplementedError
+        self.set_field(
+            "x_pixel_offset", get_x_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "y_pixel_offset", get_y_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "z_pixel_offset", get_z_offsets_from_pixel_grid(pixel_grid), "float64"
+        )
+        self.set_field(
+            "detector_number", get_detector_ids_from_pixel_grid(pixel_grid), "int64"
+        )
 
     def record_pixel_mapping(self, pixel_mapping: PixelMapping):
         """
         Records the pixel mapping data to the NeXus file.
         :param pixel_mapping: The PixelMapping created from the input provided to the Add/Edit Component Window.
         """
-        detector_number = Dataset("detector_number", DatasetMetadata([1], "int64"))
-        detector_number.values = get_detector_number_from_pixel_mapping(
-            pixel_mapping
-        )  # TODO create a helper for setting dataset values, size should be derived from the inputted 'values'
-
-    def clear_pixel_data(self):
-        raise NotImplementedError
+        self.set_field(
+            "detector_number",
+            get_detector_number_from_pixel_mapping(pixel_mapping),
+            "int64",
+        )
