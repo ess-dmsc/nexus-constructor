@@ -1,5 +1,5 @@
 from typing import Tuple, Union
-
+import numpy as np
 import attr
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
@@ -195,7 +195,8 @@ class Component(Group):
         raise NotImplementedError
 
     def set_field(self, name, value, dtype):
-        self[name] = Dataset(name, DatasetMetadata(value.size, dtype), value)
+        size = value.size if isinstance(value, (np.ndarray, np.generic)) else [1]
+        self[name] = Dataset(name, DatasetMetadata(size, dtype), value)
 
     def get_field(self, name):
         return self[name]
