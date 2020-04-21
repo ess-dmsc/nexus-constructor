@@ -1,6 +1,13 @@
 import attr
 import uuid
+
+from nexus_constructor.model.group import Group
 from nexus_constructor.writer_modules import WriterModules
+
+
+class StreamGroup(Group):
+    def __init__(self):
+        self.type = "stream"
 
 
 @attr.s

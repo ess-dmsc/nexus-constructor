@@ -3,7 +3,7 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
 import numpy as np
 
-from nexus_constructor.model.group import Group
+from nexus_constructor.model.group import Group, Dataset
 from nexus_constructor.model.helpers import (
     set_attribute_value,
     get_attribute_value,
@@ -22,14 +22,10 @@ class TransformationGroup(Group):
 
 
 @attr.s
-class Transformation:
+class Transformation(Dataset):
     """
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
-
-    name = attr.ib(type=str)
-    value = attr.ib()
-    attributes = attr.ib(default={})
 
     @property
     def type(self) -> str:
@@ -53,8 +49,8 @@ class Transformation:
 
     @property
     def ui_value(self) -> float:
-        if isinstance(self.value, (float, int)):
-            return float(self.value)
+        if isinstance(self.values, (float, int)):
+            return float(self.values)
         return float(get_attribute_value(self.attributes, CommonAttrs.UI_VALUE))
 
     @ui_value.setter

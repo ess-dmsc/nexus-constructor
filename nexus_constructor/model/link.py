@@ -5,3 +5,4 @@ import attr
 class Link:
     name = attr.ib(type=str)
     target = attr.ib(type=str)
+    type = attr.ib(type=str, default="link")

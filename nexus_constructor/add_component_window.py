@@ -436,19 +436,19 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         #     component_name, nx_class, description
         # )
 
-        component = Component(component_name, nx_class, description, pixel_data)
-
+        component = Component(component_name, description, nx_class, pixel_data)
+        # Add shape information
         self.generate_geometry_model(component, pixel_data)
 
-        self.write_pixel_data_to_component(component, nx_class, pixel_data)
-
+        # self.write_pixel_data_to_component(component, nx_class, pixel_data) TODO
         add_fields_to_component(component, self.fieldsListWidget)
+
         self.component_model.add_component(component)
 
-        component_with_geometry = create_component(
-            self.instrument.nexus, component.group
-        )
-        return component_with_geometry.shape
+        # component_with_geometry = create_component(
+        #     self.instrument.nexus, component.group
+        # )
+        return component.shape
 
     def edit_existing_component(
         self,
