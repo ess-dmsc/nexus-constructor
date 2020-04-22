@@ -5,6 +5,10 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.component.component_shape import (
+    PIXEL_SHAPE_GROUP_NAME,
+    SHAPE_GROUP_NAME,
+)
 from nexus_constructor.model.group import Group, Dataset, DatasetMetadata
 from nexus_constructor.model.helpers import (
     get_item,
@@ -172,15 +176,15 @@ class Component(Group):
 
     @property
     def shape(self):
-        raise NotImplementedError
+        pass
 
     def remove_shape(self):
-        raise NotImplementedError
+        pass
 
     def set_off_shape(
         self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
     ):
-        raise NotImplementedError
+        pass
 
     def set_cylinder_shape(
         self,
@@ -190,7 +194,22 @@ class Component(Group):
         units: Union[str, bytes] = "m",
         pixel_data=None,
     ):
-        raise NotImplementedError
+        shape = self.create_shape_group()
+
+    def create_shape_group(self, nx_class: str, shape_is_single_pixel: bool = False):
+        if shape_is_single_pixel:
+            self[PIXEL_SHAPE_GROUP_NAME] = Group(PIXEL_SHAPE_GROUP_NAME, )
+            return self[PIXEL_SHAPE_GROUP_NAME]
+            # nexus_name, self.group
+            # )
+            # self._shape = PixelShape(self.file, self.group)
+        else:
+            self[SHAPE_GROUP_NAME] = None
+            return self[SHAPE_GROUP_NAME]
+            # shape_group = self.file.create_nx_group(
+            #     SHAPE_GROUP_NAME, nexus_name, self.group
+            # )
+            # self._shape = ComponentShape(self.file, self.group)
 
     def clear_pixel_data(self):
         for field_name in PIXEL_FIELDS:
