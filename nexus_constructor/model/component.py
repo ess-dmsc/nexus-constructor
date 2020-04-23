@@ -9,7 +9,7 @@ from nexus_constructor.component.component_shape import (
 )
 import attr
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.node import _get_item
+from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation, TransformationGroup
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -21,13 +21,6 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     PIXEL_FIELDS,
 )
 from nexus_constructor.transformation_types import TransformationType
-
-
-def _generate_incremental_name(base_name, group):
-    number = 1
-    while _get_item(group.children, f"{base_name}_{number}") is not None:
-        number += 1
-    return f"{base_name}_{number}"
 
 
 def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:

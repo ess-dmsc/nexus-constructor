@@ -67,3 +67,10 @@ class Node:
 
     def get_attribute_value(self, attribute_name: str):
         return _get_item(self.attributes, attribute_name).values
+
+
+def _generate_incremental_name(base_name, group):
+    number = 1
+    while _get_item(group.children, f"{base_name}_{number}") is not None:
+        number += 1
+    return f"{base_name}_{number}"
