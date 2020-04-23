@@ -39,7 +39,7 @@ def test_component_set_field_with_numpy_array_correctly_sets_field_value():
 
     field_dataset = comp["field1"]
     assert field_dataset.name == field_name
-    assert field_dataset.values == field_value
+    assert field_dataset.values.all(field_value)
     assert field_dataset.dataset.size == (1, 2)
     assert field_dataset.dataset.type == dtype
 
