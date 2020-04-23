@@ -65,7 +65,7 @@ class Component(Group):
 
     @property
     def description(self):
-        return get_attribute_value(self.children, CommonAttrs.DESCRIPTION)
+        return get_attribute_value(self.children, CommonAttrs.DESCRIPTION) # TODO this should be a field not an attribute
 
     @description.setter
     def description(self, new_description: str):
