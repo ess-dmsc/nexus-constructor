@@ -16,9 +16,9 @@ class DatasetMetadata:
 @attr.s
 class Dataset(Node):
     dataset = attr.ib(type=DatasetMetadata)
-    values = attr.ib(type=List, default=None)
+    values = attr.ib(type=List, default=attr.Factory(list))
     type = attr.ib(type=str, default="dataset")
-    attributes = attr.ib(type=List[FieldAttribute], default=[])
+    attributes = attr.ib(type=List[FieldAttribute], default=attr.Factory(list))
 
     @property
     def nx_class(self):
