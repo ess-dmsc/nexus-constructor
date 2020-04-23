@@ -3,7 +3,8 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
 import numpy as np
 
-from nexus_constructor.model.group import Group, Dataset
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.transformation_types import TransformationType
 
