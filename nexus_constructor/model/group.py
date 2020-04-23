@@ -62,7 +62,6 @@ class Group(Node):
         size = [1]
         if isinstance(value, (np.ndarray, np.generic)):
             size = value.size
-            dtype = f"{value.dtype}"
         self[name] = Dataset(name, DatasetMetadata(size, dtype), value)
 
     def get_field_value(self, name: str):
