@@ -39,7 +39,7 @@ class Group(Node):
         self[name] = Dataset(name, DatasetMetadata(size, dtype), value)
 
     def get_field_value(self, name):
-        return self[name]
+        return self[name].values
 
 
 class Instrument(Group):
