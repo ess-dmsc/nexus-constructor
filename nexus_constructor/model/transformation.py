@@ -4,10 +4,6 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 import numpy as np
 
 from nexus_constructor.model.group import Group, Dataset
-from nexus_constructor.model.helpers import (
-    set_attribute_value,
-    get_attribute_value,
-)
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.transformation_types import TransformationType
 
@@ -29,15 +25,15 @@ class Transformation(Dataset):
 
     @property
     def type(self) -> str:
-        return get_attribute_value(self.attributes, CommonAttrs.TRANSFORMATION_TYPE)
+        return self.get_attribute_value(CommonAttrs.TRANSFORMATION_TYPE)
 
     @type.setter
     def type(self, new_type):
-        set_attribute_value(self.attributes, CommonAttrs.TRANSFORMATION_TYPE, new_type)
+        self.set_attribute_value(CommonAttrs.TRANSFORMATION_TYPE, new_type)
 
     @property
     def vector(self) -> QVector3D:
-        vector = get_attribute_value(self.attributes, CommonAttrs.VECTOR)
+        vector = self.get_attribute_value(CommonAttrs.VECTOR)
         return (
             QVector3D(vector[0], vector[1], vector[2]) if vector is not None else None
         )
@@ -45,17 +41,17 @@ class Transformation(Dataset):
     @vector.setter
     def vector(self, new_vector: QVector3D):
         vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
-        set_attribute_value(self.attributes, CommonAttrs.VECTOR, vector_as_np_array)
+        self.set_attribute_value(CommonAttrs.VECTOR, vector_as_np_array)
 
     @property
     def ui_value(self) -> float:
         if isinstance(self.values, (float, int)):
             return float(self.values)
-        return float(get_attribute_value(self.attributes, CommonAttrs.UI_VALUE))
+        return float(self.get_attribute_value(CommonAttrs.UI_VALUE))
 
     @ui_value.setter
     def ui_value(self, new_value: float):
-        set_attribute_value(self.attributes, CommonAttrs.UI_VALUE, new_value)
+        self.set_attribute_value(CommonAttrs.UI_VALUE, new_value)
 
     @property
     def qmatrix(self) -> QMatrix4x4:
@@ -74,11 +70,11 @@ class Transformation(Dataset):
 
     @property
     def units(self):
-        return get_attribute_value(self.attributes, CommonAttrs.UNITS)
+        return self.get_attribute_value(CommonAttrs.UNITS)
 
     @units.setter
     def units(self, new_units):
-        set_attribute_value(self.attributes, CommonAttrs.UNITS, new_units)
+        self.set_attribute_value(CommonAttrs.UNITS, new_units)
 
     @property
     def depends_on(self) -> "Transformation":

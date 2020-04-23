@@ -3,40 +3,43 @@ from typing import List
 import attr
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.helpers import (
-    get_item,
-    set_item,
-    set_attribute_value,
-    get_attribute_value,
-)
+from nexus_constructor.model.attribute import FieldAttribute
+from nexus_constructor.model.node import Node, _get_item, _set_item
+import numpy as np
 
 
 @attr.s
-class Group:
+class Group(Node):
     """
     Base class for any group which has a set of children and an nx_class attribute.
     """
 
-    name = attr.ib(type=str)
-    attributes = attr.ib(type=List, default=[])
     children = attr.ib(type=List, default=[])
     type = attr.ib(type=str, default="group")
+    attributes = attr.ib(type=List[FieldAttribute], default=[])
 
     def __getitem__(self, key):
-        return get_item(self.children, key)
+        return _get_item(self.children, key)
 
     def __setitem__(self, key, value):
-        set_item(self.children, key, value)
+        _set_item(self.children, key, value)
 
     @property
     def nx_class(self):
-        return get_attribute_value(self.attributes, CommonAttrs.NX_CLASS)
+        return self.get_attribute_value(CommonAttrs.NX_CLASS)
 
     @nx_class.setter
     def nx_class(self, new_nx_class: str):
-        set_attribute_value(
-            self.attributes, CommonAttrs.NX_CLASS, new_nx_class,
+        self.set_attribute_value(
+            CommonAttrs.NX_CLASS, new_nx_class,
         )
+
+    def set_field_value(self, name, value, dtype=None):
+        size = value.size if isinstance(value, (np.ndarray, np.generic)) else [1]
+        self[name] = Dataset(name, DatasetMetadata(size, dtype), value)
+
+    def get_field_value(self, name):
+        return self[name]
 
 
 class Instrument(Group):
@@ -56,19 +59,18 @@ class DatasetMetadata:
 
 
 @attr.s
-class Dataset:
-    name = attr.ib(type=str)
+class Dataset(Node):
     dataset = attr.ib(type=DatasetMetadata)
     values = attr.ib(type=List, default=None)
-    attributes = attr.ib(type=List, default=[])
     type = attr.ib(type=str, default="dataset")
+    attributes = attr.ib(type=List[FieldAttribute], default=[])
 
     @property
     def nx_class(self):
-        return get_attribute_value(self.attributes, CommonAttrs.NX_CLASS)
+        return self.get_attribute_value(CommonAttrs.NX_CLASS)
 
     @nx_class.setter
     def nx_class(self, new_nx_class: str):
-        set_attribute_value(
-            self.attributes, CommonAttrs.NX_CLASS, new_nx_class,
+        self.set_attribute_value(
+            CommonAttrs.NX_CLASS, new_nx_class,
         )

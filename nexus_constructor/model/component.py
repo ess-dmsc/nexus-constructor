@@ -1,6 +1,4 @@
 from typing import Tuple, Union
-import numpy as np
-import attr
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
@@ -9,12 +7,9 @@ from nexus_constructor.component.component_shape import (
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
 )
-from nexus_constructor.model.group import Group, Dataset, DatasetMetadata
-from nexus_constructor.model.helpers import (
-    get_item,
-    set_attribute_value,
-    get_attribute_value,
-)
+import attr
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.node import _get_item
 from nexus_constructor.model.transformation import Transformation, TransformationGroup
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -30,7 +25,7 @@ from nexus_constructor.transformation_types import TransformationType
 
 def _generate_incremental_name(base_name, group):
     number = 1
-    while get_item(group.children, f"{base_name}_{number}") is not None:
+    while _get_item(group.children, f"{base_name}_{number}") is not None:
         number += 1
     return f"{base_name}_{number}"
 
@@ -55,21 +50,13 @@ class Component(Group):
     Base class for a component object. In the NeXus file this would translate to the component group.
     """
 
-    def __init__(self, name, description, nx_class, pixel_data=None):
-        self.name = name
-        self.description = description
-        self.nx_class = nx_class
-
-        if pixel_data is not None:
-            raise NotImplementedError
-
     @property
     def description(self):
-        return get_attribute_value(self.children, CommonAttrs.DESCRIPTION) # TODO this should be a field not an attribute
+        return self.get_field_value(CommonAttrs.DESCRIPTION)
 
     @description.setter
     def description(self, new_description: str):
-        set_attribute_value(self.children, CommonAttrs.DESCRIPTION, new_description)
+        self.set_field_value(CommonAttrs.DESCRIPTION, new_description)
 
     @property
     def transform(self):
@@ -176,15 +163,15 @@ class Component(Group):
 
     @property
     def shape(self):
-        pass
+        raise NotImplementedError
 
     def remove_shape(self):
-        pass
+        raise NotImplementedError
 
     def set_off_shape(
         self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
     ):
-        pass
+        raise NotImplementedError
 
     def set_cylinder_shape(
         self,
@@ -194,11 +181,11 @@ class Component(Group):
         units: Union[str, bytes] = "m",
         pixel_data=None,
     ):
-        shape = self.create_shape_group()
+        raise NotImplementedError
 
     def create_shape_group(self, nx_class: str, shape_is_single_pixel: bool = False):
         if shape_is_single_pixel:
-            self[PIXEL_SHAPE_GROUP_NAME] = Group(PIXEL_SHAPE_GROUP_NAME, )
+            self[PIXEL_SHAPE_GROUP_NAME] = Group(PIXEL_SHAPE_GROUP_NAME,)
             return self[PIXEL_SHAPE_GROUP_NAME]
             # nexus_name, self.group
             # )
@@ -218,28 +205,21 @@ class Component(Group):
             except AttributeError:
                 pass
 
-    def set_field(self, name, value, dtype):
-        size = value.size if isinstance(value, (np.ndarray, np.generic)) else [1]
-        self[name] = Dataset(name, DatasetMetadata(size, dtype), value)
-
-    def get_field(self, name):
-        return self[name]
-
     def record_pixel_grid(self, pixel_grid: PixelGrid):
         """
         Records the pixel grid data to the NeXus file.
         :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
         """
-        self.set_field(
+        self.set_field_value(
             "x_pixel_offset", get_x_offsets_from_pixel_grid(pixel_grid), "float64"
         )
-        self.set_field(
+        self.set_field_value(
             "y_pixel_offset", get_y_offsets_from_pixel_grid(pixel_grid), "float64"
         )
-        self.set_field(
+        self.set_field_value(
             "z_pixel_offset", get_z_offsets_from_pixel_grid(pixel_grid), "float64"
         )
-        self.set_field(
+        self.set_field_value(
             "detector_number", get_detector_ids_from_pixel_grid(pixel_grid), "int64"
         )
 
@@ -248,7 +228,7 @@ class Component(Group):
         Records the pixel mapping data to the NeXus file.
         :param pixel_mapping: The PixelMapping created from the input provided to the Add/Edit Component Window.
         """
-        self.set_field(
+        self.set_field_value(
             "detector_number",
             get_detector_number_from_pixel_mapping(pixel_mapping),
             "int64",

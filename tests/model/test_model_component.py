@@ -1,6 +1,5 @@
 import pytest
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.helpers import set_attribute_value
 
 
 def test_component_set_item_with_brackets_works_with_another_component():
@@ -36,7 +35,7 @@ def test_component_set_field_with_numpy_array_correctly_sets_field_value():
     field_name = "field1"
     field_value = np.asarray(data, dtype=int)
 
-    comp.set_field(field_name, field_value, dtype)
+    comp.set_field_value(field_name, field_value, dtype)
 
     field_dataset = comp["field1"]
     assert field_dataset.name == field_name
@@ -51,7 +50,7 @@ def test_component_set_field_with_scalar_value_correctly_sets_field_value():
     data = 123
     dtype = "int"
 
-    comp.set_field(field_name, data, dtype)
+    comp.set_field_value(field_name, data, dtype)
 
     field_dataset = comp[field_name]
 
