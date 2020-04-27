@@ -1,5 +1,6 @@
 import pytest
 from nexus_constructor.model.component import Component
+import numpy as np
 
 
 def test_component_set_item_with_brackets_works_with_another_component():
@@ -27,7 +28,6 @@ def test_component_set_description_correctly_sets_description():
 
 
 def test_component_set_field_with_numpy_array_correctly_sets_field_value():
-    import numpy as np
 
     comp = Component("comp4")
     data = [[1], [2]]

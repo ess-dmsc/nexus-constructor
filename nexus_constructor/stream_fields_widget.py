@@ -26,7 +26,8 @@ from nexus_constructor.model.stream import (
     SENVStream,
     HS00Stream,
     TDCTStream,
-    WriterModules)
+    WriterModules,
+)
 
 F142_TYPES = [
     "byte",
