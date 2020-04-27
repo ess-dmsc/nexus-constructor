@@ -1,57 +1,77 @@
+from enum import Enum
 import attr
-import uuid
-
 from nexus_constructor.model.group import Group
-from nexus_constructor.writer_modules import WriterModules
+
+
+class WriterModules(Enum):
+    F142 = "f142"
+    EV42 = "ev42"
+    TDCTIME = "TdcTime"
+    NS10 = "ns10"
+    HS00 = "hs00"
+    SENV = "senv"
 
 
 class StreamGroup(Group):
     def __init__(self):
         self.type = "stream"
 
+    def __setitem__(self, key, value):
+        self.children.append(value)
+
+    def __getitem__(self, item):
+        """This is not simple as they do not have a name - we could do this by using a private member"""
+        raise NotImplementedError
+
 
 @attr.s
-class Stream:
-    """Base class for all stream objects"""
-
+class NS10Stream:
     topic = attr.ib(type=str)
     source = attr.ib(type=str)
-    writer_module = attr.ib(
-        type=str, validator=attr.validators.in_([e.value for e in WriterModules])
-    )
-    name = attr.ib(type=str, default=str(uuid.uuid4()))
+    _writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
 
 
-class EV42Stream(Stream):
-    writer_module = WriterModules.EV42.value
+@attr.s
+class SENVStream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
+    _writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
 
-class NS10Stream(Stream):
-    writer_module = WriterModules.NS10.value
+@attr.s
+class TDCTStream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
+    _writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
 
 
-class SENVStream(Stream):
-    writer_module = WriterModules.SENV.value
-
-
-class TDCTStream(Stream):
-    writer_module = WriterModules.TDCTIME.value
+@attr.s
+class EV42Stream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
+    _writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
 
 
 # TODO: optional fields
-class F142Stream(Stream):
-    writer_module = WriterModules.F142.value
+@attr.s
+class F142Stream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
     type = attr.ib(type=str)
-    value_units = attr.ib(type=str)
+    value_units = attr.ib(type=str, default=None)
     array_size = attr.ib(type=float, default=None)
+    _writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]
 
 
-class HS00Stream(Stream):
-    writer_module = WriterModules.HS00.value
+@attr.s
+class HS00Stream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
     data_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
     error_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
     edge_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
-    shape = attr.ib(default=NotImplemented)
+    shape = attr.ib()
+    _writer_module = attr.ib(type=str, default=WriterModules.HS00.value, init=False)

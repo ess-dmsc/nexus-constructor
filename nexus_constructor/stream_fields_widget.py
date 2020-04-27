@@ -18,9 +18,15 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
-from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.nexus.nexus_wrapper import create_temporary_in_memory_file
-from nexus_constructor.writer_modules import WriterModules
+from nexus_constructor.model.stream import (
+    StreamGroup,
+    F142Stream,
+    EV42Stream,
+    NS10Stream,
+    SENVStream,
+    HS00Stream,
+    TDCTStream,
+    WriterModules)
 
 F142_TYPES = [
     "byte",
@@ -285,42 +291,45 @@ class StreamFieldsWidget(QDialog):
         else:
             self.source_line_edit.setPlaceholderText("")
 
-    def get_stream_group(self) -> h5py.Group:
+    def get_stream_group(self) -> StreamGroup:
         """
         Create the stream group with a temporary in-memory HDF5 file.
         :return: The created HDF group.
         """
 
-        temp_file = create_temporary_in_memory_file()
-        group = temp_file.create_group("children")
-        group.create_dataset(name="type", dtype=STRING_DTYPE, data="stream")
-        stream_group = group.create_group(self.parent().parent().field_name_edit.text())
-        stream_group.attrs[CommonAttrs.NX_CLASS] = CommonAttrs.NC_STREAM
-        stream_group.create_dataset(
-            name="topic", dtype=STRING_DTYPE, data=self.topic_line_edit.text()
-        )
-        stream_group.create_dataset(
-            name="writer_module",
-            dtype=STRING_DTYPE,
-            data=self.schema_combo.currentText(),
-        )
+        source = self.source_line_edit.text()
+        topic = self.topic_line_edit.text()
+        stream = None
+        type = self.type_combo.currentText()
+        current_schema = self.schema_combo.currentText()
+        if current_schema == WriterModules.F142:
+            stream = F142Stream(source, topic, type)
+            # stream = self._create_f142_fields(stream)
+        elif current_schema == WriterModules.EV42:
+            stream = EV42Stream(source, topic)
+            # stream = self._create_ev42_fields(stream)
+        elif current_schema == WriterModules.NS10:
+            stream = NS10Stream(source, topic)
+        elif current_schema == WriterModules.SENV:
+            stream = SENVStream(source, topic)
+        elif current_schema == WriterModules.HS00:
+            stream = HS00Stream(
+                source, topic, NotImplemented, NotImplemented, NotImplemented, []
+            )
+        elif current_schema == WriterModules.TDCTIME:
+            stream = TDCTStream(source, topic)
 
-        schema = self.schema_combo.currentText()
-        stream_group.create_dataset(
-            "source", dtype=STRING_DTYPE, data=self.source_line_edit.text()
-        )
+        stream_group = StreamGroup()
+        stream_group[self.parent().parent().field_name_edit.text()] = stream
 
-        if schema == WriterModules.F142.value:
-            self._create_f142_fields(stream_group)
-        elif schema == WriterModules.EV42.value:
-            self._create_ev42_fields(stream_group)
         return stream_group
 
-    def _create_ev42_fields(self, stream_group: h5py.Group):
+    def _create_ev42_fields(self, stream_group: EV42Stream):
         """
         Create ev42 fields in the given group if advanced options are specified.
         :param stream_group: The group to apply fields to.
         """
+        raise NotImplementedError
         if self.advanced_options_enabled:
             if self.ev42_adc_pulse_debug_checkbox.isChecked():
                 stream_group.create_dataset(
@@ -332,11 +341,12 @@ class StreamFieldsWidget(QDialog):
                 stream_group, self.ev42_nexus_to_spinner_ui_element
             )
 
-    def _create_f142_fields(self, stream_group: h5py.Group):
+    def _create_f142_fields(self, stream_group: F142Stream):
         """
         Create f142 fields in the given group if advanced options are specified.
         :param stream_group: The group to apply fields to.
         """
+        raise NotImplementedError
         stream_group.create_dataset(
             "type", dtype=STRING_DTYPE, data=self.type_combo.currentText()
         )
@@ -369,6 +379,7 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
+        raise NotImplementedError
         all_ev42_elements = list(self.ev42_nexus_elements)
         all_ev42_elements.append(ADC_PULSE_DEBUG)
 
@@ -389,6 +400,7 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
+        raise NotImplementedError
         self.type_combo.setCurrentText(field["type"][()])
         if "array_size" in field.keys():
             self.array_radio.setChecked(True)
@@ -410,6 +422,7 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
+        raise NotImplementedError
         schema = field["writer_module"][()]
         self.schema_combo.setCurrentText(str(schema))
         self.topic_line_edit.setText(str(field["topic"][()]))
