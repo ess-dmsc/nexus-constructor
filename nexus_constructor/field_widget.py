@@ -20,10 +20,9 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.nexus.nexus_wrapper import (
-    create_temporary_in_memory_file,
-    to_string,
-)
+from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.link import Link
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -204,26 +203,12 @@ class FieldWidget(QFrame):
         self.field_name_edit.setText(name)
 
     @property
-    def dtype(self) -> Union[h5py.Datatype, h5py.SoftLink, h5py.Group]:
-        if self.field_type == FieldType.scalar_dataset:
-            return self.value.dtype
-        if self.field_type == FieldType.array_dataset:
-            return self.table_view.model.array.dtype
-        if self.field_type == FieldType.link:
-            return h5py.SoftLink
-        if self.field_type == FieldType.kafka_stream:
-            return h5py.Group
+    def dtype(self) -> str:
+        return self.value_type_combo.currentText()
 
     @dtype.setter
-    def dtype(self, dtype: h5py.Datatype):
-        type_map = {np.object: "String", np.float64: "Float", np.int64: "Integer"}
-        for item in type_map.keys():
-            if dtype == item:
-                self.value_type_combo.setCurrentText(type_map[item])
-                return
-        self.value_type_combo.setCurrentText(
-            next(key for key, value in DATASET_TYPE.items() if value == dtype)
-        )
+    def dtype(self, dtype: str):
+        self.value_type_combo.setCurrentText(dtype)
 
     @property
     def attrs(self) -> h5py.Dataset.attrs:
@@ -234,56 +219,37 @@ class FieldWidget(QFrame):
         self.attrs_dialog.fill_existing_attrs(field)
 
     @property
-    def value(self) -> Union[h5py.Dataset, h5py.Group, h5py.SoftLink]:
-        return_object = None
+    def value(self) -> Union[Dataset, Group, Link]:
+        dtype = DATASET_TYPE[self.value_type_combo.currentText()]
         if self.field_type == FieldType.scalar_dataset:
-            dtype = DATASET_TYPE[self.value_type_combo.currentText()]
             val = self.value_line_edit.text()
-            if dtype == h5py.special_dtype(vlen=str):
-                return_object = create_temporary_in_memory_file().create_dataset(
-                    name=self.name, dtype=dtype, data=val
-                )
-            else:
-                return_object = create_temporary_in_memory_file().create_dataset(
-                    name=self.name, dtype=dtype, data=dtype(val)
-                )
+            return Dataset(self.name, DatasetMetadata([1], dtype), val)
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
-            return_object = create_temporary_in_memory_file().create_dataset(
-                name=self.name, data=np.squeeze(self.table_view.model.array)
-            )
+            array = np.squeeze(self.table_view.model.array)
+            return Dataset(self.name, DatasetMetadata(array.size, dtype), array)
         elif self.field_type == FieldType.kafka_stream:
-            return_object = self.streams_widget.get_stream_group()
+            return self.streams_widget.get_stream_group()
         elif self.field_type == FieldType.link:
-            return_object = h5py.SoftLink(self.value_line_edit.text())
+            return Link(self.name, self.value_line_edit.text())
         else:
             logging.error(f"unknown field type: {self.name}")
-        if self.field_type != FieldType.link:
-            for attr_name, attr_value in self.attrs_dialog.get_attrs().items():
-                self.instrument.nexus.set_attribute_value(
-                    return_object, attr_name, attr_value
-                )
-            if self.units and self.units is not None:
-                self.instrument.nexus.set_attribute_value(
-                    return_object, CommonAttrs.UNITS, self.units
-                )
-        return return_object
 
     @value.setter
     def value(self, value):
         if self.field_type == FieldType.scalar_dataset:
-            self.value_line_edit.setText(to_string(value))
+            self.value_line_edit.setText(value)
         elif self.field_type == FieldType.array_dataset:
             self.table_view.model.array = value
         elif self.field_type == FieldType.link:
             self.value_line_edit.setText(value)
 
     @property
-    def units(self):
+    def units(self) -> str:
         return self.units_line_edit.text()
 
     @units.setter
-    def units(self, new_units):
+    def units(self, new_units: str):
         self.units_line_edit.setText(new_units)
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
@@ -371,9 +337,6 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.kafka_stream:
             self.edit_dialog.setLayout(QFormLayout())
             self.edit_dialog.layout().addWidget(self.streams_widget)
-        elif self.field_type.currentText() == FieldType.nx_class:
-            # TODO: show nx class panels
-            pass
         self.edit_dialog.show()
 
     def show_attrs_dialog(self):
