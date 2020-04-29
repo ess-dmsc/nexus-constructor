@@ -43,6 +43,3 @@ class Group(Node):
 
     def get_field_value(self, name: str):
         return self[name].values
-
-
-

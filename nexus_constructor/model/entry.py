@@ -8,6 +8,7 @@ class Nexus(QObject):
     """
     Used for storing the signals for updating the "file" - currently just needed to avoid changing the interface of Instrument
     """
+
     file_changed = Signal("QVariant")
     file_opened = Signal("QVariant")
     component_added = Signal(str, "QVariant", "QVariant")
