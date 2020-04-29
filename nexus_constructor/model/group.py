@@ -45,11 +45,4 @@ class Group(Node):
         return self[name].values
 
 
-class Instrument(Group):
-    def __init__(self):
-        self.nx_class = "NXinstrument"
 
-
-class Entry(Group):
-    def __init__(self):
-        self.nx_class = "NXentry"
