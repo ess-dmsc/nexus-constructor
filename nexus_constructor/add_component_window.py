@@ -427,7 +427,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: The geometry object.
         """
 
-        component = Component(component_name, description, nx_class, pixel_data)
+        component = Component(name=component_name)
+        component.nx_class = nx_class
+        component.description = description
         # Add shape information
         self.generate_geometry_model(component, pixel_data)
 

@@ -15,9 +15,9 @@ class Group(Node):
     Base class for any group which has a set of children and an nx_class attribute.
     """
 
-    children = attr.ib(factory=list)
-    type = attr.ib(type=str, default="group")
-    attributes = attr.ib(type=List[FieldAttribute], factory=list)
+    children = attr.ib(factory=list, init=False)
+    type = attr.ib(type=str, default="group", init=False)
+    attributes = attr.ib(type=List[FieldAttribute], factory=list, init=False)
 
     def __getitem__(self, key: str):
         return _get_item(self.children, key)

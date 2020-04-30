@@ -56,7 +56,7 @@ class Node:
     """Abstract class used for common functionality between a group and dataset. """
 
     name = attr.ib(type=str)
-    attributes = attr.ib(type=List[FieldAttribute])
+    attributes = attr.ib(type=List[FieldAttribute], init=False)
 
     def set_attribute_value(self, attribute_name: str, attribute_value: Any):
         _set_item(
