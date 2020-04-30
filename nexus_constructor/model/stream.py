@@ -12,9 +12,9 @@ class WriterModules(Enum):
     SENV = "senv"
 
 
+@attr.s
 class StreamGroup(Group):
-    def __init__(self):
-        self.type = "stream"
+    type = attr.ib(init=False, default="stream", type=str)
 
     def __setitem__(self, key, value):
         self.children.append(value)

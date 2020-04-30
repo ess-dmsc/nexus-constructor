@@ -319,9 +319,9 @@ class StreamFieldsWidget(QDialog):
             )
         elif current_schema == WriterModules.TDCTIME:
             stream = TDCTStream(source, topic)
-
-        stream_group = StreamGroup()
-        stream_group[self.parent().parent().field_name_edit.text()] = stream
+        group_name = self.parent().parent().field_name_edit.text()
+        stream_group = StreamGroup(group_name)
+        stream_group[group_name] = stream
 
         return stream_group
 

@@ -501,7 +501,7 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
     for i in range(fields_widget.count()):
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
-            component[widget.name] = widget.value  # TODO: get this working
+            component[widget.name] = widget.value
         except ValueError as error:
             show_warning_dialog(
                 f"Warning: field {widget.name} not added",
