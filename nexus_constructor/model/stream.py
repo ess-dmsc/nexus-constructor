@@ -52,7 +52,6 @@ class EV42Stream:
     _writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
 
 
-# TODO: optional fields
 @attr.s
 class F142Stream:
     topic = attr.ib(type=str)

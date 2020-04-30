@@ -1,8 +1,10 @@
 from typing import Tuple, Union
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
+from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.component.component import Component
 from nexus_constructor.component.component_shape import (
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
@@ -21,6 +23,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     PIXEL_FIELDS,
 )
 from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.ui_utils import show_warning_dialog
 
 
 def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
@@ -226,3 +229,22 @@ class Component(Group):
             get_detector_number_from_pixel_mapping(pixel_mapping),
             "int64",
         )
+
+
+def add_fields_to_component(component: Component, fields_widget: QListWidget):
+    """
+    Adds fields from a list widget to a component.
+    :param component: Component to add the field to.
+    :param fields_widget: The field list widget to extract field information such the name and value of each field.
+    """
+    for i in range(fields_widget.count()):
+        widget = fields_widget.itemWidget(fields_widget.item(i))
+        try:
+            component[widget.name] = widget.value
+        except ValueError as error:
+            show_warning_dialog(
+                f"Warning: field {widget.name} not added",
+                title="Field invalid",
+                additional_info=str(error),
+                parent=fields_widget.parent().parent(),
+            )

@@ -15,7 +15,6 @@ from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.entry import Instrument, Entry
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
-# from nexus_constructor.instrument import Instrument
 import os
 import argparse
 

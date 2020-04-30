@@ -14,7 +14,7 @@ from nexus_constructor.geometry import (
 )
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.component import Component
+from nexus_constructor.model.component import Component, add_fields_to_component
 from nexus_constructor.unit_utils import METRES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
@@ -32,8 +32,6 @@ from nexus_constructor.component_tree_model import ComponentTreeModel
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
 from nexus_constructor.component.component import (
-    # Component,
-    add_fields_to_component,
     get_fields_and_update_functions_for_component,
 )
 from nexus_constructor.geometry.geometry_loader import load_geometry
@@ -428,9 +426,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             doesn't have pixel-related fields.
         :return: The geometry object.
         """
-        # component = self.instrument.create_component(
-        #     component_name, nx_class, description
-        # )
 
         component = Component(component_name, description, nx_class, pixel_data)
         # Add shape information
@@ -441,10 +436,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.component_model.add_component(component)
 
-        # component_with_geometry = create_component(
-        #     self.instrument.nexus, component.group
-        # )
-        # return component.shape
 
     def edit_existing_component(
         self,
