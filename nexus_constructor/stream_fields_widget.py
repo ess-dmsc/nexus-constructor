@@ -303,17 +303,16 @@ class StreamFieldsWidget(QDialog):
         stream = None
         type = self.type_combo.currentText()
         current_schema = self.schema_combo.currentText()
-        if current_schema == WriterModules.F142:
-            stream = F142Stream(source, topic, type)
-            # stream = self._create_f142_fields(stream)
-        elif current_schema == WriterModules.EV42:
+        if current_schema == WriterModules.F142.value:
+            value_units = self.value_units_edit.text()
+            stream = F142Stream(source, topic, type, value_units)
+        elif current_schema == WriterModules.EV42.value:
             stream = EV42Stream(source, topic)
-            # stream = self._create_ev42_fields(stream)
-        elif current_schema == WriterModules.NS10:
+        elif current_schema == WriterModules.NS10.value:
             stream = NS10Stream(source, topic)
-        elif current_schema == WriterModules.SENV:
+        elif current_schema == WriterModules.SENV.value:
             stream = SENVStream(source, topic)
-        elif current_schema == WriterModules.HS00:
+        elif current_schema == WriterModules.HS00.value:
             stream = HS00Stream(
                 source, topic, NotImplemented, NotImplemented, NotImplemented, []
             )
