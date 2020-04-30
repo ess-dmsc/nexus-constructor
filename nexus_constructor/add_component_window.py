@@ -436,7 +436,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.component_model.add_component(component)
 
-
     def edit_existing_component(
         self,
         component_name: str,

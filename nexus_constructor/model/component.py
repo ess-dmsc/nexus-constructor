@@ -4,7 +4,6 @@ from PySide2.QtGui import QMatrix4x4, QVector3D
 from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component import Component
 from nexus_constructor.component.component_shape import (
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
