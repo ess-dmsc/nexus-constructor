@@ -56,7 +56,7 @@ class Node:
     """Abstract class used for common functionality between a group and dataset. """
 
     name = attr.ib(type=str)
-    attributes = attr.ib(type=List[FieldAttribute], init=False)
+    attributes = attr.ib(init=False, factory=list)
 
     def set_attribute_value(self, attribute_name: str, attribute_value: Any):
         _set_item(
@@ -67,6 +67,10 @@ class Node:
 
     def get_attribute_value(self, attribute_name: str):
         return _get_item(self.attributes, attribute_name).values
+
+    def contains_attribute(self, attribute_name):
+        result = _get_item(self.attributes, attribute_name)
+        return True if result is not None else False
 
 
 def _generate_incremental_name(base_name, group):

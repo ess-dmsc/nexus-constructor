@@ -25,6 +25,10 @@ class Group(Node):
     def __setitem__(self, key: str, value: Union["Group", Dataset]):
         _set_item(self.children, key, value)
 
+    def __contains__(self, item: str):
+        result = _get_item(self.children, item)
+        return True if result is not None else False
+
     @property
     def nx_class(self):
         return self.get_attribute_value(CommonAttrs.NX_CLASS)
@@ -39,7 +43,9 @@ class Group(Node):
         size = [1]
         if isinstance(value, (np.ndarray, np.generic)):
             size = value.size
-        self[name] = Dataset(name, DatasetMetadata(size, dtype), value)
+        self[name] = Dataset(
+            name=name, dataset=DatasetMetadata(size=size, type=dtype), values=value
+        )
 
     def get_field_value(self, name: str):
         return self[name].values

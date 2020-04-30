@@ -23,6 +23,7 @@ from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
+from nexus_constructor.nexus.nexus_wrapper import to_string
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -208,7 +209,7 @@ class FieldWidget(QFrame):
 
     @dtype.setter
     def dtype(self, dtype: str):
-        self.value_type_combo.setCurrentText(dtype)
+        self.value_type_combo.setCurrentText(to_string(dtype))
 
     @property
     def attrs(self) -> h5py.Dataset.attrs:
@@ -220,25 +221,36 @@ class FieldWidget(QFrame):
 
     @property
     def value(self) -> Union[Dataset, Group, Link]:
+        return_object = None
         dtype = DATASET_TYPE[self.value_type_combo.currentText()]
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
-            return Dataset(self.name, DatasetMetadata([1], dtype), val)
+            return_object = Dataset(self.name, DatasetMetadata([1], dtype), val)
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
-            return Dataset(self.name, DatasetMetadata(array.size, dtype), array)
+            return_object = Dataset(
+                self.name, DatasetMetadata(array.size, dtype), array
+            )
         elif self.field_type == FieldType.kafka_stream:
-            return self.streams_widget.get_stream_group()
+            return_object = self.streams_widget.get_stream_group()
         elif self.field_type == FieldType.link:
-            return Link(self.name, self.value_line_edit.text())
+            return_object = Link(self.name, self.value_line_edit.text())
         else:
             logging.error(f"unknown field type: {self.name}")
+            return
+
+        if self.field_type != FieldType.link:
+            for attr_name, attr_value in self.attrs_dialog.get_attrs().items():
+                return_object.set_attribute_value(attr_name, attr_value)
+            if self.units and self.units is not None:
+                return_object.set_attribute_value(CommonAttrs.UNITS, self.units)
+        return return_object
 
     @value.setter
     def value(self, value):
         if self.field_type == FieldType.scalar_dataset:
-            self.value_line_edit.setText(value)
+            self.value_line_edit.setText(to_string(value))
         elif self.field_type == FieldType.array_dataset:
             self.table_view.model.array = value
         elif self.field_type == FieldType.link:
