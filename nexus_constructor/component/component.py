@@ -28,16 +28,7 @@ from nexus_constructor.ui_utils import (
     qvector3d_to_numpy_array,
     generate_unique_name,
 )
-from nexus_constructor.geometry.cylindrical_geometry import (
-    CylindricalGeometry,
-    calculate_vertices,
-)
-from nexus_constructor.geometry import (
-    OFFGeometryNexus,
-    OFFGeometry,
-    record_faces_in_file,
-    record_vertices_in_file,
-)
+
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.component.component_shape import (
     CYLINDRICAL_GEOMETRY_NEXUS_NAME,

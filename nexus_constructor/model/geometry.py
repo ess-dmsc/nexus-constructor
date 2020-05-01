@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
 from nexus_constructor.model.group import Group
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
@@ -135,6 +136,31 @@ class CylindricalGeometry(Group):
         return tuple(
             numpy_array_to_qvector3d(vertices[cylinders[i], :]) for i in range(3)
         )
+
+    @staticmethod
+    def calculate_vertices(
+        axis_direction: QVector3D, height: float, radius: float
+    ) -> np.ndarray:
+        """
+        Given cylinder axis, height and radius, calculate the base centre, base edge and top centre vertices
+        :param axis_direction: axis of the cylinder (not required to be unit vector)
+        :param height: height of the cylinder
+        :param radius: radius of the cylinder
+        :return: base centre, base edge and top centre vertices as a numpy array
+        """
+        axis_direction = axis_direction.normalized()
+        top_centre = axis_direction * height / 2.0
+        base_centre = axis_direction * height / -2.0
+        radial_direction = get_an_orthogonal_unit_vector(axis_direction).normalized()
+        base_edge = base_centre + (radius * radial_direction)
+        vertices = np.vstack(
+            (
+                qvector3d_to_numpy_array(base_centre),
+                qvector3d_to_numpy_array(base_edge),
+                qvector3d_to_numpy_array(top_centre),
+            )
+        )
+        return vertices
 
     @property
     def cylinders(self) -> np.ndarray:

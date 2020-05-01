@@ -158,6 +158,7 @@ class Component(Group):
 
     @property
     def shape(self):
+        # TODO do this next, will need to get the shape class from the underlying shape group
         raise NotImplementedError
 
     def remove_shape(self):
@@ -167,6 +168,19 @@ class Component(Group):
         self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
     ):
         raise NotImplementedError
+        # self.remove_shape()
+        #
+        # shape_group = self.create_shape_nx_group(
+        #     OFF_GEOMETRY_NEXUS_NAME, isinstance(pixel_data, PixelGrid)
+        # )
+        #
+        # pixel_mapping = None
+        # if isinstance(pixel_data, PixelMapping):
+        #     pixel_mapping = pixel_data
+        #
+        # record_faces_in_file(self.file, shape_group, loaded_geometry.faces)
+        # record_vertices_in_file(self.file, shape_group, loaded_geometry.vertices)
+        # return OFFGeometryNexus(self.file, shape_group, units, filename, pixel_mapping)
 
     def set_cylinder_shape(
         self,
@@ -177,6 +191,25 @@ class Component(Group):
         pixel_data=None,
     ):
         raise NotImplementedError
+        # self.remove_shape()
+        # validate_nonzero_qvector(axis_direction)
+        #
+        # shape_group = self.create_shape_nx_group(
+        #     CYLINDRICAL_GEOMETRY_NEXUS_NAME, type(pixel_data) is PixelGrid
+        # )
+        #
+        # pixel_mapping = None
+        # if isinstance(pixel_data, PixelMapping):
+        #     pixel_mapping = pixel_data
+        #
+        # vertices = calculate_vertices(axis_direction, height, radius)
+        # vertices_field = self.file.set_field_value(
+        #     shape_group, CommonAttrs.VERTICES, vertices
+        # )
+        # # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
+        # self.file.set_field_value(shape_group, "cylinders", np.array([0, 1, 2]))
+        # self.file.set_attribute_value(vertices_field, CommonAttrs.UNITS, units)
+        # return CylindricalGeometry(self.file, shape_group, pixel_mapping)
 
     def create_shape_group(self, nx_class: str, shape_is_single_pixel: bool = False):
         if shape_is_single_pixel:
