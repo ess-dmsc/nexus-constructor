@@ -1,107 +1,29 @@
+from typing import List, Tuple
+
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.pixel_data import PixelMapping
-from nexus_constructor.pixel_data_to_nexus_utils import (
-    get_detector_number_from_pixel_mapping,
-)
-from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
-from math import sin, cos, pi, acos, degrees
-import h5py
+from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.model.group import Group
+from nexus_constructor.ui_utils import numpy_array_to_qvector3d
 import numpy as np
-from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.nexus.validation import (
-    NexusFormatError,
-    ValidateDataset,
-    validate_group,
-)
-from nexus_constructor.ui_utils import (
-    numpy_array_to_qvector3d,
-    qvector3d_to_numpy_array,
-)
-from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
-from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
-from typing import Tuple, List
+from math import sin, cos, pi, acos, degrees
+
+from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 
 
-def calculate_vertices(
-    axis_direction: QVector3D, height: float, radius: float
-) -> np.ndarray:
-    """
-    Given cylinder axis, height and radius, calculate the base centre, base edge and top centre vertices
-    :param axis_direction: axis of the cylinder (not required to be unit vector)
-    :param height: height of the cylinder
-    :param radius: radius of the cylinder
-    :return: base centre, base edge and top centre vertices as a numpy array
-    """
-    axis_direction = axis_direction.normalized()
-    top_centre = axis_direction * height / 2.0
-    base_centre = axis_direction * height / -2.0
-    radial_direction = get_an_orthogonal_unit_vector(axis_direction).normalized()
-    base_edge = base_centre + (radius * radial_direction)
-    vertices = np.vstack(
-        (
-            qvector3d_to_numpy_array(base_centre),
-            qvector3d_to_numpy_array(base_edge),
-            qvector3d_to_numpy_array(top_centre),
-        )
-    )
-    return vertices
-
-
-class CylindricalGeometry:
-    """
-    Describes the shape of a cylinder in 3D space. The cylinder's centre is the origin of the local coordinate system.
-    This wrapper does not have setters, delete cylinder and create a new one if the cylinder needs to change.
-
-    Note, the NXcylindrical_geometry group can describe multiple cylinders, but here we are using it only for one.
-    """
-
-    def __init__(
-        self,
-        nexus_file: nx.NexusWrapper,
-        group: h5py.Group,
-        pixel_mapping: PixelMapping = None,
-    ):
-        self.file = nexus_file
-        self.group = group
-        self._verify_in_file()
-
-        if pixel_mapping is not None:
-            self.detector_number = get_detector_number_from_pixel_mapping(pixel_mapping)
-
-    def _verify_in_file(self):
-        """
-        Check all the datasets and attributes we require are in the NXcylindrical_geometry group
-        """
-        problems = validate_group(
-            self.group,
-            "NXcylindrical_geometry",
-            (
-                ValidateDataset(
-                    CommonAttrs.VERTICES,
-                    shape=(None, 3),
-                    attributes={CommonAttrs.UNITS: None},
-                ),
-                ValidateDataset("cylinders"),
-            ),
-        )
-        if problems:
-            raise NexusFormatError("\n".join(problems))
-
+class CylindricalGeometry(Group):
     @property
     def detector_number(self) -> List[int]:
-        return self.file.get_field_value(self.group, "detector_number")
+        return self.get_field_value("detector_number")
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.file.set_field_value(self.group, "detector_number", pixel_ids)
+        self.set_field_value("detector_number", pixel_ids)
 
     @property
     def units(self) -> str:
-        return self.file.get_attribute_value(
-            self.group[CommonAttrs.VERTICES], CommonAttrs.UNITS
-        )
+        return self[CommonAttrs.VERTICES].get_attribute_value(CommonAttrs.UNITS)
 
     @property
     def height(self) -> float:
@@ -118,14 +40,14 @@ class CylindricalGeometry:
         # flatten cylinders in case there are multiple cylinders defined, we'll take the first three elements,
         # so effectively any cylinder after the first one is ignored
         cylinders = self.cylinders.flatten()
-        vertices = self.file.get_field_value(self.group, CommonAttrs.VERTICES)
+        vertices = self.get_field_value(CommonAttrs.VERTICES)
         return tuple(
             numpy_array_to_qvector3d(vertices[cylinders[i], :]) for i in range(3)
         )
 
     @property
     def cylinders(self) -> np.ndarray:
-        return self.file.get_field_value(self.group, "cylinders")
+        return self.get_field_value("cylinders")
 
     @property
     def radius(self) -> float:
@@ -194,9 +116,11 @@ class CylindricalGeometry:
             [i for i in range((2 * steps) - 1, steps - 1, -1)],
         ]
 
-        return OFFGeometryNoNexus(
-            vertices=vertices, faces=rectangle_faces + top_bottom_faces
-        )
+        raise NotImplementedError
+
+        # return OFFGeometryNoNexus(
+        #     vertices=vertices, faces=rectangle_faces + top_bottom_faces
+        # )
 
     def _rotation_matrix(self) -> QMatrix4x4:
         """

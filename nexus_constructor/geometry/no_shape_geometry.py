@@ -30,8 +30,6 @@ class NoShapeGeometry:
     Dummy object for components with no geometry.
     """
 
-    geometry_str = "None"
-
     def __init__(self):
         pass
 

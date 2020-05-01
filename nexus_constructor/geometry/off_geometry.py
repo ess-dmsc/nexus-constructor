@@ -23,7 +23,6 @@ import numpy as np
 
 
 class OFFGeometry(ABC):
-    geometry_str = "OFF"
 
     @property
     @abstractmethod

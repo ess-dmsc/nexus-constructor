@@ -21,9 +21,6 @@ def nx_geometry_group(nexus_wrapper):
     )
 
 
-def test_GIVEN_nothing_WHEN_constructing_OFFGeometry_THEN_geometry_str_is_OFF():
-    geom = OFFGeometryNoNexus()
-    assert geom.geometry_str == "OFF"
 
 
 UNIT = "m"
