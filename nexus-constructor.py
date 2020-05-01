@@ -12,8 +12,9 @@ from nexus_constructor.component.component_type import (
     make_dictionary_of_class_definitions,
 )
 from nexus_constructor.main_window import MainWindow
+from nexus_constructor.model.entry import Instrument, Entry
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.instrument import Instrument
+
 import os
 import argparse
 
@@ -35,7 +36,9 @@ if __name__ == "__main__":
     nexus_wrapper = NexusWrapper()
     definitions_dir = os.path.abspath(os.path.join(root_dir, "definitions"))
     _, nx_component_classes = make_dictionary_of_class_definitions(definitions_dir)
-    instrument = Instrument(nexus_wrapper, nx_component_classes)
+    instrument = Instrument()
+    entry = Entry()
+    entry.instrument = instrument
     ui = MainWindow(instrument, nx_component_classes)
     ui.setupUi(window)
     window.showMaximized()

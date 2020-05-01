@@ -2,7 +2,6 @@ import h5py
 from typing import Any, List, Optional, Union, Tuple
 from PySide2.QtGui import QVector3D, QMatrix4x4
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.pixel_shape import PixelShape
@@ -28,7 +27,6 @@ from nexus_constructor.transformations import Transformation, create_transformat
 from nexus_constructor.ui_utils import (
     qvector3d_to_numpy_array,
     generate_unique_name,
-    show_warning_dialog,
 )
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
@@ -490,27 +488,6 @@ class Component:
         """
         for field in PIXEL_FIELDS:
             self.delete_field(field)
-
-
-def add_fields_to_component(component: Component, fields_widget: QListWidget):
-    """
-    Adds fields from a list widget to a component.
-    :param component: Component to add the field to.
-    :param fields_widget: The field list widget to extract field information such the name and value of each field.
-    """
-    for i in range(fields_widget.count()):
-        widget = fields_widget.itemWidget(fields_widget.item(i))
-        try:
-            component.set_field(
-                name=widget.name, value=widget.value, dtype=widget.dtype
-            )
-        except ValueError as error:
-            show_warning_dialog(
-                f"Warning: field {widget.name} not added",
-                title="Field invalid",
-                additional_info=str(error),
-                parent=fields_widget.parent().parent(),
-            )
 
 
 def get_fields_and_update_functions_for_component(component: Component):

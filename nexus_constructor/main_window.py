@@ -17,7 +17,7 @@ from nexusutils.nexusbuilder import NexusBuilder
 
 import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.instrument import Instrument
+from nexus_constructor.model.entry import Instrument
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
 from nexus_constructor.component.component import Component
@@ -54,16 +54,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.widget = silx.gui.hdf5.Hdf5TreeView()
         self.widget.setAcceptDrops(True)
         self.widget.setDragEnabled(True)
-        self.treemodel = self.widget.findHdf5TreeModel()
-        self.treemodel.setDatasetDragEnabled(True)
-        self.treemodel.setFileDropEnabled(True)
-        self.treemodel.setFileMoveEnabled(True)
-        self.treemodel.insertH5pyObject(self.instrument.nexus.nexus_file)
+        # self.treemodel = self.widget.findHdf5TreeModel()
+        # self.treemodel.setDatasetDragEnabled(True)
+        # self.treemodel.setFileDropEnabled(True)
+        # self.treemodel.setFileMoveEnabled(True)
+        # self.treemodel.insertH5pyObject(self.instrument.nexus.nexus_file)
         self.instrument.nexus.file_changed.connect(
             self.update_nexus_file_structure_view
         )
         self.silx_tab_layout.addWidget(self.widget)
-        self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
+        # self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
         self.instrument.nexus.component_removed.connect(
