@@ -21,8 +21,6 @@ def nx_geometry_group(nexus_wrapper):
     )
 
 
-
-
 UNIT = "m"
 AXIS_DIRECTION = QVector3D(1, 2, 3)
 HEIGHT = 2.0

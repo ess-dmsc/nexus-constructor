@@ -6,15 +6,15 @@ from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.component_factory import create_component
-from nexus_constructor.geometry import (
-    OFFGeometryNoNexus,
-    NoShapeGeometry,
-    CylindricalGeometry,
-    OFFGeometryNexus,
-)
 from nexus_constructor.field_widget import FieldWidget
+from nexus_constructor.geometry import NoShapeGeometry
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component, add_fields_to_component
+from nexus_constructor.model.geometry import (
+    OFFGeometryNexus,
+    CylindricalGeometry,
+    OFFGeometryNoNexus,
+)
 from nexus_constructor.unit_utils import METRES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES

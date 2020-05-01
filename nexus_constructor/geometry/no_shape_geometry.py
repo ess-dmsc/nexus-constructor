@@ -1,5 +1,6 @@
-from nexus_constructor.geometry.off_geometry import OFFGeometry, OFFGeometryNoNexus
 from PySide2.QtGui import QVector3D
+
+from nexus_constructor.model.geometry import OFFGeometry, OFFGeometryNoNexus
 
 __half_side_length = 0.05
 
