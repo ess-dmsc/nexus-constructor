@@ -5,14 +5,12 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 from PySide2.QtWidgets import QListWidget
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component_shape import (
-    PIXEL_SHAPE_GROUP_NAME,
-    SHAPE_GROUP_NAME,
-    CYLINDRICAL_GEOMETRY_NEXUS_NAME,
-    OFF_GEOMETRY_NEXUS_NAME,
-)
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
-from nexus_constructor.model.geometry import CylindricalGeometry, OFFGeometryNexus, NoShapeGeometry
+from nexus_constructor.model.geometry import (
+    CylindricalGeometry,
+    OFFGeometryNexus,
+    NoShapeGeometry,
+)
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation, TransformationGroup
@@ -279,3 +277,9 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
                 additional_info=str(error),
                 parent=fields_widget.parent().parent(),
             )
+
+
+SHAPE_GROUP_NAME = "shape"
+PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
+CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
+OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"

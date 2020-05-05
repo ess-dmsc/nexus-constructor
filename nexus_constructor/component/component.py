@@ -30,12 +30,12 @@ from nexus_constructor.ui_utils import (
 )
 
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
-from nexus_constructor.component.component_shape import (
+from nexus_constructor.component.component_shape import ComponentShape
+from nexus_constructor.model.component import (
+    SHAPE_GROUP_NAME,
+    PIXEL_SHAPE_GROUP_NAME,
     CYLINDRICAL_GEOMETRY_NEXUS_NAME,
     OFF_GEOMETRY_NEXUS_NAME,
-    PIXEL_SHAPE_GROUP_NAME,
-    SHAPE_GROUP_NAME,
-    ComponentShape,
 )
 import numpy as np
 

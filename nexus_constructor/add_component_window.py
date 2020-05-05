@@ -5,14 +5,15 @@ from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component, add_fields_to_component
+from nexus_constructor.model.entry import Instrument
 from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     CylindricalGeometry,
-    OFFGeometryNoNexus, NoShapeGeometry,
+    OFFGeometryNoNexus,
+    NoShapeGeometry,
 )
 from nexus_constructor.unit_utils import METRES
 from ui.add_component import Ui_AddComponentDialog
@@ -25,14 +26,10 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     OkValidator,
 )
-from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
-from nexus_constructor.component.component import (
-    get_fields_and_update_functions_for_component,
-)
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
@@ -229,19 +226,20 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
-        items_and_update_methods = get_fields_and_update_functions_for_component(
-            self.component_to_edit
-        )
-        for field, update_method in items_and_update_methods.items():
-            if update_method is not None:
-                new_ui_field = self.create_new_ui_field(field)
-                update_method(field, new_ui_field)
-                new_ui_field.units = (
-                    self.instrument.nexus.get_attribute_value(field, CommonAttrs.UNITS)
-                    if not None
-                    else ""
-                )
-                new_ui_field.attrs = field
+        pass
+        # items_and_update_methods = get_fields_and_update_functions_for_component(
+        #     self.component_to_edit
+        # )
+        # for field, update_method in items_and_update_methods.items():
+        #     if update_method is not None:
+        #         new_ui_field = self.create_new_ui_field(field)
+        #         update_method(field, new_ui_field)
+        #         new_ui_field.units = (
+        #             self.instrument.nexus.get_attribute_value(field, CommonAttrs.UNITS)
+        #             if not None
+        #             else ""
+        #         )
+        #         new_ui_field.attrs = field
 
     def __fill_existing_shape_info(self):
         component_shape, _ = self.component_to_edit.shape
@@ -469,10 +467,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
-        component_with_geometry = create_component(
-            self.instrument.nexus, self.component_to_edit.group
-        )
-        return component_with_geometry.shape
+        # component_with_geometry = create_component(
+        #     self.instrument.nexus, self.component_to_edit.group
+        # )
+        # return component_with_geometry.shape
 
     @staticmethod
     def write_pixel_data_to_component(

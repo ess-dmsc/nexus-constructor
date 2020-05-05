@@ -4,9 +4,10 @@ from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 import numpy as np
 
-from nexus_constructor.component.component import Component
-from nexus_constructor.geometry import OFFGeometryNexus
+
 from nexus_constructor.geometry.geometry_loader import load_geometry
+from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.pixel_data import (
     PixelGrid,
     PixelMapping,
@@ -99,12 +100,12 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         self.reset_pixel_mapping_list()
 
-        if component_to_edit.get_field("x_pixel_offset") is not None:
+        if component_to_edit.get_field_value("x_pixel_offset") is not None:
             self.single_pixel_radio_button.setChecked(True)
             self.update_pixel_layout_visibility(True, False)
             self._fill_single_pixel_fields(component_to_edit)
 
-        elif component_to_edit.get_field("detector_number") is not None:
+        elif component_to_edit.get_field_value("detector_number") is not None:
             self.entire_shape_radio_button.setChecked(True)
             self.update_pixel_layout_visibility(False, True)
             self._fill_entire_shape_fields(component_to_edit)
@@ -119,9 +120,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         :param component_to_edit: The component that's being edited.
         """
         # Retrieve the pixel offsets and detector number from the component
-        x_pixel_offset = component_to_edit.get_field("x_pixel_offset")
-        y_pixel_offset = component_to_edit.get_field("y_pixel_offset")
-        detector_numbers = component_to_edit.get_field("detector_number")
+        x_pixel_offset = component_to_edit.get_field_value("x_pixel_offset")
+        y_pixel_offset = component_to_edit.get_field_value("y_pixel_offset")
+        detector_numbers = component_to_edit.get_field_value("detector_number")
 
         # Check that x offset is more than one value
         if data_is_an_array_with_more_than_one_element(x_pixel_offset):
