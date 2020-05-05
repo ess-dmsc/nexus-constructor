@@ -1,39 +1,3 @@
-from PySide2.QtGui import QVector3D
-
-from nexus_constructor.model.geometry import OFFGeometry, OFFGeometryNoNexus
-
-__half_side_length = 0.05
-
-OFFCube = OFFGeometryNoNexus(
-    vertices=[
-        QVector3D(-__half_side_length, -__half_side_length, __half_side_length),
-        QVector3D(__half_side_length, -__half_side_length, __half_side_length),
-        QVector3D(-__half_side_length, __half_side_length, __half_side_length),
-        QVector3D(__half_side_length, __half_side_length, __half_side_length),
-        QVector3D(-__half_side_length, __half_side_length, -__half_side_length),
-        QVector3D(__half_side_length, __half_side_length, -__half_side_length),
-        QVector3D(-__half_side_length, -__half_side_length, -__half_side_length),
-        QVector3D(__half_side_length, -__half_side_length, -__half_side_length),
-    ],
-    faces=[
-        [0, 1, 3, 2],
-        [2, 3, 5, 4],
-        [4, 5, 7, 6],
-        [6, 7, 1, 0],
-        [1, 7, 5, 3],
-        [6, 0, 2, 4],
-    ],
-)
 
 
-class NoShapeGeometry:
-    """
-    Dummy object for components with no geometry.
-    """
 
-    def __init__(self):
-        pass
-
-    @property
-    def off_geometry(self) -> OFFGeometry:
-        return OFFCube

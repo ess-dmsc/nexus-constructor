@@ -1,1 +1,1 @@
-from .no_shape_geometry import NoShapeGeometry
+from ..model.geometry import NoShapeGeometry

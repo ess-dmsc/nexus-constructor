@@ -19,7 +19,7 @@ from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.field_attrs import FieldAttrFrame
-from nexus_constructor.geometry import NoShapeGeometry
+from nexus_constructor.model.geometry import NoShapeGeometry
 from nexus_constructor.geometry import (
     OFFGeometryNoNexus,
     CylindricalGeometry,

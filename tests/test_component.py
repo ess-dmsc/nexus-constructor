@@ -26,8 +26,8 @@ from nexus_constructor.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
     OFFGeometryNoNexus,
-    NoShapeGeometry,
 )
+from nexus_constructor.model.geometry import NoShapeGeometry
 
 
 @pytest.fixture(scope="function")

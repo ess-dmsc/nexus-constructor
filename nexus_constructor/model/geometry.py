@@ -258,47 +258,6 @@ class OFFGeometryNexus(OFFGeometry, Group):
     http://download.nexusformat.org/sphinx/classes/base_classes/NXoff_geometry.html
     """
 
-    # def __init__(
-    #     self,
-    #     nexus_file: nx.NexusWrapper,
-    #     group: h5py.Group,
-    #     units: str = "",
-    #     file_path: str = "",
-    #     pixel_mapping: PixelMapping = None,
-    # ):
-    #     super().__init__()
-    #     self.file = nexus_file
-    #     self.group = group
-    #     self._verify_in_file()
-    #
-    #     if pixel_mapping is not None:
-    #         self.detector_faces = get_detector_faces_from_pixel_mapping(pixel_mapping)
-    #
-    #     if units:
-    #         self.units = units
-    #     if file_path:
-    #         self.file_path = file_path
-
-    # def _verify_in_file(self):
-    #     """
-    #     Check all the datasets and attributes we require are in the NXoff_geometry group
-    #     """
-    #     problems = validate_group(
-    #         self.group,
-    #         "NXoff_geometry",
-    #         (
-    #             ValidateDataset(
-    #                 CommonAttrs.VERTICES,
-    #                 shape=(None, 3),
-    #                 attributes={CommonAttrs.UNITS: None},
-    #             ),
-    #             ValidateDataset("winding_order"),
-    #             ValidateDataset("faces"),
-    #         ),
-    #     )
-    #     if problems:
-    #         raise NexusFormatError("\n".join(problems))
-
     @property
     def detector_faces(self) -> List[int]:
         return self.get_field_value("detector_faces")
@@ -404,3 +363,39 @@ class OFFGeometryNexus(OFFGeometry, Group):
         vertices = [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
         self.set_field_value(CommonAttrs.VERTICES, vertices)
         self[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, "m")
+
+
+__half_side_length = 0.05
+OFFCube = OFFGeometryNoNexus(
+    vertices=[
+        QVector3D(-__half_side_length, -__half_side_length, __half_side_length),
+        QVector3D(__half_side_length, -__half_side_length, __half_side_length),
+        QVector3D(-__half_side_length, __half_side_length, __half_side_length),
+        QVector3D(__half_side_length, __half_side_length, __half_side_length),
+        QVector3D(-__half_side_length, __half_side_length, -__half_side_length),
+        QVector3D(__half_side_length, __half_side_length, -__half_side_length),
+        QVector3D(-__half_side_length, -__half_side_length, -__half_side_length),
+        QVector3D(__half_side_length, -__half_side_length, -__half_side_length),
+    ],
+    faces=[
+        [0, 1, 3, 2],
+        [2, 3, 5, 4],
+        [4, 5, 7, 6],
+        [6, 7, 1, 0],
+        [1, 7, 5, 3],
+        [6, 0, 2, 4],
+    ],
+)
+
+
+class NoShapeGeometry:
+    """
+    Dummy object for components with no geometry.
+    """
+
+    def __init__(self):
+        pass
+
+    @property
+    def off_geometry(self) -> OFFGeometry:
+        return OFFCube

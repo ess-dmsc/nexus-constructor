@@ -11,9 +11,8 @@ from nexus_constructor.component.component_shape import (
     CYLINDRICAL_GEOMETRY_NEXUS_NAME,
     OFF_GEOMETRY_NEXUS_NAME,
 )
-from nexus_constructor.geometry import NoShapeGeometry
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
-from nexus_constructor.model.geometry import CylindricalGeometry, OFFGeometryNexus
+from nexus_constructor.model.geometry import CylindricalGeometry, OFFGeometryNexus, NoShapeGeometry
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation, TransformationGroup

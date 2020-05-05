@@ -2,10 +2,10 @@ import h5py
 from typing import Tuple, Optional, Union, List
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.model.geometry import CylindricalGeometry
+from nexus_constructor.model.geometry import CylindricalGeometry, NoShapeGeometry
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.geometry import OFFGeometryNexus, NoShapeGeometry, OFFGeometry
+from nexus_constructor.geometry import OFFGeometryNexus, OFFGeometry
 
 SHAPE_GROUP_NAME = "shape"
 PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
