@@ -34,8 +34,8 @@ from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.model.component import (
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
-    CYLINDRICAL_GEOMETRY_NEXUS_NAME,
-    OFF_GEOMETRY_NEXUS_NAME,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
 )
 import numpy as np
 
@@ -353,7 +353,7 @@ class Component:
         validate_nonzero_qvector(axis_direction)
 
         shape_group = self.create_shape_nx_group(
-            CYLINDRICAL_GEOMETRY_NEXUS_NAME, type(pixel_data) is PixelGrid
+            CYLINDRICAL_GEOMETRY_NX_CLASS, type(pixel_data) is PixelGrid
         )
 
         pixel_mapping = None
@@ -383,7 +383,7 @@ class Component:
         self.remove_shape()
 
         shape_group = self.create_shape_nx_group(
-            OFF_GEOMETRY_NEXUS_NAME, isinstance(pixel_data, PixelGrid)
+            OFF_GEOMETRY_NX_CLASS, isinstance(pixel_data, PixelGrid)
         )
 
         pixel_mapping = None

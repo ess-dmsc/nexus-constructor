@@ -4,8 +4,8 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import (
     SHAPE_GROUP_NAME,
-    CYLINDRICAL_GEOMETRY_NEXUS_NAME,
-    OFF_GEOMETRY_NEXUS_NAME,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
 )
 from nexus_constructor.model.geometry import CylindricalGeometry, NoShapeGeometry
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
@@ -19,9 +19,9 @@ def get_shape_from_component(
     if shape_group_name in component_group:
         shape_group = component_group[shape_group_name]
         nx_class = get_nx_class(shape_group)
-        if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
+        if nx_class == CYLINDRICAL_GEOMETRY_NX_CLASS:
             return CylindricalGeometry(nexus_file, shape_group)
-        if nx_class == OFF_GEOMETRY_NEXUS_NAME:
+        if nx_class == OFF_GEOMETRY_NX_CLASS:
             return OFFGeometryNexus(nexus_file, shape_group)
 
     # else return a placeholder to indicate the component's position

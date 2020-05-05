@@ -178,7 +178,8 @@ class Component(Group):
         if isinstance(pixel_data, PixelMapping):
             pixel_mapping = pixel_data
 
-        geometry = OFFGeometryNexus(OFF_GEOMETRY_NEXUS_NAME)
+        geometry = OFFGeometryNexus(SHAPE_GROUP_NAME)
+        geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         geometry.record_faces(loaded_geometry.faces)
         geometry.record_vertices(loaded_geometry.vertices)
         geometry.units = units
@@ -187,7 +188,7 @@ class Component(Group):
         if pixel_mapping is not None:
             geometry.detector_faces = pixel_mapping
 
-        self[OFF_GEOMETRY_NEXUS_NAME] = geometry
+        self[SHAPE_GROUP_NAME] = geometry
         return geometry
 
     def set_cylinder_shape(
@@ -200,7 +201,8 @@ class Component(Group):
     ):
         self.remove_shape()
         validate_nonzero_qvector(axis_direction)
-        geometry = CylindricalGeometry(CYLINDRICAL_GEOMETRY_NEXUS_NAME)
+        geometry = CylindricalGeometry(SHAPE_GROUP_NAME)
+        geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
 
         pixel_mapping = None
         if isinstance(pixel_data, PixelMapping):
@@ -220,7 +222,7 @@ class Component(Group):
         if pixel_mapping is not None:
             geometry.detector_number = pixel_mapping
 
-        self[CYLINDRICAL_GEOMETRY_NEXUS_NAME] = geometry
+        self[SHAPE_GROUP_NAME] = geometry
         return geometry
 
     def clear_pixel_data(self):
@@ -281,5 +283,5 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
 
 SHAPE_GROUP_NAME = "shape"
 PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
-CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
-OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"
+CYLINDRICAL_GEOMETRY_NX_CLASS = "NXcylindrical_geometry"
+OFF_GEOMETRY_NX_CLASS = "NXoff_geometry"

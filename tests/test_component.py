@@ -6,8 +6,8 @@ from nexus_constructor.component.component import (
 from nexus_constructor.model.component import (
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
-    CYLINDRICAL_GEOMETRY_NEXUS_NAME,
-    OFF_GEOMETRY_NEXUS_NAME,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
 )
 from cmath import isclose
 from PySide2.QtGui import QVector3D
@@ -717,7 +717,7 @@ def test_GIVEN_cylinder_properties_WHEN_setting_cylindrical_geometry_shape_THEN_
     component.set_cylinder_shape()
     assert (
         component.group[SHAPE_GROUP_NAME].attrs["NX_class"]
-        == CYLINDRICAL_GEOMETRY_NEXUS_NAME
+        == CYLINDRICAL_GEOMETRY_NX_CLASS
     )
 
 
@@ -729,9 +729,7 @@ def test_GIVEN_off_properties_WHEN_setting_off_geometry_shape_THEN_shape_group_h
     with patch("nexus_constructor.component.component.OFFGeometryNexus"):
         component.set_off_shape(loaded_geometry=off_geometry)
 
-    assert (
-        component.group[SHAPE_GROUP_NAME].attrs["NX_class"] == OFF_GEOMETRY_NEXUS_NAME
-    )
+    assert component.group[SHAPE_GROUP_NAME].attrs["NX_class"] == OFF_GEOMETRY_NX_CLASS
 
 
 def test_GIVEN_component_with_no_shape_information_WHEN_shape_is_requested_THEN_returns_NoShapeGeometry(
