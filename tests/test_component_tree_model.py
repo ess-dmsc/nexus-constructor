@@ -3,11 +3,12 @@ from nexus_constructor.component_tree_model import (
     ComponentInfo,
     LinkTransformation,
 )
-from nexus_constructor.component.component import Component
 from nexus_constructor.geometry import OFFGeometryNoNexus
 from nexus_constructor.instrument import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
+
+from nexus_constructor.model.component import Component
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from uuid import uuid1
@@ -51,19 +52,20 @@ class FakeInstrument(list):
         return self
 
     def add_component(self, name: str, nx_class: str, description: str):
-        nexus_wrapper = NexusWrapper(str(uuid1()))
-        component_group = _add_component_to_file(
-            nexus_wrapper, name, 42, "component_name"
-        )
-        return Component(nexus_wrapper, component_group)
+        # nexus_wrapper = NexusWrapper(str(uuid1()))
+        # component_group = _add_component_to_file(
+        #     nexus_wrapper, name, 42, "component_name"
+        # )
+        # return Component(nexus_wrapper, component_group)
+        return Component("component_name")
 
 
 def get_component():
-    nexus_wrapper = NexusWrapper(str(uuid1()))
-    component_group = _add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
-    return Component(nexus_wrapper, component_group)
+    # nexus_wrapper = NexusWrapper(str(uuid1()))
+    # component_group = _add_component_to_file(
+    #     nexus_wrapper, "some_field", 42, "component_name"
+    # )
+    return Component("component_name")
 
 
 def test_number_of_components_0():
