@@ -11,6 +11,7 @@ from nexus_constructor.component.component_shape import (
     CYLINDRICAL_GEOMETRY_NEXUS_NAME,
     OFF_GEOMETRY_NEXUS_NAME,
 )
+from nexus_constructor.geometry import NoShapeGeometry
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.geometry import CylindricalGeometry, OFFGeometryNexus
 from nexus_constructor.model.group import Group
@@ -164,8 +165,9 @@ class Component(Group):
     def shape(self):
         if PIXEL_SHAPE_GROUP_NAME in self:
             return self[PIXEL_SHAPE_GROUP_NAME]
-        else:
+        if SHAPE_GROUP_NAME in self:
             return self[SHAPE_GROUP_NAME]
+        return NoShapeGeometry()
 
     def remove_shape(self):
         if SHAPE_GROUP_NAME in self:
