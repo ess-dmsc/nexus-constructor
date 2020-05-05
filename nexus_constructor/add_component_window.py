@@ -403,9 +403,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 component_name, description, nx_class, pixel_data
             )
         else:
-            self.create_new_component(component_name, description, nx_class, pixel_data)
+            shape, positions = self.create_new_component(
+                component_name, description, nx_class, pixel_data
+            )
 
-        self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), None, None)
+        self.instrument.nexus.component_added.emit(
+            self.nameLineEdit.text(), shape, positions
+        )
 
     def create_new_component(
         self,
@@ -434,6 +438,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         add_fields_to_component(component, self.fieldsListWidget)
 
         self.component_model.add_component(component)
+        return component.shape
 
     def edit_existing_component(
         self,

@@ -161,10 +161,10 @@ class Component(Group):
     @property
     def shape(self):
         if PIXEL_SHAPE_GROUP_NAME in self:
-            return self[PIXEL_SHAPE_GROUP_NAME]
+            return self[PIXEL_SHAPE_GROUP_NAME], None
         if SHAPE_GROUP_NAME in self:
-            return self[SHAPE_GROUP_NAME]
-        return NoShapeGeometry()
+            return self[SHAPE_GROUP_NAME], None
+        return NoShapeGeometry(), None
 
     def remove_shape(self):
         if SHAPE_GROUP_NAME in self:
