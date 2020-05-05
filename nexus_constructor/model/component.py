@@ -167,17 +167,9 @@ class Component(Group):
         else:
             return self[SHAPE_GROUP_NAME]
 
-    # def create_shape_group(self, nx_class: str, shape_is_single_pixel: bool = False):
-    #     if shape_is_single_pixel:
-    #         shape_group = Group(PIXEL_SHAPE_GROUP_NAME)
-    #     else:
-    #         shape_group = Group(SHAPE_GROUP_NAME)
-    #     shape_group.nx_class = nx_class
-    #     self[shape_group.name] = shape_group
-    #     return shape_group
-
     def remove_shape(self):
-        raise NotImplementedError
+        if SHAPE_GROUP_NAME in self:
+            del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
         self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
@@ -231,21 +223,6 @@ class Component(Group):
 
         self[CYLINDRICAL_GEOMETRY_NEXUS_NAME] = geometry
         return geometry
-
-    # def create_shape_group(self, nx_class: str, shape_is_single_pixel: bool = False):
-    #     if shape_is_single_pixel:
-    #         self[PIXEL_SHAPE_GROUP_NAME] = Group(PIXEL_SHAPE_GROUP_NAME,)
-    #         return self[PIXEL_SHAPE_GROUP_NAME]
-    #         # nexus_name, self.group
-    #         # )
-    #         # self._shape = PixelShape(self.file, self.group)
-    #     else:
-    #         self[SHAPE_GROUP_NAME] = None
-    #         return self[SHAPE_GROUP_NAME]
-    #         # shape_group = self.file.create_nx_group(
-    #         #     SHAPE_GROUP_NAME, nexus_name, self.group
-    #         # )
-    #         # self._shape = ComponentShape(self.file, self.group)
 
     def clear_pixel_data(self):
         for field_name in PIXEL_FIELDS:
