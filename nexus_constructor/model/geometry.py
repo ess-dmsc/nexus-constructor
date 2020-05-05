@@ -111,7 +111,9 @@ class CylindricalGeometry(Group):
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.set_field_value("detector_number", pixel_ids)
+        self.set_field_value(
+            "detector_number", pixel_ids
+        )  # todo: make this take a detector number instead
 
     @property
     def units(self) -> str:
@@ -307,6 +309,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
         Records the detector faces in the NXoff_geometry.
         :param detector_faces: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
+        # TODO: call get_detector_faces_from_pixel_mapping here
         self.set_field_value("detector_faces", detector_faces)
 
     @property
