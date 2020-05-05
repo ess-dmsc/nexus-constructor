@@ -1,3 +1,5 @@
+from typing import List
+
 import attr
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
@@ -23,6 +25,8 @@ class Transformation(Dataset):
     """
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
+
+    _dependees = attr.ib(factory=list, type=List["Transformation"])
 
     @property
     def type(self) -> str:
@@ -84,3 +88,9 @@ class Transformation(Dataset):
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
         raise NotImplementedError
+
+    def deregister_dependent(self):
+        pass
+
+    def register_dependent(self):
+        pass
