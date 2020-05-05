@@ -346,7 +346,9 @@ class OFFGeometryNexus(OFFGeometry, Group):
         :param group: The shape group node
         :param new_faces: The new face data, list of list for each face with indices of vertices in face
         """
-        winding_order = [index for new_face in new_faces for index in new_face]
+        winding_order = np.array(
+            [index for new_face in new_faces for index in new_face]
+        )
         self.set_field_value("winding_order", winding_order)
         faces_length = [0]
         faces_length.extend([len(new_face) for new_face in new_faces[:-1]])
@@ -360,7 +362,9 @@ class OFFGeometryNexus(OFFGeometry, Group):
         :param group: The shape group node
         :param new_vertices: The new vertices data, list of cartesian coords for each vertex
         """
-        vertices = [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
+        vertices = np.array(
+            [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
+        )
         self.set_field_value(CommonAttrs.VERTICES, vertices)
         self[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, "m")
 
