@@ -65,6 +65,7 @@ def check_if_advanced_options_should_be_enabled(
 
 
 def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
+    raise NotImplementedError
     for nxs_string, spinner in elements:
         if nxs_string in field.keys():
             spinner.setValue(field[nxs_string][()])
@@ -373,7 +374,7 @@ class StreamFieldsWidget(QDialog):
                     nexus_string, dtype=int, data=ui_element.value()
                 )
 
-    def fill_in_existing_ev42_fields(self, field: h5py.Group):
+    def fill_in_existing_ev42_fields(self, field: EV42Stream):
         """
         Fill in specific existing ev42 fields into the new UI field.
         :param field: The stream group
@@ -387,25 +388,24 @@ class StreamFieldsWidget(QDialog):
             self._show_advanced_options(True)
             if ADC_PULSE_DEBUG in field.keys():
                 self.ev42_adc_pulse_debug_checkbox.setChecked(
-                    bool(field[ADC_PULSE_DEBUG][()])
+                    bool(field.abc_pulse_debug)
                 )
 
             fill_in_advanced_options(
                 self.ev42_nexus_to_spinner_ui_element.items(), field
             )
 
-    def fill_in_existing_f142_fields(self, field: h5py.Group):
+    def fill_in_existing_f142_fields(self, field: F142Stream):
         """
         Fill in specific existing f142 fields into the new UI field.
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
-        raise NotImplementedError
-        self.type_combo.setCurrentText(field["type"][()])
-        if "array_size" in field.keys():
+        self.type_combo.setCurrentText(field.type)
+        if field.array_size is not None:
             self.array_radio.setChecked(True)
             self.scalar_radio.setChecked(False)
-            self.array_size_spinbox.setValue(field["array_size"][()])
+            self.array_size_spinbox.setValue(field.array_size)
         else:
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
@@ -416,17 +416,17 @@ class StreamFieldsWidget(QDialog):
                 self.f142_nexus_to_spinner_ui_element.items(), field
             )
 
-    def update_existing_stream_info(self, field: h5py.Group):
+    def update_existing_stream_info(self, field):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
         raise NotImplementedError
-        schema = field["writer_module"][()]
-        self.schema_combo.setCurrentText(str(schema))
-        self.topic_line_edit.setText(str(field["topic"][()]))
-        self.source_line_edit.setText(str(field["source"][()]))
+        schema = field.writer_module
+        self.schema_combo.setCurrentText(schema)
+        self.topic_line_edit.setText(field.topic)
+        self.source_line_edit.setText(field.source)
         if schema == WriterModules.F142.value:
             self.fill_in_existing_f142_fields(field)
         elif schema == WriterModules.EV42.value:

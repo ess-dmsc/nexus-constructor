@@ -7,6 +7,8 @@ import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.link import Link
 from nexus_constructor.nexus.nexus_wrapper import (
     get_name_of_node,
     get_nx_class,
@@ -15,17 +17,17 @@ from nexus_constructor.validators import FieldType
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 
 
-def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
+def update_existing_link_field(field: Link, new_ui_field: FieldWidget):
     """
     Fill in a UI link field for an existing link in the component
     :param field: The link field in the component group
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.link.value
-    new_ui_field.value = field.parent.get(field.name, getlink=True).path
+    new_ui_field.value = field.target
 
 
-def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
     """
     Fill in a UI array field for an existing array field in the component group
     :param value: The array dataset's value to copy to the UI fields list model
@@ -33,10 +35,10 @@ def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
     """
     new_ui_field.field_type = FieldType.array_dataset.value
     new_ui_field.dtype = field.dtype
-    new_ui_field.value = field[()]
+    new_ui_field.value = field.values
 
 
-def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     """
     Fill in a UI scalar field for an existing scalar field in the component group
     :param field: The dataset to copy into the value line edit
@@ -46,9 +48,9 @@ def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget)
     dtype = field.dtype
     if "S" in str(dtype):
         dtype = h5py.special_dtype(vlen=str)
-        new_ui_field.value = field[()]
+        new_ui_field.value = field.values
     else:
-        new_ui_field.value = field[()]
+        new_ui_field.value = field.values
     new_ui_field.dtype = dtype
 
 
