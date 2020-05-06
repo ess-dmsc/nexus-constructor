@@ -1,6 +1,6 @@
 from tests.helpers import add_component_to_file
 from PySide2.QtGui import QVector3D
-from nexus_constructor.component.component import Component
+from nexus_constructor.model.component import Component
 
 
 def test_does_not_have_transformations_1(nexus_wrapper):

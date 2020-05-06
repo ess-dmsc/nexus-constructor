@@ -1,3 +1,4 @@
+from nexus_constructor.model.component import Component
 from tests.helpers import add_component_to_file
 from PySide2.QtGui import QVector3D
 
@@ -12,7 +13,7 @@ def test_remove_from_beginning_1(nexus_wrapper):
 
 
 def test_remove_from_beginning_2(nexus_wrapper):
-    component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
+    component1 = Component("component1")
     rot1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
     rot2 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
     component1.depends_on = rot1

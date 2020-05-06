@@ -11,7 +11,7 @@ from PySide2.QtWidgets import QMainWindow, QLineEdit, QApplication
 from PySide2.QtCore import QTimer, QAbstractItemModel, QSettings
 from PySide2.QtGui import QStandardItemModel, QCloseEvent
 from PySide2 import QtCore
-from nexus_constructor.instrument import Instrument
+from nexus_constructor.model.entry import Instrument
 from nexus_constructor.kafka.status_consumer import StatusConsumer
 from nexus_constructor.kafka.command_producer import CommandProducer
 import time

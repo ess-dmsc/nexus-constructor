@@ -1,5 +1,5 @@
 from nexus_constructor.transformations import Transformation
-from nexus_constructor.instrument import _convert_name_with_spaces, Instrument
+from nexus_constructor.model.entry import Instrument, _convert_name_with_spaces
 from tests.test_utils import NX_CLASS_DEFINITIONS
 
 

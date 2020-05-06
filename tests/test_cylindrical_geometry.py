@@ -4,12 +4,9 @@ from pytest import approx, raises
 import pytest
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import CylindricalGeometry
 from nexus_constructor.pixel_data import PixelMapping
-from .helpers import add_component_to_file
-from nexus_constructor.geometry.cylindrical_geometry import (
-    calculate_vertices,
-    CylindricalGeometry,
-)
 from nexus_constructor.ui_utils import numpy_array_to_qvector3d
 
 
@@ -20,8 +17,8 @@ def nx_cylindrical_geometry(nexus_wrapper):
     )
 
 
-def test_cylinder_has_property_values_it_was_created_with(nexus_wrapper):
-    component = add_component_to_file(nexus_wrapper)
+def test_cylinder_has_property_values_it_was_created_with():
+    component = Component("test")
     height = 3
     radius = 4
     units = "cubits"
@@ -32,11 +29,10 @@ def test_cylinder_has_property_values_it_was_created_with(nexus_wrapper):
     assert cylinder.radius == approx(radius)
     assert cylinder.height == approx(height)
     assert cylinder.units == units
-    assert cylinder.geometry_str == "Cylinder"
 
 
-def test_cylinder_units_returns_str_if_bytes_in_file(nexus_wrapper):
-    component = add_component_to_file(nexus_wrapper)
+def test_cylinder_units_returns_str_if_bytes_in_file():
+    component = Component("test")
     units_bytes = b"cubits"
     cylinder = component.set_cylinder_shape(
         axis_direction=QVector3D(1, 0, 0), height=3, radius=4, units=units_bytes
@@ -46,8 +42,8 @@ def test_cylinder_units_returns_str_if_bytes_in_file(nexus_wrapper):
     assert cylinder.units == units_str
 
 
-def test_axis_direction_must_be_non_zero(nexus_wrapper):
-    component = add_component_to_file(nexus_wrapper)
+def test_axis_direction_must_be_non_zero():
+    component = Component("test")
     height = 3
     radius = 4
     with raises(ValueError):
@@ -122,7 +118,7 @@ def test_get_expected_height_and_radius_when_cylinder_vertices_are_out_of_order_
 def test_calculate_vertices_gives_cylinder_centre_at_origin(
     axis_direction, height, radius
 ):
-    vertices = calculate_vertices(axis_direction, height, radius)
+    vertices = CylindricalGeometry.calculate_vertices(axis_direction, height, radius)
     base_centre = numpy_array_to_qvector3d(vertices[:][0])
     top_centre = numpy_array_to_qvector3d(vertices[:][2])
     cylinder_centre = top_centre + base_centre
@@ -143,7 +139,7 @@ def test_calculate_vertices_gives_cylinder_centre_at_origin(
 def test_calculate_vertices_gives_vertices_consistent_with_specified_height_and_radius(
     axis_direction, height, radius
 ):
-    vertices = calculate_vertices(axis_direction, height, radius)
+    vertices = CylindricalGeometry.calculate_vertices(axis_direction, height, radius)
     base_centre = numpy_array_to_qvector3d(vertices[0][:])
     base_edge = numpy_array_to_qvector3d(vertices[1][:])
     top_centre = numpy_array_to_qvector3d(vertices[2][:])

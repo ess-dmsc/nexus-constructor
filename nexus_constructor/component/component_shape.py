@@ -7,10 +7,14 @@ from nexus_constructor.model.component import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
 )
-from nexus_constructor.model.geometry import CylindricalGeometry, NoShapeGeometry
+from nexus_constructor.model.geometry import (
+    CylindricalGeometry,
+    NoShapeGeometry,
+    OFFGeometry,
+    OFFGeometryNexus,
+)
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.geometry import OFFGeometryNexus, OFFGeometry
 
 
 def get_shape_from_component(

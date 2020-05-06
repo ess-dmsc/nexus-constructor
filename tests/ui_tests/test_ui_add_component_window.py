@@ -13,19 +13,17 @@ import numpy as np
 
 from nexus_constructor.component import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.component.component import Component
-from nexus_constructor.component.component_factory import create_component
-from nexus_constructor.component.component_shape import ComponentShape
+from nexus_constructor.model.component import Component
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.field_attrs import FieldAttrFrame
-from nexus_constructor.model.geometry import NoShapeGeometry
-from nexus_constructor.geometry import (
+from nexus_constructor.model.geometry import (
+    NoShapeGeometry,
     OFFGeometryNoNexus,
     CylindricalGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.instrument import Instrument
+from nexus_constructor.model.entry import Instrument
 from nexus_constructor.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
@@ -63,7 +61,7 @@ PIXEL_GRID_FIELDS = [
     "pixel_shape",
 ]
 
-instrument = Instrument(NexusWrapper("pixels"), NX_CLASS_DEFINITIONS)
+instrument = Instrument()
 component = ComponentTreeModel(instrument)
 
 PIXEL_OPTIONS = dict()

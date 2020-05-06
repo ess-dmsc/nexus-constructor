@@ -5,15 +5,16 @@ import numpy as np
 import h5py
 import pytest
 
-from nexus_constructor.instrument import Instrument
+from nexus_constructor.model.entry import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-from nexus_constructor.json.filewriter_json_writer import (
-    NexusToDictConverter,
-    write_nexus_structure_to_json,
-    _add_attributes,
-    ATTR_NAME_BLACKLIST,
-    get_data_and_type,
-)
+
+# from nexus_constructor.json.filewriter_json_writer import (
+#     NexusToDictConverter,
+#     write_nexus_structure_to_json,
+#     _add_attributes,
+#     ATTR_NAME_BLACKLIST,
+#     get_data_and_type,
+# )
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
 from tests.test_utils import NX_CLASS_DEFINITIONS

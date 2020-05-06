@@ -6,6 +6,11 @@ from PySide2.Qt3DCore import Qt3DCore
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.model.geometry import (
+    CylindricalGeometry,
+    OFFGeometry,
+    OFFGeometryNexus,
+)
 from nexus_constructor.nexus import nexus_wrapper as nx
 
 from nexus_constructor.nexus.nexus_wrapper import (

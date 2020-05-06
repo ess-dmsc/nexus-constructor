@@ -8,7 +8,7 @@ import h5py
 from PySide2.QtWidgets import QSpinBox
 from nexus_constructor.field_utils import update_existing_stream_field
 from nexus_constructor.field_widget import FieldWidget
-from nexus_constructor.instrument import Instrument
+from nexus_constructor.model.entry import Instrument
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper, get_name_of_node
 from nexus_constructor.stream_fields_widget import (
     fill_in_advanced_options,
