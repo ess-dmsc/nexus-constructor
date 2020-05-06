@@ -73,11 +73,10 @@ class Component(Group):
         this component's group in the NeXus file
         :return:
         """
-        raise NotImplementedError
-        # transforms = TransformationsList(self)
-        # depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
-        # self._get_transform(depends_on, transforms, local_only=True)
-        # return transforms
+        transforms = []
+        depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
+        self._get_transform(depends_on, transforms, local_only=True)
+        return transforms
 
     @property
     def transforms_full_chain(self):
@@ -164,7 +163,7 @@ class Component(Group):
         raise NotImplementedError
 
     def set_off_shape(
-        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
+        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None
     ):
         raise NotImplementedError
 
@@ -180,7 +179,7 @@ class Component(Group):
 
     def create_shape_group(self, nx_class: str, shape_is_single_pixel: bool = False):
         if shape_is_single_pixel:
-            self[PIXEL_SHAPE_GROUP_NAME] = Group(PIXEL_SHAPE_GROUP_NAME,)
+            self[PIXEL_SHAPE_GROUP_NAME] = Group(PIXEL_SHAPE_GROUP_NAME)
             return self[PIXEL_SHAPE_GROUP_NAME]
             # nexus_name, self.group
             # )

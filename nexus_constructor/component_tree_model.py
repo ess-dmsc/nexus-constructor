@@ -340,5 +340,4 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_item, (Transformation, ComponentInfo, LinkTransformation)
         ):
             return 0
-        print(type(parent_item))
         raise RuntimeError("Unknown element type.")

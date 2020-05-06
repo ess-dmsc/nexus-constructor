@@ -8,7 +8,10 @@ from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.nexus import nexus_wrapper as nx
 
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
+from nexus_constructor.nexus.nexus_wrapper import (
+    get_nx_class,
+    get_name_of_node,
+)
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.pixel_data import PixelMapping, PixelGrid, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -21,7 +24,10 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
 )
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.transformations import Transformation, create_transformation
-from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
+from nexus_constructor.ui_utils import (
+    qvector3d_to_numpy_array,
+    generate_unique_name,
+)
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
     calculate_vertices,
