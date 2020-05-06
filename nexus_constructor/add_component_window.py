@@ -146,7 +146,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         if self.component_to_edit:
             parent_dialog.setWindowTitle(
-                f"Edit Component: {get_name_of_node(self.component_to_edit.group)}"
+                f"Edit Component: {self.component_to_edit.name}"
             )
             self.ok_button.setText("Edit Component")
             self._fill_existing_entries()
@@ -238,9 +238,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
                 new_ui_field.units = (
-                    self.instrument.nexus.get_attribute_value(field, CommonAttrs.UNITS)
-                    if not None
-                    else ""
+                    field.get_attribute_value(CommonAttrs.UNITS) if not None else ""
                 )
                 new_ui_field.attrs = field
 
@@ -273,9 +271,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
-        field = FieldWidget(
-            self.possible_fields, self.fieldsListWidget, self.instrument
-        )
+        field = FieldWidget(self.possible_fields, self.fieldsListWidget)
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
         item.setSizeHint(field.sizeHint())
@@ -458,22 +454,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         # remove previous fields
-        for field_group in self.component_to_edit.group.values():
-            if get_name_of_node(field_group) not in INVALID_FIELD_NAMES:
-                del self.instrument.nexus.nexus_file[field_group.name]
+        self.component_to_edit.children = []
 
         self.component_to_edit.name = component_name
         self.component_to_edit.nx_class = nx_class
         self.component_to_edit.description = description
 
         self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
-
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
-        component_with_geometry = create_component(
-            self.instrument.nexus, self.component_to_edit.group
-        )
-        return component_with_geometry.shape
+
+        return self.component_to_edit.shape
 
     @staticmethod
     def write_pixel_data_to_component(

@@ -17,6 +17,7 @@ import numpy as np
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import DATASET_TYPE, FieldValueValidator
 
@@ -40,10 +41,10 @@ class FieldAttrsDialog(QDialog):
         self.layout().addWidget(self.add_button, 0, 1)
         self.layout().addWidget(self.remove_button, 1, 1)
 
-    def fill_existing_attrs(self, existing_dataset: h5py.Dataset):
-        for name, value in existing_dataset.attrs.items():
-            if name not in ATTRS_BLACKLIST:
-                frame = FieldAttrFrame(name, value)
+    def fill_existing_attrs(self, existing_dataset: Dataset):
+        for attr in existing_dataset.attributes.items():
+            if attr.name not in ATTRS_BLACKLIST:
+                frame = FieldAttrFrame(attr.name, attr.values)
                 self._add_attr(existing_frame=frame)
 
     def __add_attr(self):

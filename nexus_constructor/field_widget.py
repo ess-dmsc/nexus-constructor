@@ -79,7 +79,6 @@ class FieldWidget(QFrame):
         self,
         possible_field_names=None,
         parent: QListWidget = None,
-        instrument: "Instrument" = None,  # noqa: F821
         hide_name_field: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
@@ -89,7 +88,6 @@ class FieldWidget(QFrame):
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
-        self.instrument = instrument
 
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
         self.hide_name_field = hide_name_field
@@ -216,7 +214,7 @@ class FieldWidget(QFrame):
         return self.value.attrs
 
     @attrs.setter
-    def attrs(self, field: h5py.Dataset):
+    def attrs(self, field: Dataset):
         self.attrs_dialog.fill_existing_attrs(field)
 
     @property
@@ -291,11 +289,11 @@ class FieldWidget(QFrame):
     def _set_up_value_validator(self, is_link: bool):
         self.value_line_edit.setValidator(None)
         if is_link:
-            self.value_line_edit.setValidator(
-                HDFLocationExistsValidator(
-                    self.instrument.nexus.nexus_file, self.field_type_combo
-                )
-            )
+            # self.value_line_edit.setValidator(
+            #     HDFLocationExistsValidator(
+            #         self.instrument.nexus.nexus_file, self.field_type_combo
+            #     )
+            # )
 
             tooltip_on_accept = "Valid HDF path"
             tooltip_on_reject = "HDF Path is not valid"
