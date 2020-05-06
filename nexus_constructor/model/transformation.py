@@ -94,3 +94,7 @@ class Transformation(Dataset):
 
     def register_dependent(self):
         pass
+
+
+def create_transformation(name: str, dataset: Dataset):
+    return Transformation(name, dataset)

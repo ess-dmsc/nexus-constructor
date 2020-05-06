@@ -6,7 +6,6 @@ from PySide2.Qt3DCore import Qt3DCore
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
-from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.nexus import nexus_wrapper as nx
 
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
@@ -21,6 +20,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     PIXEL_FIELDS,
 )
 from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.transformations import Transformation, create_transformation
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array, generate_unique_name
 from nexus_constructor.geometry.cylindrical_geometry import (
     CylindricalGeometry,
@@ -188,8 +188,7 @@ class Component:
             ):
                 # We're done, the next transformation is not stored in this component
                 return
-            # new_transform = create_transformation(self.file, transform_dataset)
-            new_transform = Transformation("")
+            new_transform = create_transformation(self.file, transform_dataset)
             new_transform.parent = transforms
             transforms.append(new_transform)
             if (
@@ -290,8 +289,7 @@ class Component:
         self.file.set_attribute_value(
             field, CommonAttrs.TRANSFORMATION_TYPE, transformation_type
         )
-        # transform = create_transformation(self.file, field)
-        transform = Transformation("")
+        transform = create_transformation(self.file, field)
         transform.ui_value = angle_or_magnitude
         transform.depends_on = depends_on
         return transform
@@ -322,10 +320,7 @@ class Component:
         depends_on_path = self.file.get_field_value(self.group, CommonAttrs.DEPENDS_ON)
         if depends_on_path in [None, "."]:
             return None
-        # return create_transformation(self.file, self.file.nexus_file[depends_on_path])
-        transformation = Transformation("")
-        transformation.depends_on = depends_on_path
-        return transformation
+        return create_transformation(self.file, self.file.nexus_file[depends_on_path])
 
     @depends_on.setter
     def depends_on(self, transformation: Transformation):
@@ -333,10 +328,9 @@ class Component:
             self.group, CommonAttrs.DEPENDS_ON
         )
         if existing_depends_on is not None:
-            Transformation("")
-            # create_transformation(
-            #     self.file, self.file[existing_depends_on]
-            # ).deregister_dependent(self)
+            create_transformation(
+                self.file, self.file[existing_depends_on]
+            ).deregister_dependent(self)
 
         if transformation is None:
             self.file.set_field_value(self.group, CommonAttrs.DEPENDS_ON, ".", str)
