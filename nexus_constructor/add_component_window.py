@@ -4,17 +4,16 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
-from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component_factory import create_component
-from nexus_constructor.geometry import (
-    OFFGeometryNoNexus,
-    NoShapeGeometry,
-    CylindricalGeometry,
-    OFFGeometryNexus,
-)
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component, add_fields_to_component
+from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.geometry import (
+    OFFGeometryNexus,
+    CylindricalGeometry,
+    OFFGeometryNoNexus,
+    NoShapeGeometry,
+)
 from nexus_constructor.unit_utils import METRES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
@@ -26,14 +25,10 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     OkValidator,
 )
-from nexus_constructor.instrument import Instrument
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from functools import partial
 from nexus_constructor.ui_utils import generate_unique_name
-from nexus_constructor.component.component import (
-    get_fields_and_update_functions_for_component,
-)
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
@@ -230,6 +225,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
+        raise NotImplementedError
         items_and_update_methods = get_fields_and_update_functions_for_component(
             self.component_to_edit
         )
@@ -402,9 +398,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 component_name, description, nx_class, pixel_data
             )
         else:
-            self.create_new_component(component_name, description, nx_class, pixel_data)
+            shape, positions = self.create_new_component(
+                component_name, description, nx_class, pixel_data
+            )
 
-        self.instrument.nexus.component_added.emit(self.nameLineEdit.text(), None, None)
+        self.instrument.nexus.component_added.emit(
+            self.nameLineEdit.text(), shape, positions
+        )
 
     def create_new_component(
         self,
@@ -433,6 +433,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         add_fields_to_component(component, self.fieldsListWidget)
 
         self.component_model.add_component(component)
+        return component.shape
 
     def edit_existing_component(
         self,
@@ -463,7 +464,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
-
         return self.component_to_edit.shape
 
     @staticmethod

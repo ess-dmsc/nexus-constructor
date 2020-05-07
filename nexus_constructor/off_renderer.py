@@ -8,7 +8,7 @@ https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342
 import logging
 from typing import List, Tuple
 
-from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.model.geometry import OFFGeometry
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D

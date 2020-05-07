@@ -3,10 +3,9 @@ from typing import Tuple, Optional, List
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
 import numpy as np
-
-from nexus_constructor.model.component import Component
-from nexus_constructor.geometry import OFFGeometryNexus
 from nexus_constructor.geometry.geometry_loader import load_geometry
+from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.pixel_data import (
     PixelGrid,
     PixelMapping,

@@ -3,11 +3,13 @@ from nexus_constructor.component_tree_model import (
     ComponentInfo,
     LinkTransformation,
 )
-from nexus_constructor.component.component import Component
-from nexus_constructor.geometry import OFFGeometryNoNexus
-from nexus_constructor.instrument import Instrument
+from nexus_constructor.model.component import Component
+
+from nexus_constructor.model.entry import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
+
+from nexus_constructor.model.geometry import OFFGeometryNoNexus
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from uuid import uuid1
@@ -59,11 +61,7 @@ class FakeInstrument(list):
 
 
 def get_component():
-    nexus_wrapper = NexusWrapper(str(uuid1()))
-    component_group = _add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
-    return Component(nexus_wrapper, component_group)
+    return Component("test_1")
 
 
 def test_number_of_components_0():
@@ -112,7 +110,7 @@ def test_transformation_list_has_0_rows():
 
 
 def test_transformation_list_has_1_rows():
-    component = get_component()
+    component = Component("test")
     translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = translation
     data_under_test = FakeInstrument([component])
@@ -125,7 +123,7 @@ def test_transformation_list_has_1_rows():
 
 
 def test_transformation_has_0_rows():
-    component = get_component()
+    component = Component("test")
     translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = translation
     data_under_test = FakeInstrument([component])
@@ -138,7 +136,7 @@ def test_transformation_has_0_rows():
 
 
 def test_transformation_link_has_0_rows():
-    component = get_component()
+    component = Component("test")
     translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = translation
     data_under_test = FakeInstrument([component])
@@ -537,7 +535,7 @@ def test_remove_transformation(nexus_wrapper):
 
 
 def test_remove_link(nexus_wrapper):
-    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
+    instrument = FakeInstrument()
     under_test = ComponentTreeModel(instrument)
     instrument.create_component("Some name", "some class", "desc")
     component_index = under_test.index(0, 0, QModelIndex())

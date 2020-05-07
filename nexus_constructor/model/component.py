@@ -1,14 +1,16 @@
+import attr
+import numpy as np
 from typing import Tuple, Union
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 from PySide2.QtWidgets import QListWidget
-
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component_shape import (
-    PIXEL_SHAPE_GROUP_NAME,
-    SHAPE_GROUP_NAME,
+from nexus_constructor.geometry.utils import validate_nonzero_qvector
+from nexus_constructor.model.geometry import (
+    CylindricalGeometry,
+    OFFGeometryNexus,
+    NoShapeGeometry,
 )
-import attr
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation, TransformationGroup
@@ -158,15 +160,36 @@ class Component(Group):
 
     @property
     def shape(self):
-        raise NotImplementedError
+        if PIXEL_SHAPE_GROUP_NAME in self:
+            return self[PIXEL_SHAPE_GROUP_NAME], None
+        if SHAPE_GROUP_NAME in self:
+            return self[SHAPE_GROUP_NAME], None
+        return NoShapeGeometry(), None
 
     def remove_shape(self):
-        raise NotImplementedError
+        if SHAPE_GROUP_NAME in self:
+            del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
         self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
     ):
-        raise NotImplementedError
+        self.remove_shape()
+        pixel_mapping = None
+        if isinstance(pixel_data, PixelMapping):
+            pixel_mapping = pixel_data
+
+        geometry = OFFGeometryNexus(SHAPE_GROUP_NAME)
+        geometry.nx_class = OFF_GEOMETRY_NX_CLASS
+        geometry.record_faces(loaded_geometry.faces)
+        geometry.record_vertices(loaded_geometry.vertices)
+        geometry.units = units
+        geometry.file_path = filename
+
+        if pixel_mapping is not None:
+            geometry.detector_faces = pixel_mapping
+
+        self[SHAPE_GROUP_NAME] = geometry
+        return geometry
 
     def set_cylinder_shape(
         self,
@@ -176,22 +199,31 @@ class Component(Group):
         units: Union[str, bytes] = "m",
         pixel_data=None,
     ):
-        raise NotImplementedError
+        self.remove_shape()
+        validate_nonzero_qvector(axis_direction)
+        geometry = CylindricalGeometry(SHAPE_GROUP_NAME)
+        geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
 
-    def create_shape_group(self, nx_class: str, shape_is_single_pixel: bool = False):
-        if shape_is_single_pixel:
-            self[PIXEL_SHAPE_GROUP_NAME] = Group(PIXEL_SHAPE_GROUP_NAME,)
-            return self[PIXEL_SHAPE_GROUP_NAME]
-            # nexus_name, self.group
-            # )
-            # self._shape = PixelShape(self.file, self.group)
-        else:
-            self[SHAPE_GROUP_NAME] = None
-            return self[SHAPE_GROUP_NAME]
-            # shape_group = self.file.create_nx_group(
-            #     SHAPE_GROUP_NAME, nexus_name, self.group
-            # )
-            # self._shape = ComponentShape(self.file, self.group)
+        pixel_mapping = None
+        if isinstance(pixel_data, PixelMapping):
+            pixel_mapping = (
+                pixel_data  # TODO what are we meant to do with pixel data here?
+            )
+
+        vertices = CylindricalGeometry.calculate_vertices(
+            axis_direction, height, radius
+        )
+        geometry.set_field_value(CommonAttrs.VERTICES, vertices)
+
+        # # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
+        geometry.set_field_value("cylinders", np.array([0, 1, 2]))
+        geometry[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, units)
+
+        if pixel_mapping is not None:
+            geometry.detector_number = pixel_mapping
+
+        self[SHAPE_GROUP_NAME] = geometry
+        return geometry
 
     def clear_pixel_data(self):
         for field_name in PIXEL_FIELDS:
@@ -247,3 +279,9 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
                 additional_info=str(error),
                 parent=fields_widget.parent().parent(),
             )
+
+
+SHAPE_GROUP_NAME = "shape"
+PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
+CYLINDRICAL_GEOMETRY_NX_CLASS = "NXcylindrical_geometry"
+OFF_GEOMETRY_NX_CLASS = "NXoff_geometry"

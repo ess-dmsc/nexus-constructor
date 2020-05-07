@@ -2,15 +2,19 @@ import h5py
 from typing import Tuple, Optional, Union, List
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.model.component import (
+    SHAPE_GROUP_NAME,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
+)
+from nexus_constructor.model.geometry import (
+    CylindricalGeometry,
+    NoShapeGeometry,
+    OFFGeometry,
+    OFFGeometryNexus,
+)
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.nexus import nexus_wrapper as nx
-from nexus_constructor.geometry.cylindrical_geometry import CylindricalGeometry
-from nexus_constructor.geometry import OFFGeometryNexus, NoShapeGeometry, OFFGeometry
-
-SHAPE_GROUP_NAME = "shape"
-PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
-CYLINDRICAL_GEOMETRY_NEXUS_NAME = "NXcylindrical_geometry"
-OFF_GEOMETRY_NEXUS_NAME = "NXoff_geometry"
 
 
 def get_shape_from_component(
@@ -19,9 +23,9 @@ def get_shape_from_component(
     if shape_group_name in component_group:
         shape_group = component_group[shape_group_name]
         nx_class = get_nx_class(shape_group)
-        if nx_class == CYLINDRICAL_GEOMETRY_NEXUS_NAME:
+        if nx_class == CYLINDRICAL_GEOMETRY_NX_CLASS:
             return CylindricalGeometry(nexus_file, shape_group)
-        if nx_class == OFF_GEOMETRY_NEXUS_NAME:
+        if nx_class == OFF_GEOMETRY_NX_CLASS:
             return OFFGeometryNexus(nexus_file, shape_group)
 
     # else return a placeholder to indicate the component's position

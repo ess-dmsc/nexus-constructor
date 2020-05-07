@@ -4,6 +4,10 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 
 
+def _convert_name_with_spaces(component_name: str) -> str:
+    return component_name.replace(" ", "_")
+
+
 class Nexus(QObject):
     """
     Used for storing the signals for updating the "file" - currently just needed to avoid changing the interface of Instrument

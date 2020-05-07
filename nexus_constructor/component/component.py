@@ -6,6 +6,11 @@ from PySide2.Qt3DCore import Qt3DCore
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.model.geometry import (
+    CylindricalGeometry,
+    OFFGeometry,
+    OFFGeometryNexus,
+)
 from nexus_constructor.nexus import nexus_wrapper as nx
 
 from nexus_constructor.nexus.nexus_wrapper import (
@@ -28,23 +33,14 @@ from nexus_constructor.ui_utils import (
     qvector3d_to_numpy_array,
     generate_unique_name,
 )
-from nexus_constructor.geometry.cylindrical_geometry import (
-    CylindricalGeometry,
-    calculate_vertices,
-)
-from nexus_constructor.geometry import (
-    OFFGeometryNexus,
-    OFFGeometry,
-    record_faces_in_file,
-    record_vertices_in_file,
-)
+
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
-from nexus_constructor.component.component_shape import (
-    CYLINDRICAL_GEOMETRY_NEXUS_NAME,
-    OFF_GEOMETRY_NEXUS_NAME,
-    PIXEL_SHAPE_GROUP_NAME,
+from nexus_constructor.component.component_shape import ComponentShape
+from nexus_constructor.model.component import (
     SHAPE_GROUP_NAME,
-    ComponentShape,
+    PIXEL_SHAPE_GROUP_NAME,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
 )
 import numpy as np
 
@@ -362,7 +358,7 @@ class Component:
         validate_nonzero_qvector(axis_direction)
 
         shape_group = self.create_shape_nx_group(
-            CYLINDRICAL_GEOMETRY_NEXUS_NAME, type(pixel_data) is PixelGrid
+            CYLINDRICAL_GEOMETRY_NX_CLASS, type(pixel_data) is PixelGrid
         )
 
         pixel_mapping = None
@@ -392,7 +388,7 @@ class Component:
         self.remove_shape()
 
         shape_group = self.create_shape_nx_group(
-            OFF_GEOMETRY_NEXUS_NAME, isinstance(pixel_data, PixelGrid)
+            OFF_GEOMETRY_NX_CLASS, isinstance(pixel_data, PixelGrid)
         )
 
         pixel_mapping = None

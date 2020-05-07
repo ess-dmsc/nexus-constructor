@@ -34,7 +34,10 @@ def _remove_item(list_to_remove_from: List[Any], item_name: str):
     :param list_to_remove_from: list containing elements that have a name attribute
     :param item_name: the name of the item
     """
-    list_to_remove_from.pop(__find_item_index(list_to_remove_from, item_name))
+    try:
+        list_to_remove_from.pop(__find_item_index(list_to_remove_from, item_name))
+    except TypeError:
+        pass
 
 
 def _set_item(list_to_look_in: List[Any], item_name: str, new_value: Any):

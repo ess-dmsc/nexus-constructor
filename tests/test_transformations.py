@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component import Component
+from nexus_constructor.model.component import Component
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.transformations import Transformation, QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
