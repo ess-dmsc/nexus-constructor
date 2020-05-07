@@ -29,7 +29,7 @@ def template(qtbot) -> QDialog:
 #
 @pytest.fixture(scope="function")
 def instrument() -> Instrument:
-    return Instrument("test")
+    return Instrument()
 
 
 @pytest.fixture(scope="function")

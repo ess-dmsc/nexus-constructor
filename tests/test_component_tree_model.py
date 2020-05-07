@@ -61,11 +61,7 @@ class FakeInstrument(list):
 
 
 def get_component():
-    nexus_wrapper = NexusWrapper(str(uuid1()))
-    component_group = _add_component_to_file(
-        nexus_wrapper, "some_field", 42, "component_name"
-    )
-    return Component(nexus_wrapper, component_group)
+    return Component("test_1")
 
 
 def test_number_of_components_0():
