@@ -11,9 +11,9 @@ from PySide2.QtWidgets import (
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.entry import Instrument
 
 from nexus_constructor.transformations import Transformation
-from nexus_constructor.instrument import Instrument
 from PySide2.QtGui import QPixmap, QRegion, QPainter
 from typing import Union
 

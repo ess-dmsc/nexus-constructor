@@ -1,7 +1,8 @@
 import logging
 
-from nexus_constructor.geometry import OFFGeometry, OFFGeometryNoNexus
 from nexusutils.readwriteoff import parse_off_file
+
+from nexus_constructor.model.geometry import OFFGeometry, OFFGeometryNoNexus
 from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 from stl import mesh
 from PySide2.QtGui import QVector3D

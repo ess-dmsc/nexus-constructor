@@ -2,7 +2,7 @@ import h5py
 from PySide2.QtGui import QVector3D
 from mock import Mock
 
-from nexus_constructor.instrument import Instrument
+from nexus_constructor.model.entry import Instrument
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 import numpy as np

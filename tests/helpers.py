@@ -1,5 +1,5 @@
 from typing import Any
-from nexus_constructor.component.component import Component
+from nexus_constructor.model.component import Component
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 
