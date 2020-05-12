@@ -87,12 +87,15 @@ class Component(Group):
 
     def _get_transform(
         self,
-        depends_on: str,
+        depends_on: Transformation,
         transforms: List[Transformation],
         local_only: bool = False,
     ):
-        if depends_on not in [".", None]:
-            pass
+        if depends_on is not None:
+            if local_only:
+                return
+            transforms.append(depends_on)
+            return self._get_transform(depends_on.depends_on, transforms, local_only)
 
     @property
     def transforms_full_chain(self):
