@@ -1,10 +1,11 @@
 import attr
 import numpy as np
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 from PySide2.QtWidgets import QListWidget
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
@@ -75,11 +76,23 @@ class Component(Group):
         this component's group in the NeXus file
         :return:
         """
-        raise NotImplementedError
-        # transforms = TransformationsList(self)
-        # depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
-        # self._get_transform(depends_on, transforms, local_only=True)
-        # return transforms
+        transforms = TransformationsList(self)
+
+        try:
+            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+        except AttributeError:
+            depends_on = None
+        self._get_transform(depends_on, transforms, local_only=True)
+        return transforms
+
+    def _get_transform(
+        self,
+        depends_on: str,
+        transforms: List[Transformation],
+        local_only: bool = False,
+    ):
+        if depends_on not in [".", None]:
+            pass
 
     @property
     def transforms_full_chain(self):
@@ -171,7 +184,7 @@ class Component(Group):
             del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
-        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
+        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None
     ):
         self.remove_shape()
         pixel_mapping = None
