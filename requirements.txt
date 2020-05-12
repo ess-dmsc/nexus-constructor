@@ -10,7 +10,7 @@ xmltodict
 numpy
 pytest-qt
 confluent-kafka
-git+https://github.com/ess-dmsc/python-streaming-data-types
+ess-streaming-data-types
 
 
 # PySide2 has had some issues with new versions and packaging so we will pin it

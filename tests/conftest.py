@@ -1,16 +1,18 @@
-import uuid
+# import uuid
 from unittest.mock import Mock
 
 import h5py
 import pytest
 from PySide2.QtWidgets import QDialog
 
-from nexus_constructor.instrument import Instrument
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+# from nexus_constructor.instrument import Instrument
+# from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.model.entry import Instrument
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import PixelValidator
 from tests.chopper_test_helpers import chopper_details  # noqa: F401
-from tests.test_utils import NX_CLASS_DEFINITIONS
+
+# from tests.test_utils import NX_CLASS_DEFINITIONS
 
 
 @pytest.fixture(scope="function")
@@ -18,16 +20,16 @@ def template(qtbot) -> QDialog:
     return QDialog()
 
 
+# @pytest.fixture(scope="function")
+# def nexus_wrapper() -> NexusWrapper:
+#     nexus_wrapper = NexusWrapper(str(uuid.uuid4()))
+#     yield nexus_wrapper
+#     nexus_wrapper.nexus_file.close()
+#
+#
 @pytest.fixture(scope="function")
-def nexus_wrapper() -> NexusWrapper:
-    nexus_wrapper = NexusWrapper(str(uuid.uuid4()))
-    yield nexus_wrapper
-    nexus_wrapper.nexus_file.close()
-
-
-@pytest.fixture(scope="function")
-def instrument(nexus_wrapper) -> Instrument:
-    return Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
+def instrument() -> Instrument:
+    return Instrument()
 
 
 @pytest.fixture(scope="function")

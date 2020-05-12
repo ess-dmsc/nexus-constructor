@@ -12,7 +12,7 @@ from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.off_renderer import OffMesh
-from nexus_constructor.geometry import OFFGeometry
+from nexus_constructor.model.geometry import OFFGeometry
 from nexus_constructor.qentity_utils import create_qentity, create_material
 
 

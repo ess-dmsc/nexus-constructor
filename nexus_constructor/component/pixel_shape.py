@@ -1,10 +1,14 @@
 from nexus_constructor.component.component_shape import (
     ComponentShape,
-    PIXEL_SHAPE_GROUP_NAME,
     get_shape_from_component,
 )
-from nexus_constructor.geometry.cylindrical_geometry import CylindricalGeometry
-from nexus_constructor.geometry import OFFGeometry, NoShapeGeometry
+from nexus_constructor.model.component import PIXEL_SHAPE_GROUP_NAME
+
+from nexus_constructor.model.geometry import (
+    NoShapeGeometry,
+    OFFGeometry,
+    CylindricalGeometry,
+)
 from nexus_constructor.nexus import nexus_wrapper as nx
 from typing import Optional, Union, List, Tuple
 from PySide2.QtGui import QVector3D
