@@ -27,7 +27,6 @@ class Transformation(Dataset):
     """
 
     _dependees = attr.ib(factory=list, type=List["Transformation"])
-    _depends_on = attr.ib(default=None, type="Transformation")
 
     @property
     def type(self) -> str:
@@ -84,11 +83,11 @@ class Transformation(Dataset):
 
     @property
     def depends_on(self) -> "Transformation":
-        return self._depends_on
+        return self.get_attribute_value(CommonAttrs.DEPENDS_ON)
 
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
-        self._depends_on = new_depends_on
+        self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
 
     def deregister_dependent(self):
         pass

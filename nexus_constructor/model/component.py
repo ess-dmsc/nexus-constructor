@@ -76,8 +76,7 @@ class Component(Group):
         this component's group in the NeXus file
         :return:
         """
-        # transforms = TransformationsList(self)
-        transforms = []
+        transforms = TransformationsList(self)
         try:
             depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
         except AttributeError:
@@ -109,8 +108,7 @@ class Component(Group):
         Gets all transforms in the depends_on chain for this component
         :return: List of transforms
         """
-        # transforms = TransformationsList(self)
-        transforms = []
+        transforms = TransformationsList(self)
         try:
             depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
         except AttributeError:
