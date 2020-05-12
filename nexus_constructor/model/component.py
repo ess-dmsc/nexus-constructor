@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 from PySide2.QtWidgets import QListWidget
@@ -9,6 +9,8 @@ from nexus_constructor.component.component_shape import (
     SHAPE_GROUP_NAME,
 )
 import attr
+
+from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation, TransformationGroup
@@ -73,10 +75,23 @@ class Component(Group):
         this component's group in the NeXus file
         :return:
         """
-        transforms = []
-        depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
+        transforms = TransformationsList(self)
+
+        try:
+            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+        except AttributeError:
+            depends_on = None
         self._get_transform(depends_on, transforms, local_only=True)
         return transforms
+
+    def _get_transform(
+        self,
+        depends_on: str,
+        transforms: List[Transformation],
+        local_only: bool = False,
+    ):
+        if depends_on not in [".", None]:
+            pass
 
     @property
     def transforms_full_chain(self):
