@@ -76,8 +76,8 @@ class Component(Group):
         this component's group in the NeXus file
         :return:
         """
-        transforms = TransformationsList(self)
-
+        # transforms = TransformationsList(self)
+        transforms = []
         try:
             depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
         except AttributeError:
@@ -95,7 +95,7 @@ class Component(Group):
             if local_only:
                 return
             transforms.append(depends_on)
-            return self._get_transform(depends_on.depends_on, transforms, local_only)
+            self._get_transform(depends_on.depends_on, transforms, local_only)
 
     @property
     def transforms_full_chain(self):
@@ -103,11 +103,14 @@ class Component(Group):
         Gets all transforms in the depends_on chain for this component
         :return: List of transforms
         """
-        raise NotImplementedError
         # transforms = TransformationsList(self)
-        # depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
-        # self._get_transform(depends_on, transforms)
-        # return transforms
+        transforms = []
+        try:
+            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+        except AttributeError:
+            depends_on = None
+        self._get_transform(depends_on, transforms, local_only=False)
+        return transforms
 
     def add_translation(
         self, vector: QVector3D, name: str = None, depends_on: Transformation = None
