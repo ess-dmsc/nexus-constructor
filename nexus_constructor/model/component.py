@@ -91,6 +91,12 @@ class Component(Group):
         transforms: List[Transformation],
         local_only: bool = False,
     ):
+        """
+        Recursive function, appends each transform in depends_on chain to transforms list
+        :param depends_on: The next depends_on string to find the next transformation in the chain
+        :param transforms: The list to populate with transformations
+        :param local_only: If True then only add transformations which are stored within this component
+        """
         if depends_on is not None:
             if local_only:
                 return
