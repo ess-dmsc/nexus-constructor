@@ -18,42 +18,37 @@ class TransformationsList(list):
 
         self.link = LinkTransformation(self)
 
-    def _has_direct_link(self) -> bool:
-        return (
-            len(self) == 0
-            and self.parent_component.depends_on is not None
-            and TRANSFORM_STR in self.parent_component.depends_on.absolute_path
-        )
-
-    def _transform_has_external_link(self, transformation: Transformation) -> bool:
-        if transformation.depends_on is None:
-            return False
-        return (
-            TRANSFORM_STR in transformation.depends_on.absolute_path
-            and (self.parent_component.absolute_path + TRANSFORM_STR)
-            not in transformation.depends_on.absolute_path
-        )
-
-    def _has_indirect_link(self) -> bool:
-        for transform in self:
-            if self._transform_has_external_link(transform):
-                return True
-        return False
+    # def _has_direct_link(self) -> bool:
+    #     return (
+    #         len(self) == 0
+    #         and self.parent_component.depends_on is not None
+    #         and TRANSFORM_STR in self.parent_component.depends_on.absolute_path
+    #     )
+    #
+    # def _transform_has_external_link(self, transformation: Transformation) -> bool:
+    #     if transformation.depends_on is None:
+    #         return False
+    #     return (
+    #         TRANSFORM_STR in transformation.depends_on.absolute_path
+    #         and (self.parent_component.absolute_path + TRANSFORM_STR)
+    #         not in transformation.depends_on.absolute_path
+    #     )
+    #
+    # def _has_indirect_link(self) -> bool:
+    #     for transform in self:
+    #         if self._transform_has_external_link(transform):
+    #             return True
+    #     return False
 
     @property
     def has_link(self) -> bool:
-        has_link_value = self.parent_component.file.get_attribute_value(
-            self.parent_component.group, LINK_STR
-        )
-        if has_link_value is None:
-            has_link_value = self._has_direct_link() or self._has_indirect_link()
-            self.parent_component.file.set_attribute_value(
-                self.parent_component.group, LINK_STR, has_link_value
-            )
-        return bool(has_link_value)
+        try:
+            return self[-1].depends_on is not None
+        except IndexError:
+            return False
 
-    @has_link.setter
-    def has_link(self, value: bool):
-        self.parent_component.file.set_attribute_value(
-            self.parent_component.group, LINK_STR, value
-        )
+    # @has_link.setter
+    # def has_link(self, value: bool):
+    #     self.parent_component.file.set_attribute_value(
+    #         self.parent_component.group, LINK_STR, value
+    #     )
