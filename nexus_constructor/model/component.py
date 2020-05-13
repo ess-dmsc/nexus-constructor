@@ -178,7 +178,7 @@ class Component(Group):
             if isinstance(item, TransformationGroup):
                 return item
         group = TransformationGroup()
-        self.children.append(group, name="transformations")
+        self.children.append(group)
         return group
 
     @property

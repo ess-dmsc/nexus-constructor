@@ -11,13 +11,14 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.transformation_types import TransformationType
 
 
+@attr.s
 class TransformationGroup(Group):
     """
     Group containing transformations.
     """
 
-    def __init__(self):
-        self.nx_class = "NXtransformations"
+    name = attr.ib(type=str, default="transformations", init=True)
+    nx_class = "NXtransformations"
 
 
 @attr.s
