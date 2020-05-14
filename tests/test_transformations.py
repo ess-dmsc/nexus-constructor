@@ -4,8 +4,10 @@ import pytest
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
-from nexus_constructor.transformations import Transformation, QVector3D
+from nexus_constructor.transformations import QVector3D
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
@@ -29,18 +31,22 @@ def _add_transform_to_file(
     return transform_dataset
 
 
-def test_can_get_transform_properties(nexus_wrapper):
+@pytest.fixture
+def dataset():
+    return Dataset("dataset", DatasetMetadata([1], "str"), "test")
+
+
+def test_can_get_transform_properties(dataset):
 
     test_name = "slartibartfast"
     test_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
     test_type = "Translation"
 
-    transform_dataset = _add_transform_to_file(
-        nexus_wrapper, test_name, test_value, test_vector, test_type
-    )
-
-    transform = Transformation(nexus_wrapper, transform_dataset)
+    transform = Transformation(name=test_name, dataset=dataset)
+    transform.vector = test_vector
+    transform.type = test_type
+    transform.ui_value = test_value
 
     assert (
         transform.name == test_name
