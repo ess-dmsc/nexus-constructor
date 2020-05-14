@@ -48,6 +48,8 @@ class Component(Group):
     Base class for a component object. In the NeXus file this would translate to the component group.
     """
 
+    transforms_list = attr.ib(factory=list)
+
     @property
     def description(self):
         return self.get_field_value(CommonAttrs.DESCRIPTION)
@@ -61,6 +63,7 @@ class Component(Group):
         """
         Creates a QTransform based on the full chain of transforms this component points to.
         :return: QTransform of final transformation
+        TODO:rename this to something more helpful, perhaps qtransform or final_3dview_transform
         """
         transform_matrix = QMatrix4x4()
         for transform in self.transforms_full_chain:
@@ -77,12 +80,16 @@ class Component(Group):
         :return:
         """
         transforms = TransformationsList(self)
-        try:
-            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
-        except AttributeError:
-            depends_on = None
-        self._get_transform(depends_on, transforms, local_only=True)
+        # try:
+        #     depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+        # except AttributeError:
+        #     depends_on = None
+        # self._get_transform(depends_on, transforms, local_only=True)
+        for i in self.transforms_list:
+            transforms.append(i)
+
         return transforms
+        # return transforms
 
     def _get_transform(
         self,
@@ -162,24 +169,17 @@ class Component(Group):
         vector: QVector3D,
         depends_on: Transformation,
     ):
-        transforms_group = self.__create_transformations_group_if_does_not_exist()
+
         if name is None:
-            name = _generate_incremental_name(transformation_type, transforms_group)
+            name = _generate_incremental_name(transformation_type, self.transforms_list)
         transform = Transformation(name, angle_or_magnitude)
         transform.type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
+        self.transforms_list.append(transform)
         return transform
-
-    def __create_transformations_group_if_does_not_exist(self) -> TransformationGroup:
-        for item in self.children:
-            if isinstance(item, TransformationGroup):
-                return item
-        group = TransformationGroup()
-        self.children.append(group)
-        return group
 
     @property
     def shape(self):
