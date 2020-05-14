@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 import attr
 from PySide2.Qt3DCore import Qt3DCore
@@ -27,7 +27,7 @@ class Transformation(Dataset):
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
 
-    _dependees = attr.ib(factory=list, type=List["Transformation"])
+    _dependents = attr.ib(factory=list, type=List["Transformation"])
 
     @property
     def type(self) -> str:
@@ -90,11 +90,19 @@ class Transformation(Dataset):
     def depends_on(self, new_depends_on: "Transformation"):
         self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
 
-    def deregister_dependent(self):
-        pass
+    @property
+    def dependents(self) -> List["Transformation"]:
+        return self._dependents
 
-    def register_dependent(self):
-        pass
+    def deregister_dependent(self, old_dependent: "Transformation"):
+        try:
+            self._dependents.remove(old_dependent)
+        except ValueError:
+            pass
+
+    def register_dependent(self, new_dependent: Union["Transformation", "Component"]):
+        if new_dependent not in self._dependents:
+            self._dependents.append(new_dependent)
 
 
 def create_transformation(name: str, dataset: Dataset):
