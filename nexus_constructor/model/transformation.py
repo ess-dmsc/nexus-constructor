@@ -55,6 +55,11 @@ class Transformation(Dataset):
         if isinstance(self.values, (float, int)):
             return float(self.values)
 
+        if not self.values:
+            default_value = 0.0
+            self.ui_value = default_value
+            return default_value
+
         ui_value = self.get_attribute_value(CommonAttrs.UI_VALUE)
 
         if isinstance(ui_value, (np.ndarray, list)):
@@ -62,11 +67,6 @@ class Transformation(Dataset):
                 return float(ui_value[0])
             except ValueError:
                 pass
-
-        if ui_value is None:
-            default_value = 0.0
-            self.ui_value = default_value
-            return default_value
 
         return float(ui_value)
 

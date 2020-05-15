@@ -137,28 +137,17 @@ def test_ui_value_for_transform_with_array_magnitude_returns_first_value():
     array = [1.1, 2.2, 3.3]
     transform_value = np.asarray(array, dtype=float)
 
-    transformation = create_transform(name=transform_name, value=transform_value, vector=QVector3D(1, 0, 0), type=TransformationType.TRANSLATION)
+    transformation = create_transform(name=transform_name, value=transform_value)
 
     assert transformation.ui_value == array[0]
 
 
-@pytest.mark.skip
-def test_ui_value_for_transform_with_array_magnitude_of_strings_returns_zero(
-    nexus_wrapper,
-):
+def test_ui_value_for_transform_with_array_magnitude_of_strings_returns_zero():
     transform_name = "transform1"
     array = ["a1", "b1", "c1"]
     transform_value = np.asarray(array, dtype=h5py.special_dtype(vlen=str))
 
-    transform_dataset = _add_transform_to_file(
-        nexus_wrapper,
-        transform_name,
-        transform_value,
-        QVector3D(1, 0, 0),
-        TransformationType.TRANSLATION,
-    )
-
-    transformation = Transformation(nexus_wrapper, transform_dataset)
+    transformation = create_transform(name=transform_name, value=transform_value)
     assert transformation.ui_value == 0
 
 
