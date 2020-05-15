@@ -67,10 +67,7 @@ def test_can_get_transform_properties(dataset):
     test_vector = QVector3D(1.0, 0.0, 0.0)
     test_type = "Translation"
 
-    transform = Transformation(name=test_name, dataset=dataset)
-    transform.vector = test_vector
-    transform.type = test_type
-    transform.ui_value = test_value
+    transform = create_transform(name=test_name, value=test_value, vector=test_vector)
 
     assert (
         transform.name == test_name
@@ -145,7 +142,7 @@ def test_ui_value_for_transform_with_array_magnitude_returns_first_value():
 def test_ui_value_for_transform_with_array_magnitude_of_strings_returns_zero():
     transform_name = "transform1"
     array = ["a1", "b1", "c1"]
-    transform_value = np.asarray(array, dtype=h5py.special_dtype(vlen=str))
+    transform_value = np.asarray(array)
 
     transformation = create_transform(name=transform_name, value=transform_value)
     assert transformation.ui_value == 0

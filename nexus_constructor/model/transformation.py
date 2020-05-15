@@ -52,23 +52,20 @@ class Transformation(Dataset):
     @property
     def ui_value(self) -> float:
 
-        if isinstance(self.values, (float, int)):
-            return float(self.values)
-
-        if not self.values:
-            default_value = 0.0
-            self.ui_value = default_value
-            return default_value
-
         ui_value = self.get_attribute_value(CommonAttrs.UI_VALUE)
 
-        if isinstance(ui_value, (np.ndarray, list)):
+        if isinstance(ui_value, (float, int)):
+            return float(ui_value)
+
+        elif isinstance(ui_value, np.ndarray):
             try:
                 return float(ui_value[0])
             except ValueError:
                 pass
 
-        return float(ui_value)
+        default_value = 0.0
+        self.ui_value = default_value
+        return default_value
 
     @ui_value.setter
     def ui_value(self, new_value: float):
