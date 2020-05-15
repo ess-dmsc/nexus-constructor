@@ -22,6 +22,4 @@ class Dataset(Node):
 
     @nx_class.setter
     def nx_class(self, new_nx_class: str):
-        self.set_attribute_value(
-            CommonAttrs.NX_CLASS, new_nx_class,
-        )
+        self.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)

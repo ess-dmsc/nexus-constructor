@@ -9,10 +9,7 @@ from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.link import Link
-from nexus_constructor.nexus.nexus_wrapper import (
-    get_name_of_node,
-    get_nx_class,
-)
+from nexus_constructor.nexus.nexus_wrapper import get_name_of_node, get_nx_class
 from nexus_constructor.validators import FieldType
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 

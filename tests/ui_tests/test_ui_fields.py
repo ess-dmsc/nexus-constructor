@@ -42,7 +42,7 @@ def test_ui_field_GIVEN_field_has_units_filled_in_ui_WHEN_getting_field_group_TH
     instrument = Instrument()
 
     listwidget = QListWidget()
-    field = FieldWidget(["test"], listwidget, instrument=instrument)
+    field = FieldWidget(["test"], listwidget)
     field_name = "test"
     field.name = field_name
     field.value_line_edit.setText("1")

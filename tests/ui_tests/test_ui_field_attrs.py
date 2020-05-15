@@ -146,20 +146,3 @@ def test_GIVEN_type_changed_to_scalar_WHEN_changing_attribute_THEN_value_line_ed
     show_and_close_window(qtbot, field_attributes_dialog)
     assert not widget.array_edit_button.isVisible()
     assert widget.attr_value_lineedit.isVisible()
-
-
-def test_GIVEN_attribute_value_is_byte_string_WHEN_filling_existing_values_THEN_string_is_decoded_in_lineedit(
-    qtbot, field_attributes_dialog, file
-):
-    attribute_value_string = "yards"
-
-    ds = file.create_dataset(name="test", data=123)
-    ds.attrs["testattr"] = attribute_value_string.encode("utf-8")
-
-    field_attributes_dialog.fill_existing_attrs(ds)
-    assert (
-        field_attributes_dialog.list_widget.itemWidget(
-            field_attributes_dialog.list_widget.item(0)
-        ).attr_value_lineedit.text()
-        == attribute_value_string
-    )

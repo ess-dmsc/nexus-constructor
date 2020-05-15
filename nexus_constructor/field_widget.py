@@ -211,7 +211,7 @@ class FieldWidget(QFrame):
 
     @property
     def attrs(self) -> h5py.Dataset.attrs:
-        return self.value.attrs
+        return self.value.attributes
 
     @attrs.setter
     def attrs(self, field: Dataset):

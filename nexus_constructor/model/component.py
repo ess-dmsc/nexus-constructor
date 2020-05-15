@@ -171,7 +171,7 @@ class Component(Group):
             del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
-        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None,
+        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None
     ):
         self.remove_shape()
         pixel_mapping = None

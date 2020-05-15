@@ -1657,9 +1657,7 @@ def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
     qtbot,
 ):
-    instrument = Instrument(
-        NexusWrapper("test_component_editing_name"), NX_CLASS_DEFINITIONS
-    )
+    instrument = Instrument()
 
     component_model = ComponentTreeModel(instrument)
 
@@ -1667,9 +1665,8 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
     nx_class = "NXmonitor"
     desc = "description"
 
-    component = instrument.create_component(
-        name=name, nx_class=nx_class, description=desc
-    )
+    component = Component(name)
+    component.nx_class = nx_class
 
     with patch("nexus_constructor.validators.PixelValidator") as mock_pixel_validator:
         mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
@@ -1726,13 +1723,13 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
 def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
     qtbot,
 ):
-    instrument = Instrument(
-        NexusWrapper("test_component_editing_cylinder"), NX_CLASS_DEFINITIONS
-    )
+    instrument = Instrument()
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"
-    component = instrument.create_component(component_name, "NXpinhole", "")
+    component = Component(component_name)
+    component.nx_class = "NXpinhole"
+
     component.set_cylinder_shape(QVector3D(1, 1, 1), height=3, radius=4)
 
     with patch("nexus_constructor.validators.PixelValidator") as mock_pixel_validator:
@@ -1790,9 +1787,10 @@ def create_group_with_component(component_name: str, file_name: str):
     """
     Convenience method, for when we don't really care about the component and just want one to be added to a file
     """
-    instrument = Instrument(NexusWrapper(file_name), NX_CLASS_DEFINITIONS)
+    instrument = Instrument()
     model = ComponentTreeModel(instrument)
-    component = instrument.create_component(component_name, "NXdisk_chopper", "")
+    component = Component(component_name)
+    component.nx_class = "NXdisk_chopper"
     return component, instrument, model
 
 
@@ -1940,14 +1938,14 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
     qtbot,
 ):
-    instrument = Instrument(
-        NexusWrapper("test_component_editing_off"), NX_CLASS_DEFINITIONS
-    )
+    instrument = Instrument()
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"
 
-    component = instrument.create_component(component_name, "NXpinhole", "")
+    component = Component(component_name)
+    component.nx_class = "NXpinhole"
+
     component.set_off_shape(
         OFFGeometryNoNexus(
             [
@@ -1981,16 +1979,15 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data_is_in_line_edits(
     qtbot,
 ):
-    instrument = Instrument(
-        NexusWrapper("test_component_editing_off_filepath"), NX_CLASS_DEFINITIONS
-    )
+    instrument = Instrument()
     component_model = ComponentTreeModel(instrument)
 
     component_name = "test"
     units = "m"
     filepath = os.path.join(os.path.pardir, "cube.off")
 
-    component = instrument.create_component(component_name, "NXpinhole", "")
+    component = Component(component_name)
+    component.nx_class = "NXpinhole"
     component.set_off_shape(
         OFFGeometryNoNexus(
             [
@@ -2367,11 +2364,9 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     array_size = 2
     streams_widget.array_size_spinbox.setValue(array_size)
 
-    group = streams_widget.get_stream_group()
+    stream = streams_widget.get_stream_group()
 
-    assert "array_size" in group
-
-    assert group["array_size"][()] == array_size
+    assert stream.array_size == array_size
 
 
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
@@ -3001,7 +2996,7 @@ def test_UI_GIVEN_changing_fields_WHEN_editing_a_component_with_a_chopper_mesh_T
             break
 
     assert widget is not None
-    prev_value = widget.value[()]
+    prev_value = widget.values
     widget.value = prev_value + 50
 
     add_component_dialog.on_ok()

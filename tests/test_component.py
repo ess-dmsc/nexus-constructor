@@ -1,8 +1,5 @@
 from mock import patch
-from nexus_constructor.component.component import (
-    DependencyError,
-    Component,
-)
+from nexus_constructor.component.component import DependencyError, Component
 from nexus_constructor.model.component import (
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
@@ -468,7 +465,7 @@ def test_can_get_cad_file_units_from_model_when_already_in_model(nexus_wrapper):
 def test_missing_cad_fields_throws_nexus_format_error_when_constructing_off_geometry(
     nexus_wrapper,
 ):
-    with pytest.raises(NexusFormatError,):
+    with pytest.raises(NexusFormatError):
         OFFGeometryNexus(nexus_wrapper, nexus_wrapper.instrument)
 
 
