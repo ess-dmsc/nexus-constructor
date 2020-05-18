@@ -14,7 +14,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
-from nexus_constructor.model.transformation import Transformation, TransformationGroup
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
