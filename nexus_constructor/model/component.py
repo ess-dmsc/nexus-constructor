@@ -80,16 +80,10 @@ class Component(Group):
         :return:
         """
         transforms = TransformationsList(self)
-        # try:
-        #     depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
-        # except AttributeError:
-        #     depends_on = None
-        # self._get_transform(depends_on, transforms, local_only=True)
         for i in self.transforms_list:
             transforms.append(i)
 
         return transforms
-        # return transforms
 
     def _get_transform(
         self,
