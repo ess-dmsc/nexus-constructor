@@ -63,7 +63,6 @@ class Component(Group):
         """
         Creates a QTransform based on the full chain of transforms this component points to.
         :return: QTransform of final transformation
-        TODO:rename this to something more helpful, perhaps qtransform or final_3dview_transform
         """
         transform_matrix = QMatrix4x4()
         for transform in self.transforms_full_chain:

@@ -11,15 +11,6 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.transformation_types import TransformationType
 
 
-class TransformationGroup(Group):
-    """
-    Group containing transformations.
-    """
-
-    name = attr.ib(type=str, default="transformations", init=True)
-    nx_class = "NXtransformations"
-
-
 @attr.s
 class Transformation(Dataset):
     """
