@@ -181,6 +181,11 @@ class Component(Group):
         self.transforms_list.append(transform)
         return transform
 
+    def remove_transformation(self, transform: Transformation):
+        if transform.dependents:
+            raise Exception
+        self.transforms_list.remove(transform)
+
     @property
     def shape(self):
         if PIXEL_SHAPE_GROUP_NAME in self:
