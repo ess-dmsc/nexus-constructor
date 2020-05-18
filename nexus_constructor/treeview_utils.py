@@ -14,7 +14,7 @@ from nexus_constructor.transformation_view import (
     EditTranslation,
     EditRotation,
 )
-from nexus_constructor.transformations import Transformation
+from nexus_constructor.model.transformation import Transformation
 
 # We have to use this for cx freeze as __file__ does not work
 if getattr(sys, "frozen", False):

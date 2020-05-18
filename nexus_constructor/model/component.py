@@ -1,10 +1,11 @@
 import attr
 import numpy as np
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 from PySide2.QtWidgets import QListWidget
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
@@ -13,7 +14,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
-from nexus_constructor.model.transformation import Transformation, TransformationGroup
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
@@ -47,6 +48,8 @@ class Component(Group):
     Base class for a component object. In the NeXus file this would translate to the component group.
     """
 
+    transforms_list = attr.ib(factory=list)
+
     @property
     def description(self):
         try:
@@ -78,11 +81,29 @@ class Component(Group):
         this component's group in the NeXus file
         :return:
         """
-        raise NotImplementedError
-        # transforms = TransformationsList(self)
-        # depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
-        # self._get_transform(depends_on, transforms, local_only=True)
-        # return transforms
+        transforms = TransformationsList(self)
+        for i in self.transforms_list:
+            transforms.append(i)
+
+        return transforms
+
+    def _get_transform(
+        self,
+        depends_on: Transformation,
+        transforms: List[Transformation],
+        local_only: bool = False,
+    ):
+        """
+        Recursive function, appends each transform in depends_on chain to transforms list
+        :param depends_on: The next depends_on string to find the next transformation in the chain
+        :param transforms: The list to populate with transformations
+        :param local_only: If True then only add transformations which are stored within this component
+        """
+        if depends_on is not None:
+            if local_only:
+                return
+            transforms.append(depends_on)
+            self._get_transform(depends_on.depends_on, transforms, local_only)
 
     @property
     def transforms_full_chain(self):
@@ -90,11 +111,13 @@ class Component(Group):
         Gets all transforms in the depends_on chain for this component
         :return: List of transforms
         """
-        raise NotImplementedError
-        # transforms = TransformationsList(self)
-        # depends_on = self.get_field(CommonAttrs.DEPENDS_ON)
-        # self._get_transform(depends_on, transforms)
-        # return transforms
+        transforms = TransformationsList(self)
+        try:
+            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+        except AttributeError:
+            depends_on = None
+        self._get_transform(depends_on, transforms, local_only=False)
+        return transforms
 
     def add_translation(
         self, vector: QVector3D, name: str = None, depends_on: Transformation = None
@@ -142,24 +165,22 @@ class Component(Group):
         vector: QVector3D,
         depends_on: Transformation,
     ):
-        transforms_group = self.__create_transformations_group_if_does_not_exist()
+
         if name is None:
-            name = _generate_incremental_name(transformation_type, transforms_group)
+            name = _generate_incremental_name(transformation_type, self.transforms_list)
         transform = Transformation(name, angle_or_magnitude)
         transform.type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
+        self.transforms_list.append(transform)
         return transform
 
-    def __create_transformations_group_if_does_not_exist(self) -> TransformationGroup:
-        for item in self.children:
-            if isinstance(item, TransformationGroup):
-                return item
-        group = TransformationGroup()
-        self.children.append(group, name="transformations")
-        return group
+    def remove_transformation(self, transform: Transformation):
+        if transform.dependents:
+            raise Exception
+        self.transforms_list.remove(transform)
 
     @property
     def shape(self):
