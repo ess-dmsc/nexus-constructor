@@ -5,8 +5,8 @@ from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
-from nexus_constructor.transformations import Transformation
 from nexus_constructor.ui_utils import generate_unique_name
 import PySide2.QtGui
 import logging

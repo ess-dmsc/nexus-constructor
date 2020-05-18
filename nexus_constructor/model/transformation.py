@@ -1,3 +1,5 @@
+from typing import List, Union
+
 import attr
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
@@ -9,20 +11,13 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.transformation_types import TransformationType
 
 
-class TransformationGroup(Group):
-    """
-    Group containing transformations.
-    """
-
-    def __init__(self):
-        self.nx_class = "NXtransformations"
-
-
 @attr.s
 class Transformation(Dataset):
     """
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
+
+    _dependents = attr.ib(factory=list, type=List["Transformation"])
 
     @property
     def type(self) -> str:
@@ -46,9 +41,21 @@ class Transformation(Dataset):
 
     @property
     def ui_value(self) -> float:
-        if isinstance(self.values, (float, int)):
-            return float(self.values)
-        return float(self.get_attribute_value(CommonAttrs.UI_VALUE))
+
+        ui_value = self.get_attribute_value(CommonAttrs.UI_VALUE)
+
+        if isinstance(ui_value, (float, int)):
+            return float(ui_value)
+
+        elif isinstance(ui_value, np.ndarray):
+            try:
+                return float(ui_value[0])
+            except ValueError:
+                pass
+
+        default_value = 0.0
+        self.ui_value = default_value
+        return default_value
 
     @ui_value.setter
     def ui_value(self, new_value: float):
@@ -79,8 +86,29 @@ class Transformation(Dataset):
 
     @property
     def depends_on(self) -> "Transformation":
-        raise NotImplementedError
+        return self.get_attribute_value(CommonAttrs.DEPENDS_ON)
 
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
-        raise NotImplementedError
+        self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+
+    @property
+    def dependents(self) -> List["Transformation"]:
+        return self._dependents
+
+    def deregister_dependent(self, old_dependent: "Transformation"):
+        try:
+            self._dependents.remove(old_dependent)
+        except ValueError:
+            pass
+
+    def register_dependent(self, new_dependent: Union["Transformation", "Component"]):
+        if new_dependent not in self._dependents:
+            self._dependents.append(new_dependent)
+
+    def remove_from_dependee_chain(self):
+        pass
+
+
+def create_transformation(name: str, dataset: Dataset):
+    return Transformation(name, dataset)

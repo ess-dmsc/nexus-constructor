@@ -13,7 +13,7 @@ from nexus_constructor.component_tree_model import ComponentInfo, LinkTransforma
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Instrument
 
-from nexus_constructor.transformations import Transformation
+from nexus_constructor.model.transformation import Transformation
 from PySide2.QtGui import QPixmap, QRegion, QPainter
 from typing import Union
 
