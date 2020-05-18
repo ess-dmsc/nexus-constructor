@@ -11,7 +11,6 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.transformation_types import TransformationType
 
 
-@attr.s
 class TransformationGroup(Group):
     """
     Group containing transformations.
