@@ -424,8 +424,7 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
-        # Hack for now, get the schema by getting the class name of the object and slicing the first 4 characters
-        schema = type(field).__name__[:4].lower()
+        schema = field.writer_module
         self.schema_combo.setCurrentText(schema)
         self.topic_line_edit.setText(field.topic)
         self.source_line_edit.setText(field.source)
