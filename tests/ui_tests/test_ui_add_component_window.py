@@ -2041,10 +2041,10 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     field.field_name_edit.setText(field_name)
     field.value_line_edit.setText(field_value)
 
-    assert field.dtype == h5py.special_dtype(vlen=str)
+    assert field.dtype == "String"
 
     assert field.name == field_name
-    assert field.value[...] == field_value
+    assert field.values == field_value
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_THEN_stream_dialog_shown(

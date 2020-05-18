@@ -289,14 +289,7 @@ class FieldWidget(QFrame):
     def _set_up_value_validator(self, is_link: bool):
         self.value_line_edit.setValidator(None)
         if is_link:
-            # self.value_line_edit.setValidator(
-            #     HDFLocationExistsValidator(
-            #         self.instrument.nexus.nexus_file, self.field_type_combo
-            #     )
-            # )
-
-            tooltip_on_accept = "Valid HDF path"
-            tooltip_on_reject = "HDF Path is not valid"
+            return
         else:
             self.value_line_edit.setValidator(
                 FieldValueValidator(

@@ -481,4 +481,4 @@ class Component:
 
 
 def get_fields_and_update_functions_for_component(component: Component):
-    return get_fields_with_update_functions(component.group)
+    return get_fields_with_update_functions(component)

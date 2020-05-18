@@ -53,15 +53,14 @@ NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
 
 
-def check_if_advanced_options_should_be_enabled(
-    elements: List[str], field: h5py.Group
-) -> bool:
+def check_if_advanced_options_should_be_enabled(elements: List[str], field) -> bool:
     """
     Checks whether the advanced options box should be enabled by checking if any of the advanced options have existing values.
     :param elements: list of names to check if exist
     :param field: the field group
     """
-    return any(item in field.keys() for item in elements)
+    raise NotImplementedError
+    return any(item in field for item in elements)
 
 
 def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
@@ -425,8 +424,8 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
-        raise NotImplementedError
-        schema = field.writer_module
+        # Hack for now, get the schema by getting the class name of the object and slicing the first 4 characters
+        schema = type(field).__name__[:4].lower()
         self.schema_combo.setCurrentText(schema)
         self.topic_line_edit.setText(field.topic)
         self.source_line_edit.setText(field.source)

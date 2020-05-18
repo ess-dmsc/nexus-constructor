@@ -4,6 +4,10 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
+from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.component.component import (
+    get_fields_and_update_functions_for_component,
+)
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component, add_fields_to_component
@@ -225,7 +229,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
-        raise NotImplementedError
         items_and_update_methods = get_fields_and_update_functions_for_component(
             self.component_to_edit
         )
