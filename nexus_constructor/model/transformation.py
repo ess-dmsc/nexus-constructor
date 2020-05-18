@@ -115,6 +115,9 @@ class Transformation(Dataset):
         if new_dependent not in self._dependents:
             self._dependents.append(new_dependent)
 
+    def remove_from_dependee_chain(self, transform: Transformation):
+        pass
+
 
 def create_transformation(name: str, dataset: Dataset):
     return Transformation(name, dataset)
