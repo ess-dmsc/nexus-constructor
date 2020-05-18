@@ -73,7 +73,7 @@ def get_fields_with_update_functions(
     items_with_update_functions = []
     for item in component.children:
         update_function = find_field_type(item)
-        items_with_update_functions.append(item, update_function)
+        items_with_update_functions.append((item, update_function))
     return items_with_update_functions
 
 
