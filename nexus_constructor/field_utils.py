@@ -1,7 +1,6 @@
 import logging
 from typing import List, Callable, Tuple, Union
 
-import h5py
 import numpy as np
 
 from nexus_constructor.model.component import Component
@@ -45,14 +44,14 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     new_ui_field.field_type = FieldType.scalar_dataset.value
     dtype = field.dataset.type
     if "S" in str(dtype):
-        dtype = h5py.special_dtype(vlen=str)
+        dtype = str
         new_ui_field.value = field.values
     else:
         new_ui_field.value = field.values
     new_ui_field.dtype = dtype
 
 
-def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
     """
     Fill in a UI stream field for an existing stream field in the component group
     :param field: The dataset to copy into the value line edit
@@ -78,7 +77,7 @@ def get_fields_with_update_functions(
 
 
 def find_field_type(item: h5Node) -> Callable:
-    if isinstance(item, Dataset) and get_name_of_node(item) not in INVALID_FIELD_NAMES:
+    if isinstance(item, Dataset) and item.name not in INVALID_FIELD_NAMES:
         if np.isscalar(item.values):
             return update_existing_scalar_field
         else:

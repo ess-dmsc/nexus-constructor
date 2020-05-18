@@ -223,17 +223,19 @@ class FieldWidget(QFrame):
         dtype = DATASET_TYPE[self.value_type_combo.currentText()]
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
-            return_object = Dataset(self.name, DatasetMetadata([1], dtype), val)
+            return_object = Dataset(
+                name=self.name, dataset=DatasetMetadata([1], dtype), values=val
+            )
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
-                self.name, DatasetMetadata(array.size, dtype), array
+                name=self.name, dataset=DatasetMetadata(array.size, dtype), values=array
             )
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()
         elif self.field_type == FieldType.link:
-            return_object = Link(self.name, self.value_line_edit.text())
+            return_object = Link(name=self.name, target=self.value_line_edit.text())
         else:
             logging.error(f"unknown field type: {self.name}")
             return

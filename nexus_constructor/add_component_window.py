@@ -18,6 +18,7 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNoNexus,
     NoShapeGeometry,
 )
+from nexus_constructor.model.link import Link
 from nexus_constructor.unit_utils import METRES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
@@ -232,14 +233,18 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         items_and_update_methods = get_fields_and_update_functions_for_component(
             self.component_to_edit
         )
-        for field, update_method in items_and_update_methods.items():
+        for field, update_method in items_and_update_methods:
             if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
-                new_ui_field.units = (
-                    field.get_attribute_value(CommonAttrs.UNITS) if not None else ""
-                )
-                new_ui_field.attrs = field
+                if not isinstance(field, Link):
+                    try:
+                        new_ui_field.units = field.get_attribute_value(
+                            CommonAttrs.UNITS
+                        )
+                    except AttributeError:
+                        new_ui_field.units = ""
+                    new_ui_field.attrs = field
 
     def __fill_existing_shape_info(self):
         component_shape, _ = self.component_to_edit.shape
@@ -265,7 +270,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
-        new_ui_field.name = get_name_of_node(field)
+        new_ui_field.name = field.name
         return new_ui_field
 
     def add_field(self) -> FieldWidget:

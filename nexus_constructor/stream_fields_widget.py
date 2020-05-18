@@ -59,7 +59,7 @@ def check_if_advanced_options_should_be_enabled(elements: List[str], field) -> b
     :param elements: list of names to check if exist
     :param field: the field group
     """
-    raise NotImplementedError
+    return False
     return any(item in field for item in elements)
 
 
@@ -305,19 +305,26 @@ class StreamFieldsWidget(QDialog):
         current_schema = self.schema_combo.currentText()
         if current_schema == WriterModules.F142.value:
             value_units = self.value_units_edit.text()
-            stream = F142Stream(source, topic, type, value_units)
+            stream = F142Stream(
+                source=source, topic=topic, type=type, value_units=value_units
+            )
             array_size = self.array_size_spinbox.value()
             if array_size:
                 stream.array_size = array_size
         elif current_schema == WriterModules.EV42.value:
-            stream = EV42Stream(source, topic)
+            stream = EV42Stream(source=source, topic=topic)
         elif current_schema == WriterModules.NS10.value:
-            stream = NS10Stream(source, topic)
+            stream = NS10Stream(source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
-            stream = SENVStream(source, topic)
+            stream = SENVStream(source=source, topic=topic)
         elif current_schema == WriterModules.HS00.value:
             stream = HS00Stream(
-                source, topic, NotImplemented, NotImplemented, NotImplemented, []
+                source=source,
+                topic=topic,
+                data_type=NotImplemented,
+                edge_type=NotImplemented,
+                error_type=NotImplemented,
+                shape=[],
             )
         elif current_schema == WriterModules.TDCTIME:
             stream = TDCTStream(source, topic)
@@ -424,6 +431,9 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
+        field = field.children[
+            0
+        ]  # only the first stream in the stream group can be edited currently
         schema = field.writer_module
         self.schema_combo.setCurrentText(schema)
         self.topic_line_edit.setText(field.topic)
