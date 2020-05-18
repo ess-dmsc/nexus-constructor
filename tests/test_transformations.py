@@ -83,7 +83,7 @@ def test_can_get_transform_properties(dataset):
     ), "Expected the transform type to match what was in the NeXus file"
 
 
-@pytest.mark.skip
+@pytest.mark.skip("Disabled whilst working on model change")
 def test_transform_dependents_depends_on_are_updated_when_transformation_name_is_changed(
     nexus_wrapper,
 ):
@@ -116,7 +116,7 @@ def test_transform_dependents_depends_on_are_updated_when_transformation_name_is
     assert str(component["depends_on"][()], encoding="UTF-8") == transform.dataset.name
 
 
-@pytest.mark.skip
+@pytest.mark.skip("Disabled whilst working on model change")
 @pytest.mark.parametrize("test_input", ["translation", "Translation", "TRANSLATION"])
 def test_transform_type_is_capitalised(test_input, nexus_wrapper):
     test_name = "slartibartfast"
@@ -431,7 +431,7 @@ def test_can_get_rotation_as_4_by_4_matrix():
     assert np.allclose(expected_matrix, np.array(test_matrix.data()), atol=1.0e-7)
 
 
-@pytest.mark.skip
+@pytest.mark.skip("Disabled whilst working on model change")
 def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_attr_WHEN_opening_nexus_file_THEN_components_linked_contain_dependee_of_attribute(
     nexus_wrapper,
 ):
@@ -461,7 +461,7 @@ def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_att
     )
 
 
-@pytest.mark.skip
+@pytest.mark.skip("Disabled whilst working on model change")
 def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_attr_WHEN_opening_nexus_file_THEN_component_linked_contains_dependee_of_attribute(
     nexus_wrapper,
 ):
@@ -492,7 +492,7 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
     assert transform.ui_value == 0
 
 
-@pytest.mark.skip
+@pytest.mark.skip("Disabled whilst working on model change")
 def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dependee_of_field(
     file, nexus_wrapper
 ):
@@ -533,7 +533,7 @@ def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dep
     )
 
 
-@pytest.mark.skip
+@pytest.mark.skip("Disabled whilst working on model change")
 def test_transforms_with_no_dependees_return_None_for_depends_on(nexus_wrapper):
 
     component_name = "component_1"
