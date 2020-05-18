@@ -26,6 +26,7 @@ from nexus_constructor.model.geometry import (
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
+from nexus_constructor.model.stream import StreamGroup, F142Stream
 from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
@@ -1764,7 +1765,9 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
 
     field_name = "scalar"
     field_value = "test"
-    component.set_field(field_name, field_value, dtype=h5py.special_dtype(vlen=str))
+    component.set_field_value(
+        field_name, field_value, dtype=h5py.special_dtype(vlen=str)
+    )
 
     dialog = AddComponentDialog(
         instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
@@ -1803,7 +1806,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
 
     field_name = "array"
     field_value = np.array([1, 2, 3, 4, 5])
-    component.set_field(field_name, field_value)
+    component.set_field_value(field_name, field_value)
     dialog = AddComponentDialog(
         instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
     )
@@ -1832,7 +1835,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
     link_name = "link1"
     link = h5py.SoftLink(entry.name)
 
-    component.set_field(link_name, link)
+    component.set_field_value(link_name, link)
 
     dialog = AddComponentDialog(
         instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
@@ -1858,11 +1861,11 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
 
     field_name1 = "array"
     field_value1 = np.array([1, 2, 3, 4, 5])
-    component.set_field(field_name1, field_value1)
+    component.set_field_value(field_name1, field_value1)
 
     field_name2 = "scalar"
     field_value2 = 1
-    component.set_field(field_name2, field_value2)
+    component.set_field_value(field_name2, field_value2)
 
     dialog = AddComponentDialog(
         instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
@@ -1892,26 +1895,18 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
     )
 
     field_name = "stream1"
-
-    file = h5py.File("temp", driver="core", backing_store=False, mode="x")
-    stream_group = file.create_group(name=field_name)
-    stream_group.attrs["NX_class"] = "NCstream"
+    stream_group = StreamGroup(field_name)
 
     topic = "topic1"
     pvname = "source1"
     pvtype = "double"
 
-    stream_group.create_dataset(
-        "writer_module", dtype=h5py.special_dtype(vlen=str), data="f142"
-    )
-    stream_group.create_dataset("topic", dtype=h5py.special_dtype(vlen=str), data=topic)
-    stream_group.create_dataset(
-        "source", dtype=h5py.special_dtype(vlen=str), data=pvname
-    )
-    stream_group.create_dataset("type", dtype=h5py.special_dtype(vlen=str), data=pvtype)
+    stream = F142Stream(pvname, topic, pvtype)
+
+    stream_group.children.append(stream)
 
     field_name1 = "stream1"
-    component.set_field(field_name1, stream_group)
+    component.set_field_value(field_name1, stream_group)
 
     dialog = AddComponentDialog(
         instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
@@ -1925,9 +1920,10 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
     widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
     stream_group = widget.value
-    assert stream_group["topic"][()] == topic
-    assert stream_group["source"][()] == pvname
-    assert stream_group["type"][()] == pvtype
+    stream = stream_group.children[0]
+    assert stream.topic == topic
+    assert stream.source == pvname
+    assert stream.type == pvtype
 
     assert widget.streams_widget.topic_line_edit.text() == topic
     assert widget.streams_widget.schema_combo.currentText() == "f142"
@@ -2366,7 +2362,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
 
     stream = streams_widget.get_stream_group()
 
-    assert stream.array_size == array_size
+    assert stream.children[0].array_size == array_size
 
 
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
@@ -2452,7 +2448,7 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_grid_THEN_new_
 
     # Check that the change in pixel data is now stored in the component
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
-        assert component_to_edit.get_field(field).shape == (
+        assert component_to_edit.get_field_value(field).shape == (
             new_pixel_grid_size,
             new_pixel_grid_size,
         )
@@ -2495,7 +2491,7 @@ def test_UI_GIVEN_pixel_mapping_WHEN_mesh_editing_component_with_mapping_THEN_ne
     shape = component_to_edit.shape[0]
 
     # Check that the change in pixel mapping is now stored in the component
-    assert component_to_edit.get_field("detector_number") == new_detector_numbers
+    assert component_to_edit.get_field_value("detector_number") == new_detector_numbers
     assert isinstance(shape, expected_geometry)
 
     assert shape.detector_faces[1] == new_detector_numbers[0]
@@ -2536,7 +2532,7 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_mapping_THE
     shape = component_to_edit.shape[0]
 
     # Check that the change in pixel mapping is now stored in the component
-    assert component_to_edit.get_field("detector_number") == new_detector_numbers
+    assert component_to_edit.get_field_value("detector_number") == new_detector_numbers
     assert isinstance(shape, expected_geometry)
 
 
@@ -2572,10 +2568,10 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_pixel_grid_THEN
 
     # Check that the pixel grid values no longer exist
     for field in PIXEL_GRID_FIELDS:
-        assert component_to_edit.get_field(field) is None
+        assert component_to_edit.get_field_value(field) is None
 
     # Check that the detector numbers field has the information from the Pixel Mapping
-    assert component_to_edit.get_field("detector_number") == detector_number
+    assert component_to_edit.get_field_value("detector_number") == detector_number
 
     shape = component_to_edit.shape[0]
 
@@ -2618,10 +2614,10 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinders_component_with_pixel_grid
 
     # Check that the pixel grid values no longer exist
     for field in PIXEL_GRID_FIELDS:
-        assert component_to_edit.get_field(field) is None
+        assert component_to_edit.get_field_value(field) is None
 
     # Check that the detector numbers field has the information from the Pixel Mapping
-    assert component_to_edit.get_field("detector_number") == detector_number
+    assert component_to_edit.get_field_value("detector_number") == detector_number
 
     shape = component_to_edit.shape[0]
 
@@ -2657,7 +2653,7 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_mesh_component_with_pixel_grid_THEN_pix
 
     # Check that all pixel data values no longer exist
     for field in PIXEL_FIELDS + ["pixel_shape"]:
-        assert component_to_edit.get_field(field) is None
+        assert component_to_edit.get_field_value(field) is None
 
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
@@ -2689,7 +2685,7 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_grid_THEN
 
     # Check that all pixel data values no longer exist
     for field in PIXEL_FIELDS + ["pixel_shape"]:
-        assert component_to_edit.get_field(field) is None
+        assert component_to_edit.get_field_value(field) is None
 
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
@@ -2996,7 +2992,7 @@ def test_UI_GIVEN_changing_fields_WHEN_editing_a_component_with_a_chopper_mesh_T
             break
 
     assert widget is not None
-    prev_value = widget.values
+    prev_value = widget.value
     widget.value = prev_value + 50
 
     add_component_dialog.on_ok()

@@ -49,7 +49,10 @@ class Component(Group):
 
     @property
     def description(self):
-        return self.get_field_value(CommonAttrs.DESCRIPTION)
+        try:
+            return self.get_field_value(CommonAttrs.DESCRIPTION)
+        except AttributeError:
+            return ""
 
     @description.setter
     def description(self, new_description: str):

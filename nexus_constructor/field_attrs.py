@@ -1,7 +1,6 @@
 from functools import partial
-from typing import Union
+from typing import Union, Any
 
-import h5py
 from PySide2.QtWidgets import (
     QDialog,
     QGridLayout,
@@ -42,7 +41,7 @@ class FieldAttrsDialog(QDialog):
         self.layout().addWidget(self.remove_button, 1, 1)
 
     def fill_existing_attrs(self, existing_dataset: Dataset):
-        for attr in existing_dataset.attributes.items():
+        for attr in existing_dataset.attributes:
             if attr.name not in ATTRS_BLACKLIST:
                 frame = FieldAttrFrame(attr.name, attr.values)
                 self._add_attr(existing_frame=frame)
@@ -160,13 +159,7 @@ class FieldAttrFrame(QFrame):
         if isinstance(new_value, bytes):
             new_value = new_value.decode("utf-8")
 
-        self.attr_dtype_combo.setCurrentText(
-            "String"
-            if isinstance(new_value, str)
-            else next(
-                key for key, value in DATASET_TYPE.items() if value == new_value.dtype
-            )
-        )
+        self.attr_dtype_combo.setCurrentText(self._get_human_readable_type(new_value))
         if np.isscalar(new_value):
             self.type_changed("Scalar")
             self.attr_value_lineedit.setText(str(new_value))
@@ -175,3 +168,16 @@ class FieldAttrFrame(QFrame):
             self.dialog.model.array = new_value
             self.dialog.model.update_array_dtype(new_value.dtype)
         self.dtype_changed(None)
+
+    @staticmethod
+    def _get_human_readable_type(new_value: Any):
+        if isinstance(new_value, str):
+            return "String"
+        elif isinstance(new_value, int):
+            return "Int"
+        elif isinstance(new_value, float):
+            return "Double"
+        else:
+            return next(
+                key for key, value in DATASET_TYPE.items() if value == new_value.dtype
+            )

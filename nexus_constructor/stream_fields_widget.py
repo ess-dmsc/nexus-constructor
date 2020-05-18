@@ -307,6 +307,9 @@ class StreamFieldsWidget(QDialog):
         if current_schema == WriterModules.F142.value:
             value_units = self.value_units_edit.text()
             stream = F142Stream(source, topic, type, value_units)
+            array_size = self.array_size_spinbox.value()
+            if array_size:
+                stream.array_size = array_size
         elif current_schema == WriterModules.EV42.value:
             stream = EV42Stream(source, topic)
         elif current_schema == WriterModules.NS10.value:
