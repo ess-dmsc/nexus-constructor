@@ -23,15 +23,15 @@ def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
     new_ui_field.value = field.parent.get(field.name, getlink=True).path
 
 
-def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
     """
     Fill in a UI array field for an existing array field in the component group
     :param value: The array dataset's value to copy to the UI fields list model
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.array_dataset.value
-    new_ui_field.dtype = field.dtype
-    new_ui_field.value = field[()]
+    new_ui_field.dtype = numpy_dtype_to_fieldswidget_dtype(field.dataset.size)
+    new_ui_field.value = field.values
 
 
 def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
@@ -42,12 +42,18 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     """
     new_ui_field.field_type = FieldType.scalar_dataset.value
     dtype = field.dataset.size
+
     if "S" in str(dtype):
         dtype = h5py.special_dtype(vlen=str)
-    dtype = next(key for key, value in DATASET_TYPE.items() if value == dtype)
+
+    dtype = numpy_dtype_to_fieldswidget_dtype(dtype)
 
     new_ui_field.value = field.values
     new_ui_field.dtype = dtype
+
+
+def numpy_dtype_to_fieldswidget_dtype(dtype):
+    return next(key for key, value in DATASET_TYPE.items() if value == dtype)
 
 
 def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget):
