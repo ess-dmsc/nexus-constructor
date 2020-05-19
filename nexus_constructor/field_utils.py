@@ -7,6 +7,7 @@ import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node, get_nx_class
 from nexus_constructor.validators import FieldType
 from nexus_constructor.nexus.nexus_wrapper import h5Node
@@ -33,19 +34,18 @@ def update_existing_array_field(field: h5py.Dataset, new_ui_field: FieldWidget):
     new_ui_field.value = field[()]
 
 
-def update_existing_scalar_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     """
     Fill in a UI scalar field for an existing scalar field in the component group
     :param field: The dataset to copy into the value line edit
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.scalar_dataset.value
-    dtype = field.dtype
+    dtype = field.dataset.size
     if "S" in str(dtype):
         dtype = h5py.special_dtype(vlen=str)
-        new_ui_field.value = field[()]
-    else:
-        new_ui_field.value = field[()]
+
+    new_ui_field.value = field.values
     new_ui_field.dtype = dtype
 
 
@@ -74,21 +74,18 @@ def get_fields_with_update_functions(
     return items_with_update_functions
 
 
-def find_field_type(item: h5Node) -> Callable:
-    if (
-        isinstance(item, h5py.Dataset)
-        and get_name_of_node(item) not in INVALID_FIELD_NAMES
-    ):
-        if np.isscalar(item[()]):
+def find_field_type(item) -> Callable:
+    if isinstance(item, Dataset) and get_name_of_node(item) not in INVALID_FIELD_NAMES:
+        if np.isscalar(item.values):
             return update_existing_scalar_field
         else:
             return update_existing_array_field
 
-    elif isinstance(item, h5py.Group):
-        if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
-            return update_existing_link_field
-        elif get_nx_class(item) == CommonAttrs.NC_STREAM:
-            return update_existing_stream_field
-    logging.debug(
-        f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"
-    )
+    # elif isinstance(item, h5py.Group):
+    #     if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
+    #         return update_existing_link_field
+    #     elif get_nx_class(item) == CommonAttrs.NC_STREAM:
+    #         return update_existing_stream_field
+    # logging.debug(
+    #     f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"
+    # )
