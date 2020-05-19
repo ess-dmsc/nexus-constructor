@@ -85,6 +85,15 @@ class Transformation(Dataset):
         self.set_attribute_value(CommonAttrs.UNITS, new_units)
 
     @property
+    def dataset(self) -> Dataset:
+        return self.get_attribute_value("dataset")
+
+    @dataset.setter
+    def dataset(self, new_dataset: Dataset):
+        self.set_attribute_value("dataset", new_dataset)
+        print(new_dataset)
+
+    @property
     def depends_on(self) -> "Transformation":
         return self.get_attribute_value(CommonAttrs.DEPENDS_ON)
 
