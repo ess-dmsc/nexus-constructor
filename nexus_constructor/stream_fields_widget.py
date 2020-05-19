@@ -394,27 +394,26 @@ class StreamFieldsWidget(QDialog):
                 self.ev42_nexus_to_spinner_ui_element.items(), field
             )
 
-    def fill_in_existing_f142_fields(self, field: h5py.Group):
+    def fill_in_existing_f142_fields(self, field: F142Stream):
         """
         Fill in specific existing f142 fields into the new UI field.
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
-        raise NotImplementedError
-        self.type_combo.setCurrentText(field["type"][()])
-        if "array_size" in field.keys():
+        self.type_combo.setCurrentText(field.type)
+        if field.array_size is not None:
             self.array_radio.setChecked(True)
             self.scalar_radio.setChecked(False)
-            self.array_size_spinbox.setValue(field["array_size"][()])
+            self.array_size_spinbox.setValue(field.array_size)
         else:
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
 
-        if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
-            self._show_advanced_options(True)
-            fill_in_advanced_options(
-                self.f142_nexus_to_spinner_ui_element.items(), field
-            )
+        # if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
+        #     self._show_advanced_options(True)
+        #     fill_in_advanced_options(
+        #         self.f142_nexus_to_spinner_ui_element.items(), field
+        #     )
 
     def update_existing_stream_info(self, field: StreamGroup):
         """
@@ -422,12 +421,13 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
+        print(field)
         child = field.children[0]
         schema = child._writer_module
         self.schema_combo.setCurrentText(schema)
         self.topic_line_edit.setText(child.topic)
         self.source_line_edit.setText(child.source)
-        # if schema == WriterModules.F142.value:
-        #     self.fill_in_existing_f142_fields(field)
+        if schema == WriterModules.F142.value:
+            self.fill_in_existing_f142_fields(field.children[0])
         # elif schema == WriterModules.EV42.value:
         #     self.fill_in_existing_ev42_fields(field)
