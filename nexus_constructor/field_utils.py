@@ -9,7 +9,7 @@ from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node, get_nx_class
-from nexus_constructor.validators import FieldType
+from nexus_constructor.validators import FieldType, DATASET_TYPE
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 
 
@@ -44,6 +44,7 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     dtype = field.dataset.size
     if "S" in str(dtype):
         dtype = h5py.special_dtype(vlen=str)
+    dtype = next(key for key, value in DATASET_TYPE.items() if value == dtype)
 
     new_ui_field.value = field.values
     new_ui_field.dtype = dtype
