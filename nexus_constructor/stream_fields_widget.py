@@ -416,18 +416,18 @@ class StreamFieldsWidget(QDialog):
                 self.f142_nexus_to_spinner_ui_element.items(), field
             )
 
-    def update_existing_stream_info(self, field: h5py.Group):
+    def update_existing_stream_info(self, field: StreamGroup):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
-        raise NotImplementedError
-        schema = field["writer_module"][()]
-        self.schema_combo.setCurrentText(str(schema))
-        self.topic_line_edit.setText(str(field["topic"][()]))
-        self.source_line_edit.setText(str(field["source"][()]))
-        if schema == WriterModules.F142.value:
-            self.fill_in_existing_f142_fields(field)
-        elif schema == WriterModules.EV42.value:
-            self.fill_in_existing_ev42_fields(field)
+        child = field.children[0]
+        schema = child._writer_module
+        self.schema_combo.setCurrentText(schema)
+        self.topic_line_edit.setText(child.topic)
+        self.source_line_edit.setText(child.source)
+        # if schema == WriterModules.F142.value:
+        #     self.fill_in_existing_f142_fields(field)
+        # elif schema == WriterModules.EV42.value:
+        #     self.fill_in_existing_ev42_fields(field)

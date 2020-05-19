@@ -8,6 +8,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.stream import StreamGroup
 from nexus_constructor.nexus.nexus_wrapper import get_name_of_node, get_nx_class
 from nexus_constructor.validators import FieldType, DATASET_TYPE
 from nexus_constructor.nexus.nexus_wrapper import h5Node
@@ -56,7 +57,7 @@ def numpy_dtype_to_fieldswidget_dtype(dtype):
     return next(key for key, value in DATASET_TYPE.items() if value == dtype)
 
 
-def update_existing_stream_field(field: h5py.Dataset, new_ui_field: FieldWidget):
+def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
     """
     Fill in a UI stream field for an existing stream field in the component group
     :param field: The dataset to copy into the value line edit
@@ -87,6 +88,8 @@ def find_field_type(item) -> Callable:
             return update_existing_scalar_field
         else:
             return update_existing_array_field
+    elif isinstance(item, StreamGroup):
+        return update_existing_stream_field
 
     # elif isinstance(item, h5py.Group):
     #     if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
