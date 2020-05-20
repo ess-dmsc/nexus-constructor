@@ -207,7 +207,7 @@ class FieldWidget(QFrame):
 
     @dtype.setter
     def dtype(self, dtype: str):
-        self.value_type_combo.setCurrentText(to_string(dtype))
+        self.value_type_combo.setCurrentText(dtype)
 
     @property
     def attrs(self) -> h5py.Dataset.attrs:
@@ -220,17 +220,21 @@ class FieldWidget(QFrame):
     @property
     def value(self) -> Union[Dataset, Group, Link]:
         return_object = None
-        dtype = DATASET_TYPE[self.value_type_combo.currentText()]
+        dtype = self.value_type_combo.currentText()
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
             return_object = Dataset(
-                name=self.name, dataset=DatasetMetadata([1], dtype), values=val
+                name=self.name,
+                dataset=DatasetMetadata(size=[1], type=dtype),
+                values=val,
             )
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
-                name=self.name, dataset=DatasetMetadata(array.size, dtype), values=array
+                name=self.name,
+                dataset=DatasetMetadata(size=array.size, type=dtype),
+                values=array,
             )
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()

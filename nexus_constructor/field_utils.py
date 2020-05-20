@@ -42,13 +42,8 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.scalar_dataset.value
-    dtype = field.dataset.type
-    if "S" in str(dtype):
-        dtype = str
-        new_ui_field.value = field.values
-    else:
-        new_ui_field.value = field.values
-    new_ui_field.dtype = dtype
+    new_ui_field.value = field.values
+    new_ui_field.dtype = field.dataset.type
 
 
 def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
