@@ -1770,7 +1770,7 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
 
     field_name = "scalar"
     field_value = "test"
-    component.set_field_value(field_name, field_value, dtype=str)
+    component.set_field_value(field_name, field_value, dtype="String")
 
     dialog = AddComponentDialog(
         instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
