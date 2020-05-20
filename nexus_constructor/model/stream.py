@@ -50,6 +50,11 @@ class EV42Stream:
     topic = attr.ib(type=str)
     source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
+    adc_pulse_debug = attr.ib(type=bool, default=None)
+    index_every_mb = attr.ib(type=int, default=None)
+    index_every_kb = attr.ib(type=int, default=None)
+    chunk_mb = attr.ib(type=int, default=None)
+    chunk_kb = attr.ib(type=int, default=None)
 
 
 @attr.s

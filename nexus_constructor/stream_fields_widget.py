@@ -384,28 +384,33 @@ class StreamFieldsWidget(QDialog):
         """
         Fill in specific existing ev42 fields into the new UI field.
         :param field: The stream group
-        :param new_ui_field: The new UI field to be filled in
         """
-        raise NotImplementedError
         all_ev42_elements = list(self.ev42_nexus_elements)
         all_ev42_elements.append(ADC_PULSE_DEBUG)
 
-        if check_if_advanced_options_should_be_enabled(all_ev42_elements, field):
+        if check_if_advanced_options_should_be_enabled(
+            [
+                field.adc_pulse_debug,
+                field.index_every_mb,
+                field.index_every_kb,
+                field.chunk_mb,
+                field.chunk_kb,
+            ]
+        ):
             self._show_advanced_options(True)
-            if ADC_PULSE_DEBUG in field.keys():
-                self.ev42_adc_pulse_debug_checkbox.setChecked(
-                    bool(field.abc_pulse_debug)
-                )
+            # if ADC_PULSE_DEBUG in field.keys():
+            #     self.ev42_adc_pulse_debug_checkbox.setChecked(
+            #         bool(field.abc_pulse_debug)
+            #     )
 
-            fill_in_advanced_options(
-                self.ev42_nexus_to_spinner_ui_element.items(), field
-            )
+            # fill_in_advanced_options(
+            #     self.ev42_nexus_to_spinner_ui_element.items(), field
+            # )
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
         Fill in specific existing f142 fields into the new UI field.
         :param field: The stream group
-        :param new_ui_field: The new UI field to be filled in
         """
         self.type_combo.setCurrentText(field.type)
         if field.array_size is not None:
@@ -430,7 +435,6 @@ class StreamFieldsWidget(QDialog):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
-        :param new_ui_field: The new UI field to be filled in
         """
         field = field.children[
             0
