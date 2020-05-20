@@ -5,9 +5,8 @@ from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component import (
-    get_fields_and_update_functions_for_component,
-)
+from nexus_constructor.model.component import Component
+from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component, add_fields_to_component
@@ -550,3 +549,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         Instruct the PixelOptions widget to carry out another check for input validity.
         """
         self.pixel_options.update_pixel_input_validity()
+
+
+def get_fields_and_update_functions_for_component(component: Component):
+    return get_fields_with_update_functions(component)

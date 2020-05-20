@@ -297,8 +297,6 @@ class Transformation:
         """
         Returns the direct dependents of a transform, i.e. anything that has depends_on pointing to this transformation.
         """
-        import nexus_constructor.component.component as comp
-
         return_dependents = []
 
         if (

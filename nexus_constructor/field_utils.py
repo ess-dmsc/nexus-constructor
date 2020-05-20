@@ -9,9 +9,7 @@ from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup
-from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import FieldType
-from nexus_constructor.nexus.nexus_wrapper import h5Node
 
 
 def update_existing_link_field(field: Link, new_ui_field: FieldWidget):
@@ -71,7 +69,7 @@ def get_fields_with_update_functions(
     return items_with_update_functions
 
 
-def find_field_type(item: h5Node) -> Callable:
+def find_field_type(item: Union[Dataset, StreamGroup, Link]) -> Callable:
     if isinstance(item, Dataset) and item.name not in INVALID_FIELD_NAMES:
         if np.isscalar(item.values):
             return update_existing_scalar_field
@@ -83,5 +81,5 @@ def find_field_type(item: h5Node) -> Callable:
         return update_existing_link_field
     else:
         logging.debug(
-            f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"
+            f"Object {item.name} not handled as field - could be used for other parts of UI instead"
         )

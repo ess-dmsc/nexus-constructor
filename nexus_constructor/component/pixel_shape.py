@@ -1,8 +1,7 @@
 from nexus_constructor.component.component_shape import (
     ComponentShape,
-    get_shape_from_component,
 )
-from nexus_constructor.model.component import PIXEL_SHAPE_GROUP_NAME
+from nexus_constructor.model.component import PIXEL_SHAPE_GROUP_NAME, get_shape_from_component
 
 from nexus_constructor.model.geometry import (
     NoShapeGeometry,

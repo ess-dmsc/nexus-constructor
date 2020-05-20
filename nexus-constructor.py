@@ -33,7 +33,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
     window = QMainWindow()
-    nexus_wrapper = NexusWrapper()
     definitions_dir = os.path.abspath(os.path.join(root_dir, "definitions"))
     _, nx_component_classes = make_dictionary_of_class_definitions(definitions_dir)
     instrument = Instrument()

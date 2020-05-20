@@ -1,5 +1,5 @@
 from mock import patch
-from nexus_constructor.component.component import DependencyError, Component
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.component import (
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,

@@ -6,14 +6,13 @@ import logging
 from typing import Union, Dict, Any, List, Tuple
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.instrument import Instrument
 from nexus_constructor.json.helpers import object_to_json_file, handle_non_std_types
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class, get_name_of_node
 
 NexusObject = Union[h5py.Group, h5py.Dataset, h5py.SoftLink]
 
 
-def write_nexus_structure_to_json(data: Instrument, file):
+def write_nexus_structure_to_json(data, file):
     """
     Generates and writes the nexus structure to a given JSON file object.
     The json description can be used by the file writer (github.com/ess-dmsc/kafka-to-nexus) to create a NeXus file
@@ -26,7 +25,7 @@ def write_nexus_structure_to_json(data: Instrument, file):
 
 
 def generate_nexus_string(
-    converter: "NexusToDictConverter", instrument: Instrument
+    converter: "NexusToDictConverter", instrument
 ) -> str:
     """
     Generates the nexus structure in a json string format for use with constructing file writer run start commands.
@@ -39,7 +38,7 @@ def generate_nexus_string(
 
 
 def generate_nexus_structure(
-    converter: "NexusToDictConverter", instrument: Instrument
+    converter: "NexusToDictConverter", instrument
 ) -> Dict[str, List[dict]]:
     return converter.convert(instrument.nexus.nexus_file)
 
