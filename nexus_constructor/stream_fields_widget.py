@@ -53,18 +53,18 @@ NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
 
 
-def check_if_advanced_options_should_be_enabled(
-    elements: List[str], field: h5py.Group
-) -> bool:
+def check_if_advanced_options_should_be_enabled(elements: List[str], field) -> bool:
     """
     Checks whether the advanced options box should be enabled by checking if any of the advanced options have existing values.
     :param elements: list of names to check if exist
     :param field: the field group
     """
-    return any(item in field.keys() for item in elements)
+    return False
+    return any(item in field for item in elements)
 
 
 def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
+    raise NotImplementedError
     for nxs_string, spinner in elements:
         if nxs_string in field.keys():
             spinner.setValue(field[nxs_string][()])
@@ -305,16 +305,26 @@ class StreamFieldsWidget(QDialog):
         current_schema = self.schema_combo.currentText()
         if current_schema == WriterModules.F142.value:
             value_units = self.value_units_edit.text()
-            stream = F142Stream(source, topic, type, value_units)
+            stream = F142Stream(
+                source=source, topic=topic, type=type, value_units=value_units
+            )
+            array_size = self.array_size_spinbox.value()
+            if array_size:
+                stream.array_size = array_size
         elif current_schema == WriterModules.EV42.value:
-            stream = EV42Stream(source, topic)
+            stream = EV42Stream(source=source, topic=topic)
         elif current_schema == WriterModules.NS10.value:
-            stream = NS10Stream(source, topic)
+            stream = NS10Stream(source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
-            stream = SENVStream(source, topic)
+            stream = SENVStream(source=source, topic=topic)
         elif current_schema == WriterModules.HS00.value:
             stream = HS00Stream(
-                source, topic, NotImplemented, NotImplemented, NotImplemented, []
+                source=source,
+                topic=topic,
+                data_type=NotImplemented,
+                edge_type=NotImplemented,
+                error_type=NotImplemented,
+                shape=[],
             )
         elif current_schema == WriterModules.TDCTIME:
             stream = TDCTStream(source, topic)
@@ -379,19 +389,20 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
+        raise NotImplementedError
         all_ev42_elements = list(self.ev42_nexus_elements)
         all_ev42_elements.append(ADC_PULSE_DEBUG)
 
-        # if check_if_advanced_options_should_be_enabled(all_ev42_elements, field):
-        #     self._show_advanced_options(True)
-        #     if ADC_PULSE_DEBUG in field.keys():
-        #         self.ev42_adc_pulse_debug_checkbox.setChecked(
-        #             bool(field[ADC_PULSE_DEBUG][()])
-        #         )
-        #
-        #     fill_in_advanced_options(
-        #         self.ev42_nexus_to_spinner_ui_element.items(), field
-        #     )
+        if check_if_advanced_options_should_be_enabled(all_ev42_elements, field):
+            self._show_advanced_options(True)
+            if ADC_PULSE_DEBUG in field.keys():
+                self.ev42_adc_pulse_debug_checkbox.setChecked(
+                    bool(field.abc_pulse_debug)
+                )
+
+            fill_in_advanced_options(
+                self.ev42_nexus_to_spinner_ui_element.items(), field
+            )
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
@@ -408,25 +419,26 @@ class StreamFieldsWidget(QDialog):
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
 
-        # if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
-        #     self._show_advanced_options(True)
-        #     fill_in_advanced_options(
-        #         self.f142_nexus_to_spinner_ui_element.items(), field
-        #     )
+        if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
+            self._show_advanced_options(True)
+            fill_in_advanced_options(
+                self.f142_nexus_to_spinner_ui_element.items(), field
+            )
 
-    def update_existing_stream_info(self, field: StreamGroup):
+    def update_existing_stream_info(self, field):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
-        print(field)
-        child = field.children[0]
-        schema = child._writer_module
+        field = field.children[
+            0
+        ]  # only the first stream in the stream group can be edited currently
+        schema = field.writer_module
         self.schema_combo.setCurrentText(schema)
-        self.topic_line_edit.setText(child.topic)
-        self.source_line_edit.setText(child.source)
+        self.topic_line_edit.setText(field.topic)
+        self.source_line_edit.setText(field.source)
         if schema == WriterModules.F142.value:
-            self.fill_in_existing_f142_fields(child)
+            self.fill_in_existing_f142_fields(field)
         elif schema == WriterModules.EV42.value:
-            self.fill_in_existing_ev42_fields(child)
+            self.fill_in_existing_ev42_fields(field)

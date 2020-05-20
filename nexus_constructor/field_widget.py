@@ -79,7 +79,6 @@ class FieldWidget(QFrame):
         self,
         possible_field_names=None,
         parent: QListWidget = None,
-        instrument: "Instrument" = None,  # noqa: F821
         hide_name_field: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
@@ -89,7 +88,6 @@ class FieldWidget(QFrame):
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
-        self.instrument = instrument
 
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
         self.hide_name_field = hide_name_field
@@ -209,33 +207,39 @@ class FieldWidget(QFrame):
 
     @dtype.setter
     def dtype(self, dtype: str):
-        self.value_type_combo.setCurrentText(to_string(dtype))
+        self.value_type_combo.setCurrentText(dtype)
 
     @property
     def attrs(self) -> h5py.Dataset.attrs:
-        return self.value.attrs
+        return self.value.attributes
 
     @attrs.setter
-    def attrs(self, field: h5py.Dataset):
+    def attrs(self, field: Dataset):
         self.attrs_dialog.fill_existing_attrs(field)
 
     @property
     def value(self) -> Union[Dataset, Group, Link]:
         return_object = None
-        dtype = DATASET_TYPE[self.value_type_combo.currentText()]
+        dtype = self.value_type_combo.currentText()
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
-            return_object = Dataset(self.name, DatasetMetadata([1], dtype), val)
+            return_object = Dataset(
+                name=self.name,
+                dataset=DatasetMetadata(size=[1], type=dtype),
+                values=val,
+            )
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
-                self.name, DatasetMetadata(array.size, dtype), array
+                name=self.name,
+                dataset=DatasetMetadata(size=array.size, type=dtype),
+                values=array,
             )
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()
         elif self.field_type == FieldType.link:
-            return_object = Link(self.name, self.value_line_edit.text())
+            return_object = Link(name=self.name, target=self.value_line_edit.text())
         else:
             logging.error(f"unknown field type: {self.name}")
             return
@@ -291,14 +295,7 @@ class FieldWidget(QFrame):
     def _set_up_value_validator(self, is_link: bool):
         self.value_line_edit.setValidator(None)
         if is_link:
-            self.value_line_edit.setValidator(
-                HDFLocationExistsValidator(
-                    self.instrument.nexus.nexus_file, self.field_type_combo
-                )
-            )
-
-            tooltip_on_accept = "Valid HDF path"
-            tooltip_on_reject = "HDF Path is not valid"
+            return
         else:
             self.value_line_edit.setValidator(
                 FieldValueValidator(

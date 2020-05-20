@@ -28,28 +28,28 @@ class StreamGroup(Group):
 class NS10Stream:
     topic = attr.ib(type=str)
     source = attr.ib(type=str)
-    _writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
 
 
 @attr.s
 class SENVStream:
     topic = attr.ib(type=str)
     source = attr.ib(type=str)
-    _writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
 
 @attr.s
 class TDCTStream:
     topic = attr.ib(type=str)
     source = attr.ib(type=str)
-    _writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
 
 
 @attr.s
 class EV42Stream:
     topic = attr.ib(type=str)
     source = attr.ib(type=str)
-    _writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
 
 
 @attr.s
@@ -59,7 +59,7 @@ class F142Stream:
     type = attr.ib(type=str)
     value_units = attr.ib(type=str, default=None)
     array_size = attr.ib(type=float, default=None)
-    _writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]
@@ -73,4 +73,4 @@ class HS00Stream:
     error_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
     edge_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
     shape = attr.ib()
-    _writer_module = attr.ib(type=str, default=WriterModules.HS00.value, init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.HS00.value, init=False)

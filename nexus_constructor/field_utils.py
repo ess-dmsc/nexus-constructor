@@ -1,27 +1,27 @@
 import logging
-from typing import List, Callable
+from typing import List, Callable, Tuple, Union
 
-import h5py
 import numpy as np
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.model.component import Component
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup
-from nexus_constructor.nexus.nexus_wrapper import get_name_of_node, get_nx_class
-from nexus_constructor.validators import FieldType, DATASET_TYPE
+from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
+from nexus_constructor.validators import FieldType
 from nexus_constructor.nexus.nexus_wrapper import h5Node
 
 
-def update_existing_link_field(field: h5py.SoftLink, new_ui_field: FieldWidget):
+def update_existing_link_field(field: Link, new_ui_field: FieldWidget):
     """
     Fill in a UI link field for an existing link in the component
     :param field: The link field in the component group
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.link.value
-    new_ui_field.value = field.parent.get(field.name, getlink=True).path
+    new_ui_field.value = field.target
 
 
 def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
@@ -31,7 +31,7 @@ def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.array_dataset.value
-    new_ui_field.dtype = numpy_dtype_to_fieldswidget_dtype(field.dataset.size)
+    new_ui_field.dtype = field.dataset.type
     new_ui_field.value = field.values
 
 
@@ -42,19 +42,8 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.scalar_dataset.value
-    dtype = field.dataset.size
-
-    if "S" in str(dtype):
-        dtype = h5py.special_dtype(vlen=str)
-
-    dtype = numpy_dtype_to_fieldswidget_dtype(dtype)
-
     new_ui_field.value = field.values
-    new_ui_field.dtype = dtype
-
-
-def numpy_dtype_to_fieldswidget_dtype(dtype):
-    return next(key for key, value in DATASET_TYPE.items() if value == dtype)
+    new_ui_field.dtype = field.dataset.type
 
 
 def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
@@ -68,34 +57,31 @@ def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
 
 
 def get_fields_with_update_functions(
-    group: h5py.Group,
-) -> (List[h5py.Dataset], List[h5py.Dataset], List[h5py.Group], List[h5py.Group]):
+    component: Component,
+) -> List[Tuple[Union[Dataset, Link, StreamGroup], Callable]]:
     """
     Return a list of fields in a given component group.
-    :param group: The hdf5 component group to check for fields
+    :param field: The hdf5 component group to check for fields
     :return: A list of a fields, regardless of field type
     """
-    items_with_update_functions = {}
-    for item in group.values():
+    items_with_update_functions = []
+    for item in component.children:
         update_function = find_field_type(item)
-        items_with_update_functions[item] = update_function
+        items_with_update_functions.append((item, update_function))
     return items_with_update_functions
 
 
-def find_field_type(item) -> Callable:
-    if isinstance(item, Dataset) and get_name_of_node(item) not in INVALID_FIELD_NAMES:
+def find_field_type(item: h5Node) -> Callable:
+    if isinstance(item, Dataset) and item.name not in INVALID_FIELD_NAMES:
         if np.isscalar(item.values):
             return update_existing_scalar_field
         else:
             return update_existing_array_field
     elif isinstance(item, StreamGroup):
         return update_existing_stream_field
-
-    # elif isinstance(item, h5py.Group):
-    #     if isinstance(item.parent.get(item.name, getlink=True), h5py.SoftLink):
-    #         return update_existing_link_field
-    #     elif get_nx_class(item) == CommonAttrs.NC_STREAM:
-    #         return update_existing_stream_field
-    # logging.debug(
-    #     f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"
-    # )
+    elif isinstance(item, Link):
+        return update_existing_link_field
+    else:
+        logging.debug(
+            f"Object {get_name_of_node(item)} not handled as field - could be used for other parts of UI instead"
+        )
