@@ -3,10 +3,7 @@ from mock import patch
 from numpy import array_equal, array
 
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.geometry import (
-    OFFGeometryNoNexus,
-    OFFGeometryNexus,
-)
+from nexus_constructor.model.geometry import OFFGeometryNoNexus, OFFGeometryNexus
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.pixel_data import PixelMapping

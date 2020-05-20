@@ -326,9 +326,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
 
     @units.setter
     def units(self, units: str):
-        self.set_field_value(
-            "cad_file_units", units,
-        )
+        self.set_field_value("cad_file_units", units)
 
     @property
     def file_path(self):

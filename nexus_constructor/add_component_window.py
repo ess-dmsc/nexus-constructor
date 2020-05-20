@@ -4,6 +4,10 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
+from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.component.component import (
+    get_fields_and_update_functions_for_component,
+)
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component, add_fields_to_component
@@ -14,6 +18,7 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNoNexus,
     NoShapeGeometry,
 )
+from nexus_constructor.model.link import Link
 from nexus_constructor.unit_utils import METRES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
@@ -141,7 +146,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         if self.component_to_edit:
             parent_dialog.setWindowTitle(
-                f"Edit Component: {get_name_of_node(self.component_to_edit.group)}"
+                f"Edit Component: {self.component_to_edit.name}"
             )
             self.ok_button.setText("Edit Component")
             self._fill_existing_entries()
@@ -225,20 +230,21 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
-        raise NotImplementedError
         items_and_update_methods = get_fields_and_update_functions_for_component(
             self.component_to_edit
         )
-        for field, update_method in items_and_update_methods.items():
+        for field, update_method in items_and_update_methods:
             if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
                 update_method(field, new_ui_field)
-                new_ui_field.units = (
-                    self.instrument.nexus.get_attribute_value(field, CommonAttrs.UNITS)
-                    if not None
-                    else ""
-                )
-                new_ui_field.attrs = field
+                if not isinstance(field, Link):
+                    try:
+                        new_ui_field.units = field.get_attribute_value(
+                            CommonAttrs.UNITS
+                        )
+                    except AttributeError:
+                        new_ui_field.units = ""
+                    new_ui_field.attrs = field
 
     def __fill_existing_shape_info(self):
         component_shape, _ = self.component_to_edit.shape
@@ -264,14 +270,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
-        new_ui_field.name = get_name_of_node(field)
+        new_ui_field.name = field.name
         return new_ui_field
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
-        field = FieldWidget(
-            self.possible_fields, self.fieldsListWidget, self.instrument
-        )
+        field = FieldWidget(self.possible_fields, self.fieldsListWidget)
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
         item.setSizeHint(field.sizeHint())
@@ -459,23 +463,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         # remove previous fields
-        for field_group in self.component_to_edit.group.values():
-            if get_name_of_node(field_group) not in INVALID_FIELD_NAMES:
-                del self.instrument.nexus.nexus_file[field_group.name]
+        self.component_to_edit.children = []
 
         self.component_to_edit.name = component_name
         self.component_to_edit.nx_class = nx_class
         self.component_to_edit.description = description
 
         self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
-
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
-        raise NotImplementedError
-        component_with_geometry = create_component(
-            self.instrument.nexus, self.component_to_edit.group
-        )
-        return component_with_geometry.shape
+        return self.component_to_edit.shape
 
     @staticmethod
     def write_pixel_data_to_component(
