@@ -67,7 +67,7 @@ class F142Stream:
     writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
     index_every_mb = attr.ib(type=int, default=None)
     index_every_kb = attr.ib(type=int, default=None)
-    store_latest_info = attr.ib(type=int, default=None)
+    store_latest_into = attr.ib(type=int, default=None)
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]

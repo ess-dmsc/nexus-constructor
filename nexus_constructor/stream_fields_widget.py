@@ -309,6 +309,8 @@ class StreamFieldsWidget(QDialog):
             array_size = self.array_size_spinbox.value()
             if array_size:
                 stream.array_size = array_size
+            if self.advanced_options_enabled:
+                self._record_advanced_f142_values(stream)
         elif current_schema == WriterModules.EV42.value:
             stream = EV42Stream(source=source, topic=topic)
         elif current_schema == WriterModules.NS10.value:
@@ -332,43 +334,59 @@ class StreamFieldsWidget(QDialog):
 
         return stream_group
 
-    def _create_ev42_fields(self, stream_group: EV42Stream):
+    def _record_advanced_f142_values(self, stream: F142Stream):
         """
-        Create ev42 fields in the given group if advanced options are specified.
-        :param stream_group: The group to apply fields to.
-        """
-        raise NotImplementedError
-        if self.advanced_options_enabled:
-            if self.ev42_adc_pulse_debug_checkbox.isChecked():
-                stream_group.create_dataset(
-                    ADC_PULSE_DEBUG,
-                    dtype=bool,
-                    data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
-                )
-            self._create_dataset_from_spinner(
-                stream_group, self.ev42_nexus_to_spinner_ui_element
-            )
 
-    def _create_f142_fields(self, stream_group: F142Stream):
+        :param stream:
+        :return:
         """
-        Create f142 fields in the given group if advanced options are specified.
-        :param stream_group: The group to apply fields to.
-        """
-        stream_group.create_dataset(
-            "type", dtype=STRING_DTYPE, data=self.type_combo.currentText()
-        )
-        if self.array_radio.isChecked():
-            stream_group.create_dataset(
-                "array_size", data=self.array_size_spinbox.value()
-            )
-        if self.value_units_edit.text():
-            stream_group.create_dataset(
-                "value_units", data=self.value_units_edit.text()
-            )
-        if self.advanced_options_enabled:
-            self._create_dataset_from_spinner(
-                stream_group, self.f142_nexus_to_spinner_ui_element
-            )
+        stream.index_every_mb = self.f142_nexus_to_spinner_ui_element[
+            NEXUS_INDICES_INDEX_EVERY_MB
+        ].value()
+        stream.index_every_kb = self.f142_nexus_to_spinner_ui_element[
+            NEXUS_INDICES_INDEX_EVERY_KB
+        ].value()
+        stream.store_latest_into = self.f142_nexus_to_spinner_ui_element[
+            STORE_LATEST_INTO
+        ].value()
+
+    # def _create_ev42_fields(self, stream_group: EV42Stream):
+    #     """
+    #     Create ev42 fields in the given group if advanced options are specified.
+    #     :param stream_group: The group to apply fields to.
+    #     """
+    #     raise NotImplementedError
+    #     if self.advanced_options_enabled:
+    #         if self.ev42_adc_pulse_debug_checkbox.isChecked():
+    #             stream_group.create_dataset(
+    #                 ADC_PULSE_DEBUG,
+    #                 dtype=bool,
+    #                 data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
+    #             )
+    #         self._create_dataset_from_spinner(
+    #             stream_group, self.ev42_nexus_to_spinner_ui_element
+    #         )
+    #
+    # def _create_f142_fields(self, stream_group: F142Stream):
+    #     """
+    #     Create f142 fields in the given group if advanced options are specified.
+    #     :param stream_group: The group to apply fields to.
+    #     """
+    #     stream_group.create_dataset(
+    #         "type", dtype=STRING_DTYPE, data=self.type_combo.currentText()
+    #     )
+    #     if self.array_radio.isChecked():
+    #         stream_group.create_dataset(
+    #             "array_size", data=self.array_size_spinbox.value()
+    #         )
+    #     if self.value_units_edit.text():
+    #         stream_group.create_dataset(
+    #             "value_units", data=self.value_units_edit.text()
+    #         )
+    #     if self.advanced_options_enabled:
+    #         self._create_dataset_from_spinner(
+    #             stream_group, self.f142_nexus_to_spinner_ui_element
+    #         )
 
     @staticmethod
     def _create_dataset_from_spinner(
@@ -424,12 +442,22 @@ class StreamFieldsWidget(QDialog):
             self.value_units_edit.setText(field.value_units)
 
         if check_if_advanced_options_should_be_enabled(
-            [field.index_every_mb, field.index_every_kb, field.store_latest_info]
+            [field.index_every_mb, field.index_every_kb, field.store_latest_into]
         ):
             self._show_advanced_options(True)
-            # fill_in_advanced_options(
-            #     self.f142_nexus_to_spinner_ui_element.items(), field
-            # )
+            self.fill_advanced_existing_f142_fields(field)
+
+    def fill_advanced_existing_f142_fields(self, field: F142Stream):
+
+        self.f142_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
+            field.index_every_mb
+        )
+        self.f142_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_KB].setValue(
+            field.index_every_kb
+        )
+        self.f142_nexus_to_spinner_ui_element[STORE_LATEST_INTO].setValue(
+            field.store_latest_into
+        )
 
     def update_existing_stream_info(self, field: StreamGroup):
         """
