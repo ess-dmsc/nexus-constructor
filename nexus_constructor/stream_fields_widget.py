@@ -1,5 +1,5 @@
 from functools import partial
-from typing import List, ItemsView, Dict
+from typing import List, ItemsView, Dict, Union
 
 import h5py
 from PySide2.QtCore import Qt
@@ -59,6 +59,7 @@ def check_if_advanced_options_should_be_enabled(elements: List[str], field) -> b
     :param elements: list of names to check if exist
     :param field: the field group
     """
+    # Disabled whilst working on model change
     return False
     return any(item in field for item in elements)
 
@@ -418,6 +419,8 @@ class StreamFieldsWidget(QDialog):
         else:
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
+        if field.value_units is not None:
+            self.value_units_edit.setText(field.value_units)
 
         if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
             self._show_advanced_options(True)
@@ -425,7 +428,7 @@ class StreamFieldsWidget(QDialog):
                 self.f142_nexus_to_spinner_ui_element.items(), field
             )
 
-    def update_existing_stream_info(self, field):
+    def update_existing_stream_info(self, field: StreamGroup):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
