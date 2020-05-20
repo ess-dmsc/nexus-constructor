@@ -419,6 +419,8 @@ class StreamFieldsWidget(QDialog):
         else:
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
+        if field.value_units is not None:
+            self.value_units_edit.setText(field.value_units)
 
         if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
             self._show_advanced_options(True)
