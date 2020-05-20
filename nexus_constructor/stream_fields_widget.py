@@ -373,26 +373,25 @@ class StreamFieldsWidget(QDialog):
                     nexus_string, dtype=int, data=ui_element.value()
                 )
 
-    def fill_in_existing_ev42_fields(self, field: h5py.Group):
+    def fill_in_existing_ev42_fields(self, field: EV42Stream):
         """
         Fill in specific existing ev42 fields into the new UI field.
         :param field: The stream group
         :param new_ui_field: The new UI field to be filled in
         """
-        raise NotImplementedError
         all_ev42_elements = list(self.ev42_nexus_elements)
         all_ev42_elements.append(ADC_PULSE_DEBUG)
 
-        if check_if_advanced_options_should_be_enabled(all_ev42_elements, field):
-            self._show_advanced_options(True)
-            if ADC_PULSE_DEBUG in field.keys():
-                self.ev42_adc_pulse_debug_checkbox.setChecked(
-                    bool(field[ADC_PULSE_DEBUG][()])
-                )
-
-            fill_in_advanced_options(
-                self.ev42_nexus_to_spinner_ui_element.items(), field
-            )
+        # if check_if_advanced_options_should_be_enabled(all_ev42_elements, field):
+        #     self._show_advanced_options(True)
+        #     if ADC_PULSE_DEBUG in field.keys():
+        #         self.ev42_adc_pulse_debug_checkbox.setChecked(
+        #             bool(field[ADC_PULSE_DEBUG][()])
+        #         )
+        #
+        #     fill_in_advanced_options(
+        #         self.ev42_nexus_to_spinner_ui_element.items(), field
+        #     )
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
@@ -428,6 +427,6 @@ class StreamFieldsWidget(QDialog):
         self.topic_line_edit.setText(child.topic)
         self.source_line_edit.setText(child.source)
         if schema == WriterModules.F142.value:
-            self.fill_in_existing_f142_fields(field.children[0])
-        # elif schema == WriterModules.EV42.value:
-        #     self.fill_in_existing_ev42_fields(field)
+            self.fill_in_existing_f142_fields(child)
+        elif schema == WriterModules.EV42.value:
+            self.fill_in_existing_ev42_fields(child)
