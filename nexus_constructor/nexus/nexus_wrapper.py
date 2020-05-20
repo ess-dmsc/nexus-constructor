@@ -11,14 +11,6 @@ DEFAULT_INSTRUMENT = "instrument"
 DEFAULT_ENTRY = "entry"
 
 
-def set_up_in_memory_nexus_file(filename: str) -> h5py.File:
-    """
-    Creates an in-memory nexus-file to store the model data in.
-    :return: The file object.
-    """
-    return h5py.File(filename, mode="x", driver="core", backing_store=False)
-
-
 def append_nxs_extension(file_name: str) -> str:
     extension = ".nxs"
     if file_name.endswith(extension):
@@ -45,12 +37,3 @@ def to_string(input_to_convert: Any) -> str:
     if isinstance(input_to_convert, bytes):
         return input_to_convert.decode("utf-8")
     return str(input_to_convert)
-
-
-def create_temporary_in_memory_file() -> h5py.File:
-    """
-    Create a temporary in-memory nexus file with a random name.
-    :return: The file object
-    """
-    return set_up_in_memory_nexus_file(str(uuid.uuid4()))
-
