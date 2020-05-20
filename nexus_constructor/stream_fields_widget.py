@@ -53,19 +53,12 @@ NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
 
 
-def check_if_advanced_options_should_be_enabled(field) -> bool:
+def check_if_advanced_options_should_be_enabled(advanced_fields) -> bool:
     """
     Checks whether the advanced options box should be enabled by checking if any of the advanced options have existing values.
-    :param field: the field group
+    :param advanced_fields: the field group
     """
-    return any(
-        item is not None
-        for item in [
-            field.index_every_kb,
-            field.index_every_mb,
-            field.store_latest_info,
-        ]
-    )
+    return any(item is not None for item in advanced_fields)
 
 
 def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
@@ -425,11 +418,13 @@ class StreamFieldsWidget(QDialog):
         if field.value_units is not None:
             self.value_units_edit.setText(field.value_units)
 
-        if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
+        if check_if_advanced_options_should_be_enabled(
+            [field.index_every_mb, field.index_every_kb, field.store_latest_info]
+        ):
             self._show_advanced_options(True)
-            fill_in_advanced_options(
-                self.f142_nexus_to_spinner_ui_element.items(), field
-            )
+            # fill_in_advanced_options(
+            #     self.f142_nexus_to_spinner_ui_element.items(), field
+            # )
 
     def update_existing_stream_info(self, field: StreamGroup):
         """
