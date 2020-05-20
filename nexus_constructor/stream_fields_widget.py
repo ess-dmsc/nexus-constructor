@@ -53,15 +53,19 @@ NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
 
 
-def check_if_advanced_options_should_be_enabled(elements: List[str], field) -> bool:
+def check_if_advanced_options_should_be_enabled(field) -> bool:
     """
     Checks whether the advanced options box should be enabled by checking if any of the advanced options have existing values.
-    :param elements: list of names to check if exist
     :param field: the field group
     """
-    # Disabled whilst working on model change
-    return False
-    return any(item in field for item in elements)
+    return any(
+        item is not None
+        for item in [
+            field.index_every_kb,
+            field.index_every_mb,
+            field.store_latest_info,
+        ]
+    )
 
 
 def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
@@ -357,7 +361,6 @@ class StreamFieldsWidget(QDialog):
         Create f142 fields in the given group if advanced options are specified.
         :param stream_group: The group to apply fields to.
         """
-        raise NotImplementedError
         stream_group.create_dataset(
             "type", dtype=STRING_DTYPE, data=self.type_combo.currentText()
         )
