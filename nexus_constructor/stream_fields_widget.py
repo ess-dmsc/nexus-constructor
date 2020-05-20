@@ -1,5 +1,5 @@
 from functools import partial
-from typing import List, ItemsView, Dict
+from typing import List, ItemsView, Dict, Union
 
 import h5py
 from PySide2.QtCore import Qt
@@ -426,7 +426,7 @@ class StreamFieldsWidget(QDialog):
                 self.f142_nexus_to_spinner_ui_element.items(), field
             )
 
-    def update_existing_stream_info(self, field):
+    def update_existing_stream_info(self, field: StreamGroup):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
