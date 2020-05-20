@@ -59,6 +59,7 @@ def check_if_advanced_options_should_be_enabled(elements: List[str], field) -> b
     :param elements: list of names to check if exist
     :param field: the field group
     """
+    # Disabled whilst working on model change
     return False
     return any(item in field for item in elements)
 
