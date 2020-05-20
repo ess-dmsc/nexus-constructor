@@ -313,6 +313,8 @@ class StreamFieldsWidget(QDialog):
                 self._record_advanced_f142_values(stream)
         elif current_schema == WriterModules.EV42.value:
             stream = EV42Stream(source=source, topic=topic)
+            if self.advanced_options_enabled:
+                self._record_advanced_ev42_values(stream)
         elif current_schema == WriterModules.NS10.value:
             stream = NS10Stream(source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
@@ -336,7 +338,6 @@ class StreamFieldsWidget(QDialog):
 
     def _record_advanced_f142_values(self, stream: F142Stream):
         """
-
         :param stream:
         :return:
         """
@@ -348,6 +349,25 @@ class StreamFieldsWidget(QDialog):
         ].value()
         stream.store_latest_into = self.f142_nexus_to_spinner_ui_element[
             STORE_LATEST_INTO
+        ].value()
+
+    def _record_advanced_ev42_values(self, stream: EV42Stream):
+        """
+        :param stream:
+        :return:
+        """
+        stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
+        stream.index_every_mb = self.ev42_nexus_to_spinner_ui_element[
+            NEXUS_INDICES_INDEX_EVERY_MB
+        ].value()
+        stream.index_every_kb = self.ev42_nexus_to_spinner_ui_element[
+            NEXUS_INDICES_INDEX_EVERY_KB
+        ].value()
+        stream.chunk_mb = self.ev42_nexus_to_spinner_ui_element[
+            NEXUS_CHUNK_CHUNK_MB
+        ].value()
+        stream.chunk_kb = self.ev42_nexus_to_spinner_ui_element[
+            NEXUS_CHUNK_CHUNK_KB
         ].value()
 
     # def _create_ev42_fields(self, stream_group: EV42Stream):
@@ -416,14 +436,26 @@ class StreamFieldsWidget(QDialog):
             ]
         ):
             self._show_advanced_options(True)
-            # if ADC_PULSE_DEBUG in field.keys():
-            #     self.ev42_adc_pulse_debug_checkbox.setChecked(
-            #         bool(field.abc_pulse_debug)
-            #     )
+            self._fill_existing_advanced_ev42_fields(field)
 
-            # fill_in_advanced_options(
-            #     self.ev42_nexus_to_spinner_ui_element.items(), field
-            # )
+    def _fill_existing_advanced_ev42_fields(self, field: EV42Stream):
+        """
+        :param field:
+        :return:
+        """
+        self.ev42_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
+        self.ev42_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
+            field.index_every_mb
+        )
+        self.ev42_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_KB].setValue(
+            field.index_every_kb
+        )
+        self.ev42_nexus_to_spinner_ui_element[NEXUS_CHUNK_CHUNK_MB].setValue(
+            field.index_every_mb
+        )
+        self.ev42_nexus_to_spinner_ui_element[NEXUS_CHUNK_CHUNK_KB].setValue(
+            field.index_every_kb
+        )
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
@@ -445,10 +477,13 @@ class StreamFieldsWidget(QDialog):
             [field.index_every_mb, field.index_every_kb, field.store_latest_into]
         ):
             self._show_advanced_options(True)
-            self.fill_advanced_existing_f142_fields(field)
+            self._fill_existing_advanced_f142_fields(field)
 
-    def fill_advanced_existing_f142_fields(self, field: F142Stream):
-
+    def _fill_existing_advanced_f142_fields(self, field: F142Stream):
+        """
+        :param field:
+        :return:
+        """
         self.f142_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
             field.index_every_mb
         )
