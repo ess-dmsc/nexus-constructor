@@ -9,7 +9,6 @@ from PySide2.QtWidgets import QSpinBox
 from nexus_constructor.field_utils import update_existing_stream_field
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.model.entry import Instrument
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper, get_name_of_node
 from nexus_constructor.stream_fields_widget import (
     fill_in_advanced_options,
     check_if_advanced_options_should_be_enabled,
@@ -39,8 +38,6 @@ def stream_fields_widget(qtbot, instrument, template):
 def test_ui_field_GIVEN_field_has_units_filled_in_ui_WHEN_getting_field_group_THEN_units_are_stored_in_attrs(
     qtbot,
 ):
-    instrument = Instrument()
-
     listwidget = QListWidget()
     field = FieldWidget(["test"], listwidget)
     field_name = "test"
@@ -254,13 +251,13 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
 
     instrument = Instrument(wrapper, {})
 
-    widget = FieldWidget(instrument=instrument)
+    widget = FieldWidget()
     qtbot.addWidget(widget)
 
     update_existing_stream_field(group, widget)
 
     # this would usually be done outside of the update_existing_stream_field
-    widget.name = get_name_of_node(group)
+    widget.name = group.name
 
     assert widget.streams_widget.f142_advanced_group_box.isEnabled()
 

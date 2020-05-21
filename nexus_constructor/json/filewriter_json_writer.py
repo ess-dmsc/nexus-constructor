@@ -24,9 +24,7 @@ def write_nexus_structure_to_json(data, file):
     object_to_json_file(generate_nexus_structure(converter, data), file)
 
 
-def generate_nexus_string(
-    converter: "NexusToDictConverter", instrument
-) -> str:
+def generate_nexus_string(converter: "NexusToDictConverter", instrument) -> str:
     """
     Generates the nexus structure in a json string format for use with constructing file writer run start commands.
     """

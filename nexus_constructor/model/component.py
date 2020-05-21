@@ -11,7 +11,8 @@ from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
-    NoShapeGeometry, OFFGeometry,
+    NoShapeGeometry,
+    OFFGeometry,
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name

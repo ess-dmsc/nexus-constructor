@@ -5,10 +5,8 @@ from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtWidgets import QListWidgetItem
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.component import Component
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.field_widget import FieldWidget
-from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component, add_fields_to_component
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.model.geometry import (
@@ -21,7 +19,6 @@ from nexus_constructor.model.link import Link
 from nexus_constructor.unit_utils import METRES
 from ui.add_component import Ui_AddComponentDialog
 from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
-from nexus_constructor.nexus.nexus_wrapper import get_name_of_node
 from nexus_constructor.validators import (
     UnitValidator,
     NameValidator,

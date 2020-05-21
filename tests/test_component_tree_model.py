@@ -10,7 +10,6 @@ import pytest
 from PySide2.QtCore import QModelIndex, Qt
 
 from nexus_constructor.model.geometry import OFFGeometryNoNexus
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from uuid import uuid1
 from PySide2.QtGui import QVector3D

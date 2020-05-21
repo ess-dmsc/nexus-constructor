@@ -14,7 +14,6 @@ import numpy as np
 from nexus_constructor.component import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
-from nexus_constructor.component.pixel_shape import PixelShape
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.field_attrs import FieldAttrFrame
 from nexus_constructor.model.geometry import (
@@ -28,7 +27,6 @@ from nexus_constructor.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup, F142Stream
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
 from nexus_constructor.pixel_options import PixelOptions
@@ -105,19 +103,19 @@ FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(DATASET_TYPE.keys())}
 FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 
-@pytest.fixture(scope="function")
-def component_with_cylindrical_geometry(nexus_wrapper):
-    shape_group = nexus_wrapper.create_nx_group(
-        "shape", "NXcylindrical_geometry", nexus_wrapper.instrument
-    )
-    nexus_wrapper.create_nx_group(
-        "detector_shape", "NXcylindrical_geometry", shape_group
-    )
-    component = create_component(nexus_wrapper, shape_group)
-    component.set_cylinder_shape()
-    component.nx_class = "NXdetector"
-    component.name = "CylindricalComponent"
-    return component
+# @pytest.fixture(scope="function")
+# def component_with_cylindrical_geometry(nexus_wrapper):
+#     shape_group = nexus_wrapper.create_nx_group(
+#         "shape", "NXcylindrical_geometry", nexus_wrapper.instrument
+#     )
+#     nexus_wrapper.create_nx_group(
+#         "detector_shape", "NXcylindrical_geometry", shape_group
+#     )
+#     component = create_component(nexus_wrapper, shape_group)
+#     component.set_cylinder_shape()
+#     component.nx_class = "NXdetector"
+#     component.name = "CylindricalComponent"
+#     return component
 
 
 @pytest.fixture(scope="function")

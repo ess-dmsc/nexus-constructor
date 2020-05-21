@@ -6,9 +6,9 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QFrame, QVBoxLayout
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
+from nexus_constructor.model.dataset import DatasetMetadata
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
-from nexus_constructor.transformations import Transformation
 from nexus_constructor.treeview_utils import (
     create_and_add_toolbar_action,
     set_button_states,
@@ -607,9 +607,9 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
 
 
 def create_transformation(trans_type: TransformationType):
-    file = NexusWrapper(str(uuid.uuid4()))
-    ds = file.nexus_file.create_dataset("transform", data=8)
-    t = Transformation(file, ds)
+    t = Transformation(
+        name="transformation", dataset=DatasetMetadata(type="Double"), values=8
+    )
     t.type = trans_type
     t.vector = QVector3D(1, 0, 0)
     return t
