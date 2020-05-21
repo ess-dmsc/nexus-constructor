@@ -341,10 +341,10 @@ class StreamFieldsWidget(QDialog):
         Save the advanced f142 properties to the stream data object.
         :param stream: The stream data object to be modified.
         """
-        stream.index_every_mb = self.f142_nexus_to_spinner_ui_element[
+        stream.nexus_indices_index_every_mb = self.f142_nexus_to_spinner_ui_element[
             NEXUS_INDICES_INDEX_EVERY_MB
         ].value()
-        stream.index_every_kb = self.f142_nexus_to_spinner_ui_element[
+        stream.nexus_indices_index_every_kb = self.f142_nexus_to_spinner_ui_element[
             NEXUS_INDICES_INDEX_EVERY_KB
         ].value()
         stream.store_latest_into = self.f142_nexus_to_spinner_ui_element[
@@ -357,16 +357,16 @@ class StreamFieldsWidget(QDialog):
         :param stream: The stream data object to be modified.
         """
         stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
-        stream.index_every_mb = self.ev42_nexus_to_spinner_ui_element[
+        stream.nexus_indices_index_every_mb = self.ev42_nexus_to_spinner_ui_element[
             NEXUS_INDICES_INDEX_EVERY_MB
         ].value()
-        stream.index_every_kb = self.ev42_nexus_to_spinner_ui_element[
+        stream.nexus_indices_index_every_kb = self.ev42_nexus_to_spinner_ui_element[
             NEXUS_INDICES_INDEX_EVERY_KB
         ].value()
-        stream.chunk_mb = self.ev42_nexus_to_spinner_ui_element[
+        stream.nexus_chunk_chunk_mb = self.ev42_nexus_to_spinner_ui_element[
             NEXUS_CHUNK_CHUNK_MB
         ].value()
-        stream.chunk_kb = self.ev42_nexus_to_spinner_ui_element[
+        stream.nexus_chunk_chunk_kb = self.ev42_nexus_to_spinner_ui_element[
             NEXUS_CHUNK_CHUNK_KB
         ].value()
 
@@ -391,10 +391,10 @@ class StreamFieldsWidget(QDialog):
         if check_if_advanced_options_should_be_enabled(
             [
                 field.adc_pulse_debug,
-                field.index_every_mb,
-                field.index_every_kb,
-                field.chunk_mb,
-                field.chunk_kb,
+                field.nexus_indices_index_every_mb,
+                field.nexus_indices_index_every_kb,
+                field.nexus_chunk_chunk_mb,
+                field.nexus_chunk_chunk_kb,
             ]
         ):
             self._show_advanced_options(True)
@@ -407,16 +407,16 @@ class StreamFieldsWidget(QDialog):
         """
         self.ev42_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
         self.ev42_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
-            field.index_every_mb
+            field.nexus_indices_index_every_mb
         )
         self.ev42_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_KB].setValue(
-            field.index_every_kb
+            field.nexus_indices_index_every_kb
         )
         self.ev42_nexus_to_spinner_ui_element[NEXUS_CHUNK_CHUNK_MB].setValue(
-            field.index_every_mb
+            field.nexus_indices_index_every_mb
         )
         self.ev42_nexus_to_spinner_ui_element[NEXUS_CHUNK_CHUNK_KB].setValue(
-            field.index_every_kb
+            field.nexus_indices_index_every_kb
         )
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
@@ -436,7 +436,7 @@ class StreamFieldsWidget(QDialog):
             self.value_units_edit.setText(field.value_units)
 
         if check_if_advanced_options_should_be_enabled(
-            [field.index_every_mb, field.index_every_kb, field.store_latest_into]
+            [field.nexus_indices_index_every_mb, field.nexus_indices_index_every_kb, field.store_latest_into]
         ):
             self._show_advanced_options(True)
             self._fill_existing_advanced_f142_fields(field)
@@ -447,10 +447,10 @@ class StreamFieldsWidget(QDialog):
         :param field: The f412 stream data object.
         """
         self.f142_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
-            field.index_every_mb
+            field.nexus_indices_index_every_mb
         )
         self.f142_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_KB].setValue(
-            field.index_every_kb
+            field.nexus_indices_index_every_kb
         )
         self.f142_nexus_to_spinner_ui_element[STORE_LATEST_INTO].setValue(
             field.store_latest_into
