@@ -43,7 +43,7 @@ def create_transform(
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
-    value=Dataset("", None, []),
+    values=Dataset("", None, []),
 ):
 
     translation = Transformation(name=name, dataset=dataset)
@@ -51,7 +51,7 @@ def create_transform(
     translation.vector = vector
     translation.type = type
     translation.ui_value = ui_value
-    translation.value = value
+    translation.values = values
 
     return translation
 
@@ -66,10 +66,10 @@ def test_can_get_transform_properties(dataset):
     test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
     test_type = "Translation"
-    test_value = Dataset("test_dataset", None, [1])
+    test_values = Dataset("test_dataset", None, [1])
 
     transform = create_transform(
-        name=test_name, vector=test_vector, ui_value=test_ui_value, value=test_value
+        name=test_name, vector=test_vector, ui_value=test_ui_value, values=test_values
     )
 
     assert (
@@ -85,7 +85,7 @@ def test_can_get_transform_properties(dataset):
         transform.type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
     assert (
-        transform.value == test_value
+        transform.values == test_values
     ), "Expected the transform type to match what was in the NeXus file"
 
 
@@ -164,13 +164,13 @@ def test_can_set_transform_properties():
     test_ui_value = 34.0
     test_vector = QVector3D(0.0, 0.0, 1.0)
     test_type = "Rotation"
-    test_value = Dataset("valuedataset", None, [1, 2])
+    test_values = Dataset("valuedataset", None, [1, 2])
 
     transform.name = test_name
     transform.ui_value = test_ui_value
     transform.vector = test_vector
     transform.type = test_type
-    transform.value = test_value
+    transform.values = test_values
 
     assert (
         transform.name == test_name
@@ -185,7 +185,7 @@ def test_can_set_transform_properties():
         transform.type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
     assert (
-        transform.value == test_value
+        transform.values == test_values
     ), "Expected the transform type to match what was in the NeXus file"
 
 
