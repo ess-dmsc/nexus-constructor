@@ -12,7 +12,6 @@ import pytest
 from pytest import approx
 import numpy as np
 
-from nexus_constructor.nexus.validation import NexusFormatError
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_x_offsets_from_pixel_grid,

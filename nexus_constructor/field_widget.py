@@ -1,7 +1,7 @@
 import logging
 import uuid
 from functools import partial
-from typing import List, Union
+from typing import List, Union, Any
 
 import h5py
 import numpy as np
@@ -25,7 +25,6 @@ from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
-from nexus_constructor.nexus.nexus_wrapper import to_string
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -351,3 +350,15 @@ class FieldWidget(QFrame):
 
     def show_attrs_dialog(self):
         self.attrs_dialog.show()
+
+
+def to_string(input_to_convert: Any) -> str:
+    """
+    Converts to string, assumes utf-8 encoding for bytes
+    Input can be bytes, str, numpy array
+    :param input_to_convert: Dataset value to convert
+    :return: str
+    """
+    if isinstance(input_to_convert, bytes):
+        return input_to_convert.decode("utf-8")
+    return str(input_to_convert)

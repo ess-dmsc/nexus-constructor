@@ -1,7 +1,5 @@
 import logging
-
 import confluent_kafka
-
 from nexus_constructor.kafka.kafka_interface import KafkaInterface
 
 

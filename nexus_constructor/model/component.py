@@ -1,7 +1,6 @@
 from typing import Tuple, Union, List
 
 import attr
-import h5py
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
@@ -14,12 +13,10 @@ from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
     NoShapeGeometry,
-    OFFGeometry,
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
@@ -314,18 +311,3 @@ SHAPE_GROUP_NAME = "shape"
 PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
 CYLINDRICAL_GEOMETRY_NX_CLASS = "NXcylindrical_geometry"
 OFF_GEOMETRY_NX_CLASS = "NXoff_geometry"
-
-
-def get_shape_from_component(
-    component_group: h5py.Group, shape_group_name: str
-) -> Union[OFFGeometry, CylindricalGeometry, NoShapeGeometry]:
-    if shape_group_name in component_group:
-        shape_group = component_group[shape_group_name]
-        nx_class = get_nx_class(shape_group)
-        if nx_class == CYLINDRICAL_GEOMETRY_NX_CLASS:
-            return CylindricalGeometry(shape_group)
-        if nx_class == OFF_GEOMETRY_NX_CLASS:
-            return OFFGeometryNexus(shape_group)
-
-    # else return a placeholder to indicate the component's position
-    return NoShapeGeometry()

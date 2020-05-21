@@ -17,8 +17,6 @@ from nexus_constructor.treeview_utils import (
 )
 from nexus_constructor.transformation_types import TransformationType
 
-# pytest.skip("Disabled whilst working on model change", allow_module_level=True)
-
 
 @pytest.fixture
 def tool_bar(template):
