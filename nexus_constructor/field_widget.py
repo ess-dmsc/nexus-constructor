@@ -2,7 +2,6 @@ import logging
 import uuid
 from functools import partial
 from typing import List, Union, Any
-
 import h5py
 import numpy as np
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
@@ -17,7 +16,6 @@ from PySide2.QtWidgets import (
     QGridLayout,
     QFormLayout,
 )
-
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
