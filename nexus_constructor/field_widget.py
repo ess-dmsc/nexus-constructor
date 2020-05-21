@@ -181,7 +181,7 @@ class FieldWidget(QFrame):
                 validate_line_edit,
                 self.field_name_edit,
                 tooltip_on_accept="Field name is valid.",
-                tooltip_on_reject=f"Field name is not valid",
+                tooltip_on_reject="Field name is not valid",
             )
         )
 

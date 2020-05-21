@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 
 import attr
 import numpy as np
@@ -101,7 +101,7 @@ class Transformation(Dataset):
         except ValueError:
             pass
 
-    def register_dependent(self, new_dependent: Union["Transformation", "Component"]):
+    def register_dependent(self, new_dependent: "Transformation"):
         if new_dependent not in self._dependents:
             self._dependents.append(new_dependent)
 
