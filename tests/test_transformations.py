@@ -39,8 +39,9 @@ def dataset():
 
 
 def create_transform(
+    value,
     name="test translation",
-    value=42.0,
+    ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
 ):
@@ -49,7 +50,8 @@ def create_transform(
 
     translation.vector = vector
     translation.type = type
-    translation.ui_value = value
+    translation.ui_value = ui_value
+    translation.value = value
 
     return translation
 
