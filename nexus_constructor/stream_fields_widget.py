@@ -61,13 +61,6 @@ def check_if_advanced_options_should_be_enabled(advanced_fields) -> bool:
     return any(item is not None for item in advanced_fields)
 
 
-def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
-    raise NotImplementedError
-    for nxs_string, spinner in elements:
-        if nxs_string in field.keys():
-            spinner.setValue(field[nxs_string][()])
-
-
 class StreamFieldsWidget(QDialog):
     """
     A stream widget containing schema-specific properties.
@@ -176,15 +169,6 @@ class StreamFieldsWidget(QDialog):
         """
         Sets up the UI for ev42 advanced options.
         """
-        self.ev42_nexus_elements = [
-            NEXUS_INDICES_INDEX_EVERY_MB,
-            NEXUS_INDICES_INDEX_EVERY_KB,
-            NEXUS_CHUNK_CHUNK_MB,
-            NEXUS_CHUNK_CHUNK_KB,
-        ]
-
-        self.ev42_nexus_to_spinner_ui_element = {}
-
         self.ev42_advanced_group_box = QGroupBox(
             parent=self.show_advanced_options_button
         )
@@ -192,28 +176,38 @@ class StreamFieldsWidget(QDialog):
 
         self.ev42_adc_pulse_debug_label = QLabel(ADC_PULSE_DEBUG)
         self.ev42_adc_pulse_debug_checkbox = QCheckBox()
-
         self.ev42_advanced_group_box.layout().addRow(
             self.ev42_adc_pulse_debug_label, self.ev42_adc_pulse_debug_checkbox
         )
 
-        self.add_labels_and_spinboxes_for_advanced_options(
-            self.ev42_nexus_elements,
-            self.ev42_advanced_group_box,
-            self.ev42_nexus_to_spinner_ui_element,
+        self.ev42_index_every_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_INDICES_INDEX_EVERY_MB, self.ev42_advanced_group_box
+        )
+        self.ev42_index_every_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_INDICES_INDEX_EVERY_KB, self.ev42_advanced_group_box
+        )
+        self.ev42_chunk_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_CHUNK_CHUNK_MB, self.ev42_advanced_group_box
+        )
+        self.ev42_chunk_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_CHUNK_CHUNK_KB, self.ev42_advanced_group_box
         )
 
-    def add_labels_and_spinboxes_for_advanced_options(
-        self, elements, group_box, nexus_to_spinner
+    def create_label_and_spinbox_for_advanced_option(
+        self, nexus_string: str, group_box: QGroupBox
     ):
-        for nexus_string in elements:
-            label = QLabel(nexus_string)
-            spinner = QSpinBox()
-            spinner.setRange(self.minimum_spinbox_value, self.maximum_spinbox_value)
+        """
+        Creates a SpinBox with a label and adds them to GroupBox then returns the SpinBox.
+        :param nexus_string: The nexus string label for the SpinBox.
+        :param group_box: The GroupBox that the label and SpinBox should be added to.
+        :return: The newly created SpinBox.
+        """
+        label = QLabel(nexus_string)
+        spinner = QSpinBox()
+        spinner.setRange(self.minimum_spinbox_value, self.maximum_spinbox_value)
+        group_box.layout().addRow(label, spinner)
 
-            group_box.layout().addRow(label, spinner)
-
-            nexus_to_spinner[nexus_string] = spinner
+        return spinner
 
     def _set_up_f142_group_box(self):
         """
@@ -223,18 +217,15 @@ class StreamFieldsWidget(QDialog):
             parent=self.show_advanced_options_button
         )
         self.f142_advanced_group_box.setLayout(QFormLayout())
-        self.f142_nexus_to_spinner_ui_element = {}
 
-        self.f142_nexus_elements = [
-            NEXUS_INDICES_INDEX_EVERY_MB,
-            NEXUS_INDICES_INDEX_EVERY_KB,
-            STORE_LATEST_INTO,
-        ]
-
-        self.add_labels_and_spinboxes_for_advanced_options(
-            self.f142_nexus_elements,
-            self.f142_advanced_group_box,
-            self.f142_nexus_to_spinner_ui_element,
+        self.f142_index_every_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_INDICES_INDEX_EVERY_MB, self.f142_advanced_group_box
+        )
+        self.f142_index_every_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_INDICES_INDEX_EVERY_KB, self.f142_advanced_group_box
+        )
+        self.f142_store_latest_into_spinner = self.create_label_and_spinbox_for_advanced_option(
+            STORE_LATEST_INTO, self.f142_advanced_group_box
         )
 
     def _show_advanced_options(self, show):
@@ -341,15 +332,9 @@ class StreamFieldsWidget(QDialog):
         Save the advanced f142 properties to the stream data object.
         :param stream: The stream data object to be modified.
         """
-        stream.nexus_indices_index_every_mb = self.f142_nexus_to_spinner_ui_element[
-            NEXUS_INDICES_INDEX_EVERY_MB
-        ].value()
-        stream.nexus_indices_index_every_kb = self.f142_nexus_to_spinner_ui_element[
-            NEXUS_INDICES_INDEX_EVERY_KB
-        ].value()
-        stream.store_latest_into = self.f142_nexus_to_spinner_ui_element[
-            STORE_LATEST_INTO
-        ].value()
+        stream.nexus_indices_index_every_mb = self.f142_index_every_mb_spinner.value()
+        stream.nexus_indices_index_every_kb = self.f142_index_every_kb_spinner.value()
+        stream.store_latest_into = self.f142_store_latest_into_spinner.value()
 
     def _record_advanced_ev42_values(self, stream: EV42Stream):
         """
@@ -357,18 +342,10 @@ class StreamFieldsWidget(QDialog):
         :param stream: The stream data object to be modified.
         """
         stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
-        stream.nexus_indices_index_every_mb = self.ev42_nexus_to_spinner_ui_element[
-            NEXUS_INDICES_INDEX_EVERY_MB
-        ].value()
-        stream.nexus_indices_index_every_kb = self.ev42_nexus_to_spinner_ui_element[
-            NEXUS_INDICES_INDEX_EVERY_KB
-        ].value()
-        stream.nexus_chunk_chunk_mb = self.ev42_nexus_to_spinner_ui_element[
-            NEXUS_CHUNK_CHUNK_MB
-        ].value()
-        stream.nexus_chunk_chunk_kb = self.ev42_nexus_to_spinner_ui_element[
-            NEXUS_CHUNK_CHUNK_KB
-        ].value()
+        stream.nexus_indices_index_every_mb = self.ev42_index_every_kb_spinner.value()
+        stream.nexus_indices_index_every_kb = self.ev42_index_every_kb_spinner.value()
+        stream.nexus_chunk_chunk_mb = self.ev42_chunk_mb_spinner.value()
+        stream.nexus_chunk_chunk_kb = self.ev42_chunk_kb_spinner.value()
 
     @staticmethod
     def _create_dataset_from_spinner(
@@ -406,18 +383,10 @@ class StreamFieldsWidget(QDialog):
         :param field: The ev42 stream data object.
         """
         self.ev42_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
-        self.ev42_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
-            field.nexus_indices_index_every_mb
-        )
-        self.ev42_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_KB].setValue(
-            field.nexus_indices_index_every_kb
-        )
-        self.ev42_nexus_to_spinner_ui_element[NEXUS_CHUNK_CHUNK_MB].setValue(
-            field.nexus_indices_index_every_mb
-        )
-        self.ev42_nexus_to_spinner_ui_element[NEXUS_CHUNK_CHUNK_KB].setValue(
-            field.nexus_indices_index_every_kb
-        )
+        self.ev42_index_every_mb_spinner.setValue(field.nexus_indices_index_every_mb)
+        self.ev42_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
+        self.ev42_chunk_mb_spinner.setValue(field.nexus_indices_index_every_mb)
+        self.ev42_chunk_kb_spinner.setValue(field.nexus_indices_index_every_kb)
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
@@ -436,7 +405,11 @@ class StreamFieldsWidget(QDialog):
             self.value_units_edit.setText(field.value_units)
 
         if check_if_advanced_options_should_be_enabled(
-            [field.nexus_indices_index_every_mb, field.nexus_indices_index_every_kb, field.store_latest_into]
+            [
+                field.nexus_indices_index_every_mb,
+                field.nexus_indices_index_every_kb,
+                field.store_latest_into,
+            ]
         ):
             self._show_advanced_options(True)
             self._fill_existing_advanced_f142_fields(field)
@@ -446,15 +419,9 @@ class StreamFieldsWidget(QDialog):
         Fill the advanced fields in the interface with the existing f142 stream data.
         :param field: The f412 stream data object.
         """
-        self.f142_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
-            field.nexus_indices_index_every_mb
-        )
-        self.f142_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_KB].setValue(
-            field.nexus_indices_index_every_kb
-        )
-        self.f142_nexus_to_spinner_ui_element[STORE_LATEST_INTO].setValue(
-            field.store_latest_into
-        )
+        self.f142_index_every_mb_spinner.setValue(field.nexus_indices_index_every_mb)
+        self.f142_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
+        self.f142_store_latest_into_spinner.setValue(field.store_latest_into)
 
     def update_existing_stream_info(self, field: StreamGroup):
         """
