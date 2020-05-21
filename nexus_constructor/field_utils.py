@@ -3,9 +3,9 @@ from typing import List, Callable, Tuple, Union
 
 import numpy as np
 
-from nexus_constructor.model.component import Component
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup

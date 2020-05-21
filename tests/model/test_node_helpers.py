@@ -1,6 +1,5 @@
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.node import _get_item, _remove_item, _set_item
-import pytest
 
 
 def test_get_item_returns_correct_component_when_given_component_is_in_list():

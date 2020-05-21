@@ -4,8 +4,8 @@ import h5py
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.json.helpers import object_to_json_file
-from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 from nexus_constructor.model.stream import WriterModules
+from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 
 FORWARDER_SCHEMAS = [WriterModules.F142.value, WriterModules.TDCTIME.value]
 

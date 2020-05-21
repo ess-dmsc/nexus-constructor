@@ -13,7 +13,6 @@ from nexus_constructor.component.component_type import (
 )
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.entry import Instrument, Entry
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 import os
 import argparse

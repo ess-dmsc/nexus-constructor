@@ -7,3 +7,4 @@ exclude = ui/,build*,definitions
 per-file-ignores =
     nexus_constructor/geometry/__init__.py:F401
     tests/ui_tests/test_ui_fields.py:F811,F401
+    tests/*:E402,F821

@@ -1,14 +1,13 @@
+import os
 import re
+from enum import Enum
+from typing import List
 
 import h5py
+import numpy as np
+import pint
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtGui import QValidator, QIntValidator
-import pint
-import os
-from typing import List
-import numpy as np
-from enum import Enum
-
 from PySide2.QtWidgets import QComboBox, QWidget, QRadioButton
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh

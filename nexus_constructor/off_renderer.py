@@ -5,15 +5,16 @@ Based off of a qml custom mesh example at https://github.com/iLya84a/qt3d/blob/m
 and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
+import itertools
 import logging
+import struct
 from typing import List, Tuple
 
-from nexus_constructor.model.geometry import OFFGeometry
-from PySide2.Qt3DRender import Qt3DRender
 from PySide2.Qt3DCore import Qt3DCore
+from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
-import struct
-import itertools
+
+from nexus_constructor.model.geometry import OFFGeometry
 
 
 def flatten(list_to_flatten):

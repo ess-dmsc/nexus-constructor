@@ -1,6 +1,7 @@
+from typing import Tuple, List, Optional
+
 import attr
 import h5py
-from typing import Tuple, List, Optional
 
 from nexus_constructor.nexus.nexus_wrapper import get_nx_class
 

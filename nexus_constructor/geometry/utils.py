@@ -1,5 +1,5 @@
-from PySide2.QtGui import QVector3D
 import numpy as np
+from PySide2.QtGui import QVector3D
 
 
 def validate_nonzero_qvector(value: QVector3D):

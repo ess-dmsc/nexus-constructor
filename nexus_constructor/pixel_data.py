@@ -1,6 +1,7 @@
 from abc import ABC
-import attr
 from enum import Enum
+
+import attr
 
 
 class CountDirection(Enum):

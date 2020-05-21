@@ -249,8 +249,6 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
     wrapper = nexus_wrapper
     wrapper.load_file(file, file)
 
-    instrument = Instrument(wrapper, {})
-
     widget = FieldWidget()
     qtbot.addWidget(widget)
 
@@ -296,7 +294,7 @@ def test_GIVEN_stream_group_that_has_ev42_advanced_option_WHEN_filling_in_existi
     update_existing_stream_field(group, widget)
 
     # this would usually be done outside of the update_existing_stream_field
-    widget.name = get_name_of_node(group)
+    widget.name = group.name
 
     assert widget.streams_widget.ev42_advanced_group_box.isEnabled()
 

@@ -1,8 +1,12 @@
 import logging
 import uuid
-import numpy as np
-import h5py
 from functools import partial
+from typing import List, Union
+
+import h5py
+import numpy as np
+from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
+from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
@@ -13,9 +17,7 @@ from PySide2.QtWidgets import (
     QGridLayout,
     QFormLayout,
 )
-from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
-from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
-from typing import List, Union
+
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
@@ -31,7 +33,6 @@ from nexus_constructor.validators import (
     FieldType,
     DATASET_TYPE,
     NameValidator,
-    HDFLocationExistsValidator,
     UnitValidator,
 )
 

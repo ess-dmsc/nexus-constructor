@@ -1,26 +1,27 @@
+import time
 import uuid
 from functools import partial
 from typing import Callable, Dict, Union, Tuple, Type
 
-from nexus_constructor.kafka.kafka_interface import KafkaInterface
-from nexus_constructor.ui_utils import validate_line_edit
-from nexus_constructor.validators import BrokerAndTopicValidator
-from ui.led import Led
-from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
-from PySide2.QtWidgets import QMainWindow, QLineEdit, QApplication
+import attr
+from PySide2 import QtCore
 from PySide2.QtCore import QTimer, QAbstractItemModel, QSettings
 from PySide2.QtGui import QStandardItemModel, QCloseEvent
-from PySide2 import QtCore
-from nexus_constructor.model.entry import Instrument
-from nexus_constructor.kafka.status_consumer import StatusConsumer
-from nexus_constructor.kafka.command_producer import CommandProducer
-import time
+from PySide2.QtWidgets import QMainWindow, QLineEdit, QApplication
+from streaming_data_types import run_start_pl72, run_stop_6s4t
+
 from nexus_constructor.json.filewriter_json_writer import (
     NexusToDictConverter,
     generate_nexus_string,
 )
-import attr
-from streaming_data_types import run_start_pl72, run_stop_6s4t
+from nexus_constructor.kafka.command_producer import CommandProducer
+from nexus_constructor.kafka.kafka_interface import KafkaInterface
+from nexus_constructor.kafka.status_consumer import StatusConsumer
+from nexus_constructor.model.entry import Instrument
+from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import BrokerAndTopicValidator
+from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
+from ui.led import Led
 
 
 @attr.s

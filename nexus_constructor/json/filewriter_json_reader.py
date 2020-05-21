@@ -1,8 +1,9 @@
 import json
-import h5py
-import numpy as np
 import uuid
 from typing import Union, List
+
+import h5py
+import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs
 

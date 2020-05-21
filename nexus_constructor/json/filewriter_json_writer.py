@@ -1,9 +1,9 @@
 import json
+import logging
+from typing import Union, Dict, Any, List, Tuple
 
 import h5py
 import numpy as np
-import logging
-from typing import Union, Dict, Any, List, Tuple
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.json.helpers import object_to_json_file, handle_non_std_types

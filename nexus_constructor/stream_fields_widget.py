@@ -1,7 +1,8 @@
 from functools import partial
-from typing import List, ItemsView, Dict, Union
+from typing import List, ItemsView, Dict
 
 import h5py
+import numpy as np
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QComboBox,
@@ -16,7 +17,6 @@ from PySide2.QtWidgets import (
     QCheckBox,
     QFormLayout,
 )
-import numpy as np
 
 from nexus_constructor.model.stream import (
     StreamGroup,

@@ -1,22 +1,8 @@
-import logging
-import uuid
+from typing import Any, Optional
+
 import h5py
-from PySide2.QtCore import Signal, QObject
-from typing import Any, TypeVar, Optional
-import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs
-
-DEFAULT_INSTRUMENT = "instrument"
-DEFAULT_ENTRY = "entry"
-
-
-def append_nxs_extension(file_name: str) -> str:
-    extension = ".nxs"
-    if file_name.endswith(extension):
-        return file_name
-    else:
-        return file_name + extension
 
 
 def get_nx_class(group: h5py.Group) -> Optional[str]:

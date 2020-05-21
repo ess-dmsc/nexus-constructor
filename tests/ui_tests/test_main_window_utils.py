@@ -1,4 +1,3 @@
-import uuid
 from unittest.mock import Mock
 import pytest
 from PySide2.QtCore import QPoint, QModelIndex
@@ -18,7 +17,7 @@ from nexus_constructor.treeview_utils import (
 )
 from nexus_constructor.transformation_types import TransformationType
 
-pytest.skip("Disabled whilst working on model change", allow_module_level=True)
+# pytest.skip("Disabled whilst working on model change", allow_module_level=True)
 
 
 @pytest.fixture
@@ -363,6 +362,7 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     )
 
 
+@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_buttons_are_enabled(
     component_tree_view,
     delete_action,
@@ -407,6 +407,7 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     )
 
 
+@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changing_button_states_THEN_create_link_button_is_disabled(
     component_tree_view,
     delete_action,
@@ -442,6 +443,7 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
     )
 
 
+@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_THEN_create_link_button_is_disabled(
     component_tree_view,
     delete_action,
@@ -615,6 +617,7 @@ def create_transformation(trans_type: TransformationType):
     return t
 
 
+@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_rotation_WHEN_getting_transformation_frame_THEN_frame_type_is_edit_rotation(
     qtbot,
 ):
@@ -626,6 +629,7 @@ def test_GIVEN_rotation_WHEN_getting_transformation_frame_THEN_frame_type_is_edi
     assert isinstance(frame.transformation_frame, EditRotation)
 
 
+@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_translation_WHEN_getting_transformation_frame_THEN_frame_type_is_edit_translation(
     qtbot,
 ):

@@ -1,5 +1,6 @@
 import os
 import sys
+
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QIcon, QColor
 from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel
@@ -8,13 +9,13 @@ from nexus_constructor.component.link_transformation import LinkTransformation
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.transformation_view import (
     EditTransformationLink,
     EditTranslation,
     EditRotation,
 )
-from nexus_constructor.model.transformation import Transformation
 
 # We have to use this for cx freeze as __file__ does not work
 if getattr(sys, "frozen", False):
