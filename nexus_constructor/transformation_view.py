@@ -35,12 +35,6 @@ class EditTransformation(QGroupBox):
             update_function(
                 self.transformation.values, self.transformation_frame.magnitude_widget
             )
-        if isinstance(self.transformation, NXLogTransformation):
-            self.transformation_frame.main_layout.addWidget(
-                QLabel(
-                    "Transformation is an NXlog - currently these are not editable. "
-                )
-            )
             self.transformation_frame.magnitude_widget.setVisible(False)
         self.transformation_frame.magnitude_widget.units = self.transformation.units
         self.transformation_frame.value_spinbox.setValue(self.transformation.ui_value)
