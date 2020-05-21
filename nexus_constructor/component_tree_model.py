@@ -3,7 +3,6 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component.link_transformation import LinkTransformation
-from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.entry import Instrument
