@@ -224,9 +224,7 @@ class ComponentTreeModel(QAbstractItemModel):
         parent_component, transformation_list, transformation_type
     ):
         value = Dataset(
-            name="",
-            dataset=DatasetMetadata(type="Byte", size=[1]),
-            values="",
+            name="", dataset=DatasetMetadata(type="Byte", size=[1]), values=""
         )
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
