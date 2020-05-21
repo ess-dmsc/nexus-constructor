@@ -338,8 +338,8 @@ class StreamFieldsWidget(QDialog):
 
     def _record_advanced_f142_values(self, stream: F142Stream):
         """
-        :param stream:
-        :return:
+        Save the advanced f142 properties to the stream data object.
+        :param stream: The stream data object to be modified.
         """
         stream.index_every_mb = self.f142_nexus_to_spinner_ui_element[
             NEXUS_INDICES_INDEX_EVERY_MB
@@ -353,8 +353,8 @@ class StreamFieldsWidget(QDialog):
 
     def _record_advanced_ev42_values(self, stream: EV42Stream):
         """
-        :param stream:
-        :return:
+        Save the advanced ev42 properties to the stream data object.
+        :param stream: The stream data object to be modified.
         """
         stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
         stream.index_every_mb = self.ev42_nexus_to_spinner_ui_element[
@@ -369,44 +369,6 @@ class StreamFieldsWidget(QDialog):
         stream.chunk_kb = self.ev42_nexus_to_spinner_ui_element[
             NEXUS_CHUNK_CHUNK_KB
         ].value()
-
-    # def _create_ev42_fields(self, stream_group: EV42Stream):
-    #     """
-    #     Create ev42 fields in the given group if advanced options are specified.
-    #     :param stream_group: The group to apply fields to.
-    #     """
-    #     raise NotImplementedError
-    #     if self.advanced_options_enabled:
-    #         if self.ev42_adc_pulse_debug_checkbox.isChecked():
-    #             stream_group.create_dataset(
-    #                 ADC_PULSE_DEBUG,
-    #                 dtype=bool,
-    #                 data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
-    #             )
-    #         self._create_dataset_from_spinner(
-    #             stream_group, self.ev42_nexus_to_spinner_ui_element
-    #         )
-    #
-    # def _create_f142_fields(self, stream_group: F142Stream):
-    #     """
-    #     Create f142 fields in the given group if advanced options are specified.
-    #     :param stream_group: The group to apply fields to.
-    #     """
-    #     stream_group.create_dataset(
-    #         "type", dtype=STRING_DTYPE, data=self.type_combo.currentText()
-    #     )
-    #     if self.array_radio.isChecked():
-    #         stream_group.create_dataset(
-    #             "array_size", data=self.array_size_spinbox.value()
-    #         )
-    #     if self.value_units_edit.text():
-    #         stream_group.create_dataset(
-    #             "value_units", data=self.value_units_edit.text()
-    #         )
-    #     if self.advanced_options_enabled:
-    #         self._create_dataset_from_spinner(
-    #             stream_group, self.f142_nexus_to_spinner_ui_element
-    #         )
 
     @staticmethod
     def _create_dataset_from_spinner(
@@ -440,8 +402,8 @@ class StreamFieldsWidget(QDialog):
 
     def _fill_existing_advanced_ev42_fields(self, field: EV42Stream):
         """
-        :param field:
-        :return:
+        Fill the fields in the interface with the existing ev42 stream data.
+        :param field: The ev42 stream data object.
         """
         self.ev42_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
         self.ev42_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
@@ -481,8 +443,8 @@ class StreamFieldsWidget(QDialog):
 
     def _fill_existing_advanced_f142_fields(self, field: F142Stream):
         """
-        :param field:
-        :return:
+        Fill the advanced fields in the interface with the existing f142 stream data.
+        :param field: The f412 stream data object.
         """
         self.f142_nexus_to_spinner_ui_element[NEXUS_INDICES_INDEX_EVERY_MB].setValue(
             field.index_every_mb
