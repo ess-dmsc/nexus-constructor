@@ -39,11 +39,11 @@ def dataset():
 
 
 def create_transform(
-    value,
     name="test translation",
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
+    value=Dataset("", None, []),
 ):
 
     translation = Transformation(name=name, dataset=dataset)
@@ -63,23 +63,29 @@ def create_component(name=""):
 def test_can_get_transform_properties(dataset):
 
     test_name = "slartibartfast"
-    test_value = 42
+    test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
     test_type = "Translation"
+    test_value = Dataset("test_dataset", None, [1])
 
-    transform = create_transform(name=test_name, value=test_value, vector=test_vector)
+    transform = create_transform(
+        name=test_name, vector=test_vector, ui_value=test_ui_value, value=test_value
+    )
 
     assert (
         transform.name == test_name
     ), "Expected the transform name to match what was in the NeXus file"
     assert (
-        transform.ui_value == test_value
+        transform.ui_value == test_ui_value
     ), "Expected the transform value to match what was in the NeXus file"
     assert (
         transform.vector == test_vector
     ), "Expected the transform vector to match what was in the NeXus file"
     assert (
         transform.type == test_type
+    ), "Expected the transform type to match what was in the NeXus file"
+    assert (
+        transform.value == test_value
     ), "Expected the transform type to match what was in the NeXus file"
 
 
@@ -89,12 +95,12 @@ def test_transform_dependents_depends_on_are_updated_when_transformation_name_is
 ):
 
     test_name = "slartibartfast"
-    test_value = 42
+    test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
     test_type = "Translation"
 
     transform_dataset = _add_transform_to_file(
-        nexus_wrapper, test_name, test_value, test_vector, test_type
+        nexus_wrapper, test_name, test_ui_value, test_vector, test_type
     )
 
     component = nexus_wrapper.create_nx_group(
@@ -120,10 +126,10 @@ def test_transform_dependents_depends_on_are_updated_when_transformation_name_is
 @pytest.mark.parametrize("test_input", ["translation", "Translation", "TRANSLATION"])
 def test_transform_type_is_capitalised(test_input, nexus_wrapper):
     test_name = "slartibartfast"
-    test_value = 42
+    test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
     transform_dataset = _add_transform_to_file(
-        nexus_wrapper, test_name, test_value, test_vector, test_input
+        nexus_wrapper, test_name, test_ui_value, test_vector, test_input
     )
     transform = Transformation(nexus_wrapper, transform_dataset)
     assert transform.type == "Translation"
@@ -134,7 +140,7 @@ def test_ui_value_for_transform_with_array_magnitude_returns_first_value():
     array = [1.1, 2.2, 3.3]
     transform_value = np.asarray(array, dtype=float)
 
-    transformation = create_transform(name=transform_name, value=transform_value)
+    transformation = create_transform(name=transform_name, ui_value=transform_value)
 
     assert transformation.ui_value == array[0]
 
@@ -144,7 +150,7 @@ def test_ui_value_for_transform_with_array_magnitude_of_strings_returns_zero():
     array = ["a1", "b1", "c1"]
     transform_value = np.asarray(array)
 
-    transformation = create_transform(name=transform_name, value=transform_value)
+    transformation = create_transform(name=transform_name, ui_value=transform_value)
     assert transformation.ui_value == 0
 
 
@@ -155,12 +161,12 @@ def test_can_set_transform_properties():
     transform = create_transform(initial_name)
 
     test_name = "beeblebrox"
-    test_value = 34.0
+    test_ui_value = 34.0
     test_vector = QVector3D(0.0, 0.0, 1.0)
     test_type = "Rotation"
 
     transform.name = test_name
-    transform.value = test_value
+    transform.value = test_ui_value
     transform.vector = test_vector
     transform.type = test_type
 
@@ -168,7 +174,7 @@ def test_can_set_transform_properties():
         transform.name == test_name
     ), "Expected the transform name to match what was in the NeXus file"
     assert (
-        transform.value == test_value
+        transform.value == test_ui_value
     ), "Expected the transform value to match what was in the NeXus file"
     assert (
         transform.vector == test_vector
@@ -379,35 +385,35 @@ def test_register_dependent_twice():
 
 def test_can_get_translation_as_4_by_4_matrix():
 
-    test_value = 42.0
+    test_ui_value = 42.0
     # Note, it should not matter if this is not set to a unit vector
     test_vector = QVector3D(2.0, 0.0, 0.0)
     test_type = "Translation"
 
     transformation = create_transform(
-        value=test_value, vector=test_vector, type=test_type
+        ui_value=test_ui_value, vector=test_vector, type=test_type
     )
 
     test_matrix = transformation.qmatrix
     expected_matrix = np.array(
-        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, test_value, 0, 0, 1)
+        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, test_ui_value, 0, 0, 1)
     )
     assert np.allclose(expected_matrix, np.array(test_matrix.data()))
 
 
 def test_can_get_rotation_as_4_by_4_matrix():
 
-    test_value = 45.0  # degrees
+    test_ui_value = 45.0  # degrees
     test_vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
     test_type = "Rotation"
 
     transformation = create_transform(
-        value=test_value, vector=test_vector, type=test_type
+        ui_value=test_ui_value, vector=test_vector, type=test_type
     )
 
     test_matrix = transformation.qmatrix
     # for a rotation around the y-axis:
-    test_value_radians = np.deg2rad(test_value)
+    test_value_radians = np.deg2rad(test_ui_value)
     expected_matrix = np.array(
         (
             np.cos(-test_value_radians),

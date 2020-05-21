@@ -30,16 +30,11 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.x_spinbox.setValue(current_vector.x())
         self.transformation_frame.y_spinbox.setValue(current_vector.y())
         self.transformation_frame.z_spinbox.setValue(current_vector.z())
-        try:
-            self.transformation.value
-            update_function = find_field_type(self.transformation.value)
-            if update_function is not None:
-                update_function(
-                    self.transformation.value,
-                    self.transformation_frame.magnitude_widget,
-                )
-        except AttributeError:
-            pass
+        update_function = find_field_type(self.transformation.value)
+        if update_function is not None:
+            update_function(
+                self.transformation.value, self.transformation_frame.magnitude_widget
+            )
         if isinstance(self.transformation, NXLogTransformation):
             self.transformation_frame.main_layout.addWidget(
                 QLabel(

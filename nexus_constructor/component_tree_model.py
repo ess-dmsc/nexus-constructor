@@ -3,7 +3,9 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component.link_transformation import LinkTransformation
+from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
@@ -221,18 +223,25 @@ class ComponentTreeModel(QAbstractItemModel):
     def _create_new_transformation(
         parent_component, transformation_list, transformation_type
     ):
+        value = Dataset(
+            name="",
+            dataset=DatasetMetadata(type="Byte", size=[1]),
+            values="",
+        )
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
                 name=generate_unique_name(
                     TransformationType.TRANSLATION, transformation_list
                 ),
                 vector=QVector3D(1.0, 0, 0),
+                value=value,
             )
         elif transformation_type == TransformationType.ROTATION:
             new_transformation = parent_component.add_rotation(
                 name=generate_unique_name("Rotation", transformation_list),
                 axis=QVector3D(1.0, 0, 0),
                 angle=0.0,
+                value=value,
             )
         else:
             raise ValueError(f"Unknown transformation type: {transformation_type}")
