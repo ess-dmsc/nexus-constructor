@@ -35,7 +35,6 @@ class EditTransformation(QGroupBox):
             update_function(
                 self.transformation.values, self.transformation_frame.magnitude_widget
             )
-            self.transformation_frame.magnitude_widget.setVisible(False)
         self.transformation_frame.magnitude_widget.units = self.transformation.units
         self.transformation_frame.value_spinbox.setValue(self.transformation.ui_value)
 
