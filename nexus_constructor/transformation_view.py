@@ -6,9 +6,8 @@ from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.unit_utils import METRES, RADIANS
 from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
-from PySide2.QtWidgets import QGroupBox, QFrame, QWidget, QLabel
+from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
 from PySide2.QtGui import QVector3D
-from nexus_constructor.transformations import NXLogTransformation
 from nexus_constructor.component_tree_model import LinkTransformation
 
 

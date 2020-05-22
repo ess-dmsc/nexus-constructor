@@ -1,5 +1,5 @@
 from functools import partial
-from typing import List, ItemsView, Dict, Union
+from typing import Dict
 
 import h5py
 from PySide2.QtCore import Qt
