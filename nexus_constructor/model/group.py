@@ -1,12 +1,12 @@
 from typing import List, Any, Union
 
 import attr
+import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.dataset import DatasetMetadata, Dataset
 from nexus_constructor.model.node import Node, _get_item, _set_item, _remove_item
-import numpy as np
 
 
 @attr.s

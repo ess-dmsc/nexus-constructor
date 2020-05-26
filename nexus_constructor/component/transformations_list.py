@@ -1,5 +1,3 @@
-from nexus_constructor.transformations import Transformation
-
 TRANSFORM_STR = "/transformations/"
 LINK_STR = "has_link"
 

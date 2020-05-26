@@ -1,10 +1,9 @@
-from copy import copy
-import time
 import json
 import logging
-import confluent_kafka
+import time
+from copy import copy
 from uuid import uuid1
-
+import confluent_kafka
 from nexus_constructor.kafka.kafka_interface import KafkaInterface
 
 

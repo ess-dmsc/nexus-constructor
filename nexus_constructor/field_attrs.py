@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Union, Any
 
+import numpy as np
 from PySide2.QtWidgets import (
     QDialog,
     QGridLayout,
@@ -12,7 +13,6 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QComboBox,
 )
-import numpy as np
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs

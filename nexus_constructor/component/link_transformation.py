@@ -1,6 +1,6 @@
-from nexus_constructor.component.transformations_list import TransformationsList
 from typing import Optional
 
+from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.model.component import Component
 
 TRANSFORM_STR = "/transformations/"

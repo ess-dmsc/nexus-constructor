@@ -1,7 +1,7 @@
+import typing
 from functools import partial
 
 import numpy as np
-import typing
 from PySide2.QtCore import QModelIndex, QAbstractTableModel, Qt, QAbstractItemModel
 from PySide2.QtWidgets import (
     QWidget,

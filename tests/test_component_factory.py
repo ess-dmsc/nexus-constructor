@@ -4,8 +4,6 @@ pytest.skip("Disabled whilst working on model change", allow_module_level=True)
 import numpy as np
 from nexus_constructor.component.chopper_shape import ChopperShape
 from nexus_constructor.component.component_shape import ComponentShape
-from nexus_constructor.component.pixel_shape import PixelShape
-from nexus_constructor.component.component_factory import create_component
 from nexus_constructor.model.geometry import OFFGeometryNoNexus, OFFGeometryNexus
 from nexus_constructor.model.geometry import NoShapeGeometry
 

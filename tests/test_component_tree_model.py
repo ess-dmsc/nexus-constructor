@@ -4,15 +4,14 @@ from nexus_constructor.component_tree_model import (
     LinkTransformation,
 )
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 
 from nexus_constructor.model.entry import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
 
 from nexus_constructor.model.geometry import OFFGeometryNoNexus
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
-from uuid import uuid1
 from PySide2.QtGui import QVector3D
 
 from tests.test_utils import NX_CLASS_DEFINITIONS
@@ -21,14 +20,17 @@ pytest.skip("Disabled whilst working on model change", allow_module_level=True)
 
 
 def _add_component_to_file(
-    nexus_wrapper: NexusWrapper,
-    field_name: str,
-    field_value: Any,
-    component_name: str = "test_component",
+    field_name: str, field_value: Any, component_name: str = "test_component"
 ):
-    component_group = nexus_wrapper.nexus_file.create_group(component_name)
-    component_group.create_dataset(field_name, data=field_value)
-    return component_group
+    component = Component(component_name)
+    component.set_field_value(
+        field_name,
+        Dataset(
+            name=field_name, dataset=DatasetMetadata(type="Double"), values=field_value
+        ),
+    )
+
+    return component
 
 
 class FakeTransformationChangedSignal:
@@ -55,11 +57,7 @@ class FakeInstrument(list):
         return self
 
     def add_component(self, name: str, nx_class: str, description: str):
-        nexus_wrapper = NexusWrapper(str(uuid1()))
-        component_group = _add_component_to_file(
-            nexus_wrapper, name, 42, "component_name"
-        )
-        return Component(nexus_wrapper, component_group)
+        return _add_component_to_file(name, 42, "component_name")
 
 
 def get_component():

@@ -1,15 +1,14 @@
-from nexus_constructor.field_utils import find_field_type
+from PySide2.QtGui import QVector3D
+from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
+
+from nexus_constructor.component_tree_model import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.unit_utils import METRES, RADIANS
-from ui.transformation import Ui_Transformation
 from ui.link import Ui_Link
-from PySide2.QtWidgets import QGroupBox, QFrame, QWidget, QLabel
-from PySide2.QtGui import QVector3D
-from nexus_constructor.transformations import NXLogTransformation
-from nexus_constructor.component_tree_model import LinkTransformation
+from ui.transformation import Ui_Transformation
 
 
 class EditTransformation(QGroupBox):

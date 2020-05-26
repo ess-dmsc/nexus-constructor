@@ -1,29 +1,19 @@
 import uuid
 from typing import Dict
 
-from PySide2.QtCore import QSettings
-from PySide2.QtWidgets import (
-    QMainWindow,
-    QApplication,
-    QInputDialog,
-    QLineEdit,
-    QAction,
-    QMessageBox,
-)
-from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
-import silx.gui.hdf5
 import h5py
+import silx.gui.hdf5
+from PySide2.QtCore import QSettings
+from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
+from PySide2.QtWidgets import QMainWindow, QApplication, QAction, QMessageBox
 from nexusutils.nexusbuilder import NexusBuilder
 
-import nexus_constructor.json.forwarder_json_writer
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Instrument
-from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
+from nexus_constructor.ui_utils import file_dialog
 from ui.main_window import Ui_MainWindow
 
-# from nexus_constructor.json import filewriter_json_writer
-# from nexus_constructor.json.filewriter_json_reader import json_to_nexus
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
@@ -176,7 +166,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             QMessageBox.critical(self, "IDF Error", "Error whilst loading IDF file")
 
     def save_to_filewriter_json(self):
-        filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
+        raise NotImplementedError
+        # filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
         # if filename:
         #     with open(filename, "w") as file:
         #         filewriter_json_writer.write_nexus_structure_to_json(
@@ -184,41 +175,44 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         #         )
 
     def save_to_forwarder_json(self):
-        filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
-        if filename:
-            provider_type, ok_pressed = QInputDialog.getItem(
-                None,
-                "Provider type",
-                "Select provider type for PVs",
-                ["ca", "pva"],
-                0,
-                False,
-            )
-            default_broker, ok_pressed = QInputDialog.getText(
-                None,
-                "Default broker",
-                "Default Broker: (This will only be used for streams that do not already have a broker)",
-                text="broker:port",
-                echo=QLineEdit.Normal,
-            )
-            if ok_pressed:
-                with open(filename, "w") as file:
-                    nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
-                        file,
-                        self.instrument.nexus.entry,
-                        provider_type=provider_type,
-                        default_broker=default_broker,
-                    )
+        raise NotImplementedError
+        # filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
+        # if filename:
+        #     provider_type, ok_pressed = QInputDialog.getItem(
+        #         None,
+        #         "Provider type",
+        #         "Select provider type for PVs",
+        #         ["ca", "pva"],
+        #         0,
+        #         False,
+        #     )
+        #     default_broker, ok_pressed = QInputDialog.getText(
+        #         None,
+        #         "Default broker",
+        #         "Default Broker: (This will only be used for streams that do not already have a broker)",
+        #         text="broker:port",
+        #         echo=QLineEdit.Normal,
+        #     )
+        #     if ok_pressed:
+        #         with open(filename, "w") as file:
+        #             nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
+        #                 file,
+        #                 self.instrument.nexus.entry,
+        #                 provider_type=provider_type,
+        #                 default_broker=default_broker,
+        #             )
 
     def open_nexus_file(self):
-        filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
-        existing_file = self.instrument.nexus.nexus_file
-        if self.instrument.nexus.open_file(filename):
-            self._update_views()
-            existing_file.close()
+        raise NotImplementedError
+        # filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
+        # existing_file = self.instrument.nexus.nexus_file
+        # if self.instrument.nexus.open_file(filename):
+        #     self._update_views()
+        #     existing_file.close()
 
     def open_json_file(self):
-        filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
+        raise NotImplementedError
+        # filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
         # if filename:
         #     with open(filename, "r") as json_file:
         #         json_data = json_file.read()

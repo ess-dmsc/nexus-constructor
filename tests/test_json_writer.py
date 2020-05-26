@@ -1,18 +1,23 @@
+import pytest
+
+
+pytest.skip("Disabled whilst working on model change", allow_module_level=True)
+
 import io
 import json
 from ast import literal_eval
 import numpy as np
 import h5py
-import pytest
-
-pytest.skip("Disabled whilst working on model change", allow_module_level=True)
-from nexus_constructor.model.entry import Instrument
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
-
 
 from nexus_constructor.json.helpers import object_to_json_file
 from nexus_constructor.json.forwarder_json_writer import generate_forwarder_command
-from tests.test_utils import NX_CLASS_DEFINITIONS
+from nexus_constructor.json.filewriter_json_writer import (
+    get_data_and_type,
+    NexusToDictConverter,
+    write_nexus_structure_to_json,
+    ATTR_NAME_BLACKLIST,
+    _add_attributes,
+)
 
 
 def test_GIVEN_float32_WHEN_getting_data_and_dtype_THEN_function_returns_correct_fw_json_dtype(
@@ -359,8 +364,7 @@ def test_GIVEN_nexus_object_and_fake_fileIO_WHEN_calling_object_to_json_file_THE
 
 def test_GIVEN_instrument_containing_component_WHEN_generating_json_THEN_file_is_written_containing_components():
     file = io.StringIO(newline=None)
-    wrapper = NexusWrapper("test.nxs")
-    data = Instrument(wrapper, NX_CLASS_DEFINITIONS)
+    data = None
 
     component_name = "pinhole"
     component_nx_class = "NXpinhole"

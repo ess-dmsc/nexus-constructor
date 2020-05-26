@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
-from copy import copy
 import asyncio
 import threading
+from abc import ABC, abstractmethod
+from copy import copy
 
 
 class KafkaInterface(ABC):

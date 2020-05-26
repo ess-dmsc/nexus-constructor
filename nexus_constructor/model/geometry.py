@@ -1,5 +1,10 @@
+from abc import ABC, abstractmethod
+from math import sin, cos, pi, acos, degrees
 from typing import List, Tuple
+
+import numpy as np
 from PySide2.QtGui import QVector3D, QMatrix4x4
+
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
 from nexus_constructor.model.group import Group
@@ -7,9 +12,6 @@ from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
 )
-import numpy as np
-from math import sin, cos, pi, acos, degrees
-from abc import ABC, abstractmethod
 from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 
 

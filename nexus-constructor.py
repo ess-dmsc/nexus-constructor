@@ -13,7 +13,6 @@ from nexus_constructor.component.component_type import (
 )
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.entry import Instrument, Entry
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 
 import os
 import argparse
@@ -33,7 +32,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
     window = QMainWindow()
-    nexus_wrapper = NexusWrapper()
     definitions_dir = os.path.abspath(os.path.join(root_dir, "definitions"))
     _, nx_component_classes = make_dictionary_of_class_definitions(definitions_dir)
     instrument = Instrument()

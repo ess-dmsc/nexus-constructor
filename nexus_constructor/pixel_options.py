@@ -1,8 +1,9 @@
 from typing import Tuple, Optional, List
 
+import numpy as np
 from PySide2.QtCore import Signal, QObject
 from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
-import numpy as np
+
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import OFFGeometryNexus
@@ -16,7 +17,6 @@ from nexus_constructor.pixel_data import (
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.validators import PixelValidator
 from ui.pixel_options import Ui_PixelOptionsWidget
-
 
 BOTTOM_LEFT_TEXT = "Bottom Left"
 BOTTOM_RIGHT_TEXT = "Bottom Right"
