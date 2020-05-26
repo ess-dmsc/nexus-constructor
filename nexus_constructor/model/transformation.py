@@ -41,24 +41,38 @@ class Transformation(Dataset):
     @property
     def ui_value(self) -> float:
 
-        ui_value = self.get_attribute_value(CommonAttrs.UI_VALUE)
+        if isinstance(self.dataset, Dataset):
+            if np.isscalar(self.dataset.values):
+                try:
+                    self.ui_value = float(self.dataset.values)
+                    return float(self.dataset.values)
+                except ValueError:
+                    pass
+            else:
+                try:
+                    self.ui_value = float(self.dataset.values[0])
+                    return float(self.dataset.values[0])
+                except ValueError:
+                    pass
 
-        if isinstance(ui_value, (float, int)):
-            return float(ui_value)
+        if self.get_attribute_value(CommonAttrs.UI_VALUE) is None:
+            default_value = 0.0
+            self.ui_value = 0.0
+            return default_value
 
-        elif isinstance(ui_value, np.ndarray):
-            try:
-                return float(ui_value[0])
-            except ValueError:
-                pass
-
-        default_value = 0.0
-        self.ui_value = default_value
-        return default_value
+        return self.get_attribute_value(CommonAttrs.UI_VALUE)
 
     @ui_value.setter
     def ui_value(self, new_value: float):
-        self.set_attribute_value(CommonAttrs.UI_VALUE, new_value)
+
+        if np.isscalar(new_value):
+            value = new_value
+        else:
+            value = new_value[0]
+        try:
+            self.set_attribute_value(CommonAttrs.UI_VALUE, float(value))
+        except ValueError:
+            self.set_attribute_value(CommonAttrs.UI_VALUE, 0.0)
 
     @property
     def qmatrix(self) -> QMatrix4x4:

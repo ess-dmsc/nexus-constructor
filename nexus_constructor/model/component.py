@@ -9,6 +9,7 @@ from PySide2.QtWidgets import QListWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
@@ -122,13 +123,18 @@ class Component(Group):
         return transforms
 
     def add_translation(
-        self, vector: QVector3D, name: str = None, depends_on: Transformation = None
+        self,
+        vector: QVector3D,
+        name: str = None,
+        depends_on: Transformation = None,
+        values: Dataset = Dataset("", None, []),
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
         :param vector: direction and magnitude of translation as a 3D vector
         :param name: name of the translation group (Optional)
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
+        :param values: The translation distance information.
         """
         unit_vector, magnitude = _normalise(vector)
         return self._create_transform(
@@ -138,6 +144,7 @@ class Component(Group):
             "m",
             unit_vector,
             depends_on,
+            values,
         )
 
     def add_rotation(
@@ -146,6 +153,7 @@ class Component(Group):
         angle: float,
         name: str = None,
         depends_on: Transformation = None,
+        values: Dataset = Dataset("", None, []),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -153,9 +161,16 @@ class Component(Group):
         :param angle:
         :param name: Name of the rotation group (Optional)
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
+        :param values: The translation distance information.
         """
         return self._create_transform(
-            name, TransformationType.ROTATION, angle, "degrees", axis, depends_on
+            name,
+            TransformationType.ROTATION,
+            angle,
+            "degrees",
+            axis,
+            depends_on,
+            values,
         )
 
     def _create_transform(
@@ -166,6 +181,7 @@ class Component(Group):
         units: str,
         vector: QVector3D,
         depends_on: Transformation,
+        values: Dataset,
     ):
 
         if name is None:
@@ -176,6 +192,7 @@ class Component(Group):
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
+        transform.values = values
         self.transforms_list.append(transform)
         return transform
 

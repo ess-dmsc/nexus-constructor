@@ -1,8 +1,7 @@
 from functools import partial
-from typing import List, ItemsView, Dict
+from typing import Dict
 
 import h5py
-import numpy as np
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QComboBox,
@@ -17,6 +16,7 @@ from PySide2.QtWidgets import (
     QCheckBox,
     QFormLayout,
 )
+import numpy as np
 
 from nexus_constructor.model.stream import (
     StreamGroup,
@@ -53,22 +53,12 @@ NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
 
 
-def check_if_advanced_options_should_be_enabled(elements: List[str], field) -> bool:
+def check_if_advanced_options_should_be_enabled(advanced_fields) -> bool:
     """
     Checks whether the advanced options box should be enabled by checking if any of the advanced options have existing values.
-    :param elements: list of names to check if exist
-    :param field: the field group
+    :param advanced_fields: the field group
     """
-    # Disabled whilst working on model change
-    return False
-    return any(item in field for item in elements)
-
-
-def fill_in_advanced_options(elements: ItemsView[str, QSpinBox], field: h5py.Group):
-    raise NotImplementedError
-    for nxs_string, spinner in elements:
-        if nxs_string in field.keys():
-            spinner.setValue(field[nxs_string][()])
+    return any(item is not None for item in advanced_fields)
 
 
 class StreamFieldsWidget(QDialog):
@@ -179,15 +169,6 @@ class StreamFieldsWidget(QDialog):
         """
         Sets up the UI for ev42 advanced options.
         """
-        self.ev42_nexus_elements = [
-            NEXUS_INDICES_INDEX_EVERY_MB,
-            NEXUS_INDICES_INDEX_EVERY_KB,
-            NEXUS_CHUNK_CHUNK_MB,
-            NEXUS_CHUNK_CHUNK_KB,
-        ]
-
-        self.ev42_nexus_to_spinner_ui_element = {}
-
         self.ev42_advanced_group_box = QGroupBox(
             parent=self.show_advanced_options_button
         )
@@ -195,28 +176,38 @@ class StreamFieldsWidget(QDialog):
 
         self.ev42_adc_pulse_debug_label = QLabel(ADC_PULSE_DEBUG)
         self.ev42_adc_pulse_debug_checkbox = QCheckBox()
-
         self.ev42_advanced_group_box.layout().addRow(
             self.ev42_adc_pulse_debug_label, self.ev42_adc_pulse_debug_checkbox
         )
 
-        self.add_labels_and_spinboxes_for_advanced_options(
-            self.ev42_nexus_elements,
-            self.ev42_advanced_group_box,
-            self.ev42_nexus_to_spinner_ui_element,
+        self.ev42_index_every_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_INDICES_INDEX_EVERY_MB, self.ev42_advanced_group_box
+        )
+        self.ev42_index_every_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_INDICES_INDEX_EVERY_KB, self.ev42_advanced_group_box
+        )
+        self.ev42_chunk_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_CHUNK_CHUNK_MB, self.ev42_advanced_group_box
+        )
+        self.ev42_chunk_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_CHUNK_CHUNK_KB, self.ev42_advanced_group_box
         )
 
-    def add_labels_and_spinboxes_for_advanced_options(
-        self, elements, group_box, nexus_to_spinner
+    def create_label_and_spinbox_for_advanced_option(
+        self, nexus_string: str, group_box: QGroupBox
     ):
-        for nexus_string in elements:
-            label = QLabel(nexus_string)
-            spinner = QSpinBox()
-            spinner.setRange(self.minimum_spinbox_value, self.maximum_spinbox_value)
+        """
+        Creates a SpinBox with a label and adds them to GroupBox then returns the SpinBox.
+        :param nexus_string: The nexus string label for the SpinBox.
+        :param group_box: The GroupBox that the label and SpinBox should be added to.
+        :return: The newly created SpinBox.
+        """
+        label = QLabel(nexus_string)
+        spinner = QSpinBox()
+        spinner.setRange(self.minimum_spinbox_value, self.maximum_spinbox_value)
+        group_box.layout().addRow(label, spinner)
 
-            group_box.layout().addRow(label, spinner)
-
-            nexus_to_spinner[nexus_string] = spinner
+        return spinner
 
     def _set_up_f142_group_box(self):
         """
@@ -226,18 +217,15 @@ class StreamFieldsWidget(QDialog):
             parent=self.show_advanced_options_button
         )
         self.f142_advanced_group_box.setLayout(QFormLayout())
-        self.f142_nexus_to_spinner_ui_element = {}
 
-        self.f142_nexus_elements = [
-            NEXUS_INDICES_INDEX_EVERY_MB,
-            NEXUS_INDICES_INDEX_EVERY_KB,
-            STORE_LATEST_INTO,
-        ]
-
-        self.add_labels_and_spinboxes_for_advanced_options(
-            self.f142_nexus_elements,
-            self.f142_advanced_group_box,
-            self.f142_nexus_to_spinner_ui_element,
+        self.f142_index_every_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_INDICES_INDEX_EVERY_MB, self.f142_advanced_group_box
+        )
+        self.f142_index_every_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
+            NEXUS_INDICES_INDEX_EVERY_KB, self.f142_advanced_group_box
+        )
+        self.f142_store_latest_into_spinner = self.create_label_and_spinbox_for_advanced_option(
+            STORE_LATEST_INTO, self.f142_advanced_group_box
         )
 
     def _show_advanced_options(self, show):
@@ -312,8 +300,12 @@ class StreamFieldsWidget(QDialog):
             array_size = self.array_size_spinbox.value()
             if array_size:
                 stream.array_size = array_size
+            if self.advanced_options_enabled:
+                self._record_advanced_f142_values(stream)
         elif current_schema == WriterModules.EV42.value:
             stream = EV42Stream(source=source, topic=topic)
+            if self.advanced_options_enabled:
+                self._record_advanced_ev42_values(stream)
         elif current_schema == WriterModules.NS10.value:
             stream = NS10Stream(source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
@@ -335,44 +327,25 @@ class StreamFieldsWidget(QDialog):
 
         return stream_group
 
-    def _create_ev42_fields(self, stream_group: EV42Stream):
+    def _record_advanced_f142_values(self, stream: F142Stream):
         """
-        Create ev42 fields in the given group if advanced options are specified.
-        :param stream_group: The group to apply fields to.
+        Save the advanced f142 properties to the stream data object.
+        :param stream: The stream data object to be modified.
         """
-        raise NotImplementedError
-        if self.advanced_options_enabled:
-            if self.ev42_adc_pulse_debug_checkbox.isChecked():
-                stream_group.create_dataset(
-                    ADC_PULSE_DEBUG,
-                    dtype=bool,
-                    data=self.ev42_adc_pulse_debug_checkbox.isChecked(),
-                )
-            self._create_dataset_from_spinner(
-                stream_group, self.ev42_nexus_to_spinner_ui_element
-            )
+        stream.nexus_indices_index_every_mb = self.f142_index_every_mb_spinner.value()
+        stream.nexus_indices_index_every_kb = self.f142_index_every_kb_spinner.value()
+        stream.store_latest_into = self.f142_store_latest_into_spinner.value()
 
-    def _create_f142_fields(self, stream_group: F142Stream):
+    def _record_advanced_ev42_values(self, stream: EV42Stream):
         """
-        Create f142 fields in the given group if advanced options are specified.
-        :param stream_group: The group to apply fields to.
+        Save the advanced ev42 properties to the stream data object.
+        :param stream: The stream data object to be modified.
         """
-        raise NotImplementedError
-        stream_group.create_dataset(
-            "type", dtype=STRING_DTYPE, data=self.type_combo.currentText()
-        )
-        if self.array_radio.isChecked():
-            stream_group.create_dataset(
-                "array_size", data=self.array_size_spinbox.value()
-            )
-        if self.value_units_edit.text():
-            stream_group.create_dataset(
-                "value_units", data=self.value_units_edit.text()
-            )
-        if self.advanced_options_enabled:
-            self._create_dataset_from_spinner(
-                stream_group, self.f142_nexus_to_spinner_ui_element
-            )
+        stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
+        stream.nexus_indices_index_every_mb = self.ev42_index_every_kb_spinner.value()
+        stream.nexus_indices_index_every_kb = self.ev42_index_every_kb_spinner.value()
+        stream.nexus_chunk_chunk_mb = self.ev42_chunk_mb_spinner.value()
+        stream.nexus_chunk_chunk_kb = self.ev42_chunk_kb_spinner.value()
 
     @staticmethod
     def _create_dataset_from_spinner(
@@ -388,28 +361,37 @@ class StreamFieldsWidget(QDialog):
         """
         Fill in specific existing ev42 fields into the new UI field.
         :param field: The stream group
-        :param new_ui_field: The new UI field to be filled in
         """
-        raise NotImplementedError
         all_ev42_elements = list(self.ev42_nexus_elements)
         all_ev42_elements.append(ADC_PULSE_DEBUG)
 
-        if check_if_advanced_options_should_be_enabled(all_ev42_elements, field):
+        if check_if_advanced_options_should_be_enabled(
+            [
+                field.adc_pulse_debug,
+                field.nexus_indices_index_every_mb,
+                field.nexus_indices_index_every_kb,
+                field.nexus_chunk_chunk_mb,
+                field.nexus_chunk_chunk_kb,
+            ]
+        ):
             self._show_advanced_options(True)
-            if ADC_PULSE_DEBUG in field.keys():
-                self.ev42_adc_pulse_debug_checkbox.setChecked(
-                    bool(field.abc_pulse_debug)
-                )
+            self._fill_existing_advanced_ev42_fields(field)
 
-            fill_in_advanced_options(
-                self.ev42_nexus_to_spinner_ui_element.items(), field
-            )
+    def _fill_existing_advanced_ev42_fields(self, field: EV42Stream):
+        """
+        Fill the fields in the interface with the existing ev42 stream data.
+        :param field: The ev42 stream data object.
+        """
+        self.ev42_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
+        self.ev42_index_every_mb_spinner.setValue(field.nexus_indices_index_every_mb)
+        self.ev42_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
+        self.ev42_chunk_mb_spinner.setValue(field.nexus_indices_index_every_mb)
+        self.ev42_chunk_kb_spinner.setValue(field.nexus_indices_index_every_kb)
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
         Fill in specific existing f142 fields into the new UI field.
         :param field: The stream group
-        :param new_ui_field: The new UI field to be filled in
         """
         self.type_combo.setCurrentText(field.type)
         if field.array_size is not None:
@@ -422,17 +404,29 @@ class StreamFieldsWidget(QDialog):
         if field.value_units is not None:
             self.value_units_edit.setText(field.value_units)
 
-        if check_if_advanced_options_should_be_enabled(self.f142_nexus_elements, field):
+        if check_if_advanced_options_should_be_enabled(
+            [
+                field.nexus_indices_index_every_mb,
+                field.nexus_indices_index_every_kb,
+                field.store_latest_into,
+            ]
+        ):
             self._show_advanced_options(True)
-            fill_in_advanced_options(
-                self.f142_nexus_to_spinner_ui_element.items(), field
-            )
+            self._fill_existing_advanced_f142_fields(field)
+
+    def _fill_existing_advanced_f142_fields(self, field: F142Stream):
+        """
+        Fill the advanced fields in the interface with the existing f142 stream data.
+        :param field: The f412 stream data object.
+        """
+        self.f142_index_every_mb_spinner.setValue(field.nexus_indices_index_every_mb)
+        self.f142_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
+        self.f142_store_latest_into_spinner.setValue(field.store_latest_into)
 
     def update_existing_stream_info(self, field: StreamGroup):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
-        :param new_ui_field: The new UI field to be filled in
         """
         field = field.children[
             0
