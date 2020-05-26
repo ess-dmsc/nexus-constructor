@@ -10,7 +10,6 @@ from nexus_constructor.field_utils import update_existing_stream_field
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.stream_fields_widget import (
-    fill_in_advanced_options,
     check_if_advanced_options_should_be_enabled,
     StreamFieldsWidget,
     ADC_PULSE_DEBUG,
