@@ -5,6 +5,7 @@ import numpy as np
 from h5py import Group
 
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
@@ -120,7 +121,7 @@ class NexusDefinedChopperChecker:
 
     @staticmethod
     def data_has_correct_type(
-        fields_dict: Dict[str, "FieldWidget"], units_dict: dict
+        fields_dict: Dict[str, FieldWidget], units_dict: dict
     ) -> bool:
         """
         Checks that the data required to create a Chopper mesh have the expected types.

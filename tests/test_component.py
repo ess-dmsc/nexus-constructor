@@ -1,5 +1,5 @@
 from mock import patch
-from nexus_constructor.component.component import DependencyError, Component
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.component import (
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
@@ -12,7 +12,6 @@ import pytest
 from pytest import approx
 import numpy as np
 
-from nexus_constructor.nexus.validation import NexusFormatError
 from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_x_offsets_from_pixel_grid,

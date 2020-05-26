@@ -1,5 +1,7 @@
 from enum import Enum
+
 import attr
+
 from nexus_constructor.model.group import Group
 
 

@@ -1,8 +1,11 @@
 import logging
 import uuid
-import numpy as np
-import h5py
 from functools import partial
+from typing import List, Union, Any
+import h5py
+import numpy as np
+from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
+from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
 from PySide2.QtWidgets import (
     QPushButton,
     QHBoxLayout,
@@ -13,9 +16,6 @@ from PySide2.QtWidgets import (
     QGridLayout,
     QFormLayout,
 )
-from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
-from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
-from typing import List, Union
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
@@ -23,7 +23,6 @@ from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
-from nexus_constructor.nexus.nexus_wrapper import to_string
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -31,7 +30,6 @@ from nexus_constructor.validators import (
     FieldType,
     DATASET_TYPE,
     NameValidator,
-    HDFLocationExistsValidator,
     UnitValidator,
 )
 
@@ -180,7 +178,7 @@ class FieldWidget(QFrame):
                 validate_line_edit,
                 self.field_name_edit,
                 tooltip_on_accept="Field name is valid.",
-                tooltip_on_reject=f"Field name is not valid",
+                tooltip_on_reject="Field name is not valid",
             )
         )
 
@@ -350,3 +348,15 @@ class FieldWidget(QFrame):
 
     def show_attrs_dialog(self):
         self.attrs_dialog.show()
+
+
+def to_string(input_to_convert: Any) -> str:
+    """
+    Converts to string, assumes utf-8 encoding for bytes
+    Input can be bytes, str, numpy array
+    :param input_to_convert: Dataset value to convert
+    :return: str
+    """
+    if isinstance(input_to_convert, bytes):
+        return input_to_convert.decode("utf-8")
+    return str(input_to_convert)

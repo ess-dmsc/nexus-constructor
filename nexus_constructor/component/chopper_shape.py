@@ -1,17 +1,18 @@
 import logging
+from typing import Optional, Union, List, Tuple
 
+from PySide2.QtGui import QVector3D
 from nexus_constructor.component.component_shape import ComponentShape
 from nexus_constructor.geometry.cylindrical_geometry import CylindricalGeometry
+
 from nexus_constructor.geometry import OFFGeometry
-from nexus_constructor.model.geometry import NoShapeGeometry
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     NexusDefinedChopperChecker,
 )
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     DiskChopperGeometryCreator,
 )
-from typing import Optional, Union, List, Tuple
-from PySide2.QtGui import QVector3D
+from nexus_constructor.model.geometry import NoShapeGeometry
 
 
 class ChopperShape(ComponentShape):

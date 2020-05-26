@@ -1,12 +1,12 @@
-from typing import List, Union
+from typing import List
 
 import attr
+import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
-import numpy as np
 
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.transformation_types import TransformationType
 
 
@@ -107,7 +107,7 @@ class Transformation(Dataset):
         except ValueError:
             pass
 
-    def register_dependent(self, new_dependent: Union["Transformation", "Component"]):
+    def register_dependent(self, new_dependent: "Transformation"):
         if new_dependent not in self._dependents:
             self._dependents.append(new_dependent)
 

@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
+from PySide2.QtGui import QVector3D
+
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
-from nexus_constructor.transformations import QVector3D
-from nexus_constructor.nexus.nexus_wrapper import NexusWrapper
 from typing import Any
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 from tests.helpers import add_component_to_file  # noqa:F401
@@ -17,16 +17,14 @@ translation_type = "Translation"
 
 
 def _add_transform_to_file(
-    nexus_wrapper: NexusWrapper,
-    name: str,
-    value: Any,
-    vector: QVector3D,
-    transform_type: str,
+    name: str, value: Any, vector: QVector3D, transform_type: str
 ):
-    transform_dataset = nexus_wrapper.nexus_file.create_dataset(name, data=value)
-    transform_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(vector)
-    transform_dataset.attrs[CommonAttrs.TRANSFORMATION_TYPE] = transform_type
-    return transform_dataset
+    transform = Transformation(name=name, dataset=DatasetMetadata(type="Double"))
+    transform.type = transform_type
+    transform.vector = vector
+    transform.values = value
+
+    return transform
 
 
 def create_dataset():

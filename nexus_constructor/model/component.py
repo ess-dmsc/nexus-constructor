@@ -1,9 +1,11 @@
+from typing import Tuple, Union, List
+
 import attr
 import numpy as np
-from typing import Tuple, Union, List
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D
 from PySide2.QtWidgets import QListWidget
+
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector

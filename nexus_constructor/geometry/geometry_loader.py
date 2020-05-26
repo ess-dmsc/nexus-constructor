@@ -1,12 +1,12 @@
 import logging
+from io import StringIO
 
+from PySide2.QtGui import QVector3D
 from nexusutils.readwriteoff import parse_off_file
+from stl import mesh
 
 from nexus_constructor.model.geometry import OFFGeometry, OFFGeometryNoNexus
 from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
-from stl import mesh
-from PySide2.QtGui import QVector3D
-from io import StringIO
 
 
 def load_geometry(
