@@ -72,7 +72,7 @@ class Transformation(Dataset):
         try:
             self.set_attribute_value(CommonAttrs.UI_VALUE, float(value))
         except ValueError:
-            pass
+            self.set_attribute_value(CommonAttrs.UI_VALUE, 0.0)
 
     @property
     def qmatrix(self) -> QMatrix4x4:
