@@ -188,7 +188,7 @@ class Component(Group):
             name = _generate_incremental_name(transformation_type, self.transforms_list)
         transform = Transformation(name, angle_or_magnitude)
         transform.type = transformation_type
-        transform.ui_value = angle_or_magnitude
+        transform.ui_value = 0.0
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
