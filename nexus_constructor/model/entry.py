@@ -27,10 +27,15 @@ class Instrument(Group):
         self.nx_class = "NXinstrument"
         self.nexus = Nexus()
 
-    def get_component_list(self):
         sample = Component("sample")
         sample.nx_class = "NXsample"
-        return [sample]
+        self.component_list = [sample]
+
+    def get_component_list(self):
+        return self.component_list
+
+    def remove_component(self, component: Component):
+        self.component_list.remove(component)
 
 
 class Entry(Group):
