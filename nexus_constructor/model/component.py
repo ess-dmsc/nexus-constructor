@@ -71,7 +71,7 @@ class Component(Group):
         :return: QTransform of final transformation
         """
         transform_matrix = QMatrix4x4()
-        for transform in self.transforms_full_chain:
+        for transform in self.transforms:
             transform_matrix *= transform.qmatrix
         transformation = Qt3DCore.QTransform()
         transformation.setMatrix(transform_matrix)
