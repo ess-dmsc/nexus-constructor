@@ -19,19 +19,12 @@ class TransformationsList(list):
         self.link = LinkTransformation(self)
 
     def _has_direct_link(self) -> bool:
-        return (
-            len(self) == 0
-            and self.parent_component.depends_on is not None
-            and TRANSFORM_STR in self.parent_component.depends_on
-        )
+        return len(self) == 0 and self.parent_component.depends_on is not None
 
     def _transform_has_external_link(self, transformation: Transformation) -> bool:
         if transformation.depends_on is None:
             return False
-        return (
-            TRANSFORM_STR in transformation.depends_on
-            and self.parent_component != transformation.depends_on
-        )
+        return transformation.depends_on != self.parent_component
 
     def _has_indirect_link(self) -> bool:
         for transform in self:

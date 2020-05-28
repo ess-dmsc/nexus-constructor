@@ -20,8 +20,8 @@ class Transformation(Dataset):
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
 
-    _parent_component = attr.ib(type=Component, default=None)
-    _dependents = attr.ib(type=List[Union["Transformation", Component]], init=False)
+    _parent_component = attr.ib(type="Component", default=None)
+    _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
 
     @_dependents.default
     def _initialise_dependents(self):
@@ -49,7 +49,6 @@ class Transformation(Dataset):
 
     @property
     def ui_value(self) -> float:
-
         if isinstance(self.dataset, Dataset):
             if np.isscalar(self.dataset.values):
                 try:
@@ -73,7 +72,6 @@ class Transformation(Dataset):
 
     @ui_value.setter
     def ui_value(self, new_value: float):
-
         if np.isscalar(new_value):
             value = new_value
         else:
