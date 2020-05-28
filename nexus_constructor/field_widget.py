@@ -67,6 +67,7 @@ class FieldNameLineEdit(QLineEdit):
 class FieldWidget(QFrame):
     # Used for deletion of field
     something_clicked = Signal()
+    show_3d_value_spinbox = Signal(bool)
 
     def dataset_type_changed(self, _):
         self.value_line_edit.validator().dataset_type_combo = self.value_type_combo
@@ -275,6 +276,8 @@ class FieldWidget(QFrame):
     def field_type_changed(self):
         self.edit_dialog = QDialog(parent=self)
         self._set_up_value_validator(False)
+        self.show_3d_value_spinbox.emit(self.field_type != FieldType.scalar_dataset)
+
         if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)
         elif self.field_type == FieldType.array_dataset:

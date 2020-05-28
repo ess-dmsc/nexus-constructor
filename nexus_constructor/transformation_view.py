@@ -23,7 +23,13 @@ class EditTransformation(QGroupBox):
         self.transformation = transformation
         current_vector = self.transformation.vector
         self._fill_in_existing_fields(current_vector)
+        self.transformation_frame.magnitude_widget.show_3d_value_spinbox.connect(
+            self._change_3d_value_spinbox_visibility
+        )
         self.disable()
+
+    def _change_3d_value_spinbox_visibility(self, show: bool):
+        self.transformation_frame.value_spinbox.setVisible(show)
 
     def _fill_in_existing_fields(self, current_vector):
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
