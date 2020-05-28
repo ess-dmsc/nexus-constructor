@@ -52,7 +52,8 @@ class EditTransformation(QGroupBox):
             ui_element.setEnabled(False)
 
     def enable(self):
-        if self.transformation_frame.magnitude_widget.scalar_field_type():
+        # Don't enable the 3D value spinbox if the magnitude is scalar
+        if self.transformation_frame.magnitude_widget.field_type_is_scalar():
             spinboxes = self.transformation_frame.spinboxes[:-1]
         else:
             spinboxes = self.transformation_frame.spinboxes
