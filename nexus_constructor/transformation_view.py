@@ -22,14 +22,8 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.setupUi(self)
         self.transformation = transformation
         current_vector = self.transformation.vector
-        self.transformation_frame.magnitude_widget.value_changed.connect(
-            self._sync_ui_value_with_magnitude
-        )
         self._fill_in_existing_fields(current_vector)
         self.disable()
-
-    def _sync_ui_value_with_magnitude(self, val: float):
-        self.transformation_frame.value_spinbox.setValue(val)
 
     def _fill_in_existing_fields(self, current_vector):
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
