@@ -22,18 +22,16 @@ class TransformationsList(list):
         return (
             len(self) == 0
             and self.parent_component.depends_on is not None
-            and TRANSFORM_STR in self.parent_component.depends_on.absolute_path
+            and TRANSFORM_STR in self.parent_component.depends_on
         )
 
     def _transform_has_external_link(self, transformation: Transformation) -> bool:
-        raise NotImplementedError
         if transformation.depends_on is None:
             return False
-        # return (
-        #     TRANSFORM_STR in transformation.depends_on.absolute_path
-        #     and (self.parent_component.absolute_path + TRANSFORM_STR)
-        #     not in transformation.depends_on.absolute_path
-        # )
+        return (
+            TRANSFORM_STR in transformation.depends_on
+            and self.parent_component != transformation._depends_on
+        )
 
     def _has_indirect_link(self) -> bool:
         for transform in self:
@@ -50,5 +48,4 @@ class TransformationsList(list):
 
     @has_link.setter
     def has_link(self, value: bool):
-        self.parent_component.set_attribute_value(LINK_STR, value
-        )
+        self.parent_component.set_attribute_value(LINK_STR, value)
