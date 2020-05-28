@@ -6,6 +6,10 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
 from nexus_constructor.common_attrs import CommonAttrs
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.transformation_types import TransformationType
 
@@ -16,7 +20,12 @@ class Transformation(Dataset):
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
 
-    _dependents = attr.ib(factory=list, type=List[Union["Transformation", "Component"]])
+    _parent_component = attr.ib(type=Component, default=None)
+    _dependents = attr.ib(type=List[Union["Transformation", Component]], init=False)
+
+    @_dependents.default
+    def _initialise_dependents(self):
+        return [] if self._parent_component is None else [self._parent_component]
 
     @property
     def type(self) -> str:
