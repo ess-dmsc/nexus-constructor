@@ -236,8 +236,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
         for component in self.instrument.get_component_list():
-            if component.name != "sample":
-                self.sceneWidget.add_transformation(component.name, component.transform)
+            self.sceneWidget.add_transformation(component.name, component.transform)
 
     def _update_views(self):
         self.sceneWidget.clear_all_transformations()
