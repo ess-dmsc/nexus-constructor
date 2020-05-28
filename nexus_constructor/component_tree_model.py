@@ -225,14 +225,14 @@ class ComponentTreeModel(QAbstractItemModel):
         parent_component, transformation_list, transformation_type
     ):
         values = Dataset(
-            name="", dataset=DatasetMetadata(type="Byte", size=[1]), values=""
+            name="", dataset=DatasetMetadata(type="Double", size=[1]), values=""
         )
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
                 name=generate_unique_name(
                     TransformationType.TRANSLATION, transformation_list
                 ),
-                vector=QVector3D(1.0, 0, 0),
+                vector=QVector3D(0, 0, 1.0),  # default to beam direction
                 values=values,
             )
         elif transformation_type == TransformationType.ROTATION:

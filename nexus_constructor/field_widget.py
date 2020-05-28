@@ -216,8 +216,7 @@ class FieldWidget(QFrame):
         self.attrs_dialog.fill_existing_attrs(field)
 
     @property
-    def value(self) -> Union[Dataset, Group, Link]:
-        return_object = None
+    def value(self) -> Union[Dataset, Group, Link, None]:
         dtype = self.value_type_combo.currentText()
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
@@ -240,7 +239,7 @@ class FieldWidget(QFrame):
             return_object = Link(name=self.name, target=self.value_line_edit.text())
         else:
             logging.error(f"unknown field type: {self.name}")
-            return
+            return None
 
         if self.field_type != FieldType.link:
             for attr_name, attr_value in self.attrs_dialog.get_attrs().items():

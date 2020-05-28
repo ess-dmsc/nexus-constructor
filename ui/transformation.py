@@ -8,14 +8,13 @@ from PySide2.QtWidgets import (
     QFrame,
     QLineEdit,
     QVBoxLayout,
-    QGridLayout,
 )
 
 from nexus_constructor.field_widget import FieldWidget
 
 
 class Ui_Transformation(object):
-    def setupUi(self, Transformation, instrument):
+    def setupUi(self, Transformation: "EditTransformation"):
         Transformation.setObjectName("Transformation")
         Transformation.resize(361, 171)
         self.frame_layout = QVBoxLayout(Transformation)
@@ -83,7 +82,7 @@ class Ui_Transformation(object):
         font.setBold(True)
         label.setFont(font)
 
-    def _set_up_vector_box(self, Transformation):
+    def _set_up_vector_box(self, Transformation: "EditTransformation"):
         self.xyz_layout = QHBoxLayout()
 
         self.x_layout = QFormLayout()
