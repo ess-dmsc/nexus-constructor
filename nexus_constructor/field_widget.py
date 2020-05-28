@@ -116,7 +116,7 @@ class FieldWidget(QFrame):
 
         self.value_line_edit = QLineEdit()
         self.value_line_edit.setPlaceholderText("value")
-        self.value_line_edit.textChanged.connect(self.update_ui_value)
+        self.value_line_edit.textChanged.connect(self._update_ui_value)
 
         self._set_up_value_validator(False)
         self.dataset_type_changed(0)
@@ -167,8 +167,7 @@ class FieldWidget(QFrame):
         # Set the layout for the default field type
         self.field_type_changed()
 
-    def update_ui_value(self, text: str):
-
+    def _update_ui_value(self, text: str):
         try:
             ui_value = float(text)
             self.value_changed.emit(ui_value)
