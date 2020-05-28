@@ -23,7 +23,7 @@ class EditTransformation(QGroupBox):
         self.transformation = transformation
         current_vector = self.transformation.vector
         self._fill_in_existing_fields(current_vector)
-        self.transformation_frame.magnitude_widget.show_3d_value_spinbox.connect(
+        self.transformation_frame.magnitude_widget.enable_3d_value_spinbox.connect(
             self._change_3d_value_spinbox_visibility
         )
         self.disable()
@@ -65,11 +65,13 @@ class EditTransformation(QGroupBox):
             ui_element.setEnabled(True)
 
     def saveChanges(self):
-        try:
-            value_3d_view = self.transformation_frame.magnitude_widget.value.values
-            self.transformation_frame.value_spinbox.setValue(float(value_3d_view))
-        except ValueError:
-            pass
+
+        if self.transformation_frame.magnitude_widget.field_type_is_scalar():
+            try:
+                value_3d_view = self.transformation_frame.magnitude_widget.value.values
+                self.transformation_frame.value_spinbox.setValue(float(value_3d_view))
+            except ValueError:
+                pass
 
         self.transformation.ui_value = self.transformation_frame.value_spinbox.value()
         self.transformation.values = self.transformation_frame.magnitude_widget.value
