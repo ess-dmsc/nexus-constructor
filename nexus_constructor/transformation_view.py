@@ -29,7 +29,7 @@ class EditTransformation(QGroupBox):
         self.disable()
 
     def _change_3d_value_spinbox_visibility(self, show: bool):
-        self.transformation_frame.value_spinbox.setVisible(show)
+        self.transformation_frame.value_spinbox.setEnabled(show)
 
     def _fill_in_existing_fields(self, current_vector):
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
@@ -52,7 +52,12 @@ class EditTransformation(QGroupBox):
             ui_element.setEnabled(False)
 
     def enable(self):
-        for ui_element in self.transformation_frame.spinboxes + [
+        if self.transformation_frame.magnitude_widget.scalar_field_type():
+            spinboxes = self.transformation_frame.spinboxes[:-1]
+        else:
+            spinboxes = self.transformation_frame.spinboxes
+
+        for ui_element in spinboxes + [
             self.transformation_frame.name_line_edit,
             self.transformation_frame.magnitude_widget,
         ]:

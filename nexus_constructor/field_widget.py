@@ -273,10 +273,13 @@ class FieldWidget(QFrame):
         else:
             return False
 
+    def scalar_field_type(self):
+        return self.field_type == FieldType.scalar_dataset
+
     def field_type_changed(self):
         self.edit_dialog = QDialog(parent=self)
         self._set_up_value_validator(False)
-        self.show_3d_value_spinbox.emit(self.field_type != FieldType.scalar_dataset)
+        self.show_3d_value_spinbox.emit(not self.scalar_field_type())
 
         if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)
