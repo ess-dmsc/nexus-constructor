@@ -19,13 +19,7 @@ class LinkTransformation:
     def _find_linked_component(self) -> Optional[Component]:
         for transformation in self.parent:
             if self.parent._transform_has_external_link(transformation):
-                component_path = transformation.depends_on.absolute_path[
-                    : transformation.depends_on.absolute_path.find(TRANSFORM_STR)
-                ]
-                return Component(
-                    self.parent.parent_component.file,
-                    self.parent.parent_component.file.nexus_file[component_path],
-                )
+                return transformation.depends_on
         return None
 
     def _has_direct_component_link(self) -> bool:
@@ -35,16 +29,6 @@ class LinkTransformation:
     def linked_component(self) -> Optional[Component]:
         if not self.parent.has_link:
             return None
-        if self._has_direct_component_link():
-            component_path = self.parent.parent_component.depends_on.absolute_path[
-                : self.parent.parent_component.depends_on.absolute_path.find(
-                    TRANSFORM_STR
-                )
-            ]
-            return Component(
-                self.parent.parent_component.file,
-                self.parent.parent_component.file.nexus_file[component_path],
-            )
         return self._find_linked_component()
 
     @linked_component.setter
@@ -55,11 +39,7 @@ class LinkTransformation:
             target = parent_component
         else:
             for c_transform in parent_component.transforms:
-                if (
-                    c_transform.depends_on is None
-                    or parent_component.absolute_path + TRANSFORM_STR
-                    not in c_transform.depends_on.absolute_path
-                ):
+                if c_transform.depends_on is None:
                     target = c_transform
                     break
         if value is not None:

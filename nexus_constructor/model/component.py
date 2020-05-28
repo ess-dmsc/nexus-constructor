@@ -106,7 +106,7 @@ class Component(Group):
             if local_only:
                 return
             transforms.append(depends_on)
-            self._get_transform(depends_on._depends_on, transforms, local_only)
+            self._get_transform(depends_on.depends_on, transforms, local_only)
 
     @property
     def transforms_full_chain(self):
@@ -193,6 +193,7 @@ class Component(Group):
         transform.vector = vector
         transform.depends_on = depends_on
         transform.values = values
+        transform._parent_component = self
         self.transforms_list.append(transform)
         return transform
 

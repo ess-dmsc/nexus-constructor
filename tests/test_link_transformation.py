@@ -59,10 +59,10 @@ def test_linked_component_via_component_1(nexus_wrapper):
 
 
 def test_linked_component_via_component_2(nexus_wrapper):
-    component1 = add_component_to_file(nexus_wrapper, "field", 42, "component1")
+    component1 = Component("component1")
     rot1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
     component1.depends_on = rot1
-    component2 = add_component_to_file(nexus_wrapper, "field", 42, "component2")
+    component2 = Component(nexus_wrapper, "field", 42, "component2")
     rot2 = component2.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
     component2.depends_on = rot2
     component1.transforms.link.linked_component = component2

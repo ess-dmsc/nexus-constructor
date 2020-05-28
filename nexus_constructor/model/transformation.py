@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 import attr
 import numpy as np
@@ -16,8 +16,7 @@ class Transformation(Dataset):
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
 
-    _dependents = attr.ib(factory=list, type=List["Transformation"])
-    _depends_on = attr.ib(default=None, type="Transformation")
+    _dependents = attr.ib(factory=list, type=List[Union["Transformation", "Component"]])
 
     @property
     def type(self) -> str:
@@ -121,20 +120,16 @@ class Transformation(Dataset):
             self._dependents.append(new_dependent)
 
     def remove_from_dependee_chain(self):
-        parent = self._depends_on
+        parent = self.depends_on
         if parent is not None:
             # deregister this transformation from the parent transformation
-            self._depends_on.deregister_dependent(self)
+            self.depends_on.deregister_dependent(self)
 
         for dependent_transform in self.dependents:
             # deregister the dependent from this transformation
             self.deregister_dependent(dependent_transform)
             # update dependent's depends_on to point at this transforms depends_on
-            dependent_transform._depends_on = parent
+            dependent_transform.depends_on = parent
             # update the parent transform to include the previously dependent transform as a dependent of the parent
-            if dependent_transform._depends_on is not None:
-                dependent_transform._depends_on.register_dependent(dependent_transform)
-
-
-def create_transformation(name: str, dataset: Dataset):
-    return Transformation(name, dataset)
+            if dependent_transform.depends_on is not None:
+                dependent_transform.depends_on.register_dependent(dependent_transform)

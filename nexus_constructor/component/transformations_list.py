@@ -30,7 +30,7 @@ class TransformationsList(list):
             return False
         return (
             TRANSFORM_STR in transformation.depends_on
-            and self.parent_component != transformation._depends_on
+            and self.parent_component != transformation.depends_on
         )
 
     def _has_indirect_link(self) -> bool:
