@@ -79,7 +79,7 @@ class ComponentTreeModel(QAbstractItemModel):
             transformation_list = parent_item
             target_index = node
         elif isinstance(parent_item, Transformation):
-            transformation_list = parent_item.depends_on
+            transformation_list = parent_item._parent_component.transforms
             target_index = self.parent(node)
         return target_index, transformation_list
 

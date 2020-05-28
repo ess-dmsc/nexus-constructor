@@ -29,6 +29,8 @@ class LinkTransformation:
     def linked_component(self) -> Optional[Component]:
         if not self.parent.has_link:
             return None
+        if self._has_direct_component_link():
+            return self.parent.parent_component
         return self._find_linked_component()
 
     @linked_component.setter
@@ -39,7 +41,10 @@ class LinkTransformation:
             target = parent_component
         else:
             for c_transform in parent_component.transforms:
-                if c_transform.depends_on is None:
+                if (
+                    c_transform.depends_on is None
+                    or c_transform.depends_on != parent_component
+                ):
                     target = c_transform
                     break
         if value is not None:
