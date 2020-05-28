@@ -59,6 +59,12 @@ class EditTransformation(QGroupBox):
             ui_element.setEnabled(True)
 
     def saveChanges(self):
+        try:
+            value_3d_view = self.transformation_frame.magnitude_widget.value.values
+            self.transformation_frame.value_spinbox.setValue(float(value_3d_view))
+        except ValueError:
+            pass
+
         self.transformation.ui_value = self.transformation_frame.value_spinbox.value()
         self.transformation.values = self.transformation_frame.magnitude_widget.value
         if self.transformation_frame.name_line_edit.text() != self.transformation.name:
