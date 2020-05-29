@@ -301,7 +301,6 @@ def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_trans
 def test_UI_GIVEN_scalar_value_WHEN_creating_new_transformation_THEN_ui_values_spinbox_is_disabled(
     qtbot, component, instrument
 ):
-
     x = 1
     y = 0
     z = 0
@@ -313,3 +312,21 @@ def test_UI_GIVEN_scalar_value_WHEN_creating_new_transformation_THEN_ui_values_s
     qtbot.addWidget(view)
 
     assert not view.transformation_frame.value_spinbox.isEnabled()
+
+
+@pytest.mark.parametrize("field_type", [item.value for item in FieldType][1:])
+def test_UI_GIVEN_array_value_WHEN_creating_new_transformation_THEN_ui_values_spinbox_is_enabled(
+    qtbot, component, instrument, field_type
+):
+    x = 1
+    y = 0
+    z = 0
+    value = 0.0
+    transform = component.add_translation(QVector3D(x, y, z), name="transform")
+    transform.values = create_corresponding_value_dataset(value)
+
+    view = EditTranslation(parent=None, transformation=transform, instrument=instrument)
+    view.transformation_frame.magnitude_widget.field_type = field_type
+    qtbot.addWidget(view)
+
+    assert view.transformation_frame.value_spinbox.isEnabled()
