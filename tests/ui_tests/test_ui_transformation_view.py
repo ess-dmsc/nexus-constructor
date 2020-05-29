@@ -204,20 +204,16 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     assert view.transformation_frame.magnitude_widget.value.path == path
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
-    qtbot, nexus_wrapper
+    qtbot, component, instrument
 ):
-    instrument = Instrument(nexus_wrapper, {})
-
-    component = instrument.create_component("test", "NXaperture", "")
-
     x = 1
     y = 2
     z = 3
-    angle = 90
+    angle = 90.0
 
     transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+    transform.values = create_corresponding_value_dataset(angle)
 
     view = EditRotation(parent=None, transformation=transform, instrument=instrument)
     qtbot.addWidget(view)
