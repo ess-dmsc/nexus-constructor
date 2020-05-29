@@ -2,14 +2,12 @@ from typing import Any
 
 import h5py
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QDialog
 from mock import Mock
 
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.entry import Instrument
-from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 import numpy as np
@@ -75,7 +73,7 @@ def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_cor
     x = 1
     y = 2
     z = 3
-    angle = 90.0
+    angle = 90
 
     transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
     transform.values = create_corresponding_value_dataset(angle)
@@ -199,7 +197,7 @@ def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
     x = 1
     y = 2
     z = 3
-    angle = 90.0
+    angle = 90
 
     transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
     transform.values = create_corresponding_value_dataset(angle)
