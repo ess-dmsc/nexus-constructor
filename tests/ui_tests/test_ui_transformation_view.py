@@ -17,12 +17,6 @@ from pytestqt.qtbot import QtBot  # noqa: F401
 import pytest
 
 
-def create_transformation(vector):
-    transformation = Transformation("Transformation1", dataset=None, values=[])
-    transformation.vector = vector
-    return transformation
-
-
 @pytest.fixture
 def instrument():
     return Instrument()
@@ -31,11 +25,6 @@ def instrument():
 @pytest.fixture
 def component():
     return Component("Component", [])
-
-
-@pytest.fixture(scope="function")
-def template(qtbot) -> QDialog:
-    return QDialog()
 
 
 def create_corresponding_value_dataset(value: Any):
