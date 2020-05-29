@@ -44,11 +44,12 @@ def create_corresponding_value_dataset(value: Any):
 
     if np.isscalar(value):
         size = 1
+        value = str(value)
     else:
         size = len(value)
 
     return Dataset(
-        name=name, dataset=DatasetMetadata(type=type, size=[size]), values=str(value),
+        name=name, dataset=DatasetMetadata(type=type, size=[size]), values=value,
     )
 
 
@@ -70,7 +71,9 @@ def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
     assert view.transformation_frame.value_spinbox.value() == value
-    assert view.transformation_frame.magnitude_widget.value.values == str(value)
+    assert view.transformation_frame.magnitude_widget.value_line_edit.text() == str(
+        value
+    )
     assert (
         view.transformation_frame.magnitude_widget.field_type
         == FieldType.scalar_dataset
@@ -104,22 +107,16 @@ def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_cor
     )
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_is_filled_correctly(
-    qtbot, file, nexus_wrapper
+    qtbot, file, component
 ):
-    instrument = Instrument(nexus_wrapper, {})
-
-    component = instrument.create_component("test", "NXaperture", "")
-
     array = np.array([1, 2, 3, 4])
 
     x = 1
     y = 0
     z = 0
     transform = component.add_translation(QVector3D(x, y, z), name="test")
-
-    transform.dataset = file.create_dataset("test", data=array)
+    transform.values = create_corresponding_value_dataset(array)
 
     view = EditTranslation(parent=None, transformation=transform, instrument=instrument)
     qtbot.addWidget(view)
@@ -127,7 +124,9 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
     assert view.transformation_frame.x_spinbox.value() == x
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
-    assert np.allclose(view.transformation.dataset[...], array)
+    assert np.allclose(
+        view.transformation_frame.magnitude_widget.table_view.model.array, array
+    )
     assert (
         view.transformation_frame.magnitude_widget.field_type == FieldType.array_dataset
     )
