@@ -1,7 +1,11 @@
+from typing import Any
+
 import h5py
 from PySide2.QtGui import QVector3D
+from PySide2.QtWidgets import QDialog
 from mock import Mock
 
+from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.entry import Instrument
@@ -29,20 +33,35 @@ def component():
     return Component("Component", [])
 
 
-@pytest.fixture
-def values():
-    return Dataset(name="", dataset=DatasetMetadata(type="Double", size=[1]), values="")
+@pytest.fixture(scope="function")
+def template(qtbot) -> QDialog:
+    return QDialog()
+
+
+def create_corresponding_value_dataset(value: Any):
+    name = ""
+    type = _get_human_readable_type(value)
+
+    if np.isscalar(value):
+        size = 1
+    else:
+        size = len(value)
+
+    return Dataset(
+        name=name, dataset=DatasetMetadata(type=type, size=[size]), values=str(value),
+    )
 
 
 def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled_correctly(
-    qtbot, instrument, component, values
+    qtbot, instrument, component
 ):
 
     x = 1
     y = 0
     z = 0
+    value = 0.0
     transform = component.add_translation(QVector3D(x, y, z), name="transform")
-    transform.values = values
+    transform.values = create_corresponding_value_dataset(value)
 
     view = EditTranslation(parent=None, transformation=transform, instrument=instrument)
     qtbot.addWidget(view)
@@ -50,29 +69,24 @@ def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled
     assert view.transformation_frame.x_spinbox.value() == x
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
-    # assert view.transformation_frame.value_spinbox.value() == 1
-    assert view.transformation_frame.magnitude_widget.value.values == ""
+    assert view.transformation_frame.value_spinbox.value() == value
+    assert view.transformation_frame.magnitude_widget.value.values == str(value)
     assert (
         view.transformation_frame.magnitude_widget.field_type
         == FieldType.scalar_dataset
     )
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
-    qtbot, nexus_wrapper
+    qtbot, instrument, component
 ):
-
-    instrument = Instrument(nexus_wrapper, {})
-
-    component = instrument.create_component("test", "NXaperture", "")
-
     x = 1
     y = 2
     z = 3
-    angle = 90
+    angle = 90.0
 
     transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+    transform.values = create_corresponding_value_dataset(angle)
 
     view = EditRotation(parent=None, transformation=transform, instrument=instrument)
     qtbot.addWidget(view)
@@ -81,7 +95,9 @@ def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_cor
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
     assert view.transformation_frame.value_spinbox.value() == angle
-    assert view.transformation_frame.magnitude_widget.value[()] == angle
+    assert view.transformation_frame.magnitude_widget.value_line_edit.text() == str(
+        angle
+    )
     assert (
         view.transformation_frame.magnitude_widget.field_type
         == FieldType.scalar_dataset
