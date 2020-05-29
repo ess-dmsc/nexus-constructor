@@ -296,3 +296,20 @@ def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_trans
     view.saveChanges()
     instrument.nexus.transformation_changed.emit.assert_called_once()
     assert transform.vector == QVector3D(new_x, y, z)
+
+
+def test_UI_GIVEN_scalar_value_WHEN_creating_new_transformation_THEN_ui_values_spinbox_is_disabled(
+    qtbot, component, instrument
+):
+
+    x = 1
+    y = 0
+    z = 0
+    value = 0.0
+    transform = component.add_translation(QVector3D(x, y, z), name="transform")
+    transform.values = create_corresponding_value_dataset(value)
+
+    view = EditTranslation(parent=None, transformation=transform, instrument=instrument)
+    qtbot.addWidget(view)
+
+    assert not view.transformation_frame.value_spinbox.isEnabled()
