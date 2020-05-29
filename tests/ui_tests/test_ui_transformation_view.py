@@ -231,20 +231,16 @@ def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
     assert transform.vector == QVector3D(new_x, new_y, new_z)
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_view_gains_focus_WHEN_transformation_view_exists_THEN_spinboxes_are_enabled(
-    qtbot, nexus_wrapper
+    qtbot, component
 ):
-    instrument = Instrument(nexus_wrapper, {})
-
-    component = instrument.create_component("test", "NXaperture", "")
-
     x = 1
     y = 2
     z = 3
     angle = 90
 
     transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+    transform.values = create_corresponding_value_dataset(angle)
 
     view = EditRotation(parent=None, transformation=transform, instrument=instrument)
     qtbot.addWidget(view)
@@ -257,20 +253,16 @@ def test_UI_GIVEN_view_gains_focus_WHEN_transformation_view_exists_THEN_spinboxe
     assert view.transformation_frame.name_line_edit.isEnabled()
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_view_loses_focus_WHEN_transformation_view_exists_THEN_spinboxes_are_disabled(
-    qtbot, nexus_wrapper
+    qtbot, component
 ):
-    instrument = Instrument(nexus_wrapper, {})
-
-    component = instrument.create_component("test", "NXaperture", "")
-
     x = 1
     y = 2
     z = 3
     angle = 90
 
     transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+    transform.values = create_corresponding_value_dataset(angle)
 
     view = EditRotation(parent=None, transformation=transform, instrument=instrument)
     qtbot.addWidget(view)
@@ -283,20 +275,16 @@ def test_UI_GIVEN_view_loses_focus_WHEN_transformation_view_exists_THEN_spinboxe
     assert not view.transformation_frame.name_line_edit.isEnabled()
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_transformation_changed_signal_is_called_to_update_3d_view(
-    qtbot, nexus_wrapper
+    qtbot, component, instrument
 ):
-    instrument = Instrument(nexus_wrapper, {})
-
-    component = instrument.create_component("test", "NXaperture", "")
-
     x = 1
     y = 2
     z = 3
     angle = 90
 
     transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
+    transform.values = create_corresponding_value_dataset(angle)
 
     view = EditRotation(parent=None, transformation=transform, instrument=instrument)
     instrument.nexus.transformation_changed = Mock()
