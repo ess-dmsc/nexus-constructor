@@ -26,6 +26,7 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_z_offsets_from_pixel_grid,
     get_detector_ids_from_pixel_grid,
     PIXEL_FIELDS,
+    get_detector_faces_from_pixel_mapping,
 )
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.ui_utils import show_warning_dialog
@@ -229,7 +230,9 @@ class Component(Group):
         geometry.file_path = filename
 
         if pixel_mapping is not None:
-            geometry.detector_faces = pixel_mapping
+            geometry.detector_faces = get_detector_faces_from_pixel_mapping(
+                pixel_mapping
+            )
 
         self[SHAPE_GROUP_NAME] = geometry
         return geometry
@@ -263,7 +266,9 @@ class Component(Group):
         geometry[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, units)
 
         if pixel_mapping is not None:
-            geometry.detector_number = pixel_mapping
+            geometry.detector_number = get_detector_number_from_pixel_mapping(
+                pixel_mapping
+            )
 
         self[SHAPE_GROUP_NAME] = geometry
         return geometry
