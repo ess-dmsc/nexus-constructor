@@ -137,11 +137,11 @@ class Component(Group):
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         :param values: The translation distance information.
         """
-        unit_vector, magnitude = _normalise(vector)
+        unit_vector, _ = _normalise(vector)
         return self._create_transform(
             name,
             TransformationType.TRANSLATION,
-            magnitude,
+            0.0,
             "m",
             unit_vector,
             depends_on,
@@ -184,12 +184,11 @@ class Component(Group):
         depends_on: Transformation,
         values: Dataset,
     ):
-
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms_list)
         transform = Transformation(name, angle_or_magnitude)
         transform.type = transformation_type
-        transform.ui_value = 0.0
+        transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
