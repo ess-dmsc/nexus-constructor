@@ -222,7 +222,8 @@ class Component(Group):
     ):
         self.remove_shape()
 
-        geometry = OFFGeometryNexus(self._get_shape_group_for_pixel_data(pixel_data))
+        shape_group = self._get_shape_group_for_pixel_data(pixel_data)
+        geometry = OFFGeometryNexus(shape_group)
         geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         geometry.record_faces(loaded_geometry.faces)
         geometry.record_vertices(loaded_geometry.vertices)
@@ -232,7 +233,7 @@ class Component(Group):
         if isinstance(pixel_data, PixelMapping):
             geometry.detector_faces = get_detector_faces_from_pixel_mapping(pixel_data)
 
-        self[self._get_shape_group_for_pixel_data(pixel_data)] = geometry
+        self[shape_group] = geometry
         return geometry
 
     def set_cylinder_shape(
@@ -245,7 +246,8 @@ class Component(Group):
     ):
         self.remove_shape()
         validate_nonzero_qvector(axis_direction)
-        geometry = CylindricalGeometry(self._get_shape_group_for_pixel_data(pixel_data))
+        shape_group = self._get_shape_group_for_pixel_data(pixel_data)
+        geometry = CylindricalGeometry(shape_group)
         geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
 
         vertices = CylindricalGeometry.calculate_vertices(
@@ -262,7 +264,7 @@ class Component(Group):
                 pixel_data
             )
 
-        self[self._get_shape_group_for_pixel_data(pixel_data)] = geometry
+        self[shape_group] = geometry
         return geometry
 
     def clear_pixel_data(self):
