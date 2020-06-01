@@ -204,7 +204,10 @@ class Component(Group):
     @property
     def shape(self):
         if PIXEL_SHAPE_GROUP_NAME in self:
-            return self[PIXEL_SHAPE_GROUP_NAME], None
+            return (
+                self[PIXEL_SHAPE_GROUP_NAME],
+                self._create_transformation_vectors_for_pixel_offsets(),
+            )
         if SHAPE_GROUP_NAME in self:
             return self[SHAPE_GROUP_NAME], None
         return NoShapeGeometry(), None
@@ -217,9 +220,6 @@ class Component(Group):
         self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None
     ):
         self.remove_shape()
-        pixel_mapping = None
-        if isinstance(pixel_data, PixelMapping):
-            pixel_mapping = pixel_data
 
         geometry = OFFGeometryNexus(SHAPE_GROUP_NAME)
         geometry.nx_class = OFF_GEOMETRY_NX_CLASS
@@ -228,12 +228,10 @@ class Component(Group):
         geometry.units = units
         geometry.file_path = filename
 
-        if pixel_mapping is not None:
-            geometry.detector_faces = get_detector_faces_from_pixel_mapping(
-                pixel_mapping
-            )
+        if isinstance(pixel_data, PixelMapping):
+            geometry.detector_faces = get_detector_faces_from_pixel_mapping(pixel_data)
 
-        self[SHAPE_GROUP_NAME] = geometry
+        self[self._get_shape_group_for_pixel_data(pixel_data)] = geometry
         return geometry
 
     def set_cylinder_shape(
@@ -249,12 +247,6 @@ class Component(Group):
         geometry = CylindricalGeometry(SHAPE_GROUP_NAME)
         geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
 
-        pixel_mapping = None
-        if isinstance(pixel_data, PixelMapping):
-            pixel_mapping = (
-                pixel_data  # TODO what are we meant to do with pixel data here?
-            )
-
         vertices = CylindricalGeometry.calculate_vertices(
             axis_direction, height, radius
         )
@@ -264,12 +256,12 @@ class Component(Group):
         geometry.set_field_value("cylinders", np.array([0, 1, 2]))
         geometry[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, units)
 
-        if pixel_mapping is not None:
+        if isinstance(pixel_data, PixelMapping):
             geometry.detector_number = get_detector_number_from_pixel_mapping(
-                pixel_mapping
+                pixel_data
             )
 
-        self[SHAPE_GROUP_NAME] = geometry
+        self[self._get_shape_group_for_pixel_data(pixel_data)] = geometry
         return geometry
 
     def clear_pixel_data(self):
@@ -307,6 +299,32 @@ class Component(Group):
             get_detector_number_from_pixel_mapping(pixel_mapping),
             "int64",
         )
+
+    def _create_transformation_vectors_for_pixel_offsets(self) -> List[QVector3D]:
+        """
+        Construct a transformation (as a QVector3D) for each pixel offset
+        """
+        x_offsets = self.get_field_value("x_pixel_offset")
+        y_offsets = self.get_field_value("y_pixel_offset")
+        z_offsets = self.get_field_value("z_pixel_offset")
+        if x_offsets is None or y_offsets is None:
+            raise Exception(
+                "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
+            )
+        if z_offsets is None:
+            z_offsets = np.zeros_like(x_offsets)
+        # offsets datasets can be 2D to match dimensionality of detector, so flatten to 1D
+        return [
+            QVector3D(x, y, z)
+            for x, y, z in zip(
+                x_offsets.flatten(), y_offsets.flatten(), z_offsets.flatten()
+            )
+        ]
+
+    def _get_shape_group_for_pixel_data(self, pixel_data):
+        if isinstance(pixel_data, PixelGrid):
+            return PIXEL_SHAPE_GROUP_NAME
+        return SHAPE_GROUP_NAME
 
 
 def add_fields_to_component(component: Component, fields_widget: QListWidget):
