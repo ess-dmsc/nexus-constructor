@@ -213,15 +213,16 @@ class Component(Group):
         return NoShapeGeometry(), None
 
     def remove_shape(self):
-        if SHAPE_GROUP_NAME in self:
-            del self[SHAPE_GROUP_NAME]
+        for group_name in [PIXEL_SHAPE_GROUP_NAME, SHAPE_GROUP_NAME]:
+            if group_name in self:
+                del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
         self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None
     ):
         self.remove_shape()
 
-        geometry = OFFGeometryNexus(SHAPE_GROUP_NAME)
+        geometry = OFFGeometryNexus(self._get_shape_group_for_pixel_data(pixel_data))
         geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         geometry.record_faces(loaded_geometry.faces)
         geometry.record_vertices(loaded_geometry.vertices)
@@ -244,7 +245,7 @@ class Component(Group):
     ):
         self.remove_shape()
         validate_nonzero_qvector(axis_direction)
-        geometry = CylindricalGeometry(SHAPE_GROUP_NAME)
+        geometry = CylindricalGeometry(self._get_shape_group_for_pixel_data(pixel_data))
         geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
 
         vertices = CylindricalGeometry.calculate_vertices(
