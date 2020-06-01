@@ -45,7 +45,7 @@ def pixel_options(qtbot, template):
 @pytest.fixture(scope="function")
 def pixel_grid():
 
-    pixel_grid = PixelGrid
+    pixel_grid = PixelGrid()
     pixel_grid.rows = 5
     pixel_grid.columns = 4
     pixel_grid.row_height = 1.5
@@ -65,20 +65,6 @@ def pixel_mapping_with_six_pixels():
 @pytest.fixture(scope="function")
 def pixel_mapping_with_single_pixel():
     return PixelMapping([3])
-
-
-# @pytest.fixture(scope="function")
-# def nx_off_geometry_group(nexus_wrapper):
-#     return nexus_wrapper.create_nx_group(
-#         "test_geometry", "NXoff_geometry", nexus_wrapper.entry
-#     )
-
-
-# @pytest.fixture(scope="function")
-# def nx_cylindrical_geometry_group(nexus_wrapper):
-#     return nexus_wrapper.create_nx_group(
-#         "test_geometry", "NXcylindrical_geometry", nexus_wrapper.entry
-#     )
 
 
 def widgets_match_pixel_mapping(
