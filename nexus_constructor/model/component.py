@@ -120,7 +120,7 @@ class Component(Group):
             depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
         except AttributeError:
             depends_on = None
-        self._get_transform(depends_on, transforms, local_only=False)
+        self._get_transform(depends_on, transforms)
         return transforms
 
     def add_translation(
@@ -138,7 +138,7 @@ class Component(Group):
         :param values: The translation distance information.
         """
         unit_vector, _ = _normalise(vector)
-        return self._create_transform(
+        return self._create_and_add_transform(
             name,
             TransformationType.TRANSLATION,
             0.0,
@@ -164,7 +164,7 @@ class Component(Group):
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         :param values: The translation distance information.
         """
-        return self._create_transform(
+        return self._create_and_add_transform(
             name,
             TransformationType.ROTATION,
             angle,
@@ -174,7 +174,7 @@ class Component(Group):
             values,
         )
 
-    def _create_transform(
+    def _create_and_add_transform(
         self,
         name: str,
         transformation_type: TransformationType,
