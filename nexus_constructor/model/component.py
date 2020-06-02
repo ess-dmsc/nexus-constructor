@@ -46,6 +46,17 @@ def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
     return input_vector.normalized(), magnitude
 
 
+def _get_shape_group_for_pixel_data(pixel_data) -> str:
+    """
+    Determines which group the geometry should be placed in based on the type of PixelData.
+    :param pixel_data: The pixel data. Can either be grid or mapping.
+    :return: The name of the key for shape group.
+    """
+    if isinstance(pixel_data, PixelGrid):
+        return PIXEL_SHAPE_GROUP_NAME
+    return SHAPE_GROUP_NAME
+
+
 @attr.s
 class Component(Group):
     """
@@ -222,7 +233,7 @@ class Component(Group):
     ):
         self.remove_shape()
 
-        shape_group = self._get_shape_group_for_pixel_data(pixel_data)
+        shape_group = _get_shape_group_for_pixel_data(pixel_data)
         geometry = OFFGeometryNexus(shape_group)
         geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         geometry.record_faces(loaded_geometry.faces)
@@ -246,7 +257,7 @@ class Component(Group):
     ):
         self.remove_shape()
         validate_nonzero_qvector(axis_direction)
-        shape_group = self._get_shape_group_for_pixel_data(pixel_data)
+        shape_group = _get_shape_group_for_pixel_data(pixel_data)
         geometry = CylindricalGeometry(shape_group)
         geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
 
@@ -323,11 +334,6 @@ class Component(Group):
                 x_offsets.flatten(), y_offsets.flatten(), z_offsets.flatten()
             )
         ]
-
-    def _get_shape_group_for_pixel_data(self, pixel_data):
-        if isinstance(pixel_data, PixelGrid):
-            return PIXEL_SHAPE_GROUP_NAME
-        return SHAPE_GROUP_NAME
 
 
 def add_fields_to_component(component: Component, fields_widget: QListWidget):
