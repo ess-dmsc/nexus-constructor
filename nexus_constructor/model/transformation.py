@@ -49,19 +49,16 @@ class Transformation(Dataset):
 
     @property
     def ui_value(self) -> float:
-        if isinstance(self.dataset, Dataset):
-            if np.isscalar(self.dataset.values):
-                try:
+        try:
+            if isinstance(self.dataset, Dataset):
+                if np.isscalar(self.dataset.values):
                     self.ui_value = float(self.dataset.values)
                     return float(self.dataset.values)
-                except ValueError:
-                    pass
-            else:
-                try:
+                else:
                     self.ui_value = float(self.dataset.values[0])
                     return float(self.dataset.values[0])
-                except ValueError:
-                    pass
+        except ValueError:
+            pass
 
         if self.get_attribute_value(CommonAttrs.UI_VALUE) is None:
             default_value = 0.0
