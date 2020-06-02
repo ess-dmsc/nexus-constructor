@@ -318,14 +318,16 @@ class Component(Group):
         """
         Construct a transformation (as a QVector3D) for each pixel offset
         """
-        x_offsets = self.get_field_value("x_pixel_offset")
-        y_offsets = self.get_field_value("y_pixel_offset")
-        z_offsets = self.get_field_value("z_pixel_offset")
-        if x_offsets is None or y_offsets is None:
+        try:
+            x_offsets = self.get_field_value("x_pixel_offset")
+            y_offsets = self.get_field_value("y_pixel_offset")
+        except AttributeError:
             raise Exception(
                 "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
             )
-        if z_offsets is None:
+        try:
+            z_offsets = self.get_field_value("z_pixel_offset")
+        except AttributeError:
             z_offsets = np.zeros_like(x_offsets)
         # offsets datasets can be 2D to match dimensionality of detector, so flatten to 1D
         return [
