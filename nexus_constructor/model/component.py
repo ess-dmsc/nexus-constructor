@@ -86,9 +86,11 @@ class Component(Group):
         :return:
         """
         transforms = TransformationsList(self)
-        for i in self.transforms_list:
-            transforms.append(i)
-
+        try:
+            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+        except AttributeError:
+            depends_on = None
+        self._get_transform(depends_on, transforms, local_only=True)
         return transforms
 
     def _get_transform(
@@ -191,7 +193,7 @@ class Component(Group):
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
-        transform.depends_on = depends_on
+        transform.depends_on = depends_on if depends_on is not None else self
         transform.values = values
         transform._parent_component = self
         self.transforms_list.append(transform)

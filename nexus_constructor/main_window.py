@@ -69,6 +69,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         self._set_up_file_writer_control_window(main_window)
         self.file_writer_control_window = None
+        self._update_views()
 
     def _set_up_file_writer_control_window(self, main_window):
         try:
