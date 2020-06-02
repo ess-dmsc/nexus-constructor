@@ -26,10 +26,6 @@ ATTRS_BLACKLIST = [CommonAttrs.UNITS]
 def _get_human_readable_type(new_type: Any):
     if new_type == str:
         return "String"
-    elif "numpy.int" in str(new_type):
-        return "Int"
-    elif "numpy.float" in str(new_type):
-        return "Double"
     else:
         return next(key for key, value in DATASET_TYPE.items() if value == new_type)
 
