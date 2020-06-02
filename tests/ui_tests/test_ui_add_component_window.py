@@ -1768,7 +1768,7 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
 
     field_name = "scalar"
     field_value = "test"
-    component.set_field_value(field_name, field_value, dtype="String")
+    component.set_field_value(field_name, field_value, dtype=str)
 
     dialog = AddComponentDialog(
         instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
@@ -1861,11 +1861,11 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     )
 
     field_name1 = "array"
-    field_value1 = np.array([1, 2, 3, 4, 5])
+    field_value1 = np.array([1, 2, 3, 4, 5], dtype=np.int64)
     component.set_field_value(field_name1, field_value1)
 
     field_name2 = "scalar"
-    field_value2 = 1
+    field_value2 = np.int64(1)
     component.set_field_value(field_name2, field_value2)
 
     dialog = AddComponentDialog(

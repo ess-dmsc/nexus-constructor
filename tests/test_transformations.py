@@ -31,7 +31,7 @@ def _add_transform_to_file(
 
 
 def create_dataset():
-    return Dataset("dataset", DatasetMetadata([1], DATASET_TYPE["str"]), "test")
+    return Dataset("dataset", DatasetMetadata([1], str), "test")
 
 
 @pytest.fixture

@@ -306,7 +306,7 @@ DATASET_TYPE = {
     "ULong": np.uint,
     "Float": np.single,
     "Double": np.double,
-    "String": h5py.special_dtype(vlen=str),
+    "String": str,
 }
 
 

@@ -3,13 +3,14 @@ from typing import List, Callable, Tuple, Union
 
 import numpy as np
 
+from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup
-from nexus_constructor.validators import FieldType
+from nexus_constructor.validators import FieldType, DATASET_TYPE
 
 
 def update_existing_link_field(field: Link, new_ui_field: FieldWidget):
@@ -29,7 +30,7 @@ def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.array_dataset.value
-    new_ui_field.dtype = field.dataset.type
+    new_ui_field.dtype = _get_human_readable_type(field.dataset.type)
     new_ui_field.value = field.values
 
 
@@ -41,7 +42,7 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     """
     new_ui_field.field_type = FieldType.scalar_dataset.value
     new_ui_field.value = field.values
-    new_ui_field.dtype = field.dataset.type
+    new_ui_field.dtype = _get_human_readable_type(field.dataset.type)
 
 
 def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
