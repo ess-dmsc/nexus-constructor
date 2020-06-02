@@ -30,11 +30,11 @@ class LinkTransformation:
         if not self.parent.has_link:
             return None
         if self._has_direct_component_link():
-            return self.parent.parent_component
+            return self.parent.parent_component.depends_on
         return self._find_linked_component()
 
     @linked_component.setter
-    def linked_component(self, value):
+    def linked_component(self, value: Component):
         parent_component = self.parent.parent_component
         target = None
         if len(parent_component.transforms) == 0:
@@ -48,6 +48,6 @@ class LinkTransformation:
                     target = c_transform
                     break
         if value is not None:
-            target.depends_on = value.depends_on
+            target.depends_on = value
             return
         target.depends_on = None
