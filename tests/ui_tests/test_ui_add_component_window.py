@@ -1861,11 +1861,11 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     )
 
     field_name1 = "array"
-    field_value1 = np.array([1, 2, 3, 4, 5], dtype=np.int64)
+    field_value1 = np.array([1, 2, 3, 4, 5], dtype=np.intc)
     component.set_field_value(field_name1, field_value1)
 
     field_name2 = "scalar"
-    field_value2 = np.int64(1)
+    field_value2 = np.intc(1)
     component.set_field_value(field_name2, field_value2)
 
     dialog = AddComponentDialog(

@@ -35,7 +35,7 @@ def field_attributes_dialog(qtbot, template):
 
 
 @pytest.mark.parametrize(
-    "attr_val", ["test", np.int64(123), np.float64(1.1), np.ushort(12)]
+    "attr_val", ["test", np.intc(123), np.single(1.1), np.ushort(12)]
 )
 def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_and_attrs_are_filled_in_correctly(
     qtbot, attr_val, field_attributes_dialog
