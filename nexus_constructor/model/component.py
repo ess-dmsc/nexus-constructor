@@ -46,7 +46,7 @@ def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
     return input_vector.normalized(), magnitude
 
 
-def _get_shape_group_for_pixel_data(pixel_data: Type[PixelData]) -> str:
+def _get_shape_group_for_pixel_data(pixel_data: PixelData) -> str:
     """
     Determines which group the geometry should be placed in based on the type of PixelData.
     :param pixel_data: The pixel data. Can either be grid or mapping.
