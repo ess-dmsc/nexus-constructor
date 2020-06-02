@@ -66,7 +66,7 @@ class Component(Group):
         self.set_field_value(CommonAttrs.DESCRIPTION, new_description)
 
     @property
-    def transform(self) -> QTransform:
+    def qtransform(self) -> QTransform:
         """
         Creates a QTransform based on the full chain of transforms this component points to.
         :return: QTransform of final transformation
