@@ -170,7 +170,12 @@ class FieldAttrFrame(QFrame):
         if isinstance(new_value, bytes):
             new_value = new_value.decode("utf-8")
 
-        self.attr_dtype_combo.setCurrentText(_get_human_readable_type(new_value))
+        if isinstance(new_value, np.ndarray):
+            dtype = new_value.dtype
+        else:
+            dtype = type(new_value)
+
+        self.attr_dtype_combo.setCurrentText(_get_human_readable_type(dtype))
         if np.isscalar(new_value):
             self.type_changed("Scalar")
             self.attr_value_lineedit.setText(str(new_value))

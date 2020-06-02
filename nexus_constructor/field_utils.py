@@ -10,7 +10,7 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup
-from nexus_constructor.validators import FieldType, DATASET_TYPE
+from nexus_constructor.validators import FieldType
 
 
 def update_existing_link_field(field: Link, new_ui_field: FieldWidget):
