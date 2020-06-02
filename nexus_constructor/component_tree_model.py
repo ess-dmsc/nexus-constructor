@@ -65,6 +65,7 @@ class ComponentTreeModel(QAbstractItemModel):
         target_pos = len(transformation_list)
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.has_link = True
+        # transformation_list.append(LinkTransformation(transformation_list))
         self.endInsertRows()
 
     def _get_transformation_list(self, node, parent_item):

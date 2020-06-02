@@ -115,7 +115,9 @@ def set_button_states(
         elif isinstance(selected_object, TransformationsList):
             create_link_action.setEnabled(not selected_object.has_link)
         elif isinstance(selected_object, Transformation):
-            create_link_action.setEnabled(not selected_object.parent.has_link)
+            create_link_action.setEnabled(
+                not selected_object._parent_component.transforms.has_link
+            )
         else:
             create_link_action.setEnabled(False)
 
