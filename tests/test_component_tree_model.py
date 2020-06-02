@@ -14,6 +14,7 @@ from nexus_constructor.model.geometry import OFFGeometryNoNexus
 from typing import Any
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.validators import DATASET_TYPE
 from tests.test_utils import NX_CLASS_DEFINITIONS
 
 pytest.skip("Disabled whilst working on model change", allow_module_level=True)
@@ -26,7 +27,9 @@ def _add_component_to_file(
     component.set_field_value(
         field_name,
         Dataset(
-            name=field_name, dataset=DatasetMetadata(type="Double"), values=field_value
+            name=field_name,
+            dataset=DatasetMetadata(type=DATASET_TYPE["Double"]),
+            values=field_value,
         ),
     )
 

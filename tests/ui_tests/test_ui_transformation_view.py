@@ -9,7 +9,7 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
-from nexus_constructor.validators import FieldType
+from nexus_constructor.validators import FieldType, DATASET_TYPE
 import numpy as np
 from pytestqt.qtbot import QtBot  # noqa: F401
 import pytest
@@ -36,7 +36,9 @@ def create_corresponding_value_dataset(value: Any):
         size = len(value)
 
     return Dataset(
-        name=name, dataset=DatasetMetadata(type=type, size=[size]), values=value,
+        name=name,
+        dataset=DatasetMetadata(type=DATASET_TYPE[type], size=[size]),
+        values=value,
     )
 
 

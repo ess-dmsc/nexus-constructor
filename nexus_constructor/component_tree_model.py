@@ -1,5 +1,7 @@
 import logging
 
+import numpy as np
+
 import PySide2.QtGui
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
 from PySide2.QtGui import QVector3D
@@ -225,7 +227,7 @@ class ComponentTreeModel(QAbstractItemModel):
         parent_component, transformation_list, transformation_type
     ):
         values = Dataset(
-            name="", dataset=DatasetMetadata(type="Double", size=[1]), values=""
+            name="", dataset=DatasetMetadata(type=np.double, size=[1]), values=""
         )
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
