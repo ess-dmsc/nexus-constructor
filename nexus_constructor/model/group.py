@@ -49,7 +49,4 @@ class Group(Node):
         )
 
     def get_field_value(self, name: str):
-        try:
-            return self[name].values
-        except AttributeError:
-            return None
+        return self[name].values
