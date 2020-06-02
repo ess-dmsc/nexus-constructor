@@ -1,4 +1,5 @@
-from typing import Tuple, Union, List, Type
+import logging
+from typing import Tuple, Union, List
 
 import attr
 import numpy as np
@@ -322,9 +323,10 @@ class Component(Group):
             x_offsets = self.get_field_value("x_pixel_offset")
             y_offsets = self.get_field_value("y_pixel_offset")
         except AttributeError:
-            raise Exception(
+            logging.info(
                 "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
             )
+            return
         try:
             z_offsets = self.get_field_value("z_pixel_offset")
         except AttributeError:
