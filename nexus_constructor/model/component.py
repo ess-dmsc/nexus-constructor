@@ -3,7 +3,7 @@ from typing import Tuple, Union, List
 import attr
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtGui import QMatrix4x4, QVector3D
+from PySide2.QtGui import QMatrix4x4, QVector3D, QTransform
 from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
@@ -54,7 +54,7 @@ class Component(Group):
     transforms_list = attr.ib(factory=list)
 
     @property
-    def description(self):
+    def description(self) -> str:
         try:
             return self.get_field_value(CommonAttrs.DESCRIPTION)
         except AttributeError:
@@ -65,7 +65,7 @@ class Component(Group):
         self.set_field_value(CommonAttrs.DESCRIPTION, new_description)
 
     @property
-    def transform(self):
+    def transform(self) -> QTransform:
         """
         Creates a QTransform based on the full chain of transforms this component points to.
         :return: QTransform of final transformation
@@ -78,7 +78,7 @@ class Component(Group):
         return transformation
 
     @property
-    def transforms(self):
+    def transforms(self) -> TransformationsList:
         """
         Gets transforms in the depends_on chain but only those which are local to
         this component's group in the NeXus file
@@ -109,7 +109,7 @@ class Component(Group):
             self._get_transform(depends_on.depends_on, transforms, local_only)
 
     @property
-    def transforms_full_chain(self):
+    def transforms_full_chain(self) -> TransformationsList:
         """
         Gets all transforms in the depends_on chain for this component
         :return: List of transforms
@@ -182,7 +182,7 @@ class Component(Group):
         vector: QVector3D,
         depends_on: Transformation,
         values: Dataset,
-    ):
+    ) -> Transformation:
 
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms_list)
@@ -203,7 +203,7 @@ class Component(Group):
         self.transforms_list.remove(transform)
 
     @property
-    def shape(self):
+    def shape(self) -> Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus]:
         if PIXEL_SHAPE_GROUP_NAME in self:
             return self[PIXEL_SHAPE_GROUP_NAME], None
         if SHAPE_GROUP_NAME in self:
@@ -216,7 +216,7 @@ class Component(Group):
 
     def set_off_shape(
         self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None
-    ):
+    ) -> OFFGeometryNexus:
         self.remove_shape()
         pixel_mapping = None
         if isinstance(pixel_data, PixelMapping):
@@ -242,7 +242,7 @@ class Component(Group):
         radius: float = 1.0,
         units: Union[str, bytes] = "m",
         pixel_data=None,
-    ):
+    ) -> CylindricalGeometry:
         self.remove_shape()
         validate_nonzero_qvector(axis_direction)
         geometry = CylindricalGeometry(SHAPE_GROUP_NAME)
