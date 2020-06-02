@@ -32,8 +32,6 @@ from tests.ui_tests.ui_test_utils import (
     CORRECT_OCTA_FACES,
 )
 
-pytest.skip("Disabled whilst working on model change", allow_module_level=True)
-
 
 @pytest.fixture(scope="function")
 def pixel_options(qtbot, template):
@@ -47,7 +45,7 @@ def pixel_options(qtbot, template):
 @pytest.fixture(scope="function")
 def pixel_grid():
 
-    pixel_grid = PixelGrid
+    pixel_grid = PixelGrid()
     pixel_grid.rows = 5
     pixel_grid.columns = 4
     pixel_grid.row_height = 1.5
@@ -67,20 +65,6 @@ def pixel_mapping_with_six_pixels():
 @pytest.fixture(scope="function")
 def pixel_mapping_with_single_pixel():
     return PixelMapping([3])
-
-
-@pytest.fixture(scope="function")
-def nx_off_geometry_group(nexus_wrapper):
-    return nexus_wrapper.create_nx_group(
-        "test_geometry", "NXoff_geometry", nexus_wrapper.entry
-    )
-
-
-@pytest.fixture(scope="function")
-def nx_cylindrical_geometry_group(nexus_wrapper):
-    return nexus_wrapper.create_nx_group(
-        "test_geometry", "NXcylindrical_geometry", nexus_wrapper.entry
-    )
 
 
 def widgets_match_pixel_mapping(
@@ -134,9 +118,12 @@ def replace_pixel_grid_in_off_component(
 
 
 @pytest.fixture(scope="function")
-def off_geometry_file(
-    nexus_wrapper, nx_off_geometry_group, pixel_mapping_with_six_pixels
-):
+def component():
+    return Component("Component", [])
+
+
+@pytest.fixture(scope="function")
+def off_geometry_file(pixel_mapping_with_six_pixels):
 
     off_string = StringIO("".join(VALID_CUBE_OFF_FILE))
     off_geometry = load_geometry_from_file_object(off_string, ".off", "m")
@@ -144,47 +131,32 @@ def off_geometry_file(
 
 
 @pytest.fixture(scope="function")
-def off_component_with_pixel_grid(
-    pixel_grid, nexus_wrapper, nx_off_geometry_group, off_geometry_file
-):
-    component = Component(nexus_wrapper, nx_off_geometry_group)
+def off_component_with_pixel_grid(pixel_grid, off_geometry_file, component):
     component.record_pixel_grid(pixel_grid)
     component.set_off_shape(off_geometry_file, pixel_data=pixel_grid)
-
     return component
 
 
 @pytest.fixture(scope="function")
 def off_component_with_pixel_mapping(
-    nexus_wrapper,
-    nx_off_geometry_group,
-    pixel_mapping_with_six_pixels,
-    off_geometry_file,
+    pixel_mapping_with_six_pixels, off_geometry_file, component,
 ):
-    component = Component(nexus_wrapper, nx_off_geometry_group)
     component.record_pixel_mapping(pixel_mapping_with_six_pixels)
     component.set_off_shape(off_geometry_file, pixel_data=pixel_mapping_with_six_pixels)
-
     return component
 
 
 @pytest.fixture(scope="function")
-def off_component_with_no_pixel_data(
-    nexus_wrapper, nx_off_geometry_group, off_geometry_file
-):
-    component = Component(nexus_wrapper, nx_off_geometry_group)
+def off_component_with_no_pixel_data(off_geometry_file, component):
     component.set_off_shape(off_geometry_file)
-
     return component
 
 
 @pytest.fixture(scope="function")
 def cylindrical_component_with_pixel_mapping(
-    nexus_wrapper, nx_cylindrical_geometry_group, pixel_mapping_with_single_pixel
+    component, pixel_mapping_with_single_pixel
 ):
-    component = Component(nexus_wrapper, nx_cylindrical_geometry_group)
     component.record_pixel_mapping(pixel_mapping_with_single_pixel)
-
     return component
 
 
@@ -806,7 +778,6 @@ def test_GIVEN_component_with_single_id_WHEN_editing_pixel_data_THEN_correct_num
 def test_GIVEN_cylindrical_geometry_WHEN_editing_pixel_mapping_with_single_pixel_THEN_pixel_data_is_recovered(
     pixel_options,
     cylindrical_component_with_pixel_mapping,
-    nx_cylindrical_geometry_group,
     pixel_mapping_with_single_pixel,
 ):
     cylindrical_geometry = cylindrical_component_with_pixel_mapping.set_cylinder_shape(

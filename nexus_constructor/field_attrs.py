@@ -23,6 +23,19 @@ from nexus_constructor.validators import DATASET_TYPE, FieldValueValidator
 ATTRS_BLACKLIST = [CommonAttrs.UNITS]
 
 
+def _get_human_readable_type(new_value: Any):
+    if isinstance(new_value, str):
+        return "String"
+    elif isinstance(new_value, int):
+        return "Int"
+    elif isinstance(new_value, float):
+        return "Double"
+    else:
+        return next(
+            key for key, value in DATASET_TYPE.items() if value == new_value.dtype
+        )
+
+
 class FieldAttrsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -159,7 +172,7 @@ class FieldAttrFrame(QFrame):
         if isinstance(new_value, bytes):
             new_value = new_value.decode("utf-8")
 
-        self.attr_dtype_combo.setCurrentText(self._get_human_readable_type(new_value))
+        self.attr_dtype_combo.setCurrentText(_get_human_readable_type(new_value))
         if np.isscalar(new_value):
             self.type_changed("Scalar")
             self.attr_value_lineedit.setText(str(new_value))
@@ -168,16 +181,3 @@ class FieldAttrFrame(QFrame):
             self.dialog.model.array = new_value
             self.dialog.model.update_array_dtype(new_value.dtype)
         self.dtype_changed(None)
-
-    @staticmethod
-    def _get_human_readable_type(new_value: Any):
-        if isinstance(new_value, str):
-            return "String"
-        elif isinstance(new_value, int):
-            return "Int"
-        elif isinstance(new_value, float):
-            return "Double"
-        else:
-            return next(
-                key for key, value in DATASET_TYPE.items() if value == new_value.dtype
-            )
