@@ -1,4 +1,4 @@
-from typing import Tuple, Union, List
+from typing import Tuple, Union, List, Type
 
 import attr
 import numpy as np
@@ -18,7 +18,7 @@ from nexus_constructor.model.geometry import (
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.pixel_data import PixelGrid, PixelMapping
+from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
     get_x_offsets_from_pixel_grid,
@@ -46,7 +46,7 @@ def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
     return input_vector.normalized(), magnitude
 
 
-def _get_shape_group_for_pixel_data(pixel_data) -> str:
+def _get_shape_group_for_pixel_data(pixel_data: Type[PixelData]) -> str:
     """
     Determines which group the geometry should be placed in based on the type of PixelData.
     :param pixel_data: The pixel data. Can either be grid or mapping.
