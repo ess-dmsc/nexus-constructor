@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from math import sin, cos, pi, acos, degrees
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 from PySide2.QtGui import QVector3D, QMatrix4x4
@@ -261,16 +261,17 @@ class OFFGeometryNexus(OFFGeometry, Group):
     """
 
     @property
-    def detector_faces(self) -> List[int]:
+    def detector_faces(self) -> Union[List[Tuple[int, int]], Tuple[int, int]]:
         return self.get_field_value("detector_faces")
 
     @detector_faces.setter
-    def detector_faces(self, detector_faces: List[Tuple[int, int]]):
+    def detector_faces(
+        self, detector_faces: Union[List[Tuple[int, int]], Tuple[int, int]]
+    ):
         """
         Records the detector faces in the NXoff_geometry.
         :param detector_faces: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
-        # TODO: call get_detector_faces_from_pixel_mapping here
         self.set_field_value("detector_faces", detector_faces)
 
     @property
