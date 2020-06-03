@@ -1,7 +1,9 @@
 from typing import Any
+
+import numpy as np
+
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
-from nexus_constructor.validators import DATASET_TYPE
 
 
 def add_component_to_file(
@@ -14,7 +16,7 @@ def add_component_to_file(
         name=field_name,
         value=Dataset(
             name=field_name,
-            dataset=DatasetMetadata(type=DATASET_TYPE["Double"]),
+            dataset=DatasetMetadata(type=np.double),
             values=field_value,
         ),
     )

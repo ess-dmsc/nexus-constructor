@@ -9,7 +9,6 @@ from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
 from typing import Any
 from nexus_constructor.ui_utils import qvector3d_to_numpy_array
-from nexus_constructor.validators import DATASET_TYPE
 from tests.helpers import add_component_to_file  # noqa:F401
 
 transform_type = "Transformation"
@@ -20,9 +19,7 @@ translation_type = "Translation"
 def _add_transform_to_file(
     name: str, value: Any, vector: QVector3D, transform_type: str
 ):
-    transform = Transformation(
-        name=name, dataset=DatasetMetadata(type=DATASET_TYPE["Double"])
-    )
+    transform = Transformation(name=name, dataset=DatasetMetadata(type=np.double))
     transform.type = transform_type
     transform.vector = vector
     transform.values = value
