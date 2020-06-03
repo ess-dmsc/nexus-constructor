@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple, Union, List
 
 import attr
@@ -18,7 +19,7 @@ from nexus_constructor.model.geometry import (
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.pixel_data import PixelGrid, PixelMapping
+from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
     get_x_offsets_from_pixel_grid,
@@ -44,6 +45,17 @@ def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
         return QVector3D(0.0, 0.0, 0.0), 0.0
 
     return input_vector.normalized(), magnitude
+
+
+def _get_shape_group_for_pixel_data(pixel_data: PixelData) -> str:
+    """
+    Determines which group the geometry should be placed in based on the type of PixelData.
+    :param pixel_data: The pixel data. Can either be grid or mapping.
+    :return: The name of the key for shape group.
+    """
+    if isinstance(pixel_data, PixelGrid):
+        return PIXEL_SHAPE_GROUP_NAME
+    return SHAPE_GROUP_NAME
 
 
 @attr.s
@@ -235,7 +247,7 @@ class Component(Group):
     ) -> OFFGeometryNexus:
         self.remove_shape()
 
-        shape_group = self._get_shape_group_for_pixel_data(pixel_data)
+        shape_group = _get_shape_group_for_pixel_data(pixel_data)
         geometry = OFFGeometryNexus(shape_group)
         geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         geometry.record_faces(loaded_geometry.faces)
@@ -259,7 +271,7 @@ class Component(Group):
     ) -> CylindricalGeometry:
         self.remove_shape()
         validate_nonzero_qvector(axis_direction)
-        shape_group = self._get_shape_group_for_pixel_data(pixel_data)
+        shape_group = _get_shape_group_for_pixel_data(pixel_data)
         geometry = CylindricalGeometry(shape_group)
         geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
 
@@ -320,14 +332,17 @@ class Component(Group):
         """
         Construct a transformation (as a QVector3D) for each pixel offset
         """
-        x_offsets = self.get_field_value("x_pixel_offset")
-        y_offsets = self.get_field_value("y_pixel_offset")
-        z_offsets = self.get_field_value("z_pixel_offset")
-        if x_offsets is None or y_offsets is None:
-            raise Exception(
+        try:
+            x_offsets = self.get_field_value("x_pixel_offset")
+            y_offsets = self.get_field_value("y_pixel_offset")
+        except AttributeError:
+            logging.info(
                 "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
             )
-        if z_offsets is None:
+            return
+        try:
+            z_offsets = self.get_field_value("z_pixel_offset")
+        except AttributeError:
             z_offsets = np.zeros_like(x_offsets)
         # offsets datasets can be 2D to match dimensionality of detector, so flatten to 1D
         return [
@@ -336,11 +351,6 @@ class Component(Group):
                 x_offsets.flatten(), y_offsets.flatten(), z_offsets.flatten()
             )
         ]
-
-    def _get_shape_group_for_pixel_data(self, pixel_data):
-        if isinstance(pixel_data, PixelGrid):
-            return PIXEL_SHAPE_GROUP_NAME
-        return SHAPE_GROUP_NAME
 
 
 def add_fields_to_component(component: Component, fields_widget: QListWidget):

@@ -98,19 +98,26 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         self.reset_pixel_mapping_list()
 
-        if component_to_edit.get_field_value("x_pixel_offset") is not None:
+        try:
+            component_to_edit.get_field_value("x_pixel_offset")
             self.single_pixel_radio_button.setChecked(True)
             self.update_pixel_layout_visibility(True, False)
             self._fill_single_pixel_fields(component_to_edit)
+            return
+        except AttributeError:
+            pass
 
-        elif component_to_edit.get_field_value("detector_number") is not None:
+        try:
+            component_to_edit.get_field_value("detector_number")
             self.entire_shape_radio_button.setChecked(True)
             self.update_pixel_layout_visibility(False, True)
             self._fill_entire_shape_fields(component_to_edit)
+            return
+        except AttributeError:
+            pass
 
-        else:
-            self.no_pixels_button.setChecked(True)
-            self.pixel_options_stack.setVisible(False)
+        self.no_pixels_button.setChecked(True)
+        self.pixel_options_stack.setVisible(False)
 
     def _fill_single_pixel_fields(self, component_to_edit: Component):
         """
