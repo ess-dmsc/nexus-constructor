@@ -19,7 +19,7 @@ translation_type = "Translation"
 def _add_transform_to_file(
     name: str, value: Any, vector: QVector3D, transform_type: str
 ):
-    transform = Transformation(name=name, dataset=DatasetMetadata(type=np.double))
+    transform = Transformation(name=name, dataset=DatasetMetadata(type="Double"))
     transform.type = transform_type
     transform.vector = vector
     transform.values = value
@@ -28,7 +28,7 @@ def _add_transform_to_file(
 
 
 def create_dataset():
-    return Dataset("dataset", DatasetMetadata([1], str), "test")
+    return Dataset("dataset", DatasetMetadata([1], "str"), "test")
 
 
 @pytest.fixture

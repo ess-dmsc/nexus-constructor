@@ -1,5 +1,3 @@
-import numpy as np
-
 from nexus_constructor.component_tree_model import (
     ComponentTreeModel,
     ComponentInfo,
@@ -28,9 +26,7 @@ def _add_component_to_file(
     component.set_field_value(
         field_name,
         Dataset(
-            name=field_name,
-            dataset=DatasetMetadata(type=np.double),
-            values=field_value,
+            name=field_name, dataset=DatasetMetadata(type="Double"), values=field_value
         ),
     )
 
