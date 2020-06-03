@@ -89,7 +89,7 @@ class Component(Group):
         try:
             depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
         except AttributeError:
-            depends_on = None
+            return transforms
         self._get_transform(depends_on, transforms, local_only=True)
         return transforms
 
@@ -121,7 +121,7 @@ class Component(Group):
         try:
             depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
         except AttributeError:
-            depends_on = None
+            return transforms
         self._get_transform(depends_on, transforms)
         return transforms
 
