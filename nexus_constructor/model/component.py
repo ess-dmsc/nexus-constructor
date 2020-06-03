@@ -107,9 +107,8 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
-            transforms.append(self.depends_on)
             self._get_transform(
-                self.depends_on, transforms, local_only=True,
+                self, transforms, local_only=True,
             )
         except AttributeError:
             pass
@@ -128,6 +127,8 @@ class Component(Group):
         :param local_only: If True then only add transformations which are stored within this component
         """
         depends_on_transform = current_transform.depends_on
+        if isinstance(depends_on_transform, Component):
+            depends_on_transform = depends_on_transform.depends_on
         if depends_on_transform is not None:
             if local_only and depends_on_transform._parent_component != self:
                 # reached an external transform - ignore if local_only
@@ -135,6 +136,7 @@ class Component(Group):
             if depends_on_transform.depends_on == depends_on_transform:
                 # reached the end of the chain
                 return
+
             transforms.append(depends_on_transform)
             self._get_transform(depends_on_transform, transforms, local_only)
 
@@ -146,9 +148,8 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
-            transforms.append(self.depends_on)
             self._get_transform(
-                self.depends_on, transforms, local_only=False,
+                self, transforms, local_only=False,
             )
         except AttributeError:
             pass
