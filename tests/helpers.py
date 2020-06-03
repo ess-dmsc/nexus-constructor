@@ -1,7 +1,5 @@
 from typing import Any
 
-import numpy as np
-
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 
