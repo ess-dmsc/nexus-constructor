@@ -110,16 +110,16 @@ class Transformation(Dataset):
         self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
 
     @property
-    def dependents(self) -> List["Transformation"]:
+    def dependents(self) -> List[Union["Transformation", "Component"]]:
         return self._dependents
 
-    def deregister_dependent(self, old_dependent: "Transformation"):
+    def deregister_dependent(self, old_dependent: ["Transformation", "Component"]):
         try:
             self._dependents.remove(old_dependent)
         except ValueError:
             pass
 
-    def register_dependent(self, new_dependent: "Transformation"):
+    def register_dependent(self, new_dependent: Union["Transformation", "Component"]):
         if new_dependent not in self._dependents:
             self._dependents.append(new_dependent)
 
@@ -127,13 +127,13 @@ class Transformation(Dataset):
         parent = self.depends_on
         if parent is not None:
             # deregister this transformation from the parent transformation
-            self.depends_on.deregister_dependent(self)
+            parent.deregister_dependent(self)
 
         for dependent_transform in self.dependents:
-            # deregister the dependent from this transformation
-            self.deregister_dependent(dependent_transform)
             # update dependent's depends_on to point at this transforms depends_on
             dependent_transform.depends_on = parent
             # update the parent transform to include the previously dependent transform as a dependent of the parent
             if dependent_transform.depends_on is not None:
                 dependent_transform.depends_on.register_dependent(dependent_transform)
+
+        self._dependents = []
