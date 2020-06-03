@@ -107,26 +107,26 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
-            self._get_transform(
+            self._get_depends_on(
                 self, transforms, local_only=True,
             )
         except AttributeError:
             pass
         return transforms
 
-    def _get_transform(
+    def _get_depends_on(
         self,
-        current_transform: Transformation,
+        current_item: Union[Transformation, "Component"],
         transforms: List[Transformation],
         local_only: bool = False,
     ):
         """
         Recursive function, appends each transform in depends_on chain to transforms list
-        :param current_transform: the current transformation, used to get the next depends_on
+        :param current_item: the current transformation, used to get the next depends_on
         :param transforms: The list to populate with transformations
         :param local_only: If True then only add transformations which are stored within this component
         """
-        depends_on_transform = current_transform.depends_on
+        depends_on_transform = current_item.depends_on
         if isinstance(depends_on_transform, Component):
             depends_on_transform = depends_on_transform.depends_on
         if depends_on_transform is not None:
@@ -138,7 +138,7 @@ class Component(Group):
                 return
 
             transforms.append(depends_on_transform)
-            self._get_transform(depends_on_transform, transforms, local_only)
+            self._get_depends_on(depends_on_transform, transforms, local_only)
 
     @property
     def transforms_full_chain(self) -> TransformationsList:
@@ -148,7 +148,7 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
-            self._get_transform(
+            self._get_depends_on(
                 self, transforms, local_only=False,
             )
         except AttributeError:
