@@ -99,10 +99,10 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
-            depends_on_transform = self.get_field_value(CommonAttrs.DEPENDS_ON)
-            transforms.append(depends_on_transform)
             self._get_transform(
-                depends_on_transform.depends_on, transforms, local_only=True
+                self.get_field_value(CommonAttrs.DEPENDS_ON),
+                transforms,
+                local_only=True,
             )
         except AttributeError:
             pass
@@ -110,21 +110,26 @@ class Component(Group):
 
     def _get_transform(
         self,
-        depends_on: Transformation,
+        current_transform: Transformation,
         transforms: List[Transformation],
         local_only: bool = False,
     ):
         """
         Recursive function, appends each transform in depends_on chain to transforms list
-        :param depends_on: The next depends_on string to find the next transformation in the chain
+        :param current_transform: the current transformation, used to get the next depends_on
         :param transforms: The list to populate with transformations
         :param local_only: If True then only add transformations which are stored within this component
         """
-        if depends_on is not None:
-            if local_only:
+        depends_on_transform = current_transform.depends_on
+        if depends_on_transform is not None:
+            if local_only and depends_on_transform._parent_component != self:
+                # reached an external transform - ignore if local_only
                 return
-            transforms.append(depends_on)
-            self._get_transform(depends_on.depends_on, transforms, local_only)
+            if depends_on_transform.depends_on == depends_on_transform:
+                # reached the end of the chain
+                return
+            transforms.append(depends_on_transform)
+            self._get_transform(depends_on_transform, transforms, local_only)
 
     @property
     def transforms_full_chain(self) -> TransformationsList:
@@ -134,10 +139,13 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
-            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+            self._get_transform(
+                self.get_field_value(CommonAttrs.DEPENDS_ON),
+                transforms,
+                local_only=False,
+            )
         except AttributeError:
-            return transforms
-        self._get_transform(depends_on, transforms)
+            pass
         return transforms
 
     def add_translation(
@@ -208,7 +216,7 @@ class Component(Group):
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
-        transform.depends_on = depends_on if depends_on is not None else self
+        transform.depends_on = depends_on
         transform.values = values
         transform._parent_component = self
         self.transforms_list.append(transform)
