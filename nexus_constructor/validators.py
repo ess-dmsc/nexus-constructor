@@ -335,18 +335,9 @@ class FieldValueValidator(QValidator):
         """
         if not input:  # More criteria here
             return self._emit_and_return(False)
+        if self.dataset_type_combo.currentText() == "String":
+            return self._emit_and_return(True)
         elif self.field_type_combo.currentText() == self.scalar:
-            try:
-                if (
-                    h5py.check_dtype(
-                        vlen=DATASET_TYPE[self.dataset_type_combo.currentText()]
-                    )
-                    == str
-                ):
-                    return self._emit_and_return(True)
-            except AttributeError:
-                pass
-
             try:
                 DATASET_TYPE[self.dataset_type_combo.currentText()](input)
             except ValueError:
@@ -373,11 +364,10 @@ class NumpyDTypeValidator(QValidator):
         if not input:
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        try:
-            if h5py.check_dtype(vlen=self.dtype) == str:
-                self.is_valid.emit(True)
-                return QValidator.Acceptable
-        except AttributeError:
+        if self.dtype == str:
+            self.is_valid.emit(True)
+            return QValidator.Acceptable
+        else:
             try:
                 self.dtype(input)
             except ValueError:
