@@ -23,15 +23,17 @@ from nexus_constructor.validators import DATASET_TYPE, FieldValueValidator
 ATTRS_BLACKLIST = [CommonAttrs.UNITS]
 
 
-def _get_human_readable_type(new_type: Any):
-    if new_type == str:
+def _get_human_readable_type(new_value: Any):
+    if isinstance(new_value, str):
         return "String"
-    elif "numpy.int" in str(new_type):
+    elif isinstance(new_value, int):
         return "Int"
-    elif "numpy.float" in str(new_type):
+    elif isinstance(new_value, float):
         return "Double"
     else:
-        return next(key for key, value in DATASET_TYPE.items() if value == new_type)
+        return next(
+            key for key, value in DATASET_TYPE.items() if value == new_value.dtype
+        )
 
 
 class FieldAttrsDialog(QDialog):

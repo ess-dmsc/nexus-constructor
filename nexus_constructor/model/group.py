@@ -40,15 +40,12 @@ class Group(Node):
     def nx_class(self, new_nx_class: str):
         self.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
-    def set_field_value(
-        self, name: str, value: Any, dtype: Union[np.dtype, str] = None
-    ):
+    def set_field_value(self, name: str, value: Any, dtype: str = None):
         size = [1]
         if isinstance(value, (np.ndarray, np.generic)):
             size = value.size
-            dtype = value.dtype
         self[name] = Dataset(
-            name=name, dataset=DatasetMetadata(size=size, type=dtype), values=value,
+            name=name, dataset=DatasetMetadata(size=size, type=dtype), values=value
         )
 
     def get_field_value(self, name: str):

@@ -4,6 +4,7 @@ import h5py
 from PySide2.QtGui import QVector3D
 from mock import Mock
 
+from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.entry import Instrument
@@ -26,17 +27,16 @@ def component():
 
 def create_corresponding_value_dataset(value: Any):
     name = ""
+    type = _get_human_readable_type(value)
 
     if np.isscalar(value):
         size = 1
         value = str(value)
-        dtype = type(value)
     else:
         size = len(value)
-        dtype = value.dtype
 
     return Dataset(
-        name=name, dataset=DatasetMetadata(type=dtype, size=[size]), values=value,
+        name=name, dataset=DatasetMetadata(type=type, size=[size]), values=value,
     )
 
 

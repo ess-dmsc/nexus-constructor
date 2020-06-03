@@ -223,7 +223,7 @@ class FieldWidget(QFrame):
             val = self.value_line_edit.text()
             return_object = Dataset(
                 name=self.name,
-                dataset=DatasetMetadata(size=[1], type=DATASET_TYPE[dtype]),
+                dataset=DatasetMetadata(size=[1], type=dtype),
                 values=val,
             )
         elif self.field_type == FieldType.array_dataset:
@@ -231,7 +231,7 @@ class FieldWidget(QFrame):
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
                 name=self.name,
-                dataset=DatasetMetadata(size=array.size, type=DATASET_TYPE[dtype]),
+                dataset=DatasetMetadata(size=array.size, type=dtype),
                 values=array,
             )
         elif self.field_type == FieldType.kafka_stream:

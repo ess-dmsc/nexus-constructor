@@ -1,6 +1,4 @@
 from unittest.mock import Mock
-
-import numpy as np
 import pytest
 from PySide2.QtCore import QPoint, QModelIndex
 from PySide2.QtGui import QVector3D
@@ -610,7 +608,7 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
 
 def create_transformation(trans_type: TransformationType):
     t = Transformation(
-        name="transformation", dataset=DatasetMetadata(type=np.double), values=8,
+        name="transformation", dataset=DatasetMetadata(type="Double"), values=8
     )
     t.type = trans_type
     t.vector = QVector3D(1, 0, 0)

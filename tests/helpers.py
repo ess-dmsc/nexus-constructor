@@ -15,9 +15,7 @@ def add_component_to_file(
     component.set_field_value(
         name=field_name,
         value=Dataset(
-            name=field_name,
-            dataset=DatasetMetadata(type=np.double),
-            values=field_value,
+            name=field_name, dataset=DatasetMetadata(type="Double"), values=field_value,
         ),
     )
     return component
