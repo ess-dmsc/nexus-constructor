@@ -87,10 +87,13 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
-            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+            depends_on_transform = self.get_field_value(CommonAttrs.DEPENDS_ON)
+            transforms.append(depends_on_transform)
+            self._get_transform(
+                depends_on_transform.depends_on, transforms, local_only=True
+            )
         except AttributeError:
-            return transforms
-        self._get_transform(depends_on, transforms, local_only=True)
+            pass
         return transforms
 
     def _get_transform(
@@ -197,6 +200,13 @@ class Component(Group):
         transform.values = values
         transform._parent_component = self
         self.transforms_list.append(transform)
+
+        try:
+            if self.get_field_value(CommonAttrs.DEPENDS_ON) is not None:
+                pass
+        except AttributeError:
+            self.set_field_value(CommonAttrs.DEPENDS_ON, transform)
+
         return transform
 
     def remove_transformation(self, transform: Transformation):
