@@ -31,9 +31,9 @@ def test_component_set_field_with_numpy_array_correctly_sets_field_value():
 
     comp = Component("comp4")
     data = [[1], [2]]
-    dtype = np.int
+    dtype = np.intc
     field_name = "field1"
-    field_value = np.asarray(data, dtype=np.int)
+    field_value = np.asarray(data, dtype=np.intc)
 
     comp.set_field_value(field_name, field_value, dtype)
 
@@ -48,7 +48,7 @@ def test_component_set_field_with_scalar_value_correctly_sets_field_value():
     comp = Component("comp4")
     field_name = "testfield"
     data = 123
-    dtype = np.int
+    dtype = np.intc
 
     comp.set_field_value(field_name, data, dtype)
 
