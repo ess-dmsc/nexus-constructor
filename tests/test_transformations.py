@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import Component
@@ -24,15 +23,6 @@ def _add_transform_to_file(
     return transform
 
 
-def create_dataset():
-    return Dataset("dataset", DatasetMetadata([1], "str"), "test")
-
-
-@pytest.fixture
-def dataset():
-    return create_dataset()
-
-
 def create_transform(
     name="test translation",
     ui_value=42.0,
@@ -41,7 +31,9 @@ def create_transform(
     values=Dataset("", None, []),
 ):
 
-    translation = Transformation(name=name, dataset=dataset)
+    translation = Transformation(
+        name=name, dataset=Dataset("dataset", DatasetMetadata([1], "str"), "test")
+    )
 
     translation.vector = vector
     translation.type = type
@@ -55,7 +47,7 @@ def create_component(name=""):
     return Component(name=name, transforms_list=[])
 
 
-def test_can_get_transform_properties(dataset):
+def test_can_get_transform_properties():
 
     test_name = "slartibartfast"
     test_ui_value = 42
