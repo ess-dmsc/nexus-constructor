@@ -1,8 +1,5 @@
 from nexus_constructor.model.component import Component
 from PySide2.QtGui import QVector3D
-import pytest
-
-pytest.skip("Disabled whilst working on model change", allow_module_level=True)
 
 
 def test_remove_from_beginning_1():
@@ -76,7 +73,7 @@ def test_remove_from_end():
     assert rot1.depends_on is None
     assert not rot1.dependents
 
-    assert component1.depends_on.absolute_path == rot3.absolute_path
+    assert component1.depends_on == rot3
 
-    assert rot2.dependents[0].absolute_path == rot3.absolute_path
+    assert rot2.dependents[0] == rot3
     assert len(component1.transforms) == 2
