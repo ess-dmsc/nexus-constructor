@@ -203,6 +203,7 @@ class ComponentTreeModel(QAbstractItemModel):
         )
 
         new_transformation.parent = transformation_list
+        new_transformation._parent_component = parent_component
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
         self.endInsertRows()

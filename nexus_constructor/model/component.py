@@ -67,6 +67,14 @@ class Component(Group):
     transforms_list = attr.ib(factory=list)
 
     @property
+    def depends_on(self) -> "Transformation":
+        return self.get_attribute_value(CommonAttrs.DEPENDS_ON)
+
+    @depends_on.setter
+    def depends_on(self, new_depends_on: "Transformation"):
+        self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+
+    @property
     def description(self) -> str:
         try:
             return self.get_field_value(CommonAttrs.DESCRIPTION)
@@ -99,10 +107,9 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
+            transforms.append(self.depends_on)
             self._get_transform(
-                self.get_field_value(CommonAttrs.DEPENDS_ON),
-                transforms,
-                local_only=True,
+                self.depends_on, transforms, local_only=True,
             )
         except AttributeError:
             pass
@@ -139,10 +146,9 @@ class Component(Group):
         """
         transforms = TransformationsList(self)
         try:
+            transforms.append(self.depends_on)
             self._get_transform(
-                self.get_field_value(CommonAttrs.DEPENDS_ON),
-                transforms,
-                local_only=False,
+                self.depends_on, transforms, local_only=False,
             )
         except AttributeError:
             pass
