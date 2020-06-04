@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, List, Union
+from typing import Tuple, Optional, List
 
 import numpy as np
 from PySide2.QtCore import Signal, QObject
