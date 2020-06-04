@@ -335,8 +335,6 @@ class FieldValueValidator(QValidator):
         """
         if not input:  # More criteria here
             return self._emit_and_return(False)
-        if self.dataset_type_combo.currentText() == "String":
-            return self._emit_and_return(True)
         elif self.field_type_combo.currentText() == self.scalar:
             try:
                 DATASET_TYPE[self.dataset_type_combo.currentText()](input)
@@ -364,9 +362,6 @@ class NumpyDTypeValidator(QValidator):
         if not input:
             self.is_valid.emit(False)
             return QValidator.Intermediate
-        if self.dtype == str:
-            self.is_valid.emit(True)
-            return QValidator.Acceptable
         else:
             try:
                 self.dtype(input)
