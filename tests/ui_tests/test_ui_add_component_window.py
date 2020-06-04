@@ -114,6 +114,11 @@ def parent_mock():
 
 
 @pytest.fixture(scope="function")
+def instrument():
+    return Instrument()
+
+
+@pytest.fixture(scope="function")
 def add_component_dialog(qtbot, template, instrument, mock_pixel_options):
 
     dialog = AddComponentDialog(
@@ -127,17 +132,22 @@ def add_component_dialog(qtbot, template, instrument, mock_pixel_options):
 
 
 @pytest.fixture(scope="function")
+def component_with_cylindrical_geometry():
+    component = Component(name="cylindrical_component")
+    component.nx_class = "NXdetector"
+    component.set_cylinder_shape()
+    return component
+
+
+@pytest.fixture(scope="function")
 def edit_component_dialog(
     qtbot,
-    nexus_wrapper,
     template,
+    instrument,
     component_with_cylindrical_geometry,
     mock_pixel_options,
     parent_mock,
 ):
-
-    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
-    instrument.nexus = component_with_cylindrical_geometry.file
     component_tree = ComponentTreeModel(instrument)
     dialog = AddComponentDialog(
         instrument,
@@ -2346,7 +2356,6 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     assert stream.children[0].array_size == array_size
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
     qtbot, edit_component_dialog, template, mock_pixel_options
 ):
