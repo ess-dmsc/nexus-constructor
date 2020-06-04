@@ -15,7 +15,7 @@ PIXEL_FIELDS = [
 
 def get_detector_faces_from_pixel_mapping(
     mapping: PixelMapping,
-) -> Union[List[Tuple[int, int]], Tuple[int, int]]:
+) -> List[Tuple[int, int]]:
     """
     Returns a list of tuples. Each tuple contains a face ID followed by the face's detector ID.
     Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
@@ -26,9 +26,7 @@ def get_detector_faces_from_pixel_mapping(
     return detector_faces
 
 
-def get_detector_number_from_pixel_mapping(
-    mapping: PixelMapping,
-) -> Union[List[int], int]:
+def get_detector_number_from_pixel_mapping(mapping: PixelMapping,) -> List[int]:
     """
     Returns a list of pixel IDs. Used for writing information to the detector_number field in NXdetector and
     NXcylindrical_geometry.
