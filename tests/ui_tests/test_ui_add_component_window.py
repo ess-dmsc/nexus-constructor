@@ -61,6 +61,8 @@ PIXEL_GRID_FIELDS = [
     "pixel_shape",
 ]
 
+COMPONENT_CLASS_PATH = "nexus_constructor.add_component_window.Component"
+
 instrument = Instrument()
 component = ComponentTreeModel(instrument)
 
@@ -101,21 +103,6 @@ SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
 FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(DATASET_TYPE.keys())}
 FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
-
-
-# @pytest.fixture(scope="function")
-# def component_with_cylindrical_geometry(nexus_wrapper):
-#     shape_group = nexus_wrapper.create_nx_group(
-#         "shape", "NXcylindrical_geometry", nexus_wrapper.instrument
-#     )
-#     nexus_wrapper.create_nx_group(
-#         "detector_shape", "NXcylindrical_geometry", shape_group
-#     )
-#     component = create_component(nexus_wrapper, shape_group)
-#     component.set_cylinder_shape()
-#     component.nx_class = "NXdetector"
-#     component.name = "CylindricalComponent"
-#     return component
 
 
 @pytest.fixture(scope="function")
@@ -1548,7 +1535,6 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
     )
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
     qtbot, template, add_component_dialog, mock_pixel_options, mock_component
 ):
@@ -1577,15 +1563,13 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
 
     # Call the on_ok method as if the user had pressed Add Component
     with patch(
-        "nexus_constructor.component.component_factory.Component",
-        return_value=mock_component,
+        COMPONENT_CLASS_PATH, return_value=mock_component,
     ):
         add_component_dialog.on_ok()
         mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
         mock_component.record_pixel_mapping.assert_not_called()
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
     qtbot, template, add_component_dialog, mock_pixel_options, mock_component
 ):
@@ -1614,15 +1598,13 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 
     # Call the on_ok method as if the user had pressed Add Component
     with patch(
-        "nexus_constructor.component.component_factory.Component",
-        return_value=mock_component,
+        COMPONENT_CLASS_PATH, return_value=mock_component,
     ):
         add_component_dialog.on_ok()
         mock_component.record_pixel_mapping.assert_called_once_with(pixel_mapping)
         mock_component.record_pixel_grid.assert_not_called()
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_writing_methods_are_not_called(
     qtbot, template, add_component_dialog, mock_pixel_options, mock_component
 ):
@@ -1649,8 +1631,7 @@ def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 
     # Call the on_ok method as if the user had pressed Add Component
     with patch(
-        "nexus_constructor.component.component_factory.Component",
-        return_value=mock_component,
+        COMPONENT_CLASS_PATH, return_value=mock_component,
     ):
         add_component_dialog.on_ok()
         mock_component.record_pixel_mapping.assert_not_called()
