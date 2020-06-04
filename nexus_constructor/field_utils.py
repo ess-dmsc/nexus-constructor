@@ -54,6 +54,7 @@ def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
     """
     new_ui_field.field_type = FieldType.kafka_stream.value
     new_ui_field.streams_widget.update_existing_stream_info(field)
+    new_ui_field.attrs = field
 
 
 def get_fields_with_update_functions(
