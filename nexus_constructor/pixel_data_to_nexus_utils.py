@@ -97,31 +97,3 @@ def get_detector_ids_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, int]:
         ids = np.rot90(ids, 2)
 
     return ids
-
-
-def convert_to_scalar_if_array_has_one_element(
-    value_array: np.ndarray,
-) -> Union[np.ndarray, float]:
-    """
-    Prevents a single value from being returned as an array.
-    :param value_array: The array containing pixel information.
-    :return: An array if the pixel information has more than 1 element, or a single value if the array has a size of 1.
-    """
-    if value_array.size > 1:
-        return value_array
-
-    return value_array.item(0)
-
-
-def convert_to_scalar_if_list_has_one_element(
-    value_list: List,
-) -> Union[List[int], int, List[Tuple[int, int]], Tuple[int, int]]:
-    """
-    Prevents a single value from being returned as a list.
-    :param value_list: The list containing pixel information.
-    :return: A list if the pixel information has more than one element, or a single value if the list has a length of 1.
-    """
-    if len(value_list) > 1:
-        return value_list
-
-    return value_list[0]

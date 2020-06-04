@@ -2574,7 +2574,6 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_pixel_grid_THEN
     assert shape.detector_faces[0][1] == detector_number[0]
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinders_component_with_pixel_grid_THEN_mapping_replaces_grid(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2607,7 +2606,8 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinders_component_with_pixel_grid
 
     # Check that the pixel grid values no longer exist
     for field in PIXEL_GRID_FIELDS:
-        assert component_to_edit.get_field_value(field) is None
+        with pytest.raises(AttributeError):
+            component_to_edit.get_field_value(field)
 
     # Check that the detector numbers field has the information from the Pixel Mapping
     assert component_to_edit.get_field_value("detector_number") == detector_number
@@ -2615,7 +2615,7 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinders_component_with_pixel_grid
     shape = component_to_edit.shape[0]
 
     # Check that _shape is a ComponentShape
-    assert isinstance(component_to_edit._shape, ComponentShape)
+    # assert isinstance(component_to_edit._shape, ComponentShape)
     assert isinstance(shape, expected_geometry)
 
 

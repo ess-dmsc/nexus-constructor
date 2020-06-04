@@ -283,7 +283,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
     @staticmethod
     def _get_detector_face_information(
         shape: OFFGeometryNexus,
-    ) -> Tuple[int, Union[List[Tuple[int, int]], Tuple[int, int]]]:
+    ) -> Tuple[int, List[Tuple[int, int]]]:
         return len(shape.faces), shape.detector_faces
 
     def get_current_mapping_filename(self) -> str:
