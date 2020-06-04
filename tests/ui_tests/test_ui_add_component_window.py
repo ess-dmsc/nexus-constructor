@@ -514,7 +514,8 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 ):
 
     template = QMainWindow()
-    window = MainWindow(Instrument(NexusWrapper("test")))
+    # window = MainWindow(Instrument(NexusWrapper("test")))
+    window = None
     template.ui = window
     template.ui.setupUi(template)
 
@@ -2721,14 +2722,14 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_pixel_mapping_THEN
 
     shape = component_to_edit.shape[0]
 
-    assert shape.detector_faces is None
+    with pytest.raises(AttributeError):
+        shape.detector_faces
 
     # Check that _shape is a PixelShape
     # assert isinstance(component_to_edit._shape, PixelShape)
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_pixel_mapping_THEN_grid_replaces_mapping(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2766,11 +2767,10 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_pixel_mapping_
     shape = component_to_edit.shape[0]
 
     # Check that _shape is a PixelShape
-    assert isinstance(component_to_edit._shape, PixelShape)
+    # assert isinstance(component_to_edit._shape, PixelShape)
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_no_pixels_WHEN_editing_mesh_component_with_pixel_mapping_THEN_mapping_is_erased(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2801,12 +2801,13 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_mesh_component_with_pixel_mapping_THEN_
     # Check that the pixel mapping data has been cleared
     with pytest.raises(AttributeError):
         component_to_edit.get_field_value("detector_number")
-    assert shape.detector_faces is None
+
+    with pytest.raises(AttributeError):
+        shape.detector_faces
 
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_mapping_THEN_mapping_is_erased(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2841,7 +2842,6 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_mapping_T
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_no_pixel_data_THEN_pixel_grid_is_created(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2873,7 +2873,6 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_no_pixel_data_THEN
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_no_pixel_data_THEN_pixel_grid_is_created(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2905,7 +2904,6 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_no_pixel_data_
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_no_pixel_data_THEN_pixel_mapping_is_created(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2934,12 +2932,11 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_no_pixel_data_T
 
     # Check that the change in pixel data is now stored in the component
     assert component_to_edit.get_field_value("detector_number") == detector_number
-    assert shape.detector_faces[1] == detector_number[0]
+    assert shape.detector_faces[0][1] == detector_number[0]
 
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_no_pixel_data_THEN_pixel_mapping_is_created(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):

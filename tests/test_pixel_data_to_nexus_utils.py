@@ -9,8 +9,6 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_ids_from_pixel_grid,
     get_z_offsets_from_pixel_grid,
     get_detector_number_from_pixel_mapping,
-    convert_to_scalar_if_list_has_one_element,
-    convert_to_scalar_if_array_has_one_element,
 )
 
 EXPECTED_DETECTOR_IDS = {
@@ -170,27 +168,3 @@ def test_GIVEN_one_by_one_pixel_grid_when_calling_offset_functions_THEN_offsets_
     assert get_z_offsets_from_pixel_grid(pixel_grid) == 0
 
     assert get_detector_ids_from_pixel_grid(pixel_grid) == pixel_grid.first_id
-
-
-def test_GIVEN_list_with_multiple_elements_WHEN_calling_convert_to_scalar_THEN_list_is_returned():
-
-    a_list = [i for i in range(5)]
-    assert convert_to_scalar_if_list_has_one_element(a_list) == a_list
-
-
-def test_GIVEN_list_with_single_element_WHEN_calling_convert_to_scalar_THEN_single_element_is_returned():
-
-    element = 8
-    assert convert_to_scalar_if_list_has_one_element([element]) == element
-
-
-def test_GIVEN_array_with_multiple_elements_WHEN_calling_convert_to_scalar_THEN_array_is_returned():
-
-    array = np.ones((5, 5))
-    assert np.array_equal(convert_to_scalar_if_array_has_one_element(array), array)
-
-
-def test_GIVEN_array_with_one_element_WHEN_calling_convert_to_scalar_THEN_element_is_returned():
-
-    array = np.ones(1)
-    assert np.array_equal(convert_to_scalar_if_array_has_one_element(array), 1)
