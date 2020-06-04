@@ -25,7 +25,7 @@ def update_existing_link_field(field: Link, new_ui_field: FieldWidget):
 def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
     """
     Fill in a UI array field for an existing array field in the component group
-    :param value: The array dataset's value to copy to the UI fields list model
+    :param field: The dataset to copy to the UI fields list model
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.array_dataset.value
@@ -62,7 +62,7 @@ def get_fields_with_update_functions(
 ) -> List[Tuple[Union[Dataset, Link, StreamGroup], Callable]]:
     """
     Return a list of fields in a given component group.
-    :param field: The hdf5 component group to check for fields
+    :param component: The component to check for fields
     :return: A list of a fields, regardless of field type
     """
     items_with_update_functions = []
