@@ -31,6 +31,7 @@ def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
     new_ui_field.field_type = FieldType.array_dataset.value
     new_ui_field.dtype = field.dataset.type
     new_ui_field.value = field.values
+    new_ui_field.attrs = field
 
 
 def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
@@ -42,6 +43,7 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     new_ui_field.field_type = FieldType.scalar_dataset.value
     new_ui_field.value = field.values
     new_ui_field.dtype = field.dataset.type
+    new_ui_field.attrs = field
 
 
 def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
