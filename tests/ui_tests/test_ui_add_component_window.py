@@ -2482,15 +2482,12 @@ def test_UI_GIVEN_pixel_mapping_WHEN_mesh_editing_component_with_mapping_THEN_ne
     shape = component_to_edit.shape[0]
 
     # Check that the change in pixel mapping is now stored in the component
-    assert (
-        component_to_edit.get_field_value("detector_number") == new_detector_numbers[0]
-    )
+    assert component_to_edit.get_field_value("detector_number") == new_detector_numbers
     assert isinstance(shape, expected_geometry)
 
-    assert shape.detector_faces[1] == new_detector_numbers[0]
+    assert shape.detector_faces[0][1] == new_detector_numbers[0]
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_mapping_THEN_new_pixel_mapping_is_written(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2530,7 +2527,6 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_mapping_THE
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_pixel_grid_THEN_mapping_replaces_grid(
     qtbot, template, add_component_dialog, mock_pixel_options, parent_mock
 ):
@@ -2572,10 +2568,10 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_pixel_grid_THEN
     shape = component_to_edit.shape[0]
 
     # Check that _shape is a ComponentShape
-    assert isinstance(component_to_edit._shape, ComponentShape)
+    # assert isinstance(component_to_edit.shape, OFFGeometryNexus)
     assert isinstance(shape, expected_geometry)
 
-    assert shape.detector_faces[1] == detector_number[0]
+    assert shape.detector_faces[0][1] == detector_number[0]
 
 
 @pytest.mark.skip(reason="Disabled whilst working on model change")

@@ -23,7 +23,7 @@ def get_detector_faces_from_pixel_mapping(
     detector_faces = [
         (id[0], id[1]) for id in enumerate(mapping.pixel_ids) if id[1] is not None
     ]
-    return convert_to_scalar_if_list_has_one_element(detector_faces)
+    return detector_faces
 
 
 def get_detector_number_from_pixel_mapping(
@@ -34,7 +34,7 @@ def get_detector_number_from_pixel_mapping(
     NXcylindrical_geometry.
     """
     detector_numbers = [id for id in mapping.pixel_ids if id is not None]
-    return convert_to_scalar_if_list_has_one_element(detector_numbers)
+    return detector_numbers
 
 
 def get_x_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
@@ -46,7 +46,7 @@ def get_x_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
     end = half_distance * (grid.columns - 1)
 
     offsets = np.linspace(start=-end, stop=end, num=grid.columns)
-    return convert_to_scalar_if_array_has_one_element(np.tile(offsets, (grid.rows, 1)))
+    return np.tile(offsets, (grid.rows, 1))
 
 
 def get_y_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
@@ -58,9 +58,7 @@ def get_y_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
     end = half_distance * (grid.rows - 1)
 
     offsets = np.linspace(start=end, stop=-end, num=grid.rows)
-    return convert_to_scalar_if_array_has_one_element(
-        np.tile(offsets, (grid.columns, 1)).transpose()
-    )
+    return np.tile(offsets, (grid.columns, 1)).transpose()
 
 
 def get_z_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
@@ -68,9 +66,7 @@ def get_z_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
     Returns a list of 'row' lists of 'column' length.
     Each entry in the sublists are z positions of pixel instances in the given PixelGrid.
     """
-    return convert_to_scalar_if_array_has_one_element(
-        np.zeros((grid.rows, grid.columns))
-    )
+    return np.zeros((grid.rows, grid.columns))
 
 
 def get_detector_ids_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, int]:
@@ -100,7 +96,7 @@ def get_detector_ids_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, int]:
     if grid.initial_count_corner == Corner.BOTTOM_RIGHT:
         ids = np.rot90(ids, 2)
 
-    return convert_to_scalar_if_array_has_one_element(ids)
+    return ids
 
 
 def convert_to_scalar_if_array_has_one_element(

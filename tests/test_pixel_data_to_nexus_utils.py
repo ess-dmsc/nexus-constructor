@@ -68,7 +68,7 @@ def test_GIVEN_single_id_WHEN_calling_detector_faces_THEN_list_is_not_returned(
 
     pixel_id = 3
     pixel_mapping.pixel_ids = [pixel_id]
-    assert get_detector_faces_from_pixel_mapping(pixel_mapping) == (0, pixel_id)
+    assert get_detector_faces_from_pixel_mapping(pixel_mapping) == [(0, pixel_id)]
 
 
 def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_number_list_is_returned(
@@ -86,7 +86,7 @@ def test_GIVEN_single_id_WHEN_calling_detector_number_THEN_list_is_not_returned(
 
     pixel_id = 3
     pixel_mapping.pixel_ids = [pixel_id]
-    assert get_detector_number_from_pixel_mapping(pixel_mapping) == pixel_id
+    assert get_detector_number_from_pixel_mapping(pixel_mapping) == [pixel_id]
 
 
 @pytest.mark.parametrize("rows", ROW_COL_VALS)
