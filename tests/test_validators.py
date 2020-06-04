@@ -343,6 +343,13 @@ def test_GIVEN_alphabetical_chars_WHEN_using_numpy_validator_with_float_as_dtype
     assert validator.validate("test", 0) == QValidator.Intermediate
 
 
+def test_GIVEN_string_when_using_numpy_validator_with_string_as_dtype_THEN_true_signal_is_emitted():
+    validator = NumpyDTypeValidator(str)
+    validator.is_valid = Mock()
+
+    assert validator.validate("test", 0) == QValidator.Acceptable
+
+
 def test_GIVEN_valid_off_WHEN_validating_geometry_THEN_validity_signal_is_emitted_with_true():
     validator = GeometryFileValidator(GEOMETRY_FILE_TYPES)
     validator.is_valid = Mock()
