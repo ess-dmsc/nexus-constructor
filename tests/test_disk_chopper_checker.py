@@ -336,7 +336,7 @@ def test_chopper_checker_GIVEN_input_cant_be_converted_to_any_units_WHEN_validat
     field_that_needs_units, units_dict, nexus_defined_chopper_checker
 ):
     units_dict[field_that_needs_units] = "notaunit"
-    assert not nexus_defined_chopper_checker.units_are_valid(units_dict)
+    assert not nexus_defined_chopper_checker._units_are_valid(units_dict)
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
@@ -344,7 +344,7 @@ def test_chopper_checker_GIVEN_unit_has_wrong_type_WHEN_validating_units_THEN_re
     field_that_needs_units, units_dict, nexus_defined_chopper_checker
 ):
     units_dict[field_that_needs_units] = IMPROPER_UNITS[field_that_needs_units]
-    assert not nexus_defined_chopper_checker.units_are_valid(units_dict)
+    assert not nexus_defined_chopper_checker._units_are_valid(units_dict)
 
 
 @pytest.mark.parametrize("field_that_needs_units", UNITS_REQUIRED)
@@ -354,7 +354,7 @@ def test_chopper_checker_GIVEN_units_have_wrong_dimension_WHEN_validating_units_
     units_dict[field_that_needs_units] = (
         "50 " + EXPECTED_UNIT_TYPE[field_that_needs_units]
     )
-    assert not nexus_defined_chopper_checker.units_are_valid(units_dict)
+    assert not nexus_defined_chopper_checker._units_are_valid(units_dict)
 
 
 def test_nexus_chopper_checker_GIVEN_units_attribute_has_wrong_type_WHEN_validating_chopper_THEN_returns_false(
