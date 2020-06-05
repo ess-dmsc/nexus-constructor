@@ -309,16 +309,14 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
 
 
 def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    user_defined_chopper_checker,
 ):
     user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[
         0
     ] = user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[1]
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        user_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
     assert _edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.shape,
@@ -327,16 +325,14 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
 
 
 def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_input_THEN_returns_false(
-    user_defined_chopper_checker, units_dict_mocks
+    user_defined_chopper_checker,
 ):
     user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[-1] = (
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[0] + 365
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(
-        user_defined_chopper_checker.fields_dict, units_dict_mocks
-    )
+    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
     assert _edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.shape,
@@ -414,11 +410,7 @@ def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_c
 ):
 
     mock_slit_edges_widget.value = RADIANS_EDGES_ARR
-    mock_slit_edges_widget.attrs.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key="units", data=units_attribute
-        )
-    )
+    mock_slit_edges_widget.units = units_attribute
     user_defined_chopper_checker.validate_chopper()
     assert np.allclose(
         user_defined_chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR
