@@ -1,5 +1,5 @@
 import logging
-from typing import Sequence, Dict
+from typing import Sequence, Dict, List
 
 import numpy as np
 from PySide2.QtWidgets import QListWidget
@@ -28,8 +28,8 @@ EXPECTED_TYPE_ERROR_MSG = {
 }
 
 REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES_NAME, SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME}
-INT_TYPES = [value for value in DATASET_TYPE.values() if "int" in str(value)]
-FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)]
+INT_TYPES = [key for key in DATASET_TYPE.keys() if "int" in str(DATASET_TYPE[key])]
+FLOAT_TYPES = [key for key in DATASET_TYPE.keys() if "float" in str(DATASET_TYPE[key])]
 
 UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
 EXPECTED_UNIT_TYPE = {
@@ -52,15 +52,11 @@ def _incorrect_data_type_message(
     return f"Wrong {field_name} type. Expected {expected_type} but found {type(data_dict[field_name])}."
 
 
-def _check_data_type(field_widget, expected_types) -> bool:
-    try:
-        dtype = field_widget.dtype
-        if isinstance(field_widget, np.int64):
-            # Fix for windows - for some reason int64 is the default numpy int type on windows...
-            dtype = np.int32
-        return dtype in expected_types
-    except AttributeError:
-        return False
+def _check_data_type(field_widget: FieldWidget, expected_types: List[str]) -> bool:
+    # if isinstance(field_widget, np.int64):
+    #     # Fix for windows - for some reason int64 is the default numpy int type on windows...
+    #     dtype = np.int32
+    return field_widget.dtype in expected_types
 
 
 def _data_has_correct_type(fields_dict: Dict[str, FieldWidget]) -> bool:
@@ -301,22 +297,23 @@ class UserDefinedChopperChecker:
             and _data_has_correct_type(self.fields_dict)
             and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
-                self.fields_dict[SLIT_EDGES_NAME].value.ndim,
-                self.fields_dict[SLIT_EDGES_NAME].value.shape,
+                self.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
+                self.fields_dict[SLIT_EDGES_NAME].value.values.shape,
             )
         ):
             return False
 
+        # TODO: fix casts
         self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS_NAME].value[()],
-            self.fields_dict[SLIT_EDGES_NAME].value,
-            self.fields_dict[RADIUS_NAME].value[()],
-            self.fields_dict[SLIT_HEIGHT_NAME].value[()],
+            int(self.fields_dict[SLITS_NAME].value.values),
+            self.fields_dict[SLIT_EDGES_NAME].value.values,
+            float(self.fields_dict[RADIUS_NAME].value.values),
+            float(self.fields_dict[SLIT_HEIGHT_NAME].value.values),
             self.units_dict[SLIT_EDGES_NAME],
             self.units_dict[SLIT_HEIGHT_NAME],
             self.units_dict[RADIUS_NAME],
         )
 
         return _input_describes_valid_chopper(
-            self._chopper_details, self.fields_dict[SLIT_EDGES_NAME].value
+            self._chopper_details, self.fields_dict[SLIT_EDGES_NAME].value.values
         )
