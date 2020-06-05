@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from PySide2.QtWidgets import QListWidget
 from mock import Mock
@@ -16,6 +18,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     FLOAT_TYPES,
     _incorrect_data_type_message,
 )
+from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from tests.chopper_test_helpers import (  # noqa: F401
     N_SLITS,
     DEGREES_EDGES_ARR,
@@ -31,51 +34,47 @@ IMPROPER_UNITS = {
 }
 
 
-def value_side_effect(given_key, expected_key, data):
-    """
-    Function for mimicking a call to dataset.value[()] or dataset.attrs[attribute_name]
-    :param given_key: The key passed to __getitem__
-    :param expected_key: The key which stores the data.
-    :param data: The data returned from the call.
-    :return: data if the correct key has been provided, otherwise a KeyError is raised.
-    """
-    if given_key == expected_key:
-        return data
-    raise KeyError
+def create_dataset(name: str, dtype: str, val: Any):
+    if np.isscalar(val):
+        return Dataset(
+            name=name, dataset=DatasetMetadata(size=[1], type=dtype), values=val
+        )
+    return Dataset(
+        name=name, dataset=DatasetMetadata(size=val.size, type=dtype), values=val
+    )
 
 
 @pytest.fixture(scope="function")
 def mock_slits_widget():
+    dtype = "Integer"
     mock_slits_widget = Mock(spec=FieldWidget)
     mock_slits_widget.name = SLITS_NAME
-    mock_slits_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(key, expected_key=(), data=N_SLITS)
-    )
-    mock_slits_widget.dtype = np.intc
+    mock_slits_widget.value = create_dataset(SLITS_NAME, dtype, N_SLITS)
+    mock_slits_widget.dtype = dtype
 
     return mock_slits_widget
 
 
 @pytest.fixture(scope="function")
 def mock_slit_edges_widget():
+    dtype = "Float"
     mock_slit_edges_widget = Mock(spec=FieldWidget)
     mock_slit_edges_widget.name = SLIT_EDGES_NAME
-    mock_slit_edges_widget.value = np.array(DEGREES_EDGES_ARR)
-    mock_slit_edges_widget.dtype = np.single
+    mock_slit_edges_widget.value = create_dataset(
+        SLIT_EDGES_NAME, dtype, np.array(DEGREES_EDGES_ARR)
+    )
+    mock_slit_edges_widget.dtype = dtype
     mock_slit_edges_widget.units = "deg"
     return mock_slit_edges_widget
 
 
 @pytest.fixture(scope="function")
 def mock_radius_widget():
+    dtype = "Float"
     mock_radius_widget = Mock(spec=FieldWidget)
     mock_radius_widget.name = RADIUS_NAME
-    mock_radius_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key=(), data=RADIUS_LENGTH
-        )
-    )
-    mock_radius_widget.dtype = np.single
+    mock_radius_widget.value = create_dataset(RADIUS_NAME, dtype, RADIUS_LENGTH)
+    mock_radius_widget.dtype = dtype
     mock_radius_widget.units = "m"
 
     return mock_radius_widget
@@ -83,14 +82,13 @@ def mock_radius_widget():
 
 @pytest.fixture(scope="function")
 def mock_slit_height_widget():
+    dtype = "Float"
     mock_slit_height_widget = Mock(spec=FieldWidget)
     mock_slit_height_widget.name = SLIT_HEIGHT_NAME
-    mock_slit_height_widget.value.__getitem__ = Mock(
-        side_effect=lambda key: value_side_effect(
-            key, expected_key=(), data=SLIT_HEIGHT_LENGTH
-        )
+    mock_slit_height_widget.value = create_dataset(
+        SLIT_HEIGHT_NAME, dtype, SLIT_HEIGHT_LENGTH
     )
-    mock_slit_height_widget.dtype = np.single
+    mock_slit_height_widget.dtype = dtype
     mock_slit_height_widget.units = "m"
 
     return mock_slit_height_widget
@@ -239,8 +237,8 @@ def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input
 def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopper_input_THEN_returns_false(
     user_defined_chopper_checker,
 ):
-    user_defined_chopper_checker.fields_dict[SLITS_NAME].value.__getitem__ = Mock(
-        return_value=5
+    user_defined_chopper_checker.fields_dict[SLITS_NAME].value = create_dataset(
+        SLITS_NAME, "Integer", 5
     )
 
     assert user_defined_chopper_checker.required_fields_present()
@@ -255,8 +253,8 @@ def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopp
 def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_THEN_returns_false(
     user_defined_chopper_checker,
 ):
-    user_defined_chopper_checker.fields_dict[SLIT_HEIGHT_NAME].value.__getitem__ = Mock(
-        return_value=201
+    user_defined_chopper_checker.fields_dict[SLITS_NAME].value = create_dataset(
+        SLITS_NAME, "Integer", 201
     )
 
     assert user_defined_chopper_checker.required_fields_present()
@@ -271,13 +269,11 @@ def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_T
 def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_THEN_returns_false(
     user_defined_chopper_checker,
 ):
-    user_defined_chopper_checker.fields_dict[
-        SLIT_HEIGHT_NAME
-    ].value.__getitem__ = user_defined_chopper_checker.fields_dict[
-        RADIUS_NAME
-    ].value.__getitem__ = Mock(
-        return_value=20
-    )
+    dataset_val = 20
+    slit_height_dataset = create_dataset(SLIT_HEIGHT_NAME, "Integer", dataset_val)
+
+    user_defined_chopper_checker.fields_dict[SLIT_HEIGHT_NAME] = slit_height_dataset
+    user_defined_chopper_checker.fields_dict[RADIUS_NAME].values = dataset_val
 
     assert user_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
@@ -292,11 +288,11 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
     user_defined_chopper_checker,
 ):
     (
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[0],
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[1],
+        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[0],
+        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[1],
     ) = (
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[1],
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[0],
+        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[1],
+        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[0],
     )
 
     assert user_defined_chopper_checker.required_fields_present()
@@ -311,9 +307,9 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
 def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
     user_defined_chopper_checker,
 ):
-    user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[
+    user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[
         0
-    ] = user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[1]
+    ] = user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[1]
 
     assert user_defined_chopper_checker.required_fields_present()
     assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
@@ -327,8 +323,8 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
 def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_input_THEN_returns_false(
     user_defined_chopper_checker,
 ):
-    user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[-1] = (
-        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value[0] + 365
+    user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[-1] = (
+        user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[0] + 365
     )
 
     assert user_defined_chopper_checker.required_fields_present()
@@ -388,8 +384,8 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
 
     assert np.allclose(details.slit_edges, RADIANS_EDGES_ARR)
     assert details.slits == mock_slits_widget.value[()]
-    assert details.radius == pytest.approx(mock_radius_widget.value[()])
-    assert details.slit_height == pytest.approx(mock_slit_height_widget.value[()])
+    assert details.radius == pytest.approx(mock_radius_widget.value.values)
+    assert details.slit_height == pytest.approx(mock_slit_height_widget.value.values)
 
 
 def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_details_are_returned(
