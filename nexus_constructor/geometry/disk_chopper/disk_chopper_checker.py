@@ -63,13 +63,10 @@ def _check_data_type(field_widget, expected_types) -> bool:
         return False
 
 
-def _data_has_correct_type(
-    fields_dict: Dict[str, FieldWidget], units_dict: dict
-) -> bool:
+def _data_has_correct_type(fields_dict: Dict[str, FieldWidget]) -> bool:
     """
     Checks that the data required to create a Chopper mesh have the expected types.
     :param fields_dict: The dictionary of field names and their field widgets/NeXus data.
-    :param units_dict: The dictionary of field names and their unit values.
     :return: True if all the fields have the correct types, False otherwise.
     """
     correct_slits_type = _check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
@@ -82,18 +79,12 @@ def _data_has_correct_type(
     correct_slit_edges_type = _check_data_type(
         fields_dict[SLIT_EDGES_NAME], FLOAT_TYPES + INT_TYPES
     )
-    correct_radius_units_type = isinstance(units_dict[RADIUS_NAME], str)
-    correct_slit_height_units_type = isinstance(units_dict[SLIT_HEIGHT_NAME], str)
-    correct_slit_edges_units_type = isinstance(units_dict[SLIT_EDGES_NAME], str)
 
     if (
         correct_slits_type
         and correct_radius_type
         and correct_slit_height_type
         and correct_slit_edges_type
-        and correct_radius_units_type
-        and correct_slit_height_units_type
-        and correct_slit_edges_units_type
     ):
         return True
 
@@ -127,19 +118,6 @@ def _data_has_correct_type(
             _incorrect_data_type_message(
                 fields_dict, SLIT_EDGES_NAME, EXPECTED_TYPE_ERROR_MSG[SLIT_EDGES_NAME],
             )
-        )
-
-    if not correct_radius_units_type:
-        problems.append(_incorrect_data_type_message(units_dict, RADIUS_NAME, "string"))
-
-    if not correct_slit_height_units_type:
-        problems.append(
-            _incorrect_data_type_message(units_dict, SLIT_HEIGHT_NAME, "string")
-        )
-
-    if not correct_slit_edges_units_type:
-        problems.append(
-            _incorrect_data_type_message(units_dict, SLIT_EDGES_NAME, "string")
         )
 
     logging.info(f"{UNABLE}\n{problems}")
@@ -294,10 +272,14 @@ class UserDefinedChopperChecker:
         missing_units = []
 
         for field in UNITS_REQUIRED:
-            try:
-                self.units_dict[field] = self.fields_dict[field].attrs["units"]
-            except KeyError:
+            units = self.fields_dict[field].units
+
+            if not units:
                 missing_units.append(field)
+            else:
+                self.units_dict[field] = units
+
+        print(self.units_dict)
 
         if len(missing_units) > 0:
             logging.info(
@@ -316,7 +298,7 @@ class UserDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and _data_has_correct_type(self.fields_dict, self.units_dict)
+            and _data_has_correct_type(self.fields_dict)
             and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].value.ndim,
