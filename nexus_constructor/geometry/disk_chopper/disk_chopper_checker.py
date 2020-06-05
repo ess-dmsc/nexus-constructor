@@ -3,9 +3,7 @@ from typing import Sequence, Dict
 
 import numpy as np
 from PySide2.QtWidgets import QListWidget
-from h5py import Group
 
-from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from nexus_constructor.unit_utils import (
@@ -339,92 +337,4 @@ class UserDefinedChopperChecker:
 
         return _input_describes_valid_chopper(
             self._chopper_details, self.fields_dict[SLIT_EDGES_NAME].value
-        )
-
-
-class NexusDefinedChopperChecker:
-    def __init__(self, disk_chopper: Group):
-
-        self.fields_dict = {}
-        self.units_dict = {}
-        self._chopper_details = None
-
-        self._disk_chopper = disk_chopper
-
-    @property
-    def chopper_details(self) -> ChopperDetails:
-        """
-        :return: The ChopperDetails object of the NeXus-defined disk chopper.
-        """
-        return self._chopper_details
-
-    def required_fields_present(self) -> bool:
-        """
-        Checks that the required fields and attributes are present in the NeXus file.
-        :return: True if all the information needed to create a chopper mesh is present, False otherwise.
-        """
-        missing_fields = []
-
-        for field in REQUIRED_CHOPPER_FIELDS:
-            try:
-                self.fields_dict[field] = self._disk_chopper[field][()]
-            except KeyError:
-                missing_fields.append(field)
-
-        if len(missing_fields) > 0:
-            logging.info(
-                f"{UNABLE} Required field(s) missing:", ", ".join(missing_fields)
-            )
-            return False
-
-        missing_units = []
-
-        for field in UNITS_REQUIRED:
-            try:
-                units = self._disk_chopper[field].attrs[CommonAttrs.UNITS]
-                self.units_dict[field] = units
-                if isinstance(units, bytes):
-                    self.units_dict[field] = units.decode()
-            except KeyError:
-                missing_units.append(field)
-
-        if len(missing_units) > 0:
-            logging.info(
-                f"{UNABLE} Unit information is missing from field(s):",
-                ", ".join(missing_fields),
-            )
-            return False
-
-        return True
-
-    def validate_chopper(self) -> bool:
-        """
-        Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
-        fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
-        and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
-        :return: True if the chopper is valid. False otherwise.
-        """
-        if not (
-            self.required_fields_present()
-            and self.data_has_correct_type(self.fields_dict, self.units_dict)
-            and _units_are_valid(self.units_dict)
-            and _edges_array_has_correct_shape(
-                self.fields_dict[SLIT_EDGES_NAME].ndim,
-                self.fields_dict[SLIT_EDGES_NAME].shape,
-            )
-        ):
-            return False
-
-        self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS_NAME],
-            self.fields_dict[SLIT_EDGES_NAME],
-            self.fields_dict[RADIUS_NAME],
-            self.fields_dict[SLIT_HEIGHT_NAME],
-            self.units_dict[SLIT_EDGES_NAME],
-            self.units_dict[SLIT_HEIGHT_NAME],
-            self.units_dict[RADIUS_NAME],
-        )
-
-        return _input_describes_valid_chopper(
-            self._chopper_details, self.fields_dict[SLIT_EDGES_NAME]
         )
