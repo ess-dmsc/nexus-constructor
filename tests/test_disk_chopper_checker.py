@@ -15,7 +15,6 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     _check_data_type,
     FLOAT_TYPES,
     _incorrect_data_type_message,
-    INT_TYPES,
 )
 from tests.chopper_test_helpers import (  # noqa: F401
     N_SLITS,
@@ -195,20 +194,6 @@ def test_GIVEN_invalid_slits_type_WHEN_validating_disk_chopper_THEN_fields_have_
     fields_dict_mocks, units_dict_mocks
 ):
     fields_dict_mocks[SLITS_NAME].dtype = FLOAT_TYPES[0]
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_invalid_slit_height_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
-):
-    fields_dict_mocks[SLIT_HEIGHT_NAME].dtype = INT_TYPES[0]
-    assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
-
-
-def test_GIVEN_invalid_slit_edges_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks, units_dict_mocks
-):
-    fields_dict_mocks[SLIT_EDGES_NAME].dtype = INT_TYPES[0]
     assert not _data_has_correct_type(fields_dict_mocks, units_dict_mocks)
 
 
@@ -432,15 +417,6 @@ def test_GIVEN_slit_height_field_is_missing_WHEN_validating_chopper_input_THEN_r
     del user_defined_chopper_checker.fields_dict[SLIT_HEIGHT_NAME]
 
     assert not user_defined_chopper_checker.required_fields_present()
-    assert not user_defined_chopper_checker.validate_chopper()
-
-
-def test_GIVEN_field_has_wrong_type_WHEN_validating_chopper_input_THEN_valid_chopper_returns_false(
-    user_defined_chopper_checker,
-):
-    user_defined_chopper_checker.fields_dict[RADIUS_NAME].dtype = np.byte
-
-    assert user_defined_chopper_checker.required_fields_present()
     assert not user_defined_chopper_checker.validate_chopper()
 
 
