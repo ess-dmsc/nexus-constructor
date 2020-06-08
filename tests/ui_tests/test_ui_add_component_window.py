@@ -515,6 +515,7 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 
     template = QMainWindow()
     # window = MainWindow(Instrument(NexusWrapper("test")))
+    # Disabled whilst working on model change
     window = None
     template.ui = window
     template.ui.setupUi(template)
@@ -2566,12 +2567,10 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_pixel_grid_THEN
     # Check that the detector numbers field has the information from the Pixel Mapping
     assert component_to_edit.get_field_value("detector_number") == detector_number
 
-    shape = component_to_edit.shape[0]
+    shape, pixel_offsets = component_to_edit.shape[0]
 
-    # Check that _shape is a ComponentShape
-    # assert isinstance(component_to_edit.shape, OFFGeometryNexus)
+    assert pixel_offsets is None
     assert isinstance(shape, expected_geometry)
-
     assert shape.detector_faces[0][1] == detector_number[0]
 
 
@@ -2614,9 +2613,6 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinders_component_with_pixel_grid
     assert component_to_edit.get_field_value("detector_number") == detector_number
 
     shape = component_to_edit.shape[0]
-
-    # Check that _shape is a ComponentShape
-    # assert isinstance(component_to_edit._shape, ComponentShape)
     assert isinstance(shape, expected_geometry)
 
 
@@ -2683,6 +2679,8 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_grid_THEN
         with pytest.raises(AttributeError):
             component_to_edit.get_field_value(field)
 
+    print(component_to_edit.shape[1])
+
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
 
@@ -2720,13 +2718,12 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_pixel_mapping_THEN
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
         assert component_to_edit.get_field_value(field).shape == (grid_size, grid_size)
 
-    shape = component_to_edit.shape[0]
+    shape, pixel_offsets = component_to_edit.shape
 
     with pytest.raises(AttributeError):
         shape.detector_faces
 
-    # Check that _shape is a PixelShape
-    # assert isinstance(component_to_edit._shape, PixelShape)
+    assert pixel_offsets is not None
     assert isinstance(shape, expected_geometry)
 
 
@@ -2764,10 +2761,9 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_pixel_mapping_
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
         assert component_to_edit.get_field_value(field).shape == (grid_size, grid_size)
 
-    shape = component_to_edit.shape[0]
+    shape, pixel_offsets = component_to_edit.shape
 
-    # Check that _shape is a PixelShape
-    # assert isinstance(component_to_edit._shape, PixelShape)
+    assert pixel_offsets is not None
     assert isinstance(shape, expected_geometry)
 
 
