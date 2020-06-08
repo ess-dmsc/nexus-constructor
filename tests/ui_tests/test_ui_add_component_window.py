@@ -15,9 +15,7 @@ from nexus_constructor.component import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.field_attrs import FieldAttrFrame
 from nexus_constructor.model.geometry import (
-    NoShapeGeometry,
     OFFGeometryNoNexus,
     CylindricalGeometry,
     OFFGeometryNexus,
@@ -2953,7 +2951,6 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_no_pixel_da
     assert isinstance(shape, expected_geometry)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_changing_fields_WHEN_editing_a_component_with_a_chopper_mesh_THEN_previous_chopper_mesh_is_removed_from_instrument_view(
     qtbot, template, add_component_dialog, parent_mock
 ):
@@ -2979,7 +2976,7 @@ def test_UI_GIVEN_changing_fields_WHEN_editing_a_component_with_a_chopper_mesh_T
 
     assert widget is not None
     prev_value = widget.value
-    widget.value = prev_value + 50
+    widget.value = int(prev_value.values) + 50
 
     add_component_dialog.on_ok()
 

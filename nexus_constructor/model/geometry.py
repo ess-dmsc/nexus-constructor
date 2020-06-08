@@ -59,20 +59,25 @@ class OFFGeometry(ABC):
         pass
 
 
-class OFFGeometryNoNexus(OFFGeometry):
+class OFFGeometryNoNexus(OFFGeometry, Group):
     """
     3D mesh description of the shape of an object, based on the OFF file format.
     This class does not store its data in the NeXus file, used for placeholder shape
     for objects which have no real shape data to be stored in the file.
     """
 
-    def __init__(self, vertices: List[QVector3D] = None, faces: List[List[int]] = None):
+    def __init__(
+        self,
+        vertices: List[QVector3D] = None,
+        faces: List[List[int]] = None,
+        name: str = "",
+    ):
         """
         :param vertices: list of Vector objects used as corners of polygons in the geometry
         :param faces: list of integer lists. Each sublist is a winding path around the corners of a polygon.
             Each sublist item is an index into the vertices list to identify a specific point in 3D space
         """
-        super().__init__()
+        super().__init__(name)
         self._vertices = vertices
         self._faces = faces
 
