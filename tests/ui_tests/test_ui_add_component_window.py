@@ -2567,7 +2567,7 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_mesh_component_with_pixel_grid_THEN
     # Check that the detector numbers field has the information from the Pixel Mapping
     assert component_to_edit.get_field_value("detector_number") == detector_number
 
-    shape, pixel_offsets = component_to_edit.shape[0]
+    shape, pixel_offsets = component_to_edit.shape
 
     assert pixel_offsets is None
     assert isinstance(shape, expected_geometry)
