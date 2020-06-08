@@ -240,7 +240,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                         )
                     except AttributeError:
                         new_ui_field.units = ""
-                    new_ui_field.attrs = field
 
     def __fill_existing_shape_info(self):
         component_shape, _ = self.component_to_edit.shape
