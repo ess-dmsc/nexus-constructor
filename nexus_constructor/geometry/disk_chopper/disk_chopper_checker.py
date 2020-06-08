@@ -66,9 +66,10 @@ def _check_data_type(field_widget: FieldWidget, expected_types: List[str]) -> bo
         field_widget.value.values = DATASET_TYPE[field_widget.dtype](
             field_widget.value.values
         )
-        return True
     except Exception:
         return False
+
+    return True
 
 
 def _data_has_correct_type(fields_dict: Dict[str, FieldWidget]) -> bool:
