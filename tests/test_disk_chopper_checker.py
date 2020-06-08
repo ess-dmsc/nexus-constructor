@@ -12,9 +12,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     RADIUS_NAME,
     SLIT_EDGES_NAME,
     UserDefinedChopperChecker,
-    _data_has_correct_type,
     _edges_array_has_correct_shape,
-    _check_data_type,
     FLOAT_TYPES,
     _incorrect_data_type_message,
 )

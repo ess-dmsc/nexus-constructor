@@ -1,5 +1,5 @@
 import logging
-from typing import Sequence, Dict, List
+from typing import Sequence, Dict, List, Any
 
 import numpy as np
 from PySide2.QtWidgets import QListWidget
@@ -53,84 +53,6 @@ def _incorrect_data_type_message(
         f"Wrong {field_name} type. Expected {expected_type} but found"
         f" {type(data_dict[field_name])}."
     )
-
-
-def _check_data_type(field_widget: FieldWidget, expected_types: List[str]) -> bool:
-    # if isinstance(field_widget, np.int64):
-    #     # Fix for windows - for some reason int64 is the default numpy int type on windows...
-    #     dtype = np.int32
-    if field_widget.dtype not in expected_types:
-        return False
-
-    try:
-        field_widget.value.values = DATASET_TYPE[field_widget.dtype](
-            field_widget.value.values
-        )
-    except Exception:
-        return False
-
-    return True
-
-
-def _data_has_correct_type(fields_dict: Dict[str, FieldWidget]) -> bool:
-    """
-    Checks that the data required to create a Chopper mesh have the expected types.
-    :param fields_dict: The dictionary of field names and their field widgets/NeXus data.
-    :return: True if all the fields have the correct types, False otherwise.
-    """
-    correct_slits_type = _check_data_type(fields_dict[SLITS_NAME], INT_TYPES)
-    correct_radius_type = _check_data_type(
-        fields_dict[RADIUS_NAME], FLOAT_TYPES + INT_TYPES
-    )
-    correct_slit_height_type = _check_data_type(
-        fields_dict[SLIT_HEIGHT_NAME], FLOAT_TYPES + INT_TYPES
-    )
-    correct_slit_edges_type = _check_data_type(
-        fields_dict[SLIT_EDGES_NAME], FLOAT_TYPES + INT_TYPES
-    )
-
-    if (
-        correct_slits_type
-        and correct_radius_type
-        and correct_slit_height_type
-        and correct_slit_edges_type
-    ):
-        return True
-
-    problems = []
-
-    if not correct_slits_type:
-        problems.append(
-            _incorrect_data_type_message(
-                fields_dict, SLITS_NAME, EXPECTED_TYPE_ERROR_MSG[SLITS_NAME]
-            )
-        )
-
-    if not correct_radius_type:
-        problems.append(
-            _incorrect_data_type_message(
-                fields_dict, RADIUS_NAME, EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME]
-            )
-        )
-
-    if not correct_slit_height_type:
-        problems.append(
-            _incorrect_data_type_message(
-                fields_dict,
-                SLIT_HEIGHT_NAME,
-                EXPECTED_TYPE_ERROR_MSG[SLIT_HEIGHT_NAME],
-            )
-        )
-
-    if not correct_slit_edges_type:
-        problems.append(
-            _incorrect_data_type_message(
-                fields_dict, SLIT_EDGES_NAME, EXPECTED_TYPE_ERROR_MSG[SLIT_EDGES_NAME],
-            )
-        )
-
-    logging.info(f"{UNABLE}\n{problems}")
-    return False
 
 
 def _edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple) -> bool:
@@ -260,15 +182,95 @@ def _input_describes_valid_chopper(
 
 
 class UserDefinedChopperChecker:
-    def __init__(self, fields_widget: QListWidget):
+    def __init__(
+        self, fields_widget: QListWidget, fields_dict: Dict[str, FieldWidget] = dict()
+    ):
 
-        self.fields_dict = {}
+        self.fields_dict = fields_dict
         self.units_dict = {}
+        self.converted_values = {}
         self._chopper_details = None
 
         for i in range(fields_widget.count()):
             widget = fields_widget.itemWidget(fields_widget.item(i))
             self.fields_dict[widget.name] = widget
+
+    def _check_data_type(self, field: str, expected_types: List[str],) -> bool:
+        # if isinstance(field_widget, np.int64):
+        #     # Fix for windows - for some reason int64 is the default numpy int type on windows...
+        #     dtype = np.int32
+        if self.fields_dict[field].dtype not in expected_types:
+            return False
+
+        try:
+            self.converted_values[field] = DATASET_TYPE[self.fields_dict[field].dtype](
+                self.fields_dict[field].value.values
+            )
+        except Exception:
+            return False
+        return True
+
+    def _data_has_correct_type(self) -> bool:
+        """
+        Checks that the data required to create a Chopper mesh have the expected types.
+        :param fields_dict: The dictionary of field names and their field widgets/NeXus data.
+        :return: True if all the fields have the correct types, False otherwise.
+        """
+        correct_slits_type = self._check_data_type(SLITS_NAME, INT_TYPES)
+        correct_radius_type = self._check_data_type(
+            RADIUS_NAME, FLOAT_TYPES + INT_TYPES,
+        )
+        correct_slit_height_type = self._check_data_type(
+            SLIT_HEIGHT_NAME, FLOAT_TYPES + INT_TYPES,
+        )
+        correct_slit_edges_type = self._check_data_type(
+            SLIT_EDGES_NAME, FLOAT_TYPES + INT_TYPES,
+        )
+
+        if (
+            correct_slits_type
+            and correct_radius_type
+            and correct_slit_height_type
+            and correct_slit_edges_type
+        ):
+            return True
+
+        problems = []
+
+        if not correct_slits_type:
+            problems.append(
+                _incorrect_data_type_message(
+                    self.fields_dict, SLITS_NAME, EXPECTED_TYPE_ERROR_MSG[SLITS_NAME]
+                )
+            )
+
+        if not correct_radius_type:
+            problems.append(
+                _incorrect_data_type_message(
+                    self.fields_dict, RADIUS_NAME, EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME]
+                )
+            )
+
+        if not correct_slit_height_type:
+            problems.append(
+                _incorrect_data_type_message(
+                    self.fields_dict,
+                    SLIT_HEIGHT_NAME,
+                    EXPECTED_TYPE_ERROR_MSG[SLIT_HEIGHT_NAME],
+                )
+            )
+
+        if not correct_slit_edges_type:
+            problems.append(
+                _incorrect_data_type_message(
+                    self.fields_dict,
+                    SLIT_EDGES_NAME,
+                    EXPECTED_TYPE_ERROR_MSG[SLIT_EDGES_NAME],
+                )
+            )
+
+        logging.info(f"{UNABLE}\n{problems}")
+        return False
 
     @property
     def chopper_details(self) -> ChopperDetails:
@@ -319,7 +321,7 @@ class UserDefinedChopperChecker:
         """
         if not (
             self.required_fields_present()
-            and _data_has_correct_type(self.fields_dict)
+            and self._data_has_correct_type()
             and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
@@ -329,10 +331,10 @@ class UserDefinedChopperChecker:
             return False
 
         self._chopper_details = ChopperDetails(
-            self.fields_dict[SLITS_NAME].value.values,
-            self.fields_dict[SLIT_EDGES_NAME].value.values,
-            self.fields_dict[RADIUS_NAME].value.values,
-            self.fields_dict[SLIT_HEIGHT_NAME].value.values,
+            self.converted_values[SLITS_NAME],
+            self.converted_values[SLIT_EDGES_NAME],
+            self.converted_values[RADIUS_NAME],
+            self.converted_values[SLIT_HEIGHT_NAME],
             self.units_dict[SLIT_EDGES_NAME],
             self.units_dict[SLIT_HEIGHT_NAME],
             self.units_dict[RADIUS_NAME],

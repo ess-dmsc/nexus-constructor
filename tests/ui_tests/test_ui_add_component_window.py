@@ -62,6 +62,7 @@ PIXEL_GRID_FIELDS = [
 ]
 
 COMPONENT_CLASS_PATH = "nexus_constructor.add_component_window.Component"
+CHOPPER_GEOMETRY_CREATOR_PATH = "nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator.DiskChopperGeometryCreator.create_disk_chopper_geometry"
 
 instrument = Instrument()
 component = ComponentTreeModel(instrument)
@@ -347,10 +348,18 @@ def enter_disk_chopper_fields(
     show_and_close_window(qtbot, template)
 
     # Set the field types
-    fields_widgets[0].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Integer"])
-    fields_widgets[1].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
-    fields_widgets[2].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
-    fields_widgets[3].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[0].value_type_combo.setCurrentIndex(
+        FIELDS_VALUE_TYPES["Integer"]
+    )  # Slits
+    fields_widgets[1].value_type_combo.setCurrentIndex(
+        FIELDS_VALUE_TYPES["Float"]
+    )  # Slit edges
+    fields_widgets[2].value_type_combo.setCurrentIndex(
+        FIELDS_VALUE_TYPES["Float"]
+    )  # Radius
+    fields_widgets[3].value_type_combo.setCurrentIndex(
+        FIELDS_VALUE_TYPES["Float"]
+    )  # Slit height
 
     show_and_close_window(qtbot, template)
 
@@ -369,27 +378,12 @@ def enter_disk_chopper_fields(
     # Manually edit the angles array
     fields_widgets[1].table_view.model.array = np.array(
         [[(i * 10.0)] for i in range(12)]
-    )
+    ).astype(np.single)
 
     # Set the units attributes
-    slit_edges_attribute_frame = FieldAttrFrame()
-    slit_edges_attribute_frame.attr_dtype_combo.setCurrentText("String")
-    slit_edges_attribute_frame.name = "units"
-    slit_edges_attribute_frame.value = "deg"
-
-    radius_attribute_frame = FieldAttrFrame()
-    radius_attribute_frame.attr_dtype_combo.setCurrentText("String")
-    radius_attribute_frame.name = "units"
-    radius_attribute_frame.value = "mm"
-
-    slit_height_attribute_frame = FieldAttrFrame()
-    slit_height_attribute_frame.attr_dtype_combo.setCurrentText("String")
-    slit_height_attribute_frame.name = "units"
-    slit_height_attribute_frame.value = "mm"
-
-    fields_widgets[1].attrs_dialog._add_attr(slit_edges_attribute_frame)
-    fields_widgets[2].attrs_dialog._add_attr(radius_attribute_frame)
-    fields_widgets[3].attrs_dialog._add_attr(slit_height_attribute_frame)
+    qtbot.keyClicks(fields_widgets[1].units_line_edit, "deg")  # Slit edges
+    qtbot.keyClicks(fields_widgets[2].units_line_edit, "mm")  # Radius
+    qtbot.keyClicks(fields_widgets[3].units_line_edit, "mm")  # Slit height
 
     show_and_close_window(qtbot, template)
 
@@ -2080,21 +2074,17 @@ def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
     assert field.value.target == field_target
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_UI_GIVEN_valid_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_creator_is_called(
     qtbot, add_component_dialog, template
 ):
     enter_disk_chopper_fields(qtbot, add_component_dialog, template)
 
-    with patch(
-        "nexus_constructor.component.chopper_shape.DiskChopperGeometryCreator.create_disk_chopper_geometry"
-    ) as chopper_creator:
-        chopper_creator.return_value = (NoShapeGeometry(), None)
+    with patch(CHOPPER_GEOMETRY_CREATOR_PATH) as chopper_creator:
+        chopper_creator.return_value = OFFGeometryNexus("chopper")
         add_component_dialog.on_ok()
         chopper_creator.assert_called_once()
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 @pytest.mark.parametrize("geometry_type", ["Cylinder", "Mesh"])
 def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_or_cylinder_shape_THEN_chopper_creator_is_not_called(
     qtbot, add_component_dialog, template, geometry_type
@@ -2112,9 +2102,7 @@ def test_UI_GIVEN_chopper_properties_WHEN_adding_component_with_mesh_or_cylinder
     show_and_close_window(qtbot, template)
     enter_disk_chopper_fields(qtbot, add_component_dialog, template)
 
-    with patch(
-        "nexus_constructor.component.chopper_shape.DiskChopperGeometryCreator.create_disk_chopper_geometry"
-    ) as chopper_creator:
+    with patch(CHOPPER_GEOMETRY_CREATOR_PATH) as chopper_creator:
         add_component_dialog.on_ok()
         chopper_creator.assert_not_called()
 
