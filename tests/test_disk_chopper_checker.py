@@ -151,15 +151,15 @@ def user_defined_chopper_checker(mock_fields_list_widget):
 
 
 def test_GIVEN_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_true(
-    mock_radius_widget,
+    user_defined_chopper_checker,
 ):
-    assert _check_data_type(mock_radius_widget, FLOAT_TYPES)
+    assert user_defined_chopper_checker._check_data_type(RADIUS_NAME, FLOAT_TYPES)
 
 
 def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_type_returns_false(
-    mock_slits_widget,
+    user_defined_chopper_checker,
 ):
-    assert not _check_data_type(mock_slits_widget, FLOAT_TYPES)
+    assert not user_defined_chopper_checker._check_data_type(SLITS_NAME, FLOAT_TYPES)
 
 
 def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned():
@@ -175,16 +175,17 @@ def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_ty
 
 
 def test_GIVEN_valid_fields_information_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_true(
-    fields_dict_mocks,
+    user_defined_chopper_checker,
 ):
-    assert _data_has_correct_type(fields_dict_mocks)
+    assert user_defined_chopper_checker._data_has_correct_type()
 
 
 def test_GIVEN_invalid_slits_type_WHEN_validating_disk_chopper_THEN_fields_have_correct_type_returns_false(
-    fields_dict_mocks,
+    user_defined_chopper_checker, fields_dict_mocks
 ):
     fields_dict_mocks[SLITS_NAME].dtype = FLOAT_TYPES[0]
-    assert not _data_has_correct_type(fields_dict_mocks)
+    user_defined_chopper_checker.fields_dict = fields_dict_mocks
+    assert not user_defined_chopper_checker._data_has_correct_type()
 
 
 def test_GIVEN_edges_array_with_valid_shape_WHEN_validating_disk_chopper_THEN_edges_array_has_correct_shape_returns_true():
@@ -228,7 +229,7 @@ def test_GIVEN_slit_edges_array_with_invalid_shape_WHEN_validating_chopper_input
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker._data_has_correct_type()
     assert not user_defined_chopper_checker.validate_chopper()
 
 
@@ -240,7 +241,7 @@ def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopp
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker._data_has_correct_type()
     assert _edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.shape,
@@ -256,7 +257,7 @@ def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_T
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker._data_has_correct_type()
     assert _edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.shape,
@@ -276,7 +277,7 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
     user_defined_chopper_checker.fields_dict[RADIUS_NAME].value.values = dataset_val
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker._data_has_correct_type()
     assert _edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.shape,
@@ -296,7 +297,7 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker._data_has_correct_type()
     assert _edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.shape,
@@ -312,7 +313,7 @@ def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_
     ] = user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values[1]
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker._data_has_correct_type()
     assert _edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.shape,
@@ -328,7 +329,7 @@ def test_GIVEN_slit_edges_list_has_overlapping_slits_WHEN_validating_chopper_inp
     )
 
     assert user_defined_chopper_checker.required_fields_present()
-    assert _data_has_correct_type(user_defined_chopper_checker.fields_dict)
+    assert user_defined_chopper_checker._data_has_correct_type()
     assert _edges_array_has_correct_shape(
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
         user_defined_chopper_checker.fields_dict[SLIT_EDGES_NAME].value.values.shape,
@@ -383,10 +384,8 @@ def test_GIVEN_chopper_details_WHEN_creating_chopper_geometry_THEN_details_match
     details = user_defined_chopper_checker.chopper_details
 
     assert np.allclose(details.slit_edges, RADIANS_EDGES_ARR)
-    assert details.slits == int(mock_slits_widget.value.values)  # TODO: fix cast
-    assert details.radius == pytest.approx(
-        float(mock_radius_widget.value.values)
-    )  # TODO: fix cast
+    assert details.slits == int(mock_slits_widget.value.values)
+    assert details.radius == pytest.approx(float(mock_radius_widget.value.values))
     assert details.slit_height == pytest.approx(
         float(mock_slit_height_widget.value.values)
     )

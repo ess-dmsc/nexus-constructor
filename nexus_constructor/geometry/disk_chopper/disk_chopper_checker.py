@@ -1,5 +1,5 @@
 import logging
-from typing import Sequence, Dict, List, Any
+from typing import Sequence, Dict, List
 
 import numpy as np
 from PySide2.QtWidgets import QListWidget
