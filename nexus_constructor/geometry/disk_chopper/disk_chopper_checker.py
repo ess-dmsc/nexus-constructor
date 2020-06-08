@@ -49,14 +49,25 @@ def _incorrect_data_type_message(
     :param expected_type: The expected data type.
     :return: A string that contains the name of the field, the type it should have, and the type the user entered.
     """
-    return f"Wrong {field_name} type. Expected {expected_type} but found {type(data_dict[field_name])}."
+    return (
+        f"Wrong {field_name} type. Expected {expected_type} but found"
+        f" {type(data_dict[field_name])}."
+    )
 
 
 def _check_data_type(field_widget: FieldWidget, expected_types: List[str]) -> bool:
     # if isinstance(field_widget, np.int64):
     #     # Fix for windows - for some reason int64 is the default numpy int type on windows...
     #     dtype = np.int32
-    return field_widget.dtype in expected_types
+    if field_widget.dtype not in expected_types:
+        return False
+
+    try:
+        field_widget.value.values = DATASET_TYPE[field_widget.dtype](
+            field_widget.value.values
+        )
+    except Exception:
+        return False
 
 
 def _data_has_correct_type(fields_dict: Dict[str, FieldWidget]) -> bool:
@@ -129,14 +140,16 @@ def _edges_array_has_correct_shape(edges_dim: int, edges_shape: tuple) -> bool:
     """
     if edges_dim > 2:
         logging.info(
-            f"{UNABLE} Expected slit edges array to be 1D but it has {edges_dim} dimensions."
+            f"{UNABLE} Expected slit edges array to be 1D but it has {edges_dim}"
+            " dimensions."
         )
         return False
 
     if edges_dim == 2:
         if edges_shape[0] != 1 and edges_shape[1] != 1:
             logging.info(
-                f"{UNABLE} Expected slit edges array to be 1D but it has shape {edges_shape}."
+                f"{UNABLE} Expected slit edges array to be 1D but it has shape"
+                f" {edges_shape}."
             )
             return False
 
@@ -156,7 +169,8 @@ def _units_are_valid(units_dict: dict) -> bool:
 
         if not units_are_recognised_by_pint(unit_input, False):
             logging.info(
-                f"{UNABLE} Units for {field} are not recognised. Found value: {unit_input}"
+                f"{UNABLE} Units for {field} are not recognised. Found value:"
+                f" {unit_input}"
             )
             good_units = False
             continue
@@ -164,13 +178,16 @@ def _units_are_valid(units_dict: dict) -> bool:
             unit_input, EXPECTED_UNIT_TYPE[field], False
         ):
             logging.info(
-                f"{UNABLE} Units for {field} have wrong type. Found {unit_input} but expected something that can be converted to {EXPECTED_UNIT_TYPE[field]}."
+                f"{UNABLE} Units for {field} have wrong type. Found {unit_input} but"
+                " expected something that can be converted to"
+                f" {EXPECTED_UNIT_TYPE[field]}."
             )
             good_units = False
             continue
         if not units_have_magnitude_of_one(unit_input, False):
             logging.info(
-                f"{UNABLE} Units for {field} should have a magnitude of one. Found value: {unit_input}"
+                f"{UNABLE} Units for {field} should have a magnitude of one. Found"
+                f" value: {unit_input}"
             )
             good_units = False
 
@@ -197,14 +214,18 @@ def _input_describes_valid_chopper(
     # Check that the number of slit edges is equal to two times the number of slits
     if len(chopper_details.slit_edges) != 2 * chopper_details.slits:
         logging.info(
-            f"{UNABLE} Size of slit edges array should be twice the number of slits. Instead there are {chopper_details.slits} slits and {len(chopper_details.slit_edges)} slit edges."
+            f"{UNABLE} Size of slit edges array should be twice the number of slits."
+            f" Instead there are {chopper_details.slits} slits and"
+            f" {len(chopper_details.slit_edges)} slit edges."
         )
         return False
 
     # Check that the slit height is smaller than the radius
     if chopper_details.slit_height >= chopper_details.radius:
         logging.info(
-            f"{UNABLE} Slit height should be smaller than radius. Instead slit height is {chopper_details.slit_height} metres and radius is {chopper_details.radius} metres."
+            f"{UNABLE} Slit height should be smaller than radius. Instead slit height"
+            f" is {chopper_details.slit_height} metres and radius is"
+            f" {chopper_details.radius} metres."
         )
         return False
 
@@ -218,7 +239,8 @@ def _input_describes_valid_chopper(
     # Check that there are no repeated angles
     if len(slit_edges) != len(np.unique(slit_edges)):
         logging.info(
-            f"{UNABLE} Angles in slit edges array should be unique. Found values: {slit_edges}"
+            f"{UNABLE} Angles in slit edges array should be unique. Found values:"
+            f" {slit_edges}"
         )
         return False
 
@@ -227,7 +249,8 @@ def _input_describes_valid_chopper(
         chopper_details.slit_edges[-1] >= chopper_details.slit_edges[0]
     ):
         logging.info(
-            f"{UNABLE} Slit edges contains overlapping slits. Found values: {slit_edges}"
+            f"{UNABLE} Slit edges contains overlapping slits. Found values:"
+            f" {slit_edges}"
         )
         return False
 
@@ -303,12 +326,11 @@ class UserDefinedChopperChecker:
         ):
             return False
 
-        # TODO: fix casts
         self._chopper_details = ChopperDetails(
-            int(self.fields_dict[SLITS_NAME].value.values),
+            self.fields_dict[SLITS_NAME].value.values,
             self.fields_dict[SLIT_EDGES_NAME].value.values,
-            float(self.fields_dict[RADIUS_NAME].value.values),
-            float(self.fields_dict[SLIT_HEIGHT_NAME].value.values),
+            self.fields_dict[RADIUS_NAME].value.values,
+            self.fields_dict[SLIT_HEIGHT_NAME].value.values,
             self.units_dict[SLIT_EDGES_NAME],
             self.units_dict[SLIT_HEIGHT_NAME],
             self.units_dict[RADIUS_NAME],
