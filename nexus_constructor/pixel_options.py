@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, List, Union
+from typing import Tuple, Optional, List
 
 import numpy as np
 from PySide2.QtCore import Signal, QObject
@@ -261,7 +261,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
             else:
                 self.create_pixel_mapping_list(n_cylinders, "cylinder")
-                self.pixel_mapping_widgets[0].id = detector_number
+                self.pixel_mapping_widgets[0].id = detector_number[0]
 
     def _fill_off_geometry_pixel_mapping(self, shape: OFFGeometryNexus):
         """
@@ -274,16 +274,13 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.create_pixel_mapping_list(n_faces, "face")
 
         # Populate the pixel mapping widgets based on the contents of the detector_faces array
-        if isinstance(detector_faces, Tuple):
-            self.pixel_mapping_widgets[detector_faces[0]].id = detector_faces[1]
-        else:
-            for detector_face in detector_faces:
-                self.pixel_mapping_widgets[detector_face[0]].id = detector_face[1]
+        for detector_face in detector_faces:
+            self.pixel_mapping_widgets[detector_face[0]].id = detector_face[1]
 
     @staticmethod
     def _get_detector_face_information(
         shape: OFFGeometryNexus,
-    ) -> Tuple[int, Union[List[Tuple[int, int]], Tuple[int, int]]]:
+    ) -> Tuple[int, List[Tuple[int, int]]]:
         return len(shape.faces), shape.detector_faces
 
     def get_current_mapping_filename(self) -> str:
