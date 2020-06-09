@@ -28,7 +28,8 @@ from nexus_constructor.model.stream import StreamGroup, F142Stream
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
 from nexus_constructor.pixel_options import PixelOptions
-from nexus_constructor.validators import FieldType, PixelValidator, DATASET_TYPE
+from nexus_constructor.validators import FieldType, PixelValidator
+from nexus_constructor.model.value_type import VALUE_TYPE
 from tests.test_utils import NX_CLASS_DEFINITIONS
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
@@ -100,7 +101,7 @@ NO_PIXEL_OPTIONS_SUBSET = {
 
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
-FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(DATASET_TYPE.keys())}
+FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(VALUE_TYPE.keys())}
 FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 

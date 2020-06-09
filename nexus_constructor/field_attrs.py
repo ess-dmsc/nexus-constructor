@@ -18,7 +18,8 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.ui_utils import validate_line_edit
-from nexus_constructor.validators import DATASET_TYPE, FieldValueValidator
+from nexus_constructor.validators import FieldValueValidator
+from nexus_constructor.model.value_type import VALUE_TYPE, ValueType
 
 ATTRS_BLACKLIST = [CommonAttrs.UNITS]
 
@@ -32,7 +33,7 @@ def _get_human_readable_type(new_value: Any):
         return "Double"
     else:
         return next(
-            key for key, value in DATASET_TYPE.items() if value == new_value.dtype
+            key for key, value in VALUE_TYPE.items() if value == new_value.dtype
         )
 
 
@@ -100,7 +101,7 @@ class FieldAttrFrame(QFrame):
         self.array_edit_button.clicked.connect(self.show_edit_array_dialog)
 
         self.attr_dtype_combo = QComboBox()
-        self.attr_dtype_combo.addItems([*DATASET_TYPE.keys()])
+        self.attr_dtype_combo.addItems([*VALUE_TYPE.keys()])
         self.attr_dtype_combo.currentTextChanged.connect(self.dtype_changed)
         self.dtype_changed(self.attr_dtype_combo.currentText())
         self.dialog = ArrayDatasetTableWidget(self.dtype)
@@ -139,8 +140,8 @@ class FieldAttrFrame(QFrame):
         )
 
     @property
-    def dtype(self):
-        return DATASET_TYPE[self.attr_dtype_combo.currentText()]
+    def dtype(self) -> ValueType:
+        return VALUE_TYPE[self.attr_dtype_combo.currentText()]
 
     @property
     def is_scalar(self):
@@ -161,7 +162,7 @@ class FieldAttrFrame(QFrame):
     def value(self) -> Union[np.generic, np.ndarray]:
 
         if self.is_scalar:
-            if self.dtype == DATASET_TYPE["String"] or isinstance(self.dtype, str):
+            if self.dtype == VALUE_TYPE["String"] or isinstance(self.dtype, str):
                 return self.attr_value_lineedit.text()
             return self.dtype(self.attr_value_lineedit.text())
         return np.squeeze(self.dialog.model.array)
