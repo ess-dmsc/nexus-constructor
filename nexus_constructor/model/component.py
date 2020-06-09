@@ -73,6 +73,8 @@ class Component(Group):
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
         self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+        if new_depends_on is not None:
+            new_depends_on.register_dependent(self)
 
     @property
     def description(self) -> str:

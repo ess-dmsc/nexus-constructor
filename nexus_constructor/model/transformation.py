@@ -108,6 +108,8 @@ class Transformation(Dataset):
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
         self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+        if new_depends_on is not None:
+            new_depends_on.register_dependent(self)
 
     @property
     def dependents(self) -> List[Union["Transformation", "Component"]]:
@@ -133,7 +135,7 @@ class Transformation(Dataset):
             # update dependent's depends_on to point at this transforms depends_on
             dependent_transform.depends_on = parent
             # update the parent transform to include the previously dependent transform as a dependent of the parent
-            if dependent_transform.depends_on is not None:
-                dependent_transform.depends_on.register_dependent(dependent_transform)
+            if parent is not None:
+                parent.register_dependent(dependent_transform)
 
         self._dependents = []
