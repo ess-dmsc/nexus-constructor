@@ -12,7 +12,7 @@ from nexus_constructor.unit_utils import (
     units_are_expected_dimensionality,
     units_have_magnitude_of_one,
 )
-from nexus_constructor.validators import DATASET_TYPE
+from nexus_constructor.validators import VALUE_TYPE
 
 SLIT_EDGES_NAME = "slit_edges"
 SLITS_NAME = "slits"
@@ -29,8 +29,8 @@ EXPECTED_TYPE_ERROR_MSG = {
 }
 
 REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES_NAME, SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME}
-INT_TYPES = [value for value in DATASET_TYPE.values() if "int" in str(value)]
-FLOAT_TYPES = [value for value in DATASET_TYPE.values() if "float" in str(value)]
+INT_TYPES = [value for value in VALUE_TYPE.values() if "int" in str(value)]
+FLOAT_TYPES = [value for value in VALUE_TYPE.values() if "float" in str(value)]
 
 UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
 EXPECTED_UNIT_TYPE = {
