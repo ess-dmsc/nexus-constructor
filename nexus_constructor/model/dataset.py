@@ -1,7 +1,9 @@
 import attr
+from typing import List
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.node import Node
+from nexus_constructor.model.value_type import ValueType
 
 
 @attr.s
@@ -13,7 +15,7 @@ class DatasetMetadata:
 @attr.s
 class Dataset(Node):
     dataset = attr.ib(type=DatasetMetadata)
-    values = attr.ib(factory=list)
+    values = attr.ib(factory=list, type=List[ValueType])
     type = attr.ib(type=str, default="dataset", init=False)
 
     @property

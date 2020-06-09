@@ -1,6 +1,6 @@
-from typing import Any
-
 import attr
+
+from nexus_constructor.model.value_type import ValueType
 
 
 @attr.s
@@ -13,4 +13,4 @@ class FieldAttribute:
     """
 
     name = attr.ib(type=str)
-    values = attr.ib(type=Any)
+    values = attr.ib(type=ValueType)
