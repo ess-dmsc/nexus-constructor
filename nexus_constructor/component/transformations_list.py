@@ -26,7 +26,10 @@ class TransformationsList(list):
 
     def _transform_has_external_link(self, transformation: Transformation) -> bool:
         try:
-            return transformation.depends_on != self.parent_component
+            return (
+                transformation.depends_on._parent_component
+                != transformation._parent_component
+            )
         except AttributeError:
             return False
 

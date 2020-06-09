@@ -19,7 +19,7 @@ class LinkTransformation:
     def _find_linked_component(self) -> Optional[Component]:
         for transformation in self.parent:
             if self.parent._transform_has_external_link(transformation):
-                return transformation.depends_on
+                return transformation.depends_on._parent_component
         return None
 
     def _has_direct_component_link(self) -> bool:
