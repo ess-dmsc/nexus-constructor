@@ -162,15 +162,17 @@ def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_
     assert not chopper_checker._check_data_type(SLITS_NAME, FLOAT_TYPES)
 
 
-def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned():
-    field_dict = {RADIUS_NAME: "string"}
+def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned(
+    mock_radius_widget,
+):
+    wrong_data_type = "String"
+    mock_radius_widget.dtype = wrong_data_type
+    field_dict = {RADIUS_NAME: mock_radius_widget}
     error_message = _incorrect_data_type_message(field_dict, RADIUS_NAME, "float")
 
     assert (
         error_message
-        == "Wrong radius type. Expected float but found "
-        + str(type(field_dict[RADIUS_NAME]))
-        + "."
+        == "Wrong radius type. Expected float but found " + wrong_data_type + "."
     )
 
 

@@ -1,5 +1,5 @@
 import logging
-from typing import Sequence, Dict, List
+from typing import Sequence, List
 
 import numpy as np
 from PySide2.QtWidgets import QListWidget
@@ -51,7 +51,7 @@ def _incorrect_data_type_message(
     """
     return (
         f"Wrong {field_name} type. Expected {expected_type} but found"
-        f" {type(data_dict[field_name])} ."
+        f" {data_dict[field_name].dtype}."
     )
 
 
@@ -240,25 +240,26 @@ class ChopperChecker:
         ):
             return True
 
-        problems = []
-
         if not correct_slits_type:
-            problems.append(
-                _incorrect_data_type_message(
+            logging.info(
+                UNABLE
+                + _incorrect_data_type_message(
                     self.fields_dict, SLITS_NAME, EXPECTED_TYPE_ERROR_MSG[SLITS_NAME]
                 )
             )
 
         if not correct_radius_type:
-            problems.append(
-                _incorrect_data_type_message(
-                    self.fields_dict, RADIUS_NAME, EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME]
+            logging.info(
+                UNABLE
+                + _incorrect_data_type_message(
+                    self.fields_dict, RADIUS_NAME, EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME],
                 )
             )
 
         if not correct_slit_height_type:
-            problems.append(
-                _incorrect_data_type_message(
+            logging.info(
+                UNABLE
+                + _incorrect_data_type_message(
                     self.fields_dict,
                     SLIT_HEIGHT_NAME,
                     EXPECTED_TYPE_ERROR_MSG[SLIT_HEIGHT_NAME],
@@ -266,15 +267,15 @@ class ChopperChecker:
             )
 
         if not correct_slit_edges_type:
-            problems.append(
-                _incorrect_data_type_message(
+            logging.info(
+                UNABLE
+                + _incorrect_data_type_message(
                     self.fields_dict,
                     SLIT_EDGES_NAME,
                     EXPECTED_TYPE_ERROR_MSG[SLIT_EDGES_NAME],
                 )
             )
 
-        logging.info(f"{UNABLE}\n{problems}")
         return False
 
     def _check_data_conversion(self, field: str):
@@ -310,34 +311,35 @@ class ChopperChecker:
         ):
             return True
 
-        problems = []
-
         if not converted_slits:
-            problems.append(
-                _unsuccessful_conversion_message(
+            logging.info(
+                UNABLE
+                + _unsuccessful_conversion_message(
                     self.fields_dict[SLITS_NAME], SLITS_NAME
                 )
             )
         if not converted_radius:
-            problems.append(
-                _unsuccessful_conversion_message(
+            logging.info(
+                UNABLE
+                + _unsuccessful_conversion_message(
                     self.fields_dict[RADIUS_NAME], RADIUS_NAME
                 )
             )
         if not converted_slit_height:
-            problems.append(
-                _unsuccessful_conversion_message(
+            logging.info(
+                UNABLE
+                + _unsuccessful_conversion_message(
                     self.fields_dict[SLIT_HEIGHT_NAME], SLIT_HEIGHT_NAME
                 )
             )
         if not converted_slit_edges:
-            problems.append(
-                _unsuccessful_conversion_message(
+            logging.info(
+                UNABLE
+                + _unsuccessful_conversion_message(
                     self.fields_dict[SLIT_EDGES_NAME], SLIT_EDGES_NAME
                 )
             )
 
-        logging.info(f"{UNABLE}\n{problems}")
         return False
 
     @property
@@ -369,8 +371,6 @@ class ChopperChecker:
                 missing_units.append(field)
             else:
                 self.units_dict[field] = units
-
-        print(self.units_dict)
 
         if len(missing_units) > 0:
             logging.info(
