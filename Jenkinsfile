@@ -130,9 +130,7 @@ return {
                 } // stage
                 stage('Archive Executable') {
                     def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-                    // Compress-Archive cmdlet is really really slow, so better to install and use 7zip if not already present
-                    powershell label: 'Install 7zip', script: "Install-Module -Name 7Zip4PowerShell"
-                    powershell label: 'Archiving build folder', script: "Compress-7Zip -Path .\\build -ArchiveFileName nexus-constructor_windows_${git_commit_short}.zip -Format Zip"
+                    powershell label: 'Archiving build folder', script: "Compress-Archive -Path .\\build -DestinationPath nexus-constructor_windows_${git_commit_short}.zip"
                     archiveArtifacts 'nexus-constructor*.zip'
                 } // stage
                 stage("Test executable") {
