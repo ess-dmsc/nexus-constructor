@@ -2,7 +2,6 @@ import os
 import re
 from enum import Enum
 from typing import List
-
 import h5py
 import numpy as np
 import pint
@@ -17,6 +16,7 @@ from nexus_constructor.unit_utils import (
     units_are_expected_dimensionality,
     units_have_magnitude_of_one,
 )
+from nexus_constructor.model.value_type import VALUE_TYPE
 
 HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 
@@ -295,21 +295,6 @@ class FieldType(Enum):
     nx_class = "NX class/group"
 
 
-DATASET_TYPE = {
-    "Byte": np.byte,
-    "UByte": np.ubyte,
-    "Short": np.short,
-    "UShort": np.ushort,
-    "Integer": np.intc,
-    "UInteger": np.uintc,
-    "Long": np.int_,
-    "ULong": np.uint,
-    "Float": np.single,
-    "Double": np.double,
-    "String": str,
-}
-
-
 class FieldValueValidator(QValidator):
     """
     Validates the field value line edit to check that the entered string is castable to the selected numpy type.
@@ -337,7 +322,7 @@ class FieldValueValidator(QValidator):
             return self._emit_and_return(False)
         elif self.field_type_combo.currentText() == self.scalar:
             try:
-                DATASET_TYPE[self.dataset_type_combo.currentText()](input)
+                VALUE_TYPE[self.dataset_type_combo.currentText()](input)
             except ValueError:
                 return self._emit_and_return(False)
         return self._emit_and_return(True)
