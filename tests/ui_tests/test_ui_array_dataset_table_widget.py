@@ -53,11 +53,14 @@ def test_UI_GIVEN_data_type_WHEN_changing_data_type_THEN_change_is_successful(
     array_dataset_table_widget, orig_data_type, new_data_type
 ):
 
-    array = np.arange(10, dtype=orig_data_type)
+    array = np.arange(10).astype(orig_data_type)
     array_dataset_table_widget.model.array = array
     array_dataset_table_widget.model.update_array_dtype(new_data_type)
 
-    assert np.array_equal(array, array_dataset_table_widget.model.array)
+    if new_data_type is not str:
+        assert array_dataset_table_widget.model.array.dtype == new_data_type
+    else:
+        assert "<U" in str(array_dataset_table_widget.model.array.dtype)
 
 
 def test_GIVEN_string_array_WHEN_changing_data_type_to_int_THEN_array_rests(
