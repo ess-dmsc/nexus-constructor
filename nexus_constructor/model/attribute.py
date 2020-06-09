@@ -1,9 +1,9 @@
 import attr
-
+import numpy as np
 from nexus_constructor.model.value_type import ValueType
 
 
-@attr.s
+@attr.s(eq=None)
 class FieldAttribute:
     """
     Class for containing attributes in the nexus structure.
@@ -13,4 +13,10 @@ class FieldAttribute:
     """
 
     name = attr.ib(type=str)
-    values = attr.ib(type=ValueType)
+    values = attr.ib(type=ValueType, cmp=False)
+
+    def __eq__(self, other_attribute):
+        assert self.name == other_attribute.name
+        if np.isscalar(self.values):
+            return self.values == other_attribute.values
+        return self.values.all(other_attribute)

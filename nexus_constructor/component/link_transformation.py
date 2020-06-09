@@ -48,6 +48,6 @@ class LinkTransformation:
                     target = c_transform
                     break
         if value is not None:
-            target.depends_on = value
+            target.depends_on = value.depends_on
             return
         target.depends_on = None

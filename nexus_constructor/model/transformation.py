@@ -107,6 +107,12 @@ class Transformation(Dataset):
 
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
+        try:
+            if self.depends_on is not None:
+                # deregister this transform as a dependent of the old depends_on transformation
+                self.depends_on.deregister_dependent(self)
+        except AttributeError:
+            pass
         self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
         if new_depends_on is not None:
             new_depends_on.register_dependent(self)

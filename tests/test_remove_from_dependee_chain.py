@@ -1,10 +1,18 @@
 from nexus_constructor.model.component import Component
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.model.dataset import DatasetMetadata, Dataset
+
+values = Dataset(
+    name="scalar_value", dataset=DatasetMetadata(type="Double", size=[1]), values=90.0
+)
+
 
 def test_remove_from_beginning_1():
     component1 = Component("component1")
-    rot = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    rot = component1.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
     component1.depends_on = rot
     assert len(rot.dependents) == 1
     rot.remove_from_dependee_chain()
@@ -13,8 +21,12 @@ def test_remove_from_beginning_1():
 
 def test_remove_from_beginning_2():
     component1 = Component("component1")
-    rot1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
-    rot2 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    rot1 = component1.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
+    rot2 = component1.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
     component1.depends_on = rot1
     rot1.depends_on = rot2
     assert len(rot2.dependents) == 1
@@ -27,8 +39,12 @@ def test_remove_from_beginning_2():
 def test_remove_from_beginning_3():
     component1 = Component("component1")
     component2 = Component("component2")
-    rot1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
-    rot2 = component2.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    rot1 = component1.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
+    rot2 = component2.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
     component1.depends_on = rot1
     component2.depends_on = rot2
     rot1.depends_on = rot2
@@ -38,33 +54,51 @@ def test_remove_from_beginning_3():
     assert component2 in rot2.dependents
     assert component1 in rot2.dependents
     assert component1.depends_on == rot2
-    assert component1.transforms.link.linked_component == component2
+    assert component1.transforms.link.linked_component.name == component2.name
 
 
 def test_remove_from_middle():
     component1 = Component("component1")
     component2 = Component("component2")
     component3 = Component("component3")
-    rot1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
-    rot2 = component2.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
-    rot3 = component3.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
+    rot1 = component1.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
+    rot2 = component2.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
+    rot3 = component3.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
     component1.depends_on = rot1
     component2.depends_on = rot2
     component3.depends_on = rot3
     component1.transforms.link.linked_component = component2
     component2.transforms.link.linked_component = component3
     rot2.remove_from_dependee_chain()
-    assert rot1.depends_on == rot3
-    assert component1.transforms.link.linked_component == component3
+    assert rot1.depends_on.name == rot3.name
+    assert component1.transforms.link.linked_component.name == component3.name
     assert rot1 in rot3.dependents
     assert component3 in rot3.dependents
 
 
 def test_remove_from_end():
     component1 = Component("component1")
-    rot1 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0)
-    rot2 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=rot1)
-    rot3 = component1.add_rotation(QVector3D(1.0, 0.0, 0.0), 90.0, depends_on=rot2)
+    rot1 = component1.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0), angle=values.values, values=values
+    )
+    rot2 = component1.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0),
+        angle=values.values,
+        values=values,
+        depends_on=rot1,
+    )
+    rot3 = component1.add_rotation(
+        axis=QVector3D(1.0, 0.0, 0.0),
+        angle=values.values,
+        values=values,
+        depends_on=rot2,
+    )
 
     component1.depends_on = rot3
 

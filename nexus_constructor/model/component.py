@@ -226,7 +226,7 @@ class Component(Group):
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms_list)
-        transform = Transformation(name, angle_or_magnitude, parent_component=self)
+        transform = Transformation(name=name, dataset=None)
         transform.type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
