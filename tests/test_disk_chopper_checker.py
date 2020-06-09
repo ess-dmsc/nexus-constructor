@@ -414,3 +414,19 @@ def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_c
     mock_slit_edges_widget.units = units_attribute
     chopper_checker.validate_chopper()
     assert np.allclose(chopper_checker.chopper_details.slit_edges, RADIANS_EDGES_ARR)
+
+
+def test_GIVEN_all_data_can_be_converted_WHEN_validating_chopper_THEN_data_can_be_converted_returns_true(
+    chopper_checker,
+):
+    assert chopper_checker._data_can_be_converted()
+
+
+@pytest.mark.parametrize("field_name", [SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME])
+def test_GIVEN_failed_conversion_WHEN_validating_chopper_THEN_data_can_be_converted_returns_false(
+    chopper_checker, field_name
+):
+    chopper_checker.fields_dict[field_name].value = create_dataset(
+        field_name, chopper_checker.fields_dict[field_name].dtype, "cantbeconverted"
+    )
+    assert not chopper_checker._data_can_be_converted()
