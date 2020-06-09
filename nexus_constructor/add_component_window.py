@@ -13,9 +13,7 @@ from nexus_constructor.component.component_type import (
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.field_widget import FieldWidget
-from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
-    UserDefinedChopperChecker,
-)
+from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import ChopperChecker
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     DiskChopperGeometryCreator,
 )
@@ -49,7 +47,7 @@ from ui.add_component import Ui_AddComponentDialog
 
 
 def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget):
-    chopper_validator = UserDefinedChopperChecker(fields_list_widget)
+    chopper_validator = ChopperChecker(fields_list_widget)
 
     if chopper_validator.validate_chopper():
         chopper_details = chopper_validator.chopper_details

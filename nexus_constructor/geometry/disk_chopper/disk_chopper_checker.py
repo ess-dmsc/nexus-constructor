@@ -181,7 +181,7 @@ def _input_describes_valid_chopper(
     return True
 
 
-class UserDefinedChopperChecker:
+class ChopperChecker:
     def __init__(
         self, fields_widget: QListWidget, fields_dict: Dict[str, FieldWidget] = dict()
     ):
@@ -206,7 +206,7 @@ class UserDefinedChopperChecker:
             self.converted_values[field] = VALUE_TYPE[self.fields_dict[field].dtype](
                 self.fields_dict[field].value.values
             )
-        except Exception:
+        except ValueError:
             return False
         return True
 
