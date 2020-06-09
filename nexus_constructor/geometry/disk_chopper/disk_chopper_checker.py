@@ -51,7 +51,20 @@ def _incorrect_data_type_message(
     """
     return (
         f"Wrong {field_name} type. Expected {expected_type} but found"
-        f" {type(data_dict[field_name])}."
+        f" {type(data_dict[field_name])} ."
+    )
+
+
+def _unsuccessful_conversion_message(field_widget: FieldWidget, field_name: str) -> str:
+    """
+    Creates a string explaining to the user that the field input could not be converted to the expected type.
+    :param data_dict: The dictionary containing the different data fields for the disk chopper.
+    :param field_name: The name of the field that failed the conversion.
+    :return: A string that tells the user that the given field could not be converted.
+    """
+    return (
+        f"Unable to convert input in {field_name} field to {field_widget.dtype}. Found"
+        f" input {field_widget.value.values}."
     )
 
 
@@ -182,11 +195,8 @@ def _input_describes_valid_chopper(
 
 
 class ChopperChecker:
-    def __init__(
-        self, fields_widget: QListWidget, fields_dict: Dict[str, FieldWidget] = dict()
-    ):
-
-        self.fields_dict = fields_dict
+    def __init__(self, fields_widget: QListWidget):
+        self.fields_dict = {}
         self.units_dict = {}
         self.converted_values = {}
         self._chopper_details = None
@@ -195,25 +205,20 @@ class ChopperChecker:
             widget = fields_widget.itemWidget(fields_widget.item(i))
             self.fields_dict[widget.name] = widget
 
-    def _check_data_type(self, field: str, expected_types: List[str],) -> bool:
-        # if isinstance(field_widget, np.int64):
-        #     # Fix for windows - for some reason int64 is the default numpy int type on windows...
-        #     dtype = np.int32
+    def _check_data_type(self, field: str, expected_types: List[str]) -> bool:
+        """
+        Checks that the data type of a field matches the expected types.
+        :param field: They key for the field.
+        :param expected_types: A list of acceptable data types for the field.
+        :return: True if the data type of the field is in the list of acceptable types, False otherwise.
+        """
         if self.fields_dict[field].dtype not in expected_types:
-            return False
-
-        try:
-            self.converted_values[field] = VALUE_TYPE[self.fields_dict[field].dtype](
-                self.fields_dict[field].value.values
-            )
-        except ValueError:
             return False
         return True
 
     def _data_has_correct_type(self) -> bool:
         """
         Checks that the data required to create a Chopper mesh have the expected types.
-        :param fields_dict: The dictionary of field names and their field widgets/NeXus data.
         :return: True if all the fields have the correct types, False otherwise.
         """
         correct_slits_type = self._check_data_type(SLITS_NAME, INT_TYPES)
@@ -272,6 +277,69 @@ class ChopperChecker:
         logging.info(f"{UNABLE}\n{problems}")
         return False
 
+    def _check_data_conversion(self, field: str):
+        """
+        Checks that the value from the field widget can be converted to the given data type.
+        :param field: The field key.
+        :return: True if the conversion was successful, False otherwise.
+        """
+        try:
+            self.converted_values[field] = VALUE_TYPE[self.fields_dict[field].dtype](
+                self.fields_dict[field].value.values
+            )
+        except ValueError:
+            return False
+
+        return True
+
+    def _data_can_be_converted(self):
+        """
+        Checks that the data can be converted to the expected numpy type.
+        :return: True if all the conversions worked, False otherwise.
+        """
+        converted_slits = self._check_data_conversion(SLITS_NAME)
+        converted_radius = self._check_data_conversion(RADIUS_NAME)
+        converted_slit_height = self._check_data_conversion(SLIT_HEIGHT_NAME)
+        converted_slit_edges = self._check_data_conversion(SLIT_EDGES_NAME)
+
+        if (
+            converted_slits
+            and converted_radius
+            and converted_slit_height
+            and converted_slit_edges
+        ):
+            return True
+
+        problems = []
+
+        if not converted_slits:
+            problems.append(
+                _unsuccessful_conversion_message(
+                    self.fields_dict[SLITS_NAME], SLITS_NAME
+                )
+            )
+        if not converted_radius:
+            problems.append(
+                _unsuccessful_conversion_message(
+                    self.fields_dict[RADIUS_NAME], RADIUS_NAME
+                )
+            )
+        if not converted_slit_height:
+            problems.append(
+                _unsuccessful_conversion_message(
+                    self.fields_dict[SLIT_HEIGHT_NAME], SLIT_HEIGHT_NAME
+                )
+            )
+        if not converted_slit_edges:
+            problems.append(
+                _unsuccessful_conversion_message(
+                    self.fields_dict[SLIT_EDGES_NAME], SLIT_EDGES_NAME
+                )
+            )
+
+        logging.info(f"{UNABLE}\n{problems}")
+        return False
+
     @property
     def chopper_details(self) -> ChopperDetails:
         """
@@ -322,6 +390,7 @@ class ChopperChecker:
         if not (
             self.required_fields_present()
             and self._data_has_correct_type()
+            and self._data_can_be_converted()
             and _units_are_valid(self.units_dict)
             and _edges_array_has_correct_shape(
                 self.fields_dict[SLIT_EDGES_NAME].value.values.ndim,
