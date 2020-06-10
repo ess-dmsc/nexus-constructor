@@ -301,14 +301,8 @@ class ChopperChecker:
         converted_slits = self._check_data_conversion(SLITS_NAME)
         converted_radius = self._check_data_conversion(RADIUS_NAME)
         converted_slit_height = self._check_data_conversion(SLIT_HEIGHT_NAME)
-        converted_slit_edges = self._check_data_conversion(SLIT_EDGES_NAME)
 
-        if (
-            converted_slits
-            and converted_radius
-            and converted_slit_height
-            and converted_slit_edges
-        ):
+        if converted_slits and converted_radius and converted_slit_height:
             return True
 
         if not converted_slits:
@@ -330,13 +324,6 @@ class ChopperChecker:
                 UNABLE
                 + _unsuccessful_conversion_message(
                     self.fields_dict[SLIT_HEIGHT_NAME], SLIT_HEIGHT_NAME
-                )
-            )
-        if not converted_slit_edges:
-            logging.info(
-                UNABLE
-                + _unsuccessful_conversion_message(
-                    self.fields_dict[SLIT_EDGES_NAME], SLIT_EDGES_NAME
                 )
             )
 
