@@ -345,7 +345,7 @@ class ChopperChecker:
 
         if len(missing_fields) > 0:
             logging.info(
-                f"{UNABLE} Required field(s) missing:", ", ".join(missing_fields)
+                f"{UNABLE} Required field(s) missing: {', '.join(missing_fields)}"
             )
             return False
 
@@ -361,7 +361,7 @@ class ChopperChecker:
 
         if len(missing_units) > 0:
             logging.info(
-                f"{UNABLE} Units are missing from field(s):", ", ".join(missing_units)
+                f"{UNABLE} Units are missing from field(s): {', '.join(missing_units)}"
             )
             return False
 
@@ -391,7 +391,7 @@ class ChopperChecker:
 
         self._chopper_details = ChopperDetails(
             self.converted_values[SLITS_NAME],
-            self.converted_values[SLIT_EDGES_NAME],
+            self.fields_dict[SLIT_EDGES_NAME].value.values,
             self.converted_values[RADIUS_NAME],
             self.converted_values[SLIT_HEIGHT_NAME],
             self.units_dict[SLIT_EDGES_NAME],

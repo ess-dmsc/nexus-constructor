@@ -346,19 +346,14 @@ def enter_disk_chopper_fields(
 
     show_and_close_window(qtbot, template)
 
-    # Set the field types
-    fields_widgets[0].value_type_combo.setCurrentIndex(
-        FIELDS_VALUE_TYPES["Integer"]
-    )  # Slits
-    fields_widgets[1].value_type_combo.setCurrentIndex(
-        FIELDS_VALUE_TYPES["Float"]
-    )  # Slit edges
-    fields_widgets[2].value_type_combo.setCurrentIndex(
-        FIELDS_VALUE_TYPES["Float"]
-    )  # Radius
-    fields_widgets[3].value_type_combo.setCurrentIndex(
-        FIELDS_VALUE_TYPES["Float"]
-    )  # Slit height
+    # Set slits field type
+    fields_widgets[0].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Integer"])
+    # Set slit edges field type
+    fields_widgets[1].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    # Set radius field type
+    fields_widgets[2].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    # Set slit height field type
+    fields_widgets[3].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
 
     show_and_close_window(qtbot, template)
 
