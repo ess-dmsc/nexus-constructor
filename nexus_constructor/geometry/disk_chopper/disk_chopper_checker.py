@@ -369,9 +369,12 @@ class ChopperChecker:
 
     def validate_chopper(self) -> bool:
         """
-        Performs the following checks in order to determine if the chopper input is valid: 1) Checks that the required
-        fields are present, 2) Checks that the fields have the correct type, 3) Checks that the slit edges array is 1D,
-        and 4) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
+        Performs the following checks in order to determine if the chopper input is valid:
+        1) Checks that the required fields are present,
+        2) Checks that the fields have the correct type,
+        3) Checks that the field data can be converted to the corresponding numpy type,
+        4) Checks that the slit edges array is 1D, and
+        5) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
         :return: True if the chopper is valid, False otherwise.
         """
         if not (
