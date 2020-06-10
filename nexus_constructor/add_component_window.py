@@ -1,3 +1,4 @@
+import logging
 from collections import OrderedDict
 from functools import partial
 
@@ -47,12 +48,19 @@ from ui.add_component import Ui_AddComponentDialog
 
 
 def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget):
+    """
+    Attempts to set a chopper geometry in the component by checking if the component fields describe a valid chopper.
+    :param Component: The component to be given a shape.
+    :param fields_list_widget: The fields list widget that contains the user input.
+    """
     chopper_validator = ChopperChecker(fields_list_widget)
 
     if chopper_validator.validate_chopper():
         chopper_details = chopper_validator.chopper_details
         chopper_creator = DiskChopperGeometryCreator(chopper_details)
         component[SHAPE_GROUP_NAME] = chopper_creator.create_disk_chopper_geometry()
+    else:
+        logging.warning("Validation failed. Unable to create disk chopper mesh.")
 
 
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
