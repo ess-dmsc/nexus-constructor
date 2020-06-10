@@ -1,5 +1,4 @@
 from typing import List, Any
-
 import attr
 
 from nexus_constructor.model.attribute import FieldAttribute

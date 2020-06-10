@@ -7,9 +7,9 @@ class Instrument(Group):
         super().__init__("instrument")
         self.nx_class = "NXinstrument"
 
-        sample = Component("sample")
-        sample.nx_class = "NXsample"
-        self.component_list = [sample]
+        self.sample = Component("sample")
+        self.sample.nx_class = "NXsample"
+        self.component_list = [self.sample]
 
     def get_component_list(self):
         return self.component_list
