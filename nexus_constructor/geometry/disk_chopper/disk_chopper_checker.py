@@ -58,7 +58,7 @@ def _incorrect_data_type_message(
 def _unsuccessful_conversion_message(field_widget: FieldWidget, field_name: str) -> str:
     """
     Creates a string explaining to the user that the field input could not be converted to the expected type.
-    :param data_dict: The dictionary containing the different data fields for the disk chopper.
+    :param field_widget: The dictionary containing the different data fields for the disk chopper.
     :param field_name: The name of the field that failed the conversion.
     :return: A string that tells the user that the given field could not be converted.
     """

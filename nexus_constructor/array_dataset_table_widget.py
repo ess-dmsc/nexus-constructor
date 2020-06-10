@@ -77,7 +77,9 @@ class ArrayDatasetTableModel(QAbstractTableModel):
 
     def add_row(self):
         self.beginResetModel()
-        self.array.resize((self.array.shape[0] + 1, self.array.shape[1]))
+        self.array = np.row_stack(
+            (self.array, np.zeros(np.shape(self.array)[1], dtype=self.array.dtype))
+        )
         self.endResetModel()
 
     def add_column(self):
