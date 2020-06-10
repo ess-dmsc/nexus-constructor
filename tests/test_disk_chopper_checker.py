@@ -15,6 +15,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     _edges_array_has_correct_shape,
     FLOAT_TYPES,
     _incorrect_data_type_message,
+    _units_are_valid,
 )
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from tests.chopper_test_helpers import (  # noqa: F401
@@ -430,3 +431,12 @@ def test_GIVEN_failed_conversion_WHEN_validating_chopper_THEN_data_can_be_conver
         field_name, chopper_checker.fields_dict[field_name].dtype, "cantbeconverted"
     )
     assert not chopper_checker._data_can_be_converted()
+
+
+@pytest.mark.parametrize("field", [RADIUS_NAME, SLIT_HEIGHT_NAME, SLIT_EDGES_NAME])
+def test_GIVEN_units_aren_recognised_by_pint_WHEN_validating_units_THEN_units_are_valid_returns_false(
+    units_dict_mocks, field
+):
+
+    units_dict_mocks[field] = "12345"
+    assert not _units_are_valid(units_dict_mocks)
