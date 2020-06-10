@@ -278,7 +278,7 @@ class ChopperChecker:
 
         return False
 
-    def _check_data_conversion(self, field: str):
+    def _check_data_conversion(self, field: str) -> bool:
         """
         Checks that the value from the field widget can be converted to the given data type.
         :param field: The field key.
@@ -293,7 +293,7 @@ class ChopperChecker:
 
         return True
 
-    def _data_can_be_converted(self):
+    def _data_can_be_converted(self) -> bool:
         """
         Checks that the data can be converted to the expected numpy type.
         :return: True if all the conversions worked, False otherwise.
