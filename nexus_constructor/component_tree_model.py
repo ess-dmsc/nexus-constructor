@@ -9,7 +9,7 @@ from nexus_constructor.component.link_transformation import LinkTransformation
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
-from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.ui_utils import generate_unique_name
@@ -24,10 +24,10 @@ class ComponentInfo(object):
 class ComponentTreeModel(QAbstractItemModel):
     data_changed = Signal("QModelIndex", "QModelIndex")
 
-    def __init__(self, instrument: Instrument, parent=None):
+    def __init__(self, model: Model, parent=None):
         super().__init__(parent)
-        self.instrument = instrument
-        self.components = self.instrument.get_component_list()
+        self.model = model
+        self.components = self.model.entry.instrument.get_component_list()
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -99,7 +99,7 @@ class ComponentTreeModel(QAbstractItemModel):
         if len(transformation_list) > 0:
             parent_transform = transformation_list[len(transformation_list) - 1]
             parent_transform.depends_on = None
-        self.instrument.nexus.transformation_changed.emit()
+        self.model.signals.transformation_changed.emit()
 
     def __update_link_rows(self):
         nr_of_components = self.rowCount(QModelIndex())
@@ -128,7 +128,7 @@ class ComponentTreeModel(QAbstractItemModel):
         component.remove_transformation(remove_transform)
         transformation_list.pop(remove_pos)
         self.endRemoveRows()
-        self.instrument.nexus.transformation_changed.emit()
+        self.model.signals.transformation_changed.emit()
 
     def _remove_component(self, index: QModelIndex):
         component = index.internalPointer()
@@ -153,7 +153,7 @@ class ComponentTreeModel(QAbstractItemModel):
         self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
         for transform in transforms:
             transform.remove_from_dependee_chain()
-        self.instrument.remove_component(component)
+        self.model.entry.instrument.remove_component(component)
         self.components.pop(remove_index)
         self.endRemoveRows()
 
@@ -168,10 +168,12 @@ class ComponentTreeModel(QAbstractItemModel):
     def duplicate_node(self, node: QModelIndex):
         node_object = node.internalPointer()
         if isinstance(node_object, Component):
-            new_component = node_object.duplicate(self.instrument.get_component_list())
+            new_component = node_object.duplicate(
+                self.model.entry.instrument.get_component_list()
+            )
             self.add_component(new_component)
             shape, positions = new_component.shape
-            self.instrument.nexus.component_added.emit(
+            self.model.signals.component_added.emit(
                 new_component.name, shape, positions
             )
         elif isinstance(node_object, Transformation):
@@ -218,7 +220,7 @@ class ComponentTreeModel(QAbstractItemModel):
                 transformation_list[
                     -1
                 ].depends_on = transformation_list.link.linked_component.transforms[0]
-        self.instrument.nexus.transformation_changed.emit()
+        self.model.signals.transformation_changed.emit()
 
     @staticmethod
     def _create_new_transformation(

@@ -9,6 +9,7 @@ from nexus_constructor.component.link_transformation import LinkTransformation
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.transformation_view import (
@@ -191,16 +192,16 @@ def fill_selection(option, painter):
     painter.fillRect(option.rect, colour)
 
 
-def get_link_transformation_frame(frame, instrument, value):
-    frame.transformation_frame = EditTransformationLink(frame, value, instrument)
+def get_link_transformation_frame(frame, model: Model, value):
+    frame.transformation_frame = EditTransformationLink(frame, value, model)
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 
-def get_transformation_frame(frame, instrument, value):
+def get_transformation_frame(frame, model: Model, value):
     if value.type == TransformationType.TRANSLATION:
-        frame.transformation_frame = EditTranslation(frame, value, instrument)
+        frame.transformation_frame = EditTranslation(frame, value, model)
     elif value.type == TransformationType.ROTATION:
-        frame.transformation_frame = EditRotation(frame, value, instrument)
+        frame.transformation_frame = EditRotation(frame, value, model)
     else:
         raise (RuntimeError('Transformation type "{}" is unknown.'.format(value.type)))
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
