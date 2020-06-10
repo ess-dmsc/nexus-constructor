@@ -2977,3 +2977,17 @@ def test_UI_GIVEN_changing_fields_WHEN_editing_a_component_with_a_chopper_mesh_T
     add_component_dialog.on_ok()
 
     parent_mock.sceneWidget.delete_component.assert_called_once_with(component_name)
+
+
+def test_UI_GIVEN_invalid_chopper_definition_WHEN_creating_component_with_no_shape_THEN_chopper_creator_is_not_called(
+    qtbot, add_component_dialog, template
+):
+
+    enter_disk_chopper_fields(qtbot, add_component_dialog, template)
+    add_component_dialog.fieldsListWidget.setCurrentRow(0)
+    systematic_button_press(qtbot, template, add_component_dialog.removeFieldPushButton)
+    add_component_dialog.on_ok()
+
+    with patch(CHOPPER_GEOMETRY_CREATOR_PATH) as chopper_creator:
+        add_component_dialog.on_ok()
+        chopper_creator.assert_not_called()
