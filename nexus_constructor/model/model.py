@@ -1,5 +1,6 @@
 from PySide2.QtCore import QObject, Signal
 from typing import Dict, Any
+from nexus_constructor.model.entry import Entry
 
 
 class Signals(QObject):
@@ -16,7 +17,7 @@ class Signals(QObject):
 
 
 class Model:
-    def __init__(self, entry):
+    def __init__(self, entry: Entry):
         self.signals = Signals()
         self.entry = entry
 
