@@ -2984,8 +2984,11 @@ def test_UI_GIVEN_invalid_chopper_definition_WHEN_creating_component_with_no_sha
 ):
 
     enter_disk_chopper_fields(qtbot, add_component_dialog, template)
+
+    # Remove the first field so the chopper information is incomplete
     add_component_dialog.fieldsListWidget.setCurrentRow(0)
     systematic_button_press(qtbot, template, add_component_dialog.removeFieldPushButton)
+
     add_component_dialog.on_ok()
 
     with patch(CHOPPER_GEOMETRY_CREATOR_PATH) as chopper_creator:
