@@ -16,6 +16,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     FLOAT_TYPES,
     _incorrect_data_type_message,
     _units_are_valid,
+    UNITS_REQUIRED,
 )
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from tests.chopper_test_helpers import (  # noqa: F401
@@ -433,10 +434,48 @@ def test_GIVEN_failed_conversion_WHEN_validating_chopper_THEN_data_can_be_conver
     assert not chopper_checker._data_can_be_converted()
 
 
-@pytest.mark.parametrize("field", [RADIUS_NAME, SLIT_HEIGHT_NAME, SLIT_EDGES_NAME])
-def test_GIVEN_units_aren_recognised_by_pint_WHEN_validating_units_THEN_units_are_valid_returns_false(
+@pytest.mark.parametrize("field", UNITS_REQUIRED)
+def test_GIVEN_units_arent_recognised_by_pint_WHEN_validating_units_THEN_units_are_valid_returns_false(
     units_dict_mocks, field
 ):
 
     units_dict_mocks[field] = "12345"
     assert not _units_are_valid(units_dict_mocks)
+
+
+@pytest.mark.parametrize("field", UNITS_REQUIRED)
+def test_GIVEN_units_have_wrong_dimensionality_WHEN_validating_units_THEN_units_are_valid_returns_false(
+    units_dict_mocks, field
+):
+
+    units_dict_mocks[field] = "nanoseconds"
+    assert not _units_are_valid(units_dict_mocks)
+
+
+@pytest.mark.parametrize("field", UNITS_REQUIRED)
+def test_GIVEN_units_have_wrong_magnitude_WHEN_validating_units_THEN_units_are_valid_returns_false(
+    units_dict_mocks, field
+):
+
+    units_dict_mocks[field] = "2 " + units_dict_mocks[field]
+    assert not _units_are_valid(units_dict_mocks)
+
+
+@pytest.mark.parametrize(
+    "field", [SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME, SLIT_EDGES_NAME]
+)
+def test_GIVEN_fields_have_wrong_type_WHEN_validating_fields_THEN_data_has_correct_type_returns_false(
+    chopper_checker, field
+):
+
+    chopper_checker.fields_dict[field].dtype = "String"
+    assert not chopper_checker._data_has_correct_type()
+
+
+@pytest.mark.parametrize("field", UNITS_REQUIRED)
+def test_GIVEN_missing_units_WHEN_validating_chopper_THEN_required_fields_present_returns_false(
+    chopper_checker, field
+):
+
+    chopper_checker.fields_dict[field].units = ""
+    assert not chopper_checker.required_fields_present()
