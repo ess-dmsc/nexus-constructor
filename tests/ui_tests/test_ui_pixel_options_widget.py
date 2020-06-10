@@ -611,7 +611,10 @@ def test_GIVEN_pixel_grid_with_single_column_WHEN_finding_column_properties_THEN
 
 
 @pytest.mark.xfail(
-    reason="The function for recovering Pixel Grid information expects an array with more than one column/row. A single row of pixels isn't handled yet."
+    reason=(
+        "The function for recovering Pixel Grid information expects an array with more"
+        " than one column/row. A single row of pixels isn't handled yet."
+    )
 )
 def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_is_returned(
     pixel_options, pixel_grid
@@ -627,7 +630,10 @@ def test_GIVEN_row_of_pixels_WHEN_calling_get_detector_number_information_THEN_e
 
 
 @pytest.mark.xfail(
-    reason="The function for recovering Pixel Grid information expects an array with more than one column/row. A single column of pixels isn't handled yet."
+    reason=(
+        "The function for recovering Pixel Grid information expects an array with more"
+        " than one column/row. A single column of pixels isn't handled yet."
+    )
 )
 def test_GIVEN_column_of_pixels_WHEN_calling_get_detector_number_information_THEN_expected_start_counting_is_returned(
     pixel_options, pixel_grid
@@ -809,3 +815,20 @@ def test_GIVEN_call_to_create_pixel_mapping_widgets_WHEN_editing_a_component_THE
     assert len(pixel_options.pixel_mapping_widgets) == new_value
 
     assert widget_1 is not widget_2
+
+
+def test_GIVEN_pixel_grid_information_WHEN_creating_pixel_grid_THEN_calling_generate_pixel_data_returns_grid_that_matches_user_input(
+    qtbot, template, pixel_options
+):
+
+    systematic_button_press(qtbot, template, pixel_options.single_pixel_radio_button)
+
+    pixel_grid = pixel_options.generate_pixel_data()
+
+    assert pixel_grid.rows == 1
+    assert pixel_grid.columns == 1
+    assert pixel_grid.row_height == 0.5
+    assert pixel_grid.col_width == 0.5
+    assert pixel_grid.first_id == 0
+    assert pixel_grid.initial_count_corner == INITIAL_COUNT_CORNER["Bottom Left"]
+    assert pixel_grid.count_direction == COUNT_DIRECTION["Rows"]
