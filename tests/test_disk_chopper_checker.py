@@ -439,7 +439,7 @@ def test_GIVEN_units_arent_recognised_by_pint_WHEN_validating_units_THEN_units_a
     units_dict_mocks, field
 ):
 
-    units_dict_mocks[field] = "12345"
+    units_dict_mocks[field] = "burger"
     assert not _units_are_valid(units_dict_mocks)
 
 
@@ -479,3 +479,27 @@ def test_GIVEN_missing_units_WHEN_validating_chopper_THEN_required_fields_presen
 
     chopper_checker.fields_dict[field].units = ""
     assert not chopper_checker.required_fields_present()
+
+
+def test_GIVEN_qlistwidget_WHEN_initialising_chopper_checker_THEN_fields_dict_contents_matches_widgets(
+    chopper_checker,
+    mock_slits_widget,
+    mock_radius_widget,
+    mock_slit_height_widget,
+    mock_slit_edges_widget,
+):
+    assert chopper_checker.fields_dict[SLITS_NAME] == mock_slits_widget
+    assert chopper_checker.fields_dict[RADIUS_NAME] == mock_radius_widget
+    assert chopper_checker.fields_dict[SLIT_HEIGHT_NAME] == mock_slit_height_widget
+    assert chopper_checker.fields_dict[SLIT_EDGES_NAME] == mock_slit_edges_widget
+
+
+def test_GIVEN_units_input_WHEN_checking_required_fields_are_present_THEN_units_dict_contents_matches_widgets(
+    chopper_checker, mock_radius_widget, mock_slit_height_widget, mock_slit_edges_widget
+):
+
+    chopper_checker.required_fields_present()
+
+    assert chopper_checker.units_dict[RADIUS_NAME] == mock_radius_widget.units
+    assert chopper_checker.units_dict[SLIT_HEIGHT_NAME] == mock_slit_height_widget.units
+    assert chopper_checker.units_dict[SLIT_EDGES_NAME] == mock_slit_edges_widget.units
