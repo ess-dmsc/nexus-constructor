@@ -157,9 +157,12 @@ def test_UI_GIVEN_data_is_entered_WHEN_data_index_is_invalid_THEN_set_data_retur
     selection_index = array_dataset_table_widget.model.index(5, 5)
     assert not array_dataset_table_widget.model.setData(selection_index, 3, Qt.EditRole)
 
-def test_UI_GIVEN_data_is_single_column_WHEN_adding_row_THEN_data_is_resized_in_order_to_add_row(array_dataset_table_widget):
+
+def test_UI_GIVEN_data_is_single_column_WHEN_adding_row_THEN_data_is_resized_in_order_to_add_row(
+    array_dataset_table_widget,
+):
 
     array = np.arange(10)
     array_dataset_table_widget.model.array = array
     array_dataset_table_widget.model.add_row()
-    assert array_dataset_table_widget.model.array.shape == (11,1)
+    assert array_dataset_table_widget.model.array.shape == (11, 1)
