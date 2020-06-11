@@ -16,6 +16,7 @@ from nexus_constructor.treeview_utils import (
     set_button_states,
 )
 from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.model.model import Model
 
 
 class ComponentTreeViewTab(QWidget):
@@ -95,10 +96,10 @@ class ComponentTreeViewTab(QWidget):
         self.component_tool_bar.insertSeparator(self.zoom_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
-    def set_up_model(self, instrument):
-        self.component_model = ComponentTreeModel(instrument)
+    def set_up_model(self, model: Model):
+        self.component_model = ComponentTreeModel(model)
         self.component_delegate = ComponentEditorDelegate(
-            self.component_tree_view, instrument
+            self.component_tree_view, model
         )
         self.component_tree_view.setItemDelegate(self.component_delegate)
         self.component_tree_view.setModel(self.component_model)

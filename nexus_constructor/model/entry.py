@@ -1,41 +1,5 @@
-from PySide2.QtCore import QObject, Signal
-
-from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
-
-
-def _convert_name_with_spaces(component_name: str) -> str:
-    return component_name.replace(" ", "_")
-
-
-class Nexus(QObject):
-    """
-    Used for storing the signals for updating the "file" - currently just needed to avoid changing the interface of Instrument
-    """
-
-    file_changed = Signal("QVariant")
-    file_opened = Signal("QVariant")
-    component_added = Signal(str, "QVariant", "QVariant")
-    component_removed = Signal(str)
-    transformation_changed = Signal()
-    show_entries_dialog = Signal("QVariant", "QVariant")
-
-
-class Instrument(Group):
-    def __init__(self):
-        super().__init__("instrument")
-        self.nx_class = "NXinstrument"
-        self.nexus = Nexus()
-
-        sample = Component("sample")
-        sample.nx_class = "NXsample"
-        self.component_list = [sample]
-
-    def get_component_list(self):
-        return self.component_list
-
-    def remove_component(self, component: Component):
-        self.component_list.remove(component)
+from nexus_constructor.model.instrument import Instrument
 
 
 class Entry(Group):

@@ -14,7 +14,7 @@ from PySide2.QtWidgets import (
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.treeview_utils import (
     get_link_transformation_frame,
@@ -29,9 +29,9 @@ from nexus_constructor.treeview_utils import (
 class ComponentEditorDelegate(QStyledItemDelegate):
     frameSize = QSize(30, 10)
 
-    def __init__(self, parent: QObject, instrument: Instrument):
+    def __init__(self, parent: QObject, model: Model):
         super().__init__(parent)
-        self.instrument = instrument
+        self.model = model
 
     def get_frame(
         self,
@@ -59,9 +59,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         elif isinstance(value, ComponentInfo):
             get_component_info_frame(frame)
         elif isinstance(value, Transformation):
-            get_transformation_frame(frame, self.instrument, value)
+            get_transformation_frame(frame, self.model, value)
         elif isinstance(value, LinkTransformation):
-            get_link_transformation_frame(frame, self.instrument, value)
+            get_link_transformation_frame(frame, self.model, value)
         return frame
 
     def paint(

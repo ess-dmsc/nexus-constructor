@@ -24,7 +24,8 @@ from nexus_constructor.model.component import (
     add_fields_to_component,
     SHAPE_GROUP_NAME,
 )
-from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.model import Model
 from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     CylindricalGeometry,
@@ -68,7 +69,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def __init__(
         self,
-        instrument: Instrument,
+        model: Model,
         component_model: ComponentTreeModel,
         component_to_edit: Component = None,
         nx_classes=None,
@@ -79,7 +80,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             nx_classes = {}
         if parent:
             self.setParent(parent)
-        self.instrument = instrument
+        self.signals = model.signals
+        self.instrument = model.entry.instrument
         self.component_model = component_model
         self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
 
@@ -438,9 +440,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 component_name, description, nx_class, pixel_data
             )
 
-        self.instrument.nexus.component_added.emit(
-            self.nameLineEdit.text(), shape, positions
-        )
+        self.signals.component_added.emit(self.nameLineEdit.text(), shape, positions)
 
     def create_new_component(
         self,
