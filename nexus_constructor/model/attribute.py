@@ -1,5 +1,6 @@
 import attr
 import numpy as np
+from typing import Dict, Any
 from nexus_constructor.model.value_type import ValueType
 
 
@@ -20,3 +21,7 @@ class FieldAttribute:
         if np.isscalar(self.values):
             return self.values == other_attribute.values
         return self.values.all(other_attribute)
+
+    @staticmethod
+    def as_dict() -> Dict[str, Any]:
+        return {}

@@ -1,6 +1,5 @@
 import logging
-from typing import Tuple, Union, List
-
+from typing import Tuple, Union, List, Dict, Any, Optional
 import attr
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
@@ -15,6 +14,7 @@ from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
     NoShapeGeometry,
+    OFFGeometry,
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
@@ -31,6 +31,8 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
 )
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.ui_utils import show_warning_dialog
+
+TRANSFORMS_GROUP_NAME = "transformations"
 
 
 def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
@@ -260,7 +262,11 @@ class Component(Group):
                 del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
-        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None
+        self,
+        loaded_geometry: OFFGeometry,
+        units: str = "",
+        filename: str = "",
+        pixel_data=None,
     ) -> OFFGeometryNexus:
         self.remove_shape()
 
@@ -345,7 +351,9 @@ class Component(Group):
             "int64",
         )
 
-    def _create_transformation_vectors_for_pixel_offsets(self) -> List[QVector3D]:
+    def _create_transformation_vectors_for_pixel_offsets(
+        self,
+    ) -> Optional[List[QVector3D]]:
         """
         Construct a transformation (as a QVector3D) for each pixel offset
         """
@@ -368,6 +376,18 @@ class Component(Group):
                 x_offsets.flatten(), y_offsets.flatten(), z_offsets.flatten()
             )
         ]
+
+    def as_dict(self) -> Dict[str, Any]:
+        dictionary = super(Component, self).as_dict()
+        # Add transformations in a child group
+        dictionary["children"].append(
+            {
+                "type": "group",
+                "name": TRANSFORMS_GROUP_NAME,
+                "children": [transform.as_dict() for transform in self.transforms_list],
+            }
+        )
+        return dictionary
 
 
 def add_fields_to_component(component: Component, fields_widget: QListWidget):
