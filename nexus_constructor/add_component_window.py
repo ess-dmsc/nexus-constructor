@@ -441,6 +441,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.signals.component_added.emit(self.nameLineEdit.text(), shape, positions)
 
+        if self.component_to_edit:
+            self.signals.transformation_changed.emit()
+
     def create_new_component(
         self,
         component_name: str,
