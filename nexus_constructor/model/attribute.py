@@ -1,5 +1,5 @@
 import attr
-
+from typing import Dict, Any
 from nexus_constructor.model.value_type import ValueType
 
 
@@ -14,3 +14,7 @@ class FieldAttribute:
 
     name = attr.ib(type=str)
     values = attr.ib(type=ValueType)
+
+    @staticmethod
+    def as_dict() -> Dict[str, Any]:
+        return {}

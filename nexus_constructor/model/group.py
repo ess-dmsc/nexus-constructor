@@ -1,5 +1,4 @@
-from typing import List, Any, Union
-
+from typing import List, Any, Union, Dict
 import attr
 import numpy as np
 
@@ -50,3 +49,11 @@ class Group(Node):
 
     def get_field_value(self, name: str):
         return self[name].values
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "type": self.type,
+            "attributes": [attribute.as_dict() for attribute in self.attributes],
+            "children": [child.as_dict() for child in self.children],
+        }
