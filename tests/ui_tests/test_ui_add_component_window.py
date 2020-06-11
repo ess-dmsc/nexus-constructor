@@ -22,7 +22,9 @@ from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.model.entry import Instrument, Entry
+from nexus_constructor.model.entry import Entry
+from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.model import Model
 from nexus_constructor.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.link import Link
@@ -64,8 +66,10 @@ PIXEL_GRID_FIELDS = [
 
 COMPONENT_CLASS_PATH = "nexus_constructor.add_component_window.Component"
 
-instrument = Instrument()
-component = ComponentTreeModel(instrument)
+entry = Entry()
+entry.instrument = Instrument()
+model = Model(entry)
+component = ComponentTreeModel(model)
 
 PIXEL_OPTIONS = dict()
 NO_PIXEL_OPTIONS = dict()
@@ -74,7 +78,7 @@ ALL_COMPONENT_TYPES = dict()
 for i, component_class in enumerate(
     list(
         AddComponentDialog(
-            instrument, component, nx_classes=NX_CLASS_DEFINITIONS
+            model, component, nx_classes=NX_CLASS_DEFINITIONS
         ).nx_component_classes.keys()
     )
 ):
@@ -120,10 +124,10 @@ def instrument():
 
 
 @pytest.fixture(scope="function")
-def add_component_dialog(qtbot, template, instrument, mock_pixel_options):
+def add_component_dialog(qtbot, template, model, mock_pixel_options):
 
     dialog = AddComponentDialog(
-        instrument, ComponentTreeModel(instrument), nx_classes=NX_CLASS_DEFINITIONS
+        model, ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS
     )
     template.ui = dialog
     template.ui.setupUi(template, mock_pixel_options)
@@ -144,14 +148,14 @@ def component_with_cylindrical_geometry():
 def edit_component_dialog(
     qtbot,
     template,
-    instrument,
+    model,
     component_with_cylindrical_geometry,
     mock_pixel_options,
     parent_mock,
 ):
-    component_tree = ComponentTreeModel(instrument)
+    component_tree = ComponentTreeModel(model)
     dialog = AddComponentDialog(
-        instrument,
+        model,
         component_tree,
         component_with_cylindrical_geometry,
         nx_classes=NX_CLASS_DEFINITIONS,
@@ -1652,11 +1656,9 @@ def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 
 
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
-    qtbot,
+    qtbot, model,
 ):
-    instrument = Instrument()
-
-    component_model = ComponentTreeModel(instrument)
+    component_model = ComponentTreeModel(model)
 
     name = "test"
     nx_class = "NXmonitor"
@@ -1673,7 +1675,7 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument,
+                model,
                 component_model,
                 component_to_edit=component,
                 nx_classes=NX_CLASS_DEFINITIONS,
@@ -1693,7 +1695,7 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
 def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_radio_is_checked(
     qtbot,
 ):
-    component, instrument, model = create_group_with_component(
+    component, instrument, treeview_model = create_group_with_component(
         "test", "test_component_editing_no_shape"
     )
 
@@ -1705,7 +1707,7 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
                 instrument,
-                model,
+                treeview_model,
                 component_to_edit=component,
                 nx_classes=NX_CLASS_DEFINITIONS,
                 parent=None,
@@ -1719,10 +1721,9 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
 
 
 def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
-    qtbot,
+    qtbot, model,
 ):
-    instrument = Instrument()
-    component_model = ComponentTreeModel(instrument)
+    component_model = ComponentTreeModel(model)
 
     component_name = "test"
     component = Component(component_name)
@@ -1737,7 +1738,7 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                instrument,
+                model,
                 component_model,
                 component_to_edit=component,
                 nx_classes=NX_CLASS_DEFINITIONS,
@@ -1756,7 +1757,7 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
     qtbot,
 ):
 
-    component, instrument, model = create_group_with_component(
+    component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_scalar_field"
     )
 
@@ -1765,7 +1766,10 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
     component.set_field_value(field_name, field_value, dtype="String")
 
     dialog = AddComponentDialog(
-        instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
+        model,
+        treeview_model,
+        component_to_edit=component,
+        nx_classes=NX_CLASS_DEFINITIONS,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
@@ -1785,17 +1789,19 @@ def create_group_with_component(component_name: str, file_name: str):
     """
     Convenience method, for when we don't really care about the component and just want one to be added to a file
     """
-    instrument = Instrument()
-    model = ComponentTreeModel(instrument)
+    entry = Entry()
+    entry.instrument = Instrument()
+    model = Model(entry)
+    treeview_model = ComponentTreeModel(model)
     component = Component(component_name)
     component.nx_class = "NXdisk_chopper"
-    return component, instrument, model
+    return component, model, treeview_model
 
 
 def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
     qtbot,
 ):
-    component, instrument, model = create_group_with_component(
+    component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_array_field"
     )
 
@@ -1803,7 +1809,10 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
     field_value = np.array([1, 2, 3, 4, 5])
     component.set_field_value(field_name, field_value)
     dialog = AddComponentDialog(
-        instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
+        model,
+        treeview_model,
+        component_to_edit=component,
+        nx_classes=NX_CLASS_DEFINITIONS,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
@@ -1821,7 +1830,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
 def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_target(
     qtbot,
 ):
-    component, instrument, model = create_group_with_component(
+    component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_link_field"
     )
 
@@ -1833,7 +1842,10 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
     component[link_name] = link
 
     dialog = AddComponentDialog(
-        instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
+        model,
+        treeview_model,
+        component_to_edit=component,
+        nx_classes=NX_CLASS_DEFINITIONS,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
@@ -1850,7 +1862,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
 def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
     qtbot,
 ):
-    component, instrument, model = create_group_with_component(
+    component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_multiple_fields"
     )
 
@@ -1863,7 +1875,10 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     component.set_field_value(field_name2, field_value2)
 
     dialog = AddComponentDialog(
-        instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
+        model,
+        treeview_model,
+        component_to_edit=component,
+        nx_classes=NX_CLASS_DEFINITIONS,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
@@ -1885,7 +1900,7 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
 def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
     qtbot,
 ):
-    component, instrument, model = create_group_with_component(
+    component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_f142_stream_field"
     )
 
@@ -1904,7 +1919,10 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
     component[field_name1] = stream_group
 
     dialog = AddComponentDialog(
-        instrument, model, component_to_edit=component, nx_classes=NX_CLASS_DEFINITIONS
+        model,
+        treeview_model,
+        component_to_edit=component,
+        nx_classes=NX_CLASS_DEFINITIONS,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     template = QDialog()
@@ -1926,10 +1944,9 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
-    qtbot,
+    qtbot, model,
 ):
-    instrument = Instrument()
-    component_model = ComponentTreeModel(instrument)
+    component_model = ComponentTreeModel(model)
 
     component_name = "test"
 
@@ -1950,7 +1967,7 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
     )
 
     dialog = AddComponentDialog(
-        instrument,
+        model,
         component_model,
         component_to_edit=component,
         nx_classes=NX_CLASS_DEFINITIONS,
@@ -1967,10 +1984,9 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data_is_in_line_edits(
-    qtbot,
+    qtbot, model,
 ):
-    instrument = Instrument()
-    component_model = ComponentTreeModel(instrument)
+    component_model = ComponentTreeModel(model)
 
     component_name = "test"
     units = "m"
@@ -1992,7 +2008,7 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data
     )
 
     dialog = AddComponentDialog(
-        instrument,
+        model,
         component_model,
         component_to_edit=component,
         nx_classes=NX_CLASS_DEFINITIONS,

@@ -13,7 +13,7 @@ from nexus_constructor.component.component_type import (
 )
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.entry import Instrument, Entry
-
+from nexus_constructor.model.model import Model
 import os
 import argparse
 
@@ -37,7 +37,8 @@ if __name__ == "__main__":
     instrument = Instrument()
     entry = Entry()
     entry.instrument = instrument
-    ui = MainWindow(instrument, nx_component_classes)
+    model = Model(entry)
+    ui = MainWindow(model, nx_component_classes)
     ui.setupUi(window)
     window.showMaximized()
     sys.exit(app.exec_())

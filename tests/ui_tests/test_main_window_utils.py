@@ -6,6 +6,7 @@ from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QFrame, QVBoxLayout
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.model.dataset import DatasetMetadata
+from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.treeview_utils import (
@@ -44,14 +45,14 @@ def trigger_method_mock():
 
 
 @pytest.fixture(scope="function")
-def component_model(instrument):
-    return ComponentTreeModel(instrument)
+def component_model(model: Model):
+    return ComponentTreeModel(model)
 
 
 @pytest.fixture(scope="function")
-def component_tree_view(template, instrument, component_model, qtbot):
+def component_tree_view(template, model, component_model, qtbot):
     component_tree_view = QTreeView(template)
-    component_delegate = ComponentEditorDelegate(component_tree_view, instrument)
+    component_delegate = ComponentEditorDelegate(component_tree_view, model)
     component_tree_view.setItemDelegate(component_delegate)
     component_tree_view.setModel(component_model)
     qtbot.addWidget(component_tree_view)

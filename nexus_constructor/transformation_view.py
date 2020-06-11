@@ -4,7 +4,7 @@ from PySide2.QtWidgets import QGroupBox, QFrame, QWidget
 from nexus_constructor.component_tree_model import LinkTransformation
 from nexus_constructor.field_utils import find_field_type
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.unit_utils import METRES, RADIANS
@@ -13,11 +13,9 @@ from ui.transformation import Ui_Transformation
 
 
 class EditTransformation(QGroupBox):
-    def __init__(
-        self, parent: QWidget, transformation: Transformation, instrument: Instrument
-    ):
+    def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
         super().__init__(parent)
-        self.instrument = instrument
+        self.model = model
         self.transformation_frame = Ui_Transformation()
         self.transformation_frame.setupUi(self)
         self.transformation = transformation
@@ -81,14 +79,12 @@ class EditTransformation(QGroupBox):
             *[spinbox.value() for spinbox in self.transformation_frame.spinboxes[:-1]]
         )
         self.transformation.units = self.transformation_frame.magnitude_widget.units
-        self.instrument.nexus.transformation_changed.emit()
+        self.model.signals.transformation_changed.emit()
 
 
 class EditTranslation(EditTransformation):
-    def __init__(
-        self, parent: QWidget, transformation: Transformation, instrument: Instrument
-    ):
-        super().__init__(parent, transformation, instrument)
+    def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
+        super().__init__(parent, transformation, model)
         self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
             METRES
         )
@@ -98,10 +94,8 @@ class EditTranslation(EditTransformation):
 
 
 class EditRotation(EditTransformation):
-    def __init__(
-        self, parent: QWidget, transformation: Transformation, instrument: Instrument
-    ):
-        super().__init__(parent, transformation, instrument)
+    def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
+        super().__init__(parent, transformation, model)
         self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
             RADIANS
         )
@@ -123,12 +117,11 @@ def links_back_to_component(reference: Component, comparison: Component):
 
 
 class EditTransformationLink(QFrame):
-    def __init__(
-        self, parent: QWidget, link: LinkTransformation, instrument: Instrument
-    ):
+    def __init__(self, parent: QWidget, link: LinkTransformation, model: Model):
         super().__init__(parent)
         self.link = link
-        self.instrument = instrument
+        self.signals = model.signals
+        self.instrument = model.entry.instrument
         self.link_frame = Ui_Link()
         self.link_frame.setupUi(self)
         self.populate_combo_box()
@@ -179,4 +172,4 @@ class EditTransformationLink(QFrame):
         self.populate_combo_box()
 
     def saveChanges(self):
-        self.instrument.nexus.transformation_changed.emit()
+        self.signals.transformation_changed.emit()

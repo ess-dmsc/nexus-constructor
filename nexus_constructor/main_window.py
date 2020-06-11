@@ -1,5 +1,6 @@
 import uuid
 from typing import Dict
+import json
 
 import h5py
 import silx.gui.hdf5
@@ -10,8 +11,8 @@ from nexusutils.nexusbuilder import NexusBuilder
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.entry import Instrument
 from nexus_constructor.ui_utils import file_dialog
+from nexus_constructor.model.model import Model
 from ui.main_window import Ui_MainWindow
 
 
@@ -20,9 +21,9 @@ JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
-    def __init__(self, instrument: Instrument, nx_classes: Dict):
+    def __init__(self, model: Model, nx_classes: Dict):
         super().__init__()
-        self.instrument = instrument
+        self.model = model
         self.nx_classes = nx_classes
 
     def setupUi(self, main_window):
@@ -49,19 +50,15 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         # self.treemodel.setDatasetDragEnabled(True)
         # self.treemodel.setFileDropEnabled(True)
         # self.treemodel.setFileMoveEnabled(True)
-        # self.treemodel.insertH5pyObject(self.instrument.nexus.nexus_file)
-        self.instrument.nexus.file_changed.connect(
-            self.update_nexus_file_structure_view
-        )
+        # self.treemodel.insertH5pyObject(self.model.signals.nexus_file)
+        self.model.signals.file_changed.connect(self.update_nexus_file_structure_view)
         self.silx_tab_layout.addWidget(self.widget)
-        # self.instrument.nexus.show_entries_dialog.connect(self.show_entries_dialog)
+        # self.model.signals.show_entries_dialog.connect(self.show_entries_dialog)
 
-        self.instrument.nexus.component_added.connect(self.sceneWidget.add_component)
-        self.instrument.nexus.component_removed.connect(
-            self.sceneWidget.delete_component
-        )
-        self.component_tree_view_tab.set_up_model(self.instrument)
-        self.instrument.nexus.transformation_changed.connect(
+        self.model.signals.component_added.connect(self.sceneWidget.add_component)
+        self.model.signals.component_removed.connect(self.sceneWidget.delete_component)
+        self.component_tree_view_tab.set_up_model(self.model)
+        self.model.signals.transformation_changed.connect(
             self._update_transformations_3d_view
         )
 
@@ -89,7 +86,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
 
             self.file_writer_ctrl_window = FileWriterCtrl(
-                self.instrument, QSettings("ess", "nexus-constructor")
+                self.model, QSettings("ess", "nexus-constructor")
             )
             self.file_writer_ctrl_window.show()
 
@@ -120,12 +117,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         ok_button.clicked.connect(self.entries_dialog.close)
 
         def _load_current_entry():
-            self.instrument.nexus.load_file(
+            self.model.signals.load_file(
                 map_of_entries[combo.currentText()], nexus_file
             )
             self._update_views()
 
-        # Connect the clicked signal of the ok_button to instrument.load_file and pass the file and entry group object.
+        # Connect the clicked signal of the ok_button to signals.load_file and pass the file and entry group object.
         ok_button.clicked.connect(_load_current_entry)
 
         self.entries_dialog.setLayout(QGridLayout())
@@ -141,7 +138,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
-        self.instrument.nexus.save_file(filename)
+        self.model.signals.save_file(filename)
 
     def open_idf_file(self):
         filename = file_dialog(False, "Open IDF file", {"IDF files": ["xml"]})
@@ -156,7 +153,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 nx_entry_name="entry",
             )
             builder.add_instrument_geometry_from_idf()
-            self.instrument.nexus.load_nexus_file(builder.target_file)
+            self.model.signals.load_nexus_file(builder.target_file)
             self._update_views()
             QMessageBox.warning(
                 self,
@@ -167,13 +164,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             QMessageBox.critical(self, "IDF Error", "Error whilst loading IDF file")
 
     def save_to_filewriter_json(self):
-        raise NotImplementedError
-        # filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
-        # if filename:
-        #     with open(filename, "w") as file:
-        #         filewriter_json_writer.write_nexus_structure_to_json(
-        #             self.instrument, file
-        #         )
+        filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
+
+        if filename:
+            with open(filename, "w") as file:
+                json.dump(self.model.as_dict(), file, indent=2)
 
     def save_to_forwarder_json(self):
         raise NotImplementedError
@@ -198,7 +193,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         #         with open(filename, "w") as file:
         #             nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
         #                 file,
-        #                 self.instrument.nexus.entry,
+        #                 self.model.signals.entry,
         #                 provider_type=provider_type,
         #                 default_broker=default_broker,
         #             )
@@ -206,8 +201,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def open_nexus_file(self):
         raise NotImplementedError
         # filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
-        # existing_file = self.instrument.nexus.nexus_file
-        # if self.instrument.nexus.open_file(filename):
+        # existing_file = self.model.signals.nexus_file
+        # if self.model.signals.open_file(filename):
         #     self._update_views()
         #     existing_file.close()
 
@@ -229,24 +224,24 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         #             )
         #             return
         #
-        #         existing_file = self.instrument.nexus.nexus_file
-        #         if self.instrument.nexus.load_nexus_file(nexus_file):
+        #         existing_file = self.model.signals.nexus_file
+        #         if self.model.signals.load_nexus_file(nexus_file):
         #             self._update_views()
         #             existing_file.close()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
-        for component in self.instrument.get_component_list():
+        for component in self.model.entry.instrument.get_component_list():
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def _update_views(self):
         self.sceneWidget.clear_all_transformations()
         self.sceneWidget.clear_all_components()
-        self.component_tree_view_tab.set_up_model(self.instrument)
+        self.component_tree_view_tab.set_up_model(self.model)
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
-        for component in self.instrument.get_component_list():
+        for component in self.model.entry.instrument.get_component_list():
             shape, positions = component.shape
             self.sceneWidget.add_component(component.name, shape, positions)
             self.sceneWidget.add_transformation(component.name, component.qtransform)
@@ -254,7 +249,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()
         self.add_component_window.ui = AddComponentDialog(
-            self.instrument,
+            self.model,
             self.component_tree_view_tab.component_model,
             component,
             nx_classes=self.nx_classes,
