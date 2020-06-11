@@ -59,7 +59,7 @@ class OFFGeometry(ABC):
         pass
 
 
-class OFFGeometryNoNexus(OFFGeometry, Group):
+class OFFGeometryNoNexus(OFFGeometry):
     """
     3D mesh description of the shape of an object, based on the OFF file format.
     This class does not store its data in the NeXus file, used for placeholder shape
@@ -77,7 +77,7 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
         :param faces: list of integer lists. Each sublist is a winding path around the corners of a polygon.
             Each sublist item is an index into the vertices list to identify a specific point in 3D space
         """
-        super().__init__(name)
+        self.name = name
         self._vertices = vertices
         self._faces = faces
 

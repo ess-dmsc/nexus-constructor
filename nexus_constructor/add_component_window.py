@@ -24,7 +24,6 @@ from nexus_constructor.model.component import (
     add_fields_to_component,
     SHAPE_GROUP_NAME,
 )
-from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
@@ -51,7 +50,7 @@ from ui.add_component import Ui_AddComponentDialog
 def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget):
     """
     Attempts to set a chopper geometry in the component by checking if the component fields describe a valid chopper.
-    :param Component: The component to be given a shape.
+    :param component: The component to be given a shape.
     :param fields_list_widget: The fields list widget that contains the user input.
     """
     chopper_validator = ChopperChecker(fields_list_widget)
