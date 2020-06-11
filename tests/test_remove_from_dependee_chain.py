@@ -54,7 +54,7 @@ def test_remove_from_beginning_3():
     assert component2 in rot2.dependents
     assert component1 in rot2.dependents
     assert component1.depends_on == rot2
-    assert component1.transforms.link.linked_component.name == component2.name
+    assert component1.transforms.link.linked_component == component2
 
 
 def test_remove_from_middle():
@@ -73,11 +73,12 @@ def test_remove_from_middle():
     component1.depends_on = rot1
     component2.depends_on = rot2
     component3.depends_on = rot3
+
     component1.transforms.link.linked_component = component2
     component2.transforms.link.linked_component = component3
     rot2.remove_from_dependee_chain()
     assert rot1.depends_on.name == rot3.name
-    assert component1.transforms.link.linked_component.name == component3.name
+    assert component1.transforms.link.linked_component == component3
     assert rot1 in rot3.dependents
     assert component3 in rot3.dependents
 

@@ -30,7 +30,7 @@ class LinkTransformation:
         if not self.parent.has_link:
             return None
         if self._has_direct_component_link():
-            return self.parent.parent_component.depends_on
+            return self.parent.parent_component.depends_on._parent_component
         return self._find_linked_component()
 
     @linked_component.setter
