@@ -14,4 +14,4 @@ git+https://github.com/ess-dmsc/python-streaming-data-types
 
 
 # PySide2 has had some issues with new versions and packaging so we will pin it
-PySide2==5.14.2.1
+PySide2==5.15.0
