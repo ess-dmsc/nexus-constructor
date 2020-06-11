@@ -399,4 +399,4 @@ class DiskChopperGeometryCreator:
         # Add the point information to the string
         vertices = [point.point_to_qvector3d() for point in self.points]
 
-        return OFFGeometryNoNexus(vertices, self.faces)
+        return OFFGeometryNoNexus(vertices, self.faces, "shape")

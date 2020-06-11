@@ -14,6 +14,7 @@ from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     OFFGeometryNexus,
     NoShapeGeometry,
+    OFFGeometry,
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.node import _generate_incremental_name
@@ -231,7 +232,11 @@ class Component(Group):
                 del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
-        self, loaded_geometry, units: str = "", filename: str = "", pixel_data=None
+        self,
+        loaded_geometry: OFFGeometry,
+        units: str = "",
+        filename: str = "",
+        pixel_data=None,
     ):
         self.remove_shape()
 

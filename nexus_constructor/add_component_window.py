@@ -1,17 +1,29 @@
+import logging
 from collections import OrderedDict
 from functools import partial
 
 from PySide2.QtCore import QUrl, Signal, QObject
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QListWidgetItem
+from PySide2.QtWidgets import QListWidgetItem, QListWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component_type import PIXEL_COMPONENT_TYPES
+from nexus_constructor.component.component_type import (
+    PIXEL_COMPONENT_TYPES,
+    CHOPPER_CLASS_NAME,
+)
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.field_widget import FieldWidget
+from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import ChopperChecker
+from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
+    DiskChopperGeometryCreator,
+)
 from nexus_constructor.geometry.geometry_loader import load_geometry
-from nexus_constructor.model.component import Component, add_fields_to_component
+from nexus_constructor.model.component import (
+    Component,
+    add_fields_to_component,
+    SHAPE_GROUP_NAME,
+)
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
@@ -33,6 +45,22 @@ from nexus_constructor.validators import (
     OkValidator,
 )
 from ui.add_component import Ui_AddComponentDialog
+
+
+def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget):
+    """
+    Attempts to set a chopper geometry in the component by checking if the component fields describe a valid chopper.
+    :param component: The component to be given a shape.
+    :param fields_list_widget: The fields list widget that contains the user input.
+    """
+    chopper_validator = ChopperChecker(fields_list_widget)
+
+    if chopper_validator.validate_chopper():
+        chopper_details = chopper_validator.chopper_details
+        chopper_creator = DiskChopperGeometryCreator(chopper_details)
+        component[SHAPE_GROUP_NAME] = chopper_creator.create_disk_chopper_geometry()
+    else:
+        logging.warning("Validation failed. Unable to create disk chopper mesh.")
 
 
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
@@ -371,6 +399,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 filename=self.fileLineEdit.text(),
                 pixel_data=pixel_data,
             )
+        elif (
+            self.noShapeRadioButton.isChecked()
+            and component.nx_class == CHOPPER_CLASS_NAME
+        ):
+            _set_chopper_geometry(component, self.fieldsListWidget)
 
     def get_pixel_visibility_condition(self) -> bool:
         """
