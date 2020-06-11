@@ -17,7 +17,7 @@ from nexus_constructor.json.filewriter_json_writer import (
 from nexus_constructor.kafka.command_producer import CommandProducer
 from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.kafka.status_consumer import StatusConsumer
-from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
@@ -56,10 +56,10 @@ def extract_bool_from_qsettings(setting: Union[str, bool]):
 
 
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
-    def __init__(self, instrument: Instrument, settings: QSettings):
+    def __init__(self, model: Model, settings: QSettings):
         super().__init__()
         self.settings = settings
-        self.instrument = instrument
+        self.model = model
         self.setupUi()
         self.known_writers = {}
         self.known_files = {}
@@ -298,7 +298,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                         stop_time=stop_time,
                         broker=broker,
                         nexus_structure=generate_nexus_string(
-                            NexusToDictConverter(), self.instrument
+                            NexusToDictConverter(), self.model
                         ),
                         service_id=service_id,
                     )

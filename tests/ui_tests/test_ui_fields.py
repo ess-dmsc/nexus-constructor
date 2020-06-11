@@ -18,14 +18,14 @@ from nexus_constructor.stream_fields_widget import (
 
 
 @pytest.fixture
-def stream_fields_widget(qtbot, instrument, template):
+def stream_fields_widget(qtbot, model, template):
     class DummyField:
         @property
         def name(self):
             return "test"
 
     add_component_dialog = AddComponentDialog(
-        instrument, ComponentTreeModel(instrument), nx_classes=NX_CLASS_DEFINITIONS
+        model, ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS
     )
     add_component_dialog.setupUi(template)
     field = add_component_dialog.create_new_ui_field(DummyField())
