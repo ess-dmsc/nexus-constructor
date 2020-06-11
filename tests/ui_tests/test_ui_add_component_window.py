@@ -3023,10 +3023,13 @@ def test_UI_GIVEN_previous_transformations_WHEN_editing_component_THEN_transform
 
 
 def test_UI_GIVEN_creating_component_WHEN_pressing_ok_THEN_transformation_changed_signal_isnt_emitted(
-    add_component_dialog,
+    add_component_dialog, qtbot, template
 ):
 
     transformation_mock = Mock()
     add_component_dialog.signals.transformation_changed = transformation_mock
+
+    enter_component_name(qtbot, template, add_component_dialog, "component name")
+
     add_component_dialog.on_ok()
     transformation_mock.emit.assert_not_called()
