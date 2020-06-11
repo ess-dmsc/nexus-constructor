@@ -9,6 +9,11 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.transformation_types import TransformationType
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.component import Component  # noqa: F401
+
 
 @attr.s
 class Transformation(Dataset):
