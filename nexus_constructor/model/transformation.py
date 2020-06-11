@@ -6,10 +6,6 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
 from nexus_constructor.common_attrs import CommonAttrs
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.transformation_types import TransformationType
 
@@ -137,7 +133,9 @@ class Transformation(Dataset):
             # deregister this transformation from the parent transformation
             parent.deregister_dependent(self)
 
-        for dependent_transform in self.dependents:
+        # Copy dependents to a tuple (because self.dependents will be modified in the loop)
+        current_dependents = tuple(self.dependents)
+        for dependent_transform in current_dependents:
             # update dependent's depends_on to point at this transforms depends_on
             dependent_transform.depends_on = parent
             # update the parent transform to include the previously dependent transform as a dependent of the parent
