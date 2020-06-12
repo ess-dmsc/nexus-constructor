@@ -3,7 +3,7 @@ from typing import Tuple, Union, List, Dict, Any, Optional
 import attr
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtGui import QMatrix4x4, QVector3D
+from PySide2.QtGui import QMatrix4x4, QVector3D, QTransform
 from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
@@ -69,7 +69,23 @@ class Component(Group):
     transforms_list = attr.ib(factory=list)
 
     @property
-    def description(self):
+    def depends_on(self) -> "Transformation":
+        return self.get_attribute_value(CommonAttrs.DEPENDS_ON)
+
+    @depends_on.setter
+    def depends_on(self, new_depends_on: "Transformation"):
+        try:
+            if self.depends_on is not None:
+                # deregister this component as a dependent of the old depends_on transformation
+                self.depends_on.deregister_dependent(self)
+        except AttributeError:
+            pass
+        self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+        if new_depends_on is not None:
+            new_depends_on.register_dependent(self)
+
+    @property
+    def description(self) -> str:
         try:
             return self.get_field_value(CommonAttrs.DESCRIPTION)
         except AttributeError:
@@ -80,61 +96,73 @@ class Component(Group):
         self.set_field_value(CommonAttrs.DESCRIPTION, new_description)
 
     @property
-    def transform(self):
+    def qtransform(self) -> QTransform:
         """
         Creates a QTransform based on the full chain of transforms this component points to.
         :return: QTransform of final transformation
         """
         transform_matrix = QMatrix4x4()
-        for transform in self.transforms:
+        for transform in self.transforms_full_chain:
             transform_matrix *= transform.qmatrix
         transformation = Qt3DCore.QTransform()
         transformation.setMatrix(transform_matrix)
         return transformation
 
     @property
-    def transforms(self):
+    def transforms(self) -> TransformationsList:
         """
         Gets transforms in the depends_on chain but only those which are local to
         this component's group in the NeXus file
         :return:
         """
         transforms = TransformationsList(self)
-        for i in self.transforms_list:
-            transforms.append(i)
-
+        try:
+            self._get_depends_on(
+                self, transforms, local_only=True,
+            )
+        except AttributeError:
+            pass
         return transforms
 
-    def _get_transform(
+    def _get_depends_on(
         self,
-        depends_on: Transformation,
+        current_item: Union[Transformation, "Component"],
         transforms: List[Transformation],
         local_only: bool = False,
     ):
         """
         Recursive function, appends each transform in depends_on chain to transforms list
-        :param depends_on: The next depends_on string to find the next transformation in the chain
+        :param current_item: the current transformation, used to get the next depends_on
         :param transforms: The list to populate with transformations
         :param local_only: If True then only add transformations which are stored within this component
         """
-        if depends_on is not None:
-            if local_only:
+        depends_on_transform = current_item.depends_on
+        if isinstance(depends_on_transform, Component):
+            depends_on_transform = depends_on_transform.depends_on
+        if depends_on_transform is not None:
+            if local_only and depends_on_transform._parent_component != self:
+                # reached an external transform - ignore if local_only
                 return
-            transforms.append(depends_on)
-            self._get_transform(depends_on.depends_on, transforms, local_only)
+            if depends_on_transform.depends_on == depends_on_transform:
+                # reached the end of the chain
+                return
+
+            transforms.append(depends_on_transform)
+            self._get_depends_on(depends_on_transform, transforms, local_only)
 
     @property
-    def transforms_full_chain(self):
+    def transforms_full_chain(self) -> TransformationsList:
         """
         Gets all transforms in the depends_on chain for this component
         :return: List of transforms
         """
         transforms = TransformationsList(self)
         try:
-            depends_on = self.get_field_value(CommonAttrs.DEPENDS_ON)
+            self._get_depends_on(
+                self, transforms, local_only=False,
+            )
         except AttributeError:
-            depends_on = None
-        self._get_transform(depends_on, transforms, local_only=False)
+            pass
         return transforms
 
     def add_translation(
@@ -152,7 +180,7 @@ class Component(Group):
         :param values: The translation distance information.
         """
         unit_vector, _ = _normalise(vector)
-        return self._create_transform(
+        return self._create_and_add_transform(
             name,
             TransformationType.TRANSLATION,
             0.0,
@@ -178,7 +206,7 @@ class Component(Group):
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         :param values: The translation distance information.
         """
-        return self._create_transform(
+        return self._create_and_add_transform(
             name,
             TransformationType.ROTATION,
             angle,
@@ -188,7 +216,7 @@ class Component(Group):
             values,
         )
 
-    def _create_transform(
+    def _create_and_add_transform(
         self,
         name: str,
         transformation_type: TransformationType,
@@ -197,17 +225,19 @@ class Component(Group):
         vector: QVector3D,
         depends_on: Transformation,
         values: Dataset,
-    ):
+    ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms_list)
-        transform = Transformation(name, angle_or_magnitude)
+        transform = Transformation(name=name, dataset=None)
         transform.type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
         transform.values = values
+        transform._parent_component = self
         self.transforms_list.append(transform)
+
         return transform
 
     def remove_transformation(self, transform: Transformation):
@@ -216,7 +246,7 @@ class Component(Group):
         self.transforms_list.remove(transform)
 
     @property
-    def shape(self):
+    def shape(self) -> Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus]:
         if PIXEL_SHAPE_GROUP_NAME in self:
             return (
                 self[PIXEL_SHAPE_GROUP_NAME],
@@ -237,7 +267,7 @@ class Component(Group):
         units: str = "",
         filename: str = "",
         pixel_data=None,
-    ):
+    ) -> OFFGeometryNexus:
         self.remove_shape()
 
         shape_group = _get_shape_group_for_pixel_data(pixel_data)
@@ -261,7 +291,7 @@ class Component(Group):
         radius: float = 1.0,
         units: Union[str, bytes] = "m",
         pixel_data=None,
-    ):
+    ) -> CylindricalGeometry:
         self.remove_shape()
         validate_nonzero_qvector(axis_direction)
         shape_group = _get_shape_group_for_pixel_data(pixel_data)

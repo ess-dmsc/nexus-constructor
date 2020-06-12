@@ -1,3 +1,5 @@
+from nexus_constructor.model.transformation import Transformation
+
 TRANSFORM_STR = "/transformations/"
 LINK_STR = "has_link"
 
@@ -16,9 +18,36 @@ class TransformationsList(list):
 
         self.link = LinkTransformation(self)
 
+    def _has_direct_link(self) -> bool:
+        try:
+            return len(self) == 0 and self.parent_component.depends_on is not None
+        except AttributeError:
+            return False
+
+    def _transform_has_external_link(self, transformation: Transformation) -> bool:
+        try:
+            return (
+                transformation.depends_on._parent_component
+                != transformation._parent_component
+            )
+        except AttributeError:
+            return False
+
+    def _has_indirect_link(self) -> bool:
+        for transform in self:
+            if self._transform_has_external_link(transform):
+                return True
+        return False
+
     @property
     def has_link(self) -> bool:
         try:
-            return self[-1].depends_on is not None
-        except IndexError:
-            return False
+            has_link = self.parent_component.get_attribute_value(LINK_STR)
+        except AttributeError:
+            has_link = self._has_direct_link() or self._has_indirect_link()
+            self.parent_component.set_attribute_value(LINK_STR, has_link)
+        return has_link
+
+    @has_link.setter
+    def has_link(self, value: bool):
+        self.parent_component.set_attribute_value(LINK_STR, value)

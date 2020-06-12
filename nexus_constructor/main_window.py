@@ -66,6 +66,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         self._set_up_file_writer_control_window(main_window)
         self.file_writer_control_window = None
+        self._update_views()
 
     def _set_up_file_writer_control_window(self, main_window):
         try:
@@ -231,7 +232,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
         for component in self.model.entry.instrument.get_component_list():
-            self.sceneWidget.add_transformation(component.name, component.transform)
+            self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def _update_views(self):
         self.sceneWidget.clear_all_transformations()
@@ -243,7 +244,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         for component in self.model.entry.instrument.get_component_list():
             shape, positions = component.shape
             self.sceneWidget.add_component(component.name, shape, positions)
-            self.sceneWidget.add_transformation(component.name, component.transform)
+            self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def show_add_component_window(self, component: Component = None):
         self.add_component_window = QDialog()

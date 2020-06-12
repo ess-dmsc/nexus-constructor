@@ -19,13 +19,7 @@ class LinkTransformation:
     def _find_linked_component(self) -> Optional[Component]:
         for transformation in self.parent:
             if self.parent._transform_has_external_link(transformation):
-                component_path = transformation.depends_on.absolute_path[
-                    : transformation.depends_on.absolute_path.find(TRANSFORM_STR)
-                ]
-                return Component(
-                    self.parent.parent_component.file,
-                    self.parent.parent_component.file.nexus_file[component_path],
-                )
+                return transformation.depends_on._parent_component
         return None
 
     def _has_direct_component_link(self) -> bool:
@@ -36,19 +30,11 @@ class LinkTransformation:
         if not self.parent.has_link:
             return None
         if self._has_direct_component_link():
-            component_path = self.parent.parent_component.depends_on.absolute_path[
-                : self.parent.parent_component.depends_on.absolute_path.find(
-                    TRANSFORM_STR
-                )
-            ]
-            return Component(
-                self.parent.parent_component.file,
-                self.parent.parent_component.file.nexus_file[component_path],
-            )
+            return self.parent.parent_component.depends_on._parent_component
         return self._find_linked_component()
 
     @linked_component.setter
-    def linked_component(self, value):
+    def linked_component(self, value: Component):
         parent_component = self.parent.parent_component
         target = None
         if len(parent_component.transforms) == 0:
@@ -57,8 +43,7 @@ class LinkTransformation:
             for c_transform in parent_component.transforms:
                 if (
                     c_transform.depends_on is None
-                    or parent_component.absolute_path + TRANSFORM_STR
-                    not in c_transform.depends_on.absolute_path
+                    or c_transform.depends_on != parent_component
                 ):
                     target = c_transform
                     break

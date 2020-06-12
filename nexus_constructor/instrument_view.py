@@ -12,6 +12,7 @@ from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.model.geometry import OFFGeometry
+from nexus_constructor.model.instrument import SAMPLE_NAME
 from nexus_constructor.off_renderer import OffMesh
 from nexus_constructor.qentity_utils import create_qentity, create_material
 
@@ -200,7 +201,10 @@ class InstrumentView(QWidget):
 
         mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
         material = create_material(
-            QColor("black"), QColor("grey"), self.component_root_entity
+            QColor("black") if name != SAMPLE_NAME else QColor("red"),
+            QColor("grey"),
+            self.component_root_entity,
+            alpha=0.5 if name == SAMPLE_NAME else None,
         )
 
         self.component_entities[name] = create_qentity(
@@ -283,25 +287,10 @@ class InstrumentView(QWidget):
         cube_mesh.setYExtent(y)
         cube_mesh.setZExtent(z)
 
-    def setup_sample_cube(self):
-        """
-        Sets up the cube that represents a sample in the 3D view by giving the cube entity a mesh and a material.
-        """
-        cube_mesh = Qt3DExtras.QCuboidMesh(self.component_root_entity)
-        self.set_cube_mesh_dimensions(cube_mesh, *[0.1, 0.1, 0.1])
-        dark_red = QColor("#b00")
-        sample_material = create_material(
-            QColor("red"), dark_red, self.component_root_entity, alpha=0.5
-        )
-        self.component_entities["sample"] = create_qentity(
-            [cube_mesh, sample_material], self.component_root_entity
-        )
-
     def initialise_view(self):
         """
         Calls the methods for defining materials, setting up the sample cube, and setting up the neutrons. Beam-related
         functions are called outside of this method to ensure that those things are generated last.
         """
-        self.setup_sample_cube()
         self.gnomon.create_gnomon()
         self.gnomon.setup_neutrons()

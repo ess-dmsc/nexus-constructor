@@ -118,9 +118,7 @@ class CylindricalGeometry(Group):
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.set_field_value(
-            "detector_number", pixel_ids
-        )  # todo: make this take a detector number instead
+        self.set_field_value("detector_number", pixel_ids)
 
     @property
     def units(self) -> str:

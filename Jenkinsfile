@@ -106,7 +106,7 @@ return {
                   bat """
                   git submodule update --init
                   python -m pip install --upgrade virtualenv
-                  python -m pip install --user -r requirements-dev.txt
+                  python -m pip install --user --upgrade -r requirements-dev.txt
                   python -m pip install codecov==2.0.15
                 """
             } // stage
@@ -163,7 +163,7 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user -r requirements-dev.txt && git submodule update --init"
+                    sh "python3 -m pip install --user --upgrade -r requirements-dev.txt && git submodule update --init"
                 } // stage
                 stage('Run tests') {
                     sh "python3 -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/"

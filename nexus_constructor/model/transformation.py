@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 import attr
 import numpy as np
@@ -9,6 +9,11 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.transformation_types import TransformationType
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.component import Component  # noqa: F401
+
 
 @attr.s
 class Transformation(Dataset):
@@ -16,7 +21,12 @@ class Transformation(Dataset):
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
 
-    _dependents = attr.ib(factory=list, type=List["Transformation"])
+    _parent_component = attr.ib(type="Component", default=None)
+    _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
+
+    @_dependents.default
+    def _initialise_dependents(self):
+        return [] if self._parent_component is None else [self._parent_component]
 
     @property
     def type(self) -> str:
@@ -40,20 +50,16 @@ class Transformation(Dataset):
 
     @property
     def ui_value(self) -> float:
-
-        if isinstance(self.dataset, Dataset):
-            if np.isscalar(self.dataset.values):
-                try:
+        try:
+            if isinstance(self.dataset, Dataset):
+                if np.isscalar(self.dataset.values):
                     self.ui_value = float(self.dataset.values)
                     return float(self.dataset.values)
-                except ValueError:
-                    pass
-            else:
-                try:
+                else:
                     self.ui_value = float(self.dataset.values[0])
                     return float(self.dataset.values[0])
-                except ValueError:
-                    pass
+        except ValueError:
+            pass
 
         if self.get_attribute_value(CommonAttrs.UI_VALUE) is None:
             default_value = 0.0
@@ -64,7 +70,6 @@ class Transformation(Dataset):
 
     @ui_value.setter
     def ui_value(self, new_value: float):
-
         if np.isscalar(new_value):
             value = new_value
         else:
@@ -103,25 +108,43 @@ class Transformation(Dataset):
 
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
+        try:
+            if self.depends_on is not None:
+                # deregister this transform as a dependent of the old depends_on transformation
+                self.depends_on.deregister_dependent(self)
+        except AttributeError:
+            pass
         self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+        if new_depends_on is not None:
+            new_depends_on.register_dependent(self)
 
     @property
-    def dependents(self) -> List["Transformation"]:
+    def dependents(self) -> List[Union["Transformation", "Component"]]:
         return self._dependents
 
-    def deregister_dependent(self, old_dependent: "Transformation"):
+    def deregister_dependent(self, old_dependent: ["Transformation", "Component"]):
         try:
             self._dependents.remove(old_dependent)
         except ValueError:
             pass
 
-    def register_dependent(self, new_dependent: "Transformation"):
+    def register_dependent(self, new_dependent: Union["Transformation", "Component"]):
         if new_dependent not in self._dependents:
             self._dependents.append(new_dependent)
 
     def remove_from_dependee_chain(self):
-        pass
+        parent = self.depends_on
+        if parent is not None:
+            # deregister this transformation from the parent transformation
+            parent.deregister_dependent(self)
 
+        # Copy dependents to a tuple (because self.dependents will be modified in the loop)
+        current_dependents = tuple(self.dependents)
+        for dependent_transform in current_dependents:
+            # update dependent's depends_on to point at this transforms depends_on
+            dependent_transform.depends_on = parent
+            # update the parent transform to include the previously dependent transform as a dependent of the parent
+            if parent is not None:
+                parent.register_dependent(dependent_transform)
 
-def create_transformation(name: str, dataset: Dataset):
-    return Transformation(name, dataset)
+        self._dependents = []

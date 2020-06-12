@@ -739,7 +739,7 @@ def test_GIVEN_component_with_no_shape_information_WHEN_shape_is_requested_THEN_
 def test_GIVEN_component_with_no_depends_on_field_WHEN_get_transformation_THEN_returns_identity_matrix(
     component,
 ):
-    assert component.transform.matrix().isIdentity()
+    assert component.qtransform.matrix().isIdentity()
 
 
 def test_GIVEN_component_with_single_translation_WHEN_get_transformation_THEN_returns_the_translation(
@@ -769,7 +769,7 @@ def test_GIVEN_component_with_single_translation_WHEN_get_transformation_THEN_re
             1,
         )
     )
-    assert np.allclose(expected_matrix, np.array(component.transform.matrix().data()))
+    assert np.allclose(expected_matrix, np.array(component.qtransform.matrix().data()))
 
 
 def test_GIVEN_component_with_two_translations_WHEN_get_transformation_THEN_returns_composite_translation(
@@ -806,7 +806,7 @@ def test_GIVEN_component_with_two_translations_WHEN_get_transformation_THEN_retu
             1,
         )
     )
-    assert np.allclose(expected_matrix, np.array(component.transform.matrix().data()))
+    assert np.allclose(expected_matrix, np.array(component.qtransform.matrix().data()))
 
 
 def test_GIVEN_component_with_pixel_mapping_WHEN_removing_pixel_data_THEN_pixel_mapping_is_cleared(

@@ -1,14 +1,10 @@
 import numpy as np
-import pytest
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.transformation_types import TransformationType
 from typing import Any
-from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 from tests.helpers import add_component_to_file  # noqa:F401
 
 transform_type = "Transformation"
@@ -27,15 +23,6 @@ def _add_transform_to_file(
     return transform
 
 
-def create_dataset():
-    return Dataset("dataset", DatasetMetadata([1], "str"), "test")
-
-
-@pytest.fixture
-def dataset():
-    return create_dataset()
-
-
 def create_transform(
     name="test translation",
     ui_value=42.0,
@@ -44,7 +31,9 @@ def create_transform(
     values=Dataset("", None, []),
 ):
 
-    translation = Transformation(name=name, dataset=dataset)
+    translation = Transformation(
+        name=name, dataset=Dataset("dataset", DatasetMetadata([1], "str"), "test")
+    )
 
     translation.vector = vector
     translation.type = type
@@ -58,7 +47,7 @@ def create_component(name=""):
     return Component(name=name, transforms_list=[])
 
 
-def test_can_get_transform_properties(dataset):
+def test_can_get_transform_properties():
 
     test_name = "slartibartfast"
     test_ui_value = 42
@@ -85,52 +74,6 @@ def test_can_get_transform_properties(dataset):
     assert (
         transform.values == test_values
     ), "Expected the transform type to match what was in the NeXus file"
-
-
-@pytest.mark.skip("Disabled whilst working on model change")
-def test_transform_dependents_depends_on_are_updated_when_transformation_name_is_changed(
-    nexus_wrapper,
-):
-
-    test_name = "slartibartfast"
-    test_ui_value = 42
-    test_vector = QVector3D(1.0, 0.0, 0.0)
-    test_type = "Translation"
-
-    transform_dataset = _add_transform_to_file(
-        nexus_wrapper, test_name, test_ui_value, test_vector, test_type
-    )
-
-    component = nexus_wrapper.create_nx_group(
-        "test", "NXaperture", nexus_wrapper.nexus_file
-    )
-
-    component = Component()
-
-    component.create_dataset("depends_on", data=transform_dataset.name)
-
-    transform = Transformation(nexus_wrapper, transform_dataset)
-    transform.register_dependent(Component(nexus_wrapper, component))
-
-    new_name = test_name + "1"
-
-    transform.name = new_name
-
-    assert transform.name == new_name
-    assert str(component["depends_on"][()], encoding="UTF-8") == transform.dataset.name
-
-
-@pytest.mark.skip("Disabled whilst working on model change")
-@pytest.mark.parametrize("test_input", ["translation", "Translation", "TRANSLATION"])
-def test_transform_type_is_capitalised(test_input, nexus_wrapper):
-    test_name = "slartibartfast"
-    test_ui_value = 42
-    test_vector = QVector3D(1.0, 0.0, 0.0)
-    transform_dataset = _add_transform_to_file(
-        nexus_wrapper, test_name, test_ui_value, test_vector, test_input
-    )
-    transform = Transformation(nexus_wrapper, transform_dataset)
-    assert transform.type == "Translation"
 
 
 def test_ui_value_for_transform_with_array_magnitude_returns_first_value():
@@ -440,56 +383,6 @@ def test_can_get_rotation_as_4_by_4_matrix():
     assert np.allclose(expected_matrix, np.array(test_matrix.data()), atol=1.0e-7)
 
 
-@pytest.mark.skip("Disabled whilst working on model change")
-def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_attr_WHEN_opening_nexus_file_THEN_components_linked_contain_dependee_of_attribute(
-    nexus_wrapper,
-):
-    transform_name = "transform_1"
-    transform = create_transform(nexus_wrapper, transform_name)
-
-    component1_name = "test_component1"
-    component2_name = "test_component2"
-
-    component1 = add_component_to_file(nexus_wrapper, component_name=component1_name)
-    component2 = add_component_to_file(nexus_wrapper, component_name=component2_name)
-    component1.depends_on = transform
-    component2.depends_on = transform
-
-    del transform._dataset.attrs[CommonAttrs.DEPENDEE_OF]
-
-    nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
-    new_transform_group = nexus_wrapper.nexus_file[transform_name]
-
-    assert CommonAttrs.DEPENDEE_OF in new_transform_group.attrs
-    assert len(new_transform_group.attrs[CommonAttrs.DEPENDEE_OF]) == 2
-    assert (
-        new_transform_group.attrs[CommonAttrs.DEPENDEE_OF][0] == "/" + component1_name
-    )
-    assert (
-        new_transform_group.attrs[CommonAttrs.DEPENDEE_OF][1] == "/" + component2_name
-    )
-
-
-@pytest.mark.skip("Disabled whilst working on model change")
-def test_GIVEN_nexus_file_with_linked_transformation_but_without_dependee_of_attr_WHEN_opening_nexus_file_THEN_component_linked_contains_dependee_of_attribute(
-    nexus_wrapper,
-):
-    transform_name = "transform_1"
-    transform = create_transform(nexus_wrapper, transform_name)
-
-    component1_name = "test_component1"
-
-    component1 = add_component_to_file(nexus_wrapper, component_name=component1_name)
-    component1.depends_on = transform
-    del transform._dataset.attrs[CommonAttrs.DEPENDEE_OF]
-
-    nexus_wrapper.load_nexus_file(nexus_wrapper.nexus_file)
-    new_transform_group = nexus_wrapper.nexus_file[transform_name]
-
-    assert CommonAttrs.DEPENDEE_OF in new_transform_group.attrs
-    assert new_transform_group.attrs[CommonAttrs.DEPENDEE_OF] == "/" + component1_name
-
-
 def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN_getting_ui_value_THEN_ui_placeholder_value_is_returned_instead():
     transform_name = "transform_1"
     transform = create_transform(transform_name)
@@ -499,70 +392,3 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
     assert transform.ui_value != str_value
     assert transform.ui_value == 0
-
-
-@pytest.mark.skip("Disabled whilst working on model change")
-def test_multiple_relative_transform_paths_are_converted_to_absolute_path_in_dependee_of_field(
-    file, nexus_wrapper
-):
-    component_name = "component_1"
-
-    component1 = add_component_to_file(nexus_wrapper, component_name=component_name)
-    # make depends_on point to relative transformations group
-    component1.group["depends_on"] = "transformations/transform1"
-
-    transformations_group = component1.group.create_group("transformations")
-
-    transform1_name = "transform1"
-    transform1_dataset = transformations_group.create_dataset(transform1_name, data=1)
-    transform1_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(
-        QVector3D(1, 0, 0)
-    )
-    transform1_dataset.attrs[
-        CommonAttrs.TRANSFORMATION_TYPE
-    ] = TransformationType.TRANSLATION
-
-    transform2_name = "transform2"
-
-    # make transform1 depends_on point to relative transform in same directory
-    transform1_dataset.attrs["depends_on"] = transform2_name
-
-    transform2_dataset = transformations_group.create_dataset(transform2_name, data=2)
-    transform2_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(
-        QVector3D(1, 1, 0)
-    )
-    transform2_dataset.attrs[
-        CommonAttrs.TRANSFORMATION_TYPE
-    ] = TransformationType.TRANSLATION
-
-    # make sure the depends_on points to the absolute path of the transform it depends on in the file
-    assert (
-        Transformation(nexus_wrapper, transform1_dataset).depends_on.dataset.name
-        == transform2_dataset.name
-    )
-
-
-@pytest.mark.skip("Disabled whilst working on model change")
-def test_transforms_with_no_dependees_return_None_for_depends_on(nexus_wrapper):
-
-    component_name = "component_1"
-
-    component1 = add_component_to_file(nexus_wrapper, component_name=component_name)
-    # make depends_on point to relative transformations group
-    component1.group["depends_on"] = "transformations/transform1"
-
-    transformations_group = component1.group.create_group("transformations")
-
-    transform1_name = "transform1"
-    transform1_dataset = transformations_group.create_dataset(transform1_name, data=1)
-    transform1_dataset.attrs[CommonAttrs.VECTOR] = qvector3d_to_numpy_array(
-        QVector3D(1, 0, 0)
-    )
-    transform1_dataset.attrs[
-        CommonAttrs.TRANSFORMATION_TYPE
-    ] = TransformationType.TRANSLATION
-
-    transform1_dataset.attrs["depends_on"] = "."
-    transformation = Transformation(nexus_wrapper, transform1_dataset)
-
-    assert not transformation.depends_on
