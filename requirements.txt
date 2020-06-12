@@ -2,7 +2,7 @@
 attrs
 h5py
 git+https://github.com/ess-dmsc/python-nexus-utilities@b89304daa55b7146f57ba192fa48f3ed3d1f24ba#egg=nexusutils
-git+https://github.com/ess-dmsc/nexus-json#egg=nexusjson
+nexusformat
 numpy-stl
 pint
 silx
