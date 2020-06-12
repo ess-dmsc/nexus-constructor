@@ -3010,3 +3010,26 @@ def test_UI_GIVEN_invalid_chopper_definition_WHEN_creating_component_with_no_sha
     with patch(CHOPPER_GEOMETRY_CREATOR_PATH) as chopper_creator:
         add_component_dialog.on_ok()
         chopper_creator.assert_not_called()
+
+
+def test_UI_GIVEN_previous_transformations_WHEN_editing_component_THEN_transformation_changed_signal_is_emitted(
+    edit_component_dialog,
+):
+
+    transformation_mock = Mock()
+    edit_component_dialog.signals.transformation_changed = transformation_mock
+    edit_component_dialog.on_ok()
+    transformation_mock.emit.assert_called_once()
+
+
+def test_UI_GIVEN_creating_component_WHEN_pressing_ok_THEN_transformation_changed_signal_isnt_emitted(
+    add_component_dialog, qtbot, template
+):
+
+    transformation_mock = Mock()
+    add_component_dialog.signals.transformation_changed = transformation_mock
+
+    enter_component_name(qtbot, template, add_component_dialog, "component name")
+
+    add_component_dialog.on_ok()
+    transformation_mock.emit.assert_not_called()
