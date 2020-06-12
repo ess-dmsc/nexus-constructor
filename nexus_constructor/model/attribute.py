@@ -4,7 +4,7 @@ from typing import Dict, Any
 from nexus_constructor.model.value_type import ValueType
 
 
-@attr.s(eq=None)
+@attr.s(eq=False)
 class FieldAttribute:
     """
     Class for containing attributes in the nexus structure.
@@ -17,10 +17,11 @@ class FieldAttribute:
     values = attr.ib(type=ValueType, cmp=False)
 
     def __eq__(self, other_attribute):
-        assert self.name == other_attribute.name
-        if np.isscalar(self.values):
+        if not self.name == other_attribute.name:
+            return False
+        if np.isscalar(self.values) or isinstance(self.values, list):
             return self.values == other_attribute.values
-        return self.values.all(other_attribute)
+        return np.array_equal(self.values, other_attribute.values)
 
     @staticmethod
     def as_dict() -> Dict[str, Any]:
