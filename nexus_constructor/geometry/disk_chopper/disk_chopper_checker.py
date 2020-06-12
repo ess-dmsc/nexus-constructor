@@ -120,7 +120,7 @@ class NexusDefinedChopperChecker:
 
     @staticmethod
     def data_has_correct_type(
-        fields_dict: Dict[str, "FieldWidget"], units_dict: dict
+        fields_dict: Dict[str, "FieldWidget"], units_dict: dict  # noqa:F821
     ) -> bool:
         """
         Checks that the data required to create a Chopper mesh have the expected types.

@@ -293,7 +293,7 @@ class Transformation:
                 )
 
     @property
-    def dependents(self) -> List[Union["Component", "Transformation"]]:
+    def dependents(self) -> List[Union["Component", "Transformation"]]:  # noqa: F821
         """
         Returns the direct dependents of a transform, i.e. anything that has depends_on pointing to this transformation.
         """
