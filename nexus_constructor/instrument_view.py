@@ -12,6 +12,7 @@ from nexus_constructor.gnomon import Gnomon
 from nexus_constructor.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_zooming_3d_window import InstrumentZooming3DWindow
 from nexus_constructor.model.geometry import OFFGeometry
+from nexus_constructor.model.instrument import SAMPLE_NAME
 from nexus_constructor.off_renderer import OffMesh
 from nexus_constructor.qentity_utils import create_qentity, create_material
 
@@ -200,10 +201,10 @@ class InstrumentView(QWidget):
 
         mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
         material = create_material(
-            QColor("black") if name != "sample" else QColor("red"),
+            QColor("black") if name != SAMPLE_NAME else QColor("red"),
             QColor("grey"),
             self.component_root_entity,
-            alpha=0.5 if name == "sample" else None,
+            alpha=0.5 if name == SAMPLE_NAME else None,
         )
 
         self.component_entities[name] = create_qentity(

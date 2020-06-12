@@ -71,8 +71,6 @@ class ComponentTreeModel(QAbstractItemModel):
         transformation_list = None
         target_index = QModelIndex()
         if isinstance(parent_item, Component):
-            # if not hasattr(parent_item, "stored_transforms"):
-            #     parent_item.stored_transforms = parent_item.transforms
             transformation_list = parent_item.transforms
             target_index = self.index(1, 0, node)
         elif isinstance(parent_item, TransformationsList):
