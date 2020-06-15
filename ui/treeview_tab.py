@@ -9,6 +9,7 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
+from nexus_constructor.instrument_view import InstrumentView
 from nexus_constructor.treeview_utils import (
     create_and_add_toolbar_action,
     add_transformation,
@@ -20,7 +21,7 @@ from nexus_constructor.model.model import Model
 
 
 class ComponentTreeViewTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, scene_widget: InstrumentView, parent=None):
         super().__init__()
         self.setLayout(QVBoxLayout())
         self.setParent(parent)
@@ -28,6 +29,8 @@ class ComponentTreeViewTab(QWidget):
         self.component_tree_view = QTreeView()
         self.componentsTabLayout.addWidget(self.component_tree_view)
         self.layout().addLayout(self.componentsTabLayout)
+
+        self.sceneWidget = scene_widget
 
         self.component_tree_view.setDragEnabled(True)
         self.component_tree_view.setAcceptDrops(True)
