@@ -44,7 +44,6 @@ class Ui_MainWindow(object):
         self.splitter.setStretchFactor(1, 1)
 
     def _set_up_3d_view(self):
-        self.sceneWidget = InstrumentView(self.splitter)
         self.sceneWidget.setMinimumSize(QSize(600, 0))
         self.splitter.addWidget(self.sceneWidget)
 
@@ -54,7 +53,10 @@ class Ui_MainWindow(object):
         # self.tab_widget.addTab(self.silx_tab, "") Disabled while changing model
 
     def _set_up_component_tree_view(self):
-        self.component_tree_view_tab = ComponentTreeViewTab(parent=self)
+        self.sceneWidget = InstrumentView(self.splitter)
+        self.component_tree_view_tab = ComponentTreeViewTab(
+            scene_widget=self.sceneWidget, parent=self
+        )
         self.tab_widget.addTab(self.component_tree_view_tab, "")
 
     def _set_up_menus(self, MainWindow):
