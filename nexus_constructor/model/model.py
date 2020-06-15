@@ -14,6 +14,7 @@ class Signals(QObject):
     component_removed = Signal(str)
     transformation_changed = Signal()
     show_entries_dialog = Signal("QVariant", "QVariant")
+    load_json_file = Signal(str)
 
 
 class Model:
