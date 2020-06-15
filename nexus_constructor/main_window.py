@@ -11,7 +11,7 @@ from nexusutils.nexusbuilder import NexusBuilder
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
-from nexus_constructor.ui_utils import file_dialog
+from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from nexus_constructor.model.model import Model
 from ui.main_window import Ui_MainWindow
 
@@ -207,27 +207,26 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         #     existing_file.close()
 
     def open_json_file(self):
-        raise NotImplementedError
-        # filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
-        # if filename:
-        #     with open(filename, "r") as json_file:
-        #         json_data = json_file.read()
-        #
-        #         try:
-        #             nexus_file = json_to_nexus(json_data)
-        #         except Exception as exception:
-        #             show_warning_dialog(
-        #                 "Provided file not recognised as valid JSON",
-        #                 "Invalid JSON",
-        #                 f"{exception}",
-        #                 parent=self,
-        #             )
-        #             return
-        #
-        #         existing_file = self.model.signals.nexus_file
-        #         if self.model.signals.load_nexus_file(nexus_file):
-        #             self._update_views()
-        #             existing_file.close()
+        filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
+        if filename:
+            with open(filename, "r") as json_file:
+                json_data = json_file.read()
+
+                try:
+                    json.loads(json_data)
+                except ValueError as exception:
+                    show_warning_dialog(
+                        "Provided file not recognised as valid JSON",
+                        "Invalid JSON",
+                        f"{exception}",
+                        parent=self,
+                    )
+                    return
+
+                existing_file = self.model.signals.nexus_file
+                if self.model.signals.load_nexus_file(nexus_file):
+                    self._update_views()
+                    existing_file.close()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
