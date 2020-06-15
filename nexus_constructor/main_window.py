@@ -223,10 +223,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     )
                     return
 
-                existing_file = self.model.signals.nexus_file
-                if self.model.signals.load_nexus_file(nexus_file):
+                if self.model.signals.load_json_file(json_data):
                     self._update_views()
-                    existing_file.close()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
