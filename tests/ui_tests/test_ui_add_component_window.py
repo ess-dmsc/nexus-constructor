@@ -3005,8 +3005,6 @@ def test_UI_GIVEN_invalid_chopper_definition_WHEN_creating_component_with_no_sha
     add_component_dialog.fieldsListWidget.setCurrentRow(0)
     systematic_button_press(qtbot, template, add_component_dialog.removeFieldPushButton)
 
-    add_component_dialog.on_ok()
-
     with patch(CHOPPER_GEOMETRY_CREATOR_PATH) as chopper_creator:
         add_component_dialog.on_ok()
         chopper_creator.assert_not_called()
@@ -3032,4 +3030,14 @@ def test_UI_GIVEN_creating_component_WHEN_pressing_ok_THEN_transformation_change
     enter_component_name(qtbot, template, add_component_dialog, "component name")
 
     add_component_dialog.on_ok()
+
     transformation_mock.emit.assert_not_called()
+
+
+def test_UI_GIVEN_component_is_changed_WHEN_editing_component_THEN_delete_component_is_called(
+    parent_mock, edit_component_dialog, component_with_cylindrical_geometry
+):
+    edit_component_dialog.on_ok()
+    parent_mock.sceneWidget.delete_component.assert_called_once_with(
+        component_with_cylindrical_geometry.name
+    )
