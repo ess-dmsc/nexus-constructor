@@ -1,6 +1,7 @@
 from PySide2.QtCore import QObject, Signal
 from typing import Dict, Any
 from nexus_constructor.model.entry import Entry
+from nexus_constructor.model.instrument import Instrument
 
 
 class Signals(QObject):
@@ -14,7 +15,11 @@ class Signals(QObject):
     component_removed = Signal(str)
     transformation_changed = Signal()
     show_entries_dialog = Signal("QVariant", "QVariant")
-    load_json_file = Signal(str)
+
+
+def as_instrument(dct):
+    if dct["name"] == "instrument":
+        return Instrument()
 
 
 class Model:
@@ -24,3 +29,6 @@ class Model:
 
     def as_dict(self) -> Dict[str, Any]:
         return {"nexus_structure": {"children": [self.entry.as_dict()]}}
+
+    def load_json_file(self, json_file: dict):
+        return False
