@@ -14,6 +14,7 @@ class FieldAttribute:
     """
 
     name = attr.ib(type=str)
+    type = attr.ib(type=str)
     values = attr.ib(type=ValueType, cmp=False)
 
     def __eq__(self, other_attribute):
