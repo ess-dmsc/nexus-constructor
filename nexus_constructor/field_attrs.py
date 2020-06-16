@@ -82,7 +82,7 @@ class FieldAttrsDialog(QDialog):
         for index in range(self.list_widget.count()):
             item = self.list_widget.item(index)
             widget = self.list_widget.itemWidget(item)
-            attrs_dict[widget.name] = widget.value
+            attrs_dict[widget.name] = (widget.value, widget.dtype)
         return attrs_dict
 
 
