@@ -14,8 +14,8 @@ class FieldAttribute:
     """
 
     name = attr.ib(type=str)
-    type = attr.ib(type=str)
     values = attr.ib(type=ValueType, cmp=False)
+    type = attr.ib(type=str, default="String")
 
     def __eq__(self, other_attribute):
         if not self.name == other_attribute.name:
