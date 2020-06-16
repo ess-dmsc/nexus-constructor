@@ -213,7 +213,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 json_data = json_file.read()
 
                 try:
-                    json_file = json.loads(json_data)
+                    json.loads(json_data)
                 except ValueError as exception:
                     show_warning_dialog(
                         "Provided file not recognised as valid JSON",
@@ -223,7 +223,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     )
                     return
 
-                if self.model.load_json_file(json_file):
+                if self.model.load_json_file(json_data):
                     self._update_views()
 
     def _update_transformations_3d_view(self):
