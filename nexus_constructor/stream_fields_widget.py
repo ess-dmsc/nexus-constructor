@@ -342,7 +342,7 @@ class StreamFieldsWidget(QDialog):
         :param stream: The stream data object to be modified.
         """
         stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
-        stream.nexus_indices_index_every_mb = self.ev42_index_every_kb_spinner.value()
+        stream.nexus_indices_index_every_mb = self.ev42_index_every_mb_spinner.value()
         stream.nexus_indices_index_every_kb = self.ev42_index_every_kb_spinner.value()
         stream.nexus_chunk_chunk_mb = self.ev42_chunk_mb_spinner.value()
         stream.nexus_chunk_chunk_kb = self.ev42_chunk_kb_spinner.value()
@@ -362,9 +362,6 @@ class StreamFieldsWidget(QDialog):
         Fill in specific existing ev42 fields into the new UI field.
         :param field: The stream group
         """
-        all_ev42_elements = list(self.ev42_nexus_elements)
-        all_ev42_elements.append(ADC_PULSE_DEBUG)
-
         if check_if_advanced_options_should_be_enabled(
             [
                 field.adc_pulse_debug,
@@ -385,8 +382,8 @@ class StreamFieldsWidget(QDialog):
         self.ev42_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
         self.ev42_index_every_mb_spinner.setValue(field.nexus_indices_index_every_mb)
         self.ev42_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
-        self.ev42_chunk_mb_spinner.setValue(field.nexus_indices_index_every_mb)
-        self.ev42_chunk_kb_spinner.setValue(field.nexus_indices_index_every_kb)
+        self.ev42_chunk_mb_spinner.setValue(field.nexus_chunk_chunk_mb)
+        self.ev42_chunk_kb_spinner.setValue(field.nexus_chunk_chunk_kb)
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
