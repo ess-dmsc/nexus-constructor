@@ -24,6 +24,5 @@ class FieldAttribute:
             return self.values == other_attribute.values
         return np.array_equal(self.values, other_attribute.values)
 
-    @staticmethod
-    def as_dict() -> Dict[str, Any]:
-        return {}
+    def as_dict(self) -> Dict[str, Any]:
+        return {"name": self.name, "type": self.type, "values": self.values}
