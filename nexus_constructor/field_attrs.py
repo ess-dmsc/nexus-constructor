@@ -19,7 +19,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import FieldValueValidator
-from nexus_constructor.model.value_type import VALUE_TYPE, ValueType
+from nexus_constructor.model.value_type import VALUE_TYPE
 
 ATTRS_BLACKLIST = [CommonAttrs.UNITS]
 
@@ -141,8 +141,12 @@ class FieldAttrFrame(QFrame):
         )
 
     @property
-    def dtype(self) -> ValueType:
+    def dtype(self) -> str:
         return self.attr_dtype_combo.currentText()
+
+    @dtype.setter
+    def dtype(self, new_dtype: str):
+        self.attr_dtype_combo.setCurrentText(new_dtype)
 
     @property
     def is_scalar(self):
