@@ -1,7 +1,9 @@
+import json
+
 import pytest
 from mock import patch, mock_open
 
-from nexus_constructor.model.load_from_json import JSONReader
+from nexus_constructor.model.load_from_json import JSONReader, _retrieve_children_list
 
 
 @pytest.fixture(scope="function")
@@ -63,6 +65,7 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
     with patch('nexus_constructor.model.load_from_json.open', mock_open(read_data=json_string), create=True):
         assert not json_reader.load_model_from_json("")
 
+
 def test_GIVEN_unable_to_find_children_field_WHEN_loading_from_json_THEN_json_loader_returns_false(json_reader):
 
     json_string = """
@@ -116,3 +119,5 @@ def test_GIVEN_unable_to_find_children_field_WHEN_loading_from_json_THEN_json_lo
 
     with patch('nexus_constructor.model.load_from_json.open', mock_open(read_data=json_string), create=True):
         assert not json_reader.load_model_from_json("")
+
+    assert not _retrieve_children_list(json.loads(json_string))
