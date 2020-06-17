@@ -9,7 +9,7 @@ def json_reader(template):
     return JSONReader(template)
 
 
-def test_GIVEN_invalid_json_WHEN_loading_from_json_THEN_json_loader_returns_false(json_reader):
+def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_returns_false(json_reader):
 
     json_string = """
     {
@@ -37,7 +37,7 @@ def test_GIVEN_invalid_json_WHEN_loading_from_json_THEN_json_loader_returns_fals
                 "children": []
               },
               {
-                "name": "wedgie",
+                "name": "sample",
                 "type": "group",
                 "attributes": [
                   {
