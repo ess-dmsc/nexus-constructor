@@ -60,11 +60,15 @@ class Node:
     name = attr.ib(type=str)
     attributes = attr.ib(init=False, factory=list)
 
-    def set_attribute_value(self, attribute_name: str, attribute_value: Any):
+    def set_attribute_value(
+        self, attribute_name: str, attribute_value: Any, attribute_type: str = "String"
+    ):
         _set_item(
             self.attributes,
             attribute_name,
-            FieldAttribute(attribute_name, attribute_value),
+            FieldAttribute(
+                name=attribute_name, values=attribute_value, type=attribute_type
+            ),
         )
 
     def get_attribute_value(self, attribute_name: str):

@@ -15,6 +15,7 @@ class FieldAttribute:
 
     name = attr.ib(type=str)
     values = attr.ib(type=ValueType, cmp=False)
+    type = attr.ib(type=str, default="String")
 
     def __eq__(self, other_attribute):
         if not self.name == other_attribute.name:
@@ -23,6 +24,5 @@ class FieldAttribute:
             return self.values == other_attribute.values
         return np.array_equal(self.values, other_attribute.values)
 
-    @staticmethod
-    def as_dict() -> Dict[str, Any]:
-        return {}
+    def as_dict(self) -> Dict[str, Any]:
+        return {"name": self.name, "type": self.type, "values": self.values}
