@@ -11,6 +11,7 @@ from nexusutils.nexusbuilder import NexusBuilder
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.load_from_json import JSONReader
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from nexus_constructor.model.model import Model
 from ui.main_window import Ui_MainWindow
@@ -209,22 +210,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def open_json_file(self):
         filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
         if filename:
-            with open(filename, "r") as json_file:
-                json_data = json_file.read()
-
-                try:
-                    json.loads(json_data)
-                except ValueError as exception:
-                    show_warning_dialog(
-                        "Provided file not recognised as valid JSON",
-                        "Invalid JSON",
-                        f"{exception}",
-                        parent=self,
-                    )
-                    return
-
-                if self.model.load_json_file(json_data):
-                    self._update_views()
+            reader = JSONReader()
+            if reader.load_model_from_json(filename):
+                self.model.entry = reader.entry
+                self._update_views()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
