@@ -19,7 +19,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import FieldValueValidator
-from nexus_constructor.model.value_type import VALUE_TYPE, ValueType
+from nexus_constructor.model.value_type import VALUE_TYPE
 
 ATTRS_BLACKLIST = [CommonAttrs.UNITS]
 
@@ -57,7 +57,7 @@ class FieldAttrsDialog(QDialog):
     def fill_existing_attrs(self, existing_dataset: Dataset):
         for attr in existing_dataset.attributes:
             if attr.name not in ATTRS_BLACKLIST:
-                frame = FieldAttrFrame(attr.name, attr.values)
+                frame = FieldAttrFrame(attr)
                 self._add_attr(existing_frame=frame)
 
     def __add_attr(self):
@@ -82,12 +82,12 @@ class FieldAttrsDialog(QDialog):
         for index in range(self.list_widget.count()):
             item = self.list_widget.item(index)
             widget = self.list_widget.itemWidget(item)
-            attrs_dict[widget.name] = widget.value
+            attrs_dict[widget.name] = (widget.value, widget.dtype)
         return attrs_dict
 
 
 class FieldAttrFrame(QFrame):
-    def __init__(self, name=None, value=None, parent=None):
+    def __init__(self, attr=None, parent=None):
         super().__init__(parent)
         self.setMinimumHeight(40)
         self.setLayout(QHBoxLayout())
@@ -104,7 +104,7 @@ class FieldAttrFrame(QFrame):
         self.attr_dtype_combo.addItems([*VALUE_TYPE.keys()])
         self.attr_dtype_combo.currentTextChanged.connect(self.dtype_changed)
         self.dtype_changed(self.attr_dtype_combo.currentText())
-        self.dialog = ArrayDatasetTableWidget(self.dtype)
+        self.dialog = ArrayDatasetTableWidget(VALUE_TYPE[self.dtype])
 
         self.layout().addWidget(self.attr_name_lineedit)
         self.layout().addWidget(self.array_or_scalar_combo)
@@ -114,9 +114,10 @@ class FieldAttrFrame(QFrame):
 
         self.type_changed("Scalar")
 
-        if name is not None and value is not None:
-            self.name = name
-            self.value = value
+        if attr is not None:
+            self.name = attr.name
+            self.value = attr.values
+            self.dtype = attr.type
 
     def type_changed(self, item: str):
         self.attr_value_lineedit.setVisible(item == "Scalar")
@@ -140,8 +141,12 @@ class FieldAttrFrame(QFrame):
         )
 
     @property
-    def dtype(self) -> ValueType:
-        return VALUE_TYPE[self.attr_dtype_combo.currentText()]
+    def dtype(self) -> str:
+        return self.attr_dtype_combo.currentText()
+
+    @dtype.setter
+    def dtype(self, new_dtype: str):
+        self.attr_dtype_combo.setCurrentText(new_dtype)
 
     @property
     def is_scalar(self):
