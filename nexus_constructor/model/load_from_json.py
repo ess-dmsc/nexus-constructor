@@ -3,6 +3,7 @@ import logging
 
 from PySide2.QtWidgets import QWidget
 
+from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
@@ -15,6 +16,8 @@ def _read_nx_class(entry: list) -> str:
     for item in entry:
         if item.get("name") == "NX_class":
             return item.get("values")
+        if item.get("NX_class"):
+            return item.get("NX_class")
 
     return ""
 
@@ -30,7 +33,7 @@ def _read_transformations(entry: list):
 def _retrieve_children_list(json_dict: dict) -> list:
     try:
         return json_dict["nexus_structure"]["children"][0]["children"]
-    except (KeyError, IndexError):
+    except (KeyError, IndexError, TypeError):
         return []
 
 
@@ -81,7 +84,11 @@ class JSONReader:
                 logging.warning("Unable to determine NXclass.")
                 return False
 
-            elif nx_class == "NX_sample":
+            if nx_class not in COMPONENT_TYPES:
+                logging.warning("NXclass does not match any known classes.")
+                return False
+
+            if nx_class == "NXsample":
                 component = self.entry.instrument.sample
                 component.name = name
             else:
