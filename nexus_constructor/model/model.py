@@ -1,6 +1,5 @@
 from PySide2.QtCore import QObject, Signal
 from typing import Dict, Any
-
 from nexus_constructor.model.entry import Entry
 
 
@@ -21,7 +20,6 @@ class Model:
     def __init__(self, entry: Entry):
         self.signals = Signals()
         self.entry = entry
-        self.temp_entry = None
 
     def as_dict(self) -> Dict[str, Any]:
         return {"nexus_structure": {"children": [self.entry.as_dict()]}}
