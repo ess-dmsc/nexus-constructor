@@ -28,14 +28,16 @@ def _read_transformations(entry: list):
 
 
 class JSONReader:
-    def __init__(self):
+    def __init__(self, parent):
 
         self.entry = Entry()
         self.entry.instrument = Instrument()
+        self.parent = parent
 
     def load_model_from_json(self, filename: str):
 
         with open(filename, "r") as json_file:
+
             json_data = json_file.read()
 
             try:
@@ -45,7 +47,7 @@ class JSONReader:
                     "Provided file not recognised as valid JSON",
                     "Invalid JSON",
                     f"{exception}",
-                    parent=self,
+                    self.parent,
                 )
                 return False
 
@@ -54,9 +56,9 @@ class JSONReader:
             except KeyError:
                 return False
 
-            return all(self.read_json_object(child) for child in children_list)
+            return all(self._read_json_object(child) for child in children_list)
 
-    def read_json_object(self, json_entry: dict):
+    def _read_json_object(self, json_entry: dict):
 
         name = json_entry.get("name")
 
