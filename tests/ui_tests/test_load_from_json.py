@@ -11,6 +11,57 @@ def json_reader(template):
     return JSONReader(template)
 
 
+@pytest.fixture(scope="function")
+def nexus_json_dictionary():
+    json_string = """
+    {
+      "nexus_structure": {
+        "children": [
+          {
+            "name": "entry",
+            "type": "group",
+            "attributes": [
+              {
+                "name":  "NX_class",
+                "values":  "NXentry"
+              }
+            ],
+            "children": [
+              {
+                "name": "instrument",
+                "type": "group",
+                "attributes":
+                  {
+                    "NX_class":  "NXinstrument"
+                  },
+                "children": []
+              },
+              {
+                "name": "sample",
+                "type": "group",
+                "attributes": [
+                  {
+                    "name":  "NX_class",
+                    "values":  "NXsample"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "group",
+                    "name": "transformations",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+    """
+    return json.loads(json_string)
+
+
 def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_returns_false(json_reader):
 
     json_string = """
