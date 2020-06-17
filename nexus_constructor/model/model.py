@@ -1,4 +1,5 @@
 import json
+import logging
 
 from PySide2.QtCore import QObject, Signal
 from typing import Dict, Any
@@ -13,8 +14,17 @@ ignore = ["entry", "instrument", "transformations", "NX_class"]
 def _parse_nx_class(entry: list):
 
     for item in entry:
-        if item.get("NX_class"):
+        if item.get("name") == "NX_class":
             return item.get("values")
+
+    return None
+
+
+def _parse_transformations(entry: list):
+
+    for item in entry:
+        if item.get("name") == "transformations":
+            return item.get("children")
 
     return None
 
@@ -72,6 +82,7 @@ class Model:
             nx_class = _parse_nx_class(json_entry.get("attributes"))
 
             if nx_class is None:
+                logging.warning("Unable to determine NXclass.")
                 return False
 
             elif nx_class == "NX_sample":
@@ -81,7 +92,15 @@ class Model:
                 component = Component(name)
                 self.temp_entry.instrument.add_component(component)
 
-            # todo: recover transformations
+            transformations = _parse_transformations(json_entry.get("children"))
+
+            if transformations is None:
+                logging.warning("Unable to find transformations entry for component.")
+                return False
+            else:
+                for transformation in transformations:
+                    # todo: transformation reading
+                    pass
 
             return True
 
