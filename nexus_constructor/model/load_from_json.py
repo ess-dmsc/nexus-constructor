@@ -10,8 +10,6 @@ from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.ui_utils import show_warning_dialog
 
-IGNORE = ["entry", "transformations", "NX_class"]
-
 
 def _find_nx_class(entry: dict) -> str:
     if entry.get("name") == "NX_class":
@@ -44,25 +42,13 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
-def _validate_nx_class(nx_class: str) -> bool:
-
-    if not nx_class:
-        logging.warning("Unable to determine NXclass.")
-        return False
-
-    if nx_class not in COMPONENT_TYPES:
-        logging.warning("NXclass does not match any known classes.")
-        return False
-
-    return True
-
-
 class JSONReader:
     def __init__(self, parent: QWidget):
 
         self.entry = Entry()
         self.entry.instrument = Instrument()
         self.parent = parent
+        self.warnings = []
 
     def load_model_from_json(self, filename: str) -> bool:
 
@@ -84,12 +70,25 @@ class JSONReader:
             children_list = _retrieve_children_list(json_dict)
 
             if not children_list:
-                logging.info("Unable to locate components in JSON file.")
+                show_warning_dialog(
+                    "Provided file not recognised as valid Instrument",
+                    "Invalid JSON",
+                    parent=self.parent,
+                )
                 return False
 
-            return all(self._read_json_object(child) for child in children_list)
+            for child in children_list:
+                self._read_json_object(child)
 
-    def _read_json_object(self, json_object: dict) -> bool:
+            if self.warnings:
+                show_warning_dialog(
+                    "\n".join(self.warnings), "Invalid JSON", parent=self.parent,
+                )
+                return False
+
+            return True
+
+    def _read_json_object(self, json_object: dict):
 
         name = json_object.get("name")
 
@@ -97,11 +96,11 @@ class JSONReader:
 
             nx_class = _read_nx_class(json_object.get("attributes"))
 
-            if not _validate_nx_class(nx_class):
-                return False
+            if not self._validate_nx_class(nx_class):
+                return
 
             if name == "NXinstrument":
-                return True
+                return
 
             if nx_class == "NXsample":
                 component = self.entry.instrument.sample
@@ -113,13 +112,22 @@ class JSONReader:
             transformations = _read_transformations(json_object.get("children"))
 
             if not transformations:
-                logging.info("Unable to find transformations entry for component.")
-                return False
+                self.warnings.append(
+                    "Unable to find transformations entry for component."
+                )
 
             for transformation in transformations:
                 # todo: transformation reading
                 pass
 
-            return True
+    def _validate_nx_class(self, nx_class: str) -> bool:
 
-        return False
+        if not nx_class:
+            self.warnings.append("Unable to determine NXclass.")
+            return False
+
+        if nx_class not in COMPONENT_TYPES:
+            self.warnings.append("NXclass does not match any known classes.")
+            return False
+
+        return True
