@@ -1,5 +1,4 @@
 import json
-import logging
 from typing import Union
 
 from PySide2.QtWidgets import QWidget
@@ -96,10 +95,10 @@ class JSONReader:
 
             nx_class = _read_nx_class(json_object.get("attributes"))
 
-            if not self._validate_nx_class(nx_class):
+            if nx_class == "NXinstrument":
                 return
 
-            if name == "NXinstrument":
+            if not self._validate_nx_class(nx_class):
                 return
 
             if nx_class == "NXsample":
@@ -111,14 +110,10 @@ class JSONReader:
 
             transformations = _read_transformations(json_object.get("children"))
 
-            if not transformations:
-                self.warnings.append(
-                    "Unable to find transformations entry for component."
-                )
-
-            for transformation in transformations:
-                # todo: transformation reading
-                pass
+            if transformations:
+                for transformation in transformations:
+                    # todo: transformation reading
+                    pass
 
     def _validate_nx_class(self, nx_class: str) -> bool:
 
