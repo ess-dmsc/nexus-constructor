@@ -173,3 +173,20 @@ def test_GIVEN_invalid_nx_class_WHEN_obtained_nx_class_value_THEN_validate_nx_cl
     nx_class,
 ):
     assert not _validate_nx_class(nx_class)
+
+
+def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_new_sample_name(
+    nexus_json_dictionary, json_reader
+):
+
+    sample_name = "NewSampleName"
+    nexus_json_dictionary["nexus_structure"]["children"][0]["children"][1][
+        "name"
+    ] = sample_name
+
+    children_list = _retrieve_children_list(nexus_json_dictionary)
+
+    for child in children_list:
+        json_reader._read_json_object(child)
+
+    assert json_reader.entry.instrument.sample.name == sample_name
