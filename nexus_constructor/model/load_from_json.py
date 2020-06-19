@@ -9,7 +9,7 @@ from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.ui_utils import show_warning_dialog
 
-IGNORE = ["entry", "instrument", "transformations", "NX_class"]
+IGNORE = ["entry", "transformations", "NX_class"]
 
 
 def _read_nx_class(entry: list) -> str:
