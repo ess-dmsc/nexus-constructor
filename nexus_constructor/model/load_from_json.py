@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Union
 
 from PySide2.QtWidgets import QWidget
 
@@ -12,14 +13,20 @@ from nexus_constructor.ui_utils import show_warning_dialog
 IGNORE = ["entry", "transformations", "NX_class"]
 
 
-def _read_nx_class(entry: list) -> str:
-    for item in entry:
-        if item.get("name") == "NX_class":
-            return item.get("values")
-        if item.get("NX_class"):
-            return item.get("NX_class")
-
+def _find_nx_class(entry: dict) -> str:
+    if entry.get("name") == "NX_class":
+        return entry.get("values")
+    if entry.get("NX_class"):
+        return entry.get("NX_class")
     return ""
+
+
+def _read_nx_class(entry: Union[list, dict]) -> str:
+    if isinstance(entry, list):
+        for item in entry:
+            return _find_nx_class(item)
+    elif isinstance(entry, dict):
+        return _find_nx_class(entry)
 
 
 def _read_transformations(entry: list):
@@ -86,15 +93,15 @@ class JSONReader:
 
         name = json_object.get("name")
 
-        if name == "instrument":
-            return True
-
-        elif name and name not in IGNORE:
+        if name:
 
             nx_class = _read_nx_class(json_object.get("attributes"))
 
             if not _validate_nx_class(nx_class):
                 return False
+
+            if name == "NXinstrument":
+                return True
 
             if nx_class == "NXsample":
                 component = self.entry.instrument.sample
