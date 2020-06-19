@@ -122,7 +122,7 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
         mock_open(read_data=json_string),
         create=True,
     ):
-        assert not json_reader.load_model_from_json("")
+        assert not json_reader.load_model_from_json("filename")
 
 
 def test_GIVEN_unable_to_find_nexus_structure_field_WHEN_loading_from_json_THEN_json_loader_returns_false(
