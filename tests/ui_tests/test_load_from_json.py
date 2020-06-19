@@ -7,6 +7,7 @@ from nexus_constructor.model.load_from_json import (
     JSONReader,
     _retrieve_children_list,
     _read_nx_class,
+    _validate_nx_class,
 )
 
 
@@ -154,3 +155,21 @@ def test_GIVEN_no_nx_class_values_for_component_WHEN_loading_from_json_THEN_json
     class_attribute,
 ):
     assert not _read_nx_class(class_attribute)
+
+
+@pytest.mark.parametrize(
+    "class_attribute",
+    [[{"name": "NX_class", "values": "NXmonitor"}], [{"NX_class": "NXmonitor"}]],
+)
+def test_GIVEN_nx_class_in_different_formations_WHEN_reading_class_information_THEN_read_nx_class_recognises_both_formats(
+    class_attribute,
+):
+
+    assert _read_nx_class(class_attribute) == "NXmonitor"
+
+
+@pytest.mark.parametrize("nx_class", ["", "notannxclass"])
+def test_GIVEN_invalid_nx_class_WHEN_obtained_nx_class_value_THEN_validate_nx_class_returns_false(
+    nx_class,
+):
+    assert not _validate_nx_class(nx_class)

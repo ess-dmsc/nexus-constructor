@@ -37,6 +37,19 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
+def _validate_nx_class(nx_class: str) -> bool:
+
+    if not nx_class:
+        logging.warning("Unable to determine NXclass.")
+        return False
+
+    if nx_class not in COMPONENT_TYPES:
+        logging.warning("NXclass does not match any known classes.")
+        return False
+
+    return True
+
+
 class JSONReader:
     def __init__(self, parent: QWidget):
 
@@ -80,12 +93,7 @@ class JSONReader:
 
             nx_class = _read_nx_class(json_object.get("attributes"))
 
-            if nx_class is None:
-                logging.warning("Unable to determine NXclass.")
-                return False
-
-            if nx_class not in COMPONENT_TYPES:
-                logging.warning("NXclass does not match any known classes.")
+            if not _validate_nx_class(nx_class):
                 return False
 
             if nx_class == "NXsample":
