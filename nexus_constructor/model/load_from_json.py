@@ -116,8 +116,10 @@ class JSONReader:
 
             if nx_class == NX_INSTRUMENT:
                 return all(
-                    self._read_json_object(child)
-                    for child in json_object.get("children")
+                    [
+                        self._read_json_object(child)
+                        for child in json_object.get("children")
+                    ]
                 )
 
             if not self._validate_nx_class(name, nx_class):
