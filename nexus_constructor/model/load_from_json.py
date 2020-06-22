@@ -99,7 +99,7 @@ class JSONReader:
                 show_warning_dialog(
                     "\n".join(self.warnings), "Warnings encountered loading JSON", parent=self.parent,
                 )
-                return False
+                return True
 
             return True
 
