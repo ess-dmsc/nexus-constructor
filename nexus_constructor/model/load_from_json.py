@@ -127,6 +127,7 @@ class JSONReader:
                 component.name = name
             else:
                 component = Component(name)
+                component.nx_class = nx_class
                 self.entry.instrument.add_component(component)
 
         else:

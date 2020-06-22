@@ -302,3 +302,17 @@ def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contain
     )
 
     assert json_reader.entry.instrument.component_list[1].name == component_name
+
+
+def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_contains_component_with_nx_class(
+    json_dict_with_component, json_reader
+):
+    component_class = "NXcrystal"
+    json_dict_with_component["nexus_structure"]["children"][0]["children"][0][
+        "children"
+    ][0]["attributes"][0]["values"] = component_class
+    json_reader._read_json_object(
+        json_dict_with_component["nexus_structure"]["children"][0]["children"][0]
+    )
+
+    assert json_reader.entry.instrument.component_list[1].nx_class == component_class
