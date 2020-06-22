@@ -47,7 +47,8 @@ def _retrieve_children_list(json_dict: dict) -> list:
     :return: The children value is returned if it was found, otherwise an empty list is returned.
     """
     try:
-        return json_dict["nexus_structure"]["children"][0]["children"]
+        entry = json_dict["nexus_structure"]["children"][0]
+        return entry["children"]
     except (KeyError, IndexError, TypeError):
         return []
 
