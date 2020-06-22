@@ -171,7 +171,7 @@ def test_GIVEN_nx_class_in_different_formats_WHEN_reading_class_information_THEN
 def test_GIVEN_invalid_nx_class_WHEN_obtained_nx_class_value_THEN_validate_nx_class_returns_false(
     nx_class, json_reader
 ):
-    assert not json_reader._validate_nx_class(nx_class)
+    assert not json_reader._validate_nx_class("name", nx_class)
 
 
 def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_new_sample_name(
@@ -201,5 +201,6 @@ def test_GIVEN_no_nx_instrument_class_WHEN_loading_from_json_THEN_read_json_obje
     nx_instrument["attributes"]["NX_class"] = None
 
     assert not json_reader._read_json_object(nx_instrument)
+
 
 # todo: component name test
