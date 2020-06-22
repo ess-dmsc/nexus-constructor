@@ -10,7 +10,7 @@ from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.ui_utils import show_warning_dialog
 
 NX_CLASS = "NX_class"
-NX_INSTRUMENT = "NXInstrument"
+NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
 
 
@@ -114,7 +114,10 @@ class JSONReader:
             nx_class = _read_nx_class(json_object.get("attributes"))
 
             if nx_class == NX_INSTRUMENT:
-                return
+                return all(
+                    self._read_json_object(child)
+                    for child in json_object.get("children")
+                )
 
             if not self._validate_nx_class(name, nx_class):
                 return
@@ -125,6 +128,7 @@ class JSONReader:
             else:
                 component = Component(name)
                 self.entry.instrument.add_component(component)
+
         else:
             self.warnings.append("Unable to find object name.")
 

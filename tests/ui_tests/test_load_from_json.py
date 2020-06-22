@@ -66,6 +66,92 @@ def nexus_json_dictionary() -> dict:
     return json.loads(json_string)
 
 
+@pytest.fixture(scope="function")
+def json_dict_with_component():
+
+    json_string = """
+    {
+        "nexus_structure": {
+            "children": [
+                {
+                    "name": "entry",
+                    "type": "group",
+                    "attributes": [
+                        {
+                            "name": "NX_class",
+                            "type": "String",
+                            "values": "NXentry"
+                        }
+                    ],
+                    "children": [
+                        {
+                            "name": "instrument",
+                            "type": "group",
+                            "attributes": [
+                                {
+                                    "name": "NX_class",
+                                    "type": "String",
+                                    "values": "NXinstrument"
+                                }
+                            ],
+                            "children": [
+                                {
+                                    "name": "componentname",
+                                    "type": "group",
+                                    "attributes": [
+                                        {
+                                            "name": "NX_class",
+                                            "type": "String",
+                                            "values": "NXaperture"
+                                        },
+                                        {
+                                            "name": "has_link",
+                                            "type": "String",
+                                            "values": false
+                                        }
+                                    ],
+                                    "children": [
+                                        {
+                                            "name": "description",
+                                            "type": "dataset",
+                                            "attributes": []
+                                        },
+                                        {
+                                            "type": "group",
+                                            "name": "transformations",
+                                            "children": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "sample",
+                            "type": "group",
+                            "attributes": [
+                                {
+                                    "name": "NX_class",
+                                    "type": "String",
+                                    "values": "NXsample"
+                                }
+                            ],
+                            "children": [
+                                {
+                                    "type": "group",
+                                    "name": "transformations",
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    """
+    return json.loads(json_string)
+
+
 def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_returns_false(
     json_reader,
 ):
@@ -203,4 +289,16 @@ def test_GIVEN_no_nx_instrument_class_WHEN_loading_from_json_THEN_read_json_obje
     assert not json_reader._read_json_object(nx_instrument)
 
 
-# todo: component name test
+def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contains_component_with_json_name(
+    json_dict_with_component, json_reader
+):
+
+    component_name = "ComponentName"
+    json_dict_with_component["nexus_structure"]["children"][0]["children"][0][
+        "children"
+    ][0]["name"] = component_name
+    json_reader._read_json_object(
+        json_dict_with_component["nexus_structure"]["children"][0]["children"][0]
+    )
+
+    assert json_reader.entry.instrument.component_list[1].name == component_name
