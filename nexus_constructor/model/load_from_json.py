@@ -31,7 +31,7 @@ def _read_nx_class(entry: Union[list, dict]) -> str:
     """
     Attempts to determine the NXclass of a component in a list/dictionary.
     :param entry: A dictionary of list of a dictionary containing NXclass information.
-    :return:
+    :return: The NXclass if it can be found, otherwise an emtpy string is returned.
     """
     if isinstance(entry, list):
         for item in entry:
