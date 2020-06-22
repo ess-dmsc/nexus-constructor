@@ -93,7 +93,9 @@ class JSONReader:
                 return False
 
             for child in children_list:
-                self._read_json_object(child)
+                self._read_json_object(
+                    child, json_dict["nexus_structure"]["children"][0].get("name")
+                )
 
             if self.warnings:
                 show_warning_dialog(
@@ -105,7 +107,7 @@ class JSONReader:
 
             return True
 
-    def _read_json_object(self, json_object: dict):
+    def _read_json_object(self, json_object: dict, parent_name: str = None):
         """
         Tries to create a component based on the contents of the JSON file.
         :param json_object:  A component from the JSON dictionary.
@@ -119,7 +121,7 @@ class JSONReader:
             if nx_class == NX_INSTRUMENT:
                 return all(
                     [
-                        self._read_json_object(child)
+                        self._read_json_object(child, name)
                         for child in json_object.get("children")
                     ]
                 )
@@ -136,7 +138,9 @@ class JSONReader:
                 self.entry.instrument.add_component(component)
 
         else:
-            self.warnings.append("Unable to find object name.")
+            self.warnings.append(
+                f"Unable to find object name for child of {parent_name}."
+            )
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
