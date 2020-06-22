@@ -97,7 +97,9 @@ class JSONReader:
 
             if self.warnings:
                 show_warning_dialog(
-                    "\n".join(self.warnings), "Warnings encountered loading JSON", parent=self.parent,
+                    "\n".join(self.warnings),
+                    "Warnings encountered loading JSON",
+                    parent=self.parent,
                 )
                 return True
 
@@ -138,7 +140,7 @@ class JSONReader:
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
-        Validates the NXclass by checking if it was found, and if it matches known NXclasses.
+        Validates the NXclass by checking if it was found, and if it matches known NXclasses for components.
         :param nx_class: The NXclass string obtained from the dictionary.
         :return: True if the NXclass is valid, False otherwise.
         """
@@ -147,9 +149,6 @@ class JSONReader:
             return False
 
         if nx_class not in COMPONENT_TYPES:
-            self.warnings.append(
-                f"NXclass value {nx_class} for component {name} does not match any known classes."
-            )
             return False
 
         return True
