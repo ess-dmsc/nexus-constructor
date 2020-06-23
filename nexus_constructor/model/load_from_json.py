@@ -12,6 +12,7 @@ from nexus_constructor.ui_utils import show_warning_dialog
 NX_CLASS = "NX_class"
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
+NX_TRANSFORMATION = "NXtransformation"
 
 
 def _find_nx_class(entry: dict) -> str:
@@ -38,6 +39,32 @@ def _read_nx_class(entry: Union[list, dict]) -> str:
             return _find_nx_class(item)
     elif isinstance(entry, dict):
         return _find_nx_class(entry)
+
+
+def _contains_transformations(entry: dict) -> bool:
+    """
+    Determines if a component contains transformations.
+    :param entry: Something...
+    :return: True if the component has transformations, False otherwise.
+    """
+    attributes = entry.get("attributes")
+    if not attributes:
+        return False
+    for attribute in attributes:
+        if _read_nx_class(attribute) == NX_TRANSFORMATION:
+            return True
+    return False
+
+
+def _read_transformations(entry: list):
+    """
+    Attempts to construct Transformation objects using information from the JSON structure.
+    :param entry: Something...
+    :return: A list of transformations if they were found, otherwise an empty list is returned.
+    """
+    for item in entry:
+        if _contains_transformations(item):
+            print("This has a transformation.")
 
 
 def _retrieve_children_list(json_dict: dict) -> list:
@@ -136,6 +163,11 @@ class JSONReader:
                 component = Component(name)
                 component.nx_class = nx_class
                 self.entry.instrument.add_component(component)
+
+            transformations = _read_transformations(json_object.get("children"))
+
+            if transformations:
+                pass
 
         else:
             self.warnings.append(
