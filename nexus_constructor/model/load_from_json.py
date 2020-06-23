@@ -1,5 +1,5 @@
 import json
-from typing import Union
+from typing import Union, List
 
 from PySide2.QtWidgets import QWidget
 
@@ -7,6 +7,7 @@ from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.ui_utils import show_warning_dialog
 
 NX_CLASS = "NX_class"
@@ -56,17 +57,6 @@ def _contains_transformations(entry: dict) -> bool:
     return False
 
 
-def _read_transformations(entry: list):
-    """
-    Attempts to construct Transformation objects using information from the JSON structure.
-    :param entry: Something...
-    :return: A list of transformations if they were found, otherwise an empty list is returned.
-    """
-    for item in entry:
-        if _contains_transformations(item):
-            print("This has a transformation.")
-
-
 def _retrieve_children_list(json_dict: dict) -> list:
     """
     Attempts to retrieve the children from the JSON dictionary.
@@ -80,9 +70,41 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
+class TransformationReader:
+    def __init__(self, parent_name: str, parent_component: Component, entry: list):
+        self.parent_name = parent_name
+        self.entry = entry
+
+    def get_transformations(self):
+        """
+        Attempts to construct Transformation objects using information from the JSON structure.
+        :return: A list of transformations if they were found, otherwise an empty list is returned.
+        """
+        if self.entry:
+            for item in self.entry:
+                if _contains_transformations(item):
+                    return self._create_transformations(item.get("children"))
+        return []
+
+    def _create_transformations(
+        self, json_transformations: list
+    ) -> List[Transformation]:
+        """
+        Uses the information contained in the JSON dictionary to construct a list of Transformations.
+        :param entry:
+        :return:
+        """
+        transformations = []
+        for json_transformation in json_transformations:
+            name = json_transformation.get("name")
+            value = json_transformation.get("values")
+            dtype = json_transformation.get("dataset").get("type")
+
+        return transformations
+
+
 class JSONReader:
     def __init__(self, parent: QWidget):
-
         self.entry = Entry()
         self.entry.instrument = Instrument()
         self.parent = parent
@@ -164,7 +186,9 @@ class JSONReader:
                 component.nx_class = nx_class
                 self.entry.instrument.add_component(component)
 
-            transformations = _read_transformations(json_object.get("children"))
+            transformations = TransformationReader(
+                name, component, json_object.get("children").get_transformations()
+            )
 
             if transformations:
                 pass
