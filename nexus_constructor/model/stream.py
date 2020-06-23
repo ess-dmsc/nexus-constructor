@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 
 import attr
 
@@ -12,16 +13,6 @@ class WriterModules(Enum):
     NS10 = "ns10"
     HS00 = "hs00"
     SENV = "senv"
-
-
-@attr.s
-class StreamGroup(Group):
-    def __setitem__(self, key, value):
-        self.children.append(value)
-
-    def __getitem__(self, item):
-        """This is not simple as they do not have a name - we could do this by using a private member"""
-        raise NotImplementedError
 
 
 @attr.s
@@ -166,3 +157,19 @@ class HS00Stream:
                 "shape": self.shape,
             },
         }
+
+
+@attr.s
+class StreamGroup(Group):
+    def __setitem__(
+        self,
+        key: str,
+        value: Union[
+            NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream
+        ],
+    ):
+        self.children.append(value)
+
+    def __getitem__(self, item):
+        """This is not simple as they do not have a name - we could do this by using a private member"""
+        raise NotImplementedError
