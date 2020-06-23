@@ -14,7 +14,7 @@ import os
 build_exe_options = {
     "optimize": 1,
     "packages": ["numpy.core._methods", "numpy.lib.format", "pkg_resources._vendor"],
-    "includes":["importlib],
+    "includes":["importlib"],
     "excludes": [
         "pytest",
         "pytest-cov",
