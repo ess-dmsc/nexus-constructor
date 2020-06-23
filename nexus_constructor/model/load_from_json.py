@@ -1,13 +1,13 @@
 import json
-from typing import Union, List
+from typing import Union, Any
 
+from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QWidget
 
 from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.ui_utils import show_warning_dialog
 
 NX_CLASS = "NX_class"
@@ -48,13 +48,12 @@ def _contains_transformations(entry: dict) -> bool:
     :param entry: Something...
     :return: True if the component has transformations, False otherwise.
     """
-    attributes = entry.get("attributes")
-    if not attributes:
+    try:
+        for attribute in entry["attributes"]:
+            if _read_nx_class(attribute) == NX_TRANSFORMATION:
+                return True
+    except KeyError:
         return False
-    for attribute in attributes:
-        if _read_nx_class(attribute) == NX_TRANSFORMATION:
-            return True
-    return False
 
 
 def _retrieve_children_list(json_dict: dict) -> list:
@@ -73,34 +72,85 @@ def _retrieve_children_list(json_dict: dict) -> list:
 class TransformationReader:
     def __init__(self, parent_name: str, parent_component: Component, entry: list):
         self.parent_name = parent_name
+        self.parent_component = parent_component
         self.entry = entry
+        self.warnings = []
 
-    def get_transformations(self):
+    def add_transformations_to_component(self):
         """
         Attempts to construct Transformation objects using information from the JSON structure.
         :return: A list of transformations if they were found, otherwise an empty list is returned.
         """
-        if self.entry:
-            for item in self.entry:
-                if _contains_transformations(item):
-                    return self._create_transformations(item.get("children"))
-        return []
+        for item in self.entry:
+            if _contains_transformations(item):
+                self._create_transformations(item.get("children"))
 
-    def _create_transformations(
-        self, json_transformations: list
-    ) -> List[Transformation]:
+    def _get_transformation_property(
+        self, property_name: str, json_transformation: dict, failure_value: Any = None
+    ):
+        try:
+            return json_transformation[property_name]
+        except KeyError:
+            self.warnings.append(
+                f"Cannot find {property_name} for transformation in component {self.parent_component.name}."
+            )
+            return failure_value
+
+    def _find_property_in_list(
+        self,
+        property_name: str,
+        transformation_name: str,
+        attributes: list,
+        failure_value: Any = None,
+    ):
+        for attribute in attributes:
+            try:
+                if attribute["name"] == property_name:
+                    return attribute["values"]
+            except KeyError:
+                continue
+        self.warnings.append(
+            f"Unable to find {property_name} property in transformation {transformation_name} from component {self.parent_component.name}"
+        )
+        return failure_value
+
+    def _create_transformations(self, json_transformations: list):
         """
         Uses the information contained in the JSON dictionary to construct a list of Transformations.
-        :param entry:
+        :param json_transformations:
         :return:
         """
-        transformations = []
-        for json_transformation in json_transformations:
-            name = json_transformation.get("name")
-            value = json_transformation.get("values")
-            dtype = json_transformation.get("dataset").get("type")
-
-        return transformations
+        if json_transformations:
+            for json_transformation in json_transformations:
+                name = self._get_transformation_property("name", json_transformation)
+                values = self._get_transformation_property(
+                    "values", json_transformation, 0.0
+                )
+                attributes = self._get_transformation_property(
+                    "attributes", json_transformation
+                )
+                if not attributes:
+                    continue
+                units = self._find_property_in_list("units", name, attributes)
+                transformation_type = self._find_property_in_list(
+                    "transformation_type", name, attributes
+                )
+                if not (transformation_type and units):
+                    continue
+                vector = self._find_property_in_list(
+                    "vector", name, attributes, [0.0, 0.0, 0.0]
+                )
+                # depends_on = self._find_property_in_list("depends_on", name, attributes, None)
+                depends_on = None
+                self.parent_component._create_and_add_transform(
+                    name,
+                    transformation_type,
+                    values,
+                    units,
+                    QVector3D(*vector),
+                    depends_on,
+                    values,
+                )
 
 
 class JSONReader:
@@ -186,11 +236,11 @@ class JSONReader:
                 component.nx_class = nx_class
                 self.entry.instrument.add_component(component)
 
-            transformations = TransformationReader(
-                name, component, json_object.get("children").get_transformations()
-            )
-
-            if transformations:
+            try:
+                TransformationReader(
+                    name, component, json_object["children"]
+                ).add_transformations_to_component()
+            except KeyError:
                 pass
 
         else:
