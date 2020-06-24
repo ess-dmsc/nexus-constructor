@@ -81,6 +81,11 @@ def transformation_json():
     return json.loads(json_string)
 
 
+@pytest.fixture(scope="function")
+def transformation_reader(transformation_json):
+    pass
+
+
 @pytest.mark.parametrize("class_value", ["NXtransformation", "NXtransformations"])
 def test_GIVEN_transformation_in_attributes_WHEN_checking_for_transformation_THEN_contains_transformations_returns_true(
     class_value, transformation_json
@@ -96,5 +101,15 @@ def test_GIVEN_no_transformation_class_in_attributes_WHEN_checking_for_transform
     transformations = transformation_json["children"][2]
     del transformations["attributes"][0]["name"]
     del transformations["attributes"][0]["values"]
+
+    assert not _contains_transformations(transformations)
+
+
+def test_GIVEN_no_attributes_field_in_dict_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
+    transformation_json,
+):
+
+    transformations = transformation_json["children"][2]
+    del transformations["attributes"]
 
     assert not _contains_transformations(transformations)
