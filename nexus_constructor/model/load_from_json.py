@@ -89,7 +89,10 @@ class TransformationReader:
         """
         for item in self.entry:
             if _contains_transformations(item):
-                self._create_transformations(item.get("children"))
+                try:
+                    self._create_transformations(item["children"])
+                except KeyError:
+                    continue
 
     def _get_transformation_property(
         self, property_name: str, json_transformation: dict, failure_value: Any = None
@@ -143,37 +146,50 @@ class TransformationReader:
         Uses the information contained in the JSON dictionary to construct a list of Transformations.
         :param json_transformations:
         """
-        if json_transformations:
-            for json_transformation in json_transformations:
-                name = self._get_transformation_property("name", json_transformation)
-                values = self._get_transformation_property(
-                    "values", json_transformation, 0.0
-                )
-                attributes = self._get_transformation_property(
-                    "attributes", json_transformation
-                )
-                if not attributes:
-                    continue
-                units = self._find_property_in_list("units", name, attributes)
+        for json_transformation in json_transformations:
+
+            name = self._get_transformation_property("name", json_transformation)
+            values = self._get_transformation_property(
+                "values", json_transformation, 0.0
+            )
+            attributes = self._get_transformation_property(
+                "attributes", json_transformation
+            )
+
+            if not attributes:
+                # todo: warning + update test
+                continue
+
+            units = self._find_property_in_list("units", name, attributes)
+
+            try:
                 transformation_type = TRANSFORMATION_MAP[
                     self._find_property_in_list("transformation_type", name, attributes)
                 ]
-                if not (transformation_type and units):
-                    continue
-                vector = self._find_property_in_list(
-                    "vector", name, attributes, [0.0, 0.0, 0.0]
-                )
-                # depends_on = self._find_property_in_list("depends_on", name, attributes, None)
-                depends_on = None
-                self.parent_component._create_and_add_transform(
-                    name,
-                    transformation_type,
-                    values,
-                    units,
-                    QVector3D(*vector),
-                    depends_on,
-                    values,
-                )
+                # todo: warning + update test
+            except KeyError:
+                continue
+
+            if not (transformation_type and units):
+                # todo: warning + update test
+                continue
+
+            vector = self._find_property_in_list(
+                "vector", name, attributes, [0.0, 0.0, 0.0]
+            )
+            # depends_on = self._find_property_in_list("depends_on", name, attributes, None)
+            # todo: manage depends on?
+            depends_on = None
+
+            self.parent_component._create_and_add_transform(
+                name,
+                transformation_type,
+                values,
+                units,
+                QVector3D(*vector),
+                depends_on,
+                values,
+            )
 
 
 class JSONReader:
