@@ -377,6 +377,9 @@ class Component(Group):
             )
         ]
 
+    def get_shape_dict(self) -> Dict[Any]:
+        return {}
+
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict()
         # Add transformations in a child group
@@ -385,8 +388,8 @@ class Component(Group):
                 "type": "group",
                 "name": TRANSFORMS_GROUP_NAME,
                 "children": [
-                    transform.as_dict()
-                    for transform in self.transforms_list + self.shape.as_dict()
+                    (transform.as_dict() for transform in self.transforms_list),
+                    self.get_shape_dict(),
                 ],
             }
         )
