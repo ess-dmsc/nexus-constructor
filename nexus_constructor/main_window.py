@@ -3,7 +3,6 @@ from typing import Dict
 import json
 
 import h5py
-import silx.gui.hdf5
 from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 from PySide2.QtWidgets import QMainWindow, QApplication, QAction, QMessageBox
@@ -44,16 +43,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
 
-        self.widget = silx.gui.hdf5.Hdf5TreeView()
-        self.widget.setAcceptDrops(True)
-        self.widget.setDragEnabled(True)
         # self.treemodel = self.widget.findHdf5TreeModel()
         # self.treemodel.setDatasetDragEnabled(True)
         # self.treemodel.setFileDropEnabled(True)
         # self.treemodel.setFileMoveEnabled(True)
         # self.treemodel.insertH5pyObject(self.model.signals.nexus_file)
         self.model.signals.file_changed.connect(self.update_nexus_file_structure_view)
-        self.silx_tab_layout.addWidget(self.widget)
         # self.model.signals.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
@@ -62,8 +57,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.model.signals.transformation_changed.connect(
             self._update_transformations_3d_view
         )
-
-        self.widget.setVisible(True)
 
         self._set_up_file_writer_control_window(main_window)
         self.file_writer_control_window = None
