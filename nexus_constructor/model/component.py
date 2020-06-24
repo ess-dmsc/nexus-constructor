@@ -377,20 +377,26 @@ class Component(Group):
             )
         ]
 
-    def get_shape_dict(self) -> Dict[Any]:
-        return {}
+    def get_shape_dict(self) -> Dict[Any, Any]:
+        return {
+            "type": "group",
+            "name": SHAPE_GROUP_NAME,  # todo:sort this out for pixel data
+            "children": [],  # todo
+        }
 
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict()
+
+        # Add shape/pixel information if there is any
+        if not isinstance(NoShapeGeometry, self.shape[0]):
+            dictionary["children"].append(self.get_shape_dict())
+
         # Add transformations in a child group
         dictionary["children"].append(
             {
                 "type": "group",
                 "name": TRANSFORMS_GROUP_NAME,
-                "children": [
-                    (transform.as_dict() for transform in self.transforms_list),
-                    self.get_shape_dict(),
-                ],
+                "children": [transform.as_dict() for transform in self.transforms],
             }
         )
         return dictionary
