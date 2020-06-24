@@ -59,5 +59,5 @@ class Group(Node):
             else None,
             "children": [child.as_dict() for child in self.children]
             if self.children
-            else None,
+            else [],
         }
