@@ -8,12 +8,18 @@ from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.ui_utils import show_warning_dialog
 
 NX_CLASS = "NX_class"
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
 NX_TRANSFORMATION = "NXtransformation"
+
+TRANSFORMATION_MAP = {
+    "translation": TransformationType.TRANSLATION,
+    "rotation": TransformationType.ROTATION,
+}
 
 
 def _find_nx_class(entry: dict) -> str:
@@ -71,15 +77,15 @@ def _retrieve_children_list(json_dict: dict) -> list:
 
 
 class TransformationReader:
-    def __init__(self, parent_name: str, parent_component: Component, entry: list):
-        self.parent_name = parent_name
+    def __init__(self, parent_component: Component, entry: list):
         self.parent_component = parent_component
         self.entry = entry
         self.warnings = []
 
     def add_transformations_to_component(self):
         """
-        Attempts to construct Transformation objects using information from the JSON structure.
+        Attempts to construct Transformation objects using information from the JSON dictionary and then add them to the
+        parent component.
         """
         for item in self.entry:
             if _contains_transformations(item):
@@ -109,18 +115,18 @@ class TransformationReader:
         self,
         property_name: str,
         transformation_name: str,
-        attributes: list,
+        attributes_list: list,
         failure_value: Any = None,
     ):
         """
-
-        :param property_name:
-        :param transformation_name:
-        :param attributes:
-        :param failure_value:
-        :return:
+        Searches the dictionaries in a list to see if one of them has a given property.
+        :param property_name: The name of the property that is being looked for.
+        :param transformation_name: The name of the transformation that is being constructed.
+        :param attributes_list: The list of dictionaries.
+        :param failure_value: The value to return if the property is not contained in any of the dictionaries.
+        :return: The value of the property if is is found in the list, otherwise the failure value is returned.
         """
-        for attribute in attributes:
+        for attribute in attributes_list:
             try:
                 if attribute["name"] == property_name:
                     return attribute["values"]
@@ -149,9 +155,9 @@ class TransformationReader:
                 if not attributes:
                     continue
                 units = self._find_property_in_list("units", name, attributes)
-                transformation_type = self._find_property_in_list(
-                    "transformation_type", name, attributes
-                )
+                transformation_type = TRANSFORMATION_MAP[
+                    self._find_property_in_list("transformation_type", name, attributes)
+                ]
                 if not (transformation_type and units):
                     continue
                 vector = self._find_property_in_list(
@@ -168,7 +174,6 @@ class TransformationReader:
                     depends_on,
                     values,
                 )
-                print(self.parent_component.transforms_list)
 
 
 class JSONReader:
@@ -256,7 +261,7 @@ class JSONReader:
 
             try:
                 TransformationReader(
-                    name, component, json_object["children"]
+                    component, json_object["children"]
                 ).add_transformations_to_component()
             except KeyError:
                 pass

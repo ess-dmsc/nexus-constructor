@@ -1,12 +1,14 @@
 import json
 
 import pytest
+from PySide2.QtGui import QVector3D
 from mock import Mock
 
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.load_from_json import (
     _contains_transformations,
     TransformationReader,
+    TRANSFORMATION_MAP,
 )
 
 
@@ -199,7 +201,7 @@ def test_GIVEN_property_value_not_in_list_WHEN_looking_for_transformation_proper
     assert "units" in transformation_reader.warnings[-1]
 
 
-def test_GIVEN_no_attributes_WHEN_attempting_to_create_transformations_THEN_transformations_are_not_created(
+def test_GIVEN_no_attributes_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
     transformation_reader, transformation_json
 ):
     del transformation_json["children"][0]["attributes"]
@@ -208,7 +210,7 @@ def test_GIVEN_no_attributes_WHEN_attempting_to_create_transformations_THEN_tran
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
-def test_GIVEN_no_transformation_type_WHEN_attempting_to_create_transformations_THEN_transformations_are_not_created(
+def test_GIVEN_no_transformation_type_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
     transformation_reader, transformation_json
 ):
     # Delete the transformation type nested dictionary
@@ -218,7 +220,7 @@ def test_GIVEN_no_transformation_type_WHEN_attempting_to_create_transformations_
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
-def test_GIVEN_no_units_WHEN_attempting_to_create_transformations_THEN_transformations_are_not_created(
+def test_GIVEN_no_units_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
     transformation_reader, transformation_json
 ):
     # Delete the units nested dictionary
@@ -228,8 +230,29 @@ def test_GIVEN_no_units_WHEN_attempting_to_create_transformations_THEN_transform
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
-def test_GIVEN_all_information_present_WHEN_attempting_to_create_transformations_THEN_transformation_is_created(
+def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THEN_create_transform_is_called(
     transformation_reader, transformation_json
 ):
+    transformation_json["children"][0]["name"] = name = "TranslationName"
+    transformation_json["children"][0]["attributes"][1][
+        "values"
+    ] = transformation_type = "translation"
+    transformation_json["children"][0]["values"] = values = 300.0
+    transformation_json["children"][0]["attributes"][0]["values"] = units = "mm"
+    transformation_json["children"][0]["attributes"][2]["values"] = vector = [
+        1.0,
+        2.0,
+        3.0,
+    ]
+    depends_on = None
+
     transformation_reader._create_transformations(transformation_json["children"])
-    transformation_reader.parent_component._create_and_add_transform.assert_called()
+    transformation_reader.parent_component._create_and_add_transform.assert_called_once_with(
+        name,
+        TRANSFORMATION_MAP[transformation_type],
+        values,
+        units,
+        QVector3D(*vector),
+        depends_on,
+        values,
+    )
