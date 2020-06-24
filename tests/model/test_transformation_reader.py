@@ -73,6 +73,7 @@ def attributes_list(transformation_json):
 def transformation_reader(transformation_json):
     parent_component = Mock(spec=Component)
     parent_component.name = "ParentComponentName"
+    parent_component.transforms_list = []
     entry = [transformation_json]
     return TransformationReader(parent_component, entry)
 
@@ -196,3 +197,39 @@ def test_GIVEN_property_value_not_in_list_WHEN_looking_for_transformation_proper
     assert len(transformation_reader.warnings) == n_warnings + 1
     # Check that the latest warning mentions the name of the property that could not be found
     assert "units" in transformation_reader.warnings[-1]
+
+
+def test_GIVEN_no_attributes_WHEN_attempting_to_create_transformations_THEN_transformations_are_not_created(
+    transformation_reader, transformation_json
+):
+    del transformation_json["children"][0]["attributes"]
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
+def test_GIVEN_no_transformation_type_WHEN_attempting_to_create_transformations_THEN_transformations_are_not_created(
+    transformation_reader, transformation_json
+):
+    # Delete the transformation type nested dictionary
+    del transformation_json["children"][0]["attributes"][1]
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
+def test_GIVEN_no_units_WHEN_attempting_to_create_transformations_THEN_transformations_are_not_created(
+    transformation_reader, transformation_json
+):
+    # Delete the units nested dictionary
+    del transformation_json["children"][0]["attributes"][0]
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
+def test_GIVEN_all_information_present_WHEN_attempting_to_create_transformations_THEN_transformation_is_created(
+    transformation_reader, transformation_json
+):
+    transformation_reader._create_transformations(transformation_json["children"])
+    transformation_reader.parent_component._create_and_add_transform.assert_called()
