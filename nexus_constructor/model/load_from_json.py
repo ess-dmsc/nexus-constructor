@@ -50,7 +50,7 @@ def _contains_transformations(entry: dict) -> bool:
     """
     try:
         for attribute in entry["attributes"]:
-            if _read_nx_class(attribute) == NX_TRANSFORMATION:
+            if NX_TRANSFORMATION in _read_nx_class(attribute):
                 return True
     except KeyError:
         return False
@@ -89,17 +89,19 @@ class TransformationReader:
         self, property_name: str, json_transformation: dict, failure_value: Any = None
     ):
         """
-
-        :param property_name:
-        :param json_transformation:
-        :param failure_value:
-        :return:
+        Tries to find a certain property of a transformation from dictionary.
+        :param property_name: The name of the property fields.
+        :param json_transformation: The dictionary to look for the property in.
+        :param failure_value: The value to return if the property cannot be found.
+        :return: Returns json_transformation[property_name] if this exists in the dictionary, otherwise failure_value is
+        returned.
         """
         try:
             return json_transformation[property_name]
         except KeyError:
             self.warnings.append(
-                f"Cannot find {property_name} for transformation in component {self.parent_component.name}."
+                f"Cannot find {property_name} for transformation in component"
+                f" {self.parent_component.name}."
             )
             return failure_value
 
@@ -125,7 +127,8 @@ class TransformationReader:
             except KeyError:
                 continue
         self.warnings.append(
-            f"Unable to find {property_name} property in transformation {transformation_name} from component {self.parent_component.name}"
+            f"Unable to find {property_name} property in transformation"
+            f" {transformation_name} from component {self.parent_component.name}"
         )
         return failure_value
 
@@ -165,6 +168,7 @@ class TransformationReader:
                     depends_on,
                     values,
                 )
+                print(self.parent_component.transforms_list)
 
 
 class JSONReader:

@@ -71,82 +71,88 @@ def json_dict_with_component():
 
     json_string = """
     {
-        "nexus_structure": {
-            "children": [
-                {
-                    "name": "entry",
-                    "type": "group",
-                    "attributes": [
-                        {
-                            "name": "NX_class",
-                            "type": "String",
-                            "values": "NXentry"
-                        }
+      "nexus_structure":{
+        "children":[
+          {
+            "name":"entry",
+            "type":"group",
+            "attributes":[
+              {
+                "name":"NX_class",
+                "type":"String",
+                "values":"NXentry"
+              }
+            ],
+            "children":[
+              {
+                "name":"instrument",
+                "type":"group",
+                "attributes":[
+                  {
+                    "name":"NX_class",
+                    "type":"String",
+                    "values":"NXinstrument"
+                  }
+                ],
+                "children":[
+                  {
+                    "name":"componentname",
+                    "type":"group",
+                    "attributes":[
+                      {
+                        "name":"NX_class",
+                        "type":"String",
+                        "values":"NXaperture"
+                      },
+                      {
+                        "name":"has_link",
+                        "type":"String",
+                        "values":false
+                      }
                     ],
-                    "children": [
-                        {
-                            "name": "instrument",
-                            "type": "group",
-                            "attributes": [
-                                {
-                                    "name": "NX_class",
-                                    "type": "String",
-                                    "values": "NXinstrument"
-                                }
-                            ],
-                            "children": [
-                                {
-                                    "name": "componentname",
-                                    "type": "group",
-                                    "attributes": [
-                                        {
-                                            "name": "NX_class",
-                                            "type": "String",
-                                            "values": "NXaperture"
-                                        },
-                                        {
-                                            "name": "has_link",
-                                            "type": "String",
-                                            "values": false
-                                        }
-                                    ],
-                                    "children": [
-                                        {
-                                            "name": "description",
-                                            "type": "dataset",
-                                            "attributes": []
-                                        },
-                                        {
-                                            "type": "group",
-                                            "name": "transformations",
-                                            "children": []
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "name": "sample",
-                            "type": "group",
-                            "attributes": [
-                                {
-                                    "name": "NX_class",
-                                    "type": "String",
-                                    "values": "NXsample"
-                                }
-                            ],
-                            "children": [
-                                {
-                                    "type": "group",
-                                    "name": "transformations",
-                                    "children": []
-                                }
-                            ]
-                        }
+                    "children":[
+                      {
+                        "name":"description",
+                        "type":"dataset",
+                        "attributes":[
+    
+                        ]
+                      },
+                      {
+                        "type":"group",
+                        "name":"transformations",
+                        "children":[
+    
+                        ]
+                      }
                     ]
-                }
+                  }
+                ]
+              },
+              {
+                "name":"sample",
+                "type":"group",
+                "attributes":[
+                  {
+                    "name":"NX_class",
+                    "type":"String",
+                    "values":"NXsample"
+                  }
+                ],
+                "children":[
+                  {
+                    "type":"group",
+                    "name":"transformations",
+                    "children":[
+    
+                    ]
+                  }
+                ]
+              }
             ]
-        }
+          }
+        ]
+      }
     }
     """
     return json.loads(json_string)
