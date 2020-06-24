@@ -45,7 +45,7 @@ def _read_nx_class(entry: Union[list, dict]) -> str:
 def _contains_transformations(entry: dict) -> bool:
     """
     Determines if a component contains transformations.
-    :param entry: Something...
+    :param entry: The component's JSON dictionary.
     :return: True if the component has transformations, False otherwise.
     """
     try:
@@ -54,6 +54,7 @@ def _contains_transformations(entry: dict) -> bool:
                 return True
     except KeyError:
         return False
+    return False
 
 
 def _retrieve_children_list(json_dict: dict) -> list:
@@ -79,7 +80,6 @@ class TransformationReader:
     def add_transformations_to_component(self):
         """
         Attempts to construct Transformation objects using information from the JSON structure.
-        :return: A list of transformations if they were found, otherwise an empty list is returned.
         """
         for item in self.entry:
             if _contains_transformations(item):
@@ -88,6 +88,13 @@ class TransformationReader:
     def _get_transformation_property(
         self, property_name: str, json_transformation: dict, failure_value: Any = None
     ):
+        """
+
+        :param property_name:
+        :param json_transformation:
+        :param failure_value:
+        :return:
+        """
         try:
             return json_transformation[property_name]
         except KeyError:
@@ -103,6 +110,14 @@ class TransformationReader:
         attributes: list,
         failure_value: Any = None,
     ):
+        """
+
+        :param property_name:
+        :param transformation_name:
+        :param attributes:
+        :param failure_value:
+        :return:
+        """
         for attribute in attributes:
             try:
                 if attribute["name"] == property_name:
@@ -118,7 +133,6 @@ class TransformationReader:
         """
         Uses the information contained in the JSON dictionary to construct a list of Transformations.
         :param json_transformations:
-        :return:
         """
         if json_transformations:
             for json_transformation in json_transformations:
