@@ -99,7 +99,7 @@ def test_GIVEN_no_attributes_field_in_dict_WHEN_checking_for_transformations_THE
 def test_GIVEN_property_not_found_WHEN_looking_for_transformation_property_THEN_get_transformation_property_returns_failure_value(
     transformation_json, transformation_reader
 ):
-    # record the current number of warnings in the TransformationReader
+    # Record the current number of warnings in the TransformationReader
     n_warnings = len(transformation_reader.warnings)
 
     failure_value = 20
@@ -119,7 +119,7 @@ def test_GIVEN_property_not_found_WHEN_looking_for_transformation_property_THEN_
 def test_GIVEN_property_is_found_WHEN_looking_for_transformation_property_THEN_get_transformation_property_returns_property_value(
     transformation_json, transformation_reader
 ):
-    # record the current number of warnings in the TransformationReader
+    # Record the current number of warnings in the TransformationReader
     n_warnings = len(transformation_reader.warnings)
     # Set the values property
     transformation_json["children"][0]["values"] = json_value = 300
@@ -129,6 +129,26 @@ def test_GIVEN_property_is_found_WHEN_looking_for_transformation_property_THEN_g
     )
 
     # Check that the json value was returned
+    assert property_value == json_value
+    # Check that the number of warnings has remained the same
+    assert len(transformation_reader.warnings) == n_warnings
+
+
+def test_GIVEN_property_is_in_list_WHEN_looking_for_transformation_property_THEN_get_property_in_list_returns_true(
+    transformation_json, transformation_reader
+):
+    # Record the current number of warnings in the TransformationReader
+    n_warnings = len(transformation_reader.warnings)
+
+    # Set the units value
+    attributes_list = transformation_json["children"][0]["attributes"]
+    attributes_list[0]["values"] = json_value = "cm"
+
+    property_value = transformation_reader._find_property_in_list(
+        "units", "TransformationName", attributes_list, failure_value="yards"
+    )
+
+    # Check that json value was returned
     assert property_value == json_value
     # Check that the number of warnings has remained the same
     assert len(transformation_reader.warnings) == n_warnings
