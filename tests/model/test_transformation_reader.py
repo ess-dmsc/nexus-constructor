@@ -173,6 +173,8 @@ def test_GIVEN_property_name_not_in_list_WHEN_looking_for_transformation_propert
     assert property_value == failure_value
     # Check that the number of warnings has increased
     assert len(transformation_reader.warnings) == n_warnings + 1
+    # Check that the latest warning mentions the name of the property that could not be found
+    assert "units" in transformation_reader.warnings[-1]
 
 
 def test_GIVEN_property_value_not_in_list_WHEN_looking_for_transformation_property_THEN_get_property_in_list_returns_false(
@@ -192,3 +194,5 @@ def test_GIVEN_property_value_not_in_list_WHEN_looking_for_transformation_proper
     assert property_value == failure_value
     # Check that the number of warnings has increased
     assert len(transformation_reader.warnings) == n_warnings + 1
+    # Check that the latest warning mentions the name of the property that could not be found
+    assert "units" in transformation_reader.warnings[-1]
