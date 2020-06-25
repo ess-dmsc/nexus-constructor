@@ -246,7 +246,12 @@ class Component(Group):
         self.transforms_list.remove(transform)
 
     @property
-    def shape(self) -> Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus]:
+    def shape(
+        self,
+    ) -> Tuple[
+        Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
+        Optional[List[QVector3D]],
+    ]:
         if PIXEL_SHAPE_GROUP_NAME in self:
             return (
                 self[PIXEL_SHAPE_GROUP_NAME],
