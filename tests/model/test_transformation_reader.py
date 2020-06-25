@@ -201,6 +201,15 @@ def test_GIVEN_property_value_not_in_list_WHEN_looking_for_transformation_proper
     assert "units" in transformation_reader.warnings[-1]
 
 
+def test_GIVEN_no_values_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
+    transformation_reader, transformation_json
+):
+    del transformation_json["children"][0]["values"]
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
 def test_GIVEN_no_attributes_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
     transformation_reader, transformation_json
 ):
@@ -230,6 +239,7 @@ def test_GIVEN_no_units_WHEN_attempting_to_create_transformations_THEN_create_tr
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
+@pytest.mark.xfail
 def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THEN_create_transform_is_called(
     transformation_reader, transformation_json
 ):
