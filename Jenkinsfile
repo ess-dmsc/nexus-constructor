@@ -105,29 +105,29 @@ return {
                   bat """
                   python -m pip install --upgrade virtualenv
                   virtualenv venv
-                  call venv\\Scripts\\activate.bat
+                  venv\\Scripts\\activate.bat
                   python -m pip install -r requirements-dev.txt
                   python -m pip install codecov==2.0.15
                 """
             } // stage
             stage("Run tests") {
                 bat """
+                venv\\Scripts\\activate.bat
                 set PYTEST_QT_API=pyside2
-                call venv\\Scripts\\activate.bat
                 python -m pytest . -s --ignore=definitions --assert=plain --cov=nexus_constructor --cov-report=xml --junit-xml=test_results.xml
                 """
 
-                withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
-                    bat """
-                        codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
-                        """
-                }
+        withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
+            bat """
+                codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
+                """
+        }
                 junit "test_results.xml"
             } // stage
             if (env.CHANGE_ID) {
                 stage("Build Executable") {
                     bat """
-                    call venv\\Scripts\\activate.bat
+                    venv\\Scripts\\activate.bat
                     pyinstaller --windowed --noconfirm nexus-constructor.spec"""
                 } // stage
                 stage('Archive Executable') {
