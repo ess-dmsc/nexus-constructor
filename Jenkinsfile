@@ -79,7 +79,7 @@ builders = pipeline_builder.createBuilders { container ->
     
     if (env.CHANGE_ID) {
         pipeline_builder.stage('Build Executable'){
-            container.sh "cd ${project} && build_env/bin/python -m pyinstaller --noconfirm nexus-constructor.spec"
+            container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
         }
         
         pipeline_builder.stage('Archive Executable') {
@@ -126,7 +126,7 @@ return {
             if (env.CHANGE_ID) {
                 stage("Build Executable") {
                     bat """
-                    python -m pyinstaller --windowed --noconfirm nexus-constructor.spec"""
+                    pyinstaller --windowed --noconfirm nexus-constructor.spec"""
                 } // stage
                 stage('Archive Executable') {
                     def git_commit_short = scm_vars.GIT_COMMIT.take(7)
