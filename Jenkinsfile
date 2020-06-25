@@ -139,7 +139,7 @@ return {
                     timeout(time:15, unit:'SECONDS') {
                         bat """
                         cd dist\\nexus-constructor\\
-                        NexusConstructor.exe --help
+                        nexus-constructor.exe --help
                         """
                         }
                 } // stage
