@@ -90,6 +90,14 @@ def _parse_dtype(dtype: str) -> str:
     return ""
 
 
+def _create_transformation_dataset(
+    angle_or_magnitude: float, dtype: str, name: str
+) -> Dataset:
+    return Dataset(
+        name, dataset=DatasetMetadata(size=[1], type=dtype), values=angle_or_magnitude,
+    )
+
+
 class TransformationReader:
     def __init__(self, parent_component: Component, entry: list):
         self.parent_component = parent_component
@@ -115,7 +123,7 @@ class TransformationReader:
         transform_name: str = None,
         failure_value: Any = None,
         parse_result_func: Callable = None,
-    ):
+    ) -> Any:
         """
         Tries to find a certain property of a transformation from dictionary.
         :param property_name: The name of the property fields.
@@ -130,7 +138,7 @@ class TransformationReader:
             if not parse_result_func:
                 return json_transformation[property_name]
             else:
-                parse_result_func(json_transformation[property_name])
+                return parse_result_func(json_transformation[property_name])
         except KeyError:
             if transform_name:
                 msg = (
@@ -151,7 +159,7 @@ class TransformationReader:
         attributes_list: list,
         failure_value: Any = None,
         parse_result_func: Callable = None,
-    ):
+    ) -> Any:
         """
         Searches the dictionaries in a list to see if one of them has a given property.
         :param property_name: The name of the property that is being looked for.
@@ -178,8 +186,13 @@ class TransformationReader:
 
     def _parse_transformation_type(
         self, transformation_type: str, transformation_name: str
-    ):
-        # todo: return type
+    ) -> Union[TransformationType, str]:
+        """
+        Converts the transformation type in the JSON to one recognised by the NeXus Constructor.
+        :param transformation_type: The transformation type from the JSON.
+        :param transformation_name: The name of the transformation that is being processed.
+        :return: The matching TransformationType class value.
+        """
         try:
             return TRANSFORMATION_MAP[transformation_type]
         except KeyError:
@@ -230,8 +243,8 @@ class TransformationReader:
                 "transformation_type",
                 name,
                 attributes,
-                parse_result_func=lambda transformation_type: self._parse_transformation_type(
-                    transformation_type=transformation_type, transformation_name=name
+                parse_result_func=lambda transform_type: self._parse_transformation_type(
+                    transformation_type=transform_type, transformation_name=name
                 ),
             )
             if not transformation_type:
@@ -244,11 +257,7 @@ class TransformationReader:
             depends_on = None
 
             angle_or_magnitude = values
-            values = Dataset(
-                name,
-                dataset=DatasetMetadata(size=[1], type=dtype),
-                values=angle_or_magnitude,
-            )
+            values = _create_transformation_dataset(angle_or_magnitude, dtype, name)
 
             self.parent_component._create_and_add_transform(
                 name,

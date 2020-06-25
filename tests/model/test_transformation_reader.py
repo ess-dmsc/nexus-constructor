@@ -8,7 +8,7 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.load_from_json import (
     _contains_transformations,
     TransformationReader,
-    TRANSFORMATION_MAP,
+    TRANSFORMATION_MAP, _create_transformation_dataset,
 )
 
 
@@ -112,7 +112,7 @@ def test_GIVEN_property_not_found_WHEN_looking_for_transformation_property_THEN_
     failure_value = 20
     property_name = "DoesNotExist"
     property_value = transformation_reader._get_transformation_property(
-        property_name, transformation_json["children"][0], failure_value
+        property_name, transformation_json["children"][0], failure_value=failure_value
     )
 
     # Check that the failure value was returned
@@ -239,7 +239,6 @@ def test_GIVEN_no_units_WHEN_attempting_to_create_transformations_THEN_create_tr
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
-@pytest.mark.xfail
 def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THEN_create_transform_is_called(
     transformation_reader, transformation_json
 ):
@@ -247,7 +246,7 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
     transformation_json["children"][0]["attributes"][1][
         "values"
     ] = transformation_type = "translation"
-    transformation_json["children"][0]["values"] = values = 300.0
+    transformation_json["children"][0]["values"] = angle_or_magnitude = 300.0
     transformation_json["children"][0]["attributes"][0]["values"] = units = "mm"
     transformation_json["children"][0]["attributes"][2]["values"] = vector = [
         1.0,
@@ -256,11 +255,14 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
     ]
     depends_on = None
 
+    values = _create_transformation_dataset(angle_or_magnitude, "Double", name)
+
+
     transformation_reader._create_transformations(transformation_json["children"])
     transformation_reader.parent_component._create_and_add_transform.assert_called_once_with(
         name,
         TRANSFORMATION_MAP[transformation_type],
-        values,
+        angle_or_magnitude,
         units,
         QVector3D(*vector),
         depends_on,
