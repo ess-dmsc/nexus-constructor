@@ -6,6 +6,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.dataset import DatasetMetadata, Dataset
 from nexus_constructor.model.node import Node, _get_item, _set_item, _remove_item
+from nexus_constructor.model.transformation import Transformation
 
 
 @attr.s
@@ -57,7 +58,11 @@ class Group(Node):
             "attributes": [attribute.as_dict() for attribute in self.attributes]
             if self.attributes
             else None,
-            "children": [child.as_dict() for child in self.children]
+            "children": [
+                child.as_dict()
+                for child in self.children
+                if not isinstance(child, Transformation)
+            ]
             if self.children
             else [],
         }

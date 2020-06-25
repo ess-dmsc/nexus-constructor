@@ -401,7 +401,7 @@ class Component(Group):
         dictionary = super(Component, self).as_dict()
 
         # Add shape/pixel information if there is any
-        if not isinstance(NoShapeGeometry, self.shape[0]):
+        if not isinstance(self.shape[0], NoShapeGeometry):
             dictionary["children"].append(self.get_shape_dict())
 
         # Add transformations in a child group

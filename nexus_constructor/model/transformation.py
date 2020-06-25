@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Dict, Any
 
 import attr
 import numpy as np
@@ -148,3 +148,25 @@ class Transformation(Dataset):
                 parent.register_dependent(dependent_transform)
 
         self._dependents = []
+
+    def as_dict(self) -> Dict[str, Any]:
+        return_dict = {
+            "name": self.name,
+            "type": self.type,
+            "attributes": [
+                attribute.as_dict()
+                for attribute in self.attributes
+                if attribute.name != CommonAttrs.DEPENDS_ON
+            ]
+            if self.attributes
+            else None,
+            "values": self.values if self.values else [],
+        }
+        try:
+            return_dict["attributes"].append(
+                {"name": "depends_on", "values": self.depends_on.name, "type": "String"}
+            )
+        except AttributeError:
+            pass
+
+        return return_dict
