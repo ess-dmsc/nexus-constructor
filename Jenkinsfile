@@ -106,15 +106,12 @@ return {
                   bat """
                   git submodule update --init
                   python -m pip install --upgrade virtualenv
-                  virtualenv venv
-                  venv\\Scripts\\activate.bat
-                  python -m pip install -r requirements-dev.txt
+                  python -m pip install --user --upgrade -r requirements-dev.txt
                   python -m pip install codecov==2.0.15
                 """
             } // stage
             stage("Run tests") {
                 bat """
-                venv\\Scripts\\activate.bat
                 set PYTEST_QT_API=pyside2
                 python -m pytest . -s --ignore=definitions --assert=plain --cov=nexus_constructor --cov-report=xml --junit-xml=test_results.xml
                 """
@@ -129,7 +126,6 @@ return {
             if (env.CHANGE_ID) {
                 stage("Build Executable") {
                     bat """
-                    venv\\Scripts\\activate.bat
                     pyinstaller --windowed --noconfirm nexus-constructor.spec"""
                 } // stage
                 stage('Archive Executable') {
