@@ -383,11 +383,19 @@ class Component(Group):
         ]
 
     def get_shape_dict(self) -> Dict[Any, Any]:
-        return {
-            "type": "group",
-            "name": SHAPE_GROUP_NAME,  # todo:sort this out for pixel data
-            "children": [],  # todo
-        }
+        if self.shape[1] is None:
+            # Component has no pixel data
+            return {
+                "type": "group",
+                "name": SHAPE_GROUP_NAME,
+                "children": [],  # todo
+            }
+        else:
+            return {
+                "type": "group",
+                "name": PIXEL_SHAPE_GROUP_NAME,
+                "children": [],  # todo
+            }
 
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict()
