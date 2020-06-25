@@ -105,7 +105,6 @@ return {
             stage("Setup") {
                   bat """
                   git submodule update --init
-                  python -m pip install --upgrade virtualenv
                   python -m pip install --user --upgrade -r requirements-dev.txt
                   python -m pip install codecov==2.0.15
                 """
@@ -126,6 +125,7 @@ return {
             if (env.CHANGE_ID) {
                 stage("Build Executable") {
                     bat """
+                    set PATH=%PATH%;%APPDATA%\\Python\\Python36\\Scripts
                     pyinstaller --windowed --noconfirm nexus-constructor.spec"""
                 } // stage
                 stage('Archive Executable') {
