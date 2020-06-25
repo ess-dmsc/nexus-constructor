@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 import PySide2
-from os import path
+import os
 
 block_cipher = None
 
@@ -8,11 +8,14 @@ added_files = [
     ("ui/*.png", "ui"),
     ("ui/*.svg", "ui"),
     ("definitions/base_classes/*.nxdl.xml", "definitions/base_classes"),
-    (
-        path.join(PySide2.__path__[0], "Qt", "plugins", "renderers"),
-        "PySide2/Qt/plugins/renderers",
-    ),
 ]
+
+# If we are not on Windows we need to make sure to get the opengl renderer plugin
+if os.name != "nt":
+    added_files.append((
+        os.path.join(PySide2.__path__[0], "Qt", "plugins", "renderers"),
+        "PySide2/Qt/plugins/renderers",
+    ))
 
 # Be careful about removing things from this list.
 # Not excluding PyQt5 for example can cause problems if it is installed on your system,
