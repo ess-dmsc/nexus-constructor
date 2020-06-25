@@ -10,8 +10,7 @@ added_files = [
     ("definitions/base_classes/*.nxdl.xml", "definitions/base_classes"),
 ]
 
-# If we are not on Windows we need to make sure to get the opengl renderer plugin
-if os.name != "nt":
+if os.path.isdir(os.path.join(PySide2.__path__[0], "Qt", "plugins", "renderers")):
     added_files.append((
         os.path.join(PySide2.__path__[0], "Qt", "plugins", "renderers"),
         "PySide2/Qt/plugins/renderers",
