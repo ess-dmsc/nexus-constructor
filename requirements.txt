@@ -5,7 +5,6 @@ git+https://github.com/ess-dmsc/python-nexus-utilities@7e95cca24a4b03423c19f9e54
 nexusformat
 numpy-stl
 pint
-silx
 xmltodict
 numpy
 pytest-qt
