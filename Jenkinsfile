@@ -44,6 +44,7 @@ builders = pipeline_builder.createBuilders { container ->
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
             build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
+            git submodule update --init
             """
     } // stage
     
@@ -103,6 +104,7 @@ return {
             }  // stage
             stage("Setup") {
                   bat """
+                  git submodule update --init
                   python -m pip install --upgrade virtualenv
                   virtualenv venv
                   venv\\Scripts\\activate.bat
@@ -165,7 +167,7 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user --upgrade -r requirements-dev.txt"
+                    sh "python3 -m pip install --user --upgrade -r requirements-dev.txt && git submodule update --init"
                 } // stage
                 stage('Run tests') {
                     sh "python3 -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/"
