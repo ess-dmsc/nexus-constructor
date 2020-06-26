@@ -275,7 +275,7 @@ class TransformationReader:
             angle_or_magnitude = values
             values = _create_transformation_dataset(angle_or_magnitude, dtype, name)
 
-            self.parent_component._create_and_add_transform(
+            transform = self.parent_component._create_and_add_transform(
                 name,
                 transformation_type,
                 angle_or_magnitude,
@@ -284,7 +284,6 @@ class TransformationReader:
                 depends_on,
                 values,
             )
-            transform = self.parent_component.transforms_list[-1]
             self.parent_component.depends_on = transform
 
 
