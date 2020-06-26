@@ -78,18 +78,6 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
-def _parse_dtype(dtype: str) -> str:
-    """
-    Sees if the type value from the JSON matches the types on the value type dictionary.
-    :param dtype: The type value obtained from the JSON.
-    :return: The corresponding type from the dictionary if it exists, otherwise an empty string is returned.
-    """
-    for key in VALUE_TYPE.keys():
-        if dtype.lower() == key.lower():
-            return key
-    return ""
-
-
 def _create_transformation_dataset(
     angle_or_magnitude: float, dtype: str, name: str
 ) -> Dataset:
@@ -184,6 +172,21 @@ class TransformationReader:
         )
         return failure_value
 
+    def _parse_dtype(self, dtype: str, transformation_name: str) -> str:
+        """
+        Sees if the type value from the JSON matches the types on the value type dictionary.
+        :param dtype: The type value obtained from the JSON.
+        :return: The corresponding type from the dictionary if it exists, otherwise an empty string is returned.
+        """
+        for key in VALUE_TYPE.keys():
+            if dtype.lower() == key.lower():
+                return key
+        self.warnings.append(
+            f"Could not recognise dtype {dtype} from transformation"
+            f" {transformation_name} in component {self.parent_component.name}."
+        )
+        return ""
+
     def _parse_transformation_type(
         self, transformation_type: str, transformation_name: str
     ) -> Union[TransformationType, str]:
@@ -197,8 +200,8 @@ class TransformationReader:
             return TRANSFORMATION_MAP[transformation_type]
         except KeyError:
             self.warnings.append(
-                f"Could not recognise transformation {transformation_name} with type"
-                f" {transformation_type} in component {self.parent_component.name}."
+                f"Could not recognise transformation type {transformation_type} of transformation"
+                f" {transformation_name} in component {self.parent_component.name}."
             )
             return ""
 
@@ -214,7 +217,7 @@ class TransformationReader:
             values = self._get_transformation_property(
                 "values", json_transformation, name
             )
-            if not values:
+            if values is None:
                 continue
 
             dataset = self._get_transformation_property(
@@ -224,7 +227,12 @@ class TransformationReader:
                 continue
 
             dtype = self._get_transformation_property(
-                "type", dataset, name, parse_result_func=_parse_dtype
+                "type",
+                dataset,
+                name,
+                parse_result_func=lambda dtype: self._parse_dtype(
+                    dtype=dtype, transformation_name=name
+                ),
             )
             if not dtype:
                 continue

@@ -8,7 +8,8 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.load_from_json import (
     _contains_transformations,
     TransformationReader,
-    TRANSFORMATION_MAP, _create_transformation_dataset,
+    TRANSFORMATION_MAP,
+    _create_transformation_dataset,
 )
 
 
@@ -210,6 +211,25 @@ def test_GIVEN_no_values_WHEN_attempting_to_create_transformations_THEN_create_t
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
+def test_GIVEN_no_dataset_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
+    transformation_reader, transformation_json
+):
+    del transformation_json["children"][0]["dataset"]
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
+def test_GIVEN_no_datatype_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
+    transformation_reader, transformation_json
+):
+    transformation_json["children"][0]["dataset"]["a"] = "b"
+    del transformation_json["children"][0]["dataset"]["type"]
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
 def test_GIVEN_no_attributes_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
     transformation_reader, transformation_json
 ):
@@ -257,7 +277,6 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
 
     values = _create_transformation_dataset(angle_or_magnitude, "Double", name)
 
-
     transformation_reader._create_transformations(transformation_json["children"])
     transformation_reader.parent_component._create_and_add_transform.assert_called_once_with(
         name,
@@ -268,3 +287,35 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
         depends_on,
         values,
     )
+
+
+def test_GIVEN_unrecognised_dtype_WHEN_parsing_dtype_THEN_parse_dtype_returns_empty_string(
+    transformation_reader,
+):
+
+    n_warnings = len(transformation_reader.warnings)
+
+    assert not transformation_reader._parse_dtype("notvalid", "TransformationName")
+    assert len(transformation_reader.warnings) == n_warnings + 1
+    assert "dtype" in transformation_reader.warnings[-1]
+
+
+@pytest.mark.parametrize("dtype", ["double", "Double", "DOUBLE"])
+def test_GIVEN_different_types_of_double_WHEN_parsing_dtype_THEN_parse_dtype_returns_same_value(
+    transformation_reader, dtype
+):
+
+    assert transformation_reader._parse_dtype(dtype, "TransformationName") == "Double"
+
+
+def test_GIVEN_unrecognised_transformation_type_WHEN_parsing_transformation_type_THEN_parse_transformation_type_returns_empty_string(
+    transformation_reader,
+):
+
+    n_warnings = len(transformation_reader.warnings)
+
+    assert not transformation_reader._parse_transformation_type(
+        "notvalid", "TransformationName"
+    )
+    assert len(transformation_reader.warnings) == n_warnings + 1
+    assert "transformation type" in transformation_reader.warnings[-1]
