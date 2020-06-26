@@ -81,6 +81,13 @@ def _retrieve_children_list(json_dict: dict) -> list:
 def _create_transformation_dataset(
     angle_or_magnitude: float, dtype: str, name: str
 ) -> Dataset:
+    """
+    Creates the transformation dataset using the angle/magnitude, name, and dtype of the transformation.
+    :param angle_or_magnitude: The angle or magnitude.
+    :param dtype: The data type.
+    :param name: The transformation name.
+    :return: A dataset containing the above information.
+    """
     return Dataset(
         name, dataset=DatasetMetadata(size=[1], type=dtype), values=angle_or_magnitude,
     )
@@ -200,15 +207,16 @@ class TransformationReader:
             return TRANSFORMATION_MAP[transformation_type]
         except KeyError:
             self.warnings.append(
-                f"Could not recognise transformation type {transformation_type} of transformation"
-                f" {transformation_name} in component {self.parent_component.name}."
+                f"Could not recognise transformation type {transformation_type} of"
+                f" transformation {transformation_name} in component"
+                f" {self.parent_component.name}."
             )
             return ""
 
     def _create_transformations(self, json_transformations: list):
         """
         Uses the information contained in the JSON dictionary to construct a list of Transformations.
-        :param json_transformations:
+        :param json_transformations: A list of JSON transformation entries.
         """
         for json_transformation in json_transformations:
 
@@ -230,8 +238,8 @@ class TransformationReader:
                 "type",
                 dataset,
                 name,
-                parse_result_func=lambda dtype: self._parse_dtype(
-                    dtype=dtype, transformation_name=name
+                parse_result_func=lambda datatype: self._parse_dtype(
+                    dtype=datatype, transformation_name=name
                 ),
             )
             if not dtype:
