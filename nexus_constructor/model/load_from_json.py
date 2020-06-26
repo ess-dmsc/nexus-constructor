@@ -375,7 +375,6 @@ class JSONReader:
                 TransformationReader(
                     component, json_object["children"]
                 ).add_transformations_to_component()
-                print(name, component.transforms_list)
             except KeyError:
                 pass
 
