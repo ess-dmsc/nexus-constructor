@@ -284,6 +284,8 @@ class TransformationReader:
                 depends_on,
                 values,
             )
+            transform = self.parent_component.transforms_list[-1]
+            self.parent_component.depends_on = transform
 
 
 class JSONReader:
@@ -373,6 +375,7 @@ class JSONReader:
                 TransformationReader(
                     component, json_object["children"]
                 ).add_transformations_to_component()
+                print(name, component.transforms_list)
             except KeyError:
                 pass
 
