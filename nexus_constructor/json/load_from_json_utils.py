@@ -13,7 +13,7 @@ def _find_attribute_from_dict(attribute_name: str, entry: dict) -> Any:
         return entry.get("values")
     if entry.get(attribute_name):
         return entry.get(attribute_name)
-    return ""
+    return None
 
 
 def _find_attribute_from_list_or_dict(
@@ -26,10 +26,16 @@ def _find_attribute_from_list_or_dict(
     """
     if isinstance(entry, list):
         for item in entry:
-            return _find_attribute_from_dict(attribute_name, item)
+            attribute = _find_attribute_from_dict(attribute_name, item)
+            if attribute:
+                return attribute
+        return None
     elif isinstance(entry, dict):
         return _find_attribute_from_dict(attribute_name, entry)
 
 
 def _find_nx_class(entry: Union[list, dict]) -> str:
-    return _find_attribute_from_list_or_dict(NX_CLASS, entry)
+    nx_class = _find_attribute_from_list_or_dict(NX_CLASS, entry)
+    if nx_class:
+        return nx_class
+    return ""

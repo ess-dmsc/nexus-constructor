@@ -112,9 +112,11 @@ class JSONReader:
                 self.entry.instrument.add_component(component)
 
             try:
-                TransformationReader(
+                transformation_reader = TransformationReader(
                     component, json_object["children"]
-                ).add_transformations_to_component()
+                )
+                transformation_reader.add_transformations_to_component()
+                self.warnings += transformation_reader.warnings
             except KeyError:
                 pass
 

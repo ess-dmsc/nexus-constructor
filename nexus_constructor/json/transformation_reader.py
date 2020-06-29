@@ -26,12 +26,9 @@ def _contains_transformations(entry: dict) -> bool:
     :return: True if the component has transformations, False otherwise.
     """
     try:
-        for attribute in entry["attributes"]:
-            if NX_TRANSFORMATION in _find_nx_class(attribute):
-                return True
+        return NX_TRANSFORMATION in _find_nx_class(entry["attributes"])
     except KeyError:
         return False
-    return False
 
 
 def _create_transformation_dataset(
@@ -181,7 +178,6 @@ class TransformationReader:
             )
             if not dataset:
                 continue
-
             dtype = self._get_transformation_attribute("type", dataset, name,)
             if not dtype:
                 continue
