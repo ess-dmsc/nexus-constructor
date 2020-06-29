@@ -1,4 +1,4 @@
-from typing import Any, Callable, Union
+from typing import Any, Union
 
 from PySide2.QtGui import QVector3D
 
@@ -48,6 +48,11 @@ def _create_transformation_dataset(
 
 class TransformationReader:
     def __init__(self, parent_component: Component, entry: list):
+        """
+        Reads transformations from a JSON dictionary.
+        :param parent_component: The parent component that the transformations should be added to.
+        :param entry: The children of the component entry.
+        """
         self.parent_component = parent_component
         self.entry = entry
         self.warnings = []
@@ -70,7 +75,6 @@ class TransformationReader:
         json_transformation: dict,
         transform_name: str = None,
         failure_value: Any = None,
-        parse_result_func: Callable = None,
     ) -> Any:
         """
         Tries to find a certain property of a transformation from dictionary.
@@ -78,15 +82,11 @@ class TransformationReader:
         :param json_transformation: The dictionary to look for the property in.
         :param transform_name: The name of the transformation (if known).
         :param failure_value: The value to return if the property cannot be found.
-        :param parse_result_func: A function that should be called on the dictionary value if it is found.
         :return: Returns the property or converted property if this exists in the dictionary, if the property is not
         found in the dictionary then the failure_value is returned.
         """
         try:
-            if not parse_result_func:
-                return json_transformation[property_name]
-            else:
-                return parse_result_func(json_transformation[property_name])
+            return json_transformation[property_name]
         except KeyError:
             if transform_name:
                 msg = (
@@ -106,7 +106,6 @@ class TransformationReader:
         transformation_name: str,
         attributes_list: list,
         failure_value: Any = None,
-        parse_result_func: Callable = None,
     ) -> Any:
         """
         Searches the dictionaries in a list to see if one of them has a given property.
@@ -114,16 +113,12 @@ class TransformationReader:
         :param transformation_name: The name of the transformation that is being constructed.
         :param attributes_list: The list of dictionaries.
         :param failure_value: The value to return if the property is not contained in any of the dictionaries.
-        :param parse_result_func: todo: description
         :return: The value of the property if is is found in the list, otherwise the failure value is returned.
         """
         for attribute in attributes_list:
             try:
                 if attribute["name"] == property_name:
-                    if parse_result_func:
-                        return parse_result_func(attribute["values"])
-                    else:
-                        return attribute["values"]
+                    return attribute["values"]
             except KeyError:
                 break
         self.warnings.append(
@@ -187,14 +182,10 @@ class TransformationReader:
             if not dataset:
                 continue
 
-            dtype = self._get_transformation_property(
-                "type",
-                dataset,
-                name,
-                parse_result_func=lambda datatype: self._parse_dtype(
-                    dtype=datatype, transformation_name=name
-                ),
-            )
+            dtype = self._get_transformation_property("type", dataset, name,)
+            if not dtype:
+                continue
+            dtype = self._parse_dtype(dtype, name)
             if not dtype:
                 continue
 
@@ -209,12 +200,12 @@ class TransformationReader:
                 continue
 
             transformation_type = self._find_property_in_list(
-                "transformation_type",
-                name,
-                attributes,
-                parse_result_func=lambda transform_type: self._parse_transformation_type(
-                    transformation_type=transform_type, transformation_name=name
-                ),
+                "transformation_type", name, attributes,
+            )
+            if not transformation_type:
+                continue
+            transformation_type = self._parse_transformation_type(
+                transformation_type, name
             )
             if not transformation_type:
                 continue
