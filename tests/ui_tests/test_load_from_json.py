@@ -213,9 +213,6 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
         assert not json_reader.load_model_from_json("filename")
 
 
-
-
-
 @pytest.mark.parametrize("nx_class", ["", "notannxclass"])
 def test_GIVEN_invalid_nx_class_WHEN_obtained_nx_class_value_THEN_validate_nx_class_returns_false(
     nx_class, json_reader
