@@ -125,7 +125,7 @@ class TransformationReader:
                     else:
                         return attribute["values"]
             except KeyError:
-                continue
+                break
         self.warnings.append(
             f"Unable to find {property_name} property in transformation"
             f" {transformation_name} from component {self.parent_component.name}"
