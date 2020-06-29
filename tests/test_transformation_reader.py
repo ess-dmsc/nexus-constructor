@@ -4,13 +4,9 @@ import pytest
 from PySide2.QtGui import QVector3D
 from mock import Mock
 
+from nexus_constructor.json.transformation_reader import TransformationReader, _contains_transformations, \
+    TRANSFORMATION_MAP, _create_transformation_dataset
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.load_from_json import (
-    _contains_transformations,
-    TransformationReader,
-    TRANSFORMATION_MAP,
-    _create_transformation_dataset,
-)
 
 
 @pytest.fixture(scope="function")
