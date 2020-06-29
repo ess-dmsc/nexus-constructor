@@ -292,7 +292,6 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
 def test_GIVEN_unrecognised_dtype_WHEN_parsing_dtype_THEN_parse_dtype_returns_empty_string(
     transformation_reader,
 ):
-
     n_warnings = len(transformation_reader.warnings)
 
     assert not transformation_reader._parse_dtype("notvalid", "TransformationName")
@@ -304,7 +303,6 @@ def test_GIVEN_unrecognised_dtype_WHEN_parsing_dtype_THEN_parse_dtype_returns_em
 def test_GIVEN_different_types_of_double_WHEN_parsing_dtype_THEN_parse_dtype_returns_same_value(
     transformation_reader, dtype
 ):
-
     assert transformation_reader._parse_dtype(dtype, "TransformationName") == "Double"
 
 
@@ -319,3 +317,21 @@ def test_GIVEN_unrecognised_transformation_type_WHEN_parsing_transformation_type
     )
     assert len(transformation_reader.warnings) == n_warnings + 1
     assert "transformation type" in transformation_reader.warnings[-1]
+
+
+def test_GIVEN_invalid_dtype_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
+    transformation_reader, transformation_json
+):
+    transformation_json["children"][0]["dataset"]["type"] = "NotAType"
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
+def test_GIVEN_invalid_transformation_type_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
+    transformation_reader, transformation_json
+):
+    transformation_json["children"][0]["attributes"][1]["values"] = "NotAType"
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
