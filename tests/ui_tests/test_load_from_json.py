@@ -64,7 +64,6 @@ def nexus_json_dictionary() -> dict:
 
 @pytest.fixture(scope="function")
 def json_dict_with_component():
-
     json_string = """
     {
       "nexus_structure":{
@@ -155,9 +154,8 @@ def json_dict_with_component():
 
 
 def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_returns_false(
-    json_reader,
+        json_reader,
 ):
-
     json_string = """
     {
       "nexus_structure": {
@@ -206,24 +204,35 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
     """
 
     with patch(
-        "nexus_constructor.json.load_from_json.open",
-        mock_open(read_data=json_string),
-        create=True,
+            "nexus_constructor.json.load_from_json.open",
+            mock_open(read_data=json_string),
+            create=True,
     ):
         assert not json_reader.load_model_from_json("filename")
 
 
+def test_GIVEN_unable_to_find_nexus_structure_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
+    assert not _retrieve_children_list(dict())
+
+
+def test_GIVEN_unable_to_find_first_children_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
+    assert not _retrieve_children_list({"nexus_structure": None})
+
+
+def test_GIVEN_unable_to_find_second_children_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
+    assert not _retrieve_children_list({"nexus_structure": {"children": [dict()]}})
+
+
 @pytest.mark.parametrize("nx_class", ["", "notannxclass"])
 def test_GIVEN_invalid_nx_class_WHEN_obtained_nx_class_value_THEN_validate_nx_class_returns_false(
-    nx_class, json_reader
+        nx_class, json_reader
 ):
     assert not json_reader._validate_nx_class("name", nx_class)
 
 
 def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_new_sample_name(
-    nexus_json_dictionary, json_reader
+        nexus_json_dictionary, json_reader
 ):
-
     sample_name = "NewSampleName"
     nexus_json_dictionary["nexus_structure"]["children"][0]["children"][1][
         "name"
@@ -238,9 +247,8 @@ def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_n
 
 
 def test_GIVEN_no_nx_instrument_class_WHEN_loading_from_json_THEN_read_json_object_returns_false(
-    nexus_json_dictionary, json_reader
+        nexus_json_dictionary, json_reader
 ):
-
     nx_instrument = nexus_json_dictionary["nexus_structure"]["children"][0]["children"][
         0
     ]
@@ -250,9 +258,8 @@ def test_GIVEN_no_nx_instrument_class_WHEN_loading_from_json_THEN_read_json_obje
 
 
 def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contains_component_with_json_name(
-    json_dict_with_component, json_reader
+        json_dict_with_component, json_reader
 ):
-
     component_name = "ComponentName"
     json_dict_with_component["nexus_structure"]["children"][0]["children"][0][
         "children"
@@ -265,7 +272,7 @@ def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contain
 
 
 def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_contains_component_with_nx_class(
-    json_dict_with_component, json_reader
+        json_dict_with_component, json_reader
 ):
     component_class = "NXcrystal"
     json_dict_with_component["nexus_structure"]["children"][0]["children"][0][

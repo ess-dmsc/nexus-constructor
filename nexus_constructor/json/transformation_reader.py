@@ -6,7 +6,10 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.value_type import VALUE_TYPE
 from nexus_constructor.transformation_types import TransformationType
-from nexus_constructor.json.load_from_json_utils import _read_nx_class
+from nexus_constructor.json.load_from_json_utils import (
+    _find_attribute_from_list_or_dict,
+    _find_nx_class,
+)
 
 NX_TRANSFORMATION = "NXtransformation"
 
@@ -24,7 +27,7 @@ def _contains_transformations(entry: dict) -> bool:
     """
     try:
         for attribute in entry["attributes"]:
-            if NX_TRANSFORMATION in _read_nx_class(attribute):
+            if NX_TRANSFORMATION in _find_nx_class(attribute):
                 return True
     except KeyError:
         return False
@@ -69,63 +72,60 @@ class TransformationReader:
                 except KeyError:
                     continue
 
-    def _get_transformation_property(
+    def _get_transformation_attribute(
         self,
-        property_name: str,
+        attribute_name: str,
         json_transformation: dict,
         transform_name: str = None,
         failure_value: Any = None,
     ) -> Any:
         """
-        Tries to find a certain property of a transformation from dictionary.
-        :param property_name: The name of the property fields.
-        :param json_transformation: The dictionary to look for the property in.
+        Tries to find a certain attribute of a transformation from dictionary.
+        :param attribute_name: The name of the attribute fields.
+        :param json_transformation: The dictionary to look for the attribute in.
         :param transform_name: The name of the transformation (if known).
-        :param failure_value: The value to return if the property cannot be found.
-        :return: Returns the property or converted property if this exists in the dictionary, if the property is not
+        :param failure_value: The value to return if the attribute cannot be found.
+        :return: Returns the attribute or converted attribute if this exists in the dictionary, if the attribute is not
         found in the dictionary then the failure_value is returned.
         """
         try:
-            return json_transformation[property_name]
+            return json_transformation[attribute_name]
         except KeyError:
             if transform_name:
                 msg = (
-                    f"Cannot find {property_name} for transformation in component"
+                    f"Cannot find {attribute_name} for transformation in component"
                     f" {transform_name}"
                 )
                 f" {self.parent_component.name}."
             else:
-                msg = f"Cannot find {property_name} for transformation in component"
+                msg = f"Cannot find {attribute_name} for transformation in component"
                 f" {self.parent_component.name}."
             self.warnings.append(msg)
             return failure_value
 
-    def _find_property_in_list(
+    def _find_attribute_in_list(
         self,
-        property_name: str,
+        attribute_name: str,
         transformation_name: str,
         attributes_list: list,
         failure_value: Any = None,
     ) -> Any:
         """
-        Searches the dictionaries in a list to see if one of them has a given property.
-        :param property_name: The name of the property that is being looked for.
+        Searches the dictionaries in a list to see if one of them has a given attribute.
+        :param attribute_name: The name of the attribute that is being looked for.
         :param transformation_name: The name of the transformation that is being constructed.
         :param attributes_list: The list of dictionaries.
-        :param failure_value: The value to return if the property is not contained in any of the dictionaries.
-        :return: The value of the property if is is found in the list, otherwise the failure value is returned.
+        :param failure_value: The value to return if the attribute is not contained in any of the dictionaries.
+        :return: The value of the attribute if is is found in the list, otherwise the failure value is returned.
         """
-        for attribute in attributes_list:
-            try:
-                if attribute["name"] == property_name:
-                    return attribute["values"]
-            except KeyError:
-                break
-        self.warnings.append(
-            f"Unable to find {property_name} property in transformation"
-            f" {transformation_name} from component {self.parent_component.name}"
-        )
-        return failure_value
+        attribute = _find_attribute_from_list_or_dict(attribute_name, attributes_list)
+        if not attribute:
+            self.warnings.append(
+                f"Unable to find {attribute_name} attribute in transformation"
+                f" {transformation_name} from component {self.parent_component.name}"
+            )
+            return failure_value
+        return attribute
 
     def _parse_dtype(self, dtype: str, transformation_name: str) -> str:
         """
@@ -168,38 +168,38 @@ class TransformationReader:
         """
         for json_transformation in json_transformations:
 
-            name = self._get_transformation_property("name", json_transformation)
+            name = self._get_transformation_attribute("name", json_transformation)
 
-            values = self._get_transformation_property(
+            values = self._get_transformation_attribute(
                 "values", json_transformation, name
             )
             if values is None:
                 continue
 
-            dataset = self._get_transformation_property(
+            dataset = self._get_transformation_attribute(
                 "dataset", json_transformation, name
             )
             if not dataset:
                 continue
 
-            dtype = self._get_transformation_property("type", dataset, name,)
+            dtype = self._get_transformation_attribute("type", dataset, name,)
             if not dtype:
                 continue
             dtype = self._parse_dtype(dtype, name)
             if not dtype:
                 continue
 
-            attributes = self._get_transformation_property(
+            attributes = self._get_transformation_attribute(
                 "attributes", json_transformation, name
             )
             if not attributes:
                 continue
 
-            units = self._find_property_in_list("units", name, attributes)
+            units = self._find_attribute_in_list("units", name, attributes)
             if not units:
                 continue
 
-            transformation_type = self._find_property_in_list(
+            transformation_type = self._find_attribute_in_list(
                 "transformation_type", name, attributes,
             )
             if not transformation_type:
@@ -210,7 +210,7 @@ class TransformationReader:
             if not transformation_type:
                 continue
 
-            vector = self._find_property_in_list(
+            vector = self._find_attribute_in_list(
                 "vector", name, attributes, [0.0, 0.0, 0.0]
             )
 

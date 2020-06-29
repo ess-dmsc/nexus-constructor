@@ -3,7 +3,7 @@ import json
 from PySide2.QtWidgets import QWidget
 
 from nexus_constructor.component.component_type import COMPONENT_TYPES
-from nexus_constructor.json.load_from_json_utils import _read_nx_class
+from nexus_constructor.json.load_from_json_utils import _find_nx_class
 from nexus_constructor.json.transformation_reader import TransformationReader
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
@@ -90,7 +90,7 @@ class JSONReader:
 
         if name:
 
-            nx_class = _read_nx_class(json_object.get("attributes"))
+            nx_class = _find_nx_class(json_object.get("attributes"))
 
             if nx_class == NX_INSTRUMENT:
                 return all(
