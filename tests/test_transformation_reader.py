@@ -348,4 +348,17 @@ def test_GIVEN_transformation_has_depends_on_chain_WHEN_getting_depends_on_value
     transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
     transformation_reader._create_transformations(transformation_json["children"])
 
-    assert transformation_reader.depends_on[transformation_name] == depends_on_path
+    assert (
+        transformation_reader.depends_on_paths[transformation_name] == depends_on_path
+    )
+
+
+@pytest.mark.parametrize("depends_on_path", [".", None])
+def test_GIVEN_transformation_has_no_depends_on_chain_WHEN_getting_depends_on_value_THEN_path_string_isnt_stored_in_dictionary(
+    transformation_reader, transformation_json, depends_on_path
+):
+
+    transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    assert len(transformation_reader.depends_on_paths) == 0

@@ -57,7 +57,7 @@ class TransformationReader:
         self.parent_component = parent_component
         self.entry = entry
         self.warnings = []
-        self.depends_on = dict()
+        self.depends_on_paths = dict()
 
     def add_transformations_to_component(self):
         """
@@ -229,4 +229,4 @@ class TransformationReader:
             )
 
             if depends_on not in DEPENDS_ON_IGNORE:
-                self.depends_on[name] = depends_on
+                self.depends_on_paths[name] = depends_on
