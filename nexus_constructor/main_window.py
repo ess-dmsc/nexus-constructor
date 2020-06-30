@@ -10,7 +10,7 @@ from nexusutils.nexusbuilder import NexusBuilder
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.load_from_json import JSONReader
+from nexus_constructor.json.load_from_json import JSONReader
 from nexus_constructor.ui_utils import file_dialog
 from nexus_constructor.model.model import Model
 from ui.main_window import Ui_MainWindow

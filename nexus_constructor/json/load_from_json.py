@@ -1,43 +1,18 @@
 import json
-from typing import Union
 
 from PySide2.QtWidgets import QWidget
 
 from nexus_constructor.component.component_type import COMPONENT_TYPES
+from nexus_constructor.json.load_from_json_utils import _find_nx_class
+from nexus_constructor.json.transformation_reader import TransformationReader
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.ui_utils import show_warning_dialog
 
-NX_CLASS = "NX_class"
+
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
-
-
-def _find_nx_class(entry: dict) -> str:
-    """
-    Attempts to find the NXclass of a component in the dictionary.
-    :param entry: The dictionary containing the NXclass information for a given component.
-    :return: The NXclass if it was able to find it, otherwise an empty string is returned.
-    """
-    if entry.get("name") == NX_CLASS:
-        return entry.get("values")
-    if entry.get(NX_CLASS):
-        return entry.get(NX_CLASS)
-    return ""
-
-
-def _read_nx_class(entry: Union[list, dict]) -> str:
-    """
-    Attempts to determine the NXclass of a component in a list/dictionary.
-    :param entry: A dictionary of list of a dictionary containing NXclass information.
-    :return: The NXclass if it can be found, otherwise an emtpy string is returned.
-    """
-    if isinstance(entry, list):
-        for item in entry:
-            return _find_nx_class(item)
-    elif isinstance(entry, dict):
-        return _find_nx_class(entry)
 
 
 def _retrieve_children_list(json_dict: dict) -> list:
@@ -55,7 +30,6 @@ def _retrieve_children_list(json_dict: dict) -> list:
 
 class JSONReader:
     def __init__(self, parent: QWidget):
-
         self.entry = Entry()
         self.entry.instrument = Instrument()
         self.parent = parent
@@ -116,7 +90,7 @@ class JSONReader:
 
         if name:
 
-            nx_class = _read_nx_class(json_object.get("attributes"))
+            nx_class = _find_nx_class(json_object.get("attributes"))
 
             if nx_class == NX_INSTRUMENT:
                 return all(
@@ -136,6 +110,15 @@ class JSONReader:
                 component = Component(name)
                 component.nx_class = nx_class
                 self.entry.instrument.add_component(component)
+
+            try:
+                transformation_reader = TransformationReader(
+                    component, json_object["children"]
+                )
+                transformation_reader.add_transformations_to_component()
+                self.warnings += transformation_reader.warnings
+            except KeyError:
+                pass
 
         else:
             self.warnings.append(
