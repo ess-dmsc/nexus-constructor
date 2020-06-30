@@ -9,6 +9,7 @@ from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
     _find_nx_class,
+    DEPENDS_ON_IGNORE,
 )
 
 NX_TRANSFORMATION = "NXtransformation"
@@ -56,6 +57,7 @@ class TransformationReader:
         self.parent_component = parent_component
         self.entry = entry
         self.warnings = []
+        self.depends_on = dict()
 
     def add_transformations_to_component(self):
         """
@@ -210,18 +212,21 @@ class TransformationReader:
                 "vector", name, attributes, [0.0, 0.0, 0.0]
             )
 
-            depends_on = None
+            depends_on = self._find_attribute_in_list("depends_on", name, attributes)
 
+            temp_depends_on = None
             angle_or_magnitude = values
             values = _create_transformation_dataset(angle_or_magnitude, dtype, name)
 
-            transform = self.parent_component._create_and_add_transform(
+            self.parent_component._create_and_add_transform(
                 name,
                 transformation_type,
                 angle_or_magnitude,
                 units,
                 QVector3D(*vector),
-                depends_on,
+                temp_depends_on,
                 values,
             )
-            self.parent_component.depends_on = transform
+
+            if depends_on not in DEPENDS_ON_IGNORE:
+                self.depends_on[name] = depends_on

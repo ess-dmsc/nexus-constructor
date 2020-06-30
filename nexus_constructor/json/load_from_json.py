@@ -3,13 +3,17 @@ import json
 from PySide2.QtWidgets import QWidget
 
 from nexus_constructor.component.component_type import COMPONENT_TYPES
-from nexus_constructor.json.load_from_json_utils import _find_nx_class
+from nexus_constructor.json.load_from_json_utils import (
+    _find_nx_class,
+    _find_attribute_from_list_or_dict,
+    DEPENDS_ON_IGNORE,
+)
 from nexus_constructor.json.transformation_reader import TransformationReader
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.ui_utils import show_warning_dialog
-
 
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
@@ -28,12 +32,26 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
+def _get_transformation_by_name(
+    component: Component, transformation_name: str
+) -> Transformation:
+    for transformation in component.transforms_list:
+        if transformation.name == transformation_name:
+            return transformation
+
+
+def _connect_dependencies(component: Component, transformation: Transformation):
+    component.depends_on = transformation
+
+
 class JSONReader:
     def __init__(self, parent: QWidget):
         self.entry = Entry()
         self.entry.instrument = Instrument()
         self.parent = parent
         self.warnings = []
+        self.depends_on_paths = dict()
+        self.component_dictionary = dict()
 
     def load_model_from_json(self, filename: str) -> bool:
         """
@@ -69,6 +87,19 @@ class JSONReader:
             for child in children_list:
                 self._read_json_object(
                     child, json_dict["nexus_structure"]["children"][0].get("name")
+                )
+
+            for key in self.depends_on_paths.keys():
+
+                depends_on_path = self.depends_on_paths[key].split("/")[3:]
+
+                target_component_name = depends_on_path[0]
+                target_transformation_name = depends_on_path[-1]
+
+                # Assuming this is always a transformation
+                self.component_dictionary[key].depends_on = _get_transformation_by_name(
+                    self.component_dictionary[target_component_name],
+                    target_transformation_name,
                 )
 
             if self.warnings:
@@ -112,13 +143,20 @@ class JSONReader:
                 self.entry.instrument.add_component(component)
 
             try:
-                transformation_reader = TransformationReader(
-                    component, json_object["children"]
-                )
-                transformation_reader.add_transformations_to_component()
-                self.warnings += transformation_reader.warnings
+                children = json_object["children"]
             except KeyError:
-                pass
+                return
+
+            transformation_reader = TransformationReader(component, children)
+            transformation_reader.add_transformations_to_component()
+            self.warnings += transformation_reader.warnings
+
+            depends_on_path = _find_attribute_from_list_or_dict("depends_on", children)
+
+            if depends_on_path not in DEPENDS_ON_IGNORE:
+                self.depends_on_paths[name] = depends_on_path
+
+            self.component_dictionary[name] = component
 
         else:
             self.warnings.append(

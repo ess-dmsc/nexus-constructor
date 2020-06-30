@@ -23,6 +23,7 @@ class Transformation(Dataset):
 
     _parent_component = attr.ib(type="Component", default=None)
     _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
+    _depends_on_json = attr.ib(type=str, default=None)
 
     @_dependents.default
     def _initialise_dependents(self):
