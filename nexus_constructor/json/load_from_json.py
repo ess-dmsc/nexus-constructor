@@ -40,10 +40,6 @@ def _get_transformation_by_name(
             return transformation
 
 
-def _connect_dependencies(component: Component, transformation: Transformation):
-    component.depends_on = transformation
-
-
 class JSONReader:
     def __init__(self, parent: QWidget):
         self.entry = Entry()
