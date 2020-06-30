@@ -90,7 +90,6 @@ class JSONReader:
                 )
 
             for key in self.depends_on_paths.keys():
-
                 depends_on_path = self.depends_on_paths[key].split("/")[3:]
 
                 target_component_name = depends_on_path[0]
@@ -123,13 +122,14 @@ class JSONReader:
 
             nx_class = _find_nx_class(json_object.get("attributes"))
 
+            try:
+                children = json_object["children"]
+            except KeyError:
+                return
+
             if nx_class == NX_INSTRUMENT:
-                return all(
-                    [
-                        self._read_json_object(child, name)
-                        for child in json_object.get("children")
-                    ]
-                )
+                for child in children:
+                    self._read_json_object(child, name)
 
             if not self._validate_nx_class(name, nx_class):
                 return
@@ -141,11 +141,6 @@ class JSONReader:
                 component = Component(name)
                 component.nx_class = nx_class
                 self.entry.instrument.add_component(component)
-
-            try:
-                children = json_object["children"]
-            except KeyError:
-                return
 
             transformation_reader = TransformationReader(component, children)
             transformation_reader.add_transformations_to_component()
