@@ -1,6 +1,6 @@
 import attr
 from typing import List, Dict, Any
-
+import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.node import Node
 from nexus_constructor.model.value_type import ValueType
@@ -27,11 +27,14 @@ class Dataset(Node):
         self.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
     def as_dict(self) -> Dict[str, Any]:
+        values = self.values
+        if isinstance(values, np.ndarray):
+            values = values.tolist()
         return {
             "name": self.name,
             "type": self.type,
             "attributes": [attribute.as_dict() for attribute in self.attributes]
             if self.attributes
             else None,
-            "values": self.values if self.values else [],
+            "values": values if values else [],
         }

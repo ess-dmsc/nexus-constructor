@@ -412,6 +412,17 @@ class Component(Group):
                 "children": [transform.as_dict() for transform in self.transforms],
             }
         )
+        try:
+            if self.depends_on is not None:
+                dictionary["attributes"].append(
+                    {
+                        "name": CommonAttrs.DEPENDS_ON,
+                        "type": "String",
+                        "values": self.depends_on.name,
+                    }
+                )
+        except AttributeError:
+            pass
         return dictionary
 
 
