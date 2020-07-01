@@ -46,6 +46,7 @@ class JSONReader:
         self.warnings = []
         # key: component name, value: NeXus path pointing to transformation that component depends on
         self.depends_on_paths: Dict[str, str] = dict()
+        # key: component name, value: Component object created from the JSON information
         self.component_dictionary = dict()
 
     def _get_transformation_by_name(
