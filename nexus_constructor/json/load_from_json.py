@@ -154,53 +154,52 @@ class JSONReader:
         :param json_object: A component from the JSON dictionary.
         :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
         """
-        name = json_object.get("name")
-
-        if name:
-
-            nx_class = _find_nx_class(json_object.get("attributes"))
-
-            try:
-                children = json_object["children"]
-            except KeyError:
-                return
-
-            if nx_class == NX_INSTRUMENT:
-                for child in children:
-                    self._read_json_object(child, name)
-
-            if not self._validate_nx_class(name, nx_class):
-                return
-
-            if nx_class == NX_SAMPLE:
-                component = self.entry.instrument.sample
-                component.name = name
-            else:
-                component = Component(name)
-                component.nx_class = nx_class
-                self.entry.instrument.add_component(component)
-
-            transformation_reader = TransformationReader(component, children)
-            transformation_reader.add_transformations_to_component()
-            self.warnings += transformation_reader.warnings
-
-            depends_on_path = _find_attribute_from_list_or_dict("depends_on", children)
-
-            if depends_on_path not in DEPENDS_ON_IGNORE:
-                self.depends_on_paths[name] = depends_on_path
-
-            self.component_dictionary[name] = component
-
-            shape_info = _find_shape_information(children)
-            if shape_info:
-                shape_reader = ShapeReader(component, shape_info)
-                shape_reader.add_shape_to_component()
-                self.warnings += shape_reader.warnings
-
-        else:
+        try:
+            name = json_object["name"]
+        except KeyError:
             self.warnings.append(
                 f"Unable to find object name for child of {parent_name}."
             )
+            return
+
+        nx_class = _find_nx_class(json_object.get("attributes"))
+
+        try:
+            children = json_object["children"]
+        except KeyError:
+            return
+
+        if nx_class == NX_INSTRUMENT:
+            for child in children:
+                self._read_json_object(child, name)
+
+        if not self._validate_nx_class(name, nx_class):
+            return
+
+        if nx_class == NX_SAMPLE:
+            component = self.entry.instrument.sample
+            component.name = name
+        else:
+            component = Component(name)
+            component.nx_class = nx_class
+            self.entry.instrument.add_component(component)
+
+        transformation_reader = TransformationReader(component, children)
+        transformation_reader.add_transformations_to_component()
+        self.warnings += transformation_reader.warnings
+
+        depends_on_path = _find_attribute_from_list_or_dict("depends_on", children)
+
+        if depends_on_path not in DEPENDS_ON_IGNORE:
+            self.depends_on_paths[name] = depends_on_path
+
+        self.component_dictionary[name] = component
+
+        shape_info = _find_shape_information(children)
+        if shape_info:
+            shape_reader = ShapeReader(component, shape_info)
+            shape_reader.add_shape_to_component()
+            self.warnings += shape_reader.warnings
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
