@@ -15,6 +15,11 @@ from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.ui_utils import show_warning_dialog
 
+"""
+The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of valid NeXus files, but are safe if the JSON was created by the NeXus Constructor:
+1. All transformations exist in NXtransformations groups inside components.
+2. All depends_on paths are absolute, not relative.
+"""
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
 
