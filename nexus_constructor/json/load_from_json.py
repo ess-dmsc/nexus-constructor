@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, List
 
 from PySide2.QtWidgets import QWidget
 
@@ -9,6 +9,7 @@ from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
     DEPENDS_ON_IGNORE,
 )
+from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.json.transformation_reader import TransformationReader
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
@@ -36,6 +37,17 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return entry["children"]
     except (KeyError, IndexError, TypeError):
         return []
+
+
+def _find_shape_information(json_list: List[dict]):
+    """
+
+    :param json_list:
+    :return:
+    """
+    for item in json_list:
+        if item["name"] == "shape":
+            return item
 
 
 class JSONReader:
@@ -107,7 +119,6 @@ class JSONReader:
                 )
 
             for dependent_component_name in self.depends_on_paths.keys():
-
                 # The following extraction of the component name and transformation name makes the assumption
                 # that the transformation lives in a component and nowhere else in the file, this is safe assuming
                 # the JSON was created by the NeXus Constructor.
@@ -179,6 +190,12 @@ class JSONReader:
                 self.depends_on_paths[name] = depends_on_path
 
             self.component_dictionary[name] = component
+
+            shape_info = _find_shape_information(children)
+            if shape_info:
+                shape_reader = ShapeReader(component, shape_info)
+                shape_reader.add_shape_to_component()
+                self.warnings += shape_reader.warnings
 
         else:
             self.warnings.append(
