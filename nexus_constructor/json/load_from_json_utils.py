@@ -1,6 +1,7 @@
 from typing import Union, Any
 
 NX_CLASS = "NX_class"
+DEPENDS_ON_IGNORE = [None, "."]
 
 
 def _find_attribute_from_dict(attribute_name: str, entry: dict) -> Any:

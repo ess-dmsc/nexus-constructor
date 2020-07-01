@@ -309,7 +309,6 @@ def test_GIVEN_different_types_of_double_WHEN_parsing_dtype_THEN_parse_dtype_ret
 def test_GIVEN_unrecognised_transformation_type_WHEN_parsing_transformation_type_THEN_parse_transformation_type_returns_empty_string(
     transformation_reader,
 ):
-
     n_warnings = len(transformation_reader.warnings)
 
     assert not transformation_reader._parse_transformation_type(
@@ -335,3 +334,28 @@ def test_GIVEN_invalid_transformation_type_WHEN_attempting_to_create_transformat
     transformation_reader._create_transformations(transformation_json["children"])
 
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
+def test_GIVEN_transformation_has_depends_on_chain_WHEN_getting_depends_on_value_THEN_path_string_is_stored_in_dictionary(
+    transformation_reader, transformation_json
+):
+    depends_on_path = "entry/instrument/component/transformations/transformation1"
+    transformation_json["children"][0][
+        "name"
+    ] = transformation_name = "TransformationName"
+    transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    assert (
+        transformation_reader.depends_on_paths[transformation_name] == depends_on_path
+    )
+
+
+@pytest.mark.parametrize("depends_on_path", [".", None])
+def test_GIVEN_transformation_has_no_depends_on_chain_WHEN_getting_depends_on_value_THEN_path_string_isnt_stored_in_dictionary(
+    transformation_reader, transformation_json, depends_on_path
+):
+    transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
+    transformation_reader._create_transformations(transformation_json["children"])
+
+    assert len(transformation_reader.depends_on_paths) == 0
