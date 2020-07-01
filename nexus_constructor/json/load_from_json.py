@@ -140,7 +140,8 @@ class JSONReader:
     def _read_json_object(self, json_object: dict, parent_name: str = None):
         """
         Tries to create a component based on the contents of the JSON file.
-        :param json_object:  A component from the JSON dictionary.
+        :param json_object: A component from the JSON dictionary.
+        :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
         """
         name = json_object.get("name")
 
@@ -187,6 +188,7 @@ class JSONReader:
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
         Validates the NXclass by checking if it was found, and if it matches known NXclasses for components.
+        :param name: TThe name of the component having its nx class validated.
         :param nx_class: The NXclass string obtained from the dictionary.
         :return: True if the NXclass is valid, False otherwise.
         """
