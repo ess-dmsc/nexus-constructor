@@ -49,7 +49,7 @@ class JSONReader:
     ) -> Transformation:
         """
         Finds a transformation in a component based on its name in order to set the depends_on value.
-        :param component: The component the transformation belongs to.
+        :param component: The component the dependency transformation belongs to.
         :param dependency_transformation_name: The name of the dependency transformation.
         :param dependent_component_name: The name of the dependent component.
         :return: The transformation with the given name.
@@ -99,6 +99,7 @@ class JSONReader:
                 )
 
             for dependent_component_name in self.depends_on_paths.keys():
+
                 depends_on_path = self.depends_on_paths[dependent_component_name].split(
                     "/"
                 )[3:]
