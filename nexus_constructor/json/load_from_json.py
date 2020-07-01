@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 from PySide2.QtWidgets import QWidget
 
@@ -106,6 +107,9 @@ class JSONReader:
 
             for dependent_component_name in self.depends_on_paths.keys():
 
+                # The following extraction of the component name and transformation name makes the assumption
+                # that the transformation lives in a component and nowhere else in the file, this is safe assuming
+                # the JSON was created by the NeXus Constructor.
                 depends_on_path = self.depends_on_paths[dependent_component_name].split(
                     "/"
                 )[3:]
