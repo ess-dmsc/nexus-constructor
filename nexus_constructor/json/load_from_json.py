@@ -32,14 +32,6 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
-def _get_transformation_by_name(
-    component: Component, transformation_name: str
-) -> Transformation:
-    for transformation in component.transforms_list:
-        if transformation.name == transformation_name:
-            return transformation
-
-
 class JSONReader:
     def __init__(self, parent: QWidget):
         self.entry = Entry()
@@ -48,6 +40,23 @@ class JSONReader:
         self.warnings = []
         self.depends_on_paths = dict()
         self.component_dictionary = dict()
+
+    def _get_transformation_by_name(
+        self, component: Component, transformation_name: str
+    ) -> Transformation:
+        """
+        Finds a transformation in a component based on its name.
+        :param component: The component the transformation belongs to.
+        :param transformation_name: The name of the transformation.
+        :return: The transformation with the given name.
+        """
+        for transformation in component.transforms_list:
+            if transformation.name == transformation_name:
+                return transformation
+        self.warnings.append(
+            f"Unable to find transformation with name {transformation_name} in component {component.name} in order to "
+            f"set depends_on value."
+        )
 
     def load_model_from_json(self, filename: str) -> bool:
         """
@@ -92,7 +101,9 @@ class JSONReader:
                 target_transformation_name = depends_on_path[-1]
 
                 # Assuming this is always a transformation
-                self.component_dictionary[key].depends_on = _get_transformation_by_name(
+                self.component_dictionary[
+                    key
+                ].depends_on = self._get_transformation_by_name(
                     self.component_dictionary[target_component_name],
                     target_transformation_name,
                 )
