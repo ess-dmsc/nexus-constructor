@@ -3,7 +3,6 @@ from typing import Dict
 import json
 
 import h5py
-import silx.gui.hdf5
 from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
 from PySide2.QtWidgets import QMainWindow, QApplication, QAction, QMessageBox
@@ -11,6 +10,7 @@ from nexusutils.nexusbuilder import NexusBuilder
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
+from nexus_constructor.json.load_from_json import JSONReader
 from nexus_constructor.ui_utils import file_dialog
 from nexus_constructor.model.model import Model
 from ui.main_window import Ui_MainWindow
@@ -43,16 +43,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
 
-        self.widget = silx.gui.hdf5.Hdf5TreeView()
-        self.widget.setAcceptDrops(True)
-        self.widget.setDragEnabled(True)
         # self.treemodel = self.widget.findHdf5TreeModel()
         # self.treemodel.setDatasetDragEnabled(True)
         # self.treemodel.setFileDropEnabled(True)
         # self.treemodel.setFileMoveEnabled(True)
         # self.treemodel.insertH5pyObject(self.model.signals.nexus_file)
         self.model.signals.file_changed.connect(self.update_nexus_file_structure_view)
-        self.silx_tab_layout.addWidget(self.widget)
         # self.model.signals.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
@@ -61,8 +57,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.model.signals.transformation_changed.connect(
             self._update_transformations_3d_view
         )
-
-        self.widget.setVisible(True)
 
         self._set_up_file_writer_control_window(main_window)
         self.file_writer_control_window = None
@@ -207,27 +201,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         #     existing_file.close()
 
     def open_json_file(self):
-        raise NotImplementedError
-        # filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
-        # if filename:
-        #     with open(filename, "r") as json_file:
-        #         json_data = json_file.read()
-        #
-        #         try:
-        #             nexus_file = json_to_nexus(json_data)
-        #         except Exception as exception:
-        #             show_warning_dialog(
-        #                 "Provided file not recognised as valid JSON",
-        #                 "Invalid JSON",
-        #                 f"{exception}",
-        #                 parent=self,
-        #             )
-        #             return
-        #
-        #         existing_file = self.model.signals.nexus_file
-        #         if self.model.signals.load_nexus_file(nexus_file):
-        #             self._update_views()
-        #             existing_file.close()
+        filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
+        if filename:
+            reader = JSONReader(self)
+            if reader.load_model_from_json(filename):
+                self.model.entry = reader.entry
+                self._update_views()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()

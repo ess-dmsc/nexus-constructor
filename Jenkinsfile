@@ -44,7 +44,6 @@ builders = pipeline_builder.createBuilders { container ->
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
             build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
-            git submodule update --init
             """
     } // stage
     
@@ -79,12 +78,12 @@ builders = pipeline_builder.createBuilders { container ->
     
     if (env.CHANGE_ID) {
         pipeline_builder.stage('Build Executable'){
-            container.sh "cd ${project} && build_env/bin/python setup.py build_exe"
+            container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
         }
         
         pipeline_builder.stage('Archive Executable') {
             def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-            container.copyFrom("${project}/build/", './build')
+            container.copyFrom("${project}/dist/", './build')
             sh "tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
             archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
         } // stage
@@ -102,10 +101,10 @@ return {
             stage("Checkout") {
               scm_vars = checkout scm
             }  // stage
+
+            // N.B. not using virtualenv as it takes >10 minutes to install the dependencies on the Jenkins node
             stage("Setup") {
                   bat """
-                  git submodule update --init
-                  python -m pip install --upgrade virtualenv
                   python -m pip install --user --upgrade -r requirements-dev.txt
                   python -m pip install codecov==2.0.15
                 """
@@ -126,20 +125,21 @@ return {
             if (env.CHANGE_ID) {
                 stage("Build Executable") {
                     bat """
-                    python setup.py build_exe"""
+                    set PATH=%PATH%;%APPDATA%\\Python\\Python36\\Scripts
+                    pyinstaller --windowed --noconfirm nexus-constructor.spec"""
                 } // stage
                 stage('Archive Executable') {
                     def git_commit_short = scm_vars.GIT_COMMIT.take(7)
                     // Compress-Archive cmdlet is really really slow, so better to use 7zip
                     // Manually install with "Install-Module -Name 7Zip4PowerShell" if not already installed
-                    powershell label: 'Archiving build folder', script: "Compress-7Zip -Path .\\build -ArchiveFileName nexus-constructor_windows_${git_commit_short}.zip -Format Zip"
+                    powershell label: 'Archiving build folder', script: "Compress-7Zip -Path .\\dist -ArchiveFileName nexus-constructor_windows_${git_commit_short}.zip -Format Zip"
                     archiveArtifacts 'nexus-constructor*.zip'
                 } // stage
                 stage("Test executable") {
                     timeout(time:15, unit:'SECONDS') {
                         bat """
-                        cd build\\e*\\
-                        NexusConstructor.exe --help
+                        cd dist\\nexus-constructor\\
+                        nexus-constructor.exe --help
                         """
                         }
                 } // stage
@@ -163,7 +163,7 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user --upgrade -r requirements-dev.txt && git submodule update --init"
+                    sh "python3 -m pip install --user --upgrade -r requirements-dev.txt"
                 } // stage
                 stage('Run tests') {
                     sh "python3 -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/"
