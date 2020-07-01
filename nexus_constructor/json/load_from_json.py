@@ -42,20 +42,24 @@ class JSONReader:
         self.component_dictionary = dict()
 
     def _get_transformation_by_name(
-        self, component: Component, transformation_name: str
+        self,
+        component: Component,
+        dependency_transformation_name: str,
+        dependent_component_name: str,
     ) -> Transformation:
         """
-        Finds a transformation in a component based on its name.
+        Finds a transformation in a component based on its name in order to set the depends_on value.
         :param component: The component the transformation belongs to.
-        :param transformation_name: The name of the transformation.
+        :param dependency_transformation_name: The name of the dependency transformation.
+        :param dependent_component_name: The name of the dependent component.
         :return: The transformation with the given name.
         """
         for transformation in component.transforms_list:
-            if transformation.name == transformation_name:
+            if transformation.name == dependency_transformation_name:
                 return transformation
         self.warnings.append(
-            f"Unable to find transformation with name {transformation_name} in component {component.name} in order to "
-            f"set depends_on value."
+            f"Unable to find transformation with name {dependency_transformation_name} in component {component.name} in order to "
+            f"set depends_on value for component {dependent_component_name}."
         )
 
     def load_model_from_json(self, filename: str) -> bool:
@@ -94,18 +98,21 @@ class JSONReader:
                     child, json_dict["nexus_structure"]["children"][0].get("name")
                 )
 
-            for key in self.depends_on_paths.keys():
-                depends_on_path = self.depends_on_paths[key].split("/")[3:]
+            for dependent_component_name in self.depends_on_paths.keys():
+                depends_on_path = self.depends_on_paths[dependent_component_name].split(
+                    "/"
+                )[3:]
 
-                target_component_name = depends_on_path[0]
-                target_transformation_name = depends_on_path[-1]
+                dependency_component_name = depends_on_path[0]
+                dependency_transformation_name = depends_on_path[-1]
 
                 # Assuming this is always a transformation
                 self.component_dictionary[
-                    key
+                    dependent_component_name
                 ].depends_on = self._get_transformation_by_name(
-                    self.component_dictionary[target_component_name],
-                    target_transformation_name,
+                    self.component_dictionary[dependency_component_name],
+                    dependency_transformation_name,
+                    dependent_component_name,
                 )
 
             if self.warnings:
