@@ -10,7 +10,9 @@ from nexus_constructor.model.component import (
     Component,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
+    SHAPE_GROUP_NAME,
 )
+from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     METRES,
@@ -83,6 +85,14 @@ class ShapeReader:
             )
             return
 
+        try:
+            name = self.shape_info["name"]
+        except KeyError:
+            self.warnings.append(
+                f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
+            )
+            name = "shape"
+
         if not isinstance(children, list):
             self.warnings.append(
                 f"{self.error_message} Children attribute in shape group is not a list."
@@ -120,6 +130,9 @@ class ShapeReader:
         winding_order = self._find_and_validate_winding_order(winding_order_dataset)
         if not winding_order:
             return
+
+        off_geometry = OFFGeometryNexus(name)
+        self.component[SHAPE_GROUP_NAME] = off_geometry
 
     def _add_cylindrical_shape_to_component(self):
         pass
