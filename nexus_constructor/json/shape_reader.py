@@ -118,6 +118,8 @@ class ShapeReader:
             self.warnings.append("A message.")
             return
 
+        self._validate_list_size(faces_dataset["dataset"], faces)
+
         if not _all_in_list_have_expected_type(faces, "int"):
             self.warnings.append("A message.")
             return
@@ -134,10 +136,13 @@ class ShapeReader:
             values = vertices_dataset["values"]
         except KeyError:
             self.warnings.append("A message.")
+            return
 
         if not isinstance(values, list):
             self.warnings.append("A message.")
             return
+
+        self._validate_list_size(vertices_dataset["dataset"], values)
 
         vertices = []
 
@@ -199,8 +204,17 @@ class ShapeReader:
             self.warnings.append("A warning")
             return
 
+        self._validate_list_size(winding_order_dataset["dataset"], values)
+
         if not _all_in_list_have_expected_type(values, "int"):
             self.warnings.append("A message.")
             return
 
         return values
+
+    def _validate_list_size(self, data_properties: dict, values: List):
+        try:
+            if data_properties["size"][0] != len(values):
+                self.warnings.append("A warning.")
+        except KeyError:
+            self.warnings.append("A warning.")
