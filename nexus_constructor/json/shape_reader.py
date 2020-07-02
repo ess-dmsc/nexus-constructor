@@ -19,6 +19,10 @@ from nexus_constructor.unit_utils import (
 )
 
 
+def _all_in_list_have_expected_type(values: list, expected_type: str):
+    return all([expected_type in str(type(value)) for value in values])
+
+
 class ShapeReader:
     def __init__(self, component: Component, shape_info: dict):
         self.component = component
@@ -79,6 +83,10 @@ class ShapeReader:
         if not vertices:
             return
 
+        winding_order = self._find_and_validate_winding_order(winding_order_dataset)
+        if not winding_order:
+            return
+
     def _add_cylindrical_shape_to_component(self):
         pass
 
@@ -110,7 +118,7 @@ class ShapeReader:
             self.warnings.append("A message.")
             return
 
-        if not all(["int" in str(type(face)) for face in faces]):
+        if not _all_in_list_have_expected_type(faces, "int"):
             self.warnings.append("A message.")
             return
 
@@ -174,3 +182,25 @@ class ShapeReader:
             return
 
         return units
+
+    def _find_and_validate_winding_order(
+        self, winding_order_dataset: dict
+    ) -> Union[List[int], None]:
+
+        self._validate_data_type(winding_order_dataset, "int")
+
+        try:
+            values = winding_order_dataset["values"]
+        except KeyError:
+            self.warnings.append("A warning.")
+            return
+
+        if not isinstance(values, list):
+            self.warnings.append("A warning")
+            return
+
+        if not _all_in_list_have_expected_type(values, "int"):
+            self.warnings.append("A message.")
+            return
+
+        return values
