@@ -65,7 +65,8 @@ class ShapeReader:
             self._add_cylindrical_shape_to_component()
         else:
             self.warnings.append(
-                f"Unrecgonised shape type for component {self.component.name}. Expected '{OFF_GEOMETRY_NX_CLASS}' or '{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}.'"
+                f"Unrecgonised shape type for component {self.component.name}. Expected '{OFF_GEOMETRY_NX_CLASS}' or "
+                f"'{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}.' "
             )
 
     def _add_off_shape_to_component(self):
@@ -220,7 +221,8 @@ class ShapeReader:
         try:
             if expected_type not in dataset["dataset"]["type"]:
                 self.warnings.append(
-                    f"{self.issue_message} Type attribute for {parent_name} doe not match expected type {expected_type}."
+                    f"{self.issue_message} Type attribute for {parent_name} doe not match expected type "
+                    f"{expected_type}."
                 )
         except KeyError:
             self.warnings.append(
@@ -255,7 +257,8 @@ class ShapeReader:
             return
         if not units_are_expected_dimensionality(units, METRES, False):
             self.warnings.append(
-                f"{self.error_message} Vertices units have wrong dimensionality. Expected something that can be converted to metred but found {units}."
+                f"{self.error_message} Vertices units have wrong dimensionality. Expected something that can be "
+                f"converted to metred but found {units}. "
             )
             return
         if not units_have_magnitude_of_one(units, False):
@@ -316,7 +319,8 @@ class ShapeReader:
         try:
             if data_properties["size"][0] != len(values):
                 self.warnings.append(
-                    f"{self.issue_message} Mismatch between length of {parent_name} list ({len(values)}) and size attribute from dataset ({data_properties['size'][0]})."
+                    f"{self.issue_message} Mismatch between length of {parent_name} list ({len(values)}) and size "
+                    f"attribute from dataset ({data_properties['size'][0]}). "
                 )
         except KeyError:
             self.warnings.append(
