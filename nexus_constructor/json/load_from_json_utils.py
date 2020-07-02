@@ -43,6 +43,4 @@ def _find_nx_class(entry: Union[list, dict]) -> str:
     :return: The NXclass if it could be found, otherwise an empty string is returned.
     """
     nx_class = _find_attribute_from_list_or_dict(NX_CLASS, entry)
-    if nx_class:
-        return nx_class
-    return ""
+    return nx_class if nx_class is not None else ""
