@@ -36,6 +36,12 @@ def _all_in_list_have_expected_type(values: list, expected_type: str):
     return all([expected_type in str(type(value)) for value in values])
 
 
+def _create_list_of_faces(
+    faces_starting_indices: List[int], winding_order: List[int]
+) -> List[List[int]]:
+    return [winding_order[index : index + 3] for index in faces_starting_indices]
+
+
 class ShapeReader:
     def __init__(self, component: Component, shape_info: dict):
         self.component = component
@@ -58,7 +64,9 @@ class ShapeReader:
 
         shape_type = self._get_shape_type()
 
+        # An error message means the shape object couldn't be made
         self.error_message = f"Error encountered when constructing {shape_type} for component {self.component.name}:"
+        # An issue message means something didn't add up
         self.issue_message = f"Issue encountered when constructing {shape_type} for component {self.component.name}:"
 
         if shape_type == OFF_GEOMETRY_NX_CLASS:
@@ -68,7 +76,7 @@ class ShapeReader:
         else:
             self.warnings.append(
                 f"Unrecgonised shape type for component {self.component.name}. Expected '{OFF_GEOMETRY_NX_CLASS}' or "
-                f"'{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}.' "
+                f"'{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}.'"
             )
 
     def _add_off_shape_to_component(self):
@@ -113,10 +121,10 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces = self._find_and_validate_faces_list(
+        faces_starting_index = self._find_and_validate_faces_list(
             faces_dataset
         )  # todo: format for OFFGeometry class?
-        if not faces:
+        if not faces_starting_index:
             return
 
         units = self._find_and_validate_units(vertices_dataset)
@@ -130,6 +138,8 @@ class ShapeReader:
         winding_order = self._find_and_validate_winding_order(winding_order_dataset)
         if not winding_order:
             return
+
+        faces = _create_list_of_faces(faces_starting_index, winding_order)
 
         off_geometry = OFFGeometryNexus(name)
         self.component[SHAPE_GROUP_NAME] = off_geometry
