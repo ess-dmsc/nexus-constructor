@@ -105,11 +105,32 @@ def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_mes
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    for attribute in off_shape_json["children"]:
-        if attribute["name"] == attribute_to_remove:
-            off_shape_json["children"].remove(attribute)
+    attribute = off_shape_reader._get_shape_dataset_from_list(
+        attribute_to_remove, off_shape_json["children"]
+    )
+    off_shape_json["children"].remove(attribute)
 
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
     assert attribute_to_remove in off_shape_reader.warnings[-1]
+
+
+def test_GIVEN_faces_type_value_is_not_int_WHEN_checking_type_THEN_issue_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "faces", off_shape_json["children"]
+    )
+    faces_dataset["dataset"]["type"] = "double"
+
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert off_shape_reader.issue_message in off_shape_reader.warnings[-1]
+    assert (
+        "Type attribute for faces does not match expected type int."
+        in off_shape_reader.warnings[-1]
+    )

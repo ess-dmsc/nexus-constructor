@@ -242,7 +242,7 @@ class ShapeReader:
         try:
             if expected_type not in dataset["dataset"]["type"]:
                 self.warnings.append(
-                    f"{self.issue_message} Type attribute for {parent_name} doe not match expected type "
+                    f"{self.issue_message} Type attribute for {parent_name} does not match expected type "
                     f"{expected_type}."
                 )
         except KeyError:
