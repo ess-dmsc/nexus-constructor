@@ -103,7 +103,6 @@ def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_warning_
 def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_message_is_created(
     off_shape_reader, off_shape_json, attribute_to_change
 ):
-
     n_warnings = len(off_shape_reader.warnings)
 
     for attribute in off_shape_json["children"]:
