@@ -116,7 +116,9 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces_starting_indices = self._find_and_validate_faces_list(faces_dataset)
+        faces_starting_indices = self._find_and_validate_faces_starting_indices_list(
+            faces_dataset
+        )
         if not faces_starting_indices:
             return
 
@@ -152,44 +154,45 @@ class ShapeReader:
         :return: The dataset if it could be found, otherwise None is returned.
         """
         for attribute in children:
-            try:
-                if attribute["name"] == attribute_name:
-                    return attribute
-            except KeyError:
-                pass
+            if attribute["name"] == attribute_name:
+                return attribute
         self.warnings.append(
             f"Couldn't find attribute {attribute_name} for shape in component {self.component.name}."
         )
 
-    def _find_and_validate_faces_list(
+    def _find_and_validate_faces_starting_indices_list(
         self, faces_dataset: dict
     ) -> Union[List[int], None]:
         """
-        Attempts to find and validate the faces data.
+        Attempts to find and validate the faces starting indices data.
         :param faces_dataset: The faces dataset.
-        :return: The list of faces if it was found and passed validation, otherwise None is returned.
+        :return: The list of faces starting indices if it was found and passed validation, otherwise None is returned.
         """
         self._validate_data_type(faces_dataset, INT_TYPE, FACES)
 
         try:
-            faces = faces_dataset["values"]
+            faces_starting_indices = faces_dataset["values"]
         except KeyError:
             self.warnings.append(
-                f"{self.error_message} Unable to find faces list in faces dataset."
+                f"{self.error_message} Unable to find faces starting indices list in faces dataset."
             )
             return
 
-        if not isinstance(faces, list):
-            self.warnings.append(f"{self.error_message} Faces attribute is not a list.")
+        if not isinstance(faces_starting_indices, list):
+            self.warnings.append(
+                f"{self.error_message} Faces starting indices attribute is not a list."
+            )
             return
 
-        self._validate_list_size(faces_dataset["dataset"], faces, FACES)
+        self._validate_list_size(
+            faces_dataset["dataset"], faces_starting_indices, FACES
+        )
 
-        if not _all_in_list_have_expected_type(faces, INT_TYPE):
-            f"{self.error_message} Faces list in faces dataset do not all have type {INT_TYPE}."
+        if not _all_in_list_have_expected_type(faces_starting_indices, INT_TYPE):
+            f"{self.error_message} Values in faces starting indices list in faces dataset do not all have type {INT_TYPE}."
             return
 
-        return faces
+        return faces_starting_indices
 
     def _find_and_validate_vertices(
         self, vertices_dataset: dict
