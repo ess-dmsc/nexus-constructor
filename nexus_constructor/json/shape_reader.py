@@ -142,6 +142,9 @@ class ShapeReader:
         faces = _create_list_of_faces(faces_starting_indices, winding_order)
 
         off_geometry = OFFGeometryNexus(name)
+        off_geometry.vertices = vertices
+        off_geometry.units = units
+        off_geometry.faces = faces
         self.component[SHAPE_GROUP_NAME] = off_geometry
 
     def _add_cylindrical_shape_to_component(self):
