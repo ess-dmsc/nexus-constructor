@@ -67,13 +67,14 @@ def test_GIVEN_missing_children_attribute_WHEN_reading_off_information_THEN_warn
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert "Unable to find children" in off_shape_reader.warnings[-1]
+    assert (
+        "Unable to find children list in shape group." in off_shape_reader.warnings[-1]
+    )
 
 
 def test_GIVEN_missing_name_WHEN_reading_off_information_THEN_warning_message_is_created_and_substitute_name_is_used(
     off_shape_reader, off_shape_json, mock_component
 ):
-
     n_warnings = len(off_shape_reader.warnings)
 
     del off_shape_json["name"]
@@ -81,3 +82,35 @@ def test_GIVEN_missing_name_WHEN_reading_off_information_THEN_warning_message_is
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
     assert mock_component["shape"].name == "shape"
+
+
+def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_warning_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    off_shape_json["children"] = "NotAList"
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert (
+        "Children attribute in shape group is not a list."
+        in off_shape_reader.warnings[-1]
+    )
+
+
+@pytest.mark.parametrize("attribute_to_change", ["faces", "vertices", "winding_order"])
+def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_message_is_created(
+    off_shape_reader, off_shape_json, attribute_to_change
+):
+
+    n_warnings = len(off_shape_reader.warnings)
+
+    for attribute in off_shape_json["children"]:
+        if attribute["name"] == attribute_to_change:
+            attribute["name"] = "WrongName"
+
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert attribute_to_change in off_shape_reader.warnings[-1]
