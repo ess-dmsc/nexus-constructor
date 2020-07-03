@@ -121,10 +121,10 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces_starting_index = self._find_and_validate_faces_list(
+        faces_starting_indices = self._find_and_validate_faces_list(
             faces_dataset
         )  # todo: format for OFFGeometry class?
-        if not faces_starting_index:
+        if not faces_starting_indices:
             return
 
         units = self._find_and_validate_units(vertices_dataset)
@@ -139,7 +139,7 @@ class ShapeReader:
         if not winding_order:
             return
 
-        faces = _create_list_of_faces(faces_starting_index, winding_order)
+        faces = _create_list_of_faces(faces_starting_indices, winding_order)
 
         off_geometry = OFFGeometryNexus(name)
         self.component[SHAPE_GROUP_NAME] = off_geometry
