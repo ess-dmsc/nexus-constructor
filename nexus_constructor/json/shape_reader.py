@@ -1,5 +1,6 @@
 from typing import List, Union
 
+import numpy
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.json.load_from_json_utils import (
@@ -34,12 +35,6 @@ def _all_in_list_have_expected_type(values: list, expected_type: str):
     :return: True of all the items in the list have the expected type, False otherwise.
     """
     return all([expected_type in str(type(value)) for value in values])
-
-
-def _create_list_of_faces(
-    faces_starting_indices: List[int], winding_order: List[int]
-) -> List[List[int]]:
-    return [winding_order[index : index + 3] for index in faces_starting_indices]
 
 
 class ShapeReader:
@@ -121,9 +116,7 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces_starting_indices = self._find_and_validate_faces_list(
-            faces_dataset
-        )  # todo: format for OFFGeometry class?
+        faces_starting_indices = self._find_and_validate_faces_list(faces_dataset)
         if not faces_starting_indices:
             return
 
@@ -139,12 +132,11 @@ class ShapeReader:
         if not winding_order:
             return
 
-        faces = _create_list_of_faces(faces_starting_indices, winding_order)
-
         off_geometry = OFFGeometryNexus(name)
         off_geometry.vertices = vertices
         off_geometry.units = units
-        off_geometry.faces = faces
+        off_geometry.set_field_value("faces", faces_starting_indices)
+        off_geometry.set_field_value("winding_order", numpy.array(winding_order))
         self.component[SHAPE_GROUP_NAME] = off_geometry
 
     def _add_cylindrical_shape_to_component(self):
