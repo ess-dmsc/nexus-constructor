@@ -27,16 +27,6 @@ FACES = "faces"
 VERTICES = "vertices"
 
 
-def _all_in_list_have_expected_type(values: list, expected_type: str):
-    """
-    Checks if all the items in a given list have the expected type.
-    :param values: The list of values.
-    :param expected_type: The expected type.
-    :return: True of all the items in the list have the expected type, False otherwise.
-    """
-    return all([expected_type in str(type(value)) for value in values])
-
-
 class ShapeReader:
     def __init__(self, component: Component, shape_info: dict):
         self.component = component
@@ -186,8 +176,9 @@ class ShapeReader:
 
         self._validate_list_size(faces_dataset, faces_starting_indices, FACES)
 
-        if not _all_in_list_have_expected_type(faces_starting_indices, INT_TYPE):
-            self._write_wrong_type_in_list_message(FACES, INT_TYPE)
+        if not self._all_in_list_have_expected_type(
+            faces_starting_indices, INT_TYPE, FACES
+        ):
             return
 
         return faces_starting_indices
@@ -314,16 +305,27 @@ class ShapeReader:
 
         self._validate_list_size(winding_order_dataset, values, WINDING_ORDER)
 
-        if not _all_in_list_have_expected_type(values, INT_TYPE):
-            self._write_wrong_type_in_list_message(WINDING_ORDER, INT_TYPE)
+        if not self._all_in_list_have_expected_type(values, INT_TYPE, WINDING_ORDER):
             return
 
         return values
 
-    def _write_wrong_type_in_list_message(self, list_name: str, expected_type: str):
+    def _all_in_list_have_expected_type(
+        self, values: list, expected_type: str, list_parent_name: str
+    ):
+        """
+        Checks if all the items in a given list have the expected type.
+        :param values: The list of values.
+        :param expected_type: The expected type.
+        :param list_parent_name: The name of the dataset the list belongs to.
+        :return: True of all the items in the list have the expected type, False otherwise.
+        """
+        if all([expected_type in str(type(value)) for value in values]):
+            return True
         self.warnings.append(
-            f"{self.error_message} Values in {list_name} list do not all have type {expected_type}."
+            f"{self.error_message} Values in {list_parent_name} list do not all have type {expected_type}."
         )
+        return False
 
     def _validate_list_size(
         self, data_properties: dict, values: List, parent_name: str

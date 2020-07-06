@@ -42,6 +42,12 @@ def off_shape_reader(off_shape_json, mock_component) -> ShapeReader:
 def _any_warning_message_has_substrings(
     sub_strings: List[str], warning_messages: str
 ) -> bool:
+    """
+    Checks that at least one of the warning messages from the shape reader contains all the given sub-strings.
+    :param sub_strings: The list of the substrings.
+    :param warning_messages: The warning messages from the shape reader.
+    :return: True if at least of the warnings contains all the sub-strings, False otherwise.
+    """
     return any(
         [
             all([substring in warning_message for substring in sub_strings])
@@ -86,7 +92,7 @@ def test_GIVEN_no_attributes_field_WHEN_reading_shape_information_THEN_warning_m
     assert "''" in off_shape_reader.warnings[-1]
 
 
-def test_GIVEN_missing_children_attribute_WHEN_reading_off_information_THEN_warning_message_is_created(
+def test_GIVEN_missing_children_attribute_WHEN_reading_off_information_THEN_error_message_is_created(
     off_shape_reader, off_shape_json
 ):
     n_warnings = len(off_shape_reader.warnings)
@@ -183,11 +189,11 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_dataset_type_to_delete, off_shape_json["children"]
     )
 
-    del faces_dataset["dataset"]["type"]
+    del invalid_dataset["dataset"]["type"]
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
@@ -206,11 +212,11 @@ def test_GIVEN_unable_to_find_dataset_WHEN_checking_type_THEN_issue_message_is_c
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    dataset = off_shape_reader._get_shape_dataset_from_list(
+    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_dataset_to_delete, off_shape_json["children"]
     )
 
-    del dataset["dataset"]
+    del invalid_dataset["dataset"]
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) > n_warnings
@@ -229,11 +235,11 @@ def test_GIVEN_missing_values_attribute_WHEN_finding_values_attribute_THEN_error
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    dataset = off_shape_reader._get_shape_dataset_from_list(
+    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_values_to_delete, off_shape_json["children"]
     )
 
-    del dataset["values"]
+    del invalid_dataset["values"]
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
@@ -252,11 +258,11 @@ def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    dataset = off_shape_reader._get_shape_dataset_from_list(
+    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_values_to_change, off_shape_json["children"]
     )
 
-    dataset["values"] = True
+    invalid_dataset["values"] = True
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
@@ -270,16 +276,16 @@ def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN
 
 
 @pytest.mark.parametrize("attribute_with_list_size_to_change", EXPECTED_TYPES.keys())
-def test_GIVEN_inconsistent_list_size_WHEN_validating_faces_indices_list_THEN_issue_message_is_created(
+def test_GIVEN_inconsistent_list_size_WHEN_validating_attribute_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_list_size_to_change
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    dataset = off_shape_reader._get_shape_dataset_from_list(
+    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_list_size_to_change, off_shape_json["children"]
     )
 
-    dataset["dataset"]["size"][0] -= 1
+    invalid_dataset["dataset"]["size"][0] -= 1
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
@@ -293,16 +299,16 @@ def test_GIVEN_inconsistent_list_size_WHEN_validating_faces_indices_list_THEN_is
 
 
 @pytest.mark.parametrize("atribute_with_list_size_to_delete", EXPECTED_TYPES.keys())
-def test_GIVEN_no_list_size_information_WHEN_validating_faces_indices_list_THEN_issue_message_is_created(
+def test_GIVEN_no_list_size_information_WHEN_validating_attribute_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, atribute_with_list_size_to_delete
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    dataset = off_shape_reader._get_shape_dataset_from_list(
+    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         atribute_with_list_size_to_delete, off_shape_json["children"]
     )
 
-    del dataset["dataset"]["size"]
+    del invalid_dataset["dataset"]["size"]
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
@@ -321,11 +327,11 @@ def test_GIVEN_value_has_wrong_type_WHEN_validating_value_THEN_error_message_is_
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    dataset = off_shape_reader._get_shape_dataset_from_list(
+    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_value_to_change, off_shape_json["children"]
     )
 
-    dataset["values"][0] = "astring"
+    invalid_dataset["values"][0] = "astring"
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
