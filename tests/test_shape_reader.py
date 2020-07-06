@@ -124,8 +124,8 @@ def test_GIVEN_faces_type_value_is_not_int_WHEN_checking_type_THEN_issue_message
     faces_dataset = off_shape_reader._get_shape_dataset_from_list(
         "faces", off_shape_json["children"]
     )
-    faces_dataset["dataset"]["type"] = "double"
 
+    faces_dataset["dataset"]["type"] = "double"
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
@@ -133,4 +133,43 @@ def test_GIVEN_faces_type_value_is_not_int_WHEN_checking_type_THEN_issue_message
     assert (
         "Type attribute for faces does not match expected type int."
         in off_shape_reader.warnings[-1]
+    )
+
+
+def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "faces", off_shape_json["children"]
+    )
+
+    del faces_dataset["dataset"]["type"]
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert off_shape_reader.issue_message in off_shape_reader.warnings[-1]
+    assert "Unable to find type attribute for faces." in off_shape_reader.warnings[-1]
+
+
+def test_GIVEN_unable_to_find_type_dataset_WHEN_checking_type_THEN_issue_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "faces", off_shape_json["children"]
+    )
+
+    del faces_dataset["dataset"]
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) > n_warnings
+    assert any(
+        [
+            off_shape_reader.issue_message in warning
+            and "Unable to find type attribute for faces." in warning
+            for warning in off_shape_reader.warnings
+        ]
     )

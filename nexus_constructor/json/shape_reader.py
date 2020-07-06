@@ -184,9 +184,7 @@ class ShapeReader:
             )
             return
 
-        self._validate_list_size(
-            faces_dataset["dataset"], faces_starting_indices, FACES
-        )
+        self._validate_list_size(faces_dataset, faces_starting_indices, FACES)
 
         if not _all_in_list_have_expected_type(faces_starting_indices, INT_TYPE):
             f"{self.error_message} Values in faces starting indices list in faces dataset do not all have type {INT_TYPE}."
@@ -219,7 +217,7 @@ class ShapeReader:
             )
             return
 
-        self._validate_list_size(vertices_dataset["dataset"], values, VERTICES)
+        self._validate_list_size(vertices_dataset, values, VERTICES)
 
         try:
             vertices = [QVector3D(*value) for value in values]
@@ -314,9 +312,7 @@ class ShapeReader:
             )
             return
 
-        self._validate_list_size(
-            winding_order_dataset["dataset"], values, WINDING_ORDER
-        )
+        self._validate_list_size(winding_order_dataset, values, WINDING_ORDER)
 
         if not _all_in_list_have_expected_type(values, INT_TYPE):
             self.warnings.append(
@@ -338,7 +334,7 @@ class ShapeReader:
         :param parent_name: The name of the parent dataset.
         """
         try:
-            if data_properties["size"][0] != len(values):
+            if data_properties["dataset"]["size"][0] != len(values):
                 self.warnings.append(
                     f"{self.issue_message} Mismatch between length of {parent_name} list ({len(values)}) and size "
                     f"attribute from dataset ({data_properties['size'][0]}). "
