@@ -187,10 +187,7 @@ class ShapeReader:
         self._validate_list_size(faces_dataset, faces_starting_indices, FACES)
 
         if not _all_in_list_have_expected_type(faces_starting_indices, INT_TYPE):
-            self.warnings.append(
-                f"{self.error_message} Values in faces starting indices list in faces dataset do not all have type"
-                f" {INT_TYPE}."
-            )
+            self._write_wrong_type_in_list_message(FACES, INT_TYPE)
             return
 
         return faces_starting_indices
@@ -318,12 +315,15 @@ class ShapeReader:
         self._validate_list_size(winding_order_dataset, values, WINDING_ORDER)
 
         if not _all_in_list_have_expected_type(values, INT_TYPE):
-            self.warnings.append(
-                f"{self.error_message} Values list in winding order dataset do not all have type {INT_TYPE}."
-            )
+            self._write_wrong_type_in_list_message(WINDING_ORDER, INT_TYPE)
             return
 
         return values
+
+    def _write_wrong_type_in_list_message(self, list_name: str, expected_type: str):
+        self.warnings.append(
+            f"{self.error_message} Values in {list_name} list do not all have type {expected_type}."
+        )
 
     def _validate_list_size(
         self, data_properties: dict, values: List, parent_name: str
