@@ -5,9 +5,9 @@ from mock import Mock
 
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.model.component import Component, OFF_GEOMETRY_NX_CLASS
+from tests.shape_json import off_shape_json
 
 EXPECTED_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
-
 COMPONENT_NAME = "ComponentName"
 
 component_shape = dict()
@@ -153,14 +153,14 @@ def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_mes
     )
 
 
-@pytest.mark.parametrize("dataset_type_to_change", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize("attribute_with_dataset_type_to_change", EXPECTED_TYPES.keys())
 def test_GIVEN_vertices_type_value_is_not_float_WHEN_checking_type_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json, dataset_type_to_change
+    off_shape_reader, off_shape_json, attribute_with_dataset_type_to_change
 ):
     n_warnings = len(off_shape_reader.warnings)
 
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
-        dataset_type_to_change, off_shape_json["children"]
+        attribute_with_dataset_type_to_change, off_shape_json["children"]
     )
 
     invalid_dataset["dataset"]["type"] = "string"
@@ -170,21 +170,21 @@ def test_GIVEN_vertices_type_value_is_not_float_WHEN_checking_type_THEN_issue_me
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            f"Type attribute for {dataset_type_to_change} does not match expected type"
-            f" {EXPECTED_TYPES[dataset_type_to_change]}.",
+            f"Type attribute for {attribute_with_dataset_type_to_change} does not match expected type"
+            f" {EXPECTED_TYPES[attribute_with_dataset_type_to_change]}.",
         ],
         off_shape_reader.warnings,
     )
 
 
-@pytest.mark.parametrize("dataset_type_to_delete", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize("attribute_with_dataset_type_to_delete", EXPECTED_TYPES.keys())
 def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json, dataset_type_to_delete
+    off_shape_reader, off_shape_json, attribute_with_dataset_type_to_delete
 ):
     n_warnings = len(off_shape_reader.warnings)
 
     faces_dataset = off_shape_reader._get_shape_dataset_from_list(
-        dataset_type_to_delete, off_shape_json["children"]
+        attribute_with_dataset_type_to_delete, off_shape_json["children"]
     )
 
     del faces_dataset["dataset"]["type"]
@@ -194,7 +194,7 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            f"Unable to find type attribute for {dataset_type_to_delete}",
+            f"Unable to find type attribute for {attribute_with_dataset_type_to_delete}",
         ],
         off_shape_reader.warnings,
     )
@@ -263,42 +263,47 @@ def test_GIVEN_faces_values_attribute_is_not_a_list_WHEN_finding_faces_indices_l
     )
 
 
+@pytest.mark.parametrize("attribute_with_list_size_to_change", EXPECTED_TYPES.keys())
 def test_GIVEN_inconsistent_list_size_WHEN_validating_faces_indices_list_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json
+    off_shape_reader, off_shape_json, attribute_with_list_size_to_change
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "faces", off_shape_json["children"]
+    dataset = off_shape_reader._get_shape_dataset_from_list(
+        attribute_with_list_size_to_change, off_shape_json["children"]
     )
 
-    faces_dataset["dataset"]["size"][0] -= 1
-    off_shape_reader.add_shape_to_component()
-
-    assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert _any_warning_message_has_substrings(
-        [off_shape_reader.issue_message, "Mismatch between length of faces list"],
-        off_shape_reader.warnings,
-    )
-
-
-def test_GIVEN_no_list_size_information_WHEN_validating_faces_indices_list_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json
-):
-    n_warnings = len(off_shape_reader.warnings)
-
-    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "faces", off_shape_json["children"]
-    )
-
-    del faces_dataset["dataset"]["size"]
+    dataset["dataset"]["size"][0] -= 1
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            "Unable to find size attribute for faces dataset.",
+            f"Mismatch between length of {attribute_with_list_size_to_change} list",
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+@pytest.mark.parametrize("atribute_with_list_size_to_delete", EXPECTED_TYPES.keys())
+def test_GIVEN_no_list_size_information_WHEN_validating_faces_indices_list_THEN_issue_message_is_created(
+    off_shape_reader, off_shape_json, atribute_with_list_size_to_delete
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    dataset = off_shape_reader._get_shape_dataset_from_list(
+        atribute_with_list_size_to_delete, off_shape_json["children"]
+    )
+
+    del dataset["dataset"]["size"]
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.issue_message,
+            f"Unable to find size attribute for {atribute_with_list_size_to_delete} dataset.",
         ],
         off_shape_reader.warnings,
     )
