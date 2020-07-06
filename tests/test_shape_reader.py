@@ -3,6 +3,9 @@ from typing import List
 import pytest
 from mock import Mock
 
+from nexus_constructor.json.load_from_json_utils import (
+    _find_attribute_from_list_or_dict,
+)
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.model.component import Component, OFF_GEOMETRY_NX_CLASS
 from tests.shape_json import off_shape_json
@@ -76,7 +79,6 @@ def test_GIVEN_unrecognised_shape_WHEN_reading_shape_information_THEN_warning_me
 def test_GIVEN_no_attributes_field_WHEN_reading_shape_information_THEN_warning_message_is_created(
     off_shape_reader, off_shape_json
 ):
-
     n_warnings = len(off_shape_reader.warnings)
 
     del off_shape_json["attributes"]
@@ -257,7 +259,48 @@ def test_GIVEN_faces_values_attribute_is_not_a_list_WHEN_finding_faces_indices_l
     )
 
 
-def test_GIVEN_faces_value_is_not_int_WHEN_finding_faces_indices_list_THEN_error_message_is_created(
+def test_GIVEN_inconsistent_list_size_WHEN_validating_faces_indices_list_THEN_issue_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "faces", off_shape_json["children"]
+    )
+
+    faces_dataset["dataset"]["size"][0] -= 1
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.issue_message, "Mismatch between length of faces list"],
+        off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_no_list_size_information_WHEN_validating_faces_indices_list_THEN_issue_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "faces", off_shape_json["children"]
+    )
+
+    del faces_dataset["dataset"]["size"]
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.issue_message,
+            "Unable to find size attribute for faces dataset.",
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_faces_value_is_not_int_WHEN_validating_faces_indices_list_THEN_error_message_is_created(
     off_shape_reader, off_shape_json
 ):
     n_warnings = len(off_shape_reader.warnings)
@@ -276,4 +319,72 @@ def test_GIVEN_faces_value_is_not_int_WHEN_finding_faces_indices_list_THEN_error
             "Values in faces starting indices list in faces dataset do not all have type int",
         ],
         off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_missing_attributes_WHEN_finding_units_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "vertices", off_shape_json["children"]
+    )
+
+    del vertices_dataset["attributes"]
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Unable to find attributes list in vertices dataset.",
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_missing_units_WHEN_finding_units_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "vertices", off_shape_json["children"]
+    )
+
+    units = off_shape_reader._get_shape_dataset_from_list(
+        "units", vertices_dataset["attributes"]
+    )
+    vertices_dataset["attributes"].remove(units)
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Unable to find units attribute in vertices dataset.",
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+@pytest.mark.parametrize("invalid_units", ["abc", "decibels", "2 m"])
+def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json, invalid_units
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "vertices", off_shape_json["children"]
+    )
+
+    off_shape_reader._get_shape_dataset_from_list(
+        "units", vertices_dataset["attributes"]
+    )["values"] = invalid_units
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.error_message, invalid_units], off_shape_reader.warnings,
     )

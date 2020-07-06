@@ -339,7 +339,7 @@ class ShapeReader:
             if data_properties["dataset"]["size"][0] != len(values):
                 self.warnings.append(
                     f"{self.issue_message} Mismatch between length of {parent_name} list ({len(values)}) and size "
-                    f"attribute from dataset ({data_properties['size'][0]}). "
+                    f"attribute from dataset ({data_properties['dataset']['size'][0]}). "
                 )
         except KeyError:
             self.warnings.append(
