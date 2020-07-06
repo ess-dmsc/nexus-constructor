@@ -174,13 +174,13 @@ class ShapeReader:
             faces_starting_indices = faces_dataset["values"]
         except KeyError:
             self.warnings.append(
-                f"{self.error_message} Unable to find faces starting indices list in faces dataset."
+                f"{self.error_message} Unable to find values in {FACES} dataset."
             )
             return
 
         if not isinstance(faces_starting_indices, list):
             self.warnings.append(
-                f"{self.error_message} Faces starting indices attribute is not a list."
+                f"{self.error_message} Values in {FACES} attribute is not a list."
             )
             return
 
@@ -210,13 +210,13 @@ class ShapeReader:
             values = vertices_dataset["values"]
         except KeyError:
             self.warnings.append(
-                f"{self.error_message} Unable to find vertices list in vertices dataset."
+                f"{self.error_message} Unable to find values in {VERTICES} dataset."
             )
             return
 
         if not isinstance(values, list):
             self.warnings.append(
-                f"{self.error_message} Vertices attribute is not a list."
+                f"{self.error_message} Values in {VERTICES} attribute is not a list."
             )
             return
 
@@ -305,13 +305,13 @@ class ShapeReader:
             values = winding_order_dataset["values"]
         except KeyError:
             self.warnings.append(
-                f"{self.error_message} Unable to find values attribute in winding order dataset."
+                f"{self.error_message} Unable to find values in {WINDING_ORDER} dataset."
             )
             return
 
         if not isinstance(values, list):
             self.warnings.append(
-                f"{self.error_message} Values in winding order dataset is not a list."
+                f"{self.error_message} Values in {WINDING_ORDER} attribute is not a list."
             )
             return
 

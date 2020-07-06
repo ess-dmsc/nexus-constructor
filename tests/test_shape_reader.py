@@ -154,7 +154,7 @@ def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_mes
 
 
 @pytest.mark.parametrize("attribute_with_dataset_type_to_change", EXPECTED_TYPES.keys())
-def test_GIVEN_vertices_type_value_is_not_float_WHEN_checking_type_THEN_issue_message_is_created(
+def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_dataset_type_to_change
 ):
     n_warnings = len(off_shape_reader.warnings)
@@ -200,64 +200,70 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
     )
 
 
-def test_GIVEN_unable_to_find_type_dataset_WHEN_checking_type_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json
+@pytest.mark.parametrize("attribute_with_dataset_to_delete", EXPECTED_TYPES.keys())
+def test_GIVEN_unable_to_find_dataset_WHEN_checking_type_THEN_issue_message_is_created(
+    off_shape_reader, off_shape_json, attribute_with_dataset_to_delete
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "faces", off_shape_json["children"]
+    dataset = off_shape_reader._get_shape_dataset_from_list(
+        attribute_with_dataset_to_delete, off_shape_json["children"]
     )
 
-    del faces_dataset["dataset"]
+    del dataset["dataset"]
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) > n_warnings
     assert _any_warning_message_has_substrings(
-        [off_shape_reader.issue_message, "Unable to find type attribute for faces."],
-        off_shape_reader.warnings,
-    )
-
-
-def test_GIVEN_missing_faces_values_attribute_WHEN_finding_faces_indices_list_THEN_error_message_is_created(
-    off_shape_reader, off_shape_json
-):
-    n_warnings = len(off_shape_reader.warnings)
-
-    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "faces", off_shape_json["children"]
-    )
-
-    del faces_dataset["values"]
-    off_shape_reader.add_shape_to_component()
-
-    assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert _any_warning_message_has_substrings(
         [
-            off_shape_reader.error_message,
-            "Unable to find faces starting indices list in faces dataset.",
+            off_shape_reader.issue_message,
+            f"Unable to find type attribute for {attribute_with_dataset_to_delete}.",
         ],
         off_shape_reader.warnings,
     )
 
 
-def test_GIVEN_faces_values_attribute_is_not_a_list_WHEN_finding_faces_indices_list_THEN_error_message_is_created(
-    off_shape_reader, off_shape_json
+@pytest.mark.parametrize("attribute_with_values_to_delete", EXPECTED_TYPES.keys())
+def test_GIVEN_missing_values_attribute_WHEN_finding_values_attribute_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json, attribute_with_values_to_delete
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "faces", off_shape_json["children"]
+    dataset = off_shape_reader._get_shape_dataset_from_list(
+        attribute_with_values_to_delete, off_shape_json["children"]
     )
 
-    faces_dataset["values"] = True
+    del dataset["values"]
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
-            "Faces starting indices attribute is not a list.",
+            f"Unable to find values in {attribute_with_values_to_delete} dataset.",
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+@pytest.mark.parametrize("attribute_with_values_to_change", EXPECTED_TYPES.keys())
+def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json, attribute_with_values_to_change
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    dataset = off_shape_reader._get_shape_dataset_from_list(
+        attribute_with_values_to_change, off_shape_json["children"]
+    )
+
+    dataset["values"] = True
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            f"Values in {attribute_with_values_to_change} attribute is not a list.",
         ],
         off_shape_reader.warnings,
     )
