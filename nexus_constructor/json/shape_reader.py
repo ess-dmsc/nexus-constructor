@@ -160,12 +160,8 @@ class ShapeReader:
         """
         self._validate_data_type(faces_dataset, INT_TYPE, FACES)
 
-        try:
-            faces_starting_indices = faces_dataset["values"]
-        except KeyError:
-            self.warnings.append(
-                f"{self.error_message} Unable to find values in {FACES} dataset."
-            )
+        faces_starting_indices = self._get_values_attribute(faces_dataset, FACES)
+        if not faces_starting_indices:
             return
 
         if not isinstance(faces_starting_indices, list):
@@ -194,12 +190,8 @@ class ShapeReader:
         """
         self._validate_data_type(vertices_dataset, "float", VERTICES)
 
-        try:
-            values = vertices_dataset["values"]
-        except KeyError:
-            self.warnings.append(
-                f"{self.error_message} Unable to find values in {VERTICES} dataset."
-            )
+        values = self._get_values_attribute(vertices_dataset, VERTICES)
+        if not values:
             return
 
         if not isinstance(values, list):
@@ -289,12 +281,8 @@ class ShapeReader:
         """
         self._validate_data_type(winding_order_dataset, INT_TYPE, WINDING_ORDER)
 
-        try:
-            values = winding_order_dataset["values"]
-        except KeyError:
-            self.warnings.append(
-                f"{self.error_message} Unable to find values in {WINDING_ORDER} dataset."
-            )
+        values = self._get_values_attribute(winding_order_dataset, WINDING_ORDER)
+        if not values:
             return
 
         if not isinstance(values, list):
@@ -348,3 +336,20 @@ class ShapeReader:
             self.warnings.append(
                 f"{self.issue_message} Unable to find size attribute for {parent_name} dataset."
             )
+
+    def _get_values_attribute(
+        self, dataset: dict, parent_name: str
+    ) -> Union[list, None]:
+        """
+        Attempts to get the values attribute in a dataset. Creates an error message if if cannot be found.
+        :param dataset: The dataset we hope to find the values attribute in.
+        :param parent_name: The name of the parent dataset.
+        :return: The values attribute if it could be found, otherwise None is returned.
+        """
+        try:
+            return dataset["values"]
+        except KeyError:
+            self.warnings.append(
+                f"{self.error_message} Unable to find values in {parent_name} dataset."
+            )
+            return
