@@ -187,7 +187,9 @@ class ShapeReader:
         self._validate_list_size(faces_dataset, faces_starting_indices, FACES)
 
         if not _all_in_list_have_expected_type(faces_starting_indices, INT_TYPE):
-            f"{self.error_message} Values in faces starting indices list in faces dataset do not all have type {INT_TYPE}."
+            self.warnings.append(
+                f"{self.error_message} Values in faces starting indices list in faces dataset do not all have type {INT_TYPE}."
+            )
             return
 
         return faces_starting_indices

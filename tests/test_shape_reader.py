@@ -255,3 +255,25 @@ def test_GIVEN_faces_values_attribute_is_not_a_list_WHEN_finding_faces_indices_l
         ],
         off_shape_reader.warnings,
     )
+
+
+def test_GIVEN_faces_value_is_not_int_WHEN_finding_faces_indices_list_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "faces", off_shape_json["children"]
+    )
+
+    faces_dataset["values"][0] = "astring"
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Values in faces starting indices list in faces dataset do not all have type int",
+        ],
+        off_shape_reader.warnings,
+    )
