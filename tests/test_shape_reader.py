@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 from mock import Mock
 
@@ -36,6 +38,17 @@ def off_shape_reader(off_shape_json, mock_component) -> ShapeReader:
     return ShapeReader(mock_component, off_shape_json)
 
 
+def _any_warning_message_has_substrings(
+    sub_strings: List[str], warning_messages: str
+) -> bool:
+    return any(
+        [
+            all([substring in warning_message for substring in sub_strings])
+            for warning_message in warning_messages
+        ]
+    )
+
+
 def test_GIVEN_off_shape_WHEN_reading_shape_information_THEN_error_and_issue_messages_have_expected_content(
     off_shape_reader,
 ):
@@ -55,7 +68,9 @@ def test_GIVEN_unrecognised_shape_WHEN_reading_shape_information_THEN_warning_me
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert bad_geometry_type in off_shape_reader.warnings[-1]
+    assert _any_warning_message_has_substrings(
+        [bad_geometry_type], off_shape_reader.warnings
+    )
 
 
 def test_GIVEN_no_attributes_field_WHEN_reading_shape_information_THEN_warning_message_is_created(
@@ -80,8 +95,12 @@ def test_GIVEN_missing_children_attribute_WHEN_reading_off_information_THEN_warn
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert (
-        "Unable to find children list in shape group." in off_shape_reader.warnings[-1]
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Unable to find children list in shape group.",
+        ],
+        off_shape_reader.warnings,
     )
 
 
@@ -106,9 +125,12 @@ def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_warning_
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert (
-        "Children attribute in shape group is not a list."
-        in off_shape_reader.warnings[-1]
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Children attribute in shape group is not a list.",
+        ],
+        off_shape_reader.warnings,
     )
 
 
@@ -126,7 +148,9 @@ def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_mes
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert attribute_to_remove in off_shape_reader.warnings[-1]
+    assert _any_warning_message_has_substrings(
+        [attribute_to_remove, off_shape_reader.error_message], off_shape_reader.warnings
+    )
 
 
 def test_GIVEN_faces_type_value_is_not_int_WHEN_checking_type_THEN_issue_message_is_created(
@@ -142,10 +166,12 @@ def test_GIVEN_faces_type_value_is_not_int_WHEN_checking_type_THEN_issue_message
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert off_shape_reader.issue_message in off_shape_reader.warnings[-1]
-    assert (
-        "Type attribute for faces does not match expected type int."
-        in off_shape_reader.warnings[-1]
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.issue_message,
+            "Type attribute for faces does not match expected type int.",
+        ],
+        off_shape_reader.warnings,
     )
 
 
@@ -162,8 +188,10 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert off_shape_reader.issue_message in off_shape_reader.warnings[-1]
-    assert "Unable to find type attribute for faces." in off_shape_reader.warnings[-1]
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.issue_message, "Unable to find type attribute for faces."],
+        off_shape_reader.warnings,
+    )
 
 
 def test_GIVEN_unable_to_find_type_dataset_WHEN_checking_type_THEN_issue_message_is_created(
@@ -179,16 +207,13 @@ def test_GIVEN_unable_to_find_type_dataset_WHEN_checking_type_THEN_issue_message
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) > n_warnings
-    assert any(
-        [
-            off_shape_reader.issue_message in warning
-            and "Unable to find type attribute for faces." in warning
-            for warning in off_shape_reader.warnings
-        ]
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.issue_message, "Unable to find type attribute for faces."],
+        off_shape_reader.warnings,
     )
 
 
-def test_GIVEN_missing_faces_values_attribute_WHEN_find_faces_indices_list_THEN_error_message_is_created(
+def test_GIVEN_missing_faces_values_attribute_WHEN_finding_faces_indices_list_THEN_error_message_is_created(
     off_shape_reader, off_shape_json
 ):
     n_warnings = len(off_shape_reader.warnings)
@@ -201,8 +226,32 @@ def test_GIVEN_missing_faces_values_attribute_WHEN_find_faces_indices_list_THEN_
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert off_shape_reader.error_message in off_shape_reader.warnings[-1]
-    assert (
-        "Unable to find faces starting indices list in faces dataset."
-        in off_shape_reader.warnings[-1]
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Unable to find faces starting indices list in faces dataset.",
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_faces_values_attribute_is_not_a_list_WHEN_finding_faces_indices_list_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "faces", off_shape_json["children"]
+    )
+
+    faces_dataset["values"] = True
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Faces starting indices attribute is not a list.",
+        ],
+        off_shape_reader.warnings,
     )

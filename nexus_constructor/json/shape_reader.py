@@ -157,7 +157,7 @@ class ShapeReader:
             if attribute["name"] == attribute_name:
                 return attribute
         self.warnings.append(
-            f"Couldn't find attribute {attribute_name} for shape in component {self.component.name}."
+            f"{self.error_message} Couldn't find {attribute_name} attribute."
         )
 
     def _find_and_validate_faces_starting_indices_list(
