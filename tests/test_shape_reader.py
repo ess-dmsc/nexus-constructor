@@ -269,7 +269,7 @@ def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
-            f"Values in {attribute_with_values_to_change} attribute is not a list.",
+            f"values attribute in {attribute_with_values_to_change} dataset is not a list.",
         ],
         off_shape_reader.warnings,
     )

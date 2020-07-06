@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Any
 
 import numpy
 from PySide2.QtGui import QVector3D
@@ -164,10 +164,7 @@ class ShapeReader:
         if not faces_starting_indices:
             return
 
-        if not isinstance(faces_starting_indices, list):
-            self.warnings.append(
-                f"{self.error_message} Values in {FACES} attribute is not a list."
-            )
+        if not self._attribute_is_a_list(faces_starting_indices, FACES):
             return
 
         self._validate_list_size(faces_dataset, faces_starting_indices, FACES)
@@ -194,10 +191,7 @@ class ShapeReader:
         if not values:
             return
 
-        if not isinstance(values, list):
-            self.warnings.append(
-                f"{self.error_message} Values in {VERTICES} attribute is not a list."
-            )
+        if not self._attribute_is_a_list(values, VERTICES):
             return
 
         self._validate_list_size(vertices_dataset, values, VERTICES)
@@ -285,10 +279,7 @@ class ShapeReader:
         if not values:
             return
 
-        if not isinstance(values, list):
-            self.warnings.append(
-                f"{self.error_message} Values in {WINDING_ORDER} attribute is not a list."
-            )
+        if not self._attribute_is_a_list(values, WINDING_ORDER):
             return
 
         self._validate_list_size(winding_order_dataset, values, WINDING_ORDER)
@@ -353,3 +344,18 @@ class ShapeReader:
                 f"{self.error_message} Unable to find values in {parent_name} dataset."
             )
             return
+
+    def _attribute_is_a_list(self, attribute: Any, parent_name: str) -> bool:
+        """
+        Checks if an attribute has the type list.
+        :param attribute: The attribute to check.
+        :param parent_name: The name of the parent dataset.
+        :return: True if attribute is a list, False otherwise.
+        """
+        if isinstance(attribute, list):
+            return True
+
+        self.warnings.append(
+            f"{self.error_message} values attribute in {parent_name} dataset is not a list."
+        )
+        return False
