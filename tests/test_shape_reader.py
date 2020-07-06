@@ -3,12 +3,10 @@ from typing import List
 import pytest
 from mock import Mock
 
-from nexus_constructor.json.load_from_json_utils import (
-    _find_attribute_from_list_or_dict,
-)
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.model.component import Component, OFF_GEOMETRY_NX_CLASS
-from tests.shape_json import off_shape_json
+
+EXPECTED_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
 
 COMPONENT_NAME = "ComponentName"
 
@@ -136,7 +134,7 @@ def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_warning_
     )
 
 
-@pytest.mark.parametrize("attribute_to_remove", ["faces", "vertices", "winding_order"])
+@pytest.mark.parametrize("attribute_to_remove", EXPECTED_TYPES.keys())
 def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_message_is_created(
     off_shape_reader, off_shape_json, attribute_to_remove
 ):
@@ -155,35 +153,38 @@ def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_mes
     )
 
 
-def test_GIVEN_faces_type_value_is_not_int_WHEN_checking_type_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json
+@pytest.mark.parametrize("dataset_type_to_change", EXPECTED_TYPES.keys())
+def test_GIVEN_vertices_type_value_is_not_float_WHEN_checking_type_THEN_issue_message_is_created(
+    off_shape_reader, off_shape_json, dataset_type_to_change
 ):
     n_warnings = len(off_shape_reader.warnings)
 
-    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "faces", off_shape_json["children"]
+    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
+        dataset_type_to_change, off_shape_json["children"]
     )
 
-    faces_dataset["dataset"]["type"] = "double"
+    invalid_dataset["dataset"]["type"] = "string"
     off_shape_reader.add_shape_to_component()
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            "Type attribute for faces does not match expected type int.",
+            f"Type attribute for {dataset_type_to_change} does not match expected type"
+            f" {EXPECTED_TYPES[dataset_type_to_change]}.",
         ],
         off_shape_reader.warnings,
     )
 
 
+@pytest.mark.parametrize("dataset_type_to_delete", EXPECTED_TYPES.keys())
 def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json
+    off_shape_reader, off_shape_json, dataset_type_to_delete
 ):
     n_warnings = len(off_shape_reader.warnings)
 
     faces_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "faces", off_shape_json["children"]
+        dataset_type_to_delete, off_shape_json["children"]
     )
 
     del faces_dataset["dataset"]["type"]
@@ -191,7 +192,10 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
 
     assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
-        [off_shape_reader.issue_message, "Unable to find type attribute for faces."],
+        [
+            off_shape_reader.issue_message,
+            f"Unable to find type attribute for {dataset_type_to_delete}",
+        ],
         off_shape_reader.warnings,
     )
 

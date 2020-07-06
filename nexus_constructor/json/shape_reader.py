@@ -22,7 +22,7 @@ from nexus_constructor.unit_utils import (
 )
 
 INT_TYPE = "int"
-WINDING_ORDER = "winding order"
+WINDING_ORDER = "winding_order"
 FACES = "faces"
 VERTICES = "vertices"
 
@@ -188,7 +188,8 @@ class ShapeReader:
 
         if not _all_in_list_have_expected_type(faces_starting_indices, INT_TYPE):
             self.warnings.append(
-                f"{self.error_message} Values in faces starting indices list in faces dataset do not all have type {INT_TYPE}."
+                f"{self.error_message} Values in faces starting indices list in faces dataset do not all have type"
+                f" {INT_TYPE}."
             )
             return
 
