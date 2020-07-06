@@ -53,7 +53,7 @@ class ShapeReader:
         try:
             return _find_nx_class(self.shape_info["attributes"])
         except KeyError:
-            return None
+            return ""
 
     def add_shape_to_component(self):
 
@@ -71,7 +71,7 @@ class ShapeReader:
         else:
             self.warnings.append(
                 f"Unrecgonised shape type for component {self.component.name}. Expected '{OFF_GEOMETRY_NX_CLASS}' or "
-                f"'{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}.'"
+                f"'{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}'."
             )
 
     def _add_off_shape_to_component(self):

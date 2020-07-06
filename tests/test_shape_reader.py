@@ -58,6 +58,19 @@ def test_GIVEN_unrecognised_shape_WHEN_reading_shape_information_THEN_warning_me
     assert bad_geometry_type in off_shape_reader.warnings[-1]
 
 
+def test_GIVEN_no_attributes_field_WHEN_reading_shape_information_THEN_warning_message_is_created(
+    off_shape_reader, off_shape_json
+):
+
+    n_warnings = len(off_shape_reader.warnings)
+
+    del off_shape_json["attributes"]
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert "''" in off_shape_reader.warnings[-1]
+
+
 def test_GIVEN_missing_children_attribute_WHEN_reading_off_information_THEN_warning_message_is_created(
     off_shape_reader, off_shape_json
 ):
@@ -172,4 +185,24 @@ def test_GIVEN_unable_to_find_type_dataset_WHEN_checking_type_THEN_issue_message
             and "Unable to find type attribute for faces." in warning
             for warning in off_shape_reader.warnings
         ]
+    )
+
+
+def test_GIVEN_missing_faces_values_attribute_WHEN_find_faces_indices_list_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    n_warnings = len(off_shape_reader.warnings)
+
+    faces_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "faces", off_shape_json["children"]
+    )
+
+    del faces_dataset["values"]
+    off_shape_reader.add_shape_to_component()
+
+    assert len(off_shape_reader.warnings) == n_warnings + 1
+    assert off_shape_reader.error_message in off_shape_reader.warnings[-1]
+    assert (
+        "Unable to find faces starting indices list in faces dataset."
+        in off_shape_reader.warnings[-1]
     )
