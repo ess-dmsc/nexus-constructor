@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from PySide2.QtWidgets import QWidget
 
@@ -39,11 +39,11 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
-def _find_shape_information(json_list: List[dict]):
+def _find_shape_information(json_list: List[dict]) -> Union[dict, None]:
     """
-
-    :param json_list:
-    :return:
+    Tries to get the shape information from a component.
+    :param json_list: The list of dictionaries.
+    :return: The shape attribute if it could be found, otherwise None.
     """
     for item in json_list:
         if item["name"] == "shape":
