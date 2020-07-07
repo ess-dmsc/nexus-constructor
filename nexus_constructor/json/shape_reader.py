@@ -200,7 +200,7 @@ class ShapeReader:
             vertices = [QVector3D(*value) for value in values]
         except TypeError:
             self.warnings.append(
-                f"{self.error_message} Unable to convert vertices values to QVector3D."
+                f"{self.error_message} Unable to convert all vertices values to QVector3D."
             )
             return
 

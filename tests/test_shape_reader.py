@@ -83,7 +83,9 @@ def test_GIVEN_no_attributes_field_WHEN_reading_shape_information_THEN_warning_m
     del off_shape_json["attributes"]
     off_shape_reader.add_shape_to_component()
 
-    assert _any_warning_message_has_substrings(["Unrecognised shape type for component"], off_shape_reader.warnings)
+    assert _any_warning_message_has_substrings(
+        ["Unrecognised shape type for component"], off_shape_reader.warnings
+    )
 
 
 def test_GIVEN_missing_children_attribute_WHEN_reading_off_information_THEN_error_message_is_created(
@@ -108,7 +110,10 @@ def test_GIVEN_missing_name_WHEN_reading_off_information_THEN_issue_message_is_c
     off_shape_reader.add_shape_to_component()
 
     assert mock_component["shape"].name == "shape"
-    assert _any_warning_message_has_substrings([off_shape_reader.issue_message, "Unable to find name of shape."], off_shape_reader.warnings)
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.issue_message, "Unable to find name of shape."],
+        off_shape_reader.warnings,
+    )
 
 
 def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_error_message_is_created(
@@ -360,4 +365,23 @@ def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created
 
     assert _any_warning_message_has_substrings(
         [off_shape_reader.error_message, invalid_units], off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertices_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "vertices", off_shape_json["children"]
+    )
+    vertices_dataset["values"][10] = "a"
+
+    off_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Unable to convert all vertices values to QVector3D.",
+        ],
+        off_shape_reader.warnings,
     )
