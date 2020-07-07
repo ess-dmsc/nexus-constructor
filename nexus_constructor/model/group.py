@@ -55,17 +55,14 @@ class Group(Node):
         return {
             "name": self.name,
             "type": self.type,
-            "attributes": [
-                attribute.as_dict()
-                for attribute in self.attributes
-                if attribute.name != CommonAttrs.DEPENDS_ON
-            ]
+            "attributes": [attribute.as_dict() for attribute in self.attributes]
             if self.attributes
             else None,
             "children": [
                 child.as_dict()
                 for child in self.children
                 if not isinstance(child, Transformation)
+                if child.name != CommonAttrs.DEPENDS_ON
             ]
             if self.children
             else [],
