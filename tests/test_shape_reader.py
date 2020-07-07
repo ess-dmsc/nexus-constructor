@@ -379,7 +379,7 @@ def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertice
     vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
         "vertices", off_shape_json["children"]
     )
-    vertices_dataset["values"][10] = "a"
+    vertices_dataset["values"][3] = "a"
 
     off_shape_reader.add_shape_to_component()
 
