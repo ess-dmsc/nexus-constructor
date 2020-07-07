@@ -60,7 +60,7 @@ class ShapeReader:
             self._add_cylindrical_shape_to_component()
         else:
             self.warnings.append(
-                f"Unrecgonised shape type for component {self.component.name}. Expected '{OFF_GEOMETRY_NX_CLASS}' or "
+                f"Unrecognised shape type for component {self.component.name}. Expected '{OFF_GEOMETRY_NX_CLASS}' or "
                 f"'{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}'."
             )
 

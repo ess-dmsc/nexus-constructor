@@ -69,12 +69,9 @@ def test_GIVEN_off_shape_WHEN_reading_shape_information_THEN_error_and_issue_mes
 def test_GIVEN_unrecognised_shape_WHEN_reading_shape_information_THEN_warning_message_is_created(
     off_shape_reader, off_shape_json
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     off_shape_json["attributes"][0]["values"] = bad_geometry_type = "NotAValidGeometry"
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [bad_geometry_type], off_shape_reader.warnings
     )
@@ -83,24 +80,18 @@ def test_GIVEN_unrecognised_shape_WHEN_reading_shape_information_THEN_warning_me
 def test_GIVEN_no_attributes_field_WHEN_reading_shape_information_THEN_warning_message_is_created(
     off_shape_reader, off_shape_json
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     del off_shape_json["attributes"]
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
-    assert "''" in off_shape_reader.warnings[-1]
+    assert _any_warning_message_has_substrings(["Unrecognised shape type for component"], off_shape_reader.warnings)
 
 
 def test_GIVEN_missing_children_attribute_WHEN_reading_off_information_THEN_error_message_is_created(
     off_shape_reader, off_shape_json
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     del off_shape_json["children"]
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
@@ -110,27 +101,22 @@ def test_GIVEN_missing_children_attribute_WHEN_reading_off_information_THEN_erro
     )
 
 
-def test_GIVEN_missing_name_WHEN_reading_off_information_THEN_warning_message_is_created_and_substitute_name_is_used(
+def test_GIVEN_missing_name_WHEN_reading_off_information_THEN_issue_message_is_created_and_substitute_name_is_used(
     off_shape_reader, off_shape_json, mock_component
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     del off_shape_json["name"]
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert mock_component["shape"].name == "shape"
+    assert _any_warning_message_has_substrings([off_shape_reader.issue_message, "Unable to find name of shape."], off_shape_reader.warnings)
 
 
-def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_warning_message_is_created(
+def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_error_message_is_created(
     off_shape_reader, off_shape_json
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     off_shape_json["children"] = "NotAList"
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
@@ -141,11 +127,9 @@ def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_warning_
 
 
 @pytest.mark.parametrize("attribute_to_remove", EXPECTED_TYPES.keys())
-def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_message_is_created(
+def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_error_message_is_created(
     off_shape_reader, off_shape_json, attribute_to_remove
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     attribute = off_shape_reader._get_shape_dataset_from_list(
         attribute_to_remove, off_shape_json["children"]
     )
@@ -153,7 +137,6 @@ def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_mes
 
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [attribute_to_remove, off_shape_reader.error_message], off_shape_reader.warnings
     )
@@ -163,8 +146,6 @@ def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_warning_mes
 def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_dataset_type_to_change
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_dataset_type_to_change, off_shape_json["children"]
     )
@@ -172,7 +153,6 @@ def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_mes
     invalid_dataset["dataset"]["type"] = "string"
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
@@ -187,8 +167,6 @@ def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_mes
 def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_dataset_type_to_delete
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_dataset_type_to_delete, off_shape_json["children"]
     )
@@ -196,7 +174,6 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
     del invalid_dataset["dataset"]["type"]
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
@@ -210,8 +187,6 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
 def test_GIVEN_unable_to_find_dataset_WHEN_checking_type_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_dataset_to_delete
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_dataset_to_delete, off_shape_json["children"]
     )
@@ -219,7 +194,6 @@ def test_GIVEN_unable_to_find_dataset_WHEN_checking_type_THEN_issue_message_is_c
     del invalid_dataset["dataset"]
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) > n_warnings
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
@@ -233,8 +207,6 @@ def test_GIVEN_unable_to_find_dataset_WHEN_checking_type_THEN_issue_message_is_c
 def test_GIVEN_missing_values_attribute_WHEN_finding_values_attribute_THEN_error_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_values_to_delete
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_values_to_delete, off_shape_json["children"]
     )
@@ -242,7 +214,6 @@ def test_GIVEN_missing_values_attribute_WHEN_finding_values_attribute_THEN_error
     del invalid_dataset["values"]
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
@@ -256,8 +227,6 @@ def test_GIVEN_missing_values_attribute_WHEN_finding_values_attribute_THEN_error
 def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN_error_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_values_to_change
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_values_to_change, off_shape_json["children"]
     )
@@ -265,7 +234,6 @@ def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN
     invalid_dataset["values"] = True
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
@@ -279,8 +247,6 @@ def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN
 def test_GIVEN_inconsistent_list_size_WHEN_validating_attribute_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_list_size_to_change
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_list_size_to_change, off_shape_json["children"]
     )
@@ -288,7 +254,6 @@ def test_GIVEN_inconsistent_list_size_WHEN_validating_attribute_THEN_issue_messa
     invalid_dataset["dataset"]["size"][0] -= 1
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
@@ -298,24 +263,21 @@ def test_GIVEN_inconsistent_list_size_WHEN_validating_attribute_THEN_issue_messa
     )
 
 
-@pytest.mark.parametrize("atribute_with_list_size_to_delete", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize("attribute_with_list_size_to_delete", EXPECTED_TYPES.keys())
 def test_GIVEN_no_list_size_information_WHEN_validating_attribute_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json, atribute_with_list_size_to_delete
+    off_shape_reader, off_shape_json, attribute_with_list_size_to_delete
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
-        atribute_with_list_size_to_delete, off_shape_json["children"]
+        attribute_with_list_size_to_delete, off_shape_json["children"]
     )
 
     del invalid_dataset["dataset"]["size"]
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            f"Unable to find size attribute for {atribute_with_list_size_to_delete} dataset.",
+            f"Unable to find size attribute for {attribute_with_list_size_to_delete} dataset.",
         ],
         off_shape_reader.warnings,
     )
@@ -325,8 +287,6 @@ def test_GIVEN_no_list_size_information_WHEN_validating_attribute_THEN_issue_mes
 def test_GIVEN_value_has_wrong_type_WHEN_validating_value_THEN_error_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_value_to_change
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
         attribute_with_value_to_change, off_shape_json["children"]
     )
@@ -334,7 +294,6 @@ def test_GIVEN_value_has_wrong_type_WHEN_validating_value_THEN_error_message_is_
     invalid_dataset["values"][0] = "astring"
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
@@ -348,8 +307,6 @@ def test_GIVEN_value_has_wrong_type_WHEN_validating_value_THEN_error_message_is_
 def test_GIVEN_missing_attributes_WHEN_finding_units_THEN_error_message_is_created(
     off_shape_reader, off_shape_json
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
         "vertices", off_shape_json["children"]
     )
@@ -357,7 +314,6 @@ def test_GIVEN_missing_attributes_WHEN_finding_units_THEN_error_message_is_creat
     del vertices_dataset["attributes"]
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
@@ -370,8 +326,6 @@ def test_GIVEN_missing_attributes_WHEN_finding_units_THEN_error_message_is_creat
 def test_GIVEN_missing_units_WHEN_finding_units_THEN_error_message_is_created(
     off_shape_reader, off_shape_json
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
         "vertices", off_shape_json["children"]
     )
@@ -382,7 +336,6 @@ def test_GIVEN_missing_units_WHEN_finding_units_THEN_error_message_is_created(
     vertices_dataset["attributes"].remove(units)
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
@@ -396,8 +349,6 @@ def test_GIVEN_missing_units_WHEN_finding_units_THEN_error_message_is_created(
 def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created(
     off_shape_reader, off_shape_json, invalid_units
 ):
-    n_warnings = len(off_shape_reader.warnings)
-
     vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
         "vertices", off_shape_json["children"]
     )
@@ -407,7 +358,6 @@ def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created
     )["values"] = invalid_units
     off_shape_reader.add_shape_to_component()
 
-    assert len(off_shape_reader.warnings) == n_warnings + 1
     assert _any_warning_message_has_substrings(
         [off_shape_reader.error_message, invalid_units], off_shape_reader.warnings,
     )
