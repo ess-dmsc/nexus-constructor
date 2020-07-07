@@ -227,7 +227,7 @@ class Component(Group):
         values: Dataset,
     ) -> Transformation:
         if name is None:
-            name = _generate_incremental_name(transformation_type, self.transforms_list)
+            name = _generate_incremental_name(transformation_type, self.transforms)
         transform = Transformation(name=name, dataset=None)
         transform.type = transformation_type
         transform.ui_value = angle_or_magnitude
@@ -236,14 +236,22 @@ class Component(Group):
         transform.depends_on = depends_on
         transform.values = values
         transform._parent_component = self
-        self.transforms_list.append(transform)
+
+        self.get_transforms_group()[name] = transform
 
         return transform
 
     def remove_transformation(self, transform: Transformation):
         if transform.dependents:
             raise Exception
-        self.transforms_list.remove(transform)
+        del self.get_transforms_group()[transform.name]
+
+    def get_transforms_group(self):
+        if self[TRANSFORMS_GROUP_NAME] is not None:
+            return self[TRANSFORMS_GROUP_NAME]
+
+        self[TRANSFORMS_GROUP_NAME] = Group(TRANSFORMS_GROUP_NAME)
+        return self[TRANSFORMS_GROUP_NAME]
 
     @property
     def shape(
@@ -409,7 +417,7 @@ class Component(Group):
             {
                 "type": "group",
                 "name": TRANSFORMS_GROUP_NAME,
-                "children": [transform.as_dict() for transform in self.transforms_list],
+                "children": [transform.as_dict() for transform in self.transforms],
             }
         )
         try:
