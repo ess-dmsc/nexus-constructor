@@ -409,7 +409,7 @@ class Component(Group):
             {
                 "type": "group",
                 "name": TRANSFORMS_GROUP_NAME,
-                "children": [transform.as_dict() for transform in self.transforms],
+                "children": [transform.as_dict() for transform in self.transforms_list],
             }
         )
         try:
