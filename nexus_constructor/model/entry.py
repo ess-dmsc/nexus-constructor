@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 class Entry(Group):
     def __init__(self):
-        super().__init__("entry")
+        super().__init__("entry", None)
         self.nx_class = "NXentry"
 
     @property

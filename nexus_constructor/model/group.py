@@ -23,7 +23,7 @@ class Group(Node):
         return _get_item(self.children, key)
 
     def __setitem__(self, key: str, value: Union["Group", Dataset]):
-        _set_item(self.children, key, value)
+        _set_item(self, self.children, key, value)
 
     def __contains__(self, item: str):
         result = _get_item(self.children, item)

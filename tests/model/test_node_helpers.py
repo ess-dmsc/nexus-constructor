@@ -18,7 +18,7 @@ def test_get_item_throws_error_when_component_is_not_in_list_then_works_when_ite
 
     assert _get_item(list_of_components, name) is None
 
-    _set_item(list_of_components, name, test)
+    _set_item(None, list_of_components, name, test)
     assert _get_item(list_of_components, name) == test
 
 
@@ -55,7 +55,7 @@ def test_set_item_works_on_list_that_has_components_in():
     comp2_name = "component2"
     comp2 = Component(comp2_name)
 
-    _set_item(list_of_components, comp2_name, comp2)
+    _set_item(None, list_of_components, comp2_name, comp2)
 
     assert list_of_components == [comp1, comp2]
 
@@ -70,6 +70,6 @@ def test_set_item_with_existing_component_in_overwrites_if_name_is_same():
 
     list_of_components = [comp1]
 
-    _set_item(list_of_components, comp1_name, comp2)
+    _set_item(None, list_of_components, comp1_name, comp2)
 
     assert list_of_components[0].nx_class == nx_class

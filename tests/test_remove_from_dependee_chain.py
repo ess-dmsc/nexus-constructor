@@ -2,14 +2,24 @@ from nexus_constructor.model.component import Component
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.dataset import DatasetMetadata, Dataset
+from nexus_constructor.model.instrument import Instrument
+import pytest
 
 values = Dataset(
-    name="scalar_value", dataset=DatasetMetadata(type="Double", size=[1]), values=90.0
+    name="scalar_value",
+    dataset=DatasetMetadata(type="Double", size=[1]),
+    values=90.0,
+    parent=None,
 )
 
 
-def test_remove_from_beginning_1():
-    component1 = Component("component1")
+@pytest.fixture
+def instrument():
+    return Instrument(parent=None)
+
+
+def test_remove_from_beginning_1(instrument):
+    component1 = Component("component1", instrument)
     rot = component1.add_rotation(
         name="rotation1",
         axis=QVector3D(1.0, 0.0, 0.0),
@@ -22,8 +32,8 @@ def test_remove_from_beginning_1():
     assert component1.depends_on is None
 
 
-def test_remove_from_beginning_2():
-    component1 = Component("component1")
+def test_remove_from_beginning_2(instrument):
+    component1 = Component("component1", instrument)
     rot1 = component1.add_rotation(
         name="rotation1",
         axis=QVector3D(1.0, 0.0, 0.0),
@@ -45,9 +55,9 @@ def test_remove_from_beginning_2():
     assert component1.depends_on == rot2
 
 
-def test_remove_from_beginning_3():
-    component1 = Component("component1")
-    component2 = Component("component2")
+def test_remove_from_beginning_3(instrument):
+    component1 = Component("component1", instrument)
+    component2 = Component("component2", instrument)
     rot1 = component1.add_rotation(
         name="rotation1",
         axis=QVector3D(1.0, 0.0, 0.0),
@@ -73,9 +83,9 @@ def test_remove_from_beginning_3():
 
 
 def test_remove_from_middle():
-    component1 = Component("component1")
-    component2 = Component("component2")
-    component3 = Component("component3")
+    component1 = Component("component1", instrument)
+    component2 = Component("component2", instrument)
+    component3 = Component("component3", instrument)
     rot1 = component1.add_rotation(
         name="rotation1",
         axis=QVector3D(1.0, 0.0, 0.0),
@@ -108,7 +118,7 @@ def test_remove_from_middle():
 
 
 def test_remove_from_end():
-    component1 = Component("component1")
+    component1 = Component("component1", instrument)
     rot1 = component1.add_rotation(
         name="rotation1",
         axis=QVector3D(1.0, 0.0, 0.0),

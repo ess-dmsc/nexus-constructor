@@ -32,7 +32,9 @@ def create_transform(
 ):
 
     translation = Transformation(
-        name=name, dataset=Dataset("dataset", DatasetMetadata([1], "str"), "test")
+        name=name,
+        dataset=Dataset("dataset", DatasetMetadata([1], "str"), "test"),
+        parent=None,
     )
 
     translation.vector = vector

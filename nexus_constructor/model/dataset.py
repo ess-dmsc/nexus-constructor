@@ -14,7 +14,7 @@ class DatasetMetadata:
 
 @attr.s
 class Dataset(Node):
-    dataset = attr.ib(type=DatasetMetadata)
+    dataset = attr.ib(type=DatasetMetadata, default={})
     values = attr.ib(factory=list, type=List[ValueType])
     type = attr.ib(type=str, default="dataset", init=False)
 

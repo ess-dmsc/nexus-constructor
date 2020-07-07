@@ -66,7 +66,7 @@ COMPONENT_CLASS_PATH = "nexus_constructor.add_component_window.Component"
 CHOPPER_GEOMETRY_CREATOR_PATH = "nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator.DiskChopperGeometryCreator.create_disk_chopper_geometry"
 
 entry = Entry()
-entry.instrument = Instrument()
+entry.instrument = Instrument(parent=entry)
 model = Model(entry)
 component = ComponentTreeModel(model)
 

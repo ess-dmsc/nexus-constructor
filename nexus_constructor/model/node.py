@@ -39,7 +39,9 @@ def _remove_item(list_to_remove_from: List[Any], item_name: str):
         pass
 
 
-def _set_item(list_to_look_in: List[Any], item_name: str, new_value: Any):
+def _set_item(
+    parent: "Node", list_to_look_in: List[Any], item_name: str, new_value: Any
+):
     """
     Given an item name, either overwrite the current entry or just append the item to the list.
     :param list_to_look_in: list containing elements that have a name attribute
@@ -51,6 +53,8 @@ def _set_item(list_to_look_in: List[Any], item_name: str, new_value: Any):
         list_to_look_in[index] = new_value
     else:
         list_to_look_in.append(new_value)
+    if hasattr(new_value, "parent"):
+        new_value.parent = parent
 
 
 @attr.s
@@ -59,11 +63,13 @@ class Node:
 
     name = attr.ib(type=str)
     attributes = attr.ib(init=False, factory=list)
+    parent = attr.ib(type="Node", default=None)
 
     def set_attribute_value(
         self, attribute_name: str, attribute_value: Any, attribute_type: str = "String"
     ):
         _set_item(
+            self,
             self.attributes,
             attribute_name,
             FieldAttribute(
