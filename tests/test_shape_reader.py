@@ -10,7 +10,7 @@ from nexus_constructor.json.load_from_json_utils import (
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.model.component import Component, OFF_GEOMETRY_NX_CLASS
 from nexus_constructor.model.geometry import OFFGeometryNexus
-from tests.shape_json import off_shape_json
+from tests.shape_json import off_shape_json, cylindrical_shape_json
 
 EXPECTED_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
 COMPONENT_NAME = "ComponentName"
@@ -40,8 +40,13 @@ def mock_component():
 
 
 @pytest.fixture(scope="function")
-def off_shape_reader(off_shape_json, mock_component) -> ShapeReader:
+def off_shape_reader(mock_component, off_shape_json) -> ShapeReader:
     return ShapeReader(mock_component, off_shape_json)
+
+
+@pytest.fixture(scope="function")
+def cylindrical_shape_reader(mock_component, cylindrical_shape_json):
+    return ShapeReader(mock_component, cylindrical_shape_json)
 
 
 def _any_warning_message_has_substrings(
@@ -395,7 +400,6 @@ def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertice
 def test_GIVEN_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
     off_shape_reader, off_shape_json, mock_component
 ):
-
     children = off_shape_json["children"]
 
     name = off_shape_json["name"]
@@ -418,3 +422,7 @@ def test_GIVEN_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_p
     assert shape.get_field_value("faces") == faces
     assert shape.vertices == vertices
     assert shape.winding_order == winding_order
+
+
+def test_nothing(cylindrical_shape_reader):
+    cylindrical_shape_reader.add_shape_to_component()

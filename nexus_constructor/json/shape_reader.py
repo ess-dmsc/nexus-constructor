@@ -70,21 +70,11 @@ class ShapeReader:
         be found and passes validation then the geometry is created and writen to the component, otherwise the function
         just returns without changing the component.
         """
-        try:
-            children = self.shape_info["children"]
-        except KeyError:
-            self.warnings.append(
-                f"{self.error_message} Unable to find children list in shape group."
-            )
+        children = self._get_children_list()
+        if not children:
             return
 
-        try:
-            name = self.shape_info["name"]
-        except KeyError:
-            self.warnings.append(
-                f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
-            )
-            name = "shape"
+        name = self._get_name()
 
         if not isinstance(children, list):
             self.warnings.append(
@@ -132,7 +122,17 @@ class ShapeReader:
         self.component[SHAPE_GROUP_NAME] = off_geometry
 
     def _add_cylindrical_shape_to_component(self):
-        pass
+        """
+        Something...
+        :return:
+        """
+        children = self._get_children_list()
+        if not children:
+            return
+
+        name = self._get_name()
+
+        print(name, children)
 
     def _get_shape_dataset_from_list(
         self, attribute_name: str, children: List[dict]
@@ -359,3 +359,29 @@ class ShapeReader:
             f"{self.error_message} values attribute in {parent_name} dataset is not a list."
         )
         return False
+
+    def _get_children_list(self) -> Union[dict, None]:
+        """
+        Attempts to get the children list from the shape dictionary.
+        :return: The children list if it could be found, otherwise None is returned.
+        """
+        try:
+            return self.shape_info["children"]
+        except KeyError:
+            self.warnings.append(
+                f"{self.error_message} Unable to find children list in shape group."
+            )
+            return
+
+    def _get_name(self) -> str:
+        """
+        Attempts to get the name attribute from the shape dictionary.
+        :return: The name if it could be found, otherwise 'shape' is returned.
+        """
+        try:
+            return self.shape_info["name"]
+        except KeyError:
+            self.warnings.append(
+                f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
+            )
+            return "shape"
