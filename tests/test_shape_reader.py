@@ -1,10 +1,15 @@
 from typing import List
 
 import pytest
+from PySide2.QtGui import QVector3D
 from mock import Mock
 
+from nexus_constructor.json.load_from_json_utils import (
+    _find_attribute_from_list_or_dict,
+)
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.model.component import Component, OFF_GEOMETRY_NX_CLASS
+from nexus_constructor.model.geometry import OFFGeometryNexus
 from tests.shape_json import off_shape_json
 
 EXPECTED_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
@@ -385,3 +390,31 @@ def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertice
         ],
         off_shape_reader.warnings,
     )
+
+
+def test_GIVEN_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
+    off_shape_reader, off_shape_json, mock_component
+):
+
+    children = off_shape_json["children"]
+
+    name = off_shape_json["name"]
+    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "vertices", children
+    )
+    vertices = list(map(lambda vertex: QVector3D(*vertex), vertices_dataset["values"]))
+    faces = off_shape_reader._get_shape_dataset_from_list("faces", children)["values"]
+    units = _find_attribute_from_list_or_dict("units", vertices_dataset["attributes"])
+    winding_order = off_shape_reader._get_shape_dataset_from_list(
+        "winding_order", children
+    )["values"]
+
+    off_shape_reader.add_shape_to_component()
+
+    shape = mock_component["shape"]
+    assert isinstance(shape, OFFGeometryNexus)
+    assert shape.name == name
+    assert shape.units == units
+    assert shape.get_field_value("faces") == faces
+    assert shape.vertices == vertices
+    assert shape.winding_order == winding_order
