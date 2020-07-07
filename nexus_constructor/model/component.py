@@ -67,24 +67,20 @@ class Component(Group):
     """
 
     transforms_list = attr.ib(factory=list)
+    _depends_on = attr.ib(type=Transformation, default=None)
 
     @property
     def depends_on(self) -> "Transformation":
-        try:
-            return self[CommonAttrs.DEPENDS_ON]
-        except AttributeError:
-            return
+        return self._depends_on
 
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
-        try:
-            if self.depends_on is not None:
-                # deregister this component as a dependent of the old depends_on transformation
-                self.depends_on.deregister_dependent(self)
-        except AttributeError:
-            pass
+        if self.depends_on is not None:
+            # deregister this component as a dependent of the old depends_on transformation
+            self.depends_on.deregister_dependent(self)
+
+        self._depends_on = new_depends_on
         if new_depends_on is not None:
-            self[CommonAttrs.DEPENDS_ON] = new_depends_on
             new_depends_on.register_dependent(self)
 
     @property

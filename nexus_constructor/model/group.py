@@ -62,7 +62,6 @@ class Group(Node):
                 child.as_dict()
                 for child in self.children
                 if not isinstance(child, Transformation)
-                if child.name != CommonAttrs.DEPENDS_ON
             ]
             if self.children
             else [],
