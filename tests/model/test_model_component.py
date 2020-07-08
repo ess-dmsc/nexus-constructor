@@ -1,6 +1,10 @@
 import pytest
-from nexus_constructor.model.component import Component
+from PySide2.QtGui import QVector3D
+
+from nexus_constructor.model.component import Component, TRANSFORMS_GROUP_NAME
 import numpy as np
+
+from nexus_constructor.model.stream import NS10Stream
 
 
 def test_component_set_item_with_brackets_works_with_another_component():
@@ -58,3 +62,42 @@ def test_component_set_field_with_scalar_value_correctly_sets_field_value():
     assert field_dataset.values == data
     assert field_dataset.dataset.size == [1]
     assert field_dataset.dataset.type == dtype
+
+
+def test_component_as_dict_contains_transformations():
+    zeroth_transform_name = "test_transform_A"
+    first_transform_name = "test_transform_B"
+    test_component = Component(name="test_component")
+
+    test_component.add_translation(
+        name=zeroth_transform_name, vector=QVector3D(0, 0, 1)
+    )
+    test_component.add_translation(name=first_transform_name, vector=QVector3D(1, 0, 0))
+    dictionary_output = test_component.as_dict()
+
+    assert dictionary_output["children"][0]["name"] == TRANSFORMS_GROUP_NAME
+    child_names = [
+        child["name"] for child in dictionary_output["children"][0]["children"]
+    ]
+    assert zeroth_transform_name in child_names
+    assert first_transform_name in child_names
+
+
+def test_component_as_dict_contains_stream_field():
+    source = "PVS:pv1"
+    topic = "topic1"
+    name = "stream1"
+    test_component = Component(name="test")
+    test_component[name] = NS10Stream(source=source, topic=topic)
+
+    dictionary_output = test_component.as_dict()
+
+    assert dictionary_output["children"][0]["type"] == "stream"
+    assert dictionary_output["children"][0]["stream"]["topic"] == topic
+    assert dictionary_output["children"][0]["stream"]["source"] == source
+    assert dictionary_output["children"][0]["stream"]["writer_module"] == "ns10"
+
+
+def test_component_as_dict_contains_links():
+    # todo
+    pass

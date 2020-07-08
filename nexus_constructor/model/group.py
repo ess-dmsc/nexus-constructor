@@ -26,7 +26,11 @@ class Group(Node):
         _set_item(self, self.children, key, value)
 
     def __contains__(self, item: str):
-        result = _get_item(self.children, item)
+        result = None
+        try:
+            result = _get_item(self.children, item)
+        except AttributeError:
+            pass
         return True if result is not None else False
 
     def __delitem__(self, key):
