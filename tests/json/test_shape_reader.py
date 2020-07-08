@@ -466,3 +466,25 @@ def test_GIVEN_missing_units_WHEN_finding_cylindrical_units_THEN_error_message_i
         ],
         cylindrical_shape_reader.warnings,
     )
+
+
+@pytest.mark.parametrize(
+    "attribute_with_values_to_delete", EXPECTED_CYLINDRICAL_TYPES.keys()
+)
+def test_GIVEN_missing_values_WHEN_finding_cylindrical_values_THEN_error_message_is_created(
+    cylindrical_shape_reader, cylindrical_shape_json, attribute_with_values_to_delete
+):
+    invalid_dataset = cylindrical_shape_reader._get_shape_dataset_from_list(
+        attribute_with_values_to_delete, cylindrical_shape_json["children"]
+    )
+
+    del invalid_dataset["values"]
+    cylindrical_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [
+            cylindrical_shape_reader.error_message,
+            f"Unable to find values in {attribute_with_values_to_delete} dataset.",
+        ],
+        cylindrical_shape_reader.warnings,
+    )
