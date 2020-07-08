@@ -145,13 +145,13 @@ class ShapeReader:
         if not units:
             return
 
-        cylinders_array = self._find_and_validate_cylinders_array(cylinders_dataset)
-        if not cylinders_array:
+        cylinders_list = self._find_and_validate_cylinders_list(cylinders_dataset)
+        if not cylinders_list:
             return
 
         cylindrical_geometry = CylindricalGeometry(name)
         # cylindrical_geometry.units = units
-        cylindrical_geometry.set_field_value(CYLINDERS, cylinders_array)
+        cylindrical_geometry.set_field_value(CYLINDERS, cylinders_list)
 
     def _get_shape_dataset_from_list(
         self, attribute_name: str, children: List[dict]
@@ -318,8 +318,8 @@ class ShapeReader:
         :param list_parent_name: The name of the dataset the list belongs to.
         :return: True of all the items in the list have the expected type, False otherwise.
         """
-        flat_list = [item for sublist in values for item in sublist]
-        if all([expected_type in str(type(value)) for value in flat_list]):
+        flat_array = np.array(values).flatten()
+        if all([expected_type in str(type(value)) for value in flat_array]):
             return True
         self.warnings.append(
             f"{self.error_message} Values in {list_parent_name} list do not all have type {expected_type}."
@@ -409,13 +409,13 @@ class ShapeReader:
             )
             return "shape"
 
-    def _find_and_validate_cylinders_array(
+    def _find_and_validate_cylinders_list(
         self, cylinders_dataset: dict
     ) -> Union[List[List[int]], None]:
         """
         Attempts to find and validate the cylinders value from the cylinders dataset.
-        :param cylinders_dataset:
-        :return:
+        :param cylinders_dataset: The cylinders dataset.
+        :return: The cylinders value list if it was found and passed validation, otherwise None is returned.
         """
         self._validate_data_type(cylinders_dataset, INT_TYPE, CYLINDERS)
 
