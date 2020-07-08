@@ -1,6 +1,6 @@
 from typing import List, Union, Any
 
-import numpy
+import numpy as np
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.json.load_from_json_utils import (
@@ -13,7 +13,7 @@ from nexus_constructor.model.component import (
     OFF_GEOMETRY_NX_CLASS,
     SHAPE_GROUP_NAME,
 )
-from nexus_constructor.model.geometry import OFFGeometryNexus
+from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     METRES,
@@ -25,6 +25,7 @@ INT_TYPE = "int"
 WINDING_ORDER = "winding_order"
 FACES = "faces"
 VERTICES = "vertices"
+CYLINDERS = "cylinders"
 
 
 class ShapeReader:
@@ -118,7 +119,7 @@ class ShapeReader:
         off_geometry.vertices = vertices
         off_geometry.units = units
         off_geometry.set_field_value("faces", faces_starting_indices)
-        off_geometry.set_field_value("winding_order", numpy.array(winding_order))
+        off_geometry.set_field_value("winding_order", np.array(winding_order))
         self.component[SHAPE_GROUP_NAME] = off_geometry
 
     def _add_cylindrical_shape_to_component(self):
@@ -132,7 +133,25 @@ class ShapeReader:
 
         name = self._get_name()
 
-        print(name, children)
+        vertices_dataset = self._get_shape_dataset_from_list(VERTICES, children)
+        if not vertices_dataset:
+            return
+
+        cylinders_dataset = self._get_shape_dataset_from_list(CYLINDERS, children)
+        if not cylinders_dataset:
+            return
+
+        units = self._find_and_validate_units(vertices_dataset)
+        if not units:
+            return
+
+        cylinders_array = self._find_and_validate_cylinders_array(cylinders_dataset)
+        if not cylinders_array:
+            return
+
+        cylindrical_geometry = CylindricalGeometry(name)
+        cylindrical_geometry.units = units
+        cylindrical_geometry.cylinders = cylinders_array
 
     def _get_shape_dataset_from_list(
         self, attribute_name: str, children: List[dict]
@@ -318,11 +337,14 @@ class ShapeReader:
         :param parent_name: The name of the parent dataset.
         """
         try:
-            if data_properties["dataset"]["size"][0] != len(values):
-                self.warnings.append(
-                    f"{self.issue_message} Mismatch between length of {parent_name} list ({len(values)}) and size "
-                    f"attribute from dataset ({data_properties['dataset']['size'][0]}). "
-                )
+            array = np.array(values)
+            size = data_properties["dataset"]["size"]
+            for i in range(len(size)):
+                if size[i] != array.shape[i]:
+                    self.warnings.append(
+                        f"{self.issue_message} Mismatch between length of {parent_name} list "
+                        f"({array.shape}) and size attribute from dataset ({size})."
+                    )
         except KeyError:
             self.warnings.append(
                 f"{self.issue_message} Unable to find size attribute for {parent_name} dataset."
@@ -385,3 +407,29 @@ class ShapeReader:
                 f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
             )
             return "shape"
+
+    def _find_and_validate_cylinders_array(
+        self, cylinders_dataset: dict
+    ) -> Union[np.ndarray, None]:
+        """
+        Attempts to find and validate the cylinders value from the cylinders dataset.
+        :param cylinders_dataset:
+        :return:
+        """
+        self._validate_data_type(cylinders_dataset, INT_TYPE, CYLINDERS)
+
+        cylinders_list = self._get_values_attribute(cylinders_dataset, CYLINDERS)
+        if not cylinders_list:
+            return
+
+        if not self._attribute_is_a_list(cylinders_list, CYLINDERS):
+            return
+
+        self._validate_list_size(cylinders_dataset, cylinders_list, CYLINDERS)
+
+        if not self._all_in_list_have_expected_type(
+            cylinders_list, INT_TYPE, CYLINDERS
+        ):
+            return
+
+        return np.array(cylinders_list)
