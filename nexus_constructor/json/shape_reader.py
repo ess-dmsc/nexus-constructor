@@ -3,6 +3,7 @@ from typing import List, Union, Any
 import numpy as np
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
     _find_attribute_from_list_or_dict,
@@ -21,11 +22,23 @@ from nexus_constructor.unit_utils import (
     units_have_magnitude_of_one,
 )
 
-INT_TYPE = "int"
+INT_TYPE = ["int"]
+FLOAT_TYPES = ["double", "float"]
 WINDING_ORDER = "winding_order"
 FACES = "faces"
 VERTICES = "vertices"
 CYLINDERS = "cylinders"
+
+
+def _convert_vertices_to_qvector3d(
+    vertices: List[List[float]],
+) -> Union[List[QVector3D], None]:
+    """
+
+    :param vertices:
+    :return:
+    """
+    return [QVector3D(*vertex) for vertex in vertices]
 
 
 class ShapeReader:
@@ -110,12 +123,16 @@ class ShapeReader:
         vertices = self._find_and_validate_vertices(vertices_dataset)
         if not vertices:
             return
+        vertices = _convert_vertices_to_qvector3d(vertices)
+        if not vertices:
+            return
 
         winding_order = self._find_and_validate_winding_order(winding_order_dataset)
         if not winding_order:
             return
 
         off_geometry = OFFGeometryNexus(name)
+        off_geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         off_geometry.vertices = vertices
         off_geometry.units = units
         off_geometry.set_field_value("faces", faces_starting_indices)
@@ -149,9 +166,17 @@ class ShapeReader:
         if not cylinders_list:
             return
 
+        vertices = self._find_and_validate_vertices(vertices_dataset)
+        if not vertices:
+            return
+
         cylindrical_geometry = CylindricalGeometry(name)
-        # cylindrical_geometry.units = units
-        cylindrical_geometry.set_field_value(CYLINDERS, cylinders_list)
+        cylindrical_geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
+        cylindrical_geometry.set_field_value(CYLINDERS, np.array(cylinders_list))
+        cylindrical_geometry.set_field_value(CommonAttrs.VERTICES, np.vstack(vertices))
+        cylindrical_geometry[CommonAttrs.VERTICES].set_attribute_value(
+            CommonAttrs.UNITS, units
+        )
 
     def _get_shape_dataset_from_list(
         self, attribute_name: str, children: List[dict]
@@ -197,14 +222,14 @@ class ShapeReader:
 
     def _find_and_validate_vertices(
         self, vertices_dataset: dict
-    ) -> Union[List[int], None]:
+    ) -> Union[List[float], None]:
         """
         Attempts to find and validate the vertices data.
         :param vertices_dataset: The verticies dataset.
         :return: A list of QVector3D objects if the vertices dataset was found and passed validation, otherwise None is
         returned.
         """
-        self._validate_data_type(vertices_dataset, "float", VERTICES)
+        self._validate_data_type(vertices_dataset, FLOAT_TYPES, VERTICES)
 
         values = self._get_values_attribute(vertices_dataset, VERTICES)
         if not values:
@@ -215,29 +240,31 @@ class ShapeReader:
 
         self._validate_list_size(vertices_dataset, values, VERTICES)
 
-        try:
-            vertices = [QVector3D(*value) for value in values]
-        except TypeError:
-            self.warnings.append(
-                f"{self.error_message} Unable to convert all vertices values to QVector3D."
-            )
+        if not self._all_in_list_have_expected_type(values, FLOAT_TYPES, VERTICES):
             return
 
-        return vertices
+        return values
 
-    def _validate_data_type(self, dataset: dict, expected_type: str, parent_name: str):
+    def _validate_data_type(
+        self, dataset: dict, expected_types: List[str], parent_name: str
+    ):
         """
         Checks if the type in the dataset attribute has an expected value. Failing this check does not stop the geometry
         creation.
         :param dataset: The dataset where we expect to find the type information.
-        :param expected_type: The expected type that the dataset type field should contain.
+        :param expected_types: The expected type that the dataset type field should contain.
         :param parent_name: The name of the parent dataset
         """
         try:
-            if expected_type not in dataset["dataset"]["type"]:
+            if not any(
+                [
+                    expected_type in dataset["dataset"]["type"]
+                    for expected_type in expected_types
+                ]
+            ):
                 self.warnings.append(
-                    f"{self.issue_message} Type attribute for {parent_name} does not match expected type "
-                    f"{expected_type}."
+                    f"{self.issue_message} Type attribute for {parent_name} does not match expected type(s) "
+                    f"{expected_types}."
                 )
         except KeyError:
             self.warnings.append(
@@ -309,20 +336,30 @@ class ShapeReader:
         return values
 
     def _all_in_list_have_expected_type(
-        self, values: list, expected_type: str, list_parent_name: str
-    ):
+        self, values: list, expected_types: List[str], list_parent_name: str
+    ) -> bool:
         """
         Checks if all the items in a given list have the expected type.
         :param values: The list of values.
-        :param expected_type: The expected type.
+        :param expected_types: The expected types.
         :param list_parent_name: The name of the dataset the list belongs to.
         :return: True of all the items in the list have the expected type, False otherwise.
         """
         flat_array = np.array(values).flatten()
-        if all([expected_type in str(type(value)) for value in flat_array]):
+        if all(
+            [
+                any(
+                    [
+                        expected_type in str(type(value))
+                        for expected_type in expected_types
+                    ]
+                )
+                for value in flat_array
+            ]
+        ):
             return True
         self.warnings.append(
-            f"{self.error_message} Values in {list_parent_name} list do not all have type {expected_type}."
+            f"{self.error_message} Values in {list_parent_name} list do not all have type(s) {expected_types}."
         )
         return False
 
@@ -411,7 +448,7 @@ class ShapeReader:
 
     def _find_and_validate_cylinders_list(
         self, cylinders_dataset: dict
-    ) -> Union[List[List[int]], None]:
+    ) -> Union[List[List[int]], None]:  # todo : merge with faces indices method?
         """
         Attempts to find and validate the cylinders value from the cylinders dataset.
         :param cylinders_dataset: The cylinders dataset.

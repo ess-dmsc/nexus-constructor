@@ -171,8 +171,8 @@ def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_mes
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            f"Type attribute for {attribute_with_dataset_type_to_change} does not match expected type"
-            f" {EXPECTED_TYPES[attribute_with_dataset_type_to_change]}.",
+            f"Type attribute for {attribute_with_dataset_type_to_change} does not match expected type(s)",
+            EXPECTED_TYPES[attribute_with_dataset_type_to_change],
         ],
         off_shape_reader.warnings,
     )
@@ -312,8 +312,8 @@ def test_GIVEN_value_has_wrong_type_WHEN_validating_value_THEN_error_message_is_
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
-            f"Values in {attribute_with_value_to_change} list do not all have type "
-            f"{EXPECTED_TYPES[attribute_with_value_to_change]}.",
+            f"Values in {attribute_with_value_to_change} list do not all have type(s)",
+            EXPECTED_TYPES[attribute_with_value_to_change],
         ],
         off_shape_reader.warnings,
     )
@@ -375,25 +375,6 @@ def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created
 
     assert _any_warning_message_has_substrings(
         [off_shape_reader.error_message, invalid_units], off_shape_reader.warnings,
-    )
-
-
-def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertices_THEN_error_message_is_created(
-    off_shape_reader, off_shape_json
-):
-    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "vertices", off_shape_json["children"]
-    )
-    vertices_dataset["values"][3] = [4.0, 4.0, "a"]
-
-    off_shape_reader.add_shape_to_component()
-
-    assert _any_warning_message_has_substrings(
-        [
-            off_shape_reader.error_message,
-            "Unable to convert all vertices values to QVector3D.",
-        ],
-        off_shape_reader.warnings,
     )
 
 
