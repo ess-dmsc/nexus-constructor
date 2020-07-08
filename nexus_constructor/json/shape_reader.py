@@ -33,9 +33,9 @@ def _convert_vertices_to_qvector3d(
     vertices: List[List[float]],
 ) -> Union[List[QVector3D], None]:
     """
-
-    :param vertices:
-    :return:
+    Converts a list of vertices to QVector3D
+    :param vertices: The list of vertices.
+    :return: The list of QVector3D vertices.
     """
     return [QVector3D(*vertex) for vertex in vertices]
 
@@ -140,8 +140,9 @@ class ShapeReader:
 
     def _add_cylindrical_shape_to_component(self):
         """
-        Something...
-        :return:
+        Attempts to create a cylindrical geometry and set this as the shape of the component. If the required
+        information can be found and passes validation then the geometry is created and writen to the component,
+        otherwise the function just returns without changing the component.
         """
         children = self._get_children_list()
         if not children:
