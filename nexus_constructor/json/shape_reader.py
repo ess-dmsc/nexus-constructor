@@ -123,8 +123,6 @@ class ShapeReader:
         if not vertices:
             return
         vertices = _convert_vertices_to_qvector3d(vertices)
-        if not vertices:
-            return
 
         winding_order = self._find_and_validate_values_list(
             winding_order_dataset, INT_TYPE, WINDING_ORDER

@@ -405,5 +405,16 @@ def test_GIVEN_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_p
     assert shape.winding_order == winding_order
 
 
-def test_nothing(cylindrical_shape_reader):
+def test_GIVEN_missing_children_attribute_WHEN_reading_cylindrical_information_THEN_error_message_is_created(
+    cylindrical_shape_reader, cylindrical_shape_json
+):
+    del cylindrical_shape_json["children"]
     cylindrical_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [
+            cylindrical_shape_reader.error_message,
+            "Unable to find children list in shape group.",
+        ],
+        cylindrical_shape_reader.warnings,
+    )
