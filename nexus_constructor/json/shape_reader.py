@@ -109,8 +109,8 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces_starting_indices = self._find_and_validate_faces_starting_indices_list(
-            faces_dataset
+        faces_starting_indices = self._find_and_validate_values_list(
+            faces_dataset, INT_TYPE, FACES
         )
         if not faces_starting_indices:
             return
@@ -126,7 +126,9 @@ class ShapeReader:
         if not vertices:
             return
 
-        winding_order = self._find_and_validate_winding_order(winding_order_dataset)
+        winding_order = self._find_and_validate_values_list(
+            winding_order_dataset, INT_TYPE, WINDING_ORDER
+        )
         if not winding_order:
             return
 
@@ -162,7 +164,9 @@ class ShapeReader:
         if not units:
             return
 
-        cylinders_list = self._find_and_validate_cylinders_list(cylinders_dataset)
+        cylinders_list = self._find_and_validate_values_list(
+            cylinders_dataset, INT_TYPE, CYLINDERS
+        )
         if not cylinders_list:
             return
 
@@ -194,32 +198,6 @@ class ShapeReader:
         self.warnings.append(
             f"{self.error_message} Couldn't find {attribute_name} attribute."
         )
-
-    def _find_and_validate_faces_starting_indices_list(
-        self, faces_dataset: dict
-    ) -> Union[List[int], None]:
-        """
-        Attempts to find and validate the faces starting indices data.
-        :param faces_dataset: The faces dataset.
-        :return: The list of faces starting indices if it was found and passed validation, otherwise None is returned.
-        """
-        self._validate_data_type(faces_dataset, INT_TYPE, FACES)
-
-        faces_starting_indices = self._get_values_attribute(faces_dataset, FACES)
-        if not faces_starting_indices:
-            return
-
-        if not self._attribute_is_a_list(faces_starting_indices, FACES):
-            return
-
-        self._validate_list_size(faces_dataset, faces_starting_indices, FACES)
-
-        if not self._all_in_list_have_expected_type(
-            faces_starting_indices, INT_TYPE, FACES
-        ):
-            return
-
-        return faces_starting_indices
 
     def _find_and_validate_vertices(
         self, vertices_dataset: dict
@@ -311,30 +289,6 @@ class ShapeReader:
             return
 
         return units
-
-    def _find_and_validate_winding_order(
-        self, winding_order_dataset: dict
-    ) -> Union[List[int], None]:
-        """
-        Attempts to retrieve and validate the winding order data.
-        :param winding_order_dataset: The winding order dataset.
-        :return: The winding order list if it was found and passed validation, otherwise None is returned.
-        """
-        self._validate_data_type(winding_order_dataset, INT_TYPE, WINDING_ORDER)
-
-        values = self._get_values_attribute(winding_order_dataset, WINDING_ORDER)
-        if not values:
-            return
-
-        if not self._attribute_is_a_list(values, WINDING_ORDER):
-            return
-
-        self._validate_list_size(winding_order_dataset, values, WINDING_ORDER)
-
-        if not self._all_in_list_have_expected_type(values, INT_TYPE, WINDING_ORDER):
-            return
-
-        return values
 
     def _all_in_list_have_expected_type(
         self, values: list, expected_types: List[str], list_parent_name: str
@@ -447,28 +401,30 @@ class ShapeReader:
             )
             return "shape"
 
-    def _find_and_validate_cylinders_list(
-        self, cylinders_dataset: dict
-    ) -> Union[List[List[int]], None]:  # todo : merge with faces indices method?
+    def _find_and_validate_values_list(
+        self, dataset: dict, expected_types: List[str], attribute_name: str
+    ) -> Union[List[List[int]], List[int], None]:
         """
-        Attempts to find and validate the cylinders value from the cylinders dataset.
-        :param cylinders_dataset: The cylinders dataset.
-        :return: The cylinders value list if it was found and passed validation, otherwise None is returned.
+        Attempts to find and validate the contents of the values attribute from the dataset.
+        :param dataset: The dataset containing the values list.
+        :param expected_types: The type(s) we expect the values list to have.
+        :param attribute_name: The name of the attribute.
+        :return: The values list if it was found and passed validation, otherwise None is returned.
         """
-        self._validate_data_type(cylinders_dataset, INT_TYPE, CYLINDERS)
+        self._validate_data_type(dataset, expected_types, attribute_name)
 
-        cylinders_list = self._get_values_attribute(cylinders_dataset, CYLINDERS)
-        if not cylinders_list:
+        values = self._get_values_attribute(dataset, attribute_name)
+        if not values:
             return
 
-        if not self._attribute_is_a_list(cylinders_list, CYLINDERS):
+        if not self._attribute_is_a_list(values, attribute_name):
             return
 
-        self._validate_list_size(cylinders_dataset, cylinders_list, CYLINDERS)
+        self._validate_list_size(dataset, values, attribute_name)
 
         if not self._all_in_list_have_expected_type(
-            cylinders_list, INT_TYPE, CYLINDERS
+            values, expected_types, attribute_name
         ):
             return
 
-        return cylinders_list
+        return values
