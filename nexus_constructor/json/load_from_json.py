@@ -1,8 +1,6 @@
 import json
 from typing import Dict, List, Union
 
-from PySide2.QtWidgets import QWidget
-
 from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
@@ -50,10 +48,9 @@ def _find_shape_information(json_list: List[dict]) -> Union[dict, None]:
 
 
 class JSONReader:
-    def __init__(self, parent: QWidget):
+    def __init__(self):
         self.entry = Entry()
         self.entry.instrument = Instrument()
-        self.parent = parent
         self.warnings = []
         # key: component name, value: NeXus path pointing to transformation that component depends on
         self.depends_on_paths: Dict[str, str] = dict()

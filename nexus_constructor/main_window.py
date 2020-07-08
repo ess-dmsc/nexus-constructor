@@ -203,7 +203,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def open_json_file(self):
         filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
         if filename:
-            reader = JSONReader(self)
+            reader = JSONReader()
             success = reader.load_model_from_json(filename)
             if reader.warnings:
                 show_warning_dialog(
