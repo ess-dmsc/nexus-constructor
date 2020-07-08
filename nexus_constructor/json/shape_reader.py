@@ -12,7 +12,6 @@ from nexus_constructor.model.component import (
     Component,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
-    SHAPE_GROUP_NAME,
 )
 from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
 from nexus_constructor.unit_utils import (
@@ -137,7 +136,7 @@ class ShapeReader:
         off_geometry.units = units
         off_geometry.set_field_value("faces", faces_starting_indices)
         off_geometry.set_field_value("winding_order", np.array(winding_order))
-        self.component[SHAPE_GROUP_NAME] = off_geometry
+        self.component[name] = off_geometry
 
     def _add_cylindrical_shape_to_component(self):
         """
@@ -177,6 +176,7 @@ class ShapeReader:
         cylindrical_geometry[CommonAttrs.VERTICES].set_attribute_value(
             CommonAttrs.UNITS, units
         )
+        self.component[name] = cylindrical_geometry
 
     def _get_shape_dataset_from_list(
         self, attribute_name: str, children: List[dict]

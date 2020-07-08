@@ -46,7 +46,7 @@ def _find_shape_information(json_list: List[dict]) -> Union[dict, None]:
     :return: The shape attribute if it could be found, otherwise None.
     """
     for item in json_list:
-        if item["name"] == "shape":
+        if item["name"] in ["shape", "pixel_shape"]:
             return item
 
 
@@ -78,8 +78,8 @@ class JSONReader:
             if transformation.name == dependency_transformation_name:
                 return transformation
         self.warnings.append(
-            f"Unable to find transformation with name {dependency_transformation_name} in component {component.name} in order to "
-            f"set depends_on value for component {dependent_component_name}."
+            f"Unable to find transformation with name {dependency_transformation_name} in component {component.name} "
+            f"in order to set depends_on value for component {dependent_component_name}."
         )
 
     def load_model_from_json(self, filename: str) -> bool:
