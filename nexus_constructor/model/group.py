@@ -5,7 +5,9 @@ import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.dataset import DatasetMetadata, Dataset
+from nexus_constructor.model.link import Link
 from nexus_constructor.model.node import Node, _get_item, _set_item, _remove_item
+
 from nexus_constructor.model.transformation import Transformation
 
 
@@ -22,7 +24,9 @@ class Group(Node):
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
 
-    def __setitem__(self, key: str, value: Union["Group", Dataset]):
+    def __setitem__(
+        self, key: str, value: Union["Group", Dataset, Link],
+    ):
         _set_item(self, self.children, key, value)
 
     def __contains__(self, item: str):

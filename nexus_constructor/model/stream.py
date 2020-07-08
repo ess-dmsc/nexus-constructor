@@ -117,6 +117,7 @@ class F142Stream:
                 "source": self.source,
                 "topic": self.topic,
                 "value_units": self.value_units,
+                "type": self.type if not None else {},
                 "array_size": self.array_size if not None else {},
                 "nexus.indices.index_every_mb": self.nexus_indices_index_every_mb
                 if not None
