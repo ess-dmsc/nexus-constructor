@@ -10,7 +10,7 @@ from nexus_constructor.json.load_from_json_utils import (
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.model.component import Component, OFF_GEOMETRY_NX_CLASS
 from nexus_constructor.model.geometry import OFFGeometryNexus
-from tests.shape_json import off_shape_json, cylindrical_shape_json
+from tests.json.shape_json import off_shape_json, cylindrical_shape_json
 
 EXPECTED_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
 COMPONENT_NAME = "ComponentName"
