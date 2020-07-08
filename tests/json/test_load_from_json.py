@@ -10,8 +10,8 @@ from nexus_constructor.model.transformation import Transformation
 
 
 @pytest.fixture(scope="function")
-def json_reader(template) -> JSONReader:
-    return JSONReader(template)
+def json_reader() -> JSONReader:
+    return JSONReader()
 
 
 @pytest.fixture(scope="function")
