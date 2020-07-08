@@ -33,7 +33,7 @@ def _retrieve_children_list(json_dict: dict) -> list:
     :return: The children value is returned if it was found, otherwise an empty list is returned.
     """
     try:
-        entry = json_dict["nexus_structure"]["children"][0]
+        entry = json_dict["children"][0]
         return entry["children"]
     except (KeyError, IndexError, TypeError):
         return []
@@ -114,9 +114,7 @@ class JSONReader:
                 return False
 
             for child in children_list:
-                self._read_json_object(
-                    child, json_dict["nexus_structure"]["children"][0].get("name")
-                )
+                self._read_json_object(child, json_dict["children"][0].get("name"))
 
             for dependent_component_name in self.depends_on_paths.keys():
                 # The following extraction of the component name and transformation name makes the assumption
