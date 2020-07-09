@@ -448,6 +448,7 @@ def test_GIVEN_off_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expect
 
     shape = mock_component["shape"]
     assert isinstance(shape, OFFGeometryNexus)
+    assert shape.nx_class == OFF_GEOMETRY_NX_CLASS
     assert shape.name == name
     assert shape.units == units
     assert shape.get_field_value("faces") == faces
