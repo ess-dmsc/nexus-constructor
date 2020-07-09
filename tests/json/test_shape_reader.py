@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 import pytest
 from PySide2.QtGui import QVector3D
 from mock import Mock
@@ -8,8 +9,12 @@ from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
 from nexus_constructor.json.shape_reader import ShapeReader
-from nexus_constructor.model.component import Component, OFF_GEOMETRY_NX_CLASS
-from nexus_constructor.model.geometry import OFFGeometryNexus
+from nexus_constructor.model.component import (
+    Component,
+    OFF_GEOMETRY_NX_CLASS,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+)
+from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
 from tests.json.shape_json import off_shape_json, cylindrical_shape_json
 
 EXPECTED_OFF_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
@@ -387,7 +392,7 @@ def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created
     )
 
 
-def test_GIVEN_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
+def test_GIVEN_off_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
     off_shape_reader, off_shape_json, mock_component
 ):
     children = off_shape_json["children"]
@@ -488,3 +493,29 @@ def test_GIVEN_missing_values_WHEN_finding_cylindrical_values_THEN_error_message
         ],
         cylindrical_shape_reader.warnings,
     )
+
+
+def test_GIVEN_cylindrical_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
+    cylindrical_shape_reader, cylindrical_shape_json, mock_component
+):
+
+    name = cylindrical_shape_json["name"]
+    vertices_dataset = cylindrical_shape_reader._get_shape_dataset_from_list(
+        "vertices", cylindrical_shape_json["children"]
+    )
+    vertices = vertices_dataset["values"]
+    units = _find_attribute_from_list_or_dict("units", vertices_dataset["attributes"])
+    cylinders_list = cylindrical_shape_reader._get_shape_dataset_from_list(
+        "cylinders", cylindrical_shape_json["children"]
+    )["values"]
+
+    cylindrical_shape_reader.add_shape_to_component()
+
+    shape = mock_component[name]
+
+    assert isinstance(shape, CylindricalGeometry)
+    assert shape.name == name
+    assert shape.nx_class == CYLINDRICAL_GEOMETRY_NX_CLASS
+    assert shape.units == units
+    assert np.allclose(shape.get_field_value("cylinders"), np.array(cylinders_list))
+    assert np.allclose(shape.get_field_value("vertices"), np.vstack(vertices))
