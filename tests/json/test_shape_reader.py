@@ -392,6 +392,42 @@ def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created
     )
 
 
+def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertices_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "vertices", off_shape_json["children"]
+    )
+    vertices_dataset["values"][3] = [4.0, None, None]
+
+    off_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            "Values in vertices list do not all have type(s)",
+            EXPECTED_OFF_TYPES["vertices"],
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_vertices_have_wrong_shape_WHEN_converting_vertices_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "vertices", off_shape_json["children"]
+    )
+    vertices_dataset["values"][3] = [4.0, 4.0]
+
+    off_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.error_message, "Incorrect array shape"],
+        off_shape_reader.warnings,
+    )
+
+
 def test_GIVEN_off_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
     off_shape_reader, off_shape_json, mock_component
 ):
@@ -498,7 +534,6 @@ def test_GIVEN_missing_values_WHEN_finding_cylindrical_values_THEN_error_message
 def test_GIVEN_cylindrical_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
     cylindrical_shape_reader, cylindrical_shape_json, mock_component
 ):
-
     name = cylindrical_shape_json["name"]
     vertices_dataset = cylindrical_shape_reader._get_shape_dataset_from_list(
         "vertices", cylindrical_shape_json["children"]

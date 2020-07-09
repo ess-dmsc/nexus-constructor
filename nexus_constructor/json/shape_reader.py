@@ -215,7 +215,8 @@ class ShapeReader:
         if not self._attribute_is_a_list(values, VERTICES):
             return
 
-        self._validate_list_size(vertices_dataset, values, VERTICES)
+        if not self._validate_list_size(vertices_dataset, values, VERTICES):
+            return
 
         if not self._all_in_list_have_expected_type(values, FLOAT_TYPES, VERTICES):
             return
@@ -318,7 +319,7 @@ class ShapeReader:
 
     def _validate_list_size(
         self, data_properties: dict, values: List, parent_name: str
-    ):
+    ) -> bool:
         """
         Checks to see if the length of a list matches the size attribute in the dataset. A warning is recorded if the
         size attribute cannot be found or if this value doesn't match the length of the list. Failing this check does
@@ -326,6 +327,8 @@ class ShapeReader:
         :param data_properties: The dictionary where we expect to find the size information.
         :param values: The list of values.
         :param parent_name: The name of the parent dataset.
+        :return: True if the sizes matched, the sizes didn't match, or the size information couldn't be found. False
+        if the array does not have a uniform size.
         """
         try:
             array = np.array(values)
@@ -336,10 +339,17 @@ class ShapeReader:
                         f"{self.issue_message} Mismatch between length of {parent_name} list "
                         f"({array.shape}) and size attribute from dataset ({size})."
                     )
+            return True
         except KeyError:
             self.warnings.append(
                 f"{self.issue_message} Unable to find size attribute for {parent_name} dataset."
             )
+            return True
+        except IndexError:
+            self.warnings.append(
+                f"{self.error_message} Incorrect array shape for {parent_name} dataset."
+            )
+            return False
 
     def _get_values_attribute(
         self, dataset: dict, parent_name: str
@@ -418,7 +428,8 @@ class ShapeReader:
         if not self._attribute_is_a_list(values, attribute_name):
             return
 
-        self._validate_list_size(dataset, values, attribute_name)
+        if not self._validate_list_size(dataset, values, attribute_name):
+            return
 
         if not self._all_in_list_have_expected_type(
             values, expected_types, attribute_name
