@@ -119,7 +119,9 @@ class ShapeReader:
         if not units:
             return
 
-        vertices = self._find_and_validate_vertices(vertices_dataset)
+        vertices = self._find_and_validate_values_list(
+            vertices_dataset, FLOAT_TYPES, VERTICES
+        )
         if not vertices:
             return
         vertices = _convert_vertices_to_qvector3d(vertices)
@@ -168,9 +170,12 @@ class ShapeReader:
         if not cylinders_list:
             return
 
-        vertices = self._find_and_validate_vertices(vertices_dataset)
+        vertices = self._find_and_validate_values_list(
+            vertices_dataset, FLOAT_TYPES, VERTICES
+        )
         if not vertices:
             return
+        print(vertices)
 
         cylindrical_geometry = CylindricalGeometry(name)
         cylindrical_geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
@@ -196,32 +201,6 @@ class ShapeReader:
         self.warnings.append(
             f"{self.error_message} Couldn't find {attribute_name} attribute."
         )
-
-    def _find_and_validate_vertices(
-        self, vertices_dataset: dict
-    ) -> Union[List[float], None]:
-        """
-        Attempts to find and validate the vertices data.
-        :param vertices_dataset: The verticies dataset.
-        :return: A list of QVector3D objects if the vertices dataset was found and passed validation, otherwise None is
-        returned.
-        """
-        self._validate_data_type(vertices_dataset, FLOAT_TYPES, VERTICES)
-
-        values = self._get_values_attribute(vertices_dataset, VERTICES)
-        if not values:
-            return
-
-        if not self._attribute_is_a_list(values, VERTICES):
-            return
-
-        if not self._validate_list_size(vertices_dataset, values, VERTICES):
-            return
-
-        if not self._all_in_list_have_expected_type(values, FLOAT_TYPES, VERTICES):
-            return
-
-        return values
 
     def _validate_data_type(
         self, dataset: dict, expected_types: List[str], parent_name: str
@@ -411,7 +390,7 @@ class ShapeReader:
 
     def _find_and_validate_values_list(
         self, dataset: dict, expected_types: List[str], attribute_name: str
-    ) -> Union[List[List[int]], List[int], None]:
+    ) -> Union[List[List[int]], List[int], List[List[float]], None]:
         """
         Attempts to find and validate the contents of the values attribute from the dataset.
         :param dataset: The dataset containing the values list.
