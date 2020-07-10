@@ -183,9 +183,7 @@ class JSONReader:
         if shape_info:
             shape_reader = ShapeReader(component, shape_info)
             shape_reader.add_shape_to_component()
-
-            if shape_info["name"] == PIXEL_SHAPE_GROUP_NAME:
-                shape_reader.add_pixel_data_to_component(json_object["children"])
+            shape_reader.add_pixel_data_to_component(json_object["children"])
 
             self.warnings += shape_reader.warnings
 

@@ -12,6 +12,7 @@ from nexus_constructor.model.component import (
     Component,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
+    PIXEL_SHAPE_GROUP_NAME,
 )
 from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
 from nexus_constructor.unit_utils import (
@@ -418,6 +419,19 @@ class ShapeReader:
 
     def add_pixel_data_to_component(self, children: List[dict]):
 
+        detector_number = self._get_shape_dataset_from_list("detector_number", children)
+        if detector_number:
+            pass  # record detector number
+
+        if self.shape_info["name"] != PIXEL_SHAPE_GROUP_NAME:
+            return  # nothing else to do
+
         x_pixel_offsets = self._get_shape_dataset_from_list("x_pixel_offset", children)
         y_pixel_offsets = self._get_shape_dataset_from_list("y_pixel_offset", children)
-        print(x_pixel_offsets, y_pixel_offsets)
+
+        if bool(x_pixel_offsets) != bool(y_pixel_offsets):
+            self.warnings.append("Bad warning.")  # incomplete grid
+            return
+
+        if x_pixel_offsets and y_pixel_offsets:
+            pass  # able to make grid
