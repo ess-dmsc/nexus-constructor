@@ -468,7 +468,9 @@ class ShapeReader:
         :param offset_name: The name of the pixel offset field.
         :param children: The JSON children list for the component.
         """
-        offset_dataset = self._get_shape_dataset_from_list(offset_name, children)
+        offset_dataset = self._get_shape_dataset_from_list(
+            offset_name, children, offset_name != "z_pixel_offset"
+        )
         if not offset_dataset:
             return
 

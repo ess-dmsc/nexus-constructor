@@ -564,10 +564,11 @@ def test_GIVEN_cylindrical_shape_json_WHEN_reading_shape_THEN_geometry_object_ha
 def test_GIVEN_no_detector_number_dataset_and_no_pixel_shape_WHEN_reading_pixel_data_THEN_set_field_value_is_never_called(
     off_shape_reader, pixel_children_list, mock_component
 ):
-    detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "detector_number", pixel_children_list
+    pixel_children_list.remove(
+        off_shape_reader._get_shape_dataset_from_list(
+            "detector_number", pixel_children_list
+        )
     )
-    pixel_children_list.remove(detector_number_dataset)
 
     off_shape_reader.add_pixel_data_to_component(pixel_children_list)
 
@@ -581,7 +582,6 @@ def test_GIVEN_no_detector_number_dataset_and_no_pixel_shape_WHEN_reading_pixel_
 def test_GIVEN_detector_number_dataset_is_present_and_no_pixel_shape_WHEN_reading_pixel_data_THEN_set_field_value_is_called(
     off_shape_reader, pixel_children_list, mock_component
 ):
-
     off_shape_reader.add_pixel_data_to_component(pixel_children_list)
     mock_component.set_field_value.assert_called_once()
 
@@ -589,10 +589,11 @@ def test_GIVEN_detector_number_dataset_is_present_and_no_pixel_shape_WHEN_readin
 def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_error_message_is_created(
     off_shape_reader, pixel_children_list, mock_component
 ):
-    detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "detector_number", pixel_children_list
+    pixel_children_list.remove(
+        off_shape_reader._get_shape_dataset_from_list(
+            "detector_number", pixel_children_list
+        )
     )
-    pixel_children_list.remove(detector_number_dataset)
 
     off_shape_reader.shape_info["name"] = "pixel_shape"
     off_shape_reader.add_pixel_data_to_component(pixel_children_list)
