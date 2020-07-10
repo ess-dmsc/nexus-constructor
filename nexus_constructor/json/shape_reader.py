@@ -430,7 +430,10 @@ class ShapeReader:
         return values, dtype
 
     def add_pixel_data_to_component(self, children: List[dict]):
-
+        """
+        Attempts to find and write pixel information to the component.
+        :param children: The JSON children list for the component.
+        """
         detector_number_dataset = self._get_shape_dataset_from_list(
             "detector_number", children, "issue"
         )
@@ -445,6 +448,7 @@ class ShapeReader:
                 "detector_number", detector_number, detector_number_dtype
             )
 
+        # return if the shape is not a pixel grid
         if self.shape_info["name"] != PIXEL_SHAPE_GROUP_NAME:
             return
 
@@ -454,6 +458,11 @@ class ShapeReader:
     def _find_and_add_pixel_offsets_to_component(
         self, offset_name: str, children: List[dict]
     ):
+        """
+        Attempts to find and add pixel offset data to the component.
+        :param offset_name: The name of the pixel offset field.
+        :param children: The JSON children list for the component.
+        """
         offset_dataset = self._get_shape_dataset_from_list(offset_name, children)
         if not offset_dataset:
             return
