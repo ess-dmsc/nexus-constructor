@@ -475,7 +475,9 @@ class ShapeReader:
         pixel_offset, pixel_offset_dtype = self._find_and_validate_values_list(
             offset_dataset, FLOAT_TYPES, offset_name
         )
-        if pixel_offset:
-            self.component.set_field_value(
-                offset_name, np.array(pixel_offset), pixel_offset_dtype
-            )
+        if not pixel_offset:
+            return
+
+        self.component.set_field_value(
+            offset_name, np.array(pixel_offset), pixel_offset_dtype
+        )
