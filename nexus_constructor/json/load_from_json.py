@@ -9,7 +9,11 @@ from nexus_constructor.json.load_from_json_utils import (
 )
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.json.transformation_reader import TransformationReader
-from nexus_constructor.model.component import Component
+from nexus_constructor.model.component import (
+    Component,
+    PIXEL_SHAPE_GROUP_NAME,
+    SHAPE_GROUP_NAME,
+)
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.transformation import Transformation
@@ -43,7 +47,7 @@ def _find_shape_information(json_list: List[dict]) -> Union[dict, None]:
     :return: The shape attribute if it could be found, otherwise None.
     """
     for item in json_list:
-        if item["name"] in ["shape", "pixel_shape"]:
+        if item["name"] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
             return item
 
 
@@ -180,6 +184,9 @@ class JSONReader:
             shape_reader = ShapeReader(component, shape_info)
             shape_reader.add_shape_to_component()
             self.warnings += shape_reader.warnings
+
+            if shape_info["name"] == PIXEL_SHAPE_GROUP_NAME:
+                print("pixel data...")
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
