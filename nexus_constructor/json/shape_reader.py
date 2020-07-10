@@ -1,4 +1,4 @@
-from typing import List, Union, Any, Optional, Tuple
+from typing import List, Union, Any, Tuple
 
 import numpy as np
 from PySide2.QtGui import QVector3D
@@ -48,6 +48,7 @@ class ShapeReader:
         self.warnings = []
         self.error_message = ""
         self.issue_message = ""
+        self.messages = dict()
 
     def _get_shape_type(self):
         """
@@ -67,6 +68,9 @@ class ShapeReader:
         self.error_message = f"Error encountered when constructing {shape_type} for component {self.component.name}:"
         # An issue message means something didn't add up
         self.issue_message = f"Issue encountered when constructing {shape_type} for component {self.component.name}:"
+
+        self.messages["error"] = self.error_message
+        self.messages["issue"] = self.issue_message
 
         if shape_type == OFF_GEOMETRY_NX_CLASS:
             self._add_off_shape_to_component()
@@ -120,7 +124,7 @@ class ShapeReader:
         if not units:
             return
 
-        vertices = self._find_and_validate_values_list(
+        vertices, _ = self._find_and_validate_values_list(
             vertices_dataset, FLOAT_TYPES, VERTICES
         )
         if not vertices:
@@ -193,7 +197,7 @@ class ShapeReader:
         self.component[name] = cylindrical_geometry
 
     def _get_shape_dataset_from_list(
-        self, attribute_name: str, children: List[dict]
+        self, attribute_name: str, children: List[dict], msg: str = "error"
     ) -> Union[dict, None]:
         """
         Tries to find a given shape dataset from a list of datasets.
@@ -205,7 +209,7 @@ class ShapeReader:
             if attribute["name"] == attribute_name:
                 return attribute
         self.warnings.append(
-            f"{self.error_message} Couldn't find {attribute_name} attribute."
+            f"{self.messages[msg]} Couldn't find {attribute_name} attribute."
         )
 
     def _validate_data_type(
@@ -398,37 +402,37 @@ class ShapeReader:
 
     def _find_and_validate_values_list(
         self, dataset: dict, expected_types: List[str], attribute_name: str
-    ) -> Optional[Tuple[list, Optional[str]]]:
+    ) -> Tuple:
         """
         Attempts to find and validate the contents of the values attribute from the dataset.
         :param dataset: The dataset containing the values list.
         :param expected_types: The type(s) we expect the values list to have.
         :param attribute_name: The name of the attribute.
-        :return: The values list if it was found and passed validation, otherwise None is returned.
+        :return: The values list if it was found and passed validation, otherwise None is returned. # todo: update
         """
         dtype = self._validate_data_type(dataset, expected_types, attribute_name)
 
         values = self._get_values_attribute(dataset, attribute_name)
         if not values:
-            return
+            return None, None
 
         if not self._attribute_is_a_list(values, attribute_name):
-            return
+            return None, None
 
         if not self._validate_list_size(dataset, values, attribute_name):
-            return
+            return None, None
 
         if not self._all_in_list_have_expected_type(
             values, expected_types, attribute_name
         ):
-            return
+            return None, None
 
         return values, dtype
 
     def add_pixel_data_to_component(self, children: List[dict]):
 
         detector_number_dataset = self._get_shape_dataset_from_list(
-            "detector_number", children
+            "detector_number", children, "issue"
         )
         if detector_number_dataset:
             (
@@ -440,7 +444,6 @@ class ShapeReader:
             self.component.set_field_value(
                 "detector_number", detector_number, detector_number_dtype
             )
-            print(self.component.get_field_value("detector_number"))
 
         if self.shape_info["name"] != PIXEL_SHAPE_GROUP_NAME:
             return  # nothing else to do
