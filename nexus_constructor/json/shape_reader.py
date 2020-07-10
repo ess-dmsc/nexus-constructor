@@ -197,7 +197,7 @@ class ShapeReader:
         self.component[name] = cylindrical_geometry
 
     def _get_shape_dataset_from_list(
-        self, attribute_name: str, children: List[dict], msg: str = "error"
+        self, attribute_name: str, children: List[dict], warning: bool = True
     ) -> Union[dict, None]:
         """
         Tries to find a given shape dataset from a list of datasets.
@@ -208,9 +208,10 @@ class ShapeReader:
         for attribute in children:
             if attribute["name"] == attribute_name:
                 return attribute
-        self.warnings.append(
-            f"{self.messages[msg]} Couldn't find {attribute_name} attribute."
-        )
+        if warning:
+            self.warnings.append(
+                f"{self.error_message} Couldn't find {attribute_name} attribute."
+            )
 
     def _validate_data_type(
         self, dataset: dict, expected_types: List[str], parent_name: str
@@ -434,8 +435,11 @@ class ShapeReader:
         Attempts to find and write pixel information to the component.
         :param children: The JSON children list for the component.
         """
+        shape_has_pixel_grid = self.shape_info["name"] == PIXEL_SHAPE_GROUP_NAME
+
+        # absence of detector number dataset is not considered an error at this point
         detector_number_dataset = self._get_shape_dataset_from_list(
-            "detector_number", children, "issue"
+            "detector_number", children, shape_has_pixel_grid
         )
         if detector_number_dataset:
             (
@@ -444,12 +448,13 @@ class ShapeReader:
             ) = self._find_and_validate_values_list(
                 detector_number_dataset, INT_TYPE, "detector_number"
             )
-            self.component.set_field_value(
-                "detector_number", detector_number, detector_number_dtype
-            )
+            if detector_number:
+                self.component.set_field_value(
+                    "detector_number", detector_number, detector_number_dtype
+                )
 
         # return if the shape is not a pixel grid
-        if self.shape_info["name"] != PIXEL_SHAPE_GROUP_NAME:
+        if not shape_has_pixel_grid:
             return
 
         for offset in ["x_pixel_offset", "y_pixel_offset", "z_pixel_offset"]:

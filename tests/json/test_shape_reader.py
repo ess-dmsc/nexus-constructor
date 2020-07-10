@@ -15,7 +15,11 @@ from nexus_constructor.model.component import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
 )
 from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
-from tests.json.shape_json import off_shape_json, cylindrical_shape_json
+from tests.json.shape_json import (
+    off_shape_json,
+    cylindrical_shape_json,
+    pixel_children_list,
+)
 
 EXPECTED_OFF_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
 EXPECTED_CYLINDRICAL_TYPES = {"vertices": "float", "cylinders": "int"}
@@ -555,3 +559,23 @@ def test_GIVEN_cylindrical_shape_json_WHEN_reading_shape_THEN_geometry_object_ha
     assert shape.units == units
     assert np.allclose(shape.get_field_value("cylinders"), np.array(cylinders_list))
     assert np.allclose(shape.get_field_value("vertices"), np.vstack(vertices))
+
+
+def test_GIVEN_no_detector_number_dataset_and_no_pixel_shape_WHEN_reading_pixel_data_THEN_set_field_value_is_never_called(
+    off_shape_reader, pixel_children_list, mock_component
+):
+    # set name to "shape" rather than "pixel_shape" so the program doesn't try to read a pixel grid
+    off_shape_reader.shape_info["name"] = "shape"
+
+    detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "detector_number", pixel_children_list
+    )
+    pixel_children_list.remove(detector_number_dataset)
+
+    off_shape_reader.add_pixel_data_to_component(pixel_children_list)
+
+    # set field value is never called because the detector number dataset couldn't be found, and the shape is not a
+    # pixel shape
+    mock_component.set_field_value.assert_not_called()
+    # no warning is created because the absence of a detector number dataset is not a problem in the case of "shape"
+    assert not off_shape_reader.warnings
