@@ -415,3 +415,9 @@ class ShapeReader:
             return
 
         return values
+
+    def add_pixel_data_to_component(self, children: List[dict]):
+
+        x_pixel_offsets = self._get_shape_dataset_from_list("x_pixel_offset", children)
+        y_pixel_offsets = self._get_shape_dataset_from_list("y_pixel_offset", children)
+        print(x_pixel_offsets, y_pixel_offsets)

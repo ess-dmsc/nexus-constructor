@@ -183,10 +183,11 @@ class JSONReader:
         if shape_info:
             shape_reader = ShapeReader(component, shape_info)
             shape_reader.add_shape_to_component()
-            self.warnings += shape_reader.warnings
 
             if shape_info["name"] == PIXEL_SHAPE_GROUP_NAME:
-                print("pixel data...")
+                shape_reader.add_pixel_data_to_component(json_object["children"])
+
+            self.warnings += shape_reader.warnings
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
