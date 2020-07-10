@@ -1,4 +1,4 @@
-from typing import List, Union, Any
+from typing import List, Union, Any, Optional, Tuple
 
 import numpy as np
 from PySide2.QtGui import QVector3D
@@ -110,7 +110,7 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces_starting_indices = self._find_and_validate_values_list(
+        faces_starting_indices, faces_dtype = self._find_and_validate_values_list(
             faces_dataset, INT_TYPE, FACES
         )
         if not faces_starting_indices:
@@ -127,7 +127,7 @@ class ShapeReader:
             return
         vertices = _convert_vertices_to_qvector3d(vertices)
 
-        winding_order = self._find_and_validate_values_list(
+        winding_order, winding_order_dtype = self._find_and_validate_values_list(
             winding_order_dataset, INT_TYPE, WINDING_ORDER
         )
         if not winding_order:
@@ -137,8 +137,10 @@ class ShapeReader:
         off_geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         off_geometry.vertices = vertices
         off_geometry.units = units
-        off_geometry.set_field_value("faces", faces_starting_indices)
-        off_geometry.set_field_value("winding_order", np.array(winding_order))
+        off_geometry.set_field_value("faces", faces_starting_indices, faces_dtype)
+        off_geometry.set_field_value(
+            "winding_order", np.array(winding_order), winding_order_dtype
+        )
         self.component[name] = off_geometry
 
     def _add_cylindrical_shape_to_component(self):
@@ -165,13 +167,13 @@ class ShapeReader:
         if not units:
             return
 
-        cylinders_list = self._find_and_validate_values_list(
+        cylinders_list, cylinders_dtype = self._find_and_validate_values_list(
             cylinders_dataset, INT_TYPE, CYLINDERS
         )
         if not cylinders_list:
             return
 
-        vertices = self._find_and_validate_values_list(
+        vertices, vertices_dtype = self._find_and_validate_values_list(
             vertices_dataset, FLOAT_TYPES, VERTICES
         )
         if not vertices:
@@ -179,8 +181,12 @@ class ShapeReader:
 
         cylindrical_geometry = CylindricalGeometry(name)
         cylindrical_geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
-        cylindrical_geometry.set_field_value(CYLINDERS, np.array(cylinders_list))
-        cylindrical_geometry.set_field_value(CommonAttrs.VERTICES, np.vstack(vertices))
+        cylindrical_geometry.set_field_value(
+            CYLINDERS, np.array(cylinders_list), cylinders_dtype
+        )
+        cylindrical_geometry.set_field_value(
+            CommonAttrs.VERTICES, np.vstack(vertices), vertices_dtype
+        )
         cylindrical_geometry[CommonAttrs.VERTICES].set_attribute_value(
             CommonAttrs.UNITS, units
         )
@@ -204,7 +210,7 @@ class ShapeReader:
 
     def _validate_data_type(
         self, dataset: dict, expected_types: List[str], parent_name: str
-    ):
+    ) -> Union[str, None]:
         """
         Checks if the type in the dataset attribute has an expected value. Failing this check does not stop the geometry
         creation.
@@ -223,6 +229,8 @@ class ShapeReader:
                     f"{self.issue_message} Type attribute for {parent_name} does not match expected type(s) "
                     f"{expected_types}."
                 )
+            else:
+                return dataset["dataset"]["type"]
         except KeyError:
             self.warnings.append(
                 f"{self.issue_message} Unable to find type attribute for {parent_name}."
@@ -390,7 +398,7 @@ class ShapeReader:
 
     def _find_and_validate_values_list(
         self, dataset: dict, expected_types: List[str], attribute_name: str
-    ) -> Union[List[List[int]], List[int], List[List[float]], None]:
+    ) -> Optional[Tuple[list, Optional[str]]]:
         """
         Attempts to find and validate the contents of the values attribute from the dataset.
         :param dataset: The dataset containing the values list.
@@ -398,7 +406,7 @@ class ShapeReader:
         :param attribute_name: The name of the attribute.
         :return: The values list if it was found and passed validation, otherwise None is returned.
         """
-        self._validate_data_type(dataset, expected_types, attribute_name)
+        dtype = self._validate_data_type(dataset, expected_types, attribute_name)
 
         values = self._get_values_attribute(dataset, attribute_name)
         if not values:
@@ -415,13 +423,24 @@ class ShapeReader:
         ):
             return
 
-        return values
+        return values, dtype
 
     def add_pixel_data_to_component(self, children: List[dict]):
 
-        detector_number = self._get_shape_dataset_from_list("detector_number", children)
-        if detector_number:
-            pass  # record detector number
+        detector_number_dataset = self._get_shape_dataset_from_list(
+            "detector_number", children
+        )
+        if detector_number_dataset:
+            (
+                detector_number,
+                detector_number_dtype,
+            ) = self._find_and_validate_values_list(
+                detector_number_dataset, INT_TYPE, "detector_number"
+            )
+            self.component.set_field_value(
+                "detector_number", detector_number, detector_number_dtype
+            )
+            print(self.component.get_field_value("detector_number"))
 
         if self.shape_info["name"] != PIXEL_SHAPE_GROUP_NAME:
             return  # nothing else to do
@@ -429,9 +448,8 @@ class ShapeReader:
         x_pixel_offsets = self._get_shape_dataset_from_list("x_pixel_offset", children)
         y_pixel_offsets = self._get_shape_dataset_from_list("y_pixel_offset", children)
 
-        if bool(x_pixel_offsets) != bool(y_pixel_offsets):
-            self.warnings.append("Bad warning.")  # incomplete grid
-            return
+        if x_pixel_offsets:
+            pass  # write
 
-        if x_pixel_offsets and y_pixel_offsets:
-            pass  # able to make grid
+        if y_pixel_offsets:
+            pass  # write
