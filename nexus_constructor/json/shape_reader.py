@@ -448,21 +448,20 @@ class ShapeReader:
         if self.shape_info["name"] != PIXEL_SHAPE_GROUP_NAME:
             return
 
-        x_offset_dataset = self._get_shape_dataset_from_list("x_pixel_offset", children)
-        y_offset_dataset = self._get_shape_dataset_from_list("y_pixel_offset", children)
+        for offset in ["x_pixel_offset", "y_pixel_offset", "z_pixel_offset"]:
+            self._find_and_add_pixel_offsets_to_component(offset, children)
 
-        if x_offset_dataset:
-            x_pixel_offset, x_offset_dtype = self._find_and_validate_values_list(
-                x_offset_dataset, FLOAT_TYPES, "x_pixel_offset"
-            )
-            self.component.set_field_value(
-                "x_pixel_offset", np.array(x_pixel_offset), x_offset_dtype
-            )
+    def _find_and_add_pixel_offsets_to_component(
+        self, offset_name: str, children: List[dict]
+    ):
+        offset_dataset = self._get_shape_dataset_from_list(offset_name, children)
+        if not offset_dataset:
+            return
 
-        if y_offset_dataset:
-            y_pixel_offset, y_offset_dtype = self._find_and_validate_values_list(
-                y_offset_dataset, FLOAT_TYPES, "y_pixel_offset"
-            )
+        pixel_offset, pixel_offset_dtype = self._find_and_validate_values_list(
+            offset_dataset, FLOAT_TYPES, offset_name
+        )
+        if pixel_offset:
             self.component.set_field_value(
-                "y_pixel_offset", np.array(y_pixel_offset), y_offset_dtype
+                offset_name, np.array(pixel_offset), pixel_offset_dtype
             )
