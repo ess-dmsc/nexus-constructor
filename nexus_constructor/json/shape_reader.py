@@ -1,8 +1,9 @@
 from typing import List, Union, Any
 
-import numpy
+import numpy as np
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
     _find_attribute_from_list_or_dict,
@@ -11,9 +12,8 @@ from nexus_constructor.model.component import (
     Component,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
-    SHAPE_GROUP_NAME,
 )
-from nexus_constructor.model.geometry import OFFGeometryNexus
+from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     METRES,
@@ -21,10 +21,23 @@ from nexus_constructor.unit_utils import (
     units_have_magnitude_of_one,
 )
 
-INT_TYPE = "int"
+INT_TYPE = ["int"]
+FLOAT_TYPES = ["double", "float"]
 WINDING_ORDER = "winding_order"
 FACES = "faces"
 VERTICES = "vertices"
+CYLINDERS = "cylinders"
+
+
+def _convert_vertices_to_qvector3d(
+    vertices: List[List[float]],
+) -> Union[List[QVector3D], None]:
+    """
+    Converts a list of vertices to QVector3D
+    :param vertices: The list of vertices.
+    :return: The list of QVector3D vertices.
+    """
+    return [QVector3D(*vertex) for vertex in vertices]
 
 
 class ShapeReader:
@@ -70,21 +83,11 @@ class ShapeReader:
         be found and passes validation then the geometry is created and writen to the component, otherwise the function
         just returns without changing the component.
         """
-        try:
-            children = self.shape_info["children"]
-        except KeyError:
-            self.warnings.append(
-                f"{self.error_message} Unable to find children list in shape group."
-            )
+        children = self._get_children_list()
+        if not children:
             return
 
-        try:
-            name = self.shape_info["name"]
-        except KeyError:
-            self.warnings.append(
-                f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
-            )
-            name = "shape"
+        name = self._get_name()
 
         if not isinstance(children, list):
             self.warnings.append(
@@ -106,8 +109,8 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces_starting_indices = self._find_and_validate_faces_starting_indices_list(
-            faces_dataset
+        faces_starting_indices = self._find_and_validate_values_list(
+            faces_dataset, INT_TYPE, FACES
         )
         if not faces_starting_indices:
             return
@@ -116,23 +119,72 @@ class ShapeReader:
         if not units:
             return
 
-        vertices = self._find_and_validate_vertices(vertices_dataset)
+        vertices = self._find_and_validate_values_list(
+            vertices_dataset, FLOAT_TYPES, VERTICES
+        )
         if not vertices:
             return
+        vertices = _convert_vertices_to_qvector3d(vertices)
 
-        winding_order = self._find_and_validate_winding_order(winding_order_dataset)
+        winding_order = self._find_and_validate_values_list(
+            winding_order_dataset, INT_TYPE, WINDING_ORDER
+        )
         if not winding_order:
             return
 
         off_geometry = OFFGeometryNexus(name)
+        off_geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         off_geometry.vertices = vertices
         off_geometry.units = units
         off_geometry.set_field_value("faces", faces_starting_indices)
-        off_geometry.set_field_value("winding_order", numpy.array(winding_order))
-        self.component[SHAPE_GROUP_NAME] = off_geometry
+        off_geometry.set_field_value("winding_order", np.array(winding_order))
+        self.component[name] = off_geometry
 
     def _add_cylindrical_shape_to_component(self):
-        pass
+        """
+        Attempts to create a cylindrical geometry and set this as the shape of the component. If the required
+        information can be found and passes validation then the geometry is created and writen to the component,
+        otherwise the function just returns without changing the component.
+        """
+        children = self._get_children_list()
+        if not children:
+            return
+
+        name = self._get_name()
+
+        vertices_dataset = self._get_shape_dataset_from_list(VERTICES, children)
+        if not vertices_dataset:
+            return
+
+        cylinders_dataset = self._get_shape_dataset_from_list(CYLINDERS, children)
+        if not cylinders_dataset:
+            return
+
+        units = self._find_and_validate_units(vertices_dataset)
+        if not units:
+            return
+
+        cylinders_list = self._find_and_validate_values_list(
+            cylinders_dataset, INT_TYPE, CYLINDERS
+        )
+        if not cylinders_list:
+            return
+
+        vertices = self._find_and_validate_values_list(
+            vertices_dataset, FLOAT_TYPES, VERTICES
+        )
+        if not vertices:
+            return
+        print(vertices)
+
+        cylindrical_geometry = CylindricalGeometry(name)
+        cylindrical_geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
+        cylindrical_geometry.set_field_value(CYLINDERS, np.array(cylinders_list))
+        cylindrical_geometry.set_field_value(CommonAttrs.VERTICES, np.vstack(vertices))
+        cylindrical_geometry[CommonAttrs.VERTICES].set_attribute_value(
+            CommonAttrs.UNITS, units
+        )
+        self.component[name] = cylindrical_geometry
 
     def _get_shape_dataset_from_list(
         self, attribute_name: str, children: List[dict]
@@ -150,75 +202,26 @@ class ShapeReader:
             f"{self.error_message} Couldn't find {attribute_name} attribute."
         )
 
-    def _find_and_validate_faces_starting_indices_list(
-        self, faces_dataset: dict
-    ) -> Union[List[int], None]:
-        """
-        Attempts to find and validate the faces starting indices data.
-        :param faces_dataset: The faces dataset.
-        :return: The list of faces starting indices if it was found and passed validation, otherwise None is returned.
-        """
-        self._validate_data_type(faces_dataset, INT_TYPE, FACES)
-
-        faces_starting_indices = self._get_values_attribute(faces_dataset, FACES)
-        if not faces_starting_indices:
-            return
-
-        if not self._attribute_is_a_list(faces_starting_indices, FACES):
-            return
-
-        self._validate_list_size(faces_dataset, faces_starting_indices, FACES)
-
-        if not self._all_in_list_have_expected_type(
-            faces_starting_indices, INT_TYPE, FACES
-        ):
-            return
-
-        return faces_starting_indices
-
-    def _find_and_validate_vertices(
-        self, vertices_dataset: dict
-    ) -> Union[List[int], None]:
-        """
-        Attempts to find and validate the vertices data.
-        :param vertices_dataset: The verticies dataset.
-        :return: A list of QVector3D objects if the vertices dataset was found and passed validation, otherwise None is
-        returned.
-        """
-        self._validate_data_type(vertices_dataset, "float", VERTICES)
-
-        values = self._get_values_attribute(vertices_dataset, VERTICES)
-        if not values:
-            return
-
-        if not self._attribute_is_a_list(values, VERTICES):
-            return
-
-        self._validate_list_size(vertices_dataset, values, VERTICES)
-
-        try:
-            vertices = [QVector3D(*value) for value in values]
-        except TypeError:
-            self.warnings.append(
-                f"{self.error_message} Unable to convert all vertices values to QVector3D."
-            )
-            return
-
-        return vertices
-
-    def _validate_data_type(self, dataset: dict, expected_type: str, parent_name: str):
+    def _validate_data_type(
+        self, dataset: dict, expected_types: List[str], parent_name: str
+    ):
         """
         Checks if the type in the dataset attribute has an expected value. Failing this check does not stop the geometry
         creation.
         :param dataset: The dataset where we expect to find the type information.
-        :param expected_type: The expected type that the dataset type field should contain.
+        :param expected_types: The expected type that the dataset type field should contain.
         :param parent_name: The name of the parent dataset
         """
         try:
-            if expected_type not in dataset["dataset"]["type"]:
+            if not any(
+                [
+                    expected_type in dataset["dataset"]["type"]
+                    for expected_type in expected_types
+                ]
+            ):
                 self.warnings.append(
-                    f"{self.issue_message} Type attribute for {parent_name} does not match expected type "
-                    f"{expected_type}."
+                    f"{self.issue_message} Type attribute for {parent_name} does not match expected type(s) "
+                    f"{expected_types}."
                 )
         except KeyError:
             self.warnings.append(
@@ -265,50 +268,37 @@ class ShapeReader:
 
         return units
 
-    def _find_and_validate_winding_order(
-        self, winding_order_dataset: dict
-    ) -> Union[List[int], None]:
-        """
-        Attempts to retrieve and validate the winding order data.
-        :param winding_order_dataset: The winding order dataset.
-        :return: The winding order list if it was found and passed validation, otherwise None is returned.
-        """
-        self._validate_data_type(winding_order_dataset, INT_TYPE, WINDING_ORDER)
-
-        values = self._get_values_attribute(winding_order_dataset, WINDING_ORDER)
-        if not values:
-            return
-
-        if not self._attribute_is_a_list(values, WINDING_ORDER):
-            return
-
-        self._validate_list_size(winding_order_dataset, values, WINDING_ORDER)
-
-        if not self._all_in_list_have_expected_type(values, INT_TYPE, WINDING_ORDER):
-            return
-
-        return values
-
     def _all_in_list_have_expected_type(
-        self, values: list, expected_type: str, list_parent_name: str
-    ):
+        self, values: list, expected_types: List[str], list_parent_name: str
+    ) -> bool:
         """
         Checks if all the items in a given list have the expected type.
         :param values: The list of values.
-        :param expected_type: The expected type.
+        :param expected_types: The expected types.
         :param list_parent_name: The name of the dataset the list belongs to.
         :return: True of all the items in the list have the expected type, False otherwise.
         """
-        if all([expected_type in str(type(value)) for value in values]):
+        flat_array = np.array(values).flatten()
+        if all(
+            [
+                any(
+                    [
+                        expected_type in str(type(value))
+                        for expected_type in expected_types
+                    ]
+                )
+                for value in flat_array
+            ]
+        ):
             return True
         self.warnings.append(
-            f"{self.error_message} Values in {list_parent_name} list do not all have type {expected_type}."
+            f"{self.error_message} Values in {list_parent_name} list do not all have type(s) {expected_types}."
         )
         return False
 
     def _validate_list_size(
         self, data_properties: dict, values: List, parent_name: str
-    ):
+    ) -> bool:
         """
         Checks to see if the length of a list matches the size attribute in the dataset. A warning is recorded if the
         size attribute cannot be found or if this value doesn't match the length of the list. Failing this check does
@@ -316,17 +306,29 @@ class ShapeReader:
         :param data_properties: The dictionary where we expect to find the size information.
         :param values: The list of values.
         :param parent_name: The name of the parent dataset.
+        :return: True if the sizes matched, the sizes didn't match, or the size information couldn't be found. False
+        if the array does not have a uniform size.
         """
         try:
-            if data_properties["dataset"]["size"][0] != len(values):
-                self.warnings.append(
-                    f"{self.issue_message} Mismatch between length of {parent_name} list ({len(values)}) and size "
-                    f"attribute from dataset ({data_properties['dataset']['size'][0]}). "
-                )
+            array = np.array(values)
+            size = data_properties["dataset"]["size"]
+            for i in range(len(size)):
+                if size[i] != array.shape[i]:
+                    self.warnings.append(
+                        f"{self.issue_message} Mismatch between length of {parent_name} list "
+                        f"({array.shape}) and size attribute from dataset ({size})."
+                    )
+            return True
         except KeyError:
             self.warnings.append(
                 f"{self.issue_message} Unable to find size attribute for {parent_name} dataset."
             )
+            return True
+        except IndexError:
+            self.warnings.append(
+                f"{self.error_message} Incorrect array shape for {parent_name} dataset."
+            )
+            return False
 
     def _get_values_attribute(
         self, dataset: dict, parent_name: str
@@ -359,3 +361,58 @@ class ShapeReader:
             f"{self.error_message} values attribute in {parent_name} dataset is not a list."
         )
         return False
+
+    def _get_children_list(self) -> Union[dict, None]:
+        """
+        Attempts to get the children list from the shape dictionary.
+        :return: The children list if it could be found, otherwise None is returned.
+        """
+        try:
+            return self.shape_info["children"]
+        except KeyError:
+            self.warnings.append(
+                f"{self.error_message} Unable to find children list in shape group."
+            )
+            return
+
+    def _get_name(self) -> str:
+        """
+        Attempts to get the name attribute from the shape dictionary.
+        :return: The name if it could be found, otherwise 'shape' is returned.
+        """
+        try:
+            return self.shape_info["name"]
+        except KeyError:
+            self.warnings.append(
+                f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
+            )
+            return "shape"
+
+    def _find_and_validate_values_list(
+        self, dataset: dict, expected_types: List[str], attribute_name: str
+    ) -> Union[List[List[int]], List[int], List[List[float]], None]:
+        """
+        Attempts to find and validate the contents of the values attribute from the dataset.
+        :param dataset: The dataset containing the values list.
+        :param expected_types: The type(s) we expect the values list to have.
+        :param attribute_name: The name of the attribute.
+        :return: The values list if it was found and passed validation, otherwise None is returned.
+        """
+        self._validate_data_type(dataset, expected_types, attribute_name)
+
+        values = self._get_values_attribute(dataset, attribute_name)
+        if not values:
+            return
+
+        if not self._attribute_is_a_list(values, attribute_name):
+            return
+
+        if not self._validate_list_size(dataset, values, attribute_name):
+            return
+
+        if not self._all_in_list_have_expected_type(
+            values, expected_types, attribute_name
+        ):
+            return
+
+        return values

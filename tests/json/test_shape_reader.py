@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 import pytest
 from PySide2.QtGui import QVector3D
 from mock import Mock
@@ -8,11 +9,16 @@ from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
 from nexus_constructor.json.shape_reader import ShapeReader
-from nexus_constructor.model.component import Component, OFF_GEOMETRY_NX_CLASS
-from nexus_constructor.model.geometry import OFFGeometryNexus
-from tests.shape_json import off_shape_json
+from nexus_constructor.model.component import (
+    Component,
+    OFF_GEOMETRY_NX_CLASS,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+)
+from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
+from tests.json.shape_json import off_shape_json, cylindrical_shape_json
 
-EXPECTED_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
+EXPECTED_OFF_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
+EXPECTED_CYLINDRICAL_TYPES = {"vertices": "float", "cylinders": "int"}
 COMPONENT_NAME = "ComponentName"
 
 component_shape = dict()
@@ -40,8 +46,13 @@ def mock_component():
 
 
 @pytest.fixture(scope="function")
-def off_shape_reader(off_shape_json, mock_component) -> ShapeReader:
+def off_shape_reader(mock_component, off_shape_json) -> ShapeReader:
     return ShapeReader(mock_component, off_shape_json)
+
+
+@pytest.fixture(scope="function")
+def cylindrical_shape_reader(mock_component, cylindrical_shape_json):
+    return ShapeReader(mock_component, cylindrical_shape_json)
 
 
 def _any_warning_message_has_substrings(
@@ -136,7 +147,7 @@ def test_GIVEN_children_is_not_a_list_WHEN_reading_off_information_THEN_error_me
     )
 
 
-@pytest.mark.parametrize("attribute_to_remove", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize("attribute_to_remove", EXPECTED_OFF_TYPES.keys())
 def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_error_message_is_created(
     off_shape_reader, off_shape_json, attribute_to_remove
 ):
@@ -152,7 +163,9 @@ def test_GIVEN_cant_find_attribute_WHEN_reading_off_information_THEN_error_messa
     )
 
 
-@pytest.mark.parametrize("attribute_with_dataset_type_to_change", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize(
+    "attribute_with_dataset_type_to_change", EXPECTED_OFF_TYPES.keys()
+)
 def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_dataset_type_to_change
 ):
@@ -166,14 +179,16 @@ def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_mes
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            f"Type attribute for {attribute_with_dataset_type_to_change} does not match expected type"
-            f" {EXPECTED_TYPES[attribute_with_dataset_type_to_change]}.",
+            f"Type attribute for {attribute_with_dataset_type_to_change} does not match expected type(s)",
+            EXPECTED_OFF_TYPES[attribute_with_dataset_type_to_change],
         ],
         off_shape_reader.warnings,
     )
 
 
-@pytest.mark.parametrize("attribute_with_dataset_type_to_delete", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize(
+    "attribute_with_dataset_type_to_delete", EXPECTED_OFF_TYPES.keys()
+)
 def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_dataset_type_to_delete
 ):
@@ -193,7 +208,7 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
     )
 
 
-@pytest.mark.parametrize("attribute_with_dataset_to_delete", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize("attribute_with_dataset_to_delete", EXPECTED_OFF_TYPES.keys())
 def test_GIVEN_unable_to_find_dataset_WHEN_checking_type_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_dataset_to_delete
 ):
@@ -213,7 +228,7 @@ def test_GIVEN_unable_to_find_dataset_WHEN_checking_type_THEN_issue_message_is_c
     )
 
 
-@pytest.mark.parametrize("attribute_with_values_to_delete", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize("attribute_with_values_to_delete", EXPECTED_OFF_TYPES.keys())
 def test_GIVEN_missing_values_attribute_WHEN_finding_values_attribute_THEN_error_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_values_to_delete
 ):
@@ -233,7 +248,7 @@ def test_GIVEN_missing_values_attribute_WHEN_finding_values_attribute_THEN_error
     )
 
 
-@pytest.mark.parametrize("attribute_with_values_to_change", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize("attribute_with_values_to_change", EXPECTED_OFF_TYPES.keys())
 def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN_error_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_values_to_change
 ):
@@ -253,7 +268,9 @@ def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN
     )
 
 
-@pytest.mark.parametrize("attribute_with_list_size_to_change", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize(
+    "attribute_with_list_size_to_change", EXPECTED_OFF_TYPES.keys()
+)
 def test_GIVEN_inconsistent_list_size_WHEN_validating_attribute_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_list_size_to_change
 ):
@@ -273,7 +290,9 @@ def test_GIVEN_inconsistent_list_size_WHEN_validating_attribute_THEN_issue_messa
     )
 
 
-@pytest.mark.parametrize("attribute_with_list_size_to_delete", EXPECTED_TYPES.keys())
+@pytest.mark.parametrize(
+    "attribute_with_list_size_to_delete", EXPECTED_OFF_TYPES.keys()
+)
 def test_GIVEN_no_list_size_information_WHEN_validating_attribute_THEN_issue_message_is_created(
     off_shape_reader, off_shape_json, attribute_with_list_size_to_delete
 ):
@@ -307,8 +326,8 @@ def test_GIVEN_value_has_wrong_type_WHEN_validating_value_THEN_error_message_is_
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
-            f"Values in {attribute_with_value_to_change} list do not all have type "
-            f"{EXPECTED_TYPES[attribute_with_value_to_change]}.",
+            f"Values in {attribute_with_value_to_change} list do not all have type(s)",
+            EXPECTED_OFF_TYPES[attribute_with_value_to_change],
         ],
         off_shape_reader.warnings,
     )
@@ -333,7 +352,7 @@ def test_GIVEN_missing_attributes_WHEN_finding_units_THEN_error_message_is_creat
     )
 
 
-def test_GIVEN_missing_units_WHEN_finding_units_THEN_error_message_is_created(
+def test_GIVEN_missing_units_WHEN_finding_off_units_THEN_error_message_is_created(
     off_shape_reader, off_shape_json
 ):
     vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
@@ -379,23 +398,39 @@ def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertice
     vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
         "vertices", off_shape_json["children"]
     )
-    vertices_dataset["values"][3] = "a"
+    vertices_dataset["values"][3] = [4.0, None, None]
 
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
-            "Unable to convert all vertices values to QVector3D.",
+            "Values in vertices list do not all have type(s)",
+            EXPECTED_OFF_TYPES["vertices"],
         ],
         off_shape_reader.warnings,
     )
 
 
-def test_GIVEN_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
+def test_GIVEN_vertices_have_wrong_shape_WHEN_converting_vertices_THEN_error_message_is_created(
+    off_shape_reader, off_shape_json
+):
+    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "vertices", off_shape_json["children"]
+    )
+    vertices_dataset["values"][3] = [4.0, 4.0]
+
+    off_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.error_message, "Incorrect array shape"],
+        off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_off_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
     off_shape_reader, off_shape_json, mock_component
 ):
-
     children = off_shape_json["children"]
 
     name = off_shape_json["name"]
@@ -413,8 +448,110 @@ def test_GIVEN_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_p
 
     shape = mock_component["shape"]
     assert isinstance(shape, OFFGeometryNexus)
+    assert shape.nx_class == OFF_GEOMETRY_NX_CLASS
     assert shape.name == name
     assert shape.units == units
     assert shape.get_field_value("faces") == faces
     assert shape.vertices == vertices
     assert shape.winding_order == winding_order
+
+
+def test_GIVEN_missing_children_attribute_WHEN_reading_cylindrical_information_THEN_error_message_is_created(
+    cylindrical_shape_reader, cylindrical_shape_json
+):
+    del cylindrical_shape_json["children"]
+    cylindrical_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [
+            cylindrical_shape_reader.error_message,
+            "Unable to find children list in shape group.",
+        ],
+        cylindrical_shape_reader.warnings,
+    )
+
+
+@pytest.mark.parametrize("attribute_to_remove", EXPECTED_CYLINDRICAL_TYPES.keys())
+def test_GIVEN_cant_find_attribute_WHEN_reading_cylindrical_information_THEN_error_message_is_created(
+    cylindrical_shape_reader, cylindrical_shape_json, attribute_to_remove
+):
+    attribute = cylindrical_shape_reader._get_shape_dataset_from_list(
+        attribute_to_remove, cylindrical_shape_json["children"]
+    )
+    cylindrical_shape_json["children"].remove(attribute)
+
+    cylindrical_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [attribute_to_remove, cylindrical_shape_reader.error_message],
+        cylindrical_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_missing_units_WHEN_finding_cylindrical_units_THEN_error_message_is_created(
+    cylindrical_shape_reader, cylindrical_shape_json
+):
+    vertices_dataset = cylindrical_shape_reader._get_shape_dataset_from_list(
+        "vertices", cylindrical_shape_json["children"]
+    )
+
+    units = cylindrical_shape_reader._get_shape_dataset_from_list(
+        "units", vertices_dataset["attributes"]
+    )
+    vertices_dataset["attributes"].remove(units)
+    cylindrical_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [
+            cylindrical_shape_reader.error_message,
+            "Unable to find units attribute in vertices dataset.",
+        ],
+        cylindrical_shape_reader.warnings,
+    )
+
+
+@pytest.mark.parametrize(
+    "attribute_with_values_to_delete", EXPECTED_CYLINDRICAL_TYPES.keys()
+)
+def test_GIVEN_missing_values_WHEN_finding_cylindrical_values_THEN_error_message_is_created(
+    cylindrical_shape_reader, cylindrical_shape_json, attribute_with_values_to_delete
+):
+    invalid_dataset = cylindrical_shape_reader._get_shape_dataset_from_list(
+        attribute_with_values_to_delete, cylindrical_shape_json["children"]
+    )
+
+    del invalid_dataset["values"]
+    cylindrical_shape_reader.add_shape_to_component()
+
+    assert _any_warning_message_has_substrings(
+        [
+            cylindrical_shape_reader.error_message,
+            f"Unable to find values in {attribute_with_values_to_delete} dataset.",
+        ],
+        cylindrical_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_cylindrical_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
+    cylindrical_shape_reader, cylindrical_shape_json, mock_component
+):
+    name = cylindrical_shape_json["name"]
+    vertices_dataset = cylindrical_shape_reader._get_shape_dataset_from_list(
+        "vertices", cylindrical_shape_json["children"]
+    )
+    vertices = vertices_dataset["values"]
+    units = _find_attribute_from_list_or_dict("units", vertices_dataset["attributes"])
+    cylinders_list = cylindrical_shape_reader._get_shape_dataset_from_list(
+        "cylinders", cylindrical_shape_json["children"]
+    )["values"]
+
+    cylindrical_shape_reader.add_shape_to_component()
+
+    shape = mock_component[name]
+
+    assert isinstance(shape, CylindricalGeometry)
+    assert shape.name == name
+    assert shape.nx_class == CYLINDRICAL_GEOMETRY_NX_CLASS
+    assert shape.units == units
+    assert np.allclose(shape.get_field_value("cylinders"), np.array(cylinders_list))
+    assert np.allclose(shape.get_field_value("vertices"), np.vstack(vertices))

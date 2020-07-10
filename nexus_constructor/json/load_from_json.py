@@ -1,8 +1,6 @@
 import json
 from typing import Dict, List, Union
 
-from PySide2.QtWidgets import QWidget
-
 from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
@@ -15,7 +13,6 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.ui_utils import show_warning_dialog
 
 """
 The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of valid NeXus files, but are safe if the JSON was created by the NeXus Constructor:
@@ -33,7 +30,7 @@ def _retrieve_children_list(json_dict: dict) -> list:
     :return: The children value is returned if it was found, otherwise an empty list is returned.
     """
     try:
-        entry = json_dict["nexus_structure"]["children"][0]
+        entry = json_dict["children"][0]
         return entry["children"]
     except (KeyError, IndexError, TypeError):
         return []
@@ -46,15 +43,14 @@ def _find_shape_information(json_list: List[dict]) -> Union[dict, None]:
     :return: The shape attribute if it could be found, otherwise None.
     """
     for item in json_list:
-        if item["name"] == "shape":
+        if item["name"] in ["shape", "pixel_shape"]:
             return item
 
 
 class JSONReader:
-    def __init__(self, parent: QWidget):
+    def __init__(self):
         self.entry = Entry()
         self.entry.instrument = Instrument()
-        self.parent = parent
         self.warnings = []
         # key: component name, value: NeXus path pointing to transformation that component depends on
         self.depends_on_paths: Dict[str, str] = dict()
@@ -78,8 +74,8 @@ class JSONReader:
             if transformation.name == dependency_transformation_name:
                 return transformation
         self.warnings.append(
-            f"Unable to find transformation with name {dependency_transformation_name} in component {component.name} in order to "
-            f"set depends_on value for component {dependent_component_name}."
+            f"Unable to find transformation with name {dependency_transformation_name} in component {component.name} "
+            f"in order to set depends_on value for component {dependent_component_name}."
         )
 
     def load_model_from_json(self, filename: str) -> bool:
@@ -95,28 +91,19 @@ class JSONReader:
             try:
                 json_dict = json.loads(json_data)
             except ValueError as exception:
-                show_warning_dialog(
-                    "Provided file not recognised as valid JSON",
-                    "Invalid JSON",
-                    f"{exception}",
-                    self.parent,
+                self.warnings.append(
+                    f"Provided file not recognised as valid JSON. Exception: {exception}"
                 )
                 return False
 
             children_list = _retrieve_children_list(json_dict)
 
             if not children_list:
-                show_warning_dialog(
-                    "Provided file not recognised as valid Instrument",
-                    "Invalid JSON",
-                    parent=self.parent,
-                )
+                self.warnings.append("Provided file not recognised as valid Instrument")
                 return False
 
             for child in children_list:
-                self._read_json_object(
-                    child, json_dict["nexus_structure"]["children"][0].get("name")
-                )
+                self._read_json_object(child, json_dict["children"][0].get("name"))
 
             for dependent_component_name in self.depends_on_paths.keys():
                 # The following extraction of the component name and transformation name makes the assumption
@@ -136,13 +123,6 @@ class JSONReader:
                     self.component_dictionary[dependency_component_name],
                     dependency_transformation_name,
                     dependent_component_name,
-                )
-
-            if self.warnings:
-                show_warning_dialog(
-                    "\n".join(self.warnings),
-                    "Warnings encountered loading JSON",
-                    parent=self.parent,
                 )
                 return True
 

@@ -136,3 +136,74 @@ def off_shape_json() -> dict:
     }
     """
     return json.loads(off_shape)
+
+
+@pytest.fixture(scope="function")
+def cylindrical_shape_json() -> dict:
+    cylindrical_shape = """
+    {
+      "type":"group",
+      "name":"pixel_shape",
+      "children":[
+        {
+          "type":"dataset",
+          "name":"cylinders",
+          "dataset":{
+            "type":"int32",
+            "size":[
+              1,
+              3
+            ]
+          },
+          "values":[
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        },
+        {
+          "type":"dataset",
+          "name":"vertices",
+          "dataset":{
+            "type":"double",
+            "size":[
+              3,
+              3
+            ]
+          },
+          "values":[
+            [
+              -0.01,
+              0,
+              0
+            ],
+            [
+              -0.01,
+              0.009,
+              0
+            ],
+            [
+              0.01,
+              0,
+              0
+            ]
+          ],
+          "attributes":[
+            {
+              "name":"units",
+              "values":"m"
+            }
+          ]
+        }
+      ],
+      "attributes":[
+        {
+          "name":"NX_class",
+          "values":"NXcylindrical_geometry"
+        }
+      ]
+    }
+    """
+    return json.loads(cylindrical_shape)
