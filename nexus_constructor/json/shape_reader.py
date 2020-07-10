@@ -446,13 +446,23 @@ class ShapeReader:
             )
 
         if self.shape_info["name"] != PIXEL_SHAPE_GROUP_NAME:
-            return  # nothing else to do
+            return
 
-        x_pixel_offsets = self._get_shape_dataset_from_list("x_pixel_offset", children)
-        y_pixel_offsets = self._get_shape_dataset_from_list("y_pixel_offset", children)
+        x_offset_dataset = self._get_shape_dataset_from_list("x_pixel_offset", children)
+        y_offset_dataset = self._get_shape_dataset_from_list("y_pixel_offset", children)
 
-        if x_pixel_offsets:
-            pass  # write
+        if x_offset_dataset:
+            x_pixel_offset, x_offset_dtype = self._find_and_validate_values_list(
+                x_offset_dataset, FLOAT_TYPES, "x_pixel_offset"
+            )
+            self.component.set_field_value(
+                "x_pixel_offset", np.array(x_pixel_offset), x_offset_dtype
+            )
 
-        if y_pixel_offsets:
-            pass  # write
+        if y_offset_dataset:
+            y_pixel_offset, y_offset_dtype = self._find_and_validate_values_list(
+                y_offset_dataset, FLOAT_TYPES, "y_pixel_offset"
+            )
+            self.component.set_field_value(
+                "y_pixel_offset", np.array(y_pixel_offset), y_offset_dtype
+            )
