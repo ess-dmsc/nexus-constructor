@@ -1,8 +1,9 @@
 import attr
 from typing import List, Dict, Any
 import numpy as np
+
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.node import Node
+from nexus_constructor.model.node import Node, ATTR_NAME_BLACKLIST
 from nexus_constructor.model.value_type import ValueType
 
 
@@ -33,7 +34,11 @@ class Dataset(Node):
         return {
             "name": self.name,
             "type": self.type,
-            "attributes": [attribute.as_dict() for attribute in self.attributes]
+            "attributes": [
+                attribute.as_dict()
+                for attribute in self.attributes
+                if attribute.name not in ATTR_NAME_BLACKLIST
+            ]
             if self.attributes
             else None,
             "values": values if values else [],

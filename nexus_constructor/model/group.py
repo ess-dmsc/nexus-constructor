@@ -6,8 +6,13 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.dataset import DatasetMetadata, Dataset
 from nexus_constructor.model.link import Link
-from nexus_constructor.model.node import Node, _get_item, _set_item, _remove_item
-
+from nexus_constructor.model.node import (
+    Node,
+    _get_item,
+    _set_item,
+    _remove_item,
+    ATTR_NAME_BLACKLIST,
+)
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
@@ -67,7 +72,11 @@ class Group(Node):
         return {
             "name": self.name,
             "type": self.type,
-            "attributes": [attribute.as_dict() for attribute in self.attributes]
+            "attributes": [
+                attribute.as_dict()
+                for attribute in self.attributes
+                if attribute.name not in ATTR_NAME_BLACKLIST
+            ]
             if self.attributes
             else None,
             "children": [

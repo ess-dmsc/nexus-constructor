@@ -1,7 +1,10 @@
 from typing import List, Any
 import attr
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attribute import FieldAttribute
+
+ATTR_NAME_BLACKLIST = [CommonAttrs.UI_VALUE]
 
 
 def __find_item_index(list_to_look_in: List[Any], item_name: str):
@@ -57,6 +60,13 @@ def _set_item(
         new_value.parent = parent
 
 
+def get_absolute_path(node: Any):
+    path = f"/{node.name}"
+    while node.parent is not None:
+        path = f"/{node.parent}{path}"
+    return path
+
+
 @attr.s
 class Node:
     """Abstract class used for common functionality between a group and dataset. """
@@ -64,6 +74,10 @@ class Node:
     name = attr.ib(type=str)
     attributes = attr.ib(init=False, factory=list)
     parent = attr.ib(type="Node", default=None)
+
+    @property
+    def absolute_path(self):
+        return get_absolute_path(self)
 
     def set_attribute_value(
         self, attribute_name: str, attribute_value: Any, attribute_type: str = "String"
