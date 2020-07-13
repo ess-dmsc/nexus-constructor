@@ -77,14 +77,14 @@ def test_set_item_with_existing_component_in_overwrites_if_name_is_same():
 
 def test_get_absolute_path_works_with_no_parent():
     name = "test"
-    node = Node(name=name, parent=None)
+    node = Node(name=name, parent_node=None)
 
     assert node.absolute_path == f"/{name}"
 
 
 def test_get_absolute_path_works_if_component_with_parents():
     name1 = "thing1"
-    node1 = Node(name=name1, parent=None)
+    node1 = Node(name=name1, parent_node=None)
     name2 = "thing2"
-    node2 = Node(name=name2, parent=node1)
+    node2 = Node(name=name2, parent_node=node1)
     assert node2.absolute_path == f"/{name1}/{name2}"

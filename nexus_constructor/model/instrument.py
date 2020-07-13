@@ -7,11 +7,11 @@ INSTRUMENT_NAME = "instrument"
 
 
 class Instrument(Group):
-    def __init__(self, parent=None):
-        super().__init__(INSTRUMENT_NAME, parent)
+    def __init__(self, parent_node=None):
+        super().__init__(INSTRUMENT_NAME, parent_node)
         self.nx_class = "NXinstrument"
 
-        self.sample = Component(SAMPLE_NAME, parent=self)
+        self.sample = Component(SAMPLE_NAME, parent_node=self)
         self.sample.nx_class = "NXsample"
         self.component_list = [self.sample]
 

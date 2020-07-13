@@ -9,13 +9,13 @@ values = Dataset(
     name="scalar_value",
     dataset=DatasetMetadata(type="Double", size=[1]),
     values=90.0,
-    parent=None,
+    parent_node=None,
 )
 
 
 @pytest.fixture
 def instrument():
-    return Instrument(parent=None)
+    return Instrument(parent_node=None)
 
 
 def test_remove_from_beginning_1(instrument):

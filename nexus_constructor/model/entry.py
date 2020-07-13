@@ -15,6 +15,7 @@ class Entry(Group):
     @instrument.setter
     def instrument(self, instrument: Instrument):
         self["instrument"] = instrument
+        instrument.parent_node = self
 
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Entry, self).as_dict()

@@ -57,14 +57,14 @@ def _set_item(
     else:
         list_to_look_in.append(new_value)
     if hasattr(new_value, "parent"):
-        new_value.parent = parent
+        new_value.parent_node = parent
 
 
 def get_absolute_path(node: Any):
     path = f"/{node.name}"
-    while node.parent is not None:
-        path = f"/{node.parent.name}{path}"
-        node = node.parent
+    while node.parent_node is not None:
+        path = f"/{node.parent_node.name}{path}"
+        node = node.parent_node
     return path
 
 
@@ -74,7 +74,7 @@ class Node:
 
     name = attr.ib(type=str)
     attributes = attr.ib(init=False, factory=list)
-    parent = attr.ib(type="Node", default=None)
+    parent_node = attr.ib(type="Node", default=None)
 
     @property
     def absolute_path(self):
