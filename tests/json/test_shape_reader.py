@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 import pytest
 from PySide2.QtGui import QVector3D
-from mock import Mock
+from mock import Mock, call
 
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
@@ -607,7 +607,6 @@ def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_e
 def test_GIVEN_pixel_shape_and_no_x_y_offset_WHEN_reading_pixel_data_THEN_error_message_is_created(
     off_shape_reader, pixel_children_list, offset_to_delete
 ):
-
     pixel_children_list.remove(
         off_shape_reader._get_shape_dataset_from_list(
             offset_to_delete, pixel_children_list
@@ -625,10 +624,92 @@ def test_GIVEN_pixel_shape_and_no_x_y_offset_WHEN_reading_pixel_data_THEN_error_
 def test_GIVEN_pixel_shape_and_no_z_offset_WHEN_reading_pixel_data_THEN_error_message_is_not_created(
     off_shape_reader, pixel_children_list
 ):
-
     off_shape_reader.shape_info["name"] = "pixel_shape"
     off_shape_reader.add_pixel_data_to_component(pixel_children_list)
 
     assert not _any_warning_message_has_substrings(
-        [off_shape_reader.error_message, "x_pixel_offset"], off_shape_reader.warnings
+        ["z_pixel_offset"], off_shape_reader.warnings
+    )
+
+
+@pytest.mark.parametrize("offset_to_corrupt", ["x_pixel_offset", "y_pixel_offset"])
+def test_GIVEN_x_y_offset_exists_but_fails_validation_WHEN_reading_pixel_data_THEN_error_message_is_created(
+    off_shape_reader, pixel_children_list, offset_to_corrupt
+):
+
+    offset_dataset = off_shape_reader._get_shape_dataset_from_list(
+        offset_to_corrupt, pixel_children_list
+    )
+    offset_dataset["values"][0] = "not a float"
+
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_children_list)
+
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            offset_to_corrupt,
+            "do not all have type(s)",
+            "float",
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_called_with_expected_values(
+    off_shape_reader, pixel_children_list, mock_component
+):
+
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_children_list)
+
+    detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "detector_number", pixel_children_list
+    )
+    detector_number = detector_number_dataset["values"]
+    detector_number_dtype = detector_number_dataset["dataset"]["type"]
+
+    x_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "x_pixel_offset", pixel_children_list
+    )
+    x_pixel_offset = np.array(x_offset_dataset["values"])
+    x_pixel_dtype = x_offset_dataset["dataset"]["type"]
+
+    y_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "y_pixel_offset", pixel_children_list
+    )
+    y_pixel_offset = np.array(y_offset_dataset["values"])
+    y_pixel_dtype = y_offset_dataset["dataset"]["type"]
+
+    mock_component.set_field_value.assert_has_calls(
+        [call("detector_number", detector_number, detector_number_dtype)]
+    )
+
+    assert "x_pixel_offset" == mock_component.set_field_value.call_args_list[1].args[0]
+    np.array_equal(
+        x_pixel_offset, mock_component.set_field_value.call_args_list[1].args[1]
+    )
+    assert x_pixel_dtype == mock_component.set_field_value.call_args_list[1].args[2]
+
+    assert "y_pixel_offset" == mock_component.set_field_value.call_args_list[2].args[0]
+    np.array_equal(
+        y_pixel_offset, mock_component.set_field_value.call_args_list[2].args[1]
+    )
+    assert y_pixel_dtype == mock_component.set_field_value.call_args_list[2].args[2]
+
+
+def test_GIVEN_valid_pixel_mapping_WHEN_reading_pixel_data_THEN_set_field_value_is_called_with_expected_values(
+    off_shape_reader, pixel_children_list, mock_component
+):
+
+    off_shape_reader.add_pixel_data_to_component(pixel_children_list)
+
+    detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
+        "detector_number", pixel_children_list
+    )
+    detector_number = detector_number_dataset["values"]
+    detector_number_dtype = detector_number_dataset["dataset"]["type"]
+
+    mock_component.set_field_value.assert_called_once_with(
+        "detector_number", detector_number, detector_number_dtype
     )
