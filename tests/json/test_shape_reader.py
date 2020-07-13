@@ -601,3 +601,34 @@ def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_e
     assert _any_warning_message_has_substrings(
         [off_shape_reader.error_message, "detector_number"], off_shape_reader.warnings
     )
+
+
+@pytest.mark.parametrize("offset_to_delete", ["x_pixel_offset", "y_pixel_offset"])
+def test_GIVEN_pixel_shape_and_no_x_y_offset_WHEN_reading_pixel_data_THEN_error_message_is_created(
+    off_shape_reader, pixel_children_list, offset_to_delete
+):
+
+    pixel_children_list.remove(
+        off_shape_reader._get_shape_dataset_from_list(
+            offset_to_delete, pixel_children_list
+        )
+    )
+
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_children_list)
+
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.error_message, offset_to_delete], off_shape_reader.warnings
+    )
+
+
+def test_GIVEN_pixel_shape_and_no_z_offset_WHEN_reading_pixel_data_THEN_error_message_is_not_created(
+    off_shape_reader, pixel_children_list
+):
+
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_children_list)
+
+    assert not _any_warning_message_has_substrings(
+        [off_shape_reader.error_message, "x_pixel_offset"], off_shape_reader.warnings
+    )
