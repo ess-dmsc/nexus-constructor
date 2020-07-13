@@ -8,7 +8,11 @@ from nexus_constructor.model.dataset import DatasetMetadata, Dataset
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.node import Node, _get_item, _set_item, _remove_item
 
-from nexus_constructor.model.transformation import Transformation
+
+TRANSFORMS_GROUP_NAME = "transformations"
+
+
+CHILD_BLACKLIST = [TRANSFORMS_GROUP_NAME]
 
 
 @attr.s
@@ -69,7 +73,7 @@ class Group(Node):
             "children": [
                 child.as_dict()
                 for child in self.children
-                if not isinstance(child, Transformation)
+                if child.name not in CHILD_BLACKLIST
             ]
             if self.children
             else [],

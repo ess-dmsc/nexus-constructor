@@ -16,7 +16,7 @@ from nexus_constructor.model.geometry import (
     NoShapeGeometry,
     OFFGeometry,
 )
-from nexus_constructor.model.group import Group
+from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
@@ -31,8 +31,6 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
 )
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.ui_utils import show_warning_dialog
-
-TRANSFORMS_GROUP_NAME = "transformations"
 
 
 def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
@@ -395,13 +393,13 @@ class Component(Group):
             return {
                 "type": "group",
                 "name": SHAPE_GROUP_NAME,
-                "children": [],  # todo
+                "children": [],
             }
         else:
             return {
                 "type": "group",
                 "name": PIXEL_SHAPE_GROUP_NAME,
-                "children": [],  # todo
+                "children": [],
             }
 
     def as_dict(self) -> Dict[str, Any]:
@@ -415,7 +413,7 @@ class Component(Group):
         dictionary["children"].append(
             {
                 "type": "group",
-                "name": TRANSFORMS_GROUP_NAME,
+                "name": TRANSFORMS_GROUP_NAME,  # this works
                 "children": [transform.as_dict() for transform in self.transforms],
             }
         )
