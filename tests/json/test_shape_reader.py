@@ -585,13 +585,6 @@ def test_GIVEN_no_detector_number_dataset_and_no_pixel_shape_WHEN_reading_pixel_
     assert not off_shape_reader.warnings
 
 
-def test_GIVEN_detector_number_dataset_is_present_and_no_pixel_shape_WHEN_reading_pixel_data_THEN_set_field_value_is_called(
-    off_shape_reader, pixel_children_list, mock_component
-):
-    off_shape_reader.add_pixel_data_to_component(pixel_children_list)
-    mock_component.set_field_value.assert_called_once()
-
-
 def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_error_message_is_created(
     off_shape_reader, pixel_children_list, mock_component
 ):
