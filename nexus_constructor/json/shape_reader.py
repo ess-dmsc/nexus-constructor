@@ -52,7 +52,6 @@ class ShapeReader:
         self.warnings = []
         self.error_message = ""
         self.issue_message = ""
-        self.messages = dict()
 
     def _get_shape_type(self):
         """
@@ -72,9 +71,6 @@ class ShapeReader:
         self.error_message = f"Error encountered when constructing {shape_type} for component {self.component.name}:"
         # An issue message means something didn't add up
         self.issue_message = f"Issue encountered when constructing {shape_type} for component {self.component.name}:"
-
-        self.messages["error"] = self.error_message
-        self.messages["issue"] = self.issue_message
 
         if shape_type == OFF_GEOMETRY_NX_CLASS:
             self._add_off_shape_to_component()
