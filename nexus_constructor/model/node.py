@@ -63,7 +63,8 @@ def _set_item(
 def get_absolute_path(node: Any):
     path = f"/{node.name}"
     while node.parent is not None:
-        path = f"/{node.parent}{path}"
+        path = f"/{node.parent.name}{path}"
+        node = node.parent
     return path
 
 
