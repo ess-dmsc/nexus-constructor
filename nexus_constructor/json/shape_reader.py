@@ -409,7 +409,8 @@ class ShapeReader:
         :param dataset: The dataset containing the values list.
         :param expected_types: The type(s) we expect the values list to have.
         :param attribute_name: The name of the attribute.
-        :return: The values list if it was found and passed validation, otherwise None is returned. # todo: update
+        :return: The values list + dtype if they were found and passed validation. None is returned in place of the
+        values list/dtype if validation fails.
         """
         dtype = self._validate_data_type(dataset, expected_types, attribute_name)
 
