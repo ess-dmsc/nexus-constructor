@@ -8,7 +8,13 @@ from mock import Mock, call
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
-from nexus_constructor.json.shape_reader import ShapeReader
+from nexus_constructor.json.shape_reader import (
+    ShapeReader,
+    X_PIXEL_OFFSET,
+    Y_PIXEL_OFFSET,
+    Z_PIXEL_OFFSET,
+    DETECTOR_NUMBER,
+)
 from nexus_constructor.model.component import (
     Component,
     OFF_GEOMETRY_NX_CLASS,
@@ -566,7 +572,7 @@ def test_GIVEN_no_detector_number_dataset_and_no_pixel_shape_WHEN_reading_pixel_
 ):
     pixel_children_list.remove(
         off_shape_reader._get_shape_dataset_from_list(
-            "detector_number", pixel_children_list
+            DETECTOR_NUMBER, pixel_children_list
         )
     )
 
@@ -591,7 +597,7 @@ def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_e
 ):
     pixel_children_list.remove(
         off_shape_reader._get_shape_dataset_from_list(
-            "detector_number", pixel_children_list
+            DETECTOR_NUMBER, pixel_children_list
         )
     )
 
@@ -599,11 +605,11 @@ def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_e
     off_shape_reader.add_pixel_data_to_component(pixel_children_list)
 
     assert _any_warning_message_has_substrings(
-        [off_shape_reader.error_message, "detector_number"], off_shape_reader.warnings
+        [off_shape_reader.error_message, DETECTOR_NUMBER], off_shape_reader.warnings
     )
 
 
-@pytest.mark.parametrize("offset_to_delete", ["x_pixel_offset", "y_pixel_offset"])
+@pytest.mark.parametrize("offset_to_delete", [X_PIXEL_OFFSET, Y_PIXEL_OFFSET])
 def test_GIVEN_pixel_shape_and_no_x_y_offset_WHEN_reading_pixel_data_THEN_error_message_is_created(
     off_shape_reader, pixel_children_list, offset_to_delete
 ):
@@ -628,11 +634,11 @@ def test_GIVEN_pixel_shape_and_no_z_offset_WHEN_reading_pixel_data_THEN_error_me
     off_shape_reader.add_pixel_data_to_component(pixel_children_list)
 
     assert not _any_warning_message_has_substrings(
-        ["z_pixel_offset"], off_shape_reader.warnings
+        [Z_PIXEL_OFFSET], off_shape_reader.warnings
     )
 
 
-@pytest.mark.parametrize("offset_to_corrupt", ["x_pixel_offset", "y_pixel_offset"])
+@pytest.mark.parametrize("offset_to_corrupt", [X_PIXEL_OFFSET, Y_PIXEL_OFFSET])
 def test_GIVEN_x_y_offset_exists_but_fails_validation_WHEN_reading_pixel_data_THEN_error_message_is_created(
     off_shape_reader, pixel_children_list, offset_to_corrupt
 ):
@@ -664,34 +670,34 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
     off_shape_reader.add_pixel_data_to_component(pixel_children_list)
 
     detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "detector_number", pixel_children_list
+        DETECTOR_NUMBER, pixel_children_list
     )
     detector_number = detector_number_dataset["values"]
     detector_number_dtype = detector_number_dataset["dataset"]["type"]
 
     x_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "x_pixel_offset", pixel_children_list
+        X_PIXEL_OFFSET, pixel_children_list
     )
     x_pixel_offset = np.array(x_offset_dataset["values"])
     x_pixel_dtype = x_offset_dataset["dataset"]["type"]
 
     y_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "y_pixel_offset", pixel_children_list
+        Y_PIXEL_OFFSET, pixel_children_list
     )
     y_pixel_offset = np.array(y_offset_dataset["values"])
     y_pixel_dtype = y_offset_dataset["dataset"]["type"]
 
     mock_component.set_field_value.assert_has_calls(
-        [call("detector_number", detector_number, detector_number_dtype)]
+        [call(DETECTOR_NUMBER, detector_number, detector_number_dtype)]
     )
 
-    assert "x_pixel_offset" == mock_component.set_field_value.call_args_list[1].args[0]
+    assert X_PIXEL_OFFSET == mock_component.set_field_value.call_args_list[1].args[0]
     np.array_equal(
         x_pixel_offset, mock_component.set_field_value.call_args_list[1].args[1]
     )
     assert x_pixel_dtype == mock_component.set_field_value.call_args_list[1].args[2]
 
-    assert "y_pixel_offset" == mock_component.set_field_value.call_args_list[2].args[0]
+    assert Y_PIXEL_OFFSET == mock_component.set_field_value.call_args_list[2].args[0]
     np.array_equal(
         y_pixel_offset, mock_component.set_field_value.call_args_list[2].args[1]
     )
@@ -701,15 +707,14 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
 def test_GIVEN_valid_pixel_mapping_WHEN_reading_pixel_data_THEN_set_field_value_is_called_with_expected_values(
     off_shape_reader, pixel_children_list, mock_component
 ):
-
     off_shape_reader.add_pixel_data_to_component(pixel_children_list)
 
     detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
-        "detector_number", pixel_children_list
+        DETECTOR_NUMBER, pixel_children_list
     )
     detector_number = detector_number_dataset["values"]
     detector_number_dtype = detector_number_dataset["dataset"]["type"]
 
     mock_component.set_field_value.assert_called_once_with(
-        "detector_number", detector_number, detector_number_dtype
+        DETECTOR_NUMBER, detector_number, detector_number_dtype
     )

@@ -28,6 +28,10 @@ WINDING_ORDER = "winding_order"
 FACES = "faces"
 VERTICES = "vertices"
 CYLINDERS = "cylinders"
+DETECTOR_NUMBER = "detector_number"
+X_PIXEL_OFFSET = "x_pixel_offset"
+Y_PIXEL_OFFSET = "y_pixel_offset"
+Z_PIXEL_OFFSET = "z_pixel_offset"
 
 
 def _convert_vertices_to_qvector3d(
@@ -439,25 +443,25 @@ class ShapeReader:
 
         # absence of detector number dataset is not considered an error at this point
         detector_number_dataset = self._get_shape_dataset_from_list(
-            "detector_number", children, shape_has_pixel_grid
+            DETECTOR_NUMBER, children, shape_has_pixel_grid
         )
         if detector_number_dataset:
             (
                 detector_number,
                 detector_number_dtype,
             ) = self._find_and_validate_values_list(
-                detector_number_dataset, INT_TYPE, "detector_number"
+                detector_number_dataset, INT_TYPE, DETECTOR_NUMBER
             )
             if detector_number:
                 self.component.set_field_value(
-                    "detector_number", detector_number, detector_number_dtype
+                    DETECTOR_NUMBER, detector_number, detector_number_dtype
                 )
 
         # return if the shape is not a pixel grid
         if not shape_has_pixel_grid:
             return
 
-        for offset in ["x_pixel_offset", "y_pixel_offset", "z_pixel_offset"]:
+        for offset in [X_PIXEL_OFFSET, Y_PIXEL_OFFSET, Z_PIXEL_OFFSET]:
             self._find_and_add_pixel_offsets_to_component(offset, children)
 
     def _find_and_add_pixel_offsets_to_component(
@@ -469,7 +473,7 @@ class ShapeReader:
         :param children: The JSON children list for the component.
         """
         offset_dataset = self._get_shape_dataset_from_list(
-            offset_name, children, offset_name != "z_pixel_offset"
+            offset_name, children, offset_name != Z_PIXEL_OFFSET
         )
         if not offset_dataset:
             return
