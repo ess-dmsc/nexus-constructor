@@ -70,10 +70,15 @@ def test_component_as_dict_contains_transformations():
     first_transform_name = "test_transform_B"
     test_component = Component(name="test_component")
 
-    test_component.add_translation(
-        name=zeroth_transform_name, vector=QVector3D(0, 0, 1)
+    first_transform = test_component.add_translation(
+        name=first_transform_name, vector=QVector3D(1, 0, 0)
     )
-    test_component.add_translation(name=first_transform_name, vector=QVector3D(1, 0, 0))
+    zeroth_transform = test_component.add_translation(
+        name=zeroth_transform_name,
+        vector=QVector3D(0, 0, 1),
+        depends_on=first_transform,
+    )
+    test_component.depends_on = zeroth_transform
     dictionary_output = test_component.as_dict()
 
     assert dictionary_output["children"][0]["name"] == TRANSFORMS_GROUP_NAME
