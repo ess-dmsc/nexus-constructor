@@ -408,15 +408,15 @@ class Component(Group):
         # Add shape/pixel information if there is any
         if not isinstance(self.shape[0], NoShapeGeometry):
             dictionary["children"].append(self.get_shape_dict())
-
-        # Add transformations in a child group
-        dictionary["children"].append(
-            {
-                "type": "group",
-                "name": TRANSFORMS_GROUP_NAME,  # this works
-                "children": [transform.as_dict() for transform in self.transforms],
-            }
-        )
+        if self.transforms:
+            # Add transformations in a child group
+            dictionary["children"].append(
+                {
+                    "type": "group",
+                    "name": TRANSFORMS_GROUP_NAME,  # this works
+                    "children": [transform.as_dict() for transform in self.transforms],
+                }
+            )
         try:
             if self.depends_on is not None:
                 dictionary["children"].append(

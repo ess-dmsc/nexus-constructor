@@ -73,8 +73,14 @@ class Group(Node):
             "children": [
                 child.as_dict()
                 for child in self.children
-                if child.name not in CHILD_BLACKLIST
+                if name_not_in_blacklist(child)
             ]
             if self.children
             else [],
         }
+
+
+def name_not_in_blacklist(child: Any):
+    if hasattr(child, "name") and child.name in CHILD_BLACKLIST:
+        return False
+    return True
