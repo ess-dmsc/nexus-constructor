@@ -160,7 +160,7 @@ class Transformation(Dataset):
             ]
             if self.attributes
             else None,
-            "values": self.values if self.values else [],
+            "values": self.values.as_dict() if self.values else [],
         }
         try:
             return_dict["attributes"].append(
