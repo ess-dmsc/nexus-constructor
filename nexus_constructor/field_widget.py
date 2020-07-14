@@ -86,7 +86,9 @@ class FieldWidget(QFrame):
             possible_field_names = []
 
         self.edit_dialog = QDialog(parent=self)
+        self.parent().parent().destroyed.connect(self.edit_dialog.close)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
+        self.parent().parent().destroyed.connect(self.attrs_dialog.close)
 
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
         self.hide_name_field = hide_name_field
