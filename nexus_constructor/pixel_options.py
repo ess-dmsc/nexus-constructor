@@ -189,7 +189,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     @staticmethod
     def _get_detector_number_information(
-        detector_numbers: np.ndarray,
+        detector_numbers: List[List[int]],
     ) -> Tuple[int, str, str]:
         """
         Determine the first pixel ID, the count direction, and the location of the first pixel from a component that's
@@ -227,14 +227,20 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             start_counting.append("Left")
             # If the first pixel is on the left of the grid, check if its neighbour on the right is the second pixel
             # If it is the second pixel, the count along value is Rows, otherwise it will remain as Columns
-            if detector_numbers[right_of_first_id] == first_id_plus_one:
+            if (
+                detector_numbers[right_of_first_id[0]][right_of_first_id[1]]
+                == first_id_plus_one
+            ):
                 count_along_text = ROWS_TEXT
 
         else:
             start_counting.append("Right")
             # If the first pixel is on the right of the grid, check if its neighbour on the left is the second pixel
             # If it is the second pixel, the count along value is Rows, otherwise it will remain as columns
-            if detector_numbers[left_of_first_id] == first_id_plus_one:
+            if (
+                detector_numbers[left_of_first_id[0]][left_of_first_id[1]]
+                == first_id_plus_one
+            ):
                 count_along_text = ROWS_TEXT
 
         start_counting_text = " ".join(start_counting)
