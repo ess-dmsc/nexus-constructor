@@ -1,4 +1,4 @@
-from typing import List, Union, Any, Tuple
+from typing import List, Union, Any
 
 import numpy as np
 from PySide2.QtGui import QVector3D
@@ -114,7 +114,8 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces_starting_indices, faces_dtype = self._find_and_validate_values_list(
+        faces_dtype = self._find_and_validate_data_type(faces_dataset, INT_TYPE, FACES)
+        faces_starting_indices = self._find_and_validate_values_list(
             faces_dataset, INT_TYPE, FACES
         )
         if not faces_starting_indices:
@@ -124,14 +125,18 @@ class ShapeReader:
         if not units:
             return
 
-        vertices, _ = self._find_and_validate_values_list(
+        self._find_and_validate_data_type(vertices_dataset, FLOAT_TYPES, VERTICES)
+        vertices = self._find_and_validate_values_list(
             vertices_dataset, FLOAT_TYPES, VERTICES
         )
         if not vertices:
             return
         vertices = _convert_vertices_to_qvector3d(vertices)
 
-        winding_order, winding_order_dtype = self._find_and_validate_values_list(
+        winding_order_dtype = self._find_and_validate_data_type(
+            winding_order_dataset, INT_TYPE, WINDING_ORDER
+        )
+        winding_order = self._find_and_validate_values_list(
             winding_order_dataset, INT_TYPE, WINDING_ORDER
         )
         if not winding_order:
@@ -171,13 +176,19 @@ class ShapeReader:
         if not units:
             return
 
-        cylinders_list, cylinders_dtype = self._find_and_validate_values_list(
+        cylinders_dtype = self._find_and_validate_data_type(
+            cylinders_dataset, INT_TYPE, CYLINDERS
+        )
+        cylinders_list = self._find_and_validate_values_list(
             cylinders_dataset, INT_TYPE, CYLINDERS
         )
         if not cylinders_list:
             return
 
-        vertices, vertices_dtype = self._find_and_validate_values_list(
+        vertices_dtype = self._find_and_validate_data_type(
+            vertices_dataset, FLOAT_TYPES, VERTICES
+        )
+        vertices = self._find_and_validate_values_list(
             vertices_dataset, FLOAT_TYPES, VERTICES
         )
         if not vertices:
@@ -213,7 +224,7 @@ class ShapeReader:
                 f"{self.error_message} Couldn't find {attribute_name} attribute."
             )
 
-    def _validate_data_type(
+    def _find_and_validate_data_type(
         self, dataset: dict, expected_types: List[str], parent_name: str
     ) -> Union[str, None]:
         """
@@ -403,33 +414,30 @@ class ShapeReader:
 
     def _find_and_validate_values_list(
         self, dataset: dict, expected_types: List[str], attribute_name: str
-    ) -> Tuple:
+    ) -> Union[List, None]:
         """
         Attempts to find and validate the contents of the values attribute from the dataset.
         :param dataset: The dataset containing the values list.
         :param expected_types: The type(s) we expect the values list to have.
         :param attribute_name: The name of the attribute.
-        :return: The values list + dtype if they were found and passed validation. None is returned in place of the
-        values list/dtype if validation fails.
+        :return: The values list if it was found and passed validation, otherwise None is returned.
         """
-        dtype = self._validate_data_type(dataset, expected_types, attribute_name)
-
         values = self._get_values_attribute(dataset, attribute_name)
         if not values:
-            return None, None
+            return
 
         if not self._attribute_is_a_list(values, attribute_name):
-            return None, None
+            return
 
         if not self._validate_list_size(dataset, values, attribute_name):
-            return None, None
+            return
 
         if not self._all_in_list_have_expected_type(
             values, expected_types, attribute_name
         ):
-            return None, None
+            return
 
-        return values, dtype
+        return values
 
     def add_pixel_data_to_component(self, children: List[dict]):
         """
@@ -438,15 +446,14 @@ class ShapeReader:
         """
         shape_has_pixel_grid = self.shape_info["name"] == PIXEL_SHAPE_GROUP_NAME
 
-        # absence of detector number dataset is not considered an error at this point
         detector_number_dataset = self._get_shape_dataset_from_list(
             DETECTOR_NUMBER, children, shape_has_pixel_grid
         )
         if detector_number_dataset:
-            (
-                detector_number,
-                detector_number_dtype,
-            ) = self._find_and_validate_values_list(
+            detector_number_dtype = self._find_and_validate_data_type(
+                detector_number_dataset, INT_TYPE, DETECTOR_NUMBER
+            )
+            detector_number = self._find_and_validate_values_list(
                 detector_number_dataset, INT_TYPE, DETECTOR_NUMBER
             )
             if detector_number:
@@ -475,7 +482,10 @@ class ShapeReader:
         if not offset_dataset:
             return
 
-        pixel_offset, pixel_offset_dtype = self._find_and_validate_values_list(
+        pixel_offset_dtype = self._find_and_validate_data_type(
+            offset_dataset, FLOAT_TYPES, offset_name
+        )
+        pixel_offset = self._find_and_validate_values_list(
             offset_dataset, FLOAT_TYPES, offset_name
         )
         if not pixel_offset:
