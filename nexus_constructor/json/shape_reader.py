@@ -34,9 +34,7 @@ Y_PIXEL_OFFSET = "y_pixel_offset"
 Z_PIXEL_OFFSET = "z_pixel_offset"
 
 
-def _convert_vertices_to_qvector3d(
-    vertices: List[List[float]],
-) -> Union[List[QVector3D], None]:
+def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
     """
     Converts a list of vertices to QVector3D
     :param vertices: The list of vertices.
