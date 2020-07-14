@@ -211,6 +211,34 @@ def cylindrical_shape_json() -> dict:
 
 
 @pytest.fixture(scope="function")
+def pixel_mapping_list() -> list:
+    children_list = """
+    [
+      {
+        "name": "detector_faces",
+        "type": "dataset",
+        "attributes": null,
+        "values": [
+          [
+            0,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            3,
+            4
+          ]
+        ]
+      }
+    ]
+    """
+    return json.loads(children_list)
+
+
+@pytest.fixture(scope="function")
 def pixel_grid_list() -> list:
     children_list = """
     [

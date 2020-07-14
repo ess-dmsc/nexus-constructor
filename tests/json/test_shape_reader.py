@@ -610,12 +610,13 @@ def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_e
 
 @pytest.mark.parametrize("offset_to_delete", [X_PIXEL_OFFSET, Y_PIXEL_OFFSET])
 def test_GIVEN_pixel_shape_and_no_x_y_offset_WHEN_reading_pixel_data_THEN_error_message_is_created(
-    off_shape_reader, pixel_grid_list, offset_to_delete
+    off_shape_reader, pixel_grid_list, offset_to_delete, mock_off_shape
 ):
     pixel_grid_list.remove(
         off_shape_reader._get_shape_dataset_from_list(offset_to_delete, pixel_grid_list)
     )
 
+    off_shape_reader.shape = mock_off_shape
     off_shape_reader.shape_info["name"] = "pixel_shape"
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
@@ -625,8 +626,9 @@ def test_GIVEN_pixel_shape_and_no_x_y_offset_WHEN_reading_pixel_data_THEN_error_
 
 
 def test_GIVEN_pixel_shape_and_no_z_offset_WHEN_reading_pixel_data_THEN_error_message_is_not_created(
-    off_shape_reader, pixel_grid_list
+    off_shape_reader, pixel_grid_list, mock_off_shape
 ):
+    off_shape_reader.shape = mock_off_shape
     off_shape_reader.shape_info["name"] = "pixel_shape"
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
@@ -637,13 +639,14 @@ def test_GIVEN_pixel_shape_and_no_z_offset_WHEN_reading_pixel_data_THEN_error_me
 
 @pytest.mark.parametrize("offset_to_corrupt", [X_PIXEL_OFFSET, Y_PIXEL_OFFSET])
 def test_GIVEN_x_y_offset_exists_but_fails_validation_WHEN_reading_pixel_data_THEN_error_message_is_created(
-    off_shape_reader, pixel_grid_list, offset_to_corrupt
+    off_shape_reader, pixel_grid_list, offset_to_corrupt, mock_off_shape
 ):
     offset_dataset = off_shape_reader._get_shape_dataset_from_list(
         offset_to_corrupt, pixel_grid_list
     )
     offset_dataset["values"][0] = "not a float"
 
+    off_shape_reader.shape = mock_off_shape
     off_shape_reader.shape_info["name"] = "pixel_shape"
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
@@ -659,8 +662,9 @@ def test_GIVEN_x_y_offset_exists_but_fails_validation_WHEN_reading_pixel_data_TH
 
 
 def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_called_with_expected_values(
-    off_shape_reader, pixel_grid_list, mock_component
+    off_shape_reader, pixel_grid_list, mock_component, mock_off_shape
 ):
+    off_shape_reader.shape = mock_off_shape
     off_shape_reader.shape_info["name"] = "pixel_shape"
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
@@ -699,9 +703,10 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
     assert y_pixel_dtype == mock_component.set_field_value.call_args_list[2].args[2]
 
 
-def test_GIVEN_valid_pixel_mapping_WHEN_reading_pixel_data_THEN_set_field_value_is_called_with_expected_values(
-    off_shape_reader, pixel_grid_list, mock_component
+def test_GIVEN_valid_pixel_mapping_and_cylindrical_shape_WHEN_reading_pixel_data_THEN_set_field_value_is_called_with_expected_values(
+    off_shape_reader, pixel_grid_list, mock_component, mock_cylindrical_shape
 ):
+    off_shape_reader.shape = mock_cylindrical_shape
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
     detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
@@ -713,3 +718,4 @@ def test_GIVEN_valid_pixel_mapping_WHEN_reading_pixel_data_THEN_set_field_value_
     mock_component.set_field_value.assert_called_once_with(
         DETECTOR_NUMBER, detector_number, detector_number_dtype
     )
+    assert mock_cylindrical_shape.detector_number == detector_number
