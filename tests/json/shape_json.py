@@ -115,7 +115,6 @@ def off_shape_json() -> dict:
             6,
             7,
             1,
-            1,
             0,
             1,
             7,
@@ -208,34 +207,6 @@ def cylindrical_shape_json() -> dict:
     }
     """
     return json.loads(cylindrical_shape)
-
-
-@pytest.fixture(scope="function")
-def pixel_mapping_list() -> list:
-    children_list = """
-    [
-      {
-        "name": "detector_faces",
-        "type": "dataset",
-        "attributes": null,
-        "values": [
-          [
-            0,
-            2
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            3,
-            4
-          ]
-        ]
-      }
-    ]
-    """
-    return json.loads(children_list)
 
 
 @pytest.fixture(scope="function")

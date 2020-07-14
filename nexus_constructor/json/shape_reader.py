@@ -464,18 +464,6 @@ class ShapeReader:
                 if isinstance(self.shape, CylindricalGeometry):
                     self.shape.detector_number = detector_number
 
-        detector_faces_dataset = self._get_shape_dataset_from_list(
-            "detector_faces",
-            children,
-            isinstance(self.shape, OFFGeometryNexus) and not shape_has_pixel_grid,
-        )
-        if detector_faces_dataset:
-            detector_faces = self._find_and_validate_values_list(
-                detector_faces_dataset, INT_TYPE, "detector_faces"
-            )
-            if detector_faces and isinstance(self.shape, OFFGeometryNexus):
-                self.shape.detector_faces = detector_faces
-
         # return if the shape is not a pixel grid
         if not shape_has_pixel_grid:
             return
