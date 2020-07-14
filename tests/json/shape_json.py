@@ -115,6 +115,7 @@ def off_shape_json() -> dict:
             6,
             7,
             1,
+            1,
             0,
             1,
             7,
@@ -210,7 +211,7 @@ def cylindrical_shape_json() -> dict:
 
 
 @pytest.fixture(scope="function")
-def pixel_children_list() -> list:
+def pixel_grid_list() -> list:
     children_list = """
     [
       {
