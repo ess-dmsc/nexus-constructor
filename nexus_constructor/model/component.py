@@ -7,7 +7,7 @@ from PySide2.QtGui import QMatrix4x4, QVector3D, QTransform
 from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.geometry import (

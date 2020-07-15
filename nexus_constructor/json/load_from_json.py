@@ -1,7 +1,7 @@
 import json
 from typing import Dict, List, Union
 
-from nexus_constructor.component.component_type import COMPONENT_TYPES
+from nexus_constructor.component_type import COMPONENT_TYPES
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
     _find_attribute_from_list_or_dict,

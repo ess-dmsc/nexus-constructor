@@ -7,7 +7,9 @@ from mock import Mock
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
-from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.entry import Instrument, Entry
+from nexus_constructor.model.model import Model
+from nexus_constructor.model.stream import StreamGroup
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 import numpy as np
@@ -114,13 +116,12 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
     )
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled_correctly(
-    qtbot, file, nexus_wrapper
+    qtbot,
 ):
-    instrument = Instrument(nexus_wrapper, {})
+    instrument = Instrument()
 
-    component = instrument.create_component("test", "NXaperture", "")
+    component = Component(name="test",)
 
     x = 0
     y = 0
@@ -128,8 +129,9 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
 
     transform = component.add_rotation(QVector3D(x, y, z), 0, name="test")
 
-    stream_group = file.create_group("stream_group")
-    stream_group.attrs["NX_class"] = "NCstream"
+    stream_group = StreamGroup("stream_group")  # todo
+
+    stream_group.set_attribute_value["NX_class"] = "NCstream"
     topic = "test_topic"
     writer_module = "ev42"
     source = "source1"
@@ -157,13 +159,12 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
     assert view.transformation_frame.magnitude_widget.value["source"][()] == source
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
     qtbot, nexus_wrapper
 ):
-    instrument = Instrument(nexus_wrapper, {})
+    model = Model(entry=Entry())
 
-    component = instrument.create_component("test", "NXaperture", "")
+    component = Component(name="test")
 
     x = 0
     y = 0
@@ -175,7 +176,7 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
 
     transform.dataset = link
 
-    view = EditRotation(parent=None, transformation=transform, instrument=instrument)
+    view = EditRotation(parent=None, transformation=transform, model=model)
     qtbot.addWidget(view)
 
     assert view.transformation_frame.x_spinbox.value() == x

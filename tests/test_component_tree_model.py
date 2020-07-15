@@ -14,9 +14,8 @@ from nexus_constructor.model.geometry import OFFGeometryNoNexus
 from typing import Any, Optional, List, Tuple
 from PySide2.QtGui import QVector3D
 
+pytest.skip("", allow_module_level=True)  # todo fix these
 from tests.test_utils import NX_CLASS_DEFINITIONS
-
-pytest.skip("Disabled whilst working on model change", allow_module_level=True)
 
 
 def _add_component_to_file(
@@ -47,7 +46,7 @@ class FakeNexusWrapper:
 
 
 class FakeInstrument(list):
-    def __init__(self, component_list: Optional[List[Component, ...]] = None):
+    def __init__(self, component_list: Optional[List[Component]] = None):
         super().__init__()
         if component_list is not None:
             self.extend(component_list)
@@ -64,7 +63,7 @@ def get_component():
 
 
 def create_component_tree_model(
-    components: Optional[List[Component, ...]] = None
+    components: Optional[List[Component]] = None,
 ) -> Tuple[ComponentTreeModel, FakeInstrument]:
     entry = Entry()
     instrument = FakeInstrument(components)

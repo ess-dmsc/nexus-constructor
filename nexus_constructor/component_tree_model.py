@@ -5,8 +5,8 @@ from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
-from nexus_constructor.component.link_transformation import LinkTransformation
-from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.link_transformation import LinkTransformation
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.model import Model

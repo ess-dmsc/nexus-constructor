@@ -1,12 +1,9 @@
-from mock import patch
-from numpy import array_equal, array
 from pytest import approx, raises
 import pytest
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import CylindricalGeometry
-from nexus_constructor.pixel_data import PixelMapping
 from nexus_constructor.ui_utils import numpy_array_to_qvector3d
 
 
@@ -39,63 +36,6 @@ def test_axis_direction_must_be_non_zero():
         component.set_cylinder_shape(
             axis_direction=QVector3D(0, 0, 0), height=height, radius=radius, units="m"
         )
-
-
-@pytest.mark.skip(reason="Disabled whilst working on model change")
-def test_creating_cylinder_from_file_with_multiple_cylinders_in_single_group_ignores_all_but_the_first_cylinder(
-    nexus_wrapper,
-):
-    height_cyl_1 = 4.2
-    radius_cyl_1 = 4.2
-    height_cyl_2 = 3.5
-    radius_cyl_2 = 3.5
-    cylinders_group = nexus_wrapper.create_nx_group(
-        "cylinders", "NXcylindrical_geometry", nexus_wrapper.nexus_file
-    )
-    vertices = [
-        [-0.5 * height_cyl_1, 0, 0],
-        [-0.5 * height_cyl_1, -radius_cyl_1, 0],
-        [0.5 * height_cyl_1, 0, 0],
-        [-0.5 * height_cyl_2, 0, 0],
-        [-0.5 * height_cyl_2, -radius_cyl_2, 0],
-        [0.5 * height_cyl_2, 0, 0],
-    ]
-    vertices_dataset = nexus_wrapper.set_field_value(
-        cylinders_group, "vertices", vertices
-    )
-    nexus_wrapper.set_attribute_value(vertices_dataset, "units", "m")
-    cylinders = [[0, 1, 2], [3, 4, 5]]
-    nexus_wrapper.set_field_value(cylinders_group, "cylinders", cylinders)
-
-    cylinder = CylindricalGeometry(nexus_wrapper, cylinders_group)
-    assert cylinder.radius == approx(radius_cyl_1)
-    assert cylinder.height == approx(height_cyl_1)
-
-
-@pytest.mark.skip(reason="Disabled whilst working on model change")
-def test_get_expected_height_and_radius_when_cylinder_vertices_are_out_of_order_in_nexus_file(
-    nexus_wrapper,
-):
-    height_cyl = 4.2
-    radius_cyl = 3.7
-    cylinders_group = nexus_wrapper.create_nx_group(
-        "cylinders", "NXcylindrical_geometry", nexus_wrapper.nexus_file
-    )
-    vertices = [
-        [-0.5 * height_cyl, 0, 0],
-        [0.5 * height_cyl, 0, 0],
-        [-0.5 * height_cyl, -radius_cyl, 0],
-    ]
-    vertices_dataset = nexus_wrapper.set_field_value(
-        cylinders_group, "vertices", vertices
-    )
-    nexus_wrapper.set_attribute_value(vertices_dataset, "units", "m")
-    cylinders = [[0, 2, 1]]  # not in 0,1,2 order
-    nexus_wrapper.set_field_value(cylinders_group, "cylinders", cylinders)
-
-    cylinder = CylindricalGeometry(nexus_wrapper, cylinders_group)
-    assert cylinder.radius == approx(radius_cyl)
-    assert cylinder.height == approx(height_cyl)
 
 
 @pytest.mark.parametrize(
@@ -140,25 +80,3 @@ def test_calculate_vertices_gives_vertices_consistent_with_specified_height_and_
 
     assert output_axis.length() == approx(height)
     assert output_radius.length() == approx(radius)
-
-
-@pytest.mark.skip(reason="Disabled whilst working on model change")
-def test_GIVEN_pixel_ids_WHEN_initialising_cylindrical_geometry_THEN_ids_in_geometry_match_ids_in_mapping(
-    nexus_wrapper, nx_cylindrical_geometry
-):
-
-    num_detectors = 6
-    expected_dataset = [i for i in range(num_detectors)]
-    pixel_mapping = PixelMapping(expected_dataset)
-
-    # Patch the validation method so that it doesn't mind information being absent from the NeXus group
-    with patch(
-        "nexus_constructor.geometry.cylindrical_geometry.CylindricalGeometry._verify_in_file"
-    ):
-        cylindrical_geometry = CylindricalGeometry(
-            nexus_wrapper, nx_cylindrical_geometry, pixel_mapping
-        )
-
-    actual_dataset = cylindrical_geometry.detector_number
-
-    assert array_equal(array(expected_dataset), actual_dataset)

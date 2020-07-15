@@ -7,7 +7,7 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidgetItem, QListWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component.component_type import (
+from nexus_constructor.component_type import (
     PIXEL_COMPONENT_TYPES,
     CHOPPER_CLASS_NAME,
 )
