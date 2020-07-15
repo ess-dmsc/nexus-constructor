@@ -207,7 +207,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             success = reader.load_model_from_json(filename)
             if reader.warnings:
                 show_warning_dialog(
-                    "\n".join(reader.warnings), "Warnings encountered loading JSON"
+                    "\n".join(reader.warnings), "Warnings encountered loading JSON", parent=self
                 )
             if success:
                 self.model.entry = reader.entry
