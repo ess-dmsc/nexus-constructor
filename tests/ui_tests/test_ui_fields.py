@@ -173,29 +173,6 @@ def test_GIVEN_advanced_option_in_field_WHEN_filling_in_advanced_options_THEN_sp
     # Disabled whilst working on model change
 
 
-def test_GIVEN_field_with_advanced_option_WHEN_checking_if_advanced_options_should_be_enabled_THEN_returns_true(
-    file,
-):
-
-    group = file.create_group("group")
-
-    field_name = "test"
-    advanced_options = [field_name]
-    group.create_dataset(name=field_name, data=1)
-    assert check_if_advanced_options_should_be_enabled(advanced_options, group)
-
-
-def test_GIVEN_field_without_advanced_option_WHEN_checking_if_advanced_options_should_be_enabled_THEN_returns_false(
-    file,
-):
-    group = file.create_group("group")
-
-    field_name = "test"
-    advanced_options = ["not_test"]
-    group.create_dataset(name=field_name, data=1)
-    assert not check_if_advanced_options_should_be_enabled(advanced_options, group)
-
-
 def test_GIVEN_element_that_has_not_been_filled_in_WHEN_creating_dataset_from_spinner_THEN_dataset_is_not_created(
     file, qtbot
 ):

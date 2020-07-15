@@ -3,9 +3,11 @@ import pytest
 from PySide2.QtCore import QPoint, QModelIndex
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QFrame, QVBoxLayout
+
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.model.dataset import DatasetMetadata
+from nexus_constructor.model.dataset import DatasetMetadata, Dataset
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
@@ -605,11 +607,14 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
 
 
 def create_transformation(trans_type: TransformationType):
+    transform_dataset = Dataset(name="transform1", values=1, dataset=DatasetMetadata(type="Double"))
+    transform_dataset.set_attribute_value(CommonAttrs.UNITS, "m")
     t = Transformation(
-        name="transformation", dataset=DatasetMetadata(type="Double"), values=8
-    )
+        name="transformation", dataset=DatasetMetadata(type="Double"), values=transform_dataset)
+    t.dataset = transform_dataset
     t.type = trans_type
     t.vector = QVector3D(1, 0, 0)
+    t.units = "m"
     return t
 
 
