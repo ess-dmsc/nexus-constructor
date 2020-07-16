@@ -13,4 +13,3 @@ class CommonAttrs:
     VERTICES = "vertices"
     NC_STREAM = "NCstream"
     VALUE = "value"
-    LINK_STR = "has_link"

@@ -66,6 +66,7 @@ class Component(Group):
 
     transforms_list = attr.ib(factory=list)
     _depends_on = attr.ib(type=Transformation, default=None)
+    has_link = attr.ib(type=bool, default=None)
 
     @property
     def depends_on(self) -> "Transformation":
