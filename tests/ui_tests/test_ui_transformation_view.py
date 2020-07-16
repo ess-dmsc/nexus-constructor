@@ -323,7 +323,6 @@ def test_UI_GIVEN_change_to_scalar_value_WHEN_creating_new_transformation_THEN_u
     transform.values = create_corresponding_value_dataset(value)
 
     view = EditTranslation(parent=None, transformation=transform, model=model)
-    print(view.transformation_frame.magnitude_widget.field_type)
     view.transformation_frame.magnitude_widget.field_type = (
         FieldType.scalar_dataset.value
     )

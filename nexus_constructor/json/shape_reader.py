@@ -175,7 +175,6 @@ class ShapeReader:
         )
         if not vertices:
             return
-        print(vertices)
 
         cylindrical_geometry = CylindricalGeometry(name)
         cylindrical_geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS

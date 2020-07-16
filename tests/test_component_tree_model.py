@@ -40,11 +40,6 @@ class FakeTransformationChangedSignal:
         pass
 
 
-class FakeNexusWrapper:
-    def __init__(self):
-        self.transformation_changed = FakeTransformationChangedSignal()
-
-
 class FakeInstrument(list):
     def __init__(self, component_list: Optional[List[Component]] = None):
         super().__init__()

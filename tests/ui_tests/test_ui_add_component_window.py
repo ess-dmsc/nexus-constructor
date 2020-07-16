@@ -2677,8 +2677,6 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_grid_THEN
         with pytest.raises(AttributeError):
             component_to_edit.get_field_value(field)
 
-    print(component_to_edit.shape[1])
-
     assert isinstance(component_to_edit.shape[0], expected_geometry)
 
 
