@@ -1,7 +1,7 @@
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.transformation import Transformation
 
 TRANSFORM_STR = "/transformations/"
-LINK_STR = "has_link"
 
 
 class TransformationsList(list):
@@ -42,12 +42,12 @@ class TransformationsList(list):
     @property
     def has_link(self) -> bool:
         try:
-            has_link = self.parent_component.get_attribute_value(LINK_STR)
+            has_link = self.parent_component.get_attribute_value(CommonAttrs.LINK_STR)
         except AttributeError:
             has_link = self._has_direct_link() or self._has_indirect_link()
-            self.parent_component.set_attribute_value(LINK_STR, has_link)
+            self.parent_component.set_attribute_value(CommonAttrs.LINK_STR, has_link)
         return has_link
 
     @has_link.setter
     def has_link(self, value: bool):
-        self.parent_component.set_attribute_value(LINK_STR, value)
+        self.parent_component.set_attribute_value(CommonAttrs.LINK_STR, value)
