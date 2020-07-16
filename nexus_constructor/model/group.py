@@ -11,13 +11,13 @@ from nexus_constructor.model.node import (
     _get_item,
     _set_item,
     _remove_item,
-    ATTR_NAME_BLACKLIST,
+    ATTR_NAME_EXCLUDELIST,
 )
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
 
-CHILD_BLACKLIST = [TRANSFORMS_GROUP_NAME]
+CHILD_EXCLUDELIST = [TRANSFORMS_GROUP_NAME]
 
 
 @attr.s
@@ -75,21 +75,21 @@ class Group(Node):
             "attributes": [
                 attribute.as_dict()
                 for attribute in self.attributes
-                if attribute.name not in ATTR_NAME_BLACKLIST
+                if attribute.name not in ATTR_NAME_EXCLUDELIST
             ]
             if self.attributes
             else None,
             "children": [
                 child.as_dict()
                 for child in self.children
-                if name_not_in_blacklist(child)
+                if name_not_in_excludelist(child)
             ]
             if self.children
             else [],
         }
 
 
-def name_not_in_blacklist(child: Any):
-    if hasattr(child, "name") and child.name in CHILD_BLACKLIST:
+def name_not_in_excludelist(child: Any):
+    if hasattr(child, "name") and child.name in CHILD_EXCLUDELIST:
         return False
     return True

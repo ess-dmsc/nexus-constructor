@@ -7,7 +7,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.node import ATTR_NAME_BLACKLIST
+from nexus_constructor.model.node import ATTR_NAME_EXCLUDELIST
 from nexus_constructor.transformation_types import TransformationType
 
 from typing import TYPE_CHECKING
@@ -158,7 +158,7 @@ class Transformation(Dataset):
                 attribute.as_dict()
                 for attribute in self.attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
-                and attribute.name not in ATTR_NAME_BLACKLIST
+                and attribute.name not in ATTR_NAME_EXCLUDELIST
             ]
             if self.attributes
             else None,

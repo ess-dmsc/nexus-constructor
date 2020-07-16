@@ -21,7 +21,7 @@ from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import FieldValueValidator
 from nexus_constructor.model.value_type import VALUE_TYPE
 
-ATTRS_BLACKLIST = [CommonAttrs.UNITS]
+ATTRS_EXCLUDELIST = [CommonAttrs.UNITS]
 
 
 def _get_human_readable_type(new_value: Any):
@@ -56,7 +56,7 @@ class FieldAttrsDialog(QDialog):
 
     def fill_existing_attrs(self, existing_dataset: Dataset):
         for attr in existing_dataset.attributes:
-            if attr.name not in ATTRS_BLACKLIST:
+            if attr.name not in ATTRS_EXCLUDELIST:
                 frame = FieldAttrFrame(attr)
                 self._add_attr(existing_frame=frame)
 
