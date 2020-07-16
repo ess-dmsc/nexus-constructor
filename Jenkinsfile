@@ -106,7 +106,7 @@ return {
             stage("Setup") {
                   bat """
                   python -m pip install --user --upgrade -r requirements-dev.txt
-                  python -m pip install codecov==2.0.15
+                  python -m pip install codecov==2.1.8
                 """
             } // stage
             stage("Run tests") {
