@@ -423,7 +423,7 @@ class Component(Group):
                     {
                         "name": CommonAttrs.DEPENDS_ON,
                         "type": "String",
-                        "values": self.depends_on.name,
+                        "values": self.depends_on.absolute_path,
                     }
                 )
         except AttributeError:
