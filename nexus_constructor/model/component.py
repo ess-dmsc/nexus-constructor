@@ -225,7 +225,9 @@ class Component(Group):
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
-        transform = Transformation(name=name, dataset=None, parent_node=self)
+        transform = Transformation(
+            name=name, dataset=None, parent_node=self.get_transforms_group()
+        )
         transform.type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
@@ -247,7 +249,7 @@ class Component(Group):
         if self[TRANSFORMS_GROUP_NAME] is not None:
             return self[TRANSFORMS_GROUP_NAME]
 
-        self[TRANSFORMS_GROUP_NAME] = Group(TRANSFORMS_GROUP_NAME)
+        self[TRANSFORMS_GROUP_NAME] = Group(TRANSFORMS_GROUP_NAME, parent_node=self)
         return self[TRANSFORMS_GROUP_NAME]
 
     @property
@@ -387,27 +389,9 @@ class Component(Group):
             )
         ]
 
-    def get_shape_dict(self) -> Dict[Any, Any]:
-        if self.shape[1] is None:
-            # Component has no pixel data
-            return {
-                "type": "group",
-                "name": SHAPE_GROUP_NAME,
-                "children": [],
-            }
-        else:
-            return {
-                "type": "group",
-                "name": PIXEL_SHAPE_GROUP_NAME,
-                "children": [],
-            }
-
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict()
 
-        # Add shape/pixel information if there is any
-        if not isinstance(self.shape[0], NoShapeGeometry):
-            dictionary["children"].append(self.get_shape_dict())
         if self.transforms:
             # Add transformations in a child group
             dictionary["children"].append(
