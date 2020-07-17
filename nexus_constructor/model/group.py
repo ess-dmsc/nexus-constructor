@@ -11,7 +11,6 @@ from nexus_constructor.model.node import (
     _get_item,
     _set_item,
     _remove_item,
-    ATTR_NAME_EXCLUDELIST,
 )
 
 TRANSFORMS_GROUP_NAME = "transformations"
@@ -72,11 +71,7 @@ class Group(Node):
         return {
             "name": self.name,
             "type": self.type,
-            "attributes": [
-                attribute.as_dict()
-                for attribute in self.attributes
-                if attribute.name not in ATTR_NAME_EXCLUDELIST
-            ]
+            "attributes": [attribute.as_dict() for attribute in self.attributes]
             if self.attributes
             else None,
             "children": [

@@ -1,10 +1,6 @@
 from typing import List, Any
 import attr
-
-from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attribute import FieldAttribute
-
-ATTR_NAME_EXCLUDELIST = [CommonAttrs.UI_VALUE]
 
 
 def __find_item_index(list_to_look_in: List[Any], item_name: str):

@@ -7,7 +7,6 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.node import ATTR_NAME_EXCLUDELIST
 from nexus_constructor.transformation_types import TransformationType
 
 from typing import TYPE_CHECKING
@@ -24,6 +23,7 @@ class Transformation(Dataset):
 
     _parent_component = attr.ib(type="Component", default=None)
     _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
+    _ui_value = attr.ib(type=float, default=None)
 
     @_dependents.default
     def _initialise_dependents(self):
@@ -62,12 +62,12 @@ class Transformation(Dataset):
         except ValueError:
             pass
 
-        if self.get_attribute_value(CommonAttrs.UI_VALUE) is None:
+        if self._ui_value is None:
             default_value = 0.0
             self.ui_value = 0.0
             return default_value
 
-        return self.get_attribute_value(CommonAttrs.UI_VALUE)
+        return self._ui_value
 
     @ui_value.setter
     def ui_value(self, new_value: float):
@@ -76,9 +76,9 @@ class Transformation(Dataset):
         else:
             value = new_value[0]
         try:
-            self.set_attribute_value(CommonAttrs.UI_VALUE, float(value))
+            self._ui_value = float(value)
         except ValueError:
-            self.set_attribute_value(CommonAttrs.UI_VALUE, 0.0)
+            self._ui_value = 0.0
 
     @property
     def qmatrix(self) -> QMatrix4x4:
@@ -158,7 +158,6 @@ class Transformation(Dataset):
                 attribute.as_dict()
                 for attribute in self.attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
-                and attribute.name not in ATTR_NAME_EXCLUDELIST
             ]
             if self.attributes
             else None,
