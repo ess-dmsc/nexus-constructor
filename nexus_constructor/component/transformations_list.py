@@ -40,9 +40,9 @@ class TransformationsList(list):
 
     @property
     def has_link(self) -> bool:
-        try:
+        if self.parent_component.has_link is not None:
             has_link = self.parent_component.has_link
-        except AttributeError:
+        else:
             has_link = self._has_direct_link() or self._has_indirect_link()
             self.parent_component.has_link = has_link
         return has_link
