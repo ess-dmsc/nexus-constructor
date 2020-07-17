@@ -37,5 +37,5 @@ class Dataset(Node):
             "attributes": [attribute.as_dict() for attribute in self.attributes]
             if self.attributes
             else None,
-            "values": values if values else [],
+            "values": values if values else "",
         }

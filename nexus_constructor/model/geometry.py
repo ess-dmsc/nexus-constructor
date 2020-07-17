@@ -263,6 +263,9 @@ class OFFGeometryNexus(OFFGeometry, Group):
     http://download.nexusformat.org/sphinx/classes/base_classes/NXoff_geometry.html
     """
 
+    _cad_file_units = ""
+    _cad_file_path = ""
+
     @property
     def detector_faces(self) -> List[Tuple[int, int]]:
         return self.get_field_value("detector_faces")
@@ -326,20 +329,19 @@ class OFFGeometryNexus(OFFGeometry, Group):
 
     @property
     def units(self) -> str:
-        return str(self.get_field_value("cad_file_units"))
+        return self._cad_file_units
 
     @units.setter
     def units(self, units: str):
-        self.set_field_value("cad_file_units", units)
+        self._cad_file_units = units
 
     @property
     def file_path(self):
-        cad_file_path = "cad_file_path"
-        return self.get_field_value(cad_file_path)
+        return self._cad_file_path
 
     @file_path.setter
     def file_path(self, file_path: str):
-        self.set_field_value("cad_file_path", file_path)
+        self._cad_file_path = file_path
 
     def record_faces(self, new_faces: List[List[int]]):
         """
