@@ -28,14 +28,10 @@ class Dataset(Node):
         self.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
     def as_dict(self) -> Dict[str, Any]:
+        return_dict = super().as_dict()
         values = self.values
         if isinstance(values, np.ndarray):
             values = values.tolist()
-        return {
-            "name": self.name,
-            "type": self.type,
-            "attributes": [attribute.as_dict() for attribute in self.attributes]
-            if self.attributes
-            else None,
-            "values": values if values else "",
-        }
+        return_dict["type"] = self.type
+        return_dict["values"] = values
+        return return_dict

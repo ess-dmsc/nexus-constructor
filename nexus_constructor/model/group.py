@@ -68,21 +68,17 @@ class Group(Node):
         return self[name].values
 
     def as_dict(self) -> Dict[str, Any]:
-        return_dict = {
-            "name": self.name,
-            "type": self.type,
-            "children": [
+        return_dict = super().as_dict()
+        return_dict["type"] = self.type
+        return_dict["children"] = (
+            [
                 child.as_dict()
                 for child in self.children
                 if name_not_in_excludelist(child)
             ]
             if self.children
-            else [],
-        }
-        if self.attributes:
-            return_dict["attributes"] = [
-                attribute.as_dict() for attribute in self.attributes
-            ]
+            else []
+        )
         return return_dict
 
 

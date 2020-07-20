@@ -95,6 +95,14 @@ class Node:
         result = _get_item(self.attributes, attribute_name)
         return True if result is not None else False
 
+    def as_dict(self):
+        return_dict = {"name": self.name}
+        if self.attributes:
+            return_dict["attributes"] = [
+                attribute.as_dict() for attribute in self.attributes
+            ]
+        return return_dict
+
 
 def _generate_incremental_name(base_name, transforms_list):
     number = 1
