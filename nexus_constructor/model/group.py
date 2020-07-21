@@ -5,7 +5,18 @@ import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attribute import FieldAttribute
 from nexus_constructor.model.dataset import DatasetMetadata, Dataset
-from nexus_constructor.model.node import Node, _get_item, _set_item, _remove_item
+from nexus_constructor.model.link import Link
+from nexus_constructor.model.node import (
+    Node,
+    _get_item,
+    _set_item,
+    _remove_item,
+)
+
+TRANSFORMS_GROUP_NAME = "transformations"
+
+
+CHILD_EXCLUDELIST = [TRANSFORMS_GROUP_NAME]
 
 
 @attr.s
@@ -21,11 +32,17 @@ class Group(Node):
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
 
-    def __setitem__(self, key: str, value: Union["Group", Dataset]):
-        _set_item(self.children, key, value)
+    def __setitem__(
+        self, key: str, value: Union["Group", Dataset, Link],
+    ):
+        _set_item(self, self.children, key, value)
 
     def __contains__(self, item: str):
-        result = _get_item(self.children, item)
+        result = None
+        try:
+            result = _get_item(self.children, item)
+        except AttributeError:
+            pass
         return True if result is not None else False
 
     def __delitem__(self, key):
@@ -51,9 +68,21 @@ class Group(Node):
         return self[name].values
 
     def as_dict(self) -> Dict[str, Any]:
-        return {
-            "name": self.name,
-            "type": self.type,
-            "attributes": [attribute.as_dict() for attribute in self.attributes],
-            "children": [child.as_dict() for child in self.children],
-        }
+        return_dict = super().as_dict()
+        return_dict["type"] = self.type
+        return_dict["children"] = (
+            [
+                child.as_dict()
+                for child in self.children
+                if name_not_in_excludelist(child)
+            ]
+            if self.children
+            else []
+        )
+        return return_dict
+
+
+def name_not_in_excludelist(child: Any):
+    if hasattr(child, "name") and child.name in CHILD_EXCLUDELIST:
+        return False
+    return True

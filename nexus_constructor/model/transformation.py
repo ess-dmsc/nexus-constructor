@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Dict, Any
 
 import attr
 import numpy as np
@@ -23,6 +23,7 @@ class Transformation(Dataset):
 
     _parent_component = attr.ib(type="Component", default=None)
     _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
+    _ui_value = attr.ib(type=float, default=None)
 
     @_dependents.default
     def _initialise_dependents(self):
@@ -61,12 +62,12 @@ class Transformation(Dataset):
         except ValueError:
             pass
 
-        if self.get_attribute_value(CommonAttrs.UI_VALUE) is None:
+        if self._ui_value is None:
             default_value = 0.0
             self.ui_value = 0.0
             return default_value
 
-        return self.get_attribute_value(CommonAttrs.UI_VALUE)
+        return self._ui_value
 
     @ui_value.setter
     def ui_value(self, new_value: float):
@@ -75,9 +76,9 @@ class Transformation(Dataset):
         else:
             value = new_value[0]
         try:
-            self.set_attribute_value(CommonAttrs.UI_VALUE, float(value))
+            self._ui_value = float(value)
         except ValueError:
-            self.set_attribute_value(CommonAttrs.UI_VALUE, 0.0)
+            self._ui_value = 0.0
 
     @property
     def qmatrix(self) -> QMatrix4x4:
@@ -148,3 +149,29 @@ class Transformation(Dataset):
                 parent.register_dependent(dependent_transform)
 
         self._dependents = []
+
+    def as_dict(self) -> Dict[str, Any]:
+        return_dict = {
+            "name": self.name,
+            "type": self.type,
+            "attributes": [
+                attribute.as_dict()
+                for attribute in self.attributes
+                if attribute.name != CommonAttrs.DEPENDS_ON
+            ]
+            if self.attributes
+            else None,
+            "values": self.values.as_dict() if self.values else [],
+        }
+        try:
+            return_dict["attributes"].append(
+                {
+                    "name": "depends_on",
+                    "values": self.depends_on.absolute_path,
+                    "type": "String",
+                }
+            )
+        except AttributeError:
+            pass
+
+        return return_dict

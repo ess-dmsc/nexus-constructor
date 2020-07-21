@@ -2,18 +2,13 @@ import time
 import uuid
 from functools import partial
 from typing import Callable, Dict, Union, Tuple, Type
-
+import json
 import attr
 from PySide2 import QtCore
 from PySide2.QtCore import QTimer, QAbstractItemModel, QSettings
 from PySide2.QtGui import QStandardItemModel, QCloseEvent
 from PySide2.QtWidgets import QMainWindow, QLineEdit, QApplication
 from streaming_data_types import run_start_pl72, run_stop_6s4t
-
-from nexus_constructor.json.filewriter_json_writer import (
-    NexusToDictConverter,
-    generate_nexus_string,
-)
 from nexus_constructor.kafka.command_producer import CommandProducer
 from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.kafka.status_consumer import StatusConsumer
@@ -297,9 +292,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
                         start_time=start_time,
                         stop_time=stop_time,
                         broker=broker,
-                        nexus_structure=generate_nexus_string(
-                            NexusToDictConverter(), self.model
-                        ),
+                        nexus_structure=json.dumps(self.model.as_dict()),
                         service_id=service_id,
                     )
                 )

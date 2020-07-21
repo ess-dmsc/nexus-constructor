@@ -250,7 +250,7 @@ def test_get_transformation_parent():
         [component]
     )
     component.stored_transforms = component.transforms
-    translation.parent = component.stored_transforms
+    translation.parent_node = component.stored_transforms
 
     test_index = test_component_tree_model.createIndex(0, 0, translation)
 

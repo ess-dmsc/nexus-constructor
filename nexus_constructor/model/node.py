@@ -1,6 +1,5 @@
 from typing import List, Any
 import attr
-
 from nexus_constructor.model.attribute import FieldAttribute
 
 
@@ -39,7 +38,9 @@ def _remove_item(list_to_remove_from: List[Any], item_name: str):
         pass
 
 
-def _set_item(list_to_look_in: List[Any], item_name: str, new_value: Any):
+def _set_item(
+    parent: "Node", list_to_look_in: List[Any], item_name: str, new_value: Any
+):
     """
     Given an item name, either overwrite the current entry or just append the item to the list.
     :param list_to_look_in: list containing elements that have a name attribute
@@ -51,6 +52,16 @@ def _set_item(list_to_look_in: List[Any], item_name: str, new_value: Any):
         list_to_look_in[index] = new_value
     else:
         list_to_look_in.append(new_value)
+    if hasattr(new_value, "parent"):
+        new_value.parent_node = parent
+
+
+def get_absolute_path(node: Any):
+    path = f"/{node.name}"
+    while node.parent_node is not None:
+        path = f"/{node.parent_node.name}{path}"
+        node = node.parent_node
+    return path
 
 
 @attr.s
@@ -59,11 +70,17 @@ class Node:
 
     name = attr.ib(type=str)
     attributes = attr.ib(init=False, factory=list)
+    parent_node = attr.ib(type="Node", default=None)
+
+    @property
+    def absolute_path(self):
+        return get_absolute_path(self)
 
     def set_attribute_value(
         self, attribute_name: str, attribute_value: Any, attribute_type: str = "String"
     ):
         _set_item(
+            self,
             self.attributes,
             attribute_name,
             FieldAttribute(
@@ -77,6 +94,14 @@ class Node:
     def contains_attribute(self, attribute_name):
         result = _get_item(self.attributes, attribute_name)
         return True if result is not None else False
+
+    def as_dict(self):
+        return_dict = {"name": self.name}
+        if self.attributes:
+            return_dict["attributes"] = [
+                attribute.as_dict() for attribute in self.attributes
+            ]
+        return return_dict
 
 
 def _generate_incremental_name(base_name, transforms_list):

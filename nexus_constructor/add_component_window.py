@@ -2,7 +2,7 @@ import logging
 from collections import OrderedDict
 from functools import partial
 
-from PySide2.QtCore import QUrl, Signal, QObject
+from PySide2.QtCore import QUrl, Signal, QObject, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidgetItem, QListWidget
 
@@ -222,6 +222,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
 
         self.change_pixel_options_visibility()
+        parent_dialog.setAttribute(Qt.WA_DeleteOnClose)
 
     def set_pixel_related_changes(self):
         """
@@ -461,7 +462,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: The geometry object.
         """
 
-        component = Component(name=component_name)
+        component = Component(name=component_name, parent_node=self.instrument)
         component.nx_class = nx_class
         component.description = description
         # Add shape information

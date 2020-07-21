@@ -86,7 +86,7 @@ def test_GIVEN_a_valid_base_class_with_no_fields_WHEN_creating_base_class_dict_T
     assert not base_classes[class_name]
 
 
-def test_GIVEN_a_valid_base_class_that_is_in_blacklist_WHEN_creating_base_class_dict_THEN_dict_stays_empty():
+def test_GIVEN_a_valid_base_class_that_is_in_excludelist_WHEN_creating_base_class_dict_THEN_dict_stays_empty():
     class_name = "NXtest"
     xml = f"""
             <definition
