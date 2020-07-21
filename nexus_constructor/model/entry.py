@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 class Entry(Group):
     def __init__(self):
-        super().__init__("entry")
+        super().__init__("entry", None)
         self.nx_class = "NXentry"
 
     @property
@@ -15,6 +15,7 @@ class Entry(Group):
     @instrument.setter
     def instrument(self, instrument: Instrument):
         self["instrument"] = instrument
+        instrument.parent_node = self
 
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Entry, self).as_dict()

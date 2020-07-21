@@ -462,7 +462,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: The geometry object.
         """
 
-        component = Component(name=component_name)
+        component = Component(name=component_name, parent_node=self.instrument)
         component.nx_class = nx_class
         component.description = description
         # Add shape information

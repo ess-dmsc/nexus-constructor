@@ -14,7 +14,11 @@ def test_group_as_dict_contains_expected_keys():
     input_name = "test_group"
     test_group = Group("test_group")
     dictionary_output = test_group.as_dict()
-    for expected_key in ("name", "type", "attributes", "children"):
+    for expected_key in (
+        "name",
+        "type",
+        "children",
+    ):  # Attributes should not be included by default if there are none, unlike children
         assert expected_key in dictionary_output.keys()
 
     assert dictionary_output["name"] == input_name

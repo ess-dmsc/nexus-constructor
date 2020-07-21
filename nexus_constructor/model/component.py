@@ -16,7 +16,7 @@ from nexus_constructor.model.geometry import (
     NoShapeGeometry,
     OFFGeometry,
 )
-from nexus_constructor.model.group import Group
+from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
 from nexus_constructor.model.node import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
@@ -31,8 +31,6 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
 )
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.ui_utils import show_warning_dialog
-
-TRANSFORMS_GROUP_NAME = "transformations"
 
 
 def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
@@ -67,20 +65,20 @@ class Component(Group):
     """
 
     transforms_list = attr.ib(factory=list)
+    _depends_on = attr.ib(type=Transformation, default=None)
+    has_link = attr.ib(type=bool, default=None)
 
     @property
     def depends_on(self) -> "Transformation":
-        return self.get_attribute_value(CommonAttrs.DEPENDS_ON)
+        return self._depends_on
 
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
-        try:
-            if self.depends_on is not None:
-                # deregister this component as a dependent of the old depends_on transformation
-                self.depends_on.deregister_dependent(self)
-        except AttributeError:
-            pass
-        self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+        if self.depends_on is not None:
+            # deregister this component as a dependent of the old depends_on transformation
+            self.depends_on.deregister_dependent(self)
+
+        self._depends_on = new_depends_on
         if new_depends_on is not None:
             new_depends_on.register_dependent(self)
 
@@ -227,8 +225,10 @@ class Component(Group):
         values: Dataset,
     ) -> Transformation:
         if name is None:
-            name = _generate_incremental_name(transformation_type, self.transforms_list)
-        transform = Transformation(name=name, dataset=None)
+            name = _generate_incremental_name(transformation_type, self.transforms)
+        transform = Transformation(
+            name=name, dataset=None, parent_node=self.get_transforms_group()
+        )
         transform.type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
@@ -236,17 +236,30 @@ class Component(Group):
         transform.depends_on = depends_on
         transform.values = values
         transform._parent_component = self
-        self.transforms_list.append(transform)
+
+        self.get_transforms_group()[name] = transform
 
         return transform
 
     def remove_transformation(self, transform: Transformation):
         if transform.dependents:
             raise Exception
-        self.transforms_list.remove(transform)
+        del self.get_transforms_group()[transform.name]
+
+    def get_transforms_group(self):
+        if self[TRANSFORMS_GROUP_NAME] is not None:
+            return self[TRANSFORMS_GROUP_NAME]
+
+        self[TRANSFORMS_GROUP_NAME] = Group(TRANSFORMS_GROUP_NAME, parent_node=self)
+        return self[TRANSFORMS_GROUP_NAME]
 
     @property
-    def shape(self) -> Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus]:
+    def shape(
+        self,
+    ) -> Tuple[
+        Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
+        Optional[List[QVector3D]],
+    ]:
         if PIXEL_SHAPE_GROUP_NAME in self:
             return (
                 self[PIXEL_SHAPE_GROUP_NAME],
@@ -379,14 +392,27 @@ class Component(Group):
 
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict()
-        # Add transformations in a child group
-        dictionary["children"].append(
-            {
-                "type": "group",
-                "name": TRANSFORMS_GROUP_NAME,
-                "children": [transform.as_dict() for transform in self.transforms_list],
-            }
-        )
+
+        if self.transforms:
+            # Add transformations in a child group
+            dictionary["children"].append(
+                {
+                    "type": "group",
+                    "name": TRANSFORMS_GROUP_NAME,  # this works
+                    "children": [transform.as_dict() for transform in self.transforms],
+                }
+            )
+        try:
+            if self.depends_on is not None:
+                dictionary["children"].append(
+                    {
+                        "name": CommonAttrs.DEPENDS_ON,
+                        "type": "String",
+                        "values": self.depends_on.absolute_path,
+                    }
+                )
+        except AttributeError:
+            pass
         return dictionary
 
 

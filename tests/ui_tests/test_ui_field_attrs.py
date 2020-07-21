@@ -48,7 +48,7 @@ def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_a
     assert field_attributes_dialog.get_attrs()[attr_key][0] == str(attr_val)
 
 
-def test_GIVEN_existing_field_with_attr_which_is_in_blacklist_WHEN_editing_component_THEN_attr_is_not_filled_in(
+def test_GIVEN_existing_field_with_attr_which_is_in_excludelist_WHEN_editing_component_THEN_attr_is_not_filled_in(
     qtbot, field_attributes_dialog
 ):
     attr_key = "units"

@@ -22,4 +22,4 @@ class Model:
         self.entry = entry
 
     def as_dict(self) -> Dict[str, Any]:
-        return {"nexus_structure": {"children": [self.entry.as_dict()]}}
+        return {"children": [self.entry.as_dict()]}

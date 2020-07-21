@@ -1,5 +1,6 @@
 import attr
 from typing import List, Dict, Any
+import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.node import Node
@@ -14,7 +15,7 @@ class DatasetMetadata:
 
 @attr.s
 class Dataset(Node):
-    dataset = attr.ib(type=DatasetMetadata)
+    dataset = attr.ib(type=DatasetMetadata, default={})
     values = attr.ib(factory=list, type=List[ValueType])
     type = attr.ib(type=str, default="dataset", init=False)
 
@@ -27,8 +28,10 @@ class Dataset(Node):
         self.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
     def as_dict(self) -> Dict[str, Any]:
-        return {
-            "name": self.name,
-            "type": self.type,
-            "attributes": [attribute.as_dict() for attribute in self.attributes],
-        }
+        return_dict = super().as_dict()
+        values = self.values
+        if isinstance(values, np.ndarray):
+            values = values.tolist()
+        return_dict["type"] = self.type
+        return_dict["values"] = values
+        return return_dict
