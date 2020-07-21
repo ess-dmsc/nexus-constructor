@@ -1,6 +1,7 @@
 import json
 from typing import Dict, List, Union
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
@@ -40,13 +41,13 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
-def _find_shape_information(json_list: List[dict]) -> Union[dict, None]:
+def _find_shape_information(children: List[dict]) -> Union[dict, None]:
     """
     Tries to get the shape information from a component.
-    :param json_list: The list of dictionaries.
+    :param children: The list of dictionaries.
     :return: The shape attribute if it could be found, otherwise None.
     """
-    for item in json_list:
+    for item in children:
         if item["name"] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
             return item
 
@@ -172,7 +173,9 @@ class JSONReader:
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
 
-        depends_on_path = _find_attribute_from_list_or_dict("depends_on", children)
+        depends_on_path = _find_attribute_from_list_or_dict(
+            CommonAttrs.DEPENDS_ON, children
+        )
 
         if depends_on_path not in DEPENDS_ON_IGNORE:
             self.depends_on_paths[name] = depends_on_path

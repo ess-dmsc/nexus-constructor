@@ -87,11 +87,11 @@ class ShapeReader:
         be found and passes validation then the geometry is created and writen to the component, otherwise the function
         just returns without changing the component.
         """
-        children = self._get_children_list()
+        children = self.children
         if not children:
             return
 
-        name = self._get_name()
+        name = self.name
 
         if not isinstance(children, list):
             self.warnings.append(
@@ -141,6 +141,28 @@ class ShapeReader:
         if not winding_order:
             return
 
+        off_geometry = self.__create_off_geometry(
+            faces_dtype,
+            faces_starting_indices,
+            name,
+            units,
+            vertices,
+            winding_order,
+            winding_order_dtype,
+        )
+        self.component[name] = off_geometry
+        self.shape = off_geometry
+
+    @staticmethod
+    def __create_off_geometry(
+        faces_dtype,
+        faces_starting_indices,
+        name,
+        units,
+        vertices,
+        winding_order,
+        winding_order_dtype,
+    ):
         off_geometry = OFFGeometryNexus(name)
         off_geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         off_geometry.vertices = vertices
@@ -149,8 +171,7 @@ class ShapeReader:
         off_geometry.set_field_value(
             "winding_order", np.array(winding_order), winding_order_dtype
         )
-        self.component[name] = off_geometry
-        self.shape = off_geometry
+        return off_geometry
 
     def _add_cylindrical_shape_to_component(self):
         """
@@ -158,11 +179,11 @@ class ShapeReader:
         information can be found and passes validation then the geometry is created and writen to the component,
         otherwise the function just returns without changing the component.
         """
-        children = self._get_children_list()
+        children = self.children
         if not children:
             return
 
-        name = self._get_name()
+        name = self.name
 
         vertices_dataset = self._get_shape_dataset_from_list(VERTICES, children)
         if not vertices_dataset:
@@ -194,6 +215,16 @@ class ShapeReader:
         if not vertices:
             return
 
+        cylindrical_geometry = self.__create_cylindrical_geometry(
+            cylinders_dtype, cylinders_list, name, units, vertices, vertices_dtype
+        )
+        self.component[name] = cylindrical_geometry
+        self.shape = cylindrical_geometry
+
+    @staticmethod
+    def __create_cylindrical_geometry(
+        cylinders_dtype, cylinders_list, name, units, vertices, vertices_dtype
+    ):
         cylindrical_geometry = CylindricalGeometry(name)
         cylindrical_geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
         cylindrical_geometry.set_field_value(
@@ -205,8 +236,7 @@ class ShapeReader:
         cylindrical_geometry[CommonAttrs.VERTICES].set_attribute_value(
             CommonAttrs.UNITS, units
         )
-        self.component[name] = cylindrical_geometry
-        self.shape = cylindrical_geometry
+        return cylindrical_geometry
 
     def _get_shape_dataset_from_list(
         self, attribute_name: str, children: List[dict], warning: bool = True
@@ -387,7 +417,8 @@ class ShapeReader:
         )
         return False
 
-    def _get_children_list(self) -> Union[dict, None]:
+    @property
+    def children(self) -> Union[List, None]:
         """
         Attempts to get the children list from the shape dictionary.
         :return: The children list if it could be found, otherwise None is returned.
@@ -400,7 +431,8 @@ class ShapeReader:
             )
             return
 
-    def _get_name(self) -> str:
+    @property
+    def name(self) -> str:
         """
         Attempts to get the name attribute from the shape dictionary.
         :return: The name if it could be found, otherwise 'shape' is returned.

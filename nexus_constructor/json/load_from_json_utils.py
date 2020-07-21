@@ -1,6 +1,7 @@
 from typing import Union, Any
 
-NX_CLASS = "NX_class"
+from nexus_constructor.common_attrs import CommonAttrs
+
 DEPENDS_ON_IGNORE = [None, "."]
 
 
@@ -42,5 +43,5 @@ def _find_nx_class(entry: Union[list, dict]) -> str:
     :param entry: A dictionary or list of dictionaries.
     :return: The NXclass if it could be found, otherwise an empty string is returned.
     """
-    nx_class = _find_attribute_from_list_or_dict(NX_CLASS, entry)
+    nx_class = _find_attribute_from_list_or_dict(CommonAttrs.NX_CLASS, entry)
     return nx_class if nx_class is not None else ""
