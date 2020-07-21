@@ -1,10 +1,156 @@
 import json
+from typing import Dict
 
 import pytest
 
 
 @pytest.fixture(scope="function")
-def off_shape_json() -> dict:
+def off_pixel_mapping() -> Dict:
+    off_shape = """
+    {
+                  "name": "shape",
+                  "attributes": [
+                    {
+                      "name": "NX_class",
+                      "type": "String",
+                      "values": "NXoff_geometry"
+                    }
+                  ],
+                  "type": "group",
+                  "children": [
+                    {
+                      "name": "winding_order",
+                      "type": "dataset",
+                      "values": [
+                        1,
+                        0,
+                        4,
+                        4,
+                        0,
+                        3,
+                        3,
+                        0,
+                        2,
+                        2,
+                        0,
+                        1,
+                        1,
+                        5,
+                        2,
+                        2,
+                        5,
+                        3,
+                        3,
+                        5,
+                        4,
+                        4,
+                        5,
+                        1
+                      ]
+                    },
+                    {
+                      "name": "faces",
+                      "type": "dataset",
+                      "values": [
+                        0,
+                        3,
+                        6,
+                        9,
+                        12,
+                        15,
+                        18,
+                        21
+                      ]
+                    },
+                    {
+                      "name": "vertices",
+                      "attributes": [
+                        {
+                          "name": "units",
+                          "type": "String",
+                          "values": "m"
+                        }
+                      ],
+                      "type": "dataset",
+                      "values": [
+                        [
+                          0.0,
+                          0.0,
+                          1.0
+                        ],
+                        [
+                          1.0,
+                          0.0,
+                          0.0
+                        ],
+                        [
+                          0.0,
+                          1.0,
+                          0.0
+                        ],
+                        [
+                          -1.0,
+                          0.0,
+                          0.0
+                        ],
+                        [
+                          0.0,
+                          -1.0,
+                          0.0
+                        ],
+                        [
+                          0.0,
+                          0.0,
+                          -1.0
+                        ]
+                      ]
+                    },
+                    {
+                      "name": "detector_faces",
+                      "type": "dataset",
+                      "values": [
+                        [
+                          0,
+                          2
+                        ],
+                        [
+                          1,
+                          3
+                        ],
+                        [
+                          2,
+                          4
+                        ],
+                        [
+                          3,
+                          5
+                        ],
+                        [
+                          4,
+                          6
+                        ],
+                        [
+                          5,
+                          7
+                        ],
+                        [
+                          6,
+                          8
+                        ],
+                        [
+                          7,
+                          9
+                        ]
+                      ]
+                    }
+                  ]
+                }
+    """
+    return json.loads(off_shape)
+
+
+@pytest.fixture(scope="function")
+def off_shape_json() -> Dict:
     """
     Mesh for a simple unit cube, centred at 0, 0, 0
     """
