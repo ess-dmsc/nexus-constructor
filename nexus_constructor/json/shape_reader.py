@@ -498,7 +498,6 @@ class ShapeReader:
 
         # return if the shape is not a pixel grid
         if not shape_has_pixel_grid:
-            # todo here find out if its mapping
             return
 
         for offset in [X_PIXEL_OFFSET, Y_PIXEL_OFFSET, Z_PIXEL_OFFSET]:
