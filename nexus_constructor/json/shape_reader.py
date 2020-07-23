@@ -12,6 +12,7 @@ from nexus_constructor.model.component import (
     Component,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
+    PIXEL_SHAPE_GROUP_NAME,
 )
 from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
 from nexus_constructor.unit_utils import (
@@ -27,11 +28,13 @@ WINDING_ORDER = "winding_order"
 FACES = "faces"
 VERTICES = "vertices"
 CYLINDERS = "cylinders"
+DETECTOR_NUMBER = "detector_number"
+X_PIXEL_OFFSET = "x_pixel_offset"
+Y_PIXEL_OFFSET = "y_pixel_offset"
+Z_PIXEL_OFFSET = "z_pixel_offset"
 
 
-def _convert_vertices_to_qvector3d(
-    vertices: List[List[float]],
-) -> Union[List[QVector3D], None]:
+def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
     """
     Converts a list of vertices to QVector3D
     :param vertices: The list of vertices.
@@ -47,6 +50,7 @@ class ShapeReader:
         self.warnings = []
         self.error_message = ""
         self.issue_message = ""
+        self.shape = None
 
     def _get_shape_type(self):
         """
@@ -83,11 +87,11 @@ class ShapeReader:
         be found and passes validation then the geometry is created and writen to the component, otherwise the function
         just returns without changing the component.
         """
-        children = self._get_children_list()
+        children = self.children
         if not children:
             return
 
-        name = self._get_name()
+        name = self.name
 
         if not isinstance(children, list):
             self.warnings.append(
@@ -109,6 +113,7 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
+        faces_dtype = self._find_and_validate_data_type(faces_dataset, INT_TYPE, FACES)
         faces_starting_indices = self._find_and_validate_values_list(
             faces_dataset, INT_TYPE, FACES
         )
@@ -119,6 +124,7 @@ class ShapeReader:
         if not units:
             return
 
+        self._find_and_validate_data_type(vertices_dataset, FLOAT_TYPES, VERTICES)
         vertices = self._find_and_validate_values_list(
             vertices_dataset, FLOAT_TYPES, VERTICES
         )
@@ -126,19 +132,46 @@ class ShapeReader:
             return
         vertices = _convert_vertices_to_qvector3d(vertices)
 
+        winding_order_dtype = self._find_and_validate_data_type(
+            winding_order_dataset, INT_TYPE, WINDING_ORDER
+        )
         winding_order = self._find_and_validate_values_list(
             winding_order_dataset, INT_TYPE, WINDING_ORDER
         )
         if not winding_order:
             return
 
+        off_geometry = self.__create_off_geometry(
+            faces_dtype,
+            faces_starting_indices,
+            name,
+            units,
+            vertices,
+            winding_order,
+            winding_order_dtype,
+        )
+        self.component[name] = off_geometry
+        self.shape = off_geometry
+
+    @staticmethod
+    def __create_off_geometry(
+        faces_dtype,
+        faces_starting_indices,
+        name,
+        units,
+        vertices,
+        winding_order,
+        winding_order_dtype,
+    ):
         off_geometry = OFFGeometryNexus(name)
         off_geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         off_geometry.vertices = vertices
         off_geometry.units = units
-        off_geometry.set_field_value("faces", faces_starting_indices)
-        off_geometry.set_field_value("winding_order", np.array(winding_order))
-        self.component[name] = off_geometry
+        off_geometry.set_field_value("faces", faces_starting_indices, faces_dtype)
+        off_geometry.set_field_value(
+            "winding_order", np.array(winding_order), winding_order_dtype
+        )
+        return off_geometry
 
     def _add_cylindrical_shape_to_component(self):
         """
@@ -146,11 +179,11 @@ class ShapeReader:
         information can be found and passes validation then the geometry is created and writen to the component,
         otherwise the function just returns without changing the component.
         """
-        children = self._get_children_list()
+        children = self.children
         if not children:
             return
 
-        name = self._get_name()
+        name = self.name
 
         vertices_dataset = self._get_shape_dataset_from_list(VERTICES, children)
         if not vertices_dataset:
@@ -164,30 +197,49 @@ class ShapeReader:
         if not units:
             return
 
+        cylinders_dtype = self._find_and_validate_data_type(
+            cylinders_dataset, INT_TYPE, CYLINDERS
+        )
         cylinders_list = self._find_and_validate_values_list(
             cylinders_dataset, INT_TYPE, CYLINDERS
         )
         if not cylinders_list:
             return
 
+        vertices_dtype = self._find_and_validate_data_type(
+            vertices_dataset, FLOAT_TYPES, VERTICES
+        )
         vertices = self._find_and_validate_values_list(
             vertices_dataset, FLOAT_TYPES, VERTICES
         )
         if not vertices:
             return
-        print(vertices)
 
+        cylindrical_geometry = self.__create_cylindrical_geometry(
+            cylinders_dtype, cylinders_list, name, units, vertices, vertices_dtype
+        )
+        self.component[name] = cylindrical_geometry
+        self.shape = cylindrical_geometry
+
+    @staticmethod
+    def __create_cylindrical_geometry(
+        cylinders_dtype, cylinders_list, name, units, vertices, vertices_dtype
+    ):
         cylindrical_geometry = CylindricalGeometry(name)
         cylindrical_geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS
-        cylindrical_geometry.set_field_value(CYLINDERS, np.array(cylinders_list))
-        cylindrical_geometry.set_field_value(CommonAttrs.VERTICES, np.vstack(vertices))
+        cylindrical_geometry.set_field_value(
+            CYLINDERS, np.array(cylinders_list), cylinders_dtype
+        )
+        cylindrical_geometry.set_field_value(
+            CommonAttrs.VERTICES, np.vstack(vertices), vertices_dtype
+        )
         cylindrical_geometry[CommonAttrs.VERTICES].set_attribute_value(
             CommonAttrs.UNITS, units
         )
-        self.component[name] = cylindrical_geometry
+        return cylindrical_geometry
 
     def _get_shape_dataset_from_list(
-        self, attribute_name: str, children: List[dict]
+        self, attribute_name: str, children: List[dict], warning: bool = True
     ) -> Union[dict, None]:
         """
         Tries to find a given shape dataset from a list of datasets.
@@ -198,13 +250,14 @@ class ShapeReader:
         for attribute in children:
             if attribute["name"] == attribute_name:
                 return attribute
-        self.warnings.append(
-            f"{self.error_message} Couldn't find {attribute_name} attribute."
-        )
+        if warning:
+            self.warnings.append(
+                f"{self.error_message} Couldn't find {attribute_name} attribute."
+            )
 
-    def _validate_data_type(
+    def _find_and_validate_data_type(
         self, dataset: dict, expected_types: List[str], parent_name: str
-    ):
+    ) -> Union[str, None]:
         """
         Checks if the type in the dataset attribute has an expected value. Failing this check does not stop the geometry
         creation.
@@ -223,6 +276,8 @@ class ShapeReader:
                     f"{self.issue_message} Type attribute for {parent_name} does not match expected type(s) "
                     f"{expected_types}."
                 )
+            else:
+                return dataset["dataset"]["type"]
         except KeyError:
             self.warnings.append(
                 f"{self.issue_message} Unable to find type attribute for {parent_name}."
@@ -362,7 +417,8 @@ class ShapeReader:
         )
         return False
 
-    def _get_children_list(self) -> Union[dict, None]:
+    @property
+    def children(self) -> Union[List, None]:
         """
         Attempts to get the children list from the shape dictionary.
         :return: The children list if it could be found, otherwise None is returned.
@@ -375,7 +431,8 @@ class ShapeReader:
             )
             return
 
-    def _get_name(self) -> str:
+    @property
+    def name(self) -> str:
         """
         Attempts to get the name attribute from the shape dictionary.
         :return: The name if it could be found, otherwise 'shape' is returned.
@@ -390,7 +447,7 @@ class ShapeReader:
 
     def _find_and_validate_values_list(
         self, dataset: dict, expected_types: List[str], attribute_name: str
-    ) -> Union[List[List[int]], List[int], List[List[float]], None]:
+    ) -> Union[List, None]:
         """
         Attempts to find and validate the contents of the values attribute from the dataset.
         :param dataset: The dataset containing the values list.
@@ -398,8 +455,6 @@ class ShapeReader:
         :param attribute_name: The name of the attribute.
         :return: The values list if it was found and passed validation, otherwise None is returned.
         """
-        self._validate_data_type(dataset, expected_types, attribute_name)
-
         values = self._get_values_attribute(dataset, attribute_name)
         if not values:
             return
@@ -416,3 +471,61 @@ class ShapeReader:
             return
 
         return values
+
+    def add_pixel_data_to_component(self, children: List[dict]):
+        """
+        Attempts to find and write pixel information to the component.
+        :param children: The JSON children list for the component.
+        """
+        shape_has_pixel_grid = self.shape_info["name"] == PIXEL_SHAPE_GROUP_NAME
+
+        detector_number_dataset = self._get_shape_dataset_from_list(
+            DETECTOR_NUMBER, children, shape_has_pixel_grid
+        )
+        if detector_number_dataset:
+            detector_number_dtype = self._find_and_validate_data_type(
+                detector_number_dataset, INT_TYPE, DETECTOR_NUMBER
+            )
+            detector_number = self._find_and_validate_values_list(
+                detector_number_dataset, INT_TYPE, DETECTOR_NUMBER
+            )
+            if detector_number:
+                self.component.set_field_value(
+                    DETECTOR_NUMBER, detector_number, detector_number_dtype
+                )
+                if isinstance(self.shape, CylindricalGeometry):
+                    self.shape.detector_number = detector_number
+
+        # return if the shape is not a pixel grid
+        if not shape_has_pixel_grid:
+            return
+
+        for offset in [X_PIXEL_OFFSET, Y_PIXEL_OFFSET, Z_PIXEL_OFFSET]:
+            self._find_and_add_pixel_offsets_to_component(offset, children)
+
+    def _find_and_add_pixel_offsets_to_component(
+        self, offset_name: str, children: List[dict]
+    ):
+        """
+        Attempts to find and add pixel offset data to the component.
+        :param offset_name: The name of the pixel offset field.
+        :param children: The JSON children list for the component.
+        """
+        offset_dataset = self._get_shape_dataset_from_list(
+            offset_name, children, offset_name != Z_PIXEL_OFFSET
+        )
+        if not offset_dataset:
+            return
+
+        pixel_offset_dtype = self._find_and_validate_data_type(
+            offset_dataset, FLOAT_TYPES, offset_name
+        )
+        pixel_offset = self._find_and_validate_values_list(
+            offset_dataset, FLOAT_TYPES, offset_name
+        )
+        if not pixel_offset:
+            return
+
+        self.component.set_field_value(
+            offset_name, np.array(pixel_offset), pixel_offset_dtype
+        )

@@ -2,6 +2,7 @@ from typing import Any, Union
 
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from nexus_constructor.model.value_type import VALUE_TYPE
@@ -193,7 +194,7 @@ class TransformationReader:
             if not attributes:
                 continue
 
-            units = self._find_attribute_in_list("units", name, attributes)
+            units = self._find_attribute_in_list(CommonAttrs.UNITS, name, attributes)
             if not units:
                 continue
 
@@ -209,10 +210,12 @@ class TransformationReader:
                 continue
 
             vector = self._find_attribute_in_list(
-                "vector", name, attributes, [0.0, 0.0, 0.0]
+                CommonAttrs.VECTOR, name, attributes, [0.0, 0.0, 0.0]
             )
 
-            depends_on = self._find_attribute_in_list("depends_on", name, attributes)
+            depends_on = self._find_attribute_in_list(
+                CommonAttrs.DEPENDS_ON, name, attributes
+            )
 
             temp_depends_on = None
             angle_or_magnitude = values

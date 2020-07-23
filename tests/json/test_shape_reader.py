@@ -3,19 +3,29 @@ from typing import List
 import numpy as np
 import pytest
 from PySide2.QtGui import QVector3D
-from mock import Mock
+from mock import Mock, call
 
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
-from nexus_constructor.json.shape_reader import ShapeReader
+from nexus_constructor.json.shape_reader import (
+    ShapeReader,
+    X_PIXEL_OFFSET,
+    Y_PIXEL_OFFSET,
+    Z_PIXEL_OFFSET,
+    DETECTOR_NUMBER,
+)
 from nexus_constructor.model.component import (
     Component,
     OFF_GEOMETRY_NX_CLASS,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
 )
 from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
-from tests.json.shape_json import off_shape_json, cylindrical_shape_json
+from tests.json.shape_json import (
+    off_shape_json,
+    cylindrical_shape_json,
+    pixel_grid_list,
+)
 
 EXPECTED_OFF_TYPES = {"faces": "int", "vertices": "float", "winding_order": "int"}
 EXPECTED_CYLINDRICAL_TYPES = {"vertices": "float", "cylinders": "int"}
@@ -43,6 +53,16 @@ def mock_component():
     mock_component.__setitem__ = set_item_mock
     mock_component.__getitem__ = get_item_mock
     return mock_component
+
+
+@pytest.fixture(scope="function")
+def mock_cylindrical_shape():
+    return Mock(spec=CylindricalGeometry)
+
+
+@pytest.fixture(scope="function")
+def mock_off_shape():
+    return Mock(spec=OFFGeometryNexus)
 
 
 @pytest.fixture(scope="function")
@@ -555,3 +575,147 @@ def test_GIVEN_cylindrical_shape_json_WHEN_reading_shape_THEN_geometry_object_ha
     assert shape.units == units
     assert np.allclose(shape.get_field_value("cylinders"), np.array(cylinders_list))
     assert np.allclose(shape.get_field_value("vertices"), np.vstack(vertices))
+
+
+def test_GIVEN_no_detector_number_dataset_and_no_pixel_shape_WHEN_reading_pixel_data_THEN_set_field_value_is_never_called(
+    off_shape_reader, pixel_grid_list, mock_component
+):
+    pixel_grid_list.remove(
+        off_shape_reader._get_shape_dataset_from_list(DETECTOR_NUMBER, pixel_grid_list)
+    )
+
+    off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
+
+    # set field value is never called because the detector number dataset couldn't be found, and the shape is not a
+    # pixel shape
+    mock_component.set_field_value.assert_not_called()
+    # no warning is created because the absence of a detector number dataset is not a problem in the case of "shape"
+    assert not off_shape_reader.warnings
+
+
+def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_error_message_is_created(
+    off_shape_reader, pixel_grid_list, mock_component
+):
+    pixel_grid_list.remove(
+        off_shape_reader._get_shape_dataset_from_list(DETECTOR_NUMBER, pixel_grid_list)
+    )
+
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
+
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.error_message, DETECTOR_NUMBER], off_shape_reader.warnings
+    )
+
+
+@pytest.mark.parametrize("offset_to_delete", [X_PIXEL_OFFSET, Y_PIXEL_OFFSET])
+def test_GIVEN_pixel_shape_and_no_x_y_offset_WHEN_reading_pixel_data_THEN_error_message_is_created(
+    off_shape_reader, pixel_grid_list, offset_to_delete, mock_off_shape
+):
+    pixel_grid_list.remove(
+        off_shape_reader._get_shape_dataset_from_list(offset_to_delete, pixel_grid_list)
+    )
+
+    off_shape_reader.shape = mock_off_shape
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
+
+    assert _any_warning_message_has_substrings(
+        [off_shape_reader.error_message, offset_to_delete], off_shape_reader.warnings
+    )
+
+
+def test_GIVEN_pixel_shape_and_no_z_offset_WHEN_reading_pixel_data_THEN_error_message_is_not_created(
+    off_shape_reader, pixel_grid_list, mock_off_shape
+):
+    off_shape_reader.shape = mock_off_shape
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
+
+    assert not _any_warning_message_has_substrings(
+        [Z_PIXEL_OFFSET], off_shape_reader.warnings
+    )
+
+
+@pytest.mark.parametrize("offset_to_corrupt", [X_PIXEL_OFFSET, Y_PIXEL_OFFSET])
+def test_GIVEN_x_y_offset_exists_but_fails_validation_WHEN_reading_pixel_data_THEN_error_message_is_created(
+    off_shape_reader, pixel_grid_list, offset_to_corrupt, mock_off_shape
+):
+    offset_dataset = off_shape_reader._get_shape_dataset_from_list(
+        offset_to_corrupt, pixel_grid_list
+    )
+    offset_dataset["values"][0] = "not a float"
+
+    off_shape_reader.shape = mock_off_shape
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
+
+    assert _any_warning_message_has_substrings(
+        [
+            off_shape_reader.error_message,
+            offset_to_corrupt,
+            "do not all have type(s)",
+            "float",
+        ],
+        off_shape_reader.warnings,
+    )
+
+
+def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_called_with_expected_values(
+    off_shape_reader, pixel_grid_list, mock_component, mock_off_shape
+):
+    off_shape_reader.shape = mock_off_shape
+    off_shape_reader.shape_info["name"] = "pixel_shape"
+    off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
+
+    detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
+        DETECTOR_NUMBER, pixel_grid_list
+    )
+    detector_number = detector_number_dataset["values"]
+    detector_number_dtype = detector_number_dataset["dataset"]["type"]
+
+    x_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
+        X_PIXEL_OFFSET, pixel_grid_list
+    )
+    x_pixel_offset = np.array(x_offset_dataset["values"])
+    x_pixel_dtype = x_offset_dataset["dataset"]["type"]
+
+    y_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
+        Y_PIXEL_OFFSET, pixel_grid_list
+    )
+    y_pixel_offset = np.array(y_offset_dataset["values"])
+    y_pixel_dtype = y_offset_dataset["dataset"]["type"]
+
+    mock_component.set_field_value.assert_has_calls(
+        [call(DETECTOR_NUMBER, detector_number, detector_number_dtype)]
+    )
+
+    assert X_PIXEL_OFFSET == mock_component.set_field_value.call_args_list[1].args[0]
+    np.array_equal(
+        x_pixel_offset, mock_component.set_field_value.call_args_list[1].args[1]
+    )
+    assert x_pixel_dtype == mock_component.set_field_value.call_args_list[1].args[2]
+
+    assert Y_PIXEL_OFFSET == mock_component.set_field_value.call_args_list[2].args[0]
+    np.array_equal(
+        y_pixel_offset, mock_component.set_field_value.call_args_list[2].args[1]
+    )
+    assert y_pixel_dtype == mock_component.set_field_value.call_args_list[2].args[2]
+
+
+def test_GIVEN_valid_pixel_mapping_and_cylindrical_shape_WHEN_reading_pixel_data_THEN_set_field_value_is_called_with_expected_values(
+    off_shape_reader, pixel_grid_list, mock_component, mock_cylindrical_shape
+):
+    off_shape_reader.shape = mock_cylindrical_shape
+    off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
+
+    detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
+        DETECTOR_NUMBER, pixel_grid_list
+    )
+    detector_number = detector_number_dataset["values"]
+    detector_number_dtype = detector_number_dataset["dataset"]["type"]
+
+    mock_component.set_field_value.assert_called_once_with(
+        DETECTOR_NUMBER, detector_number, detector_number_dtype
+    )
+    assert mock_cylindrical_shape.detector_number == detector_number
