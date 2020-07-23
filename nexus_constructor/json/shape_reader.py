@@ -1,4 +1,4 @@
-from typing import List, Union, Any
+from typing import List, Union, Any, Dict
 
 import numpy as np
 from PySide2.QtGui import QVector3D
@@ -13,6 +13,7 @@ from nexus_constructor.model.component import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
+    SHAPE_GROUP_NAME,
 )
 from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
 from nexus_constructor.unit_utils import (
@@ -32,6 +33,7 @@ DETECTOR_NUMBER = "detector_number"
 X_PIXEL_OFFSET = "x_pixel_offset"
 Y_PIXEL_OFFSET = "y_pixel_offset"
 Z_PIXEL_OFFSET = "z_pixel_offset"
+DETECTOR_FACES = "detector_faces"
 
 
 def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
@@ -44,7 +46,7 @@ def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector
 
 
 class ShapeReader:
-    def __init__(self, component: Component, shape_info: dict):
+    def __init__(self, component: Component, shape_info: Dict):
         self.component = component
         self.shape_info = shape_info
         self.warnings = []
@@ -239,24 +241,24 @@ class ShapeReader:
         return cylindrical_geometry
 
     def _get_shape_dataset_from_list(
-        self, attribute_name: str, children: List[dict], warning: bool = True
-    ) -> Union[dict, None]:
+        self, dataset_name: str, children: List[Dict], warning: bool = True
+    ) -> Union[Dict, None]:
         """
         Tries to find a given shape dataset from a list of datasets.
-        :param attribute_name: The name of the attribute that the function will search for.
+        :param dataset_name: The name of the dataset that the function will search for.
         :param children: The children list where we expect to find the dataset.
         :return: The dataset if it could be found, otherwise None is returned.
         """
-        for attribute in children:
-            if attribute["name"] == attribute_name:
-                return attribute
+        for dataset in children:
+            if dataset["name"] == dataset_name:
+                return dataset
         if warning:
             self.warnings.append(
-                f"{self.error_message} Couldn't find {attribute_name} attribute."
+                f"{self.error_message} Couldn't find {dataset_name} dataset."
             )
 
     def _find_and_validate_data_type(
-        self, dataset: dict, expected_types: List[str], parent_name: str
+        self, dataset: Dict, expected_types: List[str], parent_name: str
     ) -> Union[str, None]:
         """
         Checks if the type in the dataset attribute has an expected value. Failing this check does not stop the geometry
@@ -283,7 +285,7 @@ class ShapeReader:
                 f"{self.issue_message} Unable to find type attribute for {parent_name}."
             )
 
-    def _find_and_validate_units(self, vertices_dataset: dict) -> Union[str, None]:
+    def _find_and_validate_units(self, vertices_dataset: Dict) -> Union[str, None]:
         """
         Attempts to retrieve and validate the units data.
         :param vertices_dataset: The vertices dataset.
@@ -324,7 +326,7 @@ class ShapeReader:
         return units
 
     def _all_in_list_have_expected_type(
-        self, values: list, expected_types: List[str], list_parent_name: str
+        self, values: List, expected_types: List[str], list_parent_name: str
     ) -> bool:
         """
         Checks if all the items in a given list have the expected type.
@@ -352,7 +354,7 @@ class ShapeReader:
         return False
 
     def _validate_list_size(
-        self, data_properties: dict, values: List, parent_name: str
+        self, data_properties: Dict, values: List, parent_name: str
     ) -> bool:
         """
         Checks to see if the length of a list matches the size attribute in the dataset. A warning is recorded if the
@@ -386,8 +388,8 @@ class ShapeReader:
             return False
 
     def _get_values_attribute(
-        self, dataset: dict, parent_name: str
-    ) -> Union[list, None]:
+        self, dataset: Dict, parent_name: str
+    ) -> Union[List, None]:
         """
         Attempts to get the values attribute in a dataset. Creates an error message if if cannot be found.
         :param dataset: The dataset we hope to find the values attribute in.
@@ -446,7 +448,7 @@ class ShapeReader:
             return "shape"
 
     def _find_and_validate_values_list(
-        self, dataset: dict, expected_types: List[str], attribute_name: str
+        self, dataset: Dict, expected_types: List[str], attribute_name: str
     ) -> Union[List, None]:
         """
         Attempts to find and validate the contents of the values attribute from the dataset.
@@ -472,13 +474,31 @@ class ShapeReader:
 
         return values
 
-    def add_pixel_data_to_component(self, children: List[dict]):
+    def add_pixel_data_to_component(self, children: List[Dict]):
         """
         Attempts to find and write pixel information to the component.
         :param children: The JSON children list for the component.
         """
         shape_has_pixel_grid = self.shape_info["name"] == PIXEL_SHAPE_GROUP_NAME
 
+        self._get_detector_number(children, shape_has_pixel_grid)
+
+        # return if the shape is not a pixel grid
+        if not shape_has_pixel_grid:
+            # Shape is pixel mapping
+            self._handle_mapping(children)
+            return
+
+        for offset in [X_PIXEL_OFFSET, Y_PIXEL_OFFSET, Z_PIXEL_OFFSET]:
+            self._find_and_add_pixel_offsets_to_component(offset, children)
+
+    def _get_detector_number(self, children: List[Dict], shape_has_pixel_grid: bool):
+        """
+        Attempt to find the detector_number in the component group, and if found apply it the model component.
+        :param children:
+        :param shape_has_pixel_grid:
+        :return:
+        """
         detector_number_dataset = self._get_shape_dataset_from_list(
             DETECTOR_NUMBER, children, shape_has_pixel_grid
         )
@@ -496,15 +516,17 @@ class ShapeReader:
                 if isinstance(self.shape, CylindricalGeometry):
                     self.shape.detector_number = detector_number
 
-        # return if the shape is not a pixel grid
-        if not shape_has_pixel_grid:
-            return
-
-        for offset in [X_PIXEL_OFFSET, Y_PIXEL_OFFSET, Z_PIXEL_OFFSET]:
-            self._find_and_add_pixel_offsets_to_component(offset, children)
+    def _handle_mapping(self, children: List[Dict]):
+        shape_group = self._get_shape_dataset_from_list(
+            SHAPE_GROUP_NAME, children, False
+        )
+        detector_faces_dataset = self._get_shape_dataset_from_list(
+            DETECTOR_FACES, shape_group["children"], False
+        )
+        self.shape.detector_faces = detector_faces_dataset["values"]
 
     def _find_and_add_pixel_offsets_to_component(
-        self, offset_name: str, children: List[dict]
+        self, offset_name: str, children: List[Dict]
     ):
         """
         Attempts to find and add pixel offset data to the component.
