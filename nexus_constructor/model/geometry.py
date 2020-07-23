@@ -118,7 +118,7 @@ class CylindricalGeometry(Group):
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.set_field_value("detector_number", pixel_ids)
+        self.set_field_value("detector_number", pixel_ids, "int")
 
     @property
     def units(self) -> str:
@@ -276,7 +276,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
         Records the detector faces in the NXoff_geometry.
         :param detector_faces: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
-        self.set_field_value("detector_faces", detector_faces)
+        self.set_field_value("detector_faces", detector_faces, "int")
 
     @property
     def winding_order(self) -> List[int]:
@@ -353,11 +353,11 @@ class OFFGeometryNexus(OFFGeometry, Group):
         winding_order = np.array(
             [index for new_face in new_faces for index in new_face]
         )
-        self.set_field_value("winding_order", winding_order)
+        self.set_field_value("winding_order", winding_order, "int")
         faces_length = [0]
         faces_length.extend([len(new_face) for new_face in new_faces[:-1]])
         faces_start_indices = np.cumsum(faces_length)
-        self.set_field_value("faces", faces_start_indices)
+        self.set_field_value("faces", faces_start_indices, "int")
 
     def record_vertices(self, new_vertices: List[QVector3D]):
         """
@@ -369,7 +369,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
         vertices = np.array(
             [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
         )
-        self.set_field_value(CommonAttrs.VERTICES, vertices)
+        self.set_field_value(CommonAttrs.VERTICES, vertices, "int")
         self[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, "m")
 
 

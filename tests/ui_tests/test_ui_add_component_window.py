@@ -1794,7 +1794,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
 
     field_name = "array"
     field_value = np.array([1, 2, 3, 4, 5])
-    component.set_field_value(field_name, field_value)
+    component.set_field_value(field_name, field_value, "int")
     dialog = AddComponentDialog(
         model,
         treeview_model,
@@ -1855,11 +1855,11 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
 
     field_name1 = "array"
     field_value1 = np.array([1, 2, 3, 4, 5])
-    component.set_field_value(field_name1, field_value1)
+    component.set_field_value(field_name1, field_value1, "int")
 
     field_name2 = "scalar"
     field_value2 = 1
-    component.set_field_value(field_name2, field_value2)
+    component.set_field_value(field_name2, field_value2, "int")
 
     dialog = AddComponentDialog(
         model,

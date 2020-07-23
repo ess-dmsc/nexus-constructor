@@ -14,5 +14,6 @@ def add_component_to_file(
         value=Dataset(
             name=field_name, dataset=DatasetMetadata(type="Double"), values=field_value
         ),
+        dtype="Double",
     )
     return component

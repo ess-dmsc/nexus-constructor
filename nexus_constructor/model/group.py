@@ -56,7 +56,7 @@ class Group(Node):
     def nx_class(self, new_nx_class: str):
         self.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
-    def set_field_value(self, name: str, value: Any, dtype: str = None):
+    def set_field_value(self, name: str, value: Any, dtype: str):
         size = [1]
         if isinstance(value, (np.ndarray, np.generic)):
             size = value.size

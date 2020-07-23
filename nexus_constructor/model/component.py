@@ -91,7 +91,7 @@ class Component(Group):
 
     @description.setter
     def description(self, new_description: str):
-        self.set_field_value(CommonAttrs.DESCRIPTION, new_description)
+        self.set_field_value(CommonAttrs.DESCRIPTION, new_description, "String")
 
     @property
     def qtransform(self) -> QTransform:
@@ -314,10 +314,10 @@ class Component(Group):
         vertices = CylindricalGeometry.calculate_vertices(
             axis_direction, height, radius
         )
-        geometry.set_field_value(CommonAttrs.VERTICES, vertices)
+        geometry.set_field_value(CommonAttrs.VERTICES, vertices, "int")
 
         # # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
-        geometry.set_field_value("cylinders", np.array([0, 1, 2]))
+        geometry.set_field_value("cylinders", np.array([0, 1, 2]), "int")
         geometry[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, units)
 
         if isinstance(pixel_data, PixelMapping):
