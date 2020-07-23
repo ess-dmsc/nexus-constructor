@@ -168,7 +168,7 @@ class Component(Group):
         vector: QVector3D,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset("", None, []),
+        values: Dataset = Dataset(name="", values=0),
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
@@ -194,7 +194,7 @@ class Component(Group):
         angle: float,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset("", None, []),
+        values: Dataset = Dataset(name="", values=0),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees

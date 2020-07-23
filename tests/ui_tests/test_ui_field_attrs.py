@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QListWidget
 from nexus_constructor.field_attrs import FieldAttrsDialog, FieldAttrFrame
 import numpy as np
 
-from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.dataset import Dataset, DatasetMetadata
 from tests.ui_tests.ui_test_utils import show_and_close_window
 
 
@@ -39,7 +39,7 @@ def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_a
     qtbot, attr_val, field_attributes_dialog
 ):
     attr_key = "testattr"
-    ds = Dataset("test", [])
+    ds = Dataset(name="test", dataset=DatasetMetadata("1", "String"))
     ds.set_attribute_value(attr_key, attr_val)
 
     field_attributes_dialog.fill_existing_attrs(ds)
@@ -54,7 +54,7 @@ def test_GIVEN_existing_field_with_attr_which_is_in_excludelist_WHEN_editing_com
     attr_key = "units"
     attr_val = "m"
 
-    ds = Dataset("test", [])
+    ds = Dataset(name="test", dataset=DatasetMetadata("1", "String"))
     ds.set_attribute_value(attr_key, attr_val)
 
     field_attributes_dialog.fill_existing_attrs(ds)

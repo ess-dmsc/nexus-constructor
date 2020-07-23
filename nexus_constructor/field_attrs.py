@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Union, Any
+from typing import Union
 
 import numpy as np
 from PySide2.QtWidgets import (
@@ -16,25 +16,12 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.dataset import Dataset, _get_human_readable_type
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import FieldValueValidator
 from nexus_constructor.model.value_type import VALUE_TYPE
 
 ATTRS_EXCLUDELIST = [CommonAttrs.UNITS]
-
-
-def _get_human_readable_type(new_value: Any):
-    if isinstance(new_value, str):
-        return "String"
-    elif isinstance(new_value, int):
-        return "Int"
-    elif isinstance(new_value, float):
-        return "Double"
-    else:
-        return next(
-            key for key, value in VALUE_TYPE.items() if value == new_value.dtype
-        )
 
 
 class FieldAttrsDialog(QDialog):

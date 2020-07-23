@@ -28,7 +28,7 @@ def create_transform(
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
-    values=Dataset("", None, []),
+    values=Dataset(name="", values=0),
 ):
 
     translation = Transformation(
