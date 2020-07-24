@@ -1,7 +1,38 @@
+from typing import Any, Dict
 import attr
 import numpy as np
-from typing import Dict, Any
+
+from nexus_constructor.model.helpers import _get_item, _set_item
 from nexus_constructor.model.value_type import ValueType
+
+
+class Attributes(list):
+    """Abstract class used for common functionality between a group and dataset. """
+
+    def set_attribute_value(
+        self, attribute_name: str, attribute_value: Any, attribute_type: str = "String"
+    ):
+        _set_item(
+            self,
+            self,
+            attribute_name,
+            FieldAttribute(
+                name=attribute_name, values=attribute_value, type=attribute_type
+            ),
+        )
+
+    def get_attribute_value(self, attribute_name: str):
+        return _get_item(self, attribute_name).values
+
+    def contains_attribute(self, attribute_name):
+        result = _get_item(self, attribute_name)
+        return True if result is not None else False
+
+    def as_dict(self):
+        return_dict = {}
+        if self:
+            return_dict["attributes"] = [attribute.as_dict() for attribute in self]
+        return return_dict
 
 
 @attr.s(eq=False)
