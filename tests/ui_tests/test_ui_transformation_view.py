@@ -7,8 +7,7 @@ from mock import Mock
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import (
     Dataset,
-    DatasetMetadata,
-    _get_human_readable_type,
+
 )
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
@@ -34,7 +33,7 @@ def create_corresponding_value_dataset(value: Any):
         size = len(value)
 
     return Dataset(
-        name=name, dataset=DatasetMetadata(type=type, size=[size]), values=value,
+        name=name, type=type, size=[size], values=value,
     )
 
 

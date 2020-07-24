@@ -5,7 +5,6 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QFrame, QVBoxLayout
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.model.dataset import DatasetMetadata
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
@@ -609,7 +608,7 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
 
 def create_transformation(trans_type: TransformationType):
     t = Transformation(
-        name="transformation", dataset=DatasetMetadata(type="Double"), values=8
+        name="transformation", type="Double", size=[1], values=8
     )
     t.type = trans_type
     t.vector = QVector3D(1, 0, 0)

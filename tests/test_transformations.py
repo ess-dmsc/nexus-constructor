@@ -2,7 +2,7 @@ import numpy as np
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation
 from typing import Any
 from tests.helpers import add_component_to_file  # noqa:F401
@@ -15,7 +15,7 @@ translation_type = "Translation"
 def _add_transform_to_file(
     name: str, value: Any, vector: QVector3D, transform_type: str
 ):
-    transform = Transformation(name=name, dataset=DatasetMetadata(type="Double"))
+    transform = Transformation(name=name, type="Double", size="[1]", values=42)
     transform.type = transform_type
     transform.vector = vector
     transform.values = value
@@ -28,18 +28,16 @@ def create_transform(
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
-    values=Dataset(name="", values=0),
+    values=Dataset(name="", values=0, type="double", size=[1]),
 ):
 
     translation = Transformation(
         name=name,
-        dataset=Dataset(
-            name="dataset",
-            dataset=DatasetMetadata([1], "str"),
-            values="test",
-            parent_node=None,
-        ),
         parent_node=None,
+        values="test",
+        type="str",
+        parent_component=None,
+        size=[1],
     )
 
     translation.vector = vector

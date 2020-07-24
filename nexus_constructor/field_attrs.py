@@ -16,7 +16,7 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.dataset import Dataset, _get_human_readable_type
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import FieldValueValidator
 from nexus_constructor.model.value_type import VALUE_TYPE

@@ -1,15 +1,12 @@
 from nexus_constructor.model.component import Component
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.model.dataset import DatasetMetadata, Dataset
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.instrument import Instrument
 import pytest
 
 values = Dataset(
-    name="scalar_value",
-    dataset=DatasetMetadata(type="Double", size=[1]),
-    values=90.0,
-    parent_node=None,
+    name="scalar_value", type="Double", size=[1], values=90.0, parent_node=None,
 )
 
 

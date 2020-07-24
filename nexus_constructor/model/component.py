@@ -17,7 +17,7 @@ from nexus_constructor.model.geometry import (
     OFFGeometry,
 )
 from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
-from nexus_constructor.model.node import _generate_incremental_name
+from nexus_constructor.model.helpers import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -168,7 +168,7 @@ class Component(Group):
         vector: QVector3D,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0),
+        values: Dataset = Dataset(name="", values=0, type="Double", size="1"),
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
@@ -194,7 +194,7 @@ class Component(Group):
         angle: float,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0),
+        values: Dataset = Dataset(name="", values=0, type="Double", size="1"),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
