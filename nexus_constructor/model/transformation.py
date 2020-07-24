@@ -153,7 +153,7 @@ class Transformation(Dataset):
     def as_dict(self) -> Dict[str, Any]:
         return_dict = {
             "name": self.name,
-            "type": self.type,
+            "type": "dataset",
             "attributes": [
                 attribute.as_dict()
                 for attribute in self.attributes

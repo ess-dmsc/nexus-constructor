@@ -46,7 +46,6 @@ def create_metadata(ds: "Dataset") -> DatasetMetadata:
 @attr.s
 class Dataset(Node):
     values = attr.ib(factory=list, type=List[ValueType])
-    type = attr.ib(type=str, default="dataset", init=False)
     dataset = attr.ib(
         type=DatasetMetadata, default=attr.Factory(create_metadata, takes_self=True)
     )
@@ -64,7 +63,7 @@ class Dataset(Node):
         values = self.values
         if isinstance(values, np.ndarray):
             values = values.tolist()
-        return_dict["type"] = self.type
+        return_dict["type"] = "dataset"
         return_dict["values"] = values
         return_dict["dataset"] = self.dataset.as_dict()
         return return_dict

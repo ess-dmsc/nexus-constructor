@@ -26,7 +26,6 @@ class Group(Node):
     """
 
     children = attr.ib(factory=list, init=False)
-    type = attr.ib(type=str, default="group", init=False)
     attributes = attr.ib(type=List[FieldAttribute], factory=list, init=False)
 
     def __getitem__(self, key: str):
@@ -69,7 +68,7 @@ class Group(Node):
 
     def as_dict(self) -> Dict[str, Any]:
         return_dict = super().as_dict()
-        return_dict["type"] = self.type
+        return_dict["type"] = "group"
         return_dict["children"] = (
             [
                 child.as_dict()
