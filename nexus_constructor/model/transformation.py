@@ -53,13 +53,13 @@ class Transformation(Dataset):
     def ui_value(self) -> float:
         try:
             if isinstance(self.values, Dataset):
-                if np.isscalar(self.values):
+                if np.isscalar(self.values.values):
                     self.ui_value = float(self.values.values)
                     return float(self.values.values)
                 else:
                     self.ui_value = float(self.values.values[0])
                     return float(self.values.values[0])
-        except ValueError:
+        except (ValueError, TypeError):
             pass
 
         if self._ui_value is None:
