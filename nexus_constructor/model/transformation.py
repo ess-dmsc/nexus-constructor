@@ -31,15 +31,15 @@ class Transformation(Dataset):
 
     @property
     def type(self) -> str:
-        return self.get_attribute_value(CommonAttrs.TRANSFORMATION_TYPE)
+        return self.attributes.get_attribute_value(CommonAttrs.TRANSFORMATION_TYPE)
 
     @type.setter
     def type(self, new_type):
-        self.set_attribute_value(CommonAttrs.TRANSFORMATION_TYPE, new_type)
+        self.attributes.set_attribute_value(CommonAttrs.TRANSFORMATION_TYPE, new_type)
 
     @property
     def vector(self) -> QVector3D:
-        vector = self.get_attribute_value(CommonAttrs.VECTOR)
+        vector = self.attributes.get_attribute_value(CommonAttrs.VECTOR)
         return (
             QVector3D(vector[0], vector[1], vector[2]) if vector is not None else None
         )
@@ -47,18 +47,18 @@ class Transformation(Dataset):
     @vector.setter
     def vector(self, new_vector: QVector3D):
         vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
-        self.set_attribute_value(CommonAttrs.VECTOR, vector_as_np_array)
+        self.attributes.set_attribute_value(CommonAttrs.VECTOR, vector_as_np_array)
 
     @property
     def ui_value(self) -> float:
         try:
-            if isinstance(self.dataset, Dataset):
-                if np.isscalar(self.dataset.values):
-                    self.ui_value = float(self.dataset.values)
-                    return float(self.dataset.values)
+            if isinstance(self.values, Dataset):
+                if np.isscalar(self.values):
+                    self.ui_value = float(self.values.values)
+                    return float(self.values.values)
                 else:
-                    self.ui_value = float(self.dataset.values[0])
-                    return float(self.dataset.values[0])
+                    self.ui_value = float(self.values.values[0])
+                    return float(self.values.values[0])
         except ValueError:
             pass
 
@@ -97,15 +97,15 @@ class Transformation(Dataset):
 
     @property
     def units(self):
-        return self.get_attribute_value(CommonAttrs.UNITS)
+        return self.attributes.get_attribute_value(CommonAttrs.UNITS)
 
     @units.setter
     def units(self, new_units):
-        self.set_attribute_value(CommonAttrs.UNITS, new_units)
+        self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
 
     @property
     def depends_on(self) -> "Transformation":
-        return self.get_attribute_value(CommonAttrs.DEPENDS_ON)
+        return self.attributes.get_attribute_value(CommonAttrs.DEPENDS_ON)
 
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
@@ -115,7 +115,7 @@ class Transformation(Dataset):
                 self.depends_on.deregister_dependent(self)
         except AttributeError:
             pass
-        self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+        self.attributes.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
         if new_depends_on is not None:
             new_depends_on.register_dependent(self)
 

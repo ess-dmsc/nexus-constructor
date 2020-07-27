@@ -4,6 +4,7 @@ import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.attributes import Attributes
+from nexus_constructor.model.helpers import get_absolute_path
 from nexus_constructor.model.value_type import ValueType
 
 
@@ -15,6 +16,10 @@ class Dataset:
     size = attr.ib(factory=tuple)
     parent_node = attr.ib(type="Node", default=None)
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+
+    @property
+    def absolute_path(self):
+        return get_absolute_path(self)
 
     @property
     def nx_class(self):

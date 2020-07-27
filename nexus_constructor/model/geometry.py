@@ -122,7 +122,9 @@ class CylindricalGeometry(Group):
 
     @property
     def units(self) -> str:
-        return self[CommonAttrs.VERTICES].get_attribute_value(CommonAttrs.UNITS)
+        return self[CommonAttrs.VERTICES].attributes.get_attribute_value(
+            CommonAttrs.UNITS
+        )
 
     @property
     def height(self) -> float:
@@ -370,7 +372,9 @@ class OFFGeometryNexus(OFFGeometry, Group):
             [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
         )
         self.set_field_value(CommonAttrs.VERTICES, vertices, "int")
-        self[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, "m")
+        self[CommonAttrs.VERTICES].attributes.set_attribute_value(
+            CommonAttrs.UNITS, "m"
+        )
 
 
 __half_side_length = 0.05

@@ -227,14 +227,17 @@ class Component(Group):
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
         transform = Transformation(
-            name=name, dataset=None, parent_node=self.get_transforms_group()
+            name=name,
+            parent_node=self.get_transforms_group(),
+            type=values.type,
+            size=values.size,
+            values=values,
         )
         transform.type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
-        transform.values = values
         transform._parent_component = self
 
         self.get_transforms_group()[name] = transform
@@ -318,7 +321,9 @@ class Component(Group):
 
         # # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
         geometry.set_field_value("cylinders", np.array([0, 1, 2]), "int")
-        geometry[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, units)
+        geometry[CommonAttrs.VERTICES].attributes.set_attribute_value(
+            CommonAttrs.UNITS, units
+        )
 
         if isinstance(pixel_data, PixelMapping):
             geometry.detector_number = get_detector_number_from_pixel_mapping(
