@@ -16,7 +16,7 @@ def _add_transform_to_file(
     name: str, value: Any, vector: QVector3D, transform_type: str
 ):
     transform = Transformation(name=name, type="Double", size="[1]", values=42)
-    transform.type = transform_type
+    transform.transform_type = transform_type
     transform.vector = vector
     transform.values = value
 
@@ -41,7 +41,7 @@ def create_transform(
     )
 
     translation.vector = vector
-    translation.type = type
+    translation.transform_type = type
     translation.ui_value = ui_value
     translation.values = values
 
@@ -74,7 +74,7 @@ def test_can_get_transform_properties():
         transform.vector == test_vector
     ), "Expected the transform vector to match what was in the NeXus file"
     assert (
-        transform.type == test_type
+        transform.transform_type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
     assert (
         transform.values == test_values
@@ -115,7 +115,7 @@ def test_can_set_transform_properties():
     transform.name = test_name
     transform.ui_value = test_ui_value
     transform.vector = test_vector
-    transform.type = test_type
+    transform.transform_type = test_type
     transform.values = test_values
 
     assert (
@@ -128,7 +128,7 @@ def test_can_set_transform_properties():
         transform.vector == test_vector
     ), "Expected the transform vector to match what was in the NeXus file"
     assert (
-        transform.type == test_type
+        transform.transform_type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
     assert (
         transform.values == test_values

@@ -233,7 +233,7 @@ class Component(Group):
             size=values.size,
             values=values,
         )
-        transform.type = transformation_type
+        transform.transform_type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector

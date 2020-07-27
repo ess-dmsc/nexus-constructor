@@ -30,11 +30,11 @@ class Transformation(Dataset):
         return [] if self._parent_component is None else [self._parent_component]
 
     @property
-    def type(self) -> str:
+    def transform_type(self) -> str:
         return self.attributes.get_attribute_value(CommonAttrs.TRANSFORMATION_TYPE)
 
-    @type.setter
-    def type(self, new_type):
+    @transform_type.setter
+    def transform_type(self, new_type):
         self.attributes.set_attribute_value(CommonAttrs.TRANSFORMATION_TYPE, new_type)
 
     @property
@@ -86,13 +86,15 @@ class Transformation(Dataset):
         Get a Qt3DCore.QTransform describing the transformation
         """
         transform = Qt3DCore.QTransform()
-        if self.type == TransformationType.ROTATION:
+        if self.transform_type == TransformationType.ROTATION:
             quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
             transform.setRotation(quaternion)
-        elif self.type == TransformationType.TRANSLATION:
+        elif self.transform_type == TransformationType.TRANSLATION:
             transform.setTranslation(self.vector.normalized() * self.ui_value)
         else:
-            raise (RuntimeError(f'Unknown transformation of type "{self.type}".'))
+            raise (
+                RuntimeError(f'Unknown transformation of type "{self.transform_type}".')
+            )
         return transform.matrix()
 
     @property

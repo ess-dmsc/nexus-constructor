@@ -28,7 +28,6 @@ class Group:
 
     name = attr.ib(type=str)
     parent_node = attr.ib(type="Node", default=None)
-
     children = attr.ib(factory=list, init=False)
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
 

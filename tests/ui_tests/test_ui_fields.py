@@ -47,8 +47,8 @@ def test_ui_field_GIVEN_field_has_units_filled_in_ui_WHEN_getting_field_group_TH
     field.units = units
     group = field.value
 
-    assert group.contains_attribute("units")
-    assert group.get_attribute_value("units") == units
+    assert group.attributes.contains_attribute("units")
+    assert group.attributes.get_attribute_value("units") == units
 
 
 def test_ui_field_GIVEN_field_does_not_have_units_filled_in_ui_WHEN_getting_field_group_THEN_units_are_not_saved(
@@ -63,7 +63,7 @@ def test_ui_field_GIVEN_field_does_not_have_units_filled_in_ui_WHEN_getting_fiel
 
     group = field.value
 
-    assert not group.contains_attribute("units")
+    assert not group.attributes.contains_attribute("units")
 
 
 def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_combo_is_changed_THEN_value_units_edit_is_shown(

@@ -45,8 +45,8 @@ def test_component_set_field_with_numpy_array_correctly_sets_field_value():
     field_dataset = comp["field1"]
     assert field_dataset.name == field_name
     assert np.array_equal(field_dataset.values, field_value)
-    assert field_dataset.dataset.size == 2
-    assert field_dataset.dataset.type == dtype
+    assert field_dataset.size == 2
+    assert field_dataset.type == dtype
 
 
 def test_component_set_field_with_scalar_value_correctly_sets_field_value():
@@ -61,8 +61,8 @@ def test_component_set_field_with_scalar_value_correctly_sets_field_value():
 
     assert field_dataset.name == field_name
     assert field_dataset.values == data
-    assert field_dataset.dataset.size == [1]
-    assert field_dataset.dataset.type == dtype
+    assert field_dataset.size == [1]
+    assert field_dataset.type == dtype
 
 
 def test_component_as_dict_contains_transformations():
