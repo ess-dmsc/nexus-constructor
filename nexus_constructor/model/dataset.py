@@ -30,8 +30,7 @@ class Dataset:
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
     def as_dict(self) -> Dict[str, Any]:
-        return_dict = {}
-        return_dict["name"] = self.name
+        return_dict = {"name": self.name}
         if self.attributes:
             return_dict["attributes"] = self.attributes.as_dict()
         values = self.values
