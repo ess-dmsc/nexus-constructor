@@ -1,7 +1,7 @@
 import json
 from typing import Dict, List, Union
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys
 from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
@@ -35,8 +35,8 @@ def _retrieve_children_list(json_dict: dict) -> list:
     :return: The children value is returned if it was found, otherwise an empty list is returned.
     """
     try:
-        entry = json_dict["children"][0]
-        return entry["children"]
+        entry = json_dict[CommonKeys.CHILDREN][0]
+        return entry[CommonKeys.CHILDREN]
     except (KeyError, IndexError, TypeError):
         return []
 
@@ -48,7 +48,7 @@ def _find_shape_information(children: List[dict]) -> Union[dict, None]:
     :return: The shape attribute if it could be found, otherwise None.
     """
     for item in children:
-        if item["name"] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
+        if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
             return item
 
 
@@ -108,7 +108,9 @@ class JSONReader:
                 return False
 
             for child in children_list:
-                self._read_json_object(child, json_dict["children"][0].get("name"))
+                self._read_json_object(
+                    child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)
+                )
 
             for dependent_component_name in self.depends_on_paths.keys():
                 # The following extraction of the component name and transformation name makes the assumption
@@ -140,17 +142,17 @@ class JSONReader:
         :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
         """
         try:
-            name = json_object["name"]
+            name = json_object[CommonKeys.NAME]
         except KeyError:
             self.warnings.append(
                 f"Unable to find object name for child of {parent_name}."
             )
             return
 
-        nx_class = _find_nx_class(json_object.get("attributes"))
+        nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
 
         try:
-            children = json_object["children"]
+            children = json_object[CommonKeys.CHILDREN]
         except KeyError:
             return
 
@@ -186,7 +188,7 @@ class JSONReader:
         if shape_info:
             shape_reader = ShapeReader(component, shape_info)
             shape_reader.add_shape_to_component()
-            shape_reader.add_pixel_data_to_component(json_object["children"])
+            shape_reader.add_pixel_data_to_component(json_object[CommonKeys.CHILDREN])
             self.warnings += shape_reader.warnings
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:

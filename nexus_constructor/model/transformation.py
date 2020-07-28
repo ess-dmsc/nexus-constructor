@@ -5,7 +5,7 @@ import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
-from nexus_constructor.common_attrs import CommonAttrs, CommonKeys
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformation_types import TransformationType
@@ -156,7 +156,7 @@ class Transformation(Dataset):
     def as_dict(self) -> Dict[str, Any]:
         return_dict = {
             CommonKeys.NAME: self.name,
-            CommonKeys.TYPE: "dataset",
+            CommonKeys.TYPE: NodeType.DATASET,
             CommonKeys.ATTRIBUTES: [
                 attribute.as_dict()
                 for attribute in self.attributes

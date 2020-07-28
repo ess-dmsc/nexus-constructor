@@ -15,6 +15,17 @@ from nexus_constructor.ui_utils import (
 from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 
 
+WINDING_ORDER = "winding_order"
+FACES = "faces"
+VERTICES = "vertices"
+CYLINDERS = "cylinders"
+DETECTOR_NUMBER = "detector_number"
+X_PIXEL_OFFSET = "x_pixel_offset"
+Y_PIXEL_OFFSET = "y_pixel_offset"
+Z_PIXEL_OFFSET = "z_pixel_offset"
+DETECTOR_FACES = "detector_faces"
+
+
 class OFFGeometry(ABC):
     @property
     @abstractmethod
@@ -114,11 +125,11 @@ class OFFGeometryNoNexus(OFFGeometry):
 class CylindricalGeometry(Group):
     @property
     def detector_number(self) -> List[int]:
-        return self.get_field_value("detector_number")
+        return self.get_field_value(DETECTOR_NUMBER)
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.set_field_value("detector_number", pixel_ids, "int")
+        self.set_field_value(DETECTOR_NUMBER, pixel_ids, "int")
 
     @property
     def units(self) -> str:
@@ -173,7 +184,7 @@ class CylindricalGeometry(Group):
 
     @property
     def cylinders(self) -> np.ndarray:
-        return self.get_field_value("cylinders")
+        return self.get_field_value(CYLINDERS)
 
     @property
     def radius(self) -> float:
@@ -270,7 +281,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
 
     @property
     def detector_faces(self) -> List[Tuple[int, int]]:
-        return self.get_field_value("detector_faces")
+        return self.get_field_value(DETECTOR_FACES)
 
     @detector_faces.setter
     def detector_faces(self, detector_faces: List[Tuple[int, int]]):
@@ -278,7 +289,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
         Records the detector faces in the NXoff_geometry.
         :param detector_faces: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
-        self.set_field_value("detector_faces", detector_faces, "int")
+        self.set_field_value(DETECTOR_FACES, detector_faces, "int")
 
     @property
     def winding_order(self) -> List[int]:
@@ -313,9 +324,9 @@ class OFFGeometryNexus(OFFGeometry, Group):
         into a list of the vertex indices for each face
         :return: List of vertex indices for each face
         """
-        winding_order_from_file = self.get_field_value("winding_order")
+        winding_order_from_file = self.get_field_value(WINDING_ORDER)
         # Gives starting index for each face in winding_order
-        face_starting_indices = self.get_field_value("faces")
+        face_starting_indices = self.get_field_value(FACES)
         faces = [
             winding_order_from_file[
                 face_start : face_starting_indices[index + 1]
@@ -355,11 +366,11 @@ class OFFGeometryNexus(OFFGeometry, Group):
         winding_order = np.array(
             [index for new_face in new_faces for index in new_face]
         )
-        self.set_field_value("winding_order", winding_order, "int")
+        self.set_field_value(WINDING_ORDER, winding_order, "int")
         faces_length = [0]
         faces_length.extend([len(new_face) for new_face in new_faces[:-1]])
         faces_start_indices = np.cumsum(faces_length)
-        self.set_field_value("faces", faces_start_indices, "int")
+        self.set_field_value(FACES, faces_start_indices, "int")
 
     def record_vertices(self, new_vertices: List[QVector3D]):
         """

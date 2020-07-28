@@ -27,6 +27,12 @@ from nexus_constructor.model.stream import (
     HS00Stream,
     TDCTStream,
     WriterModules,
+    ADC_PULSE_DEBUG,
+    CHUNK_CHUNK_KB,
+    CHUNK_CHUNK_MB,
+    INDEX_EVERY_KB,
+    INDEX_EVERY_MB,
+    STORE_LATEST_INTO,
 )
 
 F142_TYPES = [
@@ -44,13 +50,6 @@ F142_TYPES = [
 ]
 
 STRING_DTYPE = h5py.special_dtype(vlen=str)
-
-NEXUS_INDICES_INDEX_EVERY_MB = "nexus.indices.index_every_mb"
-NEXUS_INDICES_INDEX_EVERY_KB = "nexus.indices.index_every_kb"
-STORE_LATEST_INTO = "store_latest_into"
-NEXUS_CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
-NEXUS_CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
-ADC_PULSE_DEBUG = "adc_pulse_debug"
 
 
 def check_if_advanced_options_should_be_enabled(advanced_fields) -> bool:
@@ -181,16 +180,16 @@ class StreamFieldsWidget(QDialog):
         )
 
         self.ev42_index_every_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            NEXUS_INDICES_INDEX_EVERY_MB, self.ev42_advanced_group_box
+            INDEX_EVERY_MB, self.ev42_advanced_group_box
         )
         self.ev42_index_every_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            NEXUS_INDICES_INDEX_EVERY_KB, self.ev42_advanced_group_box
+            INDEX_EVERY_KB, self.ev42_advanced_group_box
         )
         self.ev42_chunk_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            NEXUS_CHUNK_CHUNK_MB, self.ev42_advanced_group_box
+            CHUNK_CHUNK_MB, self.ev42_advanced_group_box
         )
         self.ev42_chunk_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            NEXUS_CHUNK_CHUNK_KB, self.ev42_advanced_group_box
+            CHUNK_CHUNK_KB, self.ev42_advanced_group_box
         )
 
     def create_label_and_spinbox_for_advanced_option(
@@ -219,10 +218,10 @@ class StreamFieldsWidget(QDialog):
         self.f142_advanced_group_box.setLayout(QFormLayout())
 
         self.f142_index_every_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            NEXUS_INDICES_INDEX_EVERY_MB, self.f142_advanced_group_box
+            INDEX_EVERY_MB, self.f142_advanced_group_box
         )
         self.f142_index_every_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            NEXUS_INDICES_INDEX_EVERY_KB, self.f142_advanced_group_box
+            INDEX_EVERY_KB, self.f142_advanced_group_box
         )
         self.f142_store_latest_into_spinner = self.create_label_and_spinbox_for_advanced_option(
             STORE_LATEST_INTO, self.f142_advanced_group_box

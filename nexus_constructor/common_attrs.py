@@ -12,7 +12,6 @@ class CommonAttrs:
     UNITS = "units"
     VERTICES = "vertices"
     NC_STREAM = "NCstream"
-    VALUE = "value"
 
 
 class CommonKeys:

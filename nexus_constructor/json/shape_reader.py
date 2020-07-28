@@ -3,7 +3,7 @@ from typing import List, Union, Any
 import numpy as np
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
     _find_attribute_from_list_or_dict,
@@ -14,7 +14,18 @@ from nexus_constructor.model.component import (
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
 )
-from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
+from nexus_constructor.model.geometry import (
+    OFFGeometryNexus,
+    CylindricalGeometry,
+    FACES,
+    VERTICES,
+    WINDING_ORDER,
+    CYLINDERS,
+    DETECTOR_NUMBER,
+    Z_PIXEL_OFFSET,
+    X_PIXEL_OFFSET,
+    Y_PIXEL_OFFSET,
+)
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     METRES,
@@ -24,14 +35,6 @@ from nexus_constructor.unit_utils import (
 
 INT_TYPE = ["int"]
 FLOAT_TYPES = ["double", "float"]
-WINDING_ORDER = "winding_order"
-FACES = "faces"
-VERTICES = "vertices"
-CYLINDERS = "cylinders"
-DETECTOR_NUMBER = "detector_number"
-X_PIXEL_OFFSET = "x_pixel_offset"
-Y_PIXEL_OFFSET = "y_pixel_offset"
-Z_PIXEL_OFFSET = "z_pixel_offset"
 
 
 def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
@@ -58,7 +61,7 @@ class ShapeReader:
         :return: The shape type i attribute if it could be found, otherwise an empty string is returned.
         """
         try:
-            return _find_nx_class(self.shape_info["attributes"])
+            return _find_nx_class(self.shape_info[CommonKeys.ATTRIBUTES])
         except KeyError:
             return ""
 
@@ -167,9 +170,9 @@ class ShapeReader:
         off_geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         off_geometry.vertices = vertices
         off_geometry.units = units
-        off_geometry.set_field_value("faces", faces_starting_indices, faces_dtype)
+        off_geometry.set_field_value(FACES, faces_starting_indices, faces_dtype)
         off_geometry.set_field_value(
-            "winding_order", np.array(winding_order), winding_order_dtype
+            WINDING_ORDER, np.array(winding_order), winding_order_dtype
         )
         return off_geometry
 
@@ -248,7 +251,7 @@ class ShapeReader:
         :return: The dataset if it could be found, otherwise None is returned.
         """
         for attribute in children:
-            if attribute["name"] == attribute_name:
+            if attribute[CommonKeys.NAME] == attribute_name:
                 return attribute
         if warning:
             self.warnings.append(
@@ -268,7 +271,7 @@ class ShapeReader:
         try:
             if not any(
                 [
-                    expected_type in dataset["dataset"]["type"]
+                    expected_type in dataset[CommonKeys.DATASET][CommonKeys.TYPE]
                     for expected_type in expected_types
                 ]
             ):
@@ -277,7 +280,7 @@ class ShapeReader:
                     f"{expected_types}."
                 )
             else:
-                return dataset["dataset"]["type"]
+                return dataset[CommonKeys.DATASET][CommonKeys.TYPE]
         except KeyError:
             self.warnings.append(
                 f"{self.issue_message} Unable to find type attribute for {parent_name}."
@@ -290,14 +293,14 @@ class ShapeReader:
         :return: Th units value if it was found and passed validation, otherwise None is returned.
         """
         try:
-            attributes_list = vertices_dataset["attributes"]
+            attributes_list = vertices_dataset[CommonKeys.ATTRIBUTES]
         except KeyError:
             self.warnings.append(
                 f"{self.error_message} Unable to find attributes list in vertices dataset."
             )
             return
 
-        units = _find_attribute_from_list_or_dict("units", attributes_list)
+        units = _find_attribute_from_list_or_dict(CommonAttrs.UNITS, attributes_list)
         if not units:
             self.warnings.append(
                 f"{self.error_message} Unable to find units attribute in vertices dataset."
@@ -366,7 +369,7 @@ class ShapeReader:
         """
         try:
             array = np.array(values)
-            size = data_properties["dataset"]["size"]
+            size = data_properties[CommonKeys.DATASET][CommonKeys.SIZE]
             for i in range(len(size)):
                 if size[i] != array.shape[i]:
                     self.warnings.append(
@@ -395,7 +398,7 @@ class ShapeReader:
         :return: The values attribute if it could be found, otherwise None is returned.
         """
         try:
-            return dataset["values"]
+            return dataset[CommonKeys.VALUES]
         except KeyError:
             self.warnings.append(
                 f"{self.error_message} Unable to find values in {parent_name} dataset."
@@ -424,7 +427,7 @@ class ShapeReader:
         :return: The children list if it could be found, otherwise None is returned.
         """
         try:
-            return self.shape_info["children"]
+            return self.shape_info[CommonKeys.CHILDREN]
         except KeyError:
             self.warnings.append(
                 f"{self.error_message} Unable to find children list in shape group."
@@ -438,7 +441,7 @@ class ShapeReader:
         :return: The name if it could be found, otherwise 'shape' is returned.
         """
         try:
-            return self.shape_info["name"]
+            return self.shape_info[CommonKeys.NAME]
         except KeyError:
             self.warnings.append(
                 f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
@@ -477,7 +480,9 @@ class ShapeReader:
         Attempts to find and write pixel information to the component.
         :param children: The JSON children list for the component.
         """
-        shape_has_pixel_grid = self.shape_info["name"] == PIXEL_SHAPE_GROUP_NAME
+        shape_has_pixel_grid = (
+            self.shape_info[CommonKeys.NAME] == PIXEL_SHAPE_GROUP_NAME
+        )
 
         detector_number_dataset = self._get_shape_dataset_from_list(
             DETECTOR_NUMBER, children, shape_has_pixel_grid

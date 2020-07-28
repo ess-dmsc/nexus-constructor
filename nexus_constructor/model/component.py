@@ -15,6 +15,11 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     NoShapeGeometry,
     OFFGeometry,
+    CYLINDERS,
+    X_PIXEL_OFFSET,
+    Y_PIXEL_OFFSET,
+    DETECTOR_NUMBER,
+    Z_PIXEL_OFFSET,
 )
 from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
 from nexus_constructor.model.helpers import _generate_incremental_name
@@ -92,7 +97,9 @@ class Component(Group):
 
     @description.setter
     def description(self, new_description: str):
-        self.set_field_value(CommonAttrs.DESCRIPTION, new_description, ValueTypes.STRING)
+        self.set_field_value(
+            CommonAttrs.DESCRIPTION, new_description, ValueTypes.STRING
+        )
 
     @property
     def qtransform(self) -> QTransform:
@@ -321,7 +328,7 @@ class Component(Group):
         geometry.set_field_value(CommonAttrs.VERTICES, vertices, "int")
 
         # # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
-        geometry.set_field_value("cylinders", np.array([0, 1, 2]), "int")
+        geometry.set_field_value(CYLINDERS, np.array([0, 1, 2]), "int")
         geometry[CommonAttrs.VERTICES].attributes.set_attribute_value(
             CommonAttrs.UNITS, units
         )
@@ -347,16 +354,16 @@ class Component(Group):
         :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
         """
         self.set_field_value(
-            "x_pixel_offset", get_x_offsets_from_pixel_grid(pixel_grid), "float64"
+            X_PIXEL_OFFSET, get_x_offsets_from_pixel_grid(pixel_grid), "float64"
         )
         self.set_field_value(
-            "y_pixel_offset", get_y_offsets_from_pixel_grid(pixel_grid), "float64"
+            Y_PIXEL_OFFSET, get_y_offsets_from_pixel_grid(pixel_grid), "float64"
         )
         self.set_field_value(
-            "z_pixel_offset", get_z_offsets_from_pixel_grid(pixel_grid), "float64"
+            X_PIXEL_OFFSET, get_z_offsets_from_pixel_grid(pixel_grid), "float64"
         )
         self.set_field_value(
-            "detector_number", get_detector_ids_from_pixel_grid(pixel_grid), "int64"
+            DETECTOR_NUMBER, get_detector_ids_from_pixel_grid(pixel_grid), "int64"
         )
 
     def record_pixel_mapping(self, pixel_mapping: PixelMapping):
@@ -365,7 +372,7 @@ class Component(Group):
         :param pixel_mapping: The PixelMapping created from the input provided to the Add/Edit Component Window.
         """
         self.set_field_value(
-            "detector_number",
+            DETECTOR_NUMBER,
             get_detector_number_from_pixel_mapping(pixel_mapping),
             "int64",
         )
@@ -377,15 +384,15 @@ class Component(Group):
         Construct a transformation (as a QVector3D) for each pixel offset
         """
         try:
-            x_offsets = self.get_field_value("x_pixel_offset")
-            y_offsets = self.get_field_value("y_pixel_offset")
+            x_offsets = self.get_field_value(X_PIXEL_OFFSET)
+            y_offsets = self.get_field_value(Y_PIXEL_OFFSET)
         except AttributeError:
             logging.info(
                 "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
             )
             return
         try:
-            z_offsets = self.get_field_value("z_pixel_offset")
+            z_offsets = self.get_field_value(Z_PIXEL_OFFSET)
         except AttributeError:
             z_offsets = np.zeros_like(x_offsets)
         # offsets datasets can be 2D to match dimensionality of detector, so flatten to 1D
@@ -405,7 +412,9 @@ class Component(Group):
                 {
                     CommonKeys.TYPE: NodeType.GROUP,
                     CommonKeys.NAME: TRANSFORMS_GROUP_NAME,  # this works
-                    CommonKeys.CHILDREN: [transform.as_dict() for transform in self.transforms],
+                    CommonKeys.CHILDREN: [
+                        transform.as_dict() for transform in self.transforms
+                    ],
                 }
             )
         try:

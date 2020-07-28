@@ -11,7 +11,10 @@ class Attributes(list):
     """Abstract class used for common functionality between a group and dataset. """
 
     def set_attribute_value(
-        self, attribute_name: str, attribute_value: Any, attribute_type: str = ValueTypes.STRING
+        self,
+        attribute_name: str,
+        attribute_value: Any,
+        attribute_type: str = ValueTypes.STRING,
     ):
         _set_item(
             self,
@@ -32,7 +35,9 @@ class Attributes(list):
     def as_dict(self):
         return_dict = {}
         if self:
-            return_dict[CommonKeys.ATTRIBUTES] = [attribute.as_dict() for attribute in self]
+            return_dict[CommonKeys.ATTRIBUTES] = [
+                attribute.as_dict() for attribute in self
+            ]
         return return_dict
 
 
@@ -60,4 +65,8 @@ class FieldAttribute:
         values = self.values
         if isinstance(values, np.ndarray):
             values = values.tolist()
-        return {CommonKeys.NAME: self.name, CommonKeys.TYPE: self.type, CommonKeys.VALUES: values}
+        return {
+            CommonKeys.NAME: self.name,
+            CommonKeys.TYPE: self.type,
+            CommonKeys.VALUES: values,
+        }

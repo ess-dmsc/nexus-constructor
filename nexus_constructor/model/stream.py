@@ -6,10 +6,16 @@ import attr
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.group import Group
 
-
+CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
+CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
+INDEX_EVERY_KB = "nexus.indices.index_every_kb"
+INDEX_EVERY_MB = "nexus.indices.index_every_mb"
+ADC_PULSE_DEBUG = "adc_pulse_debug"
+STORE_LATEST_INTO = "store_latest_into"
 WRITER_MODULE = "writer_module"
 SOURCE = "source"
 TOPIC = "topic"
+
 
 class WriterModules(Enum):
     F142 = "f142"
@@ -64,9 +70,9 @@ class TDCTStream:
         return {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
             },
         }
 
@@ -86,18 +92,14 @@ class EV42Stream:
         return {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
-                "adc_pulse_debug": self.adc_pulse_debug if not None else {},
-                "nexus.indices.index_every_mb": self.nexus_indices_index_every_mb
-                if not None
-                else {},
-                "nexus.indices.index_every_kb": self.nexus_indices_index_every_kb
-                if not None
-                else {},
-                "nexus.chunk.chunk_mb": self.nexus_chunk_chunk_mb if not None else {},
-                "nexus.chunk.chunk_kb": self.nexus_chunk_chunk_kb if not None else {},
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
+                ADC_PULSE_DEBUG: self.adc_pulse_debug if not None else {},
+                INDEX_EVERY_MB: self.nexus_indices_index_every_mb if not None else {},
+                INDEX_EVERY_KB: self.nexus_indices_index_every_kb if not None else {},
+                CHUNK_CHUNK_MB: self.nexus_chunk_chunk_mb if not None else {},
+                CHUNK_CHUNK_KB: self.nexus_chunk_chunk_kb if not None else {},
             },
         }
 
@@ -118,19 +120,15 @@ class F142Stream:
         return {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
                 "value_units": self.value_units,
-                "type": self.type if not None else {},
+                CommonKeys.TYPE: self.type if not None else {},
                 "array_size": self.array_size if not None else {},
-                "nexus.indices.index_every_mb": self.nexus_indices_index_every_mb
-                if not None
-                else {},
-                "nexus.indices.index_every_kb": self.nexus_indices_index_every_kb
-                if not None
-                else {},
-                "store_latest_into": self.store_latest_into if not None else {},
+                INDEX_EVERY_MB: self.nexus_indices_index_every_mb if not None else {},
+                INDEX_EVERY_KB: self.nexus_indices_index_every_kb if not None else {},
+                STORE_LATEST_INTO: self.store_latest_into if not None else {},
             },
         }
 
@@ -154,9 +152,9 @@ class HS00Stream:
         return {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
                 "data_type": self.data_type,
                 "error_type": self.error_type,
                 "edge_type": self.edge_type,

@@ -3,6 +3,8 @@ from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 from typing import Dict, Any
 
+INSTRUMENT_NAME = "instrument"
+
 
 class Entry(Group):
     def __init__(self):
@@ -11,11 +13,11 @@ class Entry(Group):
 
     @property
     def instrument(self) -> Instrument:
-        return self["instrument"]
+        return self[INSTRUMENT_NAME]
 
     @instrument.setter
     def instrument(self, instrument: Instrument):
-        self["instrument"] = instrument
+        self[INSTRUMENT_NAME] = instrument
         instrument.parent_node = self
 
     def as_dict(self) -> Dict[str, Any]:
