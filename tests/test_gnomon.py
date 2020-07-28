@@ -1,7 +1,7 @@
 from PySide2.QtGui import QMatrix4x4, QVector3D, QColor, QFont, QVector4D
 from mock import Mock
 
-from nexus_constructor.spacialview.gnomon import Gnomon
+from nexus_constructor.instrument_view.gnomon import Gnomon
 
 
 def test_GIVEN_cylinder_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_properties_set():

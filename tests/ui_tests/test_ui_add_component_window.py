@@ -23,7 +23,7 @@ from nexus_constructor.model.geometry import (
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
-from nexus_constructor.spacialview.instrument_view import InstrumentView
+from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup, F142Stream

@@ -3,7 +3,7 @@ import struct
 from PySide2.Qt3DRender import Qt3DRender
 from mock import Mock
 
-from nexus_constructor.spacialview.instrument_view_axes import InstrumentViewAxes
+from nexus_constructor.instrument_view.instrument_view_axes import InstrumentViewAxes
 
 
 def test_GIVEN_int_list_WHEN_calling_create_data_array_THEN_original_list_can_be_recovered_by_unpacking_byte_array():

@@ -9,7 +9,7 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.spacialview.instrument_view import InstrumentView
+from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.treeview_utils import (
     create_and_add_toolbar_action,
     add_transformation,

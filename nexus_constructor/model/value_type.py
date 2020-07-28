@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 
 
-class ValueTypes:
+class ValueTypes(Enum):
     BYTE = "Byte"
     UBYTE = "UByte"
     SHORT = "Short"
@@ -18,18 +18,19 @@ class ValueTypes:
 
 
 # Allowed types for dataset and attribute values
-class VALUE_TYPE_TO_NP(Enum):
-    ValueTypes.BYTE = (np.byte,)
-    ValueTypes.UBYTE = (np.ubyte,)
-    ValueTypes.SHORT = (np.short,)
-    ValueTypes.USHORT = (np.ushort,)
-    ValueTypes.INT = (np.intc,)
-    ValueTypes.UINT = (np.uintc,)
-    ValueTypes.LONG = (np.int_,)
-    ValueTypes.ULONG = (np.uint,)
-    ValueTypes.FLOAT = (np.single,)
-    ValueTypes.DOUBLE = (np.double,)
-    ValueTypes.STRING = str
+VALUE_TYPE_TO_NP = {
+    ValueTypes.BYTE: np.byte,
+    ValueTypes.UBYTE: np.ubyte,
+    ValueTypes.SHORT: np.short,
+    ValueTypes.USHORT: np.ushort,
+    ValueTypes.INT: np.intc,
+    ValueTypes.UINT: np.uintc,
+    ValueTypes.LONG: np.int_,
+    ValueTypes.ULONG: np.uint,
+    ValueTypes.FLOAT: np.single,
+    ValueTypes.DOUBLE: np.double,
+    ValueTypes.STRING: str,
+}
 
 
 # For use in type hints
