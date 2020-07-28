@@ -1,5 +1,6 @@
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.node import _get_item, _remove_item, _set_item, Node
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.helpers import _get_item, _remove_item, _set_item
 
 
 def test_get_item_returns_correct_component_when_given_component_is_in_list():
@@ -77,14 +78,14 @@ def test_set_item_with_existing_component_in_overwrites_if_name_is_same():
 
 def test_get_absolute_path_works_with_no_parent():
     name = "test"
-    node = Node(name=name, parent_node=None)
+    node = Group(name=name, parent_node=None)
 
     assert node.absolute_path == f"/{name}"
 
 
 def test_get_absolute_path_works_if_component_with_parents():
     name1 = "thing1"
-    node1 = Node(name=name1, parent_node=None)
+    node1 = Group(name=name1, parent_node=None)
     name2 = "thing2"
-    node2 = Node(name=name2, parent_node=node1)
+    node2 = Group(name=name2, parent_node=node1)
     assert node2.absolute_path == f"/{name1}/{name2}"

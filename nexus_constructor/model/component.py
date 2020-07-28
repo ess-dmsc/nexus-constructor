@@ -17,7 +17,7 @@ from nexus_constructor.model.geometry import (
     OFFGeometry,
 )
 from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
-from nexus_constructor.model.node import _generate_incremental_name
+from nexus_constructor.model.helpers import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
@@ -91,7 +91,7 @@ class Component(Group):
 
     @description.setter
     def description(self, new_description: str):
-        self.set_field_value(CommonAttrs.DESCRIPTION, new_description)
+        self.set_field_value(CommonAttrs.DESCRIPTION, new_description, "String")
 
     @property
     def qtransform(self) -> QTransform:
@@ -168,7 +168,7 @@ class Component(Group):
         vector: QVector3D,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset("", None, []),
+        values: Dataset = Dataset(name="", values=0, type="Double", size="1"),
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
@@ -194,7 +194,7 @@ class Component(Group):
         angle: float,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset("", None, []),
+        values: Dataset = Dataset(name="", values=0, type="Double", size="1"),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -227,14 +227,17 @@ class Component(Group):
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
         transform = Transformation(
-            name=name, dataset=None, parent_node=self.get_transforms_group()
+            name=name,
+            parent_node=self.get_transforms_group(),
+            type=values.type,
+            size=values.size,
+            values=values,
         )
-        transform.type = transformation_type
+        transform.transform_type = transformation_type
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
-        transform.values = values
         transform._parent_component = self
 
         self.get_transforms_group()[name] = transform
@@ -314,11 +317,13 @@ class Component(Group):
         vertices = CylindricalGeometry.calculate_vertices(
             axis_direction, height, radius
         )
-        geometry.set_field_value(CommonAttrs.VERTICES, vertices)
+        geometry.set_field_value(CommonAttrs.VERTICES, vertices, "int")
 
         # # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
-        geometry.set_field_value("cylinders", np.array([0, 1, 2]))
-        geometry[CommonAttrs.VERTICES].set_attribute_value(CommonAttrs.UNITS, units)
+        geometry.set_field_value("cylinders", np.array([0, 1, 2]), "int")
+        geometry[CommonAttrs.VERTICES].attributes.set_attribute_value(
+            CommonAttrs.UNITS, units
+        )
 
         if isinstance(pixel_data, PixelMapping):
             geometry.detector_number = get_detector_number_from_pixel_mapping(

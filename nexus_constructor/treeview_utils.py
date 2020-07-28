@@ -200,12 +200,16 @@ def get_link_transformation_frame(frame, model: Model, value):
 
 
 def get_transformation_frame(frame, model: Model, value):
-    if value.type == TransformationType.TRANSLATION:
+    if value.transform_type == TransformationType.TRANSLATION:
         frame.transformation_frame = EditTranslation(frame, value, model)
-    elif value.type == TransformationType.ROTATION:
+    elif value.transform_type == TransformationType.ROTATION:
         frame.transformation_frame = EditRotation(frame, value, model)
     else:
-        raise (RuntimeError('Transformation type "{}" is unknown.'.format(value.type)))
+        raise (
+            RuntimeError(
+                'Transformation type "{}" is unknown.'.format(value.transform_type)
+            )
+        )
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 

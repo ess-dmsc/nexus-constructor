@@ -1,17 +1,18 @@
-from typing import List, Any, Union, Dict
+from typing import Any, Union, Dict
 import attr
 import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.model.attribute import FieldAttribute
-from nexus_constructor.model.dataset import DatasetMetadata, Dataset
-from nexus_constructor.model.link import Link
-from nexus_constructor.model.node import (
-    Node,
+from nexus_constructor.model.attributes import Attributes
+from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.helpers import (
+    get_absolute_path,
     _get_item,
     _set_item,
     _remove_item,
 )
+from nexus_constructor.model.link import Link
+
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
@@ -20,14 +21,15 @@ CHILD_EXCLUDELIST = [TRANSFORMS_GROUP_NAME]
 
 
 @attr.s
-class Group(Node):
+class Group:
     """
     Base class for any group which has a set of children and an nx_class attribute.
     """
 
+    name = attr.ib(type=str)
+    parent_node = attr.ib(type="Node", default=None)
     children = attr.ib(factory=list, init=False)
-    type = attr.ib(type=str, default="group", init=False)
-    attributes = attr.ib(type=List[FieldAttribute], factory=list, init=False)
+    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
 
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
@@ -49,27 +51,32 @@ class Group(Node):
         _remove_item(self.children, key)
 
     @property
+    def absolute_path(self):
+        return get_absolute_path(self)
+
+    @property
     def nx_class(self):
-        return self.get_attribute_value(CommonAttrs.NX_CLASS)
+        return self.attributes.get_attribute_value(CommonAttrs.NX_CLASS)
 
     @nx_class.setter
     def nx_class(self, new_nx_class: str):
-        self.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
+        self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
-    def set_field_value(self, name: str, value: Any, dtype: str = None):
+    def set_field_value(self, name: str, value: Any, dtype: str):
         size = [1]
         if isinstance(value, (np.ndarray, np.generic)):
             size = value.size
-        self[name] = Dataset(
-            name=name, dataset=DatasetMetadata(size=size, type=dtype), values=value
-        )
+        self[name] = Dataset(name=name, size=size, type=dtype, values=value)
 
     def get_field_value(self, name: str):
         return self[name].values
 
     def as_dict(self) -> Dict[str, Any]:
-        return_dict = super().as_dict()
-        return_dict["type"] = self.type
+        return_dict = {}
+        return_dict["name"] = self.name
+        if self.attributes:
+            return_dict["attributes"] = self.attributes.as_dict()
+        return_dict["type"] = "group"
         return_dict["children"] = (
             [
                 child.as_dict()

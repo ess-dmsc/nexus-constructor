@@ -30,16 +30,16 @@ class Transformation(Dataset):
         return [] if self._parent_component is None else [self._parent_component]
 
     @property
-    def type(self) -> str:
-        return self.get_attribute_value(CommonAttrs.TRANSFORMATION_TYPE)
+    def transform_type(self) -> str:
+        return self.attributes.get_attribute_value(CommonAttrs.TRANSFORMATION_TYPE)
 
-    @type.setter
-    def type(self, new_type):
-        self.set_attribute_value(CommonAttrs.TRANSFORMATION_TYPE, new_type)
+    @transform_type.setter
+    def transform_type(self, new_type):
+        self.attributes.set_attribute_value(CommonAttrs.TRANSFORMATION_TYPE, new_type)
 
     @property
     def vector(self) -> QVector3D:
-        vector = self.get_attribute_value(CommonAttrs.VECTOR)
+        vector = self.attributes.get_attribute_value(CommonAttrs.VECTOR)
         return (
             QVector3D(vector[0], vector[1], vector[2]) if vector is not None else None
         )
@@ -47,19 +47,19 @@ class Transformation(Dataset):
     @vector.setter
     def vector(self, new_vector: QVector3D):
         vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
-        self.set_attribute_value(CommonAttrs.VECTOR, vector_as_np_array)
+        self.attributes.set_attribute_value(CommonAttrs.VECTOR, vector_as_np_array)
 
     @property
     def ui_value(self) -> float:
         try:
-            if isinstance(self.dataset, Dataset):
-                if np.isscalar(self.dataset.values):
-                    self.ui_value = float(self.dataset.values)
-                    return float(self.dataset.values)
+            if isinstance(self.values, Dataset):
+                if np.isscalar(self.values.values):
+                    self.ui_value = float(self.values.values)
+                    return float(self.values.values)
                 else:
-                    self.ui_value = float(self.dataset.values[0])
-                    return float(self.dataset.values[0])
-        except ValueError:
+                    self.ui_value = float(self.values.values[0])
+                    return float(self.values.values[0])
+        except (ValueError, TypeError):
             pass
 
         if self._ui_value is None:
@@ -86,26 +86,28 @@ class Transformation(Dataset):
         Get a Qt3DCore.QTransform describing the transformation
         """
         transform = Qt3DCore.QTransform()
-        if self.type == TransformationType.ROTATION:
+        if self.transform_type == TransformationType.ROTATION:
             quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
             transform.setRotation(quaternion)
-        elif self.type == TransformationType.TRANSLATION:
+        elif self.transform_type == TransformationType.TRANSLATION:
             transform.setTranslation(self.vector.normalized() * self.ui_value)
         else:
-            raise (RuntimeError(f'Unknown transformation of type "{self.type}".'))
+            raise (
+                RuntimeError(f'Unknown transformation of type "{self.transform_type}".')
+            )
         return transform.matrix()
 
     @property
     def units(self):
-        return self.get_attribute_value(CommonAttrs.UNITS)
+        return self.attributes.get_attribute_value(CommonAttrs.UNITS)
 
     @units.setter
     def units(self, new_units):
-        self.set_attribute_value(CommonAttrs.UNITS, new_units)
+        self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
 
     @property
     def depends_on(self) -> "Transformation":
-        return self.get_attribute_value(CommonAttrs.DEPENDS_ON)
+        return self.attributes.get_attribute_value(CommonAttrs.DEPENDS_ON)
 
     @depends_on.setter
     def depends_on(self, new_depends_on: "Transformation"):
@@ -115,7 +117,7 @@ class Transformation(Dataset):
                 self.depends_on.deregister_dependent(self)
         except AttributeError:
             pass
-        self.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
+        self.attributes.set_attribute_value(CommonAttrs.DEPENDS_ON, new_depends_on)
         if new_depends_on is not None:
             new_depends_on.register_dependent(self)
 
@@ -153,7 +155,7 @@ class Transformation(Dataset):
     def as_dict(self) -> Dict[str, Any]:
         return_dict = {
             "name": self.name,
-            "type": self.type,
+            "type": "dataset",
             "attributes": [
                 attribute.as_dict()
                 for attribute in self.attributes

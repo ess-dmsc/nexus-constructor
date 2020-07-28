@@ -6,7 +6,7 @@ from nexus_constructor.component_tree_model import (
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
@@ -25,9 +25,8 @@ def _add_component_to_file(
     component = Component(component_name)
     component.set_field_value(
         field_name,
-        Dataset(
-            name=field_name, dataset=DatasetMetadata(type="Double"), values=field_value
-        ),
+        Dataset(name=field_name, type="Double", size="[1]", values=field_value),
+        dtype="Double",
     )
 
     return component

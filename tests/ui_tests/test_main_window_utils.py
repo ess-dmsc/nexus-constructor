@@ -5,7 +5,6 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QFrame, QVBoxLayout
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.model.dataset import DatasetMetadata
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
@@ -579,7 +578,7 @@ def test_GIVEN_translation_is_added_WHEN_adding_transformation_THEN_translation_
     sample_component = sample_component_index.internalPointer()
 
     assert len(sample_component.transforms) == 1
-    assert sample_component.transforms[0].type == "Translation"
+    assert sample_component.transforms[0].transform_type == "Translation"
 
 
 def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_added_to_component(
@@ -593,7 +592,7 @@ def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_add
     sample_component = sample_component_index.internalPointer()
 
     assert len(sample_component.transforms) == 1
-    assert sample_component.transforms[0].type == "Rotation"
+    assert sample_component.transforms[0].transform_type == "Rotation"
 
 
 def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raises_value_error(
@@ -608,10 +607,8 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
 
 
 def create_transformation(trans_type: TransformationType):
-    t = Transformation(
-        name="transformation", dataset=DatasetMetadata(type="Double"), values=8
-    )
-    t.type = trans_type
+    t = Transformation(name="transformation", type="Double", size=[1], values=8)
+    t.transform_type = trans_type
     t.vector = QVector3D(1, 0, 0)
     return t
 

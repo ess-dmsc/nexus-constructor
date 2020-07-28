@@ -4,7 +4,7 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.value_type import VALUE_TYPE
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.json.load_from_json_utils import (
@@ -43,9 +43,7 @@ def _create_transformation_dataset(
     :param name: The transformation name.
     :return: A dataset containing the above information.
     """
-    return Dataset(
-        name, dataset=DatasetMetadata(size=[1], type=dtype), values=angle_or_magnitude,
-    )
+    return Dataset(name, size=[1], type=dtype, values=angle_or_magnitude,)
 
 
 class TransformationReader:

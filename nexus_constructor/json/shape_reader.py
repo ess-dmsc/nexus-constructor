@@ -233,7 +233,7 @@ class ShapeReader:
         cylindrical_geometry.set_field_value(
             CommonAttrs.VERTICES, np.vstack(vertices), vertices_dtype
         )
-        cylindrical_geometry[CommonAttrs.VERTICES].set_attribute_value(
+        cylindrical_geometry[CommonAttrs.VERTICES].attributes.set_attribute_value(
             CommonAttrs.UNITS, units
         )
         return cylindrical_geometry
