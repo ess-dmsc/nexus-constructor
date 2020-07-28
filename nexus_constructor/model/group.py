@@ -73,6 +73,7 @@ class Group:
 
     def as_dict(self) -> Dict[str, Any]:
         return_dict = {}
+        return_dict["name"] = self.name
         if self.attributes:
             return_dict["attributes"] = self.attributes.as_dict()
         return_dict["type"] = "group"

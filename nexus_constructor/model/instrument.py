@@ -8,7 +8,7 @@ INSTRUMENT_NAME = "instrument"
 
 class Instrument(Group):
     def __init__(self, parent_node=None):
-        super().__init__(INSTRUMENT_NAME, parent_node)
+        super().__init__(name=INSTRUMENT_NAME, parent_node=parent_node)
         self.nx_class = "NXinstrument"
 
         self.sample = Component(SAMPLE_NAME, parent_node=self)

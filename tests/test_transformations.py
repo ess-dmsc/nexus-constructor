@@ -28,13 +28,13 @@ def create_transform(
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
-    values=Dataset(name="", values=0, type="double", size=[1]),
+    values=Dataset(name="", values=None, type="double", size=[1]),
 ):
 
     translation = Transformation(
         name=name,
         parent_node=None,
-        values="test",
+        values=values,
         type="str",
         parent_component=None,
         size=[1],
@@ -43,7 +43,6 @@ def create_transform(
     translation.vector = vector
     translation.transform_type = type
     translation.ui_value = ui_value
-    translation.values = values
 
     return translation
 
