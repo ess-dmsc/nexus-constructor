@@ -6,7 +6,12 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D, QTransform
 from PySide2.QtWidgets import QListWidget
 
-from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
+from nexus_constructor.common_attrs import (
+    CommonAttrs,
+    CommonKeys,
+    NodeType,
+    TransformationType,
+)
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.dataset import Dataset
@@ -35,7 +40,6 @@ from nexus_constructor.pixel_data_to_nexus_utils import (
     PIXEL_FIELDS,
     get_detector_faces_from_pixel_mapping,
 )
-from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.ui_utils import show_warning_dialog
 
 

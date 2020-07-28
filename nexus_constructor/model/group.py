@@ -88,6 +88,6 @@ class Group:
 
 
 def name_not_in_excludelist(child: Any):
-    if hasattr(child, "name") and child.name in CHILD_EXCLUDELIST:
+    if hasattr(child, CommonKeys.NAME) and child.name in CHILD_EXCLUDELIST:
         return False
     return True

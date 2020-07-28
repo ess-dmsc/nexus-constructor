@@ -13,6 +13,7 @@ from nexus_constructor.model.component import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
+    SHAPE_GROUP_NAME,
 )
 from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
@@ -111,7 +112,7 @@ class ShapeReader:
             return
 
         winding_order_dataset = self._get_shape_dataset_from_list(
-            "winding_order", children
+            WINDING_ORDER, children
         )
         if not winding_order_dataset:
             return
@@ -446,7 +447,7 @@ class ShapeReader:
             self.warnings.append(
                 f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
             )
-            return "shape"
+            return SHAPE_GROUP_NAME
 
     def _find_and_validate_values_list(
         self, dataset: dict, expected_types: List[str], attribute_name: str

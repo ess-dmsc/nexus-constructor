@@ -2,11 +2,10 @@ from typing import Any, Union
 
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.common_attrs import CommonAttrs, CommonKeys
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, TransformationType
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
-from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
     _find_nx_class,

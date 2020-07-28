@@ -15,7 +15,7 @@ from nexus_constructor.treeview_utils import (
     add_transformation,
     get_transformation_frame,
 )
-from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.common_attrs import TransformationType
 
 
 @pytest.fixture

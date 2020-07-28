@@ -1,5 +1,6 @@
 from nexus_constructor.model.entry import Entry
-from nexus_constructor.model.instrument import Instrument, SAMPLE_NAME, INSTRUMENT_NAME
+from nexus_constructor.model.instrument import Instrument, SAMPLE_NAME
+from nexus_constructor.common_attrs import INSTRUMENT_NAME
 
 
 def test_entry_as_dict_contains_sample_and_instrument():

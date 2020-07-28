@@ -16,7 +16,7 @@ from nexus_constructor.treeview_utils import (
     expand_transformation_list,
     set_button_states,
 )
-from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.model.model import Model
 
 

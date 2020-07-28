@@ -11,7 +11,7 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.ui_utils import generate_unique_name
 
 

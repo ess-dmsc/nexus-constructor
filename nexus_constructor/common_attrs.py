@@ -33,3 +33,11 @@ class NodeType:
     DATASET = "dataset"
     GROUP = "group"
     LINK = "link"
+
+
+class TransformationType:
+    TRANSLATION = "Translation"
+    ROTATION = "Rotation"
+
+
+INSTRUMENT_NAME = "instrument"

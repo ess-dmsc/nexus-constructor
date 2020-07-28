@@ -1,9 +1,7 @@
-from nexus_constructor.common_attrs import CommonKeys
+from nexus_constructor.common_attrs import CommonKeys, INSTRUMENT_NAME
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 from typing import Dict, Any
-
-INSTRUMENT_NAME = "instrument"
 
 
 class Entry(Group):

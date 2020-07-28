@@ -6,6 +6,9 @@ import attr
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.group import Group
 
+
+ARRAY_SIZE = "array_size"
+VALUE_UNITS = "value_units"
 CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
 CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
 INDEX_EVERY_KB = "nexus.indices.index_every_kb"
@@ -123,9 +126,9 @@ class F142Stream:
                 WRITER_MODULE: self.writer_module,
                 SOURCE: self.source,
                 TOPIC: self.topic,
-                "value_units": self.value_units,
+                VALUE_UNITS: self.value_units,
                 CommonKeys.TYPE: self.type if not None else {},
-                "array_size": self.array_size if not None else {},
+                ARRAY_SIZE: self.array_size if not None else {},
                 INDEX_EVERY_MB: self.nexus_indices_index_every_mb if not None else {},
                 INDEX_EVERY_KB: self.nexus_indices_index_every_kb if not None else {},
                 STORE_LATEST_INTO: self.store_latest_into if not None else {},
@@ -134,6 +137,11 @@ class F142Stream:
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]
+
+DATA_TYPE = "data_type"
+ERROR_TYPE = "error_type"
+EDGE_TYPE = "edge_type"
+SHAPE = "shape"
 
 
 @attr.s
@@ -155,10 +163,10 @@ class HS00Stream:
                 WRITER_MODULE: self.writer_module,
                 SOURCE: self.source,
                 TOPIC: self.topic,
-                "data_type": self.data_type,
-                "error_type": self.error_type,
-                "edge_type": self.edge_type,
-                "shape": self.shape,
+                DATA_TYPE: self.data_type,
+                ERROR_TYPE: self.error_type,
+                EDGE_TYPE: self.edge_type,
+                SHAPE: self.shape,
             },
         }
 
