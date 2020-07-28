@@ -3,8 +3,13 @@ from typing import Union
 
 import attr
 
+from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.group import Group
 
+
+WRITER_MODULE = "writer_module"
+SOURCE = "source"
+TOPIC = "topic"
 
 class WriterModules(Enum):
     F142 = "f142"
@@ -23,11 +28,11 @@ class NS10Stream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
             },
         }
 
@@ -40,11 +45,11 @@ class SENVStream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
             },
         }
 
@@ -57,8 +62,8 @@ class TDCTStream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
                 "writer_module": self.writer_module,
                 "source": self.source,
                 "topic": self.topic,
@@ -79,8 +84,8 @@ class EV42Stream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
                 "writer_module": self.writer_module,
                 "source": self.source,
                 "topic": self.topic,
@@ -111,8 +116,8 @@ class F142Stream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
                 "writer_module": self.writer_module,
                 "source": self.source,
                 "topic": self.topic,
@@ -147,8 +152,8 @@ class HS00Stream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
                 "writer_module": self.writer_module,
                 "source": self.source,
                 "topic": self.topic,

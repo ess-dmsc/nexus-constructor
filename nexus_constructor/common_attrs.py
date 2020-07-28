@@ -13,3 +13,24 @@ class CommonAttrs:
     VERTICES = "vertices"
     NC_STREAM = "NCstream"
     VALUE = "value"
+
+
+class CommonKeys:
+    """
+    Commonly used key names in the outputted JSON.
+    """
+
+    NAME = "name"
+    VALUES = "values"
+    TYPE = "type"
+    SIZE = "size"
+    CHILDREN = "children"
+    ATTRIBUTES = "attributes"
+    DATASET = "dataset"
+
+
+class NodeType:
+    STREAM = "stream"
+    DATASET = "dataset"
+    GROUP = "group"
+    LINK = "link"

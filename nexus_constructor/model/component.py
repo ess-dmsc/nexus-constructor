@@ -6,7 +6,7 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QVector3D, QTransform
 from PySide2.QtWidgets import QListWidget
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.dataset import Dataset
@@ -19,6 +19,7 @@ from nexus_constructor.model.geometry import (
 from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
 from nexus_constructor.model.helpers import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import (
     get_detector_number_from_pixel_mapping,
@@ -91,7 +92,7 @@ class Component(Group):
 
     @description.setter
     def description(self, new_description: str):
-        self.set_field_value(CommonAttrs.DESCRIPTION, new_description, "String")
+        self.set_field_value(CommonAttrs.DESCRIPTION, new_description, ValueTypes.STRING)
 
     @property
     def qtransform(self) -> QTransform:
@@ -168,7 +169,7 @@ class Component(Group):
         vector: QVector3D,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0, type="Double", size="1"),
+        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE, size="1"),
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
@@ -194,7 +195,7 @@ class Component(Group):
         angle: float,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0, type="Double", size="1"),
+        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE, size="1"),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -400,20 +401,20 @@ class Component(Group):
 
         if self.transforms:
             # Add transformations in a child group
-            dictionary["children"].append(
+            dictionary[CommonKeys.CHILDREN].append(
                 {
-                    "type": "group",
-                    "name": TRANSFORMS_GROUP_NAME,  # this works
-                    "children": [transform.as_dict() for transform in self.transforms],
+                    CommonKeys.TYPE: NodeType.GROUP,
+                    CommonKeys.NAME: TRANSFORMS_GROUP_NAME,  # this works
+                    CommonKeys.CHILDREN: [transform.as_dict() for transform in self.transforms],
                 }
             )
         try:
             if self.depends_on is not None:
-                dictionary["children"].append(
+                dictionary[CommonKeys.CHILDREN].append(
                     {
-                        "name": CommonAttrs.DEPENDS_ON,
-                        "type": "String",
-                        "values": self.depends_on.absolute_path,
+                        CommonKeys.NAME: CommonAttrs.DEPENDS_ON,
+                        CommonKeys.TYPE: ValueTypes.STRING,
+                        CommonKeys.VALUES: self.depends_on.absolute_path,
                     }
                 )
         except AttributeError:

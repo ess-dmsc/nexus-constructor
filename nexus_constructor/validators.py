@@ -16,7 +16,7 @@ from nexus_constructor.unit_utils import (
     units_are_expected_dimensionality,
     units_have_magnitude_of_one,
 )
-from nexus_constructor.model.value_type import VALUE_TYPE
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 
@@ -322,7 +322,7 @@ class FieldValueValidator(QValidator):
             return self._emit_and_return(False)
         elif self.field_type_combo.currentText() == self.scalar:
             try:
-                VALUE_TYPE[self.dataset_type_combo.currentText()](input)
+                VALUE_TYPE_TO_NP[self.dataset_type_combo.currentText()](input)
             except ValueError:
                 return self._emit_and_return(False)
         return self._emit_and_return(True)

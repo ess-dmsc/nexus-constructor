@@ -11,7 +11,7 @@ from nexus_constructor.unit_utils import (
     units_are_expected_dimensionality,
     units_have_magnitude_of_one,
 )
-from nexus_constructor.validators import VALUE_TYPE
+from nexus_constructor.validators import VALUE_TYPE_TO_NP
 
 SLIT_EDGES_NAME = "slit_edges"
 SLITS_NAME = "slits"
@@ -28,8 +28,8 @@ EXPECTED_TYPE_ERROR_MSG = {
 }
 
 REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES_NAME, SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME}
-INT_TYPES = [key for key in VALUE_TYPE.keys() if "int" in str(VALUE_TYPE[key])]
-FLOAT_TYPES = [key for key in VALUE_TYPE.keys() if "float" in str(VALUE_TYPE[key])]
+INT_TYPES = [key for key in VALUE_TYPE_TO_NP.keys() if "int" in str(VALUE_TYPE_TO_NP[key])]
+FLOAT_TYPES = [key for key in VALUE_TYPE_TO_NP.keys() if "float" in str(VALUE_TYPE_TO_NP[key])]
 
 UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
 EXPECTED_UNIT_TYPE = {
@@ -285,7 +285,7 @@ class ChopperChecker:
         :return: True if the conversion was successful, False otherwise.
         """
         try:
-            self.converted_values[field] = VALUE_TYPE[self.fields_dict[field].dtype](
+            self.converted_values[field] = VALUE_TYPE_TO_NP[self.fields_dict[field].dtype](
                 self.fields_dict[field].value.values
             )
         except ValueError:

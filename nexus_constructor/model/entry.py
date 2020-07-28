@@ -1,3 +1,4 @@
+from nexus_constructor.common_attrs import CommonKeys
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 from typing import Dict, Any
@@ -22,7 +23,7 @@ class Entry(Group):
         # sample lives in instrument component list for purposes of GUI
         # but in the NeXus structure must live in the entry
         try:
-            dictionary["children"].append(self.instrument.sample.as_dict())
+            dictionary[CommonKeys.CHILDREN].append(self.instrument.sample.as_dict())
         except AttributeError:
             # If instrument is not set then don't try to add sample to dictionary
             pass

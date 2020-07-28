@@ -2,7 +2,7 @@ from typing import Any, Union, Dict
 import attr
 import numpy as np
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.helpers import (
@@ -73,11 +73,11 @@ class Group:
 
     def as_dict(self) -> Dict[str, Any]:
         return_dict = {}
-        return_dict["name"] = self.name
+        return_dict[CommonKeys.NAME] = self.name
         if self.attributes:
-            return_dict["attributes"] = self.attributes.as_dict()
-        return_dict["type"] = "group"
-        return_dict["children"] = (
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict()
+        return_dict[CommonKeys.TYPE] = NodeType.GROUP
+        return_dict[CommonKeys.CHILDREN] = (
             [
                 child.as_dict()
                 for child in self.children

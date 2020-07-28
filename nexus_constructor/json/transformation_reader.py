@@ -5,7 +5,7 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.value_type import VALUE_TYPE
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.transformation_types import TransformationType
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
@@ -131,7 +131,7 @@ class TransformationReader:
         :param dtype: The type value obtained from the JSON.
         :return: The corresponding type from the dictionary if it exists, otherwise an empty string is returned.
         """
-        for key in VALUE_TYPE.keys():
+        for key in VALUE_TYPE_TO_NP.keys():
             if dtype.lower() == key.lower():
                 return key
         self.warnings.append(
