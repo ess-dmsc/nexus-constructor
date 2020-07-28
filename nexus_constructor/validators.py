@@ -11,6 +11,7 @@ from PySide2.QtWidgets import QComboBox, QWidget, QRadioButton
 from nexusutils.readwriteoff import parse_off_file
 from stl import mesh
 
+from nexus_constructor.common_attrs import SCALAR
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_are_expected_dimensionality,
@@ -304,7 +305,7 @@ class FieldValueValidator(QValidator):
         self,
         field_type_combo: QComboBox,
         dataset_type_combo: QComboBox,
-        scalar_text: str = "Scalar",
+        scalar_text: str = SCALAR,
     ):
         super().__init__()
         self.field_type_combo = field_type_combo
@@ -320,11 +321,11 @@ class FieldValueValidator(QValidator):
         """
         if not input:  # More criteria here
             return self._emit_and_return(False)
-        elif self.field_type_combo.currentText() == self.scalar:
-            try:
-                VALUE_TYPE_TO_NP[self.dataset_type_combo.currentText()](input)
-            except ValueError:
-                return self._emit_and_return(False)
+        if self.field_type_combo.currentText() == self.scalar:
+            return_value = (
+                self.dataset_type_combo.currentText() in VALUE_TYPE_TO_NP.__members__
+            )
+            return self._emit_and_return(return_value)
         return self._emit_and_return(True)
 
     def _emit_and_return(self, valid: bool) -> QValidator.State:

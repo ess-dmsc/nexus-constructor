@@ -18,6 +18,7 @@ from PySide2.QtWidgets import (
 )
 import numpy as np
 
+from nexus_constructor.common_attrs import SCALAR, ARRAY
 from nexus_constructor.model.stream import (
     StreamGroup,
     F142Stream,
@@ -112,12 +113,12 @@ class StreamFieldsWidget(QDialog):
         self._set_up_f142_group_box()
         self._set_up_ev42_group_box()
 
-        self.scalar_radio = QRadioButton(text="Scalar")
+        self.scalar_radio = QRadioButton(text=SCALAR)
         self.scalar_radio.clicked.connect(partial(self._show_array_size, False))
         self.scalar_radio.setChecked(True)
         self.scalar_radio.clicked.emit()
 
-        self.array_radio = QRadioButton(text="Array")
+        self.array_radio = QRadioButton(text=ARRAY)
         self.array_radio.clicked.connect(partial(self._show_array_size, True))
 
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)

@@ -41,3 +41,5 @@ class TransformationType:
 
 
 INSTRUMENT_NAME = "instrument"
+ARRAY = "Array"
+SCALAR = "Scalar"

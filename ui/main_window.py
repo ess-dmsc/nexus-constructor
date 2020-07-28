@@ -10,7 +10,7 @@ from PySide2.QtWidgets import (
     QGridLayout,
     QLayout,
 )
-from nexus_constructor.instrument_view import InstrumentView
+from nexus_constructor.spacialview.instrument_view import InstrumentView
 from ui.treeview_tab import ComponentTreeViewTab
 
 

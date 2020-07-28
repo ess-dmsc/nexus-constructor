@@ -23,7 +23,7 @@ from nexus_constructor.model.geometry import (
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
-from nexus_constructor.instrument_view import InstrumentView
+from nexus_constructor.spacialview.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup, F142Stream
@@ -105,7 +105,7 @@ NO_PIXEL_OPTIONS_SUBSET = {
 
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
-FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(VALUE_TYPE_TO_NP.keys())}
+FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(VALUE_TYPE_TO_NP)}
 FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 

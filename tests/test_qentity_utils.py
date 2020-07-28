@@ -1,6 +1,6 @@
 from mock import Mock, call, patch
 
-from nexus_constructor.qentity_utils import create_material, create_qentity
+from nexus_constructor.spacialview.qentity_utils import create_material, create_qentity
 
 
 @patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())

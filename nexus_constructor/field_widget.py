@@ -114,7 +114,7 @@ class FieldWidget(QFrame):
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
         self.value_type_combo = QComboBox()
-        self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP.keys()))
+        self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit = QLineEdit()

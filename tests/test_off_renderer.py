@@ -1,4 +1,4 @@
-from nexus_constructor.off_renderer import (
+from nexus_constructor.spacialview.off_renderer import (
     QtOFFGeometry,
     create_vertex_buffer,
     create_normal_buffer,

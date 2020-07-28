@@ -3,6 +3,7 @@ import pytest
 from mock import Mock
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.model.stream import INDEX_EVERY_MB, ADC_PULSE_DEBUG
 from tests.test_utils import NX_CLASS_DEFINITIONS
 import h5py
 from PySide2.QtWidgets import QSpinBox
@@ -12,8 +13,6 @@ from nexus_constructor.model.entry import Instrument
 from nexus_constructor.stream_fields_widget import (
     check_if_advanced_options_should_be_enabled,
     StreamFieldsWidget,
-    ADC_PULSE_DEBUG,
-    NEXUS_INDICES_INDEX_EVERY_MB,
 )
 
 
@@ -245,7 +244,7 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
     group.create_dataset("type", dtype=vlen_str, data="byte")
     group.create_dataset("topic", dtype=vlen_str, data="topic1")
     group.create_dataset("source", dtype=vlen_str, data="source1")
-    group.create_dataset(NEXUS_INDICES_INDEX_EVERY_MB, dtype=int, data=1)
+    group.create_dataset(INDEX_EVERY_MB, dtype=int, data=1)
 
     wrapper = nexus_wrapper
     wrapper.load_file(file, file)
@@ -265,10 +264,7 @@ def test_GIVEN_stream_group_that_has_f142_advanced_option_WHEN_filling_in_existi
     assert generated_group["topic"][()] == group["topic"][()]
     assert generated_group["type"][()] == group["type"][()]
     assert generated_group["source"][()] == group["source"][()]
-    assert (
-        generated_group[NEXUS_INDICES_INDEX_EVERY_MB][()]
-        == group[NEXUS_INDICES_INDEX_EVERY_MB][()]
-    )
+    assert generated_group[INDEX_EVERY_MB][()] == group[INDEX_EVERY_MB][()]
 
 
 @pytest.mark.skip(reason="Disabled whilst working on model change")

@@ -4,9 +4,11 @@ from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
 
-from nexus_constructor.axis_colors import AxisColors
-from nexus_constructor.neutron_animation_controller import NeutronAnimationController
-from nexus_constructor.qentity_utils import create_material, create_qentity
+from nexus_constructor.spacialview.axis_colors import AxisColors
+from nexus_constructor.spacialview.neutron_animation_controller import (
+    NeutronAnimationController,
+)
+from nexus_constructor.spacialview.qentity_utils import create_material, create_qentity
 
 
 class Gnomon:

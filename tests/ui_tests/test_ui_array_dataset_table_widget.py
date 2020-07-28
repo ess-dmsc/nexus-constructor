@@ -47,8 +47,8 @@ def test_UI_GIVEN_data_has_different_shapes_WHEN_getting_array_from_component_TH
     )
 
 
-@pytest.mark.parametrize("orig_data_type", VALUE_TYPE_TO_NP.values())
-@pytest.mark.parametrize("new_data_type", VALUE_TYPE_TO_NP.values())
+@pytest.mark.parametrize("orig_data_type", [e.value for e in VALUE_TYPE_TO_NP])
+@pytest.mark.parametrize("new_data_type", [e.value for e in VALUE_TYPE_TO_NP])
 def test_UI_GIVEN_data_type_WHEN_changing_data_type_THEN_change_is_successful(
     array_dataset_table_widget, orig_data_type, new_data_type
 ):
