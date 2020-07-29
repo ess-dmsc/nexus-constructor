@@ -1,9 +1,7 @@
 from typing import Any
-
 import h5py
 from PySide2.QtGui import QVector3D
 from mock import Mock
-
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset

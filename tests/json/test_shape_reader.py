@@ -671,7 +671,7 @@ def test_GIVEN_x_y_offset_exists_but_fails_validation_WHEN_reading_pixel_data_TH
             off_shape_reader.error_message,
             offset_to_corrupt,
             "do not all have type(s)",
-            "float",
+            ValueTypes.FLOAT,
         ],
         off_shape_reader.warnings,
     )

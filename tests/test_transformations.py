@@ -37,7 +37,7 @@ def create_transform(
         name=name,
         parent_node=None,
         values=values,
-        type="str",
+        type=ValueTypes.STRING,
         parent_component=None,
         size=[1],
     )

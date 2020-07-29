@@ -31,7 +31,7 @@ from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from tests.test_utils import NX_CLASS_DEFINITIONS
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
@@ -1750,7 +1750,7 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
 
     field_name = "scalar"
     field_value = "test"
-    component.set_field_value(field_name, field_value, dtype="String")
+    component.set_field_value(field_name, field_value, dtype=ValueTypes.STRING)
 
     dialog = AddComponentDialog(
         model,
@@ -1794,7 +1794,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
 
     field_name = "array"
     field_value = np.array([1, 2, 3, 4, 5])
-    component.set_field_value(field_name, field_value, "int")
+    component.set_field_value(field_name, field_value, ValueTypes.INT)
     dialog = AddComponentDialog(
         model,
         treeview_model,
@@ -1855,11 +1855,11 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
 
     field_name1 = "array"
     field_value1 = np.array([1, 2, 3, 4, 5])
-    component.set_field_value(field_name1, field_value1, "int")
+    component.set_field_value(field_name1, field_value1, ValueTypes.INT)
 
     field_name2 = "scalar"
     field_value2 = 1
-    component.set_field_value(field_name2, field_value2, "int")
+    component.set_field_value(field_name2, field_value2, ValueTypes.INT)
 
     dialog = AddComponentDialog(
         model,

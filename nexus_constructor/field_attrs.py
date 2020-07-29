@@ -26,11 +26,11 @@ ATTRS_EXCLUDELIST = [CommonAttrs.UNITS]
 
 def _get_human_readable_type(new_value: Any):
     if isinstance(new_value, str):
-        return "String"
+        return ValueTypes.STRING
     elif isinstance(new_value, int):
-        return "Int"
+        return ValueTypes.INT
     elif isinstance(new_value, float):
-        return "Double"
+        return ValueTypes.DOUBLE
     else:
         return next(
             key for key, value in VALUE_TYPE_TO_NP.items() if value == new_value.dtype
