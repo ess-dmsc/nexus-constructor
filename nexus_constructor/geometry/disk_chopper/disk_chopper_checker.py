@@ -6,6 +6,7 @@ from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
+from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_are_expected_dimensionality,
@@ -21,23 +22,15 @@ NAME = "name"
 
 UNABLE = "Unable to create chopper geometry - "
 EXPECTED_TYPE_ERROR_MSG = {
-    SLIT_EDGES_NAME: "float",
-    SLITS_NAME: "int",
-    RADIUS_NAME: "float",
-    SLIT_HEIGHT_NAME: "float",
+    SLIT_EDGES_NAME: ValueTypes.FLOAT,
+    SLITS_NAME: ValueTypes.INT,
+    RADIUS_NAME: ValueTypes.FLOAT,
+    SLIT_HEIGHT_NAME: ValueTypes.FLOAT,
 }
 
 REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES_NAME, SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME}
-INT_TYPES = [
-    key
-    for key in [e.value for e in VALUE_TYPE_TO_NP]
-    if "int" in str(VALUE_TYPE_TO_NP[key])
-]
-FLOAT_TYPES = [
-    key
-    for key in [e.value for e in VALUE_TYPE_TO_NP]
-    if "float" in str(VALUE_TYPE_TO_NP[key])
-]
+INT_TYPES = [value for value in VALUE_TYPE_TO_NP.values() if "int" in str(value)]
+FLOAT_TYPES = [value for value in VALUE_TYPE_TO_NP.values() if "float" in str(value)]
 
 UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
 EXPECTED_UNIT_TYPE = {

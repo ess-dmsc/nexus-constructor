@@ -4,6 +4,7 @@ from typing import List
 
 import pytest
 
+from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import METRES
 from nexus_constructor.validators import (
     NameValidator,
@@ -161,7 +162,7 @@ def test_GIVEN_valid_string_value_WHEN_validating_field_value_THEN_returns_accep
     strvalue = "123a"
 
     field_type_combo = DummyCombo(FieldType.scalar_dataset.value)
-    dataset_type_combo = DummyCombo("String")
+    dataset_type_combo = DummyCombo(ValueTypes.STRING)
 
     validator = FieldValueValidator(
         field_type_combo, dataset_type_combo, FieldType.scalar_dataset.value
@@ -176,7 +177,7 @@ def test_GIVEN_invalid_float_value_WHEN_validating_field_value_THEN_returns_inte
     invalid_value = "sdfn"
 
     field_type_combo = DummyCombo(FieldType.scalar_dataset.value)
-    dataset_type_combo = DummyCombo("Float")
+    dataset_type_combo = DummyCombo(ValueTypes.FLOAT)
 
     validator = FieldValueValidator(
         field_type_combo, dataset_type_combo, FieldType.scalar_dataset.value

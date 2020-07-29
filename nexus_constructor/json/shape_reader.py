@@ -27,6 +27,7 @@ from nexus_constructor.model.geometry import (
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
 )
+from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     METRES,
@@ -34,8 +35,8 @@ from nexus_constructor.unit_utils import (
     units_have_magnitude_of_one,
 )
 
-INT_TYPE = ["int"]
-FLOAT_TYPES = ["double", "float"]
+INT_TYPE = [ValueTypes.INT]
+FLOAT_TYPES = [ValueTypes.DOUBLE, ValueTypes.FLOAT]
 
 
 def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:

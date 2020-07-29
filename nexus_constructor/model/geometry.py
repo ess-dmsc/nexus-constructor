@@ -8,6 +8,7 @@ from PySide2.QtGui import QVector3D, QMatrix4x4
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
 from nexus_constructor.model.group import Group
+from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
@@ -129,7 +130,7 @@ class CylindricalGeometry(Group):
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.set_field_value(DETECTOR_NUMBER, pixel_ids, "int")
+        self.set_field_value(DETECTOR_NUMBER, pixel_ids, ValueTypes.INT)
 
     @property
     def units(self) -> str:
@@ -289,7 +290,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
         Records the detector faces in the NXoff_geometry.
         :param detector_faces: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
-        self.set_field_value(DETECTOR_FACES, detector_faces, "int")
+        self.set_field_value(DETECTOR_FACES, detector_faces, ValueTypes.INT)
 
     @property
     def winding_order(self) -> List[int]:
@@ -366,11 +367,11 @@ class OFFGeometryNexus(OFFGeometry, Group):
         winding_order = np.array(
             [index for new_face in new_faces for index in new_face]
         )
-        self.set_field_value(WINDING_ORDER, winding_order, "int")
+        self.set_field_value(WINDING_ORDER, winding_order, ValueTypes.INT)
         faces_length = [0]
         faces_length.extend([len(new_face) for new_face in new_faces[:-1]])
         faces_start_indices = np.cumsum(faces_length)
-        self.set_field_value(FACES, faces_start_indices, "int")
+        self.set_field_value(FACES, faces_start_indices, ValueTypes.INT)
 
     def record_vertices(self, new_vertices: List[QVector3D]):
         """
@@ -382,7 +383,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
         vertices = np.array(
             [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
         )
-        self.set_field_value(CommonAttrs.VERTICES, vertices, "int")
+        self.set_field_value(CommonAttrs.VERTICES, vertices, ValueTypes.INT)
         self[CommonAttrs.VERTICES].attributes.set_attribute_value(
             CommonAttrs.UNITS, "m"
         )

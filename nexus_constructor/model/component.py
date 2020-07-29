@@ -329,10 +329,10 @@ class Component(Group):
         vertices = CylindricalGeometry.calculate_vertices(
             axis_direction, height, radius
         )
-        geometry.set_field_value(CommonAttrs.VERTICES, vertices, "int")
+        geometry.set_field_value(CommonAttrs.VERTICES, vertices, ValueTypes.INT)
 
         # # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
-        geometry.set_field_value(CYLINDERS, np.array([0, 1, 2]), "int")
+        geometry.set_field_value(CYLINDERS, np.array([0, 1, 2]), ValueTypes.INT)
         geometry[CommonAttrs.VERTICES].attributes.set_attribute_value(
             CommonAttrs.UNITS, units
         )
@@ -358,16 +358,18 @@ class Component(Group):
         :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
         """
         self.set_field_value(
-            X_PIXEL_OFFSET, get_x_offsets_from_pixel_grid(pixel_grid), "float64"
+            X_PIXEL_OFFSET, get_x_offsets_from_pixel_grid(pixel_grid), ValueTypes.FLOAT
         )
         self.set_field_value(
-            Y_PIXEL_OFFSET, get_y_offsets_from_pixel_grid(pixel_grid), "float64"
+            Y_PIXEL_OFFSET, get_y_offsets_from_pixel_grid(pixel_grid), ValueTypes.FLOAT
         )
         self.set_field_value(
-            X_PIXEL_OFFSET, get_z_offsets_from_pixel_grid(pixel_grid), "float64"
+            Z_PIXEL_OFFSET, get_z_offsets_from_pixel_grid(pixel_grid), ValueTypes.FLOAT
         )
         self.set_field_value(
-            DETECTOR_NUMBER, get_detector_ids_from_pixel_grid(pixel_grid), "int64"
+            DETECTOR_NUMBER,
+            get_detector_ids_from_pixel_grid(pixel_grid),
+            ValueTypes.INT,
         )
 
     def record_pixel_mapping(self, pixel_mapping: PixelMapping):
@@ -378,7 +380,7 @@ class Component(Group):
         self.set_field_value(
             DETECTOR_NUMBER,
             get_detector_number_from_pixel_mapping(pixel_mapping),
-            "int64",
+            ValueTypes.INT,
         )
 
     def _create_transformation_vectors_for_pixel_offsets(

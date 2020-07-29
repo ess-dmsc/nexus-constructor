@@ -1,9 +1,8 @@
-from enum import Enum
 from typing import Union
 import numpy as np
 
 
-class ValueTypes(Enum):
+class ValueTypes:
     BYTE = "Byte"
     UBYTE = "UByte"
     SHORT = "Short"

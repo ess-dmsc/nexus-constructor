@@ -163,7 +163,7 @@ def off_shape_json() -> Dict:
           "type":"dataset",
           "name":"faces",
           "dataset":{
-            "type":"int32",
+            "type":"Integer",
             "size":[
               6
             ]
@@ -181,7 +181,7 @@ def off_shape_json() -> Dict:
           "type":"dataset",
           "name":"vertices",
           "dataset":{
-            "type":"float",
+            "type":"Float",
             "size":[
               8,
               3
@@ -240,7 +240,7 @@ def off_shape_json() -> Dict:
           "type":"dataset",
           "name":"winding_order",
           "dataset":{
-            "type":"int32",
+            "type":"Integer",
             "size":[
               24
             ]
@@ -295,7 +295,7 @@ def cylindrical_shape_json() -> dict:
           "type":"dataset",
           "name":"cylinders",
           "dataset":{
-            "type":"int32",
+            "type":"Integer",
             "size":[
               1,
               3
@@ -313,7 +313,7 @@ def cylindrical_shape_json() -> dict:
           "type":"dataset",
           "name":"vertices",
           "dataset":{
-            "type":"double",
+            "type":"Double",
             "size":[
               3,
               3
@@ -363,7 +363,7 @@ def pixel_grid_list() -> list:
         "type": "dataset",
         "name": "detector_number",
         "dataset": {
-          "type": "int32",
+          "type": "Integer",
           "size": [
             100
           ]
@@ -475,7 +475,7 @@ def pixel_grid_list() -> list:
         "type": "dataset",
         "name": "x_pixel_offset",
         "dataset": {
-          "type": "double",
+          "type": "Double",
           "size": [
             100
           ]
@@ -593,7 +593,7 @@ def pixel_grid_list() -> list:
         "type": "dataset",
         "name": "y_pixel_offset",
         "dataset": {
-          "type": "double",
+          "type": "Double",
           "size": [
             100
           ]

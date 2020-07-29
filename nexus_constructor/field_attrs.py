@@ -171,7 +171,7 @@ class FieldAttrFrame(QFrame):
                 self.dtype, str
             ):
                 return self.attr_value_lineedit.text()
-            return self.dtype(self.attr_value_lineedit.text())
+            return self.dtype(VALUE_TYPE_TO_NP[self.attr_value_lineedit.text()])
         return np.squeeze(self.dialog.model.array)
 
     @value.setter
