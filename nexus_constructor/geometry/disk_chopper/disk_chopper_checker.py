@@ -29,8 +29,15 @@ EXPECTED_TYPE_ERROR_MSG = {
 }
 
 REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES_NAME, SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME}
-INT_TYPES = [value for value in VALUE_TYPE_TO_NP.values() if "int" in str(value)]
-FLOAT_TYPES = [value for value in VALUE_TYPE_TO_NP.values() if "float" in str(value)]
+INT_TYPES = [
+    ValueTypes.INT,
+    ValueTypes.UINT,
+    ValueTypes.LONG,
+    ValueTypes.ULONG,
+    ValueTypes.USHORT,
+    ValueTypes.SHORT,
+]
+FLOAT_TYPES = [ValueTypes.FLOAT, ValueTypes.DOUBLE]
 
 UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
 EXPECTED_UNIT_TYPE = {

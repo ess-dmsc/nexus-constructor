@@ -27,7 +27,7 @@ def _contains_transformations(entry: dict) -> bool:
     :return: True if the component has transformations, False otherwise.
     """
     try:
-        return NX_TRANSFORMATION in _find_nx_class(entry["attributes"])
+        return NX_TRANSFORMATION in _find_nx_class(entry[CommonKeys.ATTRIBUTES])
     except KeyError:
         return False
 

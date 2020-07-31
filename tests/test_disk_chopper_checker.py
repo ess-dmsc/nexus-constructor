@@ -173,7 +173,7 @@ def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_ty
 
     assert (
         error_message
-        == "Wrong radius type. Expected float but found " + wrong_data_type + "."
+        == "Wrong radius type. Expected Float but found " + wrong_data_type + "."
     )
 
 
