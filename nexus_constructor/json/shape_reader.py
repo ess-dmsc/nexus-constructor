@@ -28,16 +28,17 @@ from nexus_constructor.model.geometry import (
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
 )
-from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.model.value_type import (
+    INT_TYPES,
+    FLOAT_TYPES,
+    VALUE_TYPE_TO_NP,
+)
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     METRES,
     units_are_expected_dimensionality,
     units_have_magnitude_of_one,
 )
-
-INT_TYPE = [ValueTypes.INT]
-FLOAT_TYPES = [ValueTypes.DOUBLE, ValueTypes.FLOAT]
 
 
 def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
@@ -119,9 +120,9 @@ class ShapeReader:
         if not winding_order_dataset:
             return
 
-        faces_dtype = self._find_and_validate_data_type(faces_dataset, INT_TYPE, FACES)
+        faces_dtype = self._find_and_validate_data_type(faces_dataset, INT_TYPES, FACES)
         faces_starting_indices = self._find_and_validate_values_list(
-            faces_dataset, INT_TYPE, FACES
+            faces_dataset, INT_TYPES, FACES
         )
         if not faces_starting_indices:
             return
@@ -139,10 +140,10 @@ class ShapeReader:
         vertices = _convert_vertices_to_qvector3d(vertices)
 
         winding_order_dtype = self._find_and_validate_data_type(
-            winding_order_dataset, INT_TYPE, WINDING_ORDER
+            winding_order_dataset, INT_TYPES, WINDING_ORDER
         )
         winding_order = self._find_and_validate_values_list(
-            winding_order_dataset, INT_TYPE, WINDING_ORDER
+            winding_order_dataset, INT_TYPES, WINDING_ORDER
         )
         if not winding_order:
             return
@@ -204,10 +205,10 @@ class ShapeReader:
             return
 
         cylinders_dtype = self._find_and_validate_data_type(
-            cylinders_dataset, INT_TYPE, CYLINDERS
+            cylinders_dataset, INT_TYPES, CYLINDERS
         )
         cylinders_list = self._find_and_validate_values_list(
-            cylinders_dataset, INT_TYPE, CYLINDERS
+            cylinders_dataset, INT_TYPES, CYLINDERS
         )
         if not cylinders_list:
             return
@@ -342,12 +343,12 @@ class ShapeReader:
         flat_array = np.array(values).flatten()
         if all(
             [
-                any(
-                    [
-                        expected_type in str(type(value))
-                        for expected_type in expected_types
-                    ]
-                )
+                type(value)
+                in [
+                    numpy_dtype
+                    for human_readable_type, numpy_dtype in VALUE_TYPE_TO_NP.items()
+                    if human_readable_type in expected_types
+                ]
                 for value in flat_array
             ]
         ):
@@ -492,10 +493,10 @@ class ShapeReader:
         )
         if detector_number_dataset:
             detector_number_dtype = self._find_and_validate_data_type(
-                detector_number_dataset, INT_TYPE, DETECTOR_NUMBER
+                detector_number_dataset, INT_TYPES, DETECTOR_NUMBER
             )
             detector_number = self._find_and_validate_values_list(
-                detector_number_dataset, INT_TYPE, DETECTOR_NUMBER
+                detector_number_dataset, INT_TYPES, DETECTOR_NUMBER
             )
             if detector_number:
                 self.component.set_field_value(
