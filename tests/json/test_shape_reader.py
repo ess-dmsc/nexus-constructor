@@ -692,7 +692,6 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
     )
     detector_number = detector_number_dataset[CommonKeys.VALUES]
     detector_number_dtype = detector_number_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
-    detector_number_size = detector_number_dataset[CommonKeys.DATASET][CommonKeys.SIZE]
 
     x_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
         X_PIXEL_OFFSET, pixel_grid_list
@@ -707,14 +706,7 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
     y_pixel_dtype = y_offset_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
 
     mock_component.set_field_value.assert_has_calls(
-        [
-            call(
-                DETECTOR_NUMBER,
-                detector_number,
-                detector_number_dtype,
-                detector_number_size,
-            )
-        ]
+        [call(DETECTOR_NUMBER, detector_number, detector_number_dtype,)]
     )
 
     assert X_PIXEL_OFFSET == mock_component.set_field_value.call_args_list[1].args[0]
@@ -741,9 +733,8 @@ def test_GIVEN_valid_pixel_mapping_and_cylindrical_shape_WHEN_reading_pixel_data
     )
     detector_number = detector_number_dataset[CommonKeys.VALUES]
     detector_number_dtype = detector_number_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
-    detector_number_size = detector_number_dataset[CommonKeys.DATASET][CommonKeys.SIZE]
 
     mock_component.set_field_value.assert_called_once_with(
-        DETECTOR_NUMBER, detector_number, detector_number_dtype, detector_number_size
+        DETECTOR_NUMBER, detector_number, detector_number_dtype
     )
     assert mock_cylindrical_shape.detector_number == detector_number
