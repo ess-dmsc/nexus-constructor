@@ -1,7 +1,12 @@
 import json
 from typing import Dict, List, Union
 
-from nexus_constructor.common_attrs import CommonAttrs, CommonKeys
+from nexus_constructor.common_attrs import (
+    CommonAttrs,
+    CommonKeys,
+    SHAPE_GROUP_NAME,
+    PIXEL_SHAPE_GROUP_NAME,
+)
 from nexus_constructor.component.component_type import COMPONENT_TYPES
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
@@ -10,11 +15,7 @@ from nexus_constructor.json.load_from_json_utils import (
 )
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.json.transformation_reader import TransformationReader
-from nexus_constructor.model.component import (
-    Component,
-    PIXEL_SHAPE_GROUP_NAME,
-    SHAPE_GROUP_NAME,
-)
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.transformation import Transformation

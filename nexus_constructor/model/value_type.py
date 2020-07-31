@@ -34,3 +34,14 @@ VALUE_TYPE_TO_NP = {
 
 # For use in type hints
 ValueType = Union[np.ndarray, str]
+
+
+INT_TYPES = [
+    ValueTypes.INT,
+    ValueTypes.UINT,
+    ValueTypes.LONG,
+    ValueTypes.ULONG,
+    ValueTypes.USHORT,
+    ValueTypes.SHORT,
+]
+FLOAT_TYPES = [ValueTypes.FLOAT, ValueTypes.DOUBLE]

@@ -1,6 +1,6 @@
 from mock import patch
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.component import (
+from nexus_constructor.common_attrs import (
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
     CYLINDRICAL_GEOMETRY_NX_CLASS,

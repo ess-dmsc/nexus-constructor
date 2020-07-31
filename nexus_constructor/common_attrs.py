@@ -43,3 +43,7 @@ class TransformationType:
 INSTRUMENT_NAME = "instrument"
 ARRAY = "Array"
 SCALAR = "Scalar"
+SHAPE_GROUP_NAME = "shape"
+PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
+CYLINDRICAL_GEOMETRY_NX_CLASS = "NXcylindrical_geometry"
+OFF_GEOMETRY_NX_CLASS = "NXoff_geometry"

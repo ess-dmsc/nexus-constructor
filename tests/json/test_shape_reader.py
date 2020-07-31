@@ -5,7 +5,14 @@ import pytest
 from PySide2.QtGui import QVector3D
 from mock import Mock, call
 
-from nexus_constructor.common_attrs import CommonKeys, CommonAttrs
+from nexus_constructor.common_attrs import (
+    CommonKeys,
+    CommonAttrs,
+    PIXEL_SHAPE_GROUP_NAME,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
+    SHAPE_GROUP_NAME,
+)
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
@@ -16,11 +23,7 @@ from nexus_constructor.json.shape_reader import (
     Z_PIXEL_OFFSET,
     DETECTOR_NUMBER,
 )
-from nexus_constructor.model.component import (
-    Component,
-    OFF_GEOMETRY_NX_CLASS,
-    CYLINDRICAL_GEOMETRY_NX_CLASS,
-)
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
 from nexus_constructor.model.value_type import ValueTypes
 from tests.json.shape_json import (
@@ -153,7 +156,7 @@ def test_GIVEN_missing_name_WHEN_reading_off_information_THEN_issue_message_is_c
     del off_shape_json[CommonKeys.NAME]
     off_shape_reader.add_shape_to_component()
 
-    assert mock_component["shape"].name == "shape"
+    assert mock_component[SHAPE_GROUP_NAME].name == SHAPE_GROUP_NAME
     assert _any_warning_message_has_substrings(
         [off_shape_reader.issue_message, "Unable to find name of shape."],
         off_shape_reader.warnings,
@@ -480,7 +483,7 @@ def test_GIVEN_off_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expect
 
     off_shape_reader.add_shape_to_component()
 
-    shape = mock_component["shape"]
+    shape = mock_component[SHAPE_GROUP_NAME]
     assert isinstance(shape, OFFGeometryNexus)
     assert shape.nx_class == OFF_GEOMETRY_NX_CLASS
     assert shape.name == name
@@ -616,7 +619,7 @@ def test_GIVEN_pixel_shape_and_no_detector_number_WHEN_reading_pixel_data_THEN_e
         off_shape_reader._get_shape_dataset_from_list(DETECTOR_NUMBER, pixel_grid_list)
     )
 
-    off_shape_reader.shape_info[CommonKeys.NAME] = "pixel_shape"
+    off_shape_reader.shape_info[CommonKeys.NAME] = PIXEL_SHAPE_GROUP_NAME
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
     assert _any_warning_message_has_substrings(
@@ -633,7 +636,7 @@ def test_GIVEN_pixel_shape_and_no_x_y_offset_WHEN_reading_pixel_data_THEN_error_
     )
 
     off_shape_reader.shape = mock_off_shape
-    off_shape_reader.shape_info[CommonKeys.NAME] = "pixel_shape"
+    off_shape_reader.shape_info[CommonKeys.NAME] = PIXEL_SHAPE_GROUP_NAME
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
     assert _any_warning_message_has_substrings(
@@ -645,7 +648,7 @@ def test_GIVEN_pixel_shape_and_no_z_offset_WHEN_reading_pixel_data_THEN_error_me
     off_shape_reader, pixel_grid_list, mock_off_shape
 ):
     off_shape_reader.shape = mock_off_shape
-    off_shape_reader.shape_info[CommonKeys.NAME] = "pixel_shape"
+    off_shape_reader.shape_info[CommonKeys.NAME] = PIXEL_SHAPE_GROUP_NAME
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
     assert not _any_warning_message_has_substrings(
@@ -663,7 +666,7 @@ def test_GIVEN_x_y_offset_exists_but_fails_validation_WHEN_reading_pixel_data_TH
     offset_dataset[CommonKeys.VALUES][0] = "not a float"
 
     off_shape_reader.shape = mock_off_shape
-    off_shape_reader.shape_info[CommonKeys.NAME] = "pixel_shape"
+    off_shape_reader.shape_info[CommonKeys.NAME] = PIXEL_SHAPE_GROUP_NAME
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
     assert _any_warning_message_has_substrings(
@@ -681,7 +684,7 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
     off_shape_reader, pixel_grid_list, mock_component, mock_off_shape
 ):
     off_shape_reader.shape = mock_off_shape
-    off_shape_reader.shape_info[CommonKeys.NAME] = "pixel_shape"
+    off_shape_reader.shape_info[CommonKeys.NAME] = PIXEL_SHAPE_GROUP_NAME
     off_shape_reader.add_pixel_data_to_component(pixel_grid_list)
 
     detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(

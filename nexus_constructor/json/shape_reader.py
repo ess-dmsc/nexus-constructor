@@ -3,18 +3,19 @@ from typing import List, Union, Any
 import numpy as np
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.common_attrs import CommonAttrs, CommonKeys
+from nexus_constructor.common_attrs import (
+    CommonAttrs,
+    CommonKeys,
+    SHAPE_GROUP_NAME,
+    PIXEL_SHAPE_GROUP_NAME,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
+)
 from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
     _find_attribute_from_list_or_dict,
 )
-from nexus_constructor.model.component import (
-    Component,
-    CYLINDRICAL_GEOMETRY_NX_CLASS,
-    OFF_GEOMETRY_NX_CLASS,
-    PIXEL_SHAPE_GROUP_NAME,
-    SHAPE_GROUP_NAME,
-)
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     CylindricalGeometry,

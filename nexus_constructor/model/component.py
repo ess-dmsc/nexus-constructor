@@ -11,6 +11,10 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
     TransformationType,
+    SHAPE_GROUP_NAME,
+    PIXEL_SHAPE_GROUP_NAME,
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
 )
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
@@ -454,9 +458,3 @@ def add_fields_to_component(component: Component, fields_widget: QListWidget):
                 additional_info=str(error),
                 parent=fields_widget.parent().parent(),
             )
-
-
-SHAPE_GROUP_NAME = "shape"
-PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
-CYLINDRICAL_GEOMETRY_NX_CLASS = "NXcylindrical_geometry"
-OFF_GEOMETRY_NX_CLASS = "NXoff_geometry"
