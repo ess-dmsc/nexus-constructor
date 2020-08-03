@@ -183,14 +183,13 @@ class HS00Stream:
         }
 
 
+Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
+
+
 @attr.s
 class StreamGroup(Group):
     def __setitem__(
-        self,
-        key: str,
-        value: Union[
-            NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream
-        ],
+        self, key: str, value: Stream,
     ):
         self.children.append(value)
 

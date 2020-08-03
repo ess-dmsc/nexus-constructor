@@ -283,8 +283,8 @@ class StreamFieldsWidget(QDialog):
 
     def get_stream_group(self) -> StreamGroup:
         """
-        Create the stream group with a temporary in-memory HDF5 file.
-        :return: The created HDF group.
+        Create the stream group
+        :return: The created StreamGroup
         """
 
         source = self.source_line_edit.text()
