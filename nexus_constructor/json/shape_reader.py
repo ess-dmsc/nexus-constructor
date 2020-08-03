@@ -528,10 +528,11 @@ class ShapeReader:
         shape_group = self._get_shape_dataset_from_list(
             SHAPE_GROUP_NAME, children, False
         )
-        detector_faces_dataset = self._get_shape_dataset_from_list(
-            DETECTOR_FACES, shape_group[CommonKeys.CHILDREN], False
-        )
-        self.shape.detector_faces = detector_faces_dataset[CommonKeys.VALUES]
+        if shape_group:
+            detector_faces_dataset = self._get_shape_dataset_from_list(
+                DETECTOR_FACES, shape_group[CommonKeys.CHILDREN], False
+            )
+            self.shape.detector_faces = detector_faces_dataset[CommonKeys.VALUES]
 
     def _find_and_add_pixel_offsets_to_component(
         self, offset_name: str, children: List[Dict]
