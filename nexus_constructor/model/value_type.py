@@ -3,17 +3,17 @@ import numpy as np
 
 
 class ValueTypes:
-    BYTE = "Byte"
-    UBYTE = "UByte"
-    SHORT = "Short"
-    USHORT = "UShort"
-    INT = "Integer"
-    UINT = "UInteger"
-    LONG = "Long"
-    ULONG = "ULong"
-    FLOAT = "Float"
-    DOUBLE = "Double"
-    STRING = "String"
+    BYTE = "byte"
+    UBYTE = "ubyte"
+    SHORT = "int16"
+    USHORT = "uint16"
+    INT = "int32"
+    UINT = "uint32"
+    LONG = "int64"
+    ULONG = "uint64"
+    FLOAT = "float"
+    DOUBLE = "double"
+    STRING = "string"
 
 
 # Allowed types for dataset and attribute values

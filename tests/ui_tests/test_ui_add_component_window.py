@@ -351,13 +351,13 @@ def enter_disk_chopper_fields(
     show_and_close_window(qtbot, template)
 
     # Set slits field type
-    fields_widgets[0].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Integer"])
+    fields_widgets[0].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["int32"])
     # Set slit edges field type
-    fields_widgets[1].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[1].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["float"])
     # Set radius field type
-    fields_widgets[2].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[2].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["float"])
     # Set slit height field type
-    fields_widgets[3].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[3].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["float"])
 
     show_and_close_window(qtbot, template)
 
@@ -2029,7 +2029,7 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     field.field_type_combo.setCurrentText(FieldType.scalar_dataset.value)
     field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
 
-    field.value_type_combo.setCurrentText("String")
+    field.value_type_combo.setCurrentText(ValueTypes.STRING)
     field.value_type_combo.currentTextChanged.emit(field.value_type_combo.currentText)
 
     field_name = "testfield"
@@ -2038,7 +2038,7 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     field.field_name_edit.setText(field_name)
     field.value_line_edit.setText(field_value)
 
-    assert field.dtype == "String"
+    assert field.dtype == ValueTypes.STRING
 
     assert field.name == field_name
     assert field.value.values == field_value
