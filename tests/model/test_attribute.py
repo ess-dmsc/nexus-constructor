@@ -1,6 +1,6 @@
 import pytest
 
-from nexus_constructor.model.attribute import FieldAttribute
+from nexus_constructor.model.attributes import FieldAttribute
 import numpy as np
 
 NAME = "field1"

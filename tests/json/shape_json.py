@@ -12,7 +12,7 @@ def off_pixel_mapping() -> Dict:
                   "attributes": [
                     {
                       "name": "NX_class",
-                      "type": "String",
+                      "type": "string",
                       "values": "NXoff_geometry"
                     }
                   ],
@@ -67,7 +67,7 @@ def off_pixel_mapping() -> Dict:
                       "attributes": [
                         {
                           "name": "units",
-                          "type": "String",
+                          "type": "string",
                           "values": "m"
                         }
                       ],

@@ -275,7 +275,7 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
     ]
     depends_on = None
 
-    values = _create_transformation_dataset(angle_or_magnitude, "Double", name)
+    values = _create_transformation_dataset(angle_or_magnitude, "double", name)
 
     transformation_reader._create_transformations(transformation_json["children"])
     transformation_reader.parent_component._create_and_add_transform.assert_called_once_with(
@@ -303,7 +303,7 @@ def test_GIVEN_unrecognised_dtype_WHEN_parsing_dtype_THEN_parse_dtype_returns_em
 def test_GIVEN_different_types_of_double_WHEN_parsing_dtype_THEN_parse_dtype_returns_same_value(
     transformation_reader, dtype
 ):
-    assert transformation_reader._parse_dtype(dtype, "TransformationName") == "Double"
+    assert transformation_reader._parse_dtype(dtype, "TransformationName") == "double"
 
 
 def test_GIVEN_unrecognised_transformation_type_WHEN_parsing_transformation_type_THEN_parse_transformation_type_returns_empty_string(

@@ -12,4 +12,38 @@ class CommonAttrs:
     UNITS = "units"
     VERTICES = "vertices"
     NC_STREAM = "NCstream"
-    VALUE = "value"
+
+
+class CommonKeys:
+    """
+    Commonly used key names in the outputted JSON.
+    """
+
+    NAME = "name"
+    VALUES = "values"
+    TYPE = "type"
+    SIZE = "size"
+    CHILDREN = "children"
+    ATTRIBUTES = "attributes"
+    DATASET = "dataset"
+
+
+class NodeType:
+    STREAM = "stream"
+    DATASET = "dataset"
+    GROUP = "group"
+    LINK = "link"
+
+
+class TransformationType:
+    TRANSLATION = "Translation"
+    ROTATION = "Rotation"
+
+
+INSTRUMENT_NAME = "instrument"
+ARRAY = "Array"
+SCALAR = "Scalar"
+SHAPE_GROUP_NAME = "shape"
+PIXEL_SHAPE_GROUP_NAME = "pixel_shape"
+CYLINDRICAL_GEOMETRY_NX_CLASS = "NXcylindrical_geometry"
+OFF_GEOMETRY_NX_CLASS = "NXoff_geometry"

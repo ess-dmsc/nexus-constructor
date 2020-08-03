@@ -1,5 +1,7 @@
 from PySide2.QtCore import QObject, Signal
 from typing import Dict, Any
+
+from nexus_constructor.common_attrs import CommonKeys
 from nexus_constructor.model.entry import Entry
 
 
@@ -22,4 +24,4 @@ class Model:
         self.entry = entry
 
     def as_dict(self) -> Dict[str, Any]:
-        return {"children": [self.entry.as_dict()]}
+        return {CommonKeys.CHILDREN: [self.entry.as_dict()]}

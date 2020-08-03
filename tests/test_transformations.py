@@ -2,9 +2,11 @@ import numpy as np
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation
 from typing import Any
+
+from nexus_constructor.model.value_type import ValueTypes
 from tests.helpers import add_component_to_file  # noqa:F401
 
 transform_type = "Transformation"
@@ -15,8 +17,8 @@ translation_type = "Translation"
 def _add_transform_to_file(
     name: str, value: Any, vector: QVector3D, transform_type: str
 ):
-    transform = Transformation(name=name, dataset=DatasetMetadata(type="Double"))
-    transform.type = transform_type
+    transform = Transformation(name=name, type=ValueTypes.DOUBLE, size="[1]", values=42)
+    transform.transform_type = transform_type
     transform.vector = vector
     transform.values = value
 
@@ -28,24 +30,21 @@ def create_transform(
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
-    values=Dataset("", None, []),
+    values=Dataset(name="", values=None, type=ValueTypes.DOUBLE, size=[1]),
 ):
 
     translation = Transformation(
         name=name,
-        dataset=Dataset(
-            name="dataset",
-            dataset=DatasetMetadata([1], "str"),
-            values="test",
-            parent_node=None,
-        ),
         parent_node=None,
+        values=values,
+        type=ValueTypes.STRING,
+        parent_component=None,
+        size=[1],
     )
 
     translation.vector = vector
-    translation.type = type
+    translation.transform_type = type
     translation.ui_value = ui_value
-    translation.values = values
 
     return translation
 
@@ -76,7 +75,7 @@ def test_can_get_transform_properties():
         transform.vector == test_vector
     ), "Expected the transform vector to match what was in the NeXus file"
     assert (
-        transform.type == test_type
+        transform.transform_type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
     assert (
         transform.values == test_values
@@ -117,7 +116,7 @@ def test_can_set_transform_properties():
     transform.name = test_name
     transform.ui_value = test_ui_value
     transform.vector = test_vector
-    transform.type = test_type
+    transform.transform_type = test_type
     transform.values = test_values
 
     assert (
@@ -130,7 +129,7 @@ def test_can_set_transform_properties():
         transform.vector == test_vector
     ), "Expected the transform vector to match what was in the NeXus file"
     assert (
-        transform.type == test_type
+        transform.transform_type == test_type
     ), "Expected the transform type to match what was in the NeXus file"
     assert (
         transform.values == test_values

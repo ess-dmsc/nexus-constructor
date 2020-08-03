@@ -2,11 +2,10 @@ from typing import Any, Union
 
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, TransformationType
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
-from nexus_constructor.model.value_type import VALUE_TYPE
-from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
     _find_nx_class,
@@ -28,7 +27,7 @@ def _contains_transformations(entry: dict) -> bool:
     :return: True if the component has transformations, False otherwise.
     """
     try:
-        return NX_TRANSFORMATION in _find_nx_class(entry["attributes"])
+        return NX_TRANSFORMATION in _find_nx_class(entry[CommonKeys.ATTRIBUTES])
     except KeyError:
         return False
 
@@ -43,9 +42,7 @@ def _create_transformation_dataset(
     :param name: The transformation name.
     :return: A dataset containing the above information.
     """
-    return Dataset(
-        name, dataset=DatasetMetadata(size=[1], type=dtype), values=angle_or_magnitude,
-    )
+    return Dataset(name, size=[1], type=dtype, values=angle_or_magnitude,)
 
 
 class TransformationReader:
@@ -68,7 +65,7 @@ class TransformationReader:
         for item in self.entry:
             if _contains_transformations(item):
                 try:
-                    self._create_transformations(item["children"])
+                    self._create_transformations(item[CommonKeys.CHILDREN])
                 except KeyError:
                     continue
 
@@ -133,7 +130,7 @@ class TransformationReader:
         :param dtype: The type value obtained from the JSON.
         :return: The corresponding type from the dictionary if it exists, otherwise an empty string is returned.
         """
-        for key in VALUE_TYPE.keys():
+        for key in VALUE_TYPE_TO_NP.keys():
             if dtype.lower() == key.lower():
                 return key
         self.warnings.append(
@@ -168,20 +165,22 @@ class TransformationReader:
         """
         for json_transformation in json_transformations:
 
-            name = self._get_transformation_attribute("name", json_transformation)
+            name = self._get_transformation_attribute(
+                CommonKeys.NAME, json_transformation
+            )
 
             values = self._get_transformation_attribute(
-                "values", json_transformation, name
+                CommonKeys.VALUES, json_transformation, name
             )
             if values is None:
                 continue
 
             dataset = self._get_transformation_attribute(
-                "dataset", json_transformation, name
+                CommonKeys.DATASET, json_transformation, name
             )
             if not dataset:
                 continue
-            dtype = self._get_transformation_attribute("type", dataset, name,)
+            dtype = self._get_transformation_attribute(CommonKeys.TYPE, dataset, name,)
             if not dtype:
                 continue
             dtype = self._parse_dtype(dtype, name)
@@ -189,7 +188,7 @@ class TransformationReader:
                 continue
 
             attributes = self._get_transformation_attribute(
-                "attributes", json_transformation, name
+                CommonKeys.ATTRIBUTES, json_transformation, name
             )
             if not attributes:
                 continue
@@ -199,7 +198,7 @@ class TransformationReader:
                 continue
 
             transformation_type = self._find_attribute_in_list(
-                "transformation_type", name, attributes,
+                CommonAttrs.TRANSFORMATION_TYPE, name, attributes,
             )
             if not transformation_type:
                 continue

@@ -6,12 +6,13 @@ from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
+from nexus_constructor.model.value_type import ValueTypes, FLOAT_TYPES, INT_TYPES
 from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_are_expected_dimensionality,
     units_have_magnitude_of_one,
 )
-from nexus_constructor.validators import VALUE_TYPE
+from nexus_constructor.validators import VALUE_TYPE_TO_NP
 
 SLIT_EDGES_NAME = "slit_edges"
 SLITS_NAME = "slits"
@@ -21,15 +22,13 @@ NAME = "name"
 
 UNABLE = "Unable to create chopper geometry - "
 EXPECTED_TYPE_ERROR_MSG = {
-    SLIT_EDGES_NAME: "float",
-    SLITS_NAME: "int",
-    RADIUS_NAME: "float",
-    SLIT_HEIGHT_NAME: "float",
+    SLIT_EDGES_NAME: ValueTypes.FLOAT,
+    SLITS_NAME: ValueTypes.INT,
+    RADIUS_NAME: ValueTypes.FLOAT,
+    SLIT_HEIGHT_NAME: ValueTypes.FLOAT,
 }
 
 REQUIRED_CHOPPER_FIELDS = {SLIT_EDGES_NAME, SLITS_NAME, RADIUS_NAME, SLIT_HEIGHT_NAME}
-INT_TYPES = [key for key in VALUE_TYPE.keys() if "int" in str(VALUE_TYPE[key])]
-FLOAT_TYPES = [key for key in VALUE_TYPE.keys() if "float" in str(VALUE_TYPE[key])]
 
 UNITS_REQUIRED = [RADIUS_NAME, SLIT_EDGES_NAME, SLIT_HEIGHT_NAME]
 EXPECTED_UNIT_TYPE = {
@@ -285,9 +284,9 @@ class ChopperChecker:
         :return: True if the conversion was successful, False otherwise.
         """
         try:
-            self.converted_values[field] = VALUE_TYPE[self.fields_dict[field].dtype](
-                self.fields_dict[field].value.values
-            )
+            self.converted_values[field] = VALUE_TYPE_TO_NP[
+                self.fields_dict[field].dtype
+            ](self.fields_dict[field].value.values)
         except ValueError:
             return False
 

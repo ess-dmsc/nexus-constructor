@@ -1,6 +1,7 @@
 from typing import Any
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.value_type import ValueTypes
 
 
 def add_component_to_file(
@@ -12,7 +13,8 @@ def add_component_to_file(
     component.set_field_value(
         name=field_name,
         value=Dataset(
-            name=field_name, dataset=DatasetMetadata(type="Double"), values=field_value
+            name=field_name, type=ValueTypes.DOUBLE, size="1", values=field_value
         ),
+        dtype=ValueTypes.DOUBLE,
     )
     return component

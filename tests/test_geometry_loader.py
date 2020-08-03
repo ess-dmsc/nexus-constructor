@@ -1,6 +1,6 @@
 from nexus_constructor.model.geometry import OFFGeometryNoNexus
 from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
-from nexus_constructor.off_renderer import repeat_shape_over_positions
+from nexus_constructor.instrument_view.off_renderer import repeat_shape_over_positions
 from PySide2.QtGui import QVector3D
 from io import StringIO
 

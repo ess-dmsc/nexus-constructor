@@ -1,12 +1,10 @@
 from typing import Any
-
 import h5py
 from PySide2.QtGui import QVector3D
 from mock import Mock
-
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
@@ -30,9 +28,7 @@ def create_corresponding_value_dataset(value: Any):
     else:
         size = len(value)
 
-    return Dataset(
-        name=name, dataset=DatasetMetadata(type=type, size=[size]), values=value,
-    )
+    return Dataset(name=name, type=type, size=[size], values=value,)
 
 
 def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled_correctly(

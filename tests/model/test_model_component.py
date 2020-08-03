@@ -6,6 +6,7 @@ import numpy as np
 
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import NS10Stream
+from nexus_constructor.model.value_type import ValueTypes
 
 
 def test_component_set_item_with_brackets_works_with_another_component():
@@ -36,7 +37,7 @@ def test_component_set_field_with_numpy_array_correctly_sets_field_value():
 
     comp = Component("comp4")
     data = [[1], [2]]
-    dtype = "int"
+    dtype = ValueTypes.INT
     field_name = "field1"
     field_value = np.asarray(data, dtype=int)
 
@@ -45,15 +46,15 @@ def test_component_set_field_with_numpy_array_correctly_sets_field_value():
     field_dataset = comp["field1"]
     assert field_dataset.name == field_name
     assert np.array_equal(field_dataset.values, field_value)
-    assert field_dataset.dataset.size == 2
-    assert field_dataset.dataset.type == dtype
+    assert field_dataset.size == 2
+    assert field_dataset.type == dtype
 
 
 def test_component_set_field_with_scalar_value_correctly_sets_field_value():
     comp = Component("comp4")
     field_name = "testfield"
     data = 123
-    dtype = "int"
+    dtype = ValueTypes.INT
 
     comp.set_field_value(field_name, data, dtype)
 
@@ -61,8 +62,8 @@ def test_component_set_field_with_scalar_value_correctly_sets_field_value():
 
     assert field_dataset.name == field_name
     assert field_dataset.values == data
-    assert field_dataset.dataset.size == [1]
-    assert field_dataset.dataset.type == dtype
+    assert field_dataset.size == [1]
+    assert field_dataset.type == dtype
 
 
 def test_component_as_dict_contains_transformations():

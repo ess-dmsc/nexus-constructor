@@ -23,7 +23,7 @@ from nexus_constructor.model.geometry import (
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
-from nexus_constructor.instrument_view import InstrumentView
+from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup, F142Stream
@@ -31,7 +31,7 @@ from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
 from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
-from nexus_constructor.model.value_type import VALUE_TYPE
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from tests.test_utils import NX_CLASS_DEFINITIONS
 from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
@@ -105,7 +105,7 @@ NO_PIXEL_OPTIONS_SUBSET = {
 
 SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
 
-FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(VALUE_TYPE.keys())}
+FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(VALUE_TYPE_TO_NP)}
 FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 
@@ -351,13 +351,13 @@ def enter_disk_chopper_fields(
     show_and_close_window(qtbot, template)
 
     # Set slits field type
-    fields_widgets[0].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Integer"])
+    fields_widgets[0].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["int32"])
     # Set slit edges field type
-    fields_widgets[1].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[1].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["float"])
     # Set radius field type
-    fields_widgets[2].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[2].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["float"])
     # Set slit height field type
-    fields_widgets[3].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["Float"])
+    fields_widgets[3].value_type_combo.setCurrentIndex(FIELDS_VALUE_TYPES["float"])
 
     show_and_close_window(qtbot, template)
 
@@ -1750,7 +1750,7 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
 
     field_name = "scalar"
     field_value = "test"
-    component.set_field_value(field_name, field_value, dtype="String")
+    component.set_field_value(field_name, field_value, dtype=ValueTypes.STRING)
 
     dialog = AddComponentDialog(
         model,
@@ -1794,7 +1794,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
 
     field_name = "array"
     field_value = np.array([1, 2, 3, 4, 5])
-    component.set_field_value(field_name, field_value)
+    component.set_field_value(field_name, field_value, ValueTypes.INT)
     dialog = AddComponentDialog(
         model,
         treeview_model,
@@ -1855,11 +1855,11 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
 
     field_name1 = "array"
     field_value1 = np.array([1, 2, 3, 4, 5])
-    component.set_field_value(field_name1, field_value1)
+    component.set_field_value(field_name1, field_value1, ValueTypes.INT)
 
     field_name2 = "scalar"
     field_value2 = 1
-    component.set_field_value(field_name2, field_value2)
+    component.set_field_value(field_name2, field_value2, ValueTypes.INT)
 
     dialog = AddComponentDialog(
         model,
@@ -2029,7 +2029,7 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     field.field_type_combo.setCurrentText(FieldType.scalar_dataset.value)
     field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
 
-    field.value_type_combo.setCurrentText("String")
+    field.value_type_combo.setCurrentText(ValueTypes.STRING)
     field.value_type_combo.currentTextChanged.emit(field.value_type_combo.currentText)
 
     field_name = "testfield"
@@ -2038,7 +2038,7 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     field.field_name_edit.setText(field_name)
     field.value_line_edit.setText(field_value)
 
-    assert field.dtype == "String"
+    assert field.dtype == ValueTypes.STRING
 
     assert field.name == field_name
     assert field.value.values == field_value

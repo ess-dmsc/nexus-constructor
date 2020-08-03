@@ -3,7 +3,21 @@ from typing import Union
 
 import attr
 
+from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.group import Group
+
+
+ARRAY_SIZE = "array_size"
+VALUE_UNITS = "value_units"
+CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
+CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
+INDEX_EVERY_KB = "nexus.indices.index_every_kb"
+INDEX_EVERY_MB = "nexus.indices.index_every_mb"
+ADC_PULSE_DEBUG = "adc_pulse_debug"
+STORE_LATEST_INTO = "store_latest_into"
+WRITER_MODULE = "writer_module"
+SOURCE = "source"
+TOPIC = "topic"
 
 
 class WriterModules(Enum):
@@ -23,11 +37,11 @@ class NS10Stream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
             },
         }
 
@@ -40,11 +54,11 @@ class SENVStream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
             },
         }
 
@@ -57,11 +71,11 @@ class TDCTStream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
             },
         }
 
@@ -79,20 +93,16 @@ class EV42Stream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
-                "adc_pulse_debug": self.adc_pulse_debug if not None else {},
-                "nexus.indices.index_every_mb": self.nexus_indices_index_every_mb
-                if not None
-                else {},
-                "nexus.indices.index_every_kb": self.nexus_indices_index_every_kb
-                if not None
-                else {},
-                "nexus.chunk.chunk_mb": self.nexus_chunk_chunk_mb if not None else {},
-                "nexus.chunk.chunk_kb": self.nexus_chunk_chunk_kb if not None else {},
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
+                ADC_PULSE_DEBUG: self.adc_pulse_debug if not None else {},
+                INDEX_EVERY_MB: self.nexus_indices_index_every_mb if not None else {},
+                INDEX_EVERY_KB: self.nexus_indices_index_every_kb if not None else {},
+                CHUNK_CHUNK_MB: self.nexus_chunk_chunk_mb if not None else {},
+                CHUNK_CHUNK_KB: self.nexus_chunk_chunk_kb if not None else {},
             },
         }
 
@@ -111,26 +121,27 @@ class F142Stream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
-                "value_units": self.value_units,
-                "type": self.type if not None else {},
-                "array_size": self.array_size if not None else {},
-                "nexus.indices.index_every_mb": self.nexus_indices_index_every_mb
-                if not None
-                else {},
-                "nexus.indices.index_every_kb": self.nexus_indices_index_every_kb
-                if not None
-                else {},
-                "store_latest_into": self.store_latest_into if not None else {},
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
+                VALUE_UNITS: self.value_units,
+                CommonKeys.TYPE: self.type if not None else {},
+                ARRAY_SIZE: self.array_size if not None else {},
+                INDEX_EVERY_MB: self.nexus_indices_index_every_mb if not None else {},
+                INDEX_EVERY_KB: self.nexus_indices_index_every_kb if not None else {},
+                STORE_LATEST_INTO: self.store_latest_into if not None else {},
             },
         }
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]
+
+DATA_TYPE = "data_type"
+ERROR_TYPE = "error_type"
+EDGE_TYPE = "edge_type"
+SHAPE = "shape"
 
 
 @attr.s
@@ -147,15 +158,15 @@ class HS00Stream:
 
     def as_dict(self):
         return {
-            "type": "stream",
-            "stream": {
-                "writer_module": self.writer_module,
-                "source": self.source,
-                "topic": self.topic,
-                "data_type": self.data_type,
-                "error_type": self.error_type,
-                "edge_type": self.edge_type,
-                "shape": self.shape,
+            CommonKeys.TYPE: NodeType.STREAM,
+            NodeType.STREAM: {
+                WRITER_MODULE: self.writer_module,
+                SOURCE: self.source,
+                TOPIC: self.topic,
+                DATA_TYPE: self.data_type,
+                ERROR_TYPE: self.error_type,
+                EDGE_TYPE: self.edge_type,
+                SHAPE: self.shape,
             },
         }
 

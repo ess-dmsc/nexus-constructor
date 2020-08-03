@@ -1,11 +1,18 @@
 import attr
 
+from nexus_constructor.common_attrs import CommonKeys, NodeType
+
+TARGET = "target"
+
 
 @attr.s
 class Link:
     name = attr.ib(type=str)
     target = attr.ib(type=str)
-    type = attr.ib(type=str, default="link", init=False)
 
     def as_dict(self):
-        return {"name": self.name, "target": self.target, "type": self.type}
+        return {
+            CommonKeys.NAME: self.name,
+            TARGET: self.target,
+            CommonKeys.TYPE: NodeType.LINK,
+        }

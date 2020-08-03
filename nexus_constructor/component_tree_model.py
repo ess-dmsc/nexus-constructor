@@ -8,10 +8,11 @@ from PySide2.QtWidgets import QMessageBox
 from nexus_constructor.component.link_transformation import LinkTransformation
 from nexus_constructor.component.transformations_list import TransformationsList
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.common_attrs import TransformationType
+from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.ui_utils import generate_unique_name
 
 
@@ -225,9 +226,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def _create_new_transformation(
         parent_component, transformation_list, transformation_type
     ):
-        values = Dataset(
-            name="", dataset=DatasetMetadata(type="Double", size=[1]), values=""
-        )
+        values = Dataset(name="", type=ValueTypes.DOUBLE, size=[1], values="")
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
                 name=generate_unique_name(
@@ -238,7 +237,9 @@ class ComponentTreeModel(QAbstractItemModel):
             )
         elif transformation_type == TransformationType.ROTATION:
             new_transformation = parent_component.add_rotation(
-                name=generate_unique_name("Rotation", transformation_list),
+                name=generate_unique_name(
+                    TransformationType.ROTATION, transformation_list
+                ),
                 axis=QVector3D(1.0, 0, 0),
                 angle=0.0,
                 values=values,

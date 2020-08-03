@@ -6,7 +6,7 @@ from nexus_constructor.component_tree_model import (
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
@@ -14,6 +14,7 @@ from nexus_constructor.model.geometry import OFFGeometryNoNexus
 from typing import Any, Optional, List, Tuple
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.model.value_type import ValueTypes
 from tests.test_utils import NX_CLASS_DEFINITIONS
 
 pytest.skip("Disabled whilst working on model change", allow_module_level=True)
@@ -26,8 +27,9 @@ def _add_component_to_file(
     component.set_field_value(
         field_name,
         Dataset(
-            name=field_name, dataset=DatasetMetadata(type="Double"), values=field_value
+            name=field_name, type=ValueTypes.DOUBLE, size="[1]", values=field_value
         ),
+        dtype=ValueTypes.DOUBLE,
     )
 
     return component

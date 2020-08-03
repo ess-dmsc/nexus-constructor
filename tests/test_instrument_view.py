@@ -1,6 +1,6 @@
 from mock import Mock
 
-from nexus_constructor.instrument_view import InstrumentView
+from nexus_constructor.instrument_view.instrument_view import InstrumentView
 
 
 def test_GIVEN_cube_dimensions_WHEN_calling_set_cube_mesh_dimesions_THEN_dimensions_set():

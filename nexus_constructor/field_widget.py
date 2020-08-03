@@ -20,7 +20,7 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.dataset import Dataset, DatasetMetadata
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
@@ -31,7 +31,7 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
-from nexus_constructor.model.value_type import VALUE_TYPE
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -114,7 +114,7 @@ class FieldWidget(QFrame):
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
         self.value_type_combo = QComboBox()
-        self.value_type_combo.addItems(list(VALUE_TYPE.keys()))
+        self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit = QLineEdit()
@@ -224,18 +224,12 @@ class FieldWidget(QFrame):
         dtype = self.value_type_combo.currentText()
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
-            return_object = Dataset(
-                name=self.name,
-                dataset=DatasetMetadata(size=[1], type=dtype),
-                values=val,
-            )
+            return_object = Dataset(name=self.name, size=[1], type=dtype, values=val,)
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
-                name=self.name,
-                dataset=DatasetMetadata(size=array.size, type=dtype),
-                values=array,
+                name=self.name, size=array.size, type=dtype, values=array,
             )
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()
@@ -247,13 +241,15 @@ class FieldWidget(QFrame):
 
         if self.field_type != FieldType.link:
             for attr_name, attr_tuple in self.attrs_dialog.get_attrs().items():
-                return_object.set_attribute_value(
+                return_object.attributes.set_attribute_value(
                     attribute_name=attr_name,
                     attribute_value=attr_tuple[0],
                     attribute_type=attr_tuple[1],
                 )
             if self.units and self.units is not None:
-                return_object.set_attribute_value(CommonAttrs.UNITS, self.units)
+                return_object.attributes.set_attribute_value(
+                    CommonAttrs.UNITS, self.units
+                )
         return return_object
 
     @value.setter
@@ -347,7 +343,7 @@ class FieldWidget(QFrame):
         if self.field_type == FieldType.array_dataset:
             self.edit_dialog.setLayout(QGridLayout())
             self.table_view.model.update_array_dtype(
-                VALUE_TYPE[self.value_type_combo.currentText()]
+                VALUE_TYPE_TO_NP[self.value_type_combo.currentText()]
             )
             self.edit_dialog.layout().addWidget(self.table_view)
             self.edit_dialog.setWindowTitle(

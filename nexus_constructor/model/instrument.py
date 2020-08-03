@@ -1,14 +1,14 @@
+from nexus_constructor.common_attrs import CommonKeys, INSTRUMENT_NAME
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from typing import Dict, Any
 
 SAMPLE_NAME = "sample"
-INSTRUMENT_NAME = "instrument"
 
 
 class Instrument(Group):
     def __init__(self, parent_node=None):
-        super().__init__(INSTRUMENT_NAME, parent_node)
+        super().__init__(name=INSTRUMENT_NAME, parent_node=parent_node)
         self.nx_class = "NXinstrument"
 
         self.sample = Component(SAMPLE_NAME, parent_node=self)
@@ -27,7 +27,7 @@ class Instrument(Group):
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Instrument, self).as_dict()
         # Put components (other than sample) in children
-        dictionary["children"].extend(
+        dictionary[CommonKeys.CHILDREN].extend(
             [
                 component.as_dict()
                 for component in self.component_list

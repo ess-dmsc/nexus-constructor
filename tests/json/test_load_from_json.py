@@ -5,8 +5,8 @@ from mock import patch, mock_open
 
 from nexus_constructor.json.load_from_json import JSONReader, _retrieve_children_list
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import DatasetMetadata
 from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.model.value_type import ValueTypes
 
 
 @pytest.fixture(scope="function")
@@ -218,7 +218,8 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
 def component_with_transformation() -> Component:
     transformation = Transformation(
         name="Transformation",
-        dataset=DatasetMetadata(type=None),
+        type=ValueTypes.DOUBLE,
+        size="[1]",
         values="",
         parent_component=None,
     )
