@@ -154,7 +154,7 @@ class Component(Group):
         if isinstance(depends_on_transform, Component):
             depends_on_transform = depends_on_transform.depends_on
         if depends_on_transform is not None:
-            if local_only and depends_on_transform._parent_component != self:
+            if local_only and depends_on_transform.parent_component != self:
                 # reached an external transform - ignore if local_only
                 return
             if depends_on_transform.depends_on == depends_on_transform:
@@ -254,7 +254,7 @@ class Component(Group):
         transform.units = units
         transform.vector = vector
         transform.depends_on = depends_on
-        transform._parent_component = self
+        transform.parent_component = self
 
         self.get_transforms_group()[name] = transform
 
