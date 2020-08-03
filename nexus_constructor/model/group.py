@@ -62,7 +62,7 @@ class Group:
 
     def set_field_value(self, name: str, value: Any, dtype: str):
         try:
-            size = value.size
+            size = value.shape
         except AttributeError:
             size = [1]
         self[name] = Dataset(name=name, size=size, type=dtype, values=value)
