@@ -15,25 +15,25 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, ARRAY, SCALAR
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import FieldValueValidator
-from nexus_constructor.model.value_type import VALUE_TYPE
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 
 ATTRS_EXCLUDELIST = [CommonAttrs.UNITS]
 
 
 def _get_human_readable_type(new_value: Any):
     if isinstance(new_value, str):
-        return "String"
+        return ValueTypes.STRING
     elif isinstance(new_value, int):
-        return "Int"
+        return ValueTypes.INT
     elif isinstance(new_value, float):
-        return "Double"
+        return ValueTypes.DOUBLE
     else:
         return next(
-            key for key, value in VALUE_TYPE.items() if value == new_value.dtype
+            key for key, value in VALUE_TYPE_TO_NP.items() if value == new_value.dtype
         )
 
 
@@ -95,16 +95,16 @@ class FieldAttrFrame(QFrame):
         self.attr_value_lineedit = QLineEdit()
 
         self.array_or_scalar_combo = QComboBox()
-        self.array_or_scalar_combo.addItems(["Scalar", "Array"])
+        self.array_or_scalar_combo.addItems([SCALAR, ARRAY])
         self.array_or_scalar_combo.currentTextChanged.connect(self.type_changed)
         self.array_edit_button = QPushButton("Edit Array")
         self.array_edit_button.clicked.connect(self.show_edit_array_dialog)
 
         self.attr_dtype_combo = QComboBox()
-        self.attr_dtype_combo.addItems([*VALUE_TYPE.keys()])
+        self.attr_dtype_combo.addItems([*VALUE_TYPE_TO_NP.keys()])
         self.attr_dtype_combo.currentTextChanged.connect(self.dtype_changed)
         self.dtype_changed(self.attr_dtype_combo.currentText())
-        self.dialog = ArrayDatasetTableWidget(VALUE_TYPE[self.dtype])
+        self.dialog = ArrayDatasetTableWidget(VALUE_TYPE_TO_NP[self.dtype])
 
         self.layout().addWidget(self.attr_name_lineedit)
         self.layout().addWidget(self.array_or_scalar_combo)
@@ -112,7 +112,7 @@ class FieldAttrFrame(QFrame):
         self.layout().addWidget(self.attr_value_lineedit)
         self.layout().addWidget(self.array_edit_button)
 
-        self.type_changed("Scalar")
+        self.type_changed(SCALAR)
 
         if attr is not None:
             self.name = attr.name
@@ -120,8 +120,8 @@ class FieldAttrFrame(QFrame):
             self.dtype = attr.type
 
     def type_changed(self, item: str):
-        self.attr_value_lineedit.setVisible(item == "Scalar")
-        self.array_edit_button.setVisible(item == "Array")
+        self.attr_value_lineedit.setVisible(item == SCALAR)
+        self.array_edit_button.setVisible(item == ARRAY)
         self.array_or_scalar_combo.setCurrentText(item)
 
     def dtype_changed(self, _: str):
@@ -150,7 +150,7 @@ class FieldAttrFrame(QFrame):
 
     @property
     def is_scalar(self):
-        return self.array_or_scalar_combo.currentText() == "Scalar"
+        return self.array_or_scalar_combo.currentText() == SCALAR
 
     def show_edit_array_dialog(self, _):
         self.dialog.show()
@@ -167,9 +167,11 @@ class FieldAttrFrame(QFrame):
     def value(self) -> Union[np.generic, np.ndarray]:
 
         if self.is_scalar:
-            if self.dtype == VALUE_TYPE["String"] or isinstance(self.dtype, str):
+            if self.dtype == VALUE_TYPE_TO_NP[ValueTypes.STRING] or isinstance(
+                self.dtype, str
+            ):
                 return self.attr_value_lineedit.text()
-            return self.dtype(self.attr_value_lineedit.text())
+            return self.dtype(VALUE_TYPE_TO_NP[self.attr_value_lineedit.text()])
         return np.squeeze(self.dialog.model.array)
 
     @value.setter
@@ -180,10 +182,10 @@ class FieldAttrFrame(QFrame):
 
         self.attr_dtype_combo.setCurrentText(_get_human_readable_type(new_value))
         if np.isscalar(new_value):
-            self.type_changed("Scalar")
+            self.type_changed(SCALAR)
             self.attr_value_lineedit.setText(str(new_value))
         else:
-            self.type_changed("Array")
+            self.type_changed(ARRAY)
             self.dialog.model.array = new_value
             self.dialog.model.update_array_dtype(new_value.dtype)
         self.dtype_changed(None)

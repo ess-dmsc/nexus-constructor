@@ -1,20 +1,47 @@
 from typing import Union
 import numpy as np
 
+
+class ValueTypes:
+    BYTE = "byte"
+    UBYTE = "ubyte"
+    SHORT = "int16"
+    USHORT = "uint16"
+    INT = "int32"
+    UINT = "uint32"
+    LONG = "int64"
+    ULONG = "uint64"
+    FLOAT = "float"
+    DOUBLE = "double"
+    STRING = "string"
+
+
 # Allowed types for dataset and attribute values
-VALUE_TYPE = {
-    "Byte": np.byte,
-    "UByte": np.ubyte,
-    "Short": np.short,
-    "UShort": np.ushort,
-    "Integer": np.intc,
-    "UInteger": np.uintc,
-    "Long": np.int_,
-    "ULong": np.uint,
-    "Float": np.single,
-    "Double": np.double,
-    "String": str,
+VALUE_TYPE_TO_NP = {
+    ValueTypes.BYTE: np.byte,
+    ValueTypes.UBYTE: np.ubyte,
+    ValueTypes.SHORT: np.short,
+    ValueTypes.USHORT: np.ushort,
+    ValueTypes.INT: np.intc,
+    ValueTypes.UINT: np.uintc,
+    ValueTypes.LONG: np.int_,
+    ValueTypes.ULONG: np.uint,
+    ValueTypes.FLOAT: np.single,
+    ValueTypes.DOUBLE: np.double,
+    ValueTypes.STRING: str,
 }
+
 
 # For use in type hints
 ValueType = Union[np.ndarray, str]
+
+
+INT_TYPES = [
+    ValueTypes.INT,
+    ValueTypes.UINT,
+    ValueTypes.LONG,
+    ValueTypes.ULONG,
+    ValueTypes.USHORT,
+    ValueTypes.SHORT,
+]
+FLOAT_TYPES = [ValueTypes.FLOAT, ValueTypes.DOUBLE]

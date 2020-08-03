@@ -5,6 +5,8 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation
 from typing import Any
+
+from nexus_constructor.model.value_type import ValueTypes
 from tests.helpers import add_component_to_file  # noqa:F401
 
 transform_type = "Transformation"
@@ -15,7 +17,7 @@ translation_type = "Translation"
 def _add_transform_to_file(
     name: str, value: Any, vector: QVector3D, transform_type: str
 ):
-    transform = Transformation(name=name, type="Double", size="[1]", values=42)
+    transform = Transformation(name=name, type=ValueTypes.DOUBLE, size="[1]", values=42)
     transform.transform_type = transform_type
     transform.vector = vector
     transform.values = value
@@ -28,14 +30,14 @@ def create_transform(
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
-    values=Dataset(name="", values=None, type="double", size=[1]),
+    values=Dataset(name="", values=None, type=ValueTypes.DOUBLE, size=[1]),
 ):
 
     translation = Transformation(
         name=name,
         parent_node=None,
         values=values,
-        type="str",
+        type=ValueTypes.STRING,
         parent_component=None,
         size=[1],
     )

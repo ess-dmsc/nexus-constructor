@@ -31,7 +31,7 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
-from nexus_constructor.model.value_type import VALUE_TYPE
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -114,7 +114,7 @@ class FieldWidget(QFrame):
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
         self.value_type_combo = QComboBox()
-        self.value_type_combo.addItems(list(VALUE_TYPE.keys()))
+        self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit = QLineEdit()
@@ -343,7 +343,7 @@ class FieldWidget(QFrame):
         if self.field_type == FieldType.array_dataset:
             self.edit_dialog.setLayout(QGridLayout())
             self.table_view.model.update_array_dtype(
-                VALUE_TYPE[self.value_type_combo.currentText()]
+                VALUE_TYPE_TO_NP[self.value_type_combo.currentText()]
             )
             self.edit_dialog.layout().addWidget(self.table_view)
             self.edit_dialog.setWindowTitle(

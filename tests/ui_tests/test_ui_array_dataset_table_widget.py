@@ -5,7 +5,8 @@ from PySide2.QtWidgets import QWidget
 from mock import Mock
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
-from nexus_constructor.validators import VALUE_TYPE
+from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.validators import VALUE_TYPE_TO_NP
 
 
 @pytest.fixture(scope="function")
@@ -47,8 +48,8 @@ def test_UI_GIVEN_data_has_different_shapes_WHEN_getting_array_from_component_TH
     )
 
 
-@pytest.mark.parametrize("orig_data_type", VALUE_TYPE.values())
-@pytest.mark.parametrize("new_data_type", VALUE_TYPE.values())
+@pytest.mark.parametrize("orig_data_type", VALUE_TYPE_TO_NP.values())
+@pytest.mark.parametrize("new_data_type", VALUE_TYPE_TO_NP.values())
 def test_UI_GIVEN_data_type_WHEN_changing_data_type_THEN_change_is_successful(
     array_dataset_table_widget, orig_data_type, new_data_type
 ):
@@ -68,7 +69,9 @@ def test_GIVEN_string_array_WHEN_changing_data_type_to_int_THEN_array_rests(
 ):
     array = np.array(["hello" for _ in range(10)])
     array_dataset_table_widget.model.array = array
-    array_dataset_table_widget.model.update_array_dtype(VALUE_TYPE["Integer"])
+    array_dataset_table_widget.model.update_array_dtype(
+        VALUE_TYPE_TO_NP[ValueTypes.INT]
+    )
 
     assert array_dataset_table_widget.model.array.item(0) == 0
 

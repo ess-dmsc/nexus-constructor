@@ -2,7 +2,7 @@ from typing import Any, Union, Dict
 import attr
 import numpy as np
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.helpers import (
@@ -72,12 +72,10 @@ class Group:
         return self[name].values
 
     def as_dict(self) -> Dict[str, Any]:
-        return_dict = {}
-        return_dict["name"] = self.name
+        return_dict = {CommonKeys.NAME: self.name, CommonKeys.TYPE: NodeType.GROUP}
         if self.attributes:
-            return_dict["attributes"] = self.attributes.as_dict()
-        return_dict["type"] = "group"
-        return_dict["children"] = (
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict()
+        return_dict[CommonKeys.CHILDREN] = (
             [
                 child.as_dict()
                 for child in self.children
@@ -90,6 +88,6 @@ class Group:
 
 
 def name_not_in_excludelist(child: Any):
-    if hasattr(child, "name") and child.name in CHILD_EXCLUDELIST:
+    if hasattr(child, CommonKeys.NAME) and child.name in CHILD_EXCLUDELIST:
         return False
     return True

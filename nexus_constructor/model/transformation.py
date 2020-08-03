@@ -5,9 +5,14 @@ import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QVector3D, QMatrix4x4
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import (
+    CommonAttrs,
+    CommonKeys,
+    NodeType,
+    TransformationType,
+)
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.model.value_type import ValueTypes
 
 from typing import TYPE_CHECKING
 
@@ -154,23 +159,23 @@ class Transformation(Dataset):
 
     def as_dict(self) -> Dict[str, Any]:
         return_dict = {
-            "name": self.name,
-            "type": "dataset",
-            "attributes": [
+            CommonKeys.NAME: self.name,
+            CommonKeys.TYPE: NodeType.DATASET,
+            CommonKeys.ATTRIBUTES: [
                 attribute.as_dict()
                 for attribute in self.attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
             ]
             if self.attributes
             else None,
-            "values": self.values.as_dict() if self.values else [],
+            CommonKeys.VALUES: self.values.as_dict() if self.values else [],
         }
         try:
-            return_dict["attributes"].append(
+            return_dict[CommonKeys.ATTRIBUTES].append(
                 {
-                    "name": "depends_on",
-                    "values": self.depends_on.absolute_path,
-                    "type": "String",
+                    CommonKeys.NAME: CommonAttrs.DEPENDS_ON,
+                    CommonKeys.VALUES: self.depends_on.absolute_path,
+                    CommonKeys.TYPE: ValueTypes.STRING,
                 }
             )
         except AttributeError:

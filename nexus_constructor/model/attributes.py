@@ -2,15 +2,19 @@ from typing import Any, Dict
 import attr
 import numpy as np
 
+from nexus_constructor.common_attrs import CommonKeys
 from nexus_constructor.model.helpers import _get_item, _set_item
-from nexus_constructor.model.value_type import ValueType
+from nexus_constructor.model.value_type import ValueType, ValueTypes
 
 
 class Attributes(list):
     """Abstract class used for common functionality between a group and dataset. """
 
     def set_attribute_value(
-        self, attribute_name: str, attribute_value: Any, attribute_type: str = "String"
+        self,
+        attribute_name: str,
+        attribute_value: Any,
+        attribute_type: str = ValueTypes.STRING,
     ):
         _set_item(
             self,
@@ -31,7 +35,9 @@ class Attributes(list):
     def as_dict(self):
         return_dict = {}
         if self:
-            return_dict["attributes"] = [attribute.as_dict() for attribute in self]
+            return_dict[CommonKeys.ATTRIBUTES] = [
+                attribute.as_dict() for attribute in self
+            ]
         return return_dict
 
 
@@ -46,7 +52,7 @@ class FieldAttribute:
 
     name = attr.ib(type=str)
     values = attr.ib(type=ValueType, cmp=False)
-    type = attr.ib(type=str, default="String")
+    type = attr.ib(type=str, default=ValueTypes.STRING)
 
     def __eq__(self, other_attribute):
         if not self.name == other_attribute.name:
@@ -59,4 +65,8 @@ class FieldAttribute:
         values = self.values
         if isinstance(values, np.ndarray):
             values = values.tolist()
-        return {"name": self.name, "type": self.type, "values": values}
+        return {
+            CommonKeys.NAME: self.name,
+            CommonKeys.TYPE: self.type,
+            CommonKeys.VALUES: values,
+        }

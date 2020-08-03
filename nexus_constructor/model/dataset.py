@@ -2,7 +2,7 @@ import attr
 from typing import List, Dict, Any
 import numpy as np
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.helpers import get_absolute_path
 from nexus_constructor.model.value_type import ValueType
@@ -30,13 +30,18 @@ class Dataset:
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
     def as_dict(self) -> Dict[str, Any]:
-        return_dict = {"name": self.name}
+        return_dict = {
+            CommonKeys.NAME: self.name,
+            CommonKeys.TYPE: NodeType.DATASET,
+            CommonKeys.DATASET: {
+                CommonKeys.TYPE: self.type,
+                CommonKeys.SIZE: self.size,
+            },
+        }
         if self.attributes:
-            return_dict["attributes"] = self.attributes.as_dict()
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict()
         values = self.values
         if isinstance(values, np.ndarray):
             values = values.tolist()
-        return_dict["type"] = "dataset"
-        return_dict["values"] = values
-        return_dict["dataset"] = {"type": self.type, "size": self.size}
+        return_dict[CommonKeys.VALUES] = values
         return return_dict

@@ -6,7 +6,7 @@ from PySide2.QtCore import QUrl, Signal, QObject, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidgetItem, QListWidget
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, SHAPE_GROUP_NAME
 from nexus_constructor.component.component_type import (
     PIXEL_COMPONENT_TYPES,
     CHOPPER_CLASS_NAME,
@@ -22,7 +22,6 @@ from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.model.component import (
     Component,
     add_fields_to_component,
-    SHAPE_GROUP_NAME,
 )
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.geometry import (

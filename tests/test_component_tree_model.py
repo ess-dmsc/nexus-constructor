@@ -14,6 +14,7 @@ from nexus_constructor.model.geometry import OFFGeometryNoNexus
 from typing import Any, Optional, List, Tuple
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.model.value_type import ValueTypes
 from tests.test_utils import NX_CLASS_DEFINITIONS
 
 pytest.skip("Disabled whilst working on model change", allow_module_level=True)
@@ -25,8 +26,10 @@ def _add_component_to_file(
     component = Component(component_name)
     component.set_field_value(
         field_name,
-        Dataset(name=field_name, type="Double", size="[1]", values=field_value),
-        dtype="Double",
+        Dataset(
+            name=field_name, type=ValueTypes.DOUBLE, size="[1]", values=field_value
+        ),
+        dtype=ValueTypes.DOUBLE,
     )
 
     return component

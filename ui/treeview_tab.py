@@ -9,14 +9,14 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.instrument_view import InstrumentView
+from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.treeview_utils import (
     create_and_add_toolbar_action,
     add_transformation,
     expand_transformation_list,
     set_button_states,
 )
-from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.model.model import Model
 
 

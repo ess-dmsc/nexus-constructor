@@ -1,6 +1,6 @@
 from typing import Union, Any
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys
 
 DEPENDS_ON_IGNORE = [None, "."]
 
@@ -12,8 +12,8 @@ def _find_attribute_from_dict(attribute_name: str, entry: dict) -> Any:
     :param entry: The dictionary containing the information.
     :return: The attribute value if it could be found, otherwise None.
     """
-    if entry.get("name") == attribute_name:
-        return entry.get("values")
+    if entry.get(CommonKeys.NAME) == attribute_name:
+        return entry.get(CommonKeys.VALUES)
     if entry.get(attribute_name):
         return entry.get(attribute_name)
     return None

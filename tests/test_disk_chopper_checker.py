@@ -19,6 +19,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     UNITS_REQUIRED,
 )
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.value_type import ValueTypes
 from tests.chopper_test_helpers import (  # noqa: F401
     N_SLITS,
     DEGREES_EDGES_ARR,
@@ -42,7 +43,7 @@ def create_dataset(name: str, dtype: str, val: Any):
 
 @pytest.fixture(scope="function")
 def mock_slits_widget():
-    dtype = "Integer"
+    dtype = ValueTypes.INT
     mock_slits_widget = Mock(spec=FieldWidget)
     mock_slits_widget.name = SLITS_NAME
     mock_slits_widget.value = create_dataset(SLITS_NAME, dtype, N_SLITS)
@@ -53,7 +54,7 @@ def mock_slits_widget():
 
 @pytest.fixture(scope="function")
 def mock_slit_edges_widget():
-    dtype = "Float"
+    dtype = ValueTypes.FLOAT
     mock_slit_edges_widget = Mock(spec=FieldWidget)
     mock_slit_edges_widget.name = SLIT_EDGES_NAME
     mock_slit_edges_widget.value = create_dataset(
@@ -66,7 +67,7 @@ def mock_slit_edges_widget():
 
 @pytest.fixture(scope="function")
 def mock_radius_widget():
-    dtype = "Float"
+    dtype = ValueTypes.FLOAT
     mock_radius_widget = Mock(spec=FieldWidget)
     mock_radius_widget.name = RADIUS_NAME
     mock_radius_widget.value = create_dataset(RADIUS_NAME, dtype, RADIUS_LENGTH)
@@ -78,7 +79,7 @@ def mock_radius_widget():
 
 @pytest.fixture(scope="function")
 def mock_slit_height_widget():
-    dtype = "Float"
+    dtype = ValueTypes.FLOAT
     mock_slit_height_widget = Mock(spec=FieldWidget)
     mock_slit_height_widget.name = SLIT_HEIGHT_NAME
     mock_slit_height_widget.value = create_dataset(
@@ -163,10 +164,12 @@ def test_GIVEN_non_matching_data_types_WHEN_checking_data_types_THEN_check_data_
 def test_GIVEN_fields_information_and_field_name_WHEN_calling_incorrect_field_type_message_THEN_expected_string_is_returned(
     mock_radius_widget,
 ):
-    wrong_data_type = "String"
+    wrong_data_type = ValueTypes.STRING
     mock_radius_widget.dtype = wrong_data_type
     field_dict = {RADIUS_NAME: mock_radius_widget}
-    error_message = _incorrect_data_type_message(field_dict, RADIUS_NAME, "float")
+    error_message = _incorrect_data_type_message(
+        field_dict, RADIUS_NAME, ValueTypes.FLOAT
+    )
 
     assert (
         error_message
@@ -237,7 +240,7 @@ def test_GIVEN_mismatch_between_slits_and_slit_edges_array_WHEN_validating_chopp
     chopper_checker,
 ):
     chopper_checker.fields_dict[SLITS_NAME].value = create_dataset(
-        SLITS_NAME, "Integer", 5
+        SLITS_NAME, ValueTypes.INT, 5
     )
 
     assert chopper_checker.required_fields_present()
@@ -253,7 +256,7 @@ def test_GIVEN_slit_height_is_larger_than_radius_WHEN_validating_chopper_input_T
     chopper_checker,
 ):
     chopper_checker.fields_dict[SLITS_NAME].value = create_dataset(
-        SLITS_NAME, "Integer", 201
+        SLITS_NAME, ValueTypes.INT, 201
     )
 
     assert chopper_checker.required_fields_present()
@@ -269,7 +272,7 @@ def test_GIVEN_slit_height_and_radius_are_equal_WHEN_validating_chopper_input_TH
     chopper_checker,
 ):
     dataset_val = 20
-    slit_height_dataset = create_dataset(SLIT_HEIGHT_NAME, "Integer", dataset_val)
+    slit_height_dataset = create_dataset(SLIT_HEIGHT_NAME, ValueTypes.INT, dataset_val)
 
     chopper_checker.fields_dict[SLIT_HEIGHT_NAME].value = slit_height_dataset
     chopper_checker.fields_dict[RADIUS_NAME].value.values = dataset_val
@@ -407,7 +410,7 @@ def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_c
 ):
 
     mock_slit_edges_widget.value = create_dataset(
-        SLIT_EDGES_NAME, "Float", RADIANS_EDGES_ARR
+        SLIT_EDGES_NAME, ValueTypes.FLOAT, RADIANS_EDGES_ARR
     )
     mock_slit_edges_widget.units = units_attribute
     chopper_checker.validate_chopper()
@@ -464,7 +467,7 @@ def test_GIVEN_fields_have_wrong_type_WHEN_validating_fields_THEN_data_has_corre
     chopper_checker, field
 ):
 
-    chopper_checker.fields_dict[field].dtype = "String"
+    chopper_checker.fields_dict[field].dtype = ValueTypes.STRING
     assert not chopper_checker._data_has_correct_type()
 
 

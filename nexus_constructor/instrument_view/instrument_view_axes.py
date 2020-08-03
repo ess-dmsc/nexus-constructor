@@ -5,9 +5,12 @@ from PySide2 import QtCore
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DRender import Qt3DRender
 
-from nexus_constructor.axis_colors import AxisColors
-from nexus_constructor.line_geometry import LineGeometry
-from nexus_constructor.qentity_utils import create_material, create_qentity
+from nexus_constructor.instrument_view.axis_colors import AxisColors
+from nexus_constructor.instrument_view.line_geometry import LineGeometry
+from nexus_constructor.instrument_view.qentity_utils import (
+    create_material,
+    create_qentity,
+)
 
 
 class InstrumentViewAxes(object):

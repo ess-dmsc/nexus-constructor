@@ -6,7 +6,7 @@ from nexus_constructor.field_utils import find_field_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.unit_utils import METRES, RADIANS
 from ui.link import Ui_Link
 from ui.transformation import Ui_Transformation
