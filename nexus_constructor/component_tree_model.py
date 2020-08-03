@@ -153,7 +153,6 @@ class ComponentTreeModel(QAbstractItemModel):
         for transform in transforms:
             transform.remove_from_dependee_chain()
         self.model.entry.instrument.remove_component(component)
-        self.components.pop(remove_index)
         self.endRemoveRows()
 
     def remove_node(self, node: QModelIndex):
