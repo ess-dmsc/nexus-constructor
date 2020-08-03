@@ -1,7 +1,5 @@
 from functools import partial
 from typing import Dict
-
-import h5py
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QComboBox,
@@ -49,8 +47,6 @@ F142_TYPES = [
     "double",
     "string",
 ]
-
-STRING_DTYPE = h5py.special_dtype(vlen=str)
 
 
 def check_if_advanced_options_should_be_enabled(advanced_fields) -> bool:
@@ -349,7 +345,7 @@ class StreamFieldsWidget(QDialog):
 
     @staticmethod
     def _create_dataset_from_spinner(
-        stream_group: h5py.Group, nexus_to_spinner_dict: Dict[str, QSpinBox]
+        stream_group: StreamGroup, nexus_to_spinner_dict: Dict[str, QSpinBox]
     ):
         for (nexus_string, ui_element) in nexus_to_spinner_dict.items():
             if ui_element.value() > 0:

@@ -3,7 +3,7 @@ import sys
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QIcon, QColor
-from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel
+from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel, QFrame
 
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.transformations_list import TransformationsList
@@ -194,12 +194,14 @@ def fill_selection(option, painter):
     painter.fillRect(option.rect, colour)
 
 
-def get_link_transformation_frame(frame, model: Model, value):
+def get_link_transformation_frame(
+    frame: QFrame, model: Model, value: LinkTransformation
+):
     frame.transformation_frame = EditTransformationLink(frame, value, model)
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 
-def get_transformation_frame(frame, model: Model, value):
+def get_transformation_frame(frame: QFrame, model: Model, value: Transformation):
     if value.transform_type == TransformationType.TRANSLATION:
         frame.transformation_frame = EditTranslation(frame, value, model)
     elif value.transform_type == TransformationType.ROTATION:

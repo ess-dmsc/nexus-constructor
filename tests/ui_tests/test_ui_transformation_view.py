@@ -1,11 +1,13 @@
 from typing import Any
-import h5py
 from PySide2.QtGui import QVector3D
 from mock import Mock
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.entry import Entry
+from nexus_constructor.model.link import Link
+from nexus_constructor.model.model import Model
+from nexus_constructor.model.stream import StreamGroup, EV42Stream
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 import numpy as np
@@ -86,7 +88,7 @@ def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_cor
 
 
 def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_is_filled_correctly(
-    qtbot, file, component, model
+    qtbot, component, model
 ):
     array = np.array([1, 2, 3, 4])
 
@@ -110,13 +112,10 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
     )
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled_correctly(
-    qtbot, file, nexus_wrapper
+    qtbot
 ):
-    instrument = Instrument(nexus_wrapper, {})
-
-    component = instrument.create_component("test", "NXaperture", "")
+    component = Component(name="test", )
 
     x = 0
     y = 0
@@ -124,18 +123,17 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
 
     transform = component.add_rotation(QVector3D(x, y, z), 0, name="test")
 
-    stream_group = file.create_group("stream_group")
-    stream_group.attrs["NX_class"] = "NCstream"
+    stream_group = StreamGroup("stream_group")
+
     topic = "test_topic"
-    writer_module = "ev42"
     source = "source1"
-    stream_group.create_dataset("topic", dtype=h5py.special_dtype(vlen=str), data=topic)
-    stream_group.create_dataset("writer_module", data=writer_module)
-    stream_group.create_dataset("source", data=source)
+    stream = EV42Stream(topic=topic, source=source)
 
-    transform.dataset = stream_group
+    stream_group["stream"] = stream
 
-    view = EditRotation(parent=None, transformation=transform, instrument=instrument)
+    transform.values = stream_group
+
+    view = EditRotation(parent=None, transformation=transform, model=None)
     qtbot.addWidget(view)
 
     assert view.transformation_frame.x_spinbox.value() == x
@@ -145,21 +143,19 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
     assert (
         view.transformation_frame.magnitude_widget.field_type == FieldType.kafka_stream
     )
-    assert view.transformation_frame.magnitude_widget.value["topic"][()] == topic
+    assert view.transformation_frame.magnitude_widget.value.children[0].topic == topic
     assert (
-        view.transformation_frame.magnitude_widget.value["writer_module"][()]
-        == writer_module
+        view.transformation_frame.magnitude_widget.value.children[0].writer_module == "ev42"
     )
-    assert view.transformation_frame.magnitude_widget.value["source"][()] == source
+    assert view.transformation_frame.magnitude_widget.value.children[0].source == source
 
 
-@pytest.mark.skip
 def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
-    qtbot, nexus_wrapper
+    qtbot
 ):
-    instrument = Instrument(nexus_wrapper, {})
+    model = Model(entry=Entry())
 
-    component = instrument.create_component("test", "NXaperture", "")
+    component = Component(name="test")
 
     x = 0
     y = 0
@@ -167,11 +163,11 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     path = "/entry"
 
     transform = component.add_rotation(QVector3D(x, y, z), 0, name="test")
-    link = nexus_wrapper.instrument["asdfgh"] = h5py.SoftLink(path)
+    link = Link(name="test", target=path)
 
-    transform.dataset = link
+    transform.values = link
 
-    view = EditRotation(parent=None, transformation=transform, instrument=instrument)
+    view = EditRotation(transformation=transform, model=model, parent=None)
     qtbot.addWidget(view)
 
     assert view.transformation_frame.x_spinbox.value() == x
@@ -179,7 +175,7 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     assert view.transformation_frame.z_spinbox.value() == z
     assert view.transformation_frame.value_spinbox.value() == 0.0
     assert view.transformation_frame.magnitude_widget.field_type == FieldType.link
-    assert view.transformation_frame.magnitude_widget.value.path == path
+    assert view.transformation_frame.magnitude_widget.value.target == path
 
 
 def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
@@ -322,7 +318,6 @@ def test_UI_GIVEN_change_to_scalar_value_WHEN_creating_new_transformation_THEN_u
     transform.values = create_corresponding_value_dataset(value)
 
     view = EditTranslation(parent=None, transformation=transform, model=model)
-    print(view.transformation_frame.magnitude_widget.field_type)
     view.transformation_frame.magnitude_widget.field_type = (
         FieldType.scalar_dataset.value
     )

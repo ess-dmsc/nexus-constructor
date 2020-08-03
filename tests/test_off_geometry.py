@@ -1,21 +1,8 @@
-import pytest
-from mock import patch
-from numpy import array_equal, array
-
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import OFFGeometryNoNexus, OFFGeometryNexus
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.pixel_data import PixelMapping
-from .helpers import add_component_to_file
 from pytest import approx
-
-
-@pytest.fixture
-def nx_geometry_group(nexus_wrapper):
-    return nexus_wrapper.create_nx_group(
-        "test_geometry", "NXoff_geometry", nexus_wrapper.entry
-    )
 
 
 UNIT = "m"
@@ -136,94 +123,3 @@ def test_can_set_off_geometry_properties():
     assert nexus_shape.vertices[2].x() == approx(vertex_2_x)
     assert nexus_shape.vertices[2].y() == approx(vertex_2_y)
     assert nexus_shape.vertices[2].z() == approx(vertex_2_z)
-
-
-@pytest.mark.skip(reason="Disabled whilst working on model change")
-def test_can_record_list_of_vertices_for_each_face(nexus_wrapper):
-    # Reverse process of test_can_retrieve_list_of_vertices_for_each_face
-    component = add_component_to_file(nexus_wrapper)
-
-    shape = OFFGeometryNoNexus(
-        [QVector3D(0.0, 0.0, 1.0), QVector3D(0.0, 1.0, 0.0), QVector3D(0.0, 0.0, 0.0)],
-        [[0, 1, 2]],
-    )
-
-    component.set_off_shape(shape)
-    nexus_shape, _ = component.shape
-
-    test_input_vertex_indices_split_by_face = [
-        [0, 1, 2],
-        [3, 4, 5, 6],
-        [7, 8, 9, 10, 11],
-    ]
-
-    record_faces_in_file(
-        nexus_wrapper, nexus_shape.group, test_input_vertex_indices_split_by_face
-    )
-
-    expected_output_flat_list_of_vertex_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    expected_output_start_index_of_each_face = [0, 3, 7]
-
-    flat_list_of_vertex_indices = nexus_shape.group["winding_order"][...].tolist()
-    start_index_of_each_face = nexus_shape.group["faces"][...].tolist()
-
-    assert flat_list_of_vertex_indices == expected_output_flat_list_of_vertex_indices
-    assert start_index_of_each_face == expected_output_start_index_of_each_face
-
-
-@pytest.mark.skip(reason="Disabled whilst working on model change")
-def test_can_retrieve_list_of_vertices_for_each_face(nexus_wrapper):
-    # Reverse process of test_can_record_list_of_vertices_for_each_face
-
-    component = add_component_to_file(nexus_wrapper)
-
-    shape = OFFGeometryNoNexus(
-        [QVector3D(0.0, 0.0, 1.0), QVector3D(0.0, 1.0, 0.0), QVector3D(0.0, 0.0, 0.0)],
-        [[0, 1, 2]],
-    )
-
-    component.set_off_shape(shape)
-
-    test_input_flat_list_of_vertex_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    # Define there are three faces, the difference in starting index indicates there are three vertices
-    # in the first face (triangle), four in the second (square), and five in the third face (pentagon)
-    test_input_start_index_of_each_face = [0, 3, 7]
-
-    expected_output_vertex_indices_split_by_face = [
-        [0, 1, 2],
-        [3, 4, 5, 6],
-        [7, 8, 9, 10, 11],
-    ]
-
-    nexus_shape, _ = component.shape
-
-    nexus_wrapper.set_field_value(
-        nexus_shape.group, "winding_order", test_input_flat_list_of_vertex_indices
-    )
-    nexus_wrapper.set_field_value(
-        nexus_shape.group, "faces", test_input_start_index_of_each_face
-    )
-
-    assert nexus_shape.faces == expected_output_vertex_indices_split_by_face
-
-
-@pytest.mark.skip(reason="Disabled whilst working on model change")
-def test_GIVEN_pixel_mapping_WHEN_initialising_off_geometry_THEN_mapping_in_nexus_file_matches_mapping_in_pixel_data_object(
-    nexus_wrapper, nx_geometry_group
-):
-    num_detectors = 6
-    ids = [i for i in range(num_detectors)]
-    pixel_mapping = PixelMapping(ids)
-    expected_dataset = [(id, id) for id in ids]
-
-    # Patch the validation method so that it doesn't mind information being absent from the NeXus group
-    with patch(
-        "nexus_constructor.geometry.off_geometry.OFFGeometryNexus._verify_in_file"
-    ):
-        off_geometry = OFFGeometryNexus(
-            nexus_wrapper, nx_geometry_group, "m", "path", pixel_mapping
-        )
-
-    actual_dataset = off_geometry.detector_faces
-
-    assert array_equal(array(expected_dataset), actual_dataset)

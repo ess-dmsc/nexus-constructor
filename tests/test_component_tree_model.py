@@ -15,9 +15,6 @@ from typing import Any, Optional, List, Tuple
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.value_type import ValueTypes
-from tests.test_utils import NX_CLASS_DEFINITIONS
-
-pytest.skip("Disabled whilst working on model change", allow_module_level=True)
 
 
 def _add_component_to_file(
@@ -35,6 +32,14 @@ def _add_component_to_file(
     return component
 
 
+@pytest.fixture(scope="function")
+def model():
+    entry = Entry()
+    entry.instrument = Instrument()
+    model = Model(entry)
+    return model
+
+
 class FakeTransformationChangedSignal:
     def __init__(self):
         pass
@@ -43,16 +48,12 @@ class FakeTransformationChangedSignal:
         pass
 
 
-class FakeNexusWrapper:
-    def __init__(self):
-        self.transformation_changed = FakeTransformationChangedSignal()
-
-
 class FakeInstrument(list):
-    def __init__(self, component_list: Optional[List[Component, ...]] = None):
+    def __init__(self, component_list: Optional[List[Component]] = None):
         super().__init__()
         if component_list is not None:
             self.extend(component_list)
+        self.name = "instrument"
 
     def get_component_list(self):
         return self
@@ -66,7 +67,7 @@ def get_component():
 
 
 def create_component_tree_model(
-    components: Optional[List[Component, ...]] = None
+    components: Optional[List[Component]] = None,
 ) -> Tuple[ComponentTreeModel, FakeInstrument]:
     entry = Entry()
     instrument = FakeInstrument(components)
@@ -244,23 +245,6 @@ def test_get_component_info_parent():
     )
 
 
-def test_get_transformation_parent():
-    component = get_component()
-    translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
-    component.depends_on = translation
-    test_component_tree_model, test_instrument = create_component_tree_model(
-        [component]
-    )
-    component.stored_transforms = component.transforms
-    translation.parent_node = component.stored_transforms
-
-    test_index = test_component_tree_model.createIndex(0, 0, translation)
-
-    found_parent = test_component_tree_model.parent(test_index)
-    assert found_parent.internalPointer() == test_instrument[0].stored_transforms
-    assert found_parent.row() == 1
-
-
 def test_get_transformation_link_parent():
     component = get_component()
     component.stored_transforms = component.transforms
@@ -404,7 +388,7 @@ def test_add_rotation():
     test_component_tree_model.add_rotation(component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 1
     transform_index = test_component_tree_model.index(0, 0, transformation_list_index)
-    assert transform_index.internalPointer().type == "Rotation"
+    assert transform_index.internalPointer().transform_type == "Rotation"
 
 
 def test_add_translation():
@@ -417,7 +401,7 @@ def test_add_translation():
     test_component_tree_model.add_translation(component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 1
     transform_index = test_component_tree_model.index(0, 0, transformation_list_index)
-    assert transform_index.internalPointer().type == "Translation"
+    assert transform_index.internalPointer().transform_type == "Translation"
 
 
 def test_add_transformation_alt_1():
@@ -501,11 +485,8 @@ def test_add_link_multiple_times():
     assert first_link is transformation_list_index.internalPointer().link
 
 
-def test_duplicate_component():
-    test_instrument = Instrument(
-        NexusWrapper("test_component_model_duplicate"), NX_CLASS_DEFINITIONS
-    )
-    test_component_tree_model = ComponentTreeModel(test_instrument)
+def test_duplicate_component(model):
+    test_component_tree_model = ComponentTreeModel(model)
 
     assert test_component_tree_model.rowCount(QModelIndex()) == 1  # Sample
     test_component_tree_model.add_component(get_component())
@@ -514,11 +495,8 @@ def test_duplicate_component():
     assert test_component_tree_model.rowCount(QModelIndex()) == 3
 
 
-def test_duplicate_transform_fail():
-    test_instrument = Instrument(
-        NexusWrapper("test_component_model_duplicate_fail"), NX_CLASS_DEFINITIONS
-    )
-    test_component_tree_model = ComponentTreeModel(test_instrument)
+def test_duplicate_transform_fail(model):
+    test_component_tree_model = ComponentTreeModel(model)
 
     test_component_tree_model.add_component(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
@@ -534,20 +512,18 @@ def test_duplicate_transform_fail():
     assert False  # Failure
 
 
-def test_remove_component(nexus_wrapper):
-    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
-    test_component_tree_model = ComponentTreeModel(instrument)
-    instrument.create_component("Some name", "some class", "desc")
+def test_remove_component(model):
+    test_component_tree_model = ComponentTreeModel(model)
+    model.entry.instrument.add_component(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     assert test_component_tree_model.rowCount(QModelIndex()) == 1
     test_component_tree_model.remove_node(component_index)
     assert test_component_tree_model.rowCount(QModelIndex()) == 0
 
 
-def test_remove_component_with_transformation(nexus_wrapper):
-    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
-    test_component_tree_model = ComponentTreeModel(instrument)
-    instrument.create_component("Some name", "some class", "desc")
+def test_remove_component_with_transformation(model):
+    test_component_tree_model = ComponentTreeModel(model)
+    model.entry.instrument.add_component(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     test_component_tree_model.add_rotation(component_index)
     assert test_component_tree_model.rowCount(QModelIndex()) == 1
@@ -558,10 +534,10 @@ def test_remove_component_with_transformation(nexus_wrapper):
     )
 
 
-def test_remove_transformation(nexus_wrapper):
-    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
-    test_component_tree_model = ComponentTreeModel(instrument)
-    instrument.create_component("Some name", "some class", "desc")
+def test_remove_transformation(model):
+
+    test_component_tree_model = ComponentTreeModel(model)
+    model.entry.instrument.add_component(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     test_component_tree_model.add_rotation(component_index)
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
@@ -573,10 +549,9 @@ def test_remove_transformation(nexus_wrapper):
     assert test_component_tree_model.rowCount(transformation_list_index) == 0
 
 
-def test_remove_link(nexus_wrapper):
-    instrument = FakeInstrument()
-    test_component_tree_model = ComponentTreeModel(instrument)
-    instrument.create_component("Some name", "some class", "desc")
+def test_remove_link(model):
+    test_component_tree_model = ComponentTreeModel(model)
+    model.entry.instrument.add_component(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     test_component_tree_model.add_link(component_index)
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
@@ -590,17 +565,17 @@ def test_remove_link(nexus_wrapper):
 
 
 def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file(
-    nexus_wrapper,
+    model,
 ):
-
-    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     first_component_name = "component1"
     first_component_nx_class = "NXdetector"
     description = "desc"
-    first_component = instrument.create_component(
-        first_component_name, first_component_nx_class, description
-    )
+    first_component = Component(name=first_component_name)
+    first_component.nx_class = first_component_nx_class
+    first_component.description = description
+
+    model.entry.instrument.add_component(first_component)
 
     axis_direction = QVector3D(1, 0, 0)
     height = 2
@@ -609,7 +584,7 @@ def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_com
     first_component.set_cylinder_shape(
         axis_direction=axis_direction, height=height, radius=radius, units=units
     )
-    tree_model = ComponentTreeModel(instrument)
+    tree_model = ComponentTreeModel(model)
 
     first_component_index = tree_model.index(0, 0, QModelIndex())
     tree_model.duplicate_node(first_component_index)
@@ -624,16 +599,17 @@ def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_com
 
 
 def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file(
-    nexus_wrapper,
+    model,
 ):
-    instrument = Instrument(nexus_wrapper, NX_CLASS_DEFINITIONS)
 
     first_component_name = "component1"
     first_component_nx_class = "NXdetector"
     description = "desc"
-    first_component = instrument.create_component(
-        first_component_name, first_component_nx_class, description
-    )
+    first_component = Component(name=first_component_name)
+    first_component.nx_class = first_component_nx_class
+    first_component.description = description
+
+    model.entry.instrument.add_component(first_component)
 
     vertices = [
         QVector3D(-0.5, -0.5, 0.5),
@@ -657,7 +633,7 @@ def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_T
 
     first_component.set_off_shape(OFFGeometryNoNexus(vertices=vertices, faces=faces))
 
-    tree_model = ComponentTreeModel(instrument)
+    tree_model = ComponentTreeModel(model)
 
     first_component_index = tree_model.index(0, 0, QModelIndex())
     tree_model.duplicate_node(first_component_index)
