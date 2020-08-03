@@ -5,8 +5,8 @@ from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QIcon, QColor
 from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel
 
-from nexus_constructor.component.link_transformation import LinkTransformation
-from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.link_transformation import LinkTransformation
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model

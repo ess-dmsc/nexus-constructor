@@ -11,7 +11,7 @@ from mock import Mock, call, patch, mock_open
 from pytestqt.qtbot import QtBot
 import numpy as np
 
-from nexus_constructor.component import component_type
+from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel

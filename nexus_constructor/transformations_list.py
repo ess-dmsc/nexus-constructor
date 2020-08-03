@@ -13,7 +13,7 @@ class TransformationsList(list):
     def __init__(self, parent):
         super().__init__()
         self.parent_component = parent
-        from nexus_constructor.component.link_transformation import LinkTransformation
+        from nexus_constructor.link_transformation import LinkTransformation
 
         self.link = LinkTransformation(self)
 

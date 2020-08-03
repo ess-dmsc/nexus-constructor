@@ -16,7 +16,7 @@ from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
 )
-from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.geometry import (

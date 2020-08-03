@@ -2,9 +2,7 @@ import os
 
 from mock import Mock
 
-from nexus_constructor.component.component_type import (
-    make_dictionary_of_class_definitions,
-)
+from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.ui_utils import validate_line_edit, generate_unique_name
 
 
