@@ -20,7 +20,6 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     CylindricalGeometry,
     FACES,
-    VERTICES,
     WINDING_ORDER,
     CYLINDERS,
     DETECTOR_NUMBER,
@@ -111,7 +110,9 @@ class ShapeReader:
         if not faces_dataset:
             return
 
-        vertices_dataset = self._get_shape_dataset_from_list(VERTICES, children)
+        vertices_dataset = self._get_shape_dataset_from_list(
+            CommonAttrs.VERTICES, children
+        )
         if not vertices_dataset:
             return
 
@@ -132,9 +133,11 @@ class ShapeReader:
         if not units:
             return
 
-        self._find_and_validate_data_type(vertices_dataset, FLOAT_TYPES, VERTICES)
+        self._find_and_validate_data_type(
+            vertices_dataset, FLOAT_TYPES, CommonAttrs.VERTICES
+        )
         vertices = self._find_and_validate_values_list(
-            vertices_dataset, FLOAT_TYPES, VERTICES
+            vertices_dataset, FLOAT_TYPES, CommonAttrs.VERTICES
         )
         if not vertices:
             return
@@ -193,7 +196,9 @@ class ShapeReader:
 
         name = self.name
 
-        vertices_dataset = self._get_shape_dataset_from_list(VERTICES, children)
+        vertices_dataset = self._get_shape_dataset_from_list(
+            CommonAttrs.VERTICES, children
+        )
         if not vertices_dataset:
             return
 
@@ -215,10 +220,10 @@ class ShapeReader:
             return
 
         vertices_dtype = self._find_and_validate_data_type(
-            vertices_dataset, FLOAT_TYPES, VERTICES
+            vertices_dataset, FLOAT_TYPES, CommonAttrs.VERTICES
         )
         vertices = self._find_and_validate_values_list(
-            vertices_dataset, FLOAT_TYPES, VERTICES
+            vertices_dataset, FLOAT_TYPES, CommonAttrs.VERTICES
         )
         if not vertices:
             return
