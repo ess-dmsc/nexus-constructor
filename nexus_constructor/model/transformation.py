@@ -26,13 +26,13 @@ class Transformation(Dataset):
     Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
     """
 
-    parent_component = attr.ib(type="Component", default=None)
+    _parent_component = attr.ib(type="Component", default=None)
     _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
     _ui_value = attr.ib(type=float, default=None)
 
     @_dependents.default
     def _initialise_dependents(self):
-        return [] if self.parent_component is None else [self.parent_component]
+        return [] if self._parent_component is None else [self._parent_component]
 
     @property
     def transform_type(self) -> str:

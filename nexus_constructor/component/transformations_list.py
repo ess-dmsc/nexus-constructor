@@ -3,16 +3,6 @@ from nexus_constructor.model.transformation import Transformation
 TRANSFORM_STR = "/transformations/"
 
 
-def _transform_has_external_link(transformation: Transformation) -> bool:
-    try:
-        return (
-            transformation.depends_on.parent_component
-            != transformation.parent_component
-        )
-    except AttributeError:
-        return False
-
-
 class TransformationsList(list):
     """
     Holds a list of (component) local transformations and, the parent component
@@ -33,9 +23,18 @@ class TransformationsList(list):
         except AttributeError:
             return False
 
+    def _transform_has_external_link(self, transformation: Transformation) -> bool:
+        try:
+            return (
+                transformation.depends_on._parent_component
+                != transformation._parent_component
+            )
+        except AttributeError:
+            return False
+
     def _has_indirect_link(self) -> bool:
         for transform in self:
-            if _transform_has_external_link(transform):
+            if self._transform_has_external_link(transform):
                 return True
         return False
 
