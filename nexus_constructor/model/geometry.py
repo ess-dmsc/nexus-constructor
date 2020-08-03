@@ -125,11 +125,11 @@ class OFFGeometryNoNexus(OFFGeometry):
 class CylindricalGeometry(Group):
     @property
     def detector_number(self) -> List[int]:
-        return self.get_field_value(DETECTOR_NUMBER)
+        return self.get_field_value(DETECTOR_NUMBER).tolist()
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.set_field_value(DETECTOR_NUMBER, pixel_ids, ValueTypes.INT)
+        self.set_field_value(DETECTOR_NUMBER, np.array(pixel_ids), ValueTypes.INT)
 
     @property
     def units(self) -> str:
