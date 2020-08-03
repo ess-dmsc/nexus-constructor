@@ -132,7 +132,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # Retrieve the pixel offsets and detector number from the component
         x_pixel_offset = component_to_edit.get_field_value(X_PIXEL_OFFSET)
         y_pixel_offset = component_to_edit.get_field_value(Y_PIXEL_OFFSET)
-        detector_numbers = component_to_edit.get_field_value(DETECTOR_NUMBER)
+        detector_numbers = component_to_edit.get_field_value(DETECTOR_NUMBER).tolist()
 
         # Check that x offset is more than one value
         if data_is_an_array_with_more_than_one_element(x_pixel_offset):

@@ -18,7 +18,6 @@ from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRE
 
 WINDING_ORDER = "winding_order"
 FACES = "faces"
-VERTICES = "vertices"
 CYLINDERS = "cylinders"
 DETECTOR_NUMBER = "detector_number"
 X_PIXEL_OFFSET = "x_pixel_offset"
@@ -126,11 +125,11 @@ class OFFGeometryNoNexus(OFFGeometry):
 class CylindricalGeometry(Group):
     @property
     def detector_number(self) -> List[int]:
-        return self.get_field_value(DETECTOR_NUMBER)
+        return self.get_field_value(DETECTOR_NUMBER).tolist()
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.set_field_value(DETECTOR_NUMBER, pixel_ids, ValueTypes.INT)
+        self.set_field_value(DETECTOR_NUMBER, np.array(pixel_ids), ValueTypes.INT)
 
     @property
     def units(self) -> str:
@@ -282,15 +281,15 @@ class OFFGeometryNexus(OFFGeometry, Group):
 
     @property
     def detector_faces(self) -> List[Tuple[int, int]]:
-        return self.get_field_value(DETECTOR_FACES)
+        return self.get_field_value(DETECTOR_FACES).tolist()
 
     @detector_faces.setter
     def detector_faces(self, detector_faces: List[Tuple[int, int]]):
         """
-        Records the detector faces in the NXoff_geometry.
+        Records the detector faces in the NXoff_geometry as a numpy array.
         :param detector_faces: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
-        self.set_field_value(DETECTOR_FACES, detector_faces, ValueTypes.INT)
+        self.set_field_value(DETECTOR_FACES, np.array(detector_faces), ValueTypes.INT)
 
     @property
     def winding_order(self) -> List[int]:
@@ -383,7 +382,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
         vertices = np.array(
             [qvector3d_to_numpy_array(vertex) for vertex in new_vertices]
         )
-        self.set_field_value(CommonAttrs.VERTICES, vertices, ValueTypes.INT)
+        self.set_field_value(CommonAttrs.VERTICES, vertices, ValueTypes.FLOAT)
         self[CommonAttrs.VERTICES].attributes.set_attribute_value(
             CommonAttrs.UNITS, "m"
         )

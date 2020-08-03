@@ -372,7 +372,7 @@ class Component(Group):
         )
         self.set_field_value(
             DETECTOR_NUMBER,
-            get_detector_ids_from_pixel_grid(pixel_grid),
+            np.array(get_detector_ids_from_pixel_grid(pixel_grid)),
             ValueTypes.INT,
         )
 
@@ -383,7 +383,7 @@ class Component(Group):
         """
         self.set_field_value(
             DETECTOR_NUMBER,
-            get_detector_number_from_pixel_mapping(pixel_mapping),
+            np.array(get_detector_number_from_pixel_mapping(pixel_mapping)),
             ValueTypes.INT,
         )
 

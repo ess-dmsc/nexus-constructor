@@ -33,12 +33,7 @@ class Attributes(list):
         return True if result is not None else False
 
     def as_dict(self):
-        return_dict = {}
-        if self:
-            return_dict[CommonKeys.ATTRIBUTES] = [
-                attribute.as_dict() for attribute in self
-            ]
-        return return_dict
+        return [attribute.as_dict() for attribute in self]
 
 
 @attr.s(eq=False)
