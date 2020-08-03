@@ -101,15 +101,15 @@ class EV42Stream:
             },
         }
         if self.adc_pulse_debug is not None:
-            dict[ADC_PULSE_DEBUG] = self.adc_pulse_debug
+            dict[NodeType.STREAM][ADC_PULSE_DEBUG] = self.adc_pulse_debug
         if self.nexus_indices_index_every_mb is not None:
-            dict[INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
+            dict[NodeType.STREAM][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
         if self.nexus_indices_index_every_kb is not None:
-            dict[INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
+            dict[NodeType.STREAM][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
         if self.nexus_chunk_chunk_mb is not None:
-            dict[CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb
+            dict[NodeType.STREAM][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb
         if self.nexus_chunk_chunk_kb is not None:
-            dict[CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb
+            dict[NodeType.STREAM][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb
         return dict
 
 
@@ -136,15 +136,15 @@ class F142Stream:
             },
         }
         if self.type is not None:
-            dict[CommonKeys.TYPE] = self.type
+            dict[NodeType.STREAM][CommonKeys.TYPE] = self.type
         if self.array_size is not None:
-            dict[ARRAY_SIZE] = self.array_size
+            dict[NodeType.STREAM][ARRAY_SIZE] = self.array_size
         if self.nexus_indices_index_every_mb is not None:
-            dict[INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
+            dict[NodeType.STREAM][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
         if self.nexus_indices_index_every_kb is not None:
-            dict[INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
+            dict[NodeType.STREAM][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
         if self.store_latest_into is not None:
-            dict[STORE_LATEST_INTO] = self.store_latest_into
+            dict[NodeType.STREAM][STORE_LATEST_INTO] = self.store_latest_into
         return dict
 
 
