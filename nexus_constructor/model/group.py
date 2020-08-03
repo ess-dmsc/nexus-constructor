@@ -1,7 +1,5 @@
 from typing import Any, Union, Dict
 import attr
-import numpy as np
-
 from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.dataset import Dataset
@@ -64,7 +62,7 @@ class Group:
 
     def set_field_value(self, name: str, value: Any, dtype: str):
         size = [1]
-        if isinstance(value, (np.ndarray, np.generic)):
+        if hasattr(value, "size"):
             size = value.size
         self[name] = Dataset(name=name, size=size, type=dtype, values=value)
 
