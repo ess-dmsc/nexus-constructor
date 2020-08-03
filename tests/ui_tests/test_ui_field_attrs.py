@@ -113,9 +113,8 @@ def test_GIVEN_attribute_is_an_array_WHEN_getting_data_THEN_array_is_returned(
     attribute_name = "AttributeName"
     qtbot.keyClicks(widget.attr_name_lineedit, attribute_name)
 
-    name, value = widget.value
-    assert name == attribute_name
-    assert np.array_equal(value, data)
+    assert widget.name == attribute_name
+    assert np.array_equal(widget.value, data)
 
 
 def test_GIVEN_array_and_attribute_name_set_WHEN_changing_attribute_THEN_array_attribute_set(
@@ -123,9 +122,10 @@ def test_GIVEN_array_and_attribute_name_set_WHEN_changing_attribute_THEN_array_a
 ):
     widget = add_array_attribute(field_attributes_dialog, qtbot)
     data = np.arange(9).reshape((3, 3))
-    widget.value = ("AttributeName", data)
+    widget.name = "AttributeName"
+    widget.value = data
 
-    assert np.array_equal(widget.array, data)
+    assert np.array_equal(widget.dialog.model.array, data)
 
 
 def test_GIVEN_type_changed_to_array_WHEN_changing_attribute_THEN_edit_array_button_is_visible(

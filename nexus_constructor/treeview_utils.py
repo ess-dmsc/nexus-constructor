@@ -1,5 +1,5 @@
 import os
-
+import sys
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QIcon, QColor
 from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel
@@ -15,6 +15,12 @@ from nexus_constructor.transformation_view import (
     EditRotation,
 )
 from nexus_constructor.transformations import Transformation
+
+# We have to use this for cx freeze as __file__ does not work
+if getattr(sys, "frozen", False):
+    root_dir = os.path.dirname(sys.executable)
+else:
+    root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
 
 
 def create_and_add_toolbar_action(
@@ -37,7 +43,9 @@ def create_and_add_toolbar_action(
     :return The new QAction.
     """
     toolbar_action = QAction(
-        QIcon(os.path.join("ui", icon_path)), mouse_over_text, component_tree_view_tab
+        QIcon(os.path.join(root_dir, "ui", icon_path)),
+        mouse_over_text,
+        component_tree_view_tab,
     )
     toolbar_action.triggered.connect(trigger_method)
     toolbar_action.setEnabled(set_enabled)

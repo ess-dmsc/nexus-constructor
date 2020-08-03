@@ -131,7 +131,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.instrument.nexus.load_file(
                 map_of_entries[combo.currentText()], nexus_file
             )
-            self._set_up_component_model()
             self._update_views()
 
         # Connect the clicked signal of the ok_button to instrument.load_file and pass the file and entry group object.
