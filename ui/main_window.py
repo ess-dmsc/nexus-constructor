@@ -71,13 +71,13 @@ class Ui_MainWindow(object):
         self.open_idf_file_action = QAction(MainWindow)
         self.export_to_nexus_file_action = QAction(MainWindow)
         self.export_to_filewriter_JSON_action = QAction(MainWindow)
-        self.export_to_forwarder_JSON_action = QAction(MainWindow)
+        self.export_to_forwarder_config_action = QAction(MainWindow)
         # self.file_menu.addAction(self.open_nexus_file_action) Disabled while changing model
         self.file_menu.addAction(self.open_json_file_action)
         # self.file_menu.addAction(self.open_idf_file_action) Disabled while changing model
         # self.file_menu.addAction(self.export_to_nexus_file_action) Disabled while changing model
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
-        self.file_menu.addAction(self.export_to_forwarder_JSON_action)
+        self.file_menu.addAction(self.export_to_forwarder_config_action)
         self.menu_bar.addAction(self.file_menu.menuAction())
         self._set_up_titles(MainWindow)
 
@@ -96,4 +96,4 @@ class Ui_MainWindow(object):
         self.open_idf_file_action.setText("Open Mantid IDF file")
         self.export_to_nexus_file_action.setText("Export to NeXus file")
         self.export_to_filewriter_JSON_action.setText("Export to Filewriter JSON")
-        self.export_to_forwarder_JSON_action.setText("Export to Forwarder JSON")
+        self.export_to_forwarder_config_action.setText("Export to Forwarder FlatBuffer")
