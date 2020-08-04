@@ -14,11 +14,11 @@ from typing import List, Any
 provider_str_to_enum = {"pva": Protocol.PVA, "ca": Protocol.CA, "fake": Protocol.FAKE}
 
 
-def check_for_streams_in_children(
+def _check_for_streams_in_children(
     streams: List[StreamInfo], parent: Any, protocol: Protocol
 ):
     """
-    Recurse through model looking for streams
+    Recurse, go top-down through model looking for streams
     """
     for child in parent.children:
         if isinstance(child, StreamGroup):
@@ -29,18 +29,18 @@ def check_for_streams_in_children(
                     )
                 )
         elif isinstance(child, Group):
-            check_for_streams_in_children(streams, child, protocol)
+            _check_for_streams_in_children(streams, child, protocol)
     components = []
     try:
         components = parent.component_list
     except AttributeError:
         pass
     for component in components:
-        check_for_streams_in_children(streams, component, protocol)
+        _check_for_streams_in_children(streams, component, protocol)
 
 
 def create_forwarder_config(model: Model, provider_type: str) -> bytes:
     protocol = provider_str_to_enum[provider_type]
     streams = []
-    check_for_streams_in_children(streams, model.entry, protocol)
+    _check_for_streams_in_children(streams, model.entry, protocol)
     return serialise_rf5k(UpdateType.ADD, streams)
