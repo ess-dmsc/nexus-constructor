@@ -7,7 +7,7 @@ from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.model import Model
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import PixelValidator
-from tests.chopper_test_helpers import chopper_details  # noqa: F401
+from tests.geometry.chopper_test_helpers import chopper_details  # noqa: F401
 
 
 @pytest.fixture(scope="function")
