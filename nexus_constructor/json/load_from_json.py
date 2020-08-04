@@ -76,7 +76,7 @@ class JSONReader:
         :param dependent_component_name: The name of the dependent component.
         :return: The transformation with the given name.
         """
-        for transformation in component.transforms_list:
+        for transformation in component.transforms:
             if transformation.name == dependency_transformation_name:
                 return transformation
         self.warnings.append(

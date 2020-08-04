@@ -15,6 +15,7 @@ from nexus_constructor.common_attrs import (
     PIXEL_SHAPE_GROUP_NAME,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
+    NX_TRANSFORMATIONS,
 )
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
@@ -424,6 +425,12 @@ class Component(Group):
                     CommonKeys.NAME: TRANSFORMS_GROUP_NAME,  # this works
                     CommonKeys.CHILDREN: [
                         transform.as_dict() for transform in self.transforms
+                    ],
+                    CommonKeys.ATTRIBUTES: [
+                        {
+                            CommonKeys.NAME: CommonAttrs.NX_CLASS,
+                            CommonKeys.VALUES: NX_TRANSFORMATIONS,
+                        }
                     ],
                 }
             )

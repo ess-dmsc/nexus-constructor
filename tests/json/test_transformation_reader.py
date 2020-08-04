@@ -6,7 +6,7 @@ from mock import Mock
 
 from nexus_constructor.json.transformation_reader import (
     TransformationReader,
-    _contains_transformations,
+    _is_transformation_group,
     TRANSFORMATION_MAP,
     _create_transformation_dataset,
 )
@@ -48,10 +48,6 @@ def transformation_json():
             {
               "name":"depends_on",
               "values":"."
-            },
-            {
-              "name":"NX_class",
-              "values":"NXtransformation"
             }
           ]
         }
@@ -81,12 +77,11 @@ def transformation_reader(transformation_json):
     return TransformationReader(parent_component, entry)
 
 
-@pytest.mark.parametrize("class_value", ["NXtransformation", "NXtransformations"])
 def test_GIVEN_transformation_in_attributes_WHEN_checking_for_transformation_THEN_contains_transformations_returns_true(
-    class_value, transformation_json
+    transformation_json,
 ):
-    transformation_json["attributes"][0]["values"] = class_value
-    assert _contains_transformations(transformation_json)
+    transformation_json["attributes"][0]["values"] = "NXtransformations"
+    assert _is_transformation_group(transformation_json)
 
 
 def test_GIVEN_no_transformation_class_in_attributes_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
@@ -95,14 +90,14 @@ def test_GIVEN_no_transformation_class_in_attributes_WHEN_checking_for_transform
     del transformation_json["attributes"][0]["name"]
     del transformation_json["attributes"][0]["values"]
 
-    assert not _contains_transformations(transformation_json)
+    assert not _is_transformation_group(transformation_json)
 
 
 def test_GIVEN_no_attributes_field_in_dict_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
     transformation_json,
 ):
     del transformation_json["attributes"]
-    assert not _contains_transformations(transformation_json)
+    assert not _is_transformation_group(transformation_json)
 
 
 def test_GIVEN_attribute_not_found_WHEN_looking_for_transformation_attribute_THEN_get_transformation_attribute_returns_failure_value(
