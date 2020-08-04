@@ -132,11 +132,11 @@ class F142Stream:
                 WRITER_MODULE: self.writer_module,
                 SOURCE: self.source,
                 TOPIC: self.topic,
-                VALUE_UNITS: self.value_units,
+                CommonKeys.TYPE: self.type,
             },
         }
-        if self.type is not None:
-            dict[NodeType.STREAM][CommonKeys.TYPE] = self.type
+        if self.value_units is not None:
+            dict[NodeType.STREAM][VALUE_UNITS] = self.value_units
         if self.array_size is not None:
             dict[NodeType.STREAM][ARRAY_SIZE] = self.array_size
         if self.nexus_indices_index_every_mb is not None:
