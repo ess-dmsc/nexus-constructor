@@ -69,13 +69,6 @@ def delete_action(trigger_method_mock, tool_bar, tree_view_tab):
 
 
 @pytest.fixture(scope="function")
-def duplicate_action(trigger_method_mock, tool_bar, tree_view_tab):
-    return create_and_add_toolbar_action(
-        "duplicate.png", "Duplicate", trigger_method_mock, tool_bar, tree_view_tab
-    )
-
-
-@pytest.fixture(scope="function")
 def new_rotation_action(trigger_method_mock, tool_bar, tree_view_tab):
     return create_and_add_toolbar_action(
         "new_rotation.png", "New Rotation", trigger_method_mock, tool_bar, tree_view_tab
@@ -121,7 +114,6 @@ def edit_component_action(trigger_method_mock, tool_bar, tree_view_tab):
 @pytest.fixture(scope="function")
 def set_of_all_actions(
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -130,7 +122,6 @@ def set_of_all_actions(
 ):
     return {
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -249,7 +240,6 @@ def test_GIVEN_action_is_triggered_THEN_expected_trigger_method_is_called(
 def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_expected_buttons_are_disabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -259,7 +249,6 @@ def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_ex
     # Set the actions to enabled to make sure that their state changes
     actions = [
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -271,7 +260,6 @@ def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_ex
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -285,7 +273,6 @@ def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_ex
 def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons_are_enabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -299,7 +286,6 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -313,7 +299,6 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons
 def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expected_buttons_are_enabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -338,7 +323,6 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -348,7 +332,6 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
 
     transformation_selected_actions = {
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -365,7 +348,6 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
 def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_buttons_are_enabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -388,7 +370,6 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -409,7 +390,6 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
 def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changing_button_states_THEN_create_link_button_is_disabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -426,7 +406,6 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -444,7 +423,6 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
 def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_THEN_create_link_button_is_disabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -464,7 +442,6 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_T
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -482,7 +459,6 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_T
 def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_THEN_create_link_button_is_enabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -501,7 +477,6 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,

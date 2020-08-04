@@ -72,13 +72,6 @@ class ComponentTreeViewTab(QWidget):
             self.component_tool_bar,
             self,
         )
-        self.duplicate_action = create_and_add_toolbar_action(
-            "duplicate.png",
-            "Duplicate",
-            self.on_duplicate_node,
-            self.component_tool_bar,
-            self,
-        )
         self.edit_component_action = create_and_add_toolbar_action(
             "edit_component.png",
             "Edit Component",
@@ -111,7 +104,6 @@ class ComponentTreeViewTab(QWidget):
         set_button_states(
             self.component_tree_view,
             self.delete_action,
-            self.duplicate_action,
             self.new_rotation_action,
             self.new_translation_action,
             self.create_link_action,
@@ -125,12 +117,6 @@ class ComponentTreeViewTab(QWidget):
             self.component_model.add_link(selected[0])
             self._expand_transformation_list(selected[0])
             self._set_button_state()
-
-    def on_duplicate_node(self):
-        selected = self.component_tree_view.selectedIndexes()
-        if len(selected) > 0:
-            self.component_model.duplicate_node(selected[0])
-            self._expand_transformation_list(selected[0])
 
     def _expand_transformation_list(self, node: QModelIndex):
         expand_transformation_list(node, self.component_tree_view, self.component_model)

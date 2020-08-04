@@ -10,7 +10,6 @@ from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Instrument
 import pytest
 from PySide2.QtCore import QModelIndex, Qt
-from nexus_constructor.model.geometry import OFFGeometryNoNexus
 from typing import Any, Optional, List, Tuple
 from PySide2.QtGui import QVector3D
 
@@ -485,33 +484,6 @@ def test_add_link_multiple_times():
     assert first_link is transformation_list_index.internalPointer().link
 
 
-def test_duplicate_component(model):
-    test_component_tree_model = ComponentTreeModel(model)
-
-    assert test_component_tree_model.rowCount(QModelIndex()) == 1  # Sample
-    test_component_tree_model.add_component(get_component())
-    component_index = test_component_tree_model.index(0, 0, QModelIndex())
-    test_component_tree_model.duplicate_node(component_index)
-    assert test_component_tree_model.rowCount(QModelIndex()) == 3
-
-
-def test_duplicate_transform_fail(model):
-    test_component_tree_model = ComponentTreeModel(model)
-
-    test_component_tree_model.add_component(get_component())
-    component_index = test_component_tree_model.index(0, 0, QModelIndex())
-    test_component_tree_model.add_rotation(component_index)
-    transformation_list_index = test_component_tree_model.index(1, 0, component_index)
-    transformation_index = test_component_tree_model.index(
-        0, 0, transformation_list_index
-    )
-    try:
-        test_component_tree_model.duplicate_node(transformation_index)
-    except (NotImplementedError, AttributeError):
-        return  # Success
-    assert False  # Failure
-
-
 def test_remove_component(model):
     test_component_tree_model = ComponentTreeModel(model)
     model.entry.instrument.add_component(Component(name="Some name"))
@@ -562,86 +534,3 @@ def test_remove_link(model):
     assert len(transformation_list_index.internalPointer()) == 0
     test_component_tree_model.remove_node(transformation_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 0
-
-
-def test_GIVEN_component_with_cylindrical_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file(
-    model,
-):
-
-    first_component_name = "component1"
-    first_component_nx_class = "NXdetector"
-    description = "desc"
-    first_component = Component(name=first_component_name)
-    first_component.nx_class = first_component_nx_class
-    first_component.description = description
-
-    model.entry.instrument.add_component(first_component)
-
-    axis_direction = QVector3D(1, 0, 0)
-    height = 2
-    radius = 3
-    units = "cm"
-    first_component.set_cylinder_shape(
-        axis_direction=axis_direction, height=height, radius=radius, units=units
-    )
-    tree_model = ComponentTreeModel(model)
-
-    first_component_index = tree_model.index(0, 0, QModelIndex())
-    tree_model.duplicate_node(first_component_index)
-
-    assert tree_model.rowCount(QModelIndex()) == 3
-    second_component_index = tree_model.index(2, 0, QModelIndex())
-    second_component = second_component_index.internalPointer()
-    second_shape, _ = second_component.shape
-    assert second_shape.axis_direction == axis_direction
-    assert second_shape.height == height
-    assert second_shape.units == units
-
-
-def test_GIVEN_component_with_off_shape_information_WHEN_duplicating_component_THEN_shape_information_is_stored_in_nexus_file(
-    model,
-):
-
-    first_component_name = "component1"
-    first_component_nx_class = "NXdetector"
-    description = "desc"
-    first_component = Component(name=first_component_name)
-    first_component.nx_class = first_component_nx_class
-    first_component.description = description
-
-    model.entry.instrument.add_component(first_component)
-
-    vertices = [
-        QVector3D(-0.5, -0.5, 0.5),
-        QVector3D(0.5, -0.5, 0.5),
-        QVector3D(-0.5, 0.5, 0.5),
-        QVector3D(0.5, 0.5, 0.5),
-        QVector3D(-0.5, 0.5, -0.5),
-        QVector3D(0.5, 0.5, -0.5),
-        QVector3D(-0.5, -0.5, -0.5),
-        QVector3D(0.5, -0.5, -0.5),
-    ]
-
-    faces = [
-        [0, 1, 3, 2],
-        [2, 3, 5, 4],
-        [4, 5, 7, 6],
-        [6, 7, 1, 0],
-        [1, 7, 5, 3],
-        [6, 0, 2, 4],
-    ]
-
-    first_component.set_off_shape(OFFGeometryNoNexus(vertices=vertices, faces=faces))
-
-    tree_model = ComponentTreeModel(model)
-
-    first_component_index = tree_model.index(0, 0, QModelIndex())
-    tree_model.duplicate_node(first_component_index)
-
-    assert tree_model.rowCount(QModelIndex()) == 3
-    second_component_index = tree_model.index(2, 0, QModelIndex())
-    second_component = second_component_index.internalPointer()
-    second_shape, _ = second_component.shape
-
-    assert second_shape.vertices == vertices
-    assert second_shape.faces == faces
