@@ -9,7 +9,12 @@ from nexus_constructor.model.geometry import (
     Y_PIXEL_OFFSET,
     Z_PIXEL_OFFSET,
 )
-from nexus_constructor.pixel_data import PixelGrid, CountDirection, Corner, PixelMapping
+from nexus_constructor.geometry.pixel_data import (
+    PixelGrid,
+    CountDirection,
+    Corner,
+    PixelMapping,
+)
 
 PIXEL_FIELDS = [
     X_PIXEL_OFFSET,

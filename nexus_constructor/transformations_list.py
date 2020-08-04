@@ -1,7 +1,5 @@
 from nexus_constructor.model.transformation import Transformation
 
-TRANSFORM_STR = "/transformations/"
-
 
 class TransformationsList(list):
     """

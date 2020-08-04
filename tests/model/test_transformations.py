@@ -4,25 +4,8 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation
-from typing import Any
-
 from nexus_constructor.model.value_type import ValueTypes
 from tests.helpers import add_component_to_file  # noqa:F401
-
-transform_type = "Transformation"
-rotation_type = "Rotation"
-translation_type = "Translation"
-
-
-def _add_transform_to_file(
-    name: str, value: Any, vector: QVector3D, transform_type: str
-):
-    transform = Transformation(name=name, type=ValueTypes.DOUBLE, size="[1]", values=42)
-    transform.transform_type = transform_type
-    transform.vector = vector
-    transform.values = value
-
-    return transform
 
 
 def create_transform(

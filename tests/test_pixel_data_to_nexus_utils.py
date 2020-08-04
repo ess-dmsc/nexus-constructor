@@ -1,8 +1,13 @@
 import numpy as np
 import pytest
 
-from nexus_constructor.pixel_data import PixelMapping, PixelGrid, CountDirection, Corner
-from nexus_constructor.pixel_data_to_nexus_utils import (
+from nexus_constructor.geometry.pixel_data import (
+    PixelMapping,
+    PixelGrid,
+    CountDirection,
+    Corner,
+)
+from nexus_constructor.geometry.pixel_data_utils import (
     get_detector_faces_from_pixel_mapping,
     get_x_offsets_from_pixel_grid,
     get_y_offsets_from_pixel_grid,

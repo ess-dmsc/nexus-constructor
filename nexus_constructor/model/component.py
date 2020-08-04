@@ -34,8 +34,8 @@ from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
 from nexus_constructor.model.helpers import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
-from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
-from nexus_constructor.pixel_data_to_nexus_utils import (
+from nexus_constructor.geometry.pixel_data import PixelGrid, PixelMapping, PixelData
+from nexus_constructor.geometry.pixel_data_utils import (
     get_detector_number_from_pixel_mapping,
     get_x_offsets_from_pixel_grid,
     get_y_offsets_from_pixel_grid,

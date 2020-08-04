@@ -1,5 +1,4 @@
 from functools import partial
-from typing import Dict
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QComboBox,
@@ -342,16 +341,6 @@ class StreamFieldsWidget(QDialog):
         stream.nexus_indices_index_every_kb = self.ev42_index_every_kb_spinner.value()
         stream.nexus_chunk_chunk_mb = self.ev42_chunk_mb_spinner.value()
         stream.nexus_chunk_chunk_kb = self.ev42_chunk_kb_spinner.value()
-
-    @staticmethod
-    def _create_dataset_from_spinner(
-        stream_group: StreamGroup, nexus_to_spinner_dict: Dict[str, QSpinBox]
-    ):
-        for (nexus_string, ui_element) in nexus_to_spinner_dict.items():
-            if ui_element.value() > 0:
-                stream_group.create_dataset(
-                    nexus_string, dtype=int, data=ui_element.value()
-                )
 
     def fill_in_existing_ev42_fields(self, field: EV42Stream):
         """

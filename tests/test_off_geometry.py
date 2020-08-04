@@ -5,12 +5,6 @@ from PySide2.QtGui import QVector3D
 from pytest import approx
 
 
-UNIT = "m"
-AXIS_DIRECTION = QVector3D(1, 2, 3)
-HEIGHT = 2.0
-RADIUS = 1.0
-
-
 def test_GIVEN_faces_WHEN_calling_winding_order_on_OFF_THEN_order_is_correct():
     vertices = [
         QVector3D(0, 0, 1),

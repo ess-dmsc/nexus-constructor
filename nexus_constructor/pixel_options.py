@@ -12,7 +12,7 @@ from nexus_constructor.model.geometry import (
     DETECTOR_NUMBER,
     Y_PIXEL_OFFSET,
 )
-from nexus_constructor.pixel_data import (
+from nexus_constructor.geometry.pixel_data import (
     PixelGrid,
     PixelMapping,
     CountDirection,

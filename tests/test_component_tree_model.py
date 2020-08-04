@@ -39,14 +39,6 @@ def model():
     return model
 
 
-class FakeTransformationChangedSignal:
-    def __init__(self):
-        pass
-
-    def emit(self):
-        pass
-
-
 class FakeInstrument(list):
     def __init__(self, component_list: Optional[List[Component]] = None):
         super().__init__()

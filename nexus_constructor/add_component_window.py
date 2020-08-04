@@ -31,7 +31,7 @@ from nexus_constructor.model.geometry import (
     NoShapeGeometry,
 )
 from nexus_constructor.model.link import Link
-from nexus_constructor.pixel_data import PixelData, PixelMapping, PixelGrid
+from nexus_constructor.geometry.pixel_data import PixelData, PixelMapping, PixelGrid
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import file_dialog, validate_line_edit
 from nexus_constructor.ui_utils import generate_unique_name

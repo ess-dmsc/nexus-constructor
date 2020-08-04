@@ -7,7 +7,7 @@ from nexus_constructor.common_attrs import (
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
 )
-from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
+from nexus_constructor.geometry.pixel_data_utils import PIXEL_FIELDS
 
 INVALID_FIELD_NAMES = [
     CommonAttrs.DESCRIPTION,

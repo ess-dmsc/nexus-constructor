@@ -28,12 +28,6 @@ from tests.chopper_test_helpers import (  # noqa: F401
     RADIANS_EDGES_ARR,
 )
 
-IMPROPER_UNITS = {
-    SLIT_EDGES_NAME: "lumen",
-    SLIT_HEIGHT_NAME: "terabytes",
-    RADIUS_NAME: "rutherford",
-}
-
 
 def create_dataset(name: str, dtype: str, val: Any):
     if np.isscalar(val):

@@ -9,8 +9,13 @@ from mock import patch
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
-from nexus_constructor.pixel_data import PixelGrid, Corner, CountDirection, PixelMapping
-from nexus_constructor.pixel_data_to_nexus_utils import (
+from nexus_constructor.geometry.pixel_data import (
+    PixelGrid,
+    Corner,
+    CountDirection,
+    PixelMapping,
+)
+from nexus_constructor.geometry.pixel_data_utils import (
     get_y_offsets_from_pixel_grid,
     get_x_offsets_from_pixel_grid,
     get_detector_ids_from_pixel_grid,
