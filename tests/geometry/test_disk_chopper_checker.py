@@ -20,19 +20,13 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
 )
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.value_type import ValueTypes
-from tests.chopper_test_helpers import (  # noqa: F401
+from tests.geometry.chopper_test_helpers import (  # noqa: F401
     N_SLITS,
     DEGREES_EDGES_ARR,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
     RADIANS_EDGES_ARR,
 )
-
-IMPROPER_UNITS = {
-    SLIT_EDGES_NAME: "lumen",
-    SLIT_HEIGHT_NAME: "terabytes",
-    RADIUS_NAME: "rutherford",
-}
 
 
 def create_dataset(name: str, dtype: str, val: Any):

@@ -11,7 +11,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model

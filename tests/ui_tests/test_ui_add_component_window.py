@@ -11,7 +11,7 @@ from mock import Mock, call, patch, mock_open
 from pytestqt.qtbot import QtBot
 import numpy as np
 
-from nexus_constructor.component import component_type
+from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.model.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel
@@ -27,8 +27,8 @@ from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup, F142Stream
-from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
-from nexus_constructor.pixel_data_to_nexus_utils import PIXEL_FIELDS
+from nexus_constructor.geometry.pixel_data import PixelGrid, PixelMapping, PixelData
+from nexus_constructor.geometry.pixel_data_utils import PIXEL_FIELDS
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
@@ -42,7 +42,6 @@ from tests.ui_tests.ui_test_utils import (
     VALID_OCTA_OFF_FILE,
 )
 
-MISMATCHING_PIXEL_GRID_VALUES = [("0", "5.3"), ("1", "")]
 
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 WRONG_EXTENSION_FILE_PATH = os.path.join(BASE_PATH, "..", "..", "requirements.txt")

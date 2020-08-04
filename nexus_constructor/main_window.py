@@ -2,17 +2,15 @@ import uuid
 from typing import Dict
 import json
 
-import h5py
 from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import (
+    QMainWindow,
+    QApplication,
+    QAction,
+    QMessageBox,
     QDialog,
-    QLabel,
-    QGridLayout,
-    QComboBox,
-    QPushButton,
     QInputDialog,
 )
-from PySide2.QtWidgets import QMainWindow, QApplication, QAction, QMessageBox
 from nexusutils.nexusbuilder import NexusBuilder
 
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -58,7 +56,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         # self.treemodel.setFileMoveEnabled(True)
         # self.treemodel.insertH5pyObject(self.model.signals.nexus_file)
         self.model.signals.file_changed.connect(self.update_nexus_file_structure_view)
-        # self.model.signals.show_entries_dialog.connect(self.show_entries_dialog)
 
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
         self.model.signals.component_removed.connect(self.sceneWidget.delete_component)
@@ -98,42 +95,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             0
         ].internalPointer()
         self.show_add_component_window(selected_component)
-
-    def show_entries_dialog(self, map_of_entries: dict, nexus_file: h5py.File):
-        """
-        Shows the entries dialog when loading a nexus file if there are multiple entries.
-        :param map_of_entries: A map of the entry groups, with the key being the name of the group and value being the actual h5py group object.
-        :param nexus_file: A reference to the nexus file.
-        """
-        self.entries_dialog = QDialog()
-        self.entries_dialog.setMinimumWidth(400)
-        self.entries_dialog.setWindowTitle(
-            "Multiple Entries found. Please choose the entry name from the list."
-        )
-        combo = QComboBox()
-
-        # Populate the combo box with the names of the entry groups.
-        [combo.addItem(x) for x in map_of_entries.keys()]
-        ok_button = QPushButton()
-
-        ok_button.setText("OK")
-        ok_button.clicked.connect(self.entries_dialog.close)
-
-        def _load_current_entry():
-            self.model.signals.load_file(
-                map_of_entries[combo.currentText()], nexus_file
-            )
-            self._update_views()
-
-        # Connect the clicked signal of the ok_button to signals.load_file and pass the file and entry group object.
-        ok_button.clicked.connect(_load_current_entry)
-
-        self.entries_dialog.setLayout(QGridLayout())
-
-        self.entries_dialog.layout().addWidget(QLabel("Entry:"))
-        self.entries_dialog.layout().addWidget(combo)
-        self.entries_dialog.layout().addWidget(ok_button)
-        self.entries_dialog.show()
 
     def update_nexus_file_structure_view(self, nexus_file):
         self.treemodel.clear()
@@ -192,11 +153,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def open_nexus_file(self):
         raise NotImplementedError
-        # filename = file_dialog(False, "Open Nexus File", NEXUS_FILE_TYPES)
-        # existing_file = self.model.signals.nexus_file
-        # if self.model.signals.open_file(filename):
-        #     self._update_views()
-        #     existing_file.close()
 
     def open_json_file(self):
         filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)

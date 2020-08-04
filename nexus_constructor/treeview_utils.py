@@ -3,10 +3,10 @@ import sys
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QIcon, QColor
-from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel
+from PySide2.QtWidgets import QAction, QToolBar, QWidget, QTreeView, QLabel, QFrame
 
-from nexus_constructor.component.link_transformation import LinkTransformation
-from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.link_transformation import LinkTransformation
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
@@ -58,7 +58,6 @@ def create_and_add_toolbar_action(
 def set_button_states(
     component_tree_view: QTreeView,
     delete_action: QAction,
-    duplicate_action: QAction,
     new_rotation_action: QAction,
     new_translation_action: QAction,
     create_link_action: QAction,
@@ -69,7 +68,6 @@ def set_button_states(
     Changes the button states based on user interaction with the component tree view.
     :param component_tree_view: The component tree view.
     :param delete_action: The action for deleting an item.
-    :param duplicate_action: The action for duplicating an item.
     :param new_rotation_action: The action for creating a new rotation.
     :param new_translation_action: The action for creating a new translation.
     :param create_link_action: The action for creating a link.
@@ -81,7 +79,6 @@ def set_button_states(
         handle_number_of_items_selected_is_not_one(
             create_link_action,
             delete_action,
-            duplicate_action,
             new_rotation_action,
             new_translation_action,
             zoom_action,
@@ -94,7 +91,6 @@ def set_button_states(
         selected_object_is_component_or_transform = isinstance(
             selected_object, (Component, Transformation)
         )
-        duplicate_action.setEnabled(selected_object_is_component_or_transform)
         edit_component_action.setEnabled(selected_object_is_component)
 
         selected_object_is_not_link_transform = not isinstance(
@@ -125,7 +121,6 @@ def set_button_states(
 
 def handle_number_of_items_selected_is_not_one(
     delete_action: QAction,
-    duplicate_action: QAction,
     new_rotation_action: QAction,
     new_translation_action: QAction,
     create_link_action: QAction,
@@ -134,14 +129,12 @@ def handle_number_of_items_selected_is_not_one(
     """
     Disables all actions when the number of selected items in the Component Tree View is not equal to one.
     :param delete_action: The action for deleting an item.
-    :param duplicate_action: The action for duplicating an item.
     :param new_rotation_action: The action for creating a new rotation.
     :param new_translation_action: The action for creating a new translation.
     :param create_link_action: The action for creating a link.
     :param zoom_action: The action for zooming on a component.
     """
     delete_action.setEnabled(False)
-    duplicate_action.setEnabled(False)
     new_rotation_action.setEnabled(False)
     new_translation_action.setEnabled(False)
     create_link_action.setEnabled(False)
@@ -194,12 +187,14 @@ def fill_selection(option, painter):
     painter.fillRect(option.rect, colour)
 
 
-def get_link_transformation_frame(frame, model: Model, value):
+def get_link_transformation_frame(
+    frame: QFrame, model: Model, value: LinkTransformation
+):
     frame.transformation_frame = EditTransformationLink(frame, value, model)
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 
-def get_transformation_frame(frame, model: Model, value):
+def get_transformation_frame(frame: QFrame, model: Model, value: Transformation):
     if value.transform_type == TransformationType.TRANSLATION:
         frame.transformation_frame = EditTranslation(frame, value, model)
     elif value.transform_type == TransformationType.ROTATION:

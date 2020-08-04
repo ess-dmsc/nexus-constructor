@@ -16,7 +16,7 @@ from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
 )
-from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.geometry import (
@@ -34,8 +34,8 @@ from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
 from nexus_constructor.model.helpers import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
-from nexus_constructor.pixel_data import PixelGrid, PixelMapping, PixelData
-from nexus_constructor.pixel_data_to_nexus_utils import (
+from nexus_constructor.geometry.pixel_data import PixelGrid, PixelMapping, PixelData
+from nexus_constructor.geometry.pixel_data_utils import (
     get_detector_number_from_pixel_mapping,
     get_x_offsets_from_pixel_grid,
     get_y_offsets_from_pixel_grid,

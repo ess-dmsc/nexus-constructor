@@ -359,8 +359,6 @@ class OFFGeometryNexus(OFFGeometry, Group):
     def record_faces(self, new_faces: List[List[int]]):
         """
         Record face data in file
-        :param nexus_wrapper: Wrapper for the file the data will be stored in
-        :param group: The shape group node
         :param new_faces: The new face data, list of list for each face with indices of vertices in face
         """
         winding_order = np.array(
@@ -375,8 +373,6 @@ class OFFGeometryNexus(OFFGeometry, Group):
     def record_vertices(self, new_vertices: List[QVector3D]):
         """
         Record vertex data in file
-        :param nexus_wrapper: Wrapper for the file the data will be stored in
-        :param group: The shape group node
         :param new_vertices: The new vertices data, list of cartesian coords for each vertex
         """
         vertices = np.array(

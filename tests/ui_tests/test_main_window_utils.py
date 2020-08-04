@@ -5,6 +5,7 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QFrame, QVBoxLayout
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
@@ -68,13 +69,6 @@ def delete_action(trigger_method_mock, tool_bar, tree_view_tab):
 
 
 @pytest.fixture(scope="function")
-def duplicate_action(trigger_method_mock, tool_bar, tree_view_tab):
-    return create_and_add_toolbar_action(
-        "duplicate.png", "Duplicate", trigger_method_mock, tool_bar, tree_view_tab
-    )
-
-
-@pytest.fixture(scope="function")
 def new_rotation_action(trigger_method_mock, tool_bar, tree_view_tab):
     return create_and_add_toolbar_action(
         "new_rotation.png", "New Rotation", trigger_method_mock, tool_bar, tree_view_tab
@@ -120,7 +114,6 @@ def edit_component_action(trigger_method_mock, tool_bar, tree_view_tab):
 @pytest.fixture(scope="function")
 def set_of_all_actions(
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -129,7 +122,6 @@ def set_of_all_actions(
 ):
     return {
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -248,7 +240,6 @@ def test_GIVEN_action_is_triggered_THEN_expected_trigger_method_is_called(
 def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_expected_buttons_are_disabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -258,7 +249,6 @@ def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_ex
     # Set the actions to enabled to make sure that their state changes
     actions = [
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -270,7 +260,6 @@ def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_ex
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -284,7 +273,6 @@ def test_GIVEN_items_selected_is_not_one_WHEN_interacting_with_tree_view_THEN_ex
 def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons_are_enabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -298,7 +286,6 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -312,7 +299,6 @@ def test_GIVEN_component_is_selected_WHEN_changing_button_state_THEN_all_buttons
 def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expected_buttons_are_enabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -337,7 +323,6 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -347,7 +332,6 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
 
     transformation_selected_actions = {
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -361,11 +345,9 @@ def test_GIVEN_transformation_is_selected_WHEN_changing_button_states_THEN_expec
     )
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_buttons_are_enabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -388,7 +370,6 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -406,11 +387,9 @@ def test_GIVEN_link_is_selected_WHEN_changing_button_states_THEN_expected_button
     )
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changing_button_states_THEN_create_link_button_is_disabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -427,7 +406,6 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -442,11 +420,9 @@ def test_GIVEN_component_is_selected_WHEN_component_already_has_link_and_changin
     )
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_THEN_create_link_button_is_disabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -466,7 +442,6 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_T
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -484,7 +459,6 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_already_has_link_T
 def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_THEN_create_link_button_is_enabled(
     component_tree_view,
     delete_action,
-    duplicate_action,
     new_rotation_action,
     new_translation_action,
     create_link_action,
@@ -503,7 +477,6 @@ def test_GIVEN_transformation_list_is_selected_WHEN_component_doesnt_have_link_T
     set_button_states(
         component_tree_view,
         delete_action,
-        duplicate_action,
         new_rotation_action,
         new_translation_action,
         create_link_action,
@@ -613,10 +586,11 @@ def create_transformation(trans_type: TransformationType):
     )
     t.transform_type = trans_type
     t.vector = QVector3D(1, 0, 0)
+    t.values = Dataset(name="", values=0, type=ValueTypes.DOUBLE)
+    t.units = "m"
     return t
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_rotation_WHEN_getting_transformation_frame_THEN_frame_type_is_edit_rotation(
     qtbot,
 ):
@@ -628,7 +602,6 @@ def test_GIVEN_rotation_WHEN_getting_transformation_frame_THEN_frame_type_is_edi
     assert isinstance(frame.transformation_frame, EditRotation)
 
 
-@pytest.mark.skip(reason="Disabled whilst working on model change")
 def test_GIVEN_translation_WHEN_getting_transformation_frame_THEN_frame_type_is_edit_translation(
     qtbot,
 ):

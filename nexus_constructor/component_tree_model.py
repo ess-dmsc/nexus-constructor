@@ -5,8 +5,8 @@ from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
-from nexus_constructor.component.link_transformation import LinkTransformation
-from nexus_constructor.component.transformations_list import TransformationsList
+from nexus_constructor.link_transformation import LinkTransformation
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
@@ -162,20 +162,6 @@ class ComponentTreeModel(QAbstractItemModel):
             self._remove_transformation(node)
         elif isinstance(node.internalPointer(), LinkTransformation):
             self._remove_link(node)
-
-    def duplicate_node(self, node: QModelIndex):
-        node_object = node.internalPointer()
-        if isinstance(node_object, Component):
-            new_component = node_object.duplicate(
-                self.model.entry.instrument.get_component_list()
-            )
-            self.add_component(new_component)
-            shape, positions = new_component.shape
-            self.model.signals.component_added.emit(
-                new_component.name, shape, positions
-            )
-        elif isinstance(node_object, Transformation):
-            raise NotImplementedError("Duplication of transformations not implemented")
 
     def add_transformation(
         self, parent_index: QModelIndex, transformation_type: TransformationType

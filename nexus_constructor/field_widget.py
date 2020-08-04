@@ -2,7 +2,6 @@ import logging
 import uuid
 from functools import partial
 from typing import List, Union, Any
-import h5py
 import numpy as np
 from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
 from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
@@ -20,6 +19,7 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
@@ -212,7 +212,7 @@ class FieldWidget(QFrame):
         self.value_type_combo.setCurrentText(dtype)
 
     @property
-    def attrs(self) -> h5py.Dataset.attrs:
+    def attrs(self) -> List[FieldAttribute]:
         return self.value.attributes
 
     @attrs.setter
