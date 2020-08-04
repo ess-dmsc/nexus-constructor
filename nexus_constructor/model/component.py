@@ -79,7 +79,6 @@ class Component(Group):
     Base class for a component object. In the NeXus file this would translate to the component group.
     """
 
-    transforms_list = attr.ib(factory=list)
     _depends_on = attr.ib(type=Transformation, default=None)
     has_link = attr.ib(type=bool, default=None)
 
@@ -266,7 +265,7 @@ class Component(Group):
             raise Exception
         del self.get_transforms_group()[transform.name]
 
-    def get_transforms_group(self):
+    def get_transforms_group(self) -> Group:
         if self[TRANSFORMS_GROUP_NAME] is not None:
             return self[TRANSFORMS_GROUP_NAME]
 

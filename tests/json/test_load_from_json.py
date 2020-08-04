@@ -216,14 +216,17 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
 
 @pytest.fixture(scope="function")
 def component_with_transformation() -> Component:
+    comp = Component(name="Component")
     transformation = Transformation(
         name="Transformation",
         type=ValueTypes.DOUBLE,
         size="[1]",
         values="",
-        parent_component=None,
+        parent_component=comp,
     )
-    return Component(name="Component", transforms_list=[transformation])
+    comp.get_transforms_group()["Transformation"] = transformation
+    comp.depends_on = transformation
+    return comp
 
 
 def test_GIVEN_unable_to_find_nexus_structure_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
@@ -299,7 +302,7 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
 def test_GIVEN_transformation_with_matching_name_WHEN_finding_transformation_by_name_THEN_transformation_is_returned(
     json_reader, component_with_transformation
 ):
-    transformation = component_with_transformation.transforms_list[0]
+    transformation = component_with_transformation.transforms[0]
     assert transformation == json_reader._get_transformation_by_name(
         component_with_transformation, transformation.name, "DependentComponentName"
     )
@@ -310,10 +313,10 @@ def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_
 ):
     n_warnings = len(json_reader.warnings)
 
-    transformation_name = component_with_transformation.transforms_list[0].name
+    transformation_name = component_with_transformation.transforms[0].name
     dependent_component_name = "DependentComponentName"
 
-    component_with_transformation.transforms_list.clear()
+    component_with_transformation.transforms.clear()
     assert (
         json_reader._get_transformation_by_name(
             component_with_transformation, transformation_name, dependent_component_name

@@ -72,7 +72,6 @@ def attributes_list(transformation_json):
 def transformation_reader(transformation_json):
     parent_component = Mock(spec=Component)
     parent_component.name = "ParentComponentName"
-    parent_component.transforms_list = []
     entry = [transformation_json]
     return TransformationReader(parent_component, entry)
 
