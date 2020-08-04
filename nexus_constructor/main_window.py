@@ -4,7 +4,14 @@ import json
 
 import h5py
 from PySide2.QtCore import QSettings
-from PySide2.QtWidgets import QDialog, QLabel, QGridLayout, QComboBox, QPushButton
+from PySide2.QtWidgets import (
+    QDialog,
+    QLabel,
+    QGridLayout,
+    QComboBox,
+    QPushButton,
+    QInputDialog,
+)
 from PySide2.QtWidgets import QMainWindow, QApplication, QAction, QMessageBox
 from nexusutils.nexusbuilder import NexusBuilder
 
@@ -13,11 +20,13 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.json.load_from_json import JSONReader
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from nexus_constructor.model.model import Model
+from nexus_constructor.create_forwarder_config import create_forwarder_config
 from ui.main_window import Ui_MainWindow
 
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
+FLATBUFFER_FILE_TYPES = {"FlatBuffer Files": ["flat", "FLAT"]}
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
@@ -36,8 +45,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_filewriter_json
         )
-        self.export_to_forwarder_JSON_action.triggered.connect(
-            self.save_to_forwarder_json
+        self.export_to_forwarder_config_action.triggered.connect(
+            self.save_to_forwarder_config
         )
 
         # Clear the 3d view when closed
@@ -164,33 +173,22 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             with open(filename, "w") as file:
                 json.dump(self.model.as_dict(), file, indent=2)
 
-    def save_to_forwarder_json(self):
-        raise NotImplementedError
-        # filename = file_dialog(True, "Save Forwarder JSON File", JSON_FILE_TYPES)
-        # if filename:
-        #     provider_type, ok_pressed = QInputDialog.getItem(
-        #         None,
-        #         "Provider type",
-        #         "Select provider type for PVs",
-        #         ["ca", "pva"],
-        #         0,
-        #         False,
-        #     )
-        #     default_broker, ok_pressed = QInputDialog.getText(
-        #         None,
-        #         "Default broker",
-        #         "Default Broker: (This will only be used for streams that do not already have a broker)",
-        #         text="broker:port",
-        #         echo=QLineEdit.Normal,
-        #     )
-        #     if ok_pressed:
-        #         with open(filename, "w") as file:
-        #             nexus_constructor.json.forwarder_json_writer.generate_forwarder_command(
-        #                 file,
-        #                 self.model.signals.entry,
-        #                 provider_type=provider_type,
-        #                 default_broker=default_broker,
-        #             )
+    def save_to_forwarder_config(self):
+        filename = file_dialog(
+            True, "Save Forwarder FlatBuffer File", FLATBUFFER_FILE_TYPES
+        )
+        if filename:
+            provider_type, ok_pressed = QInputDialog.getItem(
+                self,
+                "Provider type",
+                "Select provider type for PVs",
+                ["ca", "pva", "fake"],
+                0,
+                False,
+            )
+            if ok_pressed:
+                with open(filename, "wb") as flat_file:
+                    flat_file.write(create_forwarder_config(self.model, provider_type,))
 
     def open_nexus_file(self):
         raise NotImplementedError

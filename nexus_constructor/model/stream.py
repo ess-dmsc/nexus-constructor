@@ -92,19 +92,25 @@ class EV42Stream:
     nexus_chunk_chunk_kb = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        return {
+        dict = {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
                 WRITER_MODULE: self.writer_module,
                 SOURCE: self.source,
                 TOPIC: self.topic,
-                ADC_PULSE_DEBUG: self.adc_pulse_debug if not None else {},
-                INDEX_EVERY_MB: self.nexus_indices_index_every_mb if not None else {},
-                INDEX_EVERY_KB: self.nexus_indices_index_every_kb if not None else {},
-                CHUNK_CHUNK_MB: self.nexus_chunk_chunk_mb if not None else {},
-                CHUNK_CHUNK_KB: self.nexus_chunk_chunk_kb if not None else {},
             },
         }
+        if self.adc_pulse_debug is not None:
+            dict[NodeType.STREAM][ADC_PULSE_DEBUG] = self.adc_pulse_debug
+        if self.nexus_indices_index_every_mb is not None:
+            dict[NodeType.STREAM][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
+        if self.nexus_indices_index_every_kb is not None:
+            dict[NodeType.STREAM][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
+        if self.nexus_chunk_chunk_mb is not None:
+            dict[NodeType.STREAM][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb
+        if self.nexus_chunk_chunk_kb is not None:
+            dict[NodeType.STREAM][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb
+        return dict
 
 
 @attr.s
@@ -120,20 +126,26 @@ class F142Stream:
     store_latest_into = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        return {
+        dict = {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
                 WRITER_MODULE: self.writer_module,
                 SOURCE: self.source,
                 TOPIC: self.topic,
-                VALUE_UNITS: self.value_units,
-                CommonKeys.TYPE: self.type if not None else {},
-                ARRAY_SIZE: self.array_size if not None else {},
-                INDEX_EVERY_MB: self.nexus_indices_index_every_mb if not None else {},
-                INDEX_EVERY_KB: self.nexus_indices_index_every_kb if not None else {},
-                STORE_LATEST_INTO: self.store_latest_into if not None else {},
+                CommonKeys.TYPE: self.type,
             },
         }
+        if self.value_units is not None:
+            dict[NodeType.STREAM][VALUE_UNITS] = self.value_units
+        if self.array_size is not None:
+            dict[NodeType.STREAM][ARRAY_SIZE] = self.array_size
+        if self.nexus_indices_index_every_mb is not None:
+            dict[NodeType.STREAM][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
+        if self.nexus_indices_index_every_kb is not None:
+            dict[NodeType.STREAM][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
+        if self.store_latest_into is not None:
+            dict[NodeType.STREAM][STORE_LATEST_INTO] = self.store_latest_into
+        return dict
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]
@@ -171,14 +183,13 @@ class HS00Stream:
         }
 
 
+Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
+
+
 @attr.s
 class StreamGroup(Group):
     def __setitem__(
-        self,
-        key: str,
-        value: Union[
-            NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream
-        ],
+        self, key: str, value: Stream,
     ):
         self.children.append(value)
 

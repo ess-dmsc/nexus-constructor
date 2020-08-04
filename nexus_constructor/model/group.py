@@ -35,6 +35,10 @@ class Group:
     def __setitem__(
         self, key: str, value: Union["Group", Dataset, Link],
     ):
+        try:
+            value.parent_node = self
+        except AttributeError:
+            pass
         _set_item(self, self.children, key, value)
 
     def __contains__(self, item: str):

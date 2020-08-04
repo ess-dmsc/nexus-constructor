@@ -29,7 +29,7 @@ def test_streams_with_name_source_and_topic(stream):
 
 
 def test_f142_stream_optional_settings():
-    type = "Double"
+    type = "double"
     value_units = "m"
     array_size = "20"
     nexus_indices_index_every_kb = 3000
