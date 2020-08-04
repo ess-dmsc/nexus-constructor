@@ -488,9 +488,11 @@ def test_remove_component(model):
     test_component_tree_model = ComponentTreeModel(model)
     model.entry.instrument.add_component(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
-    assert test_component_tree_model.rowCount(QModelIndex()) == 1
+    # Should be 2 components as the sample counts as 1
+    assert test_component_tree_model.rowCount(QModelIndex()) == 2
     test_component_tree_model.remove_node(component_index)
-    assert test_component_tree_model.rowCount(QModelIndex()) == 0
+    # Check that only the sample is left
+    assert test_component_tree_model.rowCount(QModelIndex()) == 1
 
 
 def test_remove_component_with_transformation(model):
@@ -498,9 +500,11 @@ def test_remove_component_with_transformation(model):
     model.entry.instrument.add_component(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     test_component_tree_model.add_rotation(component_index)
-    assert test_component_tree_model.rowCount(QModelIndex()) == 1
+    # Should be 2 components as the sample counts as 1
+    assert test_component_tree_model.rowCount(QModelIndex()) == 2
     test_component_tree_model.remove_node(component_index)
-    assert test_component_tree_model.rowCount(QModelIndex()) == 0, (
+    # Check that only the sample is left
+    assert test_component_tree_model.rowCount(QModelIndex()) == 1, (
         "Expected component to be successfully deleted because it has "
         "a transformation that only has it as a dependent"
     )
