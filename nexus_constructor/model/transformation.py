@@ -161,24 +161,27 @@ class Transformation(Dataset):
         return_dict = {
             CommonKeys.NAME: self.name,
             CommonKeys.TYPE: NodeType.DATASET,
-            CommonKeys.ATTRIBUTES: [
+            CommonKeys.VALUES: self.values.as_dict() if self.values else [],
+            CommonKeys.DATASET: {
+                CommonKeys.TYPE: self.type,
+                CommonKeys.SIZE: self.size,
+            },
+        }
+        if self.attributes:
+            return_dict[CommonKeys.ATTRIBUTES] = [
                 attribute.as_dict()
                 for attribute in self.attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
             ]
-            if self.attributes
-            else None,
-            CommonKeys.VALUES: self.values.as_dict() if self.values else [],
-        }
-        try:
-            return_dict[CommonKeys.ATTRIBUTES].append(
-                {
-                    CommonKeys.NAME: CommonAttrs.DEPENDS_ON,
-                    CommonKeys.VALUES: self.depends_on.absolute_path,
-                    CommonKeys.TYPE: ValueTypes.STRING,
-                }
-            )
-        except AttributeError:
-            pass
+            try:
+                return_dict[CommonKeys.ATTRIBUTES].append(
+                    {
+                        CommonKeys.NAME: CommonAttrs.DEPENDS_ON,
+                        CommonKeys.VALUES: self.depends_on.absolute_path,
+                        CommonKeys.TYPE: ValueTypes.STRING,
+                    }
+                )
+            except AttributeError:
+                pass
 
         return return_dict

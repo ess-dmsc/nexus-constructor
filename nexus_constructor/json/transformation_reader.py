@@ -152,7 +152,7 @@ class TransformationReader:
         :return: The matching TransformationType class value.
         """
         try:
-            return TRANSFORMATION_MAP[transformation_type]
+            return TRANSFORMATION_MAP[transformation_type.lower()]
         except KeyError:
             self.warnings.append(
                 f"Could not recognise transformation type {transformation_type} of"
@@ -190,6 +190,8 @@ class TransformationReader:
             if not dtype:
                 continue
 
+            # todo construct dataset here using other helper methods
+
             attributes = self._get_transformation_attribute(
                 CommonKeys.ATTRIBUTES, json_transformation, name
             )
@@ -224,13 +226,13 @@ class TransformationReader:
             values = _create_transformation_dataset(angle_or_magnitude, dtype, name)
 
             transform = self.parent_component._create_and_add_transform(
-                name,
-                transformation_type,
-                angle_or_magnitude,
-                units,
-                QVector3D(*vector),
-                temp_depends_on,
-                values,
+                name=name,
+                transformation_type=transformation_type,
+                angle_or_magnitude=angle_or_magnitude,
+                units=units,
+                vector=QVector3D(*vector),
+                depends_on=temp_depends_on,
+                values=values,
             )
 
             if depends_on not in DEPENDS_ON_IGNORE:
