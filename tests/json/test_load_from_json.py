@@ -1,11 +1,10 @@
 import json
-
 import pytest
+from PySide2.QtGui import QVector3D
 from mock import patch, mock_open
-
 from nexus_constructor.json.load_from_json import JSONReader, _retrieve_children_list
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
 
@@ -217,14 +216,13 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
 @pytest.fixture(scope="function")
 def component_with_transformation() -> Component:
     comp = Component(name="Component")
-    transformation = Transformation(
+    transformation = comp.add_rotation(
         name="Transformation",
-        type=ValueTypes.DOUBLE,
-        size="[1]",
-        values="",
-        parent_component=comp,
+        angle=90,
+        axis=QVector3D(1, 0, 0),
+        depends_on=None,
+        values=Dataset(name="test", values=123, type=ValueTypes.DOUBLE),
     )
-    comp.get_transforms_group()["Transformation"] = transformation
     comp.depends_on = transformation
     return comp
 
@@ -316,7 +314,9 @@ def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_
     transformation_name = component_with_transformation.transforms[0].name
     dependent_component_name = "DependentComponentName"
 
-    component_with_transformation.transforms.clear()
+    component_with_transformation.remove_transformation(
+        component_with_transformation.transforms[0]
+    )
     assert (
         json_reader._get_transformation_by_name(
             component_with_transformation, transformation_name, dependent_component_name

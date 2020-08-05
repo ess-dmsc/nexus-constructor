@@ -261,9 +261,15 @@ class Component(Group):
         return transform
 
     def remove_transformation(self, transform: Transformation):
-        if transform.dependents:
+        # Check the transform has no dependents, excluding this component
+        if (
+            transform.dependents
+            and not len(transform.dependents) == 1
+            and not transform.dependents[0] == self
+        ):
             raise Exception
         del self.get_transforms_group()[transform.name]
+        transform.remove_from_dependee_chain()
 
     def get_transforms_group(self) -> Group:
         if self[TRANSFORMS_GROUP_NAME] is not None:
