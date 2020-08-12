@@ -6,6 +6,7 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
+    NodeType,
 )
 from nexus_constructor.component_type import COMPONENT_TYPES
 from nexus_constructor.json.load_from_json_utils import (
@@ -16,8 +17,11 @@ from nexus_constructor.json.load_from_json_utils import (
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.json.transformation_reader import TransformationReader
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Entry
+from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.link import Link, TARGET
 from nexus_constructor.model.transformation import Transformation
 
 """
@@ -27,6 +31,7 @@ The current implementation makes a couple of assumptions that may not hold true 
 """
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
+CHILD_EXCLUDELIST = [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME, TRANSFORMS_GROUP_NAME]
 
 
 def _retrieve_children_list(json_dict: dict) -> list:
@@ -172,6 +177,8 @@ class JSONReader:
             component.nx_class = nx_class
             self.entry.instrument.add_component(component)
 
+        self._add_fields_to_component(children, component)
+
         transformation_reader = TransformationReader(component, children)
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
@@ -207,3 +214,39 @@ class JSONReader:
             return False
 
         return True
+
+    def _add_fields_to_component(self, children: Dict, component: Component):
+        for item in children:
+            child_name = item[CommonKeys.NAME]
+            if (
+                child_name not in CHILD_EXCLUDELIST
+            ):  # ignore transforms, shape etc as these are handled separately
+                type = item[CommonKeys.TYPE]
+
+                if type == NodeType.GROUP:
+                    # todo stream groups
+                    component[child_name] = _create_group(item)
+                    pass
+                elif type == NodeType.DATASET:
+                    component[child_name] = _create_dataset(item, component)
+                elif type == NodeType.LINK:
+                    component[child_name] = _create_link(item)
+
+
+def _create_group(json_object) -> Group:
+    pass
+
+
+def _create_dataset(json_object, parent) -> Dataset:
+    size = json_object[NodeType.DATASET][CommonKeys.SIZE]
+    type = json_object[NodeType.DATASET][CommonKeys.TYPE]
+    name = json_object[CommonKeys.NAME]
+    values = json_object[CommonKeys.VALUES]
+    # todo attrs
+    return Dataset(name=name, values=values, type=type, size=size, parent_node=parent)
+
+
+def _create_link(json_object) -> Link:
+    name = json_object[CommonKeys.NAME]
+    target = json_object[TARGET]
+    return Link(name=name, target=target)
