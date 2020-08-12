@@ -58,6 +58,23 @@ def _find_shape_information(children: List[dict]) -> Union[dict, None]:
             return item
 
 
+def _add_field_to_group(item: Dict, group: Group):
+    child_name = item[CommonKeys.NAME]
+    if (
+        child_name not in CHILD_EXCLUDELIST
+    ):  # ignore transforms, shape etc as these are handled separately
+        type = item[CommonKeys.TYPE]
+        if type == NodeType.GROUP:
+            # todo stream groups
+            child = _create_group(item, group)
+            pass
+        elif type == NodeType.DATASET:
+            child = _create_dataset(item, group)
+        elif type == NodeType.LINK:
+            child = _create_link(item)
+        group[child_name] = child
+
+
 class JSONReader:
     def __init__(self):
         self.entry = Entry()
@@ -177,7 +194,8 @@ class JSONReader:
             component.nx_class = nx_class
             self.entry.instrument.add_component(component)
 
-        self._add_fields_to_component(children, component)
+        for item in children:
+            _add_field_to_group(item, component)
 
         transformation_reader = TransformationReader(component, children)
         transformation_reader.add_transformations_to_component()
@@ -215,26 +233,16 @@ class JSONReader:
 
         return True
 
-    def _add_fields_to_component(self, children: Dict, component: Component):
-        for item in children:
-            child_name = item[CommonKeys.NAME]
-            if (
-                child_name not in CHILD_EXCLUDELIST
-            ):  # ignore transforms, shape etc as these are handled separately
-                type = item[CommonKeys.TYPE]
 
-                if type == NodeType.GROUP:
-                    # todo stream groups
-                    component[child_name] = _create_group(item)
-                    pass
-                elif type == NodeType.DATASET:
-                    component[child_name] = _create_dataset(item, component)
-                elif type == NodeType.LINK:
-                    component[child_name] = _create_link(item)
+def _create_group(json_object, parent) -> Group:
+    group = Group(name=json_object[CommonKeys.NAME], parent_node=parent)
+    children = json_object[CommonKeys.CHILDREN]
 
-
-def _create_group(json_object) -> Group:
-    pass
+    # todo check if stream group here and handle streams if so then return the group
+    for item in children:
+        _add_field_to_group(item, group)
+    # todo attrs
+    return group
 
 
 def _create_dataset(json_object, parent) -> Dataset:
