@@ -241,7 +241,8 @@ def _create_group(json_object, parent) -> Group:
     # todo check if stream group here and handle streams if so then return the group
     for item in children:
         _add_field_to_group(item, group)
-    # todo attrs
+
+    _add_attributes(json_object, group)
     return group
 
 
@@ -250,11 +251,25 @@ def _create_dataset(json_object, parent) -> Dataset:
     type = json_object[NodeType.DATASET][CommonKeys.TYPE]
     name = json_object[CommonKeys.NAME]
     values = json_object[CommonKeys.VALUES]
-    # todo attrs
-    return Dataset(name=name, values=values, type=type, size=size, parent_node=parent)
+    ds = Dataset(name=name, values=values, type=type, size=size, parent_node=parent)
+    _add_attributes(json_object, ds)
+    return ds
 
 
 def _create_link(json_object) -> Link:
     name = json_object[CommonKeys.NAME]
     target = json_object[TARGET]
     return Link(name=name, target=target)
+
+
+def _add_attributes(json_object, model_object: Union[Group, Dataset]):
+    try:
+        attrs_list = json_object[CommonKeys.ATTRIBUTES]
+        for attribute in attrs_list:
+            attr_name = attribute[CommonKeys.NAME]
+            attr_values = attribute[CommonKeys.VALUES]
+            model_object.attributes.set_attribute_value(
+                attribute_name=attr_name, attribute_value=attr_values
+            )
+    except (ValueError, AttributeError):
+        pass
