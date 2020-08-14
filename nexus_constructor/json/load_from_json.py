@@ -22,6 +22,18 @@ from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.link import Link, TARGET
+from nexus_constructor.model.stream import (
+    WRITER_MODULE,
+    SOURCE,
+    TOPIC,
+    WriterModules,
+    HS00Stream,
+    NS10Stream,
+    SENVStream,
+    TDCTStream,
+    F142Stream,
+    EV42Stream,
+)
 from nexus_constructor.model.transformation import Transformation
 
 """
@@ -65,13 +77,35 @@ def _add_field_to_group(item: Dict, group: Group):
     ):  # ignore transforms, shape etc as these are handled separately
         type = item[CommonKeys.TYPE]
         if type == NodeType.GROUP:
-            # todo stream groups
             child = _create_group(item, group)
-            pass
+            for group_item in item[CommonKeys.CHILDREN]:
+                _add_field_to_group(group_item, child)
         elif type == NodeType.DATASET:
             child = _create_dataset(item, group)
         elif type == NodeType.LINK:
             child = _create_link(item)
+        elif type == NodeType.STREAM:
+            writer_module = item[WRITER_MODULE]
+            source = item[SOURCE]
+            topic = item[TOPIC]
+            if writer_module == WriterModules.F142.value:
+                # todo optionals
+                stream = F142Stream()
+            elif writer_module == WriterModules.EV42.value:
+                # todo optionals
+                stream = EV42Stream()
+            elif writer_module == WriterModules.HS00.value:
+                stream = HS00Stream()
+            elif writer_module == WriterModules.NS10.value:
+                stream = NS10Stream(source=source, topic=topic)
+            elif writer_module == WriterModules.SENV.value:
+                stream = SENVStream(source=source, topic=topic)
+            elif writer_module == WriterModules.TDCTIME.value:
+                stream = TDCTStream(source=source, topic=topic)
+                # todo put it in stream group
+
+            # todo put this into another function when done
+            pass
         group[child_name] = child
 
 
