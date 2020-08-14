@@ -7,7 +7,9 @@ from nexus_constructor.json.load_from_json import (
     JSONReader,
     _retrieve_children_list,
     _add_attributes,
+    _create_link,
 )
+from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation
@@ -353,3 +355,41 @@ def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_att
     dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
     _add_attributes(test_input, dataset)
     assert not dataset.attributes
+
+
+def test_GIVEN_dictionary_containing_attribute_WHEN_adding_attributes_THEN_attribute_object_is_created():
+    key = "units"
+    value = "m"
+    test_dict = {"attributes": [{"name": key, "values": value}]}
+    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    _add_attributes(test_dict, dataset)
+    assert len(dataset.attributes) == 1
+    assert isinstance(dataset.attributes[0], FieldAttribute)
+    assert dataset.attributes[0].name == key
+    assert dataset.attributes[0].values == value
+
+
+def test_GIVEN_dictionary_containing_attributes_WHEN_adding_attributes_THEN_attribute_objects_are_created():
+    key1 = "units"
+    val1 = "m"
+    key2 = "testkey"
+    val2 = "testval"
+    test_dict = {
+        "attributes": [{"name": key1, "values": val1}, {"name": key2, "values": val2}]
+    }
+    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    _add_attributes(test_dict, dataset)
+    assert len(dataset.attributes) == 2
+    assert dataset.attributes[0].name == key1
+    assert dataset.attributes[0].values == val1
+    assert dataset.attributes[1].name == key2
+    assert dataset.attributes[1].values == val2
+
+
+def test_GIVEN_link_json_WHEN_adding_link_THEN_link_object_is_created():
+    name = "link1"
+    target = "/entry/instrument/detector1"
+    test_dict = {"name": name, "target": target}
+    link = _create_link(test_dict)
+    assert link.name == name
+    assert link.target == target
