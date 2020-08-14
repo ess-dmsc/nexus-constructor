@@ -3,8 +3,13 @@ import json
 import pytest
 from mock import patch, mock_open
 
-from nexus_constructor.json.load_from_json import JSONReader, _retrieve_children_list
+from nexus_constructor.json.load_from_json import (
+    JSONReader,
+    _retrieve_children_list,
+    _add_attributes,
+)
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 
@@ -114,7 +119,12 @@ def json_dict_with_component():
                       "type":"dataset",
                       "attributes":[
     
-                      ]
+                      ],
+                      "dataset":{
+                        "type":"string",
+                        "size":"1"
+                      },
+                      "values": "test_description"
                     },
                     {
                       "type":"group",
@@ -331,3 +341,15 @@ def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_
             ]
         ]
     )
+
+
+@pytest.mark.parametrize(
+    "test_input",
+    ({}, {"type": "dataset", "values": 0,}, {"attributes": []}),  # noqa E231
+)
+def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing(
+    test_input,
+):
+    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    _add_attributes(test_input, dataset)
+    assert not dataset.attributes

@@ -271,5 +271,5 @@ def _add_attributes(json_object, model_object: Union[Group, Dataset]):
             model_object.attributes.set_attribute_value(
                 attribute_name=attr_name, attribute_value=attr_values
             )
-    except (ValueError, AttributeError):
+    except (KeyError, AttributeError):
         pass
