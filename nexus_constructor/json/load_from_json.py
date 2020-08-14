@@ -34,6 +34,7 @@ from nexus_constructor.model.stream import (
     F142Stream,
     EV42Stream,
     StreamGroup,
+    Stream,
 )
 from nexus_constructor.model.transformation import Transformation
 
@@ -47,7 +48,7 @@ NX_SAMPLE = "NXsample"
 CHILD_EXCLUDELIST = [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME, TRANSFORMS_GROUP_NAME]
 
 
-def _retrieve_children_list(json_dict: dict) -> list:
+def _retrieve_children_list(json_dict: Dict) -> List:
     """
     Attempts to retrieve the children from the JSON dictionary.
     :param json_dict: The JSON dictionary loaded by the user.
@@ -60,7 +61,7 @@ def _retrieve_children_list(json_dict: dict) -> list:
         return []
 
 
-def _find_shape_information(children: List[dict]) -> Union[dict, None]:
+def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     """
     Tries to get the shape information from a component.
     :param children: The list of dictionaries.
@@ -74,8 +75,13 @@ def _find_shape_information(children: List[dict]) -> Union[dict, None]:
 def _add_field_to_group(item: Dict, group: Group):
     field_type = item[CommonKeys.TYPE]
     if (
-        field_type != NodeType.STREAM
-    ):  # streams do not have a name field, don't deal with them here
+        field_type == NodeType.STREAM
+    ):  # streams do not have a name field so need to be dealt with differently from other fields.
+        stream = _create_stream(item)
+        group.children.append(
+            stream
+        )  # Can't use operators here as the stream does not have a name and therefore isn't hashable.
+    else:
         child_name = item[CommonKeys.NAME]
         if (
             child_name not in CHILD_EXCLUDELIST
@@ -92,15 +98,9 @@ def _add_field_to_group(item: Dict, group: Group):
                 )
             # Add the child to the parent group
             group[child_name] = child
-        else:
-            stream = _create_stream(item)
-            group.children.append(
-                stream
-            )  # Can't use operators here as the stream does not have a name and therefore isn't hashable.
-            pass
 
 
-def _create_stream(json_object):
+def _create_stream(json_object: Dict) -> Stream:
     writer_module = json_object[WRITER_MODULE]
     source = json_object[SOURCE]
     topic = json_object[TOPIC]
@@ -128,9 +128,9 @@ class JSONReader:
         self.entry.instrument = Instrument()
         self.warnings = []
         # key: component name, value: NeXus path pointing to transformation that component depends on
-        self.depends_on_paths: Dict[str, str] = dict()
+        self.depends_on_paths: Dict[str, str] = {}
         # key: component name, value: Component object created from the JSON information
-        self.component_dictionary: Dict[str, Component] = dict()
+        self.component_dictionary: Dict[str, Component] = {}
 
     def _get_transformation_by_name(
         self,
@@ -205,7 +205,7 @@ class JSONReader:
 
             return True
 
-    def _read_json_object(self, json_object: dict, parent_name: str = None):
+    def _read_json_object(self, json_object: Dict, parent_name: str = None):
         """
         Tries to create a component based on the contents of the JSON file.
         :param json_object: A component from the JSON dictionary.
@@ -281,7 +281,7 @@ class JSONReader:
         return True
 
 
-def _create_group(json_object, parent) -> Group:
+def _create_group(json_object: Dict, parent: Group) -> Group:
     children = json_object[CommonKeys.CHILDREN]
     name = json_object[CommonKeys.NAME]
     group = Group(name=name, parent_node=parent)
@@ -297,7 +297,7 @@ def _create_group(json_object, parent) -> Group:
     return group
 
 
-def _create_dataset(json_object, parent) -> Dataset:
+def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
     size = json_object[NodeType.DATASET][CommonKeys.SIZE]
     type = json_object[NodeType.DATASET][CommonKeys.TYPE]
     name = json_object[CommonKeys.NAME]
@@ -313,7 +313,7 @@ def _create_link(json_object) -> Link:
     return Link(name=name, target=target)
 
 
-def _add_attributes(json_object, model_object: Union[Group, Dataset]):
+def _add_attributes(json_object: Dict, model_object: Union[Group, Dataset]):
     try:
         attrs_list = json_object[CommonKeys.ATTRIBUTES]
         for attribute in attrs_list:
