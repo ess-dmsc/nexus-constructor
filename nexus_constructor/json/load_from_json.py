@@ -33,6 +33,7 @@ from nexus_constructor.model.stream import (
     TDCTStream,
     F142Stream,
     EV42Stream,
+    StreamGroup,
 )
 from nexus_constructor.model.transformation import Transformation
 
@@ -71,42 +72,54 @@ def _find_shape_information(children: List[dict]) -> Union[dict, None]:
 
 
 def _add_field_to_group(item: Dict, group: Group):
-    child_name = item[CommonKeys.NAME]
+    field_type = item[CommonKeys.TYPE]
     if (
-        child_name not in CHILD_EXCLUDELIST
-    ):  # ignore transforms, shape etc as these are handled separately
-        type = item[CommonKeys.TYPE]
-        if type == NodeType.GROUP:
-            child = _create_group(item, group)
-            for group_item in item[CommonKeys.CHILDREN]:
-                _add_field_to_group(group_item, child)
-        elif type == NodeType.DATASET:
-            child = _create_dataset(item, group)
-        elif type == NodeType.LINK:
-            child = _create_link(item)
-        elif type == NodeType.STREAM:
-            writer_module = item[WRITER_MODULE]
-            source = item[SOURCE]
-            topic = item[TOPIC]
-            if writer_module == WriterModules.F142.value:
-                # todo optionals
-                stream = F142Stream()
-            elif writer_module == WriterModules.EV42.value:
-                # todo optionals
-                stream = EV42Stream()
-            elif writer_module == WriterModules.HS00.value:
-                stream = HS00Stream()
-            elif writer_module == WriterModules.NS10.value:
-                stream = NS10Stream(source=source, topic=topic)
-            elif writer_module == WriterModules.SENV.value:
-                stream = SENVStream(source=source, topic=topic)
-            elif writer_module == WriterModules.TDCTIME.value:
-                stream = TDCTStream(source=source, topic=topic)
-                # todo put it in stream group
-
-            # todo put this into another function when done
+        field_type != NodeType.STREAM
+    ):  # streams do not have a name field, don't deal with them here
+        child_name = item[CommonKeys.NAME]
+        if (
+            child_name not in CHILD_EXCLUDELIST
+        ):  # ignore transforms, shape etc as these are handled separately
+            if field_type == NodeType.GROUP:
+                child = _create_group(item, group)
+            elif field_type == NodeType.DATASET:
+                child = _create_dataset(item, group)
+            elif field_type == NodeType.LINK:
+                child = _create_link(item)
+            else:
+                raise Exception(
+                    f"Found unknown field type when loading JSON - {child_name}"
+                )
+            # Add the child to the parent group
+            group[child_name] = child
+        else:
+            stream = _create_stream(item)
+            group.children.append(
+                stream
+            )  # Can't use operators here as the stream does not have a name and therefore isn't hashable.
             pass
-        group[child_name] = child
+
+
+def _create_stream(json_object):
+    writer_module = json_object[WRITER_MODULE]
+    source = json_object[SOURCE]
+    topic = json_object[TOPIC]
+    if writer_module == WriterModules.F142.value:
+        # todo optionals
+        stream = F142Stream(source=source, topic=topic)
+    elif writer_module == WriterModules.EV42.value:
+        # todo optionals
+        stream = EV42Stream(source=source, topic=topic)
+    elif writer_module == WriterModules.HS00.value:
+        # todo optionals
+        stream = HS00Stream(source=source, topic=topic)
+    elif writer_module == WriterModules.NS10.value:
+        stream = NS10Stream(source=source, topic=topic)
+    elif writer_module == WriterModules.SENV.value:
+        stream = SENVStream(source=source, topic=topic)
+    elif writer_module == WriterModules.TDCTIME.value:
+        stream = TDCTStream(source=source, topic=topic)
+    return stream
 
 
 class JSONReader:
@@ -269,10 +282,14 @@ class JSONReader:
 
 
 def _create_group(json_object, parent) -> Group:
-    group = Group(name=json_object[CommonKeys.NAME], parent_node=parent)
     children = json_object[CommonKeys.CHILDREN]
+    name = json_object[CommonKeys.NAME]
+    group = Group(name=name, parent_node=parent)
+    for item in children:
+        if item[CommonKeys.TYPE] == NodeType.STREAM:
+            group = StreamGroup(name=name, parent_node=parent)
+            break
 
-    # todo check if stream group here and handle streams if so then return the group
     for item in children:
         _add_field_to_group(item, group)
 
