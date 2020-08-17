@@ -113,24 +113,29 @@ def _add_field_to_group(item: Dict, group: Group):
 
 
 def _create_stream(json_object: Dict) -> Stream:
-    writer_module = json_object[WRITER_MODULE]
-    source = json_object[SOURCE]
-    topic = json_object[TOPIC]
+    stream_object = json_object[NodeType.STREAM]
+    writer_module = stream_object[WRITER_MODULE]
+    source = stream_object[SOURCE]
+    topic = stream_object[TOPIC]
     if writer_module == WriterModules.F142.value:
-        type = json_object[CommonKeys.TYPE]
-        value_units = json_object[VALUE_UNITS] if VALUE_UNITS in json_object else None
+        type = stream_object[CommonKeys.TYPE]
+        value_units = (
+            stream_object[VALUE_UNITS] if VALUE_UNITS in stream_object else None
+        )
 
-        array_size = json_object[ARRAY_SIZE] if ARRAY_SIZE in json_object else None
+        array_size = stream_object[ARRAY_SIZE] if ARRAY_SIZE in stream_object else None
 
         index_mb = (
-            json_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in json_object else None
+            stream_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in stream_object else None
         )
         index_kb = (
-            json_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in json_object else None
+            stream_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in stream_object else None
         )
 
         store_latest_into = (
-            json_object[STORE_LATEST_INTO] if STORE_LATEST_INTO in json_object else None
+            stream_object[STORE_LATEST_INTO]
+            if STORE_LATEST_INTO in stream_object
+            else None
         )
 
         return F142Stream(
@@ -144,18 +149,20 @@ def _create_stream(json_object: Dict) -> Stream:
             store_latest_into=store_latest_into,
         )
     if writer_module == WriterModules.EV42.value:
-        adc = json_object[ADC_PULSE_DEBUG] if ADC_PULSE_DEBUG in json_object else None
+        adc = (
+            stream_object[ADC_PULSE_DEBUG] if ADC_PULSE_DEBUG in stream_object else None
+        )
         index_mb = (
-            json_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in json_object else None
+            stream_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in stream_object else None
         )
         index_kb = (
-            json_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in json_object else None
+            stream_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in stream_object else None
         )
         chunk_mb = (
-            json_object[CHUNK_CHUNK_MB] if CHUNK_CHUNK_MB in json_object else None
+            stream_object[CHUNK_CHUNK_MB] if CHUNK_CHUNK_MB in stream_object else None
         )
         chunk_kb = (
-            json_object[CHUNK_CHUNK_KB] if CHUNK_CHUNK_KB in json_object else None
+            stream_object[CHUNK_CHUNK_KB] if CHUNK_CHUNK_KB in stream_object else None
         )
 
         return EV42Stream(
@@ -168,10 +175,10 @@ def _create_stream(json_object: Dict) -> Stream:
             nexus_chunk_chunk_kb=chunk_kb,
         )
     if writer_module == WriterModules.HS00.value:
-        data_type = json_object[DATA_TYPE]
-        error_type = json_object[ERROR_TYPE]
-        edge_type = json_object[EDGE_TYPE]
-        shape = json_object[SHAPE]
+        data_type = stream_object[DATA_TYPE]
+        error_type = stream_object[ERROR_TYPE]
+        edge_type = stream_object[EDGE_TYPE]
+        shape = stream_object[SHAPE]
         return HS00Stream(
             source=source,
             topic=topic,
