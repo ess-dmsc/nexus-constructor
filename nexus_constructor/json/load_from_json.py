@@ -113,67 +113,26 @@ def _add_field_to_group(item: Dict, group: Group):
 
 
 def _create_stream(json_object: Dict) -> Stream:
+    """
+    Given a dictionary containing a stream, create a corresponding stream object to be used in the model.
+    :param json_object: JSON dictionary containing a stream.
+    :return: A stream object containing relevant data from the JSON.
+    """
     stream_object = json_object[NodeType.STREAM]
     writer_module = stream_object[WRITER_MODULE]
     source = stream_object[SOURCE]
     topic = stream_object[TOPIC]
+    # Common to ev42 and f142 stream objects
+    index_mb = (
+        stream_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in stream_object else None
+    )
+    index_kb = (
+        stream_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in stream_object else None
+    )
     if writer_module == WriterModules.F142.value:
-        type = stream_object[CommonKeys.TYPE]
-        value_units = (
-            stream_object[VALUE_UNITS] if VALUE_UNITS in stream_object else None
-        )
-
-        array_size = stream_object[ARRAY_SIZE] if ARRAY_SIZE in stream_object else None
-
-        index_mb = (
-            stream_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in stream_object else None
-        )
-        index_kb = (
-            stream_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in stream_object else None
-        )
-
-        store_latest_into = (
-            stream_object[STORE_LATEST_INTO]
-            if STORE_LATEST_INTO in stream_object
-            else None
-        )
-
-        return F142Stream(
-            source=source,
-            topic=topic,
-            type=type,
-            value_units=value_units,
-            array_size=array_size,
-            nexus_indices_index_every_mb=index_mb,
-            nexus_indices_index_every_kb=index_kb,
-            store_latest_into=store_latest_into,
-        )
+        return __create_f142_stream(index_kb, index_mb, source, stream_object, topic)
     if writer_module == WriterModules.EV42.value:
-        adc = (
-            stream_object[ADC_PULSE_DEBUG] if ADC_PULSE_DEBUG in stream_object else None
-        )
-        index_mb = (
-            stream_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in stream_object else None
-        )
-        index_kb = (
-            stream_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in stream_object else None
-        )
-        chunk_mb = (
-            stream_object[CHUNK_CHUNK_MB] if CHUNK_CHUNK_MB in stream_object else None
-        )
-        chunk_kb = (
-            stream_object[CHUNK_CHUNK_KB] if CHUNK_CHUNK_KB in stream_object else None
-        )
-
-        return EV42Stream(
-            source=source,
-            topic=topic,
-            adc_pulse_debug=adc,
-            nexus_indices_index_every_kb=index_kb,
-            nexus_indices_index_every_mb=index_mb,
-            nexus_chunk_chunk_mb=chunk_mb,
-            nexus_chunk_chunk_kb=chunk_kb,
-        )
+        return __create_ev42_stream(index_kb, index_mb, source, stream_object, topic)
     if writer_module == WriterModules.HS00.value:
         data_type = stream_object[DATA_TYPE]
         error_type = stream_object[ERROR_TYPE]
@@ -193,6 +152,48 @@ def _create_stream(json_object: Dict) -> Stream:
         return SENVStream(source=source, topic=topic)
     if writer_module == WriterModules.TDCTIME.value:
         return TDCTStream(source=source, topic=topic)
+
+
+def __create_ev42_stream(
+    index_kb: str, index_mb: str, source: str, stream_object: Dict, topic: str
+):
+    adc = stream_object[ADC_PULSE_DEBUG] if ADC_PULSE_DEBUG in stream_object else None
+    chunk_mb = (
+        stream_object[CHUNK_CHUNK_MB] if CHUNK_CHUNK_MB in stream_object else None
+    )
+    chunk_kb = (
+        stream_object[CHUNK_CHUNK_KB] if CHUNK_CHUNK_KB in stream_object else None
+    )
+    return EV42Stream(
+        source=source,
+        topic=topic,
+        adc_pulse_debug=adc,
+        nexus_indices_index_every_kb=index_kb,
+        nexus_indices_index_every_mb=index_mb,
+        nexus_chunk_chunk_mb=chunk_mb,
+        nexus_chunk_chunk_kb=chunk_kb,
+    )
+
+
+def __create_f142_stream(
+    index_kb: str, index_mb: str, source: str, stream_object: Dict, topic: str
+):
+    type = stream_object[CommonKeys.TYPE]
+    value_units = stream_object[VALUE_UNITS] if VALUE_UNITS in stream_object else None
+    array_size = stream_object[ARRAY_SIZE] if ARRAY_SIZE in stream_object else None
+    store_latest_into = (
+        stream_object[STORE_LATEST_INTO] if STORE_LATEST_INTO in stream_object else None
+    )
+    return F142Stream(
+        source=source,
+        topic=topic,
+        type=type,
+        value_units=value_units,
+        array_size=array_size,
+        nexus_indices_index_every_mb=index_mb,
+        nexus_indices_index_every_kb=index_kb,
+        store_latest_into=store_latest_into,
+    )
 
 
 class JSONReader:
@@ -380,7 +381,7 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
     return ds
 
 
-def _create_link(json_object) -> Link:
+def _create_link(json_object: Dict) -> Link:
     name = json_object[CommonKeys.NAME]
     target = json_object[TARGET]
     return Link(name=name, target=target)

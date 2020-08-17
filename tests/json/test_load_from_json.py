@@ -8,10 +8,12 @@ from nexus_constructor.json.load_from_json import (
     _retrieve_children_list,
     _add_attributes,
     _create_link,
+    _create_dataset,
 )
 from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 
@@ -393,3 +395,22 @@ def test_GIVEN_link_json_WHEN_adding_link_THEN_link_object_is_created():
     link = _create_link(test_dict)
     assert link.name == name
     assert link.target == target
+
+
+def test_GIVEN_dataset_with_string_value_WHEN_adding_dataset_THEN_dataset_object_is_created_with_correct_dtype():
+    name = "description"
+    values = "a description"
+    parent = Group(name="test")
+    test_dict = {
+        "name": name,
+        "type": "dataset",
+        "dataset": {"type": ValueTypes.STRING, "size": [1]},
+        "values": values,
+    }
+
+    ds = _create_dataset(test_dict, parent)
+
+    assert ds.name == name
+    assert ds.values == values
+    assert ds.parent_node == parent
+    assert ds.type == ValueTypes.STRING
