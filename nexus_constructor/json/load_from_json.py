@@ -35,6 +35,18 @@ from nexus_constructor.model.stream import (
     EV42Stream,
     StreamGroup,
     Stream,
+    DATA_TYPE,
+    ERROR_TYPE,
+    EDGE_TYPE,
+    SHAPE,
+    ARRAY_SIZE,
+    VALUE_UNITS,
+    INDEX_EVERY_MB,
+    INDEX_EVERY_KB,
+    STORE_LATEST_INTO,
+    ADC_PULSE_DEBUG,
+    CHUNK_CHUNK_KB,
+    CHUNK_CHUNK_MB,
 )
 from nexus_constructor.model.transformation import Transformation
 
@@ -105,21 +117,75 @@ def _create_stream(json_object: Dict) -> Stream:
     source = json_object[SOURCE]
     topic = json_object[TOPIC]
     if writer_module == WriterModules.F142.value:
-        # todo optionals
-        stream = F142Stream(source=source, topic=topic)
-    elif writer_module == WriterModules.EV42.value:
-        # todo optionals
-        stream = EV42Stream(source=source, topic=topic)
-    elif writer_module == WriterModules.HS00.value:
-        # todo optionals
-        stream = HS00Stream(source=source, topic=topic)
-    elif writer_module == WriterModules.NS10.value:
-        stream = NS10Stream(source=source, topic=topic)
-    elif writer_module == WriterModules.SENV.value:
-        stream = SENVStream(source=source, topic=topic)
-    elif writer_module == WriterModules.TDCTIME.value:
-        stream = TDCTStream(source=source, topic=topic)
-    return stream
+        type = json_object[CommonKeys.TYPE]
+        value_units = json_object[VALUE_UNITS] if VALUE_UNITS in json_object else None
+
+        array_size = json_object[ARRAY_SIZE] if ARRAY_SIZE in json_object else None
+
+        index_mb = (
+            json_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in json_object else None
+        )
+        index_kb = (
+            json_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in json_object else None
+        )
+
+        store_latest_into = (
+            json_object[STORE_LATEST_INTO] if STORE_LATEST_INTO in json_object else None
+        )
+
+        return F142Stream(
+            source=source,
+            topic=topic,
+            type=type,
+            value_units=value_units,
+            array_size=array_size,
+            nexus_indices_index_every_mb=index_mb,
+            nexus_indices_index_every_kb=index_kb,
+            store_latest_into=store_latest_into,
+        )
+    if writer_module == WriterModules.EV42.value:
+        adc = json_object[ADC_PULSE_DEBUG] if ADC_PULSE_DEBUG in json_object else None
+        index_mb = (
+            json_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in json_object else None
+        )
+        index_kb = (
+            json_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in json_object else None
+        )
+        chunk_mb = (
+            json_object[CHUNK_CHUNK_MB] if CHUNK_CHUNK_MB in json_object else None
+        )
+        chunk_kb = (
+            json_object[CHUNK_CHUNK_KB] if CHUNK_CHUNK_KB in json_object else None
+        )
+
+        return EV42Stream(
+            source=source,
+            topic=topic,
+            adc_pulse_debug=adc,
+            nexus_indices_index_every_kb=index_kb,
+            nexus_indices_index_every_mb=index_mb,
+            nexus_chunk_chunk_mb=chunk_mb,
+            nexus_chunk_chunk_kb=chunk_kb,
+        )
+    if writer_module == WriterModules.HS00.value:
+        data_type = json_object[DATA_TYPE]
+        error_type = json_object[ERROR_TYPE]
+        edge_type = json_object[EDGE_TYPE]
+        shape = json_object[SHAPE]
+        return HS00Stream(
+            source=source,
+            topic=topic,
+            data_type=data_type,
+            error_type=error_type,
+            edge_type=edge_type,
+            shape=shape,
+        )
+    if writer_module == WriterModules.NS10.value:
+        return NS10Stream(source=source, topic=topic)
+    if writer_module == WriterModules.SENV.value:
+        return SENVStream(source=source, topic=topic)
+    if writer_module == WriterModules.TDCTIME.value:
+        return TDCTStream(source=source, topic=topic)
 
 
 class JSONReader:
