@@ -424,7 +424,7 @@ def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_
 
     np_array = np.array(values, dtype=VALUE_TYPE_TO_NP[dtype])
 
-    test_dict = test_dict = {
+    test_dict = {
         "name": name,
         "type": "dataset",
         "dataset": {"type": dtype, "size": np_array.shape},
