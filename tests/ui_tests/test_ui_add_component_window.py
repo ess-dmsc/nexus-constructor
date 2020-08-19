@@ -13,6 +13,7 @@ import numpy as np
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.model.component import Component
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.model.geometry import (
@@ -1794,6 +1795,8 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
     field_name = "array"
     field_value = np.array([1, 2, 3, 4, 5])
     component.set_field_value(field_name, field_value, ValueTypes.INT)
+    units = "m"
+    component[field_name].attributes.set_attribute_value(CommonAttrs.UNITS, units)
     dialog = AddComponentDialog(
         model,
         treeview_model,
@@ -1811,6 +1814,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
     assert widget.field_type_combo.currentText().lower() == "array dataset"
     assert widget.name == field_name
     assert np.array_equal(widget.value.values, field_value)
+    assert widget.units_line_edit.text() == units
 
 
 def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_target(

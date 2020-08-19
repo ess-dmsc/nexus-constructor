@@ -264,7 +264,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 update_method(field, new_ui_field)
                 if not isinstance(field, Link):
                     try:
-                        new_ui_field.units = field.get_attribute_value(
+                        new_ui_field.units = field.attributes.get_attribute_value(
                             CommonAttrs.UNITS
                         )
                     except AttributeError:
