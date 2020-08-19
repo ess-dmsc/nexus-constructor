@@ -48,7 +48,9 @@ from nexus_constructor.model.stream import (
     CHUNK_CHUNK_KB,
     CHUNK_CHUNK_MB,
 )
+import numpy as np
 from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 """
 The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of valid NeXus files, but are safe if the JSON was created by the NeXus Constructor:
@@ -376,6 +378,9 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
     type = json_object[NodeType.DATASET][CommonKeys.TYPE]
     name = json_object[CommonKeys.NAME]
     values = json_object[CommonKeys.VALUES]
+    if isinstance(values, list):
+        # convert to a numpy array using specified type
+        values = np.array(values, dtype=VALUE_TYPE_TO_NP[type])
     ds = Dataset(name=name, values=values, type=type, size=size, parent_node=parent)
     _add_attributes(json_object, ds)
     return ds

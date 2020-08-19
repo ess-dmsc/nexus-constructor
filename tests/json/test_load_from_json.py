@@ -15,7 +15,8 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.model.value_type import ValueTypes, VALUE_TYPE_TO_NP
+import numpy as np
 
 
 @pytest.fixture(scope="function")
@@ -414,3 +415,25 @@ def test_GIVEN_dataset_with_string_value_WHEN_adding_dataset_THEN_dataset_object
     assert ds.values == values
     assert ds.parent_node == parent
     assert ds.type == ValueTypes.STRING
+
+
+def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_is_created_with_numpy_array_as_value():
+    name = "an_array"
+    values = [1.1, 2.2, 3.3, 4.4]
+    dtype = ValueTypes.FLOAT
+
+    np_array = np.array(values, dtype=VALUE_TYPE_TO_NP[dtype])
+
+    test_dict = test_dict = {
+        "name": name,
+        "type": "dataset",
+        "dataset": {"type": dtype, "size": np_array.shape},
+        "values": values,
+    }
+    parent = Group(name="test")
+    ds = _create_dataset(test_dict, parent)
+
+    assert ds.name == name
+    assert np.array_equal(ds.values, np_array)
+    assert ds.parent_node == parent
+    assert ds.type == dtype
