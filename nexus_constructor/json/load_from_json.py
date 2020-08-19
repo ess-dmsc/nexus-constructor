@@ -59,7 +59,12 @@ The current implementation makes a couple of assumptions that may not hold true 
 """
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
-CHILD_EXCLUDELIST = [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME, TRANSFORMS_GROUP_NAME]
+CHILD_EXCLUDELIST = [
+    SHAPE_GROUP_NAME,
+    PIXEL_SHAPE_GROUP_NAME,
+    TRANSFORMS_GROUP_NAME,
+    CommonAttrs.DEPENDS_ON,
+]
 
 
 def _retrieve_children_list(json_dict: Dict) -> List:
