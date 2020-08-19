@@ -94,7 +94,7 @@ def _add_field_to_group(item: Dict, group: Group):
         stream = _create_stream(item)
         group.children.append(
             stream
-        )  # Can't use operators here as the stream does not have a name and therefore isn't hashable.
+        )  # Can't use the `[]` operator because streams do not have a name to use as a key
     else:
         child_name = item[CommonKeys.NAME]
         if (
