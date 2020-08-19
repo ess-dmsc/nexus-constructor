@@ -163,10 +163,19 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user --upgrade -r requirements-dev.txt"
+                    sh """
+                        mkdir -p ~/virtualenvs
+                        python3 -m venv ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}
+                        source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
+                        pip --proxy=${https_proxy} install --upgrade pip
+                        pip --proxy=${https_proxy} install -r requirements-dev.txt
+                    """
                 } // stage
                 stage('Run tests') {
-                    sh "python3 -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/"
+                    sh """
+                        source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
+                        pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/
+                    """
                 } // stage
             } // dir
         } // node
