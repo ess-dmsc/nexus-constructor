@@ -3,10 +3,20 @@ import json
 import pytest
 from mock import patch, mock_open
 
-from nexus_constructor.json.load_from_json import JSONReader, _retrieve_children_list
+from nexus_constructor.json.load_from_json import (
+    JSONReader,
+    _retrieve_children_list,
+    _add_attributes,
+    _create_link,
+    _create_dataset,
+)
+from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.model.value_type import ValueTypes, VALUE_TYPE_TO_NP
+import numpy as np
 
 
 @pytest.fixture(scope="function")
@@ -114,7 +124,12 @@ def json_dict_with_component():
                       "type":"dataset",
                       "attributes":[
     
-                      ]
+                      ],
+                      "dataset":{
+                        "type":"string",
+                        "size":"1"
+                      },
+                      "values": "test_description"
                     },
                     {
                       "type":"group",
@@ -331,3 +346,94 @@ def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_
             ]
         ]
     )
+
+
+@pytest.mark.parametrize(
+    "test_input",
+    ({}, {"type": "dataset", "values": 0,}, {"attributes": []}),  # noqa E231
+)
+def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing(
+    test_input,
+):
+    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    _add_attributes(test_input, dataset)
+    assert not dataset.attributes
+
+
+def test_GIVEN_dictionary_containing_attribute_WHEN_adding_attributes_THEN_attribute_object_is_created():
+    key = "units"
+    value = "m"
+    test_dict = {"attributes": [{"name": key, "values": value}]}
+    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    _add_attributes(test_dict, dataset)
+    assert len(dataset.attributes) == 1
+    assert isinstance(dataset.attributes[0], FieldAttribute)
+    assert dataset.attributes[0].name == key
+    assert dataset.attributes[0].values == value
+
+
+def test_GIVEN_dictionary_containing_attributes_WHEN_adding_attributes_THEN_attribute_objects_are_created():
+    key1 = "units"
+    val1 = "m"
+    key2 = "testkey"
+    val2 = "testval"
+    test_dict = {
+        "attributes": [{"name": key1, "values": val1}, {"name": key2, "values": val2}]
+    }
+    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    _add_attributes(test_dict, dataset)
+    assert len(dataset.attributes) == 2
+    assert dataset.attributes[0].name == key1
+    assert dataset.attributes[0].values == val1
+    assert dataset.attributes[1].name == key2
+    assert dataset.attributes[1].values == val2
+
+
+def test_GIVEN_link_json_WHEN_adding_link_THEN_link_object_is_created():
+    name = "link1"
+    target = "/entry/instrument/detector1"
+    test_dict = {"name": name, "target": target}
+    link = _create_link(test_dict)
+    assert link.name == name
+    assert link.target == target
+
+
+def test_GIVEN_dataset_with_string_value_WHEN_adding_dataset_THEN_dataset_object_is_created_with_correct_dtype():
+    name = "description"
+    values = "a description"
+    parent = Group(name="test")
+    test_dict = {
+        "name": name,
+        "type": "dataset",
+        "dataset": {"type": ValueTypes.STRING, "size": [1]},
+        "values": values,
+    }
+
+    ds = _create_dataset(test_dict, parent)
+
+    assert ds.name == name
+    assert ds.values == values
+    assert ds.parent_node == parent
+    assert ds.type == ValueTypes.STRING
+
+
+def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_is_created_with_numpy_array_as_value():
+    name = "an_array"
+    values = [1.1, 2.2, 3.3, 4.4]
+    dtype = ValueTypes.FLOAT
+
+    np_array = np.array(values, dtype=VALUE_TYPE_TO_NP[dtype])
+
+    test_dict = {
+        "name": name,
+        "type": "dataset",
+        "dataset": {"type": dtype, "size": np_array.shape},
+        "values": values,
+    }
+    parent = Group(name="test")
+    ds = _create_dataset(test_dict, parent)
+
+    assert ds.name == name
+    assert np.array_equal(ds.values, np_array)
+    assert ds.parent_node == parent
+    assert ds.type == dtype
