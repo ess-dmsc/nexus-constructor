@@ -1,17 +1,16 @@
 # In general libraries should not be pinned to specific versions
 attrs
 h5py
-git+https://github.com/ess-dmsc/python-nexus-utilities@b89304daa55b7146f57ba192fa48f3ed3d1f24ba#egg=nexusutils
-git+https://github.com/ess-dmsc/nexus-json#egg=nexusjson
+git+https://github.com/ess-dmsc/python-nexus-utilities@7e95cca24a4b03423c19f9e541cf64c427fa1bcf#egg=nexusutils
+nexusformat
 numpy-stl
 pint
-silx
 xmltodict
 numpy
 pytest-qt
 confluent-kafka
-ess-streaming-data-types
+ess-streaming-data-types >= 0.9.0
 
 
 # PySide2 has had some issues with new versions and packaging so we will pin it
-PySide2==5.13.0
+PySide2==5.15.0
