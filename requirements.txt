@@ -10,6 +10,7 @@ numpy
 pytest-qt
 confluent-kafka
 ess-streaming-data-types >= 0.9.0
+silx
 
 
 # PySide2 has had some issues with new versions and packaging so we will pin it
