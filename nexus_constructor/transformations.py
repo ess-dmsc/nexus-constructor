@@ -11,6 +11,7 @@ from typing import TypeVar, Union, List, Optional
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node, get_nx_class
 from nexus_constructor.transformation_types import TransformationType
+from nexus_constructor.component.component import Component
 
 TransformationOrComponent = TypeVar(
     "TransformationOrComponent", "Transformation", "Component"

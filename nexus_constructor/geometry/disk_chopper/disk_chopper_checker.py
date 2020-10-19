@@ -12,6 +12,7 @@ from nexus_constructor.unit_utils import (
     units_have_magnitude_of_one,
 )
 from nexus_constructor.validators import DATASET_TYPE
+from nexus_constructor.field_widget import FieldWidget
 
 SLIT_EDGES_NAME = "slit_edges"
 SLITS_NAME = "slits"

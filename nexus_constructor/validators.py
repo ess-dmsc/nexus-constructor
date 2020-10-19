@@ -464,9 +464,10 @@ class BrokerAndTopicValidator(QValidator):
 
     @staticmethod
     def extract_addr_and_topic(in_string):
-        correct_string_re = re.compile(
-            "(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"
-        )  # noqa: W605
+        # Define regex in a separate line as noqa was being ignored in function
+        # defined in multiple lines.
+        regex = "(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"  # noqa: W605
+        correct_string_re = re.compile(regex)
         match_res = re.match(correct_string_re, in_string)
         if match_res is not None:
             return match_res.group(2), match_res.group(7)
