@@ -7,11 +7,13 @@ import h5py
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.nexus import nexus_wrapper as nx
-from typing import TypeVar, Union, List, Optional
+from typing import TypeVar, Union, List, Optional, TYPE_CHECKING
 
 from nexus_constructor.nexus.nexus_wrapper import h5Node, get_nx_class
 from nexus_constructor.transformation_types import TransformationType
-from nexus_constructor.component.component import Component
+
+if TYPE_CHECKING:
+    from nexus_constructor.component.component import Component
 
 TransformationOrComponent = TypeVar(
     "TransformationOrComponent", "Transformation", "Component"
