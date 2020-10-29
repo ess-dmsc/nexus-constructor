@@ -89,13 +89,16 @@ class Transformation(Dataset):
     def qmatrix(self) -> QMatrix4x4:
         """
         Get a Qt3DCore.QTransform describing the transformation
+        for use in the 3D view
         """
         transform = Qt3DCore.QTransform()
+        transform.matrix()
+        # Changing sign of distance or angle, as they are described as passive transformations
         if self.transform_type == TransformationType.ROTATION:
-            quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
+            quaternion = transform.fromAxisAndAngle(self.vector, -1 * self.ui_value)
             transform.setRotation(quaternion)
         elif self.transform_type == TransformationType.TRANSLATION:
-            transform.setTranslation(self.vector.normalized() * self.ui_value)
+            transform.setTranslation(self.vector.normalized() * -1 * self.ui_value)
         else:
             raise (
                 RuntimeError(f'Unknown transformation of type "{self.transform_type}".')
