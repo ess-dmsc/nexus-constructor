@@ -330,8 +330,9 @@ def test_can_get_translation_as_4_by_4_matrix():
     )
 
     test_matrix = transformation.qmatrix
+    # NB, -1 * distance because the transformation in the UI is a passive transformation
     expected_matrix = np.array(
-        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, test_ui_value, 0, 0, 1)
+        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -1 * test_ui_value, 0, 0, 1)
     )
     assert np.allclose(expected_matrix, np.array(test_matrix.data()))
 
@@ -349,19 +350,21 @@ def test_can_get_rotation_as_4_by_4_matrix():
     test_matrix = transformation.qmatrix
     # for a rotation around the y-axis:
     test_value_radians = np.deg2rad(test_ui_value)
+    # Expected matrix for passive transformation around y axis with convention
+    # of +ve angle leading to anticlockwise rotation
     expected_matrix = np.array(
         (
-            np.cos(-test_value_radians),
+            np.cos(test_value_radians),
             0,
-            np.sin(-test_value_radians),
+            -np.sin(test_value_radians),
             0,
             0,
             1,
             0,
             0,
-            -np.sin(-test_value_radians),
+            np.sin(test_value_radians),
             0,
-            np.cos(-test_value_radians),
+            np.cos(test_value_radians),
             0,
             0,
             0,

@@ -93,11 +93,14 @@ class Transformation(Dataset):
         """
         transform = Qt3DCore.QTransform()
         transform.matrix()
-        # Changing sign of distance or angle, as they are described as passive transformations
         if self.transform_type == TransformationType.ROTATION:
-            quaternion = transform.fromAxisAndAngle(self.vector, -1 * self.ui_value)
+            # fromAxisAndAngle seems to result in an active transformation of +ve angle as clockwise rotation
+            # or equivalently as passive transformation with +ve angle as anticlockwise rotation
+            # In our case it is the latter of these that we want.
+            quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
             transform.setRotation(quaternion)
         elif self.transform_type == TransformationType.TRANSLATION:
+            # Changing sign of distance so that it describes a passive transformation
             transform.setTranslation(self.vector.normalized() * -1 * self.ui_value)
         else:
             raise (
