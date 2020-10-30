@@ -23,7 +23,7 @@ container_build_nodes = [
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)
 
 builders = pipeline_builder.createBuilders { container ->
-    
+
     pipeline_builder.stage("Checkout") {
         dir(pipeline_builder.project) {
             scm_vars = checkout scm
@@ -31,14 +31,14 @@ builders = pipeline_builder.createBuilders { container ->
         // Copy source code to container
         container.copyTo(pipeline_builder.project, pipeline_builder.project)
     }  // stage
-    
+
     pipeline_builder.stage("Create virtualenv") {
         container.sh """
             cd ${project}
             python3.6 -m venv build_env
         """
     } // stage
-    
+
     pipeline_builder.stage("Install requirements") {
         container.sh """
             cd ${project}
@@ -47,21 +47,21 @@ builders = pipeline_builder.createBuilders { container ->
             git submodule update --init
             """
     } // stage
-    
+
     pipeline_builder.stage("Check formatting") {
         container.sh """
             cd ${project}
             build_env/bin/python -m black . --check
         """
     } // stage
-    
+
     pipeline_builder.stage("Run Linter") {
         container.sh """
                 cd ${project}
                 build_env/bin/flake8
             """
     } // stage
-    
+
     pipeline_builder.stage("Run tests") {
         def testsError = null
         try {
@@ -76,12 +76,12 @@ builders = pipeline_builder.createBuilders { container ->
             }
 
     } // stage
-    
+
     if (env.CHANGE_ID) {
         pipeline_builder.stage('Build Executable'){
             container.sh "cd ${project} && build_env/bin/python setup.py build_exe"
         }
-        
+
         pipeline_builder.stage('Archive Executable') {
             def git_commit_short = scm_vars.GIT_COMMIT.take(7)
             container.copyFrom("${project}/build/", './build')
@@ -89,7 +89,7 @@ builders = pipeline_builder.createBuilders { container ->
             archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
         } // stage
     } // if
-    
+
 }
 
 def get_win10_pipeline() {
@@ -161,10 +161,19 @@ def get_macos_pipeline() {
                     } // catch
                 } // stage
                 stage('Setup') {
-                    sh "python3 -m pip install --user -r requirements-dev.txt && git submodule update --init"
+                  sh """mkdir -p ~/virtualenvs
+                    /opt/local/bin/python3.6 -m venv ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}
+                    source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
+                    pip --proxy=${https_proxy} install --upgrade pip
+                    pip --proxy=${https_proxy} install -r requirements-dev.txt
+                    git submodule update --init
+                  """
                 } // stage
                 stage('Run tests') {
-                    sh "python3 -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/"
+                  sh """
+                    source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
+                    python -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/
+                  """
                 } // stage
             } // dir
         } // node
@@ -173,7 +182,7 @@ def get_macos_pipeline() {
 
 node("docker") {
     cleanWs()
-    
+
     stage('Checkout') {
         dir("${project}") {
             try {
@@ -183,7 +192,7 @@ node("docker") {
             }
         }
     }
-    
+
     builders['macOS'] = get_macos_pipeline()
     builders['windows10'] = get_win10_pipeline()
     parallel builders

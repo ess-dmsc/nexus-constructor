@@ -1,5 +1,5 @@
 import logging
-from typing import Sequence, Dict
+from typing import Sequence, Dict, TYPE_CHECKING
 
 import numpy as np
 from h5py import Group
@@ -12,6 +12,9 @@ from nexus_constructor.unit_utils import (
     units_have_magnitude_of_one,
 )
 from nexus_constructor.validators import DATASET_TYPE
+
+if TYPE_CHECKING:
+    from nexus_constructor.field_widget import FieldWidget
 
 SLIT_EDGES_NAME = "slit_edges"
 SLITS_NAME = "slits"
