@@ -165,7 +165,7 @@ def get_macos_pipeline() {
                 stage('Setup') {
                     sh """
                         mkdir -p ~/virtualenvs
-                        python3 -m venv ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}
+                        /opt/local/bin/python3.6 -m venv ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}
                         source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
                         pip --proxy=${https_proxy} install --upgrade pip
                         pip --proxy=${https_proxy} install -r requirements-dev.txt
@@ -174,7 +174,7 @@ def get_macos_pipeline() {
                 stage('Run tests') {
                     sh """
                         source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                        pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/
+                        python -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/
                     """
                 } // stage
             } // dir
