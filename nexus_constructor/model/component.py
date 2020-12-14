@@ -15,6 +15,7 @@ from nexus_constructor.common_attrs import (
     PIXEL_SHAPE_GROUP_NAME,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
+    NX_TRANSFORMATIONS,
 )
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
@@ -78,7 +79,6 @@ class Component(Group):
     Base class for a component object. In the NeXus file this would translate to the component group.
     """
 
-    transforms_list = attr.ib(factory=list)
     _depends_on = attr.ib(type=Transformation, default=None)
     has_link = attr.ib(type=bool, default=None)
 
@@ -265,11 +265,17 @@ class Component(Group):
         return transform
 
     def remove_transformation(self, transform: Transformation):
-        if transform.dependents:
+        # Check the transform has no dependents, excluding this component
+        if (
+            transform.dependents
+            and not len(transform.dependents) == 1
+            and not transform.dependents[0] == self
+        ):
             raise Exception
         del self.get_transforms_group()[transform.name]
+        transform.remove_from_dependee_chain()
 
-    def get_transforms_group(self):
+    def get_transforms_group(self) -> Group:
         if self[TRANSFORMS_GROUP_NAME] is not None:
             return self[TRANSFORMS_GROUP_NAME]
 
@@ -428,6 +434,12 @@ class Component(Group):
                     CommonKeys.NAME: TRANSFORMS_GROUP_NAME,  # this works
                     CommonKeys.CHILDREN: [
                         transform.as_dict() for transform in self.transforms
+                    ],
+                    CommonKeys.ATTRIBUTES: [
+                        {
+                            CommonKeys.NAME: CommonAttrs.NX_CLASS,
+                            CommonKeys.VALUES: NX_TRANSFORMATIONS,
+                        }
                     ],
                 }
             )

@@ -1,8 +1,7 @@
 import json
-
 import pytest
+from PySide2.QtGui import QVector3D
 from mock import patch, mock_open
-
 from nexus_constructor.json.load_from_json import (
     JSONReader,
     _retrieve_children_list,
@@ -14,7 +13,6 @@ from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes, VALUE_TYPE_TO_NP
 import numpy as np
 
@@ -231,14 +229,16 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
 
 @pytest.fixture(scope="function")
 def component_with_transformation() -> Component:
-    transformation = Transformation(
+    comp = Component(name="Component")
+    transformation = comp.add_rotation(
         name="Transformation",
-        type=ValueTypes.DOUBLE,
-        size="[1]",
-        values="",
-        parent_component=None,
+        angle=90,
+        axis=QVector3D(1, 0, 0),
+        depends_on=None,
+        values=Dataset(name="test", values=123, type=ValueTypes.DOUBLE),
     )
-    return Component(name="Component", transforms_list=[transformation])
+    comp.depends_on = transformation
+    return comp
 
 
 def test_GIVEN_unable_to_find_nexus_structure_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
@@ -314,7 +314,7 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
 def test_GIVEN_transformation_with_matching_name_WHEN_finding_transformation_by_name_THEN_transformation_is_returned(
     json_reader, component_with_transformation
 ):
-    transformation = component_with_transformation.transforms_list[0]
+    transformation = component_with_transformation.transforms[0]
     assert transformation == json_reader._get_transformation_by_name(
         component_with_transformation, transformation.name, "DependentComponentName"
     )
@@ -325,10 +325,12 @@ def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_
 ):
     n_warnings = len(json_reader.warnings)
 
-    transformation_name = component_with_transformation.transforms_list[0].name
+    transformation_name = component_with_transformation.transforms[0].name
     dependent_component_name = "DependentComponentName"
 
-    component_with_transformation.transforms_list.clear()
+    component_with_transformation.remove_transformation(
+        component_with_transformation.transforms[0]
+    )
     assert (
         json_reader._get_transformation_by_name(
             component_with_transformation, transformation_name, dependent_component_name

@@ -6,7 +6,7 @@ from mock import Mock
 
 from nexus_constructor.json.transformation_reader import (
     TransformationReader,
-    _contains_transformations,
+    _is_transformation_group,
     TRANSFORMATION_MAP,
     _create_transformation_dataset,
 )
@@ -48,10 +48,6 @@ def transformation_json():
             {
               "name":"depends_on",
               "values":"."
-            },
-            {
-              "name":"NX_class",
-              "values":"NXtransformation"
             }
           ]
         }
@@ -76,17 +72,15 @@ def attributes_list(transformation_json):
 def transformation_reader(transformation_json):
     parent_component = Mock(spec=Component)
     parent_component.name = "ParentComponentName"
-    parent_component.transforms_list = []
     entry = [transformation_json]
     return TransformationReader(parent_component, entry)
 
 
-@pytest.mark.parametrize("class_value", ["NXtransformation", "NXtransformations"])
 def test_GIVEN_transformation_in_attributes_WHEN_checking_for_transformation_THEN_contains_transformations_returns_true(
-    class_value, transformation_json
+    transformation_json,
 ):
-    transformation_json["attributes"][0]["values"] = class_value
-    assert _contains_transformations(transformation_json)
+    transformation_json["attributes"][0]["values"] = "NXtransformations"
+    assert _is_transformation_group(transformation_json)
 
 
 def test_GIVEN_no_transformation_class_in_attributes_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
@@ -95,14 +89,14 @@ def test_GIVEN_no_transformation_class_in_attributes_WHEN_checking_for_transform
     del transformation_json["attributes"][0]["name"]
     del transformation_json["attributes"][0]["values"]
 
-    assert not _contains_transformations(transformation_json)
+    assert not _is_transformation_group(transformation_json)
 
 
 def test_GIVEN_no_attributes_field_in_dict_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
     transformation_json,
 ):
     del transformation_json["attributes"]
-    assert not _contains_transformations(transformation_json)
+    assert not _is_transformation_group(transformation_json)
 
 
 def test_GIVEN_attribute_not_found_WHEN_looking_for_transformation_attribute_THEN_get_transformation_attribute_returns_failure_value(
@@ -279,13 +273,13 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
 
     transformation_reader._create_transformations(transformation_json["children"])
     transformation_reader.parent_component._create_and_add_transform.assert_called_once_with(
-        name,
-        TRANSFORMATION_MAP[transformation_type],
-        angle_or_magnitude,
-        units,
-        QVector3D(*vector),
-        depends_on,
-        values,
+        name=name,
+        transformation_type=TRANSFORMATION_MAP[transformation_type],
+        angle_or_magnitude=angle_or_magnitude,
+        units=units,
+        vector=QVector3D(*vector),
+        depends_on=depends_on,
+        values=values,
     )
 
 

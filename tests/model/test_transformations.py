@@ -33,7 +33,7 @@ def create_transform(
 
 
 def create_component(name=""):
-    return Component(name=name, transforms_list=[])
+    return Component(name=name)
 
 
 def test_can_get_transform_properties():

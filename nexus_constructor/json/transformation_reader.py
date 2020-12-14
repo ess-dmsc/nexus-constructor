@@ -2,7 +2,12 @@ from typing import Any, Union
 
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, TransformationType
+from nexus_constructor.common_attrs import (
+    CommonAttrs,
+    CommonKeys,
+    TransformationType,
+    NX_TRANSFORMATIONS,
+)
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
@@ -12,22 +17,20 @@ from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
 )
 
-NX_TRANSFORMATION = "NXtransformation"
-
 TRANSFORMATION_MAP = {
     "translation": TransformationType.TRANSLATION,
     "rotation": TransformationType.ROTATION,
 }
 
 
-def _contains_transformations(entry: dict) -> bool:
+def _is_transformation_group(child_item: dict) -> bool:
     """
     Determines if a component contains transformations.
-    :param entry: The component's JSON dictionary.
+    :param child_item: The component's JSON dictionary.
     :return: True if the component has transformations, False otherwise.
     """
     try:
-        return NX_TRANSFORMATION in _find_nx_class(entry[CommonKeys.ATTRIBUTES])
+        return NX_TRANSFORMATIONS == _find_nx_class(child_item[CommonKeys.ATTRIBUTES])
     except KeyError:
         return False
 
@@ -46,14 +49,14 @@ def _create_transformation_dataset(
 
 
 class TransformationReader:
-    def __init__(self, parent_component: Component, entry: list):
+    def __init__(self, parent_component: Component, children: list):
         """
         Reads transformations from a JSON dictionary.
         :param parent_component: The parent component that the transformations should be added to.
-        :param entry: The children of the component entry.
+        :param children: The children of the component entry.
         """
         self.parent_component = parent_component
-        self.entry = entry
+        self.children = children
         self.warnings = []
         self.depends_on_paths = dict()
 
@@ -62,8 +65,8 @@ class TransformationReader:
         Attempts to construct Transformation objects using information from the JSON dictionary and then add them to the
         parent component.
         """
-        for item in self.entry:
-            if _contains_transformations(item):
+        for item in self.children:
+            if _is_transformation_group(item):
                 try:
                     self._create_transformations(item[CommonKeys.CHILDREN])
                 except KeyError:
@@ -149,7 +152,7 @@ class TransformationReader:
         :return: The matching TransformationType class value.
         """
         try:
-            return TRANSFORMATION_MAP[transformation_type]
+            return TRANSFORMATION_MAP[transformation_type.lower()]
         except KeyError:
             self.warnings.append(
                 f"Could not recognise transformation type {transformation_type} of"
@@ -187,6 +190,8 @@ class TransformationReader:
             if not dtype:
                 continue
 
+            # todo construct dataset here using other helper methods
+
             attributes = self._get_transformation_attribute(
                 CommonKeys.ATTRIBUTES, json_transformation, name
             )
@@ -220,15 +225,16 @@ class TransformationReader:
             angle_or_magnitude = values
             values = _create_transformation_dataset(angle_or_magnitude, dtype, name)
 
-            self.parent_component._create_and_add_transform(
-                name,
-                transformation_type,
-                angle_or_magnitude,
-                units,
-                QVector3D(*vector),
-                temp_depends_on,
-                values,
+            transform = self.parent_component._create_and_add_transform(
+                name=name,
+                transformation_type=transformation_type,
+                angle_or_magnitude=angle_or_magnitude,
+                units=units,
+                vector=QVector3D(*vector),
+                depends_on=temp_depends_on,
+                values=values,
             )
 
             if depends_on not in DEPENDS_ON_IGNORE:
                 self.depends_on_paths[name] = depends_on
+                transform.depends_on = depends_on

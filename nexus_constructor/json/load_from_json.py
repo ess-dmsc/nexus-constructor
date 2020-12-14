@@ -59,7 +59,12 @@ The current implementation makes a couple of assumptions that may not hold true 
 """
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
-CHILD_EXCLUDELIST = [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME, TRANSFORMS_GROUP_NAME]
+CHILD_EXCLUDELIST = [
+    SHAPE_GROUP_NAME,
+    PIXEL_SHAPE_GROUP_NAME,
+    TRANSFORMS_GROUP_NAME,
+    CommonAttrs.DEPENDS_ON,
+]
 
 
 def _retrieve_children_list(json_dict: Dict) -> List:
@@ -221,7 +226,7 @@ class JSONReader:
         :param dependent_component_name: The name of the dependent component.
         :return: The transformation with the given name.
         """
-        for transformation in component.transforms_list:
+        for transformation in component.transforms:
             if transformation.name == dependency_transformation_name:
                 return transformation
         self.warnings.append(
@@ -337,7 +342,13 @@ class JSONReader:
         if shape_info:
             shape_reader = ShapeReader(component, shape_info)
             shape_reader.add_shape_to_component()
-            shape_reader.add_pixel_data_to_component(json_object[CommonKeys.CHILDREN])
+            try:
+                shape_reader.add_pixel_data_to_component(
+                    json_object[CommonKeys.CHILDREN]
+                )
+            except TypeError:
+                # Will fail if not a detector shape
+                pass
             self.warnings += shape_reader.warnings
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
