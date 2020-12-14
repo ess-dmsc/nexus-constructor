@@ -342,7 +342,13 @@ class JSONReader:
         if shape_info:
             shape_reader = ShapeReader(component, shape_info)
             shape_reader.add_shape_to_component()
-            shape_reader.add_pixel_data_to_component(json_object[CommonKeys.CHILDREN])
+            try:
+                shape_reader.add_pixel_data_to_component(
+                    json_object[CommonKeys.CHILDREN]
+                )
+            except TypeError:
+                # Will fail if not a detector shape
+                pass
             self.warnings += shape_reader.warnings
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
