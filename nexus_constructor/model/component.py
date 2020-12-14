@@ -113,11 +113,15 @@ class Component(Group):
     def qtransform(self) -> QTransform:
         """
         Creates a QTransform based on the full chain of transforms this component points to.
+        Where T_1 depends on T_2 which depends on T_3:
+        the final transformation T_f = T_3*T_2*T_1
+
         :return: QTransform of final transformation
         """
-        transform_matrix = QMatrix4x4()
+        transform_matrix = QMatrix4x4()  # Identity matrix
         for transform in self.transforms_full_chain:
-            transform_matrix *= transform.qmatrix
+            # Left multiply each new matrix
+            transform_matrix = transform.qmatrix * transform_matrix
         transformation = Qt3DCore.QTransform()
         transformation.setMatrix(transform_matrix)
         return transformation

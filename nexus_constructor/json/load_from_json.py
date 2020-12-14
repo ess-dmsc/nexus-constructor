@@ -374,7 +374,10 @@ def _create_group(json_object: Dict, parent: Group) -> Group:
 
 
 def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
-    size = json_object[NodeType.DATASET][CommonKeys.SIZE]
+    try:
+        size = json_object[NodeType.DATASET][CommonKeys.SIZE]
+    except KeyError:
+        size = 1
     type = json_object[NodeType.DATASET][CommonKeys.TYPE]
     name = json_object[CommonKeys.NAME]
     values = json_object[CommonKeys.VALUES]
