@@ -273,13 +273,13 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
 
     transformation_reader._create_transformations(transformation_json["children"])
     transformation_reader.parent_component._create_and_add_transform.assert_called_once_with(
-        name,
-        TRANSFORMATION_MAP[transformation_type],
-        angle_or_magnitude,
-        units,
-        QVector3D(*vector),
-        depends_on,
-        values,
+        name=name,
+        transformation_type=TRANSFORMATION_MAP[transformation_type],
+        angle_or_magnitude=angle_or_magnitude,
+        units=units,
+        vector=QVector3D(*vector),
+        depends_on=depends_on,
+        values=values,
     )
 
 
