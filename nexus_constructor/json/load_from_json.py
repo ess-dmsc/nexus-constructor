@@ -53,7 +53,8 @@ from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 """
-The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of valid NeXus files, but are safe if the JSON was created by the NeXus Constructor:
+The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of
+valid NeXus files, but are safe if the JSON was created by the NeXus Constructor:
 1. All transformations exist in NXtransformations groups inside components.
 2. All depends_on paths are absolute, not relative.
 """
@@ -185,7 +186,7 @@ def __create_ev42_stream(
 def __create_f142_stream(
     index_kb: str, index_mb: str, source: str, stream_object: Dict, topic: str
 ):
-    type = stream_object[CommonKeys.TYPE]
+    value_type = stream_object[CommonKeys.TYPE]
     value_units = stream_object[VALUE_UNITS] if VALUE_UNITS in stream_object else None
     array_size = stream_object[ARRAY_SIZE] if ARRAY_SIZE in stream_object else None
     store_latest_into = (
@@ -194,7 +195,7 @@ def __create_f142_stream(
     return F142Stream(
         source=source,
         topic=topic,
-        type=type,
+        type=value_type,
         value_units=value_units,
         array_size=array_size,
         nexus_indices_index_every_mb=index_mb,
@@ -389,13 +390,15 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
         size = json_object[NodeType.DATASET][CommonKeys.SIZE]
     except KeyError:
         size = 1
-    type = json_object[NodeType.DATASET][CommonKeys.TYPE]
+    value_type = json_object[NodeType.DATASET][CommonKeys.TYPE]
     name = json_object[CommonKeys.NAME]
     values = json_object[CommonKeys.VALUES]
     if isinstance(values, list):
         # convert to a numpy array using specified type
-        values = np.array(values, dtype=VALUE_TYPE_TO_NP[type])
-    ds = Dataset(name=name, values=values, type=type, size=size, parent_node=parent)
+        values = np.array(values, dtype=VALUE_TYPE_TO_NP[value_type])
+    ds = Dataset(
+        name=name, values=values, type=value_type, size=size, parent_node=parent
+    )
     _add_attributes(json_object, ds)
     return ds
 
