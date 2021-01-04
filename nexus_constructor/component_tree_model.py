@@ -154,6 +154,7 @@ class ComponentTreeModel(QAbstractItemModel):
             transform.remove_from_dependee_chain()
         self.model.entry.instrument.remove_component(component)
         self.endRemoveRows()
+        self.model.signals.component_removed.emit(component.name)
 
     def remove_node(self, node: QModelIndex):
         if isinstance(node.internalPointer(), Component):

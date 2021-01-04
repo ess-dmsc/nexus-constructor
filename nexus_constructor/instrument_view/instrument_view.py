@@ -252,11 +252,14 @@ class InstrumentView(QWidget):
         try:
             self.component_entities[name].setParent(None)
             self.component_entities.pop(name)
-            self.transformations.pop(name)
         except KeyError:
             logging.error(
                 f"Unable to delete component {name} because it doesn't exist."
             )
+        try:
+            self.transformations.pop(name)
+        except KeyError:
+            pass  # no problem if there are no transformations to remove
 
     def add_transformation(
         self, component_name: str, transformation: Qt3DCore.QTransform
