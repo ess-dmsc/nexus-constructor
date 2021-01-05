@@ -190,8 +190,6 @@ class TransformationReader:
             if not dtype:
                 continue
 
-            # todo construct dataset here using other helper methods
-
             attributes = self._get_transformation_attribute(
                 CommonKeys.ATTRIBUTES, json_transformation, name
             )
