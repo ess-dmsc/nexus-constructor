@@ -11,6 +11,9 @@ from nexus_constructor.json.transformation_reader import (
     _create_transformation_dataset,
 )
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.json.transform_id import TransformId
+from typing import Dict, Tuple
 
 
 @pytest.fixture(scope="function")
@@ -73,14 +76,24 @@ def transformation_reader(transformation_json):
     parent_component = Mock(spec=Component)
     parent_component.name = "ParentComponentName"
     entry = [transformation_json]
-    return TransformationReader(parent_component, entry)
+    transforms_with_dependencies: Dict[
+        TransformId, Tuple[Transformation, TransformId]
+    ] = {}
+    return TransformationReader(parent_component, entry, transforms_with_dependencies)
 
 
-def test_GIVEN_transformation_in_attributes_WHEN_checking_for_transformation_THEN_contains_transformations_returns_true(
+def test_GIVEN_nxtransformation_in_attributes_WHEN_checking_for_transformations_THEN_contains_transformations_returns_true(
     transformation_json,
 ):
     transformation_json["attributes"][0]["values"] = "NXtransformations"
     assert _is_transformation_group(transformation_json)
+
+
+def test_GIVEN_no_nxtransformation_in_attributes_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
+    transformation_json,
+):
+    transformation_json["attributes"][0]["values"] = "NXsomething"
+    assert not _is_transformation_group(transformation_json)
 
 
 def test_GIVEN_no_transformation_class_in_attributes_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
@@ -353,3 +366,6 @@ def test_GIVEN_transformation_has_no_depends_on_chain_WHEN_getting_depends_on_va
     transformation_reader._create_transformations(transformation_json["children"])
 
     assert len(transformation_reader.depends_on_paths) == 0
+
+
+# TODO test no warning if depends_on attribute is missing
