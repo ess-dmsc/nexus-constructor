@@ -444,7 +444,7 @@ def test_GIVEN_json_with_component_depending_on_transfrom_WHEN_loaded_THEN_compo
     for component in json_reader.entry.instrument.component_list:
         if component.name == "test_component":
             assert len(component.transforms) == 1
-            assert component.transforms[0].name == "position"
+            assert component.transforms[0].name == "location"
 
 
 @pytest.mark.parametrize(
