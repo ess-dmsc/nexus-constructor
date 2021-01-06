@@ -54,8 +54,9 @@ def get_component_and_transform_name(depends_on_string: str):
     # The following extraction of the component name and transformation name makes the assumption
     # that the transformation lives in a component and nowhere else in the file, this is safe assuming
     # the JSON was created by the NeXus Constructor
-    depends_on_path = depends_on_string.split("/")[3:]
-    dependency_component_name = depends_on_path[0]
+    depends_on_path = depends_on_string.split("/")
+    dependency_component_name = depends_on_path[-3]
+    # [-2] is the NXtransformations group
     dependency_transformation_name = depends_on_path[-1]
     return dependency_component_name, dependency_transformation_name
 
