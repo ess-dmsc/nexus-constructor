@@ -23,7 +23,8 @@ if TYPE_CHECKING:
 @attr.s
 class Transformation(Dataset):
     """
-    Wrapper for an individual transformation. In the NeXus file this would be translated as a transformation dataset.
+    In the NeXus file this would be in an NXtransformations group and would be a scalar dataset
+    or an NXlog if the the transformation changes with time, for example represents a motion axis
     """
 
     _parent_component = attr.ib(type="Component", default=None)
@@ -162,10 +163,18 @@ class Transformation(Dataset):
         self._dependents = []
 
     def as_dict(self) -> Dict[str, Any]:
+        value = None
+        if isinstance(self.values, Dataset):
+            if np.isscalar(self.values.values):
+                value = float(self.values.values)
+            else:
+                value = float(self.values.values[0])
+        # TODO elif NXlog, kafka stream, ...
+
         return_dict = {
             CommonKeys.NAME: self.name,
             CommonKeys.TYPE: NodeType.DATASET,
-            CommonKeys.VALUES: self.values.as_dict() if self.values else [],
+            CommonKeys.VALUES: value if value is not None else [],
             CommonKeys.DATASET: {
                 CommonKeys.TYPE: self.type,
                 CommonKeys.SIZE: self.size,
