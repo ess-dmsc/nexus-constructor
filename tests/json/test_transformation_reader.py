@@ -369,7 +369,19 @@ def test_GIVEN_transformation_has_depends_on_WHEN_creating_transformations_THEN_
 def test_GIVEN_transformation_has_no_depends_on_WHEN_creating_transformations_THEN_details_arent_stored_in_dictionary(
     transformation_reader, transformation_json, depends_on_path
 ):
+    # Having no depends_on string attribute, or it being ".", are both valid and mean it is the
+    # last transformation in the depends_on chain
     transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
     transformation_reader._create_transformations(transformation_json["children"])
 
-    assert len(transformation_reader.depends_on_paths) == 0
+    assert (
+        transformation_reader._transforms_with_dependencies[
+            TransformId(
+                PARENT_COMPONENT_NAME, transformation_json["children"][0]["name"]
+            )
+        ][1]
+        is None
+    ), (
+        "Expected transformation to be added to dictionary but there to be no details"
+        "for a transformation dependency"
+    )
