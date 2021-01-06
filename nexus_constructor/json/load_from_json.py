@@ -266,37 +266,40 @@ class JSONReader:
                 )
                 return False
 
-            children_list = _retrieve_children_list(json_dict)
+            return self._load_from_json_dict(json_dict)
 
-            if not children_list:
-                self.warnings.append("Provided file not recognised as valid Instrument")
-                return False
+    def _load_from_json_dict(self, json_dict: Dict) -> bool:
+        children_list = _retrieve_children_list(json_dict)
 
-            for child in children_list:
-                self._read_json_object(
-                    child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)
-                )
+        if not children_list:
+            self.warnings.append("Provided file not recognised as valid Instrument")
+            return False
 
-            self._set_transforms_depends_on()
+        for child in children_list:
+            self._read_json_object(
+                child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)
+            )
 
-            for dependent_component_name in self.depends_on_paths.keys():
-                (
-                    dependency_component_name,
-                    dependency_transformation_name,
-                ) = get_component_and_transform_name(
-                    self.depends_on_paths[dependent_component_name]
-                )
+        self._set_transforms_depends_on()
 
-                # Assuming this is always a transformation
-                self.component_dictionary[
-                    dependent_component_name
-                ].depends_on = self._get_transformation_by_name(
-                    self.component_dictionary[dependency_component_name],
-                    dependency_transformation_name,
-                    dependent_component_name,
-                )
+        for dependent_component_name in self.depends_on_paths.keys():
+            (
+                dependency_component_name,
+                dependency_transformation_name,
+            ) = get_component_and_transform_name(
+                self.depends_on_paths[dependent_component_name]
+            )
 
-            return True
+            # Assuming this is always a transformation
+            self.component_dictionary[
+                dependent_component_name
+            ].depends_on = self._get_transformation_by_name(
+                self.component_dictionary[dependency_component_name],
+                dependency_transformation_name,
+                dependent_component_name,
+            )
+
+        return True
 
     def _set_transforms_depends_on(self):
         """
