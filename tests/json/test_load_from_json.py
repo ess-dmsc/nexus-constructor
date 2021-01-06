@@ -437,53 +437,14 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     assert json_reader.entry.instrument.component_list[1].nx_class == component_class
 
 
-def test_GIVEN_transformation_with_matching_name_WHEN_finding_transformation_by_name_THEN_transformation_is_returned(
-    json_reader, component_with_transformation
-):
-    transformation = component_with_transformation.transforms[0]
-    assert transformation == json_reader._get_transformation_by_name(
-        component_with_transformation, transformation.name, "DependentComponentName"
-    )
-
-
 def test_GIVEN_json_with_component_depending_on_transfrom_WHEN_loaded_THEN_component_in_model_contains_transform(
     json_dict_with_component_and_transform, json_reader
 ):
     json_reader._load_from_json_dict(json_dict_with_component_and_transform)
-    assert len(json_reader.entry.instrument.component_list[0].transforms) == 1
-    assert (
-        json_reader.entry.instrument.component_list[0].transforms[0].name == "position"
-    )
-
-
-def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_by_name_THEN_warning_message_is_created(
-    json_reader, component_with_transformation
-):
-    n_warnings = len(json_reader.warnings)
-
-    transformation_name = component_with_transformation.transforms[0].name
-    dependent_component_name = "DependentComponentName"
-
-    component_with_transformation.remove_transformation(
-        component_with_transformation.transforms[0]
-    )
-    assert (
-        json_reader._get_transformation_by_name(
-            component_with_transformation, transformation_name, dependent_component_name
-        )
-        is None
-    )
-    assert len(json_reader.warnings) == n_warnings + 1
-    assert all(
-        [
-            expected_text in json_reader.warnings[-1]
-            for expected_text in [
-                component_with_transformation.name,
-                transformation_name,
-                dependent_component_name,
-            ]
-        ]
-    )
+    for component in json_reader.entry.instrument.component_list:
+        if component.name == "test_component":
+            assert len(component.transforms) == 1
+            assert component.transforms[0].name == "position"
 
 
 @pytest.mark.parametrize(

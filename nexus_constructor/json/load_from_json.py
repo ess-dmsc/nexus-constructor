@@ -213,10 +213,6 @@ class JSONReader:
         self.entry = Entry()
         self.entry.instrument = Instrument()
         self.warnings = []
-        # key: component name, value: NeXus path pointing to transformation that component depends on
-        self.depends_on_paths: Dict[str, str] = {}
-        # key: component name, value: Component object created from the JSON information
-        self.component_dictionary: Dict[str, Component] = {}
 
         # key: TransformId for transform which has a depends on
         # value: the Transformation itself and the TransformId for the Transformation which it depends on
@@ -227,26 +223,14 @@ class JSONReader:
             TransformId, Tuple[Transformation, Optional[TransformId]]
         ] = {}
 
-    def _get_transformation_by_name(
-        self,
-        component: Component,
-        dependency_transformation_name: str,
-        dependent_component_name: str,
-    ) -> Transformation:
-        """
-        Finds a transformation in a component based on its name in order to set the depends_on value.
-        :param component: The component the dependency transformation belongs to.
-        :param dependency_transformation_name: The name of the dependency transformation.
-        :param dependent_component_name: The name of the dependent component.
-        :return: The transformation with the given name.
-        """
-        for transformation in component.transforms:
-            if transformation.name == dependency_transformation_name:
-                return transformation
-        self.warnings.append(
-            f"Unable to find transformation with name {dependency_transformation_name} in component {component.name} "
-            f"in order to set depends_on value for component {dependent_component_name}."
-        )
+        # key: name of the component
+        # value: the component itself and the TransformId for the Transformation which it depends on
+        # Populated while loading the components so that depends_on property can be set to the
+        # appropriate Transformation after all the Transformations have been created, otherwise they would
+        # need to be created in a particular order
+        self._components_depends_on: Dict[
+            str, Tuple[Component, Optional[TransformId]]
+        ] = {}
 
     def load_model_from_json(self, filename: str) -> bool:
         """
@@ -281,25 +265,31 @@ class JSONReader:
             )
 
         self._set_transforms_depends_on()
-
-        for dependent_component_name in self.depends_on_paths.keys():
-            (
-                dependency_component_name,
-                dependency_transformation_name,
-            ) = get_component_and_transform_name(
-                self.depends_on_paths[dependent_component_name]
-            )
-
-            # Assuming this is always a transformation
-            self.component_dictionary[
-                dependent_component_name
-            ].depends_on = self._get_transformation_by_name(
-                self.component_dictionary[dependency_component_name],
-                dependency_transformation_name,
-                dependent_component_name,
-            )
+        self._set_components_depends_on()
 
         return True
+
+    def _set_components_depends_on(self):
+        """
+        Once all transformations have been loaded we should be able to set each component's depends_on property without
+        worrying that the Transformation dependency has not been created yet
+        """
+        for (
+            component_name,
+            (component, depends_on_id,),
+        ) in self._components_depends_on.items():
+            try:
+                # If it has a dependency then find the corresponding Transformation and assign it to
+                # the depends_on property
+                if depends_on_id is not None:
+                    component.depends_on = self._transforms_with_dependencies[
+                        depends_on_id
+                    ][0]
+            except KeyError:
+                self.warnings.append(
+                    f"Component {component_name} depends on {depends_on_id.transform_name} in component "
+                    f"{depends_on_id.component_name}, but that transform was not successfully loaded from the JSON"
+                )
 
     def _set_transforms_depends_on(self):
         """
@@ -374,9 +364,12 @@ class JSONReader:
         )
 
         if depends_on_path not in DEPENDS_ON_IGNORE:
-            self.depends_on_paths[name] = depends_on_path
-
-        self.component_dictionary[name] = component
+            depends_on_id = TransformId(
+                *get_component_and_transform_name(depends_on_path)
+            )
+            self._components_depends_on[name] = (component, depends_on_id)
+        else:
+            self._components_depends_on[name] = (component, None)
 
         shape_info = _find_shape_information(children)
         if shape_info:
