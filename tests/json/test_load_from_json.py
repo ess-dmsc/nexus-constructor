@@ -168,6 +168,132 @@ def json_dict_with_component():
     return json.loads(json_string)
 
 
+@pytest.fixture(scope="function")
+def json_dict_with_component_and_transform():
+    json_string = """
+    {
+      "children":[
+        {
+          "name":"entry",
+          "type":"group",
+          "attributes":[
+            {
+              "name":"NX_class",
+              "type":"String",
+              "values":"NXentry"
+            }
+          ],
+          "children":[
+            {
+              "name":"instrument",
+              "type":"group",
+              "attributes":[
+                {
+                  "name":"NX_class",
+                  "type":"String",
+                  "values":"NXinstrument"
+                }
+              ],
+              "children":[
+                {
+                  "name":"test_component",
+                  "type":"group",
+                  "attributes":[
+                    {
+                      "name":"NX_class",
+                      "type":"String",
+                      "values":"NXaperture"
+                    }
+                  ],
+                  "children":[
+                    {
+                      "name":"description",
+                      "type":"dataset",
+                      "attributes":[
+
+                      ],
+                      "dataset":{
+                        "type":"string",
+                        "size":"1"
+                      },
+                      "values": "test_description"
+                    },
+                    {
+                      "name":"depends_on",
+                      "type":"dataset",
+                      "attributes":[],
+                      "dataset":{
+                        "type":"string",
+                        "size":"1"
+                      },
+                      "values": "/entry/instrument/test_component/transformations/location"
+                    },
+                    {
+                      "type":"group",
+                      "name":"transformations",
+                      "children":[
+                        {
+                          "type":"dataset",
+                          "name":"location",
+                          "dataset":{
+                            "type":"double"
+                          },
+                          "values":1.0,
+                          "attributes":[
+                            {
+                              "name":"units",
+                              "values":"m"
+                            },
+                            {
+                              "name":"transformation_type",
+                              "values":"translation"
+                            },
+                            {
+                              "name":"vector",
+                              "values":[
+                                0.0,
+                                0.0,
+                                0.0
+                              ],
+                              "type":"double"
+                            },
+                            {
+                              "name":"depends_on",
+                              "values":"."
+                            }
+                          ]
+                        }
+                      ],
+                      "attributes":[
+                        {
+                          "name":"NX_class",
+                          "values":"NXtransformations"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name":"sample",
+              "type":"group",
+              "attributes":[
+                {
+                  "name":"NX_class",
+                  "type":"String",
+                  "values":"NXsample"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    """
+    return json.loads(json_string)
+
+
 def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_returns_false(
     json_reader,
 ):
@@ -320,6 +446,16 @@ def test_GIVEN_transformation_with_matching_name_WHEN_finding_transformation_by_
     )
 
 
+def test_GIVEN_json_with_component_depending_on_transfrom_WHEN_loaded_THEN_component_in_model_contains_transform(
+    json_dict_with_component_and_transform, json_reader
+):
+    json_reader._load_from_json_dict(json_dict_with_component_and_transform)
+    assert len(json_reader.entry.instrument.component_list[0].transforms) == 1
+    assert (
+        json_reader.entry.instrument.component_list[0].transforms[0].name == "position"
+    )
+
+
 def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_by_name_THEN_warning_message_is_created(
     json_reader, component_with_transformation
 ):
@@ -352,7 +488,7 @@ def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_
 
 @pytest.mark.parametrize(
     "test_input",
-    ({}, {"type": "dataset", "values": 0,}, {"attributes": []}),  # noqa E231
+    ({}, {"type": "dataset", "values": 0,}, {"attributes": []},),  # noqa E231
 )
 def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing(
     test_input,
