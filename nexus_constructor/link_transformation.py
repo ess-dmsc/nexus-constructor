@@ -7,7 +7,8 @@ from nexus_constructor.model.component import Component
 class LinkTransformation:
     """
     Used for keeping track of links (depends_on) to transformations outside the
-    current component and for keeping track of the parent transformation list.
+    current component and for keeping track of the parent transformation list
+    Not a "link" in the NeXus/HDF5 sense
     """
 
     def __init__(self, parent: TransformationsList):
