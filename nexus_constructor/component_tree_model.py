@@ -1,7 +1,7 @@
 import logging
 
 import PySide2.QtGui
-from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
+from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
@@ -23,8 +23,6 @@ class ComponentInfo(object):
 
 
 class ComponentTreeModel(QAbstractItemModel):
-    data_changed = Signal("QModelIndex", "QModelIndex")
-
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
