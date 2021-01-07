@@ -3,7 +3,6 @@ import pytest
 from PySide2.QtWidgets import QDialog
 
 from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.model import Model
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import PixelValidator
@@ -22,9 +21,7 @@ def instrument() -> Instrument:
 
 @pytest.fixture(scope="function")
 def model() -> Model:
-    entry = Entry()
-    entry.instrument = Instrument()
-    return Model(entry)
+    return Model()
 
 
 @pytest.fixture(scope="function")

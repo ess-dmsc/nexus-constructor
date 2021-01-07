@@ -391,7 +391,7 @@ def get_new_component_from_dialog(dialog: AddComponentDialog, name: str) -> Comp
     :param name: The name of the component that is being searched for.
     :return: The component.
     """
-    for component in dialog.instrument.get_component_list():
+    for component in dialog.instrument.component_list:
         if component.name == name:
             return component
 
@@ -1774,9 +1774,7 @@ def create_group_with_component(component_name: str, file_name: str):
     """
     Convenience method, for when we don't really care about the component and just want one to be added to a file
     """
-    entry = Entry()
-    entry.instrument = Instrument()
-    model = Model(entry)
+    model = Model()
     treeview_model = ComponentTreeModel(model)
     component = Component(component_name)
     component.nx_class = "NXdisk_chopper"
