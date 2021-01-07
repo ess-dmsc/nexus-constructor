@@ -322,7 +322,11 @@ class ComponentTreeModel(QAbstractItemModel):
             return self.createIndex(
                 self.components.index(parent_item.parent), 0, parent_item.parent
             )
-        elif isinstance(parent_item, (Transformation, LinkTransformation)):
+        elif isinstance(parent_item, Transformation):
+            return self.createIndex(
+                1, 0, parent_item._parent_component.stored_transforms
+            )
+        elif isinstance(parent_item, LinkTransformation):
             return self.createIndex(1, 0, parent_item.parent)
         raise RuntimeError("Unknown element type.")
 
