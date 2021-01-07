@@ -3,6 +3,7 @@ from typing import Dict, Any
 
 from nexus_constructor.common_attrs import CommonKeys
 from nexus_constructor.model.entry import Entry
+from nexus_constructor.model.instrument import Instrument
 
 
 class Signals(QObject):
@@ -19,9 +20,10 @@ class Signals(QObject):
 
 
 class Model:
-    def __init__(self, entry: Entry):
+    def __init__(self):
         self.signals = Signals()
-        self.entry = entry
+        self.entry = Entry()
+        self.entry.instrument = Instrument()
 
     def as_dict(self) -> Dict[str, Any]:
         return {CommonKeys.CHILDREN: [self.entry.as_dict()]}

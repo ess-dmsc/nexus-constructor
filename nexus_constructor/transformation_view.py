@@ -132,7 +132,7 @@ class EditTransformationLink(QFrame):
         self.link_frame.transformations_combo_box.clear()
         self.link_frame.transformations_combo_box.addItem("(None)", userData=None)
         self.link_frame.transformations_combo_box.setCurrentIndex(0)
-        components = self.instrument.get_component_list()
+        components = self.instrument.component_list
         for current_component in components:
             transformations = current_component.transforms
             self.link_frame.transformations_combo_box.addItem(

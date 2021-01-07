@@ -26,7 +26,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.components = self.model.entry.instrument.get_component_list()
+        self.components = self.model.entry.instrument.component_list
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -150,7 +150,7 @@ class ComponentTreeModel(QAbstractItemModel):
         self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
         for transform in transforms:
             transform.remove_from_dependee_chain()
-        self.model.entry.instrument.remove_component(component)
+        self.components.remove(component)
         self.endRemoveRows()
         self.model.signals.component_removed.emit(component.name)
 

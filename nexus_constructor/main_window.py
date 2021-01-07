@@ -14,6 +14,7 @@ from PySide2.QtWidgets import (
 from nexusutils.nexusbuilder import NexusBuilder
 
 from nexus_constructor.add_component_window import AddComponentDialog
+from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.model.component import Component
 from nexus_constructor.json.load_from_json import JSONReader
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
@@ -157,21 +158,26 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def open_json_file(self):
         filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)
         if filename:
-            reader = JSONReader()
-            success = reader.load_model_from_json(filename)
+            self.model = Model()
+            self.component_tree_view_tab.component_model = ComponentTreeModel(
+                self.model
+            )
+            reader = JSONReader(
+                self.component_tree_view_tab.component_model,
+                self.model.entry.instrument,
+            )
+            reader.load_model_from_json(filename)
             if reader.warnings:
                 show_warning_dialog(
                     "\n".join(reader.warnings),
                     "Warnings encountered loading JSON",
                     parent=self,
                 )
-            if success:
-                self.model.entry = reader.entry
-                self._update_views()
+            self._update_views()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
-        for component in self.model.entry.instrument.get_component_list():
+        for component in self.model.entry.instrument.component_list:
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def _update_views(self):
@@ -181,7 +187,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
-        for component in self.model.entry.instrument.get_component_list():
+        for component in self.model.entry.instrument.component_list:
             shape, positions = component.shape
             self.sceneWidget.add_component(component.name, shape, positions)
             self.sceneWidget.add_transformation(component.name, component.qtransform)
