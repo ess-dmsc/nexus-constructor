@@ -65,9 +65,7 @@ PIXEL_GRID_FIELDS = [
 COMPONENT_CLASS_PATH = "nexus_constructor.add_component_window.Component"
 CHOPPER_GEOMETRY_CREATOR_PATH = "nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator.DiskChopperGeometryCreator.create_disk_chopper_geometry"
 
-entry = Entry()
-entry.instrument = Instrument(parent_node=entry)
-model = Model(entry)
+model = Model()
 component = ComponentTreeModel(model)
 
 PIXEL_OPTIONS = dict()

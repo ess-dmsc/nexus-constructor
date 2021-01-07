@@ -22,6 +22,7 @@ from nexus_constructor.json.transformation_reader import (
 )
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.link import Link, TARGET
@@ -54,7 +55,6 @@ from nexus_constructor.model.stream import (
 import numpy as np
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
-from nexus_constructor.component_tree_model import ComponentTreeModel
 
 """
 The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of
@@ -209,10 +209,10 @@ def __create_f142_stream(
 
 
 class JSONReader:
-    def __init__(self, component_model: ComponentTreeModel, instrument: Instrument):
-        self._instrument = instrument
+    def __init__(self):
+        self.entry = Entry()
+        self.entry.instrument = Instrument()
         self.warnings = []
-        self._component_model = component_model
 
         # key: TransformId for transform which has a depends on
         # value: the Transformation itself and the TransformId for the Transformation which it depends on
@@ -343,12 +343,12 @@ class JSONReader:
             return
 
         if nx_class == NX_SAMPLE:
-            component = self._instrument.sample
+            component = self.entry.instrument.sample
             component.name = name
         else:
-            component = Component(name, parent_node=self._instrument)
+            component = Component(name, parent_node=self.entry.instrument)
             component.nx_class = nx_class
-            self._component_model.add_component(component)
+            self.entry.instrument.component_list.append(component)
 
         for item in children:
             _add_field_to_group(item, component)

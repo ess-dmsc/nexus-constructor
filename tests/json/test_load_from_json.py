@@ -14,16 +14,12 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.value_type import ValueTypes, VALUE_TYPE_TO_NP
-from nexus_constructor.model.model import Model
-from nexus_constructor.component_tree_model import ComponentTreeModel
 import numpy as np
 
 
 @pytest.fixture(scope="function")
 def json_reader() -> JSONReader:
-    model = Model()
-    component_model = ComponentTreeModel(model)
-    return JSONReader(component_model, model.entry.instrument)
+    return JSONReader()
 
 
 @pytest.fixture(scope="function")
@@ -401,7 +397,7 @@ def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_n
     for child in children_list:
         json_reader._read_json_object(child)
 
-    assert json_reader._instrument.sample.name == sample_name
+    assert json_reader.entry.instrument.sample.name == sample_name
 
 
 def test_GIVEN_no_nx_instrument_class_WHEN_loading_from_json_THEN_read_json_object_returns_false(
@@ -424,7 +420,7 @@ def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contain
         json_dict_with_component["children"][0]["children"][0]
     )
 
-    assert json_reader._instrument.component_list[1].name == component_name
+    assert json_reader.entry.instrument.component_list[1].name == component_name
 
 
 def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_contains_component_with_nx_class(
@@ -438,14 +434,14 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
         json_dict_with_component["children"][0]["children"][0]
     )
 
-    assert json_reader._instrument.component_list[1].nx_class == component_class
+    assert json_reader.entry.instrument.component_list[1].nx_class == component_class
 
 
 def test_GIVEN_json_with_component_depending_on_transfrom_WHEN_loaded_THEN_component_in_model_contains_transform(
     json_dict_with_component_and_transform, json_reader
 ):
     json_reader._load_from_json_dict(json_dict_with_component_and_transform)
-    for component in json_reader._instrument.component_list:
+    for component in json_reader.entry.instrument.component_list:
         if component.name == "test_component":
             assert len(component.transforms) == 1
             assert component.transforms[0].name == "location"
