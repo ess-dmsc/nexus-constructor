@@ -45,13 +45,15 @@ def create_component_tree_model(
 ) -> Tuple[ComponentTreeModel, Instrument]:
     model = Model()
     component_model = ComponentTreeModel(model)
-    if components is not None:
-        for component in components:
-            component_model.add_component(component)
     # remove sample component for purposes of tests
     component_model.remove_node(
         component_model.createIndex(0, 0, component_model.components[0])
     )
+
+    if components is not None:
+        for component in components:
+            component_model.add_component(component)
+
     return ComponentTreeModel(model), model.entry.instrument
 
 
