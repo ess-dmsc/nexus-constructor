@@ -346,7 +346,7 @@ class JSONReader:
             component = self.entry.instrument.sample
             component.name = name
         else:
-            component = Component(name)
+            component = Component(name, parent_node=self.entry.instrument)
             component.nx_class = nx_class
             self.entry.instrument.add_component(component)
 
