@@ -215,17 +215,17 @@ class JSONReader:
         self.warnings = []
 
         # key: TransformId for transform which has a depends on
-        # value: the Transformation itself and the TransformId for the Transformation which it depends on
-        # Populated while loading the transformations so that depends_on property can be set to the
-        # appropriate Transformation after all the Transformations have been created, otherwise they would
+        # value: the Transformation object itself and the TransformId for the Transformation which it depends on
+        # Populated while loading the transformations so that depends_on property of each Transformation can be set
+        # to the appropriate Transformation after all the Transformations have been created, otherwise they would
         # need to be created in a particular order
-        self._transforms_with_dependencies: Dict[
+        self._transforms_depends_on: Dict[
             TransformId, Tuple[Transformation, Optional[TransformId]]
         ] = {}
 
-        # key: name of the component
-        # value: the component itself and the TransformId for the Transformation which it depends on
-        # Populated while loading the components so that depends_on property can be set to the
+        # key: name of the component (uniquely identifies Component)
+        # value: the Component object itself and the TransformId for the Transformation which it depends on
+        # Populated while loading the components so that depends_on property of each Component can be set to the
         # appropriate Transformation after all the Transformations have been created, otherwise they would
         # need to be created in a particular order
         self._components_depends_on: Dict[
@@ -282,9 +282,7 @@ class JSONReader:
                 # If it has a dependency then find the corresponding Transformation and assign it to
                 # the depends_on property
                 if depends_on_id is not None:
-                    component.depends_on = self._transforms_with_dependencies[
-                        depends_on_id
-                    ][0]
+                    component.depends_on = self._transforms_depends_on[depends_on_id][0]
             except KeyError:
                 self.warnings.append(
                     f"Component {component_name} depends on {depends_on_id.transform_name} in component "
@@ -299,14 +297,12 @@ class JSONReader:
         for (
             transform_id,
             (transform, depends_on_id,),
-        ) in self._transforms_with_dependencies.items():
+        ) in self._transforms_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
                 # the depends_on property
                 if depends_on_id is not None:
-                    transform.depends_on = self._transforms_with_dependencies[
-                        depends_on_id
-                    ][0]
+                    transform.depends_on = self._transforms_depends_on[depends_on_id][0]
             except KeyError:
                 self.warnings.append(
                     f"Transformation {transform_id.transform_name} in component {transform_id.component_name} depends"
@@ -354,7 +350,7 @@ class JSONReader:
             _add_field_to_group(item, component)
 
         transformation_reader = TransformationReader(
-            component, children, self._transforms_with_dependencies
+            component, children, self._transforms_depends_on
         )
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
