@@ -27,13 +27,13 @@ class Transformation(Dataset):
     or an NXlog if the the transformation changes with time, for example represents a motion axis
     """
 
-    _parent_component = attr.ib(type="Component", default=None)
+    parent_component = attr.ib(type="Component", default=None)
     _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
     _ui_value = attr.ib(type=float, default=None)
 
     @_dependents.default
     def _initialise_dependents(self):
-        return [] if self._parent_component is None else [self._parent_component]
+        return [] if self.parent_component is None else [self.parent_component]
 
     @property
     def transform_type(self) -> str:

@@ -76,7 +76,7 @@ class ComponentTreeModel(QAbstractItemModel):
             transformation_list = parent_item
             target_index = node
         elif isinstance(parent_item, Transformation):
-            transformation_list = parent_item._parent_component.transforms
+            transformation_list = parent_item.parent_component.transforms
             target_index = self.parent(node)
         return target_index, transformation_list
 
@@ -188,7 +188,7 @@ class ComponentTreeModel(QAbstractItemModel):
         )
 
         new_transformation.parent = transformation_list
-        new_transformation._parent_component = parent_component
+        new_transformation.parent_component = parent_component
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
         self.endInsertRows()
@@ -324,7 +324,7 @@ class ComponentTreeModel(QAbstractItemModel):
             )
         elif isinstance(parent_item, Transformation):
             return self.createIndex(
-                1, 0, parent_item._parent_component.stored_transforms
+                1, 0, parent_item.parent_component.stored_transforms
             )
         elif isinstance(parent_item, LinkTransformation):
             return self.createIndex(1, 0, parent_item.parent)
