@@ -255,10 +255,6 @@ class JSONReader:
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         children_list = _retrieve_children_list(json_dict)
 
-        if not children_list:
-            self.warnings.append("Provided file not recognised as valid Instrument")
-            return False
-
         for child in children_list:
             self._read_json_object(
                 child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)

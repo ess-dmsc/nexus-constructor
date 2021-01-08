@@ -447,6 +447,51 @@ def test_GIVEN_json_with_component_depending_on_transfrom_WHEN_loaded_THEN_compo
             assert component.transforms[0].name == "location"
 
 
+def test_GIVEN_json_with_component_depending_on_non_existent_transfrom_WHEN_loaded_THEN_warning_is_added(
+    json_dict_with_component, json_reader
+):
+    depends_on_dataset_str = """
+    {
+      "name":"depends_on",
+      "type":"dataset",
+      "attributes":[],
+      "dataset":{
+        "type":"string",
+        "size":"1"
+      },
+      "values": "/entry/instrument/test_component/transformations/location"
+    }
+    """
+    depends_on_dataset = json.loads(depends_on_dataset_str)
+
+    # Add depends_on dataset which points to a transformation which does not exist in the JSON
+    json_dict_with_component["children"][0]["children"][0]["children"][0][
+        "children"
+    ].append(depends_on_dataset)
+    json_reader._load_from_json_dict(json_dict_with_component)
+
+    assert len(json_reader.warnings) > 0
+
+
+def test_GIVEN_json_with_transformation_depending_on_non_existent_transfrom_WHEN_loaded_THEN_warning_is_added(
+    json_dict_with_component_and_transform, json_reader
+):
+    # Makes depends_on attribute of transformation point to a transformation which does not exist
+    for node in json_dict_with_component_and_transform["children"][0]["children"][0][
+        "children"
+    ][0]["children"]:
+        if node["name"] == "transformations":
+            for attribute in node["children"][0]["attributes"]:
+                if attribute["name"] == "depends_on":
+                    attribute["values"] = "/transform/does/not/exist"
+
+    json_reader._load_from_json_dict(json_dict_with_component_and_transform)
+
+    assert (
+        len(json_reader.warnings) > 0
+    ), "Expected a warning due to depends_on pointing to a non-existent transform"
+
+
 @pytest.mark.parametrize(
     "test_input",
     ({}, {"type": "dataset", "values": 0,}, {"attributes": []},),  # noqa E231
