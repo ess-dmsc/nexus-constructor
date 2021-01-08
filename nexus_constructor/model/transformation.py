@@ -167,9 +167,8 @@ class Transformation(Dataset):
         if isinstance(self.values, Dataset):
             if np.isscalar(self.values.values):
                 value = float(self.values.values)
-            else:
-                value = float(self.values.values[0])
-        # TODO elif NXlog, kafka stream, ...
+
+        # TODO elif array, NXlog, kafka stream, ...
 
         return_dict = {
             CommonKeys.NAME: self.name,
