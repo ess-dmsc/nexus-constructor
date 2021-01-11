@@ -35,17 +35,12 @@ class LinkTransformation:
     @linked_component.setter
     def linked_component(self, value: Component):
         parent_component = self.parent.parent_component
-        target = None
         if len(parent_component.transforms) == 0:
             target = parent_component
         else:
-            for c_transform in parent_component.transforms:
-                if (
-                    c_transform.depends_on is None
-                    or c_transform.depends_on != parent_component
-                ):
-                    target = c_transform
-                    break
+            # The last transform of the parent component will now depend on the
+            # transform that the value component depends on
+            target = parent_component.transforms[-1]
         if value is not None:
             target.depends_on = value.depends_on
             return
