@@ -431,7 +431,7 @@ class Component(Group):
             dictionary[CommonKeys.CHILDREN].append(
                 {
                     CommonKeys.TYPE: NodeType.GROUP,
-                    CommonKeys.NAME: TRANSFORMS_GROUP_NAME,  # this works
+                    CommonKeys.NAME: TRANSFORMS_GROUP_NAME,
                     CommonKeys.CHILDREN: [
                         transform.as_dict() for transform in self.transforms
                     ],
