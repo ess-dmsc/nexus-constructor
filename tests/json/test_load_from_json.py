@@ -109,26 +109,9 @@ def json_dict_with_component():
                       "name":"NX_class",
                       "type":"String",
                       "values":"NXaperture"
-                    },
-                    {
-                      "name":"has_link",
-                      "type":"String",
-                      "values":false
                     }
                   ],
                   "children":[
-                    {
-                      "name":"description",
-                      "type":"dataset",
-                      "attributes":[
-    
-                      ],
-                      "dataset":{
-                        "type":"string",
-                        "size":"1"
-                      },
-                      "values": "test_description"
-                    },
                     {
                       "type":"group",
                       "name":"transformations",
@@ -206,18 +189,6 @@ def json_dict_with_component_and_transform():
                     }
                   ],
                   "children":[
-                    {
-                      "name":"description",
-                      "type":"dataset",
-                      "attributes":[
-
-                      ],
-                      "dataset":{
-                        "type":"string",
-                        "size":"1"
-                      },
-                      "values": "test_description"
-                    },
                     {
                       "name":"depends_on",
                       "type":"dataset",
