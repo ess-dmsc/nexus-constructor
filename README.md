@@ -4,7 +4,7 @@
 The NeXus Constructor facilitates constructing [NeXus files](https://www.nexusformat.org/) in which to record data from experiments at neutron science facilities. This includes all supporting metadata typically required to perform analysis of such experiments,
 including instrument geometry information.
 
-The application can directly output a NeXus file, or create a 
+The application can directly output a NeXus file, or create a
 [_NeXus structure_, JSON template](https://github.com/ess-dmsc/kafka-to-nexus/blob/master/documentation/commands.md#defining-a-nexus-structure)
 of the file to send to the [File Writer](https://github.com/ess-dmsc/kafka-to-nexus). The JSON template can
 include data stream details, such that the File Writer populates the NeXus file it creates with data acquired
@@ -18,10 +18,9 @@ Although the application may be useful to other institutions using NeXus, the Ne
 developed as part of the software suite for the
 [European Spallation Source (ESS)](https://europeanspallationsource.se/). Please see
 [this (open access) paper](https://iopscience.iop.org/article/10.1088/1748-0221/13/10/T10001)
-for more information on the ESS software.   
+for more information on the ESS software.
 
 Currently tested on Windows 10, Ubuntu 18.04/19.10 and CentOS 7, it should also work on other Linux distributions.
-Currently it does not work on Mac due to a bug in Qt, but we hope to resolve this soon.
 
 ## Installing dependencies
 
