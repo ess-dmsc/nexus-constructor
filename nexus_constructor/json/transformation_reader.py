@@ -56,7 +56,7 @@ def get_component_and_transform_name(depends_on_string: str):
     # the JSON was created by the NeXus Constructor
     depends_on_path = depends_on_string.split("/")
     dependency_component_name = depends_on_path[-3]
-    # [-2] is the NXtransformations group
+    # [-2] is the NXtransformations group (which we don't need)
     dependency_transformation_name = depends_on_path[-1]
     return dependency_component_name, dependency_transformation_name
 
@@ -245,6 +245,7 @@ class TransformationReader:
             )
 
             # TODO handle cases that "values" is an NXlog, KafkaStream etc
+            #  ticket #835
 
             temp_depends_on = None
             angle_or_magnitude = values

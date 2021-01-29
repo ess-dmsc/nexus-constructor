@@ -242,12 +242,12 @@ class ComponentTreeModel(QAbstractItemModel):
         transformation_list,
     ):
         """
-        @param parent_component: component to add transformation to
-        @param parent_index: index of the parent_item
-        @param parent_item: the component, transformation list or transformation that was selected "add" button pressed
-        @param target_index: index of parent component of new transformation
-        @param target_pos: position for new transformation in transformation list
-        @param transformation_list: transformation list of parent_component
+        :param parent_component: component to add transformation to
+        :param parent_index: index of the parent_item
+        :param parent_item: the component, transformation list or transformation that was selected "add" button pressed
+        :param target_index: index of parent component of new transformation
+        :param target_pos: position for new transformation in transformation list
+        :param transformation_list: transformation list of parent_component
         """
         if isinstance(parent_item, Component):
             if not hasattr(parent_item, "stored_transforms"):
