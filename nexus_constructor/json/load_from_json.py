@@ -20,6 +20,13 @@ from nexus_constructor.json.transformation_reader import (
     TransformationReader,
     get_component_and_transform_name,
 )
+from nexus_constructor.json.json_warnings import (
+    InvalidJson,
+    TransformDependencyMissing,
+    JsonWarning,
+    NameFieldMissing,
+    NXClassAttributeMissing,
+)
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Entry
@@ -212,7 +219,7 @@ class JSONReader:
     def __init__(self):
         self.entry = Entry()
         self.entry.instrument = Instrument()
-        self.warnings = []
+        self.warnings: List[JsonWarning] = []
 
         # key: TransformId for transform which has a depends on
         # value: the Transformation object itself and the TransformId for the Transformation which it depends on
@@ -246,7 +253,9 @@ class JSONReader:
                 json_dict = json.loads(json_data)
             except ValueError as exception:
                 self.warnings.append(
-                    f"Provided file not recognised as valid JSON. Exception: {exception}"
+                    InvalidJson(
+                        f"Provided file not recognised as valid JSON. Exception: {exception}"
+                    )
                 )
                 return False
 
@@ -281,8 +290,10 @@ class JSONReader:
                     component.depends_on = self._transforms_depends_on[depends_on_id][0]
             except KeyError:
                 self.warnings.append(
-                    f"Component {component_name} depends on {depends_on_id.transform_name} in component "
-                    f"{depends_on_id.component_name}, but that transform was not successfully loaded from the JSON"
+                    TransformDependencyMissing(
+                        f"Component {component_name} depends on {depends_on_id.transform_name} in component "
+                        f"{depends_on_id.component_name}, but that transform was not successfully loaded from the JSON"
+                    )
                 )
 
     def _set_transforms_depends_on(self):
@@ -301,9 +312,11 @@ class JSONReader:
                     transform.depends_on = self._transforms_depends_on[depends_on_id][0]
             except KeyError:
                 self.warnings.append(
-                    f"Transformation {transform_id.transform_name} in component {transform_id.component_name} depends"
-                    f"on {depends_on_id.transform_name} in component {depends_on_id.component_name}, but that transform"
-                    f"was not successfully loaded from the JSON"
+                    TransformDependencyMissing(
+                        f"Transformation {transform_id.transform_name} in component {transform_id.component_name} "
+                        f"depends on {depends_on_id.transform_name} in component {depends_on_id.component_name}, "
+                        f"but that transform was not successfully loaded from the JSON"
+                    )
                 )
 
     def _read_json_object(self, json_object: Dict, parent_name: str = None):
@@ -316,7 +329,9 @@ class JSONReader:
             name = json_object[CommonKeys.NAME]
         except KeyError:
             self.warnings.append(
-                f"Unable to find object name for child of {parent_name}."
+                NameFieldMissing(
+                    f"Unable to find object name for child of {parent_name}."
+                )
             )
             return
 
@@ -379,12 +394,16 @@ class JSONReader:
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
         Validates the NXclass by checking if it was found, and if it matches known NXclasses for components.
-        :param name: TThe name of the component having its nx class validated.
+        :param name: The name of the component having its nx class validated.
         :param nx_class: The NXclass string obtained from the dictionary.
         :return: True if the NXclass is valid, False otherwise.
         """
         if not nx_class:
-            self.warnings.append(f"Unable to determine NXclass of component {name}.")
+            self.warnings.append(
+                NXClassAttributeMissing(
+                    f"Unable to determine NXclass of component {name}."
+                )
+            )
             return False
 
         if nx_class not in COMPONENT_TYPES:

@@ -15,6 +15,11 @@ from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.value_type import ValueTypes, VALUE_TYPE_TO_NP
 import numpy as np
+from nexus_constructor.json.json_warnings import (
+    TransformDependencyMissing,
+    JsonWarning,
+)
+from typing import List, Type
 
 
 @pytest.fixture(scope="function")
@@ -421,7 +426,13 @@ def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_compo
     assert component_found
 
 
-def test_GIVEN_json_with_component_depending_on_non_existent_transfrom_WHEN_loaded_THEN_warning_is_added(
+def contains_warning_of_type(
+    json_warnings: List[JsonWarning], warning_type: Type[JsonWarning]
+) -> bool:
+    return any(isinstance(json_warning, warning_type) for json_warning in json_warnings)
+
+
+def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
     json_dict_with_component, json_reader
 ):
     depends_on_dataset_str = """
@@ -444,10 +455,10 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transfrom_WHEN_load
     ].append(depends_on_dataset)
     json_reader._load_from_json_dict(json_dict_with_component)
 
-    assert len(json_reader.warnings) > 0
+    assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
 
 
-def test_GIVEN_json_with_transformation_depending_on_non_existent_transfrom_WHEN_loaded_THEN_warning_is_added(
+def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
     json_dict_with_component_and_transform, json_reader
 ):
     # Makes depends_on attribute of transformation point to a transformation which does not exist
@@ -461,8 +472,8 @@ def test_GIVEN_json_with_transformation_depending_on_non_existent_transfrom_WHEN
 
     json_reader._load_from_json_dict(json_dict_with_component_and_transform)
 
-    assert (
-        len(json_reader.warnings) > 0
+    assert contains_warning_of_type(
+        json_reader.warnings, TransformDependencyMissing
     ), "Expected a warning due to depends_on pointing to a non-existent transform"
 
 
