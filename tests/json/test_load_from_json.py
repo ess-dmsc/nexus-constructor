@@ -412,10 +412,13 @@ def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_compo
     json_dict_with_component_and_transform, json_reader
 ):
     json_reader._load_from_json_dict(json_dict_with_component_and_transform)
+    component_found = False
     for component in json_reader.entry.instrument.component_list:
         if component.name == "test_component":
+            component_found = True
             assert len(component.transforms) == 1
             assert component.transforms[0].name == "location"
+    assert component_found
 
 
 def test_GIVEN_json_with_component_depending_on_non_existent_transfrom_WHEN_loaded_THEN_warning_is_added(
