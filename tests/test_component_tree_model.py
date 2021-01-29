@@ -511,7 +511,6 @@ def test_remove_component_with_transformation(model):
 
 
 def test_remove_transformation(model):
-
     test_component_tree_model = ComponentTreeModel(model)
     model.entry.instrument.component_list.append(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())

@@ -113,7 +113,7 @@ class ComponentTreeModel(QAbstractItemModel):
 
     def _remove_transformation(self, index: QModelIndex):
         remove_transform = index.internalPointer()
-        transformation_list = remove_transform.parent
+        transformation_list = remove_transform.parent_component.stored_transforms
         transformation_list_index = self.parent(index)
         remove_pos = transformation_list.index(remove_transform)
         component = transformation_list.parent_component
@@ -187,7 +187,6 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_component, transformation_list, transformation_type
         )
 
-        new_transformation.parent = transformation_list
         new_transformation.parent_component = parent_component
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
@@ -262,7 +261,7 @@ class ComponentTreeModel(QAbstractItemModel):
             target_pos = len(transformation_list)
             target_index = parent_index
         elif isinstance(parent_item, Transformation):
-            transformation_list = parent_item.parent
+            transformation_list = parent_item.parent_component.stored_transforms
             parent_component = transformation_list.parent_component
             target_pos = transformation_list.index(parent_item) + 1
             target_index = self.parent(parent_index)
