@@ -4,7 +4,6 @@ from mock import Mock
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.stream import StreamGroup, EV42Stream
@@ -113,9 +112,9 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
 
 
 def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled_correctly(
-    qtbot
+    qtbot,
 ):
-    component = Component(name="test", )
+    component = Component(name="test",)
 
     x = 0
     y = 0
@@ -145,15 +144,16 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
     )
     assert view.transformation_frame.magnitude_widget.value.children[0].topic == topic
     assert (
-        view.transformation_frame.magnitude_widget.value.children[0].writer_module == "ev42"
+        view.transformation_frame.magnitude_widget.value.children[0].writer_module
+        == "ev42"
     )
     assert view.transformation_frame.magnitude_widget.value.children[0].source == source
 
 
 def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
-    qtbot
+    qtbot,
 ):
-    model = Model(entry=Entry())
+    model = Model()
 
     component = Component(name="test")
 

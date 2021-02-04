@@ -15,15 +15,6 @@ class Instrument(Group):
         self.sample.nx_class = "NXsample"
         self.component_list = [self.sample]
 
-    def get_component_list(self):
-        return self.component_list
-
-    def add_component(self, component: Component):
-        self.component_list.append(component)
-
-    def remove_component(self, component: Component):
-        self.component_list.remove(component)
-
     def as_dict(self) -> Dict[str, Any]:
         dictionary = super(Instrument, self).as_dict()
         # Put components (other than sample) in children

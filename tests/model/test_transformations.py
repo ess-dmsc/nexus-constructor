@@ -5,7 +5,6 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
-from tests.helpers import add_component_to_file  # noqa:F401
 
 
 def create_transform(
@@ -30,10 +29,6 @@ def create_transform(
     translation.ui_value = ui_value
 
     return translation
-
-
-def create_component(name=""):
-    return Component(name=name)
 
 
 def test_can_get_transform_properties():
@@ -238,7 +233,7 @@ def test_reregister_dependent():
 def test_set_one_dependent_component():
 
     transform = create_transform("transform_1")
-    component = create_component()
+    component = Component("test_component")
     transform.register_dependent(component)
 
     set_dependents = transform.dependents
@@ -251,8 +246,8 @@ def test_set_two_dependent_components():
 
     transform = create_transform("transform_1")
 
-    component1 = create_component("component1")
-    component2 = create_component("component2")
+    component1 = Component("component1")
+    component2 = Component("component2")
 
     transform.register_dependent(component1)
     transform.register_dependent(component2)
@@ -268,9 +263,9 @@ def test_set_three_dependent_components():
 
     transform = create_transform("transform_1")
 
-    component1 = create_component("test_component1")
-    component2 = create_component("test_component2")
-    component3 = create_component("test_component3")
+    component1 = Component("test_component1")
+    component2 = Component("test_component2")
+    component3 = Component("test_component3")
 
     transform.register_dependent(component1)
     transform.register_dependent(component2)
@@ -288,9 +283,9 @@ def test_deregister_three_dependent_components():
 
     transform = create_transform("transform_1")
 
-    component1 = create_component("test_component1")
-    component2 = create_component("test_component2")
-    component3 = create_component("test_component3")
+    component1 = Component("test_component1")
+    component2 = Component("test_component2")
+    component3 = Component("test_component3")
 
     transform.register_dependent(component1)
     transform.register_dependent(component2)
@@ -308,7 +303,7 @@ def test_deregister_three_dependent_components():
 def test_register_dependent_twice():
 
     transform = create_transform("transform_1")
-    component1 = create_component("test_component1")
+    component1 = Component("test_component1")
 
     transform.register_dependent(component1)
     transform.register_dependent(component1)

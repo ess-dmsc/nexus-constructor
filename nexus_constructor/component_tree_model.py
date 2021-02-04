@@ -1,7 +1,7 @@
 import logging
 
 import PySide2.QtGui
-from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal
+from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
@@ -23,12 +23,10 @@ class ComponentInfo(object):
 
 
 class ComponentTreeModel(QAbstractItemModel):
-    data_changed = Signal("QModelIndex", "QModelIndex")
-
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.components = self.model.entry.instrument.get_component_list()
+        self.components = self.model.entry.instrument.component_list
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -78,7 +76,7 @@ class ComponentTreeModel(QAbstractItemModel):
             transformation_list = parent_item
             target_index = node
         elif isinstance(parent_item, Transformation):
-            transformation_list = parent_item._parent_component.transforms
+            transformation_list = parent_item.parent_component.transforms
             target_index = self.parent(node)
         return target_index, transformation_list
 
@@ -115,7 +113,7 @@ class ComponentTreeModel(QAbstractItemModel):
 
     def _remove_transformation(self, index: QModelIndex):
         remove_transform = index.internalPointer()
-        transformation_list = remove_transform.parent
+        transformation_list = remove_transform.parent_component.stored_transforms
         transformation_list_index = self.parent(index)
         remove_pos = transformation_list.index(remove_transform)
         component = transformation_list.parent_component
@@ -152,7 +150,7 @@ class ComponentTreeModel(QAbstractItemModel):
         self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
         for transform in transforms:
             transform.remove_from_dependee_chain()
-        self.model.entry.instrument.remove_component(component)
+        self.components.remove(component)
         self.endRemoveRows()
         self.model.signals.component_removed.emit(component.name)
 
@@ -189,8 +187,7 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_component, transformation_list, transformation_type
         )
 
-        new_transformation.parent = transformation_list
-        new_transformation._parent_component = parent_component
+        new_transformation.parent_component = parent_component
         self.beginInsertRows(target_index, target_pos, target_pos)
         transformation_list.insert(target_pos, new_transformation)
         self.endInsertRows()
@@ -243,6 +240,14 @@ class ComponentTreeModel(QAbstractItemModel):
         target_pos,
         transformation_list,
     ):
+        """
+        :param parent_component: component to add transformation to
+        :param parent_index: index of the parent_item
+        :param parent_item: the component, transformation list or transformation that was selected "add" button pressed
+        :param target_index: index of parent component of new transformation
+        :param target_pos: position for new transformation in transformation list
+        :param transformation_list: transformation list of parent_component
+        """
         if isinstance(parent_item, Component):
             if not hasattr(parent_item, "stored_transforms"):
                 parent_item.stored_transforms = parent_item.transforms
@@ -256,7 +261,7 @@ class ComponentTreeModel(QAbstractItemModel):
             target_pos = len(transformation_list)
             target_index = parent_index
         elif isinstance(parent_item, Transformation):
-            transformation_list = parent_item.parent
+            transformation_list = parent_item.parent_component.stored_transforms
             parent_component = transformation_list.parent_component
             target_pos = transformation_list.index(parent_item) + 1
             target_index = self.parent(parent_index)
@@ -316,7 +321,11 @@ class ComponentTreeModel(QAbstractItemModel):
             return self.createIndex(
                 self.components.index(parent_item.parent), 0, parent_item.parent
             )
-        elif isinstance(parent_item, (Transformation, LinkTransformation)):
+        elif isinstance(parent_item, Transformation):
+            return self.createIndex(
+                1, 0, parent_item.parent_component.stored_transforms
+            )
+        elif isinstance(parent_item, LinkTransformation):
             return self.createIndex(1, 0, parent_item.parent)
         raise RuntimeError("Unknown element type.")
 

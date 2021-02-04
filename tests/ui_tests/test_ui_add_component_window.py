@@ -65,9 +65,7 @@ PIXEL_GRID_FIELDS = [
 COMPONENT_CLASS_PATH = "nexus_constructor.add_component_window.Component"
 CHOPPER_GEOMETRY_CREATOR_PATH = "nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator.DiskChopperGeometryCreator.create_disk_chopper_geometry"
 
-entry = Entry()
-entry.instrument = Instrument(parent_node=entry)
-model = Model(entry)
+model = Model()
 component = ComponentTreeModel(model)
 
 PIXEL_OPTIONS = dict()
@@ -393,7 +391,7 @@ def get_new_component_from_dialog(dialog: AddComponentDialog, name: str) -> Comp
     :param name: The name of the component that is being searched for.
     :return: The component.
     """
-    for component in dialog.instrument.get_component_list():
+    for component in dialog.instrument.component_list:
         if component.name == name:
             return component
 
@@ -1776,9 +1774,7 @@ def create_group_with_component(component_name: str, file_name: str):
     """
     Convenience method, for when we don't really care about the component and just want one to be added to a file
     """
-    entry = Entry()
-    entry.instrument = Instrument()
-    model = Model(entry)
+    model = Model()
     treeview_model = ComponentTreeModel(model)
     component = Component(component_name)
     component.nx_class = "NXdisk_chopper"

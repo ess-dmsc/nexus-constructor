@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple, Optional
 
 from nexus_constructor.common_attrs import (
     CommonAttrs,
@@ -14,8 +14,19 @@ from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
     DEPENDS_ON_IGNORE,
 )
+from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.json.shape_reader import ShapeReader
-from nexus_constructor.json.transformation_reader import TransformationReader
+from nexus_constructor.json.transformation_reader import (
+    TransformationReader,
+    get_component_and_transform_name,
+)
+from nexus_constructor.json.json_warnings import (
+    InvalidJson,
+    TransformDependencyMissing,
+    JsonWarning,
+    NameFieldMissing,
+    NXClassAttributeMissing,
+)
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Entry
@@ -53,7 +64,8 @@ from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 """
-The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of valid NeXus files, but are safe if the JSON was created by the NeXus Constructor:
+The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of
+valid NeXus files, but are safe if the JSON was created by the NeXus Constructor:
 1. All transformations exist in NXtransformations groups inside components.
 2. All depends_on paths are absolute, not relative.
 """
@@ -185,7 +197,7 @@ def __create_ev42_stream(
 def __create_f142_stream(
     index_kb: str, index_mb: str, source: str, stream_object: Dict, topic: str
 ):
-    type = stream_object[CommonKeys.TYPE]
+    value_type = stream_object[CommonKeys.TYPE]
     value_units = stream_object[VALUE_UNITS] if VALUE_UNITS in stream_object else None
     array_size = stream_object[ARRAY_SIZE] if ARRAY_SIZE in stream_object else None
     store_latest_into = (
@@ -194,7 +206,7 @@ def __create_f142_stream(
     return F142Stream(
         source=source,
         topic=topic,
-        type=type,
+        type=value_type,
         value_units=value_units,
         array_size=array_size,
         nexus_indices_index_every_mb=index_mb,
@@ -207,32 +219,25 @@ class JSONReader:
     def __init__(self):
         self.entry = Entry()
         self.entry.instrument = Instrument()
-        self.warnings = []
-        # key: component name, value: NeXus path pointing to transformation that component depends on
-        self.depends_on_paths: Dict[str, str] = {}
-        # key: component name, value: Component object created from the JSON information
-        self.component_dictionary: Dict[str, Component] = {}
+        self.warnings: List[JsonWarning] = []
 
-    def _get_transformation_by_name(
-        self,
-        component: Component,
-        dependency_transformation_name: str,
-        dependent_component_name: str,
-    ) -> Transformation:
-        """
-        Finds a transformation in a component based on its name in order to set the depends_on value.
-        :param component: The component the dependency transformation belongs to.
-        :param dependency_transformation_name: The name of the dependency transformation.
-        :param dependent_component_name: The name of the dependent component.
-        :return: The transformation with the given name.
-        """
-        for transformation in component.transforms:
-            if transformation.name == dependency_transformation_name:
-                return transformation
-        self.warnings.append(
-            f"Unable to find transformation with name {dependency_transformation_name} in component {component.name} "
-            f"in order to set depends_on value for component {dependent_component_name}."
-        )
+        # key: TransformId for transform which has a depends on
+        # value: the Transformation object itself and the TransformId for the Transformation which it depends on
+        # Populated while loading the transformations so that depends_on property of each Transformation can be set
+        # to the appropriate Transformation after all the Transformations have been created, otherwise they would
+        # need to be created in a particular order
+        self._transforms_depends_on: Dict[
+            TransformId, Tuple[Transformation, Optional[TransformId]]
+        ] = {}
+
+        # key: name of the component (uniquely identifies Component)
+        # value: the Component object itself and the TransformId for the Transformation which it depends on
+        # Populated while loading the components so that depends_on property of each Component can be set to the
+        # appropriate Transformation after all the Transformations have been created, otherwise they would
+        # need to be created in a particular order
+        self._components_depends_on: Dict[
+            str, Tuple[Component, Optional[TransformId]]
+        ] = {}
 
     def load_model_from_json(self, filename: str) -> bool:
         """
@@ -248,43 +253,71 @@ class JSONReader:
                 json_dict = json.loads(json_data)
             except ValueError as exception:
                 self.warnings.append(
-                    f"Provided file not recognised as valid JSON. Exception: {exception}"
+                    InvalidJson(
+                        f"Provided file not recognised as valid JSON. Exception: {exception}"
+                    )
                 )
                 return False
 
-            children_list = _retrieve_children_list(json_dict)
+            return self._load_from_json_dict(json_dict)
 
-            if not children_list:
-                self.warnings.append("Provided file not recognised as valid Instrument")
-                return False
+    def _load_from_json_dict(self, json_dict: Dict) -> bool:
+        children_list = _retrieve_children_list(json_dict)
 
-            for child in children_list:
-                self._read_json_object(
-                    child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)
+        for child in children_list:
+            self._read_json_object(
+                child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)
+            )
+
+        self._set_transforms_depends_on()
+        self._set_components_depends_on()
+
+        return True
+
+    def _set_components_depends_on(self):
+        """
+        Once all transformations have been loaded we should be able to set each component's depends_on property without
+        worrying that the Transformation dependency has not been created yet
+        """
+        for (
+            component_name,
+            (component, depends_on_id,),
+        ) in self._components_depends_on.items():
+            try:
+                # If it has a dependency then find the corresponding Transformation and assign it to
+                # the depends_on property
+                if depends_on_id is not None:
+                    component.depends_on = self._transforms_depends_on[depends_on_id][0]
+            except KeyError:
+                self.warnings.append(
+                    TransformDependencyMissing(
+                        f"Component {component_name} depends on {depends_on_id.transform_name} in component "
+                        f"{depends_on_id.component_name}, but that transform was not successfully loaded from the JSON"
+                    )
                 )
 
-            for dependent_component_name in self.depends_on_paths.keys():
-                # The following extraction of the component name and transformation name makes the assumption
-                # that the transformation lives in a component and nowhere else in the file, this is safe assuming
-                # the JSON was created by the NeXus Constructor.
-                depends_on_path = self.depends_on_paths[dependent_component_name].split(
-                    "/"
-                )[3:]
-
-                dependency_component_name = depends_on_path[0]
-                dependency_transformation_name = depends_on_path[-1]
-
-                # Assuming this is always a transformation
-                self.component_dictionary[
-                    dependent_component_name
-                ].depends_on = self._get_transformation_by_name(
-                    self.component_dictionary[dependency_component_name],
-                    dependency_transformation_name,
-                    dependent_component_name,
+    def _set_transforms_depends_on(self):
+        """
+        Once all transformations have been loaded we should be able to set their depends_on property without
+        worrying that the Transformation dependency has not been created yet
+        """
+        for (
+            transform_id,
+            (transform, depends_on_id,),
+        ) in self._transforms_depends_on.items():
+            try:
+                # If it has a dependency then find the corresponding Transformation and assign it to
+                # the depends_on property
+                if depends_on_id is not None:
+                    transform.depends_on = self._transforms_depends_on[depends_on_id][0]
+            except KeyError:
+                self.warnings.append(
+                    TransformDependencyMissing(
+                        f"Transformation {transform_id.transform_name} in component {transform_id.component_name} "
+                        f"depends on {depends_on_id.transform_name} in component {depends_on_id.component_name}, "
+                        f"but that transform was not successfully loaded from the JSON"
+                    )
                 )
-                return True
-
-            return True
 
     def _read_json_object(self, json_object: Dict, parent_name: str = None):
         """
@@ -296,7 +329,9 @@ class JSONReader:
             name = json_object[CommonKeys.NAME]
         except KeyError:
             self.warnings.append(
-                f"Unable to find object name for child of {parent_name}."
+                NameFieldMissing(
+                    f"Unable to find object name for child of {parent_name}."
+                )
             )
             return
 
@@ -318,14 +353,16 @@ class JSONReader:
             component = self.entry.instrument.sample
             component.name = name
         else:
-            component = Component(name)
+            component = Component(name, parent_node=self.entry.instrument)
             component.nx_class = nx_class
-            self.entry.instrument.add_component(component)
+            self.entry.instrument.component_list.append(component)
 
         for item in children:
             _add_field_to_group(item, component)
 
-        transformation_reader = TransformationReader(component, children)
+        transformation_reader = TransformationReader(
+            component, children, self._transforms_depends_on
+        )
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
 
@@ -334,9 +371,12 @@ class JSONReader:
         )
 
         if depends_on_path not in DEPENDS_ON_IGNORE:
-            self.depends_on_paths[name] = depends_on_path
-
-        self.component_dictionary[name] = component
+            depends_on_id = TransformId(
+                *get_component_and_transform_name(depends_on_path)
+            )
+            self._components_depends_on[name] = (component, depends_on_id)
+        else:
+            self._components_depends_on[name] = (component, None)
 
         shape_info = _find_shape_information(children)
         if shape_info:
@@ -354,12 +394,16 @@ class JSONReader:
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
         Validates the NXclass by checking if it was found, and if it matches known NXclasses for components.
-        :param name: TThe name of the component having its nx class validated.
+        :param name: The name of the component having its nx class validated.
         :param nx_class: The NXclass string obtained from the dictionary.
         :return: True if the NXclass is valid, False otherwise.
         """
         if not nx_class:
-            self.warnings.append(f"Unable to determine NXclass of component {name}.")
+            self.warnings.append(
+                NXClassAttributeMissing(
+                    f"Unable to determine NXclass of component {name}."
+                )
+            )
             return False
 
         if nx_class not in COMPONENT_TYPES:
@@ -389,13 +433,15 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
         size = json_object[NodeType.DATASET][CommonKeys.SIZE]
     except KeyError:
         size = 1
-    type = json_object[NodeType.DATASET][CommonKeys.TYPE]
+    value_type = json_object[NodeType.DATASET][CommonKeys.TYPE]
     name = json_object[CommonKeys.NAME]
     values = json_object[CommonKeys.VALUES]
     if isinstance(values, list):
         # convert to a numpy array using specified type
-        values = np.array(values, dtype=VALUE_TYPE_TO_NP[type])
-    ds = Dataset(name=name, values=values, type=type, size=size, parent_node=parent)
+        values = np.array(values, dtype=VALUE_TYPE_TO_NP[value_type])
+    ds = Dataset(
+        name=name, values=values, type=value_type, size=size, parent_node=parent
+    )
     _add_attributes(json_object, ds)
     return ds
 

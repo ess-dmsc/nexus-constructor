@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Union, Dict, Tuple, Optional
 
 from PySide2.QtGui import QVector3D
 
@@ -10,12 +10,14 @@ from nexus_constructor.common_attrs import (
 )
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
     _find_nx_class,
     DEPENDS_ON_IGNORE,
 )
+from nexus_constructor.json.transform_id import TransformId
 
 TRANSFORMATION_MAP = {
     "translation": TransformationType.TRANSLATION,
@@ -48,17 +50,38 @@ def _create_transformation_dataset(
     return Dataset(name, size=[1], type=dtype, values=angle_or_magnitude,)
 
 
+def get_component_and_transform_name(depends_on_string: str):
+    # The following extraction of the component name and transformation name makes the assumption
+    # that the transformation lives in a component and nowhere else in the file, this is safe assuming
+    # the JSON was created by the NeXus Constructor
+    depends_on_path = depends_on_string.split("/")
+    dependency_component_name = depends_on_path[-3]
+    # [-2] is the NXtransformations group (which we don't need)
+    dependency_transformation_name = depends_on_path[-1]
+    return dependency_component_name, dependency_transformation_name
+
+
 class TransformationReader:
-    def __init__(self, parent_component: Component, children: list):
+    def __init__(
+        self,
+        parent_component: Component,
+        children: list,
+        transforms_with_dependencies: Dict[
+            TransformId, Tuple[Transformation, Optional[TransformId]]
+        ],
+    ):
         """
-        Reads transformations from a JSON dictionary.
-        :param parent_component: The parent component that the transformations should be added to.
-        :param children: The children of the component entry.
+        Reads transformations from a JSON dictionary
+        :param parent_component: The parent component that the transformations should be added to
+        :param children: The children of the component entry
+        :param transforms_with_dependencies: TransformationReader appends transforms and depends_on details to
+         this dictionary so that depends_on can be set to the correct Transformation object after all
+         transformations have been loaded
         """
         self.parent_component = parent_component
         self.children = children
         self.warnings = []
-        self.depends_on_paths = dict()
+        self._transforms_with_dependencies = transforms_with_dependencies
 
     def add_transformations_to_component(self):
         """
@@ -190,8 +213,6 @@ class TransformationReader:
             if not dtype:
                 continue
 
-            # todo construct dataset here using other helper methods
-
             attributes = self._get_transformation_attribute(
                 CommonKeys.ATTRIBUTES, json_transformation, name
             )
@@ -217,9 +238,14 @@ class TransformationReader:
                 CommonAttrs.VECTOR, name, attributes, [0.0, 0.0, 0.0]
             )
 
-            depends_on = self._find_attribute_in_list(
-                CommonAttrs.DEPENDS_ON, name, attributes
+            # This attribute is allowed to be missing, missing is equivalent to the value "." which means
+            # depends on origin (end of dependency chain)
+            depends_on = _find_attribute_from_list_or_dict(
+                CommonAttrs.DEPENDS_ON, attributes
             )
+
+            # TODO handle cases that "values" is an NXlog, KafkaStream etc
+            #  ticket #835
 
             temp_depends_on = None
             angle_or_magnitude = values
@@ -236,5 +262,13 @@ class TransformationReader:
             )
 
             if depends_on not in DEPENDS_ON_IGNORE:
-                self.depends_on_paths[name] = depends_on
-                transform.depends_on = depends_on
+                depends_on_id = TransformId(
+                    *get_component_and_transform_name(depends_on)
+                )
+                self._transforms_with_dependencies[
+                    TransformId(self.parent_component.name, name)
+                ] = (transform, depends_on_id)
+            else:
+                self._transforms_with_dependencies[
+                    TransformId(self.parent_component.name, name)
+                ] = (transform, None)

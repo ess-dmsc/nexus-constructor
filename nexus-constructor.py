@@ -10,7 +10,6 @@ from PySide2 import QtCore
 
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.main_window import MainWindow
-from nexus_constructor.model.entry import Instrument, Entry
 from nexus_constructor.model.model import Model
 import os
 import argparse
@@ -32,10 +31,7 @@ if __name__ == "__main__":
     window = QMainWindow()
     definitions_dir = os.path.abspath(os.path.join(root_dir, "definitions"))
     _, nx_component_classes = make_dictionary_of_class_definitions(definitions_dir)
-    instrument = Instrument()
-    entry = Entry()
-    entry.instrument = instrument
-    model = Model(entry)
+    model = Model()
     ui = MainWindow(model, nx_component_classes)
     ui.setupUi(window)
     window.showMaximized()

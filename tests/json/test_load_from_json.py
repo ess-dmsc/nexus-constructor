@@ -15,6 +15,11 @@ from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.value_type import ValueTypes, VALUE_TYPE_TO_NP
 import numpy as np
+from nexus_constructor.json.json_warnings import (
+    TransformDependencyMissing,
+    JsonWarning,
+)
+from typing import List, Type
 
 
 @pytest.fixture(scope="function")
@@ -109,26 +114,9 @@ def json_dict_with_component():
                       "name":"NX_class",
                       "type":"String",
                       "values":"NXaperture"
-                    },
-                    {
-                      "name":"has_link",
-                      "type":"String",
-                      "values":false
                     }
                   ],
                   "children":[
-                    {
-                      "name":"description",
-                      "type":"dataset",
-                      "attributes":[
-    
-                      ],
-                      "dataset":{
-                        "type":"string",
-                        "size":"1"
-                      },
-                      "values": "test_description"
-                    },
                     {
                       "type":"group",
                       "name":"transformations",
@@ -157,6 +145,120 @@ def json_dict_with_component():
                   "children":[
     
                   ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    """
+    return json.loads(json_string)
+
+
+@pytest.fixture(scope="function")
+def json_dict_with_component_and_transform():
+    json_string = """
+    {
+      "children":[
+        {
+          "name":"entry",
+          "type":"group",
+          "attributes":[
+            {
+              "name":"NX_class",
+              "type":"String",
+              "values":"NXentry"
+            }
+          ],
+          "children":[
+            {
+              "name":"instrument",
+              "type":"group",
+              "attributes":[
+                {
+                  "name":"NX_class",
+                  "type":"String",
+                  "values":"NXinstrument"
+                }
+              ],
+              "children":[
+                {
+                  "name":"test_component",
+                  "type":"group",
+                  "attributes":[
+                    {
+                      "name":"NX_class",
+                      "type":"String",
+                      "values":"NXaperture"
+                    }
+                  ],
+                  "children":[
+                    {
+                      "name":"depends_on",
+                      "type":"dataset",
+                      "attributes":[],
+                      "dataset":{
+                        "type":"string",
+                        "size":"1"
+                      },
+                      "values": "/entry/instrument/test_component/transformations/location"
+                    },
+                    {
+                      "type":"group",
+                      "name":"transformations",
+                      "children":[
+                        {
+                          "type":"dataset",
+                          "name":"location",
+                          "dataset":{
+                            "type":"double"
+                          },
+                          "values":1.0,
+                          "attributes":[
+                            {
+                              "name":"units",
+                              "values":"m"
+                            },
+                            {
+                              "name":"transformation_type",
+                              "values":"translation"
+                            },
+                            {
+                              "name":"vector",
+                              "values":[
+                                0.0,
+                                0.0,
+                                0.0
+                              ],
+                              "type":"double"
+                            },
+                            {
+                              "name":"depends_on",
+                              "values":"."
+                            }
+                          ]
+                        }
+                      ],
+                      "attributes":[
+                        {
+                          "name":"NX_class",
+                          "values":"NXtransformations"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name":"sample",
+              "type":"group",
+              "attributes":[
+                {
+                  "name":"NX_class",
+                  "type":"String",
+                  "values":"NXsample"
                 }
               ]
             }
@@ -311,48 +413,73 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     assert json_reader.entry.instrument.component_list[1].nx_class == component_class
 
 
-def test_GIVEN_transformation_with_matching_name_WHEN_finding_transformation_by_name_THEN_transformation_is_returned(
-    json_reader, component_with_transformation
+def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_component_in_model_contains_transform(
+    json_dict_with_component_and_transform, json_reader
 ):
-    transformation = component_with_transformation.transforms[0]
-    assert transformation == json_reader._get_transformation_by_name(
-        component_with_transformation, transformation.name, "DependentComponentName"
-    )
+    json_reader._load_from_json_dict(json_dict_with_component_and_transform)
+    component_found = False
+    for component in json_reader.entry.instrument.component_list:
+        if component.name == "test_component":
+            component_found = True
+            assert len(component.transforms) == 1
+            assert component.transforms[0].name == "location"
+    assert component_found
 
 
-def test_GIVEN_no_transformation_with_matching_name_WHEN_finding_transformation_by_name_THEN_warning_message_is_created(
-    json_reader, component_with_transformation
+def contains_warning_of_type(
+    json_warnings: List[JsonWarning], warning_type: Type[JsonWarning]
+) -> bool:
+    return any(isinstance(json_warning, warning_type) for json_warning in json_warnings)
+
+
+def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
+    json_dict_with_component, json_reader
 ):
-    n_warnings = len(json_reader.warnings)
+    depends_on_dataset_str = """
+    {
+      "name":"depends_on",
+      "type":"dataset",
+      "attributes":[],
+      "dataset":{
+        "type":"string",
+        "size":"1"
+      },
+      "values": "/entry/instrument/test_component/transformations/location"
+    }
+    """
+    depends_on_dataset = json.loads(depends_on_dataset_str)
 
-    transformation_name = component_with_transformation.transforms[0].name
-    dependent_component_name = "DependentComponentName"
+    # Add depends_on dataset which points to a transformation which does not exist in the JSON
+    json_dict_with_component["children"][0]["children"][0]["children"][0][
+        "children"
+    ].append(depends_on_dataset)
+    json_reader._load_from_json_dict(json_dict_with_component)
 
-    component_with_transformation.remove_transformation(
-        component_with_transformation.transforms[0]
-    )
-    assert (
-        json_reader._get_transformation_by_name(
-            component_with_transformation, transformation_name, dependent_component_name
-        )
-        is None
-    )
-    assert len(json_reader.warnings) == n_warnings + 1
-    assert all(
-        [
-            expected_text in json_reader.warnings[-1]
-            for expected_text in [
-                component_with_transformation.name,
-                transformation_name,
-                dependent_component_name,
-            ]
-        ]
-    )
+    assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
+
+
+def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
+    json_dict_with_component_and_transform, json_reader
+):
+    # Makes depends_on attribute of transformation point to a transformation which does not exist
+    for node in json_dict_with_component_and_transform["children"][0]["children"][0][
+        "children"
+    ][0]["children"]:
+        if node["name"] == "transformations":
+            for attribute in node["children"][0]["attributes"]:
+                if attribute["name"] == "depends_on":
+                    attribute["values"] = "/transform/does/not/exist"
+
+    json_reader._load_from_json_dict(json_dict_with_component_and_transform)
+
+    assert contains_warning_of_type(
+        json_reader.warnings, TransformDependencyMissing
+    ), "Expected a warning due to depends_on pointing to a non-existent transform"
 
 
 @pytest.mark.parametrize(
     "test_input",
-    ({}, {"type": "dataset", "values": 0,}, {"attributes": []}),  # noqa E231
+    ({}, {"type": "dataset", "values": 0,}, {"attributes": []},),  # noqa E231
 )
 def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing(
     test_input,

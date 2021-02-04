@@ -161,7 +161,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             success = reader.load_model_from_json(filename)
             if reader.warnings:
                 show_warning_dialog(
-                    "\n".join(reader.warnings),
+                    "\n".join(
+                        (json_warning.message for json_warning in reader.warnings)
+                    ),
                     "Warnings encountered loading JSON",
                     parent=self,
                 )
@@ -171,7 +173,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
-        for component in self.model.entry.instrument.get_component_list():
+        for component in self.model.entry.instrument.component_list:
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def _update_views(self):
@@ -181,7 +183,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
-        for component in self.model.entry.instrument.get_component_list():
+        for component in self.model.entry.instrument.component_list:
             shape, positions = component.shape
             self.sceneWidget.add_component(component.name, shape, positions)
             self.sceneWidget.add_transformation(component.name, component.qtransform)

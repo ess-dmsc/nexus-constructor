@@ -11,6 +11,9 @@ from nexus_constructor.json.transformation_reader import (
     _create_transformation_dataset,
 )
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.json.transform_id import TransformId
+from typing import Dict, Tuple
 
 
 @pytest.fixture(scope="function")
@@ -68,19 +71,32 @@ def attributes_list(transformation_json):
     return transformation_json["children"][0]["attributes"]
 
 
+PARENT_COMPONENT_NAME = "ParentComponentName"
+
+
 @pytest.fixture(scope="function")
 def transformation_reader(transformation_json):
     parent_component = Mock(spec=Component)
-    parent_component.name = "ParentComponentName"
+    parent_component.name = PARENT_COMPONENT_NAME
     entry = [transformation_json]
-    return TransformationReader(parent_component, entry)
+    transforms_with_dependencies: Dict[
+        TransformId, Tuple[Transformation, TransformId]
+    ] = {}
+    return TransformationReader(parent_component, entry, transforms_with_dependencies)
 
 
-def test_GIVEN_transformation_in_attributes_WHEN_checking_for_transformation_THEN_contains_transformations_returns_true(
+def test_GIVEN_nxtransformation_in_attributes_WHEN_checking_for_transformations_THEN_contains_transformations_returns_true(
     transformation_json,
 ):
     transformation_json["attributes"][0]["values"] = "NXtransformations"
     assert _is_transformation_group(transformation_json)
+
+
+def test_GIVEN_no_nxtransformation_in_attributes_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
+    transformation_json,
+):
+    transformation_json["attributes"][0]["values"] = "NXsomething"
+    assert not _is_transformation_group(transformation_json)
 
 
 def test_GIVEN_no_transformation_class_in_attributes_WHEN_checking_for_transformations_THEN_contains_transformations_returns_false(
@@ -330,26 +346,42 @@ def test_GIVEN_invalid_transformation_type_WHEN_attempting_to_create_transformat
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
-def test_GIVEN_transformation_has_depends_on_chain_WHEN_getting_depends_on_value_THEN_path_string_is_stored_in_dictionary(
+def test_GIVEN_transformation_has_depends_on_WHEN_creating_transformations_THEN_details_are_stored_in_dictionary(
     transformation_reader, transformation_json
 ):
-    depends_on_path = "entry/instrument/component/transformations/transformation1"
+    depends_on_component_name = "test_component"
+    depends_on_transform_name = "transformation1"
+    depends_on_path = f"entry/instrument/{depends_on_component_name}/transformations/{depends_on_transform_name}"
     transformation_json["children"][0][
         "name"
     ] = transformation_name = "TransformationName"
     transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
     transformation_reader._create_transformations(transformation_json["children"])
 
-    assert (
-        transformation_reader.depends_on_paths[transformation_name] == depends_on_path
-    )
+    assert transformation_reader._transforms_with_dependencies[
+        TransformId(PARENT_COMPONENT_NAME, transformation_name)
+    ][1] == TransformId(
+        depends_on_component_name, depends_on_transform_name
+    ), "Expected to find details of dependency stored in dictionary"
 
 
 @pytest.mark.parametrize("depends_on_path", [".", None])
-def test_GIVEN_transformation_has_no_depends_on_chain_WHEN_getting_depends_on_value_THEN_path_string_isnt_stored_in_dictionary(
+def test_GIVEN_transformation_has_no_depends_on_WHEN_creating_transformations_THEN_details_arent_stored_in_dictionary(
     transformation_reader, transformation_json, depends_on_path
 ):
+    # Having no depends_on string attribute, or it being ".", are both valid and mean it is the
+    # last transformation in the depends_on chain
     transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
     transformation_reader._create_transformations(transformation_json["children"])
 
-    assert len(transformation_reader.depends_on_paths) == 0
+    assert (
+        transformation_reader._transforms_with_dependencies[
+            TransformId(
+                PARENT_COMPONENT_NAME, transformation_json["children"][0]["name"]
+            )
+        ][1]
+        is None
+    ), (
+        "Expected transformation to be added to dictionary but there to be no details"
+        "for a transformation dependency"
+    )

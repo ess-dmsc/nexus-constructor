@@ -14,11 +14,10 @@ def test_instrument_as_dict_does_not_contain_sample():
 
 def test_instrument_as_dict_contains_components():
     test_instrument = Instrument()
-    component_list = test_instrument.get_component_list()
     zeroth_test_component_name = "Component_A"
     first_test_component_name = "Component_B"
-    component_list.append(Component(zeroth_test_component_name, []))
-    component_list.append(Component(first_test_component_name, []))
+    test_instrument.component_list.append(Component(zeroth_test_component_name, []))
+    test_instrument.component_list.append(Component(first_test_component_name, []))
     dictionary_output = test_instrument.as_dict()
 
     child_names = [child["name"] for child in dictionary_output["children"]]

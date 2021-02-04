@@ -1,7 +1,5 @@
 from nexus_constructor.create_forwarder_config import create_forwarder_config
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.entry import Entry
-from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.stream import F142Stream, StreamGroup, EV42Stream
 from streaming_data_types.forwarder_config_update_rf5k import (
@@ -14,12 +12,9 @@ from streaming_data_types.fbschemas.forwarder_config_update_rf5k.UpdateType impo
 
 
 def test_create_forwarder_config_is_add_request():
-    instrument = Instrument()
-    entry = Entry()
-    entry.instrument = instrument
-    model = Model(entry)
-    component = Component("test_component", parent_node=instrument)
-    instrument.add_component(component)
+    model = Model()
+    component = Component("test_component", parent_node=model.entry.instrument)
+    model.entry.instrument.component_list.append(component)
     stream_group = StreamGroup("test_stream_group")
     stream_group["test_stream"] = F142Stream("test_topic", "test_source", "double")
     component["test_stream_field"] = stream_group
@@ -30,12 +25,9 @@ def test_create_forwarder_config_is_add_request():
 
 
 def test_create_forwarder_config_serialises_streams_from_component_fields():
-    instrument = Instrument()
-    entry = Entry()
-    entry.instrument = instrument
-    model = Model(entry)
-    component = Component("test_component", parent_node=instrument)
-    instrument.add_component(component)
+    model = Model()
+    component = Component("test_component", parent_node=model.entry.instrument)
+    model.entry.instrument.component_list.append(component)
 
     stream_group_1 = StreamGroup("test_stream_group")
     test_stream_1 = F142Stream("test_topic", "test_source", "double")
