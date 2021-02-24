@@ -41,9 +41,7 @@ from nexus_constructor.unit_utils import (
 )
 
 
-def _convert_vertices_to_qvector3d(
-    vertices: List[List[float]],
-) -> List[QVector3D]:
+def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
     """
     Converts a list of vertices to QVector3D
     :param vertices: The list of vertices.
