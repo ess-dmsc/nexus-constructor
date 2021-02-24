@@ -220,7 +220,7 @@ class ShapeReader:
             return
 
         vertices_dtype = self._find_and_validate_data_type(
-            vertices_dataset, INT_TYPES, CommonAttrs.VERTICES
+            vertices_dataset, FLOAT_TYPES, CommonAttrs.VERTICES
         )
         vertices = self._find_and_validate_values_list(
             vertices_dataset, FLOAT_TYPES, CommonAttrs.VERTICES
