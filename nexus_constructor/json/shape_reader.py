@@ -41,7 +41,9 @@ from nexus_constructor.unit_utils import (
 )
 
 
-def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
+def _convert_vertices_to_qvector3d(
+    vertices: List[List[float]],
+) -> List[QVector3D]:
     """
     Converts a list of vertices to QVector3D
     :param vertices: The list of vertices.
@@ -220,7 +222,7 @@ class ShapeReader:
             return
 
         vertices_dtype = self._find_and_validate_data_type(
-            vertices_dataset, FLOAT_TYPES, CommonAttrs.VERTICES
+            vertices_dataset, INT_TYPES, CommonAttrs.VERTICES
         )
         vertices = self._find_and_validate_values_list(
             vertices_dataset, FLOAT_TYPES, CommonAttrs.VERTICES
