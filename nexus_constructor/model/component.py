@@ -343,7 +343,7 @@ class Component(Group):
         vertices = CylindricalGeometry.calculate_vertices(
             axis_direction, height, radius
         )
-        geometry.set_field_value(CommonAttrs.VERTICES, vertices, ValueTypes.INT)
+        geometry.set_field_value(CommonAttrs.VERTICES, vertices, ValueTypes.FLOAT)
 
         # # Specify 0th vertex is base centre, 1st is base edge, 2nd is top centre
         geometry.set_field_value(CYLINDERS, np.array([0, 1, 2]), ValueTypes.INT)
