@@ -2,7 +2,7 @@ import uuid
 from typing import Dict
 import json
 
-from PySide2.QtCore import QSettings
+from PySide2.QtCore import QSettings, Qt
 from PySide2.QtWidgets import (
     QMainWindow,
     QApplication,
@@ -46,7 +46,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.export_to_forwarder_config_action.triggered.connect(
             self.save_to_forwarder_config
         )
-
+        self.show_action_labels.triggered.connect(
+            lambda: self.on_show_action_labels(self.show_action_labels.isChecked())
+        )
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
 
@@ -80,6 +82,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             )
         except ImportError:
             pass
+
+    def on_show_action_labels(self, value):
+        self.component_tree_view_tab.component_tool_bar.setToolButtonStyle(
+            Qt.ToolButtonTextUnderIcon if value else Qt.ToolButtonIconOnly
+        )
 
     def show_control_file_writer_window(self):
         if self.file_writer_control_window is None:
