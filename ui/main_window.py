@@ -75,7 +75,13 @@ class Ui_MainWindow(object):
         self.file_menu.addAction(self.open_json_file_action)
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
         self.file_menu.addAction(self.export_to_forwarder_config_action)
+
+        self.view_menu = QMenu(self.menu_bar)
+        self.show_action_labels = QAction(MainWindow, checkable=True)
+        self.view_menu.addAction(self.show_action_labels)
+
         self.menu_bar.addAction(self.file_menu.menuAction())
+        self.menu_bar.addAction(self.view_menu.menuAction())
         self._set_up_titles(MainWindow)
 
     def _set_up_titles(self, MainWindow):
@@ -94,3 +100,5 @@ class Ui_MainWindow(object):
         self.export_to_nexus_file_action.setText("Export to NeXus file")
         self.export_to_filewriter_JSON_action.setText("Export to Filewriter JSON")
         self.export_to_forwarder_config_action.setText("Export to Forwarder FlatBuffer")
+        self.view_menu.setTitle("View")
+        self.show_action_labels.setText("Show Button Labels")

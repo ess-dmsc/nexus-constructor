@@ -84,7 +84,7 @@ class ComponentTreeViewTab(QWidget):
         )
         self.zoom_action = create_and_add_toolbar_action(
             "zoom.svg",
-            "Zoom To Component",
+            "Zoom Component",
             self.on_zoom_item,
             self.component_tool_bar,
             self,
