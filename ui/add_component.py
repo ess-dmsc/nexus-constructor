@@ -230,7 +230,9 @@ class Ui_AddComponentDialog(object):
 
         self.retranslateUi(AddComponentDialog)
         QtCore.QObject.connect(
-            self.ok_button, QtCore.SIGNAL("clicked()"), AddComponentDialog.close
+            self.ok_button,
+            QtCore.SIGNAL("clicked()"),
+            AddComponentDialog.close_without_msgbox,
         )
         QtCore.QMetaObject.connectSlotsByName(AddComponentDialog)
 

@@ -189,7 +189,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def show_add_component_window(self, component: Component = None):
-        self.add_component_window = QDialog()
+        self.add_component_window = QDialogCustom()
         self.add_component_window.ui = AddComponentDialog(
             self.model,
             self.component_tree_view_tab.component_model,
@@ -197,5 +197,36 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             nx_classes=self.nx_classes,
             parent=self,
         )
-        self.add_component_window.ui.setupUi(self.add_component_window)
+        self.add_component_window.ui.setupUi(
+            self.add_component_window
+        )  # Make necessary changes here.
         self.add_component_window.show()
+
+
+class QDialogCustom(QDialog):
+    def __init__(self):
+        super().__init__()
+        self._is_accepting_component = True
+
+    def enable_msg_box(self):
+        self._is_accepting_component = True
+
+    def disable_msg_box(self):
+        self._is_accepting_component = False
+
+    def close_without_msgbox(self):
+        self.disable_msg_box()
+        self.close()
+
+    def closeEvent(self, event):
+        if not self._is_accepting_component:
+            event.accept()
+            return
+        quit_msg = "Are you sure you want to exit the component editor?"
+        reply = QMessageBox.question(
+            self, "Message", quit_msg, QMessageBox.Yes, QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
