@@ -202,6 +202,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
 
 class QDialogCustom(QDialog):
+    """
+    Custom QDialog class that enables the possibility to properly produce
+    a message box in the component editor to the users,
+    asking if they are sure to quit editing component when exiting.
+    """
+
     def __init__(self):
         super().__init__()
         self._is_accepting_component = True
@@ -213,6 +219,9 @@ class QDialogCustom(QDialog):
         self._is_accepting_component = False
 
     def close_without_msgbox(self):
+        """
+        Close widget without producing the message box in closeEvent method.
+        """
         self.disable_msg_box()
         self.close()
 
