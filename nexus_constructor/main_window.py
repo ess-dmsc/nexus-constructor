@@ -197,9 +197,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             nx_classes=self.nx_classes,
             parent=self,
         )
-        self.add_component_window.ui.setupUi(
-            self.add_component_window
-        )  # Make necessary changes here.
+        self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
 
 
