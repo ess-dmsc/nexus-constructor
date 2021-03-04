@@ -6,7 +6,7 @@ import pytest
 import pytestqt
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QDialog, QRadioButton, QMainWindow
+from PySide2.QtWidgets import QRadioButton, QMainWindow
 from mock import Mock, call, patch, mock_open
 from pytestqt.qtbot import QtBot
 import numpy as np
@@ -25,7 +25,10 @@ from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
-from nexus_constructor.main_window import MainWindow
+from nexus_constructor.main_window import (
+    MainWindow,
+    QDialogCustom as QDialog,
+)
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup, F142Stream
 from nexus_constructor.geometry.pixel_data import PixelGrid, PixelMapping, PixelData
