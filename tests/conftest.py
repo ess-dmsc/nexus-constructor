@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 import pytest
-from nexus_constructor.main_window import QDialogCustom as QDialog
 
+from nexus_constructor.main_window import QDialogCustom as QDialog
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
 from nexus_constructor.pixel_options import PixelOptions

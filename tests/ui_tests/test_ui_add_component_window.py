@@ -197,7 +197,7 @@ def mock_component():
 
 def enter_component_name(
     qtbot: pytestqt.qtbot.QtBot,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     dialog: AddComponentDialog,
     component_name: str,
 ):
@@ -243,7 +243,7 @@ def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
 def make_pixel_options_disappear(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     component_index: int,
 ):
     """
@@ -262,7 +262,7 @@ def make_pixel_options_appear(
     qtbot: pytestqt.qtbot.QtBot,
     button: QRadioButton,
     dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     pixel_options_index: int = PIXEL_OPTIONS["NXdetector"],
 ):
     """
@@ -298,7 +298,7 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
 def enter_file_path(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     file_path: str,
     file_contents: str,
 ):
@@ -321,7 +321,7 @@ def enter_file_path(
 def enter_disk_chopper_fields(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     component_name: str = "ThisIsADiskChopper",
 ):
     """
