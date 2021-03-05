@@ -30,7 +30,6 @@ class Ui_MainWindow(object):
         self.tab_widget = QTabWidget(self.central_widget)
         self.tab_widget.setMinimumSize(QSize(500, 0))
         self._set_up_component_tree_view()
-        self._set_up_silx_view()
         self.splitter.addWidget(self.tab_widget)
 
         self._set_up_3d_view()
@@ -46,11 +45,6 @@ class Ui_MainWindow(object):
     def _set_up_3d_view(self):
         self.sceneWidget.setMinimumSize(QSize(600, 0))
         self.splitter.addWidget(self.sceneWidget)
-
-    def _set_up_silx_view(self):
-        self.silx_tab = QWidget()
-        self.silx_tab_layout = QGridLayout(self.silx_tab)
-        # self.tab_widget.addTab(self.silx_tab, "") Disabled while changing model
 
     def _set_up_component_tree_view(self):
         self.sceneWidget = InstrumentView(self.splitter)
@@ -88,9 +82,6 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle("NeXus Constructor")
         self.tab_widget.setTabText(
             self.tab_widget.indexOf(self.component_tree_view_tab), "Components"
-        )
-        self.tab_widget.setTabText(
-            self.tab_widget.indexOf(self.silx_tab), "NeXus File Layout"
         )
         self.file_menu.setTitle("File")
         self.open_nexus_file_action.setText("Open NeXus file")

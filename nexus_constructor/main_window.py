@@ -52,13 +52,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
 
-        # self.treemodel = self.widget.findHdf5TreeModel()
-        # self.treemodel.setDatasetDragEnabled(True)
-        # self.treemodel.setFileDropEnabled(True)
-        # self.treemodel.setFileMoveEnabled(True)
-        # self.treemodel.insertH5pyObject(self.model.signals.nexus_file)
-        self.model.signals.file_changed.connect(self.update_nexus_file_structure_view)
-
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
         self.model.signals.component_removed.connect(self.sceneWidget.delete_component)
         self.component_tree_view_tab.set_up_model(self.model)
@@ -102,10 +95,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             0
         ].internalPointer()
         self.show_add_component_window(selected_component)
-
-    def update_nexus_file_structure_view(self, nexus_file):
-        self.treemodel.clear()
-        self.treemodel.insertH5pyObject(nexus_file)
 
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
