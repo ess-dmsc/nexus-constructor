@@ -1,5 +1,5 @@
-from nexus_constructor.model.instrument import Instrument, SAMPLE_NAME
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.instrument import SAMPLE_NAME, Instrument
 
 
 def test_instrument_as_dict_does_not_contain_sample():

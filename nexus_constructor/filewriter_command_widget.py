@@ -1,22 +1,22 @@
 from functools import partial
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 from PySide2.QtCore import QDateTime, Qt
 from PySide2.QtWidgets import (
-    QFormLayout,
-    QDateTimeEdit,
-    QLineEdit,
     QCheckBox,
+    QDateTimeEdit,
+    QFormLayout,
+    QLineEdit,
     QPushButton,
     QWidget,
 )
 
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
-    CommandDialogFileNameValidator,
     HDF_FILE_EXTENSIONS,
-    NameValidator,
+    CommandDialogFileNameValidator,
     CommandDialogOKValidator,
+    NameValidator,
 )
 
 TIME_FORMAT = "yyyy MM dd hh:mm:ss"

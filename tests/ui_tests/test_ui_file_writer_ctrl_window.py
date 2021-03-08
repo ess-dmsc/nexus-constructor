@@ -1,18 +1,19 @@
 import pytest
 
 pytest.skip("Disabled whilst working on model change", allow_module_level=True)
+from mock import Mock
 from PySide2.QtCore import QSettings
 from PySide2.QtGui import QStandardItemModel
-from mock import Mock
 from streaming_data_types import run_start_pl72
-from nexus_constructor.validators import BrokerAndTopicValidator
+
 from nexus_constructor.file_writer_ctrl_window import (
+    File,
+    FileWriter,
     FileWriterCtrl,
     FileWriterSettings,
     extract_bool_from_qsettings,
-    File,
-    FileWriter,
 )
+from nexus_constructor.validators import BrokerAndTopicValidator
 
 
 @pytest.fixture()

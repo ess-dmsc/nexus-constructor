@@ -1,17 +1,19 @@
 from typing import Any
-from PySide2.QtGui import QVector3D
+
+import numpy as np
+import pytest
 from mock import Mock
+from PySide2.QtGui import QVector3D
+from pytestqt.qtbot import QtBot  # noqa: F401
+
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.link import Link
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import StreamGroup, EV42Stream
+from nexus_constructor.model.stream import EV42Stream, StreamGroup
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
-import numpy as np
-from pytestqt.qtbot import QtBot  # noqa: F401
-import pytest
 
 
 @pytest.fixture

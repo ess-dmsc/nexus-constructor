@@ -1,17 +1,18 @@
+from typing import Any, List, Optional, Tuple
+
+import pytest
+from PySide2.QtCore import QModelIndex, Qt
+from PySide2.QtGui import QVector3D
+
 from nexus_constructor.component_tree_model import (
-    ComponentTreeModel,
     ComponentInfo,
+    ComponentTreeModel,
     LinkTransformation,
 )
-from nexus_constructor.model.model import Model
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Instrument
-import pytest
-from PySide2.QtCore import QModelIndex, Qt
-from typing import Any, Optional, List, Tuple
-from PySide2.QtGui import QVector3D
-
+from nexus_constructor.model.model import Model
 from nexus_constructor.model.value_type import ValueTypes
 
 

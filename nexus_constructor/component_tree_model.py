@@ -5,14 +5,14 @@ from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
+from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.link_transformation import LinkTransformation
-from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.ui_utils import generate_unique_name
 
 

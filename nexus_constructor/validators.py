@@ -2,21 +2,22 @@ import os
 import re
 from enum import Enum
 from typing import List
+
 import numpy as np
 import pint
-from PySide2.QtCore import Signal, QObject
-from PySide2.QtGui import QValidator, QIntValidator
-from PySide2.QtWidgets import QComboBox, QWidget, QRadioButton
 from nexusutils.readwriteoff import parse_off_file
+from PySide2.QtCore import QObject, Signal
+from PySide2.QtGui import QIntValidator, QValidator
+from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget
 from stl import mesh
 
 from nexus_constructor.common_attrs import SCALAR
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.unit_utils import (
-    units_are_recognised_by_pint,
     units_are_expected_dimensionality,
+    units_are_recognised_by_pint,
     units_have_magnitude_of_one,
 )
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 

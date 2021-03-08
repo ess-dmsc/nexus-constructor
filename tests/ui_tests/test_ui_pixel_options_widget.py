@@ -1,40 +1,40 @@
 from io import StringIO
 from unittest.mock import mock_open
 
-import pytest
 import numpy as np
-from PySide2.QtCore import Qt
+import pytest
 from mock import patch
+from PySide2.QtCore import Qt
 
-from nexus_constructor.model.component import Component
-from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.geometry.pixel_data import (
-    PixelGrid,
     Corner,
     CountDirection,
+    PixelGrid,
     PixelMapping,
 )
 from nexus_constructor.geometry.pixel_data_utils import (
-    get_y_offsets_from_pixel_grid,
-    get_x_offsets_from_pixel_grid,
     get_detector_ids_from_pixel_grid,
+    get_x_offsets_from_pixel_grid,
+    get_y_offsets_from_pixel_grid,
 )
+from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.pixel_options import (
-    PixelOptions,
-    data_is_an_array_with_more_than_one_element,
-    INITIAL_COUNT_CORNER,
     COUNT_DIRECTION,
+    INITIAL_COUNT_CORNER,
     PIXEL_GRID_STACK_INDEX,
     PIXEL_MAPPING_STACK_INDEX,
+    PixelOptions,
+    data_is_an_array_with_more_than_one_element,
 )
 from tests.ui_tests.ui_test_utils import (
-    systematic_button_press,
-    show_and_close_window,
-    VALID_CUBE_OFF_FILE,
     CORRECT_CUBE_FACES,
-    VALID_OCTA_OFF_FILE,
     CORRECT_OCTA_FACES,
+    VALID_CUBE_OFF_FILE,
+    VALID_OCTA_OFF_FILE,
+    show_and_close_window,
+    systematic_button_press,
 )
 
 

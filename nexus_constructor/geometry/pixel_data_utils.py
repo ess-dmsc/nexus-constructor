@@ -2,18 +2,18 @@ from typing import List, Tuple, Union
 
 import numpy as np
 
+from nexus_constructor.geometry.pixel_data import (
+    Corner,
+    CountDirection,
+    PixelGrid,
+    PixelMapping,
+)
 from nexus_constructor.model.geometry import (
-    X_PIXEL_OFFSET,
     DETECTOR_FACES,
     DETECTOR_NUMBER,
+    X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
     Z_PIXEL_OFFSET,
-)
-from nexus_constructor.geometry.pixel_data import (
-    PixelGrid,
-    CountDirection,
-    Corner,
-    PixelMapping,
 )
 
 PIXEL_FIELDS = [

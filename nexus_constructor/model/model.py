@@ -1,5 +1,6 @@
+from typing import Any, Dict
+
 from PySide2.QtCore import QObject, Signal
-from typing import Dict, Any
 
 from nexus_constructor.common_attrs import CommonKeys
 from nexus_constructor.model.entry import Entry

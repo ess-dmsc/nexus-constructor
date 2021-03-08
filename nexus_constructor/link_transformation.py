@@ -1,7 +1,7 @@
 from typing import Optional
 
-from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.model.component import Component
+from nexus_constructor.transformations_list import TransformationsList
 
 
 class LinkTransformation:

@@ -1,19 +1,19 @@
 import json
+from typing import Dict, Tuple
 
 import pytest
-from PySide2.QtGui import QVector3D
 from mock import Mock
+from PySide2.QtGui import QVector3D
 
+from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.json.transformation_reader import (
-    TransformationReader,
-    _is_transformation_group,
     TRANSFORMATION_MAP,
+    TransformationReader,
     _create_transformation_dataset,
+    _is_transformation_group,
 )
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.json.transform_id import TransformId
-from typing import Dict, Tuple
 
 
 @pytest.fixture(scope="function")

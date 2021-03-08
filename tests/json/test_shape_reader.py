@@ -2,33 +2,33 @@ from typing import List
 
 import numpy as np
 import pytest
-from PySide2.QtGui import QVector3D
 from mock import Mock, call
+from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
-    CommonKeys,
-    CommonAttrs,
-    PIXEL_SHAPE_GROUP_NAME,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
+    PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
+    CommonAttrs,
+    CommonKeys,
 )
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
 from nexus_constructor.json.shape_reader import (
-    ShapeReader,
+    DETECTOR_NUMBER,
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
     Z_PIXEL_OFFSET,
-    DETECTOR_NUMBER,
+    ShapeReader,
 )
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.geometry import OFFGeometryNexus, CylindricalGeometry
+from nexus_constructor.model.geometry import CylindricalGeometry, OFFGeometryNexus
 from nexus_constructor.model.value_type import ValueTypes
 from tests.json.shape_json import (
-    off_shape_json,
     cylindrical_shape_json,
+    off_shape_json,
     pixel_grid_list,
 )
 

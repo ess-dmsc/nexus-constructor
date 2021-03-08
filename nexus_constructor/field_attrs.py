@@ -1,25 +1,25 @@
 from functools import partial
-from typing import Union, Any
+from typing import Any, Union
 
 import numpy as np
 from PySide2.QtWidgets import (
-    QDialog,
-    QGridLayout,
-    QListWidget,
-    QPushButton,
-    QListWidgetItem,
-    QLineEdit,
-    QFrame,
-    QHBoxLayout,
     QComboBox,
+    QDialog,
+    QFrame,
+    QGridLayout,
+    QHBoxLayout,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QPushButton,
 )
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
-from nexus_constructor.common_attrs import CommonAttrs, ARRAY, SCALAR
+from nexus_constructor.common_attrs import ARRAY, SCALAR, CommonAttrs
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import FieldValueValidator
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 
 ATTRS_EXCLUDELIST = [CommonAttrs.UNITS]
 

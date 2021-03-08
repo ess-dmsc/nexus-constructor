@@ -1,65 +1,66 @@
 import json
-from typing import Dict, List, Union, Tuple, Optional
+from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
 
 from nexus_constructor.common_attrs import (
+    PIXEL_SHAPE_GROUP_NAME,
+    SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
-    SHAPE_GROUP_NAME,
-    PIXEL_SHAPE_GROUP_NAME,
     NodeType,
 )
 from nexus_constructor.component_type import COMPONENT_TYPES
-from nexus_constructor.json.load_from_json_utils import (
-    _find_nx_class,
-    _find_attribute_from_list_or_dict,
-    DEPENDS_ON_IGNORE,
-)
-from nexus_constructor.json.transform_id import TransformId
-from nexus_constructor.json.shape_reader import ShapeReader
-from nexus_constructor.json.transformation_reader import (
-    TransformationReader,
-    get_component_and_transform_name,
-)
 from nexus_constructor.json.json_warnings import (
     InvalidJson,
-    TransformDependencyMissing,
     JsonWarning,
     NameFieldMissing,
     NXClassAttributeMissing,
+    TransformDependencyMissing,
+)
+from nexus_constructor.json.load_from_json_utils import (
+    DEPENDS_ON_IGNORE,
+    _find_attribute_from_list_or_dict,
+    _find_nx_class,
+)
+from nexus_constructor.json.shape_reader import ShapeReader
+from nexus_constructor.json.transform_id import TransformId
+from nexus_constructor.json.transformation_reader import (
+    TransformationReader,
+    get_component_and_transform_name,
 )
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.link import Link, TARGET
+from nexus_constructor.model.link import TARGET, Link
 from nexus_constructor.model.stream import (
-    WRITER_MODULE,
+    ADC_PULSE_DEBUG,
+    ARRAY_SIZE,
+    CHUNK_CHUNK_KB,
+    CHUNK_CHUNK_MB,
+    DATA_TYPE,
+    EDGE_TYPE,
+    ERROR_TYPE,
+    INDEX_EVERY_KB,
+    INDEX_EVERY_MB,
+    SHAPE,
     SOURCE,
+    STORE_LATEST_INTO,
     TOPIC,
-    WriterModules,
+    VALUE_UNITS,
+    WRITER_MODULE,
+    EV42Stream,
+    F142Stream,
     HS00Stream,
     NS10Stream,
     SENVStream,
-    TDCTStream,
-    F142Stream,
-    EV42Stream,
-    StreamGroup,
     Stream,
-    DATA_TYPE,
-    ERROR_TYPE,
-    EDGE_TYPE,
-    SHAPE,
-    ARRAY_SIZE,
-    VALUE_UNITS,
-    INDEX_EVERY_MB,
-    INDEX_EVERY_KB,
-    STORE_LATEST_INTO,
-    ADC_PULSE_DEBUG,
-    CHUNK_CHUNK_KB,
-    CHUNK_CHUNK_MB,
+    StreamGroup,
+    TDCTStream,
+    WriterModules,
 )
-import numpy as np
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 

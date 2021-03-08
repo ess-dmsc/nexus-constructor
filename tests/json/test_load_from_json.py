@@ -1,25 +1,24 @@
 import json
+from typing import List, Type
+
+import numpy as np
 import pytest
+from mock import mock_open, patch
 from PySide2.QtGui import QVector3D
-from mock import patch, mock_open
+
+from nexus_constructor.json.json_warnings import JsonWarning, TransformDependencyMissing
 from nexus_constructor.json.load_from_json import (
     JSONReader,
-    _retrieve_children_list,
     _add_attributes,
-    _create_link,
     _create_dataset,
+    _create_link,
+    _retrieve_children_list,
 )
 from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.value_type import ValueTypes, VALUE_TYPE_TO_NP
-import numpy as np
-from nexus_constructor.json.json_warnings import (
-    TransformDependencyMissing,
-    JsonWarning,
-)
-from typing import List, Type
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 
 
 @pytest.fixture(scope="function")

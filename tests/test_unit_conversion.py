@@ -1,5 +1,6 @@
-from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
 from pytest import approx
+
+from nexus_constructor.unit_utils import METRES, calculate_unit_conversion_factor
 
 
 def test_unit_conversion_factor():
