@@ -1,9 +1,9 @@
 import numpy as np
 
 from nexus_constructor.unit_utils import (
-    calculate_unit_conversion_factor,
-    RADIANS,
     METRES,
+    RADIANS,
+    calculate_unit_conversion_factor,
 )
 
 TWO_PI = np.pi * 2

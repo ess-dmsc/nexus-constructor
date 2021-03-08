@@ -2,17 +2,17 @@ import typing
 from functools import partial
 
 import numpy as np
-from PySide2.QtCore import QModelIndex, QAbstractTableModel, Qt, QAbstractItemModel
+from PySide2.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
 from PySide2.QtWidgets import (
-    QWidget,
+    QAbstractItemView,
+    QAction,
     QGridLayout,
+    QItemDelegate,
+    QLineEdit,
+    QStyleOptionViewItem,
     QTableView,
     QToolBar,
-    QAction,
-    QAbstractItemView,
-    QItemDelegate,
-    QStyleOptionViewItem,
-    QLineEdit,
+    QWidget,
 )
 
 from nexus_constructor.ui_utils import validate_line_edit

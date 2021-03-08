@@ -1,8 +1,9 @@
+from mock import Mock
 from PySide2.QtGui import QMatrix4x4
+
 from nexus_constructor.instrument_view.neutron_animation_controller import (
     NeutronAnimationController,
 )
-from mock import Mock
 
 
 def test_GIVEN_target_WHEN_calling_set_target_THEN_target_changed_to_new_value():

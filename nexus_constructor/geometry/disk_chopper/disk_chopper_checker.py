@@ -1,15 +1,15 @@
 import logging
-from typing import Sequence, List
+from typing import List, Sequence
 
 import numpy as np
 from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
-from nexus_constructor.model.value_type import ValueTypes, FLOAT_TYPES, INT_TYPES
+from nexus_constructor.model.value_type import FLOAT_TYPES, INT_TYPES, ValueTypes
 from nexus_constructor.unit_utils import (
-    units_are_recognised_by_pint,
     units_are_expected_dimensionality,
+    units_are_recognised_by_pint,
     units_have_magnitude_of_one,
 )
 from nexus_constructor.validators import VALUE_TYPE_TO_NP

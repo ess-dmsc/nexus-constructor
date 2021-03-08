@@ -1,4 +1,5 @@
 from unittest.mock import Mock
+
 import pytest
 
 from nexus_constructor.main_window import QDialogCustom as QDialog

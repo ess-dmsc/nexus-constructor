@@ -1,6 +1,6 @@
-from pytest import approx, raises
 import pytest
 from PySide2.QtGui import QVector3D
+from pytest import approx, raises
 
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import CylindricalGeometry

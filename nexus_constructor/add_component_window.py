@@ -2,16 +2,13 @@ import logging
 from collections import OrderedDict
 from functools import partial
 
-from PySide2.QtCore import QUrl, Signal, QObject, Qt
+from PySide2.QtCore import QObject, Qt, QUrl, Signal
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QListWidgetItem, QListWidget
+from PySide2.QtWidgets import QListWidget, QListWidgetItem
 
-from nexus_constructor.common_attrs import CommonAttrs, SHAPE_GROUP_NAME
-from nexus_constructor.component_type import (
-    PIXEL_COMPONENT_TYPES,
-    CHOPPER_CLASS_NAME,
-)
+from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
 from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_type import CHOPPER_CLASS_NAME, PIXEL_COMPONENT_TYPES
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import ChopperChecker
@@ -19,29 +16,29 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
     DiskChopperGeometryCreator,
 )
 from nexus_constructor.geometry.geometry_loader import load_geometry
-from nexus_constructor.model.component import (
-    Component,
-    add_fields_to_component,
-)
-from nexus_constructor.model.model import Model
+from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
+from nexus_constructor.model.component import Component, add_fields_to_component
 from nexus_constructor.model.geometry import (
-    OFFGeometryNexus,
     CylindricalGeometry,
-    OFFGeometryNoNexus,
     NoShapeGeometry,
+    OFFGeometryNexus,
+    OFFGeometryNoNexus,
 )
 from nexus_constructor.model.link import Link
-from nexus_constructor.geometry.pixel_data import PixelData, PixelMapping, PixelGrid
+from nexus_constructor.model.model import Model
 from nexus_constructor.pixel_options import PixelOptions
-from nexus_constructor.ui_utils import file_dialog, validate_line_edit
-from nexus_constructor.ui_utils import generate_unique_name
+from nexus_constructor.ui_utils import (
+    file_dialog,
+    generate_unique_name,
+    validate_line_edit,
+)
 from nexus_constructor.unit_utils import METRES
 from nexus_constructor.validators import (
-    UnitValidator,
-    NameValidator,
-    GeometryFileValidator,
     GEOMETRY_FILE_TYPES,
+    GeometryFileValidator,
+    NameValidator,
     OkValidator,
+    UnitValidator,
 )
 from ui.add_component import Ui_AddComponentDialog
 

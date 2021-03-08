@@ -1,12 +1,14 @@
+import itertools
+
+from PySide2.QtGui import QVector3D
+
 from nexus_constructor.instrument_view.off_renderer import (
-    QtOFFGeometry,
-    create_vertex_buffer,
-    create_normal_buffer,
     OffMesh,
+    QtOFFGeometry,
+    create_normal_buffer,
+    create_vertex_buffer,
 )
 from nexus_constructor.model.geometry import OFFCube, OFFGeometryNoNexus
-import itertools
-from PySide2.QtGui import QVector3D
 
 TRIANGLES_IN_SQUARE = 2
 VERTICES_IN_TRIANGLE = 3

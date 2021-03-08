@@ -1,8 +1,8 @@
-import pytest
 import numpy as np
-from PySide2.QtCore import QModelIndex, Qt, QItemSelectionModel
-from PySide2.QtWidgets import QWidget
+import pytest
 from mock import Mock
+from PySide2.QtCore import QItemSelectionModel, QModelIndex, Qt
+from PySide2.QtWidgets import QWidget
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.model.value_type import ValueTypes

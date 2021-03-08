@@ -1,11 +1,11 @@
 import pytest
 
 from nexus_constructor.model.stream import (
-    NS10Stream,
-    TDCTStream,
-    SENVStream,
     EV42Stream,
     F142Stream,
+    NS10Stream,
+    SENVStream,
+    TDCTStream,
 )
 
 topic = "topic1"

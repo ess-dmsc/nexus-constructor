@@ -1,10 +1,11 @@
+import pytest
+from PySide2.QtGui import QVector3D
+from pytest import approx, fail, raises
+
 from nexus_constructor.geometry.utils import (
     get_an_orthogonal_unit_vector,
     validate_nonzero_qvector,
 )
-from PySide2.QtGui import QVector3D
-from pytest import raises, fail, approx
-import pytest
 
 
 def test_zero_qvector_raises_error_when_validated():

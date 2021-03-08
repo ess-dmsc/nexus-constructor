@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QWidget, QLabel, QLineEdit, QHBoxLayout, QListWidget
+from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QListWidget, QWidget
 
 from nexus_constructor.validators import NullableIntValidator
 
