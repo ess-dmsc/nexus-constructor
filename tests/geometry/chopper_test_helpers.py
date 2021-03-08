@@ -1,5 +1,6 @@
-import pytest
 import numpy as np
+import pytest
+
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 
 N_SLITS = 3

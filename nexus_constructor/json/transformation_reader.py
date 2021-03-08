@@ -1,23 +1,23 @@
-from typing import Any, Union, Dict, Tuple, Optional
+from typing import Any, Dict, Optional, Tuple, Union
 
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
+    NX_TRANSFORMATIONS,
     CommonAttrs,
     CommonKeys,
     TransformationType,
-    NX_TRANSFORMATIONS,
 )
+from nexus_constructor.json.load_from_json_utils import (
+    DEPENDS_ON_IGNORE,
+    _find_attribute_from_list_or_dict,
+    _find_nx_class,
+)
+from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
-from nexus_constructor.json.load_from_json_utils import (
-    _find_attribute_from_list_or_dict,
-    _find_nx_class,
-    DEPENDS_ON_IGNORE,
-)
-from nexus_constructor.json.transform_id import TransformId
 
 TRANSFORMATION_MAP = {
     "translation": TransformationType.TRANSLATION,

@@ -1,8 +1,11 @@
 from unittest.mock import Mock
+
 import pytest
-from PySide2.QtCore import QPoint, QModelIndex
+from PySide2.QtCore import QModelIndex, QPoint
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QToolBar, QWidget, QTreeView, QFrame, QVBoxLayout
+from PySide2.QtWidgets import QFrame, QToolBar, QTreeView, QVBoxLayout, QWidget
+
+from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.model.dataset import Dataset
@@ -11,13 +14,12 @@ from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.treeview_utils import (
-    create_and_add_toolbar_action,
-    set_button_states,
-    expand_transformation_list,
     add_transformation,
+    create_and_add_toolbar_action,
+    expand_transformation_list,
     get_transformation_frame,
+    set_button_states,
 )
-from nexus_constructor.common_attrs import TransformationType
 
 
 @pytest.fixture

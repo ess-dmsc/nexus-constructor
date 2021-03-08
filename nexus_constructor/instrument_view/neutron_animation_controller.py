@@ -1,4 +1,4 @@
-from PySide2.QtCore import QObject, Property, Signal
+from PySide2.QtCore import Property, QObject, Signal
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 

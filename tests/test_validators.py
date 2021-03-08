@@ -2,28 +2,28 @@
 from io import StringIO
 from typing import List
 
+import attr
+import numpy as np
 import pytest
+from mock import Mock
+from PySide2.QtGui import QValidator
 
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import METRES
 from nexus_constructor.validators import (
-    NameValidator,
-    UnitValidator,
-    FieldValueValidator,
-    FieldType,
-    GeometryFileValidator,
-    OkValidator,
-    NullableIntValidator,
-    NumpyDTypeValidator,
     GEOMETRY_FILE_TYPES,
+    BrokerAndTopicValidator,
     CommandDialogFileNameValidator,
     CommandDialogOKValidator,
-    BrokerAndTopicValidator,
+    FieldType,
+    FieldValueValidator,
+    GeometryFileValidator,
+    NameValidator,
+    NullableIntValidator,
+    NumpyDTypeValidator,
+    OkValidator,
+    UnitValidator,
 )
-import attr
-from PySide2.QtGui import QValidator
-from mock import Mock
-import numpy as np
 
 
 @attr.s

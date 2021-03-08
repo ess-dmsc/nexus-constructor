@@ -1,31 +1,31 @@
 from typing import Any
 
-import pytest
-from PySide2.QtWidgets import QListWidget
-from mock import Mock
 import numpy as np
+import pytest
+from mock import Mock
+from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
-    SLITS_NAME,
-    SLIT_HEIGHT_NAME,
+    FLOAT_TYPES,
     RADIUS_NAME,
     SLIT_EDGES_NAME,
+    SLIT_HEIGHT_NAME,
+    SLITS_NAME,
+    UNITS_REQUIRED,
     ChopperChecker,
     _edges_array_has_correct_shape,
-    FLOAT_TYPES,
     _incorrect_data_type_message,
     _units_are_valid,
-    UNITS_REQUIRED,
 )
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 from tests.geometry.chopper_test_helpers import (  # noqa: F401
-    N_SLITS,
     DEGREES_EDGES_ARR,
+    N_SLITS,
+    RADIANS_EDGES_ARR,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
-    RADIANS_EDGES_ARR,
 )
 
 

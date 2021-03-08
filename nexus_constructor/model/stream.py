@@ -6,7 +6,6 @@ import attr
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.group import Group
 
-
 ARRAY_SIZE = "array_size"
 VALUE_UNITS = "value_units"
 CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"

@@ -1,7 +1,8 @@
-from nexus_constructor.common_attrs import CommonKeys, INSTRUMENT_NAME
+from typing import Any, Dict
+
+from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
-from typing import Dict, Any
 
 SAMPLE_NAME = "sample"
 

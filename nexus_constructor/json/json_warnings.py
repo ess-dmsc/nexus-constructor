@@ -1,5 +1,6 @@
-import attr
 from typing import Union
+
+import attr
 
 """
 The message field should be populated with a string that makes sense to a user

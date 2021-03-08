@@ -1,25 +1,25 @@
 import logging
-from typing import Tuple, List
+from typing import List, Tuple
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QRectF
-from PySide2.QtGui import QVector3D, QColor
-from PySide2.QtWidgets import QWidget, QVBoxLayout
+from PySide2.QtGui import QColor, QVector3D
+from PySide2.QtWidgets import QVBoxLayout, QWidget
 
 from nexus_constructor.instrument_view.gnomon import Gnomon
 from nexus_constructor.instrument_view.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
-from nexus_constructor.model.geometry import OFFGeometry
-from nexus_constructor.model.instrument import SAMPLE_NAME
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.instrument_view.qentity_utils import (
-    create_qentity,
     create_material,
+    create_qentity,
 )
+from nexus_constructor.model.geometry import OFFGeometry
+from nexus_constructor.model.instrument import SAMPLE_NAME
 
 
 class InstrumentView(QWidget):

@@ -1,14 +1,16 @@
+import json
 import time
 import uuid
 from functools import partial
-from typing import Callable, Dict, Union, Tuple, Type
-import json
+from typing import Callable, Dict, Tuple, Type, Union
+
 import attr
 from PySide2 import QtCore
-from PySide2.QtCore import QTimer, QAbstractItemModel, QSettings
-from PySide2.QtGui import QStandardItemModel, QCloseEvent
-from PySide2.QtWidgets import QMainWindow, QLineEdit, QApplication
+from PySide2.QtCore import QAbstractItemModel, QSettings, QTimer
+from PySide2.QtGui import QCloseEvent, QStandardItemModel
+from PySide2.QtWidgets import QApplication, QLineEdit, QMainWindow
 from streaming_data_types import run_start_pl72, run_stop_6s4t
+
 from nexus_constructor.kafka.command_producer import CommandProducer
 from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.kafka.status_consumer import StatusConsumer

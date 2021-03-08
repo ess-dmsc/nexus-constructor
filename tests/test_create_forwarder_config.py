@@ -1,14 +1,15 @@
-from nexus_constructor.create_forwarder_config import create_forwarder_config
-from nexus_constructor.model.model import Model
-from nexus_constructor.model.component import Component
-from nexus_constructor.model.stream import F142Stream, StreamGroup, EV42Stream
-from streaming_data_types.forwarder_config_update_rf5k import (
-    deserialise_rf5k,
-    StreamInfo,
-)
 from streaming_data_types.fbschemas.forwarder_config_update_rf5k.UpdateType import (
     UpdateType,
 )
+from streaming_data_types.forwarder_config_update_rf5k import (
+    StreamInfo,
+    deserialise_rf5k,
+)
+
+from nexus_constructor.create_forwarder_config import create_forwarder_config
+from nexus_constructor.model.component import Component
+from nexus_constructor.model.model import Model
+from nexus_constructor.model.stream import EV42Stream, F142Stream, StreamGroup
 
 
 def test_create_forwarder_config_is_add_request():

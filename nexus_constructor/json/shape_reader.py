@@ -1,42 +1,38 @@
-from typing import List, Union, Any, Dict
+from typing import Any, Dict, List, Union
 
 import numpy as np
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
-    CommonAttrs,
-    CommonKeys,
-    SHAPE_GROUP_NAME,
-    PIXEL_SHAPE_GROUP_NAME,
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
+    PIXEL_SHAPE_GROUP_NAME,
+    SHAPE_GROUP_NAME,
+    CommonAttrs,
+    CommonKeys,
 )
 from nexus_constructor.json.load_from_json_utils import (
-    _find_nx_class,
     _find_attribute_from_list_or_dict,
+    _find_nx_class,
 )
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import (
-    OFFGeometryNexus,
-    CylindricalGeometry,
+    CYLINDERS,
+    DETECTOR_FACES,
+    DETECTOR_NUMBER,
     FACES,
     WINDING_ORDER,
-    CYLINDERS,
-    DETECTOR_NUMBER,
-    Z_PIXEL_OFFSET,
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
-    DETECTOR_FACES,
+    Z_PIXEL_OFFSET,
+    CylindricalGeometry,
+    OFFGeometryNexus,
 )
-from nexus_constructor.model.value_type import (
-    INT_TYPES,
-    FLOAT_TYPES,
-    VALUE_TYPE_TO_NP,
-)
+from nexus_constructor.model.value_type import FLOAT_TYPES, INT_TYPES, VALUE_TYPE_TO_NP
 from nexus_constructor.unit_utils import (
-    units_are_recognised_by_pint,
     METRES,
     units_are_expected_dimensionality,
+    units_are_recognised_by_pint,
     units_have_magnitude_of_one,
 )
 

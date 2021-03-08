@@ -1,5 +1,6 @@
+from typing import Any, Dict, List
+
 import attr
-from typing import List, Dict, Any
 import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType

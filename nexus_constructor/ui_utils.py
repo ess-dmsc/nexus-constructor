@@ -5,7 +5,6 @@ import numpy as np
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QFileDialog, QMessageBox
 
-
 FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog
 
 
