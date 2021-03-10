@@ -63,6 +63,10 @@ class JsonWarningsContainer(List[JsonWarning]):
         self.__add_constructor_param_items(kwargs)
 
     def __add_constructor_param_items(self, other_items):
+        """
+        Internal method to add items into the container if they are provided in
+        the constructor call.
+        """
         if other_items:
             if not any(isinstance(item, self._CHECK_TYPES) for item in other_items):
                 raise TypeError(
@@ -73,7 +77,12 @@ class JsonWarningsContainer(List[JsonWarning]):
                 self.extend(other_items)
 
     def append(self, __object: _T) -> None:
-        if __object and isinstance(__object, self._CHECK_TYPES):
+        """
+        Overriding the append function so that a type check is done before new
+        items are appended into the container via the append function in the
+        superclass.
+        """
+        if isinstance(__object, self._CHECK_TYPES):
             super().append(__object)
         else:
             raise TypeError(
@@ -82,7 +91,12 @@ class JsonWarningsContainer(List[JsonWarning]):
             )
 
     def insert(self, __index: int, __object: _T) -> None:
-        if __object and isinstance(__object, self._CHECK_TYPES):
+        """
+        Overriding the insert function so that a type check is done before new
+        items are inserted into the container via the insert function in the
+        superclass.
+        """
+        if isinstance(__object, self._CHECK_TYPES):
             super().insert(__index, __object)
         else:
             raise TypeError(
@@ -90,10 +104,24 @@ class JsonWarningsContainer(List[JsonWarning]):
                 f" Item can only be inserted if it is of type in {self._CHECK_TYPES}"
             )
 
-    def __add__(self, __object: _T) -> None:
-        self.append(__object)
-        return self
+    def __add__(self, other: "JsonWarningsContainer") -> "JsonWarningsContainer":
+        """
+        Overriding the primitive add operation in list by checking that
+        other is of type JsonWarningsContainer.
+        """
+        if isinstance(other, JsonWarningsContainer):
+            return super().__add__(other)
+        else:
+            raise TypeError("It is only possible to add a JsonWarningsContainer.")
 
-    def __iadd__(self, __object: _T) -> None:
-        self.append(__object)
-        return self
+    def __iadd__(self, other: "JsonWarningsContainer") -> "JsonWarningsContainer":
+        """
+        Overriding the primitive add-assign operation in list by checking that
+        other is of type JsonWarningsContainer.
+        """
+        if isinstance(other, JsonWarningsContainer):
+            return super().__iadd__(other)
+        else:
+            raise TypeError(
+                "It is only possible to concatenate a JsonWarningsContainer."
+            )

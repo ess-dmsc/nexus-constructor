@@ -34,14 +34,20 @@ def test_json_warning_container_when_appending_another_container_containing_one_
     assert len(this_container) == 2
 
 
-def test_json_warning_container_when_using_add_operator_with_correct_type():
-    assert len(JSON_WARN_CONTAINER + JSON_WARNING + JSON_WARNING) == 3
+def test_json_warning_container_when_using_add_operator_container():
+    assert len(JSON_WARN_CONTAINER + JSON_WARN_CONTAINER + JSON_WARN_CONTAINER) == 3
 
 
 def test_json_warning_container_when_using_iadd_operator_with_correct_type():
     this_container = JsonWarningsContainer(JSON_WARN_CONTAINER)
-    this_container += JSON_WARNING
+    this_container += JsonWarningsContainer(JSON_WARNING)
     assert len(this_container) == 2
+
+
+def test_json_warning_container_if_using_iadd_operator_with_another_empty_json_warning_container():
+    this_container = JsonWarningsContainer(JSON_WARN_CONTAINER)
+    this_container += JsonWarningsContainer()
+    assert len(this_container) == 1
 
 
 def test_json_warning_container_when_using_add_operator_with_incorrect_type():
