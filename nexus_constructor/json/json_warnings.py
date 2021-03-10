@@ -58,7 +58,7 @@ class JsonWarningsContainer(List[JsonWarning]):
     """
 
     def __init__(self, *args, **kwargs):
-        self._CHECK_TYPES = (JsonWarning.__args__, JsonWarningsContainer)
+        self._CHECK_TYPES = (JsonWarning.__args__, type(self))
         self.__add_constructor_param_items(args)
         self.__add_constructor_param_items(kwargs)
 
@@ -67,7 +67,7 @@ class JsonWarningsContainer(List[JsonWarning]):
             if not any(isinstance(item, self._CHECK_TYPES) for item in other_items):
                 raise TypeError(
                     "The provided parameter to the constructor "
-                    "is not of correct type"
+                    f"is not of type in {self._CHECK_TYPES}"
                 )
             else:
                 self.extend(other_items)
@@ -77,7 +77,8 @@ class JsonWarningsContainer(List[JsonWarning]):
             super().append(__object)
         else:
             raise TypeError(
-                f"Item can only be appended if it is of type in {JsonWarning}"
+                f"Tried to add item of type {type(__object)}."
+                f" Item can only be added if it is of type in {self._CHECK_TYPES}"
             )
 
     def insert(self, __index: int, __object: _T) -> None:
@@ -85,7 +86,8 @@ class JsonWarningsContainer(List[JsonWarning]):
             super().insert(__index, __object)
         else:
             raise TypeError(
-                f"Item can only be appended if it is of type in {JsonWarning}"
+                f"Tried to add item of type {type(__object)}."
+                f" Item can only be inserted if it is of type in {self._CHECK_TYPES}"
             )
 
     def __add__(self, __object: _T) -> None:

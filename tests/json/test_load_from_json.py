@@ -1,12 +1,16 @@
 import json
-from typing import List, Type
+from typing import Type
 
 import numpy as np
 import pytest
 from mock import mock_open, patch
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.json.json_warnings import JsonWarning, TransformDependencyMissing
+from nexus_constructor.json.json_warnings import (
+    JsonWarning,
+    JsonWarningsContainer,
+    TransformDependencyMissing,
+)
 from nexus_constructor.json.load_from_json import (
     JSONReader,
     _add_attributes,
@@ -426,7 +430,7 @@ def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_compo
 
 
 def contains_warning_of_type(
-    json_warnings: List[JsonWarning], warning_type: Type[JsonWarning]
+    json_warnings: JsonWarningsContainer, warning_type: Type[JsonWarning]
 ) -> bool:
     return any(isinstance(json_warning, warning_type) for json_warning in json_warnings)
 

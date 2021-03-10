@@ -28,6 +28,12 @@ def test_json_warning_container_raises_type_error_if_appending_item_of_invalid_t
         JSON_WARN_CONTAINER.append(INVALID_CONTAINER_ELEMENT)
 
 
+def test_json_warning_container_when_appending_another_container_containing_one_item():
+    this_container = JsonWarningsContainer(JSON_WARNING)
+    this_container.append(JSON_WARN_CONTAINER)
+    assert len(this_container) == 2
+
+
 def test_json_warning_container_when_using_add_operator_with_correct_type():
     assert len(JSON_WARN_CONTAINER + JSON_WARNING + JSON_WARNING) == 3
 
