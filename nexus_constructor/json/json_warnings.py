@@ -15,6 +15,16 @@ class InvalidJson:
 
 
 @attr.s
+class InvalidShape:
+    message = attr.ib(type=str)
+
+
+@attr.s
+class InvalidTransformation:
+    message = attr.ib(type=str)
+
+
+@attr.s
 class TransformDependencyMissing:
     message = attr.ib(type=str)
 
@@ -30,7 +40,12 @@ class NXClassAttributeMissing:
 
 
 JsonWarning = Union[
-    InvalidJson, TransformDependencyMissing, NameFieldMissing, NXClassAttributeMissing
+    InvalidJson,
+    InvalidShape,
+    InvalidTransformation,
+    TransformDependencyMissing,
+    NameFieldMissing,
+    NXClassAttributeMissing,
 ]
 
 _T = TypeVar("_T", JsonWarning, "JsonWarningsContainer")

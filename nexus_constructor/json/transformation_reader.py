@@ -8,6 +8,11 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     TransformationType,
 )
+from nexus_constructor.json.json_warnings import (
+    InvalidTransformation,
+    JsonWarningsContainer,
+    TransformDependencyMissing,
+)
 from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
     _find_attribute_from_list_or_dict,
@@ -80,7 +85,7 @@ class TransformationReader:
         """
         self.parent_component = parent_component
         self.children = children
-        self.warnings = []
+        self.warnings = JsonWarningsContainer()
         self._transforms_with_dependencies = transforms_with_dependencies
 
     def add_transformations_to_component(self):
@@ -123,7 +128,7 @@ class TransformationReader:
             else:
                 msg = f"Cannot find {attribute_name} for transformation in component"
                 f" {self.parent_component.name}."
-            self.warnings.append(msg)
+            self.warnings.append(TransformDependencyMissing(msg))
             return failure_value
 
     def _find_attribute_in_list(
@@ -144,8 +149,10 @@ class TransformationReader:
         attribute = _find_attribute_from_list_or_dict(attribute_name, attributes_list)
         if not attribute:
             self.warnings.append(
-                f"Unable to find {attribute_name} attribute in transformation"
-                f" {transformation_name} from component {self.parent_component.name}"
+                TransformDependencyMissing(
+                    f"Unable to find {attribute_name} attribute in transformation"
+                    f" {transformation_name} from component {self.parent_component.name}"
+                )
             )
             return failure_value
         return attribute
@@ -160,8 +167,10 @@ class TransformationReader:
             if dtype.lower() == key.lower():
                 return key
         self.warnings.append(
-            f"Could not recognise dtype {dtype} from transformation"
-            f" {transformation_name} in component {self.parent_component.name}."
+            InvalidTransformation(
+                f"Could not recognise dtype {dtype} from transformation"
+                f" {transformation_name} in component {self.parent_component.name}."
+            )
         )
         return ""
 
@@ -178,9 +187,11 @@ class TransformationReader:
             return TRANSFORMATION_MAP[transformation_type.lower()]
         except KeyError:
             self.warnings.append(
-                f"Could not recognise transformation type {transformation_type} of"
-                f" transformation {transformation_name} in component"
-                f" {self.parent_component.name}."
+                InvalidTransformation(
+                    f"Could not recognise transformation type {transformation_type} of"
+                    f" transformation {transformation_name} in component"
+                    f" {self.parent_component.name}."
+                )
             )
             return ""
 
