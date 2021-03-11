@@ -1,20 +1,24 @@
 import logging
 import uuid
 from functools import partial
-from typing import List, Union, Any
+from typing import Any, List, Union
+
 import numpy as np
-from PySide2.QtCore import QStringListModel, Qt, Signal, QEvent, QObject
-from PySide2.QtWidgets import QCompleter, QLineEdit, QSizePolicy
+from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
 from PySide2.QtWidgets import (
-    QPushButton,
-    QHBoxLayout,
-    QFrame,
     QComboBox,
+    QCompleter,
     QDialog,
-    QListWidget,
-    QGridLayout,
     QFormLayout,
+    QFrame,
+    QGridLayout,
+    QHBoxLayout,
+    QLineEdit,
+    QListWidget,
+    QPushButton,
+    QSizePolicy,
 )
+
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
@@ -23,15 +27,15 @@ from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
-    FieldValueValidator,
     FieldType,
+    FieldValueValidator,
     NameValidator,
     UnitValidator,
 )
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 
 class FieldNameLineEdit(QLineEdit):

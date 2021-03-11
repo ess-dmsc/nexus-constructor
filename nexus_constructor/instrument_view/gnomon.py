@@ -2,7 +2,7 @@ from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtCore import QPropertyAnimation
-from PySide2.QtGui import QVector3D, QMatrix4x4, QColor, QFont, QVector4D
+from PySide2.QtGui import QColor, QFont, QMatrix4x4, QVector3D, QVector4D
 
 from nexus_constructor.instrument_view.axis_colors import AxisColors
 from nexus_constructor.instrument_view.neutron_animation_controller import (

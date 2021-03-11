@@ -1,8 +1,10 @@
-from nexus_constructor.model.geometry import OFFGeometryNoNexus
+from io import StringIO
+
+from PySide2.QtGui import QVector3D
+
 from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.instrument_view.off_renderer import repeat_shape_over_positions
-from PySide2.QtGui import QVector3D
-from io import StringIO
+from nexus_constructor.model.geometry import OFFGeometryNoNexus
 
 
 def test_GIVEN_off_file_containing_geometry_WHEN_loading_geometry_to_file_THEN_vertices_and_faces_loaded_are_the_same_as_the_file():

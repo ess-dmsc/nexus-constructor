@@ -1,16 +1,17 @@
-from typing import Any, Union, Dict
+from typing import Any, Dict, Union
+
 import attr
+
 from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.helpers import (
-    get_absolute_path,
     _get_item,
-    _set_item,
     _remove_item,
+    _set_item,
+    get_absolute_path,
 )
 from nexus_constructor.model.link import Link
-
 
 TRANSFORMS_GROUP_NAME = "transformations"
 

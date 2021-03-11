@@ -1,50 +1,51 @@
 import logging
-from typing import Tuple, Union, List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import attr
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtGui import QMatrix4x4, QVector3D, QTransform
+from PySide2.QtGui import QMatrix4x4, QTransform, QVector3D
 from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import (
+    CYLINDRICAL_GEOMETRY_NX_CLASS,
+    NX_TRANSFORMATIONS,
+    OFF_GEOMETRY_NX_CLASS,
+    PIXEL_SHAPE_GROUP_NAME,
+    SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
     NodeType,
     TransformationType,
-    SHAPE_GROUP_NAME,
-    PIXEL_SHAPE_GROUP_NAME,
-    CYLINDRICAL_GEOMETRY_NX_CLASS,
-    OFF_GEOMETRY_NX_CLASS,
-    NX_TRANSFORMATIONS,
 )
-from nexus_constructor.transformations_list import TransformationsList
-from nexus_constructor.geometry.utils import validate_nonzero_qvector
-from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.geometry import (
-    CylindricalGeometry,
-    OFFGeometryNexus,
-    NoShapeGeometry,
-    OFFGeometry,
-    CYLINDERS,
-    X_PIXEL_OFFSET,
-    Y_PIXEL_OFFSET,
-    DETECTOR_NUMBER,
-    Z_PIXEL_OFFSET,
-)
-from nexus_constructor.model.group import Group, TRANSFORMS_GROUP_NAME
-from nexus_constructor.model.helpers import _generate_incremental_name
-from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.model.value_type import ValueTypes
-from nexus_constructor.geometry.pixel_data import PixelGrid, PixelMapping, PixelData
+from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.geometry.pixel_data_utils import (
+    PIXEL_FIELDS,
+    get_detector_faces_from_pixel_mapping,
+    get_detector_ids_from_pixel_grid,
     get_detector_number_from_pixel_mapping,
     get_x_offsets_from_pixel_grid,
     get_y_offsets_from_pixel_grid,
     get_z_offsets_from_pixel_grid,
-    get_detector_ids_from_pixel_grid,
-    PIXEL_FIELDS,
-    get_detector_faces_from_pixel_mapping,
 )
+from nexus_constructor.geometry.utils import validate_nonzero_qvector
+from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.geometry import (
+    CYLINDERS,
+    DETECTOR_NUMBER,
+    X_PIXEL_OFFSET,
+    Y_PIXEL_OFFSET,
+    Z_PIXEL_OFFSET,
+    CylindricalGeometry,
+    NoShapeGeometry,
+    OFFGeometry,
+    OFFGeometryNexus,
+)
+from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
+from nexus_constructor.model.helpers import _generate_incremental_name
+from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.ui_utils import show_warning_dialog
 
 

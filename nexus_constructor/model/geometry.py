@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from math import sin, cos, pi, acos, degrees
+from math import acos, cos, degrees, pi, sin
 from typing import List, Tuple
 
 import numpy as np
-from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
@@ -13,8 +13,7 @@ from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
     qvector3d_to_numpy_array,
 )
-from nexus_constructor.unit_utils import calculate_unit_conversion_factor, METRES
-
+from nexus_constructor.unit_utils import METRES, calculate_unit_conversion_factor
 
 WINDING_ORDER = "winding_order"
 FACES = "faces"

@@ -1,15 +1,16 @@
-from nexus_constructor.model.model import Model
-from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import StreamGroup
-from streaming_data_types.fbschemas.forwarder_config_update_rf5k.UpdateType import (
-    UpdateType,
-)
+from typing import Any, List
+
 from streaming_data_types.fbschemas.forwarder_config_update_rf5k.Protocol import (
     Protocol,
 )
-from streaming_data_types.forwarder_config_update_rf5k import serialise_rf5k, StreamInfo
-from typing import List, Any
+from streaming_data_types.fbschemas.forwarder_config_update_rf5k.UpdateType import (
+    UpdateType,
+)
+from streaming_data_types.forwarder_config_update_rf5k import StreamInfo, serialise_rf5k
 
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.model import Model
+from nexus_constructor.model.stream import StreamGroup
 
 provider_str_to_enum = {"pva": Protocol.PVA, "ca": Protocol.CA, "fake": Protocol.FAKE}
 

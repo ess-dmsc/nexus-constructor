@@ -1,11 +1,11 @@
-import pytest
 import numpy as np
+import pytest
 
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
-    Point,
-    DiskChopperGeometryCreator,
     RESOLUTION,
+    DiskChopperGeometryCreator,
+    Point,
 )
 from tests.geometry.chopper_test_helpers import EXPECTED_Z
 

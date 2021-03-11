@@ -1,13 +1,14 @@
 import numpy as np
 import pytest
+
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails
 from tests.geometry.chopper_test_helpers import (
+    CONVERT_DEGREES_TO_RADIANS,
+    DEGREES_EDGES_ARR,
     N_SLITS,
+    RADIANS_EDGES_ARR,
     RADIUS_LENGTH,
     SLIT_HEIGHT_LENGTH,
-    CONVERT_DEGREES_TO_RADIANS,
-    RADIANS_EDGES_ARR,
-    DEGREES_EDGES_ARR,
 )
 
 

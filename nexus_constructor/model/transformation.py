@@ -1,9 +1,9 @@
-from typing import List, Union, Dict, Any
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 import attr
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtGui import QVector3D, QMatrix4x4
+from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import (
     CommonAttrs,
@@ -13,8 +13,6 @@ from nexus_constructor.common_attrs import (
 )
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.value_type import ValueTypes
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from nexus_constructor.model.component import Component  # noqa: F401

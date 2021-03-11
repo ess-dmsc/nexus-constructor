@@ -1,28 +1,28 @@
 from typing import Union
 
-from PySide2.QtCore import Qt, QSize, QPoint, QModelIndex, QAbstractItemModel, QObject
-from PySide2.QtGui import QPixmap, QRegion, QPainter
+from PySide2.QtCore import QAbstractItemModel, QModelIndex, QObject, QPoint, QSize, Qt
+from PySide2.QtGui import QPainter, QPixmap, QRegion
 from PySide2.QtWidgets import (
-    QStyledItemDelegate,
     QFrame,
-    QVBoxLayout,
     QSizePolicy,
+    QStyledItemDelegate,
     QStyleOptionViewItem,
+    QVBoxLayout,
     QWidget,
 )
 
-from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.treeview_utils import (
+    fill_selection,
+    get_component_frame,
+    get_component_info_frame,
     get_link_transformation_frame,
     get_transformation_frame,
-    get_component_info_frame,
     get_transformations_list_frame,
-    get_component_frame,
-    fill_selection,
 )
 
 

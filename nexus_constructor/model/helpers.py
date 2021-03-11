@@ -1,4 +1,4 @@
-from typing import List, Any, Union
+from typing import Any, List, Union
 
 
 def __find_item_index(list_to_look_in: List[Any], item_name: str):

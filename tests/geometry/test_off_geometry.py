@@ -1,8 +1,8 @@
-from nexus_constructor.model.component import Component
-from nexus_constructor.model.geometry import OFFGeometryNoNexus, OFFGeometryNexus
 from PySide2.QtGui import QVector3D
-
 from pytest import approx
+
+from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import OFFGeometryNexus, OFFGeometryNoNexus
 
 
 def test_GIVEN_faces_WHEN_calling_winding_order_on_OFF_THEN_order_is_correct():

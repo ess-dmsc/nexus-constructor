@@ -1,23 +1,23 @@
-from typing import Tuple, Optional, List
+from typing import List, Optional, Tuple
 
 import numpy as np
-from PySide2.QtCore import Signal, QObject
-from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox, QListWidgetItem
+from PySide2.QtCore import QObject, Signal
+from PySide2.QtWidgets import QDoubleSpinBox, QListWidgetItem, QSpinBox
 
 from nexus_constructor.geometry.geometry_loader import load_geometry
-from nexus_constructor.model.component import Component
-from nexus_constructor.model.geometry import (
-    OFFGeometryNexus,
-    X_PIXEL_OFFSET,
-    DETECTOR_NUMBER,
-    Y_PIXEL_OFFSET,
-)
 from nexus_constructor.geometry.pixel_data import (
+    Corner,
+    CountDirection,
+    PixelData,
     PixelGrid,
     PixelMapping,
-    CountDirection,
-    Corner,
-    PixelData,
+)
+from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import (
+    DETECTOR_NUMBER,
+    X_PIXEL_OFFSET,
+    Y_PIXEL_OFFSET,
+    OFFGeometryNexus,
 )
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.validators import PixelValidator

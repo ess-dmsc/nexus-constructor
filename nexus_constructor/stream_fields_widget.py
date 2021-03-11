@@ -1,36 +1,37 @@
 from functools import partial
+
+import numpy as np
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
-    QComboBox,
-    QGridLayout,
-    QLineEdit,
-    QDialog,
-    QLabel,
-    QSpinBox,
-    QPushButton,
-    QGroupBox,
-    QRadioButton,
     QCheckBox,
+    QComboBox,
+    QDialog,
     QFormLayout,
+    QGridLayout,
+    QGroupBox,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QRadioButton,
+    QSpinBox,
 )
-import numpy as np
 
-from nexus_constructor.common_attrs import SCALAR, ARRAY
+from nexus_constructor.common_attrs import ARRAY, SCALAR
 from nexus_constructor.model.stream import (
-    StreamGroup,
-    F142Stream,
-    EV42Stream,
-    NS10Stream,
-    SENVStream,
-    HS00Stream,
-    TDCTStream,
-    WriterModules,
     ADC_PULSE_DEBUG,
     CHUNK_CHUNK_KB,
     CHUNK_CHUNK_MB,
     INDEX_EVERY_KB,
     INDEX_EVERY_MB,
     STORE_LATEST_INTO,
+    EV42Stream,
+    F142Stream,
+    HS00Stream,
+    NS10Stream,
+    SENVStream,
+    StreamGroup,
+    TDCTStream,
+    WriterModules,
 )
 
 F142_TYPES = [

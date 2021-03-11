@@ -15,6 +15,7 @@ jsonschema==2.6.0
 black==19.10b0
 pre-commit
 flake8
+isort==5.7.0
 
 # Testing
 pytest
