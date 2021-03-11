@@ -3,7 +3,7 @@ import uuid
 from typing import Dict
 
 from nexusutils.nexusbuilder import NexusBuilder
-from PySide2.QtCore import QSettings
+from PySide2.QtCore import QSettings, Qt
 from PySide2.QtWidgets import (
     QAction,
     QApplication,
@@ -45,16 +45,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.export_to_forwarder_config_action.triggered.connect(
             self.save_to_forwarder_config
         )
-
+        self.show_action_labels.triggered.connect(
+            lambda: self.on_show_action_labels(self.show_action_labels.isChecked())
+        )
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
-
-        # self.treemodel = self.widget.findHdf5TreeModel()
-        # self.treemodel.setDatasetDragEnabled(True)
-        # self.treemodel.setFileDropEnabled(True)
-        # self.treemodel.setFileMoveEnabled(True)
-        # self.treemodel.insertH5pyObject(self.model.signals.nexus_file)
-        self.model.signals.file_changed.connect(self.update_nexus_file_structure_view)
 
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
         self.model.signals.component_removed.connect(self.sceneWidget.delete_component)
@@ -80,6 +75,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         except ImportError:
             pass
 
+    def on_show_action_labels(self, value):
+        self.component_tree_view_tab.component_tool_bar.setToolButtonStyle(
+            Qt.ToolButtonTextUnderIcon if value else Qt.ToolButtonIconOnly
+        )
+
     def show_control_file_writer_window(self):
         if self.file_writer_control_window is None:
             from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
@@ -94,10 +94,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             0
         ].internalPointer()
         self.show_add_component_window(selected_component)
-
-    def update_nexus_file_structure_view(self, nexus_file):
-        self.treemodel.clear()
-        self.treemodel.insertH5pyObject(nexus_file)
 
     def save_to_nexus_file(self):
         filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
