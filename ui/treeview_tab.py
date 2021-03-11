@@ -45,7 +45,7 @@ class ComponentTreeViewTab(QWidget):
         self.component_tool_bar = QToolBar("Actions", self)
         self.new_component_action = create_and_add_toolbar_action(
             "new_component.png",
-            "New Component",
+            "Component",
             self.parent().show_add_component_window,
             self.component_tool_bar,
             self,
@@ -53,28 +53,28 @@ class ComponentTreeViewTab(QWidget):
         )
         self.new_translation_action = create_and_add_toolbar_action(
             "new_translation.png",
-            "New Translation",
+            "Translation",
             lambda: self._add_transformation(TransformationType.TRANSLATION),
             self.component_tool_bar,
             self,
         )
         self.new_rotation_action = create_and_add_toolbar_action(
             "new_rotation.png",
-            "New Rotation",
+            "Rotation",
             lambda: self._add_transformation(TransformationType.ROTATION),
             self.component_tool_bar,
             self,
         )
         self.create_link_action = create_and_add_toolbar_action(
             "create_link.png",
-            "Create Link",
+            "Link",
             self.on_create_link,
             self.component_tool_bar,
             self,
         )
         self.edit_component_action = create_and_add_toolbar_action(
             "edit_component.png",
-            "Edit Component",
+            "Edit",
             self.parent().show_edit_component_dialog,
             self.component_tool_bar,
             self,
@@ -83,11 +83,7 @@ class ComponentTreeViewTab(QWidget):
             "delete.png", "Delete", self.on_delete_item, self.component_tool_bar, self
         )
         self.zoom_action = create_and_add_toolbar_action(
-            "zoom.svg",
-            "Zoom Component",
-            self.on_zoom_item,
-            self.component_tool_bar,
-            self,
+            "zoom.svg", "Zoom", self.on_zoom_item, self.component_tool_bar, self,
         )
         self.component_tool_bar.insertSeparator(self.zoom_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
