@@ -11,6 +11,7 @@ from nexus_constructor.common_attrs import (
     CommonAttrs,
     CommonKeys,
 )
+from nexus_constructor.json.json_warnings import InvalidShape, JsonWarningsContainer
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
     _find_nx_class,
@@ -50,7 +51,7 @@ class ShapeReader:
     def __init__(self, component: Component, shape_info: Dict):
         self.component = component
         self.shape_info = shape_info
-        self.warnings = []
+        self.warnings = JsonWarningsContainer()
         self.error_message = ""
         self.issue_message = ""
         self.shape = None
@@ -80,8 +81,10 @@ class ShapeReader:
             self._add_cylindrical_shape_to_component()
         else:
             self.warnings.append(
-                f"Unrecognised shape type for component {self.component.name}. Expected '{OFF_GEOMETRY_NX_CLASS}' or "
-                f"'{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}'."
+                InvalidShape(
+                    f"Unrecognised shape type for component {self.component.name}. Expected '{OFF_GEOMETRY_NX_CLASS}' or "
+                    f"'{CYLINDRICAL_GEOMETRY_NX_CLASS}' but found '{shape_type}'."
+                )
             )
 
     def _add_off_shape_to_component(self):
@@ -98,7 +101,9 @@ class ShapeReader:
 
         if not isinstance(children, list):
             self.warnings.append(
-                f"{self.error_message} Children attribute in shape group is not a list."
+                InvalidShape(
+                    f"{self.error_message} Children attribute in shape group is not a list."
+                )
             )
             return
 
@@ -261,7 +266,9 @@ class ShapeReader:
                 return dataset
         if warning:
             self.warnings.append(
-                f"{self.error_message} Couldn't find {dataset_name} dataset."
+                InvalidShape(
+                    f"{self.error_message} Couldn't find {dataset_name} dataset."
+                )
             )
 
     def _find_and_validate_data_type(
@@ -282,14 +289,18 @@ class ShapeReader:
                 ]
             ):
                 self.warnings.append(
-                    f"{self.issue_message} Type attribute for {parent_name} does not match expected type(s) "
-                    f"{expected_types}."
+                    InvalidShape(
+                        f"{self.issue_message} Type attribute for {parent_name} does not match expected type(s) "
+                        f"{expected_types}."
+                    )
                 )
             else:
                 return dataset[CommonKeys.DATASET][CommonKeys.TYPE]
         except KeyError:
             self.warnings.append(
-                f"{self.issue_message} Unable to find type attribute for {parent_name}."
+                InvalidShape(
+                    f"{self.issue_message} Unable to find type attribute for {parent_name}."
+                )
             )
 
     def _find_and_validate_units(self, vertices_dataset: Dict) -> Union[str, None]:
@@ -302,31 +313,41 @@ class ShapeReader:
             attributes_list = vertices_dataset[CommonKeys.ATTRIBUTES]
         except KeyError:
             self.warnings.append(
-                f"{self.error_message} Unable to find attributes list in vertices dataset."
+                InvalidShape(
+                    f"{self.error_message} Unable to find attributes list in vertices dataset."
+                )
             )
             return
 
         units = _find_attribute_from_list_or_dict(CommonAttrs.UNITS, attributes_list)
         if not units:
             self.warnings.append(
-                f"{self.error_message} Unable to find units attribute in vertices dataset."
+                InvalidShape(
+                    f"{self.error_message} Unable to find units attribute in vertices dataset."
+                )
             )
             return
 
         if not units_are_recognised_by_pint(units, False):
             self.warnings.append(
-                f"{self.error_message} Vertices units are not recognised by pint. Found {units}."
+                InvalidShape(
+                    f"{self.error_message} Vertices units are not recognised by pint. Found {units}."
+                )
             )
             return
         if not units_are_expected_dimensionality(units, METRES, False):
             self.warnings.append(
-                f"{self.error_message} Vertices units have wrong dimensionality. Expected something that can be "
-                f"converted to metred but found {units}. "
+                InvalidShape(
+                    f"{self.error_message} Vertices units have wrong dimensionality. Expected something that can be "
+                    f"converted to metred but found {units}. "
+                )
             )
             return
         if not units_have_magnitude_of_one(units, False):
             self.warnings.append(
-                f"{self.error_message} Vertices units do not have magnitude of one. Found {units}."
+                InvalidShape(
+                    f"{self.error_message} Vertices units do not have magnitude of one. Found {units}."
+                )
             )
             return
 
@@ -356,7 +377,9 @@ class ShapeReader:
         ):
             return True
         self.warnings.append(
-            f"{self.error_message} Values in {list_parent_name} list do not all have type(s) {expected_types}."
+            InvalidShape(
+                f"{self.error_message} Values in {list_parent_name} list do not all have type(s) {expected_types}."
+            )
         )
         return False
 
@@ -379,18 +402,24 @@ class ShapeReader:
             for i in range(len(size)):
                 if size[i] != array.shape[i]:
                     self.warnings.append(
-                        f"{self.issue_message} Mismatch between length of {parent_name} list "
-                        f"({array.shape}) and size attribute from dataset ({size})."
+                        InvalidShape(
+                            f"{self.issue_message} Mismatch between length of {parent_name} list "
+                            f"({array.shape}) and size attribute from dataset ({size})."
+                        )
                     )
             return True
         except KeyError:
             self.warnings.append(
-                f"{self.issue_message} Unable to find size attribute for {parent_name} dataset."
+                InvalidShape(
+                    f"{self.issue_message} Unable to find size attribute for {parent_name} dataset."
+                )
             )
             return True
         except IndexError:
             self.warnings.append(
-                f"{self.error_message} Incorrect array shape for {parent_name} dataset."
+                InvalidShape(
+                    f"{self.error_message} Incorrect array shape for {parent_name} dataset."
+                )
             )
             return False
 
@@ -407,7 +436,9 @@ class ShapeReader:
             return dataset[CommonKeys.VALUES]
         except KeyError:
             self.warnings.append(
-                f"{self.error_message} Unable to find values in {parent_name} dataset."
+                InvalidShape(
+                    f"{self.error_message} Unable to find values in {parent_name} dataset."
+                )
             )
             return
 
@@ -422,7 +453,9 @@ class ShapeReader:
             return True
 
         self.warnings.append(
-            f"{self.error_message} values attribute in {parent_name} dataset is not a list."
+            InvalidShape(
+                f"{self.error_message} values attribute in {parent_name} dataset is not a list."
+            )
         )
         return False
 
@@ -436,7 +469,9 @@ class ShapeReader:
             return self.shape_info[CommonKeys.CHILDREN]
         except KeyError:
             self.warnings.append(
-                f"{self.error_message} Unable to find children list in shape group."
+                InvalidShape(
+                    f"{self.error_message} Unable to find children list in shape group."
+                )
             )
             return
 
@@ -450,7 +485,9 @@ class ShapeReader:
             return self.shape_info[CommonKeys.NAME]
         except KeyError:
             self.warnings.append(
-                f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
+                InvalidShape(
+                    f"{self.issue_message} Unable to find name of shape. Will use 'shape'."
+                )
             )
             return SHAPE_GROUP_NAME
 

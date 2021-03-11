@@ -131,7 +131,7 @@ def test_GIVEN_attribute_not_found_WHEN_looking_for_transformation_attribute_THE
     # Check that the number of warnings has increased
     assert len(transformation_reader.warnings) == n_warnings + 1
     # Check that the latest warning mentions the name of the attribute that could not be found
-    assert attribute_name in transformation_reader.warnings[-1]
+    assert attribute_name in transformation_reader.warnings[-1].message
 
 
 def test_GIVEN_attribute_is_found_WHEN_looking_for_transformation_attribute_THEN_get_transformation_attribute_returns_attribute_value(
@@ -188,7 +188,7 @@ def test_GIVEN_attribute_name_not_in_list_WHEN_looking_for_transformation_attrib
     # Check that the number of warnings has increased
     assert len(transformation_reader.warnings) == n_warnings + 1
     # Check that the latest warning mentions the name of the attribute that could not be found
-    assert "units" in transformation_reader.warnings[-1]
+    assert "units" in transformation_reader.warnings[-1].message
 
 
 def test_GIVEN_attribute_value_not_in_list_WHEN_looking_for_transformation_attribute_THEN_get_attribute_in_list_returns_false(
@@ -209,7 +209,7 @@ def test_GIVEN_attribute_value_not_in_list_WHEN_looking_for_transformation_attri
     # Check that the number of warnings has increased
     assert len(transformation_reader.warnings) == n_warnings + 1
     # Check that the latest warning mentions the name of the attribute that could not be found
-    assert "units" in transformation_reader.warnings[-1]
+    assert "units" in transformation_reader.warnings[-1].message
 
 
 def test_GIVEN_no_values_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
@@ -306,7 +306,7 @@ def test_GIVEN_unrecognised_dtype_WHEN_parsing_dtype_THEN_parse_dtype_returns_em
 
     assert not transformation_reader._parse_dtype("notvalid", "TransformationName")
     assert len(transformation_reader.warnings) == n_warnings + 1
-    assert "dtype" in transformation_reader.warnings[-1]
+    assert "dtype" in transformation_reader.warnings[-1].message
 
 
 @pytest.mark.parametrize("dtype", ["double", "Double", "DOUBLE"])
@@ -325,7 +325,7 @@ def test_GIVEN_unrecognised_transformation_type_WHEN_parsing_transformation_type
         "notvalid", "TransformationName"
     )
     assert len(transformation_reader.warnings) == n_warnings + 1
-    assert "transformation type" in transformation_reader.warnings[-1]
+    assert "transformation type" in transformation_reader.warnings[-1].message
 
 
 def test_GIVEN_invalid_dtype_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(

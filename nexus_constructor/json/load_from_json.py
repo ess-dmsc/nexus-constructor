@@ -13,7 +13,7 @@ from nexus_constructor.common_attrs import (
 from nexus_constructor.component_type import COMPONENT_TYPES
 from nexus_constructor.json.json_warnings import (
     InvalidJson,
-    JsonWarning,
+    JsonWarningsContainer,
     NameFieldMissing,
     NXClassAttributeMissing,
     TransformDependencyMissing,
@@ -220,7 +220,7 @@ class JSONReader:
     def __init__(self):
         self.entry = Entry()
         self.entry.instrument = Instrument()
-        self.warnings: List[JsonWarning] = []
+        self.warnings = JsonWarningsContainer()
 
         # key: TransformId for transform which has a depends on
         # value: the Transformation object itself and the TransformId for the Transformation which it depends on

@@ -13,6 +13,7 @@ from nexus_constructor.common_attrs import (
     CommonAttrs,
     CommonKeys,
 )
+from nexus_constructor.json.json_warnings import JsonWarningsContainer
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
@@ -85,7 +86,7 @@ def cylindrical_shape_reader(mock_component, cylindrical_shape_json):
 
 
 def _any_warning_message_has_substrings(
-    sub_strings: List[str], warning_messages: str
+    sub_strings: List[str], warning_messages: JsonWarningsContainer
 ) -> bool:
     """
     Checks that at least one of the warning messages from the shape reader contains all the given sub-strings.
@@ -95,7 +96,7 @@ def _any_warning_message_has_substrings(
     """
     return any(
         [
-            all([substring in warning_message for substring in sub_strings])
+            all([substring in warning_message.message for substring in sub_strings])
             for warning_message in warning_messages
         ]
     )
