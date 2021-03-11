@@ -59,3 +59,8 @@ def test_json_warning_container_when_using_iadd_operator_with_incorrect_type():
     with pytest.raises(TypeError):
         this_container = JsonWarningsContainer(JSON_WARN_CONTAINER)
         this_container += INVALID_CONTAINER_ELEMENT
+
+
+def test_json_warning_container_raises_type_error_if_constructor_is_given_NoneType():
+    with pytest.raises(TypeError):
+        JsonWarningsContainer(None)
