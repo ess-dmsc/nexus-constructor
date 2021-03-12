@@ -8,7 +8,7 @@ import pytestqt
 from mock import Mock, call, mock_open, patch
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QDialog, QMainWindow, QRadioButton
+from PySide2.QtWidgets import QMainWindow, QRadioButton
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
@@ -19,6 +19,7 @@ from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMap
 from nexus_constructor.geometry.pixel_data_utils import PIXEL_FIELDS
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
+from nexus_constructor.main_window import QDialogCustom as QDialog
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.geometry import (
@@ -86,7 +87,7 @@ for i, component_class in enumerate(
     else:
         NO_PIXEL_OPTIONS[component_class] = i
 
-# Select a subset of the component class to use in parameterised tests
+# Select a subset of the component class to use in parameterised tests.
 # Should include any for which the UI is specialised
 _components_subset = {"NXdetector", "NXdisk_chopper", "NXsensor"}
 COMPONENT_TYPES_SUBSET = {
@@ -193,7 +194,7 @@ def mock_component():
 
 def enter_component_name(
     qtbot: pytestqt.qtbot.QtBot,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     dialog: AddComponentDialog,
     component_name: str,
 ):
@@ -239,7 +240,7 @@ def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
 def make_pixel_options_disappear(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     component_index: int,
 ):
     """
@@ -258,7 +259,7 @@ def make_pixel_options_appear(
     qtbot: pytestqt.qtbot.QtBot,
     button: QRadioButton,
     dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     pixel_options_index: int = PIXEL_OPTIONS["NXdetector"],
 ):
     """
@@ -294,7 +295,7 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
 def enter_file_path(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     file_path: str,
     file_contents: str,
 ):
@@ -317,7 +318,7 @@ def enter_file_path(
 def enter_disk_chopper_fields(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
-    template: PySide2.QtWidgets.QDialog,
+    template: QDialog,
     component_name: str = "ThisIsADiskChopper",
 ):
     """

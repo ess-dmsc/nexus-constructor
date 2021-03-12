@@ -184,7 +184,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def show_add_component_window(self, component: Component = None):
-        self.add_component_window = QDialog()
+        self.add_component_window = QDialogCustom()
         self.add_component_window.ui = AddComponentDialog(
             self.model,
             self.component_tree_view_tab.component_model,
@@ -194,3 +194,43 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
+
+
+class QDialogCustom(QDialog):
+    """
+    Custom QDialog class that enables the possibility to properly produce
+    a message box in the component editor to the users,
+    asking if they are sure to quit editing component when exiting.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self._is_accepting_component = True
+
+    def disable_msg_box(self):
+        self._is_accepting_component = False
+
+    def close_without_msg_box(self):
+        """
+        Close widget without producing the message box in closeEvent method.
+        """
+        self.disable_msg_box()
+        self.close()
+
+    def closeEvent(self, event):
+        """
+        Overriding closeEvent function in the superclass to produce a message box prompting
+        the user to exit the add/edit component window. This message box pops up
+        when the user exits by pressing the window close (X) button.
+        """
+        if not self._is_accepting_component:
+            event.accept()
+            return
+        quit_msg = "Are you sure you want to exit the component editor?"
+        reply = QMessageBox.question(
+            self, "Message", quit_msg, QMessageBox.Yes, QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()

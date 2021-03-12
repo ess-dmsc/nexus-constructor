@@ -1,8 +1,8 @@
 from unittest.mock import Mock
 
 import pytest
-from PySide2.QtWidgets import QDialog
 
+from nexus_constructor.main_window import QDialogCustom as QDialog
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
 from nexus_constructor.pixel_options import PixelOptions
@@ -12,7 +12,9 @@ from tests.geometry.chopper_test_helpers import chopper_details  # noqa: F401
 
 @pytest.fixture(scope="function")
 def template(qtbot) -> QDialog:
-    return QDialog()
+    q_dialog = QDialog()
+    q_dialog.disable_msg_box()
+    return q_dialog
 
 
 @pytest.fixture(scope="function")
