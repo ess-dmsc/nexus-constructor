@@ -22,10 +22,6 @@ The sample component is added by default, and is indicated by the red cube. You 
 
 ![](resources/images/NeXusConstructor_001.png)
 
-If you are familiar with the [NeXus format](resources/introduction_to_nexus.md) it may be useful to view the layout of the resulting NeXus file as you modify the template by adding components and other information. You can do this by clicking the "Nexus File Layout" tab in the left pane of the main window.
-
-![](resources/images/Selection_002.png)
-
 
 ## Adding components
 
