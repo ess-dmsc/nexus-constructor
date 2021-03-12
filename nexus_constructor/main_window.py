@@ -211,13 +211,10 @@ class QDialogCustom(QDialog):
         super().__init__()
         self._is_accepting_component = True
 
-    def enable_msg_box(self):
-        self._is_accepting_component = True
-
     def disable_msg_box(self):
         self._is_accepting_component = False
 
-    def close_without_msgbox(self):
+    def close_without_msg_box(self):
         """
         Close widget without producing the message box in closeEvent method.
         """
@@ -225,6 +222,11 @@ class QDialogCustom(QDialog):
         self.close()
 
     def closeEvent(self, event):
+        """
+        Overriding closeEvent function in the superclass to produce a message box prompting
+        the user to exit the add/edit component window. This message box pops up
+        when the user exits by pressing the window close (X) button.
+        """
         if not self._is_accepting_component:
             event.accept()
             return

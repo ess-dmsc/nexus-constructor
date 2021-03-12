@@ -232,7 +232,7 @@ class Ui_AddComponentDialog(object):
         QtCore.QObject.connect(
             self.ok_button,
             QtCore.SIGNAL("clicked()"),
-            AddComponentDialog.close_without_msgbox,
+            AddComponentDialog.close_without_msg_box,
         )
         QtCore.QMetaObject.connectSlotsByName(AddComponentDialog)
 
