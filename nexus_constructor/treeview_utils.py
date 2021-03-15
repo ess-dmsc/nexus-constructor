@@ -137,6 +137,15 @@ def set_button_states(
 
 
 def set_enabled_and_raise(action: QAction, value: bool):
+    """Disable or enable the action and autoRaise the associated QToolButton.
+
+    Parameters
+    ----------
+        action: QAction
+            The action to enable or disable
+        value: bool
+            True to enable action and raise associated QToolButton.
+    """
     action.setEnabled(value)
     for widget in action.associatedWidgets():
         if isinstance(widget, QToolButton):
@@ -159,12 +168,8 @@ def handle_number_of_items_selected_is_not_one(
     :param create_link_action: The action for creating a link.
     :param zoom_action: The action for zooming on a component.
     """
-    set_enabled_and_raise(delete_action, False)
-    set_enabled_and_raise(new_rotation_action, False)
-    set_enabled_and_raise(new_translation_action, False)
-    set_enabled_and_raise(create_link_action, False)
-    set_enabled_and_raise(zoom_action, False)
-    set_enabled_and_raise(edit_component_action, False)
+    for action in vars().values():
+        set_enabled_and_raise(action, False)
 
 
 def expand_transformation_list(
