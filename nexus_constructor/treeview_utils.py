@@ -3,7 +3,15 @@ import sys
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QColor, QIcon
-from PySide2.QtWidgets import QAction, QFrame, QLabel, QToolBar, QTreeView, QWidget
+from PySide2.QtWidgets import (
+    QAction,
+    QFrame,
+    QLabel,
+    QToolBar,
+    QToolButton,
+    QTreeView,
+    QWidget,
+)
 
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
@@ -50,8 +58,8 @@ def create_and_add_toolbar_action(
         component_tree_view_tab,
     )
     toolbar_action.triggered.connect(trigger_method)
-    toolbar_action.setEnabled(set_enabled)
     component_tool_bar.addAction(toolbar_action)
+    set_enabled_and_raise(toolbar_action, set_enabled)
     return toolbar_action
 
 
@@ -82,41 +90,66 @@ def set_button_states(
             new_rotation_action,
             new_translation_action,
             zoom_action,
+            edit_component_action,
         )
     else:
         selected_object = selection_indices[0].internalPointer()
         selected_object_is_component = isinstance(selected_object, Component)
-        zoom_action.setEnabled(selected_object_is_component)
+        set_enabled_and_raise(zoom_action, selected_object_is_component)
 
         selected_object_is_component_or_transform = isinstance(
             selected_object, (Component, Transformation)
         )
-        edit_component_action.setEnabled(selected_object_is_component)
+        set_enabled_and_raise(edit_component_action, selected_object_is_component)
 
         selected_object_is_not_link_transform = not isinstance(
             selected_object, LinkTransformation
         )
-        new_rotation_action.setEnabled(selected_object_is_not_link_transform)
-        new_translation_action.setEnabled(selected_object_is_not_link_transform)
-        delete_action.setEnabled(
-            selected_object_is_component_or_transform
-            or not selected_object_is_not_link_transform
+        set_enabled_and_raise(
+            new_rotation_action, selected_object_is_not_link_transform
         )
 
+        set_enabled_and_raise(
+            new_translation_action, selected_object_is_not_link_transform
+        )
+
+        set_enabled_and_raise(
+            delete_action,
+            selected_object_is_component_or_transform
+            or not selected_object_is_not_link_transform,
+        )
         if isinstance(selected_object, Component):
             if not hasattr(selected_object, "stored_transforms"):
                 selected_object.stored_transforms = selected_object.transforms
-            create_link_action.setEnabled(
-                not selected_object.stored_transforms.has_link
+            set_enabled_and_raise(
+                create_link_action, not selected_object.stored_transforms.has_link
             )
+
         elif isinstance(selected_object, TransformationsList):
-            create_link_action.setEnabled(not selected_object.has_link)
+            set_enabled_and_raise(create_link_action, not selected_object.has_link)
         elif isinstance(selected_object, Transformation):
-            create_link_action.setEnabled(
-                not selected_object.parent_component.transforms.has_link
+            set_enabled_and_raise(
+                create_link_action,
+                not selected_object.parent_component.transforms.has_link,
             )
         else:
-            create_link_action.setEnabled(False)
+            set_enabled_and_raise(create_link_action, False)
+
+
+def set_enabled_and_raise(action: QAction, value: bool):
+    """Disable or enable the action and autoRaise the associated QToolButton.
+
+    Parameters
+    ----------
+        action: QAction
+            The action to enable or disable
+        value: bool
+            True to enable action and raise associated QToolButton.
+    """
+    action.setEnabled(value)
+    for widget in action.associatedWidgets():
+        if isinstance(widget, QToolButton):
+            widget.setAutoRaise(not value)
 
 
 def handle_number_of_items_selected_is_not_one(
@@ -125,6 +158,7 @@ def handle_number_of_items_selected_is_not_one(
     new_translation_action: QAction,
     create_link_action: QAction,
     zoom_action: QAction,
+    edit_component_action: QAction,
 ):
     """
     Disables all actions when the number of selected items in the Component Tree View is not equal to one.
@@ -134,11 +168,8 @@ def handle_number_of_items_selected_is_not_one(
     :param create_link_action: The action for creating a link.
     :param zoom_action: The action for zooming on a component.
     """
-    delete_action.setEnabled(False)
-    new_rotation_action.setEnabled(False)
-    new_translation_action.setEnabled(False)
-    create_link_action.setEnabled(False)
-    zoom_action.setEnabled(False)
+    for action in vars().values():
+        set_enabled_and_raise(action, False)
 
 
 def expand_transformation_list(
