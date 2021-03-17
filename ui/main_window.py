@@ -1,15 +1,16 @@
-from PySide2.QtCore import QRect, QMetaObject, QSize
+from PySide2.QtCore import QMetaObject, QRect, QSize
 from PySide2.QtWidgets import (
-    QSplitter,
     QAction,
-    QStatusBar,
-    QMenuBar,
-    QMenu,
-    QWidget,
-    QTabWidget,
     QGridLayout,
     QLayout,
+    QMenu,
+    QMenuBar,
+    QSplitter,
+    QStatusBar,
+    QTabWidget,
+    QWidget,
 )
+
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from ui.treeview_tab import ComponentTreeViewTab
 
@@ -72,6 +73,8 @@ class Ui_MainWindow(object):
 
         self.view_menu = QMenu(self.menu_bar)
         self.show_action_labels = QAction(MainWindow, checkable=True)
+        self.about_window = QAction(MainWindow)
+        self.view_menu.addAction(self.about_window)
         self.view_menu.addAction(self.show_action_labels)
 
         self.menu_bar.addAction(self.file_menu.menuAction())
@@ -93,3 +96,4 @@ class Ui_MainWindow(object):
         self.export_to_forwarder_config_action.setText("Export to Forwarder FlatBuffer")
         self.view_menu.setTitle("View")
         self.show_action_labels.setText("Show Button Labels")
+        self.about_window.setText("About")

@@ -1,6 +1,7 @@
 import json
 import uuid
 from typing import Dict
+from weakref import WeakKeyDictionary
 
 from nexusutils.nexusbuilder import NexusBuilder
 from PySide2.QtCore import QSettings, Qt
@@ -21,6 +22,8 @@ from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
 
+from .about_window import AboutWindow
+
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 FLATBUFFER_FILE_TYPES = {"FlatBuffer Files": ["flat", "FLAT"]}
@@ -31,6 +34,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         super().__init__()
         self.model = model
         self.nx_classes = nx_classes
+        # For book-keeping all registered windows
+        self._registered_windows = WeakKeyDictionary()
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
@@ -48,6 +53,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.show_action_labels.triggered.connect(
             lambda: self.on_show_action_labels(self.show_action_labels.isChecked())
         )
+        self.about_window.triggered.connect(lambda: self.onOpenAboutWindow(AboutWindow))
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
 
@@ -61,6 +67,28 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._set_up_file_writer_control_window(main_window)
         self.file_writer_control_window = None
         self._update_views()
+
+    def onOpenAboutWindow(self, instance):
+        if self.checkWindowOpen(instance, self._registered_windows):
+            return
+        return instance(parent=self)
+
+    def checkWindowOpen(self, instance, windows):
+        """Check if window is already open, then bring it to front"""
+        for window in windows:
+            if isinstance(window, instance):
+                window.activateWindow()
+                return True
+        return False
+
+    def registerWindow(self, instance):
+        """Register an instance of a QMainWindow"""
+        self._registered_windows[instance] = 1
+
+    def unregisterWindow(self, instance):
+        """De-Register an instance if closeEvent is called"""
+        if instance in self._registered_windows:
+            del self._registered_windows[instance]
 
     def _set_up_file_writer_control_window(self, main_window):
         try:
