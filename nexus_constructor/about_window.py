@@ -9,7 +9,7 @@ class AboutWindow(QMainWindow):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.setWindowTitle("About")
+        self.setWindowTitle("nexus-constructor")
 
         if parent is not None:
             parent.registerWindow(self)
@@ -32,10 +32,6 @@ class AboutWindow(QMainWindow):
 
     def setupUi(self):
         layout = QVBoxLayout()
-
-        name = QLabel("Nexus-constructor")
-        name.setFont(QFont("Helvetica", pointSize=32, weight=75))
-
         url = (
             "https://github.com/ess-dmsc/nexus-constructor/blob/main/getting_started.md"
         )
@@ -49,7 +45,6 @@ class AboutWindow(QMainWindow):
         )
         copyright.setFont(QFont("monospace", pointSize=10))
 
-        layout.addWidget(name)
         layout.addStretch(10)
         layout.addWidget(getting_started)
         layout.addWidget(copyright)
