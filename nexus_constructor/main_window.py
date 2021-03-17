@@ -68,7 +68,23 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_views()
 
     def onOpenAboutWindow(self, instance):
+        if self.checkWindowOpen(instance, self._registered_windows):
+            return
         return instance(parent=self)
+
+    def checkWindowOpen(self, instance, windows):
+        for window in windows:
+            if isinstance(window, instance):
+                window.activateWindow()
+                return True
+        return False
+
+    def registerWindow(self, instance):
+        self._registered_windows[instance] = 1
+
+    def unregisterWindow(self, instance):
+        if instance in self._registered_windows:
+            del self._registered_windows[instance]
 
     def _set_up_file_writer_control_window(self, main_window):
         try:
