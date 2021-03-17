@@ -42,7 +42,7 @@ class AboutWindow(QMainWindow):
         getting_started.setOpenExternalLinks(True)
 
         copyright = QLabel(
-            "Copyright (c) 2018, European Spallation Source - Data Management & Software Centre"
+            "Copyright (c) 2018-2021, European Spallation Source ERIC. BSD-2 Clause license"
             "\nAll rights reserved."
         )
         copyright.setFont(QFont("monospace", pointSize=10))
