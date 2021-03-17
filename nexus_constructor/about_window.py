@@ -20,9 +20,11 @@ class AboutWindow(QMainWindow):
 
         self._central_widget = QWidget()
         self._central_widget.setFont(QFont("monospace", pointSize=11))
+        self._central_widget.setObjectName("central_widget")
         self._central_widget.setStyleSheet(
+            "QWidget#central_widget {"
             f"background-image:url({background_image});"
-            "background-position:center; background-repeat:no-repeat;"
+            "background-position:center; background-repeat:no-repeat; }"
         )
 
         self.setCentralWidget(self._central_widget)
