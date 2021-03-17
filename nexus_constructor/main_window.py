@@ -34,6 +34,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         super().__init__()
         self.model = model
         self.nx_classes = nx_classes
+        # For book-keeping all registered windows
         self._registered_windows = WeakKeyDictionary()
 
     def setupUi(self, main_window):
@@ -73,6 +74,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         return instance(parent=self)
 
     def checkWindowOpen(self, instance, windows):
+        """Check if window is already open, then bring it to front"""
         for window in windows:
             if isinstance(window, instance):
                 window.activateWindow()
@@ -80,9 +82,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         return False
 
     def registerWindow(self, instance):
+        """Register an instance of a QMainWindow"""
         self._registered_windows[instance] = 1
 
     def unregisterWindow(self, instance):
+        """De-Register an instance if closeEvent is called"""
         if instance in self._registered_windows:
             del self._registered_windows[instance]
 
