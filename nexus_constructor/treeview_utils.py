@@ -150,6 +150,9 @@ def set_enabled_and_raise(action: QAction, value: bool):
     for widget in action.associatedWidgets():
         if isinstance(widget, QToolButton):
             widget.setAutoRaise(not value)
+            # Change background color to pale gray if button is enabled
+            color = "#d7d6d5" if value else "white"
+            widget.setStyleSheet(f"background-color: {color}")
 
 
 def handle_number_of_items_selected_is_not_one(
