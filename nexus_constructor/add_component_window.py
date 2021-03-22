@@ -420,12 +420,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-
-        pixel_data = (
-            self.pixel_options.generate_pixel_data()
-            if nx_class in PIXEL_COMPONENT_TYPES
-            else None
-        )
+        if self.pixel_options:
+            pixel_data = (
+                self.pixel_options.generate_pixel_data()
+                if nx_class in PIXEL_COMPONENT_TYPES
+                else None
+            )
+        else:
+            pixel_data = None
 
         if self.component_to_edit:
             shape, positions = self.edit_existing_component(
@@ -498,7 +500,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
-        return self.component_to_edit.shape
+        return self.component_to_edit.shape if self.component_to_edit else None
 
     @staticmethod
     def write_pixel_data_to_component(
@@ -550,7 +552,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             if self.meshRadioButton.isChecked():
                 self.create_pixel_mapping_list_for_mesh()
 
-            if self.CylinderRadioButton.isChecked():
+            if self.CylinderRadioButton.isChecked() and self.pixel_options:
                 self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
                     self.cylinderCountSpinBox.value()
                 )

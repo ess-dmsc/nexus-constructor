@@ -14,7 +14,6 @@ from streaming_data_types import run_start_pl72, run_stop_6s4t
 from nexus_constructor.kafka.command_producer import CommandProducer
 from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.kafka.status_consumer import StatusConsumer
-from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
@@ -53,7 +52,7 @@ def extract_bool_from_qsettings(setting: Union[str, bool]):
 
 
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
-    def __init__(self, model: Model, settings: QSettings):
+    def __init__(self, model: QStandardItemModel, settings: QSettings):
         super().__init__()
         self.settings = settings
         self.model = model

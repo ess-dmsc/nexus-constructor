@@ -1,6 +1,6 @@
 import json
 import uuid
-from typing import Dict
+from typing import Dict, Optional
 from weakref import WeakKeyDictionary
 
 from nexusutils.nexusbuilder import NexusBuilder
@@ -211,7 +211,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_component(component.name, shape, positions)
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
-    def show_add_component_window(self, component: Component = None):
+    def show_add_component_window(self, component: Optional[Component] = None):
         self.add_component_window = QDialogCustom()
         self.add_component_window.ui = AddComponentDialog(
             self.model,
