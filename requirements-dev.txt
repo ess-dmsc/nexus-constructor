@@ -13,9 +13,9 @@ jsonschema==2.6.0
 
 # Formatting/linting
 black==19.10b0
-pre-commit==0.812
+pre-commit
 flake8
-mypy
+mypy==0.812
 isort==5.7.0
 
 # Testing
