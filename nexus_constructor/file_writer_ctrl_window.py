@@ -52,10 +52,9 @@ def extract_bool_from_qsettings(setting: Union[str, bool]):
 
 
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
-    def __init__(self, model: QStandardItemModel, settings: QSettings):
+    def __init__(self, settings: QSettings):
         super().__init__()
         self.settings = settings
-        self.model = model
         self.setupUi()
         self.known_writers = {}
         self.known_files = {}

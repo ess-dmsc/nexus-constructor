@@ -1,6 +1,7 @@
 import logging
 from collections import OrderedDict
 from functools import partial
+from typing import List
 
 from PySide2.QtCore import QObject, Qt, QUrl, Signal
 from PySide2.QtGui import QVector3D
@@ -81,10 +82,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
 
         self.cad_file_name = None
-        self.possible_fields = []
+        self.possible_fields: List[str] = []
         self.component_to_edit = component_to_edit
         self.valid_file_given = False
-        self.pixel_options = None
+        self.pixel_options: PixelOptions = None
 
     def setupUi(self, parent_dialog, pixel_options: PixelOptions = PixelOptions()):
         """ Sets up push buttons and validators for the add component window. """
@@ -162,7 +163,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
         self.pixel_options = pixel_options
-        self.pixel_options.setupUi(self.pixelOptionsWidget)
+        if self.pixel_options:
+            self.pixel_options.setupUi(self.pixelOptionsWidget)
         self.pixelOptionsWidget.ui = self.pixel_options
 
         if self.component_to_edit:
@@ -171,7 +173,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
             self.ok_button.setText("Edit Component")
             self._fill_existing_entries()
-            if self.get_pixel_visibility_condition():
+            if self.get_pixel_visibility_condition() and self.pixel_options:
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
 
         self.ok_validator = OkValidator(
@@ -205,9 +207,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
         # Connect the pixel mapping press signal the populate pixel mapping method
-        self.pixel_options.pixel_mapping_button_pressed.connect(
-            self.populate_pixel_mapping_if_necessary
-        )
+        if self.pixel_options:
+            self.pixel_options.pixel_mapping_button_pressed.connect(
+                self.populate_pixel_mapping_if_necessary
+            )
 
         self.cylinderCountSpinBox.valueChanged.connect(
             self.populate_pixel_mapping_if_necessary
@@ -239,7 +242,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         Wipes the previous list of pixel mapping widgets. Required if the file has changed, or if the shape type has
         changed.
         """
-        self.pixel_options.reset_pixel_mapping_list()
+        if self.pixel_options:
+            self.pixel_options.reset_pixel_mapping_list()
 
     def _fill_existing_entries(self):
         """

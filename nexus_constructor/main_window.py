@@ -113,7 +113,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
 
             self.file_writer_ctrl_window = FileWriterCtrl(
-                self.model, QSettings("ess", "nexus-constructor")
+                QSettings("ess", "nexus-constructor")
             )
             self.file_writer_ctrl_window.show()
 
