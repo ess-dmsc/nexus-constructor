@@ -317,7 +317,7 @@ class ShapeReader:
                     f"{self.error_message} Unable to find attributes list in vertices dataset."
                 )
             )
-            return
+            return None
 
         units = _find_attribute_from_list_or_dict(CommonAttrs.UNITS, attributes_list)
         if not units:
@@ -326,7 +326,7 @@ class ShapeReader:
                     f"{self.error_message} Unable to find units attribute in vertices dataset."
                 )
             )
-            return
+            return None
 
         if not units_are_recognised_by_pint(units, False):
             self.warnings.append(
@@ -334,7 +334,7 @@ class ShapeReader:
                     f"{self.error_message} Vertices units are not recognised by pint. Found {units}."
                 )
             )
-            return
+            return None
         if not units_are_expected_dimensionality(units, METRES, False):
             self.warnings.append(
                 InvalidShape(
@@ -342,14 +342,14 @@ class ShapeReader:
                     f"converted to metred but found {units}. "
                 )
             )
-            return
+            return None
         if not units_have_magnitude_of_one(units, False):
             self.warnings.append(
                 InvalidShape(
                     f"{self.error_message} Vertices units do not have magnitude of one. Found {units}."
                 )
             )
-            return
+            return None
 
         return units
 

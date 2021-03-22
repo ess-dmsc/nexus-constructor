@@ -1,5 +1,5 @@
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
@@ -18,7 +18,11 @@ from nexus_constructor.instrument_view.qentity_utils import (
     create_material,
     create_qentity,
 )
-from nexus_constructor.model.geometry import OFFGeometry
+from nexus_constructor.model.geometry import (
+    CylindricalGeometry,
+    NoShapeGeometry,
+    OFFGeometryNexus,
+)
 from nexus_constructor.model.instrument import SAMPLE_NAME
 
 
@@ -193,7 +197,10 @@ class InstrumentView(QWidget):
         return clear_buffers
 
     def add_component(
-        self, name: str, geometry: OFFGeometry, positions: List[QVector3D] = None
+        self,
+        name: str,
+        geometry: Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
+        positions: List[QVector3D] = None,
     ):
         """
         Add a component to the instrument view given a name and its geometry.

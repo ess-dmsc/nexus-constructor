@@ -35,7 +35,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.model = model
         self.nx_classes = nx_classes
         # For book-keeping all registered windows
-        self._registered_windows = WeakKeyDictionary()
+        self._registered_windows: WeakKeyDictionary = WeakKeyDictionary()
 
     def setupUi(self, main_window):
         super().setupUi(main_window)

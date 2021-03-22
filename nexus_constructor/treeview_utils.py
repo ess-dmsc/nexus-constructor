@@ -1,5 +1,7 @@
 import os
 import sys
+from collections import Callable
+from typing import Any
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QColor, QIcon
@@ -36,7 +38,7 @@ else:
 def create_and_add_toolbar_action(
     icon_path: str,
     mouse_over_text: str,
-    trigger_method: classmethod,
+    trigger_method: Callable[[], Any],
     component_tool_bar: QToolBar,
     component_tree_view_tab: QWidget,
     set_enabled: bool = False,
@@ -199,7 +201,7 @@ def expand_transformation_list(
 
 
 def add_transformation(
-    transformation_type: TransformationType,
+    transformation_type: str,
     component_tree_view: QTreeView,
     component_model: ComponentTreeModel,
 ):

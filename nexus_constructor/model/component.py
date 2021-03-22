@@ -238,7 +238,7 @@ class Component(Group):
     def _create_and_add_transform(
         self,
         name: str,
-        transformation_type: TransformationType,
+        transformation_type: str,
         angle_or_magnitude: float,
         units: str,
         vector: QVector3D,

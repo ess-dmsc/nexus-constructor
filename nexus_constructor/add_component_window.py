@@ -489,11 +489,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         # remove previous fields
-        self.component_to_edit.children = []
-
-        self.component_to_edit.name = component_name
-        self.component_to_edit.nx_class = nx_class
-        self.component_to_edit.description = description
+        if self.component_to_edit:
+            self.component_to_edit.children = []
+            self.component_to_edit.name = component_name
+            self.component_to_edit.nx_class = nx_class
+            self.component_to_edit.description = description
 
         self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
@@ -575,7 +575,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         Instruct the PixelOptions widget to carry out another check for input validity.
         """
-        self.pixel_options.update_pixel_input_validity()
+        if self.pixel_options:
+            self.pixel_options.update_pixel_input_validity()
 
 
 def get_fields_and_update_functions_for_component(component: Component):

@@ -122,3 +122,8 @@ venv.bak/
 
 # Allow JSON schemas
 !*.schema.json
+
+# Mac log file
+.DS_Store
+nexus-constructor/.DS_Store
+resources/.DS_Store

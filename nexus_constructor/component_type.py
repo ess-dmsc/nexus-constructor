@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import Dict, List
 
 import xmltodict
 
@@ -53,8 +53,8 @@ def make_dictionary_of_class_definitions(
 ):
     base_class_dir = os.path.join(repo_directory, "base_classes")
 
-    component_definitions = {}
-    all_class_definitions = {}
+    component_definitions: Dict[str, List] = {}
+    all_class_definitions: Dict[str, List] = {}
     for base_class_file in __list_base_class_files(os.listdir(base_class_dir)):
         with open(os.path.join(base_class_dir, base_class_file)) as def_file:
             _create_base_class_dict(
