@@ -133,7 +133,7 @@ class Transformation(Dataset):
     def dependents(self) -> List[Union["Transformation", "Component"]]:
         return self._dependents
 
-    def deregister_dependent(self, old_dependent: ["Transformation", "Component"]):
+    def deregister_dependent(self, old_dependent: Union["Transformation", "Component"]):
         try:
             self._dependents.remove(old_dependent)
         except ValueError:

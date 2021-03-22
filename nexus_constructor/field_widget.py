@@ -109,7 +109,7 @@ class FieldWidget(QFrame):
         )
         self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
 
-        self.field_type_combo = QComboBox()
+        self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
 
@@ -117,11 +117,11 @@ class FieldWidget(QFrame):
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
-        self.value_type_combo = QComboBox()
+        self.value_type_combo: QComboBox = QComboBox()
         self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
-        self.value_line_edit = QLineEdit()
+        self.value_line_edit: QLineEdit = QLineEdit()
         self.value_line_edit.setPlaceholderText("value")
 
         self._set_up_value_validator(False)

@@ -162,9 +162,7 @@ class ComponentTreeModel(QAbstractItemModel):
         elif isinstance(node.internalPointer(), LinkTransformation):
             self._remove_link(node)
 
-    def add_transformation(
-        self, parent_index: QModelIndex, transformation_type: TransformationType
-    ):
+    def add_transformation(self, parent_index: QModelIndex, transformation_type: str):
         parent_item = parent_index.internalPointer()
         transformation_list = None
         parent_component = None
@@ -249,7 +247,7 @@ class ComponentTreeModel(QAbstractItemModel):
         :param transformation_list: transformation list of parent_component
         """
         if isinstance(parent_item, Component):
-            if not hasattr(parent_item, "stored_transforms"):
+            if not parent_item.stored_transforms:
                 parent_item.stored_transforms = parent_item.transforms
             transformation_list = parent_item.stored_transforms
             parent_component = parent_item
@@ -287,11 +285,11 @@ class ComponentTreeModel(QAbstractItemModel):
 
         if isinstance(parent_item, Component):
             if row == 0:
-                if not hasattr(parent_item, "component_info"):
+                if not parent_item.component_info:
                     parent_item.component_info = ComponentInfo(parent_item)
                 return self.createIndex(0, 0, parent_item.component_info)
             elif row == 1:
-                if not hasattr(parent_item, "stored_transforms"):
+                if not parent_item.stored_transforms:
                     parent_item.stored_transforms = parent_item.transforms
                 return self.createIndex(1, 0, parent_item.stored_transforms)
             else:

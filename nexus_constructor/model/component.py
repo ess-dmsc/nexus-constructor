@@ -83,6 +83,10 @@ class Component(Group):
     _depends_on = attr.ib(type=Transformation, default=None)
     has_link = attr.ib(type=bool, default=None)
 
+    def __init__(self):
+        self.stored_transforms = None
+        self.component_info = None
+
     @property
     def depends_on(self) -> "Transformation":
         return self._depends_on
