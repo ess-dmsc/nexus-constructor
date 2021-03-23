@@ -44,8 +44,8 @@ def load_geometry_from_file_object(
     file: StringIO,
     extension: str,
     units: str,
-    geometry: OFFGeometry = OFFGeometryNoNexus(),
-) -> OFFGeometryNexus:
+    geometry: OFFGeometryNoNexus = OFFGeometryNoNexus(),
+) -> OFFGeometryNoNexus:
     """
     Loads geometry from a file object into an OFFGeometry instance
 

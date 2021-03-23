@@ -415,7 +415,7 @@ class Component(Group):
             logging.info(
                 "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
             )
-            return
+            return None
         try:
             z_offsets = self.get_field_value(Z_PIXEL_OFFSET)
         except AttributeError:

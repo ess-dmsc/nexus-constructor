@@ -1,4 +1,4 @@
-from typing import List, TypeVar, Union
+from typing import Iterable, List, TypeVar, Union
 
 import attr
 
@@ -48,7 +48,8 @@ JsonWarning = Union[
     NXClassAttributeMissing,
 ]
 
-_T = TypeVar("_T", JsonWarning, "JsonWarningsContainer")
+
+_T = TypeVar("_T", bound=JsonWarning)
 
 
 class JsonWarningsContainer(List[JsonWarning]):
@@ -104,7 +105,7 @@ class JsonWarningsContainer(List[JsonWarning]):
                 f" Item can only be inserted if it is of type in {self._CHECK_TYPES}"
             )
 
-    def __add__(self, other: "JsonWarningsContainer") -> "JsonWarningsContainer":
+    def __add__(self, other: List[JsonWarning]) -> List[JsonWarning]:
         """
         Overriding the primitive add operation in list by checking that
         other is of type JsonWarningsContainer.
@@ -114,7 +115,7 @@ class JsonWarningsContainer(List[JsonWarning]):
         else:
             raise TypeError("It is only possible to add a JsonWarningsContainer.")
 
-    def __iadd__(self, other: "JsonWarningsContainer") -> "JsonWarningsContainer":
+    def __iadd__(self, other: Iterable[JsonWarning]) -> List[JsonWarning]:
         """
         Overriding the primitive add-assign operation in list by checking that
         other is of type JsonWarningsContainer.

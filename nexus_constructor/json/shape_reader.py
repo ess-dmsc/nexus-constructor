@@ -270,6 +270,7 @@ class ShapeReader:
                     f"{self.error_message} Couldn't find {dataset_name} dataset."
                 )
             )
+        return None
 
     def _find_and_validate_data_type(
         self, dataset: Dict, expected_types: List[str], parent_name: str
