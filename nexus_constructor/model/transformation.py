@@ -176,12 +176,13 @@ class Transformation(Dataset):
                 },
             }
         elif isinstance(self.values, StreamGroup):
-            return self.values.as_dict()["children"]
+            return_dict = self.values.as_dict()["children"][0]
+            # TODO for loop for multiple transformations
         # TODO elif array, NXlog, kafka stream, ...
-        if self.attributes:
+        if self.attributes + self.values.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = [
                 attribute.as_dict()
-                for attribute in self.attributes
+                for attribute in self.attributes + self.values.attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
             ]
             try:
