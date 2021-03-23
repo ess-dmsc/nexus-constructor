@@ -59,7 +59,9 @@ class JsonWarningsContainer(List[JsonWarning]):
     """
 
     def __init__(self, *args, **kwargs):
-        self._CHECK_TYPES = (JsonWarning.__args__, type(self))
+        # Using type ignore here as API for typing package is very limited and
+        # __args__ has to be used.
+        self._CHECK_TYPES = (JsonWarning.__args__, type(self))  # type: ignore
         self.__add_constructor_param_items(args)
         self.__add_constructor_param_items(kwargs)
 

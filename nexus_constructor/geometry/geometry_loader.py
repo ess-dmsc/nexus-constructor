@@ -14,7 +14,7 @@ from nexus_constructor.unit_utils import METRES, calculate_unit_conversion_facto
 
 
 def load_geometry(
-    filename: str, units: str, geometry: OFFGeometry = OFFGeometryNoNexus()
+    filename: str, units: str, geometry: OFFGeometryNoNexus = OFFGeometryNoNexus()
 ) -> OFFGeometryNexus:
     """
     Loads geometry from a file into an OFFGeometry instance

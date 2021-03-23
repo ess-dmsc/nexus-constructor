@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Union
+from typing import Dict, Union
 
 import attr
 
@@ -91,7 +91,7 @@ class EV42Stream:
     nexus_chunk_chunk_kb = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        dict = {
+        dict: Dict = {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
                 WRITER_MODULE: self.writer_module,
@@ -125,7 +125,7 @@ class F142Stream:
     store_latest_into = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        dict = {
+        dict: Dict = {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
                 WRITER_MODULE: self.writer_module,

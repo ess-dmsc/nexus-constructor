@@ -306,6 +306,8 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.stop_file_writing_button.setEnabled(False)
 
     def stop_file_writing_clicked(self):
+        if not self.command_producer:
+            return
         selected_files = self.files_list.selectedIndexes()
         for index in selected_files:
             for fileKey in self.known_files:

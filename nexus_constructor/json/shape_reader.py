@@ -562,14 +562,14 @@ class ShapeReader:
                 self.component.set_field_value(
                     DETECTOR_NUMBER, detector_number, detector_number_dtype
                 )
-                if isinstance(self.shape, CylindricalGeometry):
+                if self.shape and isinstance(self.shape, CylindricalGeometry):
                     self.shape.detector_number = detector_number
 
     def _handle_mapping(self, children: List[Dict]):
         shape_group = self._get_shape_dataset_from_list(
             SHAPE_GROUP_NAME, children, False
         )
-        if shape_group:
+        if shape_group and self.shape:
             detector_faces_dataset = self._get_shape_dataset_from_list(
                 DETECTOR_FACES, shape_group[CommonKeys.CHILDREN], False
             )
