@@ -1,7 +1,6 @@
 import os
 import sys
 from collections import Callable
-from typing import Any
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QColor, QIcon
@@ -38,7 +37,7 @@ else:
 def create_and_add_toolbar_action(
     icon_path: str,
     mouse_over_text: str,
-    trigger_method: Callable[[], Any],
+    trigger_method: Callable,
     component_tool_bar: QToolBar,
     component_tree_view_tab: QWidget,
     set_enabled: bool = False,
