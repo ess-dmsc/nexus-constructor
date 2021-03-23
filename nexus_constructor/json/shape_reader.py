@@ -440,7 +440,7 @@ class ShapeReader:
                     f"{self.error_message} Unable to find values in {parent_name} dataset."
                 )
             )
-            return
+            return None
 
     def _attribute_is_a_list(self, attribute: Any, parent_name: str) -> bool:
         """
@@ -473,7 +473,7 @@ class ShapeReader:
                     f"{self.error_message} Unable to find children list in shape group."
                 )
             )
-            return
+            return None
 
     @property
     def name(self) -> str:
@@ -503,18 +503,18 @@ class ShapeReader:
         """
         values = self._get_values_attribute(dataset, attribute_name)
         if not values:
-            return
+            return None
 
         if not self._attribute_is_a_list(values, attribute_name):
-            return
+            return None
 
         if not self._validate_list_size(dataset, values, attribute_name):
-            return
+            return None
 
         if not self._all_in_list_have_expected_type(
             values, expected_types, attribute_name
         ):
-            return
+            return None
 
         return values
 

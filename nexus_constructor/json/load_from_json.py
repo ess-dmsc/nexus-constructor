@@ -102,6 +102,7 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     for item in children:
         if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
             return item
+    return None
 
 
 def _add_field_to_group(item: Dict, group: Group):
@@ -172,6 +173,8 @@ def _create_stream(json_object: Dict) -> Stream:
         return SENVStream(source=source, topic=topic)
     if writer_module == WriterModules.TDCTIME.value:
         return TDCTStream(source=source, topic=topic)
+
+    return None
 
 
 def __create_ev42_stream(

@@ -88,3 +88,4 @@ def find_field_type(item: Union[Dataset, StreamGroup, Link]) -> Callable:
         logging.debug(
             f"Object {item.name} not handled as field - could be used for other parts of UI instead"
         )
+        return None

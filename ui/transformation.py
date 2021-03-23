@@ -1,20 +1,21 @@
-from PySide2.QtCore import QSize, QMetaObject
+from PySide2.QtCore import QMetaObject, QSize
 from PySide2.QtWidgets import (
-    QLabel,
-    QFormLayout,
     QApplication,
     QDoubleSpinBox,
-    QHBoxLayout,
+    QFormLayout,
     QFrame,
+    QHBoxLayout,
+    QLabel,
     QLineEdit,
     QVBoxLayout,
 )
 
 from nexus_constructor.field_widget import FieldWidget
+from nexus_constructor.transformation_view import EditTransformation
 
 
 class Ui_Transformation(object):
-    def setupUi(self, Transformation: "EditTransformation"):
+    def setupUi(self, Transformation: EditTransformation):
         Transformation.setObjectName("Transformation")
         Transformation.resize(361, 171)
         self.frame_layout = QVBoxLayout(Transformation)
@@ -82,7 +83,7 @@ class Ui_Transformation(object):
         font.setBold(True)
         label.setFont(font)
 
-    def _set_up_vector_box(self, Transformation: "EditTransformation"):
+    def _set_up_vector_box(self, Transformation: EditTransformation):
         self.xyz_layout = QHBoxLayout()
 
         self.x_layout = QFormLayout()
