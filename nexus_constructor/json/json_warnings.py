@@ -115,7 +115,7 @@ class JsonWarningsContainer(List[JsonWarning]):
         else:
             raise TypeError("It is only possible to add a JsonWarningsContainer.")
 
-    def __iadd__(self, other: Iterable[JsonWarning]) -> List[JsonWarning]:
+    def __iadd__(self, other: Iterable[JsonWarning]) -> "JsonWarningsContainer":
         """
         Overriding the primitive add-assign operation in list by checking that
         other is of type JsonWarningsContainer.

@@ -304,6 +304,8 @@ class ShapeReader:
                 )
             )
 
+        return None
+
     def _find_and_validate_units(self, vertices_dataset: Dict) -> Union[str, None]:
         """
         Attempts to retrieve and validate the units data.
