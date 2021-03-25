@@ -48,22 +48,22 @@ class OFFGeometry(ABC):
     def off_geometry(self) -> "OFFGeometry":
         pass
 
-    @property
+    @property  # type: ignore
     @abstractmethod
     def vertices(self) -> List[QVector3D]:
         pass
 
-    @vertices.setter
+    @vertices.setter  # type: ignore
     @abstractmethod
     def vertices(self, new_vertices: List[QVector3D]):
         pass
 
-    @property
+    @property  # type: ignore
     @abstractmethod
     def faces(self) -> List[List[int]]:
         pass
 
-    @faces.setter
+    @faces.setter  # type: ignore
     @abstractmethod
     def faces(self, new_faces: List[List[int]]):
         pass
