@@ -197,7 +197,7 @@ class ChopperChecker:
     def __init__(self, fields_widget: QListWidget):
         self.fields_dict = {}
         self.units_dict: Dict[str, str] = {}
-        self.converted_values = {}
+        self.converted_values: Dict = {}
         self._chopper_details = None
 
         for i in range(fields_widget.count()):

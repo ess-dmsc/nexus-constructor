@@ -19,7 +19,7 @@ class Point:
         self.x = x
         self.y = y
         self.z = z
-        self.id = None
+        self.id: int = None
 
     def set_id(self, index: int):
         """
@@ -58,7 +58,7 @@ class DiskChopperGeometryCreator:
     def __init__(self, chopper_details: ChopperDetails):
 
         self.points: List[Point] = []
-        self.faces = []
+        self.faces: List[List[int]] = []
         self.resolution = RESOLUTION
         self.resolution_angles = None
 

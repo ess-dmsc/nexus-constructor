@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 import attr
 
@@ -12,6 +12,9 @@ from nexus_constructor.model.helpers import (
     get_absolute_path,
 )
 from nexus_constructor.model.link import Link
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.stream import StreamGroup
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
@@ -27,7 +30,7 @@ class Group:
 
     name = attr.ib(type=str)
     parent_node = attr.ib(type="Node", default=None)
-    children = attr.ib(factory=list, init=False)
+    children = attr.ib(factory=List[Union[Dataset, Link, "StreamGroup"]], init=False)
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
 
