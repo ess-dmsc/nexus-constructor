@@ -268,7 +268,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def _set_time(
         model: QAbstractItemModel,
         current_index: Union[File, FileWriter],
-        current_time: str,
+        current_time: int,
         time_str: str,
     ):
         model.setData(model.index(current_index.row, 1), time_str)

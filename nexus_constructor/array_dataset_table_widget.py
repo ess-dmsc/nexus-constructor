@@ -127,7 +127,7 @@ class ArrayDatasetTableModel(QAbstractTableModel):
             return 1
         return self.array.shape[1]
 
-    def data(self, index: QModelIndex, role: int = ...) -> str:
+    def data(self, index: QModelIndex, role=...) -> str:
         if role == Qt.DisplayRole or role == Qt.EditRole:
             value = self.array[index.row()]
             if not np.isscalar(value):
@@ -143,7 +143,7 @@ class ArrayDatasetTableModel(QAbstractTableModel):
         )
 
     def headerData(
-        self, section: int, orientation: Qt.Orientation, role: int = ...  # noqa: W504
+        self, section: int, orientation: Qt.Orientation, role=...,  # noqa: W504
     ) -> typing.Any:
         if role == Qt.DisplayRole or role == Qt.EditRole:
             if orientation == Qt.Vertical:
@@ -152,7 +152,7 @@ class ArrayDatasetTableModel(QAbstractTableModel):
                 return f"{section:d}"
         return None
 
-    def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
+    def setData(self, index: QModelIndex, value: typing.Any, role=...) -> bool:
         if index.isValid() and role == Qt.EditRole and value:
             self.array[index.row()][index.column()] = value
             self.dataChanged.emit(index, index)

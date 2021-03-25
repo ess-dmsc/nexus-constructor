@@ -85,8 +85,8 @@ class EV42Stream:
     source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
     adc_pulse_debug = attr.ib(type=bool, default=None)
-    nexus_indices_index_every_mb = attr.ib(type=int, default=None)
-    nexus_indices_index_every_kb = attr.ib(type=int, default=None)
+    nexus_indices_index_every_mb = attr.ib(type=str, default=None)
+    nexus_indices_index_every_kb = attr.ib(type=str, default=None)
     nexus_chunk_chunk_mb = attr.ib(type=int, default=None)
     nexus_chunk_chunk_kb = attr.ib(type=int, default=None)
 
@@ -120,8 +120,8 @@ class F142Stream:
     value_units = attr.ib(type=str, default=None)
     array_size = attr.ib(type=float, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
-    nexus_indices_index_every_mb = attr.ib(type=int, default=None)
-    nexus_indices_index_every_kb = attr.ib(type=int, default=None)
+    nexus_indices_index_every_mb = attr.ib(type=str, default=None)
+    nexus_indices_index_every_kb = attr.ib(type=str, default=None)
     store_latest_into = attr.ib(type=int, default=None)
 
     def as_dict(self):

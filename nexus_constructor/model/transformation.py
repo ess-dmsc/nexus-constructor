@@ -168,7 +168,7 @@ class Transformation(Dataset):
 
         # TODO elif array, NXlog, kafka stream, ...
 
-        return_dict = {
+        return_dict: Dict = {
             CommonKeys.NAME: self.name,
             CommonKeys.TYPE: NodeType.DATASET,
             CommonKeys.VALUES: value if value is not None else [],

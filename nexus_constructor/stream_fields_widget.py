@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Union
 
 import numpy as np
 from PySide2.QtCore import Qt
@@ -285,7 +286,9 @@ class StreamFieldsWidget(QDialog):
 
         source = self.source_line_edit.text()
         topic = self.topic_line_edit.text()
-        stream = None
+        stream: Union[
+            F142Stream, EV42Stream, NS10Stream, SENVStream, HS00Stream, TDCTStream
+        ] = None
         type = self.type_combo.currentText()
         current_schema = self.schema_combo.currentText()
         if current_schema == WriterModules.F142.value:
