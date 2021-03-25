@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, List, Union
 
 if TYPE_CHECKING:
+    from nexus_constructor.model.attributes import Attributes
     from nexus_constructor.model.dataset import Dataset
     from nexus_constructor.model.group import Group
 
@@ -41,7 +42,7 @@ def _remove_item(list_to_remove_from: List[Any], item_name: str):
 
 
 def _set_item(
-    parent: Union["Dataset", "Group"],  # noqa: F821
+    parent: Union["Attributes", "Dataset", "Group"],  # noqa: F821
     list_to_look_in: List[Any],
     item_name: str,
     new_value: Any,

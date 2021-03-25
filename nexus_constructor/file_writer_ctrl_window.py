@@ -56,10 +56,10 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         super().__init__()
         self.settings = settings
         self.setupUi()
-        self.known_writers = {}
-        self.known_files = {}
-        self.status_consumer = None
-        self.command_producer = None
+        self.known_writers: Dict[str, FileWriter] = {}
+        self.known_files: Dict[str, File] = {}
+        self.status_consumer: StatusConsumer = None
+        self.command_producer: CommandProducer = None
 
     def _restore_settings(self):
         """
@@ -204,7 +204,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         if result is not None:
             if self.status_consumer is not None:
                 self.status_consumer.close()
-            self.status_consumer = kafka_obj_type(*result)
+            self.status_consumer = StatusConsumer(*result)
 
     def command_broker_timer_changed(self, kafka_obj_type: KafkaInterface):
         result = BrokerAndTopicValidator.extract_addr_and_topic(
@@ -213,7 +213,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         if result is not None:
             if self.command_producer is not None:
                 self.command_producer.close()
-            self.command_producer = kafka_obj_type(*result)
+            self.command_producer = CommandProducer(*result)
 
     def _update_writer_list(self, updated_list: Dict[str, Dict]):
         for key in updated_list:

@@ -74,7 +74,7 @@ class Transformation(Dataset):
         return self._ui_value
 
     @ui_value.setter
-    def ui_value(self, new_value: float):
+    def ui_value(self, new_value):
         if np.isscalar(new_value):
             value = new_value
         else:

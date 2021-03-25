@@ -1,5 +1,5 @@
 import logging
-from typing import List, Sequence
+from typing import Dict, List, Sequence
 
 import numpy as np
 from PySide2.QtWidgets import QListWidget
@@ -196,7 +196,7 @@ def _input_describes_valid_chopper(
 class ChopperChecker:
     def __init__(self, fields_widget: QListWidget):
         self.fields_dict = {}
-        self.units_dict = {}
+        self.units_dict: Dict[str, str] = {}
         self.converted_values = {}
         self._chopper_details = None
 

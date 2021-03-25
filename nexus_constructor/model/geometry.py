@@ -152,8 +152,10 @@ class CylindricalGeometry(Group):
         # so effectively any cylinder after the first one is ignored
         cylinders = self.cylinders.flatten()
         vertices = self.get_field_value(CommonAttrs.VERTICES)
-        return tuple(
-            numpy_array_to_qvector3d(vertices[cylinders[i], :]) for i in range(3)
+        return (
+            numpy_array_to_qvector3d(vertices[cylinders[0], :]),
+            numpy_array_to_qvector3d(vertices[cylinders[1], :]),
+            numpy_array_to_qvector3d(vertices[cylinders[2], :]),
         )
 
     @staticmethod
@@ -206,7 +208,8 @@ class CylindricalGeometry(Group):
         return QVector3D(0, 0, 1)
 
     @property
-    def off_geometry(self, steps: int = 10) -> OFFGeometry:
+    def off_geometry(self) -> OFFGeometry:
+        steps: int = 10
         unit_conversion_factor = calculate_unit_conversion_factor(self.units, METRES)
 
         # A list of vertices describing the circle at the bottom of the cylinder

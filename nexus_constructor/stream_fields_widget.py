@@ -409,7 +409,7 @@ class StreamFieldsWidget(QDialog):
         self.f142_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
         self.f142_store_latest_into_spinner.setValue(field.store_latest_into)
 
-    def update_existing_stream_info(self, field: StreamGroup):
+    def update_existing_stream_info(self, field):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group

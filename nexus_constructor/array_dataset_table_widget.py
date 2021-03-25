@@ -133,6 +133,7 @@ class ArrayDatasetTableModel(QAbstractTableModel):
             if not np.isscalar(value):
                 value = value[index.column()]
             return str(value)
+        return None
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         return (

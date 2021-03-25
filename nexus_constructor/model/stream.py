@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 import attr
 
@@ -187,6 +187,8 @@ Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00S
 
 @attr.s
 class StreamGroup(Group):
+    children = attr.ib(factory=List[Stream], init=False)
+
     def __setitem__(
         self, key: str, value: Stream,
     ):
