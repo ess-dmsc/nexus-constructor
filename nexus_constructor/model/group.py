@@ -29,6 +29,7 @@ class Group:
     parent_node = attr.ib(type="Node", default=None)
     children = attr.ib(factory=list, init=False)
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+    values = None
 
     def __getitem__(self, key: str):
         return _get_item(self.children, key)

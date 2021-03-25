@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import attr
 import numpy as np
@@ -12,7 +12,7 @@ from nexus_constructor.model.value_type import ValueType
 @attr.s
 class Dataset:
     name = attr.ib(type=str)
-    values = attr.ib(type=List[ValueType])
+    values = attr.ib(type=Union[List[ValueType], ValueType])
     type = attr.ib(type=str)
     size = attr.ib(factory=tuple)
     parent_node = attr.ib(type="Node", default=None)

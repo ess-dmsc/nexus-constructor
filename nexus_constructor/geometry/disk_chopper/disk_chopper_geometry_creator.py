@@ -57,7 +57,7 @@ class DiskChopperGeometryCreator:
 
     def __init__(self, chopper_details: ChopperDetails):
 
-        self.points = []
+        self.points: List[Point] = []
         self.faces = []
         self.resolution = RESOLUTION
         self.resolution_angles = None

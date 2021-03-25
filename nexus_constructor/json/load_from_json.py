@@ -116,6 +116,7 @@ def _add_field_to_group(item: Dict, group: Group):
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
     else:
         child_name = item[CommonKeys.NAME]
+        child: Union[Group, Link, Dataset]
         if (
             child_name not in CHILD_EXCLUDELIST
         ):  # ignore transforms, shape etc as these are handled separately
