@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, List, Tuple, Union
+from typing import TYPE_CHECKING, Callable, List, Tuple, Union
 
 import numpy as np
 
@@ -11,8 +11,13 @@ from nexus_constructor.model.link import Link
 from nexus_constructor.model.stream import StreamGroup
 from nexus_constructor.validators import FieldType
 
+if TYPE_CHECKING:
+    from PySide2.QtWidgets import QFrame  # noqa: F401
 
-def update_existing_link_field(field: Link, new_ui_field: FieldWidget):
+    from nexus_constructor.stream_fields_widget import StreamFieldsWidget  # noqa: F401
+
+
+def update_existing_link_field(field: Link, new_ui_field: "QFrame"):
     """
     Fill in a UI link field for an existing link in the component
     :param field: The link field in the component group
@@ -48,7 +53,9 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     __update_existing_dataset_field(field, new_ui_field)
 
 
-def update_existing_stream_field(field: StreamGroup, new_ui_field: FieldWidget):
+def update_existing_stream_field(
+    field: StreamGroup, new_ui_field: "StreamFieldsWidget"
+):
     """
     Fill in a UI stream field for an existing stream field in the component group
     :param field: The dataset to copy into the value line edit

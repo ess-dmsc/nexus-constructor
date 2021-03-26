@@ -414,6 +414,22 @@ class NoShapeGeometry:
     Dummy object for components with no geometry.
     """
 
+    @property
+    def cylinders(self):
+        return None
+
+    @cylinders.setter
+    def cylinders(self, value):
+        pass
+
+    @property
+    def detector_number(self):
+        return None
+
+    @detector_number.setter
+    def detector_number(self, value):
+        pass
+
     def __init__(self):
         pass
 

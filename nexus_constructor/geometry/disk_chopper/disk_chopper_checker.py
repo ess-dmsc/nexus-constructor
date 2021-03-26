@@ -198,7 +198,7 @@ class ChopperChecker:
         self.fields_dict = {}
         self.units_dict: Dict[str, str] = {}
         self.converted_values: Dict = {}
-        self._chopper_details = None
+        self._chopper_details: ChopperDetails = None
 
         for i in range(fields_widget.count()):
             widget = fields_widget.itemWidget(fields_widget.item(i))
