@@ -190,7 +190,7 @@ class StreamGroup(Group):
     children = attr.ib(factory=List[Stream], init=False)
 
     def __setitem__(
-        self, key: str, value: Stream,
+        self, key: str, value,
     ):
         self.children.append(value)
 
