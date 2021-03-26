@@ -105,7 +105,9 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     return None
 
 
-def _add_field_to_group(item: Dict, group: Group):
+# Group should be a StreamGroup but as the inheritance from base class Group is broken for attribute children
+# parameter group cannot be typed here.
+def _add_field_to_group(item: Dict, group):
     field_type = item[CommonKeys.TYPE]
     if (
         field_type == NodeType.STREAM
