@@ -14,6 +14,7 @@ from nexus_constructor.validators import FieldType
 if TYPE_CHECKING:
     from PySide2.QtWidgets import QFrame  # noqa: F401
 
+    from nexus_constructor.model.value_type import ValueType  # noqa: F401
     from nexus_constructor.stream_fields_widget import StreamFieldsWidget  # noqa: F401
 
 
@@ -81,7 +82,7 @@ def get_fields_with_update_functions(
     return items_with_update_functions
 
 
-def find_field_type(item: Union[Dataset, StreamGroup, Link]) -> Callable:
+def find_field_type(item: "ValueType") -> Callable:
     if isinstance(item, Dataset) and item.name not in INVALID_FIELD_NAMES:
         if np.isscalar(item.values):
             return update_existing_scalar_field
@@ -93,6 +94,6 @@ def find_field_type(item: Union[Dataset, StreamGroup, Link]) -> Callable:
         return update_existing_link_field
     else:
         logging.debug(
-            f"Object {item.name} not handled as field - could be used for other parts of UI instead"
+            f"Object {item} not handled as field - could be used for other parts of UI instead"
         )
         return None
