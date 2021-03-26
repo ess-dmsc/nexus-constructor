@@ -88,7 +88,7 @@ class OFFGeometry(ABC):
         pass
 
 
-class OFFGeometryNoNexus(OFFGeometry):
+class OFFGeometryNoNexus(OFFGeometry, Group):
     """
     3D mesh description of the shape of an object, based on the OFF file format.
     This class does not store its data in the NeXus file, used for placeholder shape
