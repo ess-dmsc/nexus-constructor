@@ -1,7 +1,7 @@
 import logging
 import uuid
 from functools import partial
-from typing import Any, List, Union
+from typing import TYPE_CHECKING, Any, List, Union
 
 import numpy as np
 from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
@@ -36,6 +36,9 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.stream import StreamGroup
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -226,6 +229,7 @@ class FieldWidget(QFrame):
     @property
     def value(self) -> Union[Dataset, Group, Link, None]:
         dtype = self.value_type_combo.currentText()
+        return_object: Union[Dataset, StreamGroup, Link]
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
             return_object = Dataset(name=self.name, size=[1], type=dtype, values=val,)

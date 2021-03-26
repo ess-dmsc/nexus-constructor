@@ -29,7 +29,7 @@ class Group:
     """
 
     name = attr.ib(type=str)
-    parent_node = attr.ib(type="Node", default=None)
+    parent_node = attr.ib(type="Group", default=None)
     children = attr.ib(factory=List[Union[Dataset, Link, "StreamGroup"]], init=False)
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None

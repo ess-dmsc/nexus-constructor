@@ -5,6 +5,7 @@ import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.helpers import get_absolute_path
 from nexus_constructor.model.value_type import ValueType
 
@@ -15,7 +16,7 @@ class Dataset:
     values = attr.ib(type=Union[List[ValueType], ValueType])
     type = attr.ib(type=str)
     size = attr.ib(factory=tuple)
-    parent_node = attr.ib(type="Node", default=None)
+    parent_node = attr.ib(type=Group, default=None)
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
 
     @property
