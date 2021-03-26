@@ -59,7 +59,7 @@ class Transformation(Dataset):
         try:
             if isinstance(self.values, Dataset):
                 if np.isscalar(self.values.values):
-                    val: ValueType = self.values.values
+                    val: "ValueType" = self.values.values
                     self.ui_value = float(val)
                     return float(val)
                 else:
@@ -166,7 +166,7 @@ class Transformation(Dataset):
         value = None
         if isinstance(self.values, Dataset):
             if np.isscalar(self.values.values):
-                val: ValueType = self.values.values
+                val: "ValueType" = self.values.values
                 value = float(val)
 
         # TODO elif array, NXlog, kafka stream, ...
