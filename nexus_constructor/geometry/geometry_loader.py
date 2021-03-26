@@ -1,5 +1,5 @@
 import logging
-from io import StringIO
+from typing import BinaryIO, TextIO, Union
 
 from nexusutils.readwriteoff import parse_off_file
 from PySide2.QtGui import QVector3D
@@ -32,12 +32,12 @@ def load_geometry(
     except UnicodeDecodeError:
         # Try again in case the file is in binary. At least one of these should work when a user selects a file because
         # GeometryFileValidator inspects the file beforehand to check that it's valid.
-        with open(filename, "rb") as file:
-            return load_geometry_from_file_object(file, extension, units, geometry)
+        with open(filename, "rb") as file_bin:
+            return load_geometry_from_file_object(file_bin, extension, units, geometry)
 
 
 def load_geometry_from_file_object(
-    file: StringIO,
+    file: Union[BinaryIO, TextIO],
     extension: str,
     units: str,
     geometry: OFFGeometryNoNexus = OFFGeometryNoNexus(),
@@ -70,7 +70,7 @@ def load_geometry_from_file_object(
 
 
 def _load_off_geometry(
-    file: StringIO,
+    file: Union[BinaryIO, TextIO],
     mult_factor: float,
     geometry: OFFGeometryNoNexus = OFFGeometryNoNexus(),
 ) -> OFFGeometry:
@@ -95,7 +95,7 @@ def _load_off_geometry(
 
 
 def _load_stl_geometry(
-    file: StringIO,
+    file: Union[BinaryIO, TextIO],
     mult_factor: float,
     geometry: OFFGeometryNoNexus = OFFGeometryNoNexus(),
 ) -> OFFGeometry:
