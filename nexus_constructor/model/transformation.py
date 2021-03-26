@@ -16,6 +16,7 @@ from nexus_constructor.model.value_type import ValueTypes
 
 if TYPE_CHECKING:
     from nexus_constructor.model.component import Component  # noqa: F401
+    from nexus_constructor.model.value_type import ValueType  # noqa: F401
 
 
 @attr.s
@@ -58,8 +59,9 @@ class Transformation(Dataset):
         try:
             if isinstance(self.values, Dataset):
                 if np.isscalar(self.values.values):
-                    self.ui_value = float(self.values.values)
-                    return float(self.values.values)
+                    val: ValueType = self.values.values
+                    self.ui_value = float(val)
+                    return float(val)
                 else:
                     self.ui_value = float(self.values.values[0])
                     return float(self.values.values[0])
@@ -164,7 +166,8 @@ class Transformation(Dataset):
         value = None
         if isinstance(self.values, Dataset):
             if np.isscalar(self.values.values):
-                value = float(self.values.values)
+                val: ValueType = self.values.values
+                value = float(val)
 
         # TODO elif array, NXlog, kafka stream, ...
 
