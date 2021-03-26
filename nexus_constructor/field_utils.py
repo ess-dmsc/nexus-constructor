@@ -40,7 +40,7 @@ def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
 
 def __update_existing_dataset_field(field: Dataset, new_ui_field: FieldWidget):
     new_ui_field.dtype = field.type
-    new_ui_field.value = field.values
+    new_ui_field.value = field.values  # type: ignore
     new_ui_field.attrs = field
 
 
