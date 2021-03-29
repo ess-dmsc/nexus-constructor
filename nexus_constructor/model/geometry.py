@@ -106,6 +106,8 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
         :param faces: list of integer lists. Each sublist is a winding path around the corners of a polygon.
             Each sublist item is an index into the vertices list to identify a specific point in 3D space
         """
+        Group.__init__(self, name)
+        OFFGeometry.__init__(self)
         self.name = name
         self._vertices = vertices
         self._faces = faces
