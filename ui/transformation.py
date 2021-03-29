@@ -12,8 +12,9 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
+from nexus_constructor.field_widget import FieldWidget
+
 if TYPE_CHECKING:
-    from nexus_constructor.field_widget import FieldWidget
     from nexus_constructor.transformation_view import EditTransformation
 
 
