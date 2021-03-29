@@ -247,7 +247,7 @@ class ComponentTreeModel(QAbstractItemModel):
         :param transformation_list: transformation list of parent_component
         """
         if isinstance(parent_item, Component):
-            if not parent_item.stored_transforms:
+            if parent_item.stored_transforms is None:
                 parent_item.stored_transforms = parent_item.transforms
             transformation_list = parent_item.stored_transforms
             parent_component = parent_item
@@ -285,11 +285,11 @@ class ComponentTreeModel(QAbstractItemModel):
 
         if isinstance(parent_item, Component):
             if row == 0:
-                if not parent_item.component_info:
+                if parent_item.component_info is None:
                     parent_item.component_info = ComponentInfo(parent_item)
                 return self.createIndex(0, 0, parent_item.component_info)
             elif row == 1:
-                if not parent_item.stored_transforms:
+                if parent_item.stored_transforms is None:
                     parent_item.stored_transforms = parent_item.transforms
                 return self.createIndex(1, 0, parent_item.stored_transforms)
             else:
