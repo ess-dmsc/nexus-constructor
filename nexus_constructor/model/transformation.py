@@ -27,7 +27,7 @@ class Transformation(Dataset):
     """
 
     parent_component = attr.ib(type="Component", default=None)
-    _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
+    _dependents = attr.ib(type=list, init=False)
     _ui_value = attr.ib(type=float, default=None)
 
     @_dependents.default

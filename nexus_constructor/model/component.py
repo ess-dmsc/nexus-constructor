@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 import attr
 import numpy as np
@@ -48,6 +48,9 @@ from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.ui_utils import show_warning_dialog
 
+if TYPE_CHECKING:
+    from nexus_constructor.component_tree_model import ComponentInfo  # noqa: F401
+
 
 def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
     """
@@ -82,10 +85,8 @@ class Component(Group):
 
     _depends_on = attr.ib(type=Transformation, default=None)
     has_link = attr.ib(type=bool, default=None)
-
-    def __init__(self):
-        self.stored_transforms = None
-        self.component_info = None
+    component_info: "ComponentInfo" = None
+    stored_transforms: list = None
 
     @property
     def depends_on(self) -> "Transformation":

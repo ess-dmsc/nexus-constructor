@@ -28,9 +28,10 @@ class Group:
     Base class for any group which has a set of children and an nx_class attribute.
     """
 
+    children: List[Union[Dataset, Link, "StreamGroup"]]
     name = attr.ib(type=str)
     parent_node = attr.ib(type="Group", default=None)
-    children = attr.ib(factory=List[Union[Dataset, Link, "StreamGroup"]], init=False)
+    children = attr.ib(factory=list, init=False)
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
 
