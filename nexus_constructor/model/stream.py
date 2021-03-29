@@ -187,10 +187,12 @@ Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00S
 
 @attr.s
 class StreamGroup(Group):
-    children = attr.ib(factory=List[Stream], init=False)
+    # As the inheritance is broken for this class, type check with mypy must be ignored.
+    # Parent class Group has a different type hint for the list in the children attribute.
+    children: List[Stream] = attr.ib(factory=list, init=False)  # type: ignore
 
-    def __setitem__(
-        self, key: str, value,
+    def __setitem__(  # type: ignore
+        self, key: str, value: Stream,
     ):
         self.children.append(value)
 

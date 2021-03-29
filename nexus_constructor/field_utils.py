@@ -24,7 +24,7 @@ def update_existing_link_field(field: Link, new_ui_field: "QFrame"):
     :param field: The link field in the component group
     :param new_ui_field: The new UI field to fill in with existing data
     """
-    new_ui_field.field_type = FieldType.link.value
+    new_ui_field.field_type = FieldType.link
     new_ui_field.value = field.target
 
 
@@ -34,7 +34,7 @@ def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
     :param field: The dataset to copy to the UI fields list model
     :param new_ui_field: The new UI field to fill in with existing data
     """
-    new_ui_field.field_type = FieldType.array_dataset.value
+    new_ui_field.field_type = FieldType(FieldType.array_dataset.value)
     __update_existing_dataset_field(field, new_ui_field)
 
 
@@ -50,7 +50,7 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     :param field: The dataset to copy into the value line edit
     :param new_ui_field: The new UI field to fill in with existing data
     """
-    new_ui_field.field_type = FieldType.scalar_dataset.value
+    new_ui_field.field_type = FieldType(FieldType.scalar_dataset.value)
     __update_existing_dataset_field(field, new_ui_field)
 
 
@@ -62,7 +62,7 @@ def update_existing_stream_field(
     :param field: The dataset to copy into the value line edit
     :param new_ui_field: The new UI field to fill in with existing data
     """
-    new_ui_field.field_type = FieldType.kafka_stream.value
+    new_ui_field.field_type = FieldType.kafka_stream
     new_ui_field.streams_widget.update_existing_stream_info(field)
     new_ui_field.attrs = field
 

@@ -193,12 +193,12 @@ class FieldWidget(QFrame):
         )
 
     @property
-    def field_type(self) -> str:
-        return self.field_type_combo.currentText()
+    def field_type(self) -> FieldType:
+        return FieldType(self.field_type_combo.currentText())
 
     @field_type.setter
-    def field_type(self, field_type: str):
-        self.field_type_combo.setCurrentText(field_type)
+    def field_type(self, field_type: FieldType):
+        self.field_type_combo.setCurrentText(field_type.value)
         self.field_type_changed()
 
     @property
