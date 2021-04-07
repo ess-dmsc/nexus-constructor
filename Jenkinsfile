@@ -65,7 +65,7 @@ builders = pipeline_builder.createBuilders { container ->
     pipeline_builder.stage("Static type check") {
         container.sh """
                 cd ${project}
-                build_env/bin/mypy
+                build_env/bin/python -m mypy ./nexus_constructor
             """
     } // stage
     
