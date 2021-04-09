@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 import attr
 
@@ -13,6 +13,9 @@ from nexus_constructor.model.helpers import (
 )
 from nexus_constructor.model.link import Link
 
+if TYPE_CHECKING:
+    from nexus_constructor.model.stream import StreamGroup
+
 TRANSFORMS_GROUP_NAME = "transformations"
 
 
@@ -26,9 +29,12 @@ class Group:
     """
 
     name = attr.ib(type=str)
-    parent_node = attr.ib(type="Node", default=None)
-    children = attr.ib(factory=list, init=False)
+    parent_node = attr.ib(type="Group", default=None)
+    children: List[Union[Dataset, Link, "StreamGroup"]] = attr.ib(
+        factory=list, init=False
+    )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+    values = None
 
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
@@ -76,7 +82,10 @@ class Group:
         return self[name].values
 
     def as_dict(self) -> Dict[str, Any]:
-        return_dict = {CommonKeys.NAME: self.name, CommonKeys.TYPE: NodeType.GROUP}
+        return_dict: Dict = {
+            CommonKeys.NAME: self.name,
+            CommonKeys.TYPE: NodeType.GROUP,
+        }
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict()
         return_dict[CommonKeys.CHILDREN] = (

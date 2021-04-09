@@ -1,6 +1,6 @@
 import json
 import uuid
-from typing import Dict
+from typing import Dict, Optional
 from weakref import WeakKeyDictionary
 
 from nexusutils.nexusbuilder import NexusBuilder
@@ -35,7 +35,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.model = model
         self.nx_classes = nx_classes
         # For book-keeping all registered windows
-        self._registered_windows = WeakKeyDictionary()
+        self._registered_windows: WeakKeyDictionary = WeakKeyDictionary()
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
@@ -113,7 +113,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
 
             self.file_writer_ctrl_window = FileWriterCtrl(
-                self.model, QSettings("ess", "nexus-constructor")
+                QSettings("ess", "nexus-constructor")
             )
             self.file_writer_ctrl_window.show()
 
@@ -211,7 +211,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_component(component.name, shape, positions)
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
-    def show_add_component_window(self, component: Component = None):
+    def show_add_component_window(self, component: Optional[Component] = None):
         self.add_component_window = QDialogCustom()
         self.add_component_window.ui = AddComponentDialog(
             self.model,

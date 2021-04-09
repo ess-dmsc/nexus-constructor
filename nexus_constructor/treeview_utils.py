@@ -1,5 +1,6 @@
 import os
 import sys
+from collections import Callable
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QColor, QIcon
@@ -36,7 +37,7 @@ else:
 def create_and_add_toolbar_action(
     icon_path: str,
     mouse_over_text: str,
-    trigger_method: classmethod,
+    trigger_method: Callable,
     component_tool_bar: QToolBar,
     component_tree_view_tab: QWidget,
     set_enabled: bool = False,
@@ -119,7 +120,7 @@ def set_button_states(
             or not selected_object_is_not_link_transform,
         )
         if isinstance(selected_object, Component):
-            if not hasattr(selected_object, "stored_transforms"):
+            if selected_object.stored_transforms is None:
                 selected_object.stored_transforms = selected_object.transforms
             set_enabled_and_raise(
                 create_link_action, not selected_object.stored_transforms.has_link
@@ -199,7 +200,7 @@ def expand_transformation_list(
 
 
 def add_transformation(
-    transformation_type: TransformationType,
+    transformation_type: str,
     component_tree_view: QTreeView,
     component_model: ComponentTreeModel,
 ):

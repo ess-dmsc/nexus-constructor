@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Union
+from typing import Dict, List, Union
 
 import attr
 
@@ -85,13 +85,13 @@ class EV42Stream:
     source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
     adc_pulse_debug = attr.ib(type=bool, default=None)
-    nexus_indices_index_every_mb = attr.ib(type=int, default=None)
-    nexus_indices_index_every_kb = attr.ib(type=int, default=None)
+    nexus_indices_index_every_mb = attr.ib(type=str, default=None)
+    nexus_indices_index_every_kb = attr.ib(type=str, default=None)
     nexus_chunk_chunk_mb = attr.ib(type=int, default=None)
     nexus_chunk_chunk_kb = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        dict = {
+        dict: Dict = {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
                 WRITER_MODULE: self.writer_module,
@@ -120,12 +120,12 @@ class F142Stream:
     value_units = attr.ib(type=str, default=None)
     array_size = attr.ib(type=float, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
-    nexus_indices_index_every_mb = attr.ib(type=int, default=None)
-    nexus_indices_index_every_kb = attr.ib(type=int, default=None)
+    nexus_indices_index_every_mb = attr.ib(type=str, default=None)
+    nexus_indices_index_every_kb = attr.ib(type=str, default=None)
     store_latest_into = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        dict = {
+        dict: Dict = {
             CommonKeys.TYPE: NodeType.STREAM,
             NodeType.STREAM: {
                 WRITER_MODULE: self.writer_module,
@@ -187,7 +187,11 @@ Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00S
 
 @attr.s
 class StreamGroup(Group):
-    def __setitem__(
+    # As the inheritance is broken for this class, type check with mypy must be ignored.
+    # Parent class Group has a different type hint for the list in the children attribute.
+    children: List[Stream] = attr.ib(factory=list, init=False)  # type: ignore
+
+    def __setitem__(  # type: ignore
         self, key: str, value: Stream,
     ):
         self.children.append(value)

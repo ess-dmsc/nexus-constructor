@@ -32,9 +32,12 @@ def get_detector_faces_from_pixel_mapping(
     Returns a list of tuples. Each tuple contains a face ID followed by the face's detector ID.
     Corresponds to the detector_faces dataset structure of the NXoff_geometry class.
     """
-    detector_faces = [
-        (id[0], id[1]) for id in enumerate(mapping.pixel_ids) if id[1] is not None
-    ]
+    detector_faces: List[Tuple[int, int]] = []
+    idx: Tuple[int, int]
+    for idx in enumerate(mapping.pixel_ids):
+        if idx[1] is not None:
+            detector_faces.append((idx[0], idx[1]))
+
     return detector_faces
 
 

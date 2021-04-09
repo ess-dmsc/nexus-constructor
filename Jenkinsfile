@@ -61,6 +61,13 @@ builders = pipeline_builder.createBuilders { container ->
                 build_env/bin/flake8
             """
     } // stage
+
+    pipeline_builder.stage("Static type check") {
+        container.sh """
+                cd ${project}
+                build_env/bin/python -m mypy ./nexus_constructor
+            """
+    } // stage
     
     pipeline_builder.stage("Run tests") {
         def testsError = null

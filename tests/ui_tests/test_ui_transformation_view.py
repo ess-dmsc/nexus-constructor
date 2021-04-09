@@ -290,7 +290,7 @@ def test_UI_GIVEN_scalar_value_WHEN_creating_new_transformation_THEN_ui_values_s
     assert not view.transformation_frame.value_spinbox.isEnabled()
 
 
-@pytest.mark.parametrize("field_type", [item.value for item in FieldType][1:])
+@pytest.mark.parametrize("field_type", [item for item in FieldType][1:])
 def test_UI_GIVEN_change_to_non_scalar_value_WHEN_creating_new_transformation_THEN_ui_values_spinbox_is_enabled(
     qtbot, component, model, field_type
 ):
@@ -320,9 +320,7 @@ def test_UI_GIVEN_change_to_scalar_value_WHEN_creating_new_transformation_THEN_u
     transform.values = create_corresponding_value_dataset(value)
 
     view = EditTranslation(parent=None, transformation=transform, model=model)
-    view.transformation_frame.magnitude_widget.field_type = (
-        FieldType.scalar_dataset.value
-    )
+    view.transformation_frame.magnitude_widget.field_type = FieldType.scalar_dataset
     qtbot.addWidget(view)
 
     assert not view.transformation_frame.value_spinbox.isEnabled()

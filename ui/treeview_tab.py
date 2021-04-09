@@ -1,23 +1,23 @@
 from PySide2.QtCore import QModelIndex
 from PySide2.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QTreeView,
-    QToolBar,
     QAbstractItemView,
+    QToolBar,
+    QTreeView,
+    QVBoxLayout,
+    QWidget,
 )
 
+from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
+from nexus_constructor.model.model import Model
 from nexus_constructor.treeview_utils import (
-    create_and_add_toolbar_action,
     add_transformation,
+    create_and_add_toolbar_action,
     expand_transformation_list,
     set_button_states,
 )
-from nexus_constructor.common_attrs import TransformationType
-from nexus_constructor.model.model import Model
 
 
 class ComponentTreeViewTab(QWidget):
@@ -117,7 +117,7 @@ class ComponentTreeViewTab(QWidget):
     def _expand_transformation_list(self, node: QModelIndex):
         expand_transformation_list(node, self.component_tree_view, self.component_model)
 
-    def _add_transformation(self, transformation_type: TransformationType):
+    def _add_transformation(self, transformation_type: str):
         add_transformation(
             transformation_type, self.component_tree_view, self.component_model
         )

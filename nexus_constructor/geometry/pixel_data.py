@@ -67,4 +67,4 @@ class PixelMapping(PixelData):
     See http://download.nexusformat.org/sphinx/classes/base_classes/NXoff_geometry.html
     """
 
-    pixel_ids = attr.ib(list)
+    pixel_ids = attr.ib(default=[], type=list)
