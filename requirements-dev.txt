@@ -18,6 +18,9 @@ flake8
 mypy==0.812
 isort==5.7.0
 
+# Static type checking.
+mypy==0.812
+
 # Testing
 pytest
 pytest-cov
